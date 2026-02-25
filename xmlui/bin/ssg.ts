@@ -411,15 +411,25 @@ export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}
       throw new Error("failed to load renderPath from temporary SSG entry module");
     }
 
+    const writePromises: Promise<void>[] = [];
+
     for (const route of pathsToRender) {
       log(`rendering ${route}`);
       const rendered = renderModule.renderPath(route);
       const finalHtml = applyRenderToShell(shellHtml, rendered);
       const outputFile = getOutputHtmlPath(outPath, route);
-      await mkdir(path.dirname(outputFile), { recursive: true });
-      await writeFile(outputFile, finalHtml, "utf-8");
-      log(`wrote ${outputFile}`);
+      const dir = path.dirname(outputFile);
+
+      const writePromise = (async () => {
+        await mkdir(dir, { recursive: true });
+        await writeFile(outputFile, finalHtml, "utf-8");
+        log(`wrote ${outputFile}`);
+      })();
+      writePromises.push(writePromise);
     }
+
+    log("waiting for all writes to complete...");
+    await Promise.all(writePromises);
   } finally {
     await viteServer.close();
     await rm(tempEntryPath, { force: true });
