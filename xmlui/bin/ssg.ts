@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import "tsx";
-import { createServer, type InlineConfig } from "vite";
+import { build as viteBuild, type InlineConfig } from "vite";
 import { mkdir, readdir, readFile, rm, writeFile, cp } from "node:fs/promises";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import vm from "node:vm";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
@@ -325,6 +326,8 @@ export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
   const distPath = path.resolve(cwd, "dist");
+  const ssrBuildPath = path.resolve(cwd, ".xmlui-ssg-ssr");
+  const ssrBundlePath = path.join(ssrBuildPath, "render.mjs");
   const builtIndexPath = path.join(outPath, "index.html");
   const sourceIndexPath = path.resolve(cwd, "index.html");
   const tempEntryPath = path.resolve(cwd, TEMP_ENTRY_FILE_NAME);
@@ -383,28 +386,47 @@ export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}
       ]
     : { ...(existingAlias || {}), ...extensionAliases };
 
-  const viteServer = await createServer({
-    ...viteConfig,
-    resolve: {
-      ...(viteConfig.resolve || {}),
-      alias: mergedAlias,
-    },
-    appType: "custom",
-    server: {
-      middlewareMode: true,
-    },
-    define: {
-      ...(viteConfig.define || {}),
-      "process.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
-      "process.env.VITE_DEV_MODE": false,
-      "process.env.VITE_MOCK_ENABLED": false,
-      "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
-    },
-  } as InlineConfig);
-
   try {
-    const renderModule = (await viteServer.ssrLoadModule(
-      `/${TEMP_ENTRY_FILE_NAME}`,
+    log("building SSR module");
+    await rm(ssrBuildPath, { recursive: true, force: true });
+
+    await viteBuild({
+      ...viteConfig,
+      resolve: {
+        ...(viteConfig.resolve || {}),
+        alias: mergedAlias,
+      },
+      define: {
+        ...(viteConfig.define || {}),
+        "process.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
+        "process.env.VITE_DEV_MODE": false,
+        "process.env.VITE_MOCK_ENABLED": false,
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
+      },
+      build: {
+        ...(viteConfig.build || {}),
+        ssr: tempEntryPath,
+        outDir: ssrBuildPath,
+        emptyOutDir: true,
+        minify: false,
+        rollupOptions: {
+          ...(viteConfig.build?.rollupOptions || {}),
+          input: undefined,
+          output: {
+            ...(viteConfig.build?.rollupOptions?.output || {}),
+            entryFileNames: "render.mjs",
+            inlineDynamicImports: true,
+          },
+        },
+      },
+    } as InlineConfig);
+
+    if (!(await pathExists(ssrBundlePath))) {
+      throw new Error(`failed to build SSR bundle: ${ssrBundlePath}`);
+    }
+
+    const renderModule = (await import(
+      `${pathToFileURL(ssrBundlePath).href}?t=${Date.now()}`
     )) as RenderModule;
 
     if (!renderModule?.renderPath) {
@@ -431,8 +453,8 @@ export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}
     log("waiting for all writes to complete...");
     await Promise.all(writePromises);
   } finally {
-    await viteServer.close();
     await rm(tempEntryPath, { force: true });
+    await rm(ssrBuildPath, { recursive: true, force: true });
   }
 
   log(`completed. static files are in ${outPath}`);
