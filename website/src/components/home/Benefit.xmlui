@@ -1,6 +1,6 @@
 <Component name="Benefit">
   <HStack gap="$space-3">
-    <Icon name="valid" marginTop="6px" height="28px" width="28px" />
+    <Icon name="valid" marginTop="6px" height="12px" width="12px" />
     <VStack width="*">
       <Text fontSize="$fontSize-lg">
         {$props.children}

@@ -1,6 +1,6 @@
 <Component name="HeroApp">
     <Stack horizontalAlignment="center">
-      <Text>The active tab is a live XMLUI app. Try it! Then switch to the XML tab to see the code.</Text>
+      <Text>The UI tab is a live XMLUI app. Try it! Then switch to XML to see the code.</Text>
     </Stack>
     <Markdown>
         <![CDATA[

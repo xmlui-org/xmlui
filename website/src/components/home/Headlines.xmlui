@@ -21,10 +21,7 @@
         </CVStack>
         <VStack gap="$space-1" horizontalAlignment="center">
             <Text fontSize="{textSize}" lineHeight="{textLineHeight}">
-                Define your UI in any text editor.
-            </Text>
-            <Text fontSize="{textSize}" lineHeight="{textLineHeight}">
-                Create clean modern apps.
+                Make the frontend easy again
             </Text>
         </VStack>
     </VStack>
