@@ -539,6 +539,7 @@ export function externalScriptsFunction(){
     console.log(`\n✅ XMLUI Optimization successful!`);
     console.log(`Optimized build artifacts are located in your project at: ${hostOutputDir}`);
   } catch (error) {
+    console.error("\n❌ XMLUI Optimizer failed:");
     console.error(error.message || error);
     process.exit(1);
   } finally {
