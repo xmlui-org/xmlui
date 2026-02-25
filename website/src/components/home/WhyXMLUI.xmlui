@@ -1,9 +1,5 @@
 <Component name="WhyXMLUI">
-    <script>
-    function simpleContent() { return appGlobals.prefetchedContent['/pages/why-simple.md']; }
-    function reactiveContent() { return appGlobals.prefetchedContent['/pages/why-reactive.md']; }
-    </script>
-    <Markdown content="{simpleContent()}" />
-    <Markdown content="{reactiveContent()}" />
+    <Markdown content="{appGlobals.prefetchedContent['/pages/why-simple.md']}" />
+    <Markdown content="{appGlobals.prefetchedContent['/pages/why-reactive.md']}" />
 </Component>
 
