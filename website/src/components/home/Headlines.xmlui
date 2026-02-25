@@ -20,10 +20,10 @@
             </H1>
         </CVStack>
         <VStack gap="$space-1" horizontalAlignment="center">
-            <Text fontSize="{textSize}" lineHeight="{textLineHeight}" color="$color-secondary-0">
+            <Text fontSize="{textSize}" lineHeight="{textLineHeight}">
                 Define your UI in any text editor.
             </Text>
-            <Text fontSize="{textSize}" lineHeight="{textLineHeight}" color="$color-secondary-0">
+            <Text fontSize="{textSize}" lineHeight="{textLineHeight}">
                 Create clean modern apps.
             </Text>
         </VStack>
