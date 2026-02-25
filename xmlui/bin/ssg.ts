@@ -1,4 +1,11 @@
-#!/usr/bin/env node
+/**
+ *
+ # XMLUI SSG
+
+ xmlui-ssg is a static site generator (SSG) that produces HTML pages from your XMLUI applications, which are typically Single Page Applications (SPAs). It's most useful for websites with mainly static content, like blogs, documentations, marketing pages. These generated pages are fully indexable by search engines, boosting SEO.
+
+ The tool performs static analysis on your source code to identify <Page> components: if a route's URL is a plain string, it is marked for SSG, while routes with parameters (like /user/:id) are deferred to the client for dynamic handling. Currently, the implementation boots a temporary Remix server, which generates the HTML from XMLUI (React) components. It uses a web client to snapshot the generated HTML. This workflow will be further streamlined (eliminating the server-client aspect) once our core dependency, react-router is upgraded.
+ */
 
 import "tsx";
 import { build as viteBuild, type InlineConfig } from "vite";
