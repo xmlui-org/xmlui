@@ -220,6 +220,7 @@ export const Search = ({
       {collapsible && !isExpanded && animationDirection === null ? (
         <Button
           variant="ghost"
+          themeColor="secondary"
           icon={<Icon name="search" aria-hidden />}
           onClick={() => {
             setIsExpanded(true);
