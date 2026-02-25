@@ -2,7 +2,7 @@
 
 import "tsx";
 import { createServer, type InlineConfig } from "vite";
-import { mkdir, readFile, rm, writeFile, cp } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, writeFile, cp } from "node:fs/promises";
 import path from "node:path";
 import vm from "node:vm";
 import { build } from "./build";
@@ -25,6 +25,14 @@ type RenderModule = {
 };
 
 const TEMP_ENTRY_FILE_NAME = ".xmlui-ssg-entry.tsx";
+const EXTENSION_FILE_CANDIDATES = [
+  "extensions.ts",
+  "extensions.tsx",
+  "extensions.mts",
+  "extensions.mjs",
+  "extensions.cjs",
+  "extensions.js",
+];
 
 function log(message: string) {
   console.log(`[xmlui ssg] ${message}`);
@@ -128,7 +136,14 @@ function applyRenderToShell(shellHtml: string, renderResult: RenderResult): stri
   return html;
 }
 
-function getSsgEntrySource(): string {
+function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
+  const extensionLoaderLines = extensionImportSpecifiers
+    .map((spec, index) => {
+      const safeSpec = JSON.stringify(spec);
+      return `  try {\n    const m${index} = await import(${safeSpec});\n    extensions.push(m${index}.default ?? m${index});\n  } catch (error) {\n    console.warn(\"[xmlui ssg] failed to load extension ${spec}\");\n    console.error(error);\n  }`;
+    })
+    .join("\n");
+
   return `
 import React from "react";
 import { renderToString } from "react-dom/server";
@@ -142,14 +157,14 @@ import {
 
 const runtime = import.meta.glob("./src/**", { eager: true });
 
-let loadedExtensions: any = [];
-try {
-  const extensionModule = await import("./extensions");
-  loadedExtensions = extensionModule.default || [];
-  console.log("loaded extensions: ", loadedExtensions);
-} catch {
-  loadedExtensions = [];
+const loadedExtensions: any[] = [];
+async function loadExtensions() {
+  const extensions: any[] = [];
+${extensionLoaderLines}
+  return extensions;
 }
+
+loadedExtensions.push(...(await loadExtensions()));
 
 function createExtensionManager() {
   const extensionManager = new ExtMgr();
@@ -180,6 +195,130 @@ export function renderPath(pathname: string) {
   };
 }
 `;
+}
+
+async function findMonorepoRoot(startDir: string): Promise<string | null> {
+  let currentDir = startDir;
+  for (let depth = 0; depth < 12; depth++) {
+    const packageJsonPath = path.join(currentDir, "package.json");
+    if (await pathExists(packageJsonPath)) {
+      try {
+        const pkg = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+        if (pkg.workspaces) {
+          return currentDir;
+        }
+      } catch {
+        // ignore invalid package.json
+      }
+    }
+    const parent = path.dirname(currentDir);
+    if (parent === currentDir) {
+      break;
+    }
+    currentDir = parent;
+  }
+  return null;
+}
+
+async function getWorkspacePatterns(monorepoRoot: string): Promise<string[]> {
+  const packageJsonPath = path.join(monorepoRoot, "package.json");
+  const pkg = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+  if (Array.isArray(pkg.workspaces)) {
+    return pkg.workspaces;
+  }
+  if (Array.isArray(pkg.workspaces?.packages)) {
+    return pkg.workspaces.packages;
+  }
+  return [];
+}
+
+async function getExtensionImportSpecifiers(cwd: string): Promise<string[]> {
+  for (const fileName of EXTENSION_FILE_CANDIDATES) {
+    const filePath = path.join(cwd, fileName);
+    if (!(await pathExists(filePath))) {
+      continue;
+    }
+
+    const content = await readFile(filePath, "utf-8");
+    const matches = content.matchAll(/from\s+["']([^"']+)["']/g);
+    const result: string[] = [];
+    for (const match of matches) {
+      const spec = match[1];
+      if (!result.includes(spec)) {
+        result.push(spec);
+      }
+    }
+    return result;
+  }
+  return [];
+}
+
+async function getWorkspaceExtensionAliases(cwd: string): Promise<Record<string, string>> {
+  const extensionSpecs = new Set(
+    (await getExtensionImportSpecifiers(cwd)).filter(
+      (spec) => !spec.startsWith(".") && !spec.startsWith("/"),
+    ),
+  );
+
+  if (extensionSpecs.size === 0) {
+    return {};
+  }
+
+  const monorepoRoot = await findMonorepoRoot(cwd);
+  if (!monorepoRoot) {
+    return {};
+  }
+
+  const patterns = await getWorkspacePatterns(monorepoRoot);
+  const aliases: Record<string, string> = {};
+
+  for (const pattern of patterns) {
+    if (!pattern.endsWith("/*")) {
+      continue;
+    }
+    const patternBase = path.join(monorepoRoot, pattern.slice(0, -2));
+    if (!(await pathExists(patternBase))) {
+      continue;
+    }
+
+    const entries = await readdir(patternBase, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isDirectory()) {
+        continue;
+      }
+
+      const packageDir = path.join(patternBase, entry.name);
+      const packageJsonPath = path.join(packageDir, "package.json");
+      if (!(await pathExists(packageJsonPath))) {
+        continue;
+      }
+
+      try {
+        const pkg = JSON.parse(await readFile(packageJsonPath, "utf-8"));
+        const packageName = pkg.name as string | undefined;
+        if (!packageName || !extensionSpecs.has(packageName)) {
+          continue;
+        }
+
+        const sourceEntryCandidates = [
+          path.join(packageDir, "src", "index.tsx"),
+          path.join(packageDir, "src", "index.ts"),
+          path.join(packageDir, "src", "index.js"),
+        ];
+
+        for (const candidate of sourceEntryCandidates) {
+          if (await pathExists(candidate)) {
+            aliases[packageName] = candidate;
+            break;
+          }
+        }
+      } catch {
+        // ignore malformed workspace package.json
+      }
+    }
+  }
+
+  return aliases;
 }
 
 export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}) => {
@@ -222,12 +361,34 @@ export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}
     log(`route: ${route}`);
   }
 
+  const extensionImportSpecifiers = await getExtensionImportSpecifiers(cwd);
+  if (extensionImportSpecifiers.length > 0) {
+    log(`detected extensions: ${extensionImportSpecifiers.join(", ")}`);
+  }
+
   log("creating SSR module");
-  await writeFile(tempEntryPath, getSsgEntrySource(), "utf-8");
+  await writeFile(tempEntryPath, getSsgEntrySource(extensionImportSpecifiers), "utf-8");
 
   const viteConfig = await getViteConfig({});
+  const extensionAliases = await getWorkspaceExtensionAliases(cwd);
+  if (Object.keys(extensionAliases).length > 0) {
+    log(`using workspace extension aliases: ${Object.keys(extensionAliases).join(", ")}`);
+  }
+
+  const existingAlias = viteConfig.resolve?.alias;
+  const mergedAlias = Array.isArray(existingAlias)
+    ? [
+        ...existingAlias,
+        ...Object.entries(extensionAliases).map(([find, replacement]) => ({ find, replacement })),
+      ]
+    : { ...(existingAlias || {}), ...extensionAliases };
+
   const viteServer = await createServer({
     ...viteConfig,
+    resolve: {
+      ...(viteConfig.resolve || {}),
+      alias: mergedAlias,
+    },
     appType: "custom",
     server: {
       middlewareMode: true,
