@@ -805,6 +805,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             traceId: w._xsCurrentTrace,
             kind: "selection:change",
             component: "Tree",
+            displayLabel: node ? node.name : null,
             selectedId: node ? String(node.key) : null,
             selectedName: node ? node.name : null,
           });

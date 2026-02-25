@@ -543,6 +543,7 @@ export default function useRowSelection({
           traceId: w._xsCurrentTrace,
           kind: "selection:change",
           component: "Table",
+          displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
           selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
           selectedCount: selectedItems.length,
         });

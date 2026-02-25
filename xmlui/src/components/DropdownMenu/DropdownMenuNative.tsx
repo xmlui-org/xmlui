@@ -274,6 +274,7 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: w._xsCurrentTrace,
           kind: "submenu:open",
+          displayLabel: label,
           componentLabel: label,
           ariaRole: "menuitem",
           ariaName: label,

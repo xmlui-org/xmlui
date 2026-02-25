@@ -244,6 +244,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
             traceId: w._xsCurrentTrace,
             kind: "focus:change",
             component: "NavGroup",
+            displayLabel: label,
             label,
             expanded: newExpanded,
           });
@@ -367,6 +368,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
                 traceId: w._xsCurrentTrace,
                 kind: "focus:change",
                 component: "NavGroup",
+                displayLabel: label,
                 label,
                 expanded: open,
               });
