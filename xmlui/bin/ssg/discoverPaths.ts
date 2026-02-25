@@ -152,7 +152,7 @@ export async function discoverPaths(cwd: string): Promise<string[]> {
       continue;
     }
     const relative = path.relative(contentDir, filePath).replace(/\\/g, "/");
-    if (relative.startsWith("pages/")) {
+    if (relative.startsWith("pages/") || relative.includes("/pages/")) {
       continue;
     }
     discovered.add(normalizeRoute(`/${relative.replace(/\.md$/, "")}`));
