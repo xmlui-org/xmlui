@@ -47,12 +47,6 @@
       <HStack gap="0">
         <NavLink
           noIndicator
-          label="Home"
-          to="/"
-          active="{currentSegment === 'home'}"
-        />
-        <NavLink
-          noIndicator
           label="Docs"
           to="/docs"
           active="{currentSegment === 'docs'}"
