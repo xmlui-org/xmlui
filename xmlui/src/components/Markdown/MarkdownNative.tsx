@@ -1,4 +1,11 @@
-import React, { type CSSProperties, forwardRef, memo, type ReactNode, useRef, useMemo } from "react";
+import React, {
+  type CSSProperties,
+  forwardRef,
+  memo,
+  type ReactNode,
+  useRef,
+  useMemo,
+} from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
@@ -67,9 +74,7 @@ function PreTagComponent({ id, children, codeHighlighter }) {
 
   const defaultCodefence = (
     <CodeBlock>
-      <CodeText uid={id}>
-        {children}
-      </CodeText>
+      <CodeText uid={id}>{children}</CodeText>
     </CodeBlock>
   );
 
@@ -81,13 +86,10 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   if (!highlighterResult) {
     return defaultCodefence;
   }
-  
+
   return (
     <CodeBlock meta={highlighterResult.meta} textToCopy={highlighterResult.codeStr}>
-      <CodeText
-        uid={id}
-        dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }}
-      />
+      <CodeText uid={id} dangerouslySetInnerHTML={{ __html: highlighterResult.cleanedHtmlStr }} />
     </CodeBlock>
   );
 }
@@ -211,12 +213,17 @@ export const Markdown = memo(
             nonEmptySiblings[0].properties?.["data-pg-content"]
           ) {
             const sampElement = nonEmptySiblings[0];
-            
+
             // Replace the paragraph with the samp element by modifying the parent's children
-            if (parent && parent.children && Array.isArray(parent.children) && typeof index === "number") {
+            if (
+              parent &&
+              parent.children &&
+              Array.isArray(parent.children) &&
+              typeof index === "number"
+            ) {
               parent.children.splice(index, 1, sampElement);
             }
-            
+
             // Return the sampElement to continue visiting from there
             return index;
           }
@@ -234,7 +241,7 @@ export const Markdown = memo(
           { [styles.truncateLinks]: truncateLinks },
           overflowClasses,
           breakClasses,
-          className
+          className,
         )}
         style={style}
       >
@@ -340,9 +347,9 @@ export const Markdown = memo(
               if ((node as any)?.children?.[0]?.tagName === "samp") {
                 return <>{children}</>;
               }
-              
+
               return (
-                <Text variant="paragraph" className={styles.markdown} uid={id} >
+                <Text variant="paragraph" className={styles.markdown} uid={id}>
                   {children}
                 </Text>
               );
@@ -442,17 +449,17 @@ export const Markdown = memo(
               // Exclude web page extensions that should navigate instead
               if (href) {
                 // Remove query parameters and hash fragments
-                const pathOnly = href.split('?')[0].split('#')[0];
-                
+                const pathOnly = href.split("?")[0].split("#")[0];
+
                 // Match file extension pattern: ends with .{2-5 alphanumeric chars}
                 const fileExtensionMatch = pathOnly.match(/\.([a-zA-Z0-9]{2,5})$/);
-                
+
                 if (fileExtensionMatch) {
                   const extension = fileExtensionMatch[1].toLowerCase();
-                  
+
                   // Web page extensions that should navigate, not download
-                  const navigableExtensions = ['html', 'htm', 'php', 'asp', 'aspx', 'jsp', 'xhtml'];
-                  
+                  const navigableExtensions = ["html", "htm", "php", "asp", "aspx", "jsp", "xhtml"];
+
                   // If it has a file extension and it's not a navigable web page, trigger download
                   if (!navigableExtensions.includes(extension)) {
                     props.download = true;
@@ -487,13 +494,25 @@ export const Markdown = memo(
               );
             },
             tr({ children, ...props }) {
-              return <tr className={styles.htmlTr} {...props}>{children}</tr>;
+              return (
+                <tr className={styles.htmlTr} {...props}>
+                  {children}
+                </tr>
+              );
             },
             td({ children, ...props }) {
-              return <td className={styles.htmlTd} {...props}>{children}</td>;
+              return (
+                <td className={styles.htmlTd} {...props}>
+                  {children}
+                </td>
+              );
             },
             th({ children, ...props }) {
-              return <th className={styles.htmlTh} {...props}>{children}</th>;
+              return (
+                <th className={styles.htmlTh} {...props}>
+                  {children}
+                </th>
+              );
             },
             thead({ children }) {
               return <thead className={styles.htmlThead}>{children}</thead>;
@@ -506,11 +525,13 @@ export const Markdown = memo(
             },
             samp({ ...props }) {
               const markdownContentBase64 = props?.["data-pg-markdown"];
-              const markdownContent = markdownContentBase64 ? decodeFromBase64(markdownContentBase64) : "";
+              const markdownContent = markdownContentBase64
+                ? decodeFromBase64(markdownContentBase64)
+                : "";
               const dataContentBase64 = props?.["data-pg-content"];
               const jsonContent = decodeFromBase64(dataContentBase64);
               const appProps = JSON.parse(jsonContent);
-              return (
+              const content = (
                 <NestedAppAndCodeViewNative
                   markdown={markdownContent}
                   app={appProps.app}
@@ -531,6 +552,10 @@ export const Markdown = memo(
                   withSplashScreen={appProps.withSplashScreen}
                 />
               );
+              if (appProps.noFrame === true) {
+                return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
+              }
+              return content;
             },
             section({ children, ...props }) {
               const treeContentBase64 = props?.["data-tree-content"];
@@ -544,23 +569,23 @@ export const Markdown = memo(
             // These need to be created using React.createElement to avoid warnings about unrecognized tags
             svg: (({ children, ...props }) => {
               const { ref, ...restProps } = props as any;
-              return React.createElement('svg', restProps, children);
+              return React.createElement("svg", restProps, children);
             }) as any,
             g: (({ children, ...props }) => {
               const { ref, ...restProps } = props as any;
-              return React.createElement('g', restProps, children);
+              return React.createElement("g", restProps, children);
             }) as any,
             path: (({ children, ...props }) => {
               const { ref, ...restProps } = props as any;
-              return React.createElement('path', restProps, children);
+              return React.createElement("path", restProps, children);
             }) as any,
             rect: (({ children, ...props }) => {
               const { ref, ...restProps } = props as any;
-              return React.createElement('rect', restProps, children);
+              return React.createElement("rect", restProps, children);
             }) as any,
             ellipse: (({ children, ...props }) => {
               const { ref, ...restProps } = props as any;
-              return React.createElement('ellipse', restProps, children);
+              return React.createElement("ellipse", restProps, children);
             }) as any,
             // The <text> element can appear in two contexts:
             // 1. As an SVG <text> element inside SVG diagrams (rare, handled by rehype-raw)
@@ -823,13 +848,13 @@ function getHeadingId(children: React.ReactNode): string {
     .toLowerCase()
     .replace(/[^\w]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  
+
   // Ensure ID starts with a letter or underscore (not a digit)
   // This is required for querySelector to work without escaping
   if (id && /^[0-9]/.test(id)) {
     id = "heading-" + id;
   }
-  
+
   return id;
 }
 
