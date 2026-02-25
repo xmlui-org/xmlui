@@ -534,6 +534,20 @@ export default function useRowSelection({
   useEffect(() => {
     // console.log("selection DID CHANGE?");
     void onSelectionDidChange?.(selectedItems);
+    if (selectedItems.length > 0 && typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "selection:change",
+          component: "Table",
+          selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
+          selectedCount: selectedItems.length,
+        });
+      }
+    }
   }, [selectedItems, onSelectionDidChange]);
 
   /**

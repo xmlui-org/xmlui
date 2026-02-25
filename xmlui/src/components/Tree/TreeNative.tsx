@@ -794,6 +794,22 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           newNode,
         });
       }
+
+      // Emit selection:change trace event
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (Array.isArray(w._xsLogs)) {
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: w._xsCurrentTrace,
+            kind: "selection:change",
+            component: "Tree",
+            selectedId: node ? String(node.key) : null,
+            selectedName: node ? node.name : null,
+          });
+        }
+      }
     },
     [
       treeItemsById,
