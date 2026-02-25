@@ -21,6 +21,7 @@ import {
 import { Icon } from "../Icon/IconNative";
 import { Button, defaultProps } from "./ButtonNative";
 import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Button";
 
@@ -185,6 +186,11 @@ export const ButtonMd = createMetadata({
     [`backgroundColor-${COMP}-attention-ghost--active`]: "$color-danger-100",
   },
 });
+
+export const ThemedButton =({className, ...props})=>{
+  const themeClass = useComponentThemeClass(ButtonMd);
+  return <Button {...props} className={`${themeClass} ${className}`} />;
+}
 
 export const buttonComponentRenderer = createComponentRenderer(
   "Button",

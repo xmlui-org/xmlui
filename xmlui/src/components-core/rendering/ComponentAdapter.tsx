@@ -3,7 +3,7 @@ import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRe
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -16,7 +16,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 import { extractParam, shouldKeep } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
-import { useComponentStyle } from "../theming/StyleContext";
+import { useComponentStyle, useStyles } from "../theming/StyleContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
@@ -34,6 +34,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
+import { useComponentThemeClass } from "../theming/utils";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -343,7 +344,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
 
-  const className = useComponentStyle(stableLayoutCss);
+  const styleClassName = useComponentStyle(stableLayoutCss);
+  const themeClassName = useComponentThemeClass(descriptor);
+
+  const className = `${themeClassName} ${styleClassName}`;
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 

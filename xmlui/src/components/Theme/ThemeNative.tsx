@@ -21,6 +21,7 @@ import {
   useStyles,
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { parseHVar } from "../../components-core/theming/hvar";
 
 type Props = {
   id?: string;
@@ -95,9 +96,22 @@ export function Theme({
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
 
   const transformedStyles = useMemo(() => {
+    const filteredThemeCssVars = {};
+
+    Object.entries(themeCssVars).forEach(([key, value])=>{
+      // console.log({
+      //   themeKey: key,
+      //   parsedHVar: parseHVar(key),
+      // });
+      let componentName = parseHVar(key)?.component;
+      if (!componentName || componentName === "Input" || componentName === "Heading") {
+        filteredThemeCssVars[key] = value;
+      }
+    })
+
     const ret = {
       "&": {
-        ...themeCssVars,
+        ...filteredThemeCssVars,
         colorScheme: themeTone,
       },
     };

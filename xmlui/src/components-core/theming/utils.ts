@@ -1,3 +1,8 @@
+import { ComponentMetadata } from "../../abstractions/ComponentDefs";
+import { useTheme } from "./ThemeContext";
+import { useMemo } from "react";
+import { useStyles } from "./StyleContext";
+
 /**
  * Each theme can have a light or a dark tone.
  */
@@ -28,3 +33,28 @@ export const SizeScaleReadableKeys = {
   "2xl": "Double Extra Large",
   "3xl": "Triple Extra Large",
 } as const;
+
+
+export function useComponentThemeClass(descriptor: ComponentMetadata) {
+  let themeScope = useTheme();
+  console.log({ descriptor, themeScope });
+
+  const themeVars = useMemo(()=>{
+    const ret = {};
+    Object.entries({...(descriptor?.themeVars || {}), ...(descriptor?.defaultThemeVars || {})}).forEach(([key, value])=>{
+      let keyWithoutClass = key.replace("Input:", "").replace("Heading:", "");
+      let themeVar = themeScope.getThemeVar(keyWithoutClass);
+      if (themeVar !== undefined) {
+
+        ret["--xmlui-" + keyWithoutClass] = themeVar;
+      }
+    });
+
+    return ret;
+  }, [descriptor?.defaultThemeVars, descriptor?.themeVars, themeScope]);
+
+  console.log("resolved tehemvar", themeVars);
+  console.log("theem styles", themeScope.themeStyles);
+
+  return useStyles(themeVars);
+}

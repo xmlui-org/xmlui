@@ -40,7 +40,7 @@ import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
 import { Text } from "../../components/Text/TextNative";
 import { Stack } from "../../components/Stack/StackNative";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
 import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
 import { type FormAction, formReset } from "../Form/formActions";
