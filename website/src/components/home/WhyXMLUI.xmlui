@@ -81,13 +81,13 @@ Choose from a deep catalog of components.
     <HStack wrapContent="true" gap="$space-1" horizontalAlignment="start" verticalAlignment="center">
       <Items data="/resources/components.json">
         <HStack gap="0">
-          <Link to="{$item.url}" target="_blank" label="{$item.name}" />
+          <Link to="{$item.url}" label="{$item.name}" />
           <Text>{$isLast ? "" : ", "}</Text>
         </HStack>
       </Items>
     </HStack>
     <Text>
-        See the <Link to="https://docs.xmlui.org/components/_overview" target="_blank">whole catalog</Link>.
+        See the <Link to="/docs/reference/components/_overview">whole catalog</Link>.
     </Text>
     <Markdown paddingBottom="$padding-loose">
         <![CDATA[
@@ -116,7 +116,7 @@ Your apps are reactive out of the box. It's easy. No React expertise required.
 </App>
 ```
 
-Choose a line from the [Select](https://docs.xmlui.org/components/Select). That updates the [DataSource](https://docs.xmlui.org/components/DataSource), which in turn updates the [Table](https://docs.xmlui.org/components/Table).
+Choose a line from the [Select](/docs/reference/components/Select). That updates the [DataSource](/docs/reference/components/DataSource), which in turn updates the [Table](/docs/reference/components/Table).
 
 ### Custom components
 
