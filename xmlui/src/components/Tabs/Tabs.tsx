@@ -6,6 +6,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
 import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Tabs";
 
@@ -94,6 +96,21 @@ export const TabsMd = createMetadata({
     [`gap-list-${COMP}`]: "0px",
   },
 });
+
+type ThemedTabsProps = React.ComponentPropsWithoutRef<typeof Tabs>;
+
+export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, ThemedTabsProps>(
+  function ThemedTabs({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TabsMd);
+    return (
+      <Tabs
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,

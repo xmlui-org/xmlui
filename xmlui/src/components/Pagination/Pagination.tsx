@@ -1,5 +1,7 @@
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata, d, dEnabled } from "../metadata-helpers";
 import {
   PositionValues,
@@ -8,6 +10,8 @@ import {
   PageNumberValues,
   PaginationNative,
 } from "./PaginationNative";
+export { PositionValues } from "./PaginationNative";
+export type { Position } from "./PaginationNative";
 import styles from "./Pagination.module.scss";
 import {
   orientationOptionMd,
@@ -161,6 +165,21 @@ export const PaginationMd = createMetadata({
   },
 });
 
+type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof PaginationNative>;
+
+export const ThemedPagination = React.forwardRef<React.ElementRef<typeof PaginationNative>, ThemedPaginationProps>(
+  function ThemedPagination({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(PaginationMd);
+    return (
+      <PaginationNative
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const paginationComponentRenderer = createComponentRenderer(
   COMP,
   PaginationMd,
@@ -188,7 +207,7 @@ export const paginationComponentRenderer = createComponentRenderer(
     }
 
     return (
-      <PaginationNative
+      <ThemedPagination
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
         itemCount={extractValue.asOptionalNumber(node.props.itemCount)}
         pageSize={extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize)}

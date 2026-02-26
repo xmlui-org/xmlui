@@ -3,7 +3,7 @@ import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
-import { Scroller } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller } from "../ScrollViewer/ScrollViewer";
 
 import styles from "./TreeComponent.module.scss";
 

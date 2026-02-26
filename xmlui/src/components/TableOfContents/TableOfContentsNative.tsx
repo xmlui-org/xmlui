@@ -14,7 +14,7 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
 import { useTableOfContents } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useIndicatorPosition } from "./useIndicatorPosition";

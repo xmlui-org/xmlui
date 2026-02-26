@@ -6,6 +6,8 @@ import { paddingSubject, textSubject } from "../../components-core/theming/theme
 import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame, defaultProps } from "./ModalDialogNative";
 import { createMetadata, d } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "ModalDialog";
 
@@ -97,6 +99,21 @@ export const ModalDialogMd = createMetadata({
     [`marginBottom-title-${COMP}`]: "0",
   },
 });
+
+type ThemedModalDialogProps = React.ComponentPropsWithoutRef<typeof ModalDialog>;
+
+export const ThemedModalDialog = React.forwardRef<React.ElementRef<typeof ModalDialog>, ThemedModalDialogProps>(
+  function ThemedModalDialog({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ModalDialogMd);
+    return (
+      <ModalDialog
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const modalViewComponentRenderer = createComponentRenderer(
   COMP,

@@ -22,7 +22,7 @@ import {
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
-import { Card } from "../Card/CardNative";
+import { ThemedCard as Card } from "../Card/Card";
 import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {

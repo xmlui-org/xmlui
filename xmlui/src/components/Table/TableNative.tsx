@@ -48,7 +48,7 @@ import { Toggle } from "../Toggle/Toggle";
 import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { PaginationNative, type Position } from "../Pagination/PaginationNative";
+import { ThemedPagination as PaginationNative, type Position } from "../Pagination/Pagination";
 import { Part } from "../Part/Part";
 import {
   parseKeyBinding,

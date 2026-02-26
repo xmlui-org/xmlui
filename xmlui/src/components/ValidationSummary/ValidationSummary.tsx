@@ -13,7 +13,7 @@ import type {
 import { ThemedStack as Stack } from "../Stack/Stack";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedText as Text } from "../Text/Text";
-import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
+import { ThemedSpaceFiller as SpaceFiller } from "../SpaceFiller/SpaceFiller";
 import { ThemedButton as Button } from "../Button/Button";
 
 export type ValidationSummaryProps = {

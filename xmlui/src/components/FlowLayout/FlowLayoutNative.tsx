@@ -16,7 +16,7 @@ import classnames from "classnames";
 import { noop } from "lodash-es";
 
 import styles from "./FlowLayout.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
 
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";

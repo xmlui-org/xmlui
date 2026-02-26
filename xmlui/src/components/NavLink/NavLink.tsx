@@ -6,6 +6,8 @@ import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers
 import { ThemedIcon } from "../Icon/Icon";
 import { NavLink, defaultProps } from "./NavLinkNative";
 import { LinkTargetMd } from "../abstractions";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "NavLink";
 
@@ -122,6 +124,21 @@ export const NavLinkMd = createMetadata({
     [`color-indicator-${COMP}--hover`]: "$color-primary-600",
   },
 });
+
+type ThemedNavLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
+
+export const ThemedNavLink = React.forwardRef<React.ElementRef<typeof NavLink>, ThemedNavLinkProps>(
+  function ThemedNavLink({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(NavLinkMd);
+    return (
+      <NavLink
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const navLinkComponentRenderer = createComponentRenderer(
   COMP,

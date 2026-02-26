@@ -2,6 +2,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { TabItemComponent } from "./TabItemNative";
 import { createMetadata, d, dComponent, dLabel } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TabItem";
 
@@ -30,6 +32,21 @@ export const TabItemMd = createMetadata({
     ),
   },
 });
+
+type ThemedTabItemProps = React.ComponentPropsWithoutRef<typeof TabItemComponent>;
+
+export const ThemedTabItem = React.forwardRef<React.ElementRef<typeof TabItemComponent>, ThemedTabItemProps>(
+  function ThemedTabItem({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TabItemMd);
+    return (
+      <TabItemComponent
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const tabItemComponentRenderer = createComponentRenderer(
   COMP,

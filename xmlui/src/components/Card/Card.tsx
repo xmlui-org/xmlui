@@ -5,6 +5,8 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
 import { Card, defaultProps } from "./CardNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Card";
 
@@ -133,6 +135,21 @@ export const CardMd = createMetadata({
       "The vertical alignment of the title and subtitle to the avatar",
   },
 });
+
+type ThemedCardProps = React.ComponentPropsWithoutRef<typeof Card>;
+
+export const ThemedCard = React.forwardRef<React.ElementRef<typeof Card>, ThemedCardProps>(
+  function ThemedCard({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(CardMd);
+    return (
+      <Card
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const cardComponentRenderer = createComponentRenderer(
   "Card",

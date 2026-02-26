@@ -4,6 +4,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TreeDisplay";
 
@@ -44,6 +46,21 @@ export const TreeDisplayMd = createMetadata({
     [`border-${COMP}`]: "0.5px solid $borderColor",
   },
 });
+
+type ThemedTreeDisplayProps = React.ComponentPropsWithoutRef<typeof TreeDisplay>;
+
+export const ThemedTreeDisplay = React.forwardRef<React.ElementRef<typeof TreeDisplay>, ThemedTreeDisplayProps>(
+  function ThemedTreeDisplay({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TreeDisplayMd);
+    return (
+      <TreeDisplay
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const treeDisplayComponentRenderer = createComponentRenderer(
   COMP,

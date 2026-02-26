@@ -29,7 +29,7 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { ThemedIcon } from "../Icon/Icon";
-import { NavLink } from "../NavLink/NavLinkNative";
+import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";

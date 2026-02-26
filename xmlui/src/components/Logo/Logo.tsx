@@ -1,6 +1,8 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import { Logo, defaultProps } from "./LogoNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Logo";
 
@@ -24,6 +26,21 @@ export const LogoMd = createMetadata({
     },
   },
 });
+
+type ThemedLogoProps = React.ComponentPropsWithoutRef<typeof Logo>;
+
+export const ThemedLogo = React.forwardRef<React.ElementRef<typeof Logo>, ThemedLogoProps>(
+  function ThemedLogo({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(LogoMd);
+    return (
+      <Logo
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const logoComponentRenderer = createComponentRenderer(
   COMP,

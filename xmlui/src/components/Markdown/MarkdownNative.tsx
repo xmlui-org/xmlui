@@ -23,13 +23,14 @@ import {
 } from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
-import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
+import { ThemedCodeBlock as CodeBlock } from "../CodeBlock/CodeBlock";
+import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
 import { ThemedIcon } from "../Icon/Icon";
-import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
+import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
+import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";

@@ -5,6 +5,8 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -89,6 +91,21 @@ export const TableOfContentsMd = createMetadata({
     [`color-indicator-${COMP}--active`]: "$color-surface-900",
   },
 });
+
+type ThemedTableOfContentsProps = React.ComponentPropsWithoutRef<typeof TableOfContents>;
+
+export const ThemedTableOfContents = React.forwardRef<React.ElementRef<typeof TableOfContents>, ThemedTableOfContentsProps>(
+  function ThemedTableOfContents({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TableOfContentsMd);
+    return (
+      <TableOfContents
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 function IndexAwareTableOfContents(props: React.ComponentProps<typeof TableOfContents>) {
   const { indexing } = useIndexerContext();

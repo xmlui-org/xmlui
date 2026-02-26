@@ -9,10 +9,10 @@ import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { ThemedText as Text } from "../Text/Text";
 import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedImage as Image } from "../Image/Image";
-import { Markdown } from "../Markdown/MarkdownNative";
-import { TableOfContents } from "../TableOfContents/TableOfContentsNative";
-import { Tabs } from "../Tabs/TabsNative";
-import { TabItemComponent } from "../Tabs/TabItemNative";
+import { ThemedMarkdown as Markdown } from "../Markdown/Markdown";
+import { ThemedTableOfContents as TableOfContents } from "../TableOfContents/TableOfContents";
+import { ThemedTabs as Tabs } from "../Tabs/Tabs";
+import { ThemedTabItem as TabItemComponent } from "../Tabs/TabItem";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayout";
 import styles from "./Blog.module.scss";
 

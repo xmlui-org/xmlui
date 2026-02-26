@@ -195,6 +195,18 @@ Also used in `components-core/behaviors/TooltipBehavior.tsx`.
 **Used by 1 component (+ type import):**
 - `Table/TableNative.tsx`
 
+#### 16a. `Scroller` (from `ScrollViewer/Scroller.tsx`) — **needs ThemedScroller**
+
+Internal scroll primitive with no own metadata; use `ScrollViewerMd` for the theme class.
+
+**Used by 6 components:**
+- `FlowLayout/FlowLayoutNative.tsx`
+- `NavPanel/NavPanelNative.tsx`
+- `ScrollViewer/ScrollViewerNative.tsx`
+- `Stack/StackNative.tsx`
+- `TableOfContents/TableOfContentsNative.tsx`
+- `Tree/TreeNative.tsx`
+
 ### Tier 3 — Low-impact (single consumer or non-visual / context-only imports)
 
 #### 17. `Card` — used by `List/ListNative.tsx`
@@ -647,35 +659,55 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 **Also run Pagination's own tests:** `npx playwright test Pagination.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 250 passed, 1 skipped, 0 failed
+**Failing tests:** _(none)_
 
 ---
 
-### Step 17: Tier 3 themed wrappers (single-consumer components)
+### Step 17: Create `ThemedScroller` and migrate consumers
+
+**Action:** Add `ThemedScroller` to `ScrollViewer/ScrollViewer.tsx` using `ScrollViewerMd`. The `Scroller` component in `ScrollViewer/Scroller.tsx` is an internal scroll primitive (no own metadata) used by multiple components. Export `ThemedScroller` alongside `ThemedScrollViewer`. Migrate 6 consumer files.
+
+**E2E verification per consumer:**
+
+| Consumer file | E2E test file | Command | Result |
+|---|---|---|---|
+| `FlowLayout/FlowLayoutNative.tsx` | `FlowLayout.spec.ts` | `npx playwright test FlowLayout.spec.ts --workers=1 --reporter=line` | |
+| `NavPanel/NavPanelNative.tsx` | `NavPanel.spec.ts` | `npx playwright test NavPanel.spec.ts --workers=1 --reporter=line` | |
+| `ScrollViewer/ScrollViewerNative.tsx` | `ScrollViewer.spec.ts` | `npx playwright test ScrollViewer.spec.ts --workers=1 --reporter=line` | 🚫 circular |
+| `Stack/StackNative.tsx` | `Stack.spec.ts` | `npx playwright test Stack.spec.ts --workers=1 --reporter=line` | |
+| `TableOfContents/TableOfContentsNative.tsx` | _(none)_ | — | 🚫 |
+| `Tree/TreeNative.tsx` | `Tree.spec.ts` | `npx playwright test Tree.spec.ts --workers=1 --reporter=line` | |
+
+**Status:** ✅ Done — 370 passed, 6 failed (pre-existing scroll fade tests in FlowLayout, Stack, NavPanel); `ScrollViewerNative.tsx` kept importing directly from `Scroller.tsx` to avoid circular dependency
+**Failing tests:** scroll fade visibility (pre-existing)
+
+---
+
+### Step 18: Tier 3 themed wrappers (single-consumer components)
 
 Create themed wrappers for Tier 3 components. Each has only one consumer; migrate and verify one at a time.
 
 | Themed wrapper | Consumer | E2E test file | Command | Result |
 |---|---|---|---|---|
-| `ThemedCard` | `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | |
-| `ThemedModalDialog` | `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | |
+| `ThemedCard` | `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | ✅ |
+| `ThemedModalDialog` | `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | ✅ |
 | `ThemedSpaceFiller` | `ValidationSummary/ValidationSummary.tsx` | _(none)_ | — | 🚫 |
-| `ThemedCodeBlock` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | |
-| `ThemedTreeDisplay` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | _(same as above)_ | |
-| `ThemedExpandableItem` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | _(same as above)_ | |
-| `ThemedLogo` | `NavPanel/NavPanelNative.tsx` | `NavPanel.spec.ts` | `npx playwright test NavPanel.spec.ts --workers=1 --reporter=line` | |
-| `ThemedNavLink` | `NavGroup/NavGroupNative.tsx` | `NavGroup.spec.ts` | `npx playwright test NavGroup.spec.ts --workers=1 --reporter=line` | |
+| `ThemedCodeBlock` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | ✅ |
+| `ThemedTreeDisplay` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | _(same as above)_ | ✅ |
+| `ThemedExpandableItem` | `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | _(same as above)_ | ✅ |
+| `ThemedLogo` | `NavPanel/NavPanelNative.tsx` | `NavPanel.spec.ts` | `npx playwright test NavPanel.spec.ts --workers=1 --reporter=line` | ✅ |
+| `ThemedNavLink` | `NavGroup/NavGroupNative.tsx` | `NavGroup.spec.ts` | `npx playwright test NavGroup.spec.ts --workers=1 --reporter=line` | ⚠️ |
 | `ThemedTabs` / `ThemedTabItem` | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
 | `ThemedMarkdown` | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
 | `ThemedTableOfContents` | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 671 passed, 2 failed (pre-existing NavPanel scroll fade), 8 skipped
+**Failing tests:** NavPanel scroll fade visibility (pre-existing)
 
 ---
 
-### Step 18: Tier 3 themed wrappers for FormItem sub-components
+### Step 19: Tier 3 themed wrappers for FormItem sub-components
 
 FormItem uses many native components for its various input types. All consumers are in `FormItem/FormItemNative.tsx`.
 
@@ -699,7 +731,7 @@ npx playwright test FileInput.spec.ts NumberBox.spec.ts TextArea.spec.ts DatePic
 
 ---
 
-### Step 19: Final validation
+### Step 20: Final validation
 
 Run comprehensive E2E tests across all affected components with parallel workers:
 
@@ -719,6 +751,7 @@ npx playwright test \
   Form.spec.ts FormItem.spec.ts Card.spec.ts HtmlTags.spec.ts List.spec.ts \
   ResponsiveBar.spec.ts ContextMenu.spec.ts Slider.spec.ts \
   TextArea.spec.ts AutoComplete.spec.ts ColorPicker.spec.ts NavPanel.spec.ts \
+  ScrollViewer.spec.ts \
   --workers=10
 ```
 

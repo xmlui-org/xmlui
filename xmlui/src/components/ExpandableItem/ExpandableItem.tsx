@@ -5,6 +5,8 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
 import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
 import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "ExpandableItem";
 
@@ -124,6 +126,21 @@ export const ExpandableItemMd = createMetadata({
     [`animation-content-${COMP}`]: "ease-out",
   },
 });
+
+type ThemedExpandableItemProps = React.ComponentPropsWithoutRef<typeof ExpandableItem>;
+
+export const ThemedExpandableItem = React.forwardRef<React.ElementRef<typeof ExpandableItem>, ThemedExpandableItemProps>(
+  function ThemedExpandableItem({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ExpandableItemMd);
+    return (
+      <ExpandableItem
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const expandableItemComponentRenderer = createComponentRenderer(
   COMP,

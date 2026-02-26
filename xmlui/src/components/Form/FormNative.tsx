@@ -36,7 +36,7 @@ import {
   triedToSubmit,
   UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
-import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
+import { ThemedModalDialog as ModalDialog } from "../../components/ModalDialog/ModalDialog";
 import { ThemedText as Text } from "../../components/Text/Text";
 import { ThemedStack as Stack } from "../../components/Stack/Stack";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
