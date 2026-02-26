@@ -1,7 +1,9 @@
 import styles from "./Select.module.scss";
 
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   dPlaceholder,
   dInitialValue,
@@ -206,6 +208,14 @@ export const SelectMd = createMetadata({
     [`minHeight-item-${COMP}`]: "$space-7",
   },
 });
+
+type ThemedSelectProps = React.ComponentProps<typeof Select> & { className?: string };
+export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
+  function ThemedSelect({ className, ...props }: ThemedSelectProps, ref) {
+    const themeClass = useComponentThemeClass(SelectMd);
+    return <Select {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const selectComponentRenderer = createComponentRenderer(
   COMP,

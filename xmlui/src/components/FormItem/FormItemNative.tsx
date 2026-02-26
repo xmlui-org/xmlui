@@ -20,11 +20,11 @@ import type {
   ValidationSeverity,
 } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-import { TextBox } from "../TextBox/TextBoxNative";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
 import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
 import { NumberBox } from "../NumberBox/NumberBoxNative";
-import { Select } from "../Select/SelectNative";
+import { ThemedSelect as Select } from "../Select/Select";
 import { RadioGroup } from "../RadioGroup/RadioGroupNative";
 
 import {

@@ -10,7 +10,7 @@ import { ThemedIcon } from "../Icon/Icon";
 import type { OrientationOptions } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Part } from "../Part/Part";
-import { Select } from "../Select/SelectNative";
+import { ThemedSelect as Select } from "../Select/Select";
 import { convertOptionValue, OptionNative } from "../Option/OptionNative";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 

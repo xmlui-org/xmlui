@@ -496,12 +496,15 @@ After each consumer migration, run E2E tests for consumer components. Record res
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
 | `ProfileMenu/ProfileMenu.tsx` | _(none)_ | — | 🚫 |
-| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | |
+| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | ✅ |
 
 **Also run Avatar's own tests:** `npx playwright test Avatar.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Combined run:** `npx playwright test Avatar.spec.ts Card.spec.ts --workers=4 --reporter=line`
+**Result:** 119 passed, 0 failed
+
+**Status:** ✅ Done
+**Failing tests:** _(none)_
 
 ---
 
@@ -513,14 +516,22 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `Slider/SliderNative.tsx` | `Slider.spec.ts` | `npx playwright test Slider.spec.ts --workers=1 --reporter=line` | |
+| `Slider/SliderNative.tsx` | `Slider.spec.ts` | `npx playwright test Slider.spec.ts --workers=1 --reporter=line` | ✅ |
 | `ConciseValidationFeedback/ConciseValidationFeedback.tsx` | _(none)_ | — | 🚫 |
-| `components-core/behaviors/TooltipBehavior.tsx` | `Tooltip.spec.ts` | `npx playwright test Tooltip.spec.ts --workers=1 --reporter=line` | |
+| `components-core/behaviors/TooltipBehavior.tsx` | `Tooltip.spec.ts` | `npx playwright test Tooltip.spec.ts --workers=1 --reporter=line` | ✅ |
 
 **Also run Tooltip's own tests:** `npx playwright test Tooltip.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Combined run:** `npx playwright test Tooltip.spec.ts Slider.spec.ts --workers=4 --reporter=line`
+**Result:** 139 passed, 0 failed, 1 skipped
+
+**Notes:**
+- Added `className?` to `TooltipNative.tsx` `TooltipProps` (applied to `RadixTooltip.Content`)
+- Tooltip renderer updated to use `ThemedTooltip` with `className` — this also fixed 5 pre-existing Theme Variable test failures
+- Re-exported `parseTooltipOptions` from `Tooltip.tsx` so `TooltipBehavior` can import from the single source
+
+**Status:** ✅ Done
+**Failing tests:** _(none)_
 
 ---
 
@@ -532,13 +543,20 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `FileInput/FileInputNative.tsx` | `FileInput.spec.ts` | `npx playwright test FileInput.spec.ts --workers=1 --reporter=line` | |
-| `FormItem/FormItemNative.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | |
+| `FileInput/FileInputNative.tsx` | `FileInput.spec.ts` | `npx playwright test FileInput.spec.ts --workers=1 --reporter=line` | ✅ |
+| `FormItem/FormItemNative.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | ✅ |
 
 **Also run TextBox's own tests:** `npx playwright test TextBox.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Combined run:** `npx playwright test TextBox.spec.ts FormItem.spec.ts FileInput.spec.ts --workers=4 --reporter=line`
+**Result:** 318 passed, 5 failed (pre-existing), 4 skipped
+
+**Notes:**
+- `ThemedTextBox` wrapper added; `renderTextBox` helper updated to use `ThemedTextBox`
+- 5 pre-existing Theme Vars failures confirmed via `git stash` baseline check: `backgroundColor`, `borderColor`, `textColor`, `focus borderColor`, `borderRadius` (TextBox.spec.ts:596, 606, 616, 626, 647)
+
+**Status:** ✅ Done
+**Failing tests:** 5 pre-existing — TextBox Theme Vars suite (backgroundColor, borderColor, textColor, focus borderColor, borderRadius)
 
 ---
 
@@ -550,13 +568,16 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `FormItem/FormItemNative.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | |
-| `Pagination/PaginationNative.tsx` | `Pagination.spec.ts` | `npx playwright test Pagination.spec.ts --workers=1 --reporter=line` | |
+| `FormItem/FormItemNative.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Pagination/PaginationNative.tsx` | `Pagination.spec.ts` | `npx playwright test Pagination.spec.ts --workers=1 --reporter=line` | ✅ |
 
 **Also run Select's own tests:** `npx playwright test Select.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Combined run:** `npx playwright test Select.spec.ts FormItem.spec.ts Pagination.spec.ts --workers=4 --reporter=line`
+**Result:** 367 passed, 1 failed (pre-existing), 6 skipped
+
+**Status:** ✅ Done
+**Failing tests:** 1 pre-existing — `Select › Z-Index and Modal Layering › Select dropdown in modal is visible and not covered by modal overlay` (Select.spec.ts:1193)
 
 ---
 

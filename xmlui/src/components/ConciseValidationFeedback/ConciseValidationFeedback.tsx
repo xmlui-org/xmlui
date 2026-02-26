@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 import classnames from "classnames";
 
 import { ThemedIcon } from "../Icon/Icon";
-import { Tooltip } from "../Tooltip/TooltipNative";
+import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
 import type { ValidationMode } from "../Form/FormContext";
 import type { ValidationStatus } from "../abstractions";
 

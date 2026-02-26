@@ -78,6 +78,11 @@ type TooltipProps = TooltipOptions & {
    * The content that will trigger the tooltip (used when triggerRef is not provided)
    */
   children?: ReactNode;
+
+  /**
+   * Optional extra CSS class names to apply to the tooltip content element
+   */
+  className?: string;
 };
 
 export type { TooltipProps, TooltipOptions };
@@ -109,6 +114,7 @@ export const Tooltip = forwardRef(function Tooltip({
   avoidCollisions = defaultProps.avoidCollisions,
   children,
   open,
+  className,
 }: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
@@ -121,7 +127,7 @@ export const Tooltip = forwardRef(function Tooltip({
           {showTooltip && (
             <RadixTooltip.Content
               ref={ref}
-              className={styles.content}
+              className={`${styles.content}${className ? ` ${className}` : ""}`}
               side={side}
               align={align}
               sideOffset={sideOffset}
