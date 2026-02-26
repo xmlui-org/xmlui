@@ -59,6 +59,7 @@ export interface BuildContentFromRuntimeOptions {
 export function buildContentFromRuntime(
   contentRuntime: Record<string, { default: string }>,
   options: BuildContentFromRuntimeOptions = {},
+  plainTextOptions: { urlPrefix?: string } = {},
 ): {
   content: Record<string, string>;
   plainTextContent: Record<string, string>;
@@ -78,7 +79,7 @@ export function buildContentFromRuntime(
     } else {
       urlFragment = filePath.substring(contentPrefix.length).replace(/\.(md|mdx)$/, "");
       navPanelContent.push(urlFragment);
-      plainTextContent["/docs/" + urlFragment] = markdownToPlainText(raw);
+      plainTextContent[(plainTextOptions.urlPrefix ?? "") + urlFragment] = markdownToPlainText(raw);
     }
 
     content[urlFragment] = raw;

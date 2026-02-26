@@ -11,8 +11,12 @@ export const SearchMd = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
   status: "experimental",
   props: {
+    placeholder: {
+      description: `Placeholder text to show in the search input when it's empty.`,
+      valueType: "string",
+    },
     data: {
-      description: ``,
+      description: `The data to be searched.`,
     },
     limit: {
       description: ``,
@@ -23,6 +27,12 @@ export const SearchMd = createMetadata({
       description: `If true, the search starts collapsed as a button with a search icon. Clicking the button expands the search field with an animation. When the field is empty and loses focus, it collapses back to the button.`,
       valueType: "boolean",
       defaultValue: false,
+    },
+    useContentFromAppContext: {
+      description: `If true, the search will include content from the app context (e.g. content provided by the app or other extensions) in addition to the data provided directly to the component. This allows for a more comprehensive search experience that combines both extension-specific and app-wide content. Set this to false to restrict the search to only the data provided directly to this component.`,
+      valueType: "boolean",
+      defaultValue: true,
+      isInternal: true,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -68,9 +78,11 @@ const searchComponentRenderer = createComponentRenderer(
   ({ node, extractValue }) => {
     return (
       <Search
+        placeholder={extractValue.asOptionalString(node.props?.placeholder)}
         data={extractValue(node.props?.data)}
         limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
         collapsible={extractValue.asOptionalBoolean(node.props?.collapsible, false)}
+        useContentFromAppContext={extractValue.asOptionalBoolean(node.props?.useContentFromAppContext, true)}
       />
     );
   },
