@@ -42,7 +42,7 @@ const {
     // Strip "/content/docs/" so keys are "pages/intro.md", "reference/components/App", etc.
     contentPrefix: "/content/docs/",
   },
-  { urlPrefix: "/docs/reference/" }, // Prefix for plain text content keys, so they match the URL structure used in the app
+  { urlPrefix: "/docs/" }, // Prefix for plain text content keys, so they match the URL structure used in the app
 );
 
 const { plainTextContent: plainTextBlogContent } = buildContentFromRuntime(
