@@ -187,7 +187,8 @@ export const ButtonMd = createMetadata({
   },
 });
 
-export const ThemedButton =({className, ...props})=>{
+type ThemedButtonProps = React.ComponentProps<typeof Button> & { className?: string };
+export const ThemedButton =({className, ...props}: ThemedButtonProps)=>{
   const themeClass = useComponentThemeClass(ButtonMd);
   return <Button {...props} className={`${themeClass} ${className}`} />;
 }

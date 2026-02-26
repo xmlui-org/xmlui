@@ -21,8 +21,9 @@ import type {
   ButtonThemeColor,
   AlignmentOptions,
 } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
+import { Theme } from "../Theme/ThemeNative";
+import { ThemedButton } from "../Button/Button";
 
 // Context to manage dropdown menu state
 type DropdownMenuContextType = {
@@ -150,7 +151,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
           {triggerTemplate ? (
             triggerTemplate
           ) : (
-            <Button
+            <ThemedButton
               icon={<Icon name={triggerButtonIcon} fallback="chevrondown" />}
               iconPosition={triggerButtonIconPosition}
               type="button"
@@ -159,7 +160,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
               disabled={disabled}
             >
               {label}
-            </Button>
+            </ThemedButton>
           )}
         </DropdownMenuPrimitive.Trigger>
         <DropdownMenuPrimitive.Portal container={root}>
