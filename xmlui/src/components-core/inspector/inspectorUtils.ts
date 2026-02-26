@@ -202,7 +202,7 @@ export function pushXsLog(entry: XsLogEntry, xsLogMax: number = 200): void {
  * modals, toasts) is preserved.
  */
 export function splicePreservingInteractions(logs: any[], maxSize: number): void {
-  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error", "handler:start", "handler:complete", "modal:show", "modal:confirm", "modal:cancel", "toast", "submenu:open", "selection:change", "focus:change"]);
+  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error", "handler:start", "handler:complete", "modal:show", "modal:confirm", "modal:cancel", "toast", "submenu:open", "selection:change", "focus:change", "value:change"]);
   const keep: any[] = [];
   const evictable: any[] = [];
   for (const entry of logs) {
