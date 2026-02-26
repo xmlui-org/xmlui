@@ -7,7 +7,7 @@
 - **Validation states**: Built-in visual indicators for valid, warning, and error states
 - **Input control**: Support for initial values, programmatic focus, and value setting
 
-Often used in forms, see [this guide](/forms) for details.
+Often used in forms, see [this guide](/docs/guide/forms) for details.
 
 ## Behaviors [#behaviors]
 

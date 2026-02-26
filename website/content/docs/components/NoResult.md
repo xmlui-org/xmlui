@@ -37,7 +37,7 @@ This boolean property indicates if the icon should be hidden.
 
 This property defines the icon to display with the component.
 
-This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](/components/Icon).
+This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](/docs/reference/components/Icon).
 
 ```xmlui-pg copy display name="Example: icon"
 <App>

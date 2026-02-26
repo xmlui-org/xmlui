@@ -1,6 +1,6 @@
 # DataSource [#datasource]
 
-`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/components/APICall) which creates, updates or deletes data.
+`DataSource` fetches and caches data from API endpoints, versus [`APICall`](/docs/reference/components/APICall) which creates, updates or deletes data.
 
 **Key characteristics:**
 - **Conditional loading**: Use `when` property to prevent fetching until dependent data is ready

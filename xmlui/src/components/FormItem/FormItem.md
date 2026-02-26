@@ -6,7 +6,7 @@
 - **Flexible labeling**: Supports labels, helper text, and various label positioning options
 - **Layout management**: Handles consistent spacing and alignment of form elements
 
-See [this guide](/forms) for details.
+See [this guide](/docs/guides/forms) for details.
 
 %-DESC-END
 

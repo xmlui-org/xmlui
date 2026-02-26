@@ -104,7 +104,7 @@ export const HeadingMd = createMetadata({
     "`Heading` displays hierarchical text headings with semantic importance levels " +
     "from H1 to H6, following HTML heading standards. It provides text overflow " +
     "handling, anchor link generation, and integrates with " +
-    "[TableOfContents](/components/TableOfContents).",
+    "[`TableOfContents`](/docs/reference/components/TableOfContents).",
   props: {
     value: VALUE_DESC,
     level: {

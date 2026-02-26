@@ -354,11 +354,11 @@ This component does not expose any methods.
 
 The component itself cannot be styled, but the components that render the final text have customizable style variables.
 
-[`Text`](/components/Text#styling)
-[`Heading`](/components/Heading#styling)
-[`Link`](/components/Link#styling)
-[`Image`](/components/Image#styling)
-[`Checkbox`](/components/Checkbox#styling)
+[`Text`](/docs/reference/components/Text#styling)
+[`Heading`](/docs/reference/components/Heading#styling)
+[`Link`](/docs/reference/components/Link#styling)
+[`Image`](/docs/reference/components/Image#styling)
+[`Checkbox`](/docs/reference/components/Checkbox#styling)
 
 ### Theme Variables [#theme-variables]
 

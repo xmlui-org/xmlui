@@ -7,7 +7,7 @@
 - **Validation support**: Built-in validation states for form error handling
 - **Indeterminate state**: Special visual state for mixed selections (useful for "select all" scenarios)
 
-To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/forms).
+To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](/docs/forms).
 
 ## Checkbox Values [#checkbox-values]
 

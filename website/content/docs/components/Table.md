@@ -3,7 +3,7 @@
 `Table` presents structured data for viewing, sorting, selection, and interaction.
 
 **Key features:**
-- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Data integration**: Load data from APIs via [DataSource](/docs/reference/components/DataSource) or use static arrays
 - **Virtualization**: Only renders visible rows for smooth performance with large datasets
 - **Row selection**: Support single or multi-row selection for bulk operations
 - **Pagination**: Built-in pagination controls for managing large datasets
@@ -356,7 +356,7 @@ By default, the value of this property is `true`.
 
 This optional property is used to specify the height of the table header.
 
-It accepts common [size values](/styles-and-themes/common-units#size-values).
+It accepts common [size values](/docs/styles-and-themes/common-units#size-values).
 
 ```xmlui copy /headerHeight="60px"/
 <App>
@@ -1680,7 +1680,7 @@ This event is fired when the table data sorting has changed. It has two argument
 - `columnName`: The name of the column being sorted.
 - `sortDirection`: The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.
 
-Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
+Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
 ```xmlui copy {4}
 <App var.sortedBy="">

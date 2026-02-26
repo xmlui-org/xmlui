@@ -8,7 +8,7 @@
 - **Context sharing**: Provides `$data` and other context values accessible to all nested components
 - **Submission handling**: Manages form submission workflow and prevents invalid submissions
 
-See [this guide](/forms) for details.
+See [this guide](/docs/guides/forms) for details.
 
 **Context variables available during execution:**
 

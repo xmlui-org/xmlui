@@ -7,7 +7,7 @@
 - **Option containers**: Uses Option components to define selectable items with separate values and labels
 - **Search functionality**: Optional filtering to quickly find options in large lists
 - **Custom templates**: Configurable option display, value presentation, and empty state templates
-- **Dynamic options**: Supports both static [Option](/components/Option) children and dynamic lists via [Items](/components/Items).
+- **Dynamic options**: Supports both static [Option](/docs/reference/components/Option) children and dynamic lists via [Items](/docs/reference/components/Items).
 
 ## Using `Select` [#using-select]
 

@@ -1,6 +1,6 @@
 # AutoComplete [#autocomplete]
 
-`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/components/Select), it provides type-ahead functionality and can allow users to create new options.
+`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/docs/reference/components/Select), it provides type-ahead functionality and can allow users to create new options.
 
 **Key features:**
 - **Type-ahead filtering**: Users can type to narrow down options in real-time

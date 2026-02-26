@@ -9,7 +9,7 @@
 - **Label list display**: Optional legend-style list showing all segments and values
 - **Customizable sizing**: Configurable dimensions and outer radius for different layouts
 
-For a variation with a hollow center, see [DonutChart](/components/DonutChart).
+For a variation with a hollow center, see [DonutChart](/docs/reference/components/DonutChart).
 
 ## Behaviors [#behaviors]
 

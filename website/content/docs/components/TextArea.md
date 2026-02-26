@@ -2,7 +2,7 @@
 
 `TextArea` provides a multiline text input area.
 
-It is often used in forms, see [this guide](/forms) for details.
+It is often used in forms, see [this guide](/docs/guide/forms) for details.
 
 ## Behaviors [#behaviors]
 
@@ -62,7 +62,7 @@ This boolean property value indicates whether the component responds to user eve
 This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
-See [Using Forms](/forms) for details.
+See [Using Forms](/docs/forms) for details.
 
 ```xmlui-pg copy display name="Example: enterSubmits"
 <App>

@@ -501,7 +501,7 @@ This method returns the column headers from the most recently parsed CSV file.
 
 Returns an array of column header names (available when `parseAs="csv"` and `header: true`, which is the default).
 
-Click to save: [sample-products.csv](/resources/files/sample-products.csv). Then browse to sample-products.csv.
+Click to save: [sample-products.csv](/docs/resources/files/sample-products.csv). Then browse to sample-products.csv.
 
 ```xmlui-pg copy display name="Example: getFields"
 <App var.products="{[]}">
@@ -588,10 +588,10 @@ The component has some parts that can be styled through layout properties and th
 ## Styling [#styling]
 
 The `FileInput` component does not theme variables directly.
-However, it uses the [`Button`](/components/Button) and [`TextBox`](/components/TextBox) components under the hood.
+However, it uses the [`Button`](/docs/reference/components/Button) and [`TextBox`](/docs/reference/components/TextBox) components under the hood.
 Thus, modifying the styles of both of these components affects the `FileInput`.
 
-See [Button styling](/components/Button#styling) and [TextBox styling](/components/TextBox#styling).
+See [Button styling](/docs/reference/components/Button#styling) and [TextBox styling](/docs/reference/components/TextBox#styling).
 
 ### Theme Variables [#theme-variables]
 

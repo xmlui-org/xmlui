@@ -1,11 +1,11 @@
 %-DESC-START
 
-For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/layout#flowlayout).
+For details on how to work with \`FlowLayout\` (like sizing children), see [this guide](/docs/layout#flowlayout).
 
 ## Using `SpaceFiller` with `FlowLayout`
 
 The `SpaceFiller` component can be used as a line break.
-See the [reference docs](/components/SpaceFiller) for details.
+See the [reference docs](/docs/reference/components/SpaceFiller) for details.
 
 %-DESC-END
 

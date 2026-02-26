@@ -1,6 +1,6 @@
 # AppHeader [#appheader]
 
-`AppHeader` defines the top navigation bar of your application within the [`App`](/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior.
+`AppHeader` defines the top navigation bar of your application within the [`App`](/docs/reference/components/App) component. It automatically handles logo placement, application title, and user profile areas with built-in responsive behavior.
 
 **Key features:**
 
