@@ -143,6 +143,7 @@ import { sliderWrappedComponentRenderer } from "./Slider/SliderWrapped";
 import { knobComponentRenderer } from "./Knob/KnobWrapped";
 import { codeEditorComponentRenderer } from "./CodeEditor/CodeEditorWrapped";
 import { tiptapEditorComponentRenderer } from "./TiptapEditor/TiptapEditorWrapped";
+import { gaugeComponentRenderer } from "./Gauge/GaugeWrapped";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
@@ -624,6 +625,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(knobComponentRenderer);
       this.registerCoreComponent(codeEditorComponentRenderer);
       this.registerCoreComponent(tiptapEditorComponentRenderer);
+      this.registerCoreComponent(gaugeComponentRenderer);
       this.registerCoreComponent(ratingInputComponentRenderer);
       this.registerCoreComponent(backdropComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
