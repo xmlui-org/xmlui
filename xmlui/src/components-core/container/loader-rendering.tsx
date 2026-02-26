@@ -75,7 +75,7 @@ export function renderLoaders({
   cleanup,
   memoedVarsRef,
 }: LoaderRenderContext) {
-  return loaders.map((loader: ComponentDef) => {
+  return loaders.map((loader: ComponentDef, index: number) => {
     // --- Check for the uniqueness of UIDs
     if (loader?.uid) {
       if (uidInfo[loader.uid]) {
@@ -111,7 +111,7 @@ export function renderLoaders({
     }
 
     // --- Take care to use a key property for the loader
-    return <Fragment key={loader.uid}>{renderedLoader}</Fragment>;
+    return <Fragment key={loader.uid ?? index}>{renderedLoader}</Fragment>;
   });
 }
 

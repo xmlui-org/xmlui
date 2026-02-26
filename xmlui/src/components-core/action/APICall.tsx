@@ -274,13 +274,13 @@ type APICall = {
   when?: string;
 
   onBeforeRequest?: string;
-  onSuccess?: string;
+  onSuccess?: string | ((...args: any[]) => Promise<any>);
   onProgress?: string;
   onError?: string;
 } & ApiOperationDef;
 
 export async function callApi(
-  { state, appContext, lookupAction, getCurrentState, apiInstance }: ActionExecutionContext,
+  { state, appContext, lookupAction, getCurrentState, apiInstance, location }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
@@ -404,7 +404,6 @@ export async function callApi(
       resolveBindingExpressions,
       onProgress: _onProgress,
     });
-    console.log("API call result:", result);
 
     // Trace API call completion
     traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
@@ -414,11 +413,10 @@ export async function callApi(
       status: getLastApiStatus(clientTxId),
     });
 
-    const onSuccessFn = lookupAction(onSuccess, uid, {
-      eventName: "success",
-      context: getCurrentState()
-    });
-    await onSuccessFn?.(result, stateContext["$param"]);
+    const onSuccessFn = typeof onSuccess === "function"
+      ? onSuccess
+      : lookupAction(onSuccess, uid, { eventName: "success", context: getCurrentState() });
+    const onSuccessResult = await onSuccessFn?.(result, stateContext["$param"]);
 
     updateQueriesWithResult(
       queryKeysToUpdate,
@@ -428,8 +426,19 @@ export async function callApi(
       result,
     );
 
-    if (resolvedInvalidates || !updates) {
-      await invalidateQueries(resolvedInvalidates, appContext, state);
+    // An explicit `false` return from onSuccess opts out of invalidation.
+    // Any other return value (including undefined/void) proceeds normally.
+    const skipInvalidation = onSuccessResult === false;
+    if (!skipInvalidation && (resolvedInvalidates || !updates)) {
+      // Defer invalidation to a macrotask so that any navigate() call made
+      // synchronously in a parent success handler (e.g. Form.onSuccess) has
+      // time to be scheduled. React then commits the navigation render and
+      // unmounts DataSource components before the invalidation triggers a
+      // re-fetch. The react-query AbortController cancels any in-flight
+      // requests from unmounted components, preventing wasted network traffic.
+      setTimeout(() => {
+        void invalidateQueries(resolvedInvalidates, appContext, state);
+      }, 0);
     }
     const completedMessage = extractParam(
       { ...stateContext, $result: result },

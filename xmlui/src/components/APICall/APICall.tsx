@@ -227,8 +227,11 @@ export const APICallMd = createMetadata({
       parameters: {},
     },
     success: {
-      description: "This event fires when a request results in a success.",
-      signature: "(result: any) => void",
+      description:
+        "This event fires when a request results in a success. " +
+        "Returning an explicit `false` value suppresses automatic query invalidation, " +
+        "giving you full control over which cached data gets refreshed after the call.",
+      signature: "(result: any) => false | void",
       parameters: {
         result: "The response data returned from the successful API request.",
       },
@@ -368,6 +371,7 @@ export const apiCallRenderer = createComponentRenderer(
         node={node as any}
         uid={uid}
         updateState={updateState}
+        onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
       />
