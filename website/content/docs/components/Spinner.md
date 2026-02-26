@@ -77,6 +77,6 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [borderColor](../styles-and-themes/common-units/#color)-Spinner | $color-surface-400 | $color-surface-400 |
-| [size](../styles-and-themes/common-units/#size)-Spinner | 2.5em | 2.5em |
-| [thickness](../styles-and-themes/common-units/#size)-Spinner | 0.125em | 0.125em |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Spinner | $color-surface-400 | $color-surface-400 |
+| [size](/docs/styles-and-themes/common-units/#size-values)-Spinner | 2.5em | 2.5em |
+| [thickness](/docs/styles-and-themes/common-units/#size-values)-Spinner | 0.125em | 0.125em |

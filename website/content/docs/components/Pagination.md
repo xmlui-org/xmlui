@@ -226,11 +226,11 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Pagination | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-selector-Pagination | transparent | transparent |
-| [borderColor](../styles-and-themes/common-units/#color)-Pagination | $color-gray-300 | $color-gray-300 |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-selector-Pagination | $borderRadius | $borderRadius |
-| [gap](../styles-and-themes/common-units/#size)-buttonRow-Pagination | $space-2 | $space-2 |
-| [padding](../styles-and-themes/common-units/#size)-Pagination | $space-4 | $space-4 |
-| [textColor](../styles-and-themes/common-units/#color)-Pagination | $color-gray-600 | $color-gray-600 |
-| [textColor](../styles-and-themes/common-units/#color)-selector-Pagination | $color-gray-600 | $color-gray-600 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Pagination | $backgroundColor | $backgroundColor |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selector-Pagination | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Pagination | $color-gray-300 | $color-gray-300 |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-selector-Pagination | $borderRadius | $borderRadius |
+| [gap](/docs/styles-and-themes/common-units/#size)-buttonRow-Pagination | $space-2 | $space-2 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-Pagination | $space-4 | $space-4 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Pagination | $color-gray-600 | $color-gray-600 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-selector-Pagination | $color-gray-600 | $color-gray-600 |

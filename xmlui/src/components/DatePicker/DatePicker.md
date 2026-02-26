@@ -179,7 +179,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 | Array of strings | Disable multiple specific dates | `["05/25/2024", "05/26/2024"]` |
 | Boolean | Disable all dates | `true` |
 
-> [!INFO] You can use the [getDate()](/globals#getdate) function to query the current date.
+> [!INFO] You can use the [getDate()](/docs/globals#getdate) function to query the current date.
 
 ```xmlui-pg copy display name="Example: Disable specific dates" height="440px"
 <App>

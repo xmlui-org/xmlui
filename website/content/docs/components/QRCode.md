@@ -152,10 +152,10 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-QRCode | #FFFFFF | #FFFFFF |
-| [color](../styles-and-themes/common-units/#color)-QRCode | #000000 | #000000 |
-| [padding](../styles-and-themes/common-units/#size)-QRCode | $space-4 | $space-4 |
-| [size](../styles-and-themes/common-units/#size)-QRCode | 256 | 256 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-QRCode | #FFFFFF | #FFFFFF |
+| [color](/docs/styles-and-themes/common-units/#color)-QRCode | #000000 | #000000 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-QRCode | $space-4 | $space-4 |
+| [size](/docs/styles-and-themes/common-units/#size-values)-QRCode | 256 | 256 |
 
 ### Variable Explanations [#variable-explanations]
 

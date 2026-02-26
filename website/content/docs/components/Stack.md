@@ -10,7 +10,7 @@
 - **Order control**: Reverse child element order with the reverse property
 - **Foundation for variants**: Powers HStack, VStack, CHStack, and CVStack specialized components
 
-For common scenarios, consider the specialized variants: [HStack](/components/HStack) (horizontal), [VStack](/components/VStack) (vertical), [CHStack](/components/CHStack) (centered horizontal), and [CVStack](/components/CVStack) (centered vertical).
+For common scenarios, consider the specialized variants: [HStack](/docs/reference/components/HStack) (horizontal), [VStack](/docs/reference/components/VStack) (vertical), [CHStack](/docs/reference/components/CHStack) (centered horizontal), and [CVStack](/docs/reference/components/CVStack) (centered vertical).
 
 ## Behaviors [#behaviors]
 

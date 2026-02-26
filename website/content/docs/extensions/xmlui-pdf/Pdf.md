@@ -483,30 +483,30 @@ Zoom to an exact scale value (clamped between 0.1 and 5). Alias for setScale.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-annotationBox-Pdf | rgba(255, 255, 255, 0.8) | rgba(255, 255, 255, 0.8) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-checkbox-Pdf | rgba(220, 255, 220, 0.8) | rgba(220, 255, 220, 0.8) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-deleteButton-hover-Pdf | #c82333 | #c82333 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-deleteButton-Pdf | #dc3545 | #dc3545 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-resizeHandle-hover-Pdf | #0056b3 | #0056b3 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-resizeHandle-Pdf | #007bff | #007bff |
-| [backgroundColor](../styles-and-themes/common-units/#color)-signature-Pdf | rgba(220, 220, 255, 0.8) | rgba(220, 220, 255, 0.8) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-text-Pdf | rgba(255, 255, 220, 0.8) | rgba(255, 255, 220, 0.8) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-toolbar-Pdf | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
-| [borderColor](../styles-and-themes/common-units/#color)-annotationBox-Pdf | transparent | transparent |
-| [borderColor](../styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-selected-Pdf | #007bff | #007bff |
-| [borderColor](../styles-and-themes/common-units/#color)-toolbar-Pdf | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-page-Pdf | $boxShadow-md | $boxShadow-md |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-selected-Pdf | 0 0 0 2px rgba(0, 123, 255, 0.25) | 0 0 0 2px rgba(0, 123, 255, 0.25) |
-| [color](../styles-and-themes/common-units/#color)-delete-Pdf | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-deleteButton-Pdf | white | white |
-| [color](../styles-and-themes/common-units/#color)-label-Pdf | #333 | #333 |
-| [color](../styles-and-themes/common-units/#color)-resizeHandle-Pdf | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-selected-Pdf | *none* | *none* |
-| [color](../styles-and-themes/common-units/#color)-value-Pdf | #666 | #666 |
-| [gap](../styles-and-themes/common-units/#size)-pages-Pdf | $space-4 | $space-4 |
-| [size](../styles-and-themes/common-units/#size)-Scroller | 10px | 10px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-annotationBox-Pdf | rgba(255, 255, 255, 0.8) | rgba(255, 255, 255, 0.8) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-checkbox-Pdf | rgba(220, 255, 220, 0.8) | rgba(220, 255, 220, 0.8) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-deleteButton-hover-Pdf | #c82333 | #c82333 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-deleteButton-Pdf | #dc3545 | #dc3545 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-resizeHandle-hover-Pdf | #0056b3 | #0056b3 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-resizeHandle-Pdf | #007bff | #007bff |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-signature-Pdf | rgba(220, 220, 255, 0.8) | rgba(220, 220, 255, 0.8) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-text-Pdf | rgba(255, 255, 220, 0.8) | rgba(255, 255, 220, 0.8) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-toolbar-Pdf | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-annotationBox-Pdf | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-field-Pdf | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-selected-Pdf | #007bff | #007bff |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-toolbar-Pdf | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-page-Pdf | $boxShadow-md | $boxShadow-md |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-selected-Pdf | 0 0 0 2px rgba(0, 123, 255, 0.25) | 0 0 0 2px rgba(0, 123, 255, 0.25) |
+| [color](/docs/styles-and-themes/common-units/#color)-delete-Pdf | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-deleteButton-Pdf | white | white |
+| [color](/docs/styles-and-themes/common-units/#color)-label-Pdf | #333 | #333 |
+| [color](/docs/styles-and-themes/common-units/#color)-resizeHandle-Pdf | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-selected-Pdf | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-value-Pdf | #666 | #666 |
+| [gap](/docs/styles-and-themes/common-units/#size)-pages-Pdf | $space-4 | $space-4 |
+| [size](/docs/styles-and-themes/common-units/#size-values)-Scroller | 10px | 10px |

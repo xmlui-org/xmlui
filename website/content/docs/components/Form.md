@@ -8,7 +8,7 @@
 - **Context sharing**: Provides `$data` and other context values accessible to all nested components
 - **Submission handling**: Manages form submission workflow and prevents invalid submissions
 
-See [this guide](/forms) for details.
+See [this guide](/docs/guides/forms) for details.
 
 **Context variables available during execution:**
 
@@ -369,19 +369,19 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Form | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-danger-100 | $color-danger-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-primary-100 | $color-primary-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-success-100 | $color-success-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ValidationDisplay-warning | $color-warn-100 | $color-warn-100 |
-| [color](../styles-and-themes/common-units/#color)-accent-ValidationDisplay-error | $color-error | $color-error |
-| [color](../styles-and-themes/common-units/#color)-accent-ValidationDisplay-info | $color-info | $color-info |
-| [color](../styles-and-themes/common-units/#color)-accent-ValidationDisplay-valid | $color-valid | $color-valid |
-| [color](../styles-and-themes/common-units/#color)-accent-ValidationDisplay-warning | $color-warning | $color-warning |
-| [gap](../styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
-| [gap](../styles-and-themes/common-units/#size)-Form | $space-4 | $space-4 |
-| [marginTop](../styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
-| [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-error | $color-error |
-| [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-info | $color-info |
-| [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-valid | $color-valid |
-| [textColor](../styles-and-themes/common-units/#color)-ValidationDisplay-warning | $color-warning | $color-warning |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Form | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-danger-100 | $color-danger-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-primary-100 | $color-primary-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-success-100 | $color-success-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-warning | $color-warn-100 | $color-warn-100 |
+| [color](/docs/styles-and-themes/common-units/#color)-accent-ValidationDisplay-error | $color-error | $color-error |
+| [color](/docs/styles-and-themes/common-units/#color)-accent-ValidationDisplay-info | $color-info | $color-info |
+| [color](/docs/styles-and-themes/common-units/#color)-accent-ValidationDisplay-valid | $color-valid | $color-valid |
+| [color](/docs/styles-and-themes/common-units/#color)-accent-ValidationDisplay-warning | $color-warning | $color-warning |
+| [gap](/docs/styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
+| [gap](/docs/styles-and-themes/common-units/#size)-Form | $space-4 | $space-4 |
+| [marginTop](/docs/styles-and-themes/common-units/#size-values)-buttonRow-Form | $space-4 | $space-4 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-error | $color-error |
+| [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-info | $color-info |
+| [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-valid | $color-valid |
+| [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-warning | $color-warning | $color-warning |

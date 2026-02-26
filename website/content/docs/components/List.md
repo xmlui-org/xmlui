@@ -1546,5 +1546,5 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-List | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-List2 | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-List | $backgroundColor | $backgroundColor |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-List2 | *none* | *none* |
