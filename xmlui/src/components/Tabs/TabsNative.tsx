@@ -161,6 +161,22 @@ export const Tabs = forwardRef(function Tabs(
                 tabContextValue.setActiveTabId(tab);
                 setActiveIndex(newIndex);
                 onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+                if (typeof window !== "undefined") {
+                  const w = window as any;
+                  if (Array.isArray(w._xsLogs)) {
+                    w._xsLogs.push({
+                      ts: Date.now(),
+                      perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                      traceId: w._xsCurrentTrace,
+                      kind: "focus:change",
+                      component: "Tabs",
+                      displayLabel: tabItem?.label,
+                      tabIndex: newIndex,
+                      tabId: tabItem.id || tabItem.innerId,
+                      tabLabel: tabItem?.label,
+                    });
+                  }
+                }
               }
             }}
             orientation="vertical"
@@ -224,6 +240,22 @@ export const Tabs = forwardRef(function Tabs(
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
             onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+            if (typeof window !== "undefined") {
+              const w = window as any;
+              if (Array.isArray(w._xsLogs)) {
+                w._xsLogs.push({
+                  ts: Date.now(),
+                  perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                  traceId: w._xsCurrentTrace,
+                  kind: "focus:change",
+                  component: "Tabs",
+                  displayLabel: tabItem?.label,
+                  tabIndex: newIndex,
+                  tabId: tabItem.id || tabItem.innerId,
+                  tabLabel: tabItem?.label,
+                });
+              }
+            }
           }
         }}
         orientation={orientation}

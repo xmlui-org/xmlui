@@ -259,7 +259,7 @@ export const ModalDialog = React.forwardRef(
                 variant={"ghost"}
                 themeColor={"secondary"}
                 className={styles.closeButton}
-                aria-label="Close"
+                aria-label="Close dialog"
                 icon={<Icon name={"close"} size={"sm"} />}
                 orientation={"vertical"}
               />
