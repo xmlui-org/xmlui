@@ -594,8 +594,8 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 **Also run Image's own tests:** `npx playwright test Image.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 42 passed, 0 failed
+**Failing tests:** _(none)_
 
 ---
 
@@ -612,8 +612,8 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 **Also run FlowLayout's own tests:** `npx playwright test FlowLayout.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 149 passed, 4 failed (pre-existing scroll fade tests in Stack.spec.ts and FlowLayout.spec.ts)
+**Failing tests:** scroll fade visibility (pre-existing)
 
 ---
 
@@ -630,8 +630,8 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 **Also run RadioGroup's own tests:** `npx playwright test RadioGroup.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 160 passed, 0 failed
+**Failing tests:** _(none)_
 
 ---
 

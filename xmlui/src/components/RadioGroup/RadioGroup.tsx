@@ -1,7 +1,9 @@
+import React from "react";
 import styles from "./RadioGroup.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -101,6 +103,21 @@ export const RadioGroupMd = createMetadata({
   },
 });
 
+type ThemedRadioGroupProps = React.ComponentPropsWithoutRef<typeof RadioGroup>;
+
+export const ThemedRadioGroup = React.forwardRef<React.ElementRef<typeof RadioGroup>, ThemedRadioGroupProps>(
+  function ThemedRadioGroup({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(RadioGroupMd);
+    return (
+      <RadioGroup
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const radioGroupRenderer = createComponentRenderer(
   COMP,
   RadioGroupMd,
@@ -115,7 +132,7 @@ export const radioGroupRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     return (
-      <RadioGroup
+      <ThemedRadioGroup
         autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         className={className}
@@ -131,7 +148,7 @@ export const radioGroupRenderer = createComponentRenderer(
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
       >
         {renderChild(node.children)}
-      </RadioGroup>
+      </ThemedRadioGroup>
     );
   },
 );

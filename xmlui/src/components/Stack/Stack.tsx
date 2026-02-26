@@ -14,7 +14,7 @@ import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-hel
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
-import { FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayoutNative";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayout";
 
 const COMP = "Stack";
 

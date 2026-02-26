@@ -8,12 +8,12 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { ThemedText as Text } from "../Text/Text";
 import { ThemedHeading as Heading } from "../Heading/Heading";
-import { Image } from "../Image/ImageNative";
+import { ThemedImage as Image } from "../Image/Image";
 import { Markdown } from "../Markdown/MarkdownNative";
 import { TableOfContents } from "../TableOfContents/TableOfContentsNative";
 import { Tabs } from "../Tabs/TabsNative";
 import { TabItemComponent } from "../Tabs/TabItemNative";
-import { FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayoutNative";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayout";
 import styles from "./Blog.module.scss";
 
 type BlogPost = {

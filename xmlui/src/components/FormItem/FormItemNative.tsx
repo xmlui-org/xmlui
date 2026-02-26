@@ -25,7 +25,7 @@ import { Toggle } from "../Toggle/Toggle";
 import { FileInput } from "../FileInput/FileInputNative";
 import { NumberBox } from "../NumberBox/NumberBoxNative";
 import { ThemedSelect as Select } from "../Select/Select";
-import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 
 import {
   fieldChanged,

@@ -1,7 +1,7 @@
 import type { CSSProperties, ForwardedRef} from "react";
 import { forwardRef } from "react";
 
-import { Image } from "../Image/ImageNative";
+import { ThemedImage as Image } from "../Image/Image";
 import { useLogoUrl } from "../AppHeader/AppHeaderNative";
 
 // Default props for Logo component
