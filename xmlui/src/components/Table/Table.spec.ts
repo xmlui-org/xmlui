@@ -410,10 +410,10 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  test.describe("alwaysShowCheckboxes property", () => {
-    test("checkboxes are always visible when alwaysShowCheckboxes is true", async ({ initTestBed, page }) => {
+  test.describe("alwaysShowSelectionCheckboxes property", () => {
+    test("checkboxes are always visible when alwaysShowSelectionCheckboxes is true", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowCheckboxes="true" testId="table">
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
@@ -427,9 +427,9 @@ test.describe("Basic Functionality", () => {
       }
     });
 
-    test("checkboxes are hidden on non-hovered rows by default (alwaysShowCheckboxes false)", async ({ initTestBed, page }) => {
+    test("checkboxes are hidden on non-hovered rows by default (alwaysShowSelectionCheckboxes false)", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowCheckboxes="false" testId="table">
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="false" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
@@ -438,9 +438,9 @@ test.describe("Basic Functionality", () => {
       await expect(checkboxes).toHaveCount(5); // header + 4 data rows
     });
 
-    test("alwaysShowCheckboxes has no effect when hideSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+    test("alwaysShowSelectionCheckboxes has no effect when hideSelectionCheckboxes is true", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true" alwaysShowCheckboxes="true" testId="table">
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true" alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
@@ -449,9 +449,9 @@ test.describe("Basic Functionality", () => {
       await expect(checkboxes).toHaveCount(0);
     });
 
-    test("alwaysShowCheckboxes has no effect when row selection is disabled", async ({ initTestBed, page }) => {
+    test("alwaysShowSelectionCheckboxes has no effect when row selection is disabled", async ({ initTestBed, page }) => {
       await initTestBed(`
-        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowCheckboxes="true" testId="table">
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);

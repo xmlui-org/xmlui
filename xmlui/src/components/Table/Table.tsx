@@ -193,21 +193,21 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiRowSelection,
     },
-    alwaysShowSelectionHeader: {
+    alwaysShowSelectionCheckboxesHeader: {
       description:
         "This property indicates when the row selection header is displayed. When the value is " +
         "`true,` the selection header is always visible. Otherwise, it is displayed only " +
         "when hovered.",
       valueType: "boolean",
-      defaultValue: defaultProps.alwaysShowSelectionHeader,
+      defaultValue: defaultProps.alwaysShowSelectionCheckboxesHeader,
     },
-    alwaysShowCheckboxes: {
+    alwaysShowSelectionCheckboxes: {
       description:
         "When set to `true`, selection checkboxes are always visible for all rows instead of " +
         "appearing only on hover. Has no effect when `hideSelectionCheckboxes` is `true` or " +
         "when row selection is disabled.",
       valueType: "boolean",
-      defaultValue: defaultProps.alwaysShowCheckboxes,
+      defaultValue: defaultProps.alwaysShowSelectionCheckboxes,
     },
     alwaysShowSortingIndicator: {
       description:
@@ -613,8 +613,8 @@ const TableWithColumns = memo(
             enableMultiRowSelection={extractValue.asOptionalBoolean(
               node.props.enableMultiRowSelection,
             )}
-            alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
-              node.props.alwaysShowSelectionHeader,
+            alwaysShowSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
+              node.props.alwaysShowSelectionCheckboxesHeader,
             )}
             alwaysShowSortingIndicator={extractValue.asOptionalBoolean(
               node.props.alwaysShowSortingIndicator,
@@ -642,7 +642,7 @@ const TableWithColumns = memo(
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
-            alwaysShowCheckboxes={extractValue.asOptionalBoolean(node.props.alwaysShowCheckboxes)}
+            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.alwaysShowSelectionCheckboxes)}
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
           />

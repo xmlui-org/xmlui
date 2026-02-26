@@ -201,8 +201,8 @@ type TableProps = {
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
-  alwaysShowSelectionHeader?: boolean;
-  alwaysShowCheckboxes?: boolean;
+  alwaysShowSelectionCheckboxesHeader?: boolean;
+  alwaysShowSelectionCheckboxes?: boolean;
   alwaysShowSortingIndicator?: boolean;
   alwaysShowPagination?: boolean;
   registerComponentApi: RegisterComponentApiFn;
@@ -553,9 +553,9 @@ export const Table = forwardRef(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
-      alwaysShowCheckboxes = defaultProps.alwaysShowCheckboxes,
+      alwaysShowSelectionCheckboxes = defaultProps.alwaysShowSelectionCheckboxes,
       alwaysShowPagination,
-      alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
+      alwaysShowSelectionCheckboxesHeader = defaultProps.alwaysShowSelectionCheckboxesHeader,
       alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
       registerComponentApi,
       onSelectionDidChange,
@@ -837,7 +837,7 @@ export const Table = forwardRef(
               {...{
                 "aria-label": "Select all rows",
                 className: classnames(styles.checkBoxWrapper, {
-                  [styles.showInHeader]: alwaysShowSelectionHeader,
+                  [styles.showInHeader]: alwaysShowSelectionCheckboxesHeader,
                   [styles.forceHoverWrapper]: headerCheckboxHovered,
                 }),
                 value: table.getIsAllRowsSelected(),
@@ -866,7 +866,7 @@ export const Table = forwardRef(
                     "aria-label": `Select ${row.original[idKey]}`,
                     className: classnames(styles.checkBoxWrapper, {
                       [styles.forceHoverWrapper]: hoveredRowId === row.id,
-                      [styles.showInRow]: alwaysShowCheckboxes,
+                      [styles.showInRow]: alwaysShowSelectionCheckboxes,
                     }),
                     value: row.getIsSelected(),
                     indeterminate: row.getIsSomeSelected(),
@@ -892,7 +892,7 @@ export const Table = forwardRef(
       rowsSelectable,
       columnsWithCustomCell,
       enableMultiRowSelection,
-      alwaysShowSelectionHeader,
+      alwaysShowSelectionCheckboxesHeader,
       checkAllRows,
       toggleRow,
       rowDisabledPredicate,
@@ -900,7 +900,7 @@ export const Table = forwardRef(
       hoveredRowId,
       headerCheckboxHovered,
       hideSelectionCheckboxes,
-      alwaysShowCheckboxes,
+      alwaysShowSelectionCheckboxes,
     ]);
 
     // --- Set up page information (using the first page size option)
@@ -1853,8 +1853,8 @@ export const defaultProps = {
   hideHeader: false,
   hideNoDataView: false,
   hideSelectionCheckboxes: false,
-  alwaysShowSelectionHeader: false,
-  alwaysShowCheckboxes: false,
+  alwaysShowSelectionCheckboxesHeader: false,
+  alwaysShowSelectionCheckboxes: false,
   alwaysShowSortingIndicator: false,
   noBottomBorder: false,
   paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
