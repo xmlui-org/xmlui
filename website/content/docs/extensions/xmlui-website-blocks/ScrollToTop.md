@@ -69,24 +69,24 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ScrollToTop | $color-primary | $color-primary |
-| [borderColor](../styles-and-themes/common-units/#color)-ScrollToTop | $color-primary-dark | $color-primary-dark |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-ScrollToTop | $space-24 | $space-24 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ScrollToTop | $color-primary | $color-primary |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-ScrollToTop | $color-primary-dark | $color-primary-dark |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ScrollToTop | $space-24 | $space-24 |
 | bottom-ScrollToTop | *none* | *none* |
 | bottom-ScrollToTop-lg | $space-16 | $space-16 |
 | bottom-ScrollToTop-md | $space-14 | $space-14 |
 | bottom-ScrollToTop-sm | $space-12 | $space-12 |
 | bottom-ScrollToTop-xs | $space-10 | $space-10 |
-| [color](../styles-and-themes/common-units/#color)-ScrollToTop | $color-surface-0 | $color-surface-0 |
+| [color](/docs/styles-and-themes/common-units/#color)-ScrollToTop | $color-surface-0 | $color-surface-0 |
 | horizontalSpacing-ScrollToTop | *none* | *none* |
 | horizontalSpacing-ScrollToTop-lg | $space-12 | $space-12 |
 | horizontalSpacing-ScrollToTop-md | $space-10 | $space-10 |
 | horizontalSpacing-ScrollToTop-sm | $space-8 | $space-8 |
 | horizontalSpacing-ScrollToTop-xs | $space-6 | $space-6 |
 | shadow-ScrollToTop | $shadow-lg | $shadow-lg |
-| [size](../styles-and-themes/common-units/#size)-ScrollToTop | *none* | *none* |
-| [size](../styles-and-themes/common-units/#size)-ScrollToTop-lg | 48px | 48px |
-| [size](../styles-and-themes/common-units/#size)-ScrollToTop-md | 42px | 42px |
-| [size](../styles-and-themes/common-units/#size)-ScrollToTop-sm | 42px | 42px |
-| [size](../styles-and-themes/common-units/#size)-ScrollToTop-xs | 38px | 38px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-ScrollToTop | *none* | *none* |
+| [size](/docs/styles-and-themes/common-units/#size-values)-ScrollToTop-lg | 48px | 48px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-ScrollToTop-md | 42px | 42px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-ScrollToTop-sm | 42px | 42px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-ScrollToTop-xs | 38px | 38px |
 | zIndex-ScrollToTop | 1000 | 1000 |

@@ -33,9 +33,9 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [color](../styles-and-themes/common-units/#color)-MenuSeparator | $borderColor-dropdown-item | $borderColor-dropdown-item |
-| [height](../styles-and-themes/common-units/#size)-MenuSeparator | 1px | 1px |
-| [marginBottom](../styles-and-themes/common-units/#size)-MenuSeparator | $space-1 | $space-1 |
-| [margin](../styles-and-themes/common-units/#size)Horizontal-MenuSeparator | 12px | 12px |
-| [marginTop](../styles-and-themes/common-units/#size)-MenuSeparator | $space-1 | $space-1 |
-| [width](../styles-and-themes/common-units/#size)-MenuSeparator | 100% | 100% |
+| [color](/docs/styles-and-themes/common-units/#color)-MenuSeparator | $borderColor-dropdown-item | $borderColor-dropdown-item |
+| [height](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | 1px | 1px |
+| [marginBottom](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | $space-1 | $space-1 |
+| [margin](/docs/styles-and-themes/common-units/#size-values)Horizontal-MenuSeparator | 12px | 12px |
+| [marginTop](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | $space-1 | $space-1 |
+| [width](/docs/styles-and-themes/common-units/#size-values)-MenuSeparator | 100% | 100% |

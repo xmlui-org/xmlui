@@ -90,6 +90,6 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [gap](../styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-Pages | $space-4 | $space-4 |
-| [paddingVertical](../styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
+| [gap](/docs/styles-and-themes/common-units/#size)-Pages | $space-5 | $space-5 |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-Pages | $space-4 | $space-4 |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Pages | $space-5 | $space-5 |

@@ -597,12 +597,12 @@ See [Button styling](/docs/reference/components/Button#styling) and [TextBox sty
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-FileInput--focus | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-FileInput--focus | *none* | *none* |
-| [outlineColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
-| [outlineOffset](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
-| [outlineStyle](../styles-and-themes/common-units/#border)-FileInput--focus | *none* | *none* |
-| [outlineWidth](../styles-and-themes/common-units/#size)-FileInput--focus | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-FileInput--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-FileInput--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-FileInput--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-FileInput--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-FileInput--focus | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-FileInput--focus | *none* | *none* |

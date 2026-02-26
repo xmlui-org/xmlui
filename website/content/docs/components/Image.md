@@ -134,5 +134,5 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [borderColor](../styles-and-themes/common-units/#color)-Image | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Image | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Image | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Image | *none* | *none* |

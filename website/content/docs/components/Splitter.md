@@ -176,14 +176,14 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-resizer-Splitter | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Splitter | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)-Splitter | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Splitter | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Splitter | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Splitter | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Splitter | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Splitter | *none* | *none* |
-| [cursor](../styles-and-themes/common-units/#cursor)-resizer-horizontal-Splitter | ew-resize | ew-resize |
-| [cursor](../styles-and-themes/common-units/#cursor)-resizer-vertical-Splitter | ns-resize | ns-resize |
-| [thickness](../styles-and-themes/common-units/#size)-resizer-Splitter | 5px | 5px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-resizer-Splitter | $color-surface-100 | $color-surface-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Splitter | *none* | *none* |
+| [border](/docs/styles-and-themes/common-units/#border)-Splitter | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Splitter | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Splitter | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Splitter | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Splitter | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Splitter | *none* | *none* |
+| [cursor](/docs/styles-and-themes/common-units/#cursor)-resizer-horizontal-Splitter | ew-resize | ew-resize |
+| [cursor](/docs/styles-and-themes/common-units/#cursor)-resizer-vertical-Splitter | ns-resize | ns-resize |
+| [thickness](/docs/styles-and-themes/common-units/#size-values)-resizer-Splitter | 5px | 5px |
