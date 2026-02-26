@@ -13,7 +13,7 @@ import rehypeRaw from "rehype-raw";
 import styles from "./Markdown.module.scss";
 
 import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 import { LinkNative } from "../Link/LinkNative";
 import { Toggle } from "../Toggle/Toggle";
 import {

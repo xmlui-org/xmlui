@@ -1,7 +1,9 @@
 import styles from "./Text.module.scss";
 
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   variantOptionsMd,
   type VariantProps,
@@ -200,6 +202,14 @@ export const TextMd = createMetadata({
     },
   },
 });
+
+type ThemedTextProps = React.ComponentProps<typeof Text> & { className?: string };
+export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(
+  function ThemedText({ className, ...props }: ThemedTextProps, ref) {
+    const themeClass = useComponentThemeClass(TextMd);
+    return <Text {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const textComponentRenderer = createComponentRenderer(
   COMP,

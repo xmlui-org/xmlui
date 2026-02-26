@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { LinkNative } from "../Link/LinkNative";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 import { Heading } from "../Heading/HeadingNative";
 import { Image } from "../Image/ImageNative";
 import { Markdown } from "../Markdown/MarkdownNative";

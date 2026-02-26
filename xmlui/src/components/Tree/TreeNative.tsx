@@ -2,7 +2,7 @@ import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
 import { ThemedIcon } from "../Icon/Icon";
-import { Spinner } from "../Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { Scroller } from "../ScrollViewer/Scroller";
 
 import styles from "./TreeComponent.module.scss";

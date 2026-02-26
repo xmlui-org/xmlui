@@ -356,21 +356,24 @@ After each consumer migration, run E2E tests for consumer components. Record res
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
 | `ValidationSummary/ValidationSummary.tsx` | _(none)_ | — | 🚫 |
-| `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | |
-| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | |
+| `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | ✅ |
 | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
-| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | |
-| `Input/InputAdornment.tsx` | `TextBox.spec.ts` | `npx playwright test TextBox.spec.ts --workers=1 --reporter=line` | |
-| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | |
-| `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | |
-| `ModalDialog/Dialog.tsx` | `ModalDialog.spec.ts` | `npx playwright test ModalDialog.spec.ts --workers=1 --reporter=line` | |
-| `Pagination/PaginationNative.tsx` | `Pagination.spec.ts` | `npx playwright test Pagination.spec.ts --workers=1 --reporter=line` | |
-| `CodeBlock/CodeBlockNative.tsx` | `CodeBlock.spec.ts` | `npx playwright test CodeBlock.spec.ts --workers=1 --reporter=line` | |
+| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Input/InputAdornment.tsx` | `TextBox.spec.ts` | `npx playwright test TextBox.spec.ts --workers=1 --reporter=line` | ⚠️ |
+| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | ✅ |
+| `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | ✅ |
+| `ModalDialog/Dialog.tsx` | `ModalDialog.spec.ts` | `npx playwright test ModalDialog.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Pagination/PaginationNative.tsx` | `Pagination.spec.ts` | `npx playwright test Pagination.spec.ts --workers=1 --reporter=line` | ✅ |
+| `CodeBlock/CodeBlockNative.tsx` | `CodeBlock.spec.ts` | `npx playwright test CodeBlock.spec.ts --workers=1 --reporter=line` | ✅ |
 
-**Also run Text's own tests:** `npx playwright test Text.spec.ts --workers=1 --reporter=line`
+**Also run Text's own tests:** `npx playwright test Text.spec.ts --workers=1 --reporter=line` → ⚠️
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done (818 passed, 33 failed, 12 skipped — all failures pre-existing)
+
+**Failing tests (pre-existing, unrelated to Text migration):**
+- `Text.spec.ts:1778–2115` (28 tests) — "Custom Variants" suite: custom variant CSS theme variables (textColor, fontFamily, fontSize, fontStyle, fontWeight, etc.) — CSS toHaveCSS checks; pre-existing infrastructure issue unrelated to ThemedText
+- `TextBox.spec.ts:596, 606, 616, 626, 647` (5 tests) — "Theme Vars" suite: backgroundColor, borderColor, textColor, focus borderColor, borderRadius — pre-existing CSS theme variable failures
 
 ---
 
@@ -382,15 +385,19 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | |
-| `Table/TableNative.tsx` | `Table.spec.ts` | `npx playwright test Table.spec.ts --workers=1 --reporter=line` | |
-| `FormItem/ItemWithLabel.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | |
-| `Tree/TreeNative.tsx` | `Tree.spec.ts` | `npx playwright test Tree.spec.ts --workers=1 --reporter=line` | |
+| `List/ListNative.tsx` | `List.spec.ts` | `npx playwright test List.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Table/TableNative.tsx` | `Table.spec.ts` | `npx playwright test Table.spec.ts --workers=1 --reporter=line` | ✅ |
+| `FormItem/ItemWithLabel.tsx` | `FormItem.spec.ts` | `npx playwright test FormItem.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Tree/TreeNative.tsx` | `Tree.spec.ts` | `npx playwright test Tree.spec.ts --workers=1 --reporter=line` | ⚠️ |
 
-**Also run Spinner's own tests:** `npx playwright test Spinner.spec.ts --workers=1 --reporter=line`
+**Also run Spinner's own tests:** `npx playwright test Spinner.spec.ts --workers=1 --reporter=line` → ✅
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done (530 passed, 2 failed, 1 flaky, 3 skipped — all failures pre-existing)
+
+**Failing tests (pre-existing, unrelated to Spinner migration):**
+- `Tree.spec.ts:3853` — "bottom fade is visible when not at bottom" (pre-existing scroll fade visibility)
+- `Tree.spec.ts:3883` — "top fade appears when scrolled down" (pre-existing scroll fade visibility)
+- `LabelList.spec.ts:94` — flaky (Charts/LabelList visibility timing; unrelated)
 
 ---
 

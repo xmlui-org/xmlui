@@ -43,7 +43,7 @@ import { ApiInterceptorProvider } from "./components-core/interception/ApiInterc
 import { Spinner } from "./components/Spinner/SpinnerNative";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
-import { Text } from "./components/Text/TextNative";
+import { ThemedText as Text } from "./components/Text/Text";
 import { TextBox } from "./components/TextBox/TextBoxNative";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";

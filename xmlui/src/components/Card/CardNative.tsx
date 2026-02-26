@@ -9,7 +9,7 @@ import { Avatar } from "../Avatar/AvatarNative";
 import { LinkNative } from "../Link/LinkNative";
 import type { HeadingProps } from "../Heading/HeadingNative";
 import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 
 type Props = {
   style?: CSSProperties;

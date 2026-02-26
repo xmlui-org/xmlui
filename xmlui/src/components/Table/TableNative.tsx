@@ -43,7 +43,7 @@ import {
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
-import { Spinner } from "../Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { Toggle } from "../Toggle/Toggle";
 import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";

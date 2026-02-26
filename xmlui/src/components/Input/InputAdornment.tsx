@@ -3,7 +3,7 @@ import classnames from "classnames";
 import styles from "./InputAdornment.module.scss";
 
 import { ThemedIcon } from "../Icon/Icon";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 
 interface AdornmentProps {
   iconName?: string;

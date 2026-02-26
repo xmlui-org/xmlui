@@ -5,7 +5,7 @@ import type { CSSProperties, ReactNode } from "react";
 import styles from "./Pagination.module.scss";
 import { ThemedButton as Button } from "../Button/Button";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 import { ThemedIcon } from "../Icon/Icon";
 import type { OrientationOptions } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";

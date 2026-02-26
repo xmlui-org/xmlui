@@ -12,7 +12,7 @@ import type {
 } from "../Form/FormContext";
 import { Stack } from "../Stack/StackNative";
 import { ThemedIcon } from "../Icon/Icon";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
 import { ThemedButton as Button } from "../Button/Button";
 

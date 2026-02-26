@@ -37,7 +37,7 @@ import {
   UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
 import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
-import { Text } from "../../components/Text/TextNative";
+import { ThemedText as Text } from "../../components/Text/Text";
 import { Stack } from "../../components/Stack/StackNative";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
 import { ThemedButton as Button } from "../Button/Button";

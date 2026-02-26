@@ -35,8 +35,8 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
 import classnames from "classnames";
 import { useEvent } from "../../components-core/utils/misc";
-import { Spinner } from "../Spinner/SpinnerNative";
-import { Text } from "../Text/TextNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedText as Text } from "../Text/Text";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 

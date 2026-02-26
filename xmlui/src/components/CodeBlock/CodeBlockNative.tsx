@@ -1,6 +1,6 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
-import { Text } from "../Text/TextNative";
+import { ThemedText as Text } from "../Text/Text";
 import {
   type CodeHighlighterMeta,
   CodeHighlighterMetaKeys,
