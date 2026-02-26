@@ -108,6 +108,55 @@ function normalizeSectionData(rawSection: unknown): AppNavData | undefined {
   return section;
 }
 
+// Expands compound (user-defined) components used inside the NavPanel by
+// inlining their children, so that nav-specific placeholders (like
+// IncludeNavSection) are resolved before rendering.
+function expandCompoundNavChildren(
+  children: ComponentDef[] | undefined,
+  lookupCompoundComponent: (name: string) => ComponentDef | undefined,
+): ComponentDef[] | undefined {
+  if (!children) return children;
+
+  const result: ComponentDef[] = [];
+
+  children.forEach((child) => {
+    if (!child || typeof child !== "object") {
+      return;
+    }
+
+    const compoundDef = lookupCompoundComponent(child.type);
+
+    if (compoundDef) {
+      // Inline the compound component's children at the same level.
+      const inlinedChildren = expandCompoundNavChildren(
+        (compoundDef.children || []) as ComponentDef[],
+        lookupCompoundComponent,
+      );
+      if (inlinedChildren) {
+        result.push(...inlinedChildren);
+      }
+      return;
+    }
+
+    // Recurse into regular children to expand any nested compound components.
+    const expandedNestedChildren = expandCompoundNavChildren(
+      (child.children || []) as ComponentDef[],
+      lookupCompoundComponent,
+    );
+
+    if (expandedNestedChildren !== child.children) {
+      result.push({
+        ...child,
+        children: expandedNestedChildren,
+      });
+    } else {
+      result.push(child);
+    }
+  });
+
+  return result;
+}
+
 function buildSectionNavChildren(rawSection: unknown, uidPrefix: string): ComponentDef[] {
   const section = normalizeSectionData(rawSection);
   if (!section) return [];
@@ -246,15 +295,30 @@ function NavPanelWithBuiltNavHierarchy({
 }) {
   const componentRegistry = useComponentRegistry();
 
+  const appNavSections = appContext?.appGlobals?.navSections as AppNavSections | undefined;
+
   const lookupCompoundComponent = useCallback(
     (name: string): ComponentDef | undefined => {
       const entry = componentRegistry.lookupComponentRenderer(name);
       if (!entry?.isCompoundComponent || !entry.compoundComponentDef) {
         return undefined;
       }
-      return entry.compoundComponentDef.component as ComponentDef;
+      const baseComponent = entry.compoundComponentDef.component as ComponentDef;
+
+      // Ensure IncludeNavSection placeholders inside compound nav components
+      // are also resolved against appNavSections, just like top-level children.
+      const resolvedChildren = resolveNavSectionChildren(
+        baseComponent.children as ComponentDef[] | undefined,
+        appNavSections,
+        extractValue,
+      );
+
+      return {
+        ...baseComponent,
+        children: resolvedChildren,
+      };
     },
-    [componentRegistry],
+    [componentRegistry, appNavSections, extractValue],
   );
 
   const effectiveChildren = useMemo(() => {
@@ -265,15 +329,24 @@ function NavPanelWithBuiltNavHierarchy({
     );
   }, [appContext?.appGlobals?.navSections, extractValue, node.children]);
 
+  const expandedChildren = useMemo(() => {
+    return (
+      expandCompoundNavChildren(
+        effectiveChildren as ComponentDef[] | undefined,
+        lookupCompoundComponent,
+      ) || effectiveChildren
+    );
+  }, [effectiveChildren, lookupCompoundComponent]);
+
   const navLinks = useMemo(() => {
     return buildNavHierarchy(
-      effectiveChildren,
+      expandedChildren,
       extractValue,
       undefined,
       [],
       lookupCompoundComponent,
     );
-  }, [effectiveChildren, extractValue, lookupCompoundComponent]);
+  }, [expandedChildren, extractValue, lookupCompoundComponent]);
 
   const scrollStyle = extractValue.asOptionalString(
     node.props.scrollStyle,
@@ -295,7 +368,7 @@ function NavPanelWithBuiltNavHierarchy({
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
     >
-      {renderChild(effectiveChildren)}
+      {renderChild(expandedChildren)}
     </NavPanel>
   );
 }
