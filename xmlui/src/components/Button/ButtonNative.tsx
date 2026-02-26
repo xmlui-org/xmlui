@@ -16,7 +16,6 @@ import {
 } from "../abstractions";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { VisuallyHidden } from "../VisuallyHidden";
-import { ButtonMd } from "./Button";
 
 type Props = {
   id?: string;

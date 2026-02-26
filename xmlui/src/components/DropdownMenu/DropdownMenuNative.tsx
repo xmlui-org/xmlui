@@ -22,7 +22,6 @@ import type {
   AlignmentOptions,
 } from "../abstractions";
 import { Icon } from "../Icon/IconNative";
-import { Theme } from "../Theme/ThemeNative";
 import { ThemedButton } from "../Button/Button";
 
 // Context to manage dropdown menu state
@@ -158,6 +157,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
               variant={triggerButtonVariant as ButtonVariant}
               themeColor={triggerButtonThemeColor as ButtonThemeColor}
               disabled={disabled}
+              className=""
             >
               {label}
             </ThemedButton>
