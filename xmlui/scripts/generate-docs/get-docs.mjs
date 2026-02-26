@@ -205,7 +205,7 @@ async function generateComponentsOverview(overviewFile, summaryTitle, components
       const description = originalMetadata?.description || TEXT_CONSTANTS.NO_DESCRIPTION_AVAILABLE;
 
       // Format the table row with correct relative path
-      return `| [${componentName}](./${componentName}) | ${description} |`;
+      return `| [${componentName}](/docs/reference/components/${componentName}) | ${description} |`;
     });
 
     // Combine header and rows

@@ -43,4 +43,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [textColor](../styles-and-themes/common-units/#color)-LabelList | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-LabelList | $textColor-primary | $textColor-primary |

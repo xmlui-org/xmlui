@@ -152,11 +152,6 @@
           "icon": "component"
         },
         {
-          "to": "/components/EmojiSelector",
-          "label": "EmojiSelector",
-          "icon": "component"
-        },
-        {
           "to": "/components/ExpandableItem",
           "label": "ExpandableItem",
           "icon": "component"
@@ -469,6 +464,11 @@
         {
           "to": "/components/StickyBox",
           "label": "StickyBox",
+          "icon": "component"
+        },
+        {
+          "to": "/components/StickySection",
+          "label": "StickySection",
           "icon": "component"
         },
         {
