@@ -201,6 +201,14 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.alwaysShowSelectionHeader,
     },
+    alwaysShowCheckboxes: {
+      description:
+        "When set to `true`, selection checkboxes are always visible for all rows instead of " +
+        "appearing only on hover. Has no effect when `hideSelectionCheckboxes` is `true` or " +
+        "when row selection is disabled.",
+      valueType: "boolean",
+      defaultValue: defaultProps.alwaysShowCheckboxes,
+    },
     alwaysShowSortingIndicator: {
       description:
         `This property indicates whether the sorting indicator is always visible in the column ` +
@@ -634,6 +642,7 @@ const TableWithColumns = memo(
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
+            alwaysShowCheckboxes={extractValue.asOptionalBoolean(node.props.alwaysShowCheckboxes)}
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
           />

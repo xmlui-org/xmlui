@@ -202,6 +202,7 @@ type TableProps = {
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
   alwaysShowSelectionHeader?: boolean;
+  alwaysShowCheckboxes?: boolean;
   alwaysShowSortingIndicator?: boolean;
   alwaysShowPagination?: boolean;
   registerComponentApi: RegisterComponentApiFn;
@@ -552,6 +553,7 @@ export const Table = forwardRef(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      alwaysShowCheckboxes = defaultProps.alwaysShowCheckboxes,
       alwaysShowPagination,
       alwaysShowSelectionHeader = defaultProps.alwaysShowSelectionHeader,
       alwaysShowSortingIndicator = defaultProps.alwaysShowSortingIndicator,
@@ -864,6 +866,7 @@ export const Table = forwardRef(
                     "aria-label": `Select ${row.original[idKey]}`,
                     className: classnames(styles.checkBoxWrapper, {
                       [styles.forceHoverWrapper]: hoveredRowId === row.id,
+                      [styles.showInRow]: alwaysShowCheckboxes,
                     }),
                     value: row.getIsSelected(),
                     indeterminate: row.getIsSomeSelected(),
@@ -897,6 +900,7 @@ export const Table = forwardRef(
       hoveredRowId,
       headerCheckboxHovered,
       hideSelectionCheckboxes,
+      alwaysShowCheckboxes,
     ]);
 
     // --- Set up page information (using the first page size option)
@@ -1850,6 +1854,7 @@ export const defaultProps = {
   hideNoDataView: false,
   hideSelectionCheckboxes: false,
   alwaysShowSelectionHeader: false,
+  alwaysShowCheckboxes: false,
   alwaysShowSortingIndicator: false,
   noBottomBorder: false,
   paginationControlsLocation: "bottom" as TablePaginationControlsLocation,
