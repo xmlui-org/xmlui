@@ -282,37 +282,37 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | --- | --- | --- |
 | autoHideDelay-whenMouseOver-Scroller | 400 | 400 |
 | autoHideDelay-whenScrolling-Scroller | 400 | 400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgb(from $color-surface-0 r g b / 0.75) | rgb(from $color-surface-0 r g b / 0.75) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--active | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--hover | transparent | transparent |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller | none | none |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller--active | none | none |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller--hover | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller--active | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller--hover | none | none |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-handle-Scroller | 10px | 10px |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-track-Scroller | 2px | 2px |
-| [height](../styles-and-themes/common-units/#size)-fade-Scroller | 64px | 64px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-fade-Scroller | rgb(from $color-surface-0 r g b / 0.75) | rgb(from $color-surface-0 r g b / 0.75) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller--active | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller--hover | transparent | transparent |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller--active | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller--hover | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller--active | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller--hover | none | none |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-handle-Scroller | 10px | 10px |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-track-Scroller | 2px | 2px |
+| [height](/docs/styles-and-themes/common-units/#size-values)-fade-Scroller | 64px | 64px |
 | maxSize-handle-Scroller | none | none |
 | minSize-handle-Scroller | 33px | 33px |
-| [offset](../styles-and-themes/common-units/#size)-handleInteractiveArea-Scroller | 4px | 4px |
-| [padding](../styles-and-themes/common-units/#size)-axis-Scroller | 2px | 2px |
-| [padding](../styles-and-themes/common-units/#size)-perpendicular-Scroller | 2px | 2px |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--active | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--hover | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-Scroller | 10px | 10px |
-| [transition](../styles-and-themes/common-units/#transition)-fade-Scroller | opacity 0.3s ease-in-out | opacity 0.3s ease-in-out |
-| [transition](../styles-and-themes/common-units/#transition)-handle-Scroller | *none* | *none* |
-| [transition](../styles-and-themes/common-units/#transition)-Scroller | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s |
-| [transition](../styles-and-themes/common-units/#transition)-track-Scroller | *none* | *none* |
-| [transition](../styles-and-themes/common-units/#transition)Handle-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s |
-| [transition](../styles-and-themes/common-units/#transition)Track-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s |
+| [offset](/docs/styles-and-themes/common-units/#size-values)-handleInteractiveArea-Scroller | 4px | 4px |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-axis-Scroller | 2px | 2px |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-perpendicular-Scroller | 2px | 2px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller--active | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller--hover | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-Scroller | 10px | 10px |
+| [transition](/docs/styles-and-themes/common-units/#transition)-fade-Scroller | opacity 0.3s ease-in-out | opacity 0.3s ease-in-out |
+| [transition](/docs/styles-and-themes/common-units/#transition)-handle-Scroller | *none* | *none* |
+| [transition](/docs/styles-and-themes/common-units/#transition)-Scroller | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s |
+| [transition](/docs/styles-and-themes/common-units/#transition)-track-Scroller | *none* | *none* |
+| [transition](/docs/styles-and-themes/common-units/#transition)Handle-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s |
+| [transition](/docs/styles-and-themes/common-units/#transition)Track-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s |
 
 ### Variable Explanations [#variable-explanations]
 

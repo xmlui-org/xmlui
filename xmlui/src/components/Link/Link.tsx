@@ -30,6 +30,11 @@ export const LinkMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.active,
     },
+    noIndicator: {
+      description: `Indicates whether this link should have a distinct visual appearance.`,
+      type: "boolean",
+      defaultValue: false,
+    },
     target: {
       description:
         `This property specifies where to open the link represented by the \`${COMP}\`. This ` +
@@ -114,6 +119,7 @@ export const localLinkComponentRenderer = createComponentRenderer(
         horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
         verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
         onClick={lookupEventHandler("click")}
+        noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator, false)}
       >
         {node.props.label
           ? extractValue.asDisplayText(node.props.label)

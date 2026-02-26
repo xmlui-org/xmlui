@@ -5,7 +5,7 @@ The `App` component is the root container that defines your application's overal
 **Essential features:**
 
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
-- **Routing**: Built-in page routing via the [Pages](/components/Pages) component
+- **Routing**: Built-in page routing via the [Pages](/docs/reference/components/Pages) component
 
 ## Behaviors [#behaviors]
 
@@ -539,19 +539,19 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
-| [backgroundColor](../styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
-| [borderBottom](../styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
-| [borderLeft](../styles-and-themes/common-units/#border)-content-App | *none* | *none* |
-| [borderRight](../styles-and-themes/common-units/#border)-navPanelWrapper-App | 1px solid $borderColor | 1px solid $borderColor |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-header-App | none | none |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
-| [maxWidth](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
-| [maxWidth-content](../styles-and-themes/common-units/#size)-App | $maxWidth-content | $maxWidth-content |
-| [maxWidth-content](../styles-and-themes/common-units/#size)-App--withToc | *none* | *none* |
-| [width](../styles-and-themes/common-units/#size)-navPanel-App | $space-64 | $space-64 |
-| [width](../styles-and-themes/common-units/#size)-navPanel-collapsed-App | 48px | 48px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AppHeader | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-content-App | $backgroundColor | $backgroundColor |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-navPanel-App | $backgroundColor | $backgroundColor |
+| [borderBottom](/docs/styles-and-themes/common-units/#border)-AppHeader | *none* | *none* |
+| [borderLeft](/docs/styles-and-themes/common-units/#border)-content-App | *none* | *none* |
+| [borderRight](/docs/styles-and-themes/common-units/#border)-navPanelWrapper-App | 1px solid $borderColor | 1px solid $borderColor |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-header-App | none | none |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-navPanel-App | none | none |
+| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
+| [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App--withToc | *none* | *none* |
+| [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-App | $space-64 | $space-64 |
+| [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-collapsed-App | 48px | 48px |
 
 ### Variable Explanations [#variable-explanations]
 

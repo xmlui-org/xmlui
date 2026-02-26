@@ -172,6 +172,6 @@ This method opens the overflow dropdown menu.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ResponsiveBar | transparent | transparent |
-| [margin](../styles-and-themes/common-units/#size)-ResponsiveBar | 0 | 0 |
-| [padding](../styles-and-themes/common-units/#size)-ResponsiveBar | 0 | 0 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ResponsiveBar | transparent | transparent |
+| [margin](/docs/styles-and-themes/common-units/#size-values)-ResponsiveBar | 0 | 0 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-ResponsiveBar | 0 | 0 |

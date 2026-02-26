@@ -9,7 +9,7 @@ export const DataSourceMd = createMetadata({
   status: "stable",
   description:
     "`DataSource` fetches and caches data from API endpoints, versus " +
-    "[`APICall`](/components/APICall) which creates, updates or deletes data.",
+    "[`APICall`](/docs/reference/components/APICall) which creates, updates or deletes data.",
   props: {
     method: {
       description: `Set the HTTP method.`,

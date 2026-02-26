@@ -9,7 +9,7 @@
 - **Label list display**: Optional legend-style list showing all segments and values
 - **Customizable sizing**: Configurable dimensions and outer radius for different layouts
 
-For a variation with a hollow center, see [DonutChart](/components/DonutChart).
+For a variation with a hollow center, see [DonutChart](/docs/reference/components/DonutChart).
 
 ## Behaviors [#behaviors]
 
@@ -82,4 +82,4 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [textColor](../styles-and-themes/common-units/#color)-labelList-PieChart | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-labelList-PieChart | $textColor-primary | $textColor-primary |

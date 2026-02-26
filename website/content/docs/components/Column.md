@@ -1,6 +1,6 @@
 # Column [#column]
 
-`Column` defines the structure and behavior of individual table columns within a [`Table`](/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.
+`Column` defines the structure and behavior of individual table columns within a [`Table`](/docs/reference/components/Table) component. Each Column controls data binding, header display, sorting capabilities, sizing, and can contain any XMLUI components for rich cell content.
 
 **Key features:**
 - **Data binding**: Use `bindTo` to automatically display object properties
@@ -514,4 +514,4 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
-Styling is done via the [`Table` component](/components/Table).
+Styling is done via the [`Table` component](/docs/reference/components/Table).
