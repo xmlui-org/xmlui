@@ -4,9 +4,10 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import classnames from "classnames";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { useComponentRegistry } from "../ComponentRegistryContext";
 
 const COMP = "NavPanel";
 
@@ -243,6 +244,19 @@ function NavPanelWithBuiltNavHierarchy({
   extractValue,
   appContext,
 }) {
+  const componentRegistry = useComponentRegistry();
+
+  const lookupCompoundComponent = useCallback(
+    (name: string): ComponentDef | undefined => {
+      const entry = componentRegistry.lookupComponentRenderer(name);
+      if (!entry?.isCompoundComponent || !entry.compoundComponentDef) {
+        return undefined;
+      }
+      return entry.compoundComponentDef.component as ComponentDef;
+    },
+    [componentRegistry],
+  );
+
   const effectiveChildren = useMemo(() => {
     return resolveNavSectionChildren(
       node.children as ComponentDef[] | undefined,
@@ -252,8 +266,14 @@ function NavPanelWithBuiltNavHierarchy({
   }, [appContext?.appGlobals?.navSections, extractValue, node.children]);
 
   const navLinks = useMemo(() => {
-    return buildNavHierarchy(effectiveChildren, extractValue, undefined, []);
-  }, [effectiveChildren, extractValue]);
+    return buildNavHierarchy(
+      effectiveChildren,
+      extractValue,
+      undefined,
+      [],
+      lookupCompoundComponent,
+    );
+  }, [effectiveChildren, extractValue, lookupCompoundComponent]);
 
   const scrollStyle = extractValue.asOptionalString(
     node.props.scrollStyle,

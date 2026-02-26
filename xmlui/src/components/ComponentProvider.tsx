@@ -998,11 +998,13 @@ export class ComponentRegistry {
       renderer,
       metadata,
       isCompoundComponent,
+      compoundComponentDef,
     }: {
       type: string;
       renderer: ComponentRendererFn<any>;
       isCompoundComponent?: boolean;
       metadata?: ComponentMetadata;
+      compoundComponentDef?: CompoundComponentDef;
     },
     namespace: string,
   ) => {
@@ -1010,6 +1012,7 @@ export class ComponentRegistry {
       renderer,
       descriptor: metadata,
       isCompoundComponent,
+      compoundComponentDef,
     };
     const fullName = `${namespace}.${type}`;
     if (!this.pool.has(namespace)) {
@@ -1044,6 +1047,7 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
       metadata,
+      compoundComponentDef,
     };
 
     this.registerComponentRenderer(component, namespace);
