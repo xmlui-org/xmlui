@@ -21,12 +21,6 @@ jobs:
       TURBO_UI: "false"
 
     steps:
-      - name: 1. Generate a token from the GitHub App 🤖
-        id: generate_token
-        uses: tibdex/github-app-token@v2
-        with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -46,22 +40,8 @@ jobs:
       - name: Copy standalone build to docs
         run: cp xmlui/dist/standalone/xmlui-standalone.umd.js docs/public/resources/files/for-download/xmlui/xmlui-standalone.umd.js
 
-      - name: 4. Configure Git to use the App's token 🔑
-        # The token generated in the first step is used here for authentication.
-        run: git config --global url."https://x-access-token:${{ steps.generate_token.outputs.token }}@github.com/".insteadOf "https://github.com/"
-      - name: 5. DEBUG - Attempt to clone the private repo
-        # This step will give a clear error if authentication is the problem
-        run: git clone https://github.com/xmlui-org/xmlui-optimizer.git
-      - name: 5. Install optimizer's dependencies
-        run: npm install
-        working-directory: ./xmlui-optimizer
-      - name: DEBUG - install xmlui-optimizer
-        # This step will give a clear error if authentication is the problem
-        run: npm install ./xmlui-optimizer
-
       - run: cd docs && npm run release-ci-optimized
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCS_XMLUI_MAX_RELEASES_LENGTH: ${{ github.event.inputs.max_releases }}
 
       - name: Deploy site

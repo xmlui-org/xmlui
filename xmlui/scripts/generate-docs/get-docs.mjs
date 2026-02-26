@@ -36,6 +36,7 @@ import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
 const filterByProps = { [METADATA_PROPERTIES.IS_HTML_TAG]: true };
 const [components] = partitionMetadata(collectedComponentMetadata, filterByProps);
 
+await cleanupLegacyGeneratedDocsFolders();
 await generateComponents(components);
 generateIconNames();
 
@@ -351,6 +352,20 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
     ERROR_CONTEXTS.EXTENSION_PACKAGES_METADATA,
     ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND,
   );
+}
+
+async function cleanupLegacyGeneratedDocsFolders() {
+  const legacyFolders = [
+    pathResolver.resolvePath("website/content/docs/components", "workspace"),
+    pathResolver.resolvePath("website/content/docs/extensions", "workspace"),
+  ];
+
+  for (const legacyFolder of legacyFolders) {
+    if (!existsSync(legacyFolder)) {
+      continue;
+    }
+    await rm(legacyFolder, { recursive: true, force: true });
+  }
 }
 
 async function generateComponents(metadata) {

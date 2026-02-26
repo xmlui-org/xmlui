@@ -951,7 +951,7 @@
     </Page>
     <Page url="/docs/reference/components/:compId">
       <script>
-        var contentKey = "components/" + $routeParams.compId;
+        var contentKey = "reference/components/" + $routeParams.compId;
         var content = appGlobals.content[contentKey];
       </script>
       <DocumentPage when="{content}" content="{content}" />
@@ -959,7 +959,7 @@
     </Page>
     <Page url="/docs/reference/extensions/*">
       <script>
-        var contentKey = "extensions/" + $routeParams['*'];
+        var contentKey = "reference/extensions/" + $routeParams['*'];
         var content = appGlobals.content[contentKey];
       </script>
       <DocumentPage when="{content}" content="{content}" />

@@ -7,7 +7,7 @@ function main() {
 
   if (args.length === 0) {
     console.error("Error: Missing static directory path");
-    console.error("Usage: serve-optimized <directory> [--port <port>]");
+    console.error("Usage: preview-ssg <directory> [--port <port>]");
     process.exit(1);
   }
 
