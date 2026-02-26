@@ -20,6 +20,7 @@ export const TiptapEditorMd = createMetadata({
     placeholder: d("Placeholder text shown when the editor is empty.", undefined, "string", "Start writing..."),
     editable: d("Whether the editor is editable.", undefined, "boolean", true),
     toolbar: d("Whether to show the formatting toolbar.", undefined, "boolean", true),
+    toolbarItems: d("Comma-separated list of toolbar items to show (e.g. 'bold,italic,bulletList,link,undo,redo'). If omitted, all items are shown.", undefined, "string"),
     height: d("The height of the editor content area.", undefined, "string", "300px"),
   },
   events: {
@@ -52,7 +53,7 @@ export const tiptapEditorComponentRenderer = wrapCompound(
   TiptapEditorMd,
   {
     booleans: ["editable", "toolbar"],
-    strings: ["placeholder", "height"],
+    strings: ["placeholder", "height", "toolbarItems"],
     events: {
       didChange: "onDidChange",
     },
