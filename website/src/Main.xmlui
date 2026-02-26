@@ -485,9 +485,7 @@
 
     <!-- Blog routes -->
     <Page url="/blog">
-      <Theme themeId="xmlui-blog">
-        <BlogOverview />
-      </Theme>
+      <BlogOverview />
     </Page>
     <Page
       url="/blog/:slug"
@@ -496,13 +494,11 @@
               return { params: { slug: p.slug } };
             })}"
     >
-      <Theme themeId="xmlui-blog">
         <script>
           var post = posts.find(p => p.slug === $routeParams.slug)
         </script>
         <BlogPage when="{post}" post="{post}" />
         <Redirect when="{!post}" to="/404" />
-      </Theme>
     </Page>
 
     <!-- Docs routes with /docs prefix -->

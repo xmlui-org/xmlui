@@ -1,7 +1,6 @@
 <Component name="BasicLayout">
     <FlowLayout verticalAlignment="stretch" gap="$space-6">
         <Items data="{$props.sortedPosts}">
-            <Link width="100%" height="100%" active="true" to="/blog/{$item.slug}">
                 <VStack
                     gap="$space-3"
                     height="*"
@@ -19,12 +18,12 @@
                             </Text>
                         </HStack>
                         <VStack gap="$space-0_5">
-                            <H2 variant="title" fontSize="$fontSize-blog-overview-post-title" showAnchor="false">
+                            <H2 variant="title">
                                 {$item.title}
                             </H2>
-                            <Text variant="description" maxLines="4" ellipses>
+                            <H3 maxLines="4" ellipses>
                                 {$item.description}
-                            </Text>
+                            </H3>
                         </VStack>
                     </VStack>
 
@@ -37,11 +36,15 @@
                     <Text variant="blurb" maxLines="4" ellipses>
                         {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
                     </Text>
-                    <HStack horizontalAlignment="start" marginTop="auto">
-                        Read more →
-                    </HStack>
+                    <Theme 
+                        textColor-Link="$color-primary-500"
+                        textColor-Link--hover="$color-primary-400"
+                    >
+                        <Link noIndicator to="/blog/{$item.slug}">
+                            Read more →
+                        </Link>
+                    </Theme>
                 </VStack>
-            </Link>
         </Items>
     </FlowLayout>
 </Component>
