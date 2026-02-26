@@ -1,0 +1,56 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Gauge";
+
+// Three high-level XMLUI theme variables that map to Smart UI's own CSS custom properties.
+// Smart UI handles all internal styling (labels, ticks, digital display, etc.) from these.
+$backgroundColor-Gauge: createThemeVar("Input:backgroundColor-#{$componentName}");
+$textColor-Gauge: createThemeVar("Input:textColor-#{$componentName}");
+$primaryColor-Gauge: createThemeVar("Input:primaryColor-#{$componentName}");
+
+@layer components {
+  .gaugeContainer {
+    display: inline-block;
+
+    // Bridge: map XMLUI design tokens to Smart UI's own CSS custom properties.
+    // No !important needed — Smart UI respects its own variables internally.
+    :global(smart-gauge) {
+      --smart-background: #{$backgroundColor-Gauge};
+      --smart-background-color: #{$textColor-Gauge};
+      --smart-primary: #{$primaryColor-Gauge};
+      --smart-surface: #{$backgroundColor-Gauge};
+      --smart-surface-color: #{$textColor-Gauge};
+
+      // Smart UI hardcodes `color: #000` on .smart-digital-display.
+      :global(.smart-digital-display) {
+        color: #{$textColor-Gauge} !important;
+      }
+
+      // Smart UI bakes fill into inline SVG attributes at render time,
+      // so CSS variable changes (e.g. tone/theme switch) don't take effect.
+      // !important on these SVG selectors forces reactive updates.
+      :global(.smart-needle),
+      :global(.smart-needle-central-circle) {
+        fill: #{$textColor-Gauge} !important;
+      }
+      :global(.smart-track) {
+        fill: #{$backgroundColor-Gauge} !important;
+      }
+      :global(.smart-value-path) {
+        fill: #{$primaryColor-Gauge} !important;
+      }
+    }
+  }
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
