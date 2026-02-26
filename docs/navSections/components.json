@@ -467,6 +467,11 @@
           "icon": "component"
         },
         {
+          "to": "/components/StickySection",
+          "label": "StickySection",
+          "icon": "component"
+        },
+        {
           "to": "/components/SubMenuItem",
           "label": "SubMenuItem",
           "icon": "component"

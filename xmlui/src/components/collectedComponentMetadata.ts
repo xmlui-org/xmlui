@@ -216,6 +216,8 @@ import { ContextMenuMd } from "./ContextMenu/ContextMenu";
 import QRCode from "react-qr-code";
 import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
+import { StickySection } from "./StickySection/StickySectionNative";
+import { StickySectionMd } from "./StickySection/StickySection";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -403,6 +405,7 @@ export const collectedComponentMetadata = {
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
+  StickySection: StickySectionMd,
   Tooltip: TooltipMd,
   HSplitter: HSplitterMd,
   VSplitter: VSplitterMd,
