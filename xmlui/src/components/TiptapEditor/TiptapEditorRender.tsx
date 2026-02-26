@@ -85,12 +85,19 @@ export const TiptapEditorRender = React.forwardRef(
       placeholder,
       editable = true,
       toolbar = true,
+      toolbarItems,
       className,
       height = "300px",
       ...rest
     }: any,
     ref: any,
   ) => {
+    // Parse toolbarItems into a Set for O(1) lookup; undefined = show all
+    const visibleItems = React.useMemo(() => {
+      if (!toolbarItems) return null;
+      return new Set(toolbarItems.split(",").map((s: string) => s.trim()));
+    }, [toolbarItems]);
+    const show = (id: string) => !visibleItems || visibleItems.has(id);
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
     const suppressUpdate = useRef(false);
@@ -175,206 +182,139 @@ export const TiptapEditorRender = React.forwardRef(
               borderRadius: "4px 4px 0 0",
             }}
           >
-            {/* ── Text formatting ── */}
-            <Btn
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              active={editor.isActive("bold")}
-              title="Bold (Ctrl+B)"
-            >
-              <strong>B</strong>
-            </Btn>
-            <Btn
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              active={editor.isActive("italic")}
-              title="Italic (Ctrl+I)"
-            >
-              <em>I</em>
-            </Btn>
-            <Btn
-              onClick={() => editor.chain().focus().toggleStrike().run()}
-              active={editor.isActive("strike")}
-              title="Strikethrough"
-            >
-              <s>S</s>
-            </Btn>
-            <Btn
-              onClick={() => editor.chain().focus().toggleCode().run()}
-              active={editor.isActive("code")}
-              title="Inline code"
-            >
-              {"<>"}
-            </Btn>
-
-            <Sep />
-
-            {/* ── Headings ── */}
-            {([1, 2, 3] as const).map((level) => (
-              <Btn
-                key={level}
-                onClick={() =>
-                  editor.chain().focus().toggleHeading({ level }).run()
-                }
-                active={editor.isActive("heading", { level })}
-                title={`Heading ${level}`}
-              >
-                H{level}
+            {show("bold") && (
+              <Btn onClick={() => editor.chain().focus().toggleBold().run()}
+                active={editor.isActive("bold")} title="Bold (Ctrl+B)">
+                <strong>B</strong>
               </Btn>
-            ))}
+            )}
+            {show("italic") && (
+              <Btn onClick={() => editor.chain().focus().toggleItalic().run()}
+                active={editor.isActive("italic")} title="Italic (Ctrl+I)">
+                <em>I</em>
+              </Btn>
+            )}
+            {show("strike") && (
+              <Btn onClick={() => editor.chain().focus().toggleStrike().run()}
+                active={editor.isActive("strike")} title="Strikethrough">
+                <s>S</s>
+              </Btn>
+            )}
+            {show("code") && (
+              <Btn onClick={() => editor.chain().focus().toggleCode().run()}
+                active={editor.isActive("code")} title="Inline code">
+                {"<>"}
+              </Btn>
+            )}
 
-            <Sep />
+            {(show("h1") || show("h2") || show("h3")) && <Sep />}
+            {([1, 2, 3] as const).map((level) =>
+              show(`h${level}`) ? (
+                <Btn key={level}
+                  onClick={() => editor.chain().focus().toggleHeading({ level }).run()}
+                  active={editor.isActive("heading", { level })}
+                  title={`Heading ${level}`}>
+                  H{level}
+                </Btn>
+              ) : null,
+            )}
 
-            {/* ── Lists ── */}
-            <Btn
-              onClick={() =>
-                editor.chain().focus().toggleBulletList().run()
-              }
-              active={editor.isActive("bulletList")}
-              title="Bullet list"
-            >
-              &bull; List
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().toggleOrderedList().run()
-              }
-              active={editor.isActive("orderedList")}
-              title="Numbered list"
-            >
-              1. List
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().toggleTaskList().run()
-              }
-              active={editor.isActive("taskList")}
-              title="Task list"
-            >
-              &#9745; Tasks
-            </Btn>
+            {(show("bulletList") || show("orderedList") || show("taskList")) && <Sep />}
+            {show("bulletList") && (
+              <Btn onClick={() => editor.chain().focus().toggleBulletList().run()}
+                active={editor.isActive("bulletList")} title="Bullet list">
+                &bull; List
+              </Btn>
+            )}
+            {show("orderedList") && (
+              <Btn onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                active={editor.isActive("orderedList")} title="Numbered list">
+                1. List
+              </Btn>
+            )}
+            {show("taskList") && (
+              <Btn onClick={() => editor.chain().focus().toggleTaskList().run()}
+                active={editor.isActive("taskList")} title="Task list">
+                &#9745; Tasks
+              </Btn>
+            )}
 
-            <Sep />
+            {(show("blockquote") || show("codeBlock") || show("hr")) && <Sep />}
+            {show("blockquote") && (
+              <Btn onClick={() => editor.chain().focus().toggleBlockquote().run()}
+                active={editor.isActive("blockquote")} title="Blockquote">
+                &ldquo; Quote
+              </Btn>
+            )}
+            {show("codeBlock") && (
+              <Btn onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                active={editor.isActive("codeBlock")} title="Code block">
+                {"{ }"} Code
+              </Btn>
+            )}
+            {show("hr") && (
+              <Btn onClick={() => editor.chain().focus().setHorizontalRule().run()}
+                title="Horizontal rule">
+                &mdash; HR
+              </Btn>
+            )}
 
-            {/* ── Block elements ── */}
-            <Btn
-              onClick={() =>
-                editor.chain().focus().toggleBlockquote().run()
-              }
-              active={editor.isActive("blockquote")}
-              title="Blockquote"
-            >
-              &ldquo; Quote
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().toggleCodeBlock().run()
-              }
-              active={editor.isActive("codeBlock")}
-              title="Code block"
-            >
-              {"{ }"} Code
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().setHorizontalRule().run()
-              }
-              title="Horizontal rule"
-            >
-              &mdash; HR
-            </Btn>
-
-            <Sep />
-
-            {/* ── Links ── */}
-            <Btn
-              onClick={() => {
-                if (editor.isActive("link")) {
-                  editor.chain().focus().unsetLink().run();
-                } else {
-                  const url = window.prompt("URL:");
-                  if (url) {
-                    editor
-                      .chain()
-                      .focus()
-                      .setLink({ href: url })
-                      .run();
+            {show("link") && <Sep />}
+            {show("link") && (
+              <Btn
+                onClick={() => {
+                  if (editor.isActive("link")) {
+                    editor.chain().focus().unsetLink().run();
+                  } else {
+                    const url = window.prompt("URL:");
+                    if (url) {
+                      editor.chain().focus().setLink({ href: url }).run();
+                    }
                   }
-                }
-              }}
-              active={editor.isActive("link")}
-              title="Link"
-            >
-              &#128279; Link
-            </Btn>
+                }}
+                active={editor.isActive("link")} title="Link">
+                &#128279; Link
+              </Btn>
+            )}
 
-            <Sep />
+            {(show("table") || show("tableRow") || show("tableCol")) && <Sep />}
+            {show("table") && (
+              <Btn onClick={() => editor.chain().focus()
+                .insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
+                title="Insert table">
+                &#9638; Table
+              </Btn>
+            )}
+            {show("tableRow") && (
+              <>
+                <Btn onClick={() => editor.chain().focus().addRowAfter().run()}
+                  disabled={!editor.can().addRowAfter()} title="Add row">+ Row</Btn>
+                <Btn onClick={() => editor.chain().focus().deleteRow().run()}
+                  disabled={!editor.can().deleteRow()} title="Delete row">- Row</Btn>
+              </>
+            )}
+            {show("tableCol") && (
+              <>
+                <Btn onClick={() => editor.chain().focus().addColumnAfter().run()}
+                  disabled={!editor.can().addColumnAfter()} title="Add column">+ Col</Btn>
+                <Btn onClick={() => editor.chain().focus().deleteColumn().run()}
+                  disabled={!editor.can().deleteColumn()} title="Delete column">- Col</Btn>
+              </>
+            )}
 
-            {/* ── Table ── */}
-            <Btn
-              onClick={() =>
-                editor
-                  .chain()
-                  .focus()
-                  .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-                  .run()
-              }
-              title="Insert table"
-            >
-              &#9638; Table
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().addRowAfter().run()
-              }
-              disabled={!editor.can().addRowAfter()}
-              title="Add row"
-            >
-              + Row
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().deleteRow().run()
-              }
-              disabled={!editor.can().deleteRow()}
-              title="Delete row"
-            >
-              - Row
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().addColumnAfter().run()
-              }
-              disabled={!editor.can().addColumnAfter()}
-              title="Add column"
-            >
-              + Col
-            </Btn>
-            <Btn
-              onClick={() =>
-                editor.chain().focus().deleteColumn().run()
-              }
-              disabled={!editor.can().deleteColumn()}
-              title="Delete column"
-            >
-              - Col
-            </Btn>
-
-            <Sep />
-
-            {/* ── Undo / Redo ── */}
-            <Btn
-              onClick={() => editor.chain().focus().undo().run()}
-              disabled={!editor.can().undo()}
-              title="Undo (Ctrl+Z)"
-            >
-              &#8617; Undo
-            </Btn>
-            <Btn
-              onClick={() => editor.chain().focus().redo().run()}
-              disabled={!editor.can().redo()}
-              title="Redo (Ctrl+Shift+Z)"
-            >
-              &#8618; Redo
-            </Btn>
+            {(show("undo") || show("redo")) && <Sep />}
+            {show("undo") && (
+              <Btn onClick={() => editor.chain().focus().undo().run()}
+                disabled={!editor.can().undo()} title="Undo (Ctrl+Z)">
+                &#8617; Undo
+              </Btn>
+            )}
+            {show("redo") && (
+              <Btn onClick={() => editor.chain().focus().redo().run()}
+                disabled={!editor.can().redo()} title="Redo (Ctrl+Shift+Z)">
+                &#8618; Redo
+              </Btn>
+            )}
           </div>
         )}
 
