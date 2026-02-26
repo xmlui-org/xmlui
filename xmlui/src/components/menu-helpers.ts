@@ -8,6 +8,11 @@ import type { ValueExtractor } from "../abstractions/RendererDefs";
  * This correctly handles cases where menu items are conditionally hidden at runtime:
  * separators adjacent to hidden items are removed as if those items were never there.
  *
+ * When a `when` expression evaluates to `undefined` or `null` — which can happen when the
+ * expression references a context variable (e.g. `$context`) that is not yet in scope at
+ * filter time — the item is treated as **visible**.  This prevents incorrectly removing
+ * separators around items that will be visible once the full rendering context is available.
+ *
  * @param children The list of children to filter
  * @param extractValue The value extractor used to evaluate `when` expressions
  */
@@ -19,9 +24,19 @@ export function filterSeparators(
     return [];
   }
 
-  // Evaluate visibility for each child based on its `when` condition
+  // Evaluate visibility for each child based on its `when` condition.
+  // If `when` evaluates to `undefined` or `null` (e.g. because the expression references
+  // a context variable like `$context` that is not yet in scope at filter time), we treat
+  // the item as **visible**.  Defaulting to visible is safer: separators around dynamically-
+  // shown items are preserved, and the rendered output is correct once the full context is
+  // available inside `renderChild`.
   const itemVisibility = children.map((child) => {
-    const hiddenByWhen = child.when !== undefined && !extractValue(child.when);
+    let hiddenByWhen = false;
+    if (child.when !== undefined) {
+      const whenResult = extractValue(child.when);
+      // Treat undefined/null as "can't determine yet → assume visible"
+      hiddenByWhen = whenResult !== undefined && whenResult !== null && !whenResult;
+    }
     return {
       child,
       isSeparator: child.type === "MenuSeparator",

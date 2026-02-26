@@ -1,24 +1,22 @@
 <Component name="Benefits">
     <FlowLayout
         gap="$gap-loose"
-        paddingHorizontal="$space-8"
-        paddingTop="$space-12"
+        maxWidth="{mediaSize.sizeIndex > 2 ? '500px' : '400px'}" 
+        columnGap="$space-8" 
+        rowGap="$space-3" 
+        width="100%"
         paddingBottom="$space-4">
-        <Benefit width="50%" title="Easy to create.">
+        <Benefit width="50%" title="Simple.">
             No CSS or React expertise required.
         </Benefit>
+        <Benefit width="50%" title="Semantic.">
+            Humans and AIs can reason together.
+        </Benefit>
         <Benefit width="50%" title="Connected.">
-            Read and write APIs with little or no scripting.
+            Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="50%" title="Modular.">
-            Tap into a deep catalog of
-            <Link
-                to="https://docs.xmlui.org/components/_overview"
-                target="_blank" label="components" />
-            and easily make your own.
-        </Benefit>
-        <Benefit width="50%" title="Easy to deploy.">
-            Just drop a handful of files onto a static webserver.
+        <Benefit width="50%" title="Deployable">
+            Drop files onto a static webserver.
         </Benefit>
     </FlowLayout>
 </Component>

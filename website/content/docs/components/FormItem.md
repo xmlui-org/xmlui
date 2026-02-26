@@ -8,7 +8,7 @@
 - **Flexible labeling**: Supports labels, helper text, and various label positioning options
 - **Layout management**: Handles consistent spacing and alignment of form elements
 
-See [this guide](/forms) for details.
+See [this guide](/docs/guides/forms) for details.
 
 **Context variables available during execution:**
 
@@ -601,16 +601,16 @@ Removes the item specified by its index from the list held by the FormItem. The 
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [fontFamily](../styles-and-themes/common-units/#fontFamily)-FormItemLabel | *none* | *none* |
-| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel | $fontSize-sm | $fontSize-sm |
-| [fontSize](../styles-and-themes/common-units/#size)-FormItemLabel-required | *none* | *none* |
-| [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
-| [fontStyle](../styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
-| [fontWeight](../styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel | $textColor | $textColor |
-| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-optionalTag | $textColor-secondary | $textColor-secondary |
-| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-required | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
-| [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |
-| [textTransform](../styles-and-themes/common-units/#textTransform)-FormItemLabel-required | *none* | *none* |
+| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-FormItemLabel | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-FormItemLabel | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-FormItemLabel-required | *none* | *none* |
+| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
+| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel | $textColor | $textColor |
+| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-optionalTag | $textColor-secondary | $textColor-secondary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-required | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-FormItemLabel-required | *none* | *none* |

@@ -241,10 +241,10 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-DropdownMenu | $color-surface-raised | $color-surface-raised |
-| [borderColor](../styles-and-themes/common-units/#color)-DropdownMenu-content | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-DropdownMenu | $borderRadius | $borderRadius |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-DropdownMenu-content | solid | solid |
-| [borderWidth](../styles-and-themes/common-units/#size)-DropdownMenu-content | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-DropdownMenu | $boxShadow-xl | $boxShadow-xl |
-| [minWidth](../styles-and-themes/common-units/#size)-DropdownMenu | 160px | 160px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DropdownMenu | $color-surface-raised | $color-surface-raised |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-DropdownMenu-content | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DropdownMenu | $borderRadius | $borderRadius |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DropdownMenu-content | solid | solid |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DropdownMenu-content | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DropdownMenu | $boxShadow-xl | $boxShadow-xl |
+| [minWidth](/docs/styles-and-themes/common-units/#size-values)-DropdownMenu | 160px | 160px |

@@ -156,7 +156,9 @@ export type AppContextObject = {
   // Navigation Utilities
 
   // This function navigates to the specified `url`.
-  navigate: (url: To, options?: NavigateOptions) => void;
+  // The options extend React Router's NavigateOptions with an optional `queryParams` map
+  // used internally by NavigateAction to thread query params through the willNavigate handler.
+  navigate: (url: To, options?: NavigateOptions & { queryParams?: Record<string, any> }) => void;
 
   // This property determines the base name used for the router.
   routerBaseName: string;

@@ -978,13 +978,13 @@ Replace a node's properties with new data using merge semantics. Properties not 
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Tree-row--hover | $color-surface-100 | $color-surface-100 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Tree-row--selected | $color-primary-50 | $color-primary-50 |
-| [borderColor](../styles-and-themes/common-units/#color)-Tree-row--focus | $color-primary-500 | $color-primary-500 |
-| [outlineColor](../styles-and-themes/common-units/#color)-Tree--focus | $outlineColor--focus | $outlineColor--focus |
-| [outlineOffset](../styles-and-themes/common-units/#size)-Tree--focus | $outlineOffset--focus | $outlineOffset--focus |
-| [outlineStyle](../styles-and-themes/common-units/#border)-Tree--focus | $outlineStyle--focus | $outlineStyle--focus |
-| [outlineWidth](../styles-and-themes/common-units/#size)-Tree--focus | $outlineWidth--focus | $outlineWidth--focus |
-| [textColor](../styles-and-themes/common-units/#color)-Tree | $textColor-primary | $textColor-primary |
-| [textColor](../styles-and-themes/common-units/#color)-Tree--hover | $textColor-primary | $textColor-primary |
-| [textColor](../styles-and-themes/common-units/#color)-Tree--selected | $color-primary-900 | $color-primary-900 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--hover | $color-surface-100 | $color-surface-100 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tree-row--selected | $color-primary-50 | $color-primary-50 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Tree-row--focus | $color-primary-500 | $color-primary-500 |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-Tree--focus | $outlineColor--focus | $outlineColor--focus |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Tree--focus | $outlineOffset--focus | $outlineOffset--focus |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Tree--focus | $outlineStyle--focus | $outlineStyle--focus |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Tree--focus | $outlineWidth--focus | $outlineWidth--focus |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Tree | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Tree--hover | $textColor-primary | $textColor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Tree--selected | $color-primary-900 | $color-primary-900 |

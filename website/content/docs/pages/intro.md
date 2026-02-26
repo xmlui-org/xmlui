@@ -8,11 +8,11 @@ XMLUI is a framework for building user interfaces declaratively, with XML markup
 
 > [!FEAT] **Connected**. Read and write APIs with little or no scripting.
 
-> [!FEAT] **Modular**. Use a comprehensive suite of [components](/components/_overview) that you can extend with — again! — little or no scripting.
+> [!FEAT] **Modular**. Use a comprehensive suite of [components](/docs/reference/components/_overview) that you can extend with — again! — little or no scripting.
 
 > [!FEAT] **Easy to deploy**. Just drop a handful of files onto a static webserver.
 
-This paragraph is static text displayed by XMLUI's [Markdown](/components/Markdown) component.
+This paragraph is static text displayed by XMLUI's [Markdown](/docs/reference/components/Markdown) component.
 
 Here is a tiny app that reports the status of London's tube stations.
 
@@ -29,7 +29,7 @@ Let's unpack the concepts behind this example.
 
 > [!DEF] **Markup**. You write XMLUI apps in a declarative style using XML tags and attributes.
 
-> [!DEF] **Components**. [App](https://docs.xmlui.org/components/App), [List](https://docs.xmlui.org/components/List), and [Text](https://docs.xmlui.org/components/Text) are some of the [components](/components/_overview) you can invoke in XMLUI markup.
+> [!DEF] **Components**. [App](https://docs.xmlui.org/docs/reference/components/App), [List](https://docs.xmlui.org/docs/reference/components/List), and [Text](https://docs.xmlui.org/docs/reference/components/Text) are some of the [components](/docs/reference/components/_overview) you can invoke in XMLUI markup.
 
 > [!DEF] **Properties**. You configure components using properties like the `data` property on the `List`.
 

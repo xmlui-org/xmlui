@@ -121,6 +121,63 @@ The scrollbar appears only while actively scrolling and fades out after 400ms of
 </App>
 ```
 
+%-PROP-START headerTemplate
+
+The `headerTemplate` property allows you to define a custom header that remains fixed at the top of the `ScrollViewer`.
+
+```xmlui-pg copy display {3-11} name="ScrollViewer with Header" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <property name="headerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderBottom="1px solid $color-border-default"
+      >
+        <H4 value="Sticky Header" />
+      </HStack>
+    </property>
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+  </ScrollViewer>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START footerTemplate
+
+The `footerTemplate` property allows you to define a custom footer that remains fixed at the bottom of the `ScrollViewer`.
+
+```xmlui-pg copy display {9-18} name="ScrollViewer with Footer" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+    <property name="footerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderTop="1px solid $color-border-default"
+        horizontalAlignment="center"
+      >
+        <H4 value="Sticky Footer" />
+      </HStack>
+    </property>
+  </ScrollViewer>
+</App>
+```
+
+%-PROP-END
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -135,6 +192,63 @@ This component supports the following behaviors:
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
+
+### `footerTemplate` [#footertemplate]
+
+An optional template that defines content always visible at the bottom of the `ScrollViewer`, outside the scrollable area. The footer sticks to the bottom while the inner content scrolls.
+
+The `footerTemplate` property allows you to define a custom footer that remains fixed at the bottom of the `ScrollViewer`.
+
+```xmlui-pg copy display {9-18} name="ScrollViewer with Footer" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+    <property name="footerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderTop="1px solid $color-border-default"
+        horizontalAlignment="center"
+      >
+        <H4 value="Sticky Footer" />
+      </HStack>
+    </property>
+  </ScrollViewer>
+</App>
+```
+
+### `headerTemplate` [#headertemplate]
+
+An optional template that defines content always visible at the top of the `ScrollViewer`, outside the scrollable area. The header sticks to the top while the inner content scrolls.
+
+The `headerTemplate` property allows you to define a custom header that remains fixed at the top of the `ScrollViewer`.
+
+```xmlui-pg copy display {3-11} name="ScrollViewer with Header" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <property name="headerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderBottom="1px solid $color-border-default"
+      >
+        <H4 value="Sticky Header" />
+      </HStack>
+    </property>
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+  </ScrollViewer>
+</App>
+```
 
 ### `scrollStyle` [#scrollstyle]
 
@@ -168,37 +282,37 @@ The `ScrollViewer` component uses shared theme variables with other layout conta
 | --- | --- | --- |
 | autoHideDelay-whenMouseOver-Scroller | 400 | 400 |
 | autoHideDelay-whenScrolling-Scroller | 400 | 400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-fade-Scroller | rgb(from $color-surface-0 r g b / 0.75) | rgb(from $color-surface-0 r g b / 0.75) |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--active | transparent | transparent |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Scroller--hover | transparent | transparent |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller | none | none |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller--active | none | none |
-| [border](../styles-and-themes/common-units/#border)-handle-Scroller--hover | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller--active | none | none |
-| [border](../styles-and-themes/common-units/#border)-track-Scroller--hover | none | none |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-handle-Scroller | 10px | 10px |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-track-Scroller | 2px | 2px |
-| [height](../styles-and-themes/common-units/#size)-fade-Scroller | 64px | 64px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-fade-Scroller | rgb(from $color-surface-0 r g b / 0.75) | rgb(from $color-surface-0 r g b / 0.75) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--active | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-handle-Scroller--hover | $color-surface-400 | $color-surface-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller--active | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Scroller--hover | transparent | transparent |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller--active | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-handle-Scroller--hover | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller--active | none | none |
+| [border](/docs/styles-and-themes/common-units/#border)-track-Scroller--hover | none | none |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-handle-Scroller | 10px | 10px |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-track-Scroller | 2px | 2px |
+| [height](/docs/styles-and-themes/common-units/#size-values)-fade-Scroller | 64px | 64px |
 | maxSize-handle-Scroller | none | none |
 | minSize-handle-Scroller | 33px | 33px |
-| [offset](../styles-and-themes/common-units/#size)-handleInteractiveArea-Scroller | 4px | 4px |
-| [padding](../styles-and-themes/common-units/#size)-axis-Scroller | 2px | 2px |
-| [padding](../styles-and-themes/common-units/#size)-perpendicular-Scroller | 2px | 2px |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--active | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-perpendicularHandle-Scroller--hover | 100% | 100% |
-| [size](../styles-and-themes/common-units/#size)-Scroller | 10px | 10px |
-| [transition](../styles-and-themes/common-units/#transition)-fade-Scroller | opacity 0.3s ease-in-out | opacity 0.3s ease-in-out |
-| [transition](../styles-and-themes/common-units/#transition)-handle-Scroller | *none* | *none* |
-| [transition](../styles-and-themes/common-units/#transition)-Scroller | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s |
-| [transition](../styles-and-themes/common-units/#transition)-track-Scroller | *none* | *none* |
-| [transition](../styles-and-themes/common-units/#transition)Handle-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s |
-| [transition](../styles-and-themes/common-units/#transition)Track-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s |
+| [offset](/docs/styles-and-themes/common-units/#size-values)-handleInteractiveArea-Scroller | 4px | 4px |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-axis-Scroller | 2px | 2px |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-perpendicular-Scroller | 2px | 2px |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller--active | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-perpendicularHandle-Scroller--hover | 100% | 100% |
+| [size](/docs/styles-and-themes/common-units/#size-values)-Scroller | 10px | 10px |
+| [transition](/docs/styles-and-themes/common-units/#transition)-fade-Scroller | opacity 0.3s ease-in-out | opacity 0.3s ease-in-out |
+| [transition](/docs/styles-and-themes/common-units/#transition)-handle-Scroller | *none* | *none* |
+| [transition](/docs/styles-and-themes/common-units/#transition)-Scroller | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s | opacity 0.15s, visibility 0.15s, top 0.15s, right 0.15s, bottom 0.15s, left 0.15s |
+| [transition](/docs/styles-and-themes/common-units/#transition)-track-Scroller | *none* | *none* |
+| [transition](/docs/styles-and-themes/common-units/#transition)Handle-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s, height 0.15s, width 0.15s |
+| [transition](/docs/styles-and-themes/common-units/#transition)Track-Scroller | opacity 0.15s, background-color 0.15s, border-color 0.15s | opacity 0.15s, background-color 0.15s, border-color 0.15s |
 
 ### Variable Explanations [#variable-explanations]
 

@@ -119,6 +119,63 @@ The scrollbar appears only while actively scrolling and fades out after 400ms of
 </App>
 ```
 
+%-PROP-START headerTemplate
+
+The `headerTemplate` property allows you to define a custom header that remains fixed at the top of the `ScrollViewer`.
+
+```xmlui-pg copy display {3-11} name="ScrollViewer with Header" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <property name="headerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderBottom="1px solid $color-border-default"
+      >
+        <H4 value="Sticky Header" />
+      </HStack>
+    </property>
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+  </ScrollViewer>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START footerTemplate
+
+The `footerTemplate` property allows you to define a custom footer that remains fixed at the bottom of the `ScrollViewer`.
+
+```xmlui-pg copy display {9-18} name="ScrollViewer with Footer" height="400px"
+<App scrollWholePage="false">
+  <ScrollViewer height="300px" backgroundColor="$color-surface-100">
+    <Items
+      id="myList"
+      data="{ Array.from({ length: 100 }).map((_, i) => ('Item #' + i)) }"
+    >
+      <Text value="{$item}" padding="$space-2" />
+    </Items>
+    <property name="footerTemplate">
+      <HStack 
+        padding="$space-2" 
+        backgroundColor="$color-surface-200" 
+        borderTop="1px solid $color-border-default"
+        horizontalAlignment="center"
+      >
+        <H4 value="Sticky Footer" />
+      </HStack>
+    </property>
+  </ScrollViewer>
+</App>
+```
+
+%-PROP-END
+
 %-DESC-END
 
 %-STYLE-START

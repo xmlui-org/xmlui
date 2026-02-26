@@ -90,10 +90,10 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-ContextMenu | $color-surface-raised | $color-surface-raised |
-| [borderColor](../styles-and-themes/common-units/#color)-ContextMenu-content | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-ContextMenu | $borderRadius | $borderRadius |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-ContextMenu-content | solid | solid |
-| [borderWidth](../styles-and-themes/common-units/#size)-ContextMenu-content | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-ContextMenu | $boxShadow-xl | $boxShadow-xl |
-| [minWidth](../styles-and-themes/common-units/#size)-ContextMenu | 160px | 160px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-ContextMenu | $color-surface-raised | $color-surface-raised |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-ContextMenu-content | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ContextMenu | $borderRadius | $borderRadius |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ContextMenu-content | solid | solid |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ContextMenu-content | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ContextMenu | $boxShadow-xl | $boxShadow-xl |
+| [minWidth](/docs/styles-and-themes/common-units/#size-values)-ContextMenu | 160px | 160px |

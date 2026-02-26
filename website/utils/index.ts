@@ -46,11 +46,25 @@ const blogPagesRuntime: Record<string, any> = import.meta.glob(
   },
 );
 
+// Prefetched home page markdown (e.g. WhyXMLUI), keyed by `/pages/<name>.md`.
+// @ts-ignore
+const homePagesRuntime: Record<string, any> = import.meta.glob(
+  `/content/home/*.md`,
+  {
+    eager: true,
+    query: "?raw",
+  },
+);
+
 export const prefetchedContent: Record<string, any> = {};
 Object.keys(blogPagesRuntime).map((filePath) => {
   const fileName = filePath.split("/").pop() || "";
   const urlFragment = `/blog/${fileName}`;
   prefetchedContent[urlFragment] = blogPagesRuntime[filePath].default;
+});
+Object.keys(homePagesRuntime).map((filePath) => {
+  const fileName = filePath.split("/").pop() || "";
+  prefetchedContent[`/pages/${fileName}`] = homePagesRuntime[filePath].default;
 });
 
 export { content, plainTextContent };

@@ -61,7 +61,7 @@ Setting the `when` property is the most straightforward way for deep-linked moda
 
 ### The `ModalDialog` as a Container
 
-The `ModalDialog` component is also a container such as the [`Card`](/components/Card), that it also accepts child components.
+The `ModalDialog` component is also a container such as the [`Card`](/docs/reference/components/Card), that it also accepts child components.
 
 ```xmlui-pg copy {3-8} display name="Example: children" height="340px"
 <App>

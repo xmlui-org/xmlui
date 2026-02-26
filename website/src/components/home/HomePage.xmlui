@@ -1,9 +1,12 @@
 <Component name="HomePage">
-  <Theme themeId="xmlui-web">
-    <Headlines />
-    <HeroApp />
-    <Benefits />
-    <WhyXMLUI />
-  </Theme>
+  <CHStack width="100%">
+    <CVStack width="100%" maxWidth="$maxWidth-content-HomePage">
+      <Theme themeId="xmlui-web">
+        <Headlines />
+        <Benefits />
+        <HeroApp />
+        <WhyXMLUI />
+      </Theme>
+    </CVStack>
+  </CHStack>
 </Component>
-

@@ -137,6 +137,10 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
         }
       }
     }
+
+    &.noIndicator {
+      text-decoration: none;
+    }
   }
 }
 

@@ -9,7 +9,7 @@ export const ColumnMd = createMetadata({
   status: "stable",
   description:
     "`Column` defines the structure and behavior of individual table columns " +
-    "within a [`Table`](/components/Table) component. Each Column controls data " +
+    "within a [`Table`](/docs/reference/components/Table) component. Each Column controls data " +
     "binding, header display, sorting capabilities, sizing, and can contain any " +
     "XMLUI components for rich cell content.",
   props: {

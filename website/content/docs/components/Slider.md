@@ -180,73 +180,73 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
-| [backgroundColor](../styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--default--focus | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--default--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--error | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--error--focus | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--error--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--success | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--success--focus | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--success--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--warning | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--warning--focus | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-Slider--warning--hover | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
-| [borderColor](../styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider--error | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider--success | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-Slider--warning | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider--error | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider--success | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Slider--warning | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider--default | 0 | 0 |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider--default | 0 | 0 |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider--error | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider--success | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-Slider--warning | *none* | *none* |
-| [borderWidth](../styles-and-themes/common-units/#size)-thumb-Slider | 2px | 2px |
-| [borderWidth](../styles-and-themes/common-units/#size)-thumb-Slider | 2px | 2px |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--default--focus | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--default--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--error | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--error--focus | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--error--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--success | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--success--focus | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--success--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--warning | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--warning--focus | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-Slider--warning--hover | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider | *none* | *none* |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
-| [boxShadow](../styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-range-Slider | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-range-Slider--disabled | $color-surface-400 | $color-surface-800 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-primary-500 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--active | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--focus | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider--hover | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--warning | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--warning--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--warning--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--error | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--success | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--warning | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--error | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--success | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--warning | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--default | 0 | 0 |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--default | 0 | 0 |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--error | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--success | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--warning | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-thumb-Slider | 2px | 2px |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-thumb-Slider | 2px | 2px |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--warning | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--warning--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--warning--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--active | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--focus | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-thumb-Slider--hover | 0 0 0 6px rgb(from $color-primary r g b / 0.4) | 0 0 0 6px rgb(from $color-primary r g b / 0.4) |

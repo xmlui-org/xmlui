@@ -15,6 +15,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     tableOfContents: "false",
     tags: "false",
 
+    "maxWidth-content-HomePage": "800px",
+    "maxWidth-content-BlogOverview": "800px",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",

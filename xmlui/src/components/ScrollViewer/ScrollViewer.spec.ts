@@ -512,3 +512,222 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByPlaceholder("Input")).toBeVisible();
   });
 });
+
+// =============================================================================
+// HEADER AND FOOTER TEMPLATE TESTS
+// =============================================================================
+
+test.describe("Header and Footer Templates", () => {
+  test("headerTemplate renders its content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer">
+          <property name="headerTemplate">
+            <Text testId="header">Header Content</Text>
+          </property>
+          <Text>Body Content</Text>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByText("Header Content")).toBeVisible();
+    await expect(page.getByText("Body Content")).toBeVisible();
+  });
+
+  test("footerTemplate renders its content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer">
+          <property name="footerTemplate">
+            <Text testId="footer">Footer Content</Text>
+          </property>
+          <Text>Body Content</Text>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("footer")).toBeVisible();
+    await expect(page.getByText("Footer Content")).toBeVisible();
+    await expect(page.getByText("Body Content")).toBeVisible();
+  });
+
+  test("headerTemplate and footerTemplate both render alongside body content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer">
+          <property name="headerTemplate">
+            <Text testId="header">Header</Text>
+          </property>
+          <property name="footerTemplate">
+            <Text testId="footer">Footer</Text>
+          </property>
+          <Text testId="body">Body</Text>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+    await expect(page.getByTestId("body")).toBeVisible();
+  });
+
+  test("headerTemplate is positioned at the top of the viewer", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="400px">
+        <ScrollViewer testId="viewer">
+          <property name="headerTemplate">
+            <Text testId="header">Header</Text>
+          </property>
+          <Stack height="1000px"><Text>Tall content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    const { top: viewerTop } = await getBounds(page.getByTestId("viewer"));
+    const { top: headerTop } = await getBounds(page.getByTestId("header"));
+
+    expect(headerTop).toBeCloseTo(viewerTop, 0);
+  });
+
+  test("footerTemplate is positioned at the bottom of the viewer", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="400px">
+        <ScrollViewer testId="viewer">
+          <property name="footerTemplate">
+            <Text testId="footer">Footer</Text>
+          </property>
+          <Stack height="1000px"><Text>Tall content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    const { bottom: viewerBottom } = await getBounds(page.getByTestId("viewer"));
+    const { bottom: footerBottom } = await getBounds(page.getByTestId("footer"));
+
+    expect(footerBottom).toBeCloseTo(viewerBottom, 0);
+  });
+
+  test("headerTemplate appears above the scrollable content", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="400px">
+        <ScrollViewer testId="viewer">
+          <property name="headerTemplate">
+            <Text testId="header">Header</Text>
+          </property>
+          <Text testId="firstContent">First content line</Text>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    const { bottom: headerBottom } = await getBounds(page.getByTestId("header"));
+    const { top: contentTop } = await getBounds(page.getByTestId("firstContent"));
+
+    expect(headerBottom).toBeLessThanOrEqual(contentTop + 1);
+  });
+
+  test("headerTemplate stays fixed when content is scrolled", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="normal">
+          <property name="headerTemplate">
+            <Text testId="header">Sticky Header</Text>
+          </property>
+          <Stack height="2000px"><Text>Tall content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.getByTestId("header")).toBeVisible();
+
+    const { top: headerTopBefore } = await getBounds(page.getByTestId("header"));
+
+    // Scroll the inner scrollable element via JS
+    await page.getByTestId("viewer").evaluate((el) => {
+      const scroller = el.querySelector<HTMLElement>('[style*="overflow: auto"]') ?? el;
+      scroller.scrollTop = 500;
+    });
+    await page.waitForFunction(() => {
+      const el = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+      const scroller = el?.querySelector<HTMLElement>('[style*="overflow: auto"]') ?? el;
+      return scroller != null && scroller.scrollTop > 0;
+    });
+
+    const { top: headerTopAfter } = await getBounds(page.getByTestId("header"));
+
+    expect(headerTopAfter).toBeCloseTo(headerTopBefore, 0);
+  });
+
+  test("footerTemplate stays fixed when content is scrolled", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="normal">
+          <property name="footerTemplate">
+            <Text testId="footer">Sticky Footer</Text>
+          </property>
+          <Stack height="2000px"><Text>Tall content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+
+    const { bottom: footerBottomBefore } = await getBounds(page.getByTestId("footer"));
+
+    await page.getByTestId("viewer").evaluate((el) => {
+      const scroller = el.querySelector<HTMLElement>('[style*="overflow: auto"]') ?? el;
+      scroller.scrollTop = 500;
+    });
+    await page.waitForFunction(() => {
+      const el = document.querySelector<HTMLElement>('[data-testid="viewer"]');
+      const scroller = el?.querySelector<HTMLElement>('[style*="overflow: auto"]') ?? el;
+      return scroller != null && scroller.scrollTop > 0;
+    });
+
+    const { bottom: footerBottomAfter } = await getBounds(page.getByTestId("footer"));
+
+    expect(footerBottomAfter).toBeCloseTo(footerBottomBefore, 0);
+  });
+
+  test("works with overlay scrollStyle", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
+          <property name="headerTemplate">
+            <Text testId="header">Header</Text>
+          </property>
+          <property name="footerTemplate">
+            <Text testId="footer">Footer</Text>
+          </property>
+          <Stack height="1000px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("header")).toBeVisible();
+    await expect(page.getByTestId("footer")).toBeVisible();
+
+    const { top: viewerTop, bottom: viewerBottom } = await getBounds(page.getByTestId("viewer"));
+    const { top: headerTop } = await getBounds(page.getByTestId("header"));
+    const { bottom: footerBottom } = await getBounds(page.getByTestId("footer"));
+
+    expect(headerTop).toBeCloseTo(viewerTop, 0);
+    expect(footerBottom).toBeCloseTo(viewerBottom, 0);
+  });
+
+  test("without header or footer no extra wrapper structure is added", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <ScrollViewer testId="viewer">
+        <Text>Content</Text>
+      </ScrollViewer>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+
+    // Without header/footer the stickyHeader/stickyFooter containers must not exist
+    await expect(page.getByTestId("viewer").locator('[class*="stickyHeader"]')).not.toBeAttached();
+    await expect(page.getByTestId("viewer").locator('[class*="stickyFooter"]')).not.toBeAttached();
+  });
+});

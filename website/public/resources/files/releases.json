@@ -1,5 +1,29 @@
 [
   {
+    "tag_name": "xmlui@0.12.4",
+    "published_at": "2026-02-25T12:11:06Z",
+    "changes": [
+      {
+        "description": "Add experimental IncludeMarkup component",
+        "commit_sha": "0aaa878"
+      },
+      {
+        "description": "Inline styles on components with the bindTo property applied will not style the label. Also fixed NumberBox adornment location when writing mode is right-to-left.",
+        "commit_sha": "7cf02a7"
+      },
+      {
+        "description": "Use the new website project as the target of component document generation",
+        "commit_sha": "48b7e46"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.4.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.4/xmlui-0.12.4.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.2",
     "published_at": "2026-02-18T11:52:16Z",
     "changes": [
@@ -472,54 +496,6 @@
       {
         "name": "xmlui-0.11.29.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.29/xmlui-0.11.29.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.28",
-    "published_at": "2026-01-14T06:30:16Z",
-    "changes": [
-      {
-        "description": "FileInput: Automate parsing of csv/json.",
-        "commit_sha": "7485959"
-      },
-      {
-        "description": "Fixed a bug where gaps were still rendered even if there were no labels provided for input fields.",
-        "commit_sha": "96d510c"
-      },
-      {
-        "description": "Fixed incorrect background color for a number of components: AutoComplete, Form, NoResult, TextBox and other input controls.",
-        "commit_sha": "13ebd58"
-      },
-      {
-        "description": "Fixed FlowLayout passing down width incorrectly to its children.",
-        "commit_sha": "94f2354"
-      },
-      {
-        "description": "Add openLinkNewTab property to Markdown.",
-        "commit_sha": "cf6c6ef"
-      },
-      {
-        "description": "Add Markdown property truncateLinks",
-        "commit_sha": "cf6c6ef"
-      },
-      {
-        "description": "Add support for rowspan and colspan attributes in Markdown tables",
-        "commit_sha": "6c49cd2"
-      },
-      {
-        "description": "Fix star-sizing in App layouts",
-        "commit_sha": "1d9a5e7"
-      },
-      {
-        "description": "Fix state APICall and DataSource state references",
-        "commit_sha": "31e53a8"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.28.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.28/xmlui-0.11.28.js"
       }
     ]
   }

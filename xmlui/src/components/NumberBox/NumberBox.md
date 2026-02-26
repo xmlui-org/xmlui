@@ -8,7 +8,7 @@
 - **Validation**: Built-in validation status indicators and form compatibility
 - **Smart paste handling**: Only accepts pasted content that results in valid numeric values
 
-The `NumberBox` is often used in forms. See the [this guide](/forms) for details.
+The `NumberBox` is often used in forms. See the [this guide](/docs/guides/forms) for details.
 
 %-DESC-END
 

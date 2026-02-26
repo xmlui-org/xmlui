@@ -13,7 +13,7 @@
 
 ## Using Tabs [#using-tabs]
 
-The component accepts only [TabItem](/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/components/TabItem).
+The component accepts only [TabItem](/docs/reference/components/TabItem) components as children. Other child components will not be displayed. Each [TabItem](/docs/reference/components/TabItem) has a `label` property for the tab button text, with content provided by placing child components within the [TabItem](/docs/reference/components/TabItem).
 
 ```xmlui-pg copy display name="Example: using Tabs" height="200px"
 <App>
@@ -383,27 +383,27 @@ This method sets the active tab by index (0-based).
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](../styles-and-themes/common-units/#color)-list-Tabs | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-Tabs | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-trigger-Tabs | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-trigger-Tabs--active | *none* | *none* |
-| [backgroundColor](../styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-surface-100 | $color-surface-100 |
-| [border](../styles-and-themes/common-units/#border)-list-Tabs | *none* | *none* |
-| [border](../styles-and-themes/common-units/#border)-trigger-Tabs | *none* | *none* |
-| [borderColor](../styles-and-themes/common-units/#color)-active-Tabs | $color-primary | $color-primary |
-| [borderColor](../styles-and-themes/common-units/#color)-Tabs | $borderColor | $borderColor |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-list-Tabs | *none* | *none* |
-| [borderRadius](../styles-and-themes/common-units/#border-rounding)-trigger-Tabs | *none* | *none* |
-| [borderStyle](../styles-and-themes/common-units/#border-style)-Tabs | solid | solid |
-| [borderWidth](../styles-and-themes/common-units/#size)-Tabs | 2px | 2px |
-| [gap](../styles-and-themes/common-units/#size)-list-Tabs | 0px | 0px |
-| [padding](../styles-and-themes/common-units/#size)-trigger-Tabs | $space-4 | $space-4 |
-| [paddingBottom](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [paddingHorizontal](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [paddingLeft](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [paddingRight](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [paddingTop](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [paddingVertical](../styles-and-themes/common-units/#size)-trigger-Tabs | *none* | *none* |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-600 | $color-primary-600 |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--active | $color-primary-900 | $color-primary-900 |
-| [textColor](../styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-primary-900 | $color-primary-900 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-list-Tabs | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Tabs | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs--active | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-surface-100 | $color-surface-100 |
+| [border](/docs/styles-and-themes/common-units/#border)-list-Tabs | *none* | *none* |
+| [border](/docs/styles-and-themes/common-units/#border)-trigger-Tabs | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-active-Tabs | $color-primary | $color-primary |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Tabs | $borderColor | $borderColor |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-list-Tabs | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-trigger-Tabs | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Tabs | solid | solid |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Tabs | 2px | 2px |
+| [gap](/docs/styles-and-themes/common-units/#size)-list-Tabs | 0px | 0px |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | $space-4 | $space-4 |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-600 | $color-primary-600 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs--active | $color-primary-900 | $color-primary-900 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs--hover | $color-primary-900 | $color-primary-900 |

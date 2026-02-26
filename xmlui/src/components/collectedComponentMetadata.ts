@@ -19,7 +19,6 @@ import {
   MenuSeparatorMd,
   SubMenuItemMd,
 } from "./DropdownMenu/DropdownMenu";
-import { EmojiSelectorMd } from "./EmojiSelector/EmojiSelector";
 import { FileInputMd } from "./FileInput/FileInput";
 import { FileUploadDropZoneMd } from "./FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "./FlowLayout/FlowLayout";
@@ -217,6 +216,8 @@ import { ContextMenuMd } from "./ContextMenu/ContextMenu";
 import QRCode from "react-qr-code";
 import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
+import { StickySection } from "./StickySection/StickySectionNative";
+import { StickySectionMd } from "./StickySection/StickySection";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -350,7 +351,6 @@ export const collectedComponentMetadata = {
   Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
-  EmojiSelector: EmojiSelectorMd,
   ExpandableItem: ExpandableItemMd,
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
@@ -405,6 +405,7 @@ export const collectedComponentMetadata = {
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
+  StickySection: StickySectionMd,
   Tooltip: TooltipMd,
   HSplitter: HSplitterMd,
   VSplitter: VSplitterMd,
