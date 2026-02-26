@@ -13,7 +13,7 @@ import classnames from "classnames";
 import styles from "../../components/Accordion/Accordion.module.scss";
 
 import { useAccordionContext } from "../../components/Accordion/AccordionContext";
-import Icon from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 
 function defaultRenderer(header: string) {
   return <div>{header}</div>;
@@ -118,7 +118,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
                 transition: "transform 300ms cubic-bezier(0.87, 0, 0.13, 1)",
               }}
             >
-              <Icon
+              <ThemedIcon
                 name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
                 className={styles.chevron}
                 aria-hidden="true"

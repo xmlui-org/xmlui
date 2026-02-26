@@ -6,7 +6,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import styles from "./Sheet.module.scss";
 
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Icon } from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 
 //based on this: https://ui.shadcn.com/docs/components/sheet
 
@@ -49,7 +49,7 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
         >
           {children}
           <SheetPrimitive.Close className={styles.close}>
-            <Icon name={"close"} />
+            <ThemedIcon name={"close"} />
             <VisuallyHidden>Close</VisuallyHidden>
           </SheetPrimitive.Close>
         </SheetPrimitive.Content>

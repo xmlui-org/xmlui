@@ -9,7 +9,7 @@ import classnames from "classnames";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { asyncNoop } from "../../components-core/constants";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { getComposedRef } from "../component-utils";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
@@ -196,13 +196,13 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
       {children}
       {!children && !isDragActive && (
         <div className={classnames(styles.dropPlaceholder)}>
-          <Icon name={icon}></Icon>
+          <ThemedIcon name={icon}></ThemedIcon>
           {text}
         </div>
       )}
       {isDragActive && isDragAccept && (
         <div className={classnames(styles.dropPlaceholder, styles.onDragActive)}>
-          <Icon name={icon}></Icon>
+          <ThemedIcon name={icon}></ThemedIcon>
           {text}
         </div>
       )}

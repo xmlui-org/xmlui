@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
 

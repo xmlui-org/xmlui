@@ -25,7 +25,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
 import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
@@ -713,14 +713,14 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     }
 
     const iconMap: Record<string, React.ReactNode> = {
-      info: <Icon name="admonition_info" />,
-      warning: <Icon name="admonition_warning" />,
-      danger: <Icon name="admonition_danger" />,
-      note: <Icon name="admonition_note" />,
-      tip: <Icon name="admonition_tip" />,
+      info: <ThemedIcon name="admonition_info" />,
+      warning: <ThemedIcon name="admonition_warning" />,
+      danger: <ThemedIcon name="admonition_danger" />,
+      note: <ThemedIcon name="admonition_note" />,
+      tip: <ThemedIcon name="admonition_tip" />,
       card: null,
-      feat: <Icon name="star" />,
-      def: <Icon name="definition" />,
+      feat: <ThemedIcon name="star" />,
+      def: <ThemedIcon name="definition" />,
     };
 
     // Render adornment blockquote with the updated structure
@@ -741,7 +741,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
         <div className={styles.admonitionContainer}>
           {iconMap[type] !== null && (
             <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-              {iconMap[type] || <Icon name="admonition_info" />}
+              {iconMap[type] || <ThemedIcon name="admonition_info" />}
             </div>
           )}
           <div className={styles.admonitionContent}>{processedChildren}</div>
@@ -835,7 +835,7 @@ const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHead
             appGlobals.events?.emit("scroll-to-anchor", { anchor: headingId });
           }}
         >
-          <Icon name="link" />
+          <ThemedIcon name="link" />
         </a>
       )}
     </Heading>

@@ -45,7 +45,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { Toggle } from "../Toggle/Toggle";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
 import { PaginationNative, type Position } from "../Pagination/PaginationNative";
@@ -1807,14 +1807,14 @@ function ColumnOrderingIndicator({
   iconNoSort = "nosort:Table",
 }: ColumnOrderingIndicatorProps) {
   if (direction === "ascending") {
-    return <Icon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
+    return <ThemedIcon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
   } else if (direction === "descending") {
-    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
+    return <ThemedIcon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
   }
   return iconNoSort !== "-" ? (
-    <Icon name={iconNoSort} fallback="nosort" size="12" />
+    <ThemedIcon name={iconNoSort} fallback="nosort" size="12" />
   ) : (
-    <Icon name={iconNoSort} size="12" />
+    <ThemedIcon name={iconNoSort} size="12" />
   ); //nosort
 }
 

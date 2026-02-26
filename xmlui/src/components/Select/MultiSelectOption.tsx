@@ -3,7 +3,7 @@ import type { Option } from "../abstractions";
 import { useSelect } from "./SelectContext";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 export const MultiSelectOption = forwardRef<
   HTMLDivElement,
@@ -73,7 +73,7 @@ export const MultiSelectOption = forwardRef<
         ) : (
           <>
             {children || label}
-            {selected && <Icon name="checkmark" />}
+            {selected && <ThemedIcon name="checkmark" />}
           </>
         )}
       </div>

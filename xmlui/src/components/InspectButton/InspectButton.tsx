@@ -1,5 +1,5 @@
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { useInspectMode } from "../../components-core/InspectorContext";
 import styles from "./InspectButton.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";

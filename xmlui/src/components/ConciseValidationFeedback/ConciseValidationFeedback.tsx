@@ -1,7 +1,7 @@
 import type { HTMLAttributes } from "react";
 import classnames from "classnames";
 
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Tooltip } from "../Tooltip/TooltipNative";
 import type { ValidationMode } from "../Form/FormContext";
 import type { ValidationStatus } from "../abstractions";
@@ -28,7 +28,7 @@ export const ConciseValidationFeedback = ({
     return (
       <span {...rest} className={classnames(className)}>
         <Tooltip text={invalidMessages.join("\n")} delayDuration={100}>
-          <Icon name={errorIcon} className={classnames(styles.icon, styles.error)} />
+          <ThemedIcon name={errorIcon} className={classnames(styles.icon, styles.error)} />
         </Tooltip>
       </span>
     );
@@ -37,7 +37,7 @@ export const ConciseValidationFeedback = ({
   if (validationStatus === "valid") {
     return (
       <span {...rest} className={classnames(className)}>
-        <Icon name={successIcon} className={classnames(styles.icon, styles.valid)} />
+        <ThemedIcon name={successIcon} className={classnames(styles.icon, styles.valid)} />
       </span>
     );
   }

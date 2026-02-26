@@ -28,9 +28,9 @@ import {
   toUsableNumber,
 } from "./numberbox-abstractions";
 import { type ValidationStatus } from "../abstractions";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Adornment } from "../Input/InputAdornment";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
@@ -676,7 +676,7 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={upButton}
             >
-              <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
+              <ThemedIcon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
           </Part>
 
@@ -692,7 +692,7 @@ export const NumberBox = forwardRef(function NumberBox(
               disabled={!enabled || readOnly}
               ref={downButton}
             >
-              <Icon
+              <ThemedIcon
                 name={spinnerDownIcon || "spinnerDown:NumberBox"}
                 fallback="chevrondown"
                 size="sm"

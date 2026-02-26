@@ -10,7 +10,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
@@ -624,7 +624,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   // Custom clear icon
   const clearIconElement = useMemo(() => {
     if (clearIcon === null || clearIcon === "null") return null;
-    if (clearIcon) return <Icon name={clearIcon} />;
+    if (clearIcon) return <ThemedIcon name={clearIcon} />;
     // Default clear icon
     return (
       <svg

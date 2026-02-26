@@ -8,10 +8,10 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { useAppContext } from "../../components-core/AppContext";
-import { Icon } from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 import { Logo } from "../../components/Logo/LogoNative";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
-import { Button } from "../../components/Button/ButtonNative";
+import { ThemedButton as Button } from "../../components/Button/Button";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
@@ -98,7 +98,7 @@ export const AppHeader = ({
           <Part partId={PART_HAMBURGER}>
             <Button
               onClick={toggleDrawer}
-              icon={<Icon name={"hamburger"} />}
+              icon={<ThemedIcon name={"hamburger"} />}
               variant={"ghost"}
               className={styles.drawerToggle}
               style={{ color: "inherit", flexShrink: 0 }}

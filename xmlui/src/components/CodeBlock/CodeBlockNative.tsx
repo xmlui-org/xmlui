@@ -6,8 +6,8 @@ import {
   CodeHighlighterMetaKeys,
   encodeToBase64,
 } from "./highlight-code";
-import { Button } from "../Button/ButtonNative";
-import Icon from "../Icon/IconNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedIcon } from "../Icon/Icon";
 import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
@@ -60,7 +60,7 @@ export function CodeBlock({
               variant="ghost"
               size="xs"
               className={styles.copyButton}
-              icon={<Icon name={"copy"} aria-hidden />}
+              icon={<ThemedIcon name={"copy"} aria-hidden />}
               onClick={() => {
                 if (!textToCopy) return;
                 void navigator.clipboard.writeText(textToCopy);

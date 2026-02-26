@@ -2,7 +2,7 @@ import classnames from "classnames";
 
 import styles from "./InputAdornment.module.scss";
 
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Text } from "../Text/TextNative";
 
 interface AdornmentProps {
@@ -25,7 +25,7 @@ export function Adornment({ iconName, text, className, onClick, ...rest }: Adorn
           onClick={onClick}
           tabIndex={onClick ? 0 : undefined}
         >
-          <Icon name={iconName} style={{ color: "inherit" }} />
+          <ThemedIcon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>
               <Text style={{ fontSize: "inherit" }}>{text}</Text>

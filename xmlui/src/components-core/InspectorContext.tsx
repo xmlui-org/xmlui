@@ -14,7 +14,7 @@ import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
-import { Button } from "../components/Button/ButtonNative";
+import { ThemedButton as Button } from "../components/Button/Button";
 import styles from "./InspectorButton.module.scss";
 import type { ProjectCompilation } from "../abstractions/scripting/Compilation";
 import { ProjectCompilationContext, useProjectCompilation } from "./ProjectCompilationContext";

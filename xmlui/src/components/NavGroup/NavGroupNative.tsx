@@ -28,7 +28,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
@@ -267,7 +267,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       >
         {label}
         {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-        <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
+        <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
         aria-hidden={!expanded}
@@ -367,9 +367,9 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         >
           {label}
           {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
+          {level === 0 && <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
-            <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+            <ThemedIcon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}
         </NavLink>
       </Trigger>

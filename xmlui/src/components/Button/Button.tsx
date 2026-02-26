@@ -18,7 +18,6 @@ import {
   dLostFocus,
   dOrientation,
 } from "../../components/metadata-helpers";
-import { Icon } from "../Icon/IconNative";
 import { Button, defaultProps } from "./ButtonNative";
 import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
 import { useComponentThemeClass } from "../../components-core/theming/utils";

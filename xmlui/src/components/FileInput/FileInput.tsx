@@ -17,7 +17,7 @@ import {
   dValidationStatus,
 } from "../../components/metadata-helpers";
 import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { FileInput, isFileArray, defaultProps } from "./FileInputNative";
 
 const COMP = "FileInput";
@@ -165,7 +165,7 @@ export const fileInputRenderer = createComponentRenderer(
         variant={extractValue(node.props.buttonVariant)}
         buttonThemeColor={extractValue(node.props.buttonThemeColor)}
         buttonSize={extractValue(node.props.buttonSize)}
-        buttonIcon={<Icon name={iconName} fallback="folder-open" />}
+        buttonIcon={<ThemedIcon name={iconName} fallback="folder-open" />}
         buttonIconPosition={extractValue(node.props.buttonIconPosition)}
         buttonLabel={extractValue.asOptionalString(node.props.buttonLabel)}
         updateState={updateState}

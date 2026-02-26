@@ -20,7 +20,7 @@ import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { Stack } from "./components/Stack/StackNative";
-import { Button } from "./components/Button/ButtonNative";
+import { ThemedButton as Button } from "./components/Button/Button";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";

@@ -17,7 +17,7 @@ import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-u
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
@@ -147,13 +147,13 @@ export const defaultProps: Pick<
 const Chevron = ({ ...props }) => {
   const { orientation = "left" } = props;
   if (orientation === "up") {
-    return <Icon name={"chevronup"} size={"sm"} />;
+    return <ThemedIcon name={"chevronup"} size={"sm"} />;
   } else if (orientation === "down") {
-    return <Icon name={"chevrondown"} size={"sm"} />;
+    return <ThemedIcon name={"chevrondown"} size={"sm"} />;
   } else if (orientation === "left") {
-    return <Icon name={"chevronleft"} size={"lg"} />;
+    return <ThemedIcon name={"chevronleft"} size={"lg"} />;
   } else if (orientation === "right") {
-    return <Icon name={"chevronright"} size={"lg"} />;
+    return <ThemedIcon name={"chevronright"} size={"lg"} />;
   }
 };
 
