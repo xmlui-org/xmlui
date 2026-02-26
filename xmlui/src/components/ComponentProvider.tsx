@@ -65,7 +65,6 @@ import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
-import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
@@ -556,10 +555,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(lineChartComponentRenderer);
       this.registerCoreComponent(pieChartComponentRenderer);
       this.registerCoreComponent(radarChartComponentRenderer);
-    }
-
-    if (process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false") {
-      this.registerCoreComponent(emojiSelectorRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {

@@ -19,7 +19,6 @@ import {
   MenuSeparatorMd,
   SubMenuItemMd,
 } from "./DropdownMenu/DropdownMenu";
-import { EmojiSelectorMd } from "./EmojiSelector/EmojiSelector";
 import { FileInputMd } from "./FileInput/FileInput";
 import { FileUploadDropZoneMd } from "./FileUploadDropZone/FileUploadDropZone";
 import { FlowLayoutMd } from "./FlowLayout/FlowLayout";
@@ -350,7 +349,6 @@ export const collectedComponentMetadata = {
   Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
-  EmojiSelector: EmojiSelectorMd,
   ExpandableItem: ExpandableItemMd,
   FileInput: FileInputMd,
   FileUploadDropZone: FileUploadDropZoneMd,
