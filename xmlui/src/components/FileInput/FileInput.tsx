@@ -19,6 +19,8 @@ import {
 import { buttonThemeNames, buttonVariantNames, iconPositionNames, sizeMd } from "../abstractions";
 import { ThemedIcon } from "../Icon/Icon";
 import { FileInput, isFileArray, defaultProps } from "./FileInputNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "FileInput";
 const DEFAULT_ICON = "browse:FileInput";
@@ -153,6 +155,20 @@ export const FileInputMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
 });
+
+type ThemedFileInputProps = React.ComponentPropsWithoutRef<typeof FileInput>;
+
+export const ThemedFileInput = React.forwardRef<HTMLDivElement, ThemedFileInputProps>(
+  function ThemedFileInput({ className, ...props }, _ref) {
+    const themeClass = useComponentThemeClass(FileInputMd);
+    return (
+      <FileInput
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+      />
+    );
+  },
+);
 
 export const fileInputRenderer = createComponentRenderer(
   COMP,

@@ -25,6 +25,8 @@ import {
   defaultProps,
   WeekDays,
 } from "./DatePickerNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "DatePicker";
 
@@ -178,6 +180,21 @@ export const DatePickerMd = createMetadata({
     [`paddingHorizontal-${COMP}`]: "$space-2",
   },
 });
+
+type ThemedDatePickerProps = React.ComponentPropsWithoutRef<typeof DatePicker>;
+
+export const ThemedDatePicker = React.forwardRef<React.ElementRef<typeof DatePicker>, ThemedDatePickerProps>(
+  function ThemedDatePicker({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(DatePickerMd);
+    return (
+      <DatePicker
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const datePickerComponentRenderer = createComponentRenderer(
   COMP,

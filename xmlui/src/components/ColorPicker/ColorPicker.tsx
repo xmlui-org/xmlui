@@ -1,5 +1,7 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { ColorPicker, defaultProps } from "./ColorPickerNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -57,6 +59,21 @@ export const ColorPickerMd = createMetadata({
     [`height-${COMP}`]: "1.5em",
   },
 });
+
+type ThemedColorPickerProps = React.ComponentPropsWithoutRef<typeof ColorPicker>;
+
+export const ThemedColorPicker = React.forwardRef<React.ElementRef<typeof ColorPicker>, ThemedColorPickerProps>(
+  function ThemedColorPicker({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ColorPickerMd);
+    return (
+      <ColorPicker
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const colorPickerComponentRenderer = createComponentRenderer(
   "ColorPicker",

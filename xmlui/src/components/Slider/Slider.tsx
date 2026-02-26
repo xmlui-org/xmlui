@@ -1,4 +1,6 @@
 import { Slider } from "./SliderNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -140,6 +142,21 @@ export const SliderMd = createMetadata({
     },
   },
 });
+
+type ThemedSliderProps = React.ComponentPropsWithoutRef<typeof Slider>;
+
+export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, ThemedSliderProps>(
+  function ThemedSlider({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(SliderMd);
+    return (
+      <Slider
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const sliderComponentRenderer = createComponentRenderer(
   COMP,

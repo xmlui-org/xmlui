@@ -726,8 +726,8 @@ After all sub-components migrated, also run their own E2E tests:
 npx playwright test FileInput.spec.ts NumberBox.spec.ts TextArea.spec.ts DatePicker.spec.ts AutoComplete.spec.ts Slider.spec.ts ColorPicker.spec.ts --workers=1 --reporter=line
 ```
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done — 862 passed, 9 failed (all pre-existing: 7 ColorPicker CSS theme var tests, 2 TextArea hover/focus CSS pseudo-class tests), 11 skipped
+**Failing tests:** ColorPicker borderColor/borderRadius/borderWidth/borderStyle/boxShadow theme vars (pre-existing); TextArea focus/hover visual state (pre-existing, docs warn against testing CSS pseudo-classes)
 
 ---
 
