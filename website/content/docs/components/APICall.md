@@ -320,9 +320,9 @@ Fires on each poll when in deferred mode. Passes the status data and current pro
 
 ### `success` [#success]
 
-This event fires when a request results in a success.
+This event fires when a request results in a success. Returning an explicit `false` value suppresses automatic query invalidation, giving you full control over which cached data gets refreshed after the call.
 
-**Signature**: `(result: any) => void`
+**Signature**: `(result: any) => false | void`
 
 - `result`: The response data returned from the successful API request.
 

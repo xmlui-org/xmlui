@@ -132,6 +132,29 @@ $transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
   height: 100%;
 }
 
+// --- Header / footer layout
+.headerFooterWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.stickyHeader {
+  flex-shrink: 0;
+}
+
+.stickyFooter {
+  flex-shrink: 0;
+}
+
+.scrollerFlex {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
 // --- Export theme variables for registration
 :export {
   themeVars: t.json-stringify($themeVars);
