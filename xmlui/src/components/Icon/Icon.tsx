@@ -2,7 +2,10 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import Icon from "./IconNative";
+import type { IconBaseProps } from "./IconNative";
 import { createMetadata, d } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import React from "react";
 
 const COMP = "Icon";
 
@@ -39,6 +42,15 @@ export const IconMd = createMetadata({
     [`size-${COMP}`]: "1.2em",
   },
 });
+
+type ThemedIconProps = IconBaseProps & { className?: string };
+
+export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(
+  function ThemedIcon({ className, ...props }: ThemedIconProps, ref) {
+    const themeClass = useComponentThemeClass(IconMd);
+    return <Icon {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const iconComponentRenderer = createComponentRenderer(
   COMP,

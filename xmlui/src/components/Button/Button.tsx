@@ -22,6 +22,8 @@ import { Icon } from "../Icon/IconNative";
 import { Button, defaultProps } from "./ButtonNative";
 import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import React from "react";
+import { ThemedIcon } from "../Icon/Icon";
 
 const COMP = "Button";
 
@@ -188,10 +190,12 @@ export const ButtonMd = createMetadata({
 });
 
 type ThemedButtonProps = React.ComponentProps<typeof Button> & { className?: string };
-export const ThemedButton =({className, ...props}: ThemedButtonProps)=>{
-  const themeClass = useComponentThemeClass(ButtonMd);
-  return <Button {...props} className={`${themeClass} ${className}`} />;
-}
+export const ThemedButton = React.forwardRef<HTMLButtonElement, ThemedButtonProps>(
+  function ThemedButton({ className, ...props }: ThemedButtonProps, ref) {
+    const themeClass = useComponentThemeClass(ButtonMd);
+    return <Button {...props} className={`${themeClass} ${className}`} ref={ref} />;
+  },
+);
 
 export const buttonComponentRenderer = createComponentRenderer(
   "Button",
@@ -209,7 +213,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         themeColor={extractValue.asOptionalString(node.props.themeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         size={extractValue.asOptionalString(node.props.size)}
-        icon={iconName && <Icon name={iconName} aria-hidden />}
+        icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
         iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
         orientation={extractValue.asOptionalString(node.props.orientation)}
         contentPosition={extractValue.asOptionalString(node.props.contentPosition)}

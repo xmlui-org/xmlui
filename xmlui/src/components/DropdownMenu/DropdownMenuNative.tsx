@@ -21,12 +21,13 @@ import type {
   ButtonThemeColor,
   AlignmentOptions,
 } from "../abstractions";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { ThemedButton } from "../Button/Button";
 
 // Context to manage dropdown menu state
 type DropdownMenuContextType = {
   closeMenu: () => void;
+  contentClassName?: string;
 };
 
 export const DropdownMenuContext = createContext<DropdownMenuContextType | null>(null);
@@ -117,7 +118,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <DropdownMenuContext.Provider value={{ closeMenu }}>
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: className }}>
       <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={async (isOpen) => {
@@ -151,7 +152,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             triggerTemplate
           ) : (
             <ThemedButton
-              icon={<Icon name={triggerButtonIcon} fallback="chevrondown" />}
+              icon={<ThemedIcon name={triggerButtonIcon} fallback="chevrondown" />}
               iconPosition={triggerButtonIconPosition}
               type="button"
               variant={triggerButtonVariant as ButtonVariant}
@@ -255,19 +256,23 @@ type SubMenuItemProps = {
   iconPosition?: IconPosition;
   children?: ReactNode;
   triggerTemplate?: ReactNode;
+  className?: string;
+  contentClassName?: string;
 };
 
 export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function SubMenuItem(
-  { children, label, icon, iconPosition = defaultMenuItemProps.iconPosition, triggerTemplate },
+  { children, label, icon, iconPosition = defaultMenuItemProps.iconPosition, triggerTemplate, className, contentClassName },
   ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
   const iconToStart = iconPosition === "start";
+  const context = useDropdownMenuContext();
+  const resolvedContentClassName = classnames(styles.DropdownMenuSubContent, contentClassName, context?.contentClassName);
 
   return (
     <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
-      <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
+      <DropdownMenuPrimitive.SubTrigger ref={ref} className={classnames(styles.DropdownMenuSubTrigger, className)} asChild>
         {triggerTemplate ? (
           triggerTemplate
         ) : (
@@ -275,13 +280,13 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
             {iconToStart && icon}
             <div className={styles.wrapper}>{label}</div>
             {!iconToStart && icon}
-            <Icon name="chevronright" fallback="chevronright" />
+            <ThemedIcon name="chevronright" fallback="chevronright" />
           </div>
         )}
       </DropdownMenuPrimitive.SubTrigger>
       <DropdownMenuPrimitive.Portal container={root}>
         <DropdownMenuPrimitive.SubContent
-          className={styles.DropdownMenuSubContent}
+          className={resolvedContentClassName}
           sideOffset={2}
           loop={true}
         >
