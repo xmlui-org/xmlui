@@ -31,7 +31,7 @@ export default ({ mode = "lib" }) => {
           VITE_MOCK_ENABLED: true,
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
           VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
-          VITE_USED_COMPONENTS_Tree: "false",
+          // VITE_USED_COMPONENTS_Tree: "false",
           VITE_USED_COMPONENTS_TableEditor: "false",
           // VITE_USED_COMPONENTS_Charts: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
