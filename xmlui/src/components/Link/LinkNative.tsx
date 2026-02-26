@@ -33,6 +33,7 @@ type Props = {
   onClick?: () => void;
   style?: CSSProperties;
   className?: string;
+  noIndicator?: boolean;
 } & Partial<
   Pick<
     HTMLAnchorElement,
@@ -40,9 +41,10 @@ type Props = {
   >
 >;
 
-export const defaultProps: Pick<Props, "active" | "disabled"> = {
+export const defaultProps: Pick<Props, "active" | "disabled" | "noIndicator"> = {
   active: false,
   disabled: false,
+  noIndicator: false,
 };
 
 export const LinkNative = forwardRef(function LinkNative(
@@ -61,6 +63,7 @@ export const LinkNative = forwardRef(function LinkNative(
     verticalAlignment,
     style,
     className,
+    noIndicator = defaultProps.noIndicator,
     ...anchorProps
   } = specifyTypes(props);
 
@@ -98,6 +101,7 @@ export const LinkNative = forwardRef(function LinkNative(
         className,
         styles.container,
         {
+          [styles.noIndicator]: noIndicator,
           [styles.iconLink]: iconLink,
           [styles.active]: active,
           [styles.disabled]: disabled,
