@@ -2,7 +2,7 @@ import styles from "./ProfileMenu.module.scss";
 
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { Avatar } from "../Avatar/AvatarNative";
-import { DropdownMenu, MenuItem, MenuSeparator } from "../DropdownMenu/DropdownMenuNative";
+import { ThemedDropdownMenu as DropdownMenu, ThemedMenuItem as MenuItem, ThemedMenuSeparator as MenuSeparator } from "../DropdownMenu/DropdownMenu";
 
 // =====================================================================================================================
 // Heading React component

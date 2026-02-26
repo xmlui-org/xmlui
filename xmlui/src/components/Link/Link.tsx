@@ -1,10 +1,12 @@
 import styles from "./Link.module.scss";
 
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Link";
 
@@ -104,6 +106,14 @@ export const LinkMd = createMetadata({
 /**
  * This function defines the renderer for the Link component.
  */
+type ThemedLinkNativeProps = React.ComponentProps<typeof LinkNative> & { className?: string };
+export const ThemedLinkNative = React.forwardRef<HTMLDivElement, ThemedLinkNativeProps>(
+  function ThemedLinkNative({ className, ...props }: ThemedLinkNativeProps, ref) {
+    const themeClass = useComponentThemeClass(LinkMd);
+    return <LinkNative {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,

@@ -38,7 +38,7 @@ import {
 } from "../../components/Form/formActions";
 import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
 import { ThemedText as Text } from "../../components/Text/Text";
-import { Stack } from "../../components/Stack/StackNative";
+import { ThemedStack as Stack } from "../../components/Stack/Stack";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
 import { ThemedButton as Button } from "../Button/Button";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummary";

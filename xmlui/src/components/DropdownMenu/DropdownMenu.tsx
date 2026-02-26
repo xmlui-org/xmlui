@@ -11,10 +11,13 @@ import {
   defaultDropdownMenuProps,
   defaultMenuItemProps,
   DropdownMenu,
+  DropdownMenuContext,
   MenuItem,
   MenuSeparator,
   SubMenuItem,
 } from "./DropdownMenuNative";
+
+export { DropdownMenuContext };
 import { filterSeparators } from "../menu-helpers";
 
 const DDMCOMP = "DropdownMenu";
@@ -111,6 +114,15 @@ export const DropdownMenuMd = createMetadata({
   },
 });
 
+type ThemedDropdownMenuProps = React.ComponentProps<typeof DropdownMenu> & { className?: string };
+
+export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDropdownMenuProps>(
+  function ThemedDropdownMenu({ className, ...props }: ThemedDropdownMenuProps, ref) {
+    const themeClass = useComponentThemeClass(DropdownMenuMd);
+    return <DropdownMenu {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
@@ -201,7 +213,7 @@ export const MenuItemMd = createMetadata({
 
 type ThemedMenuItemProps = React.ComponentProps<typeof MenuItem> & { className?: string };
 
-const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemProps>(
+export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemProps>(
   function ThemedMenuItem({ className, ...props }: ThemedMenuItemProps, ref) {
     const themeClass = useComponentThemeClass(MenuItemMd);
     return <MenuItem {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
@@ -327,6 +339,18 @@ export const MenuSeparatorMd = createMetadata({
     [`marginHorizontal-${MSEP}`]: "12px",
   },
 });
+
+type ThemedMenuSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
+const MenuSeparatorTyped = MenuSeparator as React.ForwardRefExoticComponent<
+  React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>
+>;
+
+export const ThemedMenuSeparator = React.forwardRef<HTMLDivElement, ThemedMenuSeparatorProps>(
+  function ThemedMenuSeparator({ className, ...props }: ThemedMenuSeparatorProps, ref) {
+    const themeClass = useComponentThemeClass(MenuSeparatorMd);
+    return <MenuSeparatorTyped {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
   return <MenuSeparator />;

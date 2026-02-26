@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 
 import styles from "./Stack.module.scss";
 
@@ -11,6 +11,7 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 import { FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayoutNative";
@@ -143,6 +144,14 @@ export const StackMd = {
   },
 };
 type StackComponentDef = ComponentDef<typeof StackMd>;
+
+type ThemedStackProps = React.ComponentProps<typeof Stack> & { className?: string };
+export const ThemedStack = React.forwardRef<HTMLDivElement, ThemedStackProps>(
+  function ThemedStack({ className, ...props }: ThemedStackProps, ref) {
+    const themeClass = useComponentThemeClass(stackMd);
+    return <Stack {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const VStackMd = {
   ...StackMd,

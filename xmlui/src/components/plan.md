@@ -409,15 +409,15 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | |
+| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | ✅ |
 | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
-| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | |
-| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | |
+| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | ✅ |
 
-**Also run Heading's own tests:** `npx playwright test Heading.spec.ts H1.spec.ts H2.spec.ts H3.spec.ts H4.spec.ts H5.spec.ts H6.spec.ts --workers=1 --reporter=line`
+**Also run Heading's own tests:** `npx playwright test Heading.spec.ts H1.spec.ts H2.spec.ts H3.spec.ts H4.spec.ts H5.spec.ts H6.spec.ts --workers=1 --reporter=line` → ✅
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done (241 passed, 0 failed)
+**Failing tests:** _(none)_
 
 ---
 
@@ -429,15 +429,15 @@ After each consumer migration, run E2E tests for consumer components. Record res
 
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
-| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | |
+| `Card/CardNative.tsx` | `Card.spec.ts` | `npx playwright test Card.spec.ts --workers=1 --reporter=line` | ✅ |
 | `Blog/BlogNative.tsx` | _(none)_ | — | 🚫 |
-| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | |
-| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | |
+| `HtmlTags/HtmlTags.tsx` | `HtmlTags.spec.ts` | `npx playwright test HtmlTags.spec.ts --workers=1 --reporter=line` | ✅ |
+| `Markdown/MarkdownNative.tsx` | `Markdown.spec.ts` | `npx playwright test Markdown.spec.ts --workers=1 --reporter=line` | ✅ |
 
-**Also run Link's own tests:** `npx playwright test Link.spec.ts --workers=1 --reporter=line`
+**Also run Link's own tests:** `npx playwright test Link.spec.ts --workers=1 --reporter=line` → ✅
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done (167 passed, 1 skipped, 0 failed)
+**Failing tests:** _(none)_
 
 ---
 
@@ -450,13 +450,18 @@ After each consumer migration, run E2E tests for consumer components. Record res
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
 | `ValidationSummary/ValidationSummary.tsx` | _(none)_ | — | 🚫 |
-| `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | |
-| `ModalDialog/ConfirmationModalContextProvider.tsx` | `ModalDialog.spec.ts` | `npx playwright test ModalDialog.spec.ts --workers=1 --reporter=line` | |
+| `Form/FormNative.tsx` | `Form.spec.ts` | `npx playwright test Form.spec.ts --workers=1 --reporter=line` | ⚠️ |
+| `ModalDialog/ConfirmationModalContextProvider.tsx` | `ModalDialog.spec.ts` | `npx playwright test ModalDialog.spec.ts --workers=1 --reporter=line` | ✅ |
 
-**Also run Stack's own tests:** `npx playwright test Stack.spec.ts HStack.spec.ts VStack.spec.ts CHStack.spec.ts CVStack.spec.ts --workers=1 --reporter=line`
+**Also run Stack's own tests:** `npx playwright test Stack.spec.ts HStack.spec.ts VStack.spec.ts CHStack.spec.ts CVStack.spec.ts --workers=1 --reporter=line` → ⚠️
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Status:** ✅ Done (269 passed, 4 failed, 5 skipped — all failures pre-existing)
+
+**Failing tests (pre-existing, unrelated to Stack migration):**
+- `Stack.spec.ts:60` — "bottom fade is visible when not at bottom" (scroll fade visibility; same pattern as Tree)
+- `Stack.spec.ts:78` — "top fade appears when scrolled down" (scroll fade visibility; same pattern as Tree)
+- `Form.spec.ts:2387` — "can submit with invisible required field" (30s timeout; pre-existing)
+- `Form.spec.ts:3171` — "can submit with invisible required field" (30s timeout; pre-existing)
 
 ---
 
@@ -469,13 +474,16 @@ After each consumer migration, run E2E tests for consumer components. Record res
 | Consumer file | E2E test file | Command | Result |
 |---|---|---|---|
 | `ProfileMenu/ProfileMenu.tsx` | _(none)_ | — | 🚫 |
-| `ResponsiveBar/ResponsiveBarNative.tsx` | `ResponsiveBar.spec.ts` | `npx playwright test ResponsiveBar.spec.ts --workers=1 --reporter=line` | |
-| `ContextMenu/ContextMenuNative.tsx` | `ContextMenu.spec.ts` | `npx playwright test ContextMenu.spec.ts --workers=1 --reporter=line` | |
+| `ResponsiveBar/ResponsiveBarNative.tsx` | `ResponsiveBar.spec.ts` | `npx playwright test ResponsiveBar.spec.ts --workers=1 --reporter=line` | ✅ |
+| `ContextMenu/ContextMenuNative.tsx` | `ContextMenu.spec.ts` | `npx playwright test ContextMenu.spec.ts --workers=1 --reporter=line` | ✅ |
 
 **Also run DropdownMenu's own tests:** `npx playwright test DropdownMenu.spec.ts --workers=1 --reporter=line`
 
-**Status:** ⬜ Not started
-**Failing tests:** _(none yet)_
+**Combined run:** `npx playwright test DropdownMenu.spec.ts ResponsiveBar.spec.ts ContextMenu.spec.ts --workers=4 --reporter=line`
+**Result:** 93 passed, 1 flaky (ContextMenu right-click timeout — pre-existing), 3 skipped
+
+**Status:** ✅ Done
+**Failing tests:** 1 flaky — `ContextMenu › closes when pressing Escape` (pre-existing right-click timing flakiness)
 
 ---
 

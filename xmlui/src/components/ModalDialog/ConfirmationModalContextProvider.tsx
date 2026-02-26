@@ -10,7 +10,7 @@ import React, {
 
 import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { ThemedButton as Button } from "../Button/Button";
-import { Stack } from "../Stack/StackNative";
+import { ThemedStack as Stack } from "../Stack/Stack";
 import { Dialog } from "./Dialog";
 
 const ConfirmationModalContext = React.createContext({

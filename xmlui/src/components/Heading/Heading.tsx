@@ -1,5 +1,6 @@
 import styles from "./Heading.module.scss";
 
+import React from "react";
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -9,6 +10,7 @@ import { Heading, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
 import { d, createMetadata } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Heading";
 
@@ -147,6 +149,15 @@ export const HeadingMd = createMetadata({
 });
 
 const H1 = "H1";
+
+type ThemedHeadingProps = React.ComponentProps<typeof Heading> & { className?: string };
+export const ThemedHeading = React.forwardRef<HTMLHeadingElement, ThemedHeadingProps>(
+  function ThemedHeading({ className, ...props }: ThemedHeadingProps, ref) {
+    const themeClass = useComponentThemeClass(HeadingMd);
+    return <Heading {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const H1Md = createMetadata({
   status: "stable",
   description: LEVEL_DESC(1),

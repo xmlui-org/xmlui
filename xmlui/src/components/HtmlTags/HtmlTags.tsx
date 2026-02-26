@@ -16,8 +16,8 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { LinkNative } from "../Link/LinkNative";
-import { Heading } from "../Heading/HeadingNative";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
+import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
 import { createMetadata, d } from "../metadata-helpers";

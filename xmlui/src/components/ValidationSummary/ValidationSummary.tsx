@@ -10,7 +10,7 @@ import type {
   ValidationResult,
   ValidationSeverity,
 } from "../Form/FormContext";
-import { Stack } from "../Stack/StackNative";
+import { ThemedStack as Stack } from "../Stack/Stack";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedText as Text } from "../Text/Text";
 import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";

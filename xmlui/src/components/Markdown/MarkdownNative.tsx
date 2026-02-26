@@ -12,9 +12,9 @@ import rehypeRaw from "rehype-raw";
 
 import styles from "./Markdown.module.scss";
 
-import { Heading } from "../Heading/HeadingNative";
+import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
-import { LinkNative } from "../Link/LinkNative";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { Toggle } from "../Toggle/Toggle";
 import {
   type CodeHighlighter,
