@@ -210,12 +210,13 @@ yargs(hideBin(process.argv))
     (yargs) => {
       return yargs.option("outDir", {
         type: "string",
+        default: "dist-ssg",
         description: "SSG output directory",
       });
     },
     (argv) => {
       const { outDir } = argv;
-      ssg({ outDir: getStringArg(outDir, "xmlui-optimized-output") });
+      ssg({ outDir: getStringArg(outDir, "dist-ssg") });
     },
   )
   .strict()

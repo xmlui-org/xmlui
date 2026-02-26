@@ -13,7 +13,7 @@
     "build-optimized": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && npx xmlui-ssg",
     "release:docs": "xmlui zip-dist --source=dist --target=dist/ui.zip",
     "release-ci-optimized": "npm run build-optimized && mv xmlui-optimized-output/optimized-staticwebapp.config.json xmlui-optimized-output/staticwebapp.config.json",
-    "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
+    "preview-ssg": "npx preview-ssg ./xmlui-optimized-output"
   },
   "dependencies": {
     "xmlui": "*",

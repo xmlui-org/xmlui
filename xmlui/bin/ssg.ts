@@ -329,7 +329,7 @@ async function getWorkspaceExtensionAliases(cwd: string): Promise<Record<string,
   return aliases;
 }
 
-export const ssg = async ({ outDir = "xmlui-optimized-output" }: SsgOptions = {}) => {
+export const ssg = async ({ outDir = "dist-ssg" }: SsgOptions = {}) => {
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
   const distPath = path.resolve(cwd, "dist");

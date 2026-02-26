@@ -11,7 +11,7 @@
     "./playground",
     "./tools/create-app",
     "./tools/vscode",
-    "./tools/serve-optimized",
+    "./tools/preview-ssg",
     "./packages/*"
   ],
   "devDependencies": {
