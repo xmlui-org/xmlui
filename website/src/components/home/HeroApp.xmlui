@@ -5,7 +5,7 @@
     <Theme themeId="xmlui-landing-theme">
     <Markdown>
         <![CDATA[
-```xmlui-pg splitView height="518px" immediate withSplashScreen
+```xmlui-pg splitView height="534px" immediate withSplashScreen
 ---app display
 <App layout="condensed-sticky">
   <AppHeader>
