@@ -2,9 +2,10 @@
     <Stack horizontalAlignment="center">
       <Text>The UI tab is a live XMLUI app. Try it! Then switch to XML to see the code.</Text>
     </Stack>
+    <Theme themeId="xmlui-landing-theme">
     <Markdown>
         <![CDATA[
-```xmlui-pg splitView height="430px" immediate withSplashScreen
+```xmlui-pg splitView height="518px" immediate withSplashScreen
 ---app display
 <App layout="condensed-sticky">
   <AppHeader>
@@ -89,5 +90,6 @@
 ```
     ]]>
     </Markdown>
+    </Theme>
 </Component>
 
