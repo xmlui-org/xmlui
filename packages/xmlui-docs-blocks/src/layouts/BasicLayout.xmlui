@@ -6,7 +6,6 @@
                     height="*"
                     minHeight="0"
                     width="100%"
-                    padding="$space-7"
                     borderRadius="$space-2"
                 >
                     <VStack gap="$space-2">

@@ -1,5 +1,8 @@
 <Component name="GetStartedPage">
-<Markdown><![CDATA[
+  <CHStack>
+    <VStack maxWidth="$maxWidth-content-GetStartedPage">
+      <Markdown>
+        <![CDATA[
 
 ## Welcome
 
@@ -102,6 +105,7 @@ args = [
 
 
         ]]>
-    </Markdown>
+      </Markdown>
+    </VStack>
+  </CHStack>
 </Component>
-
