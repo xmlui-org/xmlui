@@ -152,11 +152,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/EmojiSelector",
-          "label": "EmojiSelector",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/ExpandableItem",
           "label": "ExpandableItem",
           "icon": "component"

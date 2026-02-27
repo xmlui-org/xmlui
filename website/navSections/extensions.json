@@ -3,9 +3,11 @@
     {
       "label": "Extensions",
       "icon": "puzzle",
+      "to": "/docs/reference/extensions/",
       "children": [
         {
           "label": "Xmlui Animations",
+          "to": "/docs/reference/extensions/xmlui-animations/_overview",
           "children": [
             {
               "label": "Extension Overview",
@@ -39,6 +41,7 @@
         },
         {
           "label": "Xmlui Website Blocks",
+          "to": "/docs/reference/extensions/xmlui-website-blocks/_overview",
           "children": [
             {
               "label": "Extension Overview",
@@ -64,6 +67,7 @@
         },
         {
           "label": "Xmlui Pdf",
+          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
           "children": [
             {
               "label": "Extension Overview",
