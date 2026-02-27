@@ -257,6 +257,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/IncludeMarkup",
+          "label": "IncludeMarkup",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/Items",
           "label": "Items",
           "icon": "component"
@@ -459,6 +464,11 @@
         {
           "to": "/docs/reference/components/StickyBox",
           "label": "StickyBox",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/StickySection",
+          "label": "StickySection",
           "icon": "component"
         },
         {

@@ -1,7 +1,6 @@
 import {
   componentsSection,
   extensionsSection,
-  groupedNavPanelContent,
   docsContent,
   plainTextDocsContent,
   plainTextBlogContent,
@@ -33,7 +32,6 @@ const App: StandaloneAppDescription = {
       components: componentsSection,
       extensions: extensionsSection,
     },
-    navPanelContent: groupedNavPanelContent,
     docsContent,
     plainTextDocsContent,
     plainTextBlogContent,

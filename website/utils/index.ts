@@ -1,9 +1,4 @@
-import {
-  buildContentFromRuntime,
-  buildTreeFromPathsAndMeta,
-  shikiHighlighter,
-  highlight,
-} from "xmlui-docs-blocks";
+import { buildContentFromRuntime, shikiHighlighter, highlight } from "xmlui-docs-blocks";
 import componentsSection from "../navSections/components.json";
 import extensionsSection from "../navSections/extensions.json";
 import extensions from "../extensions";
@@ -27,16 +22,7 @@ const blogContentRuntime: Record<string, { default: string }> = import.meta.glob
   },
 );
 
-// @ts-ignore
-const metaJsons: Record<string, MetaJson> = import.meta.glob(`/content/docs/**/_meta.json`, {
-  eager: true,
-});
-
-const {
-  content: docsContent,
-  plainTextContent: plainTextDocsContent,
-  navPanelContent,
-} = buildContentFromRuntime(
+const { content: docsContent, plainTextContent: plainTextDocsContent } = buildContentFromRuntime(
   docsContentRuntime,
   {
     // Strip "/content/docs/" so keys are "pages/intro.md", "reference/components/App", etc.
@@ -58,7 +44,7 @@ let {
 );
 
 plainTextBlogContent = Object.fromEntries(
-  Object.entries(plainTextBlogContent).filter(([key]) => !(blogFrontmatter[key]?.draft === true))
+  Object.entries(plainTextBlogContent).filter(([key]) => !(blogFrontmatter[key]?.draft === true)),
 );
 Object.keys(plainTextBlogContent).forEach((key) => {
   const title = key
@@ -74,7 +60,7 @@ Object.keys(plainTextBlogContent).forEach((key) => {
 blogContent = Object.fromEntries(
   Object.entries(blogContent).filter(([key]) => {
     return !(blogFrontmatter[`/blog/${key}`]?.draft === true);
-  })
+  }),
 );
 
 // Prefetched home page markdown (e.g. WhyXMLUI), keyed by `/pages/<name>.md`.
@@ -96,11 +82,6 @@ Object.keys(homePagesRuntime).map((filePath) => {
 });
 
 export { docsContent, plainTextDocsContent, plainTextBlogContent };
-
-export const groupedNavPanelContent = buildTreeFromPathsAndMeta(navPanelContent, metaJsons, {
-  // Root of the docs content tree
-  contentRoot: "/content/docs",
-});
 
 export function getLocalIcons() {
   const icons: Record<string, string> = import.meta.glob(`/icons/**/*.svg`, {

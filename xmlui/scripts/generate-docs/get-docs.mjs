@@ -64,7 +64,7 @@ async function generateComponentRefLinks(
 
     // Create JSON structure for each component
     const componentNavLinks = componentNames.map((componentName) => ({
-      to: `/components/${componentName}`,
+      to: `/docs/reference/components/${componentName}`,
       label: componentName,
       icon: "component",
     }));
@@ -86,7 +86,7 @@ async function generateComponentRefLinks(
       items: [
         {
           label: "Components",
-          to: "/reference/components",
+          to: "/docs/reference/components",
           description: "Browse all built-in XMLUI components.",
           icon: "component",
           children: allChildren,
@@ -97,7 +97,7 @@ async function generateComponentRefLinks(
     // Write to components.json file
     await writeComponentsJson(componentsJson);
   } catch (error) {
-    throw new Error(COMPONENT_NAV_ERRORS.COMPONENT_NAV_FAILED);
+    throw new Error(COMPONENT_NAV_ERRORS.COMPONENT_NAV_FAILED, { cause: error });
   }
 }
 
@@ -108,7 +108,11 @@ async function generateComponentRefLinks(
 async function writeComponentsJson(componentsJson) {
   try {
     const componentsJsonPath = join(FOLDERS.navSections, FILE_PATHS.COMPONENTS_JSON);
-    await writeFile(componentsJsonPath, JSON.stringify(componentsJson, null, 2), TEXT_CONSTANTS.UTF8_ENCODING);
+    await writeFile(
+      componentsJsonPath,
+      JSON.stringify(componentsJson, null, 2),
+      TEXT_CONSTANTS.UTF8_ENCODING,
+    );
     logger.info(`Successfully updated components.json at ${componentsJsonPath}`);
   } catch (error) {
     throw new Error(`Failed to write components.json: ${error.message}`);
@@ -122,7 +126,11 @@ async function writeComponentsJson(componentsJson) {
 async function writeExtensionsJson(extensionsJson) {
   try {
     const extensionsJsonPath = join(FOLDERS.navSections, FILE_PATHS.EXTENSIONS_JSON);
-    await writeFile(extensionsJsonPath, JSON.stringify(extensionsJson, null, 2), TEXT_CONSTANTS.UTF8_ENCODING);
+    await writeFile(
+      extensionsJsonPath,
+      JSON.stringify(extensionsJson, null, 2),
+      TEXT_CONSTANTS.UTF8_ENCODING,
+    );
     logger.info(`Successfully updated extensions.json at ${extensionsJsonPath}`);
   } catch (error) {
     throw new Error(`Failed to write extensions.json: ${error.message}`);
@@ -278,9 +286,6 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
       indexFile,
     );
 
-    // Generate a _meta.json for the files in the extension
-    extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
-
     extensionNamesAndCompNames.push({
       packageName,
       fileNames: Object.keys(componentsAndFileNames).filter(
@@ -295,7 +300,7 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
     const compLinks = ext.fileNames.map((compName) => ({
       label: compName,
-      to: `/extensions/${ext.packageName}/${compName}`,
+      to: `/docs/reference/extensions/${ext.packageName}/${compName}`,
     }));
 
     // Add the Extensions Overview link at the top
@@ -309,6 +314,7 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
     return {
       label: fromKebabtoReadable(ext.packageName),
+      to: EXTENSIONS_NAVIGATION.OVERVIEW_LINK.TO(ext.packageName),
       children,
     };
   });
@@ -319,6 +325,7 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
       {
         label: "Extensions",
         icon: "puzzle",
+        to: "/docs/reference/extensions/",
         children: extensionGroups,
       },
     ],
@@ -326,32 +333,6 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
   // Write to extensions.json file
   await writeExtensionsJson(extensionsJson);
-
-  // generate a _meta.json for the folder names
-  await withErrorHandling(
-    async () => {
-      const extensionPackagesMetafile = join(extensionsFolder, FILE_EXTENSIONS.METADATA);
-
-      const folderNames = Object.fromEntries(
-        Object.keys(metadata)
-          .filter((m) => !unlistedFolders.includes(m))
-          .map((name) => {
-            return [name, `${fromKebabtoReadable(name)} Package`];
-          }),
-      );
-
-      /* const existingMeta = JSON.parse(readFileSync(extensionPackagesMetafile, "utf-8"));
-      const updatedMeta = Object.entries(folderNames).reduce((acc, [key, value], idx) => {
-        return insertKeyAt(key, value, acc, Object.keys(acc).length === 0 ? 0 : idx + 1);
-      }, existingMeta || {}); */
-
-      // Do not include the summary file in the _meta.json
-      deleteFileIfExists(extensionPackagesMetafile);
-      await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
-    },
-    ERROR_CONTEXTS.EXTENSION_PACKAGES_METADATA,
-    ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND,
-  );
 }
 
 async function cleanupLegacyGeneratedDocsFolders() {
@@ -411,8 +392,6 @@ async function generateComponents(metadata) {
   const overviewFile = join(outputFolder, `${summaryFileName}.md`);
   await generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames);
 
-  metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
-
   await metadataGenerator.generatePermalinksForHeaders();
 
   await metadataGenerator.createMetadataJsonForLanding(URL_REFERENCES.DOCS, "components");
@@ -422,52 +401,52 @@ async function generateIconNames() {
   try {
     // Get all icon names from the built icons.js file
     const iconNames = getAllIconNames();
-    
+
     // Sort the icon names alphabetically
     const sortedIconNames = iconNames.sort();
-    
+
     // Generate the var tag with the array of icon names
     // Use single quotes for strings inside the array to avoid conflicts with the attribute's double quotes
     const iconNamesArray = JSON.stringify(sortedIconNames, null, 2)
       .replace(/"/g, "'") // Replace double quotes with single quotes
-      .replace(/^/gm, '  ') // Indent each line by 2 spaces
+      .replace(/^/gm, "  ") // Indent each line by 2 spaces
       .trim();
-    
+
     const varTag = `<variable name="names" value="{${iconNamesArray}}" />`;
-    
+
     // Read the Icons.xmlui file to find indentation
     const iconsXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.ICONS_XMLUI);
-    
+
     if (!existsSync(iconsXmluiPath)) {
       logger.warn(`Icons.xmlui file not found at ${iconsXmluiPath}`);
       return;
     }
-    
+
     const fileContent = await readFile(iconsXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
-    
+
     // Find the content between delimiters to get indentation
     const startDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.START_REGEX;
     const endDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.END_REGEX;
-    
+
     const startMatch = fileContent.match(startDelimiterRegex);
     const endMatch = fileContent.match(endDelimiterRegex);
-    
+
     if (!startMatch || !endMatch) {
-      logger.warn('Icon names delimiters not found in Icons.xmlui');
+      logger.warn("Icon names delimiters not found in Icons.xmlui");
       return;
     }
-    
+
     const startIndex = startMatch.index;
     const endIndex = endMatch.index;
     const generatedContentStart = startIndex + startMatch[0].length;
     const generatedContent = fileContent.substring(generatedContentStart, endIndex);
-    
+
     // Calculate indentation depth
     const indentationDepth = calculateIndentationDepth(generatedContent);
-    
+
     // Replace the generated content
     await replaceGeneratedContentInIconsXmlui(varTag, indentationDepth);
-    
+
     logger.info(`Generated ${sortedIconNames.length} icon names in Icons.xmlui`);
   } catch (error) {
     logger.error(`Failed to generate icon names: ${error.message}`);
@@ -703,7 +682,7 @@ async function replaceGeneratedContentInIconsXmlui(content, indentationDepth) {
     const endMatch = fileContent.match(endDelimiterRegex);
 
     if (!startMatch || !endMatch) {
-      throw new Error('Icon names delimiters not found in Icons.xmlui');
+      throw new Error("Icon names delimiters not found in Icons.xmlui");
     }
 
     const startIndex = startMatch.index;
@@ -834,7 +813,7 @@ async function generateContextVariablesSummary() {
 
   // Sort context variables by name
   const sortedContextVars = Array.from(contextVarsByName.values()).sort((a, b) =>
-    a.name.localeCompare(b.name)
+    a.name.localeCompare(b.name),
   );
 
   // Generate the markdown content
@@ -858,14 +837,19 @@ function generateContextVarsMarkdown(contextVars) {
 
   // Add header
   markdown += "# Context Variables Summary\n\n";
-  markdown += "This page provides a comprehensive overview of all context variables exposed by XMLUI components. ";
-  markdown += "Context variables are values that components make available to their children, accessible using the `$variableName` syntax.\n\n";
+  markdown +=
+    "This page provides a comprehensive overview of all context variables exposed by XMLUI components. ";
+  markdown +=
+    "Context variables are values that components make available to their children, accessible using the `$variableName` syntax.\n\n";
 
   // Add table of contents
   markdown += "## Available Context Variables\n\n";
   markdown += "Jump to:\n\n";
   for (const contextVar of contextVars) {
-    const anchor = contextVar.name.toLowerCase().replace(/\$/g, "").replace(/[^a-z0-9-]/g, "-");
+    const anchor = contextVar.name
+      .toLowerCase()
+      .replace(/\$/g, "")
+      .replace(/[^a-z0-9-]/g, "-");
     markdown += `- [\`${contextVar.name}\`](#${anchor})\n`;
   }
   markdown += "\n---\n\n";
@@ -885,7 +869,10 @@ function generateContextVarsMarkdown(contextVars) {
  */
 function generateContextVarSection(contextVar) {
   let section = "";
-  const anchor = contextVar.name.toLowerCase().replace(/\$/g, "").replace(/[^a-z0-9-]/g, "-");
+  const anchor = contextVar.name
+    .toLowerCase()
+    .replace(/\$/g, "")
+    .replace(/[^a-z0-9-]/g, "-");
 
   // Add context variable name as heading
   section += `## \`${contextVar.name}\` [#${anchor}]\n\n`;
@@ -903,12 +890,12 @@ function generateContextVarSection(contextVar) {
 
   // Sort occurrences by component name
   const sortedOccurrences = contextVar.occurrences.sort((a, b) =>
-    a.componentName.localeCompare(b.componentName)
+    a.componentName.localeCompare(b.componentName),
   );
 
   // Create table of components that expose this context variable
   const tableRows = sortedOccurrences.map((occurrence) => {
-    const componentLink = `[${occurrence.componentName}](/components/${occurrence.componentName})`;
+    const componentLink = `[${occurrence.componentName}](/docs/reference/components/${occurrence.componentName})`;
     return [componentLink, occurrence.description];
   });
 
@@ -939,7 +926,7 @@ function generateSummaryDescription(contextVar) {
 
   // If descriptions vary, generate a generic summary
   const varNameWithoutDollar = contextVar.name.replace(/^\$/, "");
-  
+
   // Try to infer what the variable represents based on its name
   if (varNameWithoutDollar.toLowerCase().includes("item")) {
     return `Provides access to the current item being rendered in a list or iteration context.`;
