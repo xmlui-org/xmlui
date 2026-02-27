@@ -18,10 +18,13 @@ $primaryColor-Gauge: createThemeVar("Input:primaryColor-#{$componentName}");
 @layer components {
   .gaugeContainer {
     display: inline-block;
+    max-width: 100%;
 
     // Bridge: map XMLUI design tokens to Smart UI's own CSS custom properties.
     // No !important needed — Smart UI respects its own variables internally.
     :global(smart-gauge) {
+      max-width: 100%;
+      width: 100% !important;
       --smart-background: #{$backgroundColor-Gauge};
       --smart-background-color: #{$textColor-Gauge};
       --smart-primary: #{$primaryColor-Gauge};
