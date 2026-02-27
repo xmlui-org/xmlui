@@ -2,6 +2,18 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import stripMarkdown from "strip-markdown";
+import { load as yamlLoad } from "js-yaml";
+
+function parseFrontmatter(raw: string): { data: Record<string, unknown>; content: string } {
+  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!match) return { data: {}, content: raw };
+  const content = raw.slice(match[0].length);
+  const parsed = yamlLoad(match[1]);
+  const data = parsed && typeof parsed === "object" && !Array.isArray(parsed)
+    ? (parsed as Record<string, unknown>)
+    : {};
+  return { data, content };
+}
 
 export function markdownToPlainText(markdown: string): string {
   const processor = unified()
@@ -64,14 +76,17 @@ export function buildContentFromRuntime(
   content: Record<string, string>;
   plainTextContent: Record<string, string>;
   navPanelContent: string[];
+  frontmatter: Record<string, Record<string, unknown>>;
 } {
   const contentPrefix = options.contentPrefix ?? "/content/";
   const content: Record<string, string> = {};
   const plainTextContent: Record<string, string> = {};
   const navPanelContent: string[] = [];
+  const frontmatter: Record<string, Record<string, unknown>> = {};
 
   Object.keys(contentRuntime).forEach((filePath) => {
     const raw = contentRuntime[filePath]?.default ?? "";
+    const { data, content: body } = parseFrontmatter(raw);
     let urlFragment: string;
 
     if (filePath.startsWith(contentPrefix + "pages/")) {
@@ -79,13 +94,15 @@ export function buildContentFromRuntime(
     } else {
       urlFragment = filePath.substring(contentPrefix.length).replace(/\.(md|mdx)$/, "");
       navPanelContent.push(urlFragment);
-      plainTextContent[(plainTextOptions.urlPrefix ?? "") + urlFragment] = markdownToPlainText(raw);
+      plainTextContent[(plainTextOptions.urlPrefix ?? "") + urlFragment] = markdownToPlainText(body);
     }
 
-    content[urlFragment] = raw;
+    content[urlFragment] = body;
+    if (Object.keys(data).length > 0) {
+      frontmatter[(plainTextOptions.urlPrefix ?? "") + urlFragment] = data;
+    }
   });
-
-  return { content, plainTextContent, navPanelContent };
+  return { content, plainTextContent, navPanelContent, frontmatter };
 }
 
 function omitIndexFromPath(path: string): string {

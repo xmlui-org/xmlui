@@ -20,7 +20,7 @@ const docsContentRuntime: Record<string, { default: string }> = import.meta.glob
 );
 
 const blogContentRuntime: Record<string, { default: string }> = import.meta.glob(
-  `/content/blog/**/*.{md,mdx}`,
+  `/content/blog/*.md`,
   {
     eager: true,
     query: "?raw",
@@ -45,15 +45,21 @@ const {
   { urlPrefix: "/docs/" }, // Prefix for plain text content keys, so they match the URL structure used in the app
 );
 
-const { plainTextContent: plainTextBlogContent } = buildContentFromRuntime(
+let {
+  content: blogContent,
+  plainTextContent: plainTextBlogContent,
+  frontmatter: blogFrontmatter,
+} = buildContentFromRuntime(
   blogContentRuntime,
   {
     contentPrefix: "/content/blog/",
   },
   { urlPrefix: "/blog/" },
 );
-// TEMP: For now, we need to generate titles for the blog search results based on the keys ofd plaintTextBlogContent.
-// These come from the file paths of the blog markdown files, so we can generate them by stripping the prefix and suffix from the keys.
+
+plainTextBlogContent = Object.fromEntries(
+  Object.entries(plainTextBlogContent).filter(([key]) => !(blogFrontmatter[key]?.draft === true))
+);
 Object.keys(plainTextBlogContent).forEach((key) => {
   const title = key
     .replace("/blog/", "")
@@ -61,16 +67,15 @@ Object.keys(plainTextBlogContent).forEach((key) => {
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-  plainTextBlogContent[key] = `${title}\n\n${plainTextBlogContent[key]}`;
+  plainTextBlogContent[key] =
+    `${blogFrontmatter[key]?.title ?? title}\n\n${plainTextBlogContent[key]}`;
 });
 
-// Prefetched blog markdown content, now loaded from /content/blog,
-// but still keyed by `/blog/<slug>.md` to match BlogPage expectations.
-// @ts-ignore
-const blogPagesRuntime: Record<string, any> = import.meta.glob(`/content/blog/*.md`, {
-  eager: true,
-  query: "?raw",
-});
+blogContent = Object.fromEntries(
+  Object.entries(blogContent).filter(([key]) => {
+    return !(blogFrontmatter[`/blog/${key}`]?.draft === true);
+  })
+);
 
 // Prefetched home page markdown (e.g. WhyXMLUI), keyed by `/pages/<name>.md`.
 // @ts-ignore
@@ -80,11 +85,11 @@ const homePagesRuntime: Record<string, any> = import.meta.glob(`/content/home/*.
 });
 
 export const prefetchedContent: Record<string, any> = {};
-Object.keys(blogPagesRuntime).map((filePath) => {
-  const fileName = filePath.split("/").pop() || "";
-  const urlFragment = `/blog/${fileName}`;
-  prefetchedContent[urlFragment] = blogPagesRuntime[filePath].default;
+Object.keys(blogContent).map((fileName) => {
+  const urlFragment = `/blog/${fileName}.md`;
+  prefetchedContent[urlFragment] = blogContent[fileName];
 });
+
 Object.keys(homePagesRuntime).map((filePath) => {
   const fileName = filePath.split("/").pop() || "";
   prefetchedContent[`/pages/${fileName}`] = homePagesRuntime[filePath].default;

@@ -1,3 +1,13 @@
+---
+title: "An XMLUI-powered blog"
+slug: "xmlui-powered-blog"
+description: "How we made this blog with a few dozen lines of XMLUI."
+author: "Jon Udell"
+date: "2025-10-28"
+image: "blog-scrabble.png"
+tags: ["blog"]
+---
+
 In this post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. It's an XMLUI app built with a handful of core components (including [NavPanel](https://docs.xmlui.org/components/NavPanel), [NavLink](https://docs.xmlui.org/components/NavLink), [Pages](https://docs.xmlui.org/components/Pages), [Page](https://docs.xmlui.org/components/Page), and [Markdown](https://docs.xmlui.org/components/Markdown)) and a couple of [user-defined components](https://docs.xmlui.org/user-defined-components).
 
 ## The simplest possible thing
