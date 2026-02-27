@@ -1,0 +1,22 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "EChart";
+
+@layer components {
+  .echartContainer {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
