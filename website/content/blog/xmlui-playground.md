@@ -1,3 +1,13 @@
+---
+title: "Reproducible XMLUI"
+slug: "xmlui-playground"
+description: "Use playgrounds to infuse docs with live examples, iterate on prototypes, and reproduce bugs."
+author: "Jon Udell"
+date: "2025-10-27"
+image: "playground.png"
+tags: ["playground"]
+---
+
 The XMLUI [docs](https://docs.xmlui.org) are full of live working examples that use [Playground](https://github.com/xmlui-org/xmlui/tree/main/packages/xmlui-playground), an extension package that runs XMLUI code inside an XMLUI app. We use playgrounds to bring component documentation to life. Why just tell you about the `enabled` property of a [Checkbox](https://docs.xmlui.org/components/Checkbox) when we can also show you, as in this live example.
 
 <blockquote>

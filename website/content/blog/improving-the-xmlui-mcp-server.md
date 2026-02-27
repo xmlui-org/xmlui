@@ -1,3 +1,12 @@
+---
+title: "Improving the XMLUI MCP server"
+slug: "improving-the-xmlui-mcp-server"
+description: "It's a virtuous cycle and you can help us turn the wheel."
+author: "Jon Udell"
+date: "2026-02-20"
+tags: ["mcp"]
+---
+
 Here's a review of the [XMLUI MCP server](https://github.com/xmlui-org/xmlui-mcp) written by one of its primary users, Claude Code.
 
 <blockquote>

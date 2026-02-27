@@ -1,3 +1,13 @@
+---
+title: "Introducing XMLUI"
+slug: "introducing-xmlui"
+description: "Let's make building user interfaces as easy as it was 30 years ago."
+author: "Jon Udell"
+date: "2025-07-18"
+image: "xmlui-demo.png"
+tags: ["xmlui"]
+---
+
 > [!TIP]
 > Ed. note: This is the post that was discussed on [Hacker News](https://news.ycombinator.com/item?id=44625292).
 

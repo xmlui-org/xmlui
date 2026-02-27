@@ -23,7 +23,6 @@
   { "name": "DatePicker", "url": "/docs/reference/components/DatePicker" },
   { "name": "DonutChart", "url": "/docs/reference/components/DonutChart" },
   { "name": "DropdownMenu", "url": "/docs/reference/components/DropdownMenu" },
-  { "name": "EmojiSelector", "url": "/docs/reference/components/EmojiSelector" },
   { "name": "FileInput", "url": "/docs/reference/components/FileInput" },
   { "name": "FileUploadDropZone", "url": "/docs/reference/components/FileUploadDropZone" },
   { "name": "FlowLayout", "url": "/docs/reference/components/FlowLayout" },
