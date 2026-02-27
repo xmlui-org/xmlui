@@ -1,4 +1,4 @@
 import Icon from "./svg/io-md-link.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const LinkIcon = (props: IconBaseProps) => <Icon {...props}/>;
+export const LinkIcon = (props: IconBaseProps) => <Icon fill="currentColor" stroke="currentColor" {...props}/>;
