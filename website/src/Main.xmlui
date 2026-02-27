@@ -76,6 +76,18 @@
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
+    <property name="logoTemplate">
+      <HStack horizontalAlignment="start" width="100%" paddingVertical="0">
+        <Link
+          to="/"
+          height="100%"
+          when="{mediaSize.sizeIndex <= 2}"
+        >
+          <Logo height="$space-8" />
+        </Link>
+      </HStack>
+
+    </property>
     <Stack
       padding="$space-4"
       when="{mediaSize.sizeIndex <= 2}"
@@ -117,7 +129,7 @@
     </Fragment>
     <Stack
       padding="0"
-      paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '0'}"
+      paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '$space-5'}"
       gap="0"
     >
       <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
@@ -493,11 +505,11 @@
               return { params: { slug: p.slug } };
             })}"
     >
-        <script>
+      <script>
           var post = posts.find(p => p.slug === $routeParams.slug)
-        </script>
-        <BlogPage when="{post}" post="{post}" />
-        <Redirect when="{!post}" to="/404" />
+      </script>
+      <BlogPage when="{post}" post="{post}" />
+      <Redirect when="{!post}" to="/404" />
     </Page>
 
     <!-- Docs routes with /docs prefix -->

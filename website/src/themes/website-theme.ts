@@ -20,6 +20,9 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-BlogPage": "800px",
     "maxWidth-content-GetStartedPage": "800px",
 
+    "paddingVertical-NavPanel": "0",
+    "marginBottom-logo-NavPanel": "0",
+
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
     "backgroundColor": "$color-surface-0",
@@ -88,6 +91,10 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "backgroundColor-ScrollToTop": "rgb(from $color-surface-100 r g b / 0.9)",
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
+
+    // --- Drawer close button
+    "top-CloseButton": "$space-3",
+    "right-CloseButton": "$space-3",
   },
   resources: {},
 };
