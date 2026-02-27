@@ -3,11 +3,9 @@
     {
       "label": "Extensions",
       "icon": "puzzle",
-      "to": "/docs/reference/extensions",
       "children": [
         {
           "label": "Xmlui Animations",
-          "to": "/docs/reference/extensions/xmlui-animations/_overview",
           "children": [
             {
               "label": "Extension Overview",
@@ -40,13 +38,37 @@
           ]
         },
         {
+          "label": "Xmlui Website Blocks",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/_overview"
+            },
+            {
+              "label": "Carousel",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Carousel"
+            },
+            {
+              "label": "FancyButton",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/FancyButton"
+            },
+            {
+              "label": "HeroSection",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/HeroSection"
+            },
+            {
+              "label": "ScrollToTop",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/ScrollToTop"
+            }
+          ]
+        },
+        {
           "label": "Xmlui Pdf",
-          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
           "children": [
             {
               "label": "Extension Overview",
               "to": "/docs/reference/extensions/xmlui-pdf/_overview"
-            },  
+            },
             {
               "label": "Pdf",
               "to": "/docs/reference/extensions/xmlui-pdf/Pdf"

@@ -64,7 +64,7 @@ async function generateComponentRefLinks(
 
     // Create JSON structure for each component
     const componentNavLinks = componentNames.map((componentName) => ({
-      to: `/components/${componentName}`,
+      to: `/docs/reference/components/${componentName}`,
       label: componentName,
       icon: "component",
     }));
@@ -86,7 +86,7 @@ async function generateComponentRefLinks(
       items: [
         {
           label: "Components",
-          to: "/reference/components",
+          to: "/docs/reference/components",
           description: "Browse all built-in XMLUI components.",
           icon: "component",
           children: allChildren,
@@ -278,9 +278,6 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
       indexFile,
     );
 
-    // Generate a _meta.json for the files in the extension
-    extensionGenerator.writeMetaSummary(componentsAndFileNames, packageFolder);
-
     extensionNamesAndCompNames.push({
       packageName,
       fileNames: Object.keys(componentsAndFileNames).filter(
@@ -295,7 +292,7 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
     const compLinks = ext.fileNames.map((compName) => ({
       label: compName,
-      to: `/extensions/${ext.packageName}/${compName}`,
+      to: `/docs/reference/extensions/${ext.packageName}/${compName}`,
     }));
 
     // Add the Extensions Overview link at the top
@@ -326,32 +323,6 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
 
   // Write to extensions.json file
   await writeExtensionsJson(extensionsJson);
-
-  // generate a _meta.json for the folder names
-  await withErrorHandling(
-    async () => {
-      const extensionPackagesMetafile = join(extensionsFolder, FILE_EXTENSIONS.METADATA);
-
-      const folderNames = Object.fromEntries(
-        Object.keys(metadata)
-          .filter((m) => !unlistedFolders.includes(m))
-          .map((name) => {
-            return [name, `${fromKebabtoReadable(name)} Package`];
-          }),
-      );
-
-      /* const existingMeta = JSON.parse(readFileSync(extensionPackagesMetafile, "utf-8"));
-      const updatedMeta = Object.entries(folderNames).reduce((acc, [key, value], idx) => {
-        return insertKeyAt(key, value, acc, Object.keys(acc).length === 0 ? 0 : idx + 1);
-      }, existingMeta || {}); */
-
-      // Do not include the summary file in the _meta.json
-      deleteFileIfExists(extensionPackagesMetafile);
-      await writeFile(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
-    },
-    ERROR_CONTEXTS.EXTENSION_PACKAGES_METADATA,
-    ERROR_HANDLING.EXIT_CODES.FILE_NOT_FOUND,
-  );
 }
 
 async function cleanupLegacyGeneratedDocsFolders() {
@@ -410,8 +381,6 @@ async function generateComponents(metadata) {
   // Generate the overview file for components
   const overviewFile = join(outputFolder, `${summaryFileName}.md`);
   await generateComponentsOverview(overviewFile, summaryTitle, componentsAndFileNames);
-
-  metadataGenerator.writeMetaSummary(componentsAndFileNames, outputFolder);
 
   await metadataGenerator.generatePermalinksForHeaders();
 
@@ -908,7 +877,7 @@ function generateContextVarSection(contextVar) {
 
   // Create table of components that expose this context variable
   const tableRows = sortedOccurrences.map((occurrence) => {
-    const componentLink = `[${occurrence.componentName}](/components/${occurrence.componentName})`;
+    const componentLink = `[${occurrence.componentName}](/docs/reference/components/${occurrence.componentName})`;
     return [componentLink, occurrence.description];
   });
 

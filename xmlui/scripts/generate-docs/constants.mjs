@@ -26,7 +26,6 @@ export const COMPONENT_STATES = {
 
 export const FILE_EXTENSIONS = {
   MARKDOWN: [".md", ".mdx"],
-  METADATA: "_meta.json",
 };
 
 export const FOLDER_NAMES = {
@@ -82,7 +81,6 @@ export const LOG_MESSAGES = {
 
 export const ERROR_MESSAGES = {
   NO_CONFIG_PATH: "No config path provided",
-  WRITE_META_FILE_ERROR: "Could not write _meta file: ",
   UNKNOWN_ERROR: "unknown error",
   NO_THEME_INFO: "No theme information found. Please run the metadata build first.",
   NO_COMPONENT_METADATA: "No component metadata found. Please run the metadata build first.",
@@ -231,11 +229,11 @@ export const COMPONENT_NAVIGATION = {
   },
   OVERVIEW_LINK: {
     LABEL: "Components Overview",
-    TO: "/components/_overview",
+    TO: "/docs/reference/components/_overview",
   },
   TEMPLATES: {
     NAVLINK: (componentName) =>
-      `<NavLink icon="component" label="${componentName}" to="/components/${componentName}" />`,
+      `<NavLink icon="component" label="${componentName}" to="/docs/reference/components/${componentName}" />`,
     OVERVIEW_NAVLINK: (label, to) => `<NavLink icon="component" label="${label}" to="${to}" />`,
   },
 };
@@ -249,12 +247,12 @@ export const EXTENSIONS_NAVIGATION = {
   },
   OVERVIEW_LINK: {
     LABEL: "Extension Overview",
-    TO: (packageName) => `/extensions/${packageName}/_overview`,
+    TO: (packageName) => `/docs/reference/extensions/${packageName}/_overview`,
   },
   TEMPLATES: {
     NAVGROUP: (label, children) => `<NavGroup label="${label}">\n${children}\n</NavGroup>`,
     NAVLINK: (packageName, componentName) =>
-      `<NavLink label="${componentName}" to="/extensions/${packageName}/${componentName}" />`,
+      `<NavLink label="${componentName}" to="/docs/reference/extensions/${packageName}/${componentName}" />`,
     OVERVIEW_NAVLINK: (label, to) => `<NavLink label="${label}" to="${to}" />`,
   },
 };
