@@ -42,5 +42,9 @@
     "generate-docs": "turbo run generate-docs",
     "_test:e2e:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
     "_test:e2e:smoke:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke"
+  },
+  "dependencies": {
+    "echarts": "6.0.0",
+    "echarts-for-react": "3.0.6"
   }
 }
