@@ -154,7 +154,8 @@ export const ThemedScroller = React.forwardRef<React.ElementRef<typeof Scroller>
     return (
       <Scroller
         {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        className={className}
+        containerClassName={themeClass}
         ref={ref}
       />
     );

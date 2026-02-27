@@ -22,6 +22,7 @@ import {
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
+import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 
 type Props = {
   id?: string;
@@ -84,6 +85,7 @@ export function Theme({
         },
       },
     };
+    console.log("Current theme:", foundTheme);
     return foundTheme;
   }, [activeTheme, generatedId, id, themeTone, themeVars, themes]);
 
@@ -98,16 +100,24 @@ export function Theme({
   const transformedStyles = useMemo(() => {
     const filteredThemeCssVars = {};
 
-    Object.entries(themeCssVars).forEach(([key, value])=>{
-      // console.log({
-      //   themeKey: key,
-      //   parsedHVar: parseHVar(key),
-      // });
+    Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
       let componentName = parseHVar(key)?.component;
-      if (!componentName || componentName === "Input" || componentName === "Heading") {
+      if (
+        !componentName ||
+        componentName === "Input" ||
+        componentName === "Heading" ||
+        componentName === "ThemedInput" ||
+        componentName === "Footer"
+      ) {
         filteredThemeCssVars[key] = value;
       }
-    })
+    });
+
+    // --- Always add the explicitly specified themeVars with the correct prefix,
+    // --- even if they don't match the componentName pattern
+    Object.entries(themeVars).forEach(([key, value]) => {
+      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
+    });
 
     const ret = {
       "&": {

@@ -2,6 +2,7 @@ import { ComponentMetadata } from "../../abstractions/ComponentDefs";
 import { useTheme } from "./ThemeContext";
 import { useMemo } from "react";
 import { useStyles } from "./StyleContext";
+import { THEME_VAR_PREFIX } from "./component-layout-resolver";
 
 /**
  * Each theme can have a light or a dark tone.
@@ -46,7 +47,7 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
       let themeVar = themeScope.getThemeVar(keyWithoutClass);
       if (themeVar !== undefined) {
 
-        ret["--xmlui-" + keyWithoutClass] = themeVar;
+        ret[`--${THEME_VAR_PREFIX}-` + keyWithoutClass] = themeVar;
       }
     });
 
