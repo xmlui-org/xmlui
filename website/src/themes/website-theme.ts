@@ -95,6 +95,9 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     // --- Drawer close button
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
+
+    // --- Search
+    "backgroundColor-SearchItem--hover": "$color-surface-50",
   },
   resources: {},
 };
