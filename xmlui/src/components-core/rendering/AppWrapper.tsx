@@ -124,7 +124,7 @@ export const AppWrapper = ({
   children,
   projectCompilation,
   onInit,
-  icons
+  icons,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -226,21 +226,3 @@ export const AppWrapper = ({
     </ErrorBoundary>
   );
 };
-
-/**
- * Attempts to get the server-side location from various sources during SSR.
- * Returns null if no location can be determined.
- */
-function getServerLocation(globalProps?: GlobalProps): string | null {
-  if (typeof window !== "undefined") {
-    // Client-side: this function shouldn't be called, but return null
-    return null;
-  }
-
-  // Check global variable that frameworks can set (e.g., in entry.server.tsx)
-  if (typeof global !== "undefined" && (global as any).__XMLUI_SSR_LOCATION) {
-    return (global as any).__XMLUI_SSR_LOCATION;
-  }
-
-  return null;
-}

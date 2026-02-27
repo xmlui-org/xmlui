@@ -87,6 +87,12 @@ This property allows you to add an optional icon (specify the icon's name) to th
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
+### `noIndicator` [#noindicator]
+
+> [!DEF]  default: **false**
+
+Indicates whether this link should have a distinct visual appearance.
+
 ### `target` [#target]
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):

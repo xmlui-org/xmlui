@@ -11,13 +11,18 @@
     }
     </script>
     <VStack gap="$space-2" marginTop="$space-4">
-        <Link to="/blog">
-            ← Go to all posts
-        </Link>
+        <Theme
+            textColor-Link="$color-primary-500"
+            textColor-Link--hover="$color-primary-400"
+        >
+            <Link to="/blog" noIndicator>
+                ← Go to all posts
+            </Link>
+        </Theme>
         <HStack gap="$space-5">
             <VStack width="*" gap="$space-2">
                 <VStack gap="$space-0_5">
-                    <H1 showAnchor="false" fontSize="$fontSize-blog-page-title">
+                    <H1 showAnchor="false">
                         {$props.post.title}
                     </H1>
                     <Text variant="blogPostDescription">
@@ -29,9 +34,14 @@
                     •
                     {formatDate($props.post.date, "d MMM yyyy")}
                 </Text>
-                <HStack when="{showTags() && $props.post.tags && $props.post.tags.length > 0}" gap="$space-1_5">
+                <HStack
+                    when="{showTags() && $props.post.tags && $props.post.tags.length > 0}"
+                    gap="$space-1_5"
+                >
                     <Items data="{$props.post.tags}">
-                        <Tag>{$item}</Tag>
+                        <Tag>
+                            {$item}
+                        </Tag>
                     </Items>
                 </HStack>
                 <Markdown

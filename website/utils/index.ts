@@ -30,7 +30,7 @@ const metaJsons: Record<string, MetaJson> = import.meta.glob(
 const { content, plainTextContent, navPanelContent } = buildContentFromRuntime(
   contentRuntime,
   {
-    // Strip "/content/docs/" so keys are "pages/intro.md", "components/App", etc.
+    // Strip "/content/docs/" so keys are "pages/intro.md", "reference/components/App", etc.
     contentPrefix: "/content/docs/",
   },
 );

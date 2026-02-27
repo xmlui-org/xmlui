@@ -410,6 +410,57 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("alwaysShowSelectionCheckboxes property", () => {
+    test("checkboxes are always visible when alwaysShowSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // All row checkboxes + header checkbox should be present and visible
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(5); // header + 4 data rows
+      // Each checkbox wrapper should have the showInRow class that makes it always visible
+      const checkboxWrappers = page.locator("tbody tr input[type='checkbox']");
+      for (const checkbox of await checkboxWrappers.all()) {
+        await expect(checkbox).toBeAttached();
+      }
+    });
+
+    test("checkboxes are hidden on non-hovered rows by default (alwaysShowSelectionCheckboxes false)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="false" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // Checkboxes still exist in DOM but are not visible without hover
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(5); // header + 4 data rows
+    });
+
+    test("alwaysShowSelectionCheckboxes has no effect when hideSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true" alwaysShowSelectionCheckboxes="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // hideSelectionCheckboxes takes precedence — no checkboxes rendered
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(0);
+    });
+
+    test("alwaysShowSelectionCheckboxes has no effect when row selection is disabled", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSelectionCheckboxes="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // No selection enabled — no checkboxes rendered
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(0);
+    });
+  });
+
   test.describe("autoFocus property", () => {
     test("focuses table when autoFocus is true", async ({ initTestBed, page }) => {
       await initTestBed(`

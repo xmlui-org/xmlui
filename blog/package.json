@@ -7,9 +7,9 @@
     "preview": "xmlui preview",
     "gen:rss": "node scripts/generate-rss.js",
     "build:blog": "npm run gen:rss && xmlui build --buildMode=INLINE_ALL --withMock && xmlui zip-dist --source=dist --target=ui.zip",
-    "build-optimized": "npx xmlui-optimizer",
+    "build-optimized": "npx xmlui-ssg",
     "release-ci-optimized": "npm run gen:rss && npm run build-optimized && mv xmlui-optimized-output/optimized-staticwebapp.config.json xmlui-optimized-output/staticwebapp.config.json",
-    "preview-optimized": "npx serve-optimized ./xmlui-optimized-output"
+    "preview-ssg": "npx preview-ssg ./xmlui-optimized-output"
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",

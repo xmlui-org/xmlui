@@ -78,7 +78,7 @@ export function buildContentFromRuntime(
     } else {
       urlFragment = filePath.substring(contentPrefix.length).replace(/\.(md|mdx)$/, "");
       navPanelContent.push(urlFragment);
-      plainTextContent["/docs/reference/" + urlFragment] = markdownToPlainText(raw);
+      plainTextContent["/docs/" + urlFragment] = markdownToPlainText(raw);
     }
 
     content[urlFragment] = raw;
