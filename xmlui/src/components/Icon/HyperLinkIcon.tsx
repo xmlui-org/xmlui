@@ -1,4 +1,4 @@
-import Icon from "./svg/md-outline-launch.svg?react";
+import Icon from "./svg/external-link.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const HyperLinkIcon = (props: IconBaseProps) => <Icon fill="currentColor" stroke="currentColor" strokeWidth={0} {...props}/>;
+export const HyperLinkIcon = (props: IconBaseProps) => <Icon {...props}/>;
