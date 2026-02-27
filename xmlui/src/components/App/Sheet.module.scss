@@ -7,6 +7,8 @@ $themeVars: ();
 }
 
 $maxWidth-Drawer: createThemeVar("maxWidth-Drawer");
+$top-CloseButton: createThemeVar("top-CloseButton");
+$right-CloseButton: createThemeVar("right-CloseButton");
 
 //we do it with animations (instead of transitions) because: https://www.radix-ui.com/primitives/docs/guides/animation
 $reveal-anim-duration: 300ms;
@@ -123,8 +125,8 @@ $reveal-anim-duration: 300ms;
 .close{
   color: inherit;
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: $top-CloseButton;
+  right: $right-CloseButton;
   display: flex;
   align-items: center;
   justify-content: center;
