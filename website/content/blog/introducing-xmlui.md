@@ -34,14 +34,14 @@ In the mid-1990s you could create useful software without being an ace coder. Yo
 
 A dozen lines of XML is enough to:
 
-- Define a [Select](https://docs.xmlui.org/components/Select) and fill its [Items](https://docs.xmlui.org/components/Items) with data from an API call.
-- Define a [DataSource](https://docs.xmlui.org/components/DataSource) to fetch data from another API call.
+- Define a [Select](/docs/reference/components/Select) and fill its [Items](/docs/reference/components/Items) with data from an API call.
+- Define a [DataSource](/docs/reference/components/DataSource) to fetch data from another API call.
 - Use the value of the `Select` to dynamically form the URL of the `DataSource`.
-- Use a [resultSelector](https://docs.xmlui.org/components/DataSource#resultselector) to drill into the result of the second API call.
-- Bind that result to a [Table](https://docs.xmlui.org/components/Table).
-- Bind fields in the result to [Columns](https://docs.xmlui.org/components/Column).
+- Use a [resultSelector](/docs/reference/components/DataSource#resultselector) to drill into the result of the second API call.
+- Bind that result to a [Table](/docs/reference/components/Table).
+- Bind fields in the result to [Columns](/docs/reference/components/Column).
 
-This is a clean, modern, component-based app that's [reactive](https://docs.xmlui.org/reactive-intro) and [themed](https://docs.xmlui.org/themes-intro) without requiring any knowledge of React or CSS. That's powerful leverage. And it's code you can read and maintain, no matter if it was you or an LLM assistant who wrote it. I'm consulting for the project so you should judge for yourself, but to me this feels like an alternative to the JavaScript industrial complex that ticks all the right boxes.
+This is a clean, modern, component-based app that's [reactive](/docs/reactive-intro) and [themed](/docs/themes-intro) without requiring any knowledge of React or CSS. That's powerful leverage. And it's code you can read and maintain, no matter if it was you or an LLM assistant who wrote it. I'm consulting for the project so you should judge for yourself, but to me this feels like an alternative to the JavaScript industrial complex that ticks all the right boxes.
 
 ## Components
 
@@ -53,7 +53,7 @@ That ecosystem of component producers and consumers didn't carry forward to the 
 
 ### User-defined components
 
-XMLUI provides a deep [catalog of components](https://docs.xmlui.org/components/_overview) including all the interactive ones you'd expect as well as behind-the-scenes ones like `DataSource`, [APICall](https://docs.xmlui.org/components/APICall), and [Queue](https://docs.xmlui.org/components/Queue). You can easily define your own components that interop with the native set and with one another. Here's the markup for a `TubeStops` component.
+XMLUI provides a deep [catalog of components](/docs/reference/components/_overview) including all the interactive ones you'd expect as well as behind-the-scenes ones like `DataSource`, [APICall](/docs/reference/components/APICall), and [Queue](/docs/reference/components/Queue). You can easily define your own components that interop with the native set and with one another. Here's the markup for a `TubeStops` component.
 
 ```xml
 <Component name="TubeStops">
@@ -154,7 +154,7 @@ Initially I wrote it in a conventional way, with a search button. Then I realize
 
 ## Themes
 
-When the team first showed me the XMLUI [theme system](https://docs.xmlui.org/themes-intro) I wasn't too excited. I am not a designer so I appreciate a nice default theme that doesn't require me to make color choices I'm not qualified to make. The ability to switch themes has never felt that important to me, and I've never quite understood why developer are so obsessed with dark mode. I have wrestled with CSS, though, to achieve both style and layout effects, and the results have not been impressive. XMLUI aims to make everything you build look good, and behave gracefully, without requiring you to write any CSS or CSS-like style and layout directives.
+When the team first showed me the XMLUI [theme system](/docs/themes-intro) I wasn't too excited. I am not a designer so I appreciate a nice default theme that doesn't require me to make color choices I'm not qualified to make. The ability to switch themes has never felt that important to me, and I've never quite understood why developer are so obsessed with dark mode. I have wrestled with CSS, though, to achieve both style and layout effects, and the results have not been impressive. XMLUI aims to make everything you build look good, and behave gracefully, without requiring you to write any CSS or CSS-like style and layout directives.
 
 You can apply inline styles but for the most part you won't need them and shouldn't use them. For me this was another unlearning exercise. I know enough CSS to be dangerous and in the early going I abused inline styles. That was partly my fault and partly because LLMs think inline styles are catnip and will abuse them on your behalf. If you look at the code snippets here, though, you'll see almost no explicit style or layout directives. Each component provides an extensive set of theme variables that influence its text color and font, background color, margins, borders, paddings, and more. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it.
 
@@ -259,15 +259,15 @@ This arrangement has mostly exceeded my expectations. As I build out a suite of 
 
 It's like working with 2-year-old savants. Crazy, but it can be effective!
 
-To increase the odds that you'll collaborate effectively, we added a [How To](https://docs.xmlui.org/howto) section to the docs site. The MCP server makes these articles visible to agents by providing tools that list and search them. This was inspired by a friend who asked: "For a Select, suppose you don't have a static default first item but you want to fetch data and choose the first item from data as the default selected, how'd you do that in xmlui?" It took me a few minutes to put together an example. Then I realized that's the kind of question LLMs should be able to ask and answer autonomously. When an agent uses one of these tools, it is anchored to ground truth: an article found this way has a citable URL that points to a working example.
+To increase the odds that you'll collaborate effectively, we added a [How To](/docs/howto) section to the docs site. The MCP server makes these articles visible to agents by providing tools that list and search them. This was inspired by a friend who asked: "For a Select, suppose you don't have a static default first item but you want to fetch data and choose the first item from data as the default selected, how'd you do that in xmlui?" It took me a few minutes to put together an example. Then I realized that's the kind of question LLMs should be able to ask and answer autonomously. When an agent uses one of these tools, it is anchored to ground truth: an article found this way has a citable URL that points to a working example.
 
 It's way easier for me to do things with XMLUI than with React and CSS, but I've also climbed a learning curve and absorbed a lot of tacit knowledge. Will the LLM-friendly documentation flatten the learning curve for newcomers and their AI assistants? I'm eager to find out.
 
 ## Content management
 
-We say XMLUI is for building apps, but what are apps really? Nowadays websites are often apps too, built on frameworks like Vercel's [Next.js](https://en.wikipedia.org/wiki/Next.js). I've used publishing systems built that way and I am not a fan. You shouldn't need a React-savvy front-end developer to help you make routine changes to your site. And with XMLUI you don't. Our [demo site](https://demo.xmlui.org), [docs site](https://docs.xmlui.org), and [landing page](https://xmlui.org) are all XMLUI apps that are much easier for me to write and maintain than the Next.js sites I've worked on.
+We say XMLUI is for building apps, but what are apps really? Nowadays websites are often apps too, built on frameworks like Vercel's [Next.js](https://en.wikipedia.org/wiki/Next.js). I've used publishing systems built that way and I am not a fan. You shouldn't need a React-savvy front-end developer to help you make routine changes to your site. And with XMLUI you don't. Our [demo site](https://demo.xmlui.org), [docs site](https://xmlui.org/docs), and [landing page](https://xmlui.org) are all XMLUI apps that are much easier for me to write and maintain than the Next.js sites I've worked on.
 
-"Eating the dogfood" is an ugly name for a beautiful idea: Builders should use and depend on the things they build. We do, but there's more to the story of XMLUI as a CMS. When you build an app with XMLUI you are going to want to document it. There's a nice synergy available: the app and its documentation can be made of [the same stuff](https://demo.coressh.com/ui/help). You can even showcase live demos of your app in your docs as we do in [component documentation](https://docs.xmlui.org/components/_overview), [tutorials](https://docs.xmlui.org/tutorial-01), and [How To](https://docs.xmlui.org/howto) articles.
+"Eating the dogfood" is an ugly name for a beautiful idea: Builders should use and depend on the things they build. We do, but there's more to the story of XMLUI as a CMS. When you build an app with XMLUI you are going to want to document it. There's a nice synergy available: the app and its documentation can be made of [the same stuff](https://demo.coressh.com/ui/help). You can even showcase live demos of your app in your docs as we do in [component documentation](/docs/reference/components/_overview), [tutorials](/docs/tutorial-01), and [How To](/docs/howto) articles.
 
 I was an early proponent of screencasts for software demos, and it can certainly be better to show than tell, but it's infuriating to search for the way to do something and find only a video. Ideally you show and tell. Documenting software with a mix of code, narrative, and live interaction brings all the modalities together.
 
@@ -279,7 +279,7 @@ For XMLUI the component I most wanted to include was the [Tiptap](https://tiptap
 
 ![Tiptap editor demo](https://jonudell.info/xmlui/tiptap.gif)
 
-This XMLUI `TableEditor` is the subject of our [guide](https://docs.xmlui.org/build-editor-component) for developers who want to understand how to create an XMLUI component that wraps a React component. And isn't just a toy example. When you use XMLUI for publishing, the foundation is [Markdown](http://docs.xmlui.org/working-with-markdown) which is wonderful for writing and editing headings, paragraphs, lists, and code blocks, but awful for writing and editing tables. In that situation I always resort to a visual editor to produce Markdown table syntax. Now I have that visual editor as an XMLUI component that I can embed anywhere.
+This XMLUI `TableEditor` is the subject of our [guide](/docs/build-editor-component) for developers who want to understand how to create an XMLUI component that wraps a React component. And isn't just a toy example. When you use XMLUI for publishing, the foundation is [Markdown](http://docs.xmlui.org/working-with-markdown) which is wonderful for writing and editing headings, paragraphs, lists, and code blocks, but awful for writing and editing tables. In that situation I always resort to a visual editor to produce Markdown table syntax. Now I have that visual editor as an XMLUI component that I can embed anywhere.
 
 The React idioms that appear in that guide were produced by LLMs, not by me, and I can't fully explain how they work, but I am now confident it will be straightforward for React-savvy developers to extend XMLUI. What's more, I can now see the boundary between component builders and solution builders begin to blur. I am mainly a solution builder who has always depended on component builders to accomplish anything useful at that level. The fact that I was able to accomplish this useful thing myself feels significant.
 
@@ -295,7 +295,7 @@ TableEditor
     └── 0.9.67.js
 ```
 
-The `index.html` just sources the latest [standalone build](https://docs.xmlui.org/change-log) of XMLUI.
+The `index.html` just sources the latest [standalone build](/docs/change-log) of XMLUI.
 
 ```html
 <script src="xmlui/0.9.67.js"></script>
