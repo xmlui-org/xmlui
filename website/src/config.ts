@@ -11,10 +11,14 @@ import {
   getLocalIcons,
 } from "../utils";
 import type { StandaloneAppDescription } from "xmlui";
+import XmluiLandingTheme from "./themes/landing-theme";
+import XmluiWebSiteTheme from "./themes/website-theme";
+import EarthtoneTheme from "./themes/earthtone";
 
 const App: StandaloneAppDescription = {
   name: "XMLUI Website",
   defaultTheme: "xmlui-website-theme",
+  themes: [XmluiLandingTheme, XmluiWebSiteTheme, EarthtoneTheme],
   icons: getLocalIcons(),
   resources: {
     logo: "/resources/logo.svg",
