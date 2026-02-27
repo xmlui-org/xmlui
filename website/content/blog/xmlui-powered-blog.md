@@ -8,7 +8,7 @@ image: "blog-scrabble.png"
 tags: ["blog"]
 ---
 
-In this post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. It's an XMLUI app built with a handful of core components (including [NavPanel](https://docs.xmlui.org/components/NavPanel), [NavLink](https://docs.xmlui.org/components/NavLink), [Pages](https://docs.xmlui.org/components/Pages), [Page](https://docs.xmlui.org/components/Page), and [Markdown](https://docs.xmlui.org/components/Markdown)) and a couple of [user-defined components](https://docs.xmlui.org/user-defined-components).
+In this post we'll explore the development of the blog engine we're using on this site. Our tagline is *Practical User Interfaces Built Simply*  and creating this blog couldn't have been simpler. It's an XMLUI app built with a handful of core components (including [NavPanel](/docs/reference/components/NavPanel), [NavLink](/docs/reference/components/NavLink), [Pages](/docs/reference/components/Pages), [Page](/docs/reference/components/Page), and [Markdown](/docs/reference/components/Markdown)) and a couple of [user-defined components](/docs/user-defined-components).
 
 ## The simplest possible thing
 
@@ -269,7 +269,7 @@ We refer to the overview in `Pages` along with the same `Page` used for the intr
 
 So far our approach has been purely declarative. Each post has its own `NavLink` and `Page`, written out explicitly. That's easy to read and requires no JavaScript knowledge. But every time you add a post you need to update three places: the `posts` array, the `NavPanel`, and the `Pages` section.
 
-XMLUI supports [dynamic route segments](https://docs.xmlui.org/routing-and-links) that let you collapse all the per-post `Page` entries into one, using a URL placeholder and the `$routeParams` context variable.
+XMLUI supports [dynamic route segments](/docs/routing-and-links) that let you collapse all the per-post `Page` entries into one, using a URL placeholder and the `$routeParams` context variable.
 
 ```xmlui copy
 <Page url="/blog/:slug">
@@ -279,7 +279,7 @@ XMLUI supports [dynamic route segments](https://docs.xmlui.org/routing-and-links
 
 The `:slug` in the URL matches any value, and `$routeParams.slug` captures it. The `find` expression looks up the matching post from the array.
 
-We can do the same for navigation using the [Items](https://docs.xmlui.org/components/Items) component to generate `NavLink` entries from the posts array:
+We can do the same for navigation using the [Items](/docs/reference/components/Items) component to generate `NavLink` entries from the posts array:
 
 ```xmlui copy
 <NavPanel>

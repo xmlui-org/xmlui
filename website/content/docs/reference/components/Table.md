@@ -61,7 +61,13 @@ This property indicates whether the table header is always visible when scrollin
 
 This property explicitly toggles pagination controls visibility. If set to `true`, controls are always shown even if there is only one page. If set to `false`, controls are hidden. If omitted, controls are hidden when there is only one page and shown otherwise. This property only has effect when pagination is enabled. It acts as an alias for showPaginationControls.
 
-### `alwaysShowSelectionHeader` [#alwaysshowselectionheader]
+### `alwaysShowSelectionCheckboxes` [#alwaysshowselectioncheckboxes]
+
+> [!DEF]  default: **false**
+
+When set to `true`, selection checkboxes are always visible for all rows instead of appearing only on hover. Has no effect when `hideSelectionCheckboxes` is `true` or when row selection is disabled.
+
+### `alwaysShowSelectionCheckboxesHeader` [#alwaysshowselectioncheckboxesheader]
 
 > [!DEF]  default: **false**
 

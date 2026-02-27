@@ -123,7 +123,7 @@ The `TubeStops` component:
 
 **Defines a dynamic data source**. When this page embeds `<TubeStops line="Bakerloo"/>`, the `TubeStops` component receives a `line` property used to form the URL that fetches data.
 
-**Transforms data**. When API responses are complex, the expressions needed to unpack them can clutter your XMLUI markup. In this case the  component offloads that work to the `transformStops` function so it can work with a simplified structure. The `transformStops` function is defined in a `<script>` tag in `index.html`. See [Scripting](https://docs.xmlui.org/scripting) for more on how to use JavaScript in XMLUI.
+**Transforms data**. When API responses are complex, the expressions needed to unpack them can clutter your XMLUI markup. In this case the  component offloads that work to the `transformStops` function so it can work with a simplified structure. The `transformStops` function is defined in a `<script>` tag in `index.html`. See [Scripting](/docs/scripting) for more on how to use JavaScript in XMLUI.
 
 <details>
   <summary>view the transformStops function</summary>

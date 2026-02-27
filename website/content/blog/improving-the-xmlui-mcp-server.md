@@ -34,7 +34,7 @@ Suppose as an XMLUI developer you ask "What's the best way to manage state in XM
 
 The research phase begins with `xmlui_search_howto` because the server prioritizes How To articles with [playgrounds](https://blog.xmlui.org/blog/xmlui-playground) that provide live working examples. Finding none on a first pass it pivots to a broader search for *state management variable*. Along with search hits the agent sees clues (*Topics*, *Facets*) that help it contextualize results.
 
-From there it explores a tutorial, discovers the [AppState](https://docs.xmlui.org/components/AppState) component, notices it has been deprecated, and redirects to looking for information about the global variables mentioned in the deprecation warning.
+From there it explores a tutorial, discovers the [AppState](/docs/reference/components/AppState) component, notices it has been deprecated, and redirects to looking for information about the global variables mentioned in the deprecation warning.
 
 Armed with those results the agent produces a pretty good report.
 
