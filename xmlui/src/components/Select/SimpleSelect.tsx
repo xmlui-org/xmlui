@@ -30,6 +30,7 @@ interface SimpleSelectProps {
   id: string;
   style: CSSProperties;
   className?: string;
+  contentClassName?: string;
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
@@ -76,6 +77,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       readOnly,
       emptyListNode,
       className,
+      contentClassName,
       modal,
       groupBy,
       groupHeaderRenderer,
@@ -225,7 +227,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         <Portal container={root}>
           <Content
             collisionPadding={0}
-            className={styles.selectDropdownContent}
+            className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
             style={{ maxHeight: height, minWidth: panelWidth }}

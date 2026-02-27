@@ -213,7 +213,8 @@ type ThemedSelectProps = React.ComponentProps<typeof Select> & { className?: str
 export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
   function ThemedSelect({ className, ...props }: ThemedSelectProps, ref) {
     const themeClass = useComponentThemeClass(SelectMd);
-    return <Select {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    return <Select {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
   },
 );
 
@@ -240,6 +241,7 @@ export const selectComponentRenderer = createComponentRenderer(
       <Select
         multiSelect={multiSelect}
         className={className}
+        contentClassName={className}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,

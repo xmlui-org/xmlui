@@ -66,6 +66,7 @@ interface SelectProps {
   // Styling
   style?: CSSProperties;
   className?: string;
+  contentClassName?: string;
   dropdownHeight?: CSSProperties["height"];
 
   // Validation
@@ -257,6 +258,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     // Styling
     style,
     className,
+    contentClassName,
     dropdownHeight,
 
     // Validation
@@ -668,6 +670,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             options={options}
             style={style}
             className={className}
+            contentClassName={contentClassName}
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
@@ -781,7 +784,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               <Portal container={root}>
                 <PopoverContent
                   style={{ minWidth: panelWidth, height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
+                  className={classnames(contentClassName, styles.selectContent, styles[validationStatus])}
                   onKeyDown={handleKeyDown}
                 >
                   <div className={styles.command}>
