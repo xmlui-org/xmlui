@@ -38,7 +38,7 @@ export const SizeScaleReadableKeys = {
 
 export function useComponentThemeClass(descriptor: ComponentMetadata) {
   let themeScope = useTheme();
-  console.log({ descriptor, themeScope });
+  //console.log({ descriptor, themeScope });
 
   const themeVars = useMemo(()=>{
     const ret = {};
@@ -54,8 +54,8 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
     return ret;
   }, [descriptor?.defaultThemeVars, descriptor?.themeVars, themeScope]);
 
-  console.log("resolved tehemvar", themeVars);
-  console.log("theem styles", themeScope.themeStyles);
+  //console.log("resolved tehemvar", themeVars);
+  //console.log("theem styles", themeScope.themeStyles);
 
   return useStyles(themeVars);
 }

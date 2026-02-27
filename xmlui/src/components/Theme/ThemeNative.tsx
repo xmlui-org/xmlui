@@ -85,7 +85,6 @@ export function Theme({
         },
       },
     };
-    console.log("Current theme:", foundTheme);
     return foundTheme;
   }, [activeTheme, generatedId, id, themeTone, themeVars, themes]);
 
