@@ -79,6 +79,11 @@ export const CheckboxMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
+    [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
+    [`outlineColor-${COMP}`]: `$outlineColor--focus`,
+    [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,
+    [`outlineStyle-${COMP}`]: `$outlineStyle--focus`,
     [`borderColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`backgroundColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`borderColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,

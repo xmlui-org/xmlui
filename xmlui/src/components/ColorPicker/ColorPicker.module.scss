@@ -61,20 +61,21 @@ $width-ColorPicker: createThemeVar("Input:width-#{$componentName}");
 $height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
 
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
 
   &:not([disabled]):not([readonly]):hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
   }
 
   &:not([readonly]):focus {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
   }
 }
 
@@ -102,7 +103,7 @@ $height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
       border-radius: 2px;
     }
 
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");

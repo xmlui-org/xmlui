@@ -14,34 +14,34 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
 
 $backgroundColor-TextBox--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
 
-$borderRadius-TextBox--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
+$borderRadius-TextBox: createThemeVar("Input:borderRadius-#{$componentName}");
 $borderRadius-TextBox--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
 $borderRadius-TextBox--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
 $borderRadius-TextBox--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
 
 // Variables for default variant
-$borderColor-TextBox--default: createThemeVar("Input:borderColor-#{$componentName}--default");
-$borderWidth-TextBox--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
-$borderStyle-TextBox--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
-$fontSize-TextBox--default: createThemeVar("Input:fontSize-#{$componentName}--default");
-$backgroundColor-TextBox--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
-$boxShadow-TextBox--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
-$textColor-TextBox--default: createThemeVar("Input:textColor-#{$componentName}--default");
-$borderColor-TextBox--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
-$backgroundColor-TextBox--default--hover: createThemeVar("Input:backgroundColor-#{$componentName}--default--hover");
-$boxShadow-TextBox--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
-$textColor-TextBox--default--hover: createThemeVar("Input:textColor-#{$componentName}--default--hover");
-$borderColor-TextBox--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
-$backgroundColor-TextBox--default--focus: createThemeVar("Input:backgroundColor-#{$componentName}--default--focus");
-$boxShadow-TextBox--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
-$textColor-TextBox--default--focus: createThemeVar("Input:textColor-#{$componentName}--default--focus");
-$outlineWidth-TextBox--default--focus: createThemeVar("Input:outlineWidth-#{$componentName}--default--focus");
-$outlineColor-TextBox--default--focus: createThemeVar("Input:outlineColor-#{$componentName}--default--focus");
-$outlineStyle-TextBox--default--focus: createThemeVar("Input:outlineStyle-#{$componentName}--default--focus");
-$outlineOffset-TextBox--default--focus: createThemeVar("Input:outlineOffset-#{$componentName}--default--focus");
-$textColor-placeholder-TextBox--default: createThemeVar("Input:textColor-placeholder-#{$componentName}--default");
-$fontSize-placeholder-TextBox--default: createThemeVar("Input:fontSize-placeholder-#{$componentName}--default");
-$color-adornment-TextBox--default: createThemeVar("Input:color-adornment-#{$componentName}--default");
+$borderColor-TextBox: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-TextBox: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-TextBox: createThemeVar("Input:borderStyle-#{$componentName}");
+$fontSize-TextBox: createThemeVar("Input:fontSize-#{$componentName}");
+$backgroundColor-TextBox: createThemeVar("Input:backgroundColor-#{$componentName}");
+$boxShadow-TextBox: createThemeVar("Input:boxShadow-#{$componentName}");
+$textColor-TextBox: createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-TextBox--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-TextBox--hover: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$boxShadow-TextBox--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$textColor-TextBox--hover: createThemeVar("Input:textColor-#{$componentName}--hover");
+$borderColor-TextBox--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$backgroundColor-TextBox--focus: createThemeVar("Input:backgroundColor-#{$componentName}--focus");
+$boxShadow-TextBox--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
+$textColor-TextBox--focus: createThemeVar("Input:textColor-#{$componentName}--focus");
+$outlineWidth-TextBox--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-TextBox--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-TextBox--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-TextBox--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-TextBox: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-TextBox: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
+$color-adornment-TextBox: createThemeVar("Input:color-adornment-#{$componentName}");
 
 // Variables for error variant
 $borderColor-TextBox--error: createThemeVar("Input:borderColor-#{$componentName}--error");
@@ -129,48 +129,52 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
 
 // --- CSS properties of a particular TextBox variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
-  font-size: createThemeVar("Input:fontSize-#{$componentName}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-Checkbox#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-Checkbox#{$suffix}");
 
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}#{$suffix}");
+
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}--hover"
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover"
     );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
   }
 
   &:focus-within {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}--focus"
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--focus"
     );
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
-    color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
+    color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--focus");
   }
 
   &:has(.input:focus-visible) {
-    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}--#{$variantName}--focus");
-    outline-color: createThemeVar("Input:outlineColor-#{$componentName}--#{$variantName}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}--#{$variantName}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}--#{$variantName}--focus");
+    outline-width: createThemeVar("Input:outlineWidth-#{$componentName}#{$suffix}--focus");
+    outline-color: createThemeVar("Input:outlineColor-#{$componentName}#{$suffix}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-#{$componentName}#{$suffix}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-#{$componentName}#{$suffix}--focus");
   }
 
   .input {
     &::placeholder {
-      color: createThemeVar("Input:textColor-placeholder-#{$componentName}--#{$variantName}");
-      font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}--#{$variantName}");
+      color: createThemeVar("Input:textColor-placeholder-#{$componentName}#{$suffix}");
+      font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}#{$suffix}");
     }
   }
 
   .adornment {
-    color: createThemeVar("Input:color-adornment-#{$componentName}--#{$variantName}");
+    color: createThemeVar("Input:color-adornment-#{$componentName}#{$suffix}");
 
     * {
       color: inherit;
@@ -205,7 +209,7 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
     transition: background-color ease-in 0.1s;
     overflow: hidden;
     @include t.paddingVars($themeVars, $componentName);
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");
