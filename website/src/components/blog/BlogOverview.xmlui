@@ -23,8 +23,8 @@
             maxWidth="$maxWidth-content-BlogOverview"
         >
             <H1
-                textAlign="center"
                 showAnchor="false"
+                marginBottom="$space-4"
             >
                 Build UIs the simple way.
             </H1>
