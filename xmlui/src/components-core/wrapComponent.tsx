@@ -250,10 +250,10 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture ---
-    // When captureNativeEvents is enabled, pass an onNativeEvent callback
-    // that the render component can call with any native library event.
-    // The event flows into the trace system automatically.
-    if (config.captureNativeEvents) {
+    // When captureNativeEvents is enabled (per-component config or appGlobals),
+    // pass an onNativeEvent callback that the render component can call with
+    // any native library event. The event flows into the trace system automatically.
+    if (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents) {
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
@@ -487,7 +487,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture (same as wrapComponent) ---
-    if (config.captureNativeEvents) {
+    if (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents) {
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
