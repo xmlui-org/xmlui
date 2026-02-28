@@ -20,6 +20,107 @@ function getMarkdownFromEditor(editor: any): string {
   }
 }
 
+/**
+ * Classify a ProseMirror transaction into a trace event.
+ * This is Tiptap-specific knowledge — the render component owns it,
+ * not the generic wrapCompound wrapper.
+ *
+ * Returns null for transactions that shouldn't be traced
+ * (e.g., pure selection/cursor moves).
+ */
+function classifyTransaction(
+  tr: any,
+  editor: any,
+): { type: string; displayLabel: string } | null {
+  // Skip non-doc-changing transactions (cursor moves, selection changes)
+  if (!tr.docChanged) return null;
+
+  const steps = tr.steps;
+  if (!steps || steps.length === 0) return null;
+
+  // Analyze steps to classify the transaction
+  for (const step of steps) {
+    const json = step.toJSON();
+
+    // Mark toggle: bold, italic, strike, code, link
+    if (json.stepType === "addMark") {
+      return { type: "format", displayLabel: `${json.mark?.type}: on` };
+    }
+    if (json.stepType === "removeMark") {
+      return { type: "format", displayLabel: `${json.mark?.type}: off` };
+    }
+
+    // Replace step: text input, delete, or structural insert
+    if (json.stepType === "replace") {
+      const content = json.slice?.content;
+
+      // Empty slice with range = deletion
+      if (!content || content.length === 0) {
+        return { type: "delete", displayLabel: "delete" };
+      }
+
+      const firstNode = content[0];
+
+      // Horizontal rule
+      if (firstNode?.type === "horizontalRule") {
+        return { type: "insert", displayLabel: "horizontal rule" };
+      }
+
+      // Table
+      if (firstNode?.type === "table") {
+        const rows = firstNode.content?.length || 0;
+        const cols = firstNode.content?.[0]?.content?.length || 0;
+        return { type: "insert", displayLabel: `table ${rows}×${cols}` };
+      }
+
+      // Heading
+      if (firstNode?.type === "heading") {
+        const level = firstNode.attrs?.level || 1;
+        return { type: "structure", displayLabel: `heading ${level}` };
+      }
+
+      // Code block
+      if (firstNode?.type === "codeBlock") {
+        return { type: "structure", displayLabel: "code block" };
+      }
+
+      // Text node (direct text insertion)
+      if (firstNode?.text) {
+        const text = firstNode.text;
+        if (text.length <= 20) {
+          return { type: "input", displayLabel: `"${text}"` };
+        }
+        return { type: "input", displayLabel: `"${text.slice(0, 20)}…" (${text.length} chars)` };
+      }
+
+      // Paragraph containing text (e.g. paste)
+      if (firstNode?.type === "paragraph" && firstNode.content?.[0]?.text) {
+        const text = firstNode.content[0].text;
+        if (text.length <= 20) {
+          return { type: "input", displayLabel: `"${text}"` };
+        }
+        return { type: "input", displayLabel: `"${text.slice(0, 20)}…" (${text.length} chars)` };
+      }
+
+      // Other node type insertion
+      if (firstNode?.type) {
+        return { type: "insert", displayLabel: firstNode.type };
+      }
+    }
+
+    // ReplaceAround: wrapping operations (list, blockquote, etc.)
+    if (json.stepType === "replaceAround") {
+      const nodeType = json.slice?.content?.[0]?.type;
+      if (nodeType) {
+        return { type: "structure", displayLabel: nodeType };
+      }
+    }
+  }
+
+  // Generic fallback for doc-changing transactions we couldn't classify
+  return { type: "edit", displayLabel: "content changed" };
+}
+
 // ── Toolbar button ──────────────────────────────────────────────────
 function Btn({
   onClick,
@@ -81,6 +182,7 @@ export const TiptapEditorRender = React.forwardRef(
     {
       value,
       onChange,
+      onNativeEvent,
       registerApi,
       placeholder,
       editable = true,
@@ -100,6 +202,8 @@ export const TiptapEditorRender = React.forwardRef(
     const show = (id: string) => !visibleItems || visibleItems.has(id);
     const onChangeRef = useRef(onChange);
     onChangeRef.current = onChange;
+    const onNativeEventRef = useRef(onNativeEvent);
+    onNativeEventRef.current = onNativeEvent;
     const suppressUpdate = useRef(false);
 
     const editor = useEditor({
@@ -125,6 +229,23 @@ export const TiptapEditorRender = React.forwardRef(
         if (suppressUpdate.current) return;
         const md = getMarkdownFromEditor(ed);
         onChangeRef.current?.(md);
+      },
+      onTransaction: ({ editor: ed, transaction: tr }) => {
+        if (suppressUpdate.current) return;
+        if (!onNativeEventRef.current) return;
+        const classified = classifyTransaction(tr, ed);
+        if (classified) {
+          onNativeEventRef.current({
+            type: classified.type,
+            displayLabel: classified.displayLabel,
+          });
+        }
+      },
+      onFocus: () => {
+        onNativeEventRef.current?.({ type: "focus", displayLabel: "focus" });
+      },
+      onBlur: () => {
+        onNativeEventRef.current?.({ type: "blur", displayLabel: "blur" });
       },
     });
 

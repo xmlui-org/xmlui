@@ -57,5 +57,6 @@ export const tiptapEditorComponentRenderer = wrapCompound(
     events: {
       didChange: "onDidChange",
     },
+    captureNativeEvents: true,
   },
 );
