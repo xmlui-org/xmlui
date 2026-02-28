@@ -212,6 +212,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     const props: Record<string, any> = {};
 
+    // --- Extract source location for trace enrichment ---
+    const nodeSource = (node as any).debug?.source;
+    const ownerFileId = nodeSource?.fileId;
+    const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
+
     // --- Always pass through XMLUI plumbing ---
     props.className = className;
     props.registerComponentApi = registerComponentApi;
@@ -236,6 +241,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
             eventName: xmluiName,
             ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+            ownerFileId,
+            ownerSource,
           }));
         }
         if (handler) {
@@ -265,6 +272,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           eventName: eventType,
           ariaName: extractValue(node.props?.["aria-label"]) || undefined,
           nativeEvent: event,
+          ownerFileId,
+          ownerSource,
         }));
 
         // Also fire as an XMLUI event if a handler is registered
@@ -431,6 +440,11 @@ export function wrapCompound<TMd extends ComponentMetadata>(
 
     const props: Record<string, any> = {};
 
+    // --- Extract source location for trace enrichment ---
+    const nodeSource = (node as any).debug?.source;
+    const ownerFileId = nodeSource?.fileId;
+    const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
+
     props.className = className;
 
     // State-management props go to StateWrapper as __-prefixed internals
@@ -456,6 +470,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
               ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ownerFileId,
+              ownerSource,
             }));
           }
           updateState({ value: args[0] });
@@ -472,6 +488,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
               ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ownerFileId,
+              ownerSource,
             }));
           }
           if (handler) {
@@ -499,6 +517,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           eventName: eventType,
           ariaName: extractValue(node.props?.["aria-label"]) || undefined,
           nativeEvent: event,
+          ownerFileId,
+          ownerSource,
         }));
 
         // Also fire as an XMLUI event if a handler is registered
