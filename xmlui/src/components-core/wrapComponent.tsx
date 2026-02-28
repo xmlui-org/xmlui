@@ -486,6 +486,29 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       props[reactPropName] = lookupSyncCallback(node.props?.[xmluiName]);
     }
 
+    // --- Dynamic native event capture (same as wrapComponent) ---
+    if (config.captureNativeEvents) {
+      const xmluiId = node.uid || node.testId;
+      props.onNativeEvent = (event: any) => {
+        const eventType = event?.type || "unknown";
+        const traceKind = `native:${eventType}`;
+        pushXsLog(createLogEntry(traceKind, {
+          componentType: type,
+          componentLabel: xmluiId || type,
+          displayLabel: event?.displayLabel || undefined,
+          eventName: eventType,
+          ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+          nativeEvent: event,
+        }));
+
+        // Also fire as an XMLUI event if a handler is registered
+        const handler = lookupEventHandler(eventType);
+        if (handler) {
+          handler(event);
+        }
+      };
+    }
+
     // --- Forward all remaining node.props ---
     if (node.props) {
       for (const [key, rawValue] of Object.entries(node.props)) {
