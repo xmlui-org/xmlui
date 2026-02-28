@@ -6,6 +6,39 @@ import styles from "./EChart.module.scss";
 import classnames from "classnames";
 
 /**
+ * Comprehensive list of ECharts events to capture.
+ * All of these are wired up to onNativeEvent — if an event never fires,
+ * there's no overhead. This is the "let everything through" approach.
+ */
+const ECHARTS_EVENTS = [
+  // Mouse events on data items
+  "click",
+  "dblclick",
+  // Legend
+  "legendselectchanged",
+  "legendselected",
+  "legendunselected",
+  "legendscroll",
+  // Data zoom
+  "datazoom",
+  "datarangeselected",
+  // Selection
+  "selectchanged",
+  // Toolbox
+  "restore",
+  "dataviewchanged",
+  "magictypechanged",
+  // Brush
+  "brush",
+  "brushEnd",
+  // Timeline
+  "timelinechanged",
+  "timelineplaychanged",
+  // Graph / tree roam
+  "graphroam",
+];
+
+/**
  * Resolve a value that may be a CSS var() reference to an actual color string.
  * ECharts renders on canvas, which doesn't understand CSS var() references.
  */
@@ -17,6 +50,91 @@ function resolveCssValue(value: string | undefined, el: HTMLElement | undefined)
     return getComputedStyle(el).getPropertyValue(varMatch[1]).trim();
   }
   return value;
+}
+
+/**
+ * Format a human-readable display label from an eCharts event object.
+ * This is eCharts-specific knowledge — the render component owns it,
+ * not the generic wrapComponent wrapper.
+ */
+function formatDisplayLabel(event: any, eventName: string): string | undefined {
+  if (!event || typeof event !== "object") return undefined;
+
+  // Legend events: { name: "seriesName", selected: { seriesName: true/false } }
+  if (event.name != null && event.selected != null) {
+    const isSelected = event.selected[event.name];
+    return `${event.name}: ${isSelected ? "show" : "hide"}`;
+  }
+
+  // Data item events: { seriesName, name, value, dataIndex }
+  if (event.seriesName != null && event.name != null) {
+    const val = event.value != null ? ` = ${event.value}` : "";
+    return `${event.seriesName} → ${event.name}${val}`;
+  }
+
+  // VisualMap slider: { selected: [min, max] } or { selected: { 0: [min, max] } }
+  if (eventName === "datarangeselected" && event.selected != null) {
+    const sel = Array.isArray(event.selected)
+      ? event.selected
+      : Object.values(event.selected)[0];
+    if (Array.isArray(sel) && sel.length === 2) {
+      return `${Math.round(sel[0] as number)} – ${Math.round(sel[1] as number)}`;
+    }
+  }
+
+  // Zoom events: { start, end }
+  if (event.start != null && event.end != null) {
+    return `${Math.round(event.start)}% – ${Math.round(event.end)}%`;
+  }
+
+  // Graph roam: { zoom } for zoom, or pan with origin coords
+  if (eventName === "graphroam") {
+    if (event.zoom != null) return `zoom: ${event.zoom.toFixed(2)}`;
+    if (event.originX != null && event.originY != null) {
+      return `pan: ${Math.round(event.originX)}, ${Math.round(event.originY)}`;
+    }
+    return "roam";
+  }
+
+  // Timeline: { currentIndex }
+  if (eventName === "timelinechanged" && event.currentIndex != null) {
+    return `index: ${event.currentIndex}`;
+  }
+  if (eventName === "timelineplaychanged" && event.playState != null) {
+    return event.playState ? "play" : "pause";
+  }
+
+  // Toolbox: magicType changed
+  if (eventName === "magictypechanged" && event.currentType != null) {
+    return event.currentType;
+  }
+
+  // Restore
+  if (eventName === "restore") {
+    return "restore";
+  }
+
+  // Brush: { areas: [...] }
+  if (eventName === "brush" && event.areas != null) {
+    return `${event.areas.length} area${event.areas.length !== 1 ? "s" : ""}`;
+  }
+  if (eventName === "brushEnd" && event.areas != null) {
+    return `${event.areas.length} area${event.areas.length !== 1 ? "s" : ""}`;
+  }
+
+  // Select changed: { selected: [{ seriesIndex, dataIndex[] }] }
+  if (eventName === "selectchanged" && event.selected != null) {
+    const total = event.selected.reduce(
+      (sum: number, s: any) => sum + (s.dataIndex?.length || 0), 0
+    );
+    return total > 0 ? `${total} selected` : "none selected";
+  }
+
+  // Generic fallback
+  if (event.name != null) return String(event.name);
+  if (event.seriesName != null) return String(event.seriesName);
+
+  return undefined;
 }
 
 /**
@@ -34,10 +152,49 @@ export function EChartRender({
   height,
   renderer = "canvas",
   registerComponentApi,
+  onNativeEvent,
 }: any) {
   const chartRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { getThemeVar, root } = useTheme();
+
+  // Build the onEvents map: every known ECharts event calls onNativeEvent.
+  // Memoized so it's stable across renders.
+  const onEvents = useMemo(() => {
+    if (!onNativeEvent) return undefined;
+    const map: Record<string, (event: any) => void> = {};
+    for (const eventName of ECHARTS_EVENTS) {
+      map[eventName] = (event: any) => {
+        const type = event?.type || eventName;
+        onNativeEvent({
+          ...event,
+          type,
+          displayLabel: formatDisplayLabel(event, eventName),
+        });
+      };
+    }
+    return map;
+  }, [onNativeEvent]);
+
+  // Diagnostic: monkey-patch trigger to discover ALL events eCharts fires.
+  // Logs unknown event names to console so ECHARTS_EVENTS can be updated from real data.
+  const patched = useRef(false);
+  useEffect(() => {
+    if (patched.current) return;
+    const instance = chartRef.current?.getEchartsInstance();
+    if (!instance) return;
+    patched.current = true;
+    const knownEvents = new Set(ECHARTS_EVENTS);
+    const seen = new Set<string>();
+    const originalTrigger = instance.trigger.bind(instance);
+    instance.trigger = (eventName: string, ...args: any[]) => {
+      if (!knownEvents.has(eventName) && !seen.has(eventName)) {
+        seen.add(eventName);
+        console.log(`[xs:echart-discovery] unknown event: "${eventName}"`, args[0]);
+      }
+      return originalTrigger(eventName, ...args);
+    };
+  });
 
   // Resolve a theme variable to an actual color value (not a CSS var reference)
   const resolve = useCallback(
@@ -146,6 +303,12 @@ export function EChartRender({
     });
   }, [registerComponentApi]);
 
+  // Diagnostic: monkey-patch the eCharts instance to discover ALL events it fires.
+  // Logs unknown events to the console so we can expand ECHARTS_EVENTS from real data.
+  // Enable by adding window._xsDiscoverEchartsEvents = true in the console.
+  useEffect(() => {
+  });
+
   // ResizeObserver for container-aware resizing (not just window resize)
   useEffect(() => {
     const container = containerRef.current;
@@ -180,6 +343,7 @@ export function EChartRender({
         opts={{ renderer }}
         style={{ width: "100%", height: "100%" }}
         notMerge={true}
+        onEvents={onEvents}
       />
     </div>
   );

@@ -55,6 +55,16 @@ export type WrapComponentConfig = {
    * Defaults to true if the metadata has events.didChange or props.initialValue.
    */
   stateful?: boolean;
+
+  /**
+   * When true, passes an `onNativeEvent` callback to the render component.
+   * The render component can call this with any native library event object.
+   * The wrapper will automatically trace it using the event's `type` field.
+   *
+   * This enables "let everything through" event capture for components that
+   * wrap libraries with their own event systems (e.g., ECharts, Monaco, etc.).
+   */
+  captureNativeEvents?: boolean;
 };
 
 /**
@@ -132,6 +142,12 @@ function traceDisplayLabel(
   // For focus events, the arg is a FocusEvent object — not useful as a label
   return undefined;
 }
+
+/**
+ * Extract a human-readable display label from a native library event object.
+ * Tries common fields in order of specificity. Returns undefined if nothing
+ * useful can be extracted, in which case the trace will just show the event type.
+ */
 
 /**
  * Creates a complete XMLUI component renderer by automatically bridging
@@ -231,6 +247,33 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // --- Sync callbacks ---
     for (const [xmluiName, reactPropName] of Object.entries(callbackMap)) {
       props[reactPropName] = lookupSyncCallback(node.props?.[xmluiName]);
+    }
+
+    // --- Dynamic native event capture ---
+    // When captureNativeEvents is enabled, pass an onNativeEvent callback
+    // that the render component can call with any native library event.
+    // The event flows into the trace system automatically.
+    if (config.captureNativeEvents) {
+      const xmluiId = node.uid || node.testId;
+      props.onNativeEvent = (event: any) => {
+        const eventType = event?.type || "unknown";
+        const traceKind = `native:${eventType}`;
+        pushXsLog(createLogEntry(traceKind, {
+          componentType: type,
+          componentLabel: xmluiId || type,
+          displayLabel: event?.displayLabel || undefined,
+          eventName: eventType,
+          ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+          nativeEvent: event,
+        }));
+
+        // Also fire as an XMLUI event if a handler is registered
+        // with the native event name (e.g., legendselectchanged in XMLUI)
+        const handler = lookupEventHandler(eventType);
+        if (handler) {
+          handler(event);
+        }
+      };
     }
 
     // --- Forward all remaining node.props ---

@@ -37,4 +37,5 @@ export const EChartMd = createMetadata({
 
 export const echartComponentRenderer = wrapComponent(COMP, EChartRender, EChartMd, {
   strings: ["width", "height", "renderer"],
+  captureNativeEvents: true,
 });
