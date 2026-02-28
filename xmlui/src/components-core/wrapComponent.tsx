@@ -238,6 +238,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         if (traceKind) {
           pushXsLog(createLogEntry(traceKind, {
             component: type,
+            componentLabel: node.uid || node.testId || undefined,
             displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
             eventName: xmluiName,
             ariaName: extractValue(node.props?.["aria-label"]) || undefined,
@@ -467,6 +468,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           if (traceKind) {
             pushXsLog(createLogEntry(traceKind, {
               component: type,
+              componentLabel: node.uid || node.testId || undefined,
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
               ariaName: extractValue(node.props?.["aria-label"]) || undefined,
@@ -485,6 +487,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           if (traceKind) {
             pushXsLog(createLogEntry(traceKind, {
               component: type,
+              componentLabel: node.uid || node.testId || undefined,
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
               ariaName: extractValue(node.props?.["aria-label"]) || undefined,
