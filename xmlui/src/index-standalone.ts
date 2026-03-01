@@ -22,6 +22,9 @@ window.React = React;
 // @ts-ignore
 window.jsxRuntime = jsxRuntime;
 window.ReactDOM = ReactDOM;
+// Expose Xmlui globally so component chunks can self-register via registerExtension
+// @ts-ignore
+window.Xmlui = Xmlui;
 
 // Export everything from index.ts plus the standalone extension manager
 const standaloneExports = { ...xmluiExports, standalone: Xmlui };
