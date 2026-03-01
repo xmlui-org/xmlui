@@ -1,5 +1,6 @@
 // @ts-ignore
 import path from "path";
+import { readFileSync } from "fs";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
@@ -8,6 +9,8 @@ import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
+// @ts-ignore
+import iife from "rollup-plugin-iife";
 // @ts-ignore
 import * as packageJson from "./package.json";
 
@@ -44,6 +47,41 @@ export default ({ mode = "lib" }) => {
           VITE_USED_COMPONENTS_TableEditor: "false",
           VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
           ...componentEnvVars,
+        },
+      };
+      break;
+    }
+    case "standalone-chunked": {
+      // Build core (all components excluded) + one chunk entry per component group.
+      // Each chunk self-registers via window.Xmlui.registerExtension().
+      // ESM format so Rollup can produce multiple output files; rollup-plugin-iife
+      // converts them to concatenable IIFEs; fix-iife-chunks.mjs post-processes.
+      distSubDirName = "chunks";
+      // Read chunk-manifest.json to dynamically build entry map and exclusion list
+      const chunkManifest = JSON.parse(
+        readFileSync(path.resolve("scripts", "chunk-manifest.json"), "utf-8")
+      );
+      const chunkEntry: Record<string, string> = {
+        "xmlui-core": path.resolve("src", "index-standalone.ts"),
+      };
+      const chunkExclusions: Record<string, string> = {};
+      for (const [chunkId, envVar] of Object.entries(chunkManifest.chunkEnvVars)) {
+        chunkEntry[`chunk-${chunkId}`] = path.resolve("src", "chunks", `register-${chunkId}.ts`);
+        chunkExclusions[envVar as string] = "false";
+      }
+      lib = {
+        entry: chunkEntry,
+        formats: ["es"] as any,
+      };
+      define = {
+        "process.env": {
+          NODE_ENV: env.NODE_ENV,
+          VITE_MOCK_ENABLED: true,
+          VITE_MOCK_WORKER_LOCATION: "mockApi.js",
+          VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
+          VITE_USED_COMPONENTS_TableEditor: "false",
+          ...chunkExclusions,
+          VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
         },
       };
       break;
@@ -117,9 +155,11 @@ export default ({ mode = "lib" }) => {
   let plugins =
     mode === "metadata"
       ? [ViteXmlui({})]
-      : mode === "inspector-parser"
-        ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
-        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+      : mode === "standalone-chunked"
+        ? [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss()]
+        : mode === "inspector-parser"
+          ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
+          : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
 
   if (mode === "lib") {
     plugins.push(
@@ -175,7 +215,7 @@ export default ({ mode = "lib" }) => {
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
-          mode === "standalone" || mode === "inspector-parser"
+          mode === "standalone" || mode === "standalone-chunked" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
