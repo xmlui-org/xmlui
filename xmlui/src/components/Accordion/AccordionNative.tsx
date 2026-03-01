@@ -164,7 +164,23 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
         value={expandedItems}
         type="multiple"
         className={classnames(styles.root, className)}
-        onValueChange={(value) => setExpandedItems(value)}
+        onValueChange={(value) => {
+          setExpandedItems(value);
+          if (typeof window !== "undefined") {
+            const w = window as any;
+            if (Array.isArray(w._xsLogs)) {
+              w._xsLogs.push({
+                ts: Date.now(),
+                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                traceId: w._xsCurrentTrace,
+                kind: "focus:change",
+                component: "Accordion",
+                displayLabel: Array.isArray(value) ? value.join(", ") : String(value),
+                expandedItems: value,
+              });
+            }
+          }
+        }}
       >
         {children}
       </RAccordion.Root>

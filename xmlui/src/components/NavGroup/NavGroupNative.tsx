@@ -240,7 +240,25 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       e.preventDefault();
       e.stopPropagation();
     }
-    setExpanded((prev) => !prev);
+    setExpanded((prev) => {
+      const newExpanded = !prev;
+      if (typeof window !== "undefined") {
+        const w = window as any;
+        if (Array.isArray(w._xsLogs)) {
+          w._xsLogs.push({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: w._xsCurrentTrace,
+            kind: "focus:change",
+            component: "NavGroup",
+            displayLabel: label,
+            label,
+            expanded: newExpanded,
+          });
+        }
+      }
+      return newExpanded;
+    });
   };
 
   return (
@@ -346,7 +364,24 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
       {...rest}
       open={expanded}
       onOpenChange={(open) => {
-        if (renderCount) setExpanded(open);
+        if (renderCount) {
+          setExpanded(open);
+          if (typeof window !== "undefined") {
+            const w = window as any;
+            if (Array.isArray(w._xsLogs)) {
+              w._xsLogs.push({
+                ts: Date.now(),
+                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                traceId: w._xsCurrentTrace,
+                kind: "focus:change",
+                component: "NavGroup",
+                displayLabel: label,
+                label,
+                expanded: open,
+              });
+            }
+          }
+        }
       }}
     >
       <Trigger asChild disabled={disabled}>
