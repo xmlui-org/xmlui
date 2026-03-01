@@ -25,17 +25,25 @@ export default ({ mode = "lib" }) => {
         formats: ["umd"] as any,
         fileName: (format: any) => `xmlui-standalone.${format}.js`,
       };
+      // Collect VITE_USED_COMPONENTS_* and VITE_INCLUDE_* env vars from the
+      // real process.env so that selective builds can exclude component groups
+      // by setting e.g. VITE_USED_COMPONENTS_Tree=false before running the build.
+      const componentEnvVars: Record<string, any> = {};
+      for (const [key, value] of Object.entries(process.env)) {
+        if (key.startsWith("VITE_USED_COMPONENTS_") || key.startsWith("VITE_INCLUDE_")) {
+          // Keep as string so ComponentProvider's !== "false" check works correctly
+          componentEnvVars[key] = String(value);
+        }
+      }
       define = {
         "process.env": {
           NODE_ENV: env.NODE_ENV,
           VITE_MOCK_ENABLED: true,
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
           VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
-          // VITE_USED_COMPONENTS_Tree: "false",
           VITE_USED_COMPONENTS_TableEditor: "false",
-          // VITE_USED_COMPONENTS_Charts: "false",
-          // VITE_USER_COMPONENTS_Inspect: "false",
           VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
+          ...componentEnvVars,
         },
       };
       break;

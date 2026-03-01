@@ -575,62 +575,127 @@ export class ComponentRegistry {
       this.registerCoreComponent(timerComponentRenderer);
     }
 
-    if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
-      //TODO, if it proves to be a working solution, make these components skippable, too
-      this.registerCoreComponent(pageMetaTitleComponentRenderer);
-      this.registerCoreComponent(progressBarComponentRenderer);
-      this.registerCoreComponent(splitterComponentRenderer);
-      this.registerCoreComponent(vSplitterComponentRenderer);
-      this.registerCoreComponent(hSplitterComponentRenderer);
-      this.registerCoreComponent(queueComponentRenderer);
-      this.registerCoreComponent(qrCodeComponentRenderer);
-      this.registerCoreComponent(includeMarkupComponentRenderer);
-      this.registerCoreComponent(positionedContainerComponentRenderer);
-      this.registerCoreComponent(changeListenerComponentRenderer);
-      this.registerCoreComponent(realTimeAdapterComponentRenderer);
+    // --- Components formerly in the VITE_INCLUDE_REST_COMPONENTS catch-all,
+    // --- now individually gated for selective bundling.
+
+    if (process.env.VITE_USED_COMPONENTS_TextBox !== "false") {
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
-      this.registerCoreComponent(hoverCardComponentRenderer);
-      this.registerCoreComponent(radioGroupRenderer);
-      this.registerCoreComponent(radioItemComponentRenderer);
-      this.registerCoreComponent(fileInputRenderer);
-      this.registerCoreComponent(spinnerComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Select !== "false") {
       this.registerCoreComponent(selectComponentRenderer);
       this.registerCoreComponent(autoCompleteComponentRenderer);
-      this.registerCoreComponent(dropdownMenuComponentRenderer);
-      this.registerCoreComponent(toneChangerButtonComponentRenderer);
-      this.registerCoreComponent(navPanelCollapseButtonComponentRenderer);
-      this.registerCoreComponent(toneSwitchComponentRenderer);
-      this.registerCoreComponent(inspectButtonComponentRenderer);
-      this.registerCoreComponent(formSectionRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_RadioGroup !== "false") {
+      this.registerCoreComponent(radioGroupRenderer);
+      this.registerCoreComponent(radioItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_FileInput !== "false") {
+      this.registerCoreComponent(fileInputRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_DropdownMenu !== "false") {
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(menuItemRenderer);
       this.registerCoreComponent(subMenuItemRenderer);
       this.registerCoreComponent(menuSeparatorRenderer);
       this.registerCoreComponent(contextMenuComponentRenderer);
-      this.registerCoreComponent(expandableItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_HoverCard !== "false") {
+      this.registerCoreComponent(hoverCardComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Splitter !== "false") {
+      this.registerCoreComponent(splitterComponentRenderer);
+      this.registerCoreComponent(vSplitterComponentRenderer);
+      this.registerCoreComponent(hSplitterComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Tabs !== "false") {
       this.registerCoreComponent(tabsComponentRenderer);
-      this.registerCoreComponent(bookmarkComponentRenderer);
-      this.registerCoreComponent(tableOfContentsRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ExpandableItem !== "false") {
+      this.registerCoreComponent(expandableItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Spinner !== "false") {
+      this.registerCoreComponent(spinnerComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ProgressBar !== "false") {
+      this.registerCoreComponent(progressBarComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Backdrop !== "false") {
+      this.registerCoreComponent(backdropComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Toast !== "false") {
+      this.registerCoreComponent(toastComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Accordion !== "false") {
+      this.registerCoreComponent(accordionComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Carousel !== "false") {
+      this.registerCoreComponent(carouselComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_QRCode !== "false") {
+      this.registerCoreComponent(qrCodeComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_RatingInput !== "false") {
+      this.registerCoreComponent(ratingInputComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Blog !== "false") {
       this.registerCoreComponent(blogComponentRenderer);
-      this.registerCoreComponent(codeBlockComponentRenderer);
-      // --- Nested app and related components
+      this.registerCoreComponent(tableOfContentsRenderer);
+      this.registerCoreComponent(bookmarkComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_NestedApp !== "false") {
       this.registerCoreComponent(nestedAppComponentRenderer);
       this.registerCoreComponent(appWithCodeViewComponentRenderer);
-      // --- New Bootstrap-inspired components
-      this.registerCoreComponent(carouselComponentRenderer);
-      this.registerCoreComponent(accordionComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_FormSection !== "false") {
+      this.registerCoreComponent(formSectionRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_CodeBlock !== "false") {
+      this.registerCoreComponent(codeBlockComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_PageMetaTitle !== "false") {
+      this.registerCoreComponent(pageMetaTitleComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Queue !== "false") {
+      this.registerCoreComponent(queueComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_IncludeMarkup !== "false") {
+      this.registerCoreComponent(includeMarkupComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_PositionedContainer !== "false") {
+      this.registerCoreComponent(positionedContainerComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ChangeListener !== "false") {
+      this.registerCoreComponent(changeListenerComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_RealTimeAdapter !== "false") {
+      this.registerCoreComponent(realTimeAdapterComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_ToneControls !== "false") {
+      this.registerCoreComponent(toneChangerButtonComponentRenderer);
+      this.registerCoreComponent(navPanelCollapseButtonComponentRenderer);
+      this.registerCoreComponent(toneSwitchComponentRenderer);
+      this.registerCoreComponent(inspectButtonComponentRenderer);
+    }
+
+    // --- Heavy third-party components (biggest bundle impact)
+    if (process.env.VITE_USED_COMPONENTS_Slider !== "false") {
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(sliderWrappedComponentRenderer);
       this.registerCoreComponent(knobComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_CodeEditor !== "false") {
       this.registerCoreComponent(codeEditorComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TiptapEditor !== "false") {
       this.registerCoreComponent(tiptapEditorComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Gauge !== "false") {
       this.registerCoreComponent(gaugeComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_EChart !== "false") {
       this.registerCoreComponent(echartComponentRenderer);
-      this.registerCoreComponent(ratingInputComponentRenderer);
-      this.registerCoreComponent(backdropComponentRenderer);
-      this.registerCoreComponent(toastComponentRenderer);
     }
     this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
