@@ -49,7 +49,11 @@ import {
   LintSeverity,
   printComponentLints,
 } from "../parsers/xmlui-parser/lint";
-import { collectedComponentMetadata } from "../components/collectedComponentMetadata";
+// In chunked mode, metadata is registered dynamically by each chunk via
+// StandaloneExtensionManager.registerMetadata(). The static import of
+// collectedComponentMetadata is intentionally removed here to avoid pulling
+// every component's dependency tree into the core bundle.
+// collectedComponentMetadata.ts still exists for the language server and docs gen.
 import type { ThemeDefinition, ThemeTone } from "../abstractions/ThemingDefs";
 import type {
   ComponentCompilation,
@@ -66,7 +70,17 @@ const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
 const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
 const CONFIG_FILE = "config.json";
 
-const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+// MetadataProvider is created lazily — in chunked mode, chunks call
+// Xmlui.registerMetadata() before DOMContentLoaded, so the metadata
+// is available by the time the app renders.
+let _metadataProvider: MetadataProvider | null = null;
+function getMetadataProvider(extensionManager?: StandaloneExtensionManager): MetadataProvider {
+  if (!_metadataProvider) {
+    const metadata = extensionManager?.metadata ?? {};
+    _metadataProvider = new MetadataProvider(metadata);
+  }
+  return _metadataProvider;
+}
 
 type RuntimeProps = {
   default?: any;
@@ -989,7 +1003,7 @@ function useStandalone(
           }
         }
         
-        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
+        const lintErrorComponent = processAppLinting(appDef, getMetadataProvider(extensionManager));
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
@@ -1071,7 +1085,7 @@ function useStandalone(
           themes,
         };
 
-        const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+        const lintErrorComponent = processAppLinting(newAppDef, getMetadataProvider(extensionManager));
         if (lintErrorComponent) {
           newAppDef.entryPoint = lintErrorComponent;
         }
@@ -1419,7 +1433,7 @@ function useStandalone(
         entryPoint: entryPointWithCodeBehind,
       };
 
-      const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+      const lintErrorComponent = processAppLinting(newAppDef, getMetadataProvider(extensionManager));
 
       const errorComponent: ComponentDef | null =
         errorComponents.length > 0

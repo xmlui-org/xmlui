@@ -1,4 +1,5 @@
 import type { Extension } from "../abstractions/ExtensionDefs";
+import type { ComponentMetadataCollection } from "../language-server/services/common/metadata-utils";
 
 type ExtensionRegisteredCallbackFn = (extension: Extension) => void;
 
@@ -10,6 +11,7 @@ type ExtensionRegisteredCallbackFn = (extension: Extension) => void;
 export default class StandaloneExtensionManager {
   subscriptions: Set<ExtensionRegisteredCallbackFn> = new Set();
   registeredExtensions: Array<Extension> = [];
+  metadata: ComponentMetadataCollection = {};
 
   constructor() {}
 
@@ -44,5 +46,9 @@ export default class StandaloneExtensionManager {
         cb(component);
       });
     });
+  }
+
+  registerMetadata(entries: ComponentMetadataCollection) {
+    Object.assign(this.metadata, entries);
   }
 }
