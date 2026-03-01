@@ -12,12 +12,12 @@
  *   2. Assign unique global names based on full filename (including hash)
  *   3. Rewrite each file as a `var globalName = (function() { ... return exports; })();`
  *   4. Replace import references with the global variable names
- *   5. Strip CSS imports (CSS handled separately)
+ *   5. Inline CSS imports as runtime <style> tag injection
  *   6. Compute dependency order (topological sort) and write chunk-order.json
  *
  * Usage: node scripts/esm-to-iife.mjs [chunks-dir]
  */
-import { readFileSync, writeFileSync, readdirSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync, existsSync } from "fs";
 import { join, basename } from "path";
 
 const chunksDir = process.argv[2] || "dist/chunks";
@@ -96,10 +96,25 @@ for (const file of files) {
   const chunk = chunks[file];
   let code = chunk.code;
 
-  // Strip CSS imports
+  // Inline CSS imports as runtime <style> tag injection
   for (const imp of chunk.imports.filter(i => i.isCss)) {
-    code = code.replace(imp.fullMatch + "\n", "");
-    code = code.replace(imp.fullMatch, "");
+    const cssPath = join(chunksDir, imp.source);
+    if (existsSync(cssPath)) {
+      const cssContent = readFileSync(cssPath, "utf-8").trim();
+      if (cssContent) {
+        // Escape backticks and backslashes for template literal
+        const escaped = cssContent.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$/g, "\\$");
+        const injection = `(function(){var s=document.createElement("style");s.textContent=\`${escaped}\`;document.head.appendChild(s)})();`;
+        code = code.replace(imp.fullMatch + "\n", injection + "\n");
+        code = code.replace(imp.fullMatch, injection);
+      } else {
+        code = code.replace(imp.fullMatch + "\n", "");
+        code = code.replace(imp.fullMatch, "");
+      }
+    } else {
+      code = code.replace(imp.fullMatch + "\n", "");
+      code = code.replace(imp.fullMatch, "");
+    }
   }
 
   // Replace JS imports with const destructuring from globals
@@ -223,6 +238,25 @@ for (const { file } of sharedAndCore) {
 }
 for (const { file } of entries) {
   visit(file);
+}
+
+// The core's CSS contains the @layer order declaration (reset,base,components,dynamic)
+// which MUST be the first @layer statement the browser sees. Otherwise, shared chunks
+// that inject @layer components CSS before the core establish an implicit layer order
+// where components has the lowest priority, and the base reset's
+// background-color:transparent overrides component styles.
+//
+// Fix: write a tiny bootstrap file that injects ONLY the layer order declaration.
+// The assembler must concatenate this before all other chunks.
+const coreCssPath = join(chunksDir, "xmlui-core.css");
+if (existsSync(coreCssPath)) {
+  const coreCss = readFileSync(coreCssPath, "utf-8");
+  const layerOrderMatch = coreCss.match(/@layer\s+reset\s*,\s*base\s*,\s*components\s*,\s*dynamic\s*;/);
+  if (layerOrderMatch) {
+    const bootstrap = `(function(){var s=document.createElement("style");s.textContent="${layerOrderMatch[0]}";document.head.appendChild(s)})();\n`;
+    writeFileSync(join(chunksDir, "css-layer-order.js"), bootstrap);
+    ordered.unshift("css-layer-order.js");
+  }
 }
 
 writeFileSync(join(chunksDir, "chunk-order.json"), JSON.stringify(ordered, null, 2));

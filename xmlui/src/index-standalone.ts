@@ -4,7 +4,6 @@ import ReactDOM from "react-dom";
 
 import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
-import * as xmluiExports from "./index";
 
 const Xmlui = new StandaloneExtensionManager();
 
@@ -25,7 +24,3 @@ window.ReactDOM = ReactDOM;
 // Expose Xmlui globally so component chunks can self-register via registerExtension
 // @ts-ignore
 window.Xmlui = Xmlui;
-
-// Export everything from index.ts plus the standalone extension manager
-const standaloneExports = { ...xmluiExports, standalone: Xmlui };
-export default standaloneExports;
