@@ -138,6 +138,11 @@
           label="Reactive Data"
           to="/docs/reactive-intro"
         />
+        <NavLink
+          icon="component"
+          label="Components"
+          to="/docs/components-intro"
+        />
         <NavLink icon="theme" label="Themes" to="/docs/themes-intro" />
       </NavGroup>
     </Stack>
@@ -417,11 +422,6 @@
       <IncludeNavSection sectionId="components" />
       <IncludeNavSection sectionId="extensions" />
       <NavGroup icon="theme" label="Themes" to="/docs/reference/themes">
-        <NavLink
-          icon="component"
-          label="Components"
-          to="/docs/components-intro"
-        />
         <NavLink
           label="Layout Properties"
           to="/docs/styles-and-themes/layout-props"
