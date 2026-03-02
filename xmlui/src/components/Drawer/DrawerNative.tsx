@@ -104,32 +104,37 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
 
   const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
 
-  // --- Prevent scrollbars in the shadow-DOM root while the drawer is visible or
-  // --- animating out. We keep overflow:hidden during the close animation and clear
-  // --- it only once the slide-out animation fires its animationend event.
+  // --- Prevent scrollbars while the drawer slides out. Radix releases the body
+  // --- scroll-lock before the close animation completes, so we re-apply it on
+  // --- the body and html elements and clear it only when animationend fires.
   const animatingRef = useRef(false);
 
   useEffect(() => {
-    if (!root || !isOpen) return;
-    root.style.overflow = 'hidden';
+    if (!isOpen) return;
+    // Lock horizontal overflow for horizontal-sliding drawers
+    document.body.style.overflowX = 'hidden';
+    document.documentElement.style.overflowX = 'hidden';
     return () => {
-      // isOpen just went false – keep overflow:hidden while the exit animation plays.
-      // handlePanelAnimationEnd clears it once animationend fires.
+      // Keep locked while the exit animation plays; cleared in handlePanelAnimationEnd.
       animatingRef.current = true;
     };
-  }, [root, isOpen]);
+  }, [isOpen]);
 
   // Safety-net: always clear on unmount.
   useEffect(() => {
-    return () => { if (root) root.style.overflow = ''; };
-  }, [root]);
+    return () => {
+      document.body.style.overflowX = '';
+      document.documentElement.style.overflowX = '';
+    };
+  }, []);
 
   const handlePanelAnimationEnd = useCallback(() => {
-    if (animatingRef.current && root) {
+    if (animatingRef.current) {
       animatingRef.current = false;
-      root.style.overflow = '';
+      document.body.style.overflowX = '';
+      document.documentElement.style.overflowX = '';
     }
-  }, [root]);
+  }, []);
 
   // Register imperative API
   useEffect(() => {
