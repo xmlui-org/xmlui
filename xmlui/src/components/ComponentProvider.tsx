@@ -43,6 +43,7 @@ import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSep
 import { cardComponentRenderer } from "./Card/Card";
 import { flowLayoutComponentRenderer } from "./FlowLayout/FlowLayout";
 import { modalViewComponentRenderer } from "./ModalDialog/ModalDialog";
+import { drawerComponentRenderer } from "./Drawer/Drawer";
 import { noResultComponentRenderer } from "./NoResult/NoResult";
 import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
 import { iconComponentRenderer } from "./Icon/Icon";
@@ -507,6 +508,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_ModalDialog !== "false") {
       this.registerCoreComponent(modalViewComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Drawer !== "false") {
+      this.registerCoreComponent(drawerComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NoResult !== "false") {
       this.registerCoreComponent(noResultComponentRenderer);
