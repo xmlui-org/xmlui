@@ -130,7 +130,7 @@
     </Fragment>
     <Stack gap="0" paddingTop="{mediaSize.sizeIndex > 2 ? '$space-4' : '0'}">
       <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
-        <NavLink icon="school" label="Introduction" to="/docs" />
+        <NavLink icon="school" label="Introduction" to="/docs" exact="true" />
         <NavLink
           icon="arrow-shuffle"
           label="Reactive Data"
