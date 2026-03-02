@@ -119,6 +119,10 @@ In the following app, the "Hotels" link is disabled:
 </App>
 ```
 
+### `exact` [#exact]
+
+When set to true, the link is only considered active when the current URL matches the `to` value exactly. When false or omitted, the link also counts as active for nested paths that start with the same prefix (e.g. a link with to="/a" is active on "/a/b").
+
 ### `icon` [#icon]
 
 This property allows you to add an optional icon (specify the icon's name) to the navigation link.
