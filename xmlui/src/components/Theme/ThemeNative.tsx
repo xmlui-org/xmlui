@@ -111,7 +111,8 @@ export function Theme({
         componentName === "Input" ||
         componentName === "Heading" ||
         componentName === "ThemedInput" ||
-        componentName === "Footer"
+        componentName === "Footer" ||
+        componentName === "Pages"
       ) {
         if (componentName) {
           // For component-specific vars, fully resolve the value via getThemeVar so that
