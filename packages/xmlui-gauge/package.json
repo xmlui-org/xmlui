@@ -1,0 +1,25 @@
+{
+  "name": "xmlui-gauge",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "dependencies": {
+    "smart-webcomponents-react": "25.5.5",
+    "classnames": "2.5.1"
+  },
+  "main": "./dist/xmlui-gauge.js",
+  "module": "./dist/xmlui-gauge.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-gauge.mjs",
+      "require": "./dist/xmlui-gauge.js"
+    }
+  },
+  "files": ["dist"]
+}

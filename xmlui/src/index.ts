@@ -16,6 +16,7 @@ import {
   createComponentRenderer,
   createUserDefinedComponentRenderer,
 } from "./components-core/renderers";
+import { wrapComponent, wrapCompound } from "./components-core/wrapComponent";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
@@ -135,6 +136,8 @@ export {
   StandaloneExtensionManager,
   createComponentRenderer,
   createUserDefinedComponentRenderer,
+  wrapComponent,
+  wrapCompound,
   createMetadata,
   d,
   dComponent,
