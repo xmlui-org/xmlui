@@ -24,6 +24,7 @@ vi.mock("../../../src/components-core/theming/ThemeContext", () => ({
 
 vi.mock("../../../src/components-core/theming/StyleContext", () => ({
   useComponentStyle: vi.fn(() => "test-class"),
+  useStyles: vi.fn(() => "test-styles-class"),
 }));
 
 vi.mock("../../../src/components-core/InspectorContext", () => ({
