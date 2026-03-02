@@ -113,7 +113,6 @@ function normalizeSectionData(rawSection: unknown): AppNavData | undefined {
 // IncludeNavSection) are resolved before rendering.
 function expandCompoundNavChildren(
   children: ComponentDef[] | undefined,
-  lookupCompoundComponent: (name: string) => ComponentDef | undefined,
 ): ComponentDef[] | undefined {
   if (!children) return children;
 
@@ -123,35 +122,7 @@ function expandCompoundNavChildren(
     if (!child || typeof child !== "object") {
       return;
     }
-
-    const compoundDef = lookupCompoundComponent(child.type);
-
-    if (compoundDef) {
-      // Inline the compound component's children at the same level.
-      const inlinedChildren = expandCompoundNavChildren(
-        (compoundDef.children || []) as ComponentDef[],
-        lookupCompoundComponent,
-      );
-      if (inlinedChildren) {
-        result.push(...inlinedChildren);
-      }
-      return;
-    }
-
-    // Recurse into regular children to expand any nested compound components.
-    const expandedNestedChildren = expandCompoundNavChildren(
-      (child.children || []) as ComponentDef[],
-      lookupCompoundComponent,
-    );
-
-    if (expandedNestedChildren !== child.children) {
-      result.push({
-        ...child,
-        children: expandedNestedChildren,
-      });
-    } else {
-      result.push(child);
-    }
+    result.push(child);
   });
 
   return result;
@@ -293,34 +264,6 @@ function NavPanelWithBuiltNavHierarchy({
   extractValue,
   appContext,
 }) {
-  const componentRegistry = useComponentRegistry();
-
-  const appNavSections = appContext?.appGlobals?.navSections as AppNavSections | undefined;
-
-  const lookupCompoundComponent = useCallback(
-    (name: string): ComponentDef | undefined => {
-      const entry = componentRegistry.lookupComponentRenderer(name);
-      if (!entry?.isCompoundComponent || !entry.compoundComponentDef) {
-        return undefined;
-      }
-      const baseComponent = entry.compoundComponentDef.component as ComponentDef;
-
-      // Ensure IncludeNavSection placeholders inside compound nav components
-      // are also resolved against appNavSections, just like top-level children.
-      const resolvedChildren = resolveNavSectionChildren(
-        baseComponent.children as ComponentDef[] | undefined,
-        appNavSections,
-        extractValue,
-      );
-
-      return {
-        ...baseComponent,
-        children: resolvedChildren,
-      };
-    },
-    [componentRegistry, appNavSections, extractValue],
-  );
-
   const effectiveChildren = useMemo(() => {
     return resolveNavSectionChildren(
       node.children as ComponentDef[] | undefined,
@@ -333,10 +276,9 @@ function NavPanelWithBuiltNavHierarchy({
     return (
       expandCompoundNavChildren(
         effectiveChildren as ComponentDef[] | undefined,
-        lookupCompoundComponent,
       ) || effectiveChildren
     );
-  }, [effectiveChildren, lookupCompoundComponent]);
+  }, [effectiveChildren]);
 
   const navLinks = useMemo(() => {
     return buildNavHierarchy(
@@ -344,9 +286,8 @@ function NavPanelWithBuiltNavHierarchy({
       extractValue,
       undefined,
       [],
-      lookupCompoundComponent,
     );
-  }, [expandedChildren, extractValue, lookupCompoundComponent]);
+  }, [expandedChildren, extractValue]);
 
   const scrollStyle = extractValue.asOptionalString(
     node.props.scrollStyle,

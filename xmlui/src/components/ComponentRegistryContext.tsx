@@ -15,10 +15,6 @@ export type ComponentRegistryEntry = {
 
   // Indicates whether this entry represents a compound (user-defined) component
   isCompoundComponent?: boolean;
-
-  // When this is a compound component, the parsed compound definition
-  // (including its root ComponentDef and children hierarchy).
-  compoundComponentDef?: CompoundComponentDef;
 };
 
 // Context object that makes the component registry available
