@@ -86,19 +86,6 @@ By default, a semi-transparent backdrop appears behind the drawer. Disable it wi
 </App>
 ```
 
-### Initially Open [#initially-open]
-
-Use `initiallyOpen="true"` to have the drawer open when the component first renders.
-
-```xmlui-pg copy display name="Example: Initially open" height="280px"
-<App>
-  <Drawer initiallyOpen="true" position="left">
-    <Text weight="bold">Drawer opened automatically</Text>
-    <Button label="Close" onClick="drawer.close()" marginTop="$space-3" />
-  </Drawer>
-</App>
-```
-
 ### Right-side Navigation Menu [#right-side-navigation-menu]
 
 A common use case is a right-side navigation drawer that doesn't close on click-away, forcing users to use the close button.
@@ -239,17 +226,6 @@ Controls whether a semi-transparent overlay appears behind the drawer.
 
 When `true`, the drawer is open on its first render.
 
-When `true`, the drawer is open when it first renders.
-
-```xmlui-pg copy display name="Example: initiallyOpen" height="280px"
-<App>
-  <Drawer initiallyOpen="true" position="left">
-    <Text weight="bold">I opened automatically</Text>
-    <Button label="Close" onClick="drawer.close()" marginTop="$space-3" />
-  </Drawer>
-</App>
-```
-
 ### `position` [#position]
 
 > [!DEF]  default: **"left"**
@@ -305,12 +281,12 @@ Fired when the drawer opens (either via `open()` API or another trigger).
 
 ```xmlui-pg copy display name="Example: onOpen event" height="280px"
 <App>
-  <VStack var.status="{}">
+  <VStack var.status="">
     <Button label="Open Drawer" onClick="drawer.open()" />
     <Text>{status}</Text>
   </VStack>
   
-  <Drawer id="drawer" onOpen="status = 'Drawer opened at ' + new Date().toLocaleTimeString()">
+  <Drawer id="drawer" onOpen="status = 'Drawer opened at '">
     <Text>I triggered the onOpen event</Text>
   </Drawer>
 </App>

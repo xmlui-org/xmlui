@@ -85,7 +85,7 @@ export const DrawerMd = createMetadata({
       "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
     [`padding-${COMP}`]: "$space-4",
     [`width-${COMP}`]: "320px",
-    [`maxWidth-${COMP}`]: "80%",
+    [`maxWidth-${COMP}`]: "50%",
     [`height-${COMP}`]: "320px",
     [`zIndex-${COMP}`]: "200",
     [`animationDuration-${COMP}`]: "250ms",

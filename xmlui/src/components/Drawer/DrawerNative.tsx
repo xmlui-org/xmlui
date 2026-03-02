@@ -102,6 +102,23 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
   const { root } = useTheme();
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // --- Create a scoped portal container appended to root. It uses
+  // --- position:absolute + inset:0 so it is a containing block for the
+  // --- drawer's own position:absolute children, and overflow:hidden clips
+  // --- the exit animation to the root's bounds (stops the flash).
+  const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!root) return;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+    (root as HTMLElement).appendChild(el);
+    setPortalContainer(el);
+    return () => {
+      (root as HTMLElement).removeChild(el);
+      setPortalContainer(null);
+    };
+  }, [root]);
+
   const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
 
   // --- Prevent scrollbars while the drawer slides out. Radix releases the body
@@ -146,11 +163,11 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     });
   }, [registerComponentApi, doOpen, doClose, isOpen]);
 
-  if (!root) return null;
+  if (!root || !portalContainer) return null;
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => { if (!open) doClose(); }}>
-      <Dialog.Portal container={root}>
+      <Dialog.Portal container={portalContainer}>
         {/* Backdrop */}
         {hasBackdrop && (
           <Dialog.Overlay className={styles.backdrop} />
