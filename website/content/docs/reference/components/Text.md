@@ -688,7 +688,7 @@ When using custom variants, you can style them using theme variables with the na
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-Text | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text | $textColor | $textColor |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text--hover | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Text-code--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Text-code--hover | initial | initial |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-marked | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
