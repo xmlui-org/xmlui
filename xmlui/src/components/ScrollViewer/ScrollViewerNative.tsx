@@ -45,10 +45,6 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
     // ComponentDecorator uses the ref to imperatively setAttribute("data-testid") on the
     // resolved DOM node. Forwarding ref to the inner Scroller would put data-testid there,
     // causing duplicate testId matches in tests.
-    //
-    // Also strip data-testid / data-component-type from rest so they are not duplicated
-    // as HTML attributes on the inner Scroller via prop spreading.
-    const { "data-testid": _testId, "data-component-type": _compType, ...scrollerRest } = rest;
     const scrollerStyle: CSSProperties = {
       overflow: "auto",
     };
@@ -60,7 +56,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
           style={scrollerStyle}
           scrollStyle={scrollStyle}
           showScrollerFade={showScrollerFade}
-          {...scrollerRest}
+          {...rest}
         >
           {children}
         </Scroller>

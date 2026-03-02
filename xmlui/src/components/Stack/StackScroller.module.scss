@@ -1,0 +1,187 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Scroller";
+
+// --- Scrollbar sizing variables
+$size-Scroller: createThemeVar('size-Scroller');
+$padding-perpendicular-Scroller: createThemeVar('padding-perpendicular-Scroller');
+$padding-axis-Scroller: createThemeVar('padding-axis-Scroller');
+
+// --- Track styling variables
+$borderRadius-track-Scroller: createThemeVar('borderRadius-track-Scroller');
+$backgroundColor-track-Scroller: createThemeVar('backgroundColor-track-Scroller');
+$backgroundColor-track-Scroller--hover: createThemeVar('backgroundColor-track-Scroller--hover');
+$backgroundColor-track-Scroller--active: createThemeVar('backgroundColor-track-Scroller--active');
+$border-track-Scroller: createThemeVar('border-track-Scroller');
+$border-track-Scroller--hover: createThemeVar('border-track-Scroller--hover');
+$border-track-Scroller--active: createThemeVar('border-track-Scroller--active');
+
+// --- Handle styling variables
+$borderRadius-handle-Scroller: createThemeVar('borderRadius-handle-Scroller');
+$backgroundColor-handle-Scroller: createThemeVar('backgroundColor-handle-Scroller');
+$backgroundColor-handle-Scroller--hover: createThemeVar('backgroundColor-handle-Scroller--hover');
+$backgroundColor-handle-Scroller--active: createThemeVar('backgroundColor-handle-Scroller--active');
+$border-handle-Scroller: createThemeVar('border-handle-Scroller');
+$border-handle-Scroller--hover: createThemeVar('border-handle-Scroller--hover');
+$border-handle-Scroller--active: createThemeVar('border-handle-Scroller--active');
+$minSize-handle-Scroller: createThemeVar('minSize-handle-Scroller');
+$maxSize-handle-Scroller: createThemeVar('maxSize-handle-Scroller');
+$size-perpendicularHandle-Scroller: createThemeVar('size-perpendicularHandle-Scroller');
+$size-perpendicularHandle-Scroller--hover: createThemeVar('size-perpendicularHandle-Scroller--hover');
+$size-perpendicularHandle-Scroller--active: createThemeVar('size-perpendicularHandle-Scroller--active');
+$offset-handleInteractiveArea-Scroller: createThemeVar('offset-handleInteractiveArea-Scroller');
+
+// --- Transition variables
+$transition-Scroller: createThemeVar('transition-Scroller');
+$transition-track-Scroller: createThemeVar('transition-track-Scroller');
+$transition-handle-Scroller: createThemeVar('transition-handle-Scroller');
+
+// --- Fade overlay variables
+$height-fade-Scroller: createThemeVar('height-fade-Scroller');
+$backgroundColor-fade-Scroller: createThemeVar('backgroundColor-fade-Scroller');
+$transition-fade-Scroller: createThemeVar('transition-fade-Scroller');
+
+@layer components {
+  // --- Radix Scroll Area Root
+  .scrollAreaRoot {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  // --- Viewport (the actual scrolling container)
+  // Do NOT set overflow here — Radix manages it internally via inline style.
+  // Do NOT apply Stack flex layout classes here — they go on .contentWrapper.
+  .viewport {
+    width: 100%;
+    height: 100%;
+  }
+
+  // --- Inner content wrapper inside Radix's internal table div.
+  // Stack's _base class sets min-height: 0 and min-width: 0 (correct for nested
+  // flex items) but those collapse this wrapper inside a scroll container.
+  // - min-height: 100% !important — fills viewport when content is short (alignment);
+  //   grows beyond 100% when content is taller, enabling vertical scrolling.
+  // - min-width: 100% !important — fills viewport width; grows wider when horizontal
+  //   content overflows, enabling horizontal scrolling.
+  .contentWrapper {
+    min-height: 100% !important;
+    min-width: 100% !important;
+  }
+
+  // --- Scrollbar styling
+  .scrollbar {
+    display: flex;
+    user-select: none;
+    touch-action: none;
+    padding: #{$padding-perpendicular-Scroller};
+    background-color: #{$backgroundColor-track-Scroller};
+    border: #{$border-track-Scroller};
+    border-radius: #{$borderRadius-track-Scroller};
+    transition: #{$transition-track-Scroller};
+
+    &[data-orientation="vertical"] {
+      width: #{$size-Scroller};
+      flex-direction: column;
+    }
+
+    &[data-orientation="horizontal"] {
+      flex-direction: row;
+      height: #{$size-Scroller};
+    }
+
+    // Track hover state
+    &:hover {
+      background-color: #{$backgroundColor-track-Scroller--hover};
+      border: #{$border-track-Scroller--hover};
+    }
+
+    // Track active state
+    &:active {
+      background-color: #{$backgroundColor-track-Scroller--active};
+      border: #{$border-track-Scroller--active};
+    }
+  }
+
+  // --- Scrollbar thumb (the draggable handle)
+  .thumb {
+    flex: 1;
+    background-color: #{$backgroundColor-handle-Scroller};
+    border: #{$border-handle-Scroller};
+    border-radius: #{$borderRadius-handle-Scroller};
+    position: relative;
+    transition: #{$transition-handle-Scroller};
+    min-width: #{$minSize-handle-Scroller};
+    min-height: #{$minSize-handle-Scroller};
+
+    // Thumb hover state
+    &[data-state="visible"] {
+      background-color: #{$backgroundColor-handle-Scroller--hover};
+      border: #{$border-handle-Scroller--hover};
+    }
+
+    // Thumb active state
+    &[data-state="hovering"] {
+      background-color: #{$backgroundColor-handle-Scroller--active};
+      border: #{$border-handle-Scroller--active};
+    }
+  }
+
+  // --- Corner where both scrollbars meet
+  .corner {
+    background-color: #{$backgroundColor-track-Scroller};
+  }
+
+  // --- Fade container for showScrollerFade feature
+  .fadeContainer {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    > .scrollAreaRoot {
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  // --- Fade overlays (positioned absolutely over the viewport)
+  .fadeOverlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: #{$transition-fade-Scroller};
+    z-index: 10;
+    height: #{$height-fade-Scroller};
+  }
+
+  .fadeTop {
+    top: 0;
+    background: linear-gradient(to bottom, #{$backgroundColor-fade-Scroller}, transparent);
+  }
+
+  .fadeBottom {
+    bottom: 0;
+    background: linear-gradient(to top, #{$backgroundColor-fade-Scroller}, transparent);
+  }
+
+  .fadeVisible {
+    opacity: 1;
+  }
+}
+
+// --- Export theme variables for registration
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

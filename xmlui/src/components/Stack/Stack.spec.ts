@@ -84,10 +84,10 @@ test.describe("Basic Functionality", () => {
       </Stack>
     `);
 
-    // Scroll down
+    // Scroll down — getByTestId resolves to ScrollArea.Root; scroll the Viewport inside it
     const stack = page.getByTestId("stack");
     await stack.evaluate((el) => {
-      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+      el.querySelector('[data-radix-scroll-area-viewport]')?.scrollTo(0, 50);
     });
 
     // Wait for fade to update
@@ -1321,6 +1321,113 @@ test.describe("Api", () => {
     scrollLeft = await stack.evaluate((elem) => elem.scrollLeft);
     expect(scrollTop).toBe(0);
     expect(scrollLeft).toBe(0);
+  });
+
+  // ---- overlay scrollStyle: scrollTo* APIs must target the Radix Viewport ----
+
+  test("scrollToTop works with scrollStyle='overlay'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" scrollStyle="overlay" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToTop()" />
+      </Fragment>
+    `);
+
+    const viewport = page.locator('[data-radix-scroll-area-viewport]').first();
+
+    // Scroll down first
+    await viewport.evaluate((el) => { el.scrollTop = el.scrollHeight; });
+    const scrollTopBefore = await viewport.evaluate((el) => el.scrollTop);
+    expect(scrollTopBefore).toBeGreaterThan(0);
+
+    // Invoke the API
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollTopAfter = await viewport.evaluate((el) => el.scrollTop);
+    expect(scrollTopAfter).toBe(0);
+  });
+
+  test("scrollToBottom works with scrollStyle='overlay'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <VStack id="myStack" height="200px" scrollStyle="overlay" testId="stack">
+          <Stack height="300px" backgroundColor="lightblue"/>
+          <Stack height="300px" backgroundColor="lightgreen"/>
+          <Stack height="300px" backgroundColor="lightcoral"/>
+        </VStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToBottom()" />
+      </Fragment>
+    `);
+
+    const viewport = page.locator('[data-radix-scroll-area-viewport]').first();
+
+    const scrollTopBefore = await viewport.evaluate((el) => el.scrollTop);
+    expect(scrollTopBefore).toBe(0);
+
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollTopAfter = await viewport.evaluate((el) => el.scrollTop);
+    const scrollHeight = await viewport.evaluate((el) => el.scrollHeight);
+    const clientHeight = await viewport.evaluate((el) => el.clientHeight);
+    expect(scrollTopAfter).toBeCloseTo(scrollHeight - clientHeight, 0);
+  });
+
+  test("scrollToStart works with scrollStyle='overlay'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" scrollStyle="overlay" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToStart()" />
+      </Fragment>
+    `);
+
+    const viewport = page.locator('[data-radix-scroll-area-viewport]').first();
+
+    // Scroll to the end first
+    await viewport.evaluate((el) => { el.scrollLeft = el.scrollWidth; });
+    const scrollLeftBefore = await viewport.evaluate((el) => el.scrollLeft);
+    expect(scrollLeftBefore).toBeGreaterThan(0);
+
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollLeftAfter = await viewport.evaluate((el) => el.scrollLeft);
+    expect(scrollLeftAfter).toBe(0);
+  });
+
+  test("scrollToEnd works with scrollStyle='overlay'", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <HStack id="myStack" width="200px" height="100px" scrollStyle="overlay" testId="stack">
+          <Stack width="300px" height="50px" backgroundColor="lightblue"/>
+          <Stack width="300px" height="50px" backgroundColor="lightgreen"/>
+          <Stack width="300px" height="50px" backgroundColor="lightcoral"/>
+        </HStack>
+        <Button testId="scrollBtn" onClick="myStack.scrollToEnd()" />
+      </Fragment>
+    `);
+
+    const viewport = page.locator('[data-radix-scroll-area-viewport]').first();
+
+    const scrollLeftBefore = await viewport.evaluate((el) => el.scrollLeft);
+    expect(scrollLeftBefore).toBe(0);
+
+    await page.getByTestId("scrollBtn").click();
+    await page.waitForTimeout(100);
+
+    const scrollLeftAfter = await viewport.evaluate((el) => el.scrollLeft);
+    const scrollWidth = await viewport.evaluate((el) => el.scrollWidth);
+    const clientWidth = await viewport.evaluate((el) => el.clientWidth);
+    expect(scrollLeftAfter).toBeCloseTo(scrollWidth - clientWidth, 0);
   });
 });
 

@@ -10,7 +10,7 @@ import {
 import classnames from "classnames";
 
 import styles from "./Stack.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { StackScroller, type ScrollStyle } from "./StackScroller";
 
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
@@ -88,45 +88,39 @@ export const Stack = forwardRef(function Stack(
   // Register API methods
   useEffect(() => {
     if (registerComponentApi) {
+      // For Radix scroll modes (overlay / whenMouseOver / whenScrolling), containerRef points to
+      // ScrollArea.Root. The actual scrollable element is the Radix Viewport inside it.
+      // For "normal" mode containerRef IS the scrollable div, so the fallback to containerRef works.
+      const getScrollTarget = (): HTMLElement | null => {
+        if (!containerRef.current) return null;
+        return (
+          containerRef.current.querySelector<HTMLElement>('[data-radix-scroll-area-viewport]') ??
+          containerRef.current
+        );
+      };
       registerComponentApi({
         scrollToTop: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: 0,
-              behavior,
-            });
-          }
+          const el = getScrollTarget();
+          el?.scrollTo({ top: 0, behavior });
         },
         scrollToBottom: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: containerRef.current.scrollHeight,
-              behavior,
-            });
-          }
+          const el = getScrollTarget();
+          if (el) el.scrollTo({ top: el.scrollHeight, behavior });
         },
         scrollToStart: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: 0,
-              behavior,
-            });
-          }
+          const el = getScrollTarget();
+          el?.scrollTo({ left: 0, behavior });
         },
         scrollToEnd: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: containerRef.current.scrollWidth,
-              behavior,
-            });
-          }
+          const el = getScrollTarget();
+          if (el) el.scrollTo({ left: el.scrollWidth, behavior });
         },
       });
     }
   }, [registerComponentApi]);
 
   return (
-    <Scroller
+    <StackScroller
       {...rest}
       onClick={onClick}
       onContextMenu={onContextMenu}
@@ -151,6 +145,6 @@ export const Stack = forwardRef(function Stack(
       )}
     >
       {children}
-    </Scroller>
+    </StackScroller>
   );
 });
