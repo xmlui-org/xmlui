@@ -100,7 +100,12 @@ export function Theme({
     const filteredThemeCssVars = {};
 
     Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
-      let componentName = parseHVar(key)?.component;
+      // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
+      // parseHVar correctly identifies the component part of a theme var name.
+      // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
+      // instead of a base (no-component) var.
+      const rawKey = key.replace(/^--[^-]+-/, "");
+      let componentName = parseHVar(rawKey)?.component;
       if (
         !componentName ||
         componentName === "Input" ||
@@ -108,7 +113,15 @@ export function Theme({
         componentName === "ThemedInput" ||
         componentName === "Footer"
       ) {
-        filteredThemeCssVars[key] = value;
+        if (componentName) {
+          // For component-specific vars, fully resolve the value via getThemeVar so that
+          // any var() chain references (e.g. var(--xmlui-backgroundColor-AppHeader)) that
+          // are not themselves emitted into this scope don't inherit stale light-tone values.
+          const resolvedValue = getThemeVar(rawKey);
+          filteredThemeCssVars[key] = resolvedValue ?? value;
+        } else {
+          filteredThemeCssVars[key] = value;
+        }
       }
     });
 
