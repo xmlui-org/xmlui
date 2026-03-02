@@ -218,6 +218,7 @@ import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
 import { StickySection } from "./StickySection/StickySectionNative";
 import { StickySectionMd } from "./StickySection/StickySection";
+import { DrawerMd } from "./Drawer/Drawer";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -346,6 +347,7 @@ export const collectedComponentMetadata = {
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
   DateInput: DateInputMd,
+  Drawer: DrawerMd,
   DropdownMenu: DropdownMenuMd,
   EM: HtmlEMMd,
   Fragment: FragmentMd,
