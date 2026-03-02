@@ -1,0 +1,24 @@
+{
+  "name": "xmlui-code-editor",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "4.7.0"
+  },
+  "main": "./dist/xmlui-code-editor.js",
+  "module": "./dist/xmlui-code-editor.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-code-editor.mjs",
+      "require": "./dist/xmlui-code-editor.js"
+    }
+  },
+  "files": ["dist"]
+}

@@ -1,0 +1,24 @@
+{
+  "name": "xmlui-knob",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "dependencies": {
+    "react-knob-headless": "0.4.0"
+  },
+  "main": "./dist/xmlui-knob.js",
+  "module": "./dist/xmlui-knob.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-knob.mjs",
+      "require": "./dist/xmlui-knob.js"
+    }
+  },
+  "files": ["dist"]
+}

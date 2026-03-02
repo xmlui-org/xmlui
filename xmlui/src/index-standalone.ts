@@ -4,6 +4,7 @@ import ReactDOM from "react-dom";
 
 import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
+import * as xmluiExports from "./index";
 
 const Xmlui = new StandaloneExtensionManager();
 
@@ -24,3 +25,8 @@ window.ReactDOM = ReactDOM;
 // Expose Xmlui globally so component chunks can self-register via registerExtension
 // @ts-ignore
 window.Xmlui = Xmlui;
+// Expose xmlui module exports so extension packages can resolve `import ... from "xmlui"`.
+// Also attach `standalone` (the extension manager) so the UMD auto-registration footer
+// (`window.xmlui.standalone.registerExtension(...)`) works.
+// @ts-ignore
+window.xmlui = { ...xmluiExports, standalone: Xmlui };
