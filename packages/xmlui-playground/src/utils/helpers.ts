@@ -1,6 +1,6 @@
 import type { PlaygroundState } from "../state/store";
 import JSZip from "jszip";
-import { saveAs } from "file-saver";
+import saveAs from "file-saver";
 import {
   type ComponentDef,
   type CompoundComponentDef,

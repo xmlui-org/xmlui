@@ -1,6 +1,6 @@
 <Component name="ReleaseList">
     <!-- Generic release list. Expects items array; each item: tag_name or version, published_at, changes[{ description, commit_sha }], optional assets[{ name, browser_download_url }]. -->
-    <VStack width="*" padding="$space-4" gap="$space-2">
+    <VStack width="*" padding="0" gap="$space-2">
         <H1>{$props.title || 'Change Log'}</H1>
         <Items items="{$props.items || []}">
             <Card>

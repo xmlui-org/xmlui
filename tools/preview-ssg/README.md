@@ -1,6 +1,6 @@
-# serve-optimized
+# preview-ssg
 
-A static file server for previewing optimized XMLUI applications with SPA fallback when there's no html file to the requested url. Proper resource 404 handling.
+A static file server for previewing XMLUI SSG applications with SPA fallback when there's no html file to the requested URL. Proper resource 404 handling.
 
 ## Features
 
@@ -12,12 +12,12 @@ A static file server for previewing optimized XMLUI applications with SPA fallba
 
 ## Usage
 
-After installing it (an `npm install` on the monorepo does that), the `serve-optimized` bin will be available for `npx`.
+After installing it (an `npm install` on the monorepo does that), the `preview-ssg` bin will be available for `npx`.
 
 ```bash
-npx serve-optimized ./public
+npx preview-ssg ./public
 
-npx serve-optimized ./public --port 8080
+npx preview-ssg ./public --port 8080
 ```
 
 ### Port Behavior

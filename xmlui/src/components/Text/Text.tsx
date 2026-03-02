@@ -138,6 +138,7 @@ export const TextMd = createMetadata({
     [`paddingBottom-${COMP}-code`]: "2px",
     [`backgroundColor-${COMP}-code`]: "rgb(from $color-surface-100 r g b / 0.4)",
     [`borderColor-${COMP}-code`]: "$color-surface-100",
+    [`textColor-${COMP}-code--hover`]: "initial",
 
     [`textDecorationLine-${COMP}-deleted`]: "line-through",
 

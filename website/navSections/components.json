@@ -152,11 +152,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/EmojiSelector",
-          "label": "EmojiSelector",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/ExpandableItem",
           "label": "ExpandableItem",
           "icon": "component"
@@ -259,6 +254,11 @@
         {
           "to": "/docs/reference/components/Image",
           "label": "Image",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/IncludeMarkup",
+          "label": "IncludeMarkup",
           "icon": "component"
         },
         {
@@ -464,6 +464,11 @@
         {
           "to": "/docs/reference/components/StickyBox",
           "label": "StickyBox",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/StickySection",
+          "label": "StickySection",
           "icon": "component"
         },
         {

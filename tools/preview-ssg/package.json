@@ -1,14 +1,14 @@
 {
-  "name": "serve-optimized",
+  "name": "preview-ssg",
   "version": "0.0.1",
   "private": true,
-  "description": "Static file server optimized for XMLUI applications with SPA fallback and resource 404 handling",
+  "description": "Static file server for previewing XMLUI SSG applications with SPA fallback and resource 404 handling",
   "main": "src/index.js",
   "bin": {
-    "serve-optimized": "bin/serve-optimized.js"
+    "preview-ssg": "bin/preview-ssg.js"
   },
   "scripts": {
-    "start": "node bin/serve-optimized.js"
+    "start": "node bin/preview-ssg.js"
   },
   "keywords": [
     "static",

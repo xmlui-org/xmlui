@@ -13,13 +13,15 @@
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",
-    "shiki": "^3.3.0",
-    "unified": "11.0.5",
+    "js-yaml": "4.1.0",
     "remark-parse": "11.0.0",
     "remark-stringify": "11.0.0",
-    "strip-markdown": "6.0.0"
+    "shiki": "^3.3.0",
+    "strip-markdown": "6.0.0",
+    "unified": "11.0.5"
   },
   "devDependencies": {
+    "@types/js-yaml": "4.0.9",
     "xmlui": "*"
   },
   "main": "./dist/xmlui-docs-blocks.js",

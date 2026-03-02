@@ -29,13 +29,13 @@ Let's unpack the concepts behind this example.
 
 > [!DEF] **Markup**. You write XMLUI apps in a declarative style using XML tags and attributes.
 
-> [!DEF] **Components**. [App](https://docs.xmlui.org/docs/reference/components/App), [List](https://docs.xmlui.org/docs/reference/components/List), and [Text](https://docs.xmlui.org/docs/reference/components/Text) are some of the [components](/docs/reference/components/_overview) you can invoke in XMLUI markup.
+> [!DEF] **Components**. [App](/docs/reference/components/App), [List](/docs/reference/components/List), and [Text](/docs/reference/components/Text) are some of the [components](/docs/reference/components/_overview) you can invoke in XMLUI markup.
 
 > [!DEF] **Properties**. You configure components using properties like the `data` property on the `List`.
 
 > [!DEF] **Data**. The `data` property fetches from a URL and provides a JSON object to components that use it.
 
-> [!DEF] **Context**. A variety of [context variables](http://localhost:5173/context-variables) are available to certain components. Here `$item` implicitly receives each of the tube stations represented in the top-level array returned from the API.
+> [!DEF] **Context**. A variety of [context variables](/docs/context-variables) are available to certain components. Here `$item` implicitly receives each of the tube stations represented in the top-level array returned from the API.
 
 > [!DEF] **Expressions**. Inside the `Text` component there are two expressions delimited by curly braces, one extracts the name of the station and another drills deeper into the `$item` to retrieve status, using JavaScript dot notation and array indexing.
 

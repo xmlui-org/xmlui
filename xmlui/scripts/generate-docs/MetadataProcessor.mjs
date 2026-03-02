@@ -44,6 +44,10 @@ export class MetadataProcessor {
    * @returns object containing the component name and the associated filenames
    */
   processDocfiles() {
+    if (!existsSync(this.outFolder)) {
+      mkdirSync(this.outFolder, { recursive: true });
+    }
+
     // Check for docs already in the output folder
     const docFiles = existsSync(this.outFolder)
       ? readdirSync(this.outFolder).filter((file) => extname(file) === FILE_EXTENSIONS.MARKDOWN[0])

@@ -235,8 +235,8 @@ export class PathResolver {
   getOutputPaths() {
     return {
       themes: this.resolvePath("dist/themes", "project"),
-      components: this.resolvePath("website/content/docs/components", "workspace"),
-      extensions: this.resolvePath("website/content/docs/extensions", "workspace"),
+      components: this.resolvePath("website/content/docs/reference/components", "workspace"),
+      extensions: this.resolvePath("website/content/docs/reference/extensions", "workspace"),
       pages: this.resolvePath("website/content/docs/pages", "workspace"),
       metadata: this.resolvePath("dist/metadata", "project"),
       downloads: this.resolvePath("website/public/downloads", "workspace")

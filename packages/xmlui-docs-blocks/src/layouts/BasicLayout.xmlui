@@ -6,7 +6,6 @@
                     height="*"
                     minHeight="0"
                     width="100%"
-                    padding="$space-7"
                     borderRadius="$space-2"
                 >
                     <VStack gap="$space-2">
@@ -18,10 +17,10 @@
                             </Text>
                         </HStack>
                         <VStack gap="$space-0_5">
-                            <H2 variant="title">
+                            <H2 variant="title" showAnchor="false">
                                 {$item.title}
                             </H2>
-                            <H3 maxLines="4" ellipses>
+                            <H3 maxLines="4" showAnchor="false" ellipses>
                                 {$item.description}
                             </H3>
                         </VStack>

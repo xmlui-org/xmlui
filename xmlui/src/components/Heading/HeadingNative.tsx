@@ -96,8 +96,10 @@ export const Heading = forwardRef(function Heading(
   const hasOverflow = useCallback(() => {
     if (elementRef.current) {
       const element = elementRef.current;
+      const anchorSpanHeight = anchorRef.current?.offsetHeight ?? 0;
       return (
-        element.scrollWidth > element.clientWidth || element.scrollHeight > element.clientHeight
+        element.scrollWidth > element.clientWidth ||
+        element.scrollHeight - anchorSpanHeight > element.clientHeight
       );
     }
     return false;
@@ -121,7 +123,7 @@ export const Heading = forwardRef(function Heading(
       // Ensure ID starts with a letter or underscore (not a digit)
       // This is required for querySelector to work without escaping
       if (newAnchorId && /^[0-9]/.test(newAnchorId)) {
-        newAnchorId = "toc-" + newAnchorId;
+        newAnchorId = "heading-" + newAnchorId;
       }
 
       setAnchorId(newAnchorId || null);
@@ -157,13 +159,13 @@ export const Heading = forwardRef(function Heading(
       )}
       {children}
       {showAnchor && anchorId && (
-        <Link
-          to={`#${anchorId}`}
+        <a
+          href={`#${anchorId}`}
           aria-hidden="true"
           onClick={(event) => {
             // cmd/ctrl + click - open in new tab, don't prevent that
             if (tableOfContentsContext) {
-              if (!event.ctrlKey && !event.metaKey && !event.metaKey) {
+              if (!event.ctrlKey && !event.metaKey) {
                 event.preventDefault();
               }
               tableOfContentsContext.scrollToAnchor(anchorId, true);
@@ -171,7 +173,7 @@ export const Heading = forwardRef(function Heading(
           }}
         >
           #
-        </Link>
+        </a>
       )}
     </Element>
   );

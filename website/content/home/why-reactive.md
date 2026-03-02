@@ -13,6 +13,7 @@ Your apps are reactive out of the box. It's easy. No React expertise required.
   <DataSource
     id="stations"
     url="https://api.tfl.gov.uk/Line/{lines.value}/Route/Sequence/inbound"
+    when="{!!lines.value}"
     resultSelector="stations"/>
 
   <Table data="{stations}" height="200px">

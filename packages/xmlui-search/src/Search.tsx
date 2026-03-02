@@ -38,6 +38,8 @@ type Props = {
   limit?: number;
   maxContentMatchNumber?: number;
   collapsible?: boolean;
+  useContentFromAppContext?: boolean;
+  placeholder?: string;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -74,7 +76,6 @@ const searchOptions: IFuseOptions<SearchItemData> = {
   keys,
 };
 
-const fuse = new Fuse<SearchItemData>([], searchOptions);
 
 export const Search = ({
   id,
@@ -82,7 +83,11 @@ export const Search = ({
   limit = defaultProps.limit,
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
   collapsible = false,
+  useContentFromAppContext = true,
+  placeholder,
 }: Props) => {
+  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
+
   const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
@@ -110,8 +115,13 @@ export const Search = ({
   const [show, setShow] = useState(false);
   // --- Step 2: Convert data to a format better handled by the search engine
   const dataFromMd = useMemo(
-    () =>
-      Object.entries(data).map<SearchItemData>(([path, content]) => {
+    () => {
+      if (!data) return [];
+      if (typeof data !== "object") {
+        console.warn("Search data should be an object with path keys and string content values");
+        return [];
+      }
+      return Object.entries(data).map<SearchItemData>(([path, content]) => {
         const lines = content.split("\n");
         const firstLine = lines.length > 0 ? lines[0] : "";
         // Remove title after matching, since it is in the "label"
@@ -121,32 +131,38 @@ export const Search = ({
           title: firstLine,
           content: restContent,
         };
-      }),
+      });
+    },
     [data],
   );
 
   const mergedData = useMemo(() => {
-    return [...dataFromMd, ...Object.values(content ?? {})];
-  }, [content, dataFromMd]);
+    return [...dataFromMd, ...(useContentFromAppContext ? Object.values(content ?? {}) : [])];
+  }, [content, dataFromMd, useContentFromAppContext]);
 
   useEffect(() => {
-    fuse.setCollection(mergedData);
+    fuseRef.current.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Step 3: Execute search & post-process results
   const results: SearchResult[] = useMemo(() => {
-    // Ignore single characters
     if (debouncedValue.length <= 1) return [];
 
     const limited = !debouncedValue
       ? []
-      : fuse.search(debouncedValue, { limit: limit ?? defaultProps.limit });
+      : fuseRef.current.search(debouncedValue, { limit: limit ?? defaultProps.limit });
 
     const mapped = postProcessSearch(limited, debouncedValue);
-
-    if (mapped.length > 0) setShow(true);
     return mapped;
   }, [debouncedValue, limit]);
+
+  useEffect(() => {
+    if (results.length > 0) setShow(true);
+  }, [results]);
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [results]);
 
   const onClick = useCallback(() => {
     setInputValue("");
@@ -212,6 +228,9 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
+  // flush item refs to prevent stale refs when results change drastically (e.g. from one search to another with few overlapping results)
+  itemRefs.current = [];
+  itemLinkRefs.current = [];
   return (
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
@@ -225,7 +244,7 @@ export const Search = ({
           onClick={() => {
             setIsExpanded(true);
             setAnimationDirection("expanding");
-            // Focus a search inputot amikor kinyílik
+            // Focus search input when it expands
             setTimeout(() => {
               inputRef.current?.focus();
               setAnimationDirection(null);
@@ -246,7 +265,7 @@ export const Search = ({
               [styles.collapsing]: animationDirection === "collapsing",
             })}
             type="search"
-            placeholder="Type to search"
+            placeholder={placeholder ?? "Type to search"}
             value={inputValue}
             startIcon="search"
             onDidChange={(value) =>
@@ -339,9 +358,26 @@ const SearchItemContent = forwardRef(function SearchItemContent(
       style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
     >
       <div style={{ width: "100%" }}>
-        <Text variant="subtitle">
-          {highlightText(item.title, matches?.title?.indices) || item.title}
-        </Text>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
+          {getSourceLabel(item.path) && (
+            <Text
+              variant="em"
+              style={{
+                fontSize: "0.7em",
+                fontWeight: 600,
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                opacity: 0.6,
+                flexShrink: 0,
+              }}
+            >
+              {getSourceLabel(item.path)}
+            </Text>
+          )}
+          <Text variant="subtitle">
+            {highlightText(item.title, matches?.title?.indices) || item.title}
+          </Text>
+        </div>
         <div
           style={{
             width: "100%",
@@ -349,6 +385,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             flexDirection: "column",
           }}
         >
+          {/* content snippets */}
           {matches?.content?.indices &&
             formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
               (snippet, snipIdx) => (
@@ -480,7 +517,7 @@ function formatContentSnippet(
     return [contextStart, contextEnd];
   });
   const highlightRanges: RangeTuple[] = limitedRanges.map(([start, end], idx) => {
-    return [start - contextRanges[idx][0], end - contextRanges[idx][1]];
+    return [start - contextRanges[idx][0], end - contextRanges[idx][0]];
   });
 
   return contextRanges.map(([start, end], idx) => {
@@ -522,6 +559,18 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     result.push(text.slice(lastIndex));
   }
   return result;
+}
+
+/**
+ * Extracts a human-readable source label from a path string.
+ * Returns "Docs", "Blog", or null if the source cannot be determined.
+ */
+function getSourceLabel(path: string): string | null {
+  const segments = path.split("/").filter(Boolean);
+  const first = segments[0]?.toLowerCase();
+  if (first === "docs") return "Docs";
+  if (first === "blog") return "Blog";
+  return null;
 }
 
 function pluralize(number: number, singular: string, plural: string): string {
