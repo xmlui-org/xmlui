@@ -31,9 +31,9 @@
                         <H1 showAnchor="false">
                             {$props.post.title}
                         </H1>
-                        <Text variant="blogPostDescription">
+                        <H3 variant="blogPostDescription">
                             {$props.post.description}
-                        </Text>
+                        </H3>
                     </VStack>
                     <Text variant="info">
                         {$props.post.author}

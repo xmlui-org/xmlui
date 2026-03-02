@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 
 import type { ComponentRendererFn } from "../abstractions/RendererDefs";
-import type { ComponentMetadata } from "../abstractions/ComponentDefs";
+import type { ComponentMetadata, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import type { ComponentRegistry } from "./ComponentProvider";
 
@@ -12,6 +12,8 @@ export type ComponentRegistryEntry = {
 
   // Component descriptor (hints and other metadata)
   descriptor?: ComponentMetadata;
+
+  // Indicates whether this entry represents a compound (user-defined) component
   isCompoundComponent?: boolean;
 };
 

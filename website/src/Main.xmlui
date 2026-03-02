@@ -96,22 +96,24 @@
       </HStack>
 
     </property>
-    <Stack
-      padding="$space-4"
+    <Fragment
       when="{mediaSize.sizeIndex <= 2}"
     >
-      <Search
-        when="{(currentSegment === 'docs')}"
-        data="{appGlobals.plainTextDocsContent}"
-        placeholder="Search Docs..."
-      />
-      <Search
-        when="{(currentSegment === 'blog')}"
-        data="{appGlobals.plainTextBlogContent}"
-        useContentFromAppContext="false"
-        placeholder="Search Blog..."
-      />
-    </Stack>
+      <Stack padding="$space-4">
+        <Search
+          when="{(currentSegment === 'docs')}"
+          data="{appGlobals.plainTextDocsContent}"
+          placeholder="Search Docs..."
+        />
+        <Search
+          marginTop="$space-4"
+          when="{(currentSegment === 'blog')}"
+          data="{appGlobals.plainTextBlogContent}"
+          useContentFromAppContext="false"
+          placeholder="Search Blog..."
+        />
+      </Stack>
+    </Fragment>
     <Fragment when="{mediaSize.sizeIndex <= 2}">
       <NavLink
         noIndicator
@@ -126,11 +128,7 @@
         active="{currentSegment === 'blog'}"
       />
     </Fragment>
-    <Stack
-      padding="0"
-      paddingTop="{mediaSize.sizeIndex <= 2 ? '$space-4' : '$space-5'}"
-      gap="0"
-    >
+    <Stack gap="0" paddingTop="{mediaSize.sizeIndex > 2 ? '$space-4' : '0'}">
       <NavGroup initiallyExpanded="{true}" label="Learn XMLUI" to="/docs/learn">
         <NavLink icon="school" label="Introduction" to="/docs" />
         <NavLink
@@ -145,356 +143,355 @@
         />
         <NavLink icon="theme" label="Themes" to="/docs/themes-intro" />
       </NavGroup>
-    </Stack>
-    <NavGroup
-      label="Guides"
-      to="/docs/guides"
-    >
-      <NavLink
-        icon="hierarchy"
-        label="App Structure"
-        to="/docs/guides/app-structure"
-      />
-      <NavLink icon="markup" label="Markup" to="/docs/guides/markup" />
-      <NavLink icon="bolt" label="Scripting" to="/docs/guides/scripting" />
-      <NavLink icon="boundary" label="Scoping" to="/docs/guides/scoping" />
-      <NavLink
-        icon="playground"
-        label="Codefences and playgrounds"
-        to="/docs/guides/playground-and-codefence"
-      />
-      <NavLink
-        icon="layout"
-        label="Layout"
-        to="/docs/guides/layout"
-      />
-      <NavLink
-        icon="typography"
-        label="Working with Text"
-        to="/docs/guides/working-with-text"
-      />
-      <NavLink
-        icon="markdown"
-        label="Working with Markdown"
-        to="/docs/guides/working-with-markdown"
-      />
-      <NavLink
-        icon="link"
-        label="Routing and Links"
-        to="/docs/guides/routing-and-links"
-      />
-      <NavLink icon="form" label="Forms" to="/docs/guides/forms" />
-      <NavLink
-        icon="dialog"
-        label="Modal Dialogs"
-        to="/docs/guides/modal-dialogs"
-      />
-      <NavLink
-        icon="component"
-        label="User-defined Components"
-        to="/docs/guides/user-defined-components"
-      />
-      <NavLink
-        icon="refactor"
-        label="Refactoring"
-        to="/docs/guides/refactoring"
-      />
-      <NavLink
-        icon="build"
-        label="Build a HelloWorld Component"
-        to="/docs/guides/build-hello-world-component"
-      />
-      <NavLink
-        icon="deploy"
-        label="Hosted Deployment"
-        to="/docs/guides/hosted-deployment"
-      />
-    </NavGroup>
-    <NavGroup
-      label="Tutorial"
-      to="/docs/tutorial"
-    >
-      <NavLink icon="invoice" label="XMLUI Invoice" to="/docs/tutorial-01" />
-      <NavLink icon="file-code" label="Main.xmlui" to="/docs/tutorial-02" />
-      <NavLink icon="menu" label="Navigation" to="/docs/tutorial-03" />
-      <NavLink icon="cards" label="InfoCards" to="/docs/tutorial-04" />
-      <NavLink icon="charts" label="Charts" to="/docs/tutorial-05" />
-      <NavLink icon="slider" label="Slider" to="/docs/tutorial-06" />
-      <NavLink icon="file-invoice" label="Invoices" to="/docs/tutorial-07" />
-      <NavLink icon="create" label="Create Invoice" to="/docs/tutorial-08" />
-      <NavLink icon="details" label="Invoice Details" to="/docs/tutorial-09" />
-      <NavLink icon="search" label="Search" to="/docs/tutorial-10" />
-      <NavLink icon="import" label="Import" to="/docs/tutorial-11" />
-      <NavLink icon="settings" label="Settings" to="/docs/tutorial-12" />
-    </NavGroup>
-    <NavGroup
-      label="How To"
-      to="/docs/howto"
-    >
-      <NavLink
-        icon="article"
-        iconAlignment="baseline"
-        label="Expose a method from a component"
-        to="/docs/howto/expose-a-method-from-a-component"
-      />
-      <NavLink
-        icon="article"
-        iconAlignment="baseline"
-        label="Delegate a method"
-        to="/docs/howto/delegate-a-method"
-      />
-      <NavLink
-        icon="article"
-        iconAlignment="baseline"
-        label="React to button click not keystrokes"
-        to="/docs/howto/react-to-button-click-not-keystrokes"
-      />
-      <NavLink
-        icon="article"
-        label="Buffer a reactive edit"
-        to="/docs/howto/buffer-a-reactive-edit"
-      />
-      <NavLink
-        icon="article"
-        label="Modify a value reported in a Column"
-        to="/docs/howto/modify-a-value-reported-in-a-column"
-      />
-      <NavLink
-        icon="article"
-        label="Filter and transform data from an API"
-        to="/docs/howto/filter-and-transform-data-from-an-api"
-      />
-      <NavLink
-        icon="article"
-        label="Group items in List by a property"
-        to="/docs/howto/group-items-in-list-by-a-property"
-      />
-      <NavLink
-        icon="article"
-        label="Delay a DataSource until another DataSource is ready"
-        to="/docs/howto/delay-a-datasource-until-another-datasource-is-ready"
-      />
-      <NavLink
-        icon="article"
-        label="Hide an element until its DataSource is ready"
-        to="/docs/howto/hide-an-element-until-its-datasource-is-ready"
-      />
-      <NavLink
-        icon="article"
-        label="Use built-in form validation"
-        to="/docs/howto/use-built-in-form-validation"
-      />
-      <NavLink
-        icon="article"
-        label="Do custom form validation"
-        to="/docs/howto/do-custom-form-validation"
-      />
-      <NavLink
-        icon="article"
-        label="Assign a complex JSON literal to a component variable"
-        to="/docs/howto/assign-a-complex-json-literal-to-a-component-variable"
-      />
-      <NavLink
-        icon="article"
-        label="Use accessors to simplify complex expressions"
-        to="/docs/howto/use-accessors-to-simplify-complex-expressions"
-      />
-      <NavLink
-        icon="article"
-        label="Make a set of equal-width cards"
-        to="/docs/howto/make-a-set-of-equal-width-cards"
-      />
-      <NavLink
-        icon="article"
-        label="Set the initial value of a Select from fetched data"
-        to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
-      />
-      <NavLink
-        icon="article"
-        label="Pass data to a Modal Dialog"
-        to="/docs/howto/pass-data-to-a-modal-dialog"
-      />
-      <NavLink
-        icon="article"
-        label="Debug a component"
-        to="/docs/howto/debug-a-component"
-      />
-      <NavLink
-        icon="article"
-        label="Share a ModalDialog across components"
-        to="/docs/howto/share-a-modaldialog-across-components"
-      />
-      <NavLink
-        icon="article"
-        label="Use the same ModalDialog to add or edit"
-        to="/docs/howto/use-the-same-modaldialog-to-add-or-edit"
-      />
-      <NavLink
-        icon="article"
-        label="Paginate a list"
-        to="/docs/howto/paginate-a-list"
-      />
-      <NavLink
-        icon="article"
-        label="Chain a DataSource refetch"
-        to="/docs/howto/chain-a-refetch"
-      />
-      <NavLink
-        icon="article"
-        label="Control cache invalidation"
-        to="/docs/howto/control-cache-invalidation"
-      />
-      <NavLink
-        icon="article"
-        label="Handle background operations"
-        to="/docs/howto/handle-background-operations"
-      />
-      <NavLink
-        icon="article"
-        label="Make a table responsive"
-        to="/docs/howto/make-a-table-responsive"
-      />
-      <NavLink
-        icon="article"
-        label="Update UI optimistically"
-        to="/docs/howto/update-ui-optimistically"
-      />
-      <NavLink
-        icon="article"
-        label="Toggle multiple items with shared state"
-        to="/docs/howto/toggle-multiple-items-with-shared-state"
-      />
-      <NavLink
-        icon="article"
-        label="Sync selections between table and list views"
-        to="/docs/howto/sync-selections-between-table-and-list-views"
-      />
-      <NavLink
-        icon="article"
-        label="Make NavPanel width responsive"
-        to="/docs/howto/make-navpanel-width-responsive"
-      />
-      <NavLink
-        icon="article"
-        label="Debounce user input for API calls"
-        to="/docs/howto/debounce-user-input-for-api-calls"
-      />
-      <NavLink
-        icon="article"
-        label="Debounce with ChangeListener"
-        to="/docs/howto/debounce-with-changelistener"
-      />
-      <NavLink
-        icon="article"
-        label="Use ModalDialog's onClose() method"
-        to="/docs/howto/use-modal-dialog-onclose"
-      />
-      <NavLink
-        icon="article"
-        label="Copy billing data to shipping"
-        to="/docs/howto/copy-billing-to-shipping"
-      />
-      <NavLink
-        icon="article"
-        label="Implement an authentication gate"
-        to="/docs/howto/implement-an-authentication-gate"
-      />
-      <NavLink
-        icon="article"
-        label="Set the Width of an Input Field in an HStack"
-        to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout"
-      />
-      <NavLink
-        icon="article"
-        label="Stop DataSource from sending requests in a closed Dialog"
-        to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
-      />
-      <NavLink
-        icon="article"
-        label="Add custom icons"
-        to="/docs/howto/add-custom-icons"
-      />
-    </NavGroup>
-    <NavGroup
-      label="Reference"
-      to="/docs/reference"
-    >
-      <IncludeNavSection sectionId="components" />
-      <IncludeNavSection sectionId="extensions" />
-      <NavGroup icon="theme" label="Themes" to="/docs/reference/themes">
+      <NavGroup
+        label="Guides"
+        to="/docs/guides"
+      >
         <NavLink
-          label="Layout Properties"
-          to="/docs/styles-and-themes/layout-props"
+          icon="hierarchy"
+          label="App Structure"
+          to="/docs/guides/app-structure"
+        />
+        <NavLink icon="markup" label="Markup" to="/docs/guides/markup" />
+        <NavLink icon="bolt" label="Scripting" to="/docs/guides/scripting" />
+        <NavLink icon="boundary" label="Scoping" to="/docs/guides/scoping" />
+        <NavLink
+          icon="playground"
+          label="Codefences and playgrounds"
+          to="/docs/guides/playground-and-codefence"
         />
         <NavLink
-          label="Theme Variables"
-          to="/docs/styles-and-themes/theme-variables"
+          icon="layout"
+          label="Layout"
+          to="/docs/guides/layout"
         />
         <NavLink
-          label="Theme Variable Defaults"
-          to="/docs/styles-and-themes/theme-variable-defaults"
+          icon="typography"
+          label="Working with Text"
+          to="/docs/guides/working-with-text"
         />
         <NavLink
-          label="Common Units"
-          to="/docs/styles-and-themes/common-units"
+          icon="markdown"
+          label="Working with Markdown"
+          to="/docs/guides/working-with-markdown"
+        />
+        <NavLink
+          icon="link"
+          label="Routing and Links"
+          to="/docs/guides/routing-and-links"
+        />
+        <NavLink icon="form" label="Forms" to="/docs/guides/forms" />
+        <NavLink
+          icon="dialog"
+          label="Modal Dialogs"
+          to="/docs/guides/modal-dialogs"
+        />
+        <NavLink
+          icon="component"
+          label="User-defined Components"
+          to="/docs/guides/user-defined-components"
+        />
+        <NavLink
+          icon="refactor"
+          label="Refactoring"
+          to="/docs/guides/refactoring"
+        />
+        <NavLink
+          icon="build"
+          label="Build a HelloWorld Component"
+          to="/docs/guides/build-hello-world-component"
+        />
+        <NavLink
+          icon="deploy"
+          label="Hosted Deployment"
+          to="/docs/guides/hosted-deployment"
         />
       </NavGroup>
+      <NavGroup
+        label="Tutorial"
+        to="/docs/tutorial"
+      >
+        <NavLink icon="invoice" label="XMLUI Invoice" to="/docs/tutorial-01" />
+        <NavLink icon="file-code" label="Main.xmlui" to="/docs/tutorial-02" />
+        <NavLink icon="menu" label="Navigation" to="/docs/tutorial-03" />
+        <NavLink icon="cards" label="InfoCards" to="/docs/tutorial-04" />
+        <NavLink icon="charts" label="Charts" to="/docs/tutorial-05" />
+        <NavLink icon="slider" label="Slider" to="/docs/tutorial-06" />
+        <NavLink icon="file-invoice" label="Invoices" to="/docs/tutorial-07" />
+        <NavLink icon="create" label="Create Invoice" to="/docs/tutorial-08" />
+        <NavLink icon="details" label="Invoice Details" to="/docs/tutorial-09" />
+        <NavLink icon="search" label="Search" to="/docs/tutorial-10" />
+        <NavLink icon="import" label="Import" to="/docs/tutorial-11" />
+        <NavLink icon="settings" label="Settings" to="/docs/tutorial-12" />
+      </NavGroup>
+      <NavGroup
+        label="How To"
+        to="/docs/howto"
+      >
+        <NavLink
+          icon="article"
+          iconAlignment="baseline"
+          label="Expose a method from a component"
+          to="/docs/howto/expose-a-method-from-a-component"
+        />
+        <NavLink
+          icon="article"
+          iconAlignment="baseline"
+          label="Delegate a method"
+          to="/docs/howto/delegate-a-method"
+        />
+        <NavLink
+          icon="article"
+          iconAlignment="baseline"
+          label="React to button click not keystrokes"
+          to="/docs/howto/react-to-button-click-not-keystrokes"
+        />
+        <NavLink
+          icon="article"
+          label="Buffer a reactive edit"
+          to="/docs/howto/buffer-a-reactive-edit"
+        />
+        <NavLink
+          icon="article"
+          label="Modify a value reported in a Column"
+          to="/docs/howto/modify-a-value-reported-in-a-column"
+        />
+        <NavLink
+          icon="article"
+          label="Filter and transform data from an API"
+          to="/docs/howto/filter-and-transform-data-from-an-api"
+        />
+        <NavLink
+          icon="article"
+          label="Group items in List by a property"
+          to="/docs/howto/group-items-in-list-by-a-property"
+        />
+        <NavLink
+          icon="article"
+          label="Delay a DataSource until another DataSource is ready"
+          to="/docs/howto/delay-a-datasource-until-another-datasource-is-ready"
+        />
+        <NavLink
+          icon="article"
+          label="Hide an element until its DataSource is ready"
+          to="/docs/howto/hide-an-element-until-its-datasource-is-ready"
+        />
+        <NavLink
+          icon="article"
+          label="Use built-in form validation"
+          to="/docs/howto/use-built-in-form-validation"
+        />
+        <NavLink
+          icon="article"
+          label="Do custom form validation"
+          to="/docs/howto/do-custom-form-validation"
+        />
+        <NavLink
+          icon="article"
+          label="Assign a complex JSON literal to a component variable"
+          to="/docs/howto/assign-a-complex-json-literal-to-a-component-variable"
+        />
+        <NavLink
+          icon="article"
+          label="Use accessors to simplify complex expressions"
+          to="/docs/howto/use-accessors-to-simplify-complex-expressions"
+        />
+        <NavLink
+          icon="article"
+          label="Make a set of equal-width cards"
+          to="/docs/howto/make-a-set-of-equal-width-cards"
+        />
+        <NavLink
+          icon="article"
+          label="Set the initial value of a Select from fetched data"
+          to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
+        />
+        <NavLink
+          icon="article"
+          label="Pass data to a Modal Dialog"
+          to="/docs/howto/pass-data-to-a-modal-dialog"
+        />
+        <NavLink
+          icon="article"
+          label="Debug a component"
+          to="/docs/howto/debug-a-component"
+        />
+        <NavLink
+          icon="article"
+          label="Share a ModalDialog across components"
+          to="/docs/howto/share-a-modaldialog-across-components"
+        />
+        <NavLink
+          icon="article"
+          label="Use the same ModalDialog to add or edit"
+          to="/docs/howto/use-the-same-modaldialog-to-add-or-edit"
+        />
+        <NavLink
+          icon="article"
+          label="Paginate a list"
+          to="/docs/howto/paginate-a-list"
+        />
+        <NavLink
+          icon="article"
+          label="Chain a DataSource refetch"
+          to="/docs/howto/chain-a-refetch"
+        />
+        <NavLink
+          icon="article"
+          label="Control cache invalidation"
+          to="/docs/howto/control-cache-invalidation"
+        />
+        <NavLink
+          icon="article"
+          label="Handle background operations"
+          to="/docs/howto/handle-background-operations"
+        />
+        <NavLink
+          icon="article"
+          label="Update UI optimistically"
+          to="/docs/howto/update-ui-optimistically"
+        />
+        <NavLink
+          icon="article"
+          label="Toggle multiple items with shared state"
+          to="/docs/howto/toggle-multiple-items-with-shared-state"
+        />
+        <NavLink
+          icon="article"
+          label="Sync selections between table and list views"
+          to="/docs/howto/sync-selections-between-table-and-list-views"
+        />
+        <NavLink
+          icon="article"
+          label="Make a table responsive"
+          to="/docs/howto/make-a-table-responsive"
+        />
+        <NavLink
+          icon="article"
+          label="Debounce user input for API calls"
+          to="/docs/howto/debounce-user-input-for-api-calls"
+        />
+        <NavLink
+          icon="article"
+          label="Debounce with ChangeListener"
+          to="/docs/howto/debounce-with-changelistener"
+        />
+        <NavLink
+          icon="article"
+          label="Use ModalDialog's onClose() method"
+          to="/docs/howto/use-modal-dialog-onclose"
+        />
+        <NavLink
+          icon="article"
+          label="Copy billing data to shipping"
+          to="/docs/howto/copy-billing-to-shipping"
+        />
+        <NavLink
+          icon="article"
+          label="Implement an authentication gate"
+          to="/docs/howto/implement-an-authentication-gate"
+        />
+        <NavLink
+          icon="article"
+          label="Set the Width of an Input Field in an HStack"
+          to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout"
+        />
+        <NavLink
+          icon="article"
+          label="Stop DataSource from sending requests in a closed Dialog"
+          to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
+        />
+        <NavLink
+          icon="article"
+          label="Add custom icons"
+          to="/docs/howto/add-custom-icons"
+        />
+      </NavGroup>
+      <NavGroup
+        label="Reference"
+        to="/docs/reference"
+      >
+        <IncludeNavSection sectionId="components" />
+        <IncludeNavSection sectionId="extensions" />
+        <NavGroup icon="theme" label="Themes" to="/docs/reference/themes">
+          <NavLink
+            label="Layout Properties"
+            to="/docs/styles-and-themes/layout-props"
+          />
+          <NavLink
+            label="Theme Variables"
+            to="/docs/styles-and-themes/theme-variables"
+          />
+          <NavLink
+            label="Theme Variable Defaults"
+            to="/docs/styles-and-themes/theme-variable-defaults"
+          />
+          <NavLink
+            label="Common Units"
+            to="/docs/styles-and-themes/common-units"
+          />
+        </NavGroup>
+        <NavLink
+          icon="behavior"
+          label="Behaviors"
+          to="/docs/behaviors"
+        />
+        <NavLink
+          icon="context"
+          label="Context Variables"
+          to="/docs/context-variables"
+        />
+        <NavLink icon="globals" label="Globals" to="/docs/globals" />
+        <NavLink icon="helper-tags" label="Helper Tags" to="/docs/helper-tags" />
+        <NavLink
+          icon="core-props"
+          label="Core Properties"
+          to="/docs/core-properties"
+        />
+        <NavLink
+          icon="template-props"
+          label="Template Properties"
+          to="/docs/template-properties"
+        />
+        <NavLink icon="palette" label="Palettes" to="/docs/palettes" />
+        <NavLink icon="icons" label="Icons" to="/docs/icons" />
+        <NavLink icon="glossary" label="Glossary" to="/docs/glossary" />
+      </NavGroup>
       <NavLink
-        icon="behavior"
-        label="Behaviors"
-        to="/docs/behaviors"
+        icon="mcp"
+        label="Model Context Protocol"
+        to="/docs/mcp"
       />
       <NavLink
-        icon="context"
-        label="Context Variables"
-        to="/docs/context-variables"
-      />
-      <NavLink icon="globals" label="Globals" to="/docs/globals" />
-      <NavLink icon="helper-tags" label="Helper Tags" to="/docs/helper-tags" />
-      <NavLink
-        icon="core-props"
-        label="Core Properties"
-        to="/docs/core-properties"
+        icon="vscode-extension"
+        label="VSCode extension"
+        to="/docs/vscode"
       />
       <NavLink
-        icon="template-props"
-        label="Template Properties"
-        to="/docs/template-properties"
+        icon="logs"
+        label="Change Log"
+        to="/docs/change-log"
       />
-      <NavLink icon="palette" label="Palettes" to="/docs/palettes" />
-      <NavLink icon="icons" label="Icons" to="/docs/icons" />
-      <NavLink icon="glossary" label="Glossary" to="/docs/glossary" />
-    </NavGroup>
-    <NavLink
-      icon="mcp"
-      label="Model Context Protocol"
-      to="/docs/mcp"
-    />
-    <NavLink
-      icon="vscode-extension"
-      label="VSCode extension"
-      to="/docs/vscode"
-    />
-    <NavLink
-      icon="logs"
-      label="Change Log"
-      to="/docs/change-log"
-    />
-    <VStack when="{mediaSize.sizeIndex <= 2}" gap="$space-2" marginTop="$space-4">
-      <NavLink
-        to="/news"
-        label="News & Reviews"
-        target="_self"
-        noIndicator
-      />
-      <NavLink
-        to="https://github.com/xmlui-org/xmlui"
-        icon="github"
-        label="GitHub"
-        noIndicator
-        target="_blank"
-      />
-    </VStack>
+    </Stack>
+    <Fragment
+      when="{mediaSize.sizeIndex <= 2}"
+    >
+      <VStack paddingBottom="$space-4" gap="0">
+        <NavLink
+          to="/news"
+          label="News & Reviews"
+          target="_self"
+          noIndicator
+        />
+        <NavLink
+          to="https://github.com/xmlui-org/xmlui"
+          icon="github"
+          label="GitHub"
+          noIndicator
+          target="_blank"
+        />
+      </VStack>
+    </Fragment>
   </NavPanel>
 
   <Pages fallbackPath="/404" defaultScrollRestoration="true">
