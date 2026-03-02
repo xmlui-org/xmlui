@@ -111,6 +111,10 @@
     "xmlui#test:unit": {
       "outputs": []
     },
+    "xmlui-website#build-ssg": {
+      "dependsOn": ["^build:extension"],
+      "cache": false
+    },
     "//#_test:e2e:with-unit-tests": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
