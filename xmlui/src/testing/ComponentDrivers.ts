@@ -150,7 +150,7 @@ export class ButtonDriver extends ComponentDriver {
 
   // NOTE: Accounts for icons being passed as children as well
   getIcons() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img"));
+    return this.locator.locator('[data-icon-name]');
   }
 }
 

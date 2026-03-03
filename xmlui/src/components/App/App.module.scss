@@ -293,7 +293,10 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     }
 
     &:not(.scrollWholePage) {
-      overflow: hidden;
+      overflow: clip; // clip (not hidden) — prevents this element from acting as a scroll container,
+      // so focus-driven scrollIntoView cannot scroll appContainer. overflow:hidden creates a scroll
+      // container which, combined with scroll-padding-block, causes a permanent 16px layout jump
+      // when tree items receive focus. overflow:clip clips visually identically but is not scrollable.
       height: 100dvh; // Use dynamic viewport height for mobile browser compatibility
       
       // When nested (like in playground), use container dimensions instead of viewport

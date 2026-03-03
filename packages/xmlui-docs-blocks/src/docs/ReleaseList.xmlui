@@ -1,15 +1,15 @@
 <Component name="ReleaseList">
     <!-- Generic release list. Expects items array; each item: tag_name or version, published_at, changes[{ description, commit_sha }], optional assets[{ name, browser_download_url }]. -->
-    <VStack width="*" padding="$space-4" gap="$space-2">
+    <VStack width="*" padding="0" gap="$space-2">
         <H1>{$props.title || 'Change Log'}</H1>
         <Items items="{$props.items || []}">
             <Card>
-                <HStack>
-                    <HStack verticalAlignment="baseline">
+                <HStack verticalAlignment="center">
+                    <VStack verticalAlignment="baseline" gap="$space-0_5">
                         <H2>{$item.tag_name ?? $item.version}</H2>
                         <Text value="{formatHumanElapsedTime($item.published_at, true)}"/>
-                    </HStack>
-                    <Fragment when="{$isFirst &amp;&amp; $props.showLatestBadge !== false}">
+                    </VStack>
+                    <Fragment when="{$isFirst && $props.showLatestBadge !== false}">
                         <SpaceFiller />
                         <Badge variant="pill">Latest</Badge>
                     </Fragment>

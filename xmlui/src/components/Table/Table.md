@@ -1,7 +1,7 @@
 %-DESC-START
 
 **Key features:**
-- **Data integration**: Load data from APIs via [DataSource](/components/DataSource) or use static arrays
+- **Data integration**: Load data from APIs via [DataSource](/docs/reference/components/DataSource) or use static arrays
 - **Virtualization**: Only renders visible rows for smooth performance with large datasets
 - **Row selection**: Support single or multi-row selection for bulk operations
 - **Pagination**: Built-in pagination controls for managing large datasets
@@ -209,7 +209,7 @@ By default, the value of this property is `true`.
 
 %-PROP-START headerHeight
 
-It accepts common [size values](/styles-and-themes/common-units#size-values).
+It accepts common [size values](/docs/styles-and-themes/common-units#size-values).
 
 ```xmlui copy /headerHeight="60px"/
 <App>
@@ -1307,7 +1307,7 @@ You can use these accelerator key names:
 
 %-EVENT-START sortingDidChange
 
-Note the [`canSort`](/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
+Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
 
 ```xmlui copy {4}
 <App var.sortedBy="">

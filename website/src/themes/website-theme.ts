@@ -15,6 +15,13 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     tableOfContents: "false",
     tags: "false",
 
+    "maxWidth-content-HomePage": "800px",
+    "maxWidth-content-BlogOverview": "800px",
+    "maxWidth-content-BlogPage": "800px",
+    "maxWidth-content-GetStartedPage": "800px",
+
+    "paddingVertical-NavPanel": "0",
+    "marginBottom-logo-NavPanel": "0",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
@@ -55,16 +62,20 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
-    "fontSize-H1-markdown": "$fontSize-5xl",
+    "fontSize-H1-markdown": "$fontSize-4xl",
+    "fontSize-H1": "$fontSize-4xl",
     "marginTop-H1-markdown": "$space-2",
     "marginBottom-H1-markdown": "$space-2",
     "fontSize-H2-markdown": "$fontSize-3xl",
+    "fontSize-H2": "$fontSize-3xl",
     "marginTop-H2-markdown": "$space-6",
     "marginBottom-H2-markdown": "$space-1",
     "fontSize-H3-markdown": "$fontSize-xl",
+    "fontSize-H3": "$fontSize-xl",
     "marginTop-H3-markdown": "$space-6",
     "marginBottom-H3-markdown": "$space-1",
     "marginTop-H4-markdown": "$space-6",
+    "fontSize-H4": "$fontSize-lg",
     "marginBottom-H4-markdown": "$space-1",
     "fontWeight-PrevNextLink": "500",
     "textColor-PrevNextLink": "$color-surface-900",
@@ -80,6 +91,13 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "backgroundColor-ScrollToTop": "rgb(from $color-surface-100 r g b / 0.9)",
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
+
+    // --- Drawer close button
+    "top-CloseButton": "$space-3",
+    "right-CloseButton": "$space-3",
+
+    // --- Search
+    "backgroundColor-SearchItem--hover": "$color-surface-50",
   },
   resources: {},
 };

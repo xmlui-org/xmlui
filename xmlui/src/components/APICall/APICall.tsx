@@ -32,9 +32,9 @@ export const APICallMd = createMetadata({
   status: "stable",
   description:
     "`APICall` creates, updates or deletes data on the backend, versus [`DataSource`]" +
-    "(/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
+    "(/docs/reference/components/DataSource) which fetches data. Unlike DataSource, APICall doesn't " +
     "automatically execute - you must trigger it manually with the `execute()` method, " +
-    "typically from form submissions or button clicks. See also [Actions.callAPI](/globals#actionscallapi).",
+    "typically from form submissions or button clicks. See also [Actions.callAPI](/docs/globals#actionscallapi).",
   nonVisual: true,
   props: {
     method: {
@@ -227,8 +227,11 @@ export const APICallMd = createMetadata({
       parameters: {},
     },
     success: {
-      description: "This event fires when a request results in a success.",
-      signature: "(result: any) => void",
+      description:
+        "This event fires when a request results in a success. " +
+        "Returning an explicit `false` value suppresses automatic query invalidation, " +
+        "giving you full control over which cached data gets refreshed after the call.",
+      signature: "(result: any) => false | void",
       parameters: {
         result: "The response data returned from the successful API request.",
       },
@@ -368,6 +371,7 @@ export const apiCallRenderer = createComponentRenderer(
         node={node as any}
         uid={uid}
         updateState={updateState}
+        onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
       />

@@ -142,6 +142,7 @@ import TableInsertColumnIcon from "./Icon/TableInsertColumnIcon";
 import TableDeleteColumnIcon from "./Icon/TableDeleteColumnIcon";
 import { ChevronsRightIcon } from "./Icon/ChevronsRight";
 import { ChevronsLeftIcon } from "./Icon/ChevronsLeft";
+import { RefreshIcon } from "./Icon/RefreshIcon";
 import { ICON_NAMES } from "./icons-abstractions";
 
 type IconRenderer<T extends IconBaseProps> = (
@@ -186,7 +187,7 @@ registerIconRenderer(ICON_NAMES.DATE, (props: IconBaseProps) => <CiCalendarDateI
 registerIconRenderer(ICON_NAMES.HAMBURGER, (props: IconBaseProps) => <AiOutlineMenuIcon {...props} />);
 registerIconRenderer(ICON_NAMES.SEND, (props: IconBaseProps) => <AiOutlineSendIcon {...props} />);
 registerIconRenderer(ICON_NAMES.USERS, (props: IconBaseProps) => <FiUsersIcon {...props} />);
-registerIconRenderer(ICON_NAMES.REFRESH, (props: IconBaseProps) => <FiRefreshCcwIcon {...props} />);
+registerIconRenderer(ICON_NAMES.REFRESH, (props: IconBaseProps) => <RefreshIcon {...props} />);
 registerIconRenderer(ICON_NAMES.CHEVRON_DOWN, (props: IconBaseProps) => <FiChevronDownIcon {...props} />);
 registerIconRenderer(ICON_NAMES.CHEVRON_UP, (props: IconBaseProps) => <FiChevronUpIcon {...props} />);
 registerIconRenderer(ICON_NAMES.CHEVRON_RIGHT, (props: IconBaseProps) => <ChevronRightIcon {...props} />);
@@ -421,21 +422,29 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
 
       // Register icon renderer immediately (works on server and client)
       registerIconRenderer(iconKey, (props: IconBaseProps) => {
-        const size = props.size || safeAttributes.width || safeAttributes.height || 24;
-        
+        const {
+          size: propSize,
+          color,
+          style,
+          className,
+          children: _children,
+          ...eventAndDataProps
+        } = props;
+        const size = propSize || safeAttributes.width || safeAttributes.height || 24;
+
         // Merge safe attributes with props (props take precedence)
         const mergedAttributes = {
           ...safeAttributes,
           width: size,
           height: size,
           viewBox,
-          fill: props.color || defaultFill || 'currentColor',
+          fill: color || defaultFill || 'currentColor',
           stroke: defaultStroke,
           strokeWidth: defaultStrokeWidth,
           xmlns: "http://www.w3.org/2000/svg",
-          style: props.style,
-          className: props.className,
-
+          style,
+          className,
+          ...eventAndDataProps,
         };
 
         // Remove undefined values

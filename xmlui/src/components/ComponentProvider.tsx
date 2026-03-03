@@ -36,6 +36,7 @@ import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
+import { stickySectionComponentRenderer } from "./StickySection/StickySection";
 import { badgeComponentRenderer } from "./Badge/Badge";
 import { avatarComponentRenderer } from "./Avatar/Avatar";
 import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSeparator";
@@ -65,7 +66,6 @@ import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
-import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
@@ -276,6 +276,7 @@ import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
 import { toastComponentRenderer } from "./Toast/Toast";
+import { drawerComponentRenderer } from "./Drawer/Drawer";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -481,6 +482,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_StickyBox !== "false") {
       this.registerCoreComponent(stickyBoxComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_StickySection !== "false") {
+      this.registerCoreComponent(stickySectionComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_Badge !== "false") {
       this.registerCoreComponent(badgeComponentRenderer);
     }
@@ -558,10 +562,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(radarChartComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_EmojiSelector !== "false") {
-      this.registerCoreComponent(emojiSelectorRenderer);
-    }
-
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
       this.registerCoreComponent(dateInputComponentRenderer);
@@ -624,6 +624,8 @@ export class ComponentRegistry {
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
+    this.registerCoreComponent(drawerComponentRenderer);
+
 
     if (process.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
       this.registerCoreComponent(htmlATagRenderer);

@@ -34,6 +34,11 @@ const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Con
         <SheetOverlay />
         <SheetPrimitive.Content
           forceMount={true}
+          onOpenAutoFocus={(event) => {
+            // Prevent Radix from automatically focusing the first focusable element
+            // (e.g. the search input in the mobile nav drawer).
+            event.preventDefault();
+          }}
           ref={ref}
           className={classnames(
             styles.sheetContent,

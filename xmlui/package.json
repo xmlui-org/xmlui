@@ -21,7 +21,6 @@
     "generate-docs": "node scripts/generate-docs/get-docs.mjs",
     "generate-all-docs": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
     "export-themes": "npm run build:xmlui-metadata && node scripts/generate-docs/create-theme-files.mjs",
-    "generate-docs-with-refresh": "npm run build:xmlui-metadata && npm run generate-docs && npm run generate-docs-summaries",
     "generate-context-vars-summary": "npm run build:xmlui-metadata && node scripts/generate-docs/generate-context-vars-summary.mjs",
     "gen:langserver-metadata": "node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js"
   },
@@ -57,7 +56,6 @@
     "dotenv": "16.3.1",
     "embla-carousel-autoplay": "^8.3.0",
     "embla-carousel-react": "^8.3.0",
-    "emoji-picker-react": "4.4.10",
     "framer-motion": "^12.18.1",
     "get-user-locale": "^3.0.0",
     "glob": "11.1.0",
@@ -126,6 +124,7 @@
     "terser": "^5.44.0",
     "tsdown": "^0.15.12",
     "typescript": "5.7.3",
+    "vite-plugin-css-injected-by-js": "4.0.1",
     "vitest": "^4.0.16"
   },
   "optionalDependencies": {

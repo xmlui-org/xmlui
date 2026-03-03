@@ -132,7 +132,7 @@ The `CreateInvoice` component encapsulates all the form logic. Let's review the 
 
 ## The Form tag
 
-This [Form](/components/Form) contains a dropdown menu of products, two date pickers, and an expandable set of lineitems. These parts separately feed into the form's `$data` [context variable](/context-variables) which accumulates the JSON payload sent to the server on submit with successful validation.
+This [Form](/docs/reference/components/Form) contains a dropdown menu of products, two date pickers, and an expandable set of lineitems. These parts separately feed into the form's `$data` [context variable](/docs/context-variables) which accumulates the JSON payload sent to the server on submit with successful validation.
 
 ```xmlui
 <Form
@@ -287,7 +287,7 @@ Nested within `lineItems` there is a `FormItem` for `product`, `quantity`, `pric
 
 ## Total for lineItems
 
-The `Add Item` button invokes the `addItem` method of [FormItem](/components/FormItem) to add a new empty row to the array. (Above we see the corresponding `removeItem` used when clicking the button at the end of a row.)
+The `Add Item` button invokes the `addItem` method of [FormItem](/docs/reference/components/FormItem) to add a new empty row to the array. (Above we see the corresponding `removeItem` used when clicking the button at the end of a row.)
 
 The app defines a function, `lineItemTotal`, to receive the `lineItems` array and add up the amounts.
 
@@ -303,7 +303,7 @@ The app defines a function, `lineItemTotal`, to receive the `lineItems` array an
 </HStack>
 ```
 
-The same function runs when the [APICall](/components/APICall) runs on form submission.
+The same function runs when the [APICall](/docs/reference/components/APICall) runs on form submission.
 
 ```xmlui /lineItemTotal/
 <Form>

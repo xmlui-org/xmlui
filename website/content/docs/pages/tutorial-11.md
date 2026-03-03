@@ -1,6 +1,6 @@
 # Import
 
-The `ImportProducts` component uses [FileInput](/components/FileInput) to acquire a CSV file, [Table](/components/Table) to display records as selectable rows, and [Queue](/components/Queue) to import selected rows.
+The `ImportProducts` component uses [FileInput](/docs/reference/components/FileInput) to acquire a CSV file, [Table](/docs/reference/components/Table) to display records as selectable rows, and [Queue](/docs/reference/components/Queue) to import selected rows.
 
 ## Using FileInput
 
@@ -43,7 +43,7 @@ It uses `rowDisabledPredicate` to disable a row if the name of any existing prod
 </Table>
 ```
 
-We define `isDuplicate()` using a `<script>` [helper tag](/helper-tags).
+We define `isDuplicate()` using a `<script>` [helper tag](/docs/helper-tags).
 
 ```xmlui
 <Component name="ImportProducts">
@@ -58,7 +58,7 @@ We define `isDuplicate()` using a `<script>` [helper tag](/helper-tags).
 
 ## Using Queue
 
-The API doesn't support batch update so we use `Queue` to iterate over the selected rows and make an [APICall](/components/APICall) for each.
+The API doesn't support batch update so we use `Queue` to iterate over the selected rows and make an [APICall](/docs/reference/components/APICall) for each.
 
 ```xmlui /pluralize/
 <Queue id="importQueue" clearAfterFinish="true">
@@ -83,7 +83,7 @@ The API doesn't support batch update so we use `Queue` to iterate over the selec
 </Queue>
 ```
 
-> [!INFO] `pluralize` is a [global helper function](/globals#pluralize).
+> [!INFO] `pluralize` is a [global helper function](/docs/globals#pluralize).
 
 The import button uses the queue's `enqueueItems` method to populate the queue with the result of the table's `getSelectedItems` method.
 

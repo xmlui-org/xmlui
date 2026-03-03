@@ -121,8 +121,13 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
     display: none;
   }
   
-  // Hide adjacent separators (when MenuSeparator immediately follows another MenuSeparator)
-  & + & {
+  // Hide a separator when it is immediately followed by another separator.
+  // Using :has(+ &) (hide the predecessor) rather than & + & (hide the successor) is crucial:
+  // when a runtime-hidden item (when=false → null in DOM) sits between two separators,
+  // those separators become DOM-adjacent.  & + & would hide the second one, leaving the
+  // first visible even though it too is orphaned.  &:has(+ &) hides the first one instead,
+  // so the last visible separator in a run is always the one closest to real content.
+  &:has(+ &) {
     display: none;
   }
 }

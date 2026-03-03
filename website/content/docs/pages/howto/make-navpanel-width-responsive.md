@@ -1,6 +1,6 @@
 # Make NavPanel width responsive
 
-You can use `width-navPanel-App` to control the width of `NavPanel` according to [mediaSize](http://docs.xmlui.org/globals#mediasize).
+You can use `width-navPanel-App` to control the width of `NavPanel` according to [mediaSize](/docs/globals#mediasize).
 
 You can use the same `mediaSize` global variable to hide labels and show only icons.
 

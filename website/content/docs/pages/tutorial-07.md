@@ -106,10 +106,10 @@ Here is the `Invoices` component.
 
 ## A ModalDialog
 
-The id attribute of the [ModalDialog](/components/ModalDialog) maps to the `onClick` handler of the `Details` column. We'll see later how, when clicked, it loads the `InvoiceDetails` component into a `ModalDialog`.
+The id attribute of the [ModalDialog](/docs/reference/components/ModalDialog) maps to the `onClick` handler of the `Details` column. We'll see later how, when clicked, it loads the `InvoiceDetails` component into a `ModalDialog`.
 
 When enabled, the `CreateInvoice` button uses the global function `navigate` to go to the page defined by the `CreateInvoice` component.
 
-Two of the columns in the table, `Status` and `Details`, show how a [Column](/components/Column) can contain XMLUI markup that may include user-defined (`StatusBadge`) and/or built-in (`Icon`) components.
+Two of the columns in the table, `Status` and `Details`, show how a [Column](/docs/reference/components/Column) can contain XMLUI markup that may include user-defined (`StatusBadge`) and/or built-in (`Icon`) components.
 
 

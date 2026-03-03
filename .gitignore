@@ -1,3 +1,28 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/tasks.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+ui-optimized.zip
+
 node_modules
 test-results
 playwright-report
@@ -12,9 +37,10 @@ __deploy
 .turbo
 test-results
 coverage
-.next
+
+dist
+dist-ssg
 xmlui-optimized-output
-xmlui-temp-build
 
 # Claude Code local config
 .claude

@@ -134,6 +134,9 @@ const stackMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`gap-Stack`]: "$gap-normal",
+  },
 });
 
 export const StackMd = {

@@ -147,7 +147,7 @@ In [Reactive data binding](/reactive-intro) we saw how a `Select` can cause a `T
 
 The `Button`'s click handler increments `count` directly. But because `countTimes3` is define using an expression that refers to `count`, the engine reevalautes that expression each time `count` changes and updates `countTimes3` indirectly.
 
-We've seen two ways to declare variables: a `var` declaration in an XML attribute, or the `variable` tag. A similar pattern applies to event handlers. The `Button` to increment the count declares its handler in an attribute whose name combines the `on` prefix with the name [click](/components/Button#click). You may also use the `<event>` helper tag with no prefix for the event name.
+We've seen two ways to declare variables: a `var` declaration in an XML attribute, or the `variable` tag. A similar pattern applies to event handlers. The `Button` to increment the count declares its handler in an attribute whose name combines the `on` prefix with the name [click](/docs/reference/components/Button#click). You may also use the `<event>` helper tag with no prefix for the event name.
 
 ```xmlui-pg copy name="Declare an event handler using the <event> tag" display
 <App var.count="{0}" >

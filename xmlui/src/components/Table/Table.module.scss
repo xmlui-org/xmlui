@@ -171,7 +171,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
         font-size: t.$fontSize;
         visibility: hidden;
 
-        &.showInHeader {
+        &.showInHeader,
+        &.showInRow {
           visibility: visible;
         }
       }

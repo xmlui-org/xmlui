@@ -1,0 +1,388 @@
+# AutoComplete [#autocomplete]
+
+`AutoComplete` is a searchable dropdown input that allows users to type and filter through options, with support for single or multiple selections. Unlike a basic [`Select`](/docs/reference/components/Select), it provides type-ahead functionality and can allow users to create new options.
+
+**Key features:**
+- **Type-ahead filtering**: Users can type to narrow down options in real-time
+- **Multi-select support**: Set `multi="true"` to allow selecting multiple items
+- **Custom option creation**: Enable `creatable="true"` to let users add new options
+- **Rich customization**: Use `optionTemplate` to create complex option layouts
+
+## Using AutoComplete [#using-autocomplete]
+
+```xmlui-pg copy display height="200px" name="Example: Using AutoComplete"
+<App>
+  <AutoComplete>
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" enabled="false" />
+    <Option value="3" label="Diana Prince" />
+  </AutoComplete>
+</App>
+```
+
+**Context variables available during execution:**
+
+- `$item`: This context value represents an item when you define an option item template. Use `$item.value` and `$item.label` to refer to the value and label of the particular option.
+
+## Behaviors [#behaviors]
+
+This component supports the following behaviors:
+
+| Behavior | Properties |
+| --- | --- |
+| Animation | `animation`, `animationOptions` |
+| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Form Binding | `bindTo`, `initialValue`, `noSubmit` |
+| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
+| Publish/Subscribe | `subscribeToTopic` |
+| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
+| Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Styling Variant | `variant` |
+
+## Properties [#properties]
+
+### `autoFocus` [#autofocus]
+
+> [!DEF]  default: **false**
+
+If this property is set to `true`, the component gets the focus automatically when displayed.
+
+### `creatable` [#creatable]
+
+> [!DEF]  default: **false**
+
+This property allows the user to create new items that are not present in the list of options.
+
+### `dropdownHeight` [#dropdownheight]
+
+This property sets the height of the dropdown list.
+
+### `emptyListTemplate` [#emptylisttemplate]
+
+This property defines the template to display when the list of options is empty.
+
+```xmlui-pg copy display height="200px" name="Example: emptyListTemplate"
+<App>
+  <AutoComplete>
+    <property name="emptyListTemplate">
+      <Text>No options found</Text>
+    </property>
+  </AutoComplete>
+</App>
+```
+
+### `enabled` [#enabled]
+
+> [!DEF]  default: **true**
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+### `initiallyOpen` [#initiallyopen]
+
+> [!DEF]  default: **false**
+
+This property determines whether the dropdown list is open when the component is first rendered.
+
+### `initialValue` [#initialvalue]
+
+This property sets the component's initial value.
+
+### `maxLength` [#maxlength]
+
+This property sets the maximum length of the input it accepts.
+
+### `multi` [#multi]
+
+> [!DEF]  default: **false**
+
+The `true` value of the property indicates if the user can select multiple items.
+
+```xmlui-pg copy display height="300px" name="Example: multi"
+    <App>
+      <AutoComplete multi="true">
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+        <Option value="3" label="Diana Prince" />
+        <Option value="4" label="Barry Allen" />
+        <Option value="5" label="Hal Jordan" />
+      </AutoComplete>
+    </App>
+```
+
+### `optionTemplate` [#optiontemplate]
+
+This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
+
+```xmlui-pg copy display height="300px" name="Example: optionTemplate"
+<App>
+  <AutoComplete multi="true">
+    <property name="optionTemplate">
+      <Text textAlign="center" color="red">{$item.label}</Text>
+    </property>
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+    <Option value="3" label="Diana Prince" />
+  </AutoComplete>
+</App>
+```
+
+### `placeholder` [#placeholder]
+
+An optional placeholder text that is visible in the input field when its empty.
+
+### `readOnly` [#readonly]
+
+> [!DEF]  default: **false**
+
+Set this property to `true` to disallow changing the component value.
+
+### `required` [#required]
+
+> [!DEF]  default: **false**
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `validationStatus` [#validationstatus]
+
+> [!DEF]  default: **"none"**
+
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
+## Events [#events]
+
+### `didChange` [#didchange]
+
+This event is triggered when value of AutoComplete has changed.
+
+**Signature**: `didChange(newValue: any): void`
+
+- `newValue`: The new value of the component.
+
+### `gotFocus` [#gotfocus]
+
+This event is triggered when the AutoComplete has received the focus.
+
+**Signature**: `gotFocus(): void`
+
+### `itemCreated` [#itemcreated]
+
+This event is triggered when a new item is created by the user (if `creatable` is enabled).
+
+**Signature**: `(item: string) => void`
+
+- `item`: The newly created item value.
+
+Add a few new items not in the options list. The following markup will display them:
+
+```xmlui-pg copy display height="300px" name="Example: itemCreated"
+<App var.newItems="{[]}">
+  <AutoComplete
+    id="autoComplete"
+    creatable="true"
+    onItemCreated="item => newItems.push(item)">
+    <Option value="1" label="Bruce Wayne" />
+    <Option value="2" label="Clark Kent" />
+  </AutoComplete>
+  <Text testId="text">
+    New items: {newItems.join(", ")}
+  </Text>
+</App>
+```
+
+### `lostFocus` [#lostfocus]
+
+This event is triggered when the AutoComplete has lost the focus.
+
+**Signature**: `lostFocus(): void`
+
+### `validationIconError` [#validationiconerror]
+
+Icon to display for error state when concise validation summary is enabled.
+
+### `validationIconSuccess` [#validationiconsuccess]
+
+Icon to display for valid state when concise validation summary is enabled.
+
+### `verboseValidationFeedback` [#verbosevalidationfeedback]
+
+Enables a concise validation summary (icon) in input components.
+
+## Exposed Methods [#exposed-methods]
+
+### `focus` [#focus]
+
+This method focuses the AutoComplete component.
+
+**Signature**: `focus()`
+
+### `setValue` [#setvalue]
+
+This API allows you to set the value of the component. If the value is not valid, the component will not update its internal state.
+
+**Signature**: `setValue(value: any)`
+
+- `value`: The value to set.
+
+### `value` [#value]
+
+This API allows you to get or set the value of the component. If no value is set, it will retrieve `undefined`.
+
+**Signature**: `get value(): any`
+
+## Styling [#styling]
+
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | transparent | transparent |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-400 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete | $backgroundColor-dropdown-item | $backgroundColor-dropdown-item |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--active | $backgroundColor-dropdown-item--active | $backgroundColor-dropdown-item--active |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $color-surface-raised | $color-surface-raised |
+| [border](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderBottom](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderBottomColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $borderColor--disabled | $borderColor--disabled |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-menu-AutoComplete | $borderColor | $borderColor |
+| [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderEndStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderHorizontal](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderHorizontalColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderHorizontalStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderHorizontalWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderLeft](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderLeftColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderLeftStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete--error | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete--success | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete--warning | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete-badge | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $borderRadius | $borderRadius |
+| [borderRight](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderRightColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderRightStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderRightWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-AutoComplete | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--error | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--success | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete--warning | *none* | *none* |
+| [borderTop](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderTopColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderTopStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderTopWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderVertical](/docs/styles-and-themes/common-units/#border)-AutoComplete | *none* | *none* |
+| [borderVerticalColor](/docs/styles-and-themes/common-units/#color)-AutoComplete | *none* | *none* |
+| [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-AutoComplete | *none* | *none* |
+| [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--error | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--success | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--warning | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-AutoComplete | 1px | 1px |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-AutoComplete | 1px | 1px |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--default | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--error | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--success | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--success--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--warning | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-AutoComplete--warning--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-AutoComplete | $boxShadow-md | $boxShadow-md |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--error | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--success | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--warning | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--error | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--success | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--warning | *none* | *none* |
+| [gap](/docs/styles-and-themes/common-units/#size)-adornment-AutoComplete | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--focus | *none* | *none* |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | $space-2 | $space-2 |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $space-2_5 | $space-2_5 |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | $space-2 | $space-2 |
+| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
+| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | *none* | *none* |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | $space-2 | $space-2 |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AutoComplete-badge | $space-0_5 | $space-0_5 |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-item-AutoComplete | $space-2 | $space-2 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--default--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--disabled | $textColor--disabled | $textColor--disabled |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--error--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--success--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--warning--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge | $const-color-surface-50 | $const-color-surface-50 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--active | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-AutoComplete-badge--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-item-AutoComplete--disabled | $color-surface-300 | $color-surface-300 |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--default | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--error | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--success | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-AutoComplete--warning | *none* | *none* |

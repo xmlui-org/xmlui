@@ -1,6 +1,6 @@
 # XMLUI Scripting
 
-With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/markup) chapter.
+With XMLUI you can go a long way without coding anything more than small JavaScript snippets like those we've seen in the [Markup](/docs/guides/markup) chapter.
 
 An expression:
 
@@ -51,7 +51,7 @@ A function call with an argument:
 
 ## Writing longer functions
 
-The most elaborate function we've seen so far was this one, used in [Components](/components-intro) chapter to extract data from a complex API response.
+The most elaborate function we've seen so far was this one, used in [Components](/docs/components-intro) chapter to extract data from a complex API response.
 
 ```js copy
 window.transformStops = function(stops) {
@@ -173,7 +173,7 @@ function transformStops(stops) {
 }
 ```
 
-> [!INFO] The code-behind file for the application root, `Main.xmlui.xs`, is special. All variables and functions declared here are [global variables](../markup#global-variables).
+> [!INFO] The code-behind file for the application root, `Main.xmlui.xs`, is special. All variables and functions declared here are [global variables](/docs/guides/markup#global-variables).
 
 ## index.html vs code-behind
 
@@ -189,7 +189,7 @@ Use code-behind if:
 
 - You prefer to organize functions by component
 - Your function works with variables scoped to a component
-- Your function works with XMLUI [globals](/globals)
+- Your function works with XMLUI [globals](/docs/globals)
 
 ## Inline code
 

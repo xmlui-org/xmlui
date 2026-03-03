@@ -75,17 +75,13 @@ export function Loader({
     enabled: initialized,
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
-        // console.log("[Loader queryFn] Starting to fetch data...");
         try {
           const newVar: any = await loaderFn(signal);
-          //console.log("[Loader queryFn] Data received:", newVar);
           if (newVar === undefined) {
-            //console.log("[Loader queryFn] Data is undefined, returning null");
             return null;
           }
           return newVar;
         } catch (error) {
-          //console.error("[Loader queryFn] Error fetching data:", error);
           throw error;
         }
       },
@@ -168,6 +164,7 @@ export function Loader({
 
   useIsomorphicLayoutEffect(() => {
     return () => {
+
       loaderLoaded(undefined);
     };
   }, [loaderLoaded, uid]);

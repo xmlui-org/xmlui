@@ -153,7 +153,7 @@ Here, `/` and `/contacts` are absolute links within the app, `about` is a relati
 
 ## Dynamic route segments
 
-You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
+You can use parameter placeholders in the URLs as part of the route. These placeholders start with a colon and are followed by a [valid identifier](/docs/glossary#variable). In the target, you can query the value of these placeholders through the `$routeParams` context variable.
 
 ```xmlui-pg display copy
 <App layout="vertical">

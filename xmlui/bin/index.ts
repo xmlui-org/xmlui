@@ -4,6 +4,7 @@ import { build } from "./build";
 import { start } from "./start";
 
 import { preview } from "./preview";
+import { ssg } from "./ssg";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import AdmZip from "adm-zip";
@@ -79,6 +80,11 @@ interface PreviewArgs {
 interface ZipDistArgs {
   target?: string;
   source?: string;
+}
+
+interface SsgArgs {
+  outDir?: string;
+  fallback?: string;
 }
 
 yargs(hideBin(process.argv))
@@ -197,6 +203,30 @@ yargs(hideBin(process.argv))
     (argv) => {
       const { target, source } = argv;
       zipDist({ target, source });
+    },
+  )
+  .command<SsgArgs>(
+    "ssg",
+    "Generate static pages",
+    (yargs) => {
+      return yargs
+        .option("outDir", {
+          type: "string",
+          default: "dist-ssg",
+          description: "SSG output directory",
+        })
+        .option("fallback", {
+          type: "string",
+          default: "200",
+          description: "Base name for the fallback HTML file served for unknown routes",
+        });
+    },
+    (argv) => {
+      const { outDir, fallback } = argv;
+      ssg({
+        outDir: getStringArg(outDir, "dist-ssg"),
+        fallbackFile: getStringArg(fallback, "200"),
+      });
     },
   )
   .strict()

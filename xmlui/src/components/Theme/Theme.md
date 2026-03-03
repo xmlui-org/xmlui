@@ -7,7 +7,7 @@
 - **Variable overrides**: Modify colors, spacing, typography, and other design variables declaratively
 - **Nested contexts**: Stack multiple `Theme` components for granular control with automatic specificity rules
 
-See [this guide](/themes-intro) and [these references](/styles-and-themes/layout-props) for details.
+See [this guide](/docs/themes-intro) and [these references](/docs/styles-and-themes/layout-props) for details.
 
 ## Using `Theme`
 

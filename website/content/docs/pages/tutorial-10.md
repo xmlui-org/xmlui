@@ -1,6 +1,6 @@
 # Search
 
-The `Search` component uses [Tabs](/components/Tabs) to enable switching between two different search experiences.
+The `Search` component uses [Tabs](/docs/reference/components/Tabs) to enable switching between two different search experiences.
 
 ```xmlui-pg display  noHeader
 ---app display
@@ -133,7 +133,7 @@ Here is `SearchInvoicesAfter`. Try changing the date.
 </Component>
 ```
 
-The `when` guards the [DatePicker](/components/DatePicker)'s `dateAfter`, so the `Table`
+The `when` guards the [DatePicker](/docs/reference/components/DatePicker)'s `dateAfter`, so the `Table`
 s `data` URL won't fire until its dependent variable is ready.
 
 > [!INFO]

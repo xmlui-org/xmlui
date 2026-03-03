@@ -10,6 +10,7 @@ import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
 // @ts-ignore
 import * as packageJson from "./package.json";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -111,7 +112,26 @@ export default ({ mode = "lib" }) => {
       ? [ViteXmlui({})]
       : mode === "inspector-parser"
         ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
-        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+        : [
+            react(),
+            svgr(),
+            ViteYaml(),
+            ViteXmlui({}),
+            cssInjectedByJsPlugin({
+              injectCode: (cssCode) => {
+                return `
+      if (typeof window !== 'undefined') {
+        window.__XMLUI_STYLES__ = window.__XMLUI_STYLES__ || '';
+        window.__XMLUI_STYLES__ += ${cssCode};
+
+        // Dispatch an event so XMLUIRoot knows the styles are ready
+        window.dispatchEvent(new CustomEvent('xmlui-styles-loaded'));
+      }
+    `;
+              },
+            }),
+            dts({ rollupTypes: true }),
+          ];
 
   if (mode === "lib") {
     plugins.push(

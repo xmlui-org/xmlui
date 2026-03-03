@@ -38,6 +38,7 @@ type Props = {
   icon?: React.ReactNode;
   iconAlignment?: "baseline" | "start" | "center" | "end";
   accessibilityProps?: any;
+  exact?: boolean;
 } & Pick<React.HTMLAttributes<HTMLAnchorElement>, LinkAria>;
 
 export const NavLink = forwardRef(function NavLink(
@@ -56,6 +57,7 @@ export const NavLink = forwardRef(function NavLink(
     icon,
     iconAlignment,
     forceActive,
+    exact,
     className,
     ...rest
   }: Props,
@@ -134,6 +136,7 @@ export const NavLink = forwardRef(function NavLink(
         id={uid}
         ref={ref}
         to={smartTo as To}
+        end={exact}
         style={styleObj}
         onClick={onClick}
         className={({ isActive }) =>

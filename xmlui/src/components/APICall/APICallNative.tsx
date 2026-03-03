@@ -14,6 +14,7 @@ interface Props {
   node: ApiActionComponent;
   uid: symbol;
   updateState?: (state: any) => void;
+  onSuccess?: (...args: any[]) => Promise<any>;
   onStatusUpdate?: (statusData: any, progress: number) => void | Promise<void>;
   onTimeout?: () => void | Promise<void>;
 }
@@ -162,7 +163,7 @@ function extractProgress(
   return 0;
 }
 
-export function APICallNative({ registerComponentApi, node, uid, updateState, onStatusUpdate, onTimeout }: Props) {
+export function APICallNative({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -471,7 +472,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             onError: node.events?.error,
             onProgress: node.events?.progress,
             onBeforeRequest: node.events?.beforeRequest,
-            onSuccess: node.events?.success,
+            onSuccess: onSuccess ?? node.events?.success,
           },
           {
             resolveBindingExpressions: true,

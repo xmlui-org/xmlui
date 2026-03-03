@@ -1,6 +1,6 @@
 # Use the same ModalDialog to add or edit
 
-See also the [refactoring](/refactoring) guide. Briefly: props flow down, events flow up.
+See also the [refactoring](/docs/guides/refactoring) guide. Briefly: props flow down, events flow up.
 
 ```xmlui-pg height="400px"
 ---app

@@ -15,6 +15,18 @@ export const ScrollViewerMd = createMetadata({
     "modes: normal (standard browser scrollbars), overlay (themed scrollbars always visible), " +
     "whenMouseOver (scrollbars appear on hover), and whenScrolling (scrollbars appear during scrolling).",
   props: {
+    headerTemplate: {
+      description:
+        "An optional template that defines content always visible at the top of the `ScrollViewer`, " +
+        "outside the scrollable area. The header sticks to the top while the inner content scrolls.",
+      valueType: "ComponentDef",
+    },
+    footerTemplate: {
+      description:
+        "An optional template that defines content always visible at the bottom of the `ScrollViewer`, " +
+        "outside the scrollable area. The footer sticks to the bottom while the inner content scrolls.",
+      valueType: "ComponentDef",
+    },
     scrollStyle: {
       description:
         "This property determines the scrollbar style and behavior. " +
@@ -136,12 +148,16 @@ export const scrollViewerComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, className }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+    const header = node.props.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
+    const footer = node.props.footerTemplate ? renderChild(node.props.footerTemplate) : undefined;
 
     return (
       <ScrollViewer 
         className={className} 
         scrollStyle={scrollStyle as any}
         showScrollerFade={showScrollerFade}
+        header={header}
+        footer={footer}
       >
         {renderChild(node.children)}
       </ScrollViewer>

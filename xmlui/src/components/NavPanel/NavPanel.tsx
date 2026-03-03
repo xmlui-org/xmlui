@@ -4,9 +4,10 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import classnames from "classnames";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { useComponentRegistry } from "../ComponentRegistryContext";
 
 const COMP = "NavPanel";
 
@@ -105,6 +106,26 @@ function normalizeSectionData(rawSection: unknown): AppNavData | undefined {
     return undefined;
   }
   return section;
+}
+
+// Expands compound (user-defined) components used inside the NavPanel by
+// inlining their children, so that nav-specific placeholders (like
+// IncludeNavSection) are resolved before rendering.
+function expandCompoundNavChildren(
+  children: ComponentDef[] | undefined,
+): ComponentDef[] | undefined {
+  if (!children) return children;
+
+  const result: ComponentDef[] = [];
+
+  children.forEach((child) => {
+    if (!child || typeof child !== "object") {
+      return;
+    }
+    result.push(child);
+  });
+
+  return result;
 }
 
 function buildSectionNavChildren(rawSection: unknown, uidPrefix: string): ComponentDef[] {
@@ -251,9 +272,22 @@ function NavPanelWithBuiltNavHierarchy({
     );
   }, [appContext?.appGlobals?.navSections, extractValue, node.children]);
 
+  const expandedChildren = useMemo(() => {
+    return (
+      expandCompoundNavChildren(
+        effectiveChildren as ComponentDef[] | undefined,
+      ) || effectiveChildren
+    );
+  }, [effectiveChildren]);
+
   const navLinks = useMemo(() => {
-    return buildNavHierarchy(effectiveChildren, extractValue, undefined, []);
-  }, [effectiveChildren, extractValue]);
+    return buildNavHierarchy(
+      expandedChildren,
+      extractValue,
+      undefined,
+      [],
+    );
+  }, [expandedChildren, extractValue]);
 
   const scrollStyle = extractValue.asOptionalString(
     node.props.scrollStyle,
@@ -275,7 +309,7 @@ function NavPanelWithBuiltNavHierarchy({
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
     >
-      {renderChild(effectiveChildren)}
+      {renderChild(expandedChildren)}
     </NavPanel>
   );
 }

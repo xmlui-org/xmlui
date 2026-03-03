@@ -1,6 +1,6 @@
 %-DESC-START
 
-It is often used in forms, see [this guide](/forms) for details.
+It is often used in forms, see [this guide](/docs/guide/forms) for details.
 
 %-DESC-END
 
@@ -31,7 +31,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 %-PROP-START enterSubmits
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
-See [Using Forms](/forms) for details.
+See [Using Forms](/docs/forms) for details.
 
 ```xmlui-pg copy display name="Example: enterSubmits"
 <App>

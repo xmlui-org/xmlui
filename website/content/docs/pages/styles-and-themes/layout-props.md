@@ -12,79 +12,79 @@ Sets the duration of the animation associated with the component.
 
 ## `background`
 
-Sets the background [color value](/styles-and-themes/common-units#color) of a component (shortcut to `backgroundColor`).
+Sets the background [color value](/docs/styles-and-themes/common-units#color) of a component (shortcut to `backgroundColor`).
 
 ## `backgroundColor`
 
-Sets the background [color value](/styles-and-themes/common-units#color) of a component.
+Sets the background [color value](/docs/styles-and-themes/common-units#color) of a component.
 
 ## `border`
 
-Sets the value of the [border](/styles-and-themes/common-units#border) area; uses the same value for the left, top, right, and bottom borders.
+Sets the value of the [border](/docs/styles-and-themes/common-units#border) area; uses the same value for the left, top, right, and bottom borders.
 
 ## `borderBottom`
 
-Sets the value of the bottom [border](/styles-and-themes/common-units#border) to the specified one.
+Sets the value of the bottom [border](/docs/styles-and-themes/common-units#border) to the specified one.
 
 ## `borderColor`
 
-Sets the [color value](/styles-and-themes/common-units#color) of the border; uses the same value for the left, top, right, and bottom borders.
+Sets the [color value](/docs/styles-and-themes/common-units#color) of the border; uses the same value for the left, top, right, and bottom borders.
 
 ## `borderHorizontal`
 
-Sets the value of the horizontal [borders](/styles-and-themes/common-units#border) (left and right) to the specified one.
+Sets the value of the horizontal [borders](/docs/styles-and-themes/common-units#border) (left and right) to the specified one.
 
 ## `borderLeft`
 
-Sets the value of the left [border](/styles-and-themes/common-units#border) to the specified one.
+Sets the value of the left [border](/docs/styles-and-themes/common-units#border) to the specified one.
 
 ## `borderRadius`
 
-This property rounds the corners of a component's outer border edge according to the specified [value](/styles-and-themes/common-units#border-rounding).
+This property rounds the corners of a component's outer border edge according to the specified [value](/docs/styles-and-themes/common-units#border-rounding).
 
 ## `borderRadiusBottomLeft`
 
-This property rounds the bottom-left corner of a component's outer border edge according to the specified [value](/styles-and-themes/common-units#border-rounding).
+This property rounds the bottom-left corner of a component's outer border edge according to the specified [value](/docs/styles-and-themes/common-units#border-rounding).
 
 ## `borderRadiusBottomRight`
 
-This property rounds the bottom-right corner of a component's outer border edge according to the specified [value](/styles-and-themes/common-units#border-rounding).
+This property rounds the bottom-right corner of a component's outer border edge according to the specified [value](/docs/styles-and-themes/common-units#border-rounding).
 
 ## `borderRadiusTopLeft`
 
-This property rounds the top-left corner of a component's outer border edge according to the specified [value](/styles-and-themes/common-units#border-rounding).
+This property rounds the top-left corner of a component's outer border edge according to the specified [value](/docs/styles-and-themes/common-units#border-rounding).
 
 ## `borderRadiusTopRight`
 
-This property rounds the top-right corner of a component's outer border edge according to the specified [value](/styles-and-themes/common-units#border-rounding).
+This property rounds the top-right corner of a component's outer border edge according to the specified [value](/docs/styles-and-themes/common-units#border-rounding).
 
 ## `borderRight`
 
-Sets the value of the right [border](/styles-and-themes/common-units#border) to the specified one.
+Sets the value of the right [border](/docs/styles-and-themes/common-units#border) to the specified one.
 
 ## `borderStyle`
 
-Sets the [style](/styles-and-themes/common-units#border-style) of the border; uses the same value for the left, top, right, and bottom borders.
+Sets the [style](/docs/styles-and-themes/common-units#border-style) of the border; uses the same value for the left, top, right, and bottom borders.
 
 ## `borderWidth`
 
-Sets the [width](/styles-and-themes/common-units#size) (thickness) of the border; uses the same value for the left, top, right, and bottom borders.
+Sets the [width](/docs/styles-and-themes/common-units#size) (thickness) of the border; uses the same value for the left, top, right, and bottom borders.
 
 ## `borderTop`
 
-Sets the value of the top [border](/styles-and-themes/common-units#border) to the specified one.
+Sets the value of the top [border](/docs/styles-and-themes/common-units#border) to the specified one.
 
 ## `borderVertical`
 
-Sets the value of the vertical [borders](/styles-and-themes/common-units#border) (top and bottom) to the specified one.
+Sets the value of the vertical [borders](/docs/styles-and-themes/common-units#border) (top and bottom) to the specified one.
 
 ## `bottom`
 
-Sets the [bottom](/styles-and-themes/common-units#size) position of the component to the specified value.
+Sets the [bottom](/docs/styles-and-themes/common-units#size) position of the component to the specified value.
 
 ## `boxShadow`
 
-This property adds [shadow effects](/styles-and-themes/common-units#shadow) around a component's frame and set up one or more shadow effects.
+This property adds [shadow effects](/docs/styles-and-themes/common-units#shadow) around a component's frame and set up one or more shadow effects.
 
 ## `canShrink`
 
@@ -92,11 +92,11 @@ This boolean property indicates if a component can shrink its size when its pare
 
 ## `color`
 
-Sets the foreground [color value](/styles-and-themes/common-units#color) of a component's text and text decorations.
+Sets the foreground [color value](/docs/styles-and-themes/common-units#color) of a component's text and text decorations.
 
 ## `cursor`
 
-Sets the mouse [cursor](/styles-and-themes/common-units#cursor), if any, to show when the mouse pointer is over a particular component
+Sets the mouse [cursor](/docs/styles-and-themes/common-units#cursor), if any, to show when the mouse pointer is over a particular component
 
 ## `direction`
 
@@ -104,19 +104,19 @@ This property sets the direction of text, table columns, and horizontal overflow
 
 ## `fill`
 
-Sets the fill [color](/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
+Sets the fill [color](/docs/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
 
 ## `fontFamily`
 
-This property specifies a prioritized list of one or more [font family](/styles-and-themes/common-units#font-family) names and/or generic family names for the selected component.
+This property specifies a prioritized list of one or more [font family](/docs/styles-and-themes/common-units#font-family) names and/or generic family names for the selected component.
 
 ## `fontSize`
 
-This property sets the size of the font. Changing the font [size](/styles-and-themes/common-units#size) also updates the sizes of the font size-relative length units, such as em, ex, and so forth.
+This property sets the size of the font. Changing the font [size](/docs/styles-and-themes/common-units#size) also updates the sizes of the font size-relative length units, such as em, ex, and so forth.
 
 ## `fontWeight`
 
-Sets the [weight (or boldness)](/styles-and-themes/common-units#font-weight) of the font. The weights available depend on the `fontFamily` that is currently set.
+Sets the [weight (or boldness)](/docs/styles-and-themes/common-units#font-weight) of the font. The weights available depend on the `fontFamily` that is currently set.
 
 ## `fontStyle`
 
@@ -124,75 +124,75 @@ This property sets whether a font should be styled with a normal, italic, or obl
 
 ## `fontVariant`
 
-This property controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as [small caps](/styles-and-themes/common-units#font-variant)), ligatures, and language-specific glyph variants.
+This property controls the usage of alternate glyphs in a font. These alternates include things like stylistic variants (such as [small caps](/docs/styles-and-themes/common-units#font-variant)), ligatures, and language-specific glyph variants.
 
 ## `gap`
 
-Layout components use this property to define the [size](/styles-and-themes/common-units#size) of space separating child components.
+Layout components use this property to define the [size](/docs/styles-and-themes/common-units#size) of space separating child components.
 
 ## `height`
 
-Specifies the [height](/styles-and-themes/common-units#size) (vertical dimension) of the component.
+Specifies the [height](/docs/styles-and-themes/common-units#size) (vertical dimension) of the component.
 
 ## `left`
 
-Sets the [left](/styles-and-themes/common-units#size) position of the component to the specified value.
+Sets the [left](/docs/styles-and-themes/common-units#size) position of the component to the specified value.
 
 ## `letterSpacing`
 
-This property sets the horizontal [spacing](/styles-and-themes/common-units#size) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.
+This property sets the horizontal [spacing](/docs/styles-and-themes/common-units#size) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.
 
 ## `lineBreak`
 
-This property determines how [line breaking](/styles-and-themes/common-units#line-break) works for languages that use a text wrapping system other than the standard space-based approach, such as Chinese, Japanese, and Korean.
+This property determines how [line breaking](/docs/styles-and-themes/common-units#line-break) works for languages that use a text wrapping system other than the standard space-based approach, such as Chinese, Japanese, and Korean.
 
 ## `lineHeight`
 
-This property sets the [height](/styles-and-themes/common-units#size) of a line box. It's commonly used to set the distance between lines of text.
+This property sets the [height](/docs/styles-and-themes/common-units#size) of a line box. It's commonly used to set the distance between lines of text.
 
 ## `margin`
 
-Sets the [size](/styles-and-themes/common-units#size) of the margin area; uses the same value for the left, top, right, and bottom margins.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the margin area; uses the same value for the left, top, right, and bottom margins.
 
 ## `marginBottom`
 
-Sets the [size](/styles-and-themes/common-units#size) of the bottom margin to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the bottom margin to the specified value.
 
 ## `marginHorizontal`
 
-Sets the [size](/styles-and-themes/common-units#size) of the horizontal margins (left and right) to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the horizontal margins (left and right) to the specified value.
 
 ## `marginLeft`
 
-Sets the [size](/styles-and-themes/common-units#size) of the left margin to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the left margin to the specified value.
 
 ## `marginRight`
 
-Sets the [size](/styles-and-themes/common-units#size) of the right margin to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the right margin to the specified value.
 
 ## `marginTop`
 
-Sets the [size](/styles-and-themes/common-units#size) of the top margin to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the top margin to the specified value.
 
 ## `marginVertical`
 
-Sets the [size](/styles-and-themes/common-units#size) of the vertical margins (top and bottom) to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the vertical margins (top and bottom) to the specified value.
 
 ## `maxHeight`
 
-Specifies the maximum [height](/styles-and-themes/common-units#size) of an element. It prevents the current value of the height property from becoming larger than the value specified.
+Specifies the maximum [height](/docs/styles-and-themes/common-units#size) of an element. It prevents the current value of the height property from becoming larger than the value specified.
 
 ## `maxWidth`
 
-Specifies the maximum [width](/styles-and-themes/common-units#size) of an element. It prevents the current value of the width property from becoming larger than the value specified.
+Specifies the maximum [width](/docs/styles-and-themes/common-units#size) of an element. It prevents the current value of the width property from becoming larger than the value specified.
 
 ## `minHeight`
 
-Specifies the minimum [height](/styles-and-themes/common-units#size) of an element. It prevents the current value of the height property from becoming smaller than the value specified.
+Specifies the minimum [height](/docs/styles-and-themes/common-units#size) of an element. It prevents the current value of the height property from becoming smaller than the value specified.
 
 ## `minWidth`
 
-Specifies the minimum [width](/styles-and-themes/common-units#size) of an element. It prevents the current value of the width property from becoming smaller than the value specified.
+Specifies the minimum [width](/docs/styles-and-themes/common-units#size) of an element. It prevents the current value of the width property from becoming smaller than the value specified.
 
 ## `opacity`
 
@@ -212,67 +212,67 @@ This property sets the style of an element's outline. An outline is a line that 
 
 ## `outlineColor`
 
-This property sets the [color](/styles-and-themes/common-units#color) of an element's outline.
+This property sets the [color](/docs/styles-and-themes/common-units#color) of an element's outline.
 
 ## `overflowX`
 
-This property defines the [overflow](/styles-and-themes/common-units#overflow) strategy when a component horizontally overflows the UI its parent provides.
+This property defines the [overflow](/docs/styles-and-themes/common-units#overflow) strategy when a component horizontally overflows the UI its parent provides.
 
 ## `overflowY`
 
-This property defines the [overflow](/styles-and-themes/common-units#overflow) strategy when a component vertically overflows the UI its parent provides.
+This property defines the [overflow](/docs/styles-and-themes/common-units#overflow) strategy when a component vertically overflows the UI its parent provides.
 
 ## `padding`
 
-Sets the [size](/styles-and-themes/common-units#size) of the padding area; uses the same value for the left, top, right, and bottom paddings.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the padding area; uses the same value for the left, top, right, and bottom paddings.
 
 ## `paddingBottom`
 
-Sets the [size](/styles-and-themes/common-units#size) of the bottom padding to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the bottom padding to the specified value.
 
 ## `paddingHorizontal`
 
-Sets the [size](/styles-and-themes/common-units#size) of the horizontal padding (left and right) to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the horizontal padding (left and right) to the specified value.
 
 ## `paddingLeft`
 
-Sets the [size](/styles-and-themes/common-units#size) of the left padding to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the left padding to the specified value.
 
 ## `paddingRight`
 
-Sets the [size](/styles-and-themes/common-units#size) of the right padding to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the right padding to the specified value.
 
 ## `paddingTop`
 
-Sets the [size](/styles-and-themes/common-units#size) of the top padding to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the top padding to the specified value.
 
 ## `paddingVertical`
 
-Sets the [size](/styles-and-themes/common-units#size) of the vertical paddings (top and bottom) to the specified value.
+Sets the [size](/docs/styles-and-themes/common-units#size) of the vertical paddings (top and bottom) to the specified value.
 
 ## `right`
 
-Sets the [right](/styles-and-themes/common-units#size) position of the component to the specified value.
+Sets the [right](/docs/styles-and-themes/common-units#size) position of the component to the specified value.
 
 ## `stroke`
 
-Sets the [stroke color](/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
+Sets the [stroke color](/docs/styles-and-themes/common-units#color) of graphical elements (such as SVG icons).
 
 ## `strokeWidth`
 
-Sets the [stroke width](/styles-and-themes/common-units#size) of graphical elements (such as SVG icons).
+Sets the [stroke width](/docs/styles-and-themes/common-units#size) of graphical elements (such as SVG icons).
 
 ## `textAlign`
 
-This property sets the horizontal [alignment](/styles-and-themes/common-units#text-align) of the inline-rendered content (e.g., text) inside its block-rendered parent.
+This property sets the horizontal [alignment](/docs/styles-and-themes/common-units#text-align) of the inline-rendered content (e.g., text) inside its block-rendered parent.
 
 ## `textAlignLast`
 
-This property sets how the last line of a block or a line, right before a forced line break, is [aligned](/styles-and-themes/common-units#text-align).
+This property sets how the last line of a block or a line, right before a forced line break, is [aligned](/docs/styles-and-themes/common-units#text-align).
 
 ## `textDecoration`
 
-This property sets the appearance of [decorative lines](/styles-and-themes/common-units#text-decoration) on text.
+This property sets the appearance of [decorative lines](/docs/styles-and-themes/common-units#text-decoration) on text.
 
 ## `textDecorationLine`
 
@@ -280,7 +280,7 @@ This property sets the kind of decoration that is used on text in an element, su
 
 ## `textDecorationColor`
 
-This property sets the [color](/styles-and-themes/common-units#color) of decorations added to text by `textDecorationLine`.
+This property sets the [color](/docs/styles-and-themes/common-units#color) of decorations added to text by `textDecorationLine`.
 
 ## `textDecorationStyle`
 
@@ -292,15 +292,15 @@ This property sets sets the stroke thickness of the decoration line that is used
 
 ## `textIndent`
 
-This property specifies the amount of [indentation](/styles-and-themes/common-units#text-indent) (empty space) that should be left before the first line of the text content of a block element.
+This property specifies the amount of [indentation](/docs/styles-and-themes/common-units#text-indent) (empty space) that should be left before the first line of the text content of a block element.
 
 ## `textShadow`
 
-This property adds [shadows](/styles-and-themes/common-units#text-shadow) to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
+This property adds [shadows](/docs/styles-and-themes/common-units#text-shadow) to text. It accepts a comma-separated list of shadows to be applied to the text and any of its decorations.
 
 ## `textTransform`
 
-This property specifies how to [capitalize](/styles-and-themes/common-units#text-transform) an element's text.
+This property specifies how to [capitalize](/docs/styles-and-themes/common-units#text-transform) an element's text.
 
 ## `textUnderlineOffset`
 
@@ -308,15 +308,15 @@ This property specifies the offset distance of an underline text decoration line
 
 ## `textWrap`
 
-The [value](/styles-and-themes/common-units#text-wrap) of this property controls how text inside an element is wrapped.
+The [value](/docs/styles-and-themes/common-units#text-wrap) of this property controls how text inside an element is wrapped.
 
 ## `top`
 
-Sets the [top](/styles-and-themes/common-units#size) position of the component to the specified value.
+Sets the [top](/docs/styles-and-themes/common-units#size) position of the component to the specified value.
 
 ## `transition`
 
-This property is a shorthand for [transition effects](/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
+This property is a shorthand for [transition effects](/docs/styles-and-themes/common-units#transition) that specify the CSS property to which a transition effect should be applied, the duration and timing of the transition, and any delay.
 
 ## `transform`
 
@@ -324,7 +324,7 @@ This layout property lets you rotate, scale, skew, or translate an element. Yo
 
 ## `userSelect`
 
-This property controls whether the [user can select](/styles-and-themes/common-units#user-select) text.
+This property controls whether the [user can select](/docs/styles-and-themes/common-units#user-select) text.
 
 ## `whiteSpace`
 
@@ -332,19 +332,19 @@ This property sets how white space inside an element is handled. Available val
 
 ## `width`
 
-Specifies the [width](/styles-and-themes/common-units#size) (horizontal dimension) of the component.
+Specifies the [width](/docs/styles-and-themes/common-units#size) (horizontal dimension) of the component.
 
 ## `wordBreak`
 
-This property specifies how [words should break](/styles-and-themes/common-units#word-break) when reaching the end of a line. It determines whether to break lines within words or to maintain words intact.
+This property specifies how [words should break](/docs/styles-and-themes/common-units#word-break) when reaching the end of a line. It determines whether to break lines within words or to maintain words intact.
 
 ## `wordSpacing`
 
-This property sets the length of [white space](/styles-and-themes/common-units#word-spacing) between words and between tags. Positive values increase the space between words, while negative values bring them closer together.
+This property sets the length of [white space](/docs/styles-and-themes/common-units#word-spacing) between words and between tags. Positive values increase the space between words, while negative values bring them closer together.
 
 ## `wordWrap`
 
-This property determines whether the browser should [break lines within words](/styles-and-themes/common-units#word-wrap) when they would otherwise overflow the container. Also known as "overflow-wrap".
+This property determines whether the browser should [break lines within words](/docs/styles-and-themes/common-units#word-wrap) when they would otherwise overflow the container. Also known as "overflow-wrap".
 
 ## `wrapContent`
 
@@ -356,7 +356,7 @@ This layout property sets the z-order of a positioned component and its children
 
 ## `writingMode`
 
-This property sets whether [lines of text](/styles-and-themes/common-units#writing-mode) are laid out horizontally or vertically, as well as the direction in which blocks progress. Use this for vertical languages, such as Chinese, Japanese, and Korean.
+This property sets whether [lines of text](/docs/styles-and-themes/common-units#writing-mode) are laid out horizontally or vertically, as well as the direction in which blocks progress. Use this for vertical languages, such as Chinese, Japanese, and Korean.
 
 ## `zoom`
 

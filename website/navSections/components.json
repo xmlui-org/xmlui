@@ -147,13 +147,13 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/DropdownMenu",
-          "label": "DropdownMenu",
+          "to": "/docs/reference/components/Drawer",
+          "label": "Drawer",
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/EmojiSelector",
-          "label": "EmojiSelector",
+          "to": "/docs/reference/components/DropdownMenu",
+          "label": "DropdownMenu",
           "icon": "component"
         },
         {
@@ -259,6 +259,11 @@
         {
           "to": "/docs/reference/components/Image",
           "label": "Image",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/IncludeMarkup",
+          "label": "IncludeMarkup",
           "icon": "component"
         },
         {
@@ -464,6 +469,11 @@
         {
           "to": "/docs/reference/components/StickyBox",
           "label": "StickyBox",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/StickySection",
+          "label": "StickySection",
           "icon": "component"
         },
         {

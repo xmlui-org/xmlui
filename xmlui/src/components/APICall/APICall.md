@@ -132,7 +132,7 @@ This is how to transform it in config:
 
 This property takes either a string or a list of strings representing URL endpoints to invalidate the local data cache based on the given URL routes.
 
-For a short overview on client side caching, see the [DataSource component](/components/DataSource).
+For a short overview on client side caching, see the [DataSource component](/docs/reference/components/DataSource).
 
 %-PROP-END
 

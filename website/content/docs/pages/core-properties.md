@@ -84,7 +84,7 @@ A component with `onInit` and `when="{false}"` still renders once so the init ha
 
 ## data
 
-The `data` property makes external data available to a component and its children. It's most commonly used with [List](/components/List), [Items](/components/Items), and [Table](/components/Table), but any component can receive data this way.
+The `data` property makes external data available to a component and its children. It's most commonly used with [List](/docs/reference/components/List), [Items](/docs/reference/components/Items), and [Table](/docs/reference/components/Table), but any component can receive data this way.
 
 When the value references a `DataSource`, the component receives the data returned from that source:
 

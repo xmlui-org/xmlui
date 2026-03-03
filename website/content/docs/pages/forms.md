@@ -2,7 +2,7 @@
 
 XMLUI enables to create forms without the hassle of managing, editing, validating, and saving the information you provide in the UI.
 
-This example demonstrates the core elements: [Form](/components/Form) and [FormItem](/components/FormItem).
+This example demonstrates the core elements: [Form](/docs/reference/components/Form) and [FormItem](/docs/reference/components/FormItem).
 
 ```xmlui-pg display
 <App>
@@ -99,7 +99,7 @@ Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equ
 
 ## FormItem
 
-`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The [`type`](/components/FormItem#type-default-text) property of a `FormItem` specifies what input component to render.
+`FormItem` is an intermediary layer between `Form` and an input component; it manages the data represented by that component. The [`type`](/docs/reference/components/FormItem#type-default-text) property of a `FormItem` specifies what input component to render.
 
 ### Checkbox
 
@@ -114,7 +114,7 @@ Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equ
 </App>
 ```
 
-[Checkbox component doc](/components/Checkbox)
+[Checkbox component doc](/docs/reference/components/Checkbox)
 
 ### DatePicker
 
@@ -128,7 +128,7 @@ Use star sizing to allocate widths flexibly. Here `Firstname` and `Lastname` equ
 </App>
 ```
 
-[DatePicker component doc](/components/DatePicker)
+[DatePicker component doc](/docs/reference/components/DatePicker)
 
 ### File
 
@@ -144,7 +144,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[File component doc](/components/FileInput)
+[File component doc](/docs/reference/components/FileInput)
 
 ### Integer
 
@@ -158,7 +158,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[NumberBox component doc](/components/NumberBox)
+[NumberBox component doc](/docs/reference/components/NumberBox)
 
 ### Number
 
@@ -172,7 +172,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[NumberBox component doc](/components/NumberBox)
+[NumberBox component doc](/docs/reference/components/NumberBox)
 
 ### RadioGroup
 
@@ -191,7 +191,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[RadioGroup component doc](/components/RadioGroup)
+[RadioGroup component doc](/docs/reference/components/RadioGroup)
 
 
 ### Select
@@ -211,7 +211,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[Select component doc](/components/Select)
+[Select component doc](/docs/reference/components/Select)
 
 ### Switch
 
@@ -227,7 +227,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[Switch component doc](/components/Switch)
+[Switch component doc](/docs/reference/components/Switch)
 
 
 ### TextBox
@@ -242,7 +242,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[TextBox component doc](/components/TextBox)
+[TextBox component doc](/docs/reference/components/TextBox)
 
 ### TextArea
 
@@ -256,7 +256,7 @@ Use `file` to select one or multiple files.
 </App>
 ```
 
-[TextArea component doc](/components/TextArea)
+[TextArea component doc](/docs/reference/components/TextArea)
 
 ### Custom
 
@@ -419,7 +419,7 @@ Evaluate predefined regex patterns: "email", "url", or "phone".
 ```
 
 
-See the [pattern property](/components/FormItem#pattern) of `FormItem`.
+See the [pattern property](/docs/reference/components/FormItem#pattern) of `FormItem`.
 
 ### `regex`
 
@@ -538,5 +538,5 @@ To submit via an `APICall`, use the `event` helper tag to bridge between the for
 
 ## Form in ModalDialog
 
-[ModalDialog](/components/ModalDialog) supports `Form` as a first-class citizen component. When a `Form` nests directly in a `ModalDialog`, the dialog's button row is replaced with the form's own button row. When form submission is successful, the dialog closes.
+[ModalDialog](/docs/reference/components/ModalDialog) supports `Form` as a first-class citizen component. When a `Form` nests directly in a `ModalDialog`, the dialog's button row is replaced with the form's own button row. When form submission is successful, the dialog closes.
 

@@ -14,7 +14,7 @@ export const AppHeaderMd = createMetadata({
   status: "stable",
   description:
     "`AppHeader` defines the top navigation bar of your application within the " +
-    "[`App`](/components/App) component. It automatically handles logo placement, " +
+    "[`App`](/docs/reference/components/App) component. It automatically handles logo placement, " +
     "application title, and user profile areas with built-in responsive behavior.",
   props: {
     profileMenuTemplate: dComponent(
@@ -47,6 +47,7 @@ export const AppHeaderMd = createMetadata({
   },
   defaultThemeVars: {
     [`padding-drawerToggle-${COMP}`]: "$space-0_5",
+    [`size-drawerToggle-${COMP}`]: "$space-12",
     [`height-${COMP}`]: "$space-14",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content-App",
     [`maxWidth-${COMP}`]: "$maxWidth-App",

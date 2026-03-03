@@ -39,4 +39,4 @@ Use the `<method>` element to create custom methods with JavaScript logic:
 
 **Cons**: More complex, requires JavaScript knowledge
 
-**See also**: [Delegate a method](/howto/delegate-a-method) for a simpler approach without custom logic.
+**See also**: [Delegate a method](/docs/howto/delegate-a-method) for a simpler approach without custom logic.

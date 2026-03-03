@@ -2,7 +2,7 @@
 
 Most properties of the component focus on the primary section (e.g. sizing).
 
-See also: [HSplitter](/components/HSplitter), [VSplitter](/components/VSplitter).
+See also: [HSplitter](/docs/reference/components/HSplitter), [VSplitter](/docs/reference/components/VSplitter).
 
 %-DESC-END
 

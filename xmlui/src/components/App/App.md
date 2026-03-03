@@ -3,7 +3,7 @@
 **Essential features:**
 
 - **Layout templates**: Choose from 7 predefined layouts (horizontal, vertical, condensed, etc.) with sticky navigation options
-- **Routing**: Built-in page routing via the [Pages](/components/Pages) component
+- **Routing**: Built-in page routing via the [Pages](/docs/reference/components/Pages) component
 
 %-DESC-END
 

@@ -1,5 +1,5 @@
 <Component name="NewsAndReviews">
-  <H1 textAlign="center" fontSize="42px" showAnchor="false">
+  <H1 textAlign="center" showAnchor="false">
     News &amp; reviews
   </H1>
   <FlowLayout gap="$space-6">
@@ -9,38 +9,38 @@
         height="323px"
         padding="$space-4"
         borderRadius="$space-2"
-        backgroundColor="$color-surface-0"
-        boxShadow="$boxShadow-spread"
       >
-        <VStack gap="$space-2" height="100%">
-          <Text fontSize="12px" color="$color-surface-300">
-            { formatDate($item.date, "MMM do, yyyy") }
-          </Text>
-          <H5 maxLines="2" showAnchor="false">
-            { $item.title }
-          </H5>
-          <Text color="$color-primary-400" fontFamily="$fontFamily-monospace">
-            { $item.source }
-          </Text>
-          <Stack width="100%">
-            <Text fontSize="14px" ellipses height="100%" maxLines="5">
-              { $item.slug }
+        <VStack gap="$space-3" height="100%">
+          <HStack>
+            <Text variant="info">
+              { formatDate($item.date, "d MMM yyyy") }
             </Text>
-          </Stack>
-          <SpaceFiller />
-          <HStack horizontalAlignment="end">
-            <Link target="_blank" to="{$item.url}" active>
-              <Button
-                variant="ghost"
-                fontSize="14px"
-                color="$color-primary-400"
-                iconPosition="right"
-                icon="arrowright"
-                
-              >
-                Go to article
-              </Button>
-            </Link>
+          </HStack>
+          <VStack gap="$space-2">
+            <H3>
+              { $item.title }
+            </H3>
+            <Theme
+              fontWeight-H5="400"
+              fontFamily-H5="Monospace"
+            >
+              <H5 maxLines="2" ellipses>
+              { $item.source }
+            </H5>
+            </Theme>
+          </VStack>
+          <Text variant="blurb" maxLines="4" ellipses>
+            { $item.slug }
+          </Text>
+          <HStack horizontalAlignment="end" marginTop="auto">
+            <Theme
+              textColor-Link="$color-primary-500"
+              textColor-Link--hover="$color-primary-400"
+            >
+              <Link noIndicator to="{$item.url}" target="_blank">
+                Go to article →
+              </Link>
+            </Theme>
           </HStack>
         </VStack>
       </Card>

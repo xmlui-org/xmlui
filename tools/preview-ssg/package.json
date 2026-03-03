@@ -1,0 +1,27 @@
+{
+  "name": "preview-ssg",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Static file server for previewing XMLUI SSG applications with SPA fallback and resource 404 handling",
+  "main": "src/index.js",
+  "bin": {
+    "preview-ssg": "bin/preview-ssg.js"
+  },
+  "scripts": {
+    "start": "node bin/preview-ssg.js"
+  },
+  "keywords": [
+    "static",
+    "server",
+    "xmlui",
+    "spa"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md"
+  ]
+}

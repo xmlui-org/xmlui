@@ -1,6 +1,6 @@
 # Settings
 
-The `Settings` component demonstrates how to manage application state that persists between sessions using [AppState](/components/AppState), [DataSource](/components/DataSource), and [APICall](/components/APICall) working together.
+The `Settings` component demonstrates how to manage application state that persists between sessions using [AppState](/docs/reference/components/AppState), [DataSource](/docs/reference/components/DataSource), and [APICall](/docs/reference/components/APICall) working together.
 
 ## State management pattern
 
@@ -59,7 +59,7 @@ When settings change, any bound UI elements automatically re-render with the new
 
 ## User input and gated saves
 
-The Settings form uses a [TextBox](/components/TextBox) that updates AppState immediately, but database saves are gated behind a [Button](/components/Button):
+The Settings form uses a [TextBox](/docs/reference/components/TextBox) that updates AppState immediately, but database saves are gated behind a [Button](/docs/reference/components/Button):
 
 ```xmlui /onDidChange/ /onClick/
 <TextBox

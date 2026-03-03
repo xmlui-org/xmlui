@@ -42,7 +42,7 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 
 ## Multiseries charts
 
-[PieChart](/components/PieChart) and [DonutChart](/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/components/BarChart) and [LineChart](/components/LineChart) can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
+[PieChart](/docs/reference/components/PieChart) and [DonutChart](/docs/reference/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/docs/reference/components/BarChart) and [LineChart](/docs/reference/components/LineChart) can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
 
 ```xmlui-pg /data/ noHeader
 ---app display /data/ /xKey/ /yKeys/

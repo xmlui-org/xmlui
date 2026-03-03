@@ -2,7 +2,7 @@
 
 XMLUI provides a `Pagination` component that can be used to display visual controls for the pagination feature, no matter whether it is handled inside or outside of a layout component requiring that feature.
 
-The [`Table`](./table) component provides out-of-the-box support for pagination,
+The [`Table`](/docs/reference/components/Table) component provides out-of-the-box support for pagination,
 so you can access pagination options via the following properties: `isPaginated`, `pageSize`, `pageSizeOptions`, `paginationControlsLocation`.
 
 ```xmlui noHeader copy
