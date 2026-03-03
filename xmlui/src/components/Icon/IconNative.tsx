@@ -117,11 +117,6 @@ const CustomIcon = forwardRef(function CustomIcon(
     const renderedIcon = customSvgIconRenderer?.({
       style,
       className,
-      onClick,
-      onKeyDown: handleKeyDown,
-      tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
-      "data-icon-name": name,
-      ...rest,
     });
     if (!renderedIcon) {
       //to prevent layout shift
@@ -138,7 +133,19 @@ const CustomIcon = forwardRef(function CustomIcon(
         />
       );
     }
-    return renderedIcon;
+    return (
+      <span
+        ref={ref as ForwardedRef<HTMLSpanElement>}
+        style={{ display: "inline-flex" }}
+        data-icon-name={name}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
+        {...(rest as any)}
+      >
+        {renderedIcon}
+      </span>
+    );
   }
 
   return (

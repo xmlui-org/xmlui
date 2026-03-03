@@ -266,7 +266,7 @@ export function useCustomSvgIconRenderer(resourceUrl?: string) {
   const customSvg = resourceUrl ? customSvgs[resourceUrl] : null;
 
   const iconRenderer = useCallback(
-    ({ style, className }: any) => {
+    ({ style, className, ...restProps }: any) => {
       if (!customSvg) {
         return null;
       }
@@ -283,7 +283,7 @@ export function useCustomSvgIconRenderer(resourceUrl?: string) {
         safeAttributes[svgAttributeMap[safeKey] || key] = value;
       });
       return (
-        <svg {...safeAttributes} style={style} className={className}>
+        <svg {...safeAttributes} style={style} className={className} {...restProps}>
           <use href={`#${name}`} />
         </svg>
       );
