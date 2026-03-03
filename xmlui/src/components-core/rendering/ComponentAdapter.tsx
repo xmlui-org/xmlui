@@ -13,10 +13,10 @@ import type {
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
-import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
+import { buildResponsiveWhenStyleObject, extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
-import { useComponentStyle } from "../theming/StyleContext";
+import { useComponentStyle, useStyles } from "../theming/StyleContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
@@ -345,6 +345,19 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const className = useComponentStyle(stableLayoutCss);
 
+  // --- Build a CSS-only responsive visibility class that handles SSR and pre-hydration flash.
+  // --- Only generated when all responsive when-* values are static (no `{...}` expressions).
+  // --- When present, the element is always rendered and CSS container style queries against
+  // --- `--screenSize` control visibility instead of JS returning null.
+  const responsiveWhenStyleObj = useMemo(
+    () => buildResponsiveWhenStyleObject(safeNode.when, safeNode.responsiveWhen),
+    [safeNode.when, safeNode.responsiveWhen],
+  );
+  const stableResponsiveWhenStyle = useShallowCompareMemoize(
+    responsiveWhenStyleObj ?? EMPTY_OBJECT,
+  );
+  const responsiveWhenClassName = useStyles(stableResponsiveWhenStyle as any);
+
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
   // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
@@ -413,8 +426,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );
 
-  // --- If when is false, don't render the component
-  if (!currentWhenValue) {
+  // --- If when is false, don't render the component.
+  // --- When a CSS responsive class is generated, visibility is handled purely by CSS
+  // --- (container style queries on --screenSize), so we always render in that case.
+  if (!responsiveWhenClassName && !currentWhenValue) {
     return null;
   }
 
@@ -588,6 +603,12 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       React.isValidElement(renderedNode) && !!children
         ? cloneElement(renderedNode, null, children)
         : renderedNode;
+  }
+
+  // --- When a CSS responsive class is active, wrap the node in a transparent span so the
+  // --- CSS container style queries can show/hide it without affecting layout.
+  if (responsiveWhenClassName) {
+    return <span className={responsiveWhenClassName}>{nodeToRender}</span>;
   }
 
   return nodeToRender;

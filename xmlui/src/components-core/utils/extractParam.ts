@@ -204,24 +204,25 @@ export function resolveResponsiveWhen(
     return shouldKeep(when, componentState, appContext);
   }
 
+  // When all responsive when-* values are static (no `{...}` expressions), ComponentAdapter
+  // calls buildResponsiveWhenStyleObject to generate CSS container-style-query rules and
+  // attaches the resulting class to a <span> wrapper. This covers both SSR (correct first-paint
+  // HTML for crawlers) and the client-side flash window before sizeIndex is resolved.
+  // The two fallback branches below (SSR heuristic / client-side suppress) are still kept as the
+  // safety net for the dynamic-expression case where no CSS class can be generated.
+
   const sizeIndex = appContext?.mediaSize?.sizeIndex;
 
   if (sizeIndex === undefined) {
-    // --- SSR mode: `document` is not available, so the viewport breakpoint is unknown.
     if (typeof document === "undefined") {
-      // Point 1: Render the component if it would be visible at *any* breakpoint.
-      // This ensures SSR output includes the component for crawlers and initial HTML.
+      // SSR mode: viewport breakpoint is unknown. Render the component if it would be
+      // visible at *any* breakpoint so that SSR output includes it for crawlers and
+      // for the initial HTML before hydration.
       const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
         if (responsiveWhen[bp] === undefined) return false;
         return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
       });
-      if (isVisibleAtAnyBreakpoint) {
-        // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
-        // and attach its class name to the component so the browser can apply the correct
-        // visibility on first paint before React hydration runs.
-        return true;
-      }
-      return false;
+      return isVisibleAtAnyBreakpoint;
     }
 
     // Client-side but sizeIndex not yet computed (media queries still resolving on first
@@ -242,6 +243,99 @@ export function resolveResponsiveWhen(
   // attrs were set at all). This means a lone `when-md="false"` on a component that has
   // no base `when` will be visible at xs/sm, because undefined `when` defaults to true.
   return shouldKeep(when, componentState, appContext);
+}
+
+/**
+ * Determines whether a value is a dynamic expression (contains `{...}`).
+ */
+function isDynamicValue(val: string | boolean | undefined): boolean {
+  return typeof val === "string" && val.includes("{");
+}
+
+/**
+ * Converts a static attribute value to a boolean.
+ * Returns `undefined` if the value cannot be statically resolved (e.g. non-boolean strings
+ * without expressions – those must be evaluated at runtime).
+ */
+function resolveStaticBool(val: string | boolean | undefined): boolean | undefined {
+  if (val === undefined) return undefined;
+  if (typeof val === "boolean") return val;
+  if (val === "true") return true;
+  if (val === "false") return false;
+  return undefined; // non-boolean string without `{` — caller should treat as dynamic
+}
+
+/**
+ * Builds a CSS style object for responsive visibility using CSS container style queries
+ * against the XMLUI `--screenSize` CSS custom property (set 0–5 by `@media` queries in
+ * ThemeNative). The resulting object is suitable for passing to `useStyles`.
+ *
+ * Returns `null` when:
+ * - No responsive rules are defined.
+ * - Any value is a dynamic expression (contains `{...}`) — fall back to JS resolution.
+ * - All breakpoints are visible — no CSS class needed.
+ *
+ * All six breakpoints (xs=0 … xxl=5) are evaluated using the same Tailwind-style
+ * mobile-first walk-down used in `resolveResponsiveWhen`.
+ *
+ * Example output (when-md="false" only, hiding xs and sm):
+ * ```
+ * {
+ *   display: "contents",
+ *   "@container (style(--screenSize: 0) or style(--screenSize: 1))": { display: "none" }
+ * }
+ * ```
+ */
+export function buildResponsiveWhenStyleObject(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+): Record<string, any> | null {
+  if (!responsiveWhen || Object.keys(responsiveWhen).length === 0) return null;
+
+  // Bail out for any dynamic value — runtime JS resolution handles those
+  if (isDynamicValue(when)) return null;
+  if (MediaBreakpointKeys.some((bp) => isDynamicValue(responsiveWhen[bp]))) return null;
+
+  // Resolve base `when`: e.g. undefined → always visible; "true" → true; "false" → false
+  const rawBase = resolveStaticBool(when);
+  if (when !== undefined && rawBase === undefined) return null; // non-bool non-expr string
+  const baseVisible = rawBase ?? true;
+
+  // All responsive values must be statically resolvable
+  for (const bp of MediaBreakpointKeys) {
+    const val = responsiveWhen[bp];
+    if (val !== undefined && resolveStaticBool(val) === undefined) return null;
+  }
+
+  // Compute visibility per sizeIndex 0–5 using Tailwind mobile-first walk-down
+  const hiddenAtSizeIndexes: number[] = [];
+  for (let i = 0; i < MediaBreakpointKeys.length; i++) {
+    let visible = baseVisible;
+    for (let j = i; j >= 0; j--) {
+      const bp = MediaBreakpointKeys[j];
+      if (responsiveWhen[bp] !== undefined) {
+        visible = resolveStaticBool(responsiveWhen[bp])!;
+        break;
+      }
+    }
+    if (!visible) hiddenAtSizeIndexes.push(i);
+  }
+
+  if (hiddenAtSizeIndexes.length === 0) return null; // always visible — no CSS class needed
+
+  // All breakpoints hidden → just display: none (no container query needed)
+  if (hiddenAtSizeIndexes.length === MediaBreakpointKeys.length) {
+    return { display: "none" };
+  }
+
+  // Some breakpoints hidden → transparent wrapper, hidden at specific --screenSize values
+  const containerQuery = hiddenAtSizeIndexes
+    .map((i) => `style(--screenSize: ${i})`)
+    .join(" or ");
+  return {
+    display: "contents",
+    [`@container (${containerQuery})`]: { display: "none" },
+  };
 }
 
 /**
