@@ -1,4 +1,4 @@
-<Theme>
+<Theme tone="dark" fontFamily="Comic Sans MS">
   <Card height="100%" title="hey, XMLUI card here on my island">
     <Form>
       <FormItem bindTo="name" placeholder="Your name"/>
