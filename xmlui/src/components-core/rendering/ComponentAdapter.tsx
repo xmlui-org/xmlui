@@ -13,7 +13,7 @@ import type {
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
-import { extractParam, shouldKeep } from "../utils/extractParam";
+import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
 import { useComponentStyle } from "../theming/StyleContext";
@@ -347,8 +347,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
-  // --- Evaluate the current "when" condition
-  const currentWhenValue = shouldKeep(safeNode.when, state, appContext);
+  // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
+  const currentWhenValue = resolveResponsiveWhen(safeNode.when, safeNode.responsiveWhen, state, appContext);
 
   // --- Handle init and cleanup events based on "when" condition transitions
   useEffect(() => {

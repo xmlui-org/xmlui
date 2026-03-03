@@ -1,17 +1,34 @@
 <Component name="Benefits">
-    <FlowLayout maxWidth="{mediaSize.sizeIndex > 2 ? '600px' : '400px'}" columnGap="$space-8" rowGap="$space-8" width="100%">
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Simple.">
+    <HStack
+        wrapContent
+        maxWidth="{$props.contentWidth}"
+        columnGap="$space-8"
+        rowGap="$space-8"
+        width="100%"
+    >
+        <Benefit
+            width="{$props.itemWidth}"
+            title="Simple."
+        >
             No CSS or React expertise required.
         </Benefit>
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Semantic.">
+        <Benefit
+            width="{$props.itemWidth}"
+            title="Semantic."
+        >
             Humans and AIs can reason together.
         </Benefit>
-            <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Connected.">
+        <Benefit
+            width="{$props.itemWidth}"
+            title="Connected."
+        >
             Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Deployable.">
+        <Benefit
+            width="{$props.itemWidth}"
+            title="Deployable."
+        >
             Drop files onto a static webserver.
         </Benefit>
-    </FlowLayout>
+    </HStack>
 </Component>
-

@@ -45,6 +45,7 @@ vi.mock("../../../src/components-core/utils/hooks", () => ({
 vi.mock("../../../src/components-core/utils/extractParam", () => ({
   extractParam: vi.fn((state, value) => value),
   shouldKeep: vi.fn((when) => when !== false),
+  resolveResponsiveWhen: vi.fn((when, _responsiveWhen) => when !== false),
 }));
 
 // Now import the component
