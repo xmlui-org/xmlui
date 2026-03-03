@@ -47,6 +47,28 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 </App>
 ```
 
+### `breakMode` [#breakmode]
+
+> [!DEF]  default: **"normal"**
+
+This property controls how text breaks into multiple lines. `normal` uses standard word boundaries, `word` breaks long words to prevent overflow, `anywhere` breaks at any character, `keep` prevents word breaking, and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `normal` | Uses standard word boundaries for breaking **(default)** |
+| `word` | Breaks long words when necessary to prevent overflow |
+| `anywhere` | Breaks at any character if needed to fit content |
+| `keep` | Prevents breaking within words entirely |
+| `hyphenate` | Uses automatic hyphenation when breaking words |
+
+### `ellipses` [#ellipses]
+
+> [!DEF]  default: **true**
+
+This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
+
 ### `enabled` [#enabled]
 
 > [!DEF]  default: **true**
@@ -87,11 +109,36 @@ This property allows you to add an optional icon (specify the icon's name) to th
 
 This property sets the label of the component.  If not set, the component will not display a label.
 
+### `maxLines` [#maxlines]
+
+This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property. When the value is not defined, there is no limit on the displayed lines.
+
 ### `noIndicator` [#noindicator]
 
 > [!DEF]  default: **false**
 
 Indicates whether this link should have a distinct visual appearance.
+
+### `overflowMode` [#overflowmode]
+
+> [!DEF]  default: **"not specified"**
+
+This property controls how text overflow is handled. `none` prevents wrapping and shows no overflow indicator, `ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). When not specified, uses the default text behavior.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `none` | No wrapping, text stays on a single line with no overflow indicator (ignores maxLines) |
+| `ellipsis` | Truncates with an ellipsis (default) |
+| `scroll` | Forces single line with horizontal scrolling when content overflows (ignores maxLines) |
+| `flow` | Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines) |
+
+### `preserveLinebreaks` [#preservelinebreaks]
+
+> [!DEF]  default: **false**
+
+This property indicates if linebreaks should be preserved when displaying text.
 
 ### `target` [#target]
 

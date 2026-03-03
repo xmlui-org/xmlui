@@ -3,7 +3,7 @@ import styles from "./Link.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
+import { LinkTargetMd, alignmentOptionValues, type OverflowMode, type BreakMode } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
 
 const COMP = "Link";
@@ -57,6 +57,68 @@ export const LinkMd = createMetadata({
       availableValues: alignmentOptionValues,
       valueType: "string",
       defaultValue: "start",
+    },
+    maxLines: d(
+      "This property determines the maximum number of lines the component can wrap to. " +
+        "If there is no space to display all the contents, the component displays up to as " +
+        "many lines as specified in this property. When the value is not defined, there is " +
+        "no limit on the displayed lines.",
+    ),
+    preserveLinebreaks: {
+      description: `This property indicates if linebreaks should be preserved when displaying text.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.preserveLinebreaks,
+    },
+    ellipses: {
+      description:
+        "This property indicates whether ellipses should be displayed when the text is " +
+        "cropped (`true`) or not (`false`).",
+      valueType: "boolean",
+      defaultValue: defaultProps.ellipses,
+    },
+    breakMode: {
+      description:
+        "This property controls how text breaks into multiple lines. " +
+        "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
+        "`anywhere` breaks at any character, `keep` prevents word breaking, " +
+        "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior.",
+      valueType: "string",
+      defaultValue: "normal",
+      availableValues: [
+        { value: "normal", description: "Uses standard word boundaries for breaking" },
+        { value: "word", description: "Breaks long words when necessary to prevent overflow" },
+        { value: "anywhere", description: "Breaks at any character if needed to fit content" },
+        { value: "keep", description: "Prevents breaking within words entirely" },
+        { value: "hyphenate", description: "Uses automatic hyphenation when breaking words" },
+      ],
+    },
+    overflowMode: {
+      description:
+        "This property controls how text overflow is handled. " +
+        "`none` prevents wrapping and shows no overflow indicator, " +
+        "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
+        "and `flow` allows multi-line wrapping with vertical scrolling when needed (ignores maxLines). " +
+        "When not specified, uses the default text behavior.",
+      valueType: "string",
+      defaultValue: "not specified",
+      availableValues: [
+        {
+          value: "none",
+          description:
+            "No wrapping, text stays on a single line with no overflow indicator (ignores maxLines)",
+        },
+        { value: "ellipsis", description: "Truncates with an ellipsis (default)" },
+        {
+          value: "scroll",
+          description:
+            "Forces single line with horizontal scrolling when content overflows (ignores maxLines)",
+        },
+        {
+          value: "flow",
+          description:
+            "Allows text to wrap into multiple lines with vertical scrolling when container height is constrained (ignores maxLines)",
+        },
+      ],
     },
   },
   events: {
@@ -120,6 +182,14 @@ export const localLinkComponentRenderer = createComponentRenderer(
         verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
         onClick={lookupEventHandler("click")}
         noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator, false)}
+        maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
+        preserveLinebreaks={extractValue.asOptionalBoolean(
+          node.props.preserveLinebreaks,
+          defaultProps.preserveLinebreaks,
+        )}
+        ellipses={extractValue.asOptionalBoolean(node.props.ellipses, defaultProps.ellipses)}
+        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
       >
         {node.props.label
           ? extractValue.asDisplayText(node.props.label)
