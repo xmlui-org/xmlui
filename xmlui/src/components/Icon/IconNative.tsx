@@ -137,11 +137,11 @@ const CustomIcon = forwardRef(function CustomIcon(
       <span
         ref={ref as ForwardedRef<HTMLSpanElement>}
         style={{ display: "inline-flex" }}
-        data-icon-name={name}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
         {...(rest as any)}
+        data-icon-name={name}
       >
         {renderedIcon}
       </span>
