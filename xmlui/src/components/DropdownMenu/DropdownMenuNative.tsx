@@ -264,8 +264,27 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
   const [open, setOpen] = useState(false);
   const iconToStart = iconPosition === "start";
 
+  const handleOpenChange = useCallback((isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen && typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "submenu:open",
+          displayLabel: label,
+          componentLabel: label,
+          ariaRole: "menuitem",
+          ariaName: label,
+        });
+      }
+    }
+  }, [label]);
+
   return (
-    <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
+    <DropdownMenuPrimitive.Sub open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
         {triggerTemplate ? (
           triggerTemplate
