@@ -92,7 +92,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
 
-    // --- Drawer close button
+    // --- Drawer
+    "maxWidth-Drawer": "100%",
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
 
