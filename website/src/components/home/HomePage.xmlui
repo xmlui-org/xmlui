@@ -2,8 +2,7 @@
   <CHStack width="100%">
     <CVStack width="100%" maxWidth="$maxWidth-content-HomePage">
       <Headlines />
-      <Benefits when-md="true" when-xs="false" contentWidth="600px" itemWidth="50%"/>
-      <Benefits when-md="false" when-xs="true" contentWidth="400px" itemWidth="100%"/>
+      <Benefits />
       <HeroApp />
       <WhyXMLUI />
     </CVStack>
