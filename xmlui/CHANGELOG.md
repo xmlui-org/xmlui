@@ -1,5 +1,24 @@
 # xmlui
 
+## 0.12.5
+
+### Patch Changes
+
+- 88ce91b: Add the 'ssg' subcommand to xmlui
+- a8dd927: Add long text related properties to Link
+- fd643cb: Remove the EmojiSelector component
+- fd643cb: Fix `Actions.navigate` with relative paths (e.g. `'.'`) and query params now correctly stays on the current page instead of redirecting to the `Pages` fallback. The relative pathname is resolved to an absolute path before being passed to the router, because the wrapped navigate introduced in 12.4 for `willNavigate`/`didNavigate` events runs in a higher-level React context that lacked the nested route matches needed for correct relative-path resolution.
+- ee167b7: refactor: prevent auto-focus in Sheet component
+- 7a4a44f: refactor: update Link component to support noIndicator prop and improve footer layout on the website
+- c32edd9: Add StickySection component
+- fd643cb: Fix willNavigate and didNavigate regression
+- 4aeced8: APICall now does not invalidate queries while navigating away
+- 8d9f103: Remove deprecated \_meta.json files and related code. Navigation now uses navSections/ JSON files exclusively.
+- 521d5b1: refactor: update layout and styling for navigation, introduce new theme vars for Drawer close button
+- c14a331: Fix new operator parsing (priority) issue
+- bc0f26b: ExpandableItem whitespace can be fully controlled via theme
+- 7c6c270: Add Drawer component
+
 ## 0.12.4
 
 ### Patch Changes
