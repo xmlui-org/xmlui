@@ -11,7 +11,6 @@ import type {
   CompoundComponentDef,
 } from "../abstractions/ComponentDefs";
 
-import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
 import { normalizePath } from "./utils/misc";
 import { ApiInterceptorProvider } from "./interception/ApiInterceptorProvider";
@@ -364,7 +363,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     throw new Error(`Failed to fetch ${response.url}`);
   }
   const code = await response.text();
-  
+
   const parser = new Parser(code);
   try {
     parser.parseStatements();
@@ -810,18 +809,18 @@ function useStandalone(
   // --- pre-built Globals.xs module.
   const extractGlobals = (prebuiltGlobals: Record<string, any>): Record<string, any> => {
     const extractedVars: Record<string, any> = {};
-    
+
     // Process variables in multiple passes to handle dependencies
     // Keep processing until no new variables are resolved (fixed-point iteration)
     const unprocessed = new Map(Object.entries(prebuiltGlobals));
     let progress = true;
     let maxIterations = 100; // Prevent infinite loops
     let iterations = 0;
-    
+
     while (unprocessed.size > 0 && progress && iterations < maxIterations) {
       progress = false;
       iterations++;
-      
+
       for (const [key, value] of Array.from(unprocessed.entries())) {
         // The value is a variable definition object with __PARSED__ and tree
         if (
@@ -847,10 +846,10 @@ function useStandalone(
             // Evaluate the expression tree (handles literals, binary expressions, etc.)
             const evaluatedValue = evalBinding(tree, evalContext);
             extractedVars[key] = evaluatedValue;
-            
+
             // IMPORTANT: Store the original tree to enable re-evaluation on global updates (for reactivity)
             extractedVars[`__tree_${key}`] = tree;
-            
+
             unprocessed.delete(key);
             progress = true;
           } catch (error) {
@@ -865,7 +864,7 @@ function useStandalone(
         }
       }
     }
-    
+
     // Handle any remaining unprocessed variables (circular dependencies or evaluation errors)
     for (const [key, value] of unprocessed.entries()) {
       if (typeof value === "object" && value !== null && (value as any).tree) {
@@ -880,7 +879,7 @@ function useStandalone(
         extractedVars[key] = value;
       }
     }
-    
+
     return extractedVars;
   };
 
@@ -892,7 +891,7 @@ function useStandalone(
   // For now, dependent globals maintain their initially evaluated values.
   const reEvaluateGlobals = (globals: Record<string, any>): Record<string, any> => {
     const result = { ...globals };
-    
+
     // Find all keys with stored expression trees
     const treesMap = new Map<string, any>();
     for (const [key, value] of Object.entries(globals)) {
@@ -903,21 +902,21 @@ function useStandalone(
         }
       }
     }
-    
+
     // If there are no trees to re-evaluate, return globals as-is
     if (treesMap.size === 0) {
       return result;
     }
-    
+
     // Re-evaluate all variables with trees in dependency order (may need multiple passes)
     let changed = true;
     let iterations = 0;
     const maxIterations = 10;
-    
+
     while (changed && iterations < maxIterations) {
       changed = false;
       iterations++;
-      
+
       for (const [varName, tree] of treesMap.entries()) {
         try {
           const evalContext: BindingTreeEvaluationContext = {
@@ -929,7 +928,7 @@ function useStandalone(
             },
             localContext: result,
           };
-          
+
           const evaluatedValue = evalBinding(tree, evalContext);
           if (result[varName] !== evaluatedValue) {
             result[varName] = evaluatedValue;
@@ -941,7 +940,7 @@ function useStandalone(
         }
       }
     }
-    
+
     return result;
   };
 
@@ -988,7 +987,7 @@ function useStandalone(
             }
           }
         }
-        
+
         const lintErrorComponent = processAppLinting(appDef, metadataProvider);
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
@@ -1000,23 +999,23 @@ function useStandalone(
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(appDef);
-        
+
         // --- Collect globalVars from the MERGED app definition (not resolved runtime)
         // --- This ensures test components' globalVars are included
         const parsedGlobals: Record<string, any> = {};
-        
+
         // Collect from root element (cast as ComponentDef since entryPoint is always a component definition)
         const entryPointDef = appDef.entryPoint as ComponentDef;
         if (entryPointDef?.globalVars) {
           Object.assign(parsedGlobals, entryPointDef.globalVars);
         }
-        
+
         // Collect functions from root element (from Main.xmlui.xs)
         // Functions need to flow through globalVars to be available in compound components
         if (entryPointDef?.functions) {
           Object.assign(parsedGlobals, entryPointDef.functions);
         }
-        
+
         // Collect from compound components
         appDef.components?.forEach((compound) => {
           if (compound?.component?.globalVars) {
@@ -1027,7 +1026,7 @@ function useStandalone(
             });
           }
         });
-        
+
         // Merge extension-provided global functions (app/component globals take precedence)
         extensionManager?.registeredExtensions?.forEach((ext) => {
           if (ext.functions) {
@@ -1038,7 +1037,7 @@ function useStandalone(
             });
           }
         });
-        
+
         // --- Since Globals.xs variables are now transformed to <global> tags,
         // --- we only need to set the parsed globals from component definitions
         setGlobalVars(parsedGlobals);
@@ -1106,10 +1105,10 @@ function useStandalone(
       const globalsPromise = new Promise(async (resolve) => {
         try {
           const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
-          
+
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
-            
+
             const mainXs = parsedGlobals?.codeBehind;
             const extractedGlobals = extractGlobals({
               ...(mainXs?.vars || {}),
@@ -1249,7 +1248,7 @@ function useStandalone(
         scriptError:
           loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
-      
+
       // --- Transform Main.xmlui.xs variables into <global> tags for dependency support (same as pre-built path)
       if (loadedGlobals && typeof loadedGlobals === 'object' && ((loadedGlobals as any).vars || (loadedGlobals as any).functions)) {
         // Pass loadedGlobals directly - it has the same structure as runtime[MAIN_XS_BUILT_RESOURCE]
@@ -1445,15 +1444,15 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
-      
+
       // --- Collect and merge globalVars from parsed components
       const parsedGlobals: Record<string, any> = {};
-      
+
       // Collect from root element
       if (entryPointWithCodeBehind.globalVars) {
         Object.assign(parsedGlobals, entryPointWithCodeBehind.globalVars);
       }
-      
+
       // Collect from compound components (root precedence already handled in component order)
       componentsWithCodeBehinds.forEach((compound) => {
         if (compound?.component?.globalVars) {
@@ -1465,7 +1464,7 @@ function useStandalone(
           });
         }
       });
-      
+
       // Merge extension-provided global functions (app/component globals take precedence)
       extensionManager?.registeredExtensions?.forEach((ext) => {
         if (ext.functions) {
@@ -1476,7 +1475,7 @@ function useStandalone(
           });
         }
       });
-      
+
       // Set globalVars with expressions from parsedGlobals (same as pre-built path)
       // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
       setGlobalVars(parsedGlobals);
@@ -1624,13 +1623,13 @@ function transformMainXsToGlobalTags(
   mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
 ): ComponentDef {
   const globalVars: Record<string, string> = {};
-  
+
   // Process vars from Main.xmlui.xs
   if (mainXs.vars) {
     Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
       // Use the source text directly from the parsed expression
       let valueExpression = "";
-      
+
       if (typeof varDef === "object" && varDef?.source) {
         // Use the source text preserved by the parser
         valueExpression = varDef.source;
@@ -1641,21 +1640,21 @@ function transformMainXsToGlobalTags(
           valueExpression = srcMatch[1].trim();
         }
       }
-      
+
       if (!valueExpression) {
         valueExpression = "0"; // Safe fallback
       }
-      
+
       // Wrap in braces if not already wrapped
       if (!valueExpression.startsWith("{")) {
         valueExpression = `{${valueExpression}}`;
       }
-      
+
       // Add to globalVars
       globalVars[varName] = valueExpression;
     });
   }
-  
+
   // Process functions from Main.xmlui.xs
   // Functions are parse trees that need to be evaluated to become callable
   const functions: Record<string, any> = {};
@@ -1690,7 +1689,7 @@ function transformMainXsToGlobalTags(
       }
     });
   }
-  
+
   // Add the globalVars and functions to the entry point
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
     const transformedEntryPoint: ComponentDef = {
@@ -1704,10 +1703,10 @@ function transformMainXsToGlobalTags(
         ...functions
       }
     };
-    
+
     return transformedEntryPoint;
   }
-  
+
   return entryPoint;
 }
 

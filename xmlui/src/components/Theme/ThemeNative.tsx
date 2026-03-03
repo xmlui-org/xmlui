@@ -22,6 +22,10 @@ import {
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
+import baseStyles from "../../index.scss?inline";
+const STYLE_ID = 'xmlui-base-styles';
+const PROD_STYLE_ID = "xmlui-module-styles";
+
 type Props = {
   id?: string;
   isRoot?: boolean;
@@ -272,13 +276,45 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
     // The SSR part is handled by the render itself.
     if (typeof document !== "undefined") {
       const insideShadowRoot = domRoot instanceof ShadowRoot;
+
+      const target: HTMLElement = insideShadowRoot ? domRoot.getRootNode() : document.head;
+      // 2. FORCE BASE STYLES TO THE TOP using a physical <style> tag
+      // We do NOT use adoptedStyleSheets here to ensure the @layer declaration evaluates first.
+      if (!target.querySelector(`#${STYLE_ID}`)) {
+        const styleTag = document.createElement("style");
+        styleTag.id = STYLE_ID;
+        styleTag.textContent = baseStyles;
+        target.prepend(styleTag); // Prepend makes it evaluate before Vite's injected styles
+      }
+
       let documentElement = insideShadowRoot
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
       documentElement.classList.add(...classNames);
+
+
+      const applyRegistryStyles = () => {
+        if (!window.__XMLUI_STYLES__) return;
+
+        let styleTag = target.querySelector(`#${PROD_STYLE_ID}`);
+        if (!styleTag) {
+          styleTag = document.createElement("style");
+          styleTag.id = PROD_STYLE_ID;
+          // Append so it evaluates after the prepended baseStyles
+          target.appendChild(styleTag);
+        }
+        styleTag.textContent = window.__XMLUI_STYLES__;
+      };
+
+      // Apply immediately if available
+      applyRegistryStyles();
+
+      // Listen for the JS chunk finishing its evaluation
+      window.addEventListener("xmlui-styles-loaded", applyRegistryStyles);
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);
+        window.removeEventListener("xmlui-styles-loaded", applyRegistryStyles);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

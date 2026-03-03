@@ -5,6 +5,7 @@ import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "./vite-xmlui-plugin";
 import * as path from "path";
+import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 type ViteConfigData = {
   flatDist?: boolean;
@@ -36,7 +37,26 @@ export async function getViteConfig({
   }
 
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
+    plugins: [
+      react(),
+      svgr(),
+      ViteYaml(),
+      ViteXmlui({}),
+      cssInjectedByJsPlugin({
+        injectCode: (cssCode) => {
+          return `
+      if (typeof window !== 'undefined') {
+        window.__XMLUI_STYLES__ = window.__XMLUI_STYLES__ || '';
+        window.__XMLUI_STYLES__ += ${cssCode};
+
+        // Dispatch an event so XMLUIRoot knows the styles are ready
+        window.dispatchEvent(new CustomEvent('xmlui-styles-loaded'));
+      }
+    `;
+        },
+      }),
+      ...(overrides.plugins || []),
+    ],
     customLogger: logger,
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
