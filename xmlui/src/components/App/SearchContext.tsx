@@ -2,11 +2,11 @@ import { createContext, useContextSelector } from "use-context-selector";
 import { useCallback, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 
-type SearchEntry = { path: string; title: string; content: string };
+type SearchEntry = { path: string; title: string; content: string, category?: string };
 
 type ISearchContext = {
   content: Record<string, SearchEntry>;
-  storeContent: ({ path, title, content }: SearchEntry) => void;
+  storeContent: ({ path, title, content, category }: SearchEntry) => void;
   isIndexing: boolean;
   setIsIndexing: (isIndexing: boolean) => void;
 };

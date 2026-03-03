@@ -493,7 +493,7 @@
     </Page>
 
     <!-- Blog routes -->
-    <Page url="/blog">
+    <Page url="/blog" searchIndexable="false">
       <BlogOverview />
     </Page>
     <Page

@@ -136,15 +136,17 @@ export const Search = ({
     });
   }, [data]);
 
+  console.log(dataFromMd, content)
   const mergedData = useMemo(() => {
     return [
       ...dataFromMd,
       ...(useContentFromAppContext
-        ? Object.values(content ?? {}).map((item) => ({ ...item, category: DEFAULT_CATEGORY }))
+        ? Object.entries(content ?? {}).map(([key, item]) => ({ ...item, category: item.category ?? key.split("/")[0] ?? DEFAULT_CATEGORY }))
         : []),
     ];
   }, [content, dataFromMd, useContentFromAppContext]);
 
+  //console.log(mergedData)
   useEffect(() => {
     fuseRef.current.setCollection(mergedData);
   }, [mergedData]);

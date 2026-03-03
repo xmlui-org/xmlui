@@ -19,6 +19,8 @@ const indexerContextValue = {
   indexing: true,
 };
 
+const EXCLUDED_URL_PATTERNS = [/^404$/, /^not-found$/];
+
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
   renderChild: RenderChildFn;
@@ -48,7 +50,9 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
           child.type === "Page" && // Ensure 'Page' matches your actual component type name
           child.props?.url && // Ensure URL exists
           !child.props.url.includes("*") &&
-          !child.props.url.includes(":"),
+          !child.props.url.includes(":") &&
+          !EXCLUDED_URL_PATTERNS.some((pattern) => pattern.test(child.props.url)) &&
+          child.props?.searchIndexable !== false, // explicit opt-out
       ) || []
     );
   }, [Pages?.children]);
@@ -145,6 +149,7 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
           title,
           content: textContent,
           path: pageUrl,
+          category: pageUrl.split("/")[0] || "", // Assuming category is the first segment of the URL
         });
 
         onIndexed();
