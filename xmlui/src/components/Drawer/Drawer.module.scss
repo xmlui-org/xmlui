@@ -16,6 +16,7 @@ $padding-Drawer: createThemeVar("padding-#{$component}");
 $width-Drawer: createThemeVar("width-#{$component}");
 $maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
 $height-Drawer: createThemeVar("height-#{$component}");
+$maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
 $zIndex-Drawer: createThemeVar("zIndex-#{$component}");
 $animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
 $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
@@ -68,12 +69,13 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   inset: 0;
   background-color: $backgroundColor-backdrop-Drawer;
   z-index: $zIndex-Drawer;
+  pointer-events: auto;
 
   &[data-state="open"] {
     animation: backdropFadeIn $animationDuration-Drawer $animationEasing-Drawer;
   }
   &[data-state="closed"] {
-    animation: backdropFadeOut $animationDuration-Drawer $animationEasing-Drawer;
+    animation: backdropFadeOut $animationDuration-Drawer $animationEasing-Drawer forwards;
   }
 }
 
@@ -88,6 +90,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   overflow: auto;
   display: flex;
   flex-direction: column;
+  pointer-events: auto;
 
   // --- Side variants
   &.left {
@@ -99,7 +102,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     border-radius: 0 $borderRadius-Drawer $borderRadius-Drawer 0;
 
     &[data-state="open"]   { animation: slideInFromLeft  $animationDuration-Drawer $animationEasing-Drawer; }
-    &[data-state="closed"] { animation: slideOutToLeft   $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToLeft   $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
   &.right {
@@ -111,7 +114,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     border-radius: $borderRadius-Drawer 0 0 $borderRadius-Drawer;
 
     &[data-state="open"]   { animation: slideInFromRight $animationDuration-Drawer $animationEasing-Drawer; }
-    &[data-state="closed"] { animation: slideOutToRight  $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToRight  $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
   &.top {
@@ -119,10 +122,11 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     left: 0;
     right: 0;
     height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
     border-radius: 0 0 $borderRadius-Drawer $borderRadius-Drawer;
 
     &[data-state="open"]   { animation: slideInFromTop   $animationDuration-Drawer $animationEasing-Drawer; }
-    &[data-state="closed"] { animation: slideOutToTop    $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToTop    $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 
   &.bottom {
@@ -130,10 +134,11 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     left: 0;
     right: 0;
     height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
     border-radius: $borderRadius-Drawer $borderRadius-Drawer 0 0;
 
     &[data-state="open"]   { animation: slideInFromBottom $animationDuration-Drawer $animationEasing-Drawer; }
-    &[data-state="closed"] { animation: slideOutToBottom  $animationDuration-Drawer $animationEasing-Drawer; }
+    &[data-state="closed"] { animation: slideOutToBottom  $animationDuration-Drawer $animationEasing-Drawer forwards; }
   }
 }
 

@@ -23,6 +23,7 @@ $backgroundColor-AppHeader: createThemeVar("backgroundColor-#{$component}");
 $maxWidth-content-AppHeader: createThemeVar("maxWidth-content-#{$component}");
 $maxWidth-AppHeader: createThemeVar("maxWidth-#{$component}");
 $padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-#{$component}");
+$size-drawerToggle-AppHeader: createThemeVar("size-drawerToggle-#{$component}");
 
 @layer components {
   .header {
@@ -137,6 +138,8 @@ $padding-drawerToggle-AppHeader: createThemeVar("padding-drawerToggle-#{$compone
 
   .drawerToggle.drawerToggle{
     padding: $padding-drawerToggle-AppHeader !important;
+    width: $size-drawerToggle-AppHeader !important;
+    height: $size-drawerToggle-AppHeader !important;
     display: none;
     @include t.withMaxScreenSize(2) {
       display: block;

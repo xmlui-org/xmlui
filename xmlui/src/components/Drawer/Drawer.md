@@ -21,7 +21,7 @@ The simplest way to use a drawer is with the imperative API. Set an `id` and cal
   <VStack>
     <Button label="Open Drawer" onClick="drawer.open()" />
   </VStack>
-  <Drawer id="drawer">
+  <Drawer id="drawer" position="right">
     <Text weight="bold" size="lg">Navigation</Text>
     <VStack marginTop="$space-3">
       <Button label="Profile" variant="ghost" />
@@ -37,12 +37,16 @@ The simplest way to use a drawer is with the imperative API. Set an `id` and cal
 Use the `position` property to slide the drawer from different edges of the viewport.
 
 ```xmlui-pg copy display name="Example: Drawer positions" height="300px"
-<App>
+<App scrollWholePage="false">
   <HStack>
-    <Button label="Left" onClick="leftDrawer.open()" />
     <Button label="Right" onClick="rightDrawer.open()" />
-    <Button label="Top" onClick="topDrawer.open()" />
     <Button label="Bottom" onClick="bottomDrawer.open()" />
+  </HStack>
+  <SpaceFiller />
+  <HStack>
+    <SpaceFiller />
+    <Button label="Left" onClick="leftDrawer.open()" />
+    <Button label="Top" onClick="topDrawer.open()" />
   </HStack>
   
   <Drawer id="leftDrawer" position="left">
@@ -66,59 +70,20 @@ By default, a semi-transparent backdrop appears behind the drawer. Disable it wi
 
 ```xmlui-pg copy display name="Example: Backdrop control" height="280px"
 <App>
-  <HStack>
+  <VStack horizontalAlignment="end">
     <Button label="With Backdrop" onClick="drawer1.open()" />
     <Button label="No Backdrop" onClick="drawer2.open()" />
     <Button label="Click-away disabled" onClick="drawer3.open()" />
-  </HStack>
+  </VStack>
   
-  <Drawer id="drawer1" hasBackdrop="true" closeOnClickAway="true">
+  <Drawer id="drawer1">
     <Text>Click outside to close</Text>
   </Drawer>
   <Drawer id="drawer2" hasBackdrop="false">
     <Text>No backdrop overlay</Text>
   </Drawer>
-  <Drawer id="drawer3" hasBackdrop="true" closeOnClickAway="false" closeButtonVisible="true">
+  <Drawer id="drawer3" closeOnClickAway="false">
     <Text>Click the close button to dismiss</Text>
-  </Drawer>
-</App>
-```
-
-### Initially Open
-
-Use `initiallyOpen="true"` to have the drawer open when the component first renders.
-
-```xmlui-pg copy display name="Example: Initially open" height="280px"
-<App>
-  <Drawer initiallyOpen="true" position="left">
-    <Text weight="bold">Drawer opened automatically</Text>
-    <Button label="Close" onClick="drawer.close()" marginTop="$space-3" />
-  </Drawer>
-</App>
-```
-
-### Right-side Navigation Menu
-
-A common use case is a right-side navigation drawer that doesn't close on click-away, forcing users to use the close button.
-
-```xmlui-pg copy display name="Example: Navigation drawer" height="340px"
-<App>
-  <VStack height="100%">
-    <HStack>
-      <Text weight="bold" size="lg">My App</Text>
-      <Button label="☰" onClick="navDrawer.open()" marginLeft="*" size="lg" variant="ghost" />
-    </HStack>
-    <Text color="$color-text-secondary">Main content area</Text>
-  </VStack>
-  
-  <Drawer id="navDrawer" position="right" closeOnClickAway="false">
-    <VStack spacing="$space-2">
-      <Text weight="bold" size="lg">Menu</Text>
-      <Button label="Dashboard" variant="ghost" width="100%" />
-      <Button label="Profile" variant="ghost" width="100%" />
-      <Button label="Settings" variant="ghost" width="100%" />
-      <Button label="Logout" variant="ghost" width="100%" />
-    </VStack>
   </Drawer>
 </App>
 ```
@@ -128,15 +93,16 @@ A common use case is a right-side navigation drawer that doesn't close on click-
 Monitor when the drawer opens or closes using `onOpen` and `onClose` events.
 
 ```xmlui-pg copy display name="Example: Events" height="300px"
-<App>
-  <VStack var.openCount="{0}" var.closeCount="{0}">
+<App var.openCount="{0}" var.closeCount="{0}">
+  <VStack>
     <Button label="Open Drawer" onClick="drawer.open()" />
     <Text>Opened: {openCount} times</Text>
     <Text>Closed: {closeCount} times</Text>
   </VStack>
   
   <Drawer 
-    id="drawer" 
+    id="drawer"
+    position="right"
     onOpen="openCount++" 
     onClose="closeCount++">
     <Text>I track my open/close events</Text>
@@ -146,103 +112,22 @@ Monitor when the drawer opens or closes using `onOpen` and `onClose` events.
 
 %-DESC-END
 
-%-PROP-START position
-
-The edge from which the drawer slides in.
-
-```xmlui-pg copy display name="Example: position values" height="320px"
-<App>
-  <VStack spacing="$space-2">
-    <Button label="Left" onClick="leftDrawer.open()" width="150px" />
-    <Button label="Right" onClick="rightDrawer.open()" width="150px" />
-    <Button label="Top" onClick="topDrawer.open()" width="150px" />
-    <Button label="Bottom" onClick="bottomDrawer.open()" width="150px" />
-  </VStack>
-  
-  <Drawer id="leftDrawer" position="left"><Text>Left</Text></Drawer>
-  <Drawer id="rightDrawer" position="right"><Text>Right</Text></Drawer>
-  <Drawer id="topDrawer" position="top"><Text>Top</Text></Drawer>
-  <Drawer id="bottomDrawer" position="bottom"><Text>Bottom</Text></Drawer>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START hasBackdrop
-
-Controls whether a semi-transparent overlay appears behind the drawer.
-
-```xmlui-pg copy display name="Example: hasBackdrop" height="280px"
-<App>
-  <HStack>
-    <Button label="With Backdrop (default)" onClick="drawer1.open()" />
-    <Button label="Without Backdrop" onClick="drawer2.open()" />
-  </HStack>
-  
-  <Drawer id="drawer1" hasBackdrop="true">
-    <Text>Backdrop visible behind me</Text>
-  </Drawer>
-  <Drawer id="drawer2" hasBackdrop="false">
-    <Text>No backdrop visible</Text>
-  </Drawer>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START initiallyOpen
-
-When `true`, the drawer is open when it first renders.
-
-```xmlui-pg copy display name="Example: initiallyOpen" height="280px"
-<App>
-  <Drawer initiallyOpen="true" position="left">
-    <Text weight="bold">I opened automatically</Text>
-    <Button label="Close" onClick="drawer.close()" marginTop="$space-3" />
-  </Drawer>
-</App>
-```
-
-%-PROP-END
-
 %-PROP-START closeButtonVisible
 
 Controls whether the close (✕) button appears in the top-right corner of the drawer.
 
 ```xmlui-pg copy display name="Example: closeButtonVisible" height="280px"
 <App>
-  <HStack>
+  <VStack horizontalAlignment="end">
     <Button label="With Close Button (default)" onClick="drawer1.open()" />
     <Button label="Without Close Button" onClick="drawer2.open()" />
-  </HStack>
+  </VStack>
   
   <Drawer id="drawer1" closeButtonVisible="true">
     <Text>Close button visible</Text>
   </Drawer>
-  <Drawer id="drawer2" closeButtonVisible="false" closeOnClickAway="true">
+  <Drawer id="drawer2" closeButtonVisible="false">
     <Text>No close button, click outside to dismiss</Text>
-  </Drawer>
-</App>
-```
-
-%-PROP-END
-
-%-PROP-START closeOnClickAway
-
-When `true`, clicking the backdrop dimming area closes the drawer.
-
-```xmlui-pg copy display name="Example: closeOnClickAway" height="280px"
-<App>
-  <HStack>
-    <Button label="Close on click-away" onClick="drawer1.open()" />
-    <Button label="Stay open" onClick="drawer2.open()" />
-  </HStack>
-  
-  <Drawer id="drawer1" closeOnClickAway="true">
-    <Text>Click outside to close</Text>
-  </Drawer>
-  <Drawer id="drawer2" closeOnClickAway="false" closeButtonVisible="true">
-    <Text>Must use the close button</Text>
   </Drawer>
 </App>
 ```
@@ -254,13 +139,16 @@ When `true`, clicking the backdrop dimming area closes the drawer.
 Fired when the drawer opens (either via `open()` API or another trigger).
 
 ```xmlui-pg copy display name="Example: onOpen event" height="280px"
-<App>
-  <VStack var.status="{}">
+<App var.status="">
+  <VStack >
     <Button label="Open Drawer" onClick="drawer.open()" />
     <Text>{status}</Text>
   </VStack>
   
-  <Drawer id="drawer" onOpen="status = 'Drawer opened at ' + new Date().toLocaleTimeString()">
+  <Drawer 
+    id="drawer" 
+    position="right"
+    onOpen="status = 'Drawer opened at ' + formatDateTime(getDate())">
     <Text>I triggered the onOpen event</Text>
   </Drawer>
 </App>
@@ -273,13 +161,16 @@ Fired when the drawer opens (either via `open()` API or another trigger).
 Fired when the drawer closes (via API, close button, backdrop click, or Escape key).
 
 ```xmlui-pg copy display name="Example: onClose event" height="280px"
-<App>
-  <VStack var.status="{}">
+<App var.status="">
+  <VStack>
     <Button label="Open Drawer" onClick="drawer.open()" />
     <Text>{status}</Text>
   </VStack>
   
-  <Drawer id="drawer" onClose="status = 'Drawer closed at ' + new Date().toLocaleTimeString()">
+  <Drawer 
+    id="drawer" 
+    position="right"
+    onClose="status = 'Drawer closed at ' + formatDateTime(getDate())">
     <Text>I triggered the onClose event</Text>
   </Drawer>
 </App>

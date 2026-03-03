@@ -5,6 +5,7 @@ import type {
 } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
 import { Parser } from "../scripting/Parser";
@@ -468,6 +469,16 @@ export function nodeToComponentDef(
         comp.uses = splitUsesValue(value);
         return;
       default:
+        // --- Handle responsive when-* attributes (when-xs, when-sm, etc.)
+        if (name.startsWith("when-")) {
+          const bp = name.slice(5); // Extract breakpoint name: "xs", "sm", "md", "lg", "xl", "xxl"
+          if ((MediaBreakpointKeys as readonly string[]).includes(bp)) {
+            comp.responsiveWhen ??= {};
+            (comp.responsiveWhen as any)[bp] = value;
+            return;
+          }
+        }
+        
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;

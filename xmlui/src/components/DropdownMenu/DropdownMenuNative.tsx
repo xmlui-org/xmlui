@@ -270,9 +270,28 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
   const context = useDropdownMenuContext();
   const resolvedContentClassName = classnames(styles.DropdownMenuSubContent, contentClassName, context?.contentClassName);
 
+  const handleOpenChange = useCallback((isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen && typeof window !== "undefined") {
+      const w = window as any;
+      if (Array.isArray(w._xsLogs)) {
+        w._xsLogs.push({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "submenu:open",
+          displayLabel: label,
+          componentLabel: label,
+          ariaRole: "menuitem",
+          ariaName: label,
+        });
+      }
+    }
+  }, [label]);
+
   return (
-    <DropdownMenuPrimitive.Sub open={open} onOpenChange={setOpen}>
-      <DropdownMenuPrimitive.SubTrigger ref={ref} className={classnames(styles.DropdownMenuSubTrigger, className)} asChild>
+    <DropdownMenuPrimitive.Sub open={open} onOpenChange={handleOpenChange}>
+      <DropdownMenuPrimitive.SubTrigger ref={ref} className={styles.DropdownMenuSubTrigger} asChild>
         {triggerTemplate ? (
           triggerTemplate
         ) : (

@@ -216,4 +216,8 @@ Scrolls the Stack container to the top. Works when the Stack has an explicit hei
 
 ## Styling [#styling]
 
-This component does not have any styles.
+### Theme Variables [#theme-variables]
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [gap](/docs/styles-and-themes/common-units/#size)-Stack | $gap-normal | $gap-normal |

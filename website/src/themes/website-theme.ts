@@ -62,8 +62,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
-    "fontSize-H1-markdown": "$fontSize-5xl",
-    "fontSize-H1": "$fontSize-5xl",
+    "fontSize-H1-markdown": "$fontSize-4xl",
+    "fontSize-H1": "$fontSize-4xl",
     "marginTop-H1-markdown": "$space-2",
     "marginBottom-H1-markdown": "$space-2",
     "fontSize-H2-markdown": "$fontSize-3xl",
@@ -92,7 +92,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
 
-    // --- Drawer close button
+    // --- Drawer
+    "maxWidth-Drawer": "100%",
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
 

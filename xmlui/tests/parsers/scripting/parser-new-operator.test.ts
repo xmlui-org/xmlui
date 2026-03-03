@@ -9,10 +9,12 @@ import {
   T_ARRAY_LITERAL,
   T_OBJECT_LITERAL,
   T_SEQUENCE_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
   type NewExpression,
   type Identifier,
   type MemberAccessExpression,
   type Literal,
+  type FunctionInvocationExpression,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
 
 describe("Parser - new operator", () => {
@@ -242,7 +244,58 @@ describe("Parser - new operator", () => {
       const expr = parser.parseExpr();
 
       expect(expr).not.toBeNull();
-      // This should parse as a function invocation on a new expression
+      expect(expr!.type).toBe(T_FUNCTION_INVOCATION_EXPRESSION);
+      
+      const invocation = expr as FunctionInvocationExpression;
+      expect(invocation.obj.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
+      
+      const memberAccess = invocation.obj as MemberAccessExpression;
+      expect(memberAccess.member).toBe("getTime");
+      expect(memberAccess.obj.type).toBe(T_NEW_EXPRESSION);
+    });
+
+    it("should parse new Date().toLocaleDateString() - regression test for method chaining", () => {
+      const parser = new Parser("new Date().toLocaleDateString()");
+      const expr = parser.parseExpr();
+
+      expect(expr).not.toBeNull();
+      expect(expr!.type).toBe(T_FUNCTION_INVOCATION_EXPRESSION);
+      
+      const invocation = expr as FunctionInvocationExpression;
+      expect(invocation.obj.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
+      expect(invocation.arguments).toHaveLength(0);
+      
+      const memberAccess = invocation.obj as MemberAccessExpression;
+      expect(memberAccess.member).toBe("toLocaleDateString");
+      expect(memberAccess.obj.type).toBe(T_NEW_EXPRESSION);
+      
+      const newExpr = memberAccess.obj as NewExpression;
+      expect((newExpr.callee as Identifier).name).toBe("Date");
+      expect(newExpr.arguments).toHaveLength(0);
+    });
+
+    it("should parse chained method calls on new expressions", () => {
+      const parser = new Parser("new String('hello').toUpperCase().length");
+      const expr = parser.parseExpr();
+
+      expect(expr).not.toBeNull();
+      expect(expr!.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
+      
+      // Outermost is .length property access
+      const lengthAccess = expr as MemberAccessExpression;
+      expect(lengthAccess.member).toBe("length");
+      
+      // Next level down is .toUpperCase() invocation
+      expect(lengthAccess.obj.type).toBe(T_FUNCTION_INVOCATION_EXPRESSION);
+      const toUpperCaseInvoke = lengthAccess.obj as FunctionInvocationExpression;
+      
+      // The object of that invocation is .toUpperCase property access
+      expect(toUpperCaseInvoke.obj.type).toBe(T_MEMBER_ACCESS_EXPRESSION);
+      const toUpperCaseAccess = toUpperCaseInvoke.obj as MemberAccessExpression;
+      expect(toUpperCaseAccess.member).toBe("toUpperCase");
+      
+      // And that property is on a new expression
+      expect(toUpperCaseAccess.obj.type).toBe(T_NEW_EXPRESSION);
     });
   });
 

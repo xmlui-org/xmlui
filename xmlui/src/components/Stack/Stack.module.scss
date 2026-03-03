@@ -7,6 +7,8 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$gap-Stack: createThemeVar("gap-Stack");
+
 @layer components {
   .base {
     display: flex;
@@ -15,7 +17,7 @@ $themeVars: ();
     align-items: stretch;
     min-height: 0;
     min-width: 0;
-    gap: var(--stack-gap-default);
+    gap: var(--xmlui-gap-Stack, var(--stack-gap-default));
 
     &.hoverContainer{
       :global(.display-on-hover){

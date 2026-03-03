@@ -12,12 +12,13 @@ import classnames from "classnames";
 import styles from "./Link.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
-import type { LinkTarget } from "../abstractions";
+import type { BreakMode, LinkTarget, OverflowMode } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
 import { ThemedIcon } from "../Icon/Icon";
 import type { To } from "react-router-dom";
 import { Part } from "../Part/Part";
 import { PART_ICON } from "../../components-core/parts";
+import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 
 // =====================================================================================================================
 // React Link component implementation
@@ -34,6 +35,11 @@ type Props = {
   style?: CSSProperties;
   className?: string;
   noIndicator?: boolean;
+  maxLines?: number;
+  preserveLinebreaks?: boolean;
+  ellipses?: boolean;
+  overflowMode?: OverflowMode;
+  breakMode?: BreakMode;
 } & Partial<
   Pick<
     HTMLAnchorElement,
@@ -41,10 +47,12 @@ type Props = {
   >
 >;
 
-export const defaultProps: Pick<Props, "active" | "disabled" | "noIndicator"> = {
+export const defaultProps: Pick<Props, "active" | "disabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
   active: false,
   disabled: false,
   noIndicator: false,
+  preserveLinebreaks: false,
+  ellipses: true,
 };
 
 export const LinkNative = forwardRef(function LinkNative(
@@ -64,6 +72,11 @@ export const LinkNative = forwardRef(function LinkNative(
     style,
     className,
     noIndicator = defaultProps.noIndicator,
+    maxLines = 0,
+    preserveLinebreaks = defaultProps.preserveLinebreaks,
+    ellipses = defaultProps.ellipses,
+    overflowMode,
+    breakMode,
     ...anchorProps
   } = specifyTypes(props);
 
@@ -85,6 +98,79 @@ export const LinkNative = forwardRef(function LinkNative(
     };
   }, [horizontalAlignment, verticalAlignment]);
 
+  // Determine whether any overflow/break/linebreak feature is active so we
+  // know to render a wrapper <span> and apply the shrink guard on the container.
+  const hasOverflowFeature = useMemo(
+    () => !!(overflowMode || maxLines > 0 || preserveLinebreaks || breakMode),
+    [overflowMode, maxLines, preserveLinebreaks, breakMode],
+  );
+
+  // Classes for the inner <span> that wraps the text content.
+  // text-overflow / word-break only work on block-level boxes, NOT on flex containers,
+  // so we must delegate them to a child element rather than the inline-flex container.
+  const textSpanClasses = useMemo(() => {
+    const classes: Record<string, boolean> = {};
+
+    // --- overflow mode ---
+    if (!overflowMode) {
+      classes[styles.truncateOverflow] = maxLines > 0;
+      classes[styles.noEllipsis] = !ellipses;
+      classes[styles.multiLineClamp] = maxLines > 1;
+    } else {
+      switch (overflowMode) {
+        case "none":
+          classes[styles.overflowNone] = true;
+          break;
+        case "scroll":
+          classes[styles.overflowScroll] = true;
+          break;
+        case "ellipsis":
+          classes[styles.truncateOverflow] = true;
+          classes[styles.noEllipsis] = !ellipses;
+          classes[styles.multiLineClamp] = maxLines > 1;
+          break;
+        case "flow":
+          classes[styles.overflowFlow] = true;
+          break;
+      }
+    }
+
+    // --- break mode ---
+    if (breakMode) {
+      switch (breakMode) {
+        case "normal":
+          classes[styles.breakNormal] = true;
+          break;
+        case "word":
+          classes[styles.breakWord] = true;
+          break;
+        case "anywhere":
+          classes[styles.breakAnywhere] = true;
+          break;
+        case "keep":
+          classes[styles.breakKeep] = true;
+          break;
+        case "hyphenate":
+          classes[styles.breakHyphenate] = true;
+          break;
+      }
+    }
+
+    // --- preserve linebreaks ---
+    classes[styles.preserveLinebreaks] = preserveLinebreaks;
+
+    return classes;
+  }, [overflowMode, maxLines, ellipses, breakMode, preserveLinebreaks]);
+
+  // Inline style for the text span (maxLines uses CSS that requires display:-webkit-box)
+  const textSpanStyle = useMemo(
+    () =>
+      overflowMode === "ellipsis" || (!overflowMode && maxLines)
+        ? getMaxLinesStyle(maxLines)
+        : undefined,
+    [overflowMode, maxLines],
+  );
+
   const Node = to ? Link : "div";
   return (
     <Node
@@ -94,7 +180,6 @@ export const LinkNative = forwardRef(function LinkNative(
       // Ref: https://v2.remix.run/docs/components/link#reloaddocument
       reloadDocument={anchorProps.download !== undefined}
       to={smartTo}
-      style={style}
       target={target}
       onClick={onClick}
       className={classnames(
@@ -105,10 +190,14 @@ export const LinkNative = forwardRef(function LinkNative(
           [styles.iconLink]: iconLink,
           [styles.active]: active,
           [styles.disabled]: disabled,
+          // When any overflow/text feature is active the container must be
+          // allowed to shrink (min-width:0) and must clip its flex children.
+          [styles.textOverflowContainer]: hasOverflowFeature,
         },
         alignmentClasses.horizontal,
         alignmentClasses.vertical,
       )}
+      style={style}
     >
       {icon && (
         <Part partId={PART_ICON}>
@@ -117,7 +206,13 @@ export const LinkNative = forwardRef(function LinkNative(
           </div>
         </Part>
       )}
-      {children}
+      {hasOverflowFeature ? (
+        <span className={classnames(styles.textSpan, textSpanClasses)} style={textSpanStyle}>
+          {children}
+        </span>
+      ) : (
+        children
+      )}
     </Node>
   );
 });

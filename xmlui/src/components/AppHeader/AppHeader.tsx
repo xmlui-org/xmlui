@@ -47,6 +47,7 @@ export const AppHeaderMd = createMetadata({
   },
   defaultThemeVars: {
     [`padding-drawerToggle-${COMP}`]: "$space-0_5",
+    [`size-drawerToggle-${COMP}`]: "$space-12",
     [`height-${COMP}`]: "$space-14",
     [`maxWidth-content-${COMP}`]: "$maxWidth-content-App",
     [`maxWidth-${COMP}`]: "$maxWidth-App",

@@ -277,6 +277,7 @@ import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
 import { toastComponentRenderer } from "./Toast/Toast";
+import { drawerComponentRenderer } from "./Drawer/Drawer";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -627,6 +628,8 @@ export class ComponentRegistry {
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
+    this.registerCoreComponent(drawerComponentRenderer);
+
 
     if (process.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
       this.registerCoreComponent(htmlATagRenderer);

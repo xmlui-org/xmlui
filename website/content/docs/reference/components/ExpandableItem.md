@@ -308,7 +308,7 @@ The component has some parts that can be styled through layout properties and th
 | [padding](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-summary-ExpandableItem | $space-2 $space-4 | $space-2 $space-4 |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-content-ExpandableItem | *none* | *none* |
-| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | $space-2 | $space-2 |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | $space-0 | $space-0 |
 | [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-summary-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-content-ExpandableItem | *none* | *none* |
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | *none* | *none* |
@@ -320,7 +320,7 @@ The component has some parts that can be styled through layout properties and th
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | $space-0 | $space-0 |
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-summary-ExpandableItem | *none* | *none* |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-content-ExpandableItem | *none* | *none* |
-| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | $space-2 | $space-2 |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | $space-0 | $space-0 |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-summary-ExpandableItem | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-content-ExpandableItem | $space-2 | $space-2 |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-ExpandableItem | *none* | *none* |
