@@ -1,5 +1,73 @@
 [
   {
+    "tag_name": "xmlui@0.12.5",
+    "published_at": "2026-03-03T09:09:48Z",
+    "changes": [
+      {
+        "description": "Add the 'ssg' subcommand to xmlui",
+        "commit_sha": "88ce91b"
+      },
+      {
+        "description": "Add long text related properties to Link",
+        "commit_sha": "a8dd927"
+      },
+      {
+        "description": "Remove the EmojiSelector component",
+        "commit_sha": "fd643cb"
+      },
+      {
+        "description": "Fix `Actions.navigate` with relative paths (e.g. `'.'`) and query params now correctly stays on the current page instead of redirecting to the `Pages` fallback. The relative pathname is resolved to an absolute path before being passed to the router, because the wrapped navigate introduced in 12.4 for `willNavigate`/`didNavigate` events runs in a higher-level React context that lacked the nested route matches needed for correct relative-path resolution.",
+        "commit_sha": "fd643cb"
+      },
+      {
+        "description": "refactor: prevent auto-focus in Sheet component",
+        "commit_sha": "ee167b7"
+      },
+      {
+        "description": "refactor: update Link component to support noIndicator prop and improve footer layout on the website",
+        "commit_sha": "7a4a44f"
+      },
+      {
+        "description": "Add StickySection component",
+        "commit_sha": "c32edd9"
+      },
+      {
+        "description": "Fix willNavigate and didNavigate regression",
+        "commit_sha": "fd643cb"
+      },
+      {
+        "description": "APICall now does not invalidate queries while navigating away",
+        "commit_sha": "4aeced8"
+      },
+      {
+        "description": "Remove deprecated \\_meta.json files and related code. Navigation now uses navSections/ JSON files exclusively.",
+        "commit_sha": "8d9f103"
+      },
+      {
+        "description": "refactor: update layout and styling for navigation, introduce new theme vars for Drawer close button",
+        "commit_sha": "521d5b1"
+      },
+      {
+        "description": "Fix new operator parsing (priority) issue",
+        "commit_sha": "c14a331"
+      },
+      {
+        "description": "ExpandableItem whitespace can be fully controlled via theme",
+        "commit_sha": "bc0f26b"
+      },
+      {
+        "description": "Add Drawer component",
+        "commit_sha": "7c6c270"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.5.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.5/xmlui-0.12.5.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.4",
     "published_at": "2026-02-25T12:11:06Z",
     "changes": [
@@ -420,82 +488,6 @@
       {
         "name": "xmlui-0.11.30.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.30/xmlui-0.11.30.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.29",
-    "published_at": "2026-01-19T15:48:52Z",
-    "changes": [
-      {
-        "description": "Add experimental MessageListener component",
-        "commit_sha": "eead0f5"
-      },
-      {
-        "description": "Fix scroll issues with List virtualization",
-        "commit_sha": "5c9cd56"
-      },
-      {
-        "description": "Added itemRequiredIndicator property to Form to control required/optional indicators for FormItems on the form level.",
-        "commit_sha": "6021e4d"
-      },
-      {
-        "description": "make goto-definition reach components across the whole opened workspace",
-        "commit_sha": "1906b59"
-      },
-      {
-        "description": "Change the indicator in TableOfContents",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add iconAlignment to NavLink and NavGroup",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add new Theme variables to NavLink and NavGroup",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Experiment with documentation theme",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add overflowMode and breakMode to Markdown",
-        "commit_sha": "45441eb"
-      },
-      {
-        "description": "Renamed requiredIndicator to requireLabelMode and itemRequiredIndicator to itemRequireLabelMode.",
-        "commit_sha": "a43b636"
-      },
-      {
-        "description": "In the Search box, hitting Enter opens the first match when none selected.",
-        "commit_sha": "ee7ad5a"
-      },
-      {
-        "description": "Added requiredIndicator property to FormItem to customize required/optional indicators next to labels. Options are: \"required\", \"optional\", \"both\". Default is \"required\".",
-        "commit_sha": "6c232bf"
-      },
-      {
-        "description": "Fix alignment issues with Text",
-        "commit_sha": "beff0fc"
-      },
-      {
-        "description": "Fix Column sortable regression",
-        "commit_sha": "23c44d5"
-      },
-      {
-        "description": "Fix List visibility issue in Markdown",
-        "commit_sha": "99039d4"
-      },
-      {
-        "description": "Removed language-server-web-worker export from package.json",
-        "commit_sha": "626bede"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.29.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.29/xmlui-0.11.29.js"
       }
     ]
   }
