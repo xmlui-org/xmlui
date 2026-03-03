@@ -2449,7 +2449,7 @@ export class Parser {
         this.expectToken(TokenType.RParent, "W006");
       }
 
-      return this.createExpressionNode<NewExpression>(
+      let newExprResult: Expression = this.createExpressionNode<NewExpression>(
         T_NEW_EXPRESSION,
         {
           callee,
@@ -2458,6 +2458,88 @@ export class Parser {
         startToken,
         endToken,
       );
+
+      // Continue parsing member access and invocations on the result of the new expression
+      // e.g., new Date().toLocaleDateString() or new obj.Constructor().method()
+      let exitMemberLoop = false;
+      do {
+        const currentStart = this._lexer.peek();
+
+        switch (currentStart.type) {
+          case TokenType.LParent: {
+            this._lexer.get();
+            let invokeArgs: Expression[] = [];
+            if (this._lexer.peek().type !== TokenType.RParent) {
+              const expr = this.parseExpr();
+              if (!expr) {
+                this.reportError("W001");
+                return null;
+              }
+              invokeArgs = expr.type === T_SEQUENCE_EXPRESSION ? expr.exprs : [expr];
+            }
+            const invokeEndToken = this._lexer.peek();
+            this.expectToken(TokenType.RParent, "W006");
+            newExprResult = this.createExpressionNode<FunctionInvocationExpression>(
+              T_FUNCTION_INVOCATION_EXPRESSION,
+              {
+                obj: newExprResult,
+                arguments: invokeArgs,
+              },
+              startToken,
+              invokeEndToken,
+            );
+            break;
+          }
+
+          case TokenType.Dot:
+          case TokenType.OptionalChaining: {
+            this._lexer.get();
+            const member = this._lexer.get();
+            const memberTrait = tokenTraits[member.type];
+            if (!memberTrait.keywordLike) {
+              this.reportError("W003");
+              return null;
+            }
+            newExprResult = this.createExpressionNode<MemberAccessExpression>(
+              T_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: newExprResult,
+                member: member.text,
+                opt: currentStart.type === TokenType.OptionalChaining,
+              },
+              startToken,
+              member,
+            );
+            break;
+          }
+
+          case TokenType.LSquare: {
+            this._lexer.get();
+            const memberExpr = this.getExpression();
+            if (!memberExpr) {
+              return null;
+            }
+            const calcEndToken = this._lexer.peek();
+            this.expectToken(TokenType.RSquare, "W005");
+            newExprResult = this.createExpressionNode<CalculatedMemberAccessExpression>(
+              T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+              {
+                obj: newExprResult,
+                member: memberExpr,
+              },
+              startToken,
+              calcEndToken,
+            );
+            break;
+          }
+
+          default:
+            exitMemberLoop = true;
+            break;
+        }
+      } while (!exitMemberLoop);
+
+      return newExprResult;
     }
 
     // Check for await expression (contextual keyword)

@@ -13,12 +13,12 @@
     <SpaceFiller />
     <ToneSwitch />
   </AppHeader>
+  
   <List data="/api/users">
     <Card title="{$item.username}" subtitle="{$item.email}"
       orientation="horizontal" avatarUrl="{$item.avatar_url}">
       <SpaceFiller />
-      <Badge variant="pill" when="{!mediaSize.phone}" value="{$item.status}"
-        colorMap="{{ active: 'green', pending: 'orange' }}" />
+      <Badge when="{!mediaSize.phone}" value="{$item.status}" />
       <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
         <event name="click">
           <APICall url="/api/users/{$item.id}" method="delete"

@@ -9,7 +9,7 @@
             <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Connected.">
             Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Deployable">
+        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Deployable.">
             Drop files onto a static webserver.
         </Benefit>
     </FlowLayout>
