@@ -155,6 +155,7 @@
         <NavLink icon="markup" label="Markup" to="/docs/guides/markup" />
         <NavLink icon="bolt" label="Scripting" to="/docs/guides/scripting" />
         <NavLink icon="boundary" label="Scoping" to="/docs/guides/scoping" />
+        <NavLink icon="eye" label="Visibility" to="/docs/guides/visibility" />
         <NavLink
           icon="playground"
           label="Codefences and playgrounds"
@@ -643,6 +644,9 @@
     </Page>
     <Page url="/docs/guides/scoping">
       <DocumentPage content="{appGlobals.docsContent['pages/scoping.md']}" />
+    </Page>
+    <Page url="/docs/guides/visibility">
+      <DocumentPage content="{appGlobals.docsContent['pages/visibility.md']}" />
     </Page>
     <Page url="/docs/guides/scripting">
       <DocumentPage content="{appGlobals.docsContent['pages/scripting.md']}" />
