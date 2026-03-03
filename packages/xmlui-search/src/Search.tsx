@@ -47,36 +47,6 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   maxContentMatchNumber: 3,
 };
 
-const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
-  {
-    name: "title",
-    weight: 2,
-  },
-  {
-    name: "content",
-    weight: 1,
-  },
-];
-
-const searchOptions: IFuseOptions<SearchItemData> = {
-  // isCaseSensitive: false,
-  includeScore: true,
-  // ignoreDiacritics: false,
-  shouldSort: true, // <- sorts by "score"
-  includeMatches: true,
-  // findAllMatches: false,
-  minMatchCharLength: 2,
-  // location: 0,
-  threshold: 0,
-  // distance: 500,
-  // useExtendedSearch: true,
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-  // fieldNormWeight: 1,
-  keys,
-};
-
-
 export const Search = ({
   id,
   data,
@@ -86,6 +56,35 @@ export const Search = ({
   useContentFromAppContext = true,
   placeholder,
 }: Props) => {
+  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
+    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
+      {
+        name: "title",
+        weight: 2,
+      },
+      {
+        name: "content",
+        weight: 1,
+      },
+    ];
+    return {
+      // isCaseSensitive: false,
+      includeScore: true,
+      // ignoreDiacritics: false,
+      shouldSort: true, // <- sorts by "score"
+      includeMatches: true,
+      // findAllMatches: false,
+      minMatchCharLength: 2,
+      // location: 0,
+      threshold: 0,
+      // distance: 500,
+      // useExtendedSearch: true,
+      ignoreLocation: true,
+      ignoreFieldNorm: true,
+      // fieldNormWeight: 1,
+      keys,
+    };
+  }, []);
   const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
 
   const content = useSearchContextContent();
@@ -161,7 +160,7 @@ export const Search = ({
   }, [results]);
 
   useEffect(() => {
-    setActiveIndex(-1);
+    setActiveIndex(results.length > 0 ? 0 : -1);
   }, [results]);
 
   const onClick = useCallback(() => {
@@ -268,12 +267,7 @@ export const Search = ({
             placeholder={placeholder ?? "Type to search"}
             value={inputValue}
             startIcon="search"
-            onDidChange={(value) =>
-              setInputValue(() => {
-                setActiveIndex(-1);
-                return value;
-              })
-            }
+            onDidChange={(value) => setInputValue(value)}
             onFocus={onInputFocus}
             onBlur={onInputBlur}
             onKeyDown={handleKeyDown}
