@@ -88,6 +88,7 @@ export const nestedAppComponentRenderer = createComponentRenderer(
     return (
       <IndexAwareNestedApp
         app={node.props?.app}
+        resolvedApp={node.props?.resolvedApp}
         className={className}
         api={extractValue(node.props?.api)}
         components={extractValue(node.props?.components)}

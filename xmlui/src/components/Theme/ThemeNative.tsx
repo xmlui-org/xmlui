@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
 import classnames from "classnames";
 
+import rootStyles from "../../index.scss?inline";
 import styles from "./Theme.module.scss";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -276,6 +277,11 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
       documentElement.classList.add(...classNames);
+
+      // Inject Mantine styles into shadow DOM
+      const mantineStyles = document.createElement("style");
+      mantineStyles.textContent = rootStyles;
+      documentElement.appendChild(mantineStyles);
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);

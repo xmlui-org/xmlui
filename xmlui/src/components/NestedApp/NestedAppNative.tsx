@@ -97,6 +97,7 @@ export function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolea
 export function NestedApp({
   api,
   app,
+  resolvedApp,
   components = EMPTY_ARRAY,
   config,
   activeTheme,
@@ -225,7 +226,8 @@ export function NestedApp({
   }, []);
 
   useEffect(() => {
-    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(app);
+    let { errors, component, erroneousCompoundComponentName } =
+      resolvedApp ? {component: resolvedApp, errors: []} : xmlUiMarkupToComponent(app);
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
@@ -254,7 +256,7 @@ export function NestedApp({
       if (errors.length > 0) {
         return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
       }
-      
+
       // Extract globalVars from component definitions too
       if (component && 'component' in component) {
         const compGlobalVars = (component as CompoundComponentDef).component?.globalVars;
@@ -262,7 +264,7 @@ export function NestedApp({
           appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
         }
       }
-      
+
       return component;
     });
 
@@ -311,6 +313,7 @@ export function NestedApp({
     onInit,
     activeTheme,
     app,
+    resolvedApp,
     componentRegistry,
     components,
     config?.appGlobals,

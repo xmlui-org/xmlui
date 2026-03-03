@@ -1,0 +1,3 @@
+<Form>
+  <FormItem bindTo="name"/>
+</Form>
