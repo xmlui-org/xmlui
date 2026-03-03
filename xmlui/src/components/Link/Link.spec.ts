@@ -1,4 +1,5 @@
 import { expect, test } from "../../testing/fixtures";
+import { getBounds } from "../../testing/component-test-helpers";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createLinkDriver }) => {
@@ -1137,5 +1138,263 @@ test.describe("Behaviors and Parts", () => {
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveText("Tooltip text");
+  });
+});
+
+// =============================================================================
+// OVERFLOW AND TEXT WRAPPING TESTS
+// =============================================================================
+
+const LONG_LABEL =
+  "This is a very long link label that will not fit into a narrow container and should be handled by overflow settings";
+
+test.describe("maxLines", () => {
+  test("limits link to a single line with overflow hidden", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <VStack>
+        <Link testId="linkShort" to="/" width="200px">Short</Link>
+        <Link testId="linkLong" to="/" width="200px" maxLines="1">${LONG_LABEL}</Link>
+      </VStack>
+    `);
+    const shortDriver = await createLinkDriver("linkShort");
+    const longDriver = await createLinkDriver("linkLong");
+
+    await expect(shortDriver.component).toBeVisible();
+    await expect(longDriver.component).toBeVisible();
+
+    const { height: shortHeight } = await getBounds(shortDriver.component);
+    const { height: longHeight } = await getBounds(longDriver.component);
+
+    // Single-line clamp: heights should be approximately the same
+    expect(Math.abs(shortHeight - longHeight)).toBeLessThan(10);
+    // text-overflow is on the inner text span, not the flex container
+    await expect(longDriver.component.locator("span").first()).toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("constrains link to two lines", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Link testId="linkShort" to="/" width="200px">Short</Link>
+        <Link testId="linkLong" to="/" width="200px" maxLines="2">${LONG_LABEL}</Link>
+      </VStack>
+    `);
+    const shortDriver = await createLinkDriver("linkShort");
+    const longDriver = await createLinkDriver("linkLong");
+
+    await expect(shortDriver.component).toBeVisible();
+    await expect(longDriver.component).toBeVisible();
+
+    const { height: shortHeight } = await getBounds(shortDriver.component);
+    const { height: longHeight } = await getBounds(longDriver.component);
+
+    // Two-line clamp: long link should be taller than single-line but bounded
+    expect(longHeight).toBeGreaterThan(shortHeight);
+    expect(longHeight).toBeLessThan(shortHeight * 3);
+  });
+
+  test("no maxLines – link can grow to full height", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <VStack>
+        <Link testId="linkShort" to="/" width="200px">Short</Link>
+        <Link testId="linkLong" to="/" width="200px">${LONG_LABEL}</Link>
+      </VStack>
+    `);
+    const shortDriver = await createLinkDriver("linkShort");
+    const longDriver = await createLinkDriver("linkLong");
+
+    await expect(shortDriver.component).toBeVisible();
+    await expect(longDriver.component).toBeVisible();
+
+    const { height: shortHeight } = await getBounds(shortDriver.component);
+    const { height: longHeight } = await getBounds(longDriver.component);
+
+    expect(longHeight).toBeGreaterThan(shortHeight);
+  });
+});
+
+test.describe("ellipses", () => {
+  test("shows ellipsis by default when text is clipped (maxLines=1)", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" maxLines="1">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // text-overflow is on the inner text span, not the flex container
+    await expect(driver.component.locator("span").first()).toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("hides ellipsis when ellipses=false", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" maxLines="1" ellipses="false">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).not.toHaveCSS("text-overflow", "ellipsis");
+  });
+});
+
+test.describe("preserveLinebreaks", () => {
+  test("applies pre-wrap white-space when true", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" preserveLinebreaks="true">Line 1&#10;Line 2</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // white-space is on the inner text span
+    await expect(driver.component.locator("span").first()).toHaveCSS("white-space", "pre-wrap");
+  });
+
+  test("does not apply pre-wrap by default", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <Link testId="link" to="/">Line 1&#10;Line 2</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component).not.toHaveCSS("white-space", "pre-wrap");
+  });
+});
+
+test.describe("overflowMode", () => {
+  test("overflowMode=ellipsis applies overflow hidden and ellipsis", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" overflowMode="ellipsis">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // overflow:hidden is on the container (textOverflowContainer), text-overflow is on the span
+    await expect(driver.component).toHaveCSS("overflow", "hidden");
+    await expect(driver.component.locator("span").first()).toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("overflowMode=none applies overflow hidden with clipped text", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" overflowMode="none">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // overflow:hidden is on the container; text-overflow clip is on the span
+    await expect(driver.component).toHaveCSS("overflow", "hidden");
+    await expect(driver.component.locator("span").first()).not.toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("overflowMode=scroll applies horizontal scroll", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" overflowMode="scroll">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // white-space and overflow-x are on the inner span
+    await expect(driver.component.locator("span").first()).toHaveCSS("white-space", "nowrap");
+    await expect(driver.component.locator("span").first()).toHaveCSS("overflow-x", "auto");
+  });
+
+  test("overflowMode=flow allows text wrapping", async ({ initTestBed, createLinkDriver }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" width="200px" overflowMode="flow">${LONG_LABEL}</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    // white-space: normal is on the inner span
+    await expect(driver.component.locator("span").first()).toHaveCSS("white-space", "normal");
+  });
+
+  test("overflowMode=ellipsis with maxLines=2 constrains to two lines", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <VStack>
+        <Link testId="linkShort" to="/" width="200px">Short</Link>
+        <Link testId="linkLong" to="/" width="200px" overflowMode="ellipsis" maxLines="2">${LONG_LABEL}</Link>
+      </VStack>
+    `);
+    const shortDriver = await createLinkDriver("linkShort");
+    const longDriver = await createLinkDriver("linkLong");
+
+    await expect(shortDriver.component).toBeVisible();
+    await expect(longDriver.component).toBeVisible();
+
+    const { height: shortHeight } = await getBounds(shortDriver.component);
+    const { height: longHeight } = await getBounds(longDriver.component);
+
+    expect(longHeight).toBeGreaterThan(shortHeight);
+    expect(longHeight).toBeLessThan(shortHeight * 3);
+  });
+});
+
+test.describe("breakMode", () => {
+  test("breakMode=word applies overflow-wrap break-word", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" breakMode="word">superlongwordthatwontbreakwithoutbreakmode</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).toHaveCSS("overflow-wrap", "break-word");
+  });
+
+  test("breakMode=anywhere applies word-break break-all", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" breakMode="anywhere">superlongwordthatwontbreakwithoutbreakmode</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).toHaveCSS("word-break", "break-all");
+  });
+
+  test("breakMode=keep applies word-break keep-all", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" breakMode="keep">Link text</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).toHaveCSS("word-break", "keep-all");
+  });
+
+  test("breakMode=normal applies normal word-break", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" breakMode="normal">Link text</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).toHaveCSS("word-break", "normal");
+  });
+
+  test("breakMode=hyphenate applies hyphens auto", async ({
+    initTestBed,
+    createLinkDriver,
+  }) => {
+    await initTestBed(`
+      <Link testId="link" to="/" breakMode="hyphenate">superlongwordthatwontbreakwithoutbreakmode</Link>
+    `);
+    const driver = await createLinkDriver("link");
+    await expect(driver.component).toBeVisible();
+    await expect(driver.component.locator("span").first()).toHaveCSS("hyphens", "auto");
   });
 });

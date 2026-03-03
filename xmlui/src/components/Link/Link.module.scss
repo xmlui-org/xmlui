@@ -142,6 +142,128 @@ $outlineOffset-Link--focus: createThemeVar("outlineOffset-#{$component}--focus")
       text-decoration: none;
     }
   }
+
+  // --- Overflow behavior classes (applied to inner text <span>, not the flex container)
+
+  // Container shrink guard: lets the flex container clip its children without
+  // fighting its natural "shrink to content" behaviour.
+  .textOverflowContainer {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  // Base class for the text content wrapper span
+  .textSpan {
+    display: block;
+    min-width: 0;
+  }
+
+  // Single-line truncation with optional ellipsis
+  .truncateOverflow {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .preserveLinebreaks {
+    white-space: pre-wrap;
+  }
+
+  .noEllipsis {
+    text-overflow: clip;
+  }
+
+  // Prevents pixel artifacts from descenders when using multi-line clamp
+  .multiLineClamp {
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: inherit;
+      pointer-events: none;
+    }
+  }
+
+  .overflowNone {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    min-width: 0;
+  }
+
+  .overflowScroll {
+    display: block;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 0;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+  }
+
+  .overflowFlow {
+    display: block;
+    white-space: normal;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-width: 0;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.3);
+      border-radius: 3px;
+    }
+  }
+}
+
+// --- Break mode classes
+.breakNormal {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.breakWord {
+  overflow-wrap: break-word;
+}
+
+.breakAnywhere {
+  word-break: break-all;
+  overflow-wrap: anywhere;
+}
+
+.breakKeep {
+  word-break: keep-all;
+}
+
+.breakHyphenate {
+  hyphens: auto;
+  overflow-wrap: break-word;
 }
 
 // --- We export the theme variables to add them to the component renderer
