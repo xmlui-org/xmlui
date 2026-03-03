@@ -73,6 +73,8 @@ export function AppRoot({
         type: "NestedApp",
         props: {
           resolvedApp: node,
+          resolvedComponents: contributes.compoundComponents,
+          asIsland
         },
         children: [],
       };
@@ -99,7 +101,7 @@ export function AppRoot({
       uses: [],
       globalVars: globalVars || {},
     };
-  }, [node, asIsland, globalVars]);
+  }, [asIsland, node, globalVars, contributes?.compoundComponents]);
 
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;

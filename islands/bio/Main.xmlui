@@ -1,3 +1,10 @@
-<Markdown>
-# XMLUI bio
-</Markdown>
+<Stack>
+  <Markdown>
+    <![CDATA[
+# XMLUI markdown, on my own island
+ - 1
+ - 2
+]]>
+  </Markdown>
+  <MyComp/>
+</Stack>

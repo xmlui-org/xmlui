@@ -9,6 +9,7 @@
     "build:for-node": "tsdown",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
+    "build:xmlui-islands": "vite build --mode islands",
     "build:xmlui-metadata": "vite build --mode metadata",
     "build:inspector-parser": "vite build --mode inspector-parser",
     "test:unit": "vitest run",

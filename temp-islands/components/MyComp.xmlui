@@ -1,0 +1,3 @@
+<Component name="MyComp">
+  <Badge backgroundColor="$color-secondary">my custom component</Badge>
+</Component>

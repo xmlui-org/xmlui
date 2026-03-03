@@ -18,13 +18,14 @@ export default ({ mode = "lib" }) => {
   let define;
   let distSubDirName = "";
   switch (mode) {
-    case "standalone": {
-      distSubDirName = "standalone";
+    case "standalone":
+    case "islands": {
+      distSubDirName = mode;
       lib = {
-        entry: [path.resolve("src", "index-standalone.ts")],
+        entry: [path.resolve("src", `index-${mode}.ts`)],
         name: "xmlui",
         formats: ["umd"] as any,
-        fileName: (format: any) => `xmlui-standalone.${format}.js`,
+        fileName: (format: any) => `xmlui-${mode}.${format}.js`,
       };
       define = {
         "process.env": {
@@ -187,7 +188,7 @@ export default ({ mode = "lib" }) => {
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
-          mode === "standalone" || mode === "inspector-parser"
+          mode === "standalone" || mode === "inspector-parser" || mode === "islands"
             ? [] // Bundle everything for standalone builds
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
