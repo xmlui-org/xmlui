@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   forwardRef,
+  Fragment,
   type ForwardedRef,
 } from "react";
 import {
@@ -34,7 +35,7 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 
 type Props = {
   id?: string;
-  data: Record<string, string>;
+  data: IndexableData;
   limit?: number;
   maxContentMatchNumber?: number;
   collapsible?: boolean;
@@ -46,6 +47,8 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   limit: 10,
   maxContentMatchNumber: 3,
 };
+
+const DEFAULT_CATEGORY = "Other";
 
 export const Search = ({
   id,
@@ -113,30 +116,33 @@ export const Search = ({
   // render-related state
   const [show, setShow] = useState(false);
   // --- Step 2: Convert data to a format better handled by the search engine
-  const dataFromMd = useMemo(
-    () => {
-      if (!data) return [];
-      if (typeof data !== "object") {
-        console.warn("Search data should be an object with path keys and string content values");
-        return [];
-      }
-      return Object.entries(data).map<SearchItemData>(([path, content]) => {
-        const lines = content.split("\n");
-        const firstLine = lines.length > 0 ? lines[0] : "";
-        // Remove title after matching, since it is in the "label"
-        const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
-        return {
-          path,
-          title: firstLine,
-          content: restContent,
-        };
-      });
-    },
-    [data],
-  );
+  const dataFromMd = useMemo(() => {
+    if (!data) return [];
+    if (typeof data !== "object") {
+      console.warn("Search data should be an object with path keys and string content values");
+      return [];
+    }
+    return Object.entries(data).map<SearchItemData>(([path, { content, meta }]) => {
+      const lines = content.split("\n");
+      const firstLine = lines.length > 0 ? lines[0] : "";
+      // Remove title after matching, since it is in the "label"
+      const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
+      return {
+        path,
+        title: firstLine,
+        content: restContent,
+        category: meta?.category ?? DEFAULT_CATEGORY,
+      };
+    });
+  }, [data]);
 
   const mergedData = useMemo(() => {
-    return [...dataFromMd, ...(useContentFromAppContext ? Object.values(content ?? {}) : [])];
+    return [
+      ...dataFromMd,
+      ...(useContentFromAppContext
+        ? Object.values(content ?? {}).map((item) => ({ ...item, category: DEFAULT_CATEGORY }))
+        : []),
+    ];
   }, [content, dataFromMd, useContentFromAppContext]);
 
   useEffect(() => {
@@ -291,29 +297,53 @@ export const Search = ({
             <ul className={styles.list} role="listbox">
               {results.length > 0 &&
                 results.map((result, idx) => {
+                  const effectiveCategory = result.item.category ?? DEFAULT_CATEGORY;
+                  const prevEffectiveCategory =
+                    idx > 0 ? (results[idx - 1].item.category ?? DEFAULT_CATEGORY) : undefined;
+                  const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
                   return (
-                    <li
-                      role="option"
-                      key={`${result.item.path}-${idx}`}
-                      className={classnames(styles.item, styles.header, {
-                        [styles.keyboardFocus]: activeIndex === idx,
-                      })}
-                      onMouseEnter={() => {
-                        setActiveIndex(idx);
-                        setNavigationSource("mouse");
-                      }}
-                      ref={(el) => (itemRefs.current[idx] = el!)}
-                      aria-selected={activeIndex === idx}
-                    >
-                      <SearchItemContent
-                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                        idx={idx}
-                        item={result.item}
-                        matches={result.matches}
-                        maxContentMatchNumber={maxContentMatchNumber}
-                        onClick={onClick}
-                      />
-                    </li>
+                    <Fragment key={`${result.item.path}-${idx}`}>
+                      {showCategoryHeader && (
+                        <li
+                          className={styles.categoryHeader}
+                          role="presentation"
+                          aria-hidden="true"
+                        >
+                          <Text
+                            variant="em"
+                            style={{
+                              fontSize: "0.72em",
+                              fontWeight: 600,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {effectiveCategory}
+                          </Text>
+                        </li>
+                      )}
+                      <li
+                        role="option"
+                        className={classnames(styles.item, styles.header, {
+                          [styles.keyboardFocus]: activeIndex === idx,
+                        })}
+                        onMouseEnter={() => {
+                          setActiveIndex(idx);
+                          setNavigationSource("mouse");
+                        }}
+                        ref={(el) => (itemRefs.current[idx] = el!)}
+                        aria-selected={activeIndex === idx}
+                      >
+                        <SearchItemContent
+                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                          idx={idx}
+                          item={result.item}
+                          matches={result.matches}
+                          maxContentMatchNumber={maxContentMatchNumber}
+                          onClick={onClick}
+                        />
+                      </li>
+                    </Fragment>
                   );
                 })}
               {results.length === 0 && (
@@ -353,7 +383,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
     >
       <div style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          {getSourceLabel(item.path) && (
+          {item.category && (
             <Text
               variant="em"
               style={{
@@ -365,7 +395,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
                 flexShrink: 0,
               }}
             >
-              {getSourceLabel(item.path)}
+              {item.category}
             </Text>
           )}
           <Text variant="subtitle">
@@ -390,9 +420,9 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             )}
         </div>
         {/* Display the number of other matches if there are any */}
-        {matches?.content?.indices && (
+        {matches.content?.indices && (
           <Text variant="em">
-            {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
+            {`${pluralize(matches.content.indices.length, "match", "matches")} in this article`}
           </Text>
         )}
       </div>
@@ -431,6 +461,10 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
       .filter((match) => !!match.key)
       .reduce<MatchesByKey>((acc, match) => {
         const matchKey = match.key as keyof SearchItemData;
+        const fieldValue = result.item[matchKey];
+
+        // Skip fields that have no value (e.g. optional fields like category)
+        if (fieldValue === undefined) return acc;
 
         // --- Prefilter matches that are too short/significantly misaligned compared to the search term
         const filteredMatches = match.indices.filter((index) => {
@@ -444,7 +478,7 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             return foundSubstrLength >= longContentAcceptance;
           }
           // Content: regular text search
-          return result.item[matchKey]
+          return fieldValue
             .slice(index[0], index[1] + 1)
             .toLocaleLowerCase()
             .includes(debouncedValue.toLocaleLowerCase());
@@ -458,10 +492,10 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             }
           }
 
-          const origTextLength = result.item[matchKey].length;
+          const origTextLength = fieldValue.length;
           const startIdx = Math.max(index[0] - textSearchRadius, 0);
           const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
-          const textSnippet = result.item[matchKey].toLocaleLowerCase();
+          const textSnippet = fieldValue.toLocaleLowerCase();
 
           const position = textSnippet.indexOf(debouncedValue.toLocaleLowerCase(), startIdx);
           if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
@@ -555,18 +589,6 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
   return result;
 }
 
-/**
- * Extracts a human-readable source label from a path string.
- * Returns "Docs", "Blog", or null if the source cannot be determined.
- */
-function getSourceLabel(path: string): string | null {
-  const segments = path.split("/").filter(Boolean);
-  const first = segments[0]?.toLowerCase();
-  if (first === "docs") return "Docs";
-  if (first === "blog") return "Blog";
-  return null;
-}
-
 function pluralize(number: number, singular: string, plural: string): string {
   if (number === 1) {
     return `${number} ${singular}`;
@@ -574,7 +596,8 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-type SearchItemData = { path: string; title: string; content: string };
+type IndexableData = Record<string, { content: string; meta?: { category?: string } }>;
+type SearchItemData = { path: string; title: string; content: string; category?: string };
 type MatchesByKey = Partial<
   Record<keyof SearchItemData, Pick<FuseResultMatch, "indices" | "value">>
 >;
