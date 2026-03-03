@@ -206,7 +206,7 @@ export function splicePreservingInteractions(logs: any[], maxSize: number): void
   const keep: any[] = [];
   const evictable: any[] = [];
   for (const entry of logs) {
-    if (preserved.has(entry.kind)) {
+    if (preserved.has(entry.kind) || entry.kind?.startsWith("native:")) {
       keep.push(entry);
     } else {
       evictable.push(entry);
