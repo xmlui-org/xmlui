@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
 import type { ComponentCleanupFn } from "../rendering/ContainerWrapper";
-import { shouldKeep, extractParam } from "../utils/extractParam";
+import { resolveResponsiveWhen, extractParam } from "../utils/extractParam";
 import { ComponentWrapper } from "./ComponentWrapper";
 import type { StatePartChangedFn } from "./ContainerWrapper";
 
@@ -56,7 +56,7 @@ export function renderChild({
     !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
 
   // --- Render only visible components (skip when check if component has init event)
-  if (shouldCheckWhen && !shouldKeep(node.when, state, appContext)) {
+  if (shouldCheckWhen && !resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext)) {
     return null;
   }
 

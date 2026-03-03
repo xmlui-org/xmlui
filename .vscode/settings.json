@@ -57,6 +57,7 @@
     "/^npm run \\| grep -E \"lint\\|check\"$/": {
       "approve": true,
       "matchCommandLine": true
-    }
+    },
+    "npx changeset": true
   }
 }

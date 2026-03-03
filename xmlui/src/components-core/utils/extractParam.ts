@@ -2,7 +2,8 @@ import React, { type CSSProperties } from "react";
 import { isPlainObject } from "lodash-es";
 
 import type { ContainerState } from "../rendering/ContainerWrapper";
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -173,6 +174,55 @@ export function shouldKeep(
     return true;
   }
   return asOptionalBoolean(extractParam(componentState, when, appContext, true));
+}
+
+/**
+ * Resolves the effective "when" value for a component, applying Tailwind-style
+ * min-width (mobile-first) responsive overrides.
+ *
+ * If no responsiveWhen entries are defined, delegates to the plain shouldKeep (base `when`).
+ * Otherwise, treats responsiveWhen as the exclusive source of truth:
+ * - For the current sizeIndex, walks from the current breakpoint down to "xs"
+ * - Returns the first defined responsive value found
+ * - If no responsive rule matches, returns false (hidden by default)
+ * - If sizeIndex is undefined, falls back to base `when`
+ *
+ * @param when Base visibility condition
+ * @param responsiveWhen Per-breakpoint visibility overrides (Tailwind mobile-first)
+ * @param componentState Current component state
+ * @param appContext Application context with mediaSize information
+ * @returns The effective visibility (true=show, false=hide)
+ */
+export function resolveResponsiveWhen(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+  componentState: ContainerState,
+  appContext?: AppContextObject,
+): boolean {
+  // If no responsive rules are defined, use base `when` (backward compatibility)
+  if (!responsiveWhen || Object.keys(responsiveWhen).length === 0) {
+    return shouldKeep(when, componentState, appContext);
+  }
+
+  const sizeIndex = appContext?.mediaSize?.sizeIndex;
+
+  // If sizeIndex is not yet computed, fall back to base `when`
+  if (sizeIndex === undefined) {
+    return shouldKeep(when, componentState, appContext);
+  }
+
+  // Walk from current breakpoint down to xs (Tailwind mobile-first)
+  for (let i = sizeIndex; i >= 0; i--) {
+    const bp = MediaBreakpointKeys[i];
+    if (responsiveWhen[bp] !== undefined) {
+      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+    }
+  }
+
+  // No responsive rule matched — fall back to base `when` (same as if no responsive
+  // attrs were set at all). This means a lone `when-md="false"` on a component that has
+  // no base `when` will be visible at xs/sm, because undefined `when` defaults to true.
+  return shouldKeep(when, componentState, appContext);
 }
 
 /**
