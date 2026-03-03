@@ -1,1 +1,10 @@
-<Button>HELO</Button>
+<Theme tone="dark">
+  <Card>
+    <Form>
+      <FormItem bindTo="name" placeholder="Your name"/>
+      <FormItem bindTo="email" placeholder="example@something.com"/>
+    </Form>
+    <Button onClick="modal.open()">Open modal</Button>
+  </Card>
+  <ModalDialog id="modal" title="myModal"/>
+</Theme>

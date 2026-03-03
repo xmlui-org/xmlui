@@ -77,13 +77,18 @@ export function AppRoot({
         children: [],
       };
     }
-    const themedRoot = {
-      type: "Theme",
-      props: {
-        root: true,
-      },
-      children: [node],
-    };
+    let themedRoot = node;
+    if (node.type !== "Theme") {
+      themedRoot = {
+        type: "Theme",
+        props: {
+          root: true,
+        },
+        children: [node],
+      };
+    } else {
+      node.props.root = true;
+    }
     return {
       type: "Container",
       uid: "root",

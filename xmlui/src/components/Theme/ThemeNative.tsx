@@ -292,6 +292,25 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         : document.documentElement;
       documentElement.classList.add(...classNames);
 
+      if(insideShadowRoot){
+        // A. Local Vite Dev Mode (Still needs to catch Vite's HMR styles)
+        if (import.meta.env.DEV) {
+          const syncDevStyles = (node) => {
+            if (node.tagName === "STYLE" && node.hasAttribute("data-vite-dev-id")) {
+              const viteId = node.getAttribute("data-vite-dev-id");
+              const exists = target.querySelector(`style[data-vite-dev-id="${viteId}"]`);
+              if (!exists) target.appendChild(node.cloneNode(true));
+            }
+          };
+          document.head.querySelectorAll("style").forEach(syncDevStyles);
+          const observer = new MutationObserver((m) =>
+            m.forEach((mu) => mu.addedNodes.forEach(syncDevStyles)),
+          );
+          observer.observe(document.head, { childList: true });
+          return () => observer.disconnect();
+        }
+      }
+
 
       const applyRegistryStyles = () => {
         if (!window.__XMLUI_STYLES__) return;
