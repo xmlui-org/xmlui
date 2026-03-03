@@ -18,6 +18,7 @@ import { noop } from "../../components-core/constants";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
+import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
@@ -450,11 +451,20 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
+      // Emit native trace event when xsVerbose tracing is active
+      // (window._xsLogs existence is the proxy, same as InspectorContext)
+      if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+        const selectedOption = options.find((o) => String(o.value) === String(selectedValue));
+        pushXsLog(createLogEntry("native:selection:change", {
+          displayLabel: selectedOption?.label || String(selectedValue),
+          value: newSelectedValue,
+        }));
+      }
       if (!multiSelect) {
         setOpen(false);
       }
     },
-    [multiSelect, currentValue, updateState, onDidChange],
+    [multiSelect, currentValue, updateState, onDidChange, options],
   );
 
   // Clear selected value
