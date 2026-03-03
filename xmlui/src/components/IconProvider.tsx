@@ -422,20 +422,29 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
 
       // Register icon renderer immediately (works on server and client)
       registerIconRenderer(iconKey, (props: IconBaseProps) => {
-        const size = props.size || safeAttributes.width || safeAttributes.height || 24;
-        
+        const {
+          size: propSize,
+          color,
+          style,
+          className,
+          children: _children,
+          ...eventAndDataProps
+        } = props;
+        const size = propSize || safeAttributes.width || safeAttributes.height || 24;
+
         // Merge safe attributes with props (props take precedence)
         const mergedAttributes = {
           ...safeAttributes,
           width: size,
           height: size,
           viewBox,
-          fill: props.color || defaultFill || 'currentColor',
+          fill: color || defaultFill || 'currentColor',
           stroke: defaultStroke,
           strokeWidth: defaultStrokeWidth,
           xmlns: "http://www.w3.org/2000/svg",
-          style: props.style,
-          className: props.className,
+          style,
+          className,
+          ...eventAndDataProps,
         };
 
         // Remove undefined values
