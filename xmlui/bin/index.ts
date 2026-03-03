@@ -84,6 +84,7 @@ interface ZipDistArgs {
 
 interface SsgArgs {
   outDir?: string;
+  fallback?: string;
 }
 
 yargs(hideBin(process.argv))
@@ -208,15 +209,24 @@ yargs(hideBin(process.argv))
     "ssg",
     "Generate static pages",
     (yargs) => {
-      return yargs.option("outDir", {
-        type: "string",
-        default: "dist-ssg",
-        description: "SSG output directory",
-      });
+      return yargs
+        .option("outDir", {
+          type: "string",
+          default: "dist-ssg",
+          description: "SSG output directory",
+        })
+        .option("fallback", {
+          type: "string",
+          default: "200",
+          description: "Base name for the fallback HTML file served for unknown routes",
+        });
     },
     (argv) => {
-      const { outDir } = argv;
-      ssg({ outDir: getStringArg(outDir, "dist-ssg") });
+      const { outDir, fallback } = argv;
+      ssg({
+        outDir: getStringArg(outDir, "dist-ssg"),
+        fallbackFile: getStringArg(fallback, "200"),
+      });
     },
   )
   .strict()

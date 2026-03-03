@@ -301,46 +301,28 @@ export const Markdown = memo(
               }
             },
             h1({ children }) {
-              return (
-                <LinkAwareHeading level="h1" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h2({ children }) {
-              return (
-                <LinkAwareHeading level="h2" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h3({ children }) {
-              return (
-                <LinkAwareHeading level="h3" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h4({ children }) {
-              return (
-                <LinkAwareHeading level="h4" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h5({ children }) {
-              return (
-                <LinkAwareHeading level="h5" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h6({ children }) {
-              return (
-                <LinkAwareHeading level="h6" showHeadingAnchors={showHeadingAnchors}>
-                  {children}
-                </LinkAwareHeading>
-              );
+              const { label, uid } = removeGeneratedAnchorSuffix(children);
+              return <Heading level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
@@ -758,11 +740,29 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
   );
 };
 
-type LinkAwareHeadingProps = {
-  level: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  children: React.ReactNode;
-  showHeadingAnchors?: boolean;
-};
+function removeGeneratedAnchorSuffix(children: React.ReactNode): {
+  label: React.ReactNode;
+  uid?: string;
+} {
+  const textContent = getHeadingText(children);
+  const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
+
+  if (match) {
+    const anchor = match[2];
+    const anchorText = `[#${anchor}]`;
+    const label = removeSuffixFromReactNodes(children, anchorText);
+    if (typeof label === "string") {
+      const trimmedLabel = label.trim();
+      return { label: trimmedLabel === "" ? null : trimmedLabel, uid: anchor };
+    } else if (React.isValidElement(label)) {
+      const trimmedLabel = getHeadingText(label).trim();
+      return { label: trimmedLabel === "" ? null : label, uid: anchor };
+    }
+    return { label, uid: anchor };
+  }
+
+  return { label: children };
+}
 
 function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): React.ReactNode {
   if (!suffix) {
@@ -806,59 +806,6 @@ function removeSuffixFromReactNodes(node: React.ReactNode, suffix: string): Reac
   return node;
 }
 
-const LinkAwareHeading = ({ level, children, showHeadingAnchors }: LinkAwareHeadingProps) => {
-  const { appGlobals } = useAppContext();
-
-  // --- Extract the optional anchor
-  let anchor: string | undefined = undefined;
-  let label: React.ReactNode = children;
-
-  const textContent = getHeadingText(children);
-  const match = textContent.match(/^(.*)\[#([a-zA-Z0-9-]+)\]\s*$/);
-
-  if (match) {
-    anchor = match[2];
-    const anchorText = `[#${anchor}]`;
-    label = removeSuffixFromReactNodes(children, anchorText);
-  }
-
-  const headingId = anchor ?? getHeadingId(children);
-
-  return (
-    <Heading level={level} id={headingId} className={styles.linkAwareHeading}>
-      {label}
-      {showHeadingAnchors && (
-        <a
-          href={`#${headingId}`}
-          className={styles.headingLink}
-          onClick={(e) => {
-            e.preventDefault();
-            appGlobals.events?.emit("scroll-to-anchor", { anchor: headingId });
-          }}
-        >
-          <ThemedIcon name="link" />
-        </a>
-      )}
-    </Heading>
-  );
-};
-
-function getHeadingId(children: React.ReactNode): string {
-  const text = getHeadingText(children);
-  let id = text
-    .toLowerCase()
-    .replace(/[^\w]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  // Ensure ID starts with a letter or underscore (not a digit)
-  // This is required for querySelector to work without escaping
-  if (id && /^[0-9]/.test(id)) {
-    id = "heading-" + id;
-  }
-
-  return id;
-}
-
 function getHeadingText(children: React.ReactNode): string {
   if (typeof children === "string") {
     return children;
@@ -871,32 +818,6 @@ function getHeadingText(children: React.ReactNode): string {
   }
   return "";
 }
-
-const getLabelContent = (node: React.ReactNode, labelText: string): React.ReactNode => {
-  if (typeof node === "string") {
-    return labelText.includes(node) ? node : null;
-  }
-  if (Array.isArray(node)) {
-    const children = node.map((n) => getLabelContent(n, labelText)).filter(Boolean);
-    return children.length > 0 ? children : null;
-  }
-  if (React.isValidElement(node)) {
-    const nodeText = getHeadingText(node);
-    if (labelText.trim() === nodeText.trim()) {
-      return node;
-    }
-    if (labelText.includes(nodeText)) {
-      return node;
-    }
-    const newChildren = getLabelContent(node.props.children, labelText);
-    if (newChildren) {
-      return React.cloneElement(node, node.props, newChildren);
-    }
-  }
-  return null;
-};
-
-// --- Helper functions
 
 function removeTextIndents(input: string): string {
   if (!input) {

@@ -814,6 +814,33 @@ test.describe("Visual state", () => {
     await expect(driver.component).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
+  test("paddingTop and paddingBottom default to 0", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {});
+    const driver = await createExpandableItemDriver();
+
+    await expect(driver.component).toHaveCSS("padding-top", "0px");
+    await expect(driver.component).toHaveCSS("padding-bottom", "0px");
+  });
+
+  test("paddingTop and paddingBottom can be controlled via theme variables", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(`<ExpandableItem summary="Test">Content</ExpandableItem>`, {
+      testThemeVars: {
+        "paddingTop-ExpandableItem": "8px",
+        "paddingBottom-ExpandableItem": "8px",
+      },
+    });
+    const driver = await createExpandableItemDriver();
+
+    await expect(driver.component).toHaveCSS("padding-top", "8px");
+    await expect(driver.component).toHaveCSS("padding-bottom", "8px");
+  });
+
   test("component applies disabled visual state", async ({
     initTestBed,
     createExpandableItemDriver,

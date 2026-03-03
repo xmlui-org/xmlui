@@ -134,6 +134,53 @@ test.describe("Basic Functionality", () => {
 });
 
 // =============================================================================
+// THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("Theme Variables", () => {
+  test("gap-Stack theme variable controls default gap between children", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <VStack testId="stack">
+        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
+      </VStack>
+    `,
+      {
+        testThemeVars: { "gap-Stack": "24px" },
+      },
+    );
+
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Top - item1Bottom).toBeCloseTo(24, 0);
+  });
+
+  test("gap-Stack theme variable can set gap to zero", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <VStack testId="stack">
+        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
+        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
+      </VStack>
+    `,
+      {
+        testThemeVars: { "gap-Stack": "0px" },
+      },
+    );
+
+    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+
+    expect(item2Top - item1Bottom).toBeCloseTo(0, 0);
+  });
+});
+
+// =============================================================================
 // LAYOUT TESTS
 // =============================================================================
 

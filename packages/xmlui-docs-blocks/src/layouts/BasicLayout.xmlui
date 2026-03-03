@@ -1,49 +1,50 @@
 <Component name="BasicLayout">
-    <FlowLayout verticalAlignment="stretch" gap="$space-6">
+    <FlowLayout verticalAlignment="stretch" gap="$space-14">
         <Items data="{$props.sortedPosts}">
-                <VStack
-                    gap="$space-3"
-                    height="*"
-                    minHeight="0"
-                    width="100%"
-                    borderRadius="$space-2"
-                >
-                    <VStack gap="$space-2">
-                        <HStack>
-                            <Text variant="info">
-                                {$item.author}
-                                •
-                                {formatDate($item.date, "d MMM yyyy")}
-                            </Text>
-                        </HStack>
-                        <VStack gap="$space-0_5">
-                            <H2 variant="title">
-                                {$item.title}
-                            </H2>
-                            <H3 maxLines="4" ellipses>
-                                {$item.description}
-                            </H3>
-                        </VStack>
-                    </VStack>
-
-                    <HStack when="{$props.showTags && $item.tags && $item.tags.length > 0}" gap="$space-1_5">
-                        <Items data="{$item.tags}">
-                            <Tag>{$item}</Tag>
-                        </Items>
-                    </HStack>
-
-                    <Text variant="blurb" maxLines="4" ellipses>
-                        {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+            <VStack
+                gap="$space-3"
+                height="*"
+                minHeight="0"
+                width="100%"
+                borderRadius="$space-2"
+            >
+                <VStack gap="$space-0_5">
+                    <Text variant="info">
+                        {$item.author}
+                            •
+                            {formatDate($item.date, "d MMM yyyy")}
                     </Text>
-                    <Theme 
-                        textColor-Link="$color-primary-500"
-                        textColor-Link--hover="$color-primary-400"
-                    >
-                        <Link noIndicator to="/blog/{$item.slug}">
-                            Read more →
-                        </Link>
-                    </Theme>
+                    <H2 variant="title" showAnchor="false">
+                        {$item.title}
+                    </H2>
+                    <H3 maxLines="4" showAnchor="false" ellipses>
+                        {$item.description}
+                    </H3>
                 </VStack>
+
+                <HStack
+                    when="{$props.showTags && $item.tags && $item.tags.length > 0}"
+                    gap="$space-1_5"
+                >
+                    <Items data="{$item.tags}">
+                        <Tag>
+                            {$item}
+                        </Tag>
+                    </Items>
+                </HStack>
+
+                <Text variant="blurb" maxLines="4" ellipses>
+                    {globalThis.getBlurb(appGlobals.prefetchedContent['/blog/' + $item.slug + '.md'])}
+                </Text>
+                <Theme
+                    textColor-Link="$color-primary-500"
+                    textColor-Link--hover="$color-primary-400"
+                >
+                    <Link noIndicator to="/blog/{$item.slug}">
+                        Read more →
+                    </Link>
+                </Theme>
+            </VStack>
         </Items>
     </FlowLayout>
 </Component>

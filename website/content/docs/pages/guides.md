@@ -7,6 +7,7 @@ Use the sidebar to open any guide:
 - **App Structure** — How an XMLUI app is organized
 - **Markup** — XMLUI markup basics
 - **Scoping** — Scoping and visibility
+- **Visibility** — Conditional rendering and responsive display
 - **Scripting** — Scripting and reactivity
 - **Codefences and playgrounds** — Inline code and live demos
 - **Layout** — Layout components

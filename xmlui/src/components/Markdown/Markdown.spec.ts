@@ -405,7 +405,7 @@ test.describe("Heading ID Generation Regression", () => {
     // Verify the component renders without errors
     const heading = page.getByRole("heading", { level: 2, name: /1\. Install the management tool/ });
     await expect(heading).toBeVisible();
-    await expect(heading).toHaveText("1. Install the management tool");
+    await expect(heading).toHaveText("1. Install the management tool#");
     
     // Check if anchor link renders
     await heading.hover();

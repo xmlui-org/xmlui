@@ -1192,3 +1192,23 @@ test.describe("noIndicator property", () => {
     expect(afterElement.content).toBe('""');
   });
 });
+
+// =============================================================================
+// exact PROPERTY TESTS
+// =============================================================================
+
+test.describe("exact property", () => {
+  test("link with exact=true is active on exact path", async ({
+    initTestBed,
+    createNavLinkDriver,
+  }) => {
+    await initTestBed(`<NavLink to="/" exact="true">Test</NavLink>`);
+
+    const driver = await createNavLinkDriver();
+    const hasActiveClass = await driver.component.evaluate((el) =>
+      el.classList.contains("xmlui-navlink-active"),
+    );
+
+    expect(hasActiveClass).toBe(true);
+  });
+});

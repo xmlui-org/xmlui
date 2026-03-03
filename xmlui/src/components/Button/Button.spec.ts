@@ -12,7 +12,7 @@ import { sizeValues } from "../abstractions";
 
 // --- Smoke
 
-test.describe("smoke tests", { tag: "@smoke" }, () => {
+test.describe("smoke tests", () => {
   test("component renders", async ({ initTestBed, createButtonDriver }) => {
     await initTestBed(`<Button />`);
     await expect((await createButtonDriver()).component).toBeAttached();

@@ -1,0 +1,37 @@
+name: Deploy xmlui.org website
+
+on:
+  workflow_dispatch:
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=8192"
+      TURBO_UI: "false"
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          registry-url: https://registry.npmjs.org/
+
+      - name: npm clean-install
+        run: npm ci --prefer-offline
+
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v2.3.1
+
+      - name: build xmlui-website
+        run: npx turbo run build-ssg --filter="xmlui-website"
+
+      - name: Deploy site
+        uses: azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_WEBAPP_DEPLOYMENT_TOKEN_XMLUI }}
+          action: "upload"
+          app_location: "website/dist-ssg"
+          skip_app_build: true
+          production_branch: "main"

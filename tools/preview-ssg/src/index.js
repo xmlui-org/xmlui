@@ -60,6 +60,7 @@ class Server {
     this.staticDir = staticDir;
     this.port = options.port || null;
     this.explicitPort = options.port != null;
+    this.fallbackFile = options.fallbackFile || "200.html";
     this.server = null;
     this.hasStarted = false; // Track if startup messages have been shown
 
@@ -161,10 +162,10 @@ class Server {
           return;
         }
 
-        // For non-resource files, fallback to index.html (SPA behavior)
-        const indexPath = path.join(this.staticDir, "index.html");
-        if (fs.existsSync(indexPath)) {
-          filePath = indexPath;
+        // For non-resource files, serve the fallback file (SPA behavior)
+        const fallbackPath = path.join(this.staticDir, this.fallbackFile);
+        if (fs.existsSync(fallbackPath)) {
+          filePath = fallbackPath;
         } else {
           const timestamp = this._getTimestamp();
           const msg = `${timestamp} \x1b[36m${req.method}\x1b[0m \x1b[33m${pathname}\x1b[0m -> \x1b[31m404\x1b[0m -`;

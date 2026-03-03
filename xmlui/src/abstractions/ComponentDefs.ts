@@ -1,6 +1,7 @@
 import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import type { DefaultThemeVars } from "./ThemingDefs";
+import type { MediaBreakpointType } from "./AppContextDefs";
 
 /**
  * This interface represents the core properties of a component definition
@@ -56,6 +57,18 @@ export interface ComponentDefCore {
    * component hierarchy is omitted from the rendered tree.
    */
   when?: string | boolean;
+
+  /**
+   * Per-breakpoint visibility conditions (Tailwind mobile-first style).
+   * Keys are breakpoint names ("xs" | "sm" | "md" | "lg" | "xl" | "xxl").
+   * When any responsiveWhen entries are defined, they become the exclusive source of truth
+   * for visiblity, overriding the base `when` value. For a given screen size, the resolution
+   * walks from the current breakpoint down to "xs", returning the first defined responsive
+   * value. If no responsive rule matches, the component is hidden (false). If no responsiveWhen
+   * entries are defined at all, the base `when` property is used (backward compatibility).
+   * Example: `<Button when-md="true" />` shows only at md and above, hidden at xs/sm.
+   */
+  responsiveWhen?: Partial<Record<MediaBreakpointType, string | boolean>>;
 
   /**
    * Some components work with data obtained asynchronously. Fetching this data requires

@@ -19,6 +19,7 @@ import { discoverPaths, pathExists } from "./ssg/discoverPaths";
 
 type SsgOptions = {
   outDir?: string;
+  fallbackFile?: string;
 };
 
 type RenderResult = {
@@ -329,7 +330,7 @@ async function getWorkspaceExtensionAliases(cwd: string): Promise<Record<string,
   return aliases;
 }
 
-export const ssg = async ({ outDir = "dist-ssg" }: SsgOptions = {}) => {
+export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOptions = {}) => {
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
   const distPath = path.resolve(cwd, "dist");
@@ -365,6 +366,16 @@ export const ssg = async ({ outDir = "dist-ssg" }: SsgOptions = {}) => {
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
   const pathsToRender = (await discoverPaths(cwd)).map(normalizeRoute);
+
+  // Collision detection: a discovered page route must not share the base name of the fallback file.
+  const fallbackBaseName = fallbackFile.replace(/\.html$/i, "");
+  const fallbackRoute = normalizeRoute(`/${fallbackBaseName}`);
+  if (pathsToRender.includes(fallbackRoute)) {
+    throw new Error(
+      `A discovered page route "${fallbackRoute}" conflicts with the fallback file name ` +
+        `"${fallbackBaseName}.html". Use --fallback to specify a different name.`,
+    );
+  }
 
   log(`discovered ${pathsToRender.length} route(s)`);
   for (const route of pathsToRender) {
@@ -459,6 +470,16 @@ export const ssg = async ({ outDir = "dist-ssg" }: SsgOptions = {}) => {
 
     log("waiting for all writes to complete...");
     await Promise.all(writePromises);
+
+    // Render the fallback file using a synthetic route that no <Page> will match.
+    // Even if there is a fallbackRoute prop on the Pages component, that renders a <Navigate> component, which
+    // emits no DOM output, so the result remains a good app shell.
+    const fallbackRendered = renderModule.renderPath(fallbackFile);
+    log(`rendering fallback shell at synthetic route ${fallbackRoute}`);
+    const fallbackHtml = applyRenderToShell(shellHtml, fallbackRendered);
+    const fallbackOutputFile = path.join(outPath, `${fallbackBaseName}.html`);
+    await writeFile(fallbackOutputFile, fallbackHtml, "utf-8");
+    log(`wrote ${fallbackOutputFile}`);
   } finally {
     await rm(tempEntryPath, { force: true });
     await rm(ssrBuildPath, { recursive: true, force: true });

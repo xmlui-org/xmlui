@@ -237,6 +237,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     type: "Container",
     uid: node.uid,
     when: node.when,
+    responsiveWhen: node.responsiveWhen,
     loaders: node.loaders,
     vars: node.vars,
     functions: node.functions,

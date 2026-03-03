@@ -2,7 +2,8 @@ import React, { type CSSProperties } from "react";
 import { isPlainObject } from "lodash-es";
 
 import type { ContainerState } from "../rendering/ContainerWrapper";
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -173,6 +174,74 @@ export function shouldKeep(
     return true;
   }
   return asOptionalBoolean(extractParam(componentState, when, appContext, true));
+}
+
+/**
+ * Resolves the effective "when" value for a component, applying Tailwind-style
+ * min-width (mobile-first) responsive overrides.
+ *
+ * If no responsiveWhen entries are defined, delegates to the plain shouldKeep (base `when`).
+ * Otherwise, treats responsiveWhen as the exclusive source of truth:
+ * - For the current sizeIndex, walks from the current breakpoint down to "xs"
+ * - Returns the first defined responsive value found
+ * - If no responsive rule matches, returns false (hidden by default)
+ * - If sizeIndex is undefined, falls back to base `when`
+ *
+ * @param when Base visibility condition
+ * @param responsiveWhen Per-breakpoint visibility overrides (Tailwind mobile-first)
+ * @param componentState Current component state
+ * @param appContext Application context with mediaSize information
+ * @returns The effective visibility (true=show, false=hide)
+ */
+export function resolveResponsiveWhen(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+  componentState: ContainerState,
+  appContext?: AppContextObject,
+): boolean {
+  // If no responsive rules are defined, use base `when` (backward compatibility)
+  if (!responsiveWhen || Object.keys(responsiveWhen).length === 0) {
+    return shouldKeep(when, componentState, appContext);
+  }
+
+  const sizeIndex = appContext?.mediaSize?.sizeIndex;
+
+  if (sizeIndex === undefined) {
+    // --- SSR mode: `document` is not available, so the viewport breakpoint is unknown.
+    if (typeof document === "undefined") {
+      // Point 1: Render the component if it would be visible at *any* breakpoint.
+      // This ensures SSR output includes the component for crawlers and initial HTML.
+      const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
+        if (responsiveWhen[bp] === undefined) return false;
+        return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+      });
+      if (isVisibleAtAnyBreakpoint) {
+        // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
+        // and attach its class name to the component so the browser can apply the correct
+        // visibility on first paint before React hydration runs.
+        return true;
+      }
+      return false;
+    }
+
+    // Client-side but sizeIndex not yet computed (media queries still resolving on first
+    // render). Suppress rendering to avoid a flash where multiple mutually-exclusive
+    // responsive components briefly appear together before the breakpoint is known.
+    return false;
+  }
+
+  // Walk from current breakpoint down to xs (Tailwind mobile-first)
+  for (let i = sizeIndex; i >= 0; i--) {
+    const bp = MediaBreakpointKeys[i];
+    if (responsiveWhen[bp] !== undefined) {
+      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+    }
+  }
+
+  // No responsive rule matched — fall back to base `when` (same as if no responsive
+  // attrs were set at all). This means a lone `when-md="false"` on a component that has
+  // no base `when` will be visible at xs/sm, because undefined `when` defaults to true.
+  return shouldKeep(when, componentState, appContext);
 }
 
 /**

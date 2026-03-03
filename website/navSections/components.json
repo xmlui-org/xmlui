@@ -147,6 +147,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/Drawer",
+          "label": "Drawer",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/DropdownMenu",
           "label": "DropdownMenu",
           "icon": "component"

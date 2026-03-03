@@ -157,6 +157,7 @@ This component does not expose any methods.
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $paddingVertical-logo-AppHeader | $paddingVertical-logo-AppHeader |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-AppHeader | $space-0 | $space-0 |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | $space-0 | $space-0 |
+| [size](/docs/styles-and-themes/common-units/#size-values)-drawerToggle-AppHeader | $space-12 | $space-12 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-logo-AppHeader | *none* | *none* |
 
 ### Variable Explanations [#variable-explanations]

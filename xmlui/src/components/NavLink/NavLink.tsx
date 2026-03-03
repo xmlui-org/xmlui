@@ -61,6 +61,13 @@ export const NavLinkMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
+    exact: {
+      description:
+        `When set to true, the link is only considered active when the current URL matches the ` +
+        `\`to\` value exactly. When false or omitted, the link also counts as active for nested ` +
+        `paths that start with the same prefix (e.g. a link with to="/a" is active on "/a/b").`,
+      valueType: "boolean",
+    },
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
     ),
@@ -154,6 +161,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         displayActive={extractValue.asOptionalBoolean(node.props.displayActive)}
         noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
+        exact={extractValue.asOptionalBoolean(node.props.exact)}
         level={extractValue.asOptionalNumber(node.props.level)}
         className={className}
         target={extractValue(node.props?.target)}
