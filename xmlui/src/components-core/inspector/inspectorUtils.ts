@@ -284,10 +284,18 @@ export function popTrace(): void {
 
 /**
  * Get the current trace ID.
+ * After startup is complete, never return the startup trace — events that
+ * fire without an active interaction trace should get no traceId rather
+ * than being incorrectly attributed to startup.
  */
 export function getCurrentTrace(): string | undefined {
   if (typeof window !== "undefined") {
-    return (window as any)._xsCurrentTrace;
+    const w = window as any;
+    const current = w._xsCurrentTrace;
+    if (current && w._xsStartupComplete && current === w._xsStartupTrace) {
+      return undefined;
+    }
+    return current;
   }
   return traceStack[traceStack.length - 1];
 }
