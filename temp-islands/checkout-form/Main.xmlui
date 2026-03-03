@@ -1,5 +1,5 @@
-<Theme tone="dark">
-  <Card>
+<Theme>
+  <Card height="100%" title="hey, XMLUI card here on my island">
     <Form>
       <FormItem bindTo="name" placeholder="Your name"/>
       <FormItem bindTo="email" placeholder="example@something.com"/>

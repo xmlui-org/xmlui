@@ -87,6 +87,9 @@ export function AppRoot({
         children: [node],
       };
     } else {
+      if (!node.props) {
+        node.props = {};
+      }
       node.props.root = true;
     }
     return {
