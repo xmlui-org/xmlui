@@ -16,6 +16,7 @@ $padding-Drawer: createThemeVar("padding-#{$component}");
 $width-Drawer: createThemeVar("width-#{$component}");
 $maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
 $height-Drawer: createThemeVar("height-#{$component}");
+$maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
 $zIndex-Drawer: createThemeVar("zIndex-#{$component}");
 $animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
 $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
@@ -121,6 +122,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     left: 0;
     right: 0;
     height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
     border-radius: 0 0 $borderRadius-Drawer $borderRadius-Drawer;
 
     &[data-state="open"]   { animation: slideInFromTop   $animationDuration-Drawer $animationEasing-Drawer; }
@@ -132,6 +134,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
     left: 0;
     right: 0;
     height: $height-Drawer;
+    max-height: $maxHeight-Drawer;
     border-radius: $borderRadius-Drawer $borderRadius-Drawer 0 0;
 
     &[data-state="open"]   { animation: slideInFromBottom $animationDuration-Drawer $animationEasing-Drawer; }

@@ -21,8 +21,7 @@ export const DrawerMd = createMetadata({
   props: {
     position: {
       description:
-        "Specifies the edge from which the drawer slides in. " +
-        "Accepted values are `\"left\"`, `\"right\"`, `\"top\"`, and `\"bottom\"`.",
+        "Specifies the edge from which the drawer slides in.",
       valueType: "string",
       availableValues: ["left", "right", "top", "bottom"],
       defaultValue: defaultProps.position,
@@ -85,8 +84,9 @@ export const DrawerMd = createMetadata({
       "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
     [`padding-${COMP}`]: "$space-4",
     [`width-${COMP}`]: "320px",
-    [`maxWidth-${COMP}`]: "50%",
+    [`maxWidth-${COMP}`]: "80%",
     [`height-${COMP}`]: "320px",
+    [`maxHeight-${COMP}`]: "50%",
     [`zIndex-${COMP}`]: "200",
     [`animationDuration-${COMP}`]: "250ms",
     [`animationEasing-${COMP}`]: "cubic-bezier(0.4, 0, 0.2, 1)",
