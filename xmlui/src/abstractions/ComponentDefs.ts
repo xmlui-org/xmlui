@@ -339,6 +339,9 @@ export type ComponentMetadata<
   // including the component name
   limitThemeVarsToComponent?: boolean;
 
+  // Component names (type) that contribute theme variables to this component.
+  themeVarContributorComponents?: string[];
+
   // Indicates that the component allows arbitrary props (not just the named ones)
   allowArbitraryProps?: boolean;
 

@@ -12,7 +12,7 @@ import { ThemedIcon } from "../../components/Icon/Icon";
 import { Logo } from "../../components/Logo/LogoNative";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { ThemedButton as Button } from "../../components/Button/Button";
-import { NavLink } from "../../components/NavLink/NavLinkNative";
+import { ThemedNavLink } from "../../components/NavLink/NavLink";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
 
@@ -76,9 +76,9 @@ export const AppHeader = ({
   const effectiveNavPanelVisible = navPanelVisible;
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
-      <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
+      <ThemedNavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
         {title}
-      </NavLink>
+      </ThemedNavLink>
     ) : (
       titleContent
     );
@@ -116,9 +116,9 @@ export const AppHeader = ({
               <>
                 {!!logoUrl && (
                   <div className={styles.logoContainer}>
-                    <NavLink to={"/"} displayActive={false} className={styles.logoLink}>
+                    <ThemedNavLink to={"/"} displayActive={false} className={styles.logoLink}>
                       <Logo />
-                    </NavLink>
+                    </ThemedNavLink>
                   </div>
                 )}
                 {safeLogoTitle}

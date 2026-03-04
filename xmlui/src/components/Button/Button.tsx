@@ -192,7 +192,7 @@ type ThemedButtonProps = React.ComponentProps<typeof Button> & { className?: str
 export const ThemedButton = React.forwardRef<HTMLButtonElement, ThemedButtonProps>(
   function ThemedButton({ className, ...props }: ThemedButtonProps, ref) {
     const themeClass = useComponentThemeClass(ButtonMd);
-    return <Button {...props} className={`${themeClass} ${className}`} ref={ref} />;
+    return <Button {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
   },
 );
 

@@ -23,6 +23,7 @@ import {
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
+import { useComponentRegistry } from "../ComponentRegistryContext";
 
 type Props = {
   id?: string;
@@ -112,16 +113,21 @@ export function Theme({
         componentName === "Heading" ||
         componentName === "ThemedInput" ||
         componentName === "Footer" ||
-        componentName === "Pages"
+        componentName === "Pages" ||
+        componentName === "Text" ||
+        componentName === "NestedApp"
       ) {
+        const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
         if (componentName) {
-          // For component-specific vars, fully resolve the value via getThemeVar so that
-          // any var() chain references (e.g. var(--xmlui-backgroundColor-AppHeader)) that
-          // are not themselves emitted into this scope don't inherit stale light-tone values.
-          const resolvedValue = getThemeVar(rawKey);
-          filteredThemeCssVars[key] = resolvedValue ?? value;
+          // For component-specific vars, use allThemeVarsWithResolvedHierarchicalVars instead of
+          // getThemeVar. getThemeVar only follows pure $-reference chains and does NOT resolve
+          // embedded $-references in compound values like "1px solid $borderColor".
+          // allThemeVarsWithResolvedHierarchicalVars has gone through resolveThemeVarsWithCssVars
+          // which converts all $varName occurrences to var(--xmlui-varName), even inside compound
+          // values.
+          filteredThemeCssVars[key] = resolvedValue;
         } else {
-          filteredThemeCssVars[key] = value;
+          filteredThemeCssVars[key] = resolvedValue;
         }
       }
     });

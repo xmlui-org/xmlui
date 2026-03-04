@@ -43,6 +43,7 @@ type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   label: string;
   icon?: React.ReactNode;
   to?: string;
@@ -80,6 +81,7 @@ export const NavGroup = forwardRef(function NavGroup(
   {
     node,
     style,
+    className,
     label,
     icon,
     renderChild,
@@ -147,6 +149,7 @@ export const NavGroup = forwardRef(function NavGroup(
           {...rest}
           to={to}
           style={style}
+          className={className}
           label={label}
           icon={icon}
           node={node}
@@ -180,6 +183,7 @@ export const NavGroup = forwardRef(function NavGroup(
 
 type ExpandableNavGroupProps = {
   style?: CSSProperties;
+  className?: string;
   label: string;
   icon: ReactNode;
   node: NavGroupComponentDef;
@@ -195,6 +199,7 @@ type ExpandableNavGroupProps = {
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   {
     style = EMPTY_OBJECT,
+    className,
     label,
     icon,
     renderChild,
@@ -263,7 +268,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <div
-      className={styles.groupWrapper}
+      className={classnames(styles.groupWrapper, className)}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >
       <NavLink

@@ -80,7 +80,7 @@ export function DraggableAnnotation({
 
   return (
     <div
-      className={`${className} ${isDragging ? styles.dragging : ""}`}
+      className={`${className ?? ''} ${isDragging ? styles.dragging : ""}`}
       style={{
         left: `${currentLeft}px`,
         top: `${currentTop}px`,

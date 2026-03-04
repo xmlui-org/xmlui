@@ -168,7 +168,7 @@ export const AppMd = createMetadata({
     [`boxShadow-header-${COMP}`]: "none",
     [`boxShadow-navPanel-${COMP}`]: "none",
     [`scroll-padding-block-Pages`]: "$space-4",
-    [`backgroundColor-content-App`]: "$backgroundColor",
+    [`backgroundColor-content-${COMP}`]: "$backgroundColor",
     light: {
       // --- No light-specific theme vars
     },

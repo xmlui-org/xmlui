@@ -61,7 +61,7 @@ test("Themed AppHeader", async ({ page, initTestBed }) => {
           tones: {
             dark: {
               themeVars: {
-                "background-color": EXPECTED_COLOR,
+                "backgroundColor-AppHeader": EXPECTED_COLOR,
               },
             },
           },
@@ -96,7 +96,7 @@ test("Themed Footer", async ({ page, initTestBed }) => {
           tones: {
             dark: {
               themeVars: {
-                "background-color": EXPECTED_COLOR,
+                "backgroundColor-Footer": EXPECTED_COLOR,
               },
             },
           },
