@@ -1618,12 +1618,15 @@ export const Table = forwardRef(
                           data-column-id={header.id}
                           className={classnames(styles.columnCell, alignmentClass)}
                           colSpan={header.colSpan}
-                          style={{
-                            position: "relative",
-                            width: size,
-                            flexShrink: 0,
-                            ...getCommonPinningStyles(header.column),
-                          }}
+                          style={
+                            {
+                              ["--column-width" as string]: `${size}px`,
+                              position: "relative",
+                              width: size,
+                              flexShrink: 0,
+                              ...getCommonPinningStyles(header.column),
+                            } as React.CSSProperties
+                          }
                         >
                           <ClickableHeader
                             hasSorting={
@@ -1720,6 +1723,7 @@ export const Table = forwardRef(
                     const size = cell.column.getSize();
                     const columnClassName = cell.column.columnDef?.meta?.className;
                     const columnStyle = cell.column.columnDef?.meta?.style;
+                    const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
 
                     const alignmentClass =
                       cellVerticalAlign === "top"
@@ -1732,10 +1736,11 @@ export const Table = forwardRef(
                         className={classnames(styles.cell, alignmentClass, columnClassName)}
                         key={`${cell.id}-${i}`}
                         style={{
+                          width: size,
                           "--column-width": `${size}px`,
                           flexShrink: 0,
                           ...getCommonPinningStyles(cell.column),
-                          ...columnStyle,
+                          ...styleWithoutWidth,
                         } as CSSProperties}
                       >
                         <div
