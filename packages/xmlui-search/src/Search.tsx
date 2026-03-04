@@ -35,11 +35,10 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 
 type Props = {
   id?: string;
-  data: IndexableData;
+  data: SearchItemData[];
   limit?: number;
   maxContentMatchNumber?: number;
   collapsible?: boolean;
-  useContentFromAppContext?: boolean;
   placeholder?: string;
 };
 
@@ -56,41 +55,8 @@ export const Search = ({
   limit = defaultProps.limit,
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
   collapsible = false,
-  useContentFromAppContext = true,
   placeholder,
 }: Props) => {
-  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
-    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
-      {
-        name: "title",
-        weight: 2,
-      },
-      {
-        name: "content",
-        weight: 1,
-      },
-    ];
-    return {
-      // isCaseSensitive: false,
-      includeScore: true,
-      // ignoreDiacritics: false,
-      shouldSort: true, // <- sorts by "score"
-      includeMatches: true,
-      // findAllMatches: false,
-      minMatchCharLength: 2,
-      // location: 0,
-      threshold: 0,
-      // distance: 500,
-      // useExtendedSearch: true,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
-      // fieldNormWeight: 1,
-      keys,
-    };
-  }, []);
-  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
-
-  const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
   const { root } = useTheme();
@@ -106,6 +72,8 @@ export const Search = ({
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
+  // --- Merge data, do search, postprocess results
+  const results = useSearch(data, limit, debouncedValue);
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
@@ -115,53 +83,6 @@ export const Search = ({
 
   // render-related state
   const [show, setShow] = useState(false);
-  // --- Step 2: Convert data to a format better handled by the search engine
-  const dataFromMd = useMemo(() => {
-    if (!data) return [];
-    if (typeof data !== "object") {
-      console.warn("Search data should be an object with path keys and string content values");
-      return [];
-    }
-    return Object.entries(data).map<SearchItemData>(([path, { content, meta }]) => {
-      const lines = content.split("\n");
-      const firstLine = lines.length > 0 ? lines[0] : "";
-      // Remove title after matching, since it is in the "label"
-      const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
-      return {
-        path,
-        title: firstLine,
-        content: restContent,
-        category: meta?.category ?? DEFAULT_CATEGORY,
-      };
-    });
-  }, [data]);
-
-  console.log(dataFromMd, content)
-  const mergedData = useMemo(() => {
-    return [
-      ...dataFromMd,
-      ...(useContentFromAppContext
-        ? Object.entries(content ?? {}).map(([key, item]) => ({ ...item, category: item.category ?? key.split("/")[0] ?? DEFAULT_CATEGORY }))
-        : []),
-    ];
-  }, [content, dataFromMd, useContentFromAppContext]);
-
-  //console.log(mergedData)
-  useEffect(() => {
-    fuseRef.current.setCollection(mergedData);
-  }, [mergedData]);
-
-  // --- Step 3: Execute search & post-process results
-  const results: SearchResult[] = useMemo(() => {
-    if (debouncedValue.length <= 1) return [];
-
-    const limited = !debouncedValue
-      ? []
-      : fuseRef.current.search(debouncedValue, { limit: limit ?? defaultProps.limit });
-
-    const mapped = postProcessSearch(limited, debouncedValue);
-    return mapped;
-  }, [debouncedValue, limit]);
 
   useEffect(() => {
     if (results.length > 0) setShow(true);
@@ -235,9 +156,11 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  // flush item refs to prevent stale refs when results change drastically (e.g. from one search to another with few overlapping results)
+  // flush item refs to prevent stale refs when results change drastically
+  // (e.g. from one search to another with few overlapping results)
   itemRefs.current = [];
   itemLinkRefs.current = [];
+
   return (
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
@@ -598,8 +521,90 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-type IndexableData = Record<string, { content: string; meta?: { category?: string } }>;
+function useSearch(data: SearchItemData[], limit: number, query: string): SearchResult[] {
+  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
+    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
+      {
+        name: "title",
+        weight: 2,
+      },
+      {
+        name: "content",
+        weight: 1,
+      },
+    ];
+    return {
+      // isCaseSensitive: false,
+      includeScore: true,
+      // ignoreDiacritics: false,
+      shouldSort: true, // <- sorts by "score"
+      includeMatches: true,
+      // findAllMatches: false,
+      minMatchCharLength: 2,
+      // location: 0,
+      threshold: 0,
+      // distance: 500,
+      // useExtendedSearch: true,
+      ignoreLocation: true,
+      ignoreFieldNorm: true,
+      // fieldNormWeight: 1,
+      keys,
+    };
+  }, []);
+  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
+
+  // --- Convert data to a format better handled by the search engine
+  const dynamicData = useSearchContextContent();
+  const staticData = useMemo(() => {
+    if (!data) return [];
+    if (typeof data !== "object") {
+      console.warn("Search data should be an object with path keys and string content values");
+      return [];
+    }
+    if (!isSearchItemDataArray(data)) {
+      console.warn(
+        "Search data should be an array of objects with 'path', 'title' and 'content' string properties",
+      );
+      return [];
+    }
+    return data;
+  }, [data]);
+
+  const mergedData = useMemo(() => {
+    return [...staticData, ...Object.values(dynamicData ?? {})];
+  }, [dynamicData, staticData]);
+
+  useEffect(() => {
+    fuseRef.current.setCollection(mergedData);
+  }, [mergedData]);
+
+  // --- Step 3: Execute search & post-process results
+  const results: SearchResult[] = useMemo(() => {
+    if (query.length <= 1) return [];
+
+    const limited = !query
+      ? []
+      : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
+
+    const mapped = postProcessSearch(limited, query);
+    return mapped;
+  }, [query, limit]);
+
+  return results;
+}
+
 type SearchItemData = { path: string; title: string; content: string; category?: string };
+function isSearchItemDataArray(data: any): data is SearchItemData[] {
+  return (
+    Array.isArray(data) &&
+    (data.length === 0 ||
+      (typeof data[0] === "object" &&
+        typeof data[0].path === "string" &&
+        typeof data[0].title === "string" &&
+        typeof data[0].content === "string"))
+  );
+}
+
 type MatchesByKey = Partial<
   Record<keyof SearchItemData, Pick<FuseResultMatch, "indices" | "value">>
 >;

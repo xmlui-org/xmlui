@@ -28,12 +28,6 @@ export const SearchMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
-    useContentFromAppContext: {
-      description: `If true, the search will include content from the app context (e.g. content provided by the app or other extensions) in addition to the data provided directly to the component. This allows for a more comprehensive search experience that combines both extension-specific and app-wide content. Set this to false to restrict the search to only the data provided directly to this component.`,
-      valueType: "boolean",
-      defaultValue: true,
-      isInternal: true,
-    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -82,7 +76,6 @@ const searchComponentRenderer = createComponentRenderer(
         data={extractValue(node.props?.data)}
         limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
         collapsible={extractValue.asOptionalBoolean(node.props?.collapsible, false)}
-        useContentFromAppContext={extractValue.asOptionalBoolean(node.props?.useContentFromAppContext, true)}
       />
     );
   },

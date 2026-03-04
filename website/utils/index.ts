@@ -58,58 +58,57 @@ let {
   plainTextContent: Record<string, string>;
   frontmatter: Record<string, Record<string, unknown>>;
 };
-
 plainTextBlogContent = Object.fromEntries(
   Object.entries(plainTextBlogContent).filter(([key]) => !(blogFrontmatter[key]?.draft === true)),
 );
 
-// Place the title (from frontmatter if available, otherwise derived from filename)
-// at the top of the plain text content for each blog post, since the title is often important context
-// for search results and may not be included in the body of the markdown.
-Object.keys(plainTextBlogContent).forEach((key) => {
-  const title = key
-    .replace("/blog/", "")
-    .replace(/\.mdx?$/, "")
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-  plainTextBlogContent[key] =
-    `${blogFrontmatter[key]?.title ?? title}\n\n${plainTextBlogContent[key]}`;
-});
+const staticSearchData: SearchItemData[] = [
+  ...Object.entries(plainTextDocsContent).map(([key, value]) => {
+      const lines = value.split("\n");
+      const firstLine = lines.length > 0 ? lines[0] : "";
+      // Remove title after matching, since it is in the "label"
+      const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
+      return {
+        path: key,
+        title: firstLine,
+        content: restContent,
+        category: "Docs",
+      }}),
+  ...Object.entries(plainTextBlogContent).map(([key, value]) => {
+    const titleFromFileName = key
+      .replace("/blog/", "")
+      .replace(/\.mdx?$/, "")
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    const title = blogFrontmatter[key]?.title ? String(blogFrontmatter[key].title) : titleFromFileName;
+    return {
+      path: key,
+      title,
+      content: value,
+      category: "Blog",
+    };
+  }),
+];
+
+const prefetchedContent: Record<string, any> = {};
+
 // Filter out drafts from the main blogContent as well, so they don't show up in the UI
 blogContent = Object.fromEntries(
   Object.entries(blogContent).filter(([key]) => {
     return !(blogFrontmatter[`/blog/${key}`]?.draft === true);
   }),
 );
-
-const prefetchedContent: Record<string, any> = {};
-
 // Populate prefetched blog content
 Object.keys(blogContent).forEach((fileName) => {
   prefetchedContent[`/blog/${fileName}.md`] = blogContent[fileName];
 });
-
 // Populate prefetched homepage content
 Object.keys(rawHomepageContent).forEach((filePath) => {
   const fileName = filePath.split("/").pop() || "";
   prefetchedContent[`/pages/${fileName}`] = rawHomepageContent[filePath].default;
 });
 
-const staticSearchData = {
-  ...Object.fromEntries(
-    Object.entries(plainTextDocsContent).map(([key, value]) => [
-      key,
-      { content: value, meta: { category: "Docs" } },
-    ]),
-  ),
-  ...Object.fromEntries(
-    Object.entries(plainTextBlogContent).map(([key, value]) => [
-      key,
-      { content: value, meta: { category: "Blog" } },
-    ]),
-  ),
-};
 export { prefetchedContent, docsContent, staticSearchData };
 
 // --- Icon loader utility
@@ -131,3 +130,5 @@ export function getLocalIcons() {
   });
   return processedIcons;
 }
+
+type SearchItemData = { path: string; title: string; content: string; category?: string };

@@ -20,6 +20,8 @@ const indexerContextValue = {
 };
 
 const EXCLUDED_URL_PATTERNS = [/^404$/, /^not-found$/];
+const CATEGORIES = ["docs", "blog"]; // categories based on URL structure
+const DEFAULT_CATEGORY = "other";
 
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
@@ -145,11 +147,12 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
+        const categoryBasedOnUrl = pageUrl.split("/")[0];
         searchContextUpdater({
           title,
           content: textContent,
           path: pageUrl,
-          category: pageUrl.split("/")[0] || "", // Assuming category is the first segment of the URL
+          category: CATEGORIES.includes(categoryBasedOnUrl) ? categoryBasedOnUrl : DEFAULT_CATEGORY,
         });
 
         onIndexed();
