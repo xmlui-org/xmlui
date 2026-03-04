@@ -25,6 +25,10 @@ import {
 } from "./xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
+  StyleInjectionTargetContext,
+  StyleProvider,
+} from "./theming/StyleContext";
+import {
   codeBehindFileExtension,
   componentFileExtension,
   moduleFileExtension,
@@ -1613,6 +1617,91 @@ export function startApp(
     </BrowserRouter>,
   );
   return contentRoot;
+}
+
+/**
+ * Moves XMLUI-injected style elements from document.head into the ShadowRoot,
+ * so they no longer affect the host page. Identifies XMLUI styles by their
+ * @layer declarations or xmlui CSS variable references.
+ */
+function moveStylesToShadow(shadow: ShadowRoot) {
+  const styleElements = Array.from(document.head.querySelectorAll("style"));
+  for (const el of styleElements) {
+    const text = el.textContent || "";
+    // Identify XMLUI-injected styles by their layer declaration or CSS variable prefix
+    if (text.includes("@layer reset") || text.includes("--xmlui-")) {
+      // Move the element: remove from head, re-enable, append to shadow
+      document.head.removeChild(el);
+      el.removeAttribute("media");
+      shadow.appendChild(el);
+    }
+  }
+}
+
+/**
+ * Wrapper component that provides Shadow DOM style isolation context.
+ */
+function IsolatedStandaloneApp({
+  shadowRoot,
+  runtime,
+  extensionManager,
+}: {
+  shadowRoot: ShadowRoot;
+  runtime: any;
+  extensionManager: StandaloneExtensionManager;
+}) {
+  return (
+    <StyleInjectionTargetContext.Provider value={shadowRoot}>
+      <StyleProvider forceNew={true}>
+        <div id="nested-app-root" style={{ minHeight: "100%", height: "100%" }}>
+          <BrowserRouter>
+            <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
+          </BrowserRouter>
+        </div>
+      </StyleProvider>
+    </StyleInjectionTargetContext.Provider>
+  );
+}
+
+let isolatedContentRoot: Root | null = null;
+
+/**
+ * Starts an XMLUI app inside a Shadow DOM for style isolation.
+ * The app's styles won't leak into the host page and vice versa.
+ * Uses the same root element lookup as startApp (getElementById("root")).
+ */
+export function startAppIsolated(
+  runtime: any,
+  extensions: Extension[] | Extension = [],
+  extensionManager: StandaloneExtensionManager = new StandaloneExtensionManager(),
+) {
+  extensionManager.registerExtension(extensions);
+  let rootElement: HTMLElement | null = document.getElementById("root");
+  if (!rootElement) {
+    rootElement = document.createElement("div");
+    rootElement.setAttribute("id", "root");
+    document.body.appendChild(rootElement);
+  }
+
+  // Attach shadow DOM if not already attached
+  let shadow = rootElement.shadowRoot;
+  if (!shadow) {
+    shadow = rootElement.attachShadow({ mode: "open" });
+    moveStylesToShadow(shadow);
+  }
+
+  if (!isolatedContentRoot) {
+    isolatedContentRoot = ReactDOM.createRoot(shadow);
+  }
+
+  isolatedContentRoot.render(
+    <IsolatedStandaloneApp
+      shadowRoot={shadow}
+      runtime={runtime}
+      extensionManager={extensionManager}
+    />,
+  );
+  return isolatedContentRoot;
 }
 
 /**
