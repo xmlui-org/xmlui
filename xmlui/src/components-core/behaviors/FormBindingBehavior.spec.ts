@@ -2118,7 +2118,7 @@ test.describe("Phone Pattern Validation", () => {
     await expect(phoneField).not.toContainText("Not a valid phone number");
   });
 
-  test("shows warning for empty phone number", async ({
+  test("does not show warning for empty phone number (optional field)", async ({
     initTestBed,
     page,
     createTextBoxDriver,
@@ -2143,9 +2143,9 @@ test.describe("Phone Pattern Validation", () => {
 
     await page.getByTestId("validateBtn").click();
 
-    // Validation warning should be displayed
+    // Empty optional field should pass pattern validation — no warning expected
     const phoneField = page.getByTestId("phoneField");
-    await expect(phoneField).toContainText("Not a valid phone number");
+    await expect(phoneField).not.toContainText("Not a valid phone number");
   });
 });
 
