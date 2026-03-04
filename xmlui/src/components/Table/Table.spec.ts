@@ -1312,6 +1312,41 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test("links inside cells remain clickable and right-clickable when no onContextMenu handler is provided", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Table
+        data='{["/destination"]}'
+        width="800px"
+        testId="table"
+      >
+        <Column>
+          <Link
+            testId="cell-link"
+            to="{$item}"
+            onClick="() => testState = 'link-clicked'"
+            onContextMenu="() => testState = 'link-context-menu'"
+          >
+            Hello
+          </Link>
+        </Column>
+      </Table>
+    `);
+
+    const link = page.getByTestId("cell-link");
+    await expect(link).toBeVisible();
+
+    // Left click should trigger the link's onClick handler
+    await link.click();
+    await expect.poll(testStateDriver.testState).toEqual("link-clicked");
+
+    // Right click should trigger the link's own onContextMenu handler
+    await link.click({ button: "right" });
+    await expect.poll(testStateDriver.testState).toEqual("link-context-menu");
+  });
+
   test.describe("onContextMenu event", () => {
     test("fires onContextMenu event on right-click", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
