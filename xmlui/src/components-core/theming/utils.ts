@@ -70,7 +70,7 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
       // themeScope.themeVars has already gone through resolveThemeVarsWithCssVars, which converts
       // all $varName occurrences to var(--xmlui-varName), even inside compound values.
       let themeVar = themeScope.themeVars[keyWithoutClass];
-      if (themeVar !== undefined) {
+      if (themeVar != undefined && (typeof themeVar === "string" && themeVar.trim() !== "")) {
         ret[`--${THEME_VAR_PREFIX}-` + keyWithoutClass] = themeVar;
       }
     });

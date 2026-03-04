@@ -18,7 +18,8 @@ export const ContextMenuMd = createMetadata({
     "trigger button and is typically used with `onContextMenu` events to create right-click " +
     "menus or custom context-aware action menus. The menu automatically positions itself " +
     "within the viewport and closes when clicking outside or when a menu item is selected. ",
-  parts: {
+    themeVarContributorComponents: ["MenuItem", "MenuSeparator", "SubMenuItem" ],
+    parts: {
     content: {
       description: "The content area of the ContextMenu where menu items are displayed.",
     },
