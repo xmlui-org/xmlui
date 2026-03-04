@@ -7,7 +7,12 @@ import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { PageMd } from "../Pages/Pages";
 import { IndexerContext } from "./IndexerContext";
-import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import {
+  SEARCH_CATEGORIES,
+  SEARCH_DEFAULT_CATEGORY,
+  useSearchContextSetIndexing,
+  useSearchContextUpdater,
+} from "./SearchContext";
 
 const HIDDEN_STYLE: CSSProperties = {
   position: "absolute",
@@ -20,8 +25,6 @@ const indexerContextValue = {
 };
 
 const EXCLUDED_URL_PATTERNS = [/^\/404$/, /^\/not-found$/];
-const CATEGORIES = ["docs", "blog"]; // categories based on URL structure
-const DEFAULT_CATEGORY = "other";
 
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
@@ -147,12 +150,14 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
-        const categoryBasedOnUrl = pageUrl.split("/")[0];
+        const categoryBasedOnUrl = pageUrl.split("/").find((segment: string) => segment.length > 0) || "";
         searchContextUpdater({
           title,
           content: textContent,
           path: pageUrl,
-          category: CATEGORIES.includes(categoryBasedOnUrl) ? categoryBasedOnUrl : DEFAULT_CATEGORY,
+          category: SEARCH_CATEGORIES.includes(categoryBasedOnUrl)
+            ? categoryBasedOnUrl
+            : SEARCH_DEFAULT_CATEGORY,
         });
 
         onIndexed();

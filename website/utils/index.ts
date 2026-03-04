@@ -1,4 +1,5 @@
 import { buildContentFromRuntime, shikiHighlighter, highlight } from "xmlui-docs-blocks";
+import { type SearchItemData, SEARCH_CATEGORIES } from "xmlui";
 import componentsSection from "../navSections/components.json";
 import extensionsSection from "../navSections/extensions.json";
 import extensions from "../extensions";
@@ -72,7 +73,7 @@ const staticSearchData: SearchItemData[] = [
         path: key,
         title: firstLine,
         content: restContent,
-        category: "docs",
+        category: SEARCH_CATEGORIES[0], // "docs"
       }}),
   ...Object.entries(plainTextBlogContent).map(([key, value]) => {
     const titleFromFileName = key
@@ -86,7 +87,7 @@ const staticSearchData: SearchItemData[] = [
       path: key,
       title,
       content: value,
-      category: "blog",
+      category: SEARCH_CATEGORIES[1], // "blog"
     };
   }),
 ];
@@ -130,5 +131,3 @@ export function getLocalIcons() {
   });
   return processedIcons;
 }
-
-type SearchItemData = { path: string; title: string; content: string; category?: string };

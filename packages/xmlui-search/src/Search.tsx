@@ -20,6 +20,7 @@ import {
   useAppLayoutContext,
   Button,
   Icon,
+  SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -46,8 +47,6 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   limit: 10,
   maxContentMatchNumber: 3,
 };
-
-const DEFAULT_CATEGORY = "other";
 
 export const Search = ({
   id,
@@ -222,9 +221,9 @@ export const Search = ({
             <ul className={styles.list} role="listbox">
               {results.length > 0 &&
                 results.map((result, idx) => {
-                  const effectiveCategory = result.item.category ?? DEFAULT_CATEGORY;
+                  const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
                   const prevEffectiveCategory =
-                    idx > 0 ? (results[idx - 1].item.category ?? DEFAULT_CATEGORY) : undefined;
+                    idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
                   const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
                   return (
                     <Fragment key={`${result.item.path}-${idx}`}>

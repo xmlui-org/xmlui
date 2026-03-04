@@ -2,7 +2,10 @@ import { createContext, useContextSelector } from "use-context-selector";
 import { useCallback, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 
-type SearchItemData = { path: string; title: string; content: string, category?: string };
+export type SearchItemData = { path: string; title: string; content: string; category?: string };
+
+export const SEARCH_CATEGORIES = ["docs", "blog"] as const;
+export const SEARCH_DEFAULT_CATEGORY = "other";
 
 type ISearchContext = {
   content: Record<string, SearchItemData>;
