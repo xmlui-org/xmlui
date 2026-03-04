@@ -72,7 +72,7 @@ const staticSearchData: SearchItemData[] = [
         path: key,
         title: firstLine,
         content: restContent,
-        category: "Docs",
+        category: "docs",
       }}),
   ...Object.entries(plainTextBlogContent).map(([key, value]) => {
     const titleFromFileName = key
@@ -86,7 +86,7 @@ const staticSearchData: SearchItemData[] = [
       path: key,
       title,
       content: value,
-      category: "Blog",
+      category: "blog",
     };
   }),
 ];

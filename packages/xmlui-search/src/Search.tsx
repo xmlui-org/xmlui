@@ -47,7 +47,7 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   maxContentMatchNumber: 3,
 };
 
-const DEFAULT_CATEGORY = "Other";
+const DEFAULT_CATEGORY = "other";
 
 export const Search = ({
   id,
