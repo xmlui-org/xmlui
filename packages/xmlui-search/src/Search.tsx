@@ -570,8 +570,18 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
     return data;
   }, [data]);
 
+  // Does very basic deduplication of search data based on path and title, preferring entries with longer content
   const mergedData = useMemo(() => {
-    return [...staticData, ...Object.values(dynamicData ?? {})];
+    const combined = [...staticData, ...Object.values(dynamicData ?? {})];
+    const deduped = new Map<string, SearchItemData>();
+    for (const item of combined) {
+      const key = `${item.path}::${item.title}`;
+      const existing = deduped.get(key);
+      if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
+        deduped.set(key, item);
+      }
+    }
+    return Array.from(deduped.values());
   }, [dynamicData, staticData]);
 
   useEffect(() => {

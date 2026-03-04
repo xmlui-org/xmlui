@@ -19,7 +19,7 @@ const indexerContextValue = {
   indexing: true,
 };
 
-const EXCLUDED_URL_PATTERNS = [/^404$/, /^not-found$/];
+const EXCLUDED_URL_PATTERNS = [/^\/404$/, /^\/not-found$/];
 const CATEGORIES = ["docs", "blog"]; // categories based on URL structure
 const DEFAULT_CATEGORY = "other";
 
