@@ -1324,25 +1324,26 @@ export const Table = forwardRef(
                 currentRow.style.cursor = "";
                 setHoveredRowId(null);
               }}
-              onContextMenu={(event) => {
-                // Prevent default browser context menu
-                event.preventDefault();
+              onContextMenu={
+                lookupEventHandler
+                  ? (event) => {
+                      // Prevent default browser context menu only when a contextMenu handler is configured
+                      event.preventDefault();
 
-                // Use lookupEventHandler with context containing row variables
-                if (lookupEventHandler) {
-                  const handler = lookupEventHandler("contextMenu", {
-                    context: {
-                      $item: row.original,
-                      $row: row.original,
-                      $rowIndex: rowIndex,
-                      $itemIndex: rowIndex,
-                    },
-                    ephemeral: true, // Don't cache this handler since context changes per row
-                  });
+                      const handler = lookupEventHandler("contextMenu", {
+                        context: {
+                          $item: row.original,
+                          $row: row.original,
+                          $rowIndex: rowIndex,
+                          $itemIndex: rowIndex,
+                        },
+                        ephemeral: true, // Don't cache this handler since context changes per row
+                      });
 
-                  handler?.(event);
-                }
-              }}
+                      handler?.(event);
+                    }
+                  : undefined
+              }
             >
               {children}
             </tr>
