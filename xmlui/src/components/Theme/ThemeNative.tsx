@@ -24,6 +24,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
+import { register } from "module";
 
 type Props = {
   id?: string;
@@ -108,10 +109,10 @@ export function Theme({
       // instead of a base (no-component) var.
       const rawKey = key.replace(/^--[^-]+-/, "");
       let componentName = parseHVar(rawKey)?.component;
-      
+      const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
       if (
         !componentName ||
-        componentRegistry.hasComponent(componentName) ||
+        (registeredComponent?.isCompoundComponent) ||
         componentName === "Input" ||
         componentName === "Heading" ||
         componentName === "ThemedInput" ||

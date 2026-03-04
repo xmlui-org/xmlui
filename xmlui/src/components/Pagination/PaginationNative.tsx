@@ -72,7 +72,7 @@ export const defaultProps: Required<
   pageInfoPosition: "end",
 };
 
-interface PaginationAPI extends ComponentApi {
+export interface PaginationAPI extends ComponentApi {
   moveFirst: () => void;
   moveLast: () => void;
   movePrev: () => void;

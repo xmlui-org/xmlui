@@ -7,7 +7,7 @@
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:for-node": "tsdown",
-    "build:xmlui": "vite build --mode lib",
+    "build:xmlui": "node --max-old-space-size=8192 node_modules/.bin/vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "build:inspector-parser": "vite build --mode inspector-parser",
