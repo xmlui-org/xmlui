@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
   forwardRef,
+  Fragment,
   type ForwardedRef,
 } from "react";
 import {
@@ -19,6 +20,7 @@ import {
   useAppLayoutContext,
   Button,
   Icon,
+  SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
 import type {
   FuseOptionKeyObject,
@@ -34,11 +36,10 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 
 type Props = {
   id?: string;
-  data: Record<string, string>;
+  data: SearchItemData[];
   limit?: number;
   maxContentMatchNumber?: number;
   collapsible?: boolean;
-  useContentFromAppContext?: boolean;
   placeholder?: string;
 };
 
@@ -53,41 +54,8 @@ export const Search = ({
   limit = defaultProps.limit,
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
   collapsible = false,
-  useContentFromAppContext = true,
   placeholder,
 }: Props) => {
-  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
-    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
-      {
-        name: "title",
-        weight: 2,
-      },
-      {
-        name: "content",
-        weight: 1,
-      },
-    ];
-    return {
-      // isCaseSensitive: false,
-      includeScore: true,
-      // ignoreDiacritics: false,
-      shouldSort: true, // <- sorts by "score"
-      includeMatches: true,
-      // findAllMatches: false,
-      minMatchCharLength: 2,
-      // location: 0,
-      threshold: 0,
-      // distance: 500,
-      // useExtendedSearch: true,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
-      // fieldNormWeight: 1,
-      keys,
-    };
-  }, []);
-  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
-
-  const content = useSearchContextContent();
   const _id = useId();
   const inputId = id || _id;
   const { root } = useTheme();
@@ -103,6 +71,8 @@ export const Search = ({
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
+  // --- Merge data, do search, postprocess results
+  const results = useSearch(data, limit, debouncedValue);
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
@@ -112,48 +82,6 @@ export const Search = ({
 
   // render-related state
   const [show, setShow] = useState(false);
-  // --- Step 2: Convert data to a format better handled by the search engine
-  const dataFromMd = useMemo(
-    () => {
-      if (!data) return [];
-      if (typeof data !== "object") {
-        console.warn("Search data should be an object with path keys and string content values");
-        return [];
-      }
-      return Object.entries(data).map<SearchItemData>(([path, content]) => {
-        const lines = content.split("\n");
-        const firstLine = lines.length > 0 ? lines[0] : "";
-        // Remove title after matching, since it is in the "label"
-        const restContent = lines.length > 1 ? lines.slice(1).join("\n") : "";
-        return {
-          path,
-          title: firstLine,
-          content: restContent,
-        };
-      });
-    },
-    [data],
-  );
-
-  const mergedData = useMemo(() => {
-    return [...dataFromMd, ...(useContentFromAppContext ? Object.values(content ?? {}) : [])];
-  }, [content, dataFromMd, useContentFromAppContext]);
-
-  useEffect(() => {
-    fuseRef.current.setCollection(mergedData);
-  }, [mergedData]);
-
-  // --- Step 3: Execute search & post-process results
-  const results: SearchResult[] = useMemo(() => {
-    if (debouncedValue.length <= 1) return [];
-
-    const limited = !debouncedValue
-      ? []
-      : fuseRef.current.search(debouncedValue, { limit: limit ?? defaultProps.limit });
-
-    const mapped = postProcessSearch(limited, debouncedValue);
-    return mapped;
-  }, [debouncedValue, limit]);
 
   useEffect(() => {
     if (results.length > 0) setShow(true);
@@ -227,9 +155,11 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  // flush item refs to prevent stale refs when results change drastically (e.g. from one search to another with few overlapping results)
+  // flush item refs to prevent stale refs when results change drastically
+  // (e.g. from one search to another with few overlapping results)
   itemRefs.current = [];
   itemLinkRefs.current = [];
+
   return (
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
@@ -291,29 +221,54 @@ export const Search = ({
             <ul className={styles.list} role="listbox">
               {results.length > 0 &&
                 results.map((result, idx) => {
+                  const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+                  const prevEffectiveCategory =
+                    idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
+                  const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+                  const allUncategorized = results.every((r) => r.item.category == null);
                   return (
-                    <li
-                      role="option"
-                      key={`${result.item.path}-${idx}`}
-                      className={classnames(styles.item, styles.header, {
-                        [styles.keyboardFocus]: activeIndex === idx,
-                      })}
-                      onMouseEnter={() => {
-                        setActiveIndex(idx);
-                        setNavigationSource("mouse");
-                      }}
-                      ref={(el) => (itemRefs.current[idx] = el!)}
-                      aria-selected={activeIndex === idx}
-                    >
-                      <SearchItemContent
-                        ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                        idx={idx}
-                        item={result.item}
-                        matches={result.matches}
-                        maxContentMatchNumber={maxContentMatchNumber}
-                        onClick={onClick}
-                      />
-                    </li>
+                    <Fragment key={`${result.item.path}-${idx}`}>
+                      {showCategoryHeader && !allUncategorized && (
+                        <li
+                          className={styles.categoryHeader}
+                          role="presentation"
+                          aria-hidden="true"
+                        >
+                          <Text
+                            variant="em"
+                            style={{
+                              fontSize: "0.72em",
+                              fontWeight: 600,
+                              textTransform: "uppercase",
+                              letterSpacing: "0.05em",
+                            }}
+                          >
+                            {effectiveCategory}
+                          </Text>
+                        </li>
+                      )}
+                      <li
+                        role="option"
+                        className={classnames(styles.item, styles.header, {
+                          [styles.keyboardFocus]: activeIndex === idx,
+                        })}
+                        onMouseEnter={() => {
+                          setActiveIndex(idx);
+                          setNavigationSource("mouse");
+                        }}
+                        ref={(el) => (itemRefs.current[idx] = el!)}
+                        aria-selected={activeIndex === idx}
+                      >
+                        <SearchItemContent
+                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                          idx={idx}
+                          item={result.item}
+                          matches={result.matches}
+                          maxContentMatchNumber={maxContentMatchNumber}
+                          onClick={onClick}
+                        />
+                      </li>
+                    </Fragment>
                   );
                 })}
               {results.length === 0 && (
@@ -353,7 +308,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
     >
       <div style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          {getSourceLabel(item.path) && (
+          {item.category && (
             <Text
               variant="em"
               style={{
@@ -365,7 +320,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
                 flexShrink: 0,
               }}
             >
-              {getSourceLabel(item.path)}
+              {item.category}
             </Text>
           )}
           <Text variant="subtitle">
@@ -390,9 +345,9 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             )}
         </div>
         {/* Display the number of other matches if there are any */}
-        {matches?.content?.indices && (
+        {matches.content?.indices && (
           <Text variant="em">
-            {`${pluralize(matches?.content?.indices.length, "match", "matches")} in this article`}
+            {`${pluralize(matches.content.indices.length, "match", "matches")} in this article`}
           </Text>
         )}
       </div>
@@ -431,6 +386,10 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
       .filter((match) => !!match.key)
       .reduce<MatchesByKey>((acc, match) => {
         const matchKey = match.key as keyof SearchItemData;
+        const fieldValue = result.item[matchKey];
+
+        // Skip fields that have no value (e.g. optional fields like category)
+        if (fieldValue === undefined) return acc;
 
         // --- Prefilter matches that are too short/significantly misaligned compared to the search term
         const filteredMatches = match.indices.filter((index) => {
@@ -444,7 +403,7 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             return foundSubstrLength >= longContentAcceptance;
           }
           // Content: regular text search
-          return result.item[matchKey]
+          return fieldValue
             .slice(index[0], index[1] + 1)
             .toLocaleLowerCase()
             .includes(debouncedValue.toLocaleLowerCase());
@@ -458,10 +417,10 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
             }
           }
 
-          const origTextLength = result.item[matchKey].length;
+          const origTextLength = fieldValue.length;
           const startIdx = Math.max(index[0] - textSearchRadius, 0);
           const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
-          const textSnippet = result.item[matchKey].toLocaleLowerCase();
+          const textSnippet = fieldValue.toLocaleLowerCase();
 
           const position = textSnippet.indexOf(debouncedValue.toLocaleLowerCase(), startIdx);
           if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
@@ -555,18 +514,6 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
   return result;
 }
 
-/**
- * Extracts a human-readable source label from a path string.
- * Returns "Docs", "Blog", or null if the source cannot be determined.
- */
-function getSourceLabel(path: string): string | null {
-  const segments = path.split("/").filter(Boolean);
-  const first = segments[0]?.toLowerCase();
-  if (first === "docs") return "Docs";
-  if (first === "blog") return "Blog";
-  return null;
-}
-
 function pluralize(number: number, singular: string, plural: string): string {
   if (number === 1) {
     return `${number} ${singular}`;
@@ -574,7 +521,127 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-type SearchItemData = { path: string; title: string; content: string };
+function useSearch(data: SearchItemData[], limit: number, query: string): SearchResult[] {
+  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
+    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
+      {
+        name: "title",
+        weight: 2,
+      },
+      {
+        name: "content",
+        weight: 1,
+      },
+    ];
+    return {
+      // isCaseSensitive: false,
+      includeScore: true,
+      // ignoreDiacritics: false,
+      shouldSort: true, // <- sorts by "score"
+      includeMatches: true,
+      // findAllMatches: false,
+      minMatchCharLength: 2,
+      // location: 0,
+      threshold: 0,
+      // distance: 500,
+      // useExtendedSearch: true,
+      ignoreLocation: true,
+      ignoreFieldNorm: true,
+      // fieldNormWeight: 1,
+      keys,
+    };
+  }, []);
+  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
+
+  // --- Convert data to a format better handled by the search engine
+  const dynamicData = useSearchContextContent();
+  const staticData = useMemo(() => {
+    if (!data) return [];
+    if (typeof data !== "object") {
+      console.warn("Search data should be an object with path keys and string content values");
+      return [];
+    }
+    if (!isSearchItemDataArray(data)) {
+      console.warn(
+        "Search data should be an array of objects with 'path', 'title' and 'content' string properties",
+      );
+      return [];
+    }
+    return data;
+  }, [data]);
+
+  // Does very basic deduplication of search data based on path and title, preferring entries with longer content
+  const mergedData = useMemo(() => {
+    const combined = [...staticData, ...Object.values(dynamicData ?? {})];
+    const deduped = new Map<string, SearchItemData>();
+    for (const item of combined) {
+      const key = `${item.path}::${item.title}`;
+      const existing = deduped.get(key);
+      if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
+        deduped.set(key, item);
+      }
+    }
+    return Array.from(deduped.values());
+  }, [dynamicData, staticData]);
+
+  useEffect(() => {
+    fuseRef.current.setCollection(mergedData);
+  }, [mergedData]);
+
+  // --- Step 3: Execute search & post-process results
+  const results: SearchResult[] = useMemo(() => {
+    if (query.length <= 1) return [];
+
+    const limited = !query
+      ? []
+      : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
+
+    const mapped = postProcessSearch(limited, query);
+    return groupAndSortByCategory(mapped);
+  }, [query, limit]);
+
+  return results;
+}
+
+/**
+ * Groups search results by category and sorts the groups by their summed Fuse.js scores
+ * (lower sum = better overall match quality), keeping items within each group in their
+ * original score-sorted order.
+ */
+function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
+  const groups = new Map<string, SearchResult[]>();
+  for (const result of results) {
+    const cat = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+    if (!groups.has(cat)) groups.set(cat, []);
+    groups.get(cat)!.push(result);
+  }
+
+  // Sum scores per group — lower is better in Fuse.js (0 = perfect match)
+  const groupScores = new Map<string, number>();
+  for (const [cat, items] of groups) {
+    const sum = items.reduce((acc, item) => acc + (item.score ?? 0), 0);
+    groupScores.set(cat, sum);
+  }
+
+  const sortedCategories = [...groups.keys()].sort(
+    (a, b) => (groupScores.get(a) ?? 0) - (groupScores.get(b) ?? 0),
+  );
+
+  return sortedCategories.flatMap((cat) => groups.get(cat)!);
+}
+
+type SearchItemData = { path: string; title: string; content: string; category?: string };
+function isSearchItemDataArray(data: any): data is SearchItemData[] {
+  return (
+    Array.isArray(data) &&
+    (data.length === 0 ||
+      (typeof data[0] === "object" &&
+        typeof data[0].path === "string" &&
+        typeof data[0].title === "string" &&
+        typeof data[0].content === "string"))
+  );
+}
+
 type MatchesByKey = Partial<
   Record<keyof SearchItemData, Pick<FuseResultMatch, "indices" | "value">>
 >;

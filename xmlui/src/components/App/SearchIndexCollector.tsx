@@ -7,7 +7,12 @@ import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { PageMd } from "../Pages/Pages";
 import { IndexerContext } from "./IndexerContext";
-import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import {
+  SEARCH_CATEGORIES,
+  SEARCH_DEFAULT_CATEGORY,
+  useSearchContextSetIndexing,
+  useSearchContextUpdater,
+} from "./SearchContext";
 
 const HIDDEN_STYLE: CSSProperties = {
   position: "absolute",
@@ -18,6 +23,8 @@ const HIDDEN_STYLE: CSSProperties = {
 const indexerContextValue = {
   indexing: true,
 };
+
+const EXCLUDED_URL_PATTERNS = [/^\/404$/, /^\/not-found$/];
 
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
@@ -48,7 +55,9 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
           child.type === "Page" && // Ensure 'Page' matches your actual component type name
           child.props?.url && // Ensure URL exists
           !child.props.url.includes("*") &&
-          !child.props.url.includes(":"),
+          !child.props.url.includes(":") &&
+          !EXCLUDED_URL_PATTERNS.some((pattern) => pattern.test(child.props.url)) &&
+          child.props?.searchIndexable !== false, // explicit opt-out
       ) || []
     );
   }, [Pages?.children]);
@@ -141,10 +150,14 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
+        const categoryBasedOnUrl = pageUrl.split("/").find((segment: string) => segment.length > 0) || "";
         searchContextUpdater({
           title,
           content: textContent,
           path: pageUrl,
+          category: SEARCH_CATEGORIES.includes(categoryBasedOnUrl)
+            ? categoryBasedOnUrl
+            : SEARCH_DEFAULT_CATEGORY,
         });
 
         onIndexed();

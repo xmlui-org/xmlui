@@ -22,6 +22,13 @@ export const PageMd = createMetadata({
     url: d(
       `The URL of the route associated with the content. If not set, the page is not available.`,
     ),
+    // NOTE: This is experimental
+    searchIndexable: {
+      description: "Whether the content of this page should be indexed for search. Defaults to true.",
+      type: "boolean",
+      defaultValue: true,
+      isInternal: true,
+    },
     navLabel: dInternal(
       "The label of the page that is displayed in the navigation panel. If provided, the " +
         "a new entry will be added to the navigation panel.",
