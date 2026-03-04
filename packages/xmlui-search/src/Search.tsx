@@ -225,9 +225,10 @@ export const Search = ({
                   const prevEffectiveCategory =
                     idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
                   const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+                  const allUncategorized = results.every((r) => r.item.category == null);
                   return (
                     <Fragment key={`${result.item.path}-${idx}`}>
-                      {showCategoryHeader && (
+                      {showCategoryHeader && !allUncategorized && (
                         <li
                           className={styles.categoryHeader}
                           role="presentation"
@@ -596,10 +597,37 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
       : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
 
     const mapped = postProcessSearch(limited, query);
-    return mapped;
+    return groupAndSortByCategory(mapped);
   }, [query, limit]);
 
   return results;
+}
+
+/**
+ * Groups search results by category and sorts the groups by their summed Fuse.js scores
+ * (lower sum = better overall match quality), keeping items within each group in their
+ * original score-sorted order.
+ */
+function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
+  const groups = new Map<string, SearchResult[]>();
+  for (const result of results) {
+    const cat = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+    if (!groups.has(cat)) groups.set(cat, []);
+    groups.get(cat)!.push(result);
+  }
+
+  // Sum scores per group — lower is better in Fuse.js (0 = perfect match)
+  const groupScores = new Map<string, number>();
+  for (const [cat, items] of groups) {
+    const sum = items.reduce((acc, item) => acc + (item.score ?? 0), 0);
+    groupScores.set(cat, sum);
+  }
+
+  const sortedCategories = [...groups.keys()].sort(
+    (a, b) => (groupScores.get(a) ?? 0) - (groupScores.get(b) ?? 0),
+  );
+
+  return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
 type SearchItemData = { path: string; title: string; content: string; category?: string };
