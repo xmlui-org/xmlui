@@ -6,7 +6,7 @@
   },
   "responseOverrides": {
     "404": {
-      "rewrite": "/404/index.html"
+      "rewrite": "/200.html"
     }
   },
   "routes": [
