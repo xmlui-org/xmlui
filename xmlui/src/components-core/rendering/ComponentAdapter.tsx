@@ -3,7 +3,7 @@ import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo, useRe
 import { isEmpty, isPlainObject } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -35,6 +35,7 @@ import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
+import { is } from "immer/dist/internal.js";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -345,6 +346,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
 
   const styleClassName = useComponentStyle(stableLayoutCss);
+
   const themeClassName = useComponentThemeClass(descriptor);
 
   const className = `${themeClassName} ${styleClassName}`;

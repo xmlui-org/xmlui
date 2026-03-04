@@ -96,6 +96,7 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     getThemeVar,
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
+  const componentRegistry = useComponentRegistry();
 
   const transformedStyles = useMemo(() => {
     const filteredThemeCssVars = {};
@@ -107,8 +108,10 @@ export function Theme({
       // instead of a base (no-component) var.
       const rawKey = key.replace(/^--[^-]+-/, "");
       let componentName = parseHVar(rawKey)?.component;
+      
       if (
         !componentName ||
+        componentRegistry.hasComponent(componentName) ||
         componentName === "Input" ||
         componentName === "Heading" ||
         componentName === "ThemedInput" ||
@@ -185,7 +188,7 @@ export function Theme({
       };
     }
     return ret;
-  }, [isRoot, themeCssVars, themeTone, getThemeVar]);
+  }, [isRoot, themeCssVars, themeTone, getThemeVar, componentRegistry]);
 
   const className = useStyles(transformedStyles);
 
@@ -210,11 +213,13 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     currentTheme,
     currentThemeRoot,
+    fontLinks,
     getResourceUrl,
     getThemeVar,
     themeCssVars,
     themeTone,
     disableInlineStyle,
+    componentRegistry
   ]);
 
   const { indexing } = useIndexerContext();

@@ -302,27 +302,27 @@ export const Markdown = memo(
             },
             h1({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h2({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h3({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h4({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h5({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h6({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
@@ -332,14 +332,14 @@ export const Markdown = memo(
               }
 
               return (
-                <Text variant="paragraph" className={styles.markdown} uid={id}>
+                <Text variant="paragraph" className={classnames(styles.markdown, className)} uid={id}>
                   {children}
                 </Text>
               );
             },
             code({ id, children }) {
               return (
-                <Text uid={id} variant="code">
+                <Text uid={id} className={className} variant="code">
                   {children}
                 </Text>
               );
@@ -353,21 +353,21 @@ export const Markdown = memo(
             },
             strong({ id, children }) {
               return (
-                <Text uid={id} variant="strong">
+                <Text uid={id} className={className} variant="strong">
                   {children}
                 </Text>
               );
             },
             em({ id, children }) {
               return (
-                <Text uid={id} variant="em">
+                <Text uid={id} className={className} variant="em">
                   {children}
                 </Text>
               );
             },
             del({ id, children }) {
               return (
-                <Text uid={id} variant="deleted">
+                <Text uid={id} className={className} variant="deleted">
                   {children}
                 </Text>
               );
@@ -451,7 +451,7 @@ export const Markdown = memo(
               }
 
               return (
-                <LinkNative to={href} target={target} {...(props as any)}>
+                <LinkNative className={className} to={href} target={target} {...(props as any)}>
                   {label}
                 </LinkNative>
               );
@@ -464,6 +464,7 @@ export const Markdown = memo(
                   variant="checkbox"
                   readOnly={disabled}
                   value={checked}
+                  className={className}
                   /* label={value}
                 labelPosition={"right"} */
                 />

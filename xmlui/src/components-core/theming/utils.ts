@@ -38,27 +38,16 @@ export const SizeScaleReadableKeys = {
 
 export function useComponentThemeClass(descriptor: ComponentMetadata) {
   let themeScope = useTheme();
-  //console.log({ descriptor, themeScope });
   const componentRegistry = useComponentRegistry();
 
   const themeVars = useMemo(() => {
     const ret = {};
+
+    // --- Theme vars defined by the component itself
     let collectedThemeVars = {
       ...(descriptor?.themeVars || {}),
       ...(descriptor?.defaultThemeVars || {}),
     };
-    const contributorComponents = descriptor?.themeVarContributorComponents || [];
-    contributorComponents.forEach((componentName) => {
-      const componentThmemeVars =
-        componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.themeVars;
-      const componentDefaultThemeVars =
-        componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.defaultThemeVars;
-      collectedThemeVars = {
-        ...collectedThemeVars,
-        ...(componentThmemeVars || {}),
-        ...(componentDefaultThemeVars || {}),
-      };
-    });
 
     Object.entries(collectedThemeVars).forEach(([key]) => {
       let keyWithoutClass = key.replace("Input:", "").replace("Heading:", "");
@@ -74,7 +63,14 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
     });
 
     return ret;
-  }, [descriptor?.defaultThemeVars, descriptor?.themeVars, themeScope]);
+  }, [
+    descriptor?.themeVars,
+    descriptor?.defaultThemeVars,
+    descriptor?.themeVarContributorComponents,
+    themeScope,
+    themeScope.themeVars,
+    componentRegistry,
+  ]);
 
   return useStyles(themeVars);
 }
