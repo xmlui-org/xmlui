@@ -145,6 +145,7 @@ export const AppMd = createMetadata({
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
+  themeVarContributorComponents: ["Footer", "Pages"],
   themeVarDescriptions: {
     "maxWidth-content-App":
       "This theme variable defines the maximum width of the main content. If the main " +

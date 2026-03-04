@@ -1,5 +1,5 @@
 <Component name="Overview">
-    <Stack width="100%" maxWidth="$maxWidth-content-NoToc" gap="$space-6">
+    <Stack width="100%" gap="$space-6">
         <Breadcrumbs />
         <VStack gap="$space-2">
             <H1 showAnchor="{false}">{$linkInfo.label}</H1>

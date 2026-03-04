@@ -40,6 +40,7 @@ type Props = {
   collapsible?: boolean;
   useContentFromAppContext?: boolean;
   placeholder?: string;
+  className?: string;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -55,6 +56,7 @@ export const Search = ({
   collapsible = false,
   useContentFromAppContext = true,
   placeholder,
+  className,
 }: Props) => {
   const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
     const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
@@ -231,6 +233,7 @@ export const Search = ({
   itemRefs.current = [];
   itemLinkRefs.current = [];
   return (
+    <span className={className}>
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
         <label htmlFor={inputId}>Search Field</label>
@@ -326,6 +329,7 @@ export const Search = ({
         </Portal>
       )}
     </Popover>
+    </span>
   );
 };
 

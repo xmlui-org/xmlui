@@ -49,6 +49,19 @@ export function useComponentThemeClass(descriptor: ComponentMetadata) {
       ...(descriptor?.defaultThemeVars || {}),
     };
 
+    if (descriptor?.themeVarContributorComponents) {
+      descriptor.themeVarContributorComponents.forEach((contributorComponent) => {
+        const contributorDescriptor = componentRegistry.lookupComponentRenderer(contributorComponent)?.descriptor;
+        if (contributorDescriptor) {
+          collectedThemeVars = {
+            ...collectedThemeVars,
+            ...(contributorDescriptor.themeVars || {}),
+            ...(contributorDescriptor.defaultThemeVars || {}),
+          };
+        }
+      });
+    }
+
     Object.entries(collectedThemeVars).forEach(([key]) => {
       let keyWithoutClass = key.replace("Input:", "").replace("Heading:", "");
       // Use themeScope.themeVars (allThemeVarsWithResolvedHierarchicalVars) instead of getThemeVar,
