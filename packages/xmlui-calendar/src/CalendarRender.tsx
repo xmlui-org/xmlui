@@ -110,6 +110,13 @@ export function CalendarRender({
       .${scopeId} .rbc-show-more {
         color: ${primary500};
       }
+      .${scopeId} .rbc-agenda-event-cell a {
+        color: ${primary500};
+        text-decoration: underline;
+      }
+      .${scopeId} .rbc-agenda-event-cell a:hover {
+        color: ${eventSelected};
+      }
     `;
   }, [resolve, scopeId]);
 
