@@ -218,7 +218,13 @@ class FormItemValidator {
       return undefined;
     }
     switch (pattern.toLowerCase()) {
-      case "email":
+      case "email": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         return {
           isValid: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
             this.value,
@@ -226,14 +232,28 @@ class FormItemValidator {
           invalidMessage: patternInvalidMessage || "Not a valid email address",
           severity: patternInvalidSeverity,
         };
-      case "phone":
+      }
+      case "phone": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         return {
           // Phone must contain at least one digit and only allowed characters
           isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
           invalidMessage: patternInvalidMessage || "Not a valid phone number",
           severity: patternInvalidSeverity,
         };
-      case "url":
+      }
+      case "url": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         let url;
         try {
           url = new URL(this.value);
@@ -245,11 +265,11 @@ class FormItemValidator {
             severity: patternInvalidSeverity,
           };
         }
-
         return {
           isValid: true,
           severity: "valid",
         };
+      }
       default: {
         console.warn("Unknown pattern provided");
         return {
