@@ -27,6 +27,7 @@ export const MarkdownMd = createMetadata({
     "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
     "when you need [rich formatting](/working-with-markdown).",
   themeVars: parseScssVar(styles.themeVars),
+  themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
     content: d(
       "This property sets the markdown content to display. Alternatively, you can nest " +

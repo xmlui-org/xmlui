@@ -1,4 +1,5 @@
-import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
+import React from "react";
+import { createComponentRenderer, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
 import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
 
@@ -75,18 +76,27 @@ export const SearchMd = createMetadata({
 const searchComponentRenderer = createComponentRenderer(
   COMP,
   SearchMd,
-  ({ node, extractValue }) => {
+  ({ node, extractValue, className }) => {
+    const props = node.props as any;
     return (
       <Search
-        placeholder={extractValue.asOptionalString(node.props?.placeholder)}
-        data={extractValue(node.props?.data)}
-        limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
-        collapsible={extractValue.asOptionalBoolean(node.props?.collapsible, false)}
-        useContentFromAppContext={extractValue.asOptionalBoolean(node.props?.useContentFromAppContext, true)}
+        placeholder={extractValue.asOptionalString(props?.placeholder)}
+        data={extractValue(props?.data)}
+        limit={extractValue.asOptionalNumber(props?.limit, defaultProps.limit)}
+        collapsible={extractValue.asOptionalBoolean(props?.collapsible, false)}
+        useContentFromAppContext={extractValue.asOptionalBoolean(props?.useContentFromAppContext, true)}
+        className={className}
       />
     );
   },
 );
+
+type ThemedSearchProps = React.ComponentProps<typeof Search>;
+
+export const ThemedSearch = function ThemedSearch({ className, ...props }: ThemedSearchProps) {
+  const themeClass = useComponentThemeClass(SearchMd);
+  return <Search {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} />;
+};
 
 export default {
   namespace: "XMLUIExtensions",

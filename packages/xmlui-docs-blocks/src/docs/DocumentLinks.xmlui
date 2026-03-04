@@ -22,15 +22,15 @@
               <HStack verticalAlignment="center" gap="0">
                 <Icon name="chevronleft" />
                 <Text
-                  fontSize="$fontSize-PrevNextText"
-                  color="$textColor-PrevNextText"
+                  fontSize="$fontSize-prevNextText-DocumentLinks"
+                  color="$textColor-prevNextText-DocumentLinks"
                 >
                   Previous
                 </Text>
               </HStack>
               <Text
-                color="$textColor-PrevNextLink"
-                paddingLeft="$padding-PrevNextLink"
+                color="$textColor-prevNextLink-DocumentLinks"
+                paddingLeft="$padding-prevNextLink-DocumentLinks"
                 overflowMode="ellipsis"
               >
                 {$linkInfo.prevLink.label}
@@ -49,16 +49,16 @@
             <VStack gap="0" horizontalAlignment="end" width="100%">
               <HStack verticalAlignment="center" gap="0">
                 <Text
-                  fontSize="$fontSize-PrevNextText"
-                  color="$textColor-PrevNextText"
+                  fontSize="$fontSize-prevNextText-DocumentLinks"
+                  color="$textColor-prevNextText-DocumentLinks"
                 >
                   Next
                 </Text>
                 <Icon name="chevronright" />
               </HStack>
               <Text
-                color="$textColor-PrevNextLink"
-                paddingRight="$padding-PrevNextLink"
+                color="$textColor-prevNextLink-DocumentLinks"
+                paddingRight="$padding-prevNextLink-DocumentLinks"
                 overflowMode="ellipsis"
               >
                 {$linkInfo.nextLink.label}

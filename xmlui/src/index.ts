@@ -17,7 +17,7 @@ import {
   createUserDefinedComponentRenderer,
 } from "./components-core/renderers";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
-import { Icon } from "./components/Icon/IconNative";
+import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { ThemedStack as Stack } from "./components/Stack/Stack";
 import { ThemedButton as Button } from "./components/Button/Button";
@@ -36,15 +36,15 @@ import StandaloneExtensionManager from "./components-core/StandaloneExtensionMan
 import type { ThemeDefinition, ThemeTone } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
-import { TabItemComponent } from "./components/Tabs/TabItemNative";
-import { Tabs } from "./components/Tabs/TabsNative";
+import { ThemedTabItem as TabItemComponent } from "./components/Tabs/TabItem";
+import { ThemedTabs as Tabs } from "./components/Tabs/Tabs";
 import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
 import { ThemedSpinner as Spinner } from "./components/Spinner/Spinner";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
 import { ThemedText as Text } from "./components/Text/Text";
-import { TextBox } from "./components/TextBox/TextBoxNative";
+import { ThemedTextBox as TextBox } from "./components/TextBox/TextBox";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
@@ -56,6 +56,7 @@ import { Logo } from "./components/Logo/LogoNative";
 import { Theme } from "./components/Theme/ThemeNative";
 import { useSearchContextContent } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { useComponentThemeClass } from "./components-core/theming/utils";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
@@ -204,6 +205,7 @@ export {
   Breakout,
   useSearchContextContent,
   useAppLayoutContext,
+  useComponentThemeClass,
   StyleProvider,
   StyleRegistry,
   useEvent,

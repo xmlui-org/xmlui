@@ -24,6 +24,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
+import { register } from "module";
 
 type Props = {
   id?: string;
@@ -108,30 +109,16 @@ export function Theme({
       // instead of a base (no-component) var.
       const rawKey = key.replace(/^--[^-]+-/, "");
       let componentName = parseHVar(rawKey)?.component;
-      
+      const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
       if (
         !componentName ||
-        componentRegistry.hasComponent(componentName) ||
+        registeredComponent?.isCompoundComponent ||
         componentName === "Input" ||
         componentName === "Heading" ||
-        componentName === "ThemedInput" ||
-        componentName === "Footer" ||
-        componentName === "Pages" ||
-        componentName === "Text" ||
-        componentName === "NestedApp"
+        componentName === "Footer"
       ) {
         const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
-        if (componentName) {
-          // For component-specific vars, use allThemeVarsWithResolvedHierarchicalVars instead of
-          // getThemeVar. getThemeVar only follows pure $-reference chains and does NOT resolve
-          // embedded $-references in compound values like "1px solid $borderColor".
-          // allThemeVarsWithResolvedHierarchicalVars has gone through resolveThemeVarsWithCssVars
-          // which converts all $varName occurrences to var(--xmlui-varName), even inside compound
-          // values.
-          filteredThemeCssVars[key] = resolvedValue;
-        } else {
-          filteredThemeCssVars[key] = resolvedValue;
-        }
+        filteredThemeCssVars[key] = resolvedValue;
       }
     });
 
@@ -219,7 +206,7 @@ export function Theme({
     themeCssVars,
     themeTone,
     disableInlineStyle,
-    componentRegistry
+    componentRegistry,
   ]);
 
   const { indexing } = useIndexerContext();
