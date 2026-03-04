@@ -11,7 +11,8 @@
     "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
     "build": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
     "build-ssg": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui ssg && mv dist-ssg/ssg-staticwebapp.config.json dist-ssg/staticwebapp.config.json",
-    "preview-ssg": "npx preview-ssg ./dist-ssg"
+    "preview-ssg": "npx preview-ssg ./dist-ssg",
+    "debug": "tsx tmp.ts"
   },
   "dependencies": {
     "xmlui": "*",

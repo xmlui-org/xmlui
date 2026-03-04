@@ -1,10 +1,8 @@
-import { readdir, readFile, stat } from "node:fs/promises";
+import { glob } from "glob";
+import { stat } from "node:fs/promises";
 import path from "node:path";
-import {
-  createXmlUiParser,
-  extractParam,
-  nodeToComponentDef,
-} from "../../src/parsers/xmlui-parser";
+import { createXmlUiParser, nodeToComponentDef } from "../../src/parsers/xmlui-parser";
+import { ComponentDef } from "../../src";
 
 type ComponentNode = {
   type?: string;
@@ -30,35 +28,6 @@ function getPagesComponent(comp: ComponentNode | undefined): ComponentNode | nul
   return null;
 }
 
-function substituteParams(url: string, params: Record<string, unknown>): string[] {
-  let variants: string[] = [url];
-
-  for (const [key, value] of Object.entries(params)) {
-    if (!variants.some((variant) => variant.includes(`:${key}`))) {
-      continue;
-    }
-
-    const values = Array.isArray(value) ? value : [value];
-    const next: string[] = [];
-    for (const variant of variants) {
-      if (!variant.includes(`:${key}`)) {
-        next.push(variant);
-        continue;
-      }
-
-      for (const paramValue of values) {
-        if (paramValue === null || paramValue === undefined) {
-          continue;
-        }
-        next.push(variant.split(`:${key}`).join(String(paramValue)));
-      }
-    }
-    variants = next;
-  }
-
-  return variants.filter((variant) => !variant.includes(":"));
-}
-
 function normalizeRoute(pathname: string): string {
   let route = pathname.trim();
   if (route.length === 0) {
@@ -73,43 +42,38 @@ function normalizeRoute(pathname: string): string {
   return route;
 }
 
-async function readAllFilesRecursive(dir: string): Promise<string[]> {
-  const files: string[] = [];
-  let entries;
-
-  try {
-    entries = await readdir(dir, { withFileTypes: true });
-  } catch {
-    return files;
+function dynRouteToGlobPattern(route: string, contentDir: string): string {
+  const normalized = route.startsWith("/") ? route.slice(1) : route;
+  const segments = normalized.split("/").filter(Boolean);
+  const globSegments = segments.map((seg) => {
+    if (seg === "*") return "**";
+    if (seg.startsWith(":")) return "*";
+    return seg;
+  });
+  let lastSegment = globSegments[globSegments.length - 1]!;
+  if (!lastSegment.endsWith("*")) {
+    globSegments[globSegments.length - 1] = lastSegment + "*";
   }
-
-  for (const entry of entries) {
-    const fullPath = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...(await readAllFilesRecursive(fullPath)));
-      continue;
-    }
-    files.push(fullPath);
-  }
-  return files;
+  return path.join(contentDir, ...globSegments);
 }
 
-export async function discoverPaths(cwd: string): Promise<string[]> {
-  const mainXmluiPath = path.resolve(cwd, "src", "Main.xmlui");
-  const discovered = new Set<string>();
-
-  let mainXmluiTextContent: string;
-  try {
-    mainXmluiTextContent = await readFile(mainXmluiPath, "utf-8");
-  } catch {
-    return ["/"];
+/**
+ *
+ * @param entrypoint The Main.xmlui file's content or component representation
+ * @returns Set of urls from the Page components. The "/" route isn't in it implicitly.
+ */
+function extractUrls(entrypoint: string | ComponentDef): string[] {
+  let componentDef: ComponentNode;
+  if (typeof entrypoint === "string") {
+    const { parse, getText } = createXmlUiParser(entrypoint);
+    const parsedMain = parse();
+    componentDef = nodeToComponentDef(parsedMain.node, getText, 0) as ComponentNode;
+  } else {
+    componentDef = entrypoint;
   }
 
-  const { parse, getText } = createXmlUiParser(mainXmluiTextContent);
-  const parsedMain = parse();
-  const componentDef = nodeToComponentDef(parsedMain.node, getText, 0) as ComponentNode;
   const pagesComp = getPagesComponent(componentDef);
-
+  const urls: string[] = [];
   if (pagesComp?.children) {
     for (const page of pagesComp.children) {
       const url = page.props?.url;
@@ -117,50 +81,41 @@ export async function discoverPaths(cwd: string): Promise<string[]> {
         continue;
       }
 
-      if (page.props?.staticPaths) {
-        try {
-          const staticPaths = extractParam({}, page.props.staticPaths, undefined, true);
-          if (Array.isArray(staticPaths)) {
-            for (const entry of staticPaths) {
-              if (!entry || typeof entry !== "object") {
-                continue;
-              }
-              const params = (entry as { params?: Record<string, unknown> }).params;
-              if (!params || typeof params !== "object") {
-                continue;
-              }
-              for (const resolved of substituteParams(url, params)) {
-                discovered.add(normalizeRoute(resolved));
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`Failed to evaluate staticPaths for '${url}'`, error);
-        }
-      }
+      urls.push(url);
+    }
+  }
+  return urls;
+}
 
-      if (!url.includes(":") && !url.includes("*")) {
-        discovered.add(normalizeRoute(url));
-      }
+export async function discoverPaths(
+  entrypoint: string | ComponentDef,
+  options?: { contentDir?: string },
+): Promise<string[]> {
+  const extractedRoutes = extractUrls(entrypoint).map(normalizeRoute);
+
+  const staticRoutes = extractedRoutes.filter((r) => !r.includes(":") && !r.includes("*"));
+  const dynamicRoutes = extractedRoutes.filter((r) => r.includes(":") || r.includes("*"));
+
+  const discovered = new Set<string>(staticRoutes);
+
+  const contentDir = options?.contentDir || "content";
+
+  if (dynamicRoutes.length > 0) {
+    const patterns = dynamicRoutes.map((r) => dynRouteToGlobPattern(r, contentDir));
+    const mergedPattern = patterns.length === 1 ? patterns[0] : `{${patterns.join(",")}}`;
+
+    const matchedFiles = await glob(mergedPattern, { nodir: true, dot: false });
+
+    for (const filePath of matchedFiles) {
+      const relative = path.relative(contentDir, filePath).replace(/\\/g, "/");
+      const extension = path.extname(relative);
+      const routePath = relative.slice(0, relative.length - extension.length);
+      const normalizedFileRoute = normalizeRoute(`/${routePath}`);
+      discovered.add(normalizedFileRoute);
     }
   }
 
-  const contentDir = path.resolve(cwd, "content");
-  const contentFiles = await readAllFilesRecursive(contentDir);
-  for (const filePath of contentFiles) {
-    if (!filePath.endsWith(".md")) {
-      continue;
-    }
-    const relative = path.relative(contentDir, filePath).replace(/\\/g, "/");
-    if (relative.startsWith("pages/") || relative.includes("/pages/")) {
-      continue;
-    }
-    discovered.add(normalizeRoute(`/${relative.replace(/\.md$/, "")}`));
-  }
-
-  if (discovered.size === 0) {
-    return ["/"];
-  }
+  discovered.add("/");
 
   return [...discovered];
 }

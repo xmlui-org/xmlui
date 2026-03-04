@@ -16,10 +16,13 @@ import vm from "node:vm";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { discoverPaths, pathExists } from "./ssg/discoverPaths";
+import { JSDOM } from "jsdom";
 
 type SsgOptions = {
   outDir?: string;
   fallbackFile?: string;
+  debug?: boolean;
+  contentDir?: string;
 };
 
 type RenderResult = {
@@ -34,6 +37,15 @@ type RenderModule = {
 };
 
 const TEMP_ENTRY_FILE_NAME = ".xmlui-ssg-entry.tsx";
+
+// Duplicated from xmlui/src/components/App/SearchContext.tsx.
+// If you update one, update the other.
+const SEARCH_CATEGORIES = ["docs", "blog", "news", "get-started"];
+const SEARCH_DEFAULT_CATEGORY = "other";
+
+type SearchItemData = { path: string; title: string; content: string; category?: string };
+
+const SEARCH_INDEX_FILE_NAME = "__xmlui-search-index.json";
 const EXTENSION_FILE_CANDIDATES = [
   "extensions.ts",
   "extensions.tsx",
@@ -45,20 +57,6 @@ const EXTENSION_FILE_CANDIDATES = [
 
 function log(message: string) {
   console.log(`[xmlui ssg] ${message}`);
-}
-
-function normalizeRoute(pathname: string): string {
-  const url = new URL(pathname, "http://localhost");
-  let normalized = url.pathname;
-
-  if (!normalized.startsWith("/")) {
-    normalized = `/${normalized}`;
-  }
-  if (normalized !== "/" && normalized.endsWith("/")) {
-    normalized = normalized.slice(0, -1);
-  }
-
-  return normalized || "/";
 }
 
 function getOutputHtmlPath(outDir: string, routePath: string): string {
@@ -134,6 +132,44 @@ function injectMarkup(shellHtml: string, markup: string): string {
   return `${shellHtml}${markup}`;
 }
 
+/**
+ * Extracts a search index entry from the HTML produced by renderToString.
+ * Mirrors the DOM-based extraction in PageIndexer (SearchIndexCollector.tsx)
+ * by using JSDOM to isolate the page content and extract unescaped text.
+ */
+function extractSearchEntry(pageUrl: string, markup: string, navLabel = ""): SearchItemData {
+  const dom = new JSDOM(markup);
+  const document = dom.window.document;
+
+  // Isolate the physical page content (skip header, nav, footer)
+  const pageRoot = document.querySelector(".xmlui-page-root") || document.body;
+
+  // Strip style and script tags (and their content)
+  const elementsToRemove = pageRoot.querySelectorAll("style, script");
+  elementsToRemove.forEach((el: Element) => el.remove());
+
+  // Extract first h1 text as title
+  const titleElement = pageRoot.querySelector("h1");
+  let title = "";
+  if (titleElement) {
+    title = (titleElement.textContent || "").trim();
+    titleElement.remove();
+  }
+  if (!title) {
+    title = navLabel || pageUrl.split("/").filter(Boolean).pop() || pageUrl;
+  }
+
+  // Get the unescaped text content and collapse whitespace
+  const content = (pageRoot.textContent || "").replace(/\s+/g, " ").trim();
+
+  const firstSegment = pageUrl.split("/").find((s) => s.length > 0) || "";
+  const category = SEARCH_CATEGORIES.includes(firstSegment)
+    ? firstSegment
+    : SEARCH_DEFAULT_CATEGORY;
+
+  return { path: pageUrl, title, content, category };
+}
+
 function applyRenderToShell(shellHtml: string, renderResult: RenderResult): string {
   let html = shellHtml;
   html = mergeHtmlClasses(html, renderResult.htmlClasses);
@@ -149,7 +185,7 @@ function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
   const extensionLoaderLines = extensionImportSpecifiers
     .map((spec, index) => {
       const safeSpec = JSON.stringify(spec);
-      return `  try {\n    const m${index} = await import(${safeSpec});\n    extensions.push(m${index}.default ?? m${index});\n  } catch (error) {\n    console.warn(\"[xmlui ssg] failed to load extension ${spec}\");\n    console.error(error);\n  }`;
+      return `  try {\n    const m${index} = await import(${safeSpec});\n    extensions.push(m${index}.default ?? m${index});\n  } catch (error) {\n    console.warn("[xmlui ssg] failed to load extension ${spec}");\n    console.error(error);\n  }`;
     })
     .join("\n");
 
@@ -330,7 +366,12 @@ async function getWorkspaceExtensionAliases(cwd: string): Promise<Record<string,
   return aliases;
 }
 
-export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOptions = {}) => {
+export const ssg = async ({
+  outDir = "dist-ssg",
+  fallbackFile = "200",
+  debug = false,
+  contentDir = "content",
+}: SsgOptions = {}) => {
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
   const distPath = path.resolve(cwd, "dist");
@@ -365,11 +406,14 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
   executeInlineScripts(sourceHtml);
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
-  const pathsToRender = (await discoverPaths(cwd)).map(normalizeRoute);
-
+  const mainXmluiPath = path.resolve(cwd, "src", "Main.xmlui");
+  const mainXmluiTextContent = await readFile(mainXmluiPath, "utf-8");
+  const pathsToRender = await discoverPaths(mainXmluiTextContent, { contentDir });
   // Collision detection: a discovered page route must not share the base name of the fallback file.
   const fallbackBaseName = fallbackFile.replace(/\.html$/i, "");
-  const fallbackRoute = normalizeRoute(`/${fallbackBaseName}`);
+  const fallbackRoute = fallbackBaseName.startsWith("/")
+    ? fallbackBaseName
+    : `/${fallbackBaseName}`;
   if (pathsToRender.includes(fallbackRoute)) {
     throw new Error(
       `A discovered page route "${fallbackRoute}" conflicts with the fallback file name ` +
@@ -402,7 +446,7 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
         ...existingAlias,
         ...Object.entries(extensionAliases).map(([find, replacement]) => ({ find, replacement })),
       ]
-    : { ...(existingAlias || {}), ...extensionAliases };
+    : { ...existingAlias, ...extensionAliases };
 
   try {
     log("building SSR module");
@@ -411,27 +455,27 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
     await viteBuild({
       ...viteConfig,
       resolve: {
-        ...(viteConfig.resolve || {}),
+        ...viteConfig.resolve,
         alias: mergedAlias,
       },
       define: {
-        ...(viteConfig.define || {}),
+        ...viteConfig.define,
         "process.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
         "process.env.VITE_DEV_MODE": false,
         "process.env.VITE_MOCK_ENABLED": false,
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
       },
       build: {
-        ...(viteConfig.build || {}),
+        ...viteConfig.build,
         ssr: tempEntryPath,
         outDir: ssrBuildPath,
         emptyOutDir: true,
         minify: false,
         rollupOptions: {
-          ...(viteConfig.build?.rollupOptions || {}),
+          ...viteConfig.build?.rollupOptions,
           input: undefined,
           output: {
-            ...(viteConfig.build?.rollupOptions?.output || {}),
+            ...viteConfig.build?.rollupOptions?.output,
             entryFileNames: "render.mjs",
             inlineDynamicImports: true,
           },
@@ -452,6 +496,7 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
     }
 
     const writePromises: Promise<void>[] = [];
+    const searchIndex: SearchItemData[] = [];
 
     for (const route of pathsToRender) {
       log(`rendering ${route}`);
@@ -459,6 +504,8 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
       const finalHtml = applyRenderToShell(shellHtml, rendered);
       const outputFile = getOutputHtmlPath(outPath, route);
       const dir = path.dirname(outputFile);
+
+      searchIndex.push(extractSearchEntry(route, rendered.markup));
 
       const writePromise = (async () => {
         await mkdir(dir, { recursive: true });
@@ -471,6 +518,10 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
     log("waiting for all writes to complete...");
     await Promise.all(writePromises);
 
+    const searchIndexFile = path.join(outPath, SEARCH_INDEX_FILE_NAME);
+    await writeFile(searchIndexFile, JSON.stringify(searchIndex), "utf-8");
+    log(`wrote search index with ${searchIndex.length} entries to ${searchIndexFile}`);
+
     // Render the fallback file using a synthetic route that no <Page> will match.
     // Even if there is a fallbackRoute prop on the Pages component, that renders a <Navigate> component, which
     // emits no DOM output, so the result remains a good app shell.
@@ -481,8 +532,13 @@ export const ssg = async ({ outDir = "dist-ssg", fallbackFile = "200" }: SsgOpti
     await writeFile(fallbackOutputFile, fallbackHtml, "utf-8");
     log(`wrote ${fallbackOutputFile}`);
   } finally {
-    await rm(tempEntryPath, { force: true });
-    await rm(ssrBuildPath, { recursive: true, force: true });
+    if (debug) {
+      log(`debug mode: preserved SSR entry at ${tempEntryPath}`);
+      log(`debug mode: preserved SSR build at ${ssrBuildPath}`);
+    } else {
+      await rm(tempEntryPath, { force: true });
+      await rm(ssrBuildPath, { recursive: true, force: true });
+    }
   }
 
   log(`completed. static files are in ${outPath}`);

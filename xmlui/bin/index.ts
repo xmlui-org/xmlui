@@ -85,6 +85,8 @@ interface ZipDistArgs {
 interface SsgArgs {
   outDir?: string;
   fallback?: string;
+  debug?: boolean;
+  contentDir?: string;
 }
 
 yargs(hideBin(process.argv))
@@ -219,13 +221,26 @@ yargs(hideBin(process.argv))
           type: "string",
           default: "200",
           description: "Base name for the fallback HTML file served for unknown routes",
+        })
+        .option("debug", {
+          type: "boolean",
+          default: false,
+          description: "Preserve intermediate SSR files for debugging",
+          hidden: true,
+        })
+        .option("contentDir", {
+          type: "string",
+          default: "content",
+          description: "Content directory for file based routing",
         });
     },
     (argv) => {
-      const { outDir, fallback } = argv;
+      const { outDir, fallback, debug, contentDir } = argv;
       ssg({
         outDir: getStringArg(outDir, "dist-ssg"),
         fallbackFile: getStringArg(fallback, "200"),
+        debug: getBoolArg(debug, false),
+        contentDir: getStringArg(contentDir, "content"),
       });
     },
   )

@@ -499,10 +499,6 @@
     </Page>
     <Page
       url="/blog/:slug"
-      staticPaths="{
-            posts.map((p) => {
-              return { params: { slug: p.slug } };
-            })}"
     >
       <script>
           var post = posts.find(p => p.slug === $routeParams.slug)

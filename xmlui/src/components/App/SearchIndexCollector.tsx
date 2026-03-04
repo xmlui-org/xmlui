@@ -12,6 +12,7 @@ import {
   SEARCH_DEFAULT_CATEGORY,
   useSearchContextSetIndexing,
   useSearchContextUpdater,
+  useSearchContextHydrated,
 } from "./SearchContext";
 
 const HIDDEN_STYLE: CSSProperties = {
@@ -34,6 +35,7 @@ interface SearchIndexCollectorProps {
 export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
+  const hydrated = useSearchContextHydrated();
   const { root } = useTheme();
 
   const [indexState, setIndexState] = useState<{ index: number; done: boolean }>({
@@ -76,7 +78,7 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     });
   }, [pagesToIndex.length]); // Recreate if the total number of pages changes
 
-  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done) {
+  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done || hydrated) {
     return null;
   }
 
