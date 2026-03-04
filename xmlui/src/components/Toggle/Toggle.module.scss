@@ -8,13 +8,13 @@ $themeVars: ();
 }
 
 // Variables for Checkbox - default variant
-$borderRadius-Checkbox--default: createThemeVar("Input:borderRadius-Checkbox--default");
-$borderColor-Checkbox--default: createThemeVar("Input:borderColor-Checkbox--default");
-$backgroundColor-Checkbox--default: createThemeVar("Input:backgroundColor-Checkbox--default");
-$outlineWidth-Checkbox--default--focus: createThemeVar("Input:outlineWidth-Checkbox--default--focus");
-$outlineColor-Checkbox--default--focus: createThemeVar("Input:outlineColor-Checkbox--default--focus");
-$outlineStyle-Checkbox--default--focus: createThemeVar("Input:outlineStyle-Checkbox--default--focus");
-$outlineOffset-Checkbox--default--focus: createThemeVar("Input:outlineOffset-Checkbox--default--focus");
+$borderRadius-Checkbox: createThemeVar("Input:borderRadius-Checkbox");
+$borderColor-Checkbox: createThemeVar("Input:borderColor-Checkbox");
+$backgroundColor-Checkbox: createThemeVar("Input:backgroundColor-Checkbox");
+$outlineWidth-Checkbox--focus: createThemeVar("Input:outlineWidth-Checkbox--focus");
+$outlineColor-Checkbox--focus: createThemeVar("Input:outlineColor-Checkbox--focus");
+$outlineStyle-Checkbox--focus: createThemeVar("Input:outlineStyle-Checkbox--focus");
+$outlineOffset-Checkbox--focus: createThemeVar("Input:outlineOffset-Checkbox--focus");
 
 // Variables for Checkbox - error variant
 $borderRadius-Checkbox--error: createThemeVar("Input:borderRadius-Checkbox--error");
@@ -62,7 +62,7 @@ $backgroundColor-checked-Checkbox--success: createThemeVar("Input:backgroundColo
 $backgroundColor-indicator-Checkbox: createThemeVar("backgroundColor-indicator-Checkbox");
 
 // Variables for Switch - hover and disabled states
-$borderColor-Switch--default--hover: createThemeVar("Input:borderColor-Switch--default--hover");
+$borderColor-Switch--hover: createThemeVar("Input:borderColor-Switch--hover");
 $backgroundColor-Switch--disabled: createThemeVar("Input:backgroundColor-Switch--disabled");
 $borderColor-Switch--disabled: createThemeVar("Input:borderColor-Switch--disabled");
 
@@ -94,16 +94,17 @@ $borderColor-Switch--warning: createThemeVar("Input:borderColor-Switch--warning"
 $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success");
 
 // --- CSS properties of a particular Checkbox variant
-@mixin checkboxVariant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-Checkbox--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-Checkbox--#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-Checkbox--#{$variantName}");
+@mixin checkboxVariant($variantName: "") {
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-Checkbox#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-Checkbox#{$suffix}");
+  background-color: createThemeVar("Input:backgroundColor-Checkbox#{$suffix}");
 
   &:focus-visible {
-    outline-width: createThemeVar("Input:outlineWidth-Checkbox--#{$variantName}--focus");
-    outline-color: createThemeVar("Input:outlineColor-Checkbox--#{$variantName}--focus");
-    outline-style: createThemeVar("Input:outlineStyle-Checkbox--#{$variantName}--focus");
-    outline-offset: createThemeVar("Input:outlineOffset-Checkbox--#{$variantName}--focus");
+    outline-width: createThemeVar("Input:outlineWidth-Checkbox#{$suffix}--focus");
+    outline-color: createThemeVar("Input:outlineColor-Checkbox#{$suffix}--focus");
+    outline-style: createThemeVar("Input:outlineStyle-Checkbox#{$suffix}--focus");
+    outline-offset: createThemeVar("Input:outlineOffset-Checkbox#{$suffix}--focus");
   }
 }
 
@@ -182,7 +183,7 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
       cursor: pointer;
     }
 
-    @include checkboxVariant("default");
+    @include checkboxVariant("");
     @include hoverAndDisabledState("Checkbox");
 
     .forceHover {
@@ -288,7 +289,7 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
     @include checkedState("Switch");
 
     .forceHover {
-      border-color: $borderColor-Switch--default--hover;
+      border-color: $borderColor-Switch--hover;
       // Don't override background-color - let the existing background rules apply
     }
 

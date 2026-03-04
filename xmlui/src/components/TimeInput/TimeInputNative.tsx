@@ -9,7 +9,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 // Import utilities and types from merged utils file
 import {
@@ -601,7 +601,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   // Custom clear icon
   const clearIconElement = useMemo(() => {
     if (clearIcon === null || clearIcon === "null") return null;
-    if (clearIcon) return <Icon name={clearIcon} />;
+    if (clearIcon) return <ThemedIcon name={clearIcon} />;
     // Default clear icon
     return (
       <svg

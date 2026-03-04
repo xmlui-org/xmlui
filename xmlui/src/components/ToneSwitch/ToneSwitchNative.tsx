@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { useThemes } from "../../components-core/theming/ThemeContext";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Toggle } from "../Toggle/Toggle";
 import styles from "./ToneSwitch.module.scss";
 import classnames from "classnames";
@@ -67,9 +67,9 @@ export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function T
             >
               <div className={styles.iconThumb}>
                 {!contextVars.$checked ? (
-                  <Icon name={iconLight} fallback="sun" className={styles.icon} />
+                  <ThemedIcon name={iconLight} fallback="sun" className={styles.icon} />
                 ) : (
-                  <Icon name={iconDark} fallback="moon" className={styles.icon} />
+                  <ThemedIcon name={iconDark} fallback="moon" className={styles.icon} />
                 )}
               </div>
             </div>

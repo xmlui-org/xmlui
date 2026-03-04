@@ -16,8 +16,8 @@ import styles from "./ModalDialog.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
-import { Icon } from "../Icon/IconNative";
-import { Button } from "../Button/ButtonNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedButton as Button } from "../Button/Button";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import { Part } from "../Part/Part";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
@@ -259,8 +259,8 @@ export const ModalDialog = React.forwardRef(
                 variant={"ghost"}
                 themeColor={"secondary"}
                 className={styles.closeButton}
-                aria-label="Close dialog"
-                icon={<Icon name={"close"} size={"sm"} />}
+                aria-label="Close"
+                icon={<ThemedIcon name={"close"} size={"sm"} />}
                 orientation={"vertical"}
               />
             </Dialog.Close>

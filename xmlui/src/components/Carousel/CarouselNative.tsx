@@ -11,7 +11,7 @@ import styles from "./Carousel.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import type { OrientationOptions } from "../abstractions";
 
 type CarouselApi = UseEmblaCarouselType[1];
@@ -247,7 +247,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
                 onClick={toggleAutoplay}
                 aria-label={isPlaying ? "Pause Autoplay" : "Start Autoplay"}
               >
-                {isPlaying ? <Icon name={"pause"} /> : <Icon name={"play"} />}
+                {isPlaying ? <ThemedIcon name={"pause"} /> : <ThemedIcon name={"play"} />}
               </button>
             )}
             <button
@@ -256,7 +256,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               onClick={scrollPrev}
               aria-label="Previous Slide"
             >
-              <Icon name={prevIconName} />
+              <ThemedIcon name={prevIconName} />
             </button>
             <button
               className={styles.controlButton}
@@ -264,7 +264,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               disabled={!canScrollNext}
               aria-label="Next Slide"
             >
-              <Icon name={nextIconName} />
+              <ThemedIcon name={nextIconName} />
             </button>
           </div>
         )}

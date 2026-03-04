@@ -19,8 +19,8 @@ import {
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
-import { Stack } from "./components/Stack/StackNative";
-import { Button } from "./components/Button/ButtonNative";
+import { ThemedStack as Stack } from "./components/Stack/Stack";
+import { ThemedButton as Button } from "./components/Button/Button";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
@@ -40,15 +40,15 @@ import { TabItemComponent } from "./components/Tabs/TabItemNative";
 import { Tabs } from "./components/Tabs/TabsNative";
 import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
-import { Spinner } from "./components/Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "./components/Spinner/Spinner";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
-import { Text } from "./components/Text/TextNative";
+import { ThemedText as Text } from "./components/Text/Text";
 import { TextBox } from "./components/TextBox/TextBoxNative";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
-import { LinkNative } from "./components/Link/LinkNative";
+import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
 import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
@@ -102,7 +102,10 @@ import {
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
 import { Tooltip } from "./components/Tooltip/TooltipNative";
-import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
+import {
+  ThemedDropdownMenu as DropdownMenu,
+  ThemedMenuItem as MenuItem,
+} from "./components/DropdownMenu/DropdownMenu";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 import { MemoizedItem } from "./components/container-helpers";
 

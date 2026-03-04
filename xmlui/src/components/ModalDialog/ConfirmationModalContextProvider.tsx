@@ -9,8 +9,8 @@ import React, {
 } from "react";
 
 import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
-import { Stack } from "../Stack/StackNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedStack as Stack } from "../Stack/Stack";
 import { Dialog } from "./Dialog";
 
 const ConfirmationModalContext = React.createContext({

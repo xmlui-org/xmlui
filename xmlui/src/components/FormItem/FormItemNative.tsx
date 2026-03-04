@@ -20,12 +20,12 @@ import type {
   ValidationSeverity,
 } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-import { TextBox } from "../TextBox/TextBoxNative";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
 import { Toggle } from "../Toggle/Toggle";
-import { FileInput } from "../FileInput/FileInputNative";
-import { NumberBox } from "../NumberBox/NumberBoxNative";
-import { Select } from "../Select/SelectNative";
-import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import { ThemedFileInput as FileInput } from "../FileInput/FileInput";
+import { ThemedNumberBox as NumberBox } from "../NumberBox/NumberBox";
+import { ThemedSelect as Select } from "../Select/Select";
+import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 
 import {
   fieldChanged,
@@ -34,17 +34,17 @@ import {
   fieldLostFocus,
   fieldRemoved,
 } from "../Form/formActions";
-import { TextArea } from "../TextArea/TextAreaNative";
+import { ThemedTextArea as TextArea } from "../TextArea/TextArea";
 import { useEvent } from "../../components-core/utils/misc";
-import { DatePicker } from "../DatePicker/DatePickerNative";
+import { ThemedDatePicker as DatePicker } from "../DatePicker/DatePicker";
 import { getByPath } from "../Form/FormNative";
-import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
+import { ThemedAutoComplete as AutoComplete } from "../AutoComplete/AutoComplete";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { resolveFormItemId } from "./FormItemUtils";
-import { Slider } from "../Slider/SliderNative";
-import { ColorPicker } from "../ColorPicker/ColorPickerNative";
+import { ThemedSlider as Slider } from "../Slider/Slider";
+import { ThemedColorPicker as ColorPicker } from "../ColorPicker/ColorPicker";
 import { Items } from "../Items/ItemsNative";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";

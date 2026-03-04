@@ -5,15 +5,15 @@ import classnames from "classnames";
 
 import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { LinkNative } from "../Link/LinkNative";
-import { Text } from "../Text/TextNative";
-import { Heading } from "../Heading/HeadingNative";
-import { Image } from "../Image/ImageNative";
-import { Markdown } from "../Markdown/MarkdownNative";
-import { TableOfContents } from "../TableOfContents/TableOfContentsNative";
-import { Tabs } from "../Tabs/TabsNative";
-import { TabItemComponent } from "../Tabs/TabItemNative";
-import { FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayoutNative";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedHeading as Heading } from "../Heading/Heading";
+import { ThemedImage as Image } from "../Image/Image";
+import { ThemedMarkdown as Markdown } from "../Markdown/Markdown";
+import { ThemedTableOfContents as TableOfContents } from "../TableOfContents/TableOfContents";
+import { ThemedTabs as Tabs } from "../Tabs/Tabs";
+import { ThemedTabItem as TabItemComponent } from "../Tabs/TabItem";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayout";
 import styles from "./Blog.module.scss";
 
 type BlogPost = {

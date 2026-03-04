@@ -21,6 +21,8 @@ import {
   d,
 } from "../metadata-helpers";
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "AutoComplete";
 
@@ -167,6 +169,21 @@ export const AutoCompleteMd = createMetadata({
     [`textColor-${COMP}--disabled`]: "$textColor--disabled",
   },
 });
+
+type ThemedAutoCompleteProps = React.ComponentPropsWithoutRef<typeof AutoComplete>;
+
+export const ThemedAutoComplete = React.forwardRef<React.ElementRef<typeof AutoComplete>, ThemedAutoCompleteProps>(
+  function ThemedAutoComplete({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(AutoCompleteMd);
+    return (
+      <AutoComplete
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const autoCompleteComponentRenderer = createComponentRenderer(
   COMP,

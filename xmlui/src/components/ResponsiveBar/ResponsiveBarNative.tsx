@@ -11,7 +11,7 @@ import classnames from "classnames";
 
 import styles from "./ResponsiveBar.module.scss";
 import { useResizeObserver } from "../../components-core/utils/hooks";
-import { DropdownMenu, MenuItem } from "../DropdownMenu/DropdownMenuNative";
+import { ThemedDropdownMenu as DropdownMenu, ThemedMenuItem as MenuItem } from "../DropdownMenu/DropdownMenu";
 import type { AlignmentOptions } from "../abstractions";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { Part } from "../Part/Part";

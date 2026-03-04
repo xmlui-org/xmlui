@@ -21,7 +21,7 @@ import {
   defaultProps,
 } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
-import { PositionValues } from "../Pagination/PaginationNative";
+import { PositionValues } from "../Pagination/Pagination";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";

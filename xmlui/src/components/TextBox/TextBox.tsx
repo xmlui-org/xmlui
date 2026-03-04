@@ -1,11 +1,13 @@
 import styles from "./TextBox.module.scss";
 
+import React from "react";
 import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -147,13 +149,14 @@ export const TextBoxMd = createMetadata({
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
     "textColor-Input--disabled": "$textColor--disabled",
-    "borderColor-Input--default": "$borderColor-Input-default",
-    "borderColor-Input--default--hover": "$borderColor-Input-default--hover",
+    "borderColor-Input": "$borderColor-Input-default",
+    "borderColor-Input--hover": "$borderColor-Input-default--hover",
     "borderColor-Input--error": "$borderColor-Input-default--error",
     "borderColor-Input--warning": "$borderColor-Input-default--warning",
     "borderColor-Input--success": "$borderColor-Input-default--success",
     "textColor-placeholder-Input": "$textColor-subtitle",
     "color-adornment-Input": "$textColor-subtitle",
+    "color-adornment-TextBox": "$textColor-subtitle",
 
     "outlineColor-Input--focus": "$outlineColor--focus",
     "outlineWidth-Input--focus": "$outlineWidth--focus",
@@ -169,6 +172,14 @@ export const TextBoxMd = createMetadata({
     },
   },
 });
+
+type ThemedTextBoxProps = React.ComponentProps<typeof TextBox> & { className?: string };
+export const ThemedTextBox = React.forwardRef<HTMLDivElement, ThemedTextBoxProps>(
+  function ThemedTextBox({ className, ...props }: ThemedTextBoxProps, ref) {
+    const themeClass = useComponentThemeClass(TextBoxMd);
+    return <TextBox {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
 
@@ -188,7 +199,7 @@ function renderTextBox(
   // TODO: How can we use the gap from the className?
   //delete layoutCss.gap;
   return (
-    <TextBox
+    <ThemedTextBox
       type={type}
       className={className}
       value={state.value}

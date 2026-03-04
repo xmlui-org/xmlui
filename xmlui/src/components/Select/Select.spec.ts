@@ -1206,9 +1206,7 @@ test.describe("Z-Index and Modal Layering", () => {
           <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
             <FormItem bindTo="firstName" required="true" />
             <FormItem bindTo="lastName" required="true" />
-            <FormItem
-              label="Field to Update"
-              type="select"
+            <Select
               width="200px"
               bindTo="fieldToUpdate"
               required
@@ -1218,7 +1216,7 @@ test.describe("Z-Index and Modal Layering", () => {
               <Option value="rate">Price</Option>
               <Option value="description">Item Description</Option>
               <Option value="account_id">Account</Option>
-            </FormItem>
+            </Select>
           </Form>
         </ModalDialog>
       </Fragment>
@@ -1235,8 +1233,8 @@ test.describe("Z-Index and Modal Layering", () => {
     await expect(page.getByRole("dialog", { name: "Example Dialog" })).toBeVisible();
 
     // Open the select in the modal
-    const modalSelectDriver = await createSelectDriver("modal-select");
-    await modalSelectDriver.click();
+    const priceButton = page.getByText("Price").nth(0);
+    await priceButton.click();
 
     // Check that all options are visible
     await expect(page.getByRole("option", { name: "Price" })).toBeVisible();

@@ -6,11 +6,11 @@ import { Slot } from "@radix-ui/react-slot";
 import styles from "./FormItem.module.scss";
 
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
-import { Spinner } from "../Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
-import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 // Component part names

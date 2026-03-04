@@ -12,7 +12,7 @@ import classNames from "classnames";
 import styles from "./ExpandableItem.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Toggle } from "../Toggle/Toggle";
 import { Part } from "../Part/Part";
 
@@ -186,7 +186,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
                 onDidChange={handleSwitchChange}
               />
             ) : (
-              <Icon
+              <ThemedIcon
                 name={isOpen ? iconExpanded : iconCollapsed}
                 fallback={isOpen ? "chevrondown" : "chevronright"}
               />

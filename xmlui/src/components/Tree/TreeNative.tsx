@@ -1,9 +1,9 @@
 import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
-import Icon from "../Icon/IconNative";
-import { Spinner } from "../Spinner/SpinnerNative";
-import { Scroller } from "../ScrollViewer/Scroller";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedScroller as Scroller } from "../ScrollViewer/ScrollViewer";
 
 import styles from "./TreeComponent.module.scss";
 
@@ -227,7 +227,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
                 {isLoading && showSpinner ? (
                   <Spinner data-tree-node-spinner delay={0} style={{ width: 24, height: 24 }} />
                 ) : (
-                  <Icon
+                  <ThemedIcon
                     data-tree-expand-icon
                     name={
                       animateExpand

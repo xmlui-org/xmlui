@@ -151,7 +151,7 @@ export function useCompiledTheme(
     return resultedTheme;
   }, [activeTone, themeDefChain]);
 
-  const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
+  const [allThemeVarsWithResolvedHierarchicalVars, rawAllThemeVars] = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
     themeDefChainVars?.forEach((theme) => {
@@ -176,10 +176,12 @@ export function useCompiledTheme(
       }
     });
 
-    return resolveThemeVarsWithCssVars({
+    const rawVars = {
       ...mergedThemeVars,
       ...resolvedThemeVarsFromChains,
-    });
+    };
+
+    return [resolveThemeVarsWithCssVars(rawVars), rawVars];
   }, [componentThemeVars, themeDefChainVars]);
 
   const themeCssVars = useMemo(() => {
@@ -195,9 +197,9 @@ export function useCompiledTheme(
 
   const getThemeVar = useCallback(
     (varName: string) => {
-      return resolveThemeVar(varName, allThemeVarsWithResolvedHierarchicalVars);
+      return resolveThemeVar(varName, rawAllThemeVars);
     },
-    [allThemeVarsWithResolvedHierarchicalVars],
+    [rawAllThemeVars],
   );
 
   useEffect(() => {
