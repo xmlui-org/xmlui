@@ -2212,6 +2212,61 @@ test.describe("Edge Cases", () => {
       await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
     }
   );
+
+  test("resizing a column with explicit width keeps header and data cells aligned",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table
+          data="{[1,2,3]}"
+          width="800px"
+          testId="table"
+        >
+          <Column width="400px" canResize="{true}" header="Col 1">
+            Col 1
+          </Column>
+          <Column width="300px" canResize="{true}" header="Col 2">
+            Col 2
+          </Column>
+          <Column width="500px" canResize="{true}" header="Col 3">
+            Col 3
+          </Column>
+        </Table>
+      `);
+
+      const firstHeader = page.locator("thead th").first();
+      const firstCell = page.locator("tbody tr").first().locator("td").first();
+
+      const headerBoxBefore = await firstHeader.boundingBox();
+      const cellBoxBefore = await firstCell.boundingBox();
+
+      expect(headerBoxBefore).not.toBeNull();
+      expect(cellBoxBefore).not.toBeNull();
+
+      expect(Math.abs(headerBoxBefore!.width - cellBoxBefore!.width)).toBeLessThan(4);
+
+      const resizer = firstHeader.locator('div[class*="resizer"]');
+      const resizerBox = await resizer.boundingBox();
+      expect(resizerBox).not.toBeNull();
+
+      const startX = resizerBox!.x + resizerBox!.width / 2;
+      const startY = resizerBox!.y + resizerBox!.height / 2;
+
+      await page.mouse.move(startX, startY);
+      await page.mouse.down();
+      await page.mouse.move(startX + 120, startY);
+      await page.mouse.up();
+
+      const headerBoxAfter = await firstHeader.boundingBox();
+      const cellBoxAfter = await firstCell.boundingBox();
+
+      expect(headerBoxAfter).not.toBeNull();
+      expect(cellBoxAfter).not.toBeNull();
+
+      expect(headerBoxAfter!.width).toBeGreaterThan(headerBoxBefore!.width + 20);
+
+      expect(Math.abs(headerBoxAfter!.width - cellBoxAfter!.width)).toBeLessThan(4);
+    }
+  );
 });
 
 // =============================================================================
