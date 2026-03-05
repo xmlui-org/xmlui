@@ -86,6 +86,14 @@ export const TableMd = createMetadata({
         `this takes precedence over the initiallySelected property for initial selection. ` +
         `You can use the AppState's didUpdate event to receive notifications when the selection changes.`,
     ),
+    syncWithVar: d(
+      `The name of a global variable to synchronize the table's selection state with. ` +
+        `The named variable must reference an object; the table will read from and write to its ` +
+        `'selectedIds' property. When provided, this takes precedence over both ` +
+        `\`initiallySelected\` and \`syncWithAppState\`. Multiple tables sharing the same variable ` +
+        `name will keep their selections in sync automatically. ` +
+        `A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+    ),
     pageSize: d(
       `This property defines the number of rows to display per page when pagination is enabled.`,
     ),
@@ -483,6 +491,7 @@ const TableWithColumns = memo(
         node,
         renderChild,
         lookupEventHandler,
+        lookupAction,
         lookupSyncCallback,
         className,
         registerComponentApi,
@@ -492,6 +501,7 @@ const TableWithColumns = memo(
         | "node"
         | "renderChild"
         | "lookupEventHandler"
+        | "lookupAction"
         | "className"
         | "registerComponentApi"
         | "lookupSyncCallback"
@@ -558,6 +568,65 @@ const TableWithColumns = memo(
       );
 
       const selectionContext = useSelectionContext();
+
+      // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
+      //
+      // KEY POINTS:
+      // 1. extractValue({varName}) returns the PLAIN state value, not a reactive proxy.
+      //    Mutating it directly has no effect on XMLUI state.
+      // 2. Writes must go through lookupAction so the expression runs inside XMLUI's
+      //    reactive execution engine (buildProxy + statePartChanged chain).
+      // 3. The adapter object must stay STABLE (same reference) across renders so that
+      //    useRowSelection's effects do not fire on every render.  We achieve this with
+      //    a ref whose .value property is updated in-place each render.
+      const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+      const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+
+      // Keep lookupAction current without breaking the stable adapter reference.
+      const lookupActionRef = useRef(lookupAction);
+      lookupActionRef.current = lookupAction;
+
+      // Holder for the stable adapter object.
+      const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+
+      let syncAdapter: any;
+      if (syncVarName !== undefined) {
+        if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
+          console.error(
+            `[Table syncWithVar] Invalid variable name: "${syncVarName}"`,
+          );
+          syncAdapterHolderRef.current = null;
+        } else {
+          const currentSyncVarValue = extractValue(`{${syncVarName}}`);
+          if (currentSyncVarValue != null) {
+            if (!syncAdapterHolderRef.current) {
+              // Create the stable adapter object once.  The update function always
+              // uses the latest lookupAction via the ref.
+              syncAdapterHolderRef.current = {
+                value: currentSyncVarValue,
+                update: ({ selectedIds }: { selectedIds: string[] }) => {
+                  // Embed the actual value as a JSON literal so the expression is
+                  // self-contained.  We use ephemeral:true to prevent caching — the
+                  // handler string is different on every invocation.
+                  const valueJson = JSON.stringify(selectedIds);
+                  const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
+                  const handler = lookupActionRef.current?.(expr, { ephemeral: true });
+                  handler?.();
+                },
+              };
+            } else {
+              // Update the value in-place so useRowSelection sees the latest
+              // selectedIds while the object identity stays the same.
+              syncAdapterHolderRef.current.value = currentSyncVarValue;
+            }
+          } else {
+            syncAdapterHolderRef.current = null;
+          }
+        }
+      } else {
+        syncAdapterHolderRef.current = null;
+      }
+      syncAdapter = syncAdapterHolderRef.current;
 
       const tableContent = (
         <>
@@ -637,7 +706,7 @@ const TableWithColumns = memo(
             showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
             checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
             initiallySelected={extractValue(node.props.initiallySelected)}
-            syncWithAppState={extractValue(node.props.syncWithAppState)}
+            syncWithAppState={syncAdapter ?? extractValue(node.props.syncWithAppState)}
             userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
@@ -666,6 +735,7 @@ export const tableComponentRenderer = createComponentRenderer(
     node,
     renderChild,
     lookupEventHandler,
+    lookupAction,
     lookupSyncCallback,
     className,
     registerComponentApi,
@@ -675,6 +745,7 @@ export const tableComponentRenderer = createComponentRenderer(
         node={node}
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
+        lookupAction={lookupAction}
         lookupSyncCallback={lookupSyncCallback}
         className={className}
         renderChild={renderChild}

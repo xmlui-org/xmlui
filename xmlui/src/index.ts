@@ -54,7 +54,12 @@ import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerBut
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { Theme } from "./components/Theme/ThemeNative";
-import { useSearchContextContent } from "./components/App/SearchContext";
+import {
+  type SearchItemData,
+  useSearchContextContent,
+  SEARCH_DEFAULT_CATEGORY,
+  SEARCH_CATEGORIES,
+} from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
 import { useComponentThemeClass } from "./components-core/theming/utils";
 import { StyleProvider } from "./components-core/theming/StyleContext";
@@ -127,6 +132,7 @@ export type {
   ComponentMetadata,
   ThemeTone,
   XmlUiNode,
+  SearchItemData,
 };
 export {
   StandaloneApp,
@@ -217,4 +223,6 @@ export {
   MenuItem,
   ContentSeparator,
   MemoizedItem,
+  SEARCH_DEFAULT_CATEGORY,
+  SEARCH_CATEGORIES,
 };

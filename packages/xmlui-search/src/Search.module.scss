@@ -128,6 +128,19 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   }
 }
 
+.categoryHeader {
+  list-style: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0.25rem;
+  padding-inline: 0.75rem;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+  margin-bottom: 0.25rem;
+
+  &:not(:first-child) {
+    margin-top: 0.75rem;
+  }
+}
+
 .noResults {
   display: flex;
   justify-content: center;

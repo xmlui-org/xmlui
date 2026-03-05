@@ -1718,3 +1718,39 @@ This event is triggered when a table row is double-clicked. The handler receives
 ```
 
 %-PROP-END
+
+%-PROP-START syncWithVar
+
+The following example demonstrates how two independent `MyTable` components share selection state through a global variable. Selecting a row in either table immediately reflects in the other, and `selState` always holds the current selection:
+
+>[!INFO]
+> `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
+
+```xmlui-pg
+---app copy display /global.selState/ filename="Main.xmlui"
+<App global.selState="{{}}">
+  <MyTable />
+  <Text>Selection: {JSON.stringify(selState)}</Text>
+  <MyTable />
+</App>
+---comp copy display /syncWithVar="selState"/ filename="MyTable.xmlui"
+<Component name="MyTable">
+  <Table
+    syncWithVar="selState"
+    rowsSelectable="true"
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+      { id: 1, name: "Bananas", quantity: 6 },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</Component>
+---desc
+Change the selection in one of the tables and check how it is synced.
+```
+
+%-PROP-END

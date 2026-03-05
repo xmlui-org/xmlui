@@ -67,16 +67,9 @@
     <SpaceFiller />
     <Search
       collapsible="true"
-      when="{mediaSize.sizeIndex > 1 && currentSegment && (currentSegment === 'docs')}"
-      data="{appGlobals.plainTextDocsContent}"
-      placeholder="Search Docs..."
-    />
-    <Search
-      collapsible="true"
-      useContentFromAppContext="false"
-      when="{mediaSize.sizeIndex > 1 && currentSegment && (currentSegment === 'blog')}"
-      data="{appGlobals.plainTextBlogContent}"
-      placeholder="Search Blog..."
+      when="{mediaSize.sizeIndex > 1}"
+      data="{appGlobals.staticSearchData}"
+      placeholder="Search on site..."
     />
   </AppHeader>
   <NavPanel
@@ -101,16 +94,9 @@
     >
       <Stack padding="$space-4">
         <Search
-          when="{(currentSegment === 'docs')}"
-          data="{appGlobals.plainTextDocsContent}"
-          placeholder="Search Docs..."
-        />
-        <Search
           marginTop="$space-4"
-          when="{(currentSegment === 'blog')}"
-          data="{appGlobals.plainTextBlogContent}"
-          useContentFromAppContext="false"
-          placeholder="Search Blog..."
+          data="{appGlobals.staticSearchData}"
+          placeholder="Search on site..."
         />
       </Stack>
     </Fragment>
@@ -507,7 +493,7 @@
     </Page>
 
     <!-- Blog routes -->
-    <Page url="/blog">
+    <Page url="/blog" searchIndexable="false">
       <BlogOverview />
     </Page>
     <Page

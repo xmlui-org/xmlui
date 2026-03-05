@@ -52,6 +52,15 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   max-height: var(--radix-dropdown-menu-content-available-height);
   overflow: auto;
 
+  // Hide separators that would appear at the leading or trailing position,
+  // or consecutively — handles dynamic `when` conditions and compound component children
+  // where JS-based pre-filtering cannot see the actual rendered item list.
+  & > [role="separator"]:first-child,
+  & > [role="separator"]:last-child,
+  & > [role="separator"] + [role="separator"] {
+    display: none;
+  }
+
   &.compact {
     min-width: auto;
   }

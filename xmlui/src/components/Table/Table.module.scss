@@ -164,6 +164,7 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     .headerRow {
       display: flex;
       flex-direction: row;
+      width: 100%;
       border-bottom: $borderBottom-cell-Table;
       //background-color: inherit;
 

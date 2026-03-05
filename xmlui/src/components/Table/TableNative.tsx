@@ -1324,25 +1324,26 @@ export const Table = forwardRef(
                 currentRow.style.cursor = "";
                 setHoveredRowId(null);
               }}
-              onContextMenu={(event) => {
-                // Prevent default browser context menu
-                event.preventDefault();
+              onContextMenu={
+                lookupEventHandler
+                  ? (event) => {
+                      // Prevent default browser context menu only when a contextMenu handler is configured
+                      event.preventDefault();
 
-                // Use lookupEventHandler with context containing row variables
-                if (lookupEventHandler) {
-                  const handler = lookupEventHandler("contextMenu", {
-                    context: {
-                      $item: row.original,
-                      $row: row.original,
-                      $rowIndex: rowIndex,
-                      $itemIndex: rowIndex,
-                    },
-                    ephemeral: true, // Don't cache this handler since context changes per row
-                  });
+                      const handler = lookupEventHandler("contextMenu", {
+                        context: {
+                          $item: row.original,
+                          $row: row.original,
+                          $rowIndex: rowIndex,
+                          $itemIndex: rowIndex,
+                        },
+                        ephemeral: true, // Don't cache this handler since context changes per row
+                      });
 
-                  handler?.(event);
-                }
-              }}
+                      handler?.(event);
+                    }
+                  : undefined
+              }
             >
               {children}
             </tr>
@@ -1617,12 +1618,15 @@ export const Table = forwardRef(
                           data-column-id={header.id}
                           className={classnames(styles.columnCell, alignmentClass)}
                           colSpan={header.colSpan}
-                          style={{
-                            position: "relative",
-                            width: size,
-                            flexShrink: 0,
-                            ...getCommonPinningStyles(header.column),
-                          }}
+                          style={
+                            {
+                              ["--column-width" as string]: `${size}px`,
+                              position: "relative",
+                              width: size,
+                              flexShrink: 0,
+                              ...getCommonPinningStyles(header.column),
+                            } as React.CSSProperties
+                          }
                         >
                           <ClickableHeader
                             hasSorting={
@@ -1719,6 +1723,7 @@ export const Table = forwardRef(
                     const size = cell.column.getSize();
                     const columnClassName = cell.column.columnDef?.meta?.className;
                     const columnStyle = cell.column.columnDef?.meta?.style;
+                    const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
 
                     const alignmentClass =
                       cellVerticalAlign === "top"
@@ -1731,10 +1736,11 @@ export const Table = forwardRef(
                         className={classnames(styles.cell, alignmentClass, columnClassName)}
                         key={`${cell.id}-${i}`}
                         style={{
+                          width: size,
                           "--column-width": `${size}px`,
                           flexShrink: 0,
                           ...getCommonPinningStyles(cell.column),
-                          ...columnStyle,
+                          ...styleWithoutWidth,
                         } as CSSProperties}
                       >
                         <div

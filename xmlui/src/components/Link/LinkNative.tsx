@@ -72,7 +72,7 @@ export const LinkNative = forwardRef(function LinkNative(
     style,
     className,
     noIndicator = defaultProps.noIndicator,
-    maxLines = 0,
+    maxLines = 1,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
     overflowMode,

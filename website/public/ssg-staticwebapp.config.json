@@ -4,18 +4,22 @@
     "Referrer-Policy": "strict-origin-when-cross-origin",
     "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0"
   },
-  "navigationFallback": {
-    "rewrite": "/200.html",
-    "exclude": [
-      "/resources/*",
-      "/assets/*",
-      "/*.{png,csv,jpg,jpeg,gif,svg,webp,ico,json,xml,rss,js,css,woff,woff2,ttf,eot,md,mp4,mp3,zip,html}"
-    ]
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/200.html"
+    }
   },
   "routes": [
     {
       "route": "/api/v1/templates/",
       "rewrite": "/resources/files/cli-templates.json",
+      "headers": {
+        "Cache-Control": "max-age=30, must-revalidate"
+      }
+    },
+    {
+      "route": "/xmlui.js",
+      "rewrite": "/resources/files/for-download/xmlui/xmlui-standalone.umd.js",
       "headers": {
         "Cache-Control": "max-age=30, must-revalidate"
       }
