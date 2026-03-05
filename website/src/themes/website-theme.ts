@@ -10,6 +10,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "width-navPanel-App": "280px",
     "maxWidth-content-App": "1000px",
     "maxWidth-content-NoToc": "700px",
+    "height-AppHeader": "44px",
 
     layout: "basic",
     tableOfContents: "false",
