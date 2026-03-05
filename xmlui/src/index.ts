@@ -16,7 +16,7 @@ import {
   createComponentRenderer,
   createUserDefinedComponentRenderer,
 } from "./components-core/renderers";
-import { wrapComponent, wrapCompound } from "./components-core/wrapComponent";
+import { wrapComponent, wrapCompound, wrapContainer } from "./components-core/wrapComponent";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { Icon } from "./components/Icon/IconNative";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
@@ -31,6 +31,8 @@ import type {
   ComponentRendererDef,
   RegisterComponentApiFn,
   RendererContext,
+  RenderChildFn,
+  LayoutContext,
 } from "./abstractions/RendererDefs";
 import { parseScssVar } from "./components-core/theming/themeVars";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
@@ -105,7 +107,8 @@ import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
 import { Tooltip } from "./components/Tooltip/TooltipNative";
 import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
-import { MemoizedItem } from "./components/container-helpers";
+import type { MemoizedItem } from "./components/container-helpers";
+import type { ContainerWrapperDef } from "./components-core/rendering/ContainerWrapper";
 
 export type {
   ThemeDefinition,
@@ -124,6 +127,9 @@ export type {
   ComponentMetadata,
   ThemeTone,
   XmlUiNode,
+  RenderChildFn,
+  LayoutContext,
+  ContainerWrapperDef,
 };
 export {
   StandaloneApp,
@@ -132,6 +138,7 @@ export {
   createUserDefinedComponentRenderer,
   wrapComponent,
   wrapCompound,
+  wrapContainer,
   createMetadata,
   d,
   dComponent,

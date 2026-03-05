@@ -1,0 +1,53 @@
+<App>
+  <VStack padding="16" gap="24">
+    <VStack gap="8">
+      <Text variant="strong">Gradient Segmented Control</Text>
+      <GradientSegmentedControl
+        id="framework"
+        initialValue="React"
+        data="{['React', 'Angular', 'Vue', 'Svelte']}"
+        gradientFrom="#7c3aed"
+        gradientTo="#06b6d4"
+        gradientDegree="135"
+      />
+      <Text>Selected: {framework.value}</Text>
+
+      <GradientSegmentedControl
+        initialValue="Monthly"
+        data="{['Monthly', 'Yearly']}"
+        gradientFrom="#f59e0b"
+        gradientTo="#ef4444"
+        gradientDegree="90"
+        size="md"
+        radius="md"
+      />
+    </VStack>
+
+    <VStack gap="8">
+      <Text variant="strong">Drag and Drop</Text>
+      <DragDropProvider>
+        <HStack gap="16">
+          <VStack gap="8">
+            <Text variant="label">Source items</Text>
+            <Draggable dragId="item-1">
+              <Card>Apple</Card>
+            </Draggable>
+            <Draggable dragId="item-2">
+              <Card>Banana</Card>
+            </Draggable>
+            <Draggable dragId="item-3">
+              <Card>Cherry</Card>
+            </Draggable>
+          </VStack>
+
+          <Droppable dropId="zone-1">
+            <Card border="dashed" width="300px" height="200px" padding="12">
+              <Text variant="label">Drop zone</Text>
+              <DroppedItems />
+            </Card>
+          </Droppable>
+        </HStack>
+      </DragDropProvider>
+    </VStack>
+  </VStack>
+</App>

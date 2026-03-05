@@ -1,0 +1,44 @@
+{
+  "name": "xmlui-dnd",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "dependencies": {
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/utilities": "3.2.2",
+    "@mantine/core": "^7.17.0",
+    "@mantine/hooks": "^7.17.0"
+  },
+  "main": "./dist/xmlui-dnd.js",
+  "module": "./dist/xmlui-dnd.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-dnd.mjs",
+      "require": "./dist/xmlui-dnd.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "Drag-and-drop components for XMLUI based on dnd-kit"
+}

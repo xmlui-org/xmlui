@@ -25,6 +25,8 @@
     "gen:langserver-metadata": "node scripts/get-langserver-metadata.js > src/language-server/xmlui-metadata-generated.js"
   },
   "dependencies": {
+    "@dnd-kit/core": "6.3.1",
+    "@dnd-kit/utilities": "3.2.2",
     "@eslint-community/regexpp": "4.10.0",
     "@formkit/auto-animate": "0.7.0",
     "@modyfi/vite-plugin-yaml": "1.1.0",

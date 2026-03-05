@@ -1,8 +1,12 @@
-import React from "react";
+import React, { memo, useMemo } from "react";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
-import type { ComponentRendererDef } from "../abstractions/RendererDefs";
+import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type { ComponentRendererDef, LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry } from "./inspector/inspectorUtils";
+import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
+import { EMPTY_OBJECT } from "./constants";
+import { useShallowCompareMemoize } from "./utils/hooks";
 
 /**
  * Configuration for wrapComponent. Only specify what can't be inferred
@@ -296,6 +300,213 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         const reactKey = renameMap[key] ?? key;
 
         // Extract with the appropriate type converter
+        if (booleanSet.has(key)) {
+          props[reactKey] = extractValue.asOptionalBoolean(rawValue);
+        } else if (numberSet.has(key)) {
+          props[reactKey] = extractValue.asOptionalNumber(rawValue);
+        } else if (stringSet.has(key)) {
+          props[reactKey] = extractValue.asOptionalString(rawValue);
+        } else {
+          props[reactKey] = extractValue(rawValue);
+        }
+      }
+    }
+
+    return <Component {...props} />;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// wrapContainer
+// ---------------------------------------------------------------------------
+
+/**
+ * Internal React component equivalent to MemoizedItem from container-helpers.
+ * Kept here to avoid a circular dependency (components-core ← components).
+ */
+const ChildrenRenderer = memo(function ChildrenRenderer({
+  node,
+  renderChild,
+  layoutContext,
+  contextVars = EMPTY_OBJECT,
+}: {
+  node: ComponentDef | ComponentDef[] | undefined;
+  renderChild: RenderChildFn;
+  layoutContext?: LayoutContext;
+  contextVars?: Record<string, any>;
+}) {
+  const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
+  const nodeWithContextVars = useMemo(
+    () => {
+      if (!node) return undefined;
+      return {
+        type: "Container",
+        contextVars: shallowMemoedContextVars,
+        children: Array.isArray(node) ? node : [node],
+      } as ContainerWrapperDef;
+    },
+    [node, shallowMemoedContextVars],
+  );
+  if (!nodeWithContextVars) return null;
+  return <>{renderChild(nodeWithContextVars, layoutContext)}</>;
+});
+
+/**
+ * Extended configuration for wrapContainer.
+ */
+export type WrapContainerConfig = WrapComponentConfig & {
+  /**
+   * The prop name the native component expects for the children render callback.
+   * The wrapper creates this as a function that renders XMLUI children with
+   * context variables derived from the arguments passed to the callback.
+   * Defaults to "childrenRender".
+   */
+  childrenProp?: string;
+
+  /**
+   * Names for the context variables injected into XMLUI children, in the same
+   * positional order as the arguments the native component passes when it calls
+   * the children render callback.
+   *
+   * e.g., ["$isDragging"] means the first argument becomes { $isDragging: arg0 }
+   * in the child component tree.
+   */
+  contextVarNames?: string[];
+};
+
+/**
+ * Creates a complete XMLUI component renderer for container components —
+ * components that render XMLUI children, optionally injecting reactive state
+ * into them as context variables.
+ *
+ * Identical to wrapComponent for prop/event/callback forwarding, but
+ * additionally injects a `childrenRender` callback (or any named prop via
+ * `childrenProp`) into the native component. The callback accepts positional
+ * state arguments from dnd-kit (or any library) and maps them to XMLUI context
+ * variables accessible to children via `$varName` syntax.
+ *
+ * @example
+ * ```ts
+ * export const draggableComponentRenderer = wrapContainer(
+ *   "Draggable",
+ *   DraggableNative,
+ *   DraggableMd,
+ *   { booleans: ["disabled"], contextVarNames: ["$isDragging"] },
+ * );
+ * ```
+ */
+export function wrapContainer<TMd extends ComponentMetadata>(
+  type: string,
+  Component: React.ComponentType<any>,
+  metadata: TMd,
+  config: WrapContainerConfig = {},
+): ComponentRendererDef {
+  const childrenProp = config.childrenProp ?? "childrenRender";
+  const contextVarNames = config.contextVarNames ?? [];
+
+  const eventMap = normalizeEvents(config.events);
+  const callbackMap = normalizeCallbacks(config.callbacks);
+  const renameMap = config.rename ?? {};
+  const booleanSet = new Set(config.booleans ?? []);
+  const numberSet = new Set(config.numbers ?? []);
+  const stringSet = new Set(config.strings ?? []);
+  const excludeSet = new Set(config.exclude ?? []);
+
+  const specialProps = new Set([
+    ...Object.keys(eventMap),
+    ...Object.keys(callbackMap),
+    "id",
+  ]);
+
+  const isStateful =
+    config.stateful ??
+    !!(metadata.props?.["initialValue"] || metadata.events?.["didChange"]);
+
+  if (isStateful) {
+    specialProps.add("initialValue");
+  }
+
+  return createComponentRenderer(type, metadata, (context) => {
+    const {
+      node,
+      extractValue,
+      lookupEventHandler,
+      lookupSyncCallback,
+      className,
+      updateState,
+      state,
+      registerComponentApi,
+      renderChild,
+      layoutContext,
+    } = context;
+
+    const props: Record<string, any> = {};
+
+    const nodeSource = (node as any).debug?.source;
+    const ownerFileId = nodeSource?.fileId;
+    const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
+
+    props.className = className;
+    props.registerComponentApi = registerComponentApi;
+
+    if (isStateful) {
+      props.updateState = updateState;
+      props.value = state.value;
+      props.initialValue = extractValue(node.props?.initialValue);
+    }
+
+    // --- Events ---
+    for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
+      const handler = lookupEventHandler(xmluiName);
+      const traceKind = eventNameToTraceKind(xmluiName);
+      props[reactPropName] = (...args: any[]) => {
+        if (traceKind) {
+          pushXsLog(createLogEntry(traceKind, {
+            component: type,
+            componentLabel: node.uid || node.testId || undefined,
+            displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+            eventName: xmluiName,
+            ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+            ownerFileId,
+            ownerSource,
+          }));
+        }
+        if (handler) {
+          return handler(...args);
+        }
+      };
+    }
+
+    // --- Sync callbacks ---
+    for (const [xmluiName, reactPropName] of Object.entries(callbackMap)) {
+      props[reactPropName] = lookupSyncCallback(node.props?.[xmluiName]);
+    }
+
+    // --- Children render callback ---
+    // The native component calls this with state args; we map them to XMLUI context vars.
+    props[childrenProp] = (...args: any[]) => {
+      const contextVars: Record<string, any> = {};
+      contextVarNames.forEach((name, i) => {
+        contextVars[name] = args[i];
+      });
+      return (
+        <ChildrenRenderer
+          node={node.children as any}
+          renderChild={renderChild}
+          layoutContext={layoutContext}
+          contextVars={contextVars}
+        />
+      );
+    };
+
+    // --- Forward all remaining node.props ---
+    if (node.props) {
+      for (const [key, rawValue] of Object.entries(node.props)) {
+        if (specialProps.has(key)) continue;
+        if (excludeSet.has(key)) continue;
+
+        const reactKey = renameMap[key] ?? key;
+
         if (booleanSet.has(key)) {
           props[reactKey] = extractValue.asOptionalBoolean(rawValue);
         } else if (numberSet.has(key)) {
