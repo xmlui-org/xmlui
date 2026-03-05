@@ -219,6 +219,7 @@ import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
 import { StickySection } from "./StickySection/StickySectionNative";
 import { StickySectionMd } from "./StickySection/StickySection";
 import { DrawerMd } from "./Drawer/Drawer";
+import { TableWMd } from "./TableW/TableW";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -419,6 +420,7 @@ export const collectedComponentMetadata = {
   StickyBox: StickyBoxMd,
   Switch: SwitchMd,
   Table: TableMd,
+  TableW: TableWMd,
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,

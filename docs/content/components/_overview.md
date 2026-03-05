@@ -100,6 +100,7 @@
 | [TabItem](./TabItem) | `TabItem` defines individual tabs within a [Tabs](/components/Tabs) component, providing both the tab header label and the content that displays when the tab is selected. As a non-visual structural component, it serves as a container that organizes content into distinct, switchable sections. |
 | [Table](./Table) | `Table` presents structured data for viewing, sorting, selection, and interaction. |
 | [TableOfContents](./TableOfContents) | `TableOfContents` collects [Heading](/components/Heading) and [Bookmark](/components/Bookmark) within the current page and displays them in a navigable tree. Uses the same Scroller behavior as NavPanel (scrollStyle, showScrollerFade). |
+| TableW | `Table` presents structured data for viewing, sorting, selection, and interaction. |
 | [Tabs](./Tabs) | `Tabs` enables users to switch among content panels using clickable tab headers. It provides an efficient way to present multiple related sections in a single interface area, with each tab containing distinct content defined by [TabItem](/components/TabItem) components. |
 | [Text](./Text) | The `Text` component displays textual information in a number of optional styles and variants. |
 | [TextArea](./TextArea) | `TextArea` provides a multiline text input area. |

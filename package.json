@@ -26,7 +26,7 @@
     "changeset:add": "changeset add",
     "changeset:version": "changeset version",
     "changeset:publish": "changeset publish",
-    "build-xmlui": "turbo run build:xmlui-all",
+    "build-xmlui": "NODE_OPTIONS='--max-old-space-size=8192' turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
     "test": "turbo run //#_test:e2e:with-unit-tests",
     "test-smoke": "turbo run //#_test:e2e:smoke:with-unit-tests",

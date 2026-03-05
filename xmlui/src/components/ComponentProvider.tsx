@@ -35,6 +35,7 @@ import { textComponentRenderer } from "./Text/Text";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
 import { tableComponentRenderer } from "./Table/Table";
+import { tableWComponentRenderer } from "./TableW/TableW";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { stickySectionComponentRenderer } from "./StickySection/StickySection";
 import { badgeComponentRenderer } from "./Badge/Badge";
@@ -467,6 +468,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);
       this.registerCoreComponent(columnComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TableW !== "false") {
+      this.registerCoreComponent(tableWComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerCoreComponent(dynamicHeightListComponentRenderer);

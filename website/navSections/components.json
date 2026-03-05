@@ -502,6 +502,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/TableW",
+          "label": "TableW",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/Tabs",
           "label": "Tabs",
           "icon": "component"

@@ -58,6 +58,7 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "npx changeset": true
+    "npx changeset": true,
+    "cp": true
   }
 }
