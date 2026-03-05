@@ -136,15 +136,15 @@ export const SelectRender = forwardRef(({
               placeholder={placeholder}
               className={styles.valueText}
             />
+            {clearable && selectedValues.length > 0 && (
+              <Select.ClearTrigger className={styles.clearTrigger}>
+                <ClearIcon />
+              </Select.ClearTrigger>
+            )}
             <Select.Indicator className={styles.indicator}>
               <ChevronDownIcon />
             </Select.Indicator>
           </Select.Trigger>
-          {clearable && selectedValues.length > 0 && (
-            <Select.ClearTrigger className={styles.clearTrigger}>
-              <ClearIcon />
-            </Select.ClearTrigger>
-          )}
         </Select.Control>
 
         <Portal>

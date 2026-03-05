@@ -187,6 +187,11 @@ $textColor-itemIndicator:         createThemeVar("Input:textColor-itemIndicator-
     align-items: center;
     flex-shrink: 0;
     width: 16px;
+
+    // ark-ui always renders ItemIndicator — hide it when the item is not selected.
+    &[data-state="unchecked"] {
+      visibility: hidden;
+    }
   }
 
   .clearTrigger {
