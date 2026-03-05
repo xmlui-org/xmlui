@@ -74,10 +74,10 @@ const searchComponentRenderer = createComponentRenderer(
     const props = node.props as any;
     return (
       <Search
-        placeholder={extractValue.asOptionalString(node.props?.placeholder)}
-        data={extractValue(node.props?.data)}
-        limit={extractValue.asOptionalNumber(node.props?.limit, defaultProps.limit)}
-        collapsible={extractValue.asOptionalBoolean(node.props?.collapsible, false)}
+        placeholder={extractValue.asOptionalString(props.placeholder)}
+        data={extractValue(props.data)}
+        limit={extractValue.asOptionalNumber(props.limit, defaultProps.limit)}
+        collapsible={extractValue.asOptionalBoolean(props.collapsible, false)}
       />
     );
   },
