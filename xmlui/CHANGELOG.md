@@ -1,5 +1,22 @@
 # xmlui
 
+## 0.12.6
+
+### Patch Changes
+
+- 4a27cd3: fix: Links in tables can't be right-clicked
+- 77cde39: Allow sync between Table instance with syncWithVar
+- ffc1b30: Made pattern validation such as email, phone and url more lenient: now they accept empty values.
+- 66da3b5: Updated search functionality on website and reworked search data transformation. Also added categories for search results.
+- 8478033: Add responsive `when-xs`, `when-sm`, `when-md`, `when-lg`, `when-xl`, `when-xxl` attributes
+  that control component visibility per breakpoint, following Tailwind's mobile-first (min-width)
+  convention. When any responsive `when-*` attribute is defined it becomes the exclusive source of
+  truth — the base `when` is only consulted when no responsive attributes are present, preserving
+  full backward compatibility.
+- 75c96b7: Fixed a bug where pressing enter after entering an input in the Search field on the website did not navigate to the first result.
+- ee088cc: fix: ensure header and data cells remain aligned during column resizing in Table component
+- 8478033: Add responsive "when" (-xs, -sm, -md, ect.) attributes
+
 ## 0.12.5
 
 ### Patch Changes
