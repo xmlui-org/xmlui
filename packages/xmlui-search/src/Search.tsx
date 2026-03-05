@@ -287,7 +287,7 @@ export const Search = ({
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
             onEscapeKeyDown={() => setShow(false)}
-            className={classnames(styles.listPanel, {
+            className={classnames(styles.listPanel, className, {
               [styles.inDrawer]: inDrawer,
             })}
           >
