@@ -1,0 +1,102 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "CheckboxCard";
+
+// --- XMLUI theme variables ---
+$backgroundColor-CheckboxCard:        createThemeVar("backgroundColor-#{$componentName}");
+$backgroundColorChecked-CheckboxCard: createThemeVar("backgroundColor-checked-#{$componentName}");
+$borderColor-CheckboxCard:            createThemeVar("borderColor-#{$componentName}");
+$borderColorChecked-CheckboxCard:     createThemeVar("borderColor-checked-#{$componentName}");
+$borderRadius-CheckboxCard:           createThemeVar("borderRadius-#{$componentName}");
+$textColor-CheckboxCard:              createThemeVar("textColor-#{$componentName}");
+$descriptionColor-CheckboxCard:       createThemeVar("descriptionColor-#{$componentName}");
+$checkboxColor-CheckboxCard:            createThemeVar("checkboxColor-#{$componentName}");
+$checkboxIconColor-CheckboxCard:        createThemeVar("checkboxIconColor-#{$componentName}");
+$indicatorBackgroundColor-CheckboxCard: createThemeVar("indicatorBackgroundColor-#{$componentName}");
+$indicatorBorderColor-CheckboxCard:     createThemeVar("indicatorBorderColor-#{$componentName}");
+
+// Wrapper: maps XMLUI theme vars → local --cc-* vars, then bridges to Mantine.
+// Nested .indicator selector (specificity 0,2,0) beats Mantine's 0,1,0 rule
+// for --checkbox-color, so our value wins regardless of stylesheet order.
+.wrapper {
+  --cc-bg:             #{$backgroundColor-CheckboxCard};
+  --cc-bg-checked:     #{$backgroundColorChecked-CheckboxCard};
+  --cc-border:         #{$borderColor-CheckboxCard};
+  --cc-border-checked: #{$borderColorChecked-CheckboxCard};
+  --cc-radius:         #{$borderRadius-CheckboxCard};
+  --cc-text:           #{$textColor-CheckboxCard};
+  --cc-desc:           #{$descriptionColor-CheckboxCard};
+  --cc-checkbox:         #{$checkboxColor-CheckboxCard};
+  --cc-icon:             #{$checkboxIconColor-CheckboxCard};
+  --cc-indicator-bg:     #{$indicatorBackgroundColor-CheckboxCard};
+  --cc-indicator-border: #{$indicatorBorderColor-CheckboxCard};
+
+  // Bridge to Mantine's --card-radius (read by CheckboxCard's inline style)
+  --card-radius: var(--cc-radius);
+
+  // Override Mantine's --checkbox-color AND unchecked background/border
+  // on the indicator element using descendant selector for higher specificity.
+  .indicator {
+    --checkbox-color: var(--cc-checkbox);
+    --checkbox-icon-color: var(--cc-icon);
+    // Override Mantine's hard-coded --mantine-color-white for unchecked state
+    background-color: var(--cc-indicator-bg) !important;
+    border-color: var(--cc-indicator-border) !important;
+    // Restore checked/indeterminate state: fill with the checkbox brand color
+    &[data-checked],
+    &[data-indeterminate] {
+      background-color: var(--cc-checkbox) !important;
+      border-color: var(--cc-checkbox) !important;
+    }
+  }
+}
+
+// Applied to Mantine's CheckboxCard root via classNames.card
+.card {
+  background-color: var(--cc-bg) !important;
+  border-color: var(--cc-border) !important;
+
+  &[data-checked] {
+    background-color: var(--cc-bg-checked) !important;
+    border-color: var(--cc-border-checked) !important;
+  }
+}
+
+// Card body layout
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+}
+
+.label {
+  display: block;
+  font-weight: 500;
+  color: var(--cc-text);
+}
+
+.description {
+  display: block;
+  font-size: 0.875em;
+  color: var(--cc-desc);
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

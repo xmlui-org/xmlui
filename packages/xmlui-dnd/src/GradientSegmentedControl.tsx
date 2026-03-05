@@ -1,5 +1,6 @@
-import { wrapComponent, createMetadata, d } from "xmlui";
+import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
 import { GradientSegmentedControlNative, defaultProps } from "./GradientSegmentedControlNative";
+import styles from "./GradientSegmentedControl.module.scss";
 
 const COMP = "GradientSegmentedControl";
 
@@ -18,27 +19,43 @@ export const GradientSegmentedControlMd = createMetadata({
     initialValue: d("The initially selected option value.", undefined, "string"),
     gradientFrom: d(
       "Starting color of the gradient applied to the active indicator. " +
-        "Accepts any valid CSS color value.",
+        "Overrides `gradientFrom-GradientSegmentedControl` theme variable.",
       undefined,
       "string",
-      defaultProps.gradientFrom,
     ),
     gradientTo: d(
       "Ending color of the gradient applied to the active indicator. " +
-        "Accepts any valid CSS color value.",
+        "Overrides `gradientTo-GradientSegmentedControl` theme variable.",
       undefined,
       "string",
-      defaultProps.gradientTo,
     ),
     gradientDegree: d(
-      "Rotation angle (in degrees) for the linear gradient.",
+      "Rotation angle in degrees for the linear gradient. " +
+        "Overrides `gradientDegree-GradientSegmentedControl` theme variable.",
       undefined,
       "number",
-      defaultProps.gradientDegree,
     ),
-    color: d(
-      "Mantine theme color for the active indicator. When set this takes precedence " +
-        "over `gradientFrom`/`gradientTo`.",
+    backgroundColor: d(
+      "Background color of the track (the container behind all options). " +
+        "Overrides `backgroundColor-GradientSegmentedControl` theme variable.",
+      undefined,
+      "string",
+    ),
+    textColor: d(
+      "Text color for inactive option labels. " +
+        "Overrides `textColor-GradientSegmentedControl` theme variable.",
+      undefined,
+      "string",
+    ),
+    activeTextColor: d(
+      "Text color shown on the active indicator (on top of the gradient). " +
+        "Overrides `activeTextColor-GradientSegmentedControl` theme variable.",
+      undefined,
+      "string",
+    ),
+    borderRadius: d(
+      "Border radius of the control (any CSS length, e.g. `8px`, `1rem`). " +
+        "Overrides `borderRadius-GradientSegmentedControl` theme variable.",
       undefined,
       "string",
     ),
@@ -47,12 +64,6 @@ export const GradientSegmentedControlMd = createMetadata({
       undefined,
       "string",
       defaultProps.size,
-    ),
-    radius: d(
-      "Border radius. One of `xs`, `sm`, `md`, `lg`, `xl` or a pixel number.",
-      undefined,
-      "string",
-      String(defaultProps.radius),
     ),
     disabled: d(
       "When `true`, all options are non-interactive.",
@@ -80,6 +91,22 @@ export const GradientSegmentedControlMd = createMetadata({
         "passed as the first argument.",
     },
   },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`gradientFrom-${COMP}`]: "#7c3aed",
+    [`gradientTo-${COMP}`]: "#06b6d4",
+    [`gradientDegree-${COMP}`]: "135deg",
+    [`activeTextColor-${COMP}`]: "$color-surface-50",
+    [`borderRadius-${COMP}`]: "9999px",
+    light: {
+      [`backgroundColor-${COMP}`]: "$color-surface-200",
+      [`textColor-${COMP}`]: "$textColor-secondary",
+    },
+    dark: {
+      [`backgroundColor-${COMP}`]: "$color-surface-100",
+      [`textColor-${COMP}`]: "$textColor-secondary",
+    },
+  },
 });
 
 export const gradientSegmentedControlComponentRenderer = wrapComponent(
@@ -89,7 +116,7 @@ export const gradientSegmentedControlComponentRenderer = wrapComponent(
   {
     booleans: ["disabled", "fullWidth"],
     numbers: ["gradientDegree"],
-    strings: ["gradientFrom", "gradientTo", "orientation", "size", "radius", "color"],
+    strings: ["gradientFrom", "gradientTo", "backgroundColor", "textColor", "activeTextColor", "borderRadius", "orientation", "size"],
     events: { didChange: "onChange" },
   },
 );

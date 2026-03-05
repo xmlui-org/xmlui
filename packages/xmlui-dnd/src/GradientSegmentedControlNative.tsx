@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { MantineProvider, SegmentedControl } from "@mantine/core";
+import styles from "./GradientSegmentedControl.module.scss";
 
 export type SegmentedControlItem = {
   label: string;
@@ -17,18 +18,22 @@ type Props = {
   updateState?: (updater: Record<string, any>) => void;
   /** XMLUI didChange event handler (provided by wrapComponent) */
   onChange?: (value: string) => void;
-  /** Start color of the active-indicator gradient */
+  /** Start color of the active-indicator gradient (overrides theme var) */
   gradientFrom?: string;
-  /** End color of the active-indicator gradient */
+  /** End color of the active-indicator gradient (overrides theme var) */
   gradientTo?: string;
-  /** Gradient direction in degrees */
+  /** Gradient direction in degrees (overrides theme var) */
   gradientDegree?: number;
-  /** Mantine color key — overrides gradient when set */
-  color?: string;
+  /** Track background color (overrides theme var) */
+  backgroundColor?: string;
+  /** Inactive label text color (overrides theme var) */
+  textColor?: string;
+  /** Active label text color on top of the gradient (overrides theme var) */
+  activeTextColor?: string;
+  /** Border radius value with CSS unit, e.g. "8px" or "xl" (overrides theme var) */
+  borderRadius?: string;
   /** Size: xs | sm | md | lg | xl */
   size?: string;
-  /** Border radius: xs | sm | md | lg | xl or a number */
-  radius?: string | number;
   disabled?: boolean;
   fullWidth?: boolean;
   orientation?: "horizontal" | "vertical";
@@ -36,14 +41,8 @@ type Props = {
   registerComponentApi?: any;
 };
 
-export const defaultProps: Required<
-  Pick<Props, "gradientFrom" | "gradientTo" | "gradientDegree" | "size" | "radius" | "orientation">
-> = {
-  gradientFrom: "#7c3aed",
-  gradientTo: "#06b6d4",
-  gradientDegree: 135,
+export const defaultProps: Required<Pick<Props, "size" | "orientation">> = {
   size: "sm",
-  radius: "xl",
   orientation: "horizontal",
 };
 
@@ -53,12 +52,14 @@ export const GradientSegmentedControlNative = ({
   initialValue,
   updateState,
   onChange,
-  gradientFrom = defaultProps.gradientFrom,
-  gradientTo = defaultProps.gradientTo,
-  gradientDegree = defaultProps.gradientDegree,
-  color,
+  gradientFrom,
+  gradientTo,
+  gradientDegree,
+  backgroundColor,
+  textColor,
+  activeTextColor,
+  borderRadius,
   size = defaultProps.size,
-  radius = defaultProps.radius,
   disabled,
   fullWidth,
   orientation = defaultProps.orientation,
@@ -78,29 +79,36 @@ export const GradientSegmentedControlNative = ({
     onChange?.(newValue);
   };
 
-  const indicatorStyle: React.CSSProperties = color
-    ? {}
-    : {
-        backgroundImage: `linear-gradient(${gradientDegree}deg, ${gradientFrom}, ${gradientTo})`,
-      };
+  // Per-instance prop overrides: set CSS custom properties on the wrapper div so they
+  // take precedence over the XMLUI theme vars that the SCSS establishes as defaults.
+  const wrapperVars: React.CSSProperties = {
+    ...(gradientFrom !== undefined && { "--gsc-from": gradientFrom } as any),
+    ...(gradientTo !== undefined && { "--gsc-to": gradientTo } as any),
+    ...(gradientDegree !== undefined && { "--gsc-degree": `${gradientDegree}deg` } as any),
+    ...(backgroundColor !== undefined && { "--gsc-bg": backgroundColor } as any),
+    ...(textColor !== undefined && { "--gsc-text": textColor } as any),
+    ...(activeTextColor !== undefined && { "--gsc-active-text": activeTextColor } as any),
+    ...(borderRadius !== undefined && { "--gsc-radius": borderRadius } as any),
+  };
 
   return (
     <MantineProvider>
-      <SegmentedControl
-        data={data}
-        value={value ?? ""}
-        onChange={handleChange}
-        disabled={disabled}
-        fullWidth={fullWidth}
-        orientation={orientation as any}
-        size={size as any}
-        radius={radius as any}
-        color={color}
-        className={className}
-        styles={{
-          indicator: indicatorStyle,
-        }}
-      />
+      <div className={`${styles.wrapper}${className ? ` ${className}` : ""}`} style={wrapperVars}>
+        <SegmentedControl
+          data={data}
+          value={value ?? ""}
+          onChange={handleChange}
+          disabled={disabled}
+          fullWidth={fullWidth}
+          orientation={orientation as any}
+          size={size as any}
+          classNames={{
+            root: styles.root,
+            indicator: styles.indicator,
+            label: styles.label,
+          }}
+        />
+      </div>
     </MantineProvider>
   );
 };

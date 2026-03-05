@@ -1,0 +1,61 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "GradientSegmentedControl";
+
+// --- XMLUI theme variables ---
+$gradientFrom-GradientSegmentedControl:       createThemeVar("gradientFrom-#{$componentName}");
+$gradientTo-GradientSegmentedControl:         createThemeVar("gradientTo-#{$componentName}");
+$gradientDegree-GradientSegmentedControl:     createThemeVar("gradientDegree-#{$componentName}");
+$backgroundColor-GradientSegmentedControl:    createThemeVar("backgroundColor-#{$componentName}");
+$textColor-GradientSegmentedControl:          createThemeVar("textColor-#{$componentName}");
+$activeTextColor-GradientSegmentedControl:    createThemeVar("activeTextColor-#{$componentName}");
+$borderRadius-GradientSegmentedControl:        createThemeVar("borderRadius-#{$componentName}");
+
+// Wrapper div: maps XMLUI theme vars → local --gsc-* CSS vars, then bridges
+// those into Mantine's own --sc-* vars so the standard Mantine selectors pick up.
+.wrapper {
+  display: inline-flex;
+
+  // --- Expose as local --gsc-* so SCSS sub-rules and inline overrides can use them ---
+  --gsc-from:         #{$gradientFrom-GradientSegmentedControl};
+  --gsc-to:           #{$gradientTo-GradientSegmentedControl};
+  --gsc-degree:       #{$gradientDegree-GradientSegmentedControl};
+  --gsc-bg:           #{$backgroundColor-GradientSegmentedControl};
+  --gsc-text:         #{$textColor-GradientSegmentedControl};
+  --gsc-active-text:  #{$activeTextColor-GradientSegmentedControl};
+  --gsc-radius:       #{$borderRadius-GradientSegmentedControl};
+
+  // --- Bridge to Mantine's own CSS vars ---
+  --sc-radius:        var(--gsc-radius);
+  --sc-label-color:   var(--gsc-active-text);
+}
+
+// Applied to Mantine's root element via classNames.root
+.root {
+  background-color: var(--gsc-bg) !important;
+}
+
+// Applied to Mantine's indicator element via classNames.indicator
+// background-image paints over the default background-color fallback.
+.indicator {
+  background-image: linear-gradient(var(--gsc-degree), var(--gsc-from), var(--gsc-to)) !important;
+}
+
+// Applied to Mantine's label elements via classNames.label
+// Active labels get the theme-driven active text color via --sc-label-color (set above).
+// Inactive labels get $textColor.
+.label {
+  color: var(--gsc-text);
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

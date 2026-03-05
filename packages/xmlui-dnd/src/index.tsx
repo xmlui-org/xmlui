@@ -3,6 +3,8 @@ import { draggableComponentRenderer } from "./Draggable";
 import { droppableComponentRenderer } from "./Droppable";
 import { droppedItemsComponentRenderer } from "./DroppedItems";
 import { gradientSegmentedControlComponentRenderer } from "./GradientSegmentedControl";
+import { checkboxCardComponentRenderer } from "./CheckboxCard";
+import { imageCheckboxCardComponentRenderer } from "./ImageCheckboxCard";
 
 export default {
   namespace: "XMLUIExtensions",
@@ -12,5 +14,7 @@ export default {
     droppableComponentRenderer,
     droppedItemsComponentRenderer,
     gradientSegmentedControlComponentRenderer,
+    checkboxCardComponentRenderer,
+    imageCheckboxCardComponentRenderer,
   ],
 };

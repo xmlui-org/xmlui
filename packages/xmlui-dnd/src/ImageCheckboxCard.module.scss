@@ -1,0 +1,107 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "ImageCheckboxCard";
+
+// --- XMLUI theme variables ---
+$imageHeight-ImageCheckboxCard:            createThemeVar("imageHeight-#{$componentName}");
+$backgroundColor-ImageCheckboxCard:        createThemeVar("backgroundColor-#{$componentName}");
+$backgroundColorChecked-ImageCheckboxCard: createThemeVar("backgroundColor-checked-#{$componentName}");
+$borderColor-ImageCheckboxCard:            createThemeVar("borderColor-#{$componentName}");
+$borderColorChecked-ImageCheckboxCard:     createThemeVar("borderColor-checked-#{$componentName}");
+$borderRadius-ImageCheckboxCard:           createThemeVar("borderRadius-#{$componentName}");
+$textColor-ImageCheckboxCard:              createThemeVar("textColor-#{$componentName}");
+$descriptionColor-ImageCheckboxCard:       createThemeVar("descriptionColor-#{$componentName}");
+$checkboxColor-ImageCheckboxCard:            createThemeVar("checkboxColor-#{$componentName}");
+$checkboxIconColor-ImageCheckboxCard:        createThemeVar("checkboxIconColor-#{$componentName}");
+$indicatorBackgroundColor-ImageCheckboxCard: createThemeVar("indicatorBackgroundColor-#{$componentName}");
+$indicatorBorderColor-ImageCheckboxCard:     createThemeVar("indicatorBorderColor-#{$componentName}");
+
+.wrapper {
+  --ic-img-h:          #{$imageHeight-ImageCheckboxCard};
+  --ic-bg:             #{$backgroundColor-ImageCheckboxCard};
+  --ic-bg-checked:     #{$backgroundColorChecked-ImageCheckboxCard};
+  --ic-border:         #{$borderColor-ImageCheckboxCard};
+  --ic-border-checked: #{$borderColorChecked-ImageCheckboxCard};
+  --ic-radius:         #{$borderRadius-ImageCheckboxCard};
+  --ic-text:           #{$textColor-ImageCheckboxCard};
+  --ic-desc:           #{$descriptionColor-ImageCheckboxCard};
+  --ic-checkbox:         #{$checkboxColor-ImageCheckboxCard};
+  --ic-icon:             #{$checkboxIconColor-ImageCheckboxCard};
+  --ic-indicator-bg:     #{$indicatorBackgroundColor-ImageCheckboxCard};
+  --ic-indicator-border: #{$indicatorBorderColor-ImageCheckboxCard};
+
+  --card-radius: var(--ic-radius);
+
+  .indicator {
+    --checkbox-color: var(--ic-checkbox);
+    --checkbox-icon-color: var(--ic-icon);
+    background-color: var(--ic-indicator-bg) !important;
+    border-color: var(--ic-indicator-border) !important;
+    &[data-checked],
+    &[data-indeterminate] {
+      background-color: var(--ic-checkbox) !important;
+      border-color: var(--ic-checkbox) !important;
+    }
+  }
+}
+
+.card {
+  background-color: var(--ic-bg) !important;
+  border-color: var(--ic-border) !important;
+  overflow: hidden;
+
+  &[data-checked] {
+    background-color: var(--ic-bg-checked) !important;
+    border-color: var(--ic-border-checked) !important;
+  }
+}
+
+.image {
+  display: block;
+  width: 100%;
+  height: var(--ic-img-h);
+  object-fit: cover;
+}
+
+// Bottom row: title + description on the left, indicator on the right
+.content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.label {
+  display: block;
+  font-weight: 500;
+  color: var(--ic-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description {
+  display: block;
+  font-size: 0.875em;
+  color: var(--ic-desc);
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

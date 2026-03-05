@@ -1,53 +1,149 @@
 <App>
+  <AppHeader>
+    <H3>
+      XMLUI React Component Wrapping Demo
+    </H3>
+    <SpaceFiller />
+    <ToneSwitch />
+  </AppHeader>
   <VStack padding="16" gap="24">
     <VStack gap="8">
-      <Text variant="strong">Gradient Segmented Control</Text>
+      <Text variant="strong">
+        Gradient Segmented Control — defaults from theme vars
+      </Text>
       <GradientSegmentedControl
         id="framework"
         initialValue="React"
         data="{['React', 'Angular', 'Vue', 'Svelte']}"
-        gradientFrom="#7c3aed"
-        gradientTo="#06b6d4"
-        gradientDegree="135"
       />
-      <Text>Selected: {framework.value}</Text>
-
-      <GradientSegmentedControl
-        initialValue="Monthly"
-        data="{['Monthly', 'Yearly']}"
-        gradientFrom="#f59e0b"
-        gradientTo="#ef4444"
-        gradientDegree="90"
-        size="md"
-        radius="md"
-      />
+      <Text>
+        Selected: {framework.value}
+      </Text>
     </VStack>
 
     <VStack gap="8">
-      <Text variant="strong">Drag and Drop</Text>
+      <Text variant="strong">
+        Instance-level prop overrides
+      </Text>
+      <Theme
+        gradientFrom-GradientSegmentedControl="#8b5cf6"
+        gradientTo-GradientSegmentedControl="#ec4899"
+        backgroundColor-GradientSegmentedControl="#f3e8ff"
+        textColor-GradientSegmentedControl="$color-primary-800"
+      >
+        <GradientSegmentedControl
+          initialValue="Monthly"
+          data="{['Monthly', 'Yearly']}"
+          gradientFrom="#f59e0b"
+          gradientTo="#ef4444"
+          gradientDegree="90"
+          activeTextColor="white"
+          size="md"
+          borderRadius="8px"
+        />
+      </Theme>
+    </VStack>
+
+    <VStack gap="8">
+      <Text variant="strong">
+        Drag and Drop
+      </Text>
       <DragDropProvider>
         <HStack gap="16">
           <VStack gap="8">
-            <Text variant="label">Source items</Text>
+            <Text>
+              Source items
+            </Text>
             <Draggable dragId="item-1">
-              <Card>Apple</Card>
+              <Card title="Apple" />
             </Draggable>
             <Draggable dragId="item-2">
-              <Card>Banana</Card>
+              <Card title="Banana" />
             </Draggable>
             <Draggable dragId="item-3">
-              <Card>Cherry</Card>
+              <Card title="Cherry" />
             </Draggable>
           </VStack>
 
           <Droppable dropId="zone-1">
-            <Card border="dashed" width="300px" height="200px" padding="12">
-              <Text variant="label">Drop zone</Text>
+            <Card border="dashed" width="300px" height="300px" padding="12">
+              <Text variant="label">
+                Drop zone
+              </Text>
               <DroppedItems />
             </Card>
           </Droppable>
         </HStack>
       </DragDropProvider>
+    </VStack>
+
+    <VStack gap="8">
+      <Text variant="strong">
+        CheckboxCard
+      </Text>
+      <HStack gap="8" wrap="wrap">
+        <CheckboxCard
+          id="card1"
+          label="Standard plan"
+          description="Up to 5 users, 10 GB storage"
+        />
+        <CheckboxCard
+          id="card2"
+          label="Pro plan"
+          description="Unlimited users, 1 TB storage"
+          initialValue="true"
+        />
+        <Theme
+          color-primary="#059669"
+        >
+          <CheckboxCard
+            id="card3"
+            label="Enterprise plan"
+            description="Custom limits, SLA included"
+          />
+        </Theme>
+      </HStack>
+      <Text>
+        card1={card1.value}, card2={card2.value}, card3={card3.value}
+      </Text>
+    </VStack>
+
+    <VStack gap="8">
+      <Text variant="strong">
+        ImageCheckboxCard
+      </Text>
+      <HStack gap="8" wrap="wrap">
+        <ImageCheckboxCard
+          id="img1"
+          imageUrl="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=200&fit=crop"
+          imageAlt="Mountain"
+          label="Mountain retreat"
+          description="Alps, Switzerland"
+          width="200px"
+        />
+        <ImageCheckboxCard
+          id="img2"
+          imageUrl="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=200&fit=crop"
+          imageAlt="Beach"
+          label="Beach getaway"
+          description="Maldives"
+          initialValue="true"
+          width="200px"
+        />
+        <ImageCheckboxCard
+          id="img3"
+          imageUrl="https://images.unsplash.com/photo-1551632811-561732d1e306?w=400&h=200&fit=crop"
+          imageAlt="Hiking"
+          label="Forest hike"
+          description="Black Forest, Germany"
+          width="200px"
+          imageHeight="120px"
+          borderRadius="12px"
+        />
+      </HStack>
+      <Text>
+        img1={img1.value}, img2={img2.value}, img3={img3.value}
+      </Text>
     </VStack>
   </VStack>
 </App>
