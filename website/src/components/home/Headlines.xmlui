@@ -37,14 +37,14 @@
                 lineHeight="{textLineHeight}"
                 textAlign="center"
             >
-                Define your UI in any text editor
+                Define your UI in any text editor.
             </Text>
             <Text
                 fontSize="{textSize}"
                 lineHeight="{textLineHeight}"
                 textAlign="center"
             >
-                Create clean modern apps
+                Create clean modern apps.
             </Text>
         </VStack>
     </VStack>
