@@ -3565,3 +3565,230 @@ test.describe("Virtualization", () => {
     expect(scrollHeight - clientHeight).toBeLessThan(10);
   });
 });
+
+// =============================================================================
+// syncWithVar PROPERTY TESTS
+// =============================================================================
+
+test.describe("syncWithVar property", () => {
+  // Shared data for all syncWithVar tests — numeric ids match the default idKey="id"
+  const syncData = JSON.stringify([
+    { id: 1, name: "Apple" },
+    { id: 2, name: "Banana" },
+    { id: 3, name: "Carrot" },
+  ]);
+
+  test("row selection updates the synced global variable's selectedIds", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+        <Text testId="sync-display">{JSON.stringify(syncState)}</Text>
+      </Fragment>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Click the first data-row checkbox (index 1 skips the header checkbox)
+    const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
+    await expect(firstRowCheckbox).toBeAttached();
+    await firstRowCheckbox.click({ force: true });
+    await expect(firstRowCheckbox).toBeChecked();
+
+    // The global variable should now contain selectedIds holding the first item's id
+    const display = page.getByTestId("sync-display");
+    await expect(display).toContainText('"selectedIds"');
+    await expect(display).toContainText("1");
+  });
+
+  test("initial selectedIds in the variable pre-selects the matching rows on load", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{selectedIds: [1]}}">
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+      </Fragment>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+
+    // Row with id=1 should be pre-selected
+    const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
+    await expect(firstRowCheckbox).toBeChecked();
+
+    // Rows with id=2 and id=3 should not be selected
+    await expect(table.locator("input[type='checkbox']").nth(2)).not.toBeChecked();
+    await expect(table.locator("input[type='checkbox']").nth(3)).not.toBeChecked();
+  });
+
+  test("deselecting a row clears selectedIds in the variable", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <Table
+          syncWithVar="syncState"
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          testId="table"
+          data='{${syncData}}'
+        >
+          <Column bindTo="name"/>
+        </Table>
+        <Text testId="sync-display">{JSON.stringify(syncState)}</Text>
+      </Fragment>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
+    await expect(firstRowCheckbox).toBeAttached();
+
+    // Select the first row
+    await firstRowCheckbox.click({ force: true });
+    await expect(firstRowCheckbox).toBeChecked();
+
+    // Deselect the first row
+    await firstRowCheckbox.click({ force: true });
+    await expect(firstRowCheckbox).not.toBeChecked();
+
+    // The variable's selectedIds should now be empty
+    await expect(page.getByTestId("sync-display")).toContainText('"selectedIds":[]');
+  });
+
+  test("two tables sharing the same variable stay in sync — selecting in table1 reflects in table2", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table1" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table2" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+      </Fragment>
+    `);
+
+    const table1 = page.getByTestId("table1");
+    const table2 = page.getByTestId("table2");
+    await expect(table1).toBeVisible();
+    await expect(table2).toBeVisible();
+
+    // Click the first row checkbox in table1
+    const t1Checkbox = table1.locator("input[type='checkbox']").nth(1);
+    await expect(t1Checkbox).toBeAttached();
+    await t1Checkbox.click({ force: true });
+    await expect(t1Checkbox).toBeChecked();
+
+    // table2 should reflect the same selection via the shared variable
+    const t2Checkbox = table2.locator("input[type='checkbox']").nth(1);
+    await expect(t2Checkbox).toBeChecked();
+  });
+
+  test("two tables sharing the same variable stay in sync — selecting in table2 reflects in table1", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table1" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+        <Table syncWithVar="syncState" rowsSelectable="true" testId="table2" data='{${syncData}}'>
+          <Column bindTo="name"/>
+        </Table>
+      </Fragment>
+    `);
+
+    const table1 = page.getByTestId("table1");
+    const table2 = page.getByTestId("table2");
+    await expect(table1).toBeVisible();
+    await expect(table2).toBeVisible();
+
+    // Click the first row checkbox in table2
+    const t2Checkbox = table2.locator("input[type='checkbox']").nth(1);
+    await expect(t2Checkbox).toBeAttached();
+    await t2Checkbox.click({ force: true });
+    await expect(t2Checkbox).toBeChecked();
+
+    // table1 should reflect the same selection via the shared variable (bidirectional)
+    const t1Checkbox = table1.locator("input[type='checkbox']").nth(1);
+    await expect(t1Checkbox).toBeChecked();
+  });
+
+  test("syncWithVar takes precedence over initiallySelected", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{selectedIds: [2]}}">
+        <Table
+          syncWithVar="syncState"
+          initiallySelected="{[1]}"
+          rowsSelectable="true"
+          testId="table"
+          data='{${syncData}}'
+        >
+          <Column bindTo="name"/>
+        </Table>
+      </Fragment>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+
+    // syncWithVar variable says id=2 should be selected — not initiallySelected's id=1
+    await expect(table.locator("input[type='checkbox']").nth(1)).not.toBeChecked(); // id=1
+    await expect(table.locator("input[type='checkbox']").nth(2)).toBeChecked();    // id=2
+  });
+
+  test("invalid variable name does not crash the table and it still renders", async ({
+    initTestBed,
+    page,
+  }) => {
+    // "123invalid" is not a valid JS identifier — the table should log an error
+    // but continue rendering normally without sync
+    await initTestBed(`
+      <Table syncWithVar="123invalid" rowsSelectable="true" testId="table" data='{${syncData}}'>
+        <Column bindTo="name"/>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apple" }).first()).toBeVisible();
+  });
+
+  test("non-existent variable name renders table normally with local-only selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    // "noSuchVar" is a valid identifier but is not defined — sync is silently skipped
+    await initTestBed(`
+      <Table syncWithVar="noSuchVar" rowsSelectable="true" testId="table" data='{${syncData}}'>
+        <Column bindTo="name"/>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Row selection should still work locally even without a sync target
+    const firstRowCheckbox = table.locator("input[type='checkbox']").nth(1);
+    await expect(firstRowCheckbox).toBeAttached();
+    await firstRowCheckbox.click({ force: true });
+    await expect(firstRowCheckbox).toBeChecked();
+  });
+});

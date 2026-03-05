@@ -1452,6 +1452,42 @@ This property determines the sort order to be `ascending` or `descending`. This 
 
 An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes.
 
+### `syncWithVar` [#syncwithvar]
+
+The name of a global variable to synchronize the table's selection state with. The named variable must reference an object; the table will read from and write to its 'selectedIds' property. When provided, this takes precedence over both `initiallySelected` and `syncWithAppState`. Multiple tables sharing the same variable name will keep their selections in sync automatically. A runtime error is signalled if the value is not a valid JavaScript variable name.
+
+The following example demonstrates how two independent `MyTable` components share selection state through a global variable. Selecting a row in either table immediately reflects in the other, and `selState` always holds the current selection:
+
+>[!INFO]
+> `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
+
+```xmlui-pg
+---app copy display /global.selState/ filename="Main.xmlui"
+<App global.selState="{{}}">
+  <MyTable />
+  <Text>Selection: {JSON.stringify(selState)}</Text>
+  <MyTable />
+</App>
+---comp copy display /syncWithVar="selState"/ filename="MyTable.xmlui"
+<Component name="MyTable">
+  <Table
+    syncWithVar="selState"
+    rowsSelectable="true"
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+      { id: 1, name: "Bananas", quantity: 6 },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</Component>
+---desc
+Change the selection in one of the tables and check how it is synced.
+```
+
 ### `userSelectCell` [#userselectcell]
 
 > [!DEF]  default: **"auto"**
