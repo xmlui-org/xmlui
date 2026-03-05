@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.6
+
+### Patch Changes
+
+- 66da3b5: Updated search functionality on website and reworked search data transformation. Also added categories for search results.
+
 ## 0.1.5
 
 ### Patch Changes
