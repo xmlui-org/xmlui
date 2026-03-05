@@ -520,9 +520,9 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done
 - ✅ 1.4 `global-variables.spec.ts` (merged 3 static tests → 1)
 
 ### Phase 2 — Heading Component Family
-- ⬜ 2.1 Merge H1–H6 into one file (30 → ~6 tests)
-- ⬜ 2.2 `Heading.spec.ts` value-type tests (11 → 1)
-- ⬜ 2.3 `Heading.spec.ts` size-comparison tests (5 → 1)
+- ✅ 2.1 Merge H1–H6 into `HeadingShortcuts.spec.ts` (24 → 6 tests)
+- ✅ 2.2 `Heading.spec.ts` value-type tests (11 → 1)
+- ✅ 2.3 `Heading.spec.ts` size-comparison tests (5 → 1)
 
 ### Phase 3 — Simple Display Components
 - ⬜ 3.1 `Text.spec.ts` value-type tests (~40 reduction)
