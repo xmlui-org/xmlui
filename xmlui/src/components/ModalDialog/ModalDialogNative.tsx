@@ -278,7 +278,7 @@ export const ModalDialog = React.forwardRef(
               since we get the same result & the main content outside remains scrollable.
             */
             <div
-              className={classnames(styles.overlayBg, styles.nested, {
+              className={classnames(styles.overlayBg, styles.nested, className, {
                 [styles.fullScreen]: fullScreen,
               })}
             >
@@ -287,7 +287,7 @@ export const ModalDialog = React.forwardRef(
           )}
           {!isDialogRootInShadowDom && (
             <>
-              <div className={classnames(styles.overlayBg)} />
+              <div className={classnames(styles.overlayBg, className)} />
               {/* This Overlay is responsible for the focus capture & scroll-lock */}
               <Dialog.Overlay
                 className={classnames(styles.overlay, {
