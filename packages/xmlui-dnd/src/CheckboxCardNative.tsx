@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Checkbox, MantineProvider } from "@mantine/core";
 import styles from "./CheckboxCard.module.scss";
 
@@ -15,18 +15,6 @@ type Props = {
   onChange?: (checked: boolean) => void;
   size?: string;
   disabled?: boolean;
-  /** Per-instance overrides — each supersedes the matching theme variable */
-  checkboxColor?: string;
-  checkboxIconColor?: string;
-  indicatorBackgroundColor?: string;
-  indicatorBorderColor?: string;
-  backgroundColor?: string;
-  backgroundColorChecked?: string;
-  borderColor?: string;
-  borderColorChecked?: string;
-  borderRadius?: string;
-  textColor?: string;
-  descriptionColor?: string;
   className?: string;
   registerComponentApi?: any;
 };
@@ -44,17 +32,6 @@ export const CheckboxCardNative = ({
   onChange,
   size = defaultProps.size,
   disabled,
-  checkboxColor,
-  checkboxIconColor,
-  indicatorBackgroundColor,
-  indicatorBorderColor,
-  backgroundColor,
-  backgroundColorChecked,
-  borderColor,
-  borderColorChecked,
-  borderRadius,
-  textColor,
-  descriptionColor,
   className,
 }: Props) => {
   useEffect(() => {
@@ -74,25 +51,10 @@ export const CheckboxCardNative = ({
         onChange?.(!checked);
       };
 
-  const wrapperVars: React.CSSProperties = {
-    ...(checkboxColor !== undefined && { "--cc-checkbox": checkboxColor } as any),
-    ...(checkboxIconColor !== undefined && { "--cc-icon": checkboxIconColor } as any),
-    ...(indicatorBackgroundColor !== undefined && { "--cc-indicator-bg": indicatorBackgroundColor } as any),
-    ...(indicatorBorderColor !== undefined && { "--cc-indicator-border": indicatorBorderColor } as any),
-    ...(backgroundColor !== undefined && { "--cc-bg": backgroundColor } as any),
-    ...(backgroundColorChecked !== undefined && { "--cc-bg-checked": backgroundColorChecked } as any),
-    ...(borderColor !== undefined && { "--cc-border": borderColor } as any),
-    ...(borderColorChecked !== undefined && { "--cc-border-checked": borderColorChecked } as any),
-    ...(borderRadius !== undefined && { "--cc-radius": borderRadius } as any),
-    ...(textColor !== undefined && { "--cc-text": textColor } as any),
-    ...(descriptionColor !== undefined && { "--cc-desc": descriptionColor } as any),
-  };
-
   return (
     <MantineProvider>
       <div
         className={`${styles.wrapper}${className ? ` ${className}` : ""}`}
-        style={wrapperVars}
       >
         <Checkbox.Card
           checked={checked}

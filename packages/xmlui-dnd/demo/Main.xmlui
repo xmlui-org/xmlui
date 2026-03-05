@@ -145,5 +145,71 @@
         img1={img1.value}, img2={img2.value}, img3={img3.value}
       </Text>
     </VStack>
+
+    <VStack gap="8">
+      <Text variant="strong">
+        Sortable List — drag anywhere on an item
+      </Text>
+      <HStack gap="24" alignItems="flex-start">
+        <SortableList id="taskList" width="280px">
+          <SortableItem itemId="task-high">
+            <HStack gap="8" alignItems="center">
+              <Text>🔴</Text>
+              <Text variant="strong">High priority</Text>
+            </HStack>
+          </SortableItem>
+          <SortableItem itemId="task-medium">
+            <HStack gap="8" alignItems="center">
+              <Text>🟡</Text>
+              <Text variant="strong">Medium priority</Text>
+            </HStack>
+          </SortableItem>
+          <SortableItem itemId="task-low">
+            <HStack gap="8" alignItems="center">
+              <Text>🟢</Text>
+              <Text variant="strong">Low priority</Text>
+            </HStack>
+          </SortableItem>
+          <SortableItem itemId="task-backlog">
+            <HStack gap="8" alignItems="center">
+              <Text>⚪</Text>
+              <Text variant="strong">Backlog</Text>
+            </HStack>
+          </SortableItem>
+        </SortableList>
+
+        <VStack gap="8" width="280px">
+          <Text variant="strong">
+            Sortable List — drag via handle
+          </Text>
+          <SortableList>
+            <SortableItem itemId="step-1" dragHandle="true">
+              <VStack gap="2">
+                <Text variant="strong">Step 1: Setup</Text>
+                <Text>Configure environment</Text>
+              </VStack>
+            </SortableItem>
+            <SortableItem itemId="step-2" dragHandle="true">
+              <VStack gap="2">
+                <Text variant="strong">Step 2: Install</Text>
+                <Text>Run npm install</Text>
+              </VStack>
+            </SortableItem>
+            <SortableItem itemId="step-3" dragHandle="true">
+              <VStack gap="2">
+                <Text variant="strong">Step 3: Build</Text>
+                <Text>Run npm run build</Text>
+              </VStack>
+            </SortableItem>
+            <SortableItem itemId="step-4" dragHandle="true">
+              <VStack gap="2">
+                <Text variant="strong">Step 4: Deploy</Text>
+                <Text>Push to production</Text>
+              </VStack>
+            </SortableItem>
+          </SortableList>
+        </VStack>
+      </HStack>
+    </VStack>
   </VStack>
 </App>

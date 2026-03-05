@@ -1,0 +1,26 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "SortableList";
+
+// --- XMLUI theme variables ---
+$gap-SortableList: createThemeVar("gap-#{$componentName}");
+
+// The list is a flex column; CSS `order` on children handles visual reordering
+// without touching the DOM order.
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: #{$gap-SortableList};
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

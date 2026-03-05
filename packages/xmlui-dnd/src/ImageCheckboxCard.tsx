@@ -28,61 +28,6 @@ export const ImageCheckboxCardMd = createMetadata({
       undefined,
       "string",
     ),
-    checkboxColor: d(
-      "Fill color of the checkbox indicator when checked. " +
-        "Overrides `checkboxColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    checkboxIconColor: d(
-      "Color of the check icon inside the indicator. " +
-        "Overrides `checkboxIconColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    indicatorBackgroundColor: d(
-      "Background of the checkbox indicator when unchecked. " +
-        "Overrides `indicatorBackgroundColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    indicatorBorderColor: d(
-      "Border color of the checkbox indicator when unchecked. " +
-        "Overrides `indicatorBorderColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    backgroundColor: d(
-      "Card background when unchecked. Overrides `backgroundColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    backgroundColorChecked: d(
-      "Card background when checked. Overrides `backgroundColor-checked-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    borderColor: d(
-      "Card border color when unchecked. Overrides `borderColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    borderColorChecked: d(
-      "Card border color when checked. Overrides `borderColor-checked-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    borderRadius: d(
-      "Card border radius. Overrides `borderRadius-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
-    textColor: d("Label text color. Overrides `textColor-ImageCheckboxCard`.", undefined, "string"),
-    descriptionColor: d(
-      "Description text color. Overrides `descriptionColor-ImageCheckboxCard`.",
-      undefined,
-      "string",
-    ),
   },
   events: {
     didChange: {
@@ -112,25 +57,7 @@ export const imageCheckboxCardComponentRenderer = wrapComponent(
   ImageCheckboxCardMd,
   {
     booleans: ["disabled"],
-    strings: [
-      "imageUrl",
-      "imageAlt",
-      "label",
-      "description",
-      "size",
-      "imageHeight",
-      "checkboxColor",
-      "checkboxIconColor",
-      "indicatorBackgroundColor",
-      "indicatorBorderColor",
-      "backgroundColor",
-      "backgroundColorChecked",
-      "borderColor",
-      "borderColorChecked",
-      "borderRadius",
-      "textColor",
-      "descriptionColor",
-    ],
+    strings: ["imageUrl", "imageAlt", "label", "description", "size", "imageHeight"],
     events: { didChange: "onChange" },
   },
 );

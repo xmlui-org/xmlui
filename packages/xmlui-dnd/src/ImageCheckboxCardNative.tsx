@@ -17,19 +17,8 @@ type Props = {
   onChange?: (checked: boolean) => void;
   size?: string;
   disabled?: boolean;
-  /** Per-instance overrides — each supersedes the matching theme variable */
+  /** Layout override */
   imageHeight?: string;
-  checkboxColor?: string;
-  checkboxIconColor?: string;
-  indicatorBackgroundColor?: string;
-  indicatorBorderColor?: string;
-  backgroundColor?: string;
-  backgroundColorChecked?: string;
-  borderColor?: string;
-  borderColorChecked?: string;
-  borderRadius?: string;
-  textColor?: string;
-  descriptionColor?: string;
   className?: string;
   registerComponentApi?: any;
 };
@@ -50,17 +39,6 @@ export const ImageCheckboxCardNative = ({
   size = defaultProps.size,
   disabled,
   imageHeight,
-  checkboxColor,
-  checkboxIconColor,
-  indicatorBackgroundColor,
-  indicatorBorderColor,
-  backgroundColor,
-  backgroundColorChecked,
-  borderColor,
-  borderColorChecked,
-  borderRadius,
-  textColor,
-  descriptionColor,
   className,
 }: Props) => {
   useEffect(() => {
@@ -82,17 +60,6 @@ export const ImageCheckboxCardNative = ({
 
   const wrapperVars: React.CSSProperties = {
     ...(imageHeight !== undefined && { "--ic-img-h": imageHeight } as any),
-    ...(checkboxColor !== undefined && { "--ic-checkbox": checkboxColor } as any),
-    ...(checkboxIconColor !== undefined && { "--ic-icon": checkboxIconColor } as any),
-    ...(indicatorBackgroundColor !== undefined && { "--ic-indicator-bg": indicatorBackgroundColor } as any),
-    ...(indicatorBorderColor !== undefined && { "--ic-indicator-border": indicatorBorderColor } as any),
-    ...(backgroundColor !== undefined && { "--ic-bg": backgroundColor } as any),
-    ...(backgroundColorChecked !== undefined && { "--ic-bg-checked": backgroundColorChecked } as any),
-    ...(borderColor !== undefined && { "--ic-border": borderColor } as any),
-    ...(borderColorChecked !== undefined && { "--ic-border-checked": borderColorChecked } as any),
-    ...(borderRadius !== undefined && { "--ic-radius": borderRadius } as any),
-    ...(textColor !== undefined && { "--ic-text": textColor } as any),
-    ...(descriptionColor !== undefined && { "--ic-desc": descriptionColor } as any),
   };
 
   return (

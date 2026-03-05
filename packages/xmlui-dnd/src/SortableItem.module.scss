@@ -1,0 +1,79 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "SortableItem";
+
+// --- XMLUI theme variables ---
+$backgroundColor-SortableItem:  createThemeVar("backgroundColor-#{$componentName}");
+$borderColor-SortableItem:      createThemeVar("borderColor-#{$componentName}");
+$borderRadius-SortableItem:     createThemeVar("borderRadius-#{$componentName}");
+$padding-SortableItem:          createThemeVar("padding-#{$componentName}");
+$handleColor-SortableItem:      createThemeVar("handleColor-#{$componentName}");
+$draggingShadow-SortableItem:   createThemeVar("draggingShadow-#{$componentName}");
+$dragOpacity-SortableItem:      createThemeVar("dragOpacity-#{$componentName}");
+
+// .item is both the outermost layout element and the visual card.
+// CSS vars are declared here so descendants (.handle, .content) can inherit
+// them without needing a separate wrapper div.
+.item {
+  --si-bg:      #{$backgroundColor-SortableItem};
+  --si-border:  #{$borderColor-SortableItem};
+  --si-radius:  #{$borderRadius-SortableItem};
+  --si-padding: #{$padding-SortableItem};
+  --si-handle:  #{$handleColor-SortableItem};
+  --si-shadow:  #{$draggingShadow-SortableItem};
+  --si-opacity: #{$dragOpacity-SortableItem};
+
+  display: flex;
+  align-items: stretch;
+  background-color: var(--si-bg);
+  border: 1px solid var(--si-border);
+  border-radius: var(--si-radius);
+  position: relative;
+  // Transition shadow only; transform/transition handled by dnd-kit inline style
+  transition: box-shadow 150ms ease, opacity 150ms ease;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+
+  &.dragging {
+    box-shadow: var(--si-shadow);
+    opacity: var(--si-opacity);
+    cursor: grabbing;
+  }
+
+  // When drag handle is present the whole card is not the drag target
+  &.hasHandle {
+    cursor: default;
+  }
+}
+
+.handle {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  color: var(--si-handle);
+  cursor: grab;
+  flex-shrink: 0;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.content {
+  padding: var(--si-padding);
+  flex: 1;
+  min-width: 0;
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
