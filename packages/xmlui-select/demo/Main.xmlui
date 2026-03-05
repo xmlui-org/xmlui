@@ -1,0 +1,55 @@
+<App xmlns:Extensions="component-ns:XMLUIExtensions" var.selected="{undefined}">
+  <VStack gap="$space-6" padding="$space-6">
+
+    <Text variant="h2">
+      Select — Demo
+    </Text>
+    <Form>
+      <!-- Single select from strings -->
+      <FormItem label="Framework">
+        <Extensions:Select
+          id="frameworkSelect"
+          items="{['React', 'Vue', 'Svelte', 'Angular', 'SolidJS']}"
+          placeholder="Pick a framework"
+          onDidChange="(val) => selected = val"
+        />
+      </FormItem>
+      <Text>
+        Selected: {selected}
+      </Text>
+
+      <!-- Single select from objects -->
+      <FormItem label="Country">
+        <Extensions:Select
+          items="{[
+          { value: 'hu', label: 'Hungary' },
+          { value: 'de', label: 'Germany' },
+          { value: 'fr', label: 'France' },
+          { value: 'us', label: 'United States' }
+        ]}"
+          placeholder="Choose a country"
+          clearable="{true}"
+        />
+      </FormItem>
+
+      <!-- Multi-select -->
+      <FormItem label="Tags (multi)">
+        <Extensions:Select
+          items="{['TypeScript', 'JavaScript', 'Rust', 'Go', 'Python']}"
+          placeholder="Select tags"
+          multiple="{true}"
+          clearable="{true}"
+        />
+      </FormItem>
+
+      <!-- Disabled -->
+      <FormItem label="Disabled">
+        <Extensions:Select
+          items="{['Option A', 'Option B']}"
+          initialValue="Option A"
+          enabled="{false}"
+        />
+      </FormItem>
+    </Form>
+  </VStack>
+</App>

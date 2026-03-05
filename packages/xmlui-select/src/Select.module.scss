@@ -1,0 +1,223 @@
+@use "xmlui/themes.scss" as t;
+
+// --- Required boilerplate to collect theme variables ---
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Select";
+
+// --- Trigger (the button that opens the dropdown) ---
+$backgroundColor-trigger:     createThemeVar("Input:backgroundColor-#{$componentName}");
+$textColor-trigger:           createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-trigger:         createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-trigger:         createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-trigger:         createThemeVar("Input:borderStyle-#{$componentName}");
+$borderRadius-trigger:        createThemeVar("Input:borderRadius-#{$componentName}");
+$paddingHorizontal-trigger:   createThemeVar("Input:paddingHorizontal-#{$componentName}");
+$paddingVertical-trigger:     createThemeVar("Input:paddingVertical-#{$componentName}");
+$fontSize-trigger:            createThemeVar("Input:fontSize-#{$componentName}");
+$minHeight-trigger:           createThemeVar("Input:minHeight-#{$componentName}");
+
+$backgroundColor-trigger--hover:    createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$borderColor-trigger--hover:        createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-trigger--focus:    createThemeVar("Input:backgroundColor-#{$componentName}--focus");
+$borderColor-trigger--focus:        createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-trigger--focus:          createThemeVar("Input:boxShadow-#{$componentName}--focus");
+$backgroundColor-trigger--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
+$textColor-trigger--disabled:       createThemeVar("Input:textColor-#{$componentName}--disabled");
+$borderColor-trigger--disabled:     createThemeVar("Input:borderColor-#{$componentName}--disabled");
+
+// --- Dropdown panel ---
+$backgroundColor-content:  createThemeVar("Input:backgroundColor-content-#{$componentName}");
+$borderColor-content:       createThemeVar("Input:borderColor-content-#{$componentName}");
+$borderWidth-content:       createThemeVar("Input:borderWidth-content-#{$componentName}");
+$borderStyle-content:       createThemeVar("Input:borderStyle-content-#{$componentName}");
+$borderRadius-content:      createThemeVar("Input:borderRadius-content-#{$componentName}");
+$boxShadow-content:         createThemeVar("Input:boxShadow-content-#{$componentName}");
+$paddingVertical-content:   createThemeVar("Input:paddingVertical-content-#{$componentName}");
+$maxHeight-content:         createThemeVar("Input:maxHeight-content-#{$componentName}");
+
+// --- Items ---
+$paddingHorizontal-item:          createThemeVar("Input:paddingHorizontal-item-#{$componentName}");
+$paddingVertical-item:            createThemeVar("Input:paddingVertical-item-#{$componentName}");
+$borderRadius-item:               createThemeVar("Input:borderRadius-item-#{$componentName}");
+$textColor-item:                  createThemeVar("Input:textColor-item-#{$componentName}");
+$fontSize-item:                   createThemeVar("Input:fontSize-item-#{$componentName}");
+
+$backgroundColor-item--hover:     createThemeVar("Input:backgroundColor-item-#{$componentName}--hover");
+$textColor-item--hover:           createThemeVar("Input:textColor-item-#{$componentName}--hover");
+$backgroundColor-item--selected:  createThemeVar("Input:backgroundColor-item-#{$componentName}--selected");
+$textColor-item--selected:        createThemeVar("Input:textColor-item-#{$componentName}--selected");
+$backgroundColor-item--disabled:  createThemeVar("Input:backgroundColor-item-#{$componentName}--disabled");
+$textColor-item--disabled:        createThemeVar("Input:textColor-item-#{$componentName}--disabled");
+
+// --- Indicator (chevron / checkmark) ---
+$textColor-indicator:             createThemeVar("Input:textColor-indicator-#{$componentName}");
+$textColor-itemIndicator:         createThemeVar("Input:textColor-itemIndicator-#{$componentName}");
+
+@layer components {
+  .selectContainer {
+    display: inline-flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  // --- Trigger button ---
+  .trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+    min-height: #{$minHeight-trigger};
+    padding: #{$paddingVertical-trigger} #{$paddingHorizontal-trigger};
+    background-color: #{$backgroundColor-trigger};
+    color: #{$textColor-trigger};
+    border: #{$borderWidth-trigger} #{$borderStyle-trigger} #{$borderColor-trigger};
+    border-radius: #{$borderRadius-trigger};
+    font-size: #{$fontSize-trigger};
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #{$backgroundColor-trigger--hover};
+      border-color: #{$borderColor-trigger--hover};
+    }
+
+    &:focus-visible {
+      background-color: #{$backgroundColor-trigger--focus};
+      border-color: #{$borderColor-trigger--focus};
+      box-shadow: #{$boxShadow-trigger--focus};
+    }
+
+    &:disabled,
+    &[data-disabled] {
+      background-color: #{$backgroundColor-trigger--disabled};
+      color: #{$textColor-trigger--disabled};
+      border-color: #{$borderColor-trigger--disabled};
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .indicator {
+    color: #{$textColor-indicator};
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+
+    &[data-state="open"] {
+      transform: rotate(180deg);
+    }
+  }
+
+  .valueText {
+    flex: 1;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &[data-placeholder-shown] {
+      opacity: 0.5;
+    }
+  }
+
+  // --- Dropdown content panel ---
+  .content {
+    background-color: #{$backgroundColor-content};
+    border: #{$borderWidth-content} #{$borderStyle-content} #{$borderColor-content};
+    border-radius: #{$borderRadius-content};
+    box-shadow: #{$boxShadow-content};
+    padding: #{$paddingVertical-content} 0;
+    max-height: #{$maxHeight-content};
+    overflow-y: auto;
+    outline: none;
+    z-index: 50;
+
+    // Ark UI open/close animation
+    &[data-state="open"] {
+      animation: selectContentOpen 0.15s ease;
+    }
+    &[data-state="closed"] {
+      animation: selectContentClose 0.1s ease;
+    }
+  }
+
+  // --- Individual items ---
+  .item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: #{$paddingVertical-item} #{$paddingHorizontal-item};
+    border-radius: #{$borderRadius-item};
+    color: #{$textColor-item};
+    font-size: #{$fontSize-item};
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.1s ease;
+
+    &[data-highlighted] {
+      background-color: #{$backgroundColor-item--hover};
+      color: #{$textColor-item--hover};
+    }
+
+    &[data-selected] {
+      background-color: #{$backgroundColor-item--selected};
+      color: #{$textColor-item--selected};
+    }
+
+    &[data-disabled] {
+      background-color: #{$backgroundColor-item--disabled};
+      color: #{$textColor-item--disabled};
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+  }
+
+  .itemIndicator {
+    color: #{$textColor-itemIndicator};
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    width: 16px;
+  }
+
+  .clearTrigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    color: #{$textColor-trigger};
+    flex-shrink: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+@keyframes selectContentOpen {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes selectContentClose {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+// --- Export theme variables for the component renderer ---
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
