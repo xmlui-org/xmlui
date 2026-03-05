@@ -69,22 +69,31 @@ export const SelectRender = forwardRef(({
   const multipleRef = useRef(multiple);
   multipleRef.current = multiple;
 
+  // Root cause of the infinite loop:
+  // registerComponentApi (XMLUI) uses immer's produce to store API objects.
+  // Immer compares each key: `draft[uid][key] !== value`. If any API function
+  // is a NEW reference (because onChange changed), immer updates the draft →
+  // new state object → setComponentApis → XMLUI re-render → new __onDidChange
+  // → new onChange → new API functions → immer detects change again → loop.
+  //
+  // Fix: all API functions must have STABLE references (created once).
+  // We achieve this by using onChangeRef (already kept up-to-date above)
+  // and keeping registerApi as the only dep — so the effect runs just once.
   useEffect(() => {
     registerApi?.({
       focus: () => triggerRef.current?.focus(),
       setValue: (v: any) => {
         const arr = Array.isArray(v) ? v.map(String) : v != null ? [String(v)] : [];
-        onChange(arr);
+        onChangeRef.current(arr);
       },
-      clear: () => onChange([]),
+      clear: () => onChangeRef.current([]),
       getValue: () =>
         multipleRef.current
           ? selectedValuesRef.current
           : selectedValuesRef.current[0] ?? undefined,
     });
-  // Only re-register when the stable callbacks change, not on every value update.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [registerApi, onChange]);
+  }, [registerApi]);
 
   // Keep a ref to the latest onChange so handleValueChange never needs to
   // change its own reference. Ark-ui's Select.Root has an internal useEffect
