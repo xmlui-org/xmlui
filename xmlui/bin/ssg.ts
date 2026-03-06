@@ -17,6 +17,7 @@ import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { discoverPaths, pathExists } from "./ssg/discoverPaths";
 import { JSDOM } from "jsdom";
+import { exit } from "node:process";
 
 type SsgOptions = {
   outDir?: string;
@@ -46,6 +47,7 @@ const SEARCH_DEFAULT_CATEGORY = "other";
 type SearchItemData = { path: string; title: string; content: string; category?: string };
 
 const SEARCH_INDEX_FILE_NAME = "__xmlui-search-index.json";
+const SSG_WRITE_CONCURRENCY = 16;
 const EXTENSION_FILE_CANDIDATES = [
   "extensions.ts",
   "extensions.tsx",
@@ -122,7 +124,12 @@ function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: s
 function injectMarkup(shellHtml: string, markup: string): string {
   const rootRegex = /<div([^>]*\bid=["']root["'][^>]*)>[\s\S]*?<\/div>/i;
   if (rootRegex.test(shellHtml)) {
-    return shellHtml.replace(rootRegex, `<div$1>${markup}</div>`);
+    return shellHtml.replace(rootRegex, (full, attributes: string) => {
+      const attrsWithSsg = /\bdata-xmlui-ssg=/.test(attributes)
+        ? attributes
+        : `${attributes} data-xmlui-ssg="1"`;
+      return `<div${attrsWithSsg}>${markup}</div>`;
+    });
   }
 
   if (shellHtml.includes("</body>")) {
@@ -495,28 +502,34 @@ export const ssg = async ({
       throw new Error("failed to load renderPath from temporary SSG entry module");
     }
 
-    const writePromises: Promise<void>[] = [];
-    const searchIndex: SearchItemData[] = [];
+    const searchIndex: SearchItemData[] = new Array(pathsToRender.length);
+    let nextRouteIndex = 0;
+    const workerCount = Math.min(SSG_WRITE_CONCURRENCY, pathsToRender.length);
 
-    for (const route of pathsToRender) {
-      log(`rendering ${route}`);
-      const rendered = renderModule.renderPath(route);
-      const finalHtml = applyRenderToShell(shellHtml, rendered);
-      const outputFile = getOutputHtmlPath(outPath, route);
-      const dir = path.dirname(outputFile);
+    const workers = Array.from({ length: workerCount }, async () => {
+      while (true) {
+        const routeIndex = nextRouteIndex++;
+        if (routeIndex >= pathsToRender.length) {
+          return;
+        }
 
-      searchIndex.push(extractSearchEntry(route, rendered.markup));
+        const route = pathsToRender[routeIndex]!;
 
-      const writePromise = (async () => {
+        log(`rendering ${route}`);
+        const rendered = renderModule.renderPath(route);
+        const finalHtml = applyRenderToShell(shellHtml, rendered);
+        const outputFile = getOutputHtmlPath(outPath, route);
+        const dir = path.dirname(outputFile);
+
+        searchIndex[routeIndex] = extractSearchEntry(route, rendered.markup);
+
         await mkdir(dir, { recursive: true });
         await writeFile(outputFile, finalHtml, "utf-8");
         log(`wrote ${outputFile}`);
-      })();
-      writePromises.push(writePromise);
-    }
+      }
+    });
 
-    log("waiting for all writes to complete...");
-    await Promise.all(writePromises);
+    await Promise.all(workers);
 
     const searchIndexFile = path.join(outPath, SEARCH_INDEX_FILE_NAME);
     await writeFile(searchIndexFile, JSON.stringify(searchIndex), "utf-8");

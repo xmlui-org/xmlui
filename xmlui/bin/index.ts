@@ -224,7 +224,6 @@ yargs(hideBin(process.argv))
         })
         .option("debug", {
           type: "boolean",
-          default: false,
           description: "Preserve intermediate SSR files for debugging",
           hidden: true,
         })

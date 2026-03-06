@@ -1,6 +1,8 @@
 import { createContext, useContextSelector } from "use-context-selector";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { useAppContext } from "../../components-core/AppContext";
+import { useSsgEnv } from "../../components-core/rendering/SsgEnvContext";
 
 export type SearchItemData = { path: string; title: string; content: string; category?: string };
 
@@ -16,17 +18,23 @@ type ISearchContext = {
   storeContent: ({ path, title, content, category }: SearchItemData) => void;
   isIndexing: boolean;
   setIsIndexing: (isIndexing: boolean) => void;
-  hydrated: boolean;
+  loadedExternalIndex: boolean;
 };
 
 const SearchContext = createContext<ISearchContext | null>(null);
 
-export const SearchContextProvider = ({children})=>{
+export const SearchContextProvider = ({ children }) => {
+  const appContext = useAppContext();
+  const ssgEnv = useSsgEnv();
   const [content, setContent] = useState<Record<string, SearchItemData>>(EMPTY_OBJECT);
   const [isIndexing, setIsIndexing] = useState(true);
-  const [hydrated, setHydrated] = useState(false);
+  const [loadedExternalIndex, setLoadedExternalIndex] = useState(false);
 
   useEffect(() => {
+    if (!appContext.appGlobals?.searchIndexEnabled || !ssgEnv) {
+      return;
+    }
+
     fetch(SSG_SEARCH_INDEX_URL)
       .then((res) => {
         if (!res.ok) return null;
@@ -40,12 +48,12 @@ export const SearchContextProvider = ({children})=>{
         }
         setContent(map);
         setIsIndexing(false);
-        setHydrated(true);
+        setLoadedExternalIndex(true);
       })
       .catch(() => {
         // Pre-built index not available (e.g. dev server) — SearchIndexCollector will run instead.
       });
-  }, []);
+  }, [appContext.appGlobals?.searchIndexEnabled, ssgEnv]);
 
   const storeContent = useCallback((entry: SearchItemData) => {
     setContent((prevContent) => ({
@@ -54,15 +62,18 @@ export const SearchContextProvider = ({children})=>{
     }));
   }, []);
 
-  const value = useMemo(()=>({
-    content,
-    storeContent,
-    isIndexing,
-    setIsIndexing,
-    hydrated,
-  }), [content, hydrated, isIndexing, storeContent]);
+  const value = useMemo(
+    () => ({
+      content,
+      storeContent,
+      isIndexing,
+      setIsIndexing,
+      loadedExternalIndex,
+    }),
+    [content, loadedExternalIndex, isIndexing, storeContent],
+  );
 
-  return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>
+  return <SearchContext.Provider value={value}>{children}</SearchContext.Provider>;
 };
 
 export const useSearchContextUpdater = () => {
@@ -77,7 +88,6 @@ export const useSearchContextSetIndexing = () => {
   return useContextSelector(SearchContext, (value) => value.setIsIndexing);
 };
 
-export const useSearchContextHydrated = () => {
-  return useContextSelector(SearchContext, (value) => value?.hydrated ?? false);
+export const useSearchContextLoadedExternalIndex = () => {
+  return useContextSelector(SearchContext, (value) => value?.loadedExternalIndex ?? false);
 };
-
