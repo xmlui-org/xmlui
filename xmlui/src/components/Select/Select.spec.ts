@@ -642,7 +642,7 @@ test.describe("searchable select", () => {
     await expect(page.getByText("Please select an item")).toBeVisible();
   });
 
-  test("inProgressNotificationMessage shown when inProgress is true", async ({
+  test("inProgressNotificationMessage respects inProgress", async ({
     initTestBed,
     page,
     createSelectDriver,
@@ -654,16 +654,10 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    let driver = await createSelectDriver();
     await driver.click();
     await expect(page.getByText("in-progress-msg")).toBeVisible();
-  });
 
-  test("inProgressNotificationMessage not shown when inProgress is false", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable inProgress="false" inProgressNotificationMessage="in-progress-msg">
         <Option value="opt1" label="first"/>
@@ -671,7 +665,7 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
     await expect(page.getByText("in-progress-msg")).not.toBeVisible();
   });
@@ -696,7 +690,7 @@ test.describe("searchable select", () => {
     },
   );
 
-  test("dropdownHeight applies custom height with searchable", async ({
+  test("dropdownHeight/search behavior in searchable mode", async ({
     initTestBed,
     page,
     createSelectDriver,
@@ -713,19 +707,11 @@ test.describe("searchable select", () => {
         <Option value="opt8" label="Honeydew"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    let driver = await createSelectDriver();
     await driver.click();
-    
-    // Verify dropdown opens and shows options
     await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Honeydew" })).toBeAttached();
-  });
 
-  test("dropdown defaults to height with searchable when not specified", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable>
         <Option value="opt1" label="Apple"/>
@@ -733,19 +719,11 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="Cherry"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
-    
-    // Verify dropdown opens and shows options
     await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
-  });
 
-  test("search works with dropdownHeight", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable dropdownHeight="120px">
         <Option value="opt1" label="Apple"/>
@@ -755,13 +733,9 @@ test.describe("searchable select", () => {
         <Option value="opt5" label="Elderberry"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
-    
-    // Search for a specific option
     await driver.searchFor("Cherry");
-    
-    // Only Cherry should be visible after search
     await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
     const options = await page.getByRole("option").all();
     expect(options).toHaveLength(1);
@@ -1087,38 +1061,28 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Visual State", () => {
-  test("input has correct width in px", async ({ page, initTestBed }) => {
+  test("input width variants", async ({ page, initTestBed }) => {
     await initTestBed(`<Select width="200px" testId="test"/>`, {});
+    let input = page.getByTestId("test");
+    let bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test");
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input with label has correct width in px", async ({ page, initTestBed }) => {
     await initTestBed(`<Select width="200px" label="test" testId="test"/>`, {});
+    input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input has correct width in %", async ({ page, initTestBed }) => {
     await page.setViewportSize({ width: 400, height: 300 });
     await initTestBed(`<Select width="50%" testId="test"/>`, {});
+    input = page.getByTestId("test");
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test");
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input with label has correct width in %", async ({ page, initTestBed }) => {
     await page.setViewportSize({ width: 400, height: 300 });
     await initTestBed(`<Select width="50%" label="test" testId="test"/>`, {});
-
-    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
+    input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
   });
 
   test("dropdown height is consistent across Select variants with same number of options", async ({
@@ -1250,112 +1214,106 @@ test.describe("Z-Index and Modal Layering", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  [
+  const variants = [
     { value: "--default", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },
-  ].forEach((variant) => {
-    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderRadius-Select${variant.value}`]: "12px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
-    });
+  ];
 
-    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderColor-Select${variant.value}`]: "rgb(255, 0, 0)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
-    });
-
-    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderWidth-Select${variant.value}`]: "1px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
-    });
-
-    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderStyle-Select${variant.value}`]: "dashed" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
-    });
-
-    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`fontSize-Select${variant.value}`]: "14px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
-    });
-
-    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`backgroundColor-Select${variant.value}`]: "rgb(240, 240, 240)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
-    });
-
-    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+  const runPerVariant = async (
+    initTestBed: any,
+    page: any,
+    themeVarPrefix: string,
+    cssProp: string,
+    expected: string,
+    hover = false,
+  ) => {
+    for (const variant of variants) {
       await initTestBed(`<Select testId="test" ${variant.prop} />`, {
         testThemeVars: {
-          [`boxShadow-Select${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          [`${themeVarPrefix}-Select${variant.value}${hover ? "--hover" : ""}`]: expected,
         },
       });
-      await expect(page.getByTestId("test")).toHaveCSS(
-        "box-shadow",
-        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
-      );
-    });
+      if (hover) {
+        await page.getByTestId("test").hover();
+      }
+      await expect(page.getByTestId("test")).toHaveCSS(cssProp, expected);
+    }
+  };
 
-    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`textColor-Select${variant.value}`]: "rgb(0, 0, 0)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
-    });
+  test("applies correct borderRadius across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderRadius", "border-radius", "12px");
+  });
 
-    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
-    });
+  test("applies correct borderColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderColor", "border-color", "rgb(255, 0, 0)");
+  });
 
-    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+  test("applies correct borderWidth across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderWidth", "border-width", "1px");
+  });
+
+  test("applies correct borderStyle across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderStyle", "border-style", "dashed");
+  });
+
+  test("applies correct fontSize across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "fontSize", "font-size", "14px");
+  });
+
+  test("applies correct backgroundColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
       initTestBed,
       page,
-    }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`backgroundColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    });
+      "backgroundColor",
+      "background-color",
+      "rgb(240, 240, 240)",
+    );
+  });
 
-    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: {
-          [`boxShadow-Select${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS(
-        "box-shadow",
-        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
-      );
-    });
+  test("applies correct boxShadow across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "boxShadow",
+      "box-shadow",
+      "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+    );
+  });
 
-    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`textColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
-    });
+  test("applies correct textColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "textColor", "color", "rgb(0, 0, 0)");
+  });
+
+  test("applies correct borderColor on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderColor", "border-color", "rgb(0, 0, 0)", true);
+  });
+
+  test("applies correct backgroundColor on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "backgroundColor",
+      "background-color",
+      "rgb(0, 0, 0)",
+      true,
+    );
+  });
+
+  test("applies correct boxShadow on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "boxShadow",
+      "box-shadow",
+      "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      true,
+    );
+  });
+
+  test("applies correct textColor on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "textColor", "color", "rgb(0, 0, 0)", true);
   });
 });
 

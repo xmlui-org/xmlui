@@ -352,7 +352,7 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ skipped
 
 ### Phase 10 — Remaining High-Value Targets
 
-- ⬜ 10.1 `Badge.spec.ts` border/padding theme-var tests (~108 → ~12, −~96)
+- ✅ 10.1 `Badge.spec.ts` border/padding theme-var tests (~108 → ~12, −~96)
 - ⬜ 10.2 `Footer.spec.ts` border/padding theme-vars + sticky variants (~54 → ~14, −~40)
 - ⬜ 10.3 `NoResult.spec.ts` border/padding theme-var tests (35 → ~3, −~32)
 - ⬜ 10.4 `Select.spec.ts` theme-var + width + inProgress tests (−~30)
