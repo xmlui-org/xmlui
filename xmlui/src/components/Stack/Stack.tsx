@@ -1,4 +1,4 @@
-import type React from "react";
+import React from "react";
 
 import styles from "./Stack.module.scss";
 
@@ -102,6 +102,19 @@ const stackMd = createMetadata({
         "The default width applied to child elements in the Stack. " +
         "For vertical stacks, defaults to '100%' (children take full width). " +
         "For horizontal stacks, defaults to 'fit-content' (children size to their content).",
+      valueType: "string",
+    },
+    dock: {
+      description:
+        "When set on a child of a Stack, activates DockPanel layout in the parent Stack. " +
+        "`top` — child occupies the top of the remaining area, full width, respects its own `height`. " +
+        "`bottom` — child occupies the bottom, full width, respects its own `height`. " +
+        "`left` — child occupies the left of the middle row, respects its own `width`. " +
+        "`right` — child occupies the right of the middle row, respects its own `width`. " +
+        "`stretch` — child fills all remaining middle-row space; its `width` and `height` are ignored. " +
+        "Children without a `dock` prop participate as undocked items in the middle row. " +
+        "The parent Stack must have a defined height for `bottom`-docked children to anchor correctly.",
+      availableValues: ["top", "bottom", "left", "right", "stretch"],
       valueType: "string",
     },
   },
@@ -213,6 +226,99 @@ type RenderStackPars = {
   registerComponentApi?: (api: any) => void;
 };
 
+function renderDockLayout({
+  node,
+  extractValue,
+  className,
+  lookupEventHandler,
+  renderChild,
+  scrollStyle,
+  showScrollerFade,
+  registerComponentApi,
+}: RenderStackPars) {
+  const allChildren = (Array.isArray(node.children) ? node.children : [node.children]).filter(
+    (child) => child != null
+  );
+
+  // Categorise children by dock value
+  const top: any[] = [], bottom: any[] = [], left: any[] = [], right: any[] = [], middle: any[] = [];
+  for (const child of allChildren) {
+    const dock = (child.props as any)?.dock;
+    if (dock === "top") top.push(child);
+    else if (dock === "bottom") bottom.push(child);
+    else if (dock === "left") left.push(child);
+    else if (dock === "right") right.push(child);
+    else middle.push(child); // "stretch" and undocked children share the middle row
+  }
+
+  // The middle row is always rendered if any bottom children exist (it acts as the flex:1 spacer
+  // that pushes bottom children to the bottom of the outer flex column).
+  const needsMiddleRow = middle.length > 0 || left.length > 0 || right.length > 0 || bottom.length > 0;
+
+  // Renders a homogeneous group of children — each wrapped in a flex-positioning div
+  const renderGroup = (children: any[], wrapStyle: Record<string, any>) =>
+    renderChild(children, {
+      type: "DockLayout",
+      wrapChild: (_ctx, rendered, metadata) =>
+        metadata?.opaque || metadata?.nonVisual
+          ? rendered
+          : <div style={wrapStyle}>{rendered}</div>,
+    });
+
+  // Middle children are rendered individually so that "stretch" children can receive
+  // ignoreLayoutProps while undocked children keep their own width/height props.
+  const middleRendered = middle.map((child, index) => {
+    const isStretch = (child.props as any)?.dock === "stretch";
+    return (
+      <React.Fragment key={index}>
+        {renderChild(child, {
+          type: "DockLayout",
+          ignoreLayoutProps: isStretch
+            ? ["width", "minWidth", "maxWidth", "height", "minHeight", "maxHeight"]
+            : undefined,
+          wrapChild: (_ctx, rendered, metadata) => {
+            if (metadata?.opaque || metadata?.nonVisual) return rendered;
+            return (
+              <div style={isStretch ? { flex: 1, minWidth: 0, minHeight: 0 } : { flexShrink: 0 }}>
+                {rendered}
+              </div>
+            );
+          },
+        })}
+      </React.Fragment>
+    );
+  });
+
+  return (
+    <Stack
+      orientation="vertical"
+      scrollStyle={scrollStyle as any}
+      showScrollerFade={showScrollerFade}
+      className={className}
+      onClick={lookupEventHandler("click")}
+      onContextMenu={lookupEventHandler("contextMenu")}
+      onMount={lookupEventHandler("mounted")}
+      registerComponentApi={registerComponentApi}
+    >
+      {/* Top-docked children in declaration order */}
+      {top.length > 0 && renderGroup(top, { flexShrink: 0, width: "100%", minWidth: 0 })}
+
+      {/* Middle row: left | undocked+stretch | right — flex:1 so it consumes leftover height */}
+      {needsMiddleRow && (
+        <div style={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0, minWidth: 0 }}>
+          {left.length > 0 && renderGroup(left, { flexShrink: 0, alignSelf: "stretch" })}
+          {middleRendered}
+          {/* Right children reversed so the first-declared sits at the rightmost edge */}
+          {right.length > 0 && renderGroup(right.slice().reverse(), { flexShrink: 0, alignSelf: "stretch" })}
+        </div>
+      )}
+
+      {/* Bottom-docked children reversed so the first-declared sits at the very bottom */}
+      {bottom.length > 0 && renderGroup(bottom.slice().reverse(), { flexShrink: 0, width: "100%", minWidth: 0 })}
+    </Stack>
+  );
+}
+
 function renderStack({
   node,
   extractValue,
@@ -230,6 +336,14 @@ function renderStack({
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
+  }
+
+  // If any direct child carries a dock prop, delegate to DockPanel layout.
+  const allChildren = (Array.isArray(node.children) ? node.children : [node.children]).filter(
+    (child) => child != null
+  );
+  if (allChildren.some((child) => (child.props as any)?.dock != null)) {
+    return renderDockLayout({ node, extractValue, className, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi });
   }
 
   // Use FlowLayout when orientation is horizontal and wrapContent is true

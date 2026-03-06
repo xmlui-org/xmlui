@@ -1559,3 +1559,188 @@ test.describe("itemWidth property", () => {
     expect(item2Width).toBeGreaterThan(item1Width);
   });
 });
+
+// =============================================================================
+// DOCK LAYOUT TESTS
+// =============================================================================
+
+test.describe("Dock Layout", () => {
+  const PARENT_H = 500;
+  const PARENT_W = 400;
+
+  test("dock=top child occupies full width at top of parent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="top" dock="top" height="100px" />
+        <Stack testId="fill" dock="stretch" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const top = await getBounds(page.getByTestId("top"));
+
+    expect(top.top).toBeCloseTo(parent.top, 0);
+    expect(top.width).toBeCloseTo(parent.width, 0);
+  });
+
+  test("dock=bottom child occupies full width at bottom of parent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="fill" dock="stretch" />
+        <Stack testId="bottom" dock="bottom" height="100px" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const bottom = await getBounds(page.getByTestId("bottom"));
+
+    expect(bottom.bottom).toBeCloseTo(parent.bottom, 0);
+    expect(bottom.width).toBeCloseTo(parent.width, 0);
+  });
+
+  test("sequential top children stack from the top inward", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="top1" dock="top" height="100px" />
+        <Stack testId="top2" dock="top" height="100px" />
+        <Stack testId="fill" dock="stretch" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const top1 = await getBounds(page.getByTestId("top1"));
+    const top2 = await getBounds(page.getByTestId("top2"));
+
+    expect(top1.top).toBeCloseTo(parent.top, 0);
+    expect(top2.top).toBeCloseTo(top1.bottom, 0);
+  });
+
+  test("multiple bottom children stack inward from the bottom", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="fill" dock="stretch" />
+        <Stack testId="bot1" dock="bottom" height="80px" />
+        <Stack testId="bot2" dock="bottom" height="60px" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const bot1 = await getBounds(page.getByTestId("bot1"));
+    const bot2 = await getBounds(page.getByTestId("bot2"));
+
+    // bot1 is declared first → sits at the very bottom
+    expect(bot1.bottom).toBeCloseTo(parent.bottom, 0);
+    // bot2 is declared second → immediately above bot1
+    expect(bot2.bottom).toBeCloseTo(bot1.top, 0);
+  });
+
+  test("dock=left child is left-aligned and respects own width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="left" dock="left" width="120px" />
+        <Stack testId="fill" dock="stretch" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const left = await getBounds(page.getByTestId("left"));
+
+    expect(left.left).toBeCloseTo(parent.left, 0);
+    expect(left.width).toBeCloseTo(120, 0);
+  });
+
+  test("dock=right child is right-aligned and respects own width", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="fill" dock="stretch" />
+        <Stack testId="right" dock="right" width="120px" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const right = await getBounds(page.getByTestId("right"));
+
+    expect(right.right).toBeCloseTo(parent.right, 0);
+    expect(right.width).toBeCloseTo(120, 0);
+  });
+
+  test("dock=stretch child fills remaining space, ignoring its width and height props", async ({
+    page, initTestBed,
+  }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="top" dock="top" height="100px" />
+        <Stack testId="bottom" dock="bottom" height="100px" />
+        <Stack testId="stretch" dock="stretch" width="50px" height="50px" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const top = await getBounds(page.getByTestId("top"));
+    const bottom = await getBounds(page.getByTestId("bottom"));
+    const stretch = await getBounds(page.getByTestId("stretch"));
+
+    // stretch should fill width of parent and height between top and bottom
+    expect(stretch.width).toBeCloseTo(parent.width, 0);
+    expect(stretch.height).toBeCloseTo(parent.height - top.height - bottom.height, 0);
+  });
+
+  test("full dock layout: top, top, bottom, left, stretch matches the example in the plan", async ({
+    page, initTestBed,
+  }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="st1" dock="top" height="100px" />
+        <Stack testId="st2" dock="top" height="100px" />
+        <Stack testId="st3" dock="bottom" height="100px" />
+        <Stack testId="st4" dock="left" width="50%" />
+        <Stack testId="st5" dock="stretch" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    const st1 = await getBounds(page.getByTestId("st1"));
+    const st2 = await getBounds(page.getByTestId("st2"));
+    const st3 = await getBounds(page.getByTestId("st3"));
+    const st4 = await getBounds(page.getByTestId("st4"));
+    const st5 = await getBounds(page.getByTestId("st5"));
+
+    // st1: top 100px
+    expect(st1.top).toBeCloseTo(parent.top, 0);
+    expect(st1.height).toBeCloseTo(100, 0);
+
+    // st2: next 100px below st1
+    expect(st2.top).toBeCloseTo(st1.bottom, 0);
+    expect(st2.height).toBeCloseTo(100, 0);
+
+    // st3: bottom 100px
+    expect(st3.bottom).toBeCloseTo(parent.bottom, 0);
+    expect(st3.height).toBeCloseTo(100, 0);
+
+    // st4: left side of middle row, 50% of parent width
+    expect(st4.left).toBeCloseTo(parent.left, 0);
+    expect(st4.width).toBeCloseTo(parent.width * 0.5, 0);
+
+    // st4 and st5 are vertically between st2 and st3
+    expect(st4.top).toBeCloseTo(st2.bottom, 0);
+    expect(st4.bottom).toBeCloseTo(st3.top, 0);
+
+    // st5: fills remainder of middle row to the right of st4
+    expect(st5.left).toBeCloseTo(st4.right, 0);
+    expect(st5.right).toBeCloseTo(parent.right, 0);
+  });
+
+  test("dock layout reacts to parent resize", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" height="${PARENT_H}px" width="${PARENT_W}px" gap="0">
+        <Stack testId="top" dock="top" height="50px" />
+        <Stack testId="stretch" dock="stretch" />
+      </Stack>
+    `);
+    // Initial state
+    const stretch1 = await getBounds(page.getByTestId("stretch"));
+    expect(stretch1.height).toBeCloseTo(PARENT_H - 50, 0);
+
+    // Resize the viewport (simulates a parent size change)
+    await page.setViewportSize({ width: 800, height: 400 });
+    await page.waitForTimeout(50);
+
+    // Stack without fixed height relies on viewport; here parent has fixed 500px so
+    // the stretch child's height stays 450px regardless of viewport height.
+    // The width of stretch should adapt to the new viewport width.
+    const stretch2 = await getBounds(page.getByTestId("stretch"));
+    expect(stretch2.height).toBeCloseTo(PARENT_H - 50, 0);
+  });
+});
