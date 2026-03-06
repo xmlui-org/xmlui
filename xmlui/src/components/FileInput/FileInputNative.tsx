@@ -26,9 +26,25 @@ const { useDropzone } = dropzone;
 function toDropzoneAccept(acceptsFileType: string | undefined): Accept | undefined {
   if (!acceptsFileType) return undefined;
 
-  const extensions = acceptsFileType.split(",").map(ext => ext.trim());
-  // Use a wildcard MIME type to accept any file with the specified extensions
-  return { "application/octet-stream": extensions };
+  const items = acceptsFileType.split(",").map(s => s.trim());
+  const result: Accept = {};
+  const extensions: string[] = [];
+
+  for (const item of items) {
+    if (item.includes("/")) {
+      // MIME type (e.g. "image/*", "application/pdf") — use as key directly
+      result[item] = [];
+    } else {
+      // File extension (e.g. ".csv", ".txt")
+      extensions.push(item);
+    }
+  }
+
+  if (extensions.length > 0) {
+    result["application/octet-stream"] = extensions;
+  }
+
+  return Object.keys(result).length > 0 ? result : undefined;
 }
 
 // ============================================================================
