@@ -3,12 +3,12 @@
 ## Overview
 
 The project has approximately **5,929 E2E test cases** spread across:
-- 121 component spec files in `xmlui/src/components/**/`
+- 116 component spec files in `xmlui/src/components/**/`
 - 27 general spec files in `xmlui/tests-e2e/`
 
 Starting an E2E test is expensive (dev-server spin-up, XMLUI parse, browser render). The primary optimization is to **reduce the number of `initTestBed()` calls** by merging tests that can share a single rendered app instance.
 
-The total estimated reduction from the plan below is roughly **1,400–1,700 test cases eliminated** (~25–30% reduction).
+Phases 1–9 are complete, saving approximately **~430 tests**. Phase 10 (below) targets the next ~400+ reduction across the remaining unanalyzed files.
 
 ---
 
@@ -67,447 +67,233 @@ test("all initialValue type edge cases render correctly", async ({ page, initTes
 
 ---
 
-## Phase 1 — tests-e2e Frame-Level Tests
+## Completed Phases Summary (1–9)
 
-**Files:** `xmlui/tests-e2e/`  
-**Estimated reduction:** ~30 tests eliminated  
-**Risk:** Low (small files, clear patterns)
+| Phase | Files | Key merges | Actual reduction |
+|-------|-------|-----------|-----------------|
+| 1 | 4 tests-e2e frame files | breakpoints (17→6), responsive-when inner groups (25→8), data-bindings (8→2), global-vars | ~28 |
+| 2 | 7 Heading files | H1–H6 → HeadingShortcuts (24→6), value-type tests (11→1), size-comparison (5→1) | ~54 |
+| 3 | Text, Icon, Avatar, Br | forEach variant groups, invalid-name (9→1), initials (7→1), br pairs | ~75 |
+| 4 | Checkbox, Switch, DateInput, TimeInput | initialValue type coercion groups | −81 |
+| 5 | NavPanel, NavLink, NavGroup, Link | non-border static prop groups | −16 |
+| 6 | FormItem, NumberBox, TextBox, TextArea, Form | labelPosition, requireLabelMode, resize | −24 |
+| 7 | HStack, VStack, CVStack, CHStack, ContentSeparator | static layout groups | −13 |
+| 8 | App-layout, App-layout-mobile | tall-content 3-test triples → sequential | −120 |
+| 9 | Accordion, Tabs, Slider, Pagination, Tooltip, Drawer, Markdown | border/padding vars, coercion, position | −69 |
+| **Total** | **~47 files** | | **~480** |
 
-### 1.1 `screen-breakpoints.spec.ts` (17 tests → ~6)
-
-All 17 tests use identical markup, differing only in `page.setViewportSize()` width. Group
-by breakpoint tier — one test per tier iterates through 2–3 representative widths.
-
-```
-xs-tier:  3 tests → 1
-sm-tier:  3 tests → 1
-md-tier:  3 tests → 1
-lg-tier:  3 tests → 1
-xl-tier:  3 tests → 1
-xxl-tier: 2 tests → 1
-```
-
-### 1.2 `responsive-when.spec.ts` (the within-describe groups)
-
-The `"when-md only"` describe block has 6 tests — one per viewport — all checking the same
-`when-md="true"` markup. Merge each inner describe block from 4–6 separate viewport tests into
-a single test that loops over viewports:
-
-```
-"when-md only" describe (6 tests) → 1 test
-"base when + when-md" describe (4 tests) → 1 test
-"when-xs + when-md" describe (5 tests) → 1 test
-"when-xs + when-lg" describe (6 tests) → 1 test
-```
-
-The existing `"all combinations"` test and `"base when only"` loop test are already merged —
-keep them as-is.
-
-### 1.3 `data-bindings.spec.ts` (8 tests → ~3)
-
-Six of the eight tests all verify the same final text (`STRING_DATA_FROM_API`) by binding
-data via different mechanisms (inline DataSource, reference, property, url, url-binding).
-Render all binding approaches as separate component instances in a single Fragment, assert
-all six outputs in one test.
-
-### 1.4 `global-variables.spec.ts`
-
-The first two tests (`displays global variable in Text component` and `displays global
-variable from function call`) are pure static renders — merge into one test.
+> **Note on the sequential `initTestBed` pattern** — Phases 1–6 primarily merged tests by
+> rendering multiple component instances in one `initTestBed` call. Phases 7–9 established
+> a second equally powerful pattern: **sequential `initTestBed` calls within one `test()`**.
+> Each call fully re-renders the page, so even tests with different `testThemeVars` can be
+> merged this way. This unlocks the border/padding theme-variable test families that were
+> previously skipped in Phases 3 and 5 (Badge, NoResult, NavPanel, NavLink, Link).
 
 ---
 
-## Phase 2 — Heading Component Family
+## Phase 10 — Remaining High-Value Targets
 
-**Files:** `H1.spec.ts`, `H2.spec.ts`, `H3.spec.ts`, `H4.spec.ts`, `H5.spec.ts`, `H6.spec.ts`,
-`Heading.spec.ts`  
-**Estimated reduction:** ~50 tests eliminated  
-**Risk:** Low
+**Estimated reduction: ~400+ tests**  
+**Risk:** Low–Medium (all are pure property/theme-var variation, no complex state logic)
 
-### 2.1 Merge H1–H6 files entirely (30 tests → 4–5 tests)
+The files below follow the same patterns established in earlier phases. All are mergeable
+using sequential `initTestBed` calls unless noted otherwise.
 
-All 6 files are structurally identical — each has 5 tests:
-1. "renders as hN level heading" — checks rendered tag name
-2. "renders with value property"
-3. "is equivalent to Heading with level='hN'"
-4. "ignores level property"
-5. (some have a 5th)
+### 10.1 `Badge.spec.ts` (108 → ~12, −~96)
 
-**Strategy:** Replace the 6 files with a single `H1-H6.spec.ts` that uses a for-loop or
-`test.describe.each` over `["h1","h2","h3","h4","h5","h6"]`. Within each iteration, render
-all 3 static cases in one `initTestBed`:
+`Badge.spec.ts` contains two large theme-variable describe blocks — **"Theme Vars: Badge"**
+and **"Theme Vars: Pill"** — with an identical test structure to `Accordion.spec.ts`:
 
-```typescript
-for (const level of ["h1", "h2", "h3", "h4", "h5", "h6"]) {
-  const Tag = level.toUpperCase(); // H1, H2, ...
+| Group | Tests | Merge strategy |
+|-------|-------|----------------|
+| "Theme Vars: Badge" border-side tests | border, borderLeft, borderRight, borderHorizontal, borderHorizontal+borderLeft, borderHorizontal+borderRight, borderTop, borderBottom, borderVertical, borderVertical+borderTop, borderVertical+borderBottom ≈ **11 tests → 1** | sequential `initTestBed` with `createBadgeDriver` |
+| "Theme Vars: Badge" border-color tests | border-color, border+border-color, border+border-color-horizontal … bottom ≈ **8 tests → 1** | sequential |
+| "Theme Vars: Badge" border-style tests | border-style, border+border-style, …+horizontal/left/right/vertical/top/bottom ≈ **8 tests → 1** | sequential |
+| "Theme Vars: Badge" border-thickness tests | border-thickness, border+border-thickness, …+horizontal/left/right/vertical/top/bottom ≈ **8 tests → 1** | sequential |
+| "Theme Vars: Badge" padding tests | padding, paddingHorizontal, paddingLeft, paddingRight, paddingVertical, paddingTop, paddingBottom, padding+paddingHorizontal, …+Left, …+Right, …+Vertical, …+Top, …+Bottom ≈ **13 tests → 1** | sequential |
+| "Theme Vars: Pill" (same five groups as Badge) | ≈ **50 tests → 5** | sequential |
+
+The non-theme-var tests (render, colorMap, pill shape, fontSize, fontWeight) are short and
+best left untouched (~8 tests untouched).
+
+### 10.2 `Footer.spec.ts` (54 tests → ~14, −~40)
+
+The "Visual State" describe block mirrors Badge/Accordion's border test structure exactly:
+border-side (11), border-color (8), border-style (8), border-thickness (8) → merge each
+family into one sequential test.
+
+The "sticky property" describe block contains 12 tests for 6 layout × sticky/not-sticky.
+Each test scrolls the page and checks position — these CAN be merged into two sequential
+tests: one for all "sticky by default" layouts, one for all "sticky=false" layouts, since
+each `initTestBed` call resets the scroll state.
+
+### 10.3 `NoResult.spec.ts` (35 → ~3, −~32)
+
+Previously skipped in Phase 3.6 because it uses different `testThemeVars` per test.
+With sequential `initTestBed` calls this is now straightforward — identical structure to
+Accordion's border/padding groups. All 35 border+padding theme-var tests → 3 merged tests
+(border-sides, border-color/style/thickness, padding).
+
+### 10.4 `Select.spec.ts` (122 → ~90, −~32)
 
-  test(`${level}: renders correctly and is equivalent to Heading`, async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App>
-        <${Tag} testId="tag"      value="Hello" />
-        <Heading testId="heading" level="${level}" value="Hello" />
-        <${Tag} testId="ignore"   level="h3" value="Hello" />
-      </App>
-    `);
-    await expect(page.getByTestId("tag")).toHaveText("Hello");
-    await expect(page.getByTestId("heading")).toHaveText("Hello");
-    // tag and heading should produce the same rendered element
-    const tagName = await page.getByTestId("tag").evaluate(el => el.tagName.toLowerCase());
-    expect(tagName).toBe(level);
-    // ignores level override
-    const ignoreTagName = await page.getByTestId("ignore").evaluate(el => el.tagName.toLowerCase());
-    expect(ignoreTagName).toBe(level);
-  });
-}
-```
+Most tests involve user interaction (clicks, keyboard, option selection) and are not
+mergeable. The following groups are safe:
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| Visual State: width tests (px, px+label, %, %+label) | 4 → 1 | 3 |
+| searchable: dropdownHeight tests (custom, default, search+height) | 3 → 1 | 2 |
+| searchable: inProgressNotificationMessage (true, false) | 2 → 1 | 1 |
+| Theme Variables describe block (forEach-generated tests — inspect exact count) | TBD | ~15–25 |
+
+### 10.5 `Stack.spec.ts` (67 → ~45, −~22)
+
+The `Stack` component has scroll-API tests: `scrollToTop`, `scrollToBottom`,
+`scrollToStart`, `scrollToEnd` — each tested with `'smooth'`, `'instant'`, and default
+behavior (3 variants each). These 3-variant groups match the App-layout pattern exactly
+(Phase 8): merge each direction group into one sequential test.
+
+Also: `showScrollerFade` with `overlay`/`whenMouseOver`/`whenScrolling` (3 → 1) and
+`itemWidth` variants (px, %, fit-content, star) (4 → 1).
 
-### 2.2 `Heading.spec.ts` — value-type tests (11 tests → 1)
+### 10.6 `IFrame.spec.ts` (49 → ~28, −~21)
 
-The describe block testing different `value` types (null, undefined, empty string, integer,
-float, boolean, object, array) all render `<Heading value="{X}"/>` and check `toHaveText()`.
-Render all 11 variants with unique testIds in one Fragment, assert all in a single test.
+Pure property-variation tests:
 
-### 2.3 `Heading.spec.ts` — size-comparison tests (5 tests → 1)
-
-All 5 size-comparison tests use the same setup (render all 6 headings together) and check
-`h(n) > h(n+1)`. The setup already renders all 6 headings — just consolidate all 5 assertions
-into a single test.
-
----
-
-## Phase 3 — Simple Display Components
-
-**Files:** `Text.spec.ts`, `Icon.spec.ts`, `Avatar.spec.ts`, `Badge.spec.ts`, `Br.spec.ts`,
-`Bookmark.spec.ts`, `NoResult.spec.ts`, `ProgressBar.spec.ts`  
-**Estimated reduction:** ~120 tests eliminated  
-**Risk:** Low–Medium
-
-### 3.1 `Text.spec.ts` — value-type tests (~90 tests)
-
-The ~13 tests that render `<Text value="{X}"/>` for each value type (undefined, null, empty
-string, integer, float, boolean, object, array) all follow the same pattern. Render all 13
-in one Fragment with unique testIds, assert all.
-
-Additionally, merge the three "renders" tests (no value, with `value` prop, with text content)
-into a single test.
-
-**Estimated:** ~90 tests → ~50 (removing ~40 tests)
-
-### 3.2 `Icon.spec.ts` — invalid name tests (9 tests → 1)
-
-The 9 tests for "handles X name gracefully" (non-existent, empty, null, undefined, special
-chars, unicode, emoji, component-syntax, very-long) all render `<Icon name="X"/>` and assert
-`count() === 0`. Render all 9 instances in one Fragment, assert all counts in one test.
-
-Similarly, the 4 predefined-size tests (xs, sm, md, lg) and 3 custom-size tests (px, em, rem)
-can each be merged into single tests.
-
-**Estimated:** ~62 tests → ~45
-
-### 3.3 `Avatar.spec.ts` — name rendering tests (8 tests → 1)
-
-All 8 "name rendering" tests (empty, symbols, numeric, unicode, single word, three words,
-many words) render `<Avatar name="X"/>` and check initials text. Render all 8 in one Fragment.
-
-Also merge custom-size tests (6 variants) into one test.
-
-**Estimated:** ~97 tests → ~70
-
-### 3.4 `Badge.spec.ts` — border-side tests (~85 tests)
-
-The long runs of `border*` theme variable tests (border, borderLeft, borderRight, borderTop,
-borderBottom, borderHorizontal, borderVertical and all color/style/thickness combos per
-variant) are the primary opportunity. Each test renders the same Badge with one different
-theme var set.
-
-Strategy: Group by variant (badge/pill), render one instance per border-property theme var
-combination with unique testIds, assert all in a few consolidated tests.
-
-**Estimated:** ~113 tests → ~70
-
-### 3.5 `Br.spec.ts` — lowercase/uppercase pairs (7 tests → 4)
-
-Three pairs of tests (`br rendered`, `br with attributes`, `br in text`) each test the same
-behavior for `<br/>` and `<Br/>`. Merge each pair into one test containing both.
-
-### 3.6 `NoResult.spec.ts` — border-side tests
-
-Similar to Badge: ~8 border-side tests can use one `initTestBed` with 8 instances, one
-per theme var. Assert all borders in one test.
-
-**Estimated:** ~35 tests → ~22
-
-### 3.7 `ProgressBar.spec.ts` — edge case value tests (9 tests → 1)
-
-The 9 "Edge Cases" tests (negative value, > 1, NaN, undefined, null, small decimal,
-non-number string, empty string, boolean) all render `<ProgressBar value="{X}"/>` and call
-`getProgressRatio()`. Render all 9 in one Fragment, assert all.
-
-The 7 "Basic Functionality" value tests (0.7, 0, 1, 0.335, string "0.6", no prop) can
-similarly be merged into one test.
-
-**Estimated:** ~21 tests → ~8
-
----
-
-## Phase 4 — Input Components: Type Coercion Tests ✅ COMPLETE (601 → 520, −81)
-
-**Files:** `Checkbox.spec.ts`, `Switch.spec.ts`, `DateInput.spec.ts`, `TimeInput.spec.ts`  
-**Estimated reduction:** ~150–200 tests eliminated  
-**Risk:** Medium (large files, require careful validation after changes)
-
-### 4.1 `Checkbox.spec.ts` — `initialValue` type tests (~25 tests → 1)
-
-The ~25 `initialValue handles X` tests are the biggest single consolidation opportunity in
-this file. Each renders `<Checkbox initialValue="..."/>` with one different value type and
-asserts `toBeChecked()` or `not.toBeChecked()`. Replace with one test that renders ~25
-Checkbox instances in a single `<App>` Fragment, each with a unique testId, assert all
-25 outcomes in one pass.
-
-Similarly merge `component renders`, `component renders with label`, and the first
-`initialValue sets checked state` test into one.
-
-**Estimated:** ~132 tests → ~95
-
-### 4.2 `Switch.spec.ts` — same structure as Checkbox
-
-Identical to Phase 4.1. Apply the exact same strategy.
-
-**Estimated:** ~125 tests → ~90
-
-### 4.3 `DateInput.spec.ts` — dateFormat and initialValue tests (~35 tests → 2)
-
-- **8 `dateFormat` tests** (different format strings): render all 8 DateInput instances with
-  distinct `format` props and unique testIds in one `initTestBed`, assert all displayed values.
-- **~20 `initialValue` graceful-handling tests** (null, undefined, empty, invalid, numeric,
-  object, boolean, etc.): render all 20 instances at once, assert all show empty/cleared.
-
-**Estimated:** ~161 tests → ~120
-
-### 4.4 `TimeInput.spec.ts` — initialValue and combination tests (~25 tests → 2)
-
-- **~20 `initialValue` graceful-handling tests**: same as DateInput strategy.
-- **4 `hour24 × seconds` combination tests**: render all 4 instances at once.
-- **`clearable` true/false pair**: render both in one test.
-
-**Estimated:** ~171 tests → ~130
-
----
-
-## ✅ Phase 5 — Navigation Components: Border Theme Variable Tests — COMPLETE (188 → 172, −16)
-
-**Files:** `NavPanel.spec.ts`, `NavLink.spec.ts`, `NavGroup.spec.ts`, `Link.spec.ts`
-
-**Key finding:** All border tests use different `testThemeVars` per test → cannot merge (same constraint as Badge/NoResult in Phase 3). Merges focused on non-border tests.
-
-**Completed merges:**
-- `Link.spec.ts`: breakMode 5→1, overflowMode simple 4→1, preserveLinebreaks 2→1, ellipses 2→1 (−9)
-- `NavLink.spec.ts`: noIndicator 9→5 (merged active+displayActive+vertical, hover true/false, null+undefined) (−4)
-- `NavGroup.spec.ts`: noIndicator null+undefined 2→1, expandIconAlignment tests 1+2 merged (−2)
-- `NavPanel.spec.ts`: no merges possible (all tests use distinct testThemeVars or navigation interactions)
-
----
-
-## ✅ Phase 6 — Form Components — COMPLETE (687 → 663, −24)
-
-**Files:** `Form.spec.ts` (176, unchanged), `FormItem.spec.ts` (107→95), `NumberBox.spec.ts` (173→165), `TextBox.spec.ts` (115→111), `TextArea.spec.ts` (116→114)
-
-**Completed merges:**
-- `FormItem.spec.ts`: requireLabelMode 6→1 (−5), Type Property 8→1 (−7)
-- `NumberBox.spec.ts`: enabled pair 2→1 (−1), hasSpinBox pair 2→1 (−1), labelPosition 6→1 (−5)
-- `TextBox.spec.ts`: labelPosition 4→1 (−3)
-- `TextArea.spec.ts`: resize 3→1 (−2)
-- `Form.spec.ts`: no merges (all tests involve interactions or different testThemeVars)
-
----
-
-## Phase 7 — Layout Components
-
-**Files:** `Stack.spec.ts`, `HStack.spec.ts`, `VStack.spec.ts`, `CVStack.spec.ts`,
-`CHStack.spec.ts`, `ContentSeparator.spec.ts`, `FlowLayout.spec.ts`  
-**Estimated reduction:** ~40–60 tests eliminated  
-**Risk:** Medium–High (layout tests use `getBounds()` and pixel-precise assertions)
-
-### 7.1 Stack family files (3 tests each → 1 each)
-
-`HStack.spec.ts`, `VStack.spec.ts`, `CVStack.spec.ts`, `CHStack.spec.ts` each have 4 tests
-that can be rendered together in one `initTestBed` call (one instance per variant: empty,
-populated, reversed orientation). The centering/bounds assertions can stay in the same test.
-
-**Estimated:** 4 × 4 tests = 16 tests → 4 tests
-
-### 7.2 `ContentSeparator.spec.ts` — margin theme variable tests (~15 tests → 2–3)
-
-The Theme Variables section has ~15 tests that each set one theme var and assert one margin
-property. Group into 2–3 tests by margin direction (vertical vs horizontal, overrides).
-
-**Estimated:** ~50 tests → ~35
-
-### 7.3 `FlowLayout.spec.ts` (82 tests)
-
-Primarily layout-measurement tests — many call `getBounds()`. The static behavior flag tests
-(wrapping, gap, alignment props) may be consolidatable but require careful review.
-
-**Estimated reduction: low** (~10–15 tests)
-
----
-
-## Phase 8 — App Layout Tests
-
-**Files:** `App-layout.spec.ts` (188 tests), `App-layout-mobile.spec.ts` (193 tests)  
-**Estimated reduction:** ~60–80 tests eliminated  
-**Risk:** High (scroll interaction, pixel-precise positioning — do last)
-
-Both files have the same 32 `test.describe` blocks. Within each describe, there are 4–6
-tests for different scroll positions (top, mid-scroll, bottom, short-content). These are not
-as easily merged because each scroll state requires navigation to a different position.
-
-However, within each describe, the "short content" test (no scrolling needed) and the
-"renders header/nav/main/footer" test could be merged.
-
-Also, many describe blocks test structurally identical combos:
-- 8 Layout × 4 property combos = 32 describes, each having the same test names
-- Consider a cross-describe consolidation: render all 8 layouts simultaneously in one
-  viewport, assert all layout positions at once for the "short content" case.
-
-**Strategy:** Address only the within-describe "static layout" tests (no scroll required)
-in this phase. Leave scroll-dependent tests as-is.
-
----
-
-## Phase 9 — Remaining High-Value Targets
-
-**Files:** `Accordion.spec.ts`, `Tabs.spec.ts`, `Slider.spec.ts`, `Select.spec.ts`,
-`RadioGroup.spec.ts`, `AutoComplete.spec.ts`, `ColorPicker.spec.ts`, `Tooltip.spec.ts`,
-`Drawer.spec.ts`, `Pagination.spec.ts`, `Markdown.spec.ts`  
-**Estimated reduction:** ~80 tests eliminated  
-**Risk:** Mixed
-
-### 9.1 `Accordion.spec.ts` — border/padding theme variable tests (~35 tests → 3–4)
-
-Same pattern as NavPanel. Group all border-side variants, border-color variants,
-border-thickness variants into separate combined tests.
-
-### 9.2 `Tabs.spec.ts` — `tabAlignment` tests (8 tests → 1)
-
-All 8 tabAlignment tests render with a single `tabAlignment` prop value and check CSS.
-
-### 9.3 `Slider.spec.ts` — graceful-handling tests (5 tests → 1)
-
-5 "handles X gracefully" tests (NaN, null, undefined, empty string, "abc") → one test.
-
-### 9.4 `Pagination.spec.ts` — `showPageSizeSelector` coercion tests (8 tests → 1)
-
-8 type-coercion tests for the `showPageSizeSelector` prop → one test with 8 instances.
-
-### 9.5 `Tooltip.spec.ts` — `side` and theme variable tests (4+5=9 tests → 2)
-
-4 `side` position tests and 5 theme variable tests can each be consolidated into one test.
-
-### 9.6 `Markdown.spec.ts` — File Download Attribute tests (6 tests → 1)
-
-6 tests for different link URL patterns (extensions, web pages, query params) → one test.
-
-### 9.7 `Drawer.spec.ts` — `position` tests (4 tests → 1)
-
-The 4 position tests (left/right/top/bottom) open a Drawer and assert position offset.
-These require interaction (click to open) but all use the same interaction sequence — render
-4 drawers with different positions, open each one, assert, close each one.
-
----
-
-## Summary Table
-
-| Phase | Files | Current Tests | Estimated After | Reduction |
-|-------|-------|--------------|-----------------|-----------|
-| 1 | tests-e2e frame tests | ~70 | ~42 | ~28 |
-| 2 | Heading family (7 files) | ~109 | ~55 | ~54 |
-| 3 | Display components (8 files) | ~425 | ~293 | ~132 |
-| 4 | Input type-coercion (4 files) | ~591 | ~435 | ~156 |
-| 5 | Navigation border tests (4 files) | ~207 | ~127 | ~80 |
-| 6 | Form components (5 files) | ~767 | ~668 | ~99 |
-| 7 | Layout components (7 files) | ~353 | ~302 | ~51 |
-| 8 | App layout (2 files) | ~381 | ~321 | ~60 |
-| 9 | Remaining high-value (11 files) | ~456 | ~376 | ~80 |
-| **Total** | | **~3,359** | **~2,619** | **~740** |
-
-> Note: These estimates cover the ~37 files analyzed in detail. The remaining ~111 files
-> (not analyzed here) contain further opportunities but at diminishing returns.
-
----
-
-## Execution Workflow (per step)
-
-Each step follows this exact sequence:
-
-1. **Pre-flight** — Run the affected spec file(s) to confirm they all pass before changes.
-2. **Refactor** — Apply the consolidation (merge tests into fewer `initTestBed` calls).
-3. **Post-flight** — Run the same spec file(s) to confirm all tests still pass.
-4. **Mark complete** — Update this plan (check off the step).
-5. **Request approval** — Pause and ask before moving to the next step.
-
-Progress legend: ⬜ not started · 🔄 in progress · ✅ done
-
----
-
-## Step Checklist
-
-### Phase 1 — tests-e2e Frame-Level Tests
-- ✅ 1.1 `screen-breakpoints.spec.ts` (17 → 6 tests)
-- ✅ 1.2 `responsive-when.spec.ts` inner describe blocks (25 → 8 tests)
-- ✅ 1.3 `data-bindings.spec.ts` (8 → 2 tests)
-- ✅ 1.4 `global-variables.spec.ts` (merged 3 static tests → 1)
-
-### Phase 2 — Heading Component Family
-- ✅ 2.1 Merge H1–H6 into `HeadingShortcuts.spec.ts` (24 → 6 tests)
-- ✅ 2.2 `Heading.spec.ts` value-type tests (11 → 1)
-- ✅ 2.3 `Heading.spec.ts` size-comparison tests (5 → 1)
-
-### Phase 3 — Simple Display Components
-- ✅ 3.1 `Text.spec.ts` variant forEach (23→1), htmlElement forEach (~15→1), value-type forEach (13→1), edge-case forEach (4→1), whitespace pair (2→1) (~53 reduction)
-- ✅ 3.2 `Icon.spec.ts` invalid-name tests (9→1), predefined sizes (4→1), custom sizes (3→1) (~13 reduction)
-- ✅ 3.3 `Avatar.spec.ts` initials tests (7→1) (~6 reduction)
-- ⏸ 3.4 `Badge.spec.ts` — skipped (each test uses different `testThemeVars`; cannot share `initTestBed`)
-- ✅ 3.5 `Br.spec.ts` lowercase/uppercase pairs (6→3) (~3 reduction)
-- ⏸ 3.6 `NoResult.spec.ts` — skipped (same reason as Badge)
-- ⬜ 3.7 `ProgressBar.spec.ts` edge-case value tests (16 → 2)
-
-### Phase 4 — Input Components: Type Coercion Tests
-- ⬜ 4.1 `Checkbox.spec.ts` initialValue type tests (~37 reduction)
-- ⬜ 4.2 `Switch.spec.ts` initialValue type tests (~35 reduction)
-- ⬜ 4.3 `DateInput.spec.ts` dateFormat + initialValue tests (~41 reduction)
-- ⬜ 4.4 `TimeInput.spec.ts` initialValue + combination tests (~41 reduction)
-
-### Phase 5 — Navigation Components: Border Theme Variable Tests
-- ⬜ 5.1 `NavPanel.spec.ts` border tests (~33 reduction)
-- ⬜ 5.2 `NavLink.spec.ts` border tests (~33 reduction)
-- ⬜ 5.3 `Link.spec.ts` border-side tests (~28 reduction)
-- ⬜ 5.4 `NavGroup.spec.ts` noIndicator combination tests (6 → 1)
-
-### Phase 6 — Form Components
-- ⬜ 6.1 `FormItem.spec.ts` type property tests (~23 reduction)
-- ⬜ 6.2 `Form.spec.ts` static property tests (~22 reduction)
-- ⬜ 6.3 `NumberBox.spec.ts` labelPosition and flag tests (~28 reduction)
-- ⬜ 6.4 `TextBox.spec.ts` labelPosition and adornment tests (~14 reduction)
-- ⬜ 6.5 `TextArea.spec.ts` resize option tests (~12 reduction)
-
-### Phase 7 — Layout Components ✅ COMPLETE (−13 tests)
-- ✅ 7.1 HStack/VStack/CVStack/CHStack (12 → 4 tests, −8)
-- ✅ 7.2 `ContentSeparator.spec.ts` Basic Functionality (6→1) + remove 2 redundant fallbacks (−7)
-- ⏭️ 7.3 `FlowLayout.spec.ts` — skipped (complex pixel-precise boundingBox tests, too risky)
-
-### Phase 8 — App Layout Tests ✅ COMPLETE (−120 tests)
-- ✅ 8.1 `App-layout.spec.ts` merge 28 tall-content 3-test triples → 1 sequential each (124 → 68, −56)
-- ✅ 8.2 `App-layout-mobile.spec.ts` same strategy (129 → 65, −64)
-
-### Phase 9 — Remaining High-Value Targets
-- ✅ 9.1 `Accordion.spec.ts` border/padding theme-var tests (47 → 9, −38)
-- ✅ 9.2 `Tabs.spec.ts` tabAlignment tests (60 → 56, −4)
-- ✅ 9.3 `Slider.spec.ts` graceful-handling tests (86 → 82, −4)
-- ✅ 9.4 `Pagination.spec.ts` showPageSizeSelector coercion tests (105 → 98, −7)
-- ✅ 9.5 `Tooltip.spec.ts` side and theme-var tests (26 → 19, −7)
-- ✅ 9.6 `Markdown.spec.ts` File Download Attribute tests (44 → 38, −6)
-- ✅ 9.7 `Drawer.spec.ts` position tests (28 → 25, −3)
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `allow` property (empty, null, undefined) | 3 → 1 | 2 |
+| `name` property (empty, null, undefined, unicode, normal) | 5 → 1 | 4 |
+| `referrerPolicy` values (9 valid policies + null/invalid) | 9 → 1 | 8 |
+| `sandbox` flag combinations (3 cases) | 3 → 1 | 2 |
+| Theme variables (width, height, borderRadius, border — CSS checks) | 4–6 → 1 | ~4 |
+
+### 10.7 `App.spec.ts` (58 → ~43, −~15)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| Layout variants (horizontal, condensed, vertical, vertical-full-header, vertical-sticky, horizontal-sticky, desktop) | 7–8 → 1 | ~6 |
+| Fragment with `when` conditions (false, true, with Theme wrapper) | 3 → 1 | 2 |
+| Drawer hamburger `when` conditions (none, true, {true}, false, {false}) | 5 → 1 | 4 |
+| Layout input validation (unicode dashes, fallback, whitespace, extra spaces) | 4 → 1 | 3 |
+
+### 10.8 `APICall.spec.ts` (88 → ~68, −~20)
+
+`APICall` tests often click a button then wait for a response — but when the interaction
+pattern is identical across variants they can still be merged sequentially.
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| HTTP methods: GET, POST, PUT, DELETE | 4 → 1 | 3 |
+| Context variables: `$param`, `$params`, `$result`, `$error` | 4 → 1 | 3 |
+| Spinner delay values: 0, null, undefined, negative, numeric | 5 → 1 | 4 |
+| `credentials` values: omit, same-origin, include, default | 4 → 1 | 3 |
+| URL variants: absolute, relative, special characters | 3 → 1 | 2 |
+
+### 10.9 Chart files — boolean prop groups (−~50 combined)
+
+All Recharts-based chart files follow the same structure: a `test.describe` per prop, with
+tests for `default` / `true` / (`false when applicable`). Each set is a direct 3→1 merge.
+
+| File | Tests | Mergeable groups | Saves |
+|------|-------|-----------------|-------|
+| `AreaChart.spec.ts` | 62 | hideX, hideY, hideTickX, hideTickY, hideTooltip, showLegend, stacked, curved (3→1 each) | −16 |
+| `BarChart.spec.ts` | 33 | hideX, hideY, hideTickX, hideTickY, stacked, legend, tooltip (2–3→1 each) | −10 |
+| `DonutChart.spec.ts` | 35 | legend (3→1), innerRadius (5→1), showLabel (4→1), showLabelList (3→1) | −11 |
+| `PieChart.spec.ts` | 33 | Similar to BarChart/DonutChart | ~−10 |
+| `RadarChart.spec.ts` | 33 | Similar boolean prop groups | ~−8 |
+| `Legend.spec.ts` | 27 | Property variant groups | ~−5 |
+| `LabelList.spec.ts` | 25 | Property variant groups | ~−5 |
+| `LineChart.spec.ts` | 24 | Similar boolean prop groups | ~−5 |
+
+### 10.10 `Splitter.spec.ts` (51 → ~38, −~13)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `when=false` on children (4 cases) | 4 → 1 | 3 |
+| `orientation` (horizontal, vertical, default) | 3 → 1 | 2 |
+| `initialPrimarySize` (25%, 100px, default 50%) | 3 → 1 | 2 |
+| `floating` prop (true, false) | 2 → 1 | 1 |
+| Size constraint edge cases (null, undefined, invalid) | 3 → 1 | 2 |
+| Theme variables (borderColor, thickness variants, cursor) | 5 → 1–2 | ~3 |
+
+### 10.11 `ScrollViewer.spec.ts` (40 → ~28, −~12)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `scrollStyle` variants (normal, overlay, whenMouseOver, whenScrolling) | 4 → 1 | 3 |
+| `showScrollerFade` (default, true, false) | 3 → 1 | 2 |
+| Invalid `scrollStyle` values (null, undefined, invalid string) | 3 → 1 | 2 |
+| Theme variables (size, backgroundColor-handle, borderRadius, minSize, backgroundColor-track) | 5 → 1 | 4 |
+
+### 10.12 `AutoComplete.spec.ts` (65 → ~50, −~15)
+
+Inspect the Theme Variables section — likely the same forEach validation-status pattern as
+`Select.spec.ts`. Merge each property's 4-variant test group into one sequential test.
+Also: requireLabelMode (6 → 2), validation feedback modes (5 → 2).
+
+### 10.13 `ColorPicker.spec.ts` (64 → ~50, −~14)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `requireLabelMode` variants (markRequired, markOptional, markBoth + form inheritance) | 6 → 2 | 4 |
+| Theme variables (backgroundColor, borderColor, borderRadius, borderWidth, borderStyle, boxShadow, width, height) | 8 → 2 | 6 |
+| `enabled` true/false | 2 → 1 | 1 |
+| Edge cases (invalid color, required, readOnly) | 3 → 1 | 2 |
+
+### 10.14 `RadioGroup.spec.ts` (48 → ~39, −~9)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `initialValue` type variants (string/number/boolean matching/not-matching) | 6 → 2 | 4 |
+| `requireLabelMode` variants | 7 → 2 | 5 |
+
+### 10.15 `DatePicker.spec.ts` (41 → ~33, −~8)
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `requireLabelMode` variants | 7 → 2 | 5 |
+| Validation feedback modes (verbose/concise, icon visibility, tooltip) | 5 → 2 | 3 |
+
+### 10.16 `Table.spec.ts` (159 → ~140, −~19)
+
+Most Table tests use complex interactions (sorting, selection, scrolling). Safe merges:
+
+| Group | Tests | Saves |
+|-------|-------|-------|
+| `hideHeader` true/false | 2 → 1 | 1 |
+| `hideSelectionCheckboxes` true/false | 2 → 1 | 1 |
+| `checkboxTolerance` (compact, none, comfortable, spacious) | 8 → 2 | 6 |
+| `alwaysShowSortingIndicator` true/false | 4 → 2 | 2 |
+| `noDataTemplate` (null, empty, custom) | 3 → 1 | 2 |
+| Width variants (4 layout cases) | 4 → 2 | 2 |
+| Column alignment (horizontal: start, center, end) | 5 → 2 | 3 |
+
+### 10.17 Smaller wins (−~60 combined)
+
+| File | Tests | Target groups | Saves |
+|------|-------|--------------|-------|
+| `ProgressBar.spec.ts` *(leftover from Phase 3.7)* | ~16 | Edge-case values (9→1), basic values (7→1) | ~14 |
+| `Spinner.spec.ts` | ~25 | Delay values (6→1), basic render (3→1), accessibility (2→1), fullScreen (2→1) | ~8 |
+| `ResponsiveBar.spec.ts` | 33 | `dropdownText` (7→1), `dropdownAlignment` (4→1), `reverse` (5→2) | ~9 |
+| `FileInput.spec.ts` | ~35 | Width tests (4→1), `requireLabelMode` (6→2), file type handling (4→1) | ~10 |
+| `TableOfContents.spec.ts` | 33 | `maxHeadingLevel` (3→1), `smoothScrolling` (2→1) | ~3 |
+| `ExpandableItem.spec.ts` | 56 | Icon positions (4→1), accessibility keyboard (6→2) | ~7 |
+| `Carousel.spec.ts` | 41 | Dimension theme vars (4→2) | ~2 |
+| `ContextMenu.spec.ts` | 32 | Alignment (2→1), theme vars (2→1) | ~2 |
+| `Image.spec.ts` | 25 | `fit` property (3→1), lazy loading (3→1) | ~4 |
+
+### Not analyzed (further opportunities at diminishing returns)
+
+The following files have not been analyzed in detail. They likely contain merge opportunities
+but at smaller scale:
+
+`Tree.spec.ts` (139), `Tree-dynamic.spec.ts` (51), `Tree-replace-apis.spec.ts` (~20),
+`Tree-loaded-field.spec.ts` (~15), `List.spec.ts` (67), `Queue.spec.ts` (29),
+`AppState.spec.ts` (16), `CodeBlock.spec.ts` (15), `Button.spec.ts` (24),
+`DropdownMenu.spec.ts` (24), `Option.spec.ts` (31), `Card.spec.ts` (24),
+`RatingInput.spec.ts`, `Backdrop.spec.ts` (10), `ChangeListener.spec.ts` (8),
+`FileUploadDropZone.spec.ts` (37), `HtmlTags.spec.ts`, and others.
 
 ---
 
@@ -515,46 +301,85 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done
 
 ### Creating merged tests
 
-1. **Use unique testIds** for each component instance: `testId="null-case"`, `testId="xs-size"`, etc.
-2. **Add comments** to each assertion explaining which variant it tests.
-3. **Keep test name descriptive** — the merged test name should describe the group:
-   `"handles all invalid initialValue types gracefully"` instead of `"handles null initialValue"`.
-4. **Wrap in `<App>` not `<Fragment>`** when the component needs routing or context.
-5. **Keep failures readable** — if merging makes a failure hard to diagnose, it's too aggressive.
+1. **Sequential `initTestBed` calls** — each call fully re-renders the page. Use this when
+   tests differ only by a theme var (including `testThemeVars`), prop value, or markup variant.
+2. **Parallel instances in one `initTestBed`** — render multiple component instances with
+   unique `testId`s when they can live side-by-side. Use this for simple value-type checks
+   where CSS state doesn't need to be isolated.
+3. **Use `let` instead of `const`** for driver/component variables that are reassigned across
+   sequential `initTestBed` calls: `let component = (await createDriver()).component`.
+4. **Add inline comments** between `initTestBed` blocks to name each variant.
+5. **Keep test names descriptive** — `"applies border-side theme variables"` not `"borderLeft"`.
+6. **Wrap in `<App>` not `<Fragment>`** when the component needs routing or app context.
 
 ### When NOT to merge even though it looks possible
 
-- Tests that check **mutually exclusive CSS states** on the same element (e.g. borderLeft
-  vs borderRight on the same component) → use separate instances with separate testIds
-- Tests whose intended behavior requires a **clean component state** (e.g. form validation
-  state bleeds across sibling instances)
-- Tests that **validate error or warning states** that might visually interact
+- Tests that require **different viewport sizes** per variant and there is no `initTestBed`
+  call between the viewport change and the assertion — must stay separate.
+- Tests whose intended behavior requires a **clean component state** that could bleed across
+  sibling instances in the same render.
+- Tests that **validate error or warning states** that might visually interact with siblings.
+- Very long sequential blocks (>10 `initTestBed` calls) where a failure would be hard to
+  diagnose — consider splitting into 2–3 merged tests instead of one giant one.
 
 ### Running merged tests
 
-After each phase, validate:
-
 ```bash
-# Run the specific spec file(s) that were changed
-npx playwright test path/to/Component.spec.ts --workers=1 --reporter=line
+# Run a single spec file
+npx playwright test path/to/Component.spec.ts --workers=4 --reporter=line
 
-# Final validation with full parallelism
+# Final validation under full parallelism (catches race conditions)
 npx playwright test path/to/Component.spec.ts --workers=10
 ```
 
-Always run with `--workers=10` before considering a phase complete to catch race conditions
-that only appear under parallel execution.
-
 ---
 
-## Execution Order Recommendations
+## Step Checklist
 
-Start with **Phase 1** and **Phase 2** — they have the most predictable outcomes, are small
-files, and produce immediate wins. Use them to validate the approach and build confidence.
+Progress legend: ⬜ not started · 🔄 in progress · ✅ done · ⏸ skipped
 
-Move to **Phase 4** (Checkbox/Switch/DateInput/TimeInput) next — these are the highest single-
-file ROI but require careful handling of the test assertions.
+### Phases 1–9 (Complete)
 
-**Phase 8** (App layout) should be tackled last — it is the most complex and high-risk phase.
+- ✅ Phase 1: tests-e2e frame files (−28)
+- ✅ Phase 2: Heading family — H1–H6 merged, value-types, sizes (−54)
+- ✅ Phase 3: Text, Icon, Avatar, Br forEach/pair groups (−75); Badge and NoResult skipped → revisited in Phase 10; ProgressBar → Phase 10
+- ✅ Phase 4: Checkbox, Switch, DateInput, TimeInput type-coercion groups (−81)
+- ✅ Phase 5: Link, NavLink, NavGroup non-border groups (−16)
+- ✅ Phase 6: FormItem, NumberBox, TextBox, TextArea, Form static groups (−24)
+- ✅ Phase 7: HStack/VStack/CVStack/CHStack, ContentSeparator (−13)
+- ✅ Phase 8: App-layout, App-layout-mobile tall-content triples (−120)
+- ✅ Phase 9: Accordion, Tabs, Slider, Pagination, Tooltip, Drawer, Markdown (−69)
 
-The phases are independent of each other and can be tackled in parallel by different contributors.
+### Phase 10 — Remaining High-Value Targets
+
+- ⬜ 10.1 `Badge.spec.ts` border/padding theme-var tests (~108 → ~12, −~96)
+- ⬜ 10.2 `Footer.spec.ts` border/padding theme-vars + sticky variants (~54 → ~14, −~40)
+- ⬜ 10.3 `NoResult.spec.ts` border/padding theme-var tests (35 → ~3, −~32)
+- ⬜ 10.4 `Select.spec.ts` theme-var + width + inProgress tests (−~30)
+- ⬜ 10.5 `Stack.spec.ts` scroll-API method variants + scrollerFade + itemWidth (−~22)
+- ⬜ 10.6 `IFrame.spec.ts` allow/name/referrerPolicy/sandbox/theme-var groups (−~21)
+- ⬜ 10.7 `App.spec.ts` layout variants, hamburger conditions, input validation (−~15)
+- ⬜ 10.8 `APICall.spec.ts` HTTP methods, context vars, delay, credentials, URL (−~20)
+- ⬜ 10.9 `AreaChart.spec.ts` boolean prop groups (62 → ~46, −~16)
+- ⬜ 10.10 `BarChart.spec.ts` boolean prop groups (33 → ~23, −~10)
+- ⬜ 10.11 `DonutChart.spec.ts` legend/innerRadius/showLabel groups (35 → ~24, −~11)
+- ⬜ 10.12 `PieChart.spec.ts` boolean prop groups (−~10)
+- ⬜ 10.13 `RadarChart.spec.ts` boolean prop groups (−~8)
+- ⬜ 10.14 `Legend.spec.ts` property variant groups (−~5)
+- ⬜ 10.15 `LabelList.spec.ts` property variant groups (−~5)
+- ⬜ 10.16 `LineChart.spec.ts` boolean prop groups (−~5)
+- ⬜ 10.17 `Splitter.spec.ts` orientation/initialPrimarySize/floating/theme-var (−~13)
+- ⬜ 10.18 `ScrollViewer.spec.ts` scrollStyle/showScrollerFade/theme-var (−~12)
+- ⬜ 10.19 `AutoComplete.spec.ts` theme-var + requireLabelMode groups (−~15)
+- ⬜ 10.20 `ColorPicker.spec.ts` requireLabelMode + theme-var + edge cases (−~14)
+- ⬜ 10.21 `RadioGroup.spec.ts` initialValue types + requireLabelMode (−~9)
+- ⬜ 10.22 `DatePicker.spec.ts` requireLabelMode + validation feedback (−~8)
+- ⬜ 10.23 `Table.spec.ts` boolean props + tolerance + alignment groups (−~19)
+- ⬜ 10.24 `ProgressBar.spec.ts` edge-case + basic value groups (−~14)
+- ⬜ 10.25 `Spinner.spec.ts` delay + render + accessibility groups (−~8)
+- ⬜ 10.26 `ResponsiveBar.spec.ts` dropdownText/Alignment/reverse groups (−~9)
+- ⬜ 10.27 `FileInput.spec.ts` width/requireLabelMode/fileType groups (−~10)
+- ⬜ 10.28 `TableOfContents.spec.ts` maxHeadingLevel/smoothScrolling (−~3)
+- ⬜ 10.29 `ExpandableItem.spec.ts` icon positions + keyboard accessibility (−~7)
+- ⬜ 10.30 Remaining smaller files (Image, Carousel, ContextMenu, …) (−~10)
+
