@@ -26,190 +26,82 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("transformToLegitValue Input Type Tests", () => {
-    // Boolean values
-    test("initialValue handles boolean true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{true}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles boolean false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{false}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    // Undefined and null values
-    test("initialValue handles undefined as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{undefined}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles null as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{null}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    // Number values
-    test("initialValue handles number 0 as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{0}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles positive number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{1}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles negative number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{-1}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles decimal number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{3.14}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles NaN as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{NaN}" />`);
-      // NaN is treated as true due to JavaScript evaluation context
-      // In XMLUI context, NaN is passed through differently than expected
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    // String values
-    test("initialValue handles empty string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles whitespace-only string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="   " />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'false' as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="false" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'FALSE' as false (case insensitive)", async ({
+    test("initialValue handles various deterministic input types", async ({
       initTestBed,
       page,
     }) => {
-      await initTestBed(`<Checkbox initialValue="FALSE" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
+      await initTestBed(`
+        <Fragment>
+          <Checkbox testId="cb0" initialValue="{true}" />
+          <Checkbox testId="cb1" initialValue="{false}" />
+          <Checkbox testId="cb2" initialValue="{undefined}" />
+          <Checkbox testId="cb3" initialValue="{null}" />
+          <Checkbox testId="cb4" initialValue="{0}" />
+          <Checkbox testId="cb5" initialValue="{1}" />
+          <Checkbox testId="cb6" initialValue="{-1}" />
+          <Checkbox testId="cb7" initialValue="{3.14}" />
+          <Checkbox testId="cb8" initialValue="{NaN}" />
+          <Checkbox testId="cb9" initialValue="" />
+          <Checkbox testId="cb10" initialValue="   " />
+          <Checkbox testId="cb11" initialValue="false" />
+          <Checkbox testId="cb12" initialValue="FALSE" />
+          <Checkbox testId="cb13" initialValue="true" />
+          <Checkbox testId="cb14" initialValue="yes" />
+          <Checkbox testId="cb15" initialValue="not false" />
+          <Checkbox testId="cb16" initialValue="{Infinity}" />
+          <Checkbox testId="cb17" initialValue="{-Infinity}" />
+        </Fragment>
+      `);
+      // Boolean values
+      await expect(page.getByTestId("cb0")).toBeChecked();
+      await expect(page.getByTestId("cb1")).not.toBeChecked();
+      // Undefined and null
+      await expect(page.getByTestId("cb2")).not.toBeChecked();
+      await expect(page.getByTestId("cb3")).not.toBeChecked();
+      // Number values
+      await expect(page.getByTestId("cb4")).not.toBeChecked();
+      await expect(page.getByTestId("cb5")).toBeChecked();
+      await expect(page.getByTestId("cb6")).toBeChecked();
+      await expect(page.getByTestId("cb7")).toBeChecked();
+      // NaN is treated as true in XMLUI context
+      await expect(page.getByTestId("cb8")).toBeChecked();
+      // String values
+      await expect(page.getByTestId("cb9")).not.toBeChecked();
+      await expect(page.getByTestId("cb10")).not.toBeChecked();
+      await expect(page.getByTestId("cb11")).not.toBeChecked();
+      await expect(page.getByTestId("cb12")).not.toBeChecked();
+      await expect(page.getByTestId("cb13")).toBeChecked();
+      await expect(page.getByTestId("cb14")).toBeChecked();
+      await expect(page.getByTestId("cb15")).toBeChecked();
+      // Edge cases
+      await expect(page.getByTestId("cb16")).toBeChecked();
+      await expect(page.getByTestId("cb17")).toBeChecked();
     });
 
-    test("initialValue handles string 'true' as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="true" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles non-empty string as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="yes" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles string with content and 'false' as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Checkbox initialValue="not false" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    // Array values
-    test("initialValue handles empty array as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{[]}" />`);
-      // Empty arrays may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with elements as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{[1, 2, 3]}" />`);
-      // Arrays with elements may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with complex array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with single element as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Checkbox initialValue="{['item']}" />`);
-      // Arrays may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Object values
-    test("initialValue handles empty object as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{}}" />`);
-      // Empty objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles object with properties as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{a: 'b'}}" />`);
-      // Objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles complex object as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{name: 'test', value: 123}}" />`);
-      // Complex objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with complex object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Edge case values
-    test("initialValue handles Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{Infinity}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles negative Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{-Infinity}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
+    test("initialValue handles array and object values", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Fragment>
+          <Checkbox testId="ca0" initialValue="{[]}" />
+          <Checkbox testId="ca1" initialValue="{[1, 2, 3]}" />
+          <Checkbox testId="ca2" initialValue="{['item']}" />
+          <Checkbox testId="co0" initialValue="{{}}" />
+          <Checkbox testId="co1" initialValue="{{a: 'b'}}" />
+          <Checkbox testId="co2" initialValue="{{name: 'test', value: 123}}" />
+        </Fragment>
+      `);
+      // Arrays and objects may cause the component to not render - that is acceptable
+      const ca0 = page.getByTestId("ca0");
+      if ((await ca0.count()) > 0) await expect(ca0).not.toBeChecked();
+      const ca1 = page.getByTestId("ca1");
+      if ((await ca1.count()) > 0) await expect(ca1).toBeChecked();
+      const ca2 = page.getByTestId("ca2");
+      if ((await ca2.count()) > 0) await expect(ca2).toBeChecked();
+      const co0 = page.getByTestId("co0");
+      if ((await co0.count()) > 0) await expect(co0).not.toBeChecked();
+      const co1 = page.getByTestId("co1");
+      if ((await co1.count()) > 0) await expect(co1).toBeChecked();
+      const co2 = page.getByTestId("co2");
+      if ((await co2.count()) > 0) await expect(co2).toBeChecked();
     });
   });
 

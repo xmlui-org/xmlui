@@ -582,12 +582,18 @@ test.describe("noIndicator property", () => {
     expect(afterElement.height).toBe("5px");
   });
 
-  test("handles null value for noIndicator", async ({ initTestBed, page }) => {
+  test("null and undefined noIndicator treated as false (indicator shown)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(
       `
       <App layout="vertical">
         <NavPanel>
-          <NavGroup label="Pages" noIndicator="{null}">
+          <NavGroup label="PagesNull" noIndicator="{null}">
+            <NavLink label="Page 1" />
+          </NavGroup>
+          <NavGroup label="PagesUndef" noIndicator="{undefined}">
             <NavLink label="Page 1" />
           </NavGroup>
         </NavPanel>
@@ -600,93 +606,38 @@ test.describe("noIndicator property", () => {
       },
     );
 
-    const navGroupButton = page.getByRole("button", { name: "Pages" });
-    await navGroupButton.hover();
-
-    const afterElement = await navGroupButton.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
-
-    // Null should be treated as false (default), so indicator should be shown
-    expect(afterElement.content).toBe('""');
-  });
-
-  test("handles undefined value for noIndicator", async ({ initTestBed, page }) => {
-    await initTestBed(
-      `
-      <App layout="vertical">
-        <NavPanel>
-          <NavGroup label="Pages" noIndicator="{undefined}">
-            <NavLink label="Page 1" />
-          </NavGroup>
-        </NavPanel>
-      </App>
-    `,
-      {
-        testThemeVars: {
-          "thickness-indicator-NavLink": "4px",
-        },
-      },
-    );
-
-    const navGroupButton = page.getByRole("button", { name: "Pages" });
-    await navGroupButton.hover();
-
-    const afterElement = await navGroupButton.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
-
-    // Undefined should be treated as false (default), so indicator should be shown
-    expect(afterElement.content).toBe('""');
+    for (const name of ["PagesNull", "PagesUndef"]) {
+      const btn = page.getByRole("button", { name });
+      await btn.hover();
+      const content = await btn.evaluate((el) => window.getComputedStyle(el, "::after").content);
+      expect(content).toBe('""');
+    }
   });
 });
 
 // EXPAND ICON ALIGNMENT TESTS
 test.describe("Expand Icon Alignment", () => {
-  test("renders with default expandIconAlignment (start)", async ({
+  test("renders with default and 'end' expandIconAlignment", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(`
       <App layout="vertical">
         <NavPanel>
-          <NavGroup testId="navGroup" label="Pages">
+          <NavGroup testId="navGroupDefault" label="PagesDefault">
+            <NavLink label="Page 1" />
+          </NavGroup>
+          <NavGroup testId="navGroupEnd" label="PagesEnd" expandIconAlignment="end">
             <NavLink label="Page 1" />
           </NavGroup>
         </NavPanel>
       </App>
     `);
 
-    const navGroup = page.getByTestId("navGroup");
-    await expect(navGroup).toBeVisible();
-
-    // Verify the button structure exists
-    const button = page.getByRole("button", { name: "Pages" });
-    await expect(button).toBeVisible();
-  });
-
-  test("renders with expandIconAlignment='end'", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <App layout="vertical">
-        <NavPanel>
-          <NavGroup testId="navGroup" label="Pages" expandIconAlignment="end">
-            <NavLink label="Page 1" />
-          </NavGroup>
-        </NavPanel>
-      </App>
-    `);
-
-    const navGroup = page.getByTestId("navGroup");
-    await expect(navGroup).toBeVisible();
-
-    const button = page.getByRole("button", { name: "Pages" });
-    await expect(button).toBeVisible();
+    await expect(page.getByTestId("navGroupDefault")).toBeVisible();
+    await expect(page.getByTestId("navGroupEnd")).toBeVisible();
+    await expect(page.getByRole("button", { name: "PagesDefault" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "PagesEnd" })).toBeVisible();
   });
 
   test("icon positioning differs between start and end alignment", async ({

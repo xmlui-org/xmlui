@@ -250,7 +250,7 @@ similarly be merged into one test.
 
 ---
 
-## Phase 4 — Input Components: Type Coercion Tests
+## Phase 4 — Input Components: Type Coercion Tests ✅ COMPLETE (601 → 520, −81)
 
 **Files:** `Checkbox.spec.ts`, `Switch.spec.ts`, `DateInput.spec.ts`, `TimeInput.spec.ts`  
 **Estimated reduction:** ~150–200 tests eliminated  
@@ -294,40 +294,17 @@ Identical to Phase 4.1. Apply the exact same strategy.
 
 ---
 
-## Phase 5 — Navigation Components: Border Theme Variable Tests
+## ✅ Phase 5 — Navigation Components: Border Theme Variable Tests — COMPLETE (188 → 172, −16)
 
-**Files:** `NavPanel.spec.ts`, `NavLink.spec.ts`, `NavGroup.spec.ts`, `Link.spec.ts`  
-**Estimated reduction:** ~100 tests eliminated  
-**Risk:** Medium
+**Files:** `NavPanel.spec.ts`, `NavLink.spec.ts`, `NavGroup.spec.ts`, `Link.spec.ts`
 
-### 5.1 `NavPanel.spec.ts` — border tests (~35 tests → 2–3)
+**Key finding:** All border tests use different `testThemeVars` per test → cannot merge (same constraint as Badge/NoResult in Phase 3). Merges focused on non-border tests.
 
-The ~35 border theme variable tests (border, borderLeft, borderRight, borderColor,
-borderHorizontal, borderVertical, borderTop, borderBottom and all thickness/style/color
-variants per side) share exactly the same structure: set one theme var, assert one border
-CSS property.
-
-Strategy: Group by test purpose:
-1. Merge all "which sides get the border" tests (7 side tests) into one test with 7 instances.
-2. Merge all "border color controls" tests into one test.
-3. Merge all "border style controls" tests into one test.
-
-### 5.2 `NavLink.spec.ts` — same structure as NavPanel
-
-Apply identical strategy to the ~35 border tests.
-
-The `noIndicator` true/false/default static triple can be merged into one test.
-
-### 5.3 `Link.spec.ts` — border-side tests
-
-Same pattern: ~8+ border-side tests can be merged (render 8 Link instances simultaneously).
-
-**Estimated:** ~73 tests → ~45
-
-### 5.4 `NavGroup.spec.ts` — noIndicator combination tests (6 tests → 1)
-
-The 6 `noIndicator` tests (true/false/default × vertical/horizontal layout) are static
-renders with no interaction. Render all 6 instances in one Fragment, assert all.
+**Completed merges:**
+- `Link.spec.ts`: breakMode 5→1, overflowMode simple 4→1, preserveLinebreaks 2→1, ellipses 2→1 (−9)
+- `NavLink.spec.ts`: noIndicator 9→5 (merged active+displayActive+vertical, hover true/false, null+undefined) (−4)
+- `NavGroup.spec.ts`: noIndicator null+undefined 2→1, expandIconAlignment tests 1+2 merged (−2)
+- `NavPanel.spec.ts`: no merges possible (all tests use distinct testThemeVars or navigation interactions)
 
 ---
 
@@ -525,12 +502,12 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done
 - ✅ 2.3 `Heading.spec.ts` size-comparison tests (5 → 1)
 
 ### Phase 3 — Simple Display Components
-- ⬜ 3.1 `Text.spec.ts` value-type tests (~40 reduction)
-- ⬜ 3.2 `Icon.spec.ts` invalid-name and size tests (~17 reduction)
-- ⬜ 3.3 `Avatar.spec.ts` name-rendering and size tests (~27 reduction)
-- ⬜ 3.4 `Badge.spec.ts` border theme-var tests (~43 reduction)
-- ⬜ 3.5 `Br.spec.ts` lowercase/uppercase pairs (7 → 4)
-- ⬜ 3.6 `NoResult.spec.ts` border-side tests (~13 reduction)
+- ✅ 3.1 `Text.spec.ts` variant forEach (23→1), htmlElement forEach (~15→1), value-type forEach (13→1), edge-case forEach (4→1), whitespace pair (2→1) (~53 reduction)
+- ✅ 3.2 `Icon.spec.ts` invalid-name tests (9→1), predefined sizes (4→1), custom sizes (3→1) (~13 reduction)
+- ✅ 3.3 `Avatar.spec.ts` initials tests (7→1) (~6 reduction)
+- ⏸ 3.4 `Badge.spec.ts` — skipped (each test uses different `testThemeVars`; cannot share `initTestBed`)
+- ✅ 3.5 `Br.spec.ts` lowercase/uppercase pairs (6→3) (~3 reduction)
+- ⏸ 3.6 `NoResult.spec.ts` — skipped (same reason as Badge)
 - ⬜ 3.7 `ProgressBar.spec.ts` edge-case value tests (16 → 2)
 
 ### Phase 4 — Input Components: Type Coercion Tests
