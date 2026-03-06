@@ -55,14 +55,15 @@ test.describe("Basic Functionality", () => {
 
   // --- enabled prop
 
-  test("enabled=false disables control", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox enabled="false" />`);
-    await expect(page.getByRole("textbox")).toBeDisabled();
-  });
-
-  test("enabled=true enables control", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox enabled="true" />`);
-    await expect(page.getByRole("textbox")).not.toBeDisabled();
+  test("enabled prop enables or disables control", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox testId="nb-disabled" enabled="false" />
+        <NumberBox testId="nb-enabled" enabled="true" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("nb-disabled").getByRole("textbox")).toBeDisabled();
+    await expect(page.getByTestId("nb-enabled").getByRole("textbox")).not.toBeDisabled();
   });
 
   test("disabled input field stops user interaction for spinbox", async ({
@@ -161,29 +162,21 @@ test.describe("Basic Functionality", () => {
 
   // --- hasSpinBox prop
 
-  test("hasSpinBox=true renders spinbox", async ({ initTestBed, page }) => {
+  test("hasSpinBox shows or hides spinbox controls", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox hasSpinBox="true" />`);
-    // Look for spinner container or buttons
     const spinnerContainer = page.locator(".spinnerBox, .spinner, [class*='spin']").first();
     const spinButtons = page.locator("button");
-
     const hasSpinnerContainer = await spinnerContainer.isVisible().catch(() => false);
     const hasSpinButtons = (await spinButtons.count()) > 0;
-
     expect(hasSpinnerContainer || hasSpinButtons).toBe(true);
-  });
 
-  test("hasSpinBox=false hides spinbox", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox hasSpinBox="false" />`);
-    // When hasSpinBox is false, spinner should not be visible
-    const spinnerContainer = page.locator(".spinnerBox, .spinner, [class*='spin']").first();
-    const spinButtons = page.locator("button");
-
-    const hasSpinnerContainer = await spinnerContainer.isVisible().catch(() => false);
-    const spinButtonCount = await spinButtons.count();
-
-    expect(hasSpinnerContainer).toBe(false);
-    expect(spinButtonCount).toBe(0);
+    const spinnerOff = page.locator(".spinnerBox, .spinner, [class*='spin']").first();
+    const spinButtonsOff = page.locator("button");
+    const offVisible = await spinnerOff.isVisible().catch(() => false);
+    const offCount = await spinButtonsOff.count();
+    expect(offVisible).toBe(false);
+    expect(offCount).toBe(0);
   });
 
   // --- step prop with spinbox
@@ -362,52 +355,41 @@ test.describe("Label", () => {
     await expect(page.getByRole("textbox")).toBeFocused();
   });
 
-  test("labelPosition=start positions label before input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox direction="ltr" label="Label" labelPosition="start" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
+  test("labelPosition places label correctly for all positions and directions", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox testId="nb-sl" direction="ltr" label="StartLTR" labelPosition="start" />
+        <NumberBox testId="nb-el" direction="ltr" label="EndLTR" labelPosition="end" />
+        <NumberBox testId="nb-sr" direction="rtl" label="StartRTL" labelPosition="start" />
+        <NumberBox testId="nb-er" direction="rtl" label="EndRTL" labelPosition="end" />
+        <NumberBox testId="nb-top" label="Top" labelPosition="top" />
+        <NumberBox testId="nb-bot" label="Bottom" labelPosition="bottom" />
+      </Fragment>
+    `);
 
-    expect(labelBox.right).toBeLessThan(inputBox.left);
-  });
+    const slLabel = await getBounds(page.getByText("StartLTR"));
+    const slInput = await getBounds(page.getByTestId("nb-sl").getByRole("textbox"));
+    expect(slLabel.right).toBeLessThan(slInput.left);
 
-  test("labelPosition=end positions label after input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox direction="ltr" label="Label" labelPosition="end" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
+    const elLabel = await getBounds(page.getByText("EndLTR"));
+    const elInput = await getBounds(page.getByTestId("nb-el").getByRole("textbox"));
+    expect(elLabel.left).toBeGreaterThan(elInput.right);
 
-    expect(labelBox.left).toBeGreaterThan(inputBox.right);
-  });
+    const srLabel = await getBounds(page.getByText("StartRTL"));
+    const srInput = await getBounds(page.getByTestId("nb-sr").getByRole("textbox"));
+    expect(srLabel.left).toBeGreaterThan(srInput.right);
 
-  test("labelPosition=start positions label before input (rtl)", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox direction="rtl" label="Label" labelPosition="start" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
+    const erLabel = await getBounds(page.getByText("EndRTL"));
+    const erInput = await getBounds(page.getByTestId("nb-er").getByRole("textbox"));
+    expect(erLabel.right).toBeLessThan(erInput.left);
 
-    expect(labelBox.left).toBeGreaterThan(inputBox.right);
-  });
+    const topLabel = await getBounds(page.getByText("Top"));
+    const topInput = await getBounds(page.getByTestId("nb-top").getByRole("textbox"));
+    expect(topLabel.bottom).toBeLessThan(topInput.top);
 
-  test("labelPosition=end positions label after input (rtl)", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox direction="rtl" label="Label" labelPosition="end" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
-
-    expect(labelBox.right).toBeLessThan(inputBox.left);
-  });
-
-  test("labelPosition=top positions label above input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Label" labelPosition="top" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
-
-    expect(labelBox.bottom).toBeLessThan(inputBox.top);
-  });
-
-  test("labelPosition=bottom positions label below input", async ({ initTestBed, page }) => {
-    await initTestBed(`<NumberBox label="Label" labelPosition="bottom" />`);
-    const labelBox = await getBounds(page.getByText("Label"));
-    const inputBox = await getBounds(page.getByRole("textbox"));
-
-    expect(labelBox.top).toBeGreaterThan(inputBox.bottom);
+    const botLabel = await getBounds(page.getByText("Bottom"));
+    const botInput = await getBounds(page.getByTestId("nb-bot").getByRole("textbox"));
+    expect(botLabel.top).toBeGreaterThan(botInput.bottom);
   });
 
   test("labelWidth applies custom label width", async ({ initTestBed, page }) => {

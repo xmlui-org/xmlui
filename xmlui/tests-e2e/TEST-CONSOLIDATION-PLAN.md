@@ -308,54 +308,16 @@ Identical to Phase 4.1. Apply the exact same strategy.
 
 ---
 
-## Phase 6 — Form Components
+## ✅ Phase 6 — Form Components — COMPLETE (687 → 663, −24)
 
-**Files:** `Form.spec.ts`, `FormItem.spec.ts`, `NumberBox.spec.ts`, `TextBox.spec.ts`,
-`TextArea.spec.ts`  
-**Estimated reduction:** ~100 tests eliminated  
-**Risk:** Medium
+**Files:** `Form.spec.ts` (176, unchanged), `FormItem.spec.ts` (107→95), `NumberBox.spec.ts` (173→165), `TextBox.spec.ts` (115→111), `TextArea.spec.ts` (116→114)
 
-### 6.1 `FormItem.spec.ts` — `type` property tests (8 tests → 1)
-
-All 8 tests render `<FormItem type="X">` with different type values (text, password, number,
-integer, textarea, checkbox, select, radio) and assert the rendered input type. Render all 8
-FormItem instances in one Fragment, assert all input types in one test.
-
-Also: the 6 `requireLabelMode` variant tests are static label renders — merge into one.
-
-**Estimated:** ~118 tests → ~95
-
-### 6.2 `Form.spec.ts` — static property tests
-
-- `hideButtonRow` true/false/default (3 tests → 1)
-- `enableSubmit` graceful handling (3 tests → 1)
-- `itemRequireLabelMode` × required/optional (6 tests → 1)
-- `itemLabelPosition` (already loop-generated — check if still separated)
-
-**Estimated:** ~197 tests → ~175
-
-### 6.3 `NumberBox.spec.ts` — labelPosition tests (6 tests → 1)
-
-The 6 `labelPosition` tests (start/end/top/bottom × RTL/LTR) each render with a single
-prop and assert one CSS rule. Render all 6 instances in one Fragment.
-
-Also: `hasSpinBox` true/false pair → one test; `enabled` true/false pair → one test.
-
-**Estimated:** ~188 tests → ~160
-
-### 6.4 `TextBox.spec.ts` — labelPosition and adornment tests
-
-- 4 `labelPosition` tests → 1
-- 4 input adornment tests (startText, endText, startIcon, endIcon) → 1
-
-**Estimated:** ~132 tests → ~118
-
-### 6.5 `TextArea.spec.ts` — resize option tests (4 tests → 1)
-
-The 4 `resize` option tests (horizontal, vertical, both, none) each set one `resize` prop
-value and check CSS. Render all 4 instances simultaneously.
-
-**Estimated:** ~132 tests → ~120
+**Completed merges:**
+- `FormItem.spec.ts`: requireLabelMode 6→1 (−5), Type Property 8→1 (−7)
+- `NumberBox.spec.ts`: enabled pair 2→1 (−1), hasSpinBox pair 2→1 (−1), labelPosition 6→1 (−5)
+- `TextBox.spec.ts`: labelPosition 4→1 (−3)
+- `TextArea.spec.ts`: resize 3→1 (−2)
+- `Form.spec.ts`: no merges (all tests involve interactions or different testThemeVars)
 
 ---
 

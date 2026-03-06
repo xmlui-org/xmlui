@@ -210,48 +210,35 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Label", () => {
-  test("labelPosition=start positions label before input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="start" />`);
+  test("labelPosition places label correctly in all positions", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextBox testId="lp-start" direction="ltr" label="test" labelPosition="start" />
+        <TextBox testId="lp-end" direction="ltr" label="test" labelPosition="end" />
+        <TextBox testId="lp-top" label="test" labelPosition="top" />
+        <TextBox testId="lp-bottom" label="test" labelPosition="bottom" />
+      </Fragment>
+    `);
 
-    const driver = await createTextBoxDriver("test");
+    const startDriver = await createTextBoxDriver("lp-start");
+    const { left: startInputLeft } = await getBounds(startDriver.input);
+    const { right: startLabelRight } = await getBounds(startDriver.label);
+    expect(startLabelRight).toBeLessThan(startInputLeft);
 
-    const { left: textboxLeft } = await getBounds(driver.input);
-    const { right: labelRight } = await getBounds(driver.label);
+    const endDriver = await createTextBoxDriver("lp-end");
+    const { right: endInputRight } = await getBounds(endDriver.input);
+    const { left: endLabelLeft } = await getBounds(endDriver.label);
+    expect(endLabelLeft).toBeGreaterThan(endInputRight);
 
-    expect(labelRight).toBeLessThan(textboxLeft);
-  });
+    const topDriver = await createTextBoxDriver("lp-top");
+    const { top: topInputTop } = await getBounds(topDriver.input);
+    const { bottom: topLabelBottom } = await getBounds(topDriver.label);
+    expect(topLabelBottom).toBeLessThan(topInputTop);
 
-  test("labelPosition=end positions label after input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="end" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { right: textboxRight } = await getBounds(driver.input);
-    const { left: labelLeft } = await getBounds(driver.label);
-
-    expect(labelLeft).toBeGreaterThan(textboxRight);
-  });
-
-  test("labelPosition=top positions label above input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" label="test" labelPosition="top" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { top: textboxTop } = await getBounds(driver.input);
-    const { bottom: labelBottom } = await getBounds(driver.label);
-
-    expect(labelBottom).toBeLessThan(textboxTop);
-  });
-
-  test("labelPosition=bottom positions label below input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" label="test" labelPosition="bottom" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { bottom: textboxBottom } = await getBounds(driver.input);
-    const { top: labelTop } = await getBounds(driver.label);
-
-    expect(labelTop).toBeGreaterThan(textboxBottom);
+    const bottomDriver = await createTextBoxDriver("lp-bottom");
+    const { bottom: bottomInputBottom } = await getBounds(bottomDriver.input);
+    const { top: bottomLabelTop } = await getBounds(bottomDriver.label);
+    expect(bottomLabelTop).toBeGreaterThan(bottomInputBottom);
   });
 
   test("labelBreak enables label line breaks", async ({ initTestBed, createTextBoxDriver }) => {
