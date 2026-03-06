@@ -185,7 +185,8 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("drawerContent")).toBeVisible();
   });
 
-  test("position='left' renders drawer from left edge", async ({ page, initTestBed }) => {
+  test("renders drawer from correct edge for all positions", async ({ page, initTestBed }) => {
+    // left
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -194,14 +195,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    let dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("left", "0px");
-  });
 
-  test("position='right' renders drawer from right edge", async ({ page, initTestBed }) => {
+    // right
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -210,14 +209,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("right", "0px");
-  });
 
-  test("position='top' renders drawer from top edge", async ({ page, initTestBed }) => {
+    // top
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -226,14 +223,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("top", "0px");
-  });
 
-  test("position='bottom' renders drawer from bottom edge", async ({ page, initTestBed }) => {
+    // bottom
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -242,9 +237,8 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("bottom", "0px");
   });

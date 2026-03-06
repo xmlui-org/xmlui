@@ -501,13 +501,13 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done
 - ✅ 8.2 `App-layout-mobile.spec.ts` same strategy (129 → 65, −64)
 
 ### Phase 9 — Remaining High-Value Targets
-- ⬜ 9.1 `Accordion.spec.ts` border/padding theme-var tests (~35 reduction)
-- ⬜ 9.2 `Tabs.spec.ts` tabAlignment tests (8 → 1)
-- ⬜ 9.3 `Slider.spec.ts` graceful-handling tests (5 → 1)
-- ⬜ 9.4 `Pagination.spec.ts` showPageSizeSelector coercion tests (8 → 1)
-- ⬜ 9.5 `Tooltip.spec.ts` side and theme-var tests (~9 reduction)
-- ⬜ 9.6 `Markdown.spec.ts` File Download Attribute tests (6 → 1)
-- ⬜ 9.7 `Drawer.spec.ts` position tests (4 → 1)
+- ✅ 9.1 `Accordion.spec.ts` border/padding theme-var tests (47 → 9, −38)
+- ✅ 9.2 `Tabs.spec.ts` tabAlignment tests (60 → 56, −4)
+- ✅ 9.3 `Slider.spec.ts` graceful-handling tests (86 → 82, −4)
+- ✅ 9.4 `Pagination.spec.ts` showPageSizeSelector coercion tests (105 → 98, −7)
+- ✅ 9.5 `Tooltip.spec.ts` side and theme-var tests (26 → 19, −7)
+- ✅ 9.6 `Markdown.spec.ts` File Download Attribute tests (44 → 38, −6)
+- ✅ 9.7 `Drawer.spec.ts` position tests (28 → 25, −3)
 
 ---
 
