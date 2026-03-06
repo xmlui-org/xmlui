@@ -28,42 +28,16 @@ test.describe("Responsive when-* attributes", () => {
   // when-md="true" — Tailwind mobile-first semantics
   // ---------------------------------------------------------------------------
   test.describe("when-md only", () => {
-    const MARKUP = `<Text testId="t" value="hello" when-md="true" />`;
-
-    test("visible at xs (no responsive rule — falls back to base when, which is undefined → visible)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xs);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at sm (no responsive rule — falls back to base when, which is undefined → visible)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.sm);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at md (matches when-md)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.md);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at lg (inherits from when-md below)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.lg);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at xl (inherits from when-md below)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xl);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at xxl (inherits from when-md below)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xxl);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
+    // Below md: no responsive rule matches → falls back to base when (undefined → visible).
+    // At md+: when-md="true" matches → visible.
+    // Result: visible at ALL breakpoints.
+    test("visible at all breakpoints", async ({ page, initTestBed }) => {
+      const MARKUP = `<Text testId="t" value="hello" when-md="true" />`;
+      for (const vp of Object.values(VP)) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).toBeVisible();
+      }
     });
   });
 
@@ -71,36 +45,20 @@ test.describe("Responsive when-* attributes", () => {
   // when="true" when-md="false" — below md falls back to base when=true (visible)
   // ---------------------------------------------------------------------------
   test.describe("base when + when-md override", () => {
-    const MARKUP = `<Text testId="t" value="hello" when="true" when-md="{false}" />`;
-
-    test("visible at xs (no responsive rule matches — falls back to base when=true)", async ({
-      page,
-      initTestBed,
-    }) => {
-      await page.setViewportSize(VP.xs);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at sm (no responsive rule matches — falls back to base when=true)", async ({
-      page,
-      initTestBed,
-    }) => {
-      await page.setViewportSize(VP.sm);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("hidden at md (when-md=false wins)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.md);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
-    });
-
-    test("hidden at lg (inherits when-md=false)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.lg);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
+    // xs, sm: no responsive rule matches → base when=true → visible
+    // md, lg: when-md=false wins (lg inherits) → hidden
+    test("visible below md, hidden at md+", async ({ page, initTestBed }) => {
+      const MARKUP = `<Text testId="t" value="hello" when="true" when-md="{false}" />`;
+      for (const vp of [VP.xs, VP.sm]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).toBeVisible();
+      }
+      for (const vp of [VP.md, VP.lg]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).not.toBeVisible();
+      }
     });
   });
 
@@ -108,39 +66,20 @@ test.describe("Responsive when-* attributes", () => {
   // when-xs="true" when-md="false" — visible at xs/sm, hidden at md+
   // ---------------------------------------------------------------------------
   test.describe("when-xs + when-md override", () => {
-    const MARKUP = `<Text testId="t" value="hello" when-xs="true" when-md="{false}" />`;
-
-    test("visible at xs (when-xs=true)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xs);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at sm (inherits when-xs=true, no when-sm rule)", async ({
-      page,
-      initTestBed,
-    }) => {
-      await page.setViewportSize(VP.sm);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("hidden at md (when-md=false wins)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.md);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
-    });
-
-    test("hidden at lg (inherits when-md=false)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.lg);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
-    });
-
-    test("hidden at xxl (inherits when-md=false)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xxl);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
+    // xs, sm: when-xs=true (sm inherits, no when-sm rule) → visible
+    // md, lg, xxl: when-md=false wins (lg, xxl inherit) → hidden
+    test("visible at xs/sm, hidden at md+", async ({ page, initTestBed }) => {
+      const MARKUP = `<Text testId="t" value="hello" when-xs="true" when-md="{false}" />`;
+      for (const vp of [VP.xs, VP.sm]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).toBeVisible();
+      }
+      for (const vp of [VP.md, VP.lg, VP.xxl]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).not.toBeVisible();
+      }
     });
   });
 
@@ -171,42 +110,20 @@ test.describe("Responsive when-* attributes", () => {
   // when-xs="true" when-lg="false" — visible at xs/sm/md, hidden at lg+
   // ---------------------------------------------------------------------------
   test.describe("when-xs + when-lg override", () => {
-    const MARKUP = `<Text testId="t" value="hello" when-xs="true" when-lg="{false}" />`;
-
-    test("visible at xs", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xs);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at sm (inherits when-xs)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.sm);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("visible at md (inherits when-xs, no md rule)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.md);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).toBeVisible();
-    });
-
-    test("hidden at lg (when-lg=false wins)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.lg);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
-    });
-
-    test("hidden at xl (inherits when-lg=false)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xl);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
-    });
-
-    test("hidden at xxl (inherits when-lg=false)", async ({ page, initTestBed }) => {
-      await page.setViewportSize(VP.xxl);
-      await initTestBed(MARKUP);
-      await expect(page.getByTestId("t")).not.toBeVisible();
+    // xs, sm, md: when-xs=true (sm, md inherit, no sm/md rule) → visible
+    // lg, xl, xxl: when-lg=false wins (xl, xxl inherit) → hidden
+    test("visible at xs/sm/md, hidden at lg+", async ({ page, initTestBed }) => {
+      const MARKUP = `<Text testId="t" value="hello" when-xs="true" when-lg="{false}" />`;
+      for (const vp of [VP.xs, VP.sm, VP.md]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).toBeVisible();
+      }
+      for (const vp of [VP.lg, VP.xl, VP.xxl]) {
+        await page.setViewportSize(vp);
+        await initTestBed(MARKUP);
+        await expect(page.getByTestId("t")).not.toBeVisible();
+      }
     });
   });
 

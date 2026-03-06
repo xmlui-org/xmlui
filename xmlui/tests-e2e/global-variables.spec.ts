@@ -5,33 +5,19 @@ import { expect, test } from "../src/testing/fixtures";
 // =============================================================================
 
 test.describe("Global variables", () => {
-  test("displays global variable in Text component", async ({ page, initTestBed }) => {
+  test("displays global variables and function results without interaction", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <App>
         <Text testId="countText">Count: {count}</Text>
-      </App>
-    `,
-      {
-        mainXs: `
-      var count = 42;
-    `,
-      },
-    );
-
-    await expect(page.getByTestId("countText")).toHaveText("Count: 42");
-  });
-
-  test("displays global variable from function call", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <App>
         <Text testId="resultText">Result: {getCount()}</Text>
+        <Text testId="exprText">Expression: {result}</Text>
       </App>
     `,
       {
         mainXs: `
       var count = 42;
+      var result = 6 * 7;
 
       function getCount() {
         return count;
@@ -40,7 +26,9 @@ test.describe("Global variables", () => {
       },
     );
 
-    await expect(page.getByTestId("resultText")).toHaveText("Result: 42");
+    await expect(page.getByTestId("countText")).toHaveText("Count: 42");   // global variable in Text
+    await expect(page.getByTestId("resultText")).toHaveText("Result: 42"); // global variable from function call
+    await expect(page.getByTestId("exprText")).toHaveText("Expression: 42"); // complex expression
   });
 
   test("modifies global variable via button click", async ({ page, initTestBed }) => {
@@ -189,23 +177,6 @@ test.describe("Global variables", () => {
     
     await page.getByRole("button", { name: "Button 3: 7" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 8");
-  });
-
-  test("global variable with complex expression", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <App>
-        <Text testId="resultText">Result: {result}</Text>
-      </App>
-    `,
-      {
-        mainXs: `
-      var result = 6 * 7;
-    `,
-      },
-    );
-
-    await expect(page.getByTestId("resultText")).toHaveText("Result: 42");
   });
 
   test("global function modifying global variable", async ({ page, initTestBed }) => {

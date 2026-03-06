@@ -77,7 +77,8 @@ test.describe("Basic Functionality", () => {
     await expect(tooltip.locator("code")).toContainText("tooltipMarkdown");
   });
 
-  test("renders with 'side' property set to right", async ({ page, initTestBed }) => {
+  test("renders with all side property values", async ({ page, initTestBed }) => {
+    // right
     await initTestBed(`
       <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned right" side="right">
@@ -85,21 +86,15 @@ test.describe("Basic Functionality", () => {
         </Tooltip>
       </CVStack>
     `);
-
-    const button = page.getByTestId("right-tooltip-button");
+    let button = page.getByTestId("right-tooltip-button");
     await button.hover();
-
-    const tooltip = page.getByText("I'm positioned right");
+    let tooltip = page.getByText("I'm positioned right");
     await expect(tooltip).toBeVisible();
-
-    // Verify tooltip is positioned to the right of the button
-    const buttonBox = await getBounds(button);
-    const tooltipBox = await getBounds(tooltip);
-
+    let buttonBox = await getBounds(button);
+    let tooltipBox = await getBounds(tooltip);
     expect(tooltipBox.left).toBeGreaterThan(buttonBox.right);
-  });
 
-  test("renders with 'side' property set to left", async ({ page, initTestBed }) => {
+    // left
     await initTestBed(`
       <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned left" side="left">
@@ -107,21 +102,15 @@ test.describe("Basic Functionality", () => {
         </Tooltip>
       </CVStack>
     `);
-
-    const button = page.getByTestId("left-tooltip-button");
+    button = page.getByTestId("left-tooltip-button");
     await button.hover();
-
-    const tooltip = page.getByText("I'm positioned left");
+    tooltip = page.getByText("I'm positioned left");
     await expect(tooltip).toBeVisible();
-
-    // Verify tooltip is positioned to the right of the button
-    const buttonBox = await getBounds(button);
-    const tooltipBox = await getBounds(tooltip);
-
+    buttonBox = await getBounds(button);
+    tooltipBox = await getBounds(tooltip);
     expect(tooltipBox.right).toBeLessThan(buttonBox.left);
-  });
 
-  test("renders with 'side' property set to top", async ({ page, initTestBed }) => {
+    // top
     await initTestBed(`
       <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned top" side="top">
@@ -129,21 +118,15 @@ test.describe("Basic Functionality", () => {
         </Tooltip>
       </CVStack>
     `);
-
-    const button = page.getByTestId("top-tooltip-button");
+    button = page.getByTestId("top-tooltip-button");
     await button.hover();
-
-    const tooltip = page.getByText("I'm positioned top");
+    tooltip = page.getByText("I'm positioned top");
     await expect(tooltip).toBeVisible();
-
-    // Verify tooltip is positioned above the button
-    const buttonBox = await getBounds(button);
-    const tooltipBox = await getBounds(tooltip);
-
+    buttonBox = await getBounds(button);
+    tooltipBox = await getBounds(tooltip);
     expect(tooltipBox.bottom).toBeLessThan(buttonBox.top);
-  });
 
-  test("renders with 'side' property set to bottom", async ({ page, initTestBed }) => {
+    // bottom
     await initTestBed(`
       <CVStack height="200px" horizontalAlignment="center" verticalAlignment="center">
         <Tooltip delayDuration="${LOW_DELAY}" text="I'm positioned bottom" side="bottom">
@@ -151,17 +134,12 @@ test.describe("Basic Functionality", () => {
         </Tooltip>
       </CVStack>
     `);
-
-    const button = page.getByTestId("bottom-tooltip-button");
+    button = page.getByTestId("bottom-tooltip-button");
     await button.hover();
-
-    const tooltip = page.getByText("I'm positioned bottom");
+    tooltip = page.getByText("I'm positioned bottom");
     await expect(tooltip).toBeVisible();
-
-    // Verify tooltip is positioned below the button
-    const buttonBox = await getBounds(button);
-    const tooltipBox = await getBounds(tooltip);
-
+    buttonBox = await getBounds(button);
+    tooltipBox = await getBounds(tooltip);
     expect(tooltipBox.top).toBeGreaterThan(buttonBox.bottom);
   });
 
@@ -392,84 +370,49 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies 'backgroundColor-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
+  test("applies all Tooltip theme variables", async ({ page, initTestBed }) => {
+    const TOOLTIP_MARKUP = `
       <Tooltip text="This tooltip is accessible" defaultOpen="true" delayDuration="${LOW_DELAY}">
         <Button label="Button with default open tooltip" />
       </Tooltip>
-    `,
-      {
-        testThemeVars: { "backgroundColor-Tooltip": "rgb(255, 0, 0)" },
-      },
-    );
+    `;
+
+    // backgroundColor-Tooltip
+    await initTestBed(TOOLTIP_MARKUP, {
+      testThemeVars: { "backgroundColor-Tooltip": "rgb(255, 0, 0)" },
+    });
     await expect(page.locator("div[data-tooltip-container]")).toHaveCSS(
       "background-color",
       "rgb(255, 0, 0)",
     );
-  });
 
-  test("applies 'textColor-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <Tooltip text="This tooltip is accessible" defaultOpen="true" delayDuration="${LOW_DELAY}">
-        <Button label="Button with default open tooltip" />
-      </Tooltip>
-    `,
-      {
-        testThemeVars: { "textColor-Tooltip": "rgb(0, 255, 0)" },
-      },
-    );
+    // textColor-Tooltip
+    await initTestBed(TOOLTIP_MARKUP, {
+      testThemeVars: { "textColor-Tooltip": "rgb(0, 255, 0)" },
+    });
     await expect(page.locator("div[data-tooltip-container]")).toHaveCSS("color", "rgb(0, 255, 0)");
-  });
 
-  test("applies 'borderRadius-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <Tooltip text="This tooltip is accessible" defaultOpen="true" delayDuration="${LOW_DELAY}">
-        <Button label="Button with default open tooltip" />
-      </Tooltip>
-    `,
-      {
-        testThemeVars: { "borderRadius-Tooltip": "12px" },
-      },
-    );
+    // borderRadius-Tooltip
+    await initTestBed(TOOLTIP_MARKUP, {
+      testThemeVars: { "borderRadius-Tooltip": "12px" },
+    });
     await expect(page.locator("div[data-tooltip-container]")).toHaveCSS("border-radius", "12px");
-  });
 
-  test("applies 'fontSize-Tooltip' theme variable", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <Tooltip text="This tooltip is accessible" defaultOpen="true" delayDuration="${LOW_DELAY}">
-        <Button label="Button with default open tooltip" />
-      </Tooltip>
-    `,
-      {
-        testThemeVars: { "fontSize-Tooltip": "20px" },
-      },
-    );
+    // fontSize-Tooltip
+    await initTestBed(TOOLTIP_MARKUP, {
+      testThemeVars: { "fontSize-Tooltip": "20px" },
+    });
     const tooltip = page.getByRole("tooltip");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toHaveCSS("font-size", "20px");
-  });
 
-  test("applies 'paddingLeft-Tooltip' and 'paddingRight-Tooltip' theme variables", async ({
-    page,
-    initTestBed,
-  }) => {
-    await initTestBed(
-      `
-      <Tooltip text="This tooltip is accessible" defaultOpen="true" delayDuration="${LOW_DELAY}">
-        <Button label="Button with default open tooltip" />
-      </Tooltip>
-    `,
-      {
-        testThemeVars: {
-          "paddingLeft-Tooltip": "20px",
-          "paddingRight-Tooltip": "25px",
-        },
+    // paddingLeft-Tooltip and paddingRight-Tooltip
+    await initTestBed(TOOLTIP_MARKUP, {
+      testThemeVars: {
+        "paddingLeft-Tooltip": "20px",
+        "paddingRight-Tooltip": "25px",
       },
-    );
+    });
     await expect(page.locator("div[data-tooltip-container]")).toHaveCSS("padding-left", "20px");
     await expect(page.locator("div[data-tooltip-container]")).toHaveCSS("padding-right", "25px");
   });

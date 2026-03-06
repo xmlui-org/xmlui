@@ -141,88 +141,41 @@ test.describe("Basic Functionality", () => {
     await expect(driver.label).toHaveText("Very Long Label That Should Break");
   });
 
-  test("renders with requireLabelMode set to 'markRequired' showing asterisk for required fields", async ({
+  test("requireLabelMode variants show correct label indicators", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markRequired" />
+        <FormItem testId="rlm-mr-req" label="Required Field" required="true" requireLabelMode="markRequired" />
+        <FormItem testId="rlm-mr-opt" label="Optional Field" required="false" requireLabelMode="markRequired" />
+        <FormItem testId="rlm-mo-opt" label="Optional Field" required="false" requireLabelMode="markOptional" />
+        <FormItem testId="rlm-mo-req" label="Required Field" required="true" requireLabelMode="markOptional" />
+        <FormItem testId="rlm-mb-req" label="Required Field" required="true" requireLabelMode="markBoth" />
+        <FormItem testId="rlm-mb-opt" label="Optional Field" required="false" requireLabelMode="markBoth" />
       </Form>
     `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).toContainText("*");
-    await expect(driver.label).not.toContainText("(Optional)");
-  });
-
-  test("renders with requireLabelMode set to 'markRequired' hiding indicator for optional fields", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markRequired" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).not.toContainText("*");
-    await expect(driver.label).not.toContainText("(Optional)");
-  });
-
-  test("renders with requireLabelMode set to 'markOptional' showing optional tag for optional fields", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markOptional" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).toContainText("(Optional)");
-    await expect(driver.label).not.toContainText("*");
-  });
-
-  test("renders with requireLabelMode set to 'markOptional' hiding indicator for required fields", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markOptional" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).not.toContainText("*");
-    await expect(driver.label).not.toContainText("(Optional)");
-  });
-
-  test("renders with requireLabelMode set to 'markBoth' showing asterisk for required fields", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" label="Required Field" required="true" requireLabelMode="markBoth" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).toContainText("*");
-    await expect(driver.label).not.toContainText("(Optional)");
-  });
-
-  test("renders with requireLabelMode set to 'markBoth' showing optional tag for optional fields", async ({
-    initTestBed,
-    createFormItemDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" label="Optional Field" required="false" requireLabelMode="markBoth" />
-      </Form>
-    `);
-    const driver = await createFormItemDriver("formItem");
-    await expect(driver.label).not.toContainText("*");
-    await expect(driver.label).toContainText("(Optional)");
+    // markRequired: required→* present; optional→no markers
+    const mrReq = await createFormItemDriver("rlm-mr-req");
+    await expect(mrReq.label).toContainText("*");
+    await expect(mrReq.label).not.toContainText("(Optional)");
+    const mrOpt = await createFormItemDriver("rlm-mr-opt");
+    await expect(mrOpt.label).not.toContainText("*");
+    await expect(mrOpt.label).not.toContainText("(Optional)");
+    // markOptional: optional→(Optional); required→no markers
+    const moOpt = await createFormItemDriver("rlm-mo-opt");
+    await expect(moOpt.label).toContainText("(Optional)");
+    await expect(moOpt.label).not.toContainText("*");
+    const moReq = await createFormItemDriver("rlm-mo-req");
+    await expect(moReq.label).not.toContainText("*");
+    await expect(moReq.label).not.toContainText("(Optional)");
+    // markBoth: required→*; optional→(Optional)
+    const mbReq = await createFormItemDriver("rlm-mb-req");
+    await expect(mbReq.label).toContainText("*");
+    await expect(mbReq.label).not.toContainText("(Optional)");
+    const mbOpt = await createFormItemDriver("rlm-mb-opt");
+    await expect(mbOpt.label).not.toContainText("*");
+    await expect(mbOpt.label).toContainText("(Optional)");
   });
 
   test("renders with gap property", async ({ initTestBed, createFormItemDriver }) => {
@@ -329,114 +282,59 @@ test.describe("Basic Functionality", () => {
 });
 
 test.describe("Type Property", () => {
-  test("renders with type 'text'", async ({
+  test("renders correct input for each type variant", async ({
     initTestBed,
     createFormItemDriver,
     createTextBoxDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="text" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    const inputDriver = await createTextBoxDriver(formItemDriver.input);
-    await expect(inputDriver.field).toBeVisible();
-    await expect(inputDriver.field).toHaveAttribute("type", "text");
-  });
-
-  test("renders with type 'password'", async ({
-    initTestBed,
-    createFormItemDriver,
-    createTextBoxDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="password" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    const inputDriver = await createTextBoxDriver(formItemDriver.input);
-    await expect(inputDriver.field).toBeVisible();
-    await expect(inputDriver.field).toHaveAttribute("type", "password");
-  });
-
-  test("renders with type 'number'", async ({
-    initTestBed,
-    createFormItemDriver,
     createNumberBoxDriver,
   }) => {
     await initTestBed(`
       <Form>
-        <FormItem testId="formItem" type="number" />
+        <FormItem testId="fi-text" type="text" />
+        <FormItem testId="fi-password" type="password" />
+        <FormItem testId="fi-number" type="number" />
+        <FormItem testId="fi-integer" type="integer" />
+        <FormItem testId="fi-textarea" type="textarea" />
+        <FormItem testId="fi-checkbox" type="checkbox" />
+        <FormItem testId="fi-select" type="select" />
+        <FormItem testId="fi-radio" type="radio" />
       </Form>
     `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    const inputDriver = await createNumberBoxDriver(formItemDriver.input);
-    await expect(inputDriver.field).toBeVisible();
-    // XMLUI number inputs use type="text" with inputmode="numeric"
-    await expect(inputDriver.field).toHaveAttribute("type", "text");
-    await expect(inputDriver.field).toHaveAttribute("inputmode", "numeric");
-  });
 
-  test("renders with type 'integer'", async ({
-    initTestBed,
-    createFormItemDriver,
-    createNumberBoxDriver,
-  }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="integer" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    const inputDriver = await createNumberBoxDriver(formItemDriver.input);
-    await expect(inputDriver.field).toBeVisible();
-  });
+    const textFI = await createFormItemDriver("fi-text");
+    const textInput = await createTextBoxDriver(textFI.input);
+    await expect(textInput.field).toBeVisible();
+    await expect(textInput.field).toHaveAttribute("type", "text");
 
-  test("renders with type 'textarea'", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="textarea" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    await expect(formItemDriver.input.getByRole("textbox")).toBeVisible();
-  });
+    const passFI = await createFormItemDriver("fi-password");
+    const passInput = await createTextBoxDriver(passFI.input);
+    await expect(passInput.field).toBeVisible();
+    await expect(passInput.field).toHaveAttribute("type", "password");
 
-  test("renders with type 'checkbox'", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="checkbox" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    await expect(formItemDriver.checkbox).toBeVisible();
-  });
+    const numFI = await createFormItemDriver("fi-number");
+    const numInput = await createNumberBoxDriver(numFI.input);
+    await expect(numInput.field).toBeVisible();
+    await expect(numInput.field).toHaveAttribute("type", "text");
+    await expect(numInput.field).toHaveAttribute("inputmode", "numeric");
 
-  test("renders with type 'select'", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="select" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    await expect(formItemDriver.component).toBeVisible();
-  });
+    const intFI = await createFormItemDriver("fi-integer");
+    const intInput = await createNumberBoxDriver(intFI.input);
+    await expect(intInput.field).toBeVisible();
 
-  test("renders with type 'radio'", async ({ initTestBed, createFormItemDriver }) => {
-    await initTestBed(`
-      <Form>
-        <FormItem testId="formItem" type="radio" />
-      </Form>
-    `);
-    const formItemDriver = await createFormItemDriver("formItem");
-    // Radio FormItems may render as hidden without radio options
-    const isVisible = await formItemDriver.component.isVisible();
+    const textareaFI = await createFormItemDriver("fi-textarea");
+    await expect(textareaFI.input.getByRole("textbox")).toBeVisible();
+
+    const checkboxFI = await createFormItemDriver("fi-checkbox");
+    await expect(checkboxFI.checkbox).toBeVisible();
+
+    const selectFI = await createFormItemDriver("fi-select");
+    await expect(selectFI.component).toBeVisible();
+
+    const radioFI = await createFormItemDriver("fi-radio");
+    const isVisible = await radioFI.component.isVisible();
     if (isVisible) {
-      await expect(formItemDriver.component).toBeVisible();
+      await expect(radioFI.component).toBeVisible();
     } else {
-      // It's acceptable for radio FormItem to be hidden without options
       expect(isVisible).toBe(false);
     }
   });
