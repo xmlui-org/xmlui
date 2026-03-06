@@ -279,7 +279,7 @@ function renderDockLayout({
           wrapChild: (_ctx, rendered, metadata) => {
             if (metadata?.opaque || metadata?.nonVisual) return rendered;
             return (
-              <div style={isStretch ? { flex: 1, minWidth: 0, minHeight: 0 } : { flexShrink: 0 }}>
+              <div style={isStretch ? { flex: 1, minWidth: 0, minHeight: 0, display: "grid" } : { flexShrink: 0 }}>
                 {rendered}
               </div>
             );
@@ -306,10 +306,34 @@ function renderDockLayout({
       {/* Middle row: left | undocked+stretch | right — flex:1 so it consumes leftover height */}
       {needsMiddleRow && (
         <div style={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0, minWidth: 0 }}>
-          {left.length > 0 && renderGroup(left, { flexShrink: 0, alignSelf: "stretch" })}
+          {left.length > 0 && renderChild(left, {
+            type: "DockLayout",
+            ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+            wrapChild: (ctx, rendered, metadata) => {
+              if (metadata?.opaque || metadata?.nonVisual) return rendered;
+              const w = ctx.extractValue((ctx.node.props as any)?.width);
+              return (
+                <div style={{ flexShrink: 0, alignSelf: "stretch", display: "grid", width: w }}>
+                  {rendered}
+                </div>
+              );
+            },
+          })}
           {middleRendered}
           {/* Right children reversed so the first-declared sits at the rightmost edge */}
-          {right.length > 0 && renderGroup(right.slice().reverse(), { flexShrink: 0, alignSelf: "stretch" })}
+          {right.length > 0 && renderChild(right.slice().reverse(), {
+            type: "DockLayout",
+            ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+            wrapChild: (ctx, rendered, metadata) => {
+              if (metadata?.opaque || metadata?.nonVisual) return rendered;
+              const w = ctx.extractValue((ctx.node.props as any)?.width);
+              return (
+                <div style={{ flexShrink: 0, alignSelf: "stretch", display: "grid", width: w }}>
+                  {rendered}
+                </div>
+              );
+            },
+          })}
         </div>
       )}
 
