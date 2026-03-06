@@ -147,6 +147,10 @@ export const selectComponentRenderer = wrapCompound(COMP, SelectRender, SelectMd
   events: {
     didChange: "onDidChange",
   },
+  // These props are consumed by labelBehavior (rendered by ItemWithLabel) and
+  // must NOT be forwarded to SelectRender — they would end up as unknown HTML
+  // attributes on the root <div> and trigger React dev-mode warnings.
+  exclude: ["label", "labelPosition", "labelWidth", "labelBreak", "shrinkToLabel", "readOnly"],
   // Return undefined for "no selection" so the StateWrapper init-effect never
   // calls updateState with an empty array. This prevents the wrapCompound sync
   // loop where setLocalValue(new []) fires on every render because

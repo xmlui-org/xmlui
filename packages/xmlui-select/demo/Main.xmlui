@@ -6,14 +6,13 @@
     </Text>
     <Form>
       <!-- Single select from strings -->
-      <FormItem label="Framework">
         <Extensions:Select
+        label="Framework"
           id="frameworkSelect"
           items="{['React', 'Vue', 'Svelte', 'Angular', 'SolidJS']}"
           placeholder="Pick a framework"
           onDidChange="(val) => selected = val"
         />
-      </FormItem>
       <Text>
         Selected: {selected}
       </Text>
