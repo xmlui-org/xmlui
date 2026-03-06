@@ -491,14 +491,14 @@ Progress legend: ⬜ not started · 🔄 in progress · ✅ done
 - ⬜ 6.4 `TextBox.spec.ts` labelPosition and adornment tests (~14 reduction)
 - ⬜ 6.5 `TextArea.spec.ts` resize option tests (~12 reduction)
 
-### Phase 7 — Layout Components
-- ⬜ 7.1 HStack/VStack/CVStack/CHStack (16 → 4 tests)
-- ⬜ 7.2 `ContentSeparator.spec.ts` margin theme-var tests (~15 reduction)
-- ⬜ 7.3 `FlowLayout.spec.ts` static behavior flag tests (~10 reduction)
+### Phase 7 — Layout Components ✅ COMPLETE (−13 tests)
+- ✅ 7.1 HStack/VStack/CVStack/CHStack (12 → 4 tests, −8)
+- ✅ 7.2 `ContentSeparator.spec.ts` Basic Functionality (6→1) + remove 2 redundant fallbacks (−7)
+- ⏭️ 7.3 `FlowLayout.spec.ts` — skipped (complex pixel-precise boundingBox tests, too risky)
 
-### Phase 8 — App Layout Tests (last, highest risk)
-- ⬜ 8.1 `App-layout.spec.ts` within-describe static layout tests (~30 reduction)
-- ⬜ 8.2 `App-layout-mobile.spec.ts` same strategy (~30 reduction)
+### Phase 8 — App Layout Tests ✅ COMPLETE (−120 tests)
+- ✅ 8.1 `App-layout.spec.ts` merge 28 tall-content 3-test triples → 1 sequential each (124 → 68, −56)
+- ✅ 8.2 `App-layout-mobile.spec.ts` same strategy (129 → 65, −64)
 
 ### Phase 9 — Remaining High-Value Targets
 - ⬜ 9.1 `Accordion.spec.ts` border/padding theme-var tests (~35 reduction)

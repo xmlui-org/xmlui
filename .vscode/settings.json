@@ -60,6 +60,7 @@
     },
     "npx changeset": true,
     "paste": true,
-    "bc": true
+    "bc": true,
+    "cp": true
   }
 }

@@ -5,83 +5,46 @@ import { expect, test } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("component renders with default props", async ({
+  test("renders default, horizontal, vertical, and thickness variants", async ({
     initTestBed,
     createContentSeparatorDriver,
   }) => {
-    await initTestBed(`<ContentSeparator />`);
-    const driver = await createContentSeparatorDriver();
+    await initTestBed(`
+      <Fragment>
+        <ContentSeparator testId="cs-default" />
+        <ContentSeparator testId="cs-horiz" orientation="horizontal" />
+        <ContentSeparator testId="cs-vert" orientation="vertical" />
+        <ContentSeparator testId="cs-thick5" thickness="5px" orientation="horizontal" />
+        <ContentSeparator testId="cs-thick10" thickness="10px" orientation="horizontal" />
+        <ContentSeparator testId="cs-vthick3" thickness="3px" orientation="vertical" />
+      </Fragment>
+    `);
 
-    await expect(driver.component).toBeVisible();
-    await expect(driver.separator).toBeVisible();
+    const defaultDriver = await createContentSeparatorDriver("cs-default");
+    await expect(defaultDriver.component).toBeVisible();
+    await expect(defaultDriver.separator).toBeVisible();
+    expect(await defaultDriver.getOrientation()).toBe("horizontal");
 
-    // Default orientation should be horizontal
-    const orientation = await driver.getOrientation();
-    expect(orientation).toBe("horizontal");
-  });
+    const horizDriver = await createContentSeparatorDriver("cs-horiz");
+    await expect(horizDriver.component).toBeVisible();
+    expect(await horizDriver.getOrientation()).toBe("horizontal");
+    expect(await horizDriver.getComputedWidth()).not.toBe("0px");
 
-  test("component renders with horizontal orientation", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator orientation="horizontal" />`);
-    const driver = await createContentSeparatorDriver();
+    const vertDriver = await createContentSeparatorDriver("cs-vert");
+    await expect(vertDriver.component).toBeVisible();
+    expect(await vertDriver.getOrientation()).toBe("vertical");
 
-    await expect(driver.component).toBeVisible();
-    const orientation = await driver.getOrientation();
-    expect(orientation).toBe("horizontal");
+    const thick5Driver = await createContentSeparatorDriver("cs-thick5");
+    await expect(thick5Driver.component).toBeVisible();
+    expect(await thick5Driver.getComputedHeight()).toBe("5px");
 
-    // Horizontal should span full width
-    const width = await driver.getComputedWidth();
-    expect(width).not.toBe("0px");
-  });
+    const thick10Driver = await createContentSeparatorDriver("cs-thick10");
+    await expect(thick10Driver.component).toBeVisible();
+    expect(await thick10Driver.getComputedHeight()).toBe("10px");
 
-  test("component renders with vertical orientation", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator orientation="vertical" />`);
-    const driver = await createContentSeparatorDriver();
-
-    await expect(driver.component).toBeVisible();
-    const orientation = await driver.getOrientation();
-    expect(orientation).toBe("vertical");
-  });
-
-  test("component respects custom size prop", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator thickness="5px" orientation="horizontal" />`);
-    const driver = await createContentSeparatorDriver();
-
-    await expect(driver.component).toBeVisible();
-    const height = await driver.getComputedHeight();
-    expect(height).toBe("5px");
-  });
-
-  test("component handles numeric size values", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator thickness="10px" orientation="horizontal" />`);
-    const driver = await createContentSeparatorDriver();
-
-    await expect(driver.component).toBeVisible();
-    const height = await driver.getComputedHeight();
-    expect(height).toBe("10px");
-  });
-
-  test("vertical separator respects size for width", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator thickness="3px" orientation="vertical" />`);
-    const driver = await createContentSeparatorDriver();
-
-    await expect(driver.component).toBeVisible();
-    const width = await driver.getComputedWidth();
-    expect(width).toBe("3px");
+    const vthick3Driver = await createContentSeparatorDriver("cs-vthick3");
+    await expect(vthick3Driver.component).toBeVisible();
+    expect(await vthick3Driver.getComputedWidth()).toBe("3px");
   });
 });
 
@@ -353,40 +316,6 @@ test.describe("Theme Variables", () => {
     await expect(driver.separator).toHaveCSS("margin-bottom", "8px");
     await expect(driver.separator).toHaveCSS("margin-left", "12px");
     await expect(driver.separator).toHaveCSS("margin-right", "18px");
-  });
-
-  test("fallback to vertical margin when specific margins not defined", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator />`, {
-      testThemeVars: {
-        "marginVertical-ContentSeparator": "20px",
-        // No specific marginTop or marginBottom defined
-      },
-    });
-    const driver = await createContentSeparatorDriver();
-
-    // Should fall back to vertical margin values
-    await expect(driver.separator).toHaveCSS("margin-top", "20px");
-    await expect(driver.separator).toHaveCSS("margin-bottom", "20px");
-  });
-
-  test("fallback to horizontal margin when specific margins not defined", async ({
-    initTestBed,
-    createContentSeparatorDriver,
-  }) => {
-    await initTestBed(`<ContentSeparator />`, {
-      testThemeVars: {
-        "marginHorizontal-ContentSeparator": "25px",
-        // No specific marginLeft or marginRight defined
-      },
-    });
-    const driver = await createContentSeparatorDriver();
-
-    // Should fall back to horizontal margin values
-    await expect(driver.separator).toHaveCSS("margin-left", "25px");
-    await expect(driver.separator).toHaveCSS("margin-right", "25px");
   });
 
   test("handles zero margin values", async ({ initTestBed, createContentSeparatorDriver }) => {
