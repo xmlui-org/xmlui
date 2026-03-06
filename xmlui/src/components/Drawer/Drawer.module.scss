@@ -12,12 +12,17 @@ $backgroundColor-Drawer: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-#{$component}");
 $borderRadius-Drawer: createThemeVar("borderRadius-#{$component}");
 $boxShadow-Drawer: createThemeVar("boxShadow-#{$component}");
-$padding-Drawer: createThemeVar("padding-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$paddingTop-Drawer:    createThemeVar("paddingTop-#{$component}");
+$paddingRight-Drawer:  createThemeVar("paddingRight-#{$component}");
+$paddingBottom-Drawer: createThemeVar("paddingBottom-#{$component}");
+$paddingLeft-Drawer:   createThemeVar("paddingLeft-#{$component}");
 $width-Drawer: createThemeVar("width-#{$component}");
 $maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
 $height-Drawer: createThemeVar("height-#{$component}");
 $maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
 $zIndex-Drawer: createThemeVar("zIndex-#{$component}");
+$gap-Drawer: createThemeVar("gap-#{$component}");
 $animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
 $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
 
@@ -85,9 +90,8 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   background-color: $backgroundColor-Drawer;
   border-radius: $borderRadius-Drawer;
   box-shadow: $boxShadow-Drawer;
-  padding: $padding-Drawer;
   z-index: calc($zIndex-Drawer + 1);
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   pointer-events: auto;
@@ -142,15 +146,45 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   }
 }
 
-// Close button (×) in top-right corner
-.closeButton {
+// Visually hidden but accessible to screen readers
+.srOnly {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+// Sticky header: outer padding (top + horizontal), no bottom — gap handles spacing
+.header {
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  padding: $paddingTop-Drawer $paddingRight-Drawer 0 $paddingLeft-Drawer;
+}
+
+.headerContent {
+  flex: 1;
+  min-width: 0;
+}
+
+// Scrollable body: outer padding (bottom + horizontal), gap-driven top margin
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: 0 $paddingRight-Drawer $paddingBottom-Drawer $paddingLeft-Drawer;
+  margin-top: $gap-Drawer;
+}
+
+// Close button (×)
+.closeButton {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
+  margin-left: auto;
   border: 0;
   border-radius: t.$borderRadius;
   background-color: transparent;
@@ -158,7 +192,6 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 150ms ease;
-  z-index: 1;
 
   &:hover {
     opacity: 1;

@@ -134,6 +134,28 @@ Controls whether the close (✕) button appears in the top-right corner of the d
 
 %-PROP-END
 
+%-PROP-START headerTemplate
+
+This property defines a custom template rendered in the sticky header area of the drawer, next to the close button. Use it to display a logo, title, or any custom content that stays fixed at the top while the drawer body scrolls.
+
+```xmlui-pg copy display {5-7} name="Example: headerTemplate" height="280px"
+<App>
+  <Button label="Open Drawer" onClick="drawer.open()" />
+  <Drawer id="drawer" position="left">
+    <property name="headerTemplate">
+      <H3>Navigation</H3>
+    </property>
+    <VStack gap="$space-2">
+      <Button label="Home" variant="ghost" />
+      <Button label="Settings" variant="ghost" />
+      <Button label="Help" variant="ghost" />
+    </VStack>
+  </Drawer>
+</App>
+```
+
+%-PROP-END
+
 %-EVENT-START open
 
 Fired when the drawer opens (either via `open()` API or another trigger).

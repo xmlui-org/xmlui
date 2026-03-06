@@ -35,6 +35,8 @@ export interface DrawerProps {
   closeButtonVisible?: boolean;
   /** Close the drawer when the user clicks outside of it */
   closeOnClickAway?: boolean;
+  /** Custom content rendered in the sticky header (next to the close button) */
+  headerTemplate?: ReactNode;
   /** Callback fired when the drawer opens */
   onOpen?: () => void;
   /** Callback fired when the drawer closes */
@@ -90,6 +92,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     initiallyOpen = defaultProps.initiallyOpen,
     closeButtonVisible = defaultProps.closeButtonVisible,
     closeOnClickAway = defaultProps.closeOnClickAway,
+    headerTemplate,
     onOpen,
     onClose,
     registerComponentApi,
@@ -188,16 +191,22 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
           onPointerDownOutside={(e) => { if (closeOnClickAway) doClose(); else e.preventDefault(); }}
           onEscapeKeyDown={() => doClose()}
         >
-          {/* Visually-hidden title so Dialog.Content has accessible label */}
-          <Dialog.Title className="sr-only">Drawer</Dialog.Title>
-          {closeButtonVisible && (
-            <Dialog.Close asChild>
-              <button className={styles.closeButton} aria-label="Close">
-                <Icon name="close" />
-              </button>
-            </Dialog.Close>
-          )}
-          {children}
+          <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>
+          <div className={styles.header}>
+            <div className={styles.headerContent}>
+              {headerTemplate}
+            </div>
+            {closeButtonVisible && (
+              <Dialog.Close asChild>
+                <button className={styles.closeButton} aria-label="Close">
+                  <Icon name="close" />
+                </button>
+              </Dialog.Close>
+            )}
+          </div>
+          <div className={styles.body}>
+            {children}
+          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
