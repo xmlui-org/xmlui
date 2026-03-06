@@ -65,12 +65,7 @@ export const GradientSegmentedControlMd = createMetadata({
       "string",
       defaultProps.size,
     ),
-    disabled: d(
-      "When `true`, all options are non-interactive.",
-      undefined,
-      "boolean",
-      false,
-    ),
+    disabled: d("When `true`, all options are non-interactive.", undefined, "boolean", false),
     fullWidth: d(
       "When `true`, the control stretches to fill the width of its container.",
       undefined,
@@ -93,19 +88,13 @@ export const GradientSegmentedControlMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`gradientFrom-${COMP}`]: "#7c3aed",
-    [`gradientTo-${COMP}`]: "#06b6d4",
+    [`gradientFrom-${COMP}`]: "red",
+    [`gradientTo-${COMP}`]: "lightcoral",
     [`gradientDegree-${COMP}`]: "135deg",
     [`activeTextColor-${COMP}`]: "$color-surface-50",
     [`borderRadius-${COMP}`]: "9999px",
-    light: {
-      [`backgroundColor-${COMP}`]: "$color-surface-200",
-      [`textColor-${COMP}`]: "$textColor-secondary",
-    },
-    dark: {
-      [`backgroundColor-${COMP}`]: "$color-surface-100",
-      [`textColor-${COMP}`]: "$textColor-secondary",
-    },
+    [`backgroundColor-${COMP}`]: "$color-surface-200",
+    [`textColor-${COMP}`]: "$textColor-secondary",
   },
 });
 
@@ -116,7 +105,16 @@ export const gradientSegmentedControlComponentRenderer = wrapComponent(
   {
     booleans: ["disabled", "fullWidth"],
     numbers: ["gradientDegree"],
-    strings: ["gradientFrom", "gradientTo", "backgroundColor", "textColor", "activeTextColor", "borderRadius", "orientation", "size"],
+    strings: [
+      "gradientFrom",
+      "gradientTo",
+      "backgroundColor",
+      "textColor",
+      "activeTextColor",
+      "borderRadius",
+      "orientation",
+      "size",
+    ],
     events: { didChange: "onChange" },
   },
 );

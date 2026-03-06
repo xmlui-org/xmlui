@@ -28,14 +28,12 @@
       <Theme
         gradientFrom-GradientSegmentedControl="#8b5cf6"
         gradientTo-GradientSegmentedControl="#ec4899"
-        backgroundColor-GradientSegmentedControl="#f3e8ff"
+        backgroundColor-GradientSegmentedControl="$color-surface-100"
         textColor-GradientSegmentedControl="$color-primary-800"
       >
         <GradientSegmentedControl
           initialValue="Monthly"
           data="{['Monthly', 'Yearly']}"
-          gradientFrom="#f59e0b"
-          gradientTo="#ef4444"
           gradientDegree="90"
           activeTextColor="white"
           size="md"
