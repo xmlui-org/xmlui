@@ -1,17 +1,20 @@
 import { test, expect } from "../../testing/fixtures";
 
-test("border", async ({ initTestBed, createNoResultDriver }) => {
+test("applies border-side and combination theme variables", async ({
+  initTestBed,
+  createNoResultDriver,
+}) => {
   const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
+  // border
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  let component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -24,20 +27,14 @@ test("border", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderLeft", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderLeft
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderLeft-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -50,20 +47,14 @@ test("borderLeft", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderRight", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderRight
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderRight-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -76,20 +67,14 @@ test("borderRight", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderHorizontal", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderHorizontal
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderHorizontal-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -102,21 +87,15 @@ test("borderHorizontal", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderHorizontal and borderLeft", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderHorizontal and borderLeft
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderHorizontal-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "borderLeft-NoResult": "8px double rgb(0, 128, 0)",
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -129,21 +108,15 @@ test("borderHorizontal and borderLeft", async ({ initTestBed, createNoResultDriv
   await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
   await expect(component).toHaveCSS("border-left-width", "8px");
   await expect(component).toHaveCSS("border-left-style", "double");
-});
 
-test("borderHorizontal and borderRight", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderHorizontal and borderRight
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderHorizontal-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "borderRight-NoResult": "8px double rgb(0, 128, 0)",
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -156,20 +129,14 @@ test("borderHorizontal and borderRight", async ({ initTestBed, createNoResultDri
   await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderTop", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderTop
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderTop-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -182,20 +149,14 @@ test("borderTop", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderBottom", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderBottom
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderBottom-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -208,20 +169,14 @@ test("borderBottom", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderVertical", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderVertical
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderVertical-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -234,21 +189,15 @@ test("borderVertical", async ({ initTestBed, createNoResultDriver }) => {
   await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderVertical and borderTop", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderVertical and borderTop
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderVertical-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "borderTop-NoResult": "8px double rgb(0, 128, 0)",
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
   await expect(component).toHaveCSS("border-top-width", "8px");
   await expect(component).toHaveCSS("border-top-style", "double");
@@ -261,21 +210,15 @@ test("borderVertical and borderTop", async ({ initTestBed, createNoResultDriver 
   await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
   await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("borderVertical and border-bottom", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // borderVertical and borderBottom
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderVertical-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
       "borderBottom-NoResult": "8px double rgb(0, 128, 0)",
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
@@ -290,668 +233,328 @@ test("borderVertical and border-bottom", async ({ initTestBed, createNoResultDri
   await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
 });
 
-test("border-color", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
+test("applies border-color, border-style, and border-thickness theme variables", async ({
+  initTestBed,
+  createNoResultDriver,
+}) => {
+  const EXPECTED_COLOR = "rgb(255, 0, 0)";
   const EXPECTED_WIDTH = "5px";
   const EXPECTED_STYLE = "dotted";
 
+  // border-color
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderColor-NoResult": EXPECTED_COLOR,
+      "borderColor-NoResult": "rgb(0, 128, 0)",
     },
   });
-  const component = (await createNoResultDriver()).component;
+  let component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
 
+  // border + border-color
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderColor-NoResult": "rgb(0, 128, 0)",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+
+  // border + border-color-horizontal
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderHorizontalColor-NoResult": "rgb(0, 128, 0)",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
   await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
 
-test("border, border-color", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
+  // border + border-color-left
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderColor-NoResult": UPDATED,
+      "borderLeftColor-NoResult": "rgb(0, 128, 0)",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", UPDATED);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", UPDATED);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", UPDATED);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-color-horizontal", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderHorizontalColor-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", UPDATED);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", UPDATED);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-color", "rgb(0, 128, 0)");
 
-test("border, border-color-left", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
+  // border + border-color-right
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderLeftColor-NoResult": UPDATED,
+      "borderRightColor-NoResult": "rgb(0, 128, 0)",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-right-color", "rgb(0, 128, 0)");
   await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", UPDATED);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
 
-test("border, border-color-right", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
+  // border + border-color-vertical
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderRightColor-NoResult": UPDATED,
+      "borderVerticalColor-NoResult": "rgb(0, 128, 0)",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
 
+  // border + border-color-top
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderTopColor-NoResult": "rgb(0, 128, 0)",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-color", "rgb(0, 128, 0)");
+  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+
+  // border + border-color-bottom
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderBottomColor-NoResult": "rgb(0, 128, 0)",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", UPDATED);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-color-vertical", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderVerticalColor-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", UPDATED);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
   await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
+  await expect(component).toHaveCSS("border-bottom-color", "rgb(0, 128, 0)");
   await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border, border-color-top", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderTopColor-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", UPDATED);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-color-bottom", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "rgb(0, 128, 0)";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderBottomColor-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border-style", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-
+  // border-style
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
       "borderStyle-NoResult": EXPECTED_STYLE,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-right-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).not.toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border, border-style", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderStyle-NoResult": UPDATED,
+      "borderStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-style", "double");
+  await expect(component).toHaveCSS("border-right-style", "double");
+  await expect(component).toHaveCSS("border-bottom-style", "double");
+  await expect(component).toHaveCSS("border-left-style", "double");
 
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", UPDATED);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", UPDATED);
-});
-
-test("border, border-style-horizontal", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-horizontal
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderHorizontalStyle-NoResult": UPDATED,
+      "borderHorizontalStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", "double");
   await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", UPDATED);
-});
+  await expect(component).toHaveCSS("border-left-style", "double");
 
-test("border, border-style-left", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-left
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderLeftStyle-NoResult": UPDATED,
+      "borderLeftStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", UPDATED);
-});
+  await expect(component).toHaveCSS("border-left-style", "double");
 
-test("border, border-style-right", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-right
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderRightStyle-NoResult": UPDATED,
+      "borderRightStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-right-style", "double");
   await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border, border-style-vertical", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-vertical
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderVerticalStyle-NoResult": UPDATED,
+      "borderVerticalStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", UPDATED);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-style", "double");
   await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", "double");
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border, border-style-top", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-top
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderTopStyle-NoResult": UPDATED,
+      "borderTopStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", UPDATED);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-style", "double");
   await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border, border-style-bottom", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "double";
-
+  // border + border-style-bottom
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderBottomStyle-NoResult": UPDATED,
+      "borderBottomStyle-NoResult": "double",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", UPDATED);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-style", "double");
   await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
 
-test("border-thickness", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(0, 128, 0)";
-  const EXPECTED_WIDTH = "8px";
-  const EXPECTED_STYLE = "dotted";
-
+  // border-thickness
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderWidth-NoResult": EXPECTED_WIDTH,
+      "borderWidth-NoResult": "8px",
     },
   });
-  const component = (await createNoResultDriver()).component;
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-width", "8px");
+  await expect(component).toHaveCSS("border-right-width", "8px");
+  await expect(component).toHaveCSS("border-bottom-width", "8px");
+  await expect(component).toHaveCSS("border-left-width", "8px");
 
-  await expect(component).not.toHaveCSS("border-top-color", EXPECTED_COLOR);
+  // border + border-thickness
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderWidth-NoResult": "12px",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-width", "12px");
+  await expect(component).toHaveCSS("border-right-width", "12px");
+  await expect(component).toHaveCSS("border-bottom-width", "12px");
+  await expect(component).toHaveCSS("border-left-width", "12px");
+
+  // border + border-thickness-horizontal
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderHorizontalWidth-NoResult": "12px",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", "12px");
   await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).not.toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).not.toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-width", "12px");
 
-test("border, border-thickness", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
+  // border + border-thickness-left
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderWidth-NoResult": UPDATED,
+      "borderLeftWidth-NoResult": "12px",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", UPDATED);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", UPDATED);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", UPDATED);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-thickness-horizontal", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderHorizontalWidth-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", UPDATED);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
   await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", UPDATED);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-width", "12px");
 
-test("border, border-thickness-left", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
+  // border + border-thickness-right
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderLeftWidth-NoResult": UPDATED,
+      "borderRightWidth-NoResult": "12px",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-right-width", "12px");
   await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", UPDATED);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
 
-test("border, border-thickness-right", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
+  // border + border-thickness-vertical
   await initTestBed(`<NoResult />`, {
     testThemeVars: {
-      "borderRightWidth-NoResult": UPDATED,
+      "borderVerticalWidth-NoResult": "12px",
       "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
     },
   });
-  const component = (await createNoResultDriver()).component;
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-width", "12px");
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-width", "12px");
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
 
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
+  // border + border-thickness-top
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderTopWidth-NoResult": "12px",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
+  await expect(component).toHaveCSS("border-top-width", "12px");
+  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
+  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
+
+  // border + border-thickness-bottom
+  await initTestBed(`<NoResult />`, {
+    testThemeVars: {
+      "borderBottomWidth-NoResult": "12px",
+      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
+    },
+  });
+  component = (await createNoResultDriver()).component;
   await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", UPDATED);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-thickness-vertical", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderVerticalWidth-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", UPDATED);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
   await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
+  await expect(component).toHaveCSS("border-bottom-width", "12px");
   await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-thickness-top", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderTopWidth-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", UPDATED);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
-});
-
-test("border, border-thickness-bottom", async ({ initTestBed, createNoResultDriver }) => {
-  const EXPECTED_COLOR = "rgb(255, 0, 0)";
-  const EXPECTED_WIDTH = "5px";
-  const EXPECTED_STYLE = "dotted";
-  const UPDATED = "12px";
-
-  await initTestBed(`<NoResult />`, {
-    testThemeVars: {
-      "borderBottomWidth-NoResult": UPDATED,
-      "border-NoResult": `${EXPECTED_STYLE} ${EXPECTED_COLOR} ${EXPECTED_WIDTH}`,
-    },
-  });
-  const component = (await createNoResultDriver()).component;
-
-  await expect(component).toHaveCSS("border-top-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-top-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-top-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-right-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-right-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-right-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-bottom-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-bottom-width", UPDATED);
-  await expect(component).toHaveCSS("border-bottom-style", EXPECTED_STYLE);
-  await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
-  await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
-  await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
 });

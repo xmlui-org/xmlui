@@ -61,6 +61,7 @@
     "npx changeset": true,
     "paste": true,
     "bc": true,
-    "cp": true
+    "cp": true,
+    "git restore": true
   }
 }
