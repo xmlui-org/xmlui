@@ -106,8 +106,13 @@ import { Tooltip } from "./components/Tooltip/TooltipNative";
 import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 import { MemoizedItem } from "./components/container-helpers";
+import { OptionContext, useOption } from "./components/Select/OptionContext";
+import { HiddenOption } from "./components/Select/HiddenOption";
+import OptionTypeProvider from "./components/Option/OptionTypeProvider";
+import type { Option } from "./components/abstractions";
 
 export type {
+  Option,
   ThemeDefinition,
   ComponentDef,
   ComponentRendererDef,
@@ -215,4 +220,8 @@ export {
   MenuItem,
   ContentSeparator,
   MemoizedItem,
+  OptionContext,
+  useOption,
+  HiddenOption,
+  OptionTypeProvider,
 };

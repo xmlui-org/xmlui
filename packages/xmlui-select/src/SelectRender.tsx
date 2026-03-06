@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { forwardRef } from "react";
 import { Select, createListCollection } from "@ark-ui/react/select";
 import { Portal } from "@ark-ui/react/portal";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
+import { OptionContext, HiddenOption, OptionTypeProvider, type Option } from "xmlui";
 
 export type SelectItem = {
   value: string;
@@ -24,10 +25,11 @@ function normalizeItems(raw: any): SelectItem[] {
 }
 
 /**
- * Pure ark-ui Select assembly. No XMLUI imports.
+ * Pure ark-ui Select assembly.
  *
  * Receives `value` (string[]), `onChange`, and `registerApi` from
  * wrapCompound's StateWrapper. Everything else is native React/ark-ui props.
+ * Supports both `items` prop and XMLUI `Option` children.
  */
 export const SelectRender = forwardRef(({
   value,
@@ -40,15 +42,45 @@ export const SelectRender = forwardRef(({
   multiple = false,
   clearable = false,
   id,
+  children,
   ...rest
 }: any, ref: any) => {
   const triggerRef = useRef<HTMLButtonElement>(null);
+
+  // Collect options registered by Option children
+  const [childrenOptions, setChildrenOptions] = useState<Option[]>([]);
+
+  const onOptionAdd = useCallback((option: Option) => {
+    setChildrenOptions((prev) => [...prev, option]);
+  }, []);
+
+  const onOptionRemove = useCallback((option: Option) => {
+    setChildrenOptions((prev) => prev.filter((o) => o.value !== option.value));
+  }, []);
+
+  const optionContextValue = useMemo(
+    () => ({ onOptionAdd, onOptionRemove }),
+    [onOptionAdd, onOptionRemove],
+  );
 
   // Stabilize items: XMLUI passes a new array reference on every render,
   // so we use JSON.stringify as the memo key to avoid recreating the collection
   // (which would cause ark-ui to fire onValueChange on every render → infinite loop).
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const items = useMemo(() => normalizeItems(rawItems), [JSON.stringify(rawItems)]);
+  const propItems = useMemo(() => normalizeItems(rawItems), [JSON.stringify(rawItems)]);
+
+  // Merge prop items with children options (children options take precedence if same value)
+  const items = useMemo(() => {
+    if (childrenOptions.length === 0) return propItems;
+    const childItems = childrenOptions.map((o) => ({
+      value: String(o.value),
+      label: String(o.label ?? o.value),
+      disabled: o.enabled === false,
+    }));
+    const childValues = new Set(childItems.map((i) => i.value));
+    return [...propItems.filter((i) => !childValues.has(i.value)), ...childItems];
+  }, [propItems, childrenOptions]);
+
   const collection = useMemo(
     () => createListCollection({ items }),
     [items],
@@ -113,6 +145,12 @@ export const SelectRender = forwardRef(({
   );
 
   return (
+    <OptionContext.Provider value={optionContextValue}>
+      {children && (
+        <div style={{ display: "none" }}>
+          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+        </div>
+      )}
     <div
       ref={ref}
       className={classnames(styles.selectContainer, className)}
@@ -169,6 +207,7 @@ export const SelectRender = forwardRef(({
         <Select.HiddenSelect />
       </Select.Root>
     </div>
+    </OptionContext.Provider>
   );
 });
 
