@@ -4,7 +4,7 @@ import { Select, createListCollection } from "@ark-ui/react/select";
 import { Portal } from "@ark-ui/react/portal";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import { OptionContext, HiddenOption, OptionTypeProvider, type Option } from "xmlui";
+import { OptionContext, HiddenOption, OptionTypeProvider, type Option, Icon } from "xmlui";
 
 export type SelectItem = {
   value: string;
@@ -176,11 +176,11 @@ export const SelectRender = forwardRef(({
             />
             {clearable && selectedValues.length > 0 && (
               <Select.ClearTrigger className={styles.clearTrigger}>
-                <ClearIcon />
+                <Icon name="close" />
               </Select.ClearTrigger>
             )}
             <Select.Indicator className={styles.indicator}>
-              <ChevronDownIcon />
+              <Icon name="chevrondown" />
             </Select.Indicator>
           </Select.Trigger>
         </Select.Control>
@@ -196,7 +196,7 @@ export const SelectRender = forwardRef(({
                 >
                   <Select.ItemText>{item.label}</Select.ItemText>
                   <Select.ItemIndicator className={styles.itemIndicator}>
-                    <CheckIcon />
+                    <Icon name="checkmark" />
                   </Select.ItemIndicator>
                 </Select.Item>
               ))}
@@ -213,67 +213,3 @@ export const SelectRender = forwardRef(({
 
 SelectRender.displayName = "SelectRender";
 
-// --- Inline SVG icons (no external icon dep) ---
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M4 6L8 10L12 6"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M3 8L6.5 11.5L13 5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ClearIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 16 16"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <path
-        d="M4 4L12 12M12 4L4 12"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
