@@ -1,10 +1,7 @@
+import React from "react";
 import styles from "./TextBox.module.scss";
 
-import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
-import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import type { LookupActionOptions } from "../../abstractions/ActionDefs";
-import { type ComponentDef } from "../../abstractions/ComponentDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapCompound } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -24,7 +21,8 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TextBox, defaultProps } from "./TextBoxNative";
+import { defaultProps } from "./TextBoxNative";
+import { TextBoxRender } from "./TextBoxRender";
 
 const COMP = "TextBox";
 
@@ -170,80 +168,21 @@ export const TextBoxMd = createMetadata({
   },
 });
 
-type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
-
-function renderTextBox(
-  className: string | undefined,
-  state: any,
-  updateState: (componentState: any) => void,
-  extractValue: ValueExtractor,
-  node: TextBoxComponentDef,
-  lookupEventHandler: (
-    eventName: keyof NonNullable<TextBoxComponentDef["events"]>,
-    actionOptions?: LookupActionOptions,
-  ) => AsyncFunction | undefined,
-  registerComponentApi: RegisterComponentApiFn,
-  type: "text" | "password" = "text",
-) {
-  // TODO: How can we use the gap from the className?
-  //delete layoutCss.gap;
-  return (
-    <TextBox
-      type={type}
-      className={className}
-      value={state.value}
-      updateState={updateState}
-      initialValue={extractValue(node.props.initialValue)}
-      maxLength={extractValue(node.props.maxLength)}
-      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-      placeholder={extractValue.asOptionalString(node.props.placeholder)}
-      validationStatus={extractValue(node.props.validationStatus)}
-      invalidMessages={extractValue(node.props.invalidMessages)}
-      onDidChange={lookupEventHandler("didChange")}
-      onFocus={lookupEventHandler("gotFocus")}
-      onBlur={lookupEventHandler("lostFocus")}
-      registerComponentApi={registerComponentApi}
-      startText={extractValue.asOptionalString(node.props.startText)}
-      startIcon={extractValue.asOptionalString(node.props.startIcon)}
-      endText={extractValue.asOptionalString(node.props.endText)}
-      endIcon={extractValue.asOptionalString(node.props.endIcon)}
-      gap={extractValue.asOptionalString(node.props.gap)}
-      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      required={extractValue.asOptionalBoolean(node.props.required)}
-      showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
-      passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
-      passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
-      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-      validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-      validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-    />
-  );
-}
-
-export const textBoxComponentRenderer = createComponentRenderer(
-  COMP,
-  TextBoxMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    className,
-    registerComponentApi,
-  }) => {
-    return renderTextBox(
-      className,
-      state,
-      updateState,
-      extractValue,
-      node as TextBoxComponentDef,
-      lookupEventHandler,
-      registerComponentApi,
-    );
+export const textBoxComponentRenderer = wrapCompound(COMP, TextBoxRender, TextBoxMd, {
+  booleans: ["enabled", "autoFocus", "readOnly", "required", "showPasswordToggle"],
+  numbers: ["maxLength"],
+  events: {
+    didChange: "onDidChange",
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
   },
-);
+  parseInitialValue: (raw: any) => {
+    return raw != null ? String(raw) : "";
+  },
+  formatExternalValue: (value: any) => {
+    return value != null ? String(value) : "";
+  },
+});
 
 export const PasswordMd = createMetadata({
   ...TextBoxMd,
@@ -252,27 +191,24 @@ export const PasswordMd = createMetadata({
     "to input and edit passwords.",
 });
 
-export const passwordInputComponentRenderer = createComponentRenderer(
-  "PasswordInput",
-  PasswordMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    className,
-    registerComponentApi,
-  }) => {
-    return renderTextBox(
-      className,
-      state,
-      updateState,
-      extractValue,
-      node as TextBoxComponentDef,
-      lookupEventHandler,
-      registerComponentApi,
-      "password",
-    );
-  },
+// Password render: same as TextBoxRender but forces type="password"
+const PasswordRender = React.forwardRef((props: any, ref: any) =>
+  <TextBoxRender {...props} ref={ref} type="password" />
 );
+PasswordRender.displayName = "PasswordRender";
+
+export const passwordInputComponentRenderer = wrapCompound("PasswordInput", PasswordRender, PasswordMd, {
+  booleans: ["enabled", "autoFocus", "readOnly", "required", "showPasswordToggle"],
+  numbers: ["maxLength"],
+  events: {
+    didChange: "onDidChange",
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
+  },
+  parseInitialValue: (raw: any) => {
+    return raw != null ? String(raw) : "";
+  },
+  formatExternalValue: (value: any) => {
+    return value != null ? String(value) : "";
+  },
+});

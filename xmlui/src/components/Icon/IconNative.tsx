@@ -65,6 +65,11 @@ export const Icon = forwardRef(function Icon(
     onClick,
     onKeyDown: handleKeyDown,
     tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
+    // Clickable icons are interactive — add button role and accessible name
+    ...(onClick ? {
+      role: "button" as const,
+      "aria-label": restProps["aria-label"] || restProps.title || iconName || undefined,
+    } : {}),
   };
   // ---
   const customIconUrl = useCustomIconUrl(name);
@@ -113,6 +118,12 @@ const CustomIcon = forwardRef(function CustomIcon(
   const isSvgIcon = iconResourceUrl?.toLowerCase()?.endsWith(".svg");
   const customSvgIconRenderer = useCustomSvgIconRenderer(iconResourceUrl);
 
+  // Clickable custom icons get button role and accessible name
+  const ariaProps = onClick ? {
+    role: "button" as const,
+    "aria-label": rest["aria-label"] || rest.title || name || undefined,
+  } : {};
+
   if (iconResourceUrl && isSvgIcon) {
     const renderedIcon = customSvgIconRenderer?.({
       style,
@@ -130,6 +141,7 @@ const CustomIcon = forwardRef(function CustomIcon(
           onClick={onClick}
           onKeyDown={handleKeyDown}
           tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
+          {...ariaProps}
         />
       );
     }
@@ -142,6 +154,7 @@ const CustomIcon = forwardRef(function CustomIcon(
         tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
         {...(rest as any)}
         data-icon-name={name}
+        {...ariaProps}
       >
         {renderedIcon}
       </span>
@@ -154,11 +167,12 @@ const CustomIcon = forwardRef(function CustomIcon(
       src={iconResourceUrl}
       data-icon-name={name}
       style={{ width, height, ...style }}
-      alt={name}
+      alt={rest["aria-label"] || rest.title || name}
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
       {...(rest as any)}
+      {...ariaProps}
     />
   );
 });

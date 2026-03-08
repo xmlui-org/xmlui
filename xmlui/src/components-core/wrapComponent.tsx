@@ -471,7 +471,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               componentLabel: node.uid || node.testId || undefined,
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
-              ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
               ownerFileId,
               ownerSource,
             }));
@@ -490,7 +490,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               componentLabel: node.uid || node.testId || undefined,
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
-              ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
               ownerFileId,
               ownerSource,
             }));
