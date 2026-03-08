@@ -364,11 +364,22 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     specialProps.add("initialValue");
   }
 
-  // StateWrapper: a React component that manages value state lifecycle,
-  // then renders the user's RenderComponent with processed props.
-  const StateWrapper = React.memo(React.forwardRef((
-    { __updateState, __initialValue, __registerComponentApi,
-      __value, __onDidChange, ...nativeProps }: any,
+  // StateWrapper uses an outer/inner split to solve the stale-closure
+  // problem with React.memo.  XMLUI's createComponentRenderer creates new
+  // function references (event handlers) on every evaluation, which defeats
+  // React.memo's shallow comparison.
+  //
+  // CallbackSync (outer, NOT memoized):
+  //   - Always renders (cheap — just updates a ref and renders child)
+  //   - Keeps a ref pointing to the latest function props
+  //
+  // MemoizedInner (inner, memoized with custom comparison):
+  //   - Only re-renders when non-function props change (value, className, etc.)
+  //   - Uses the ref from CallbackSync for all callback invocations
+  //   - Provides stable onChange/registerApi references to RenderComponent
+
+  const MemoizedInner = React.memo(React.forwardRef((
+    { __callbackRef, __initialValue, __value, ...nativeProps }: any,
     ref: any,
   ) => {
     const [localValue, setLocalValue] = React.useState(() =>
@@ -380,11 +391,10 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // Initial state setup (once on mount)
     const initialized = React.useRef(false);
     React.useEffect(() => {
-      if (!initialized.current && __updateState && localValue !== undefined) {
-        // Unwrap single-element arrays for XMLUI state
+      if (!initialized.current && __callbackRef.current.__updateState && localValue !== undefined) {
         const stateValue = Array.isArray(localValue) && localValue.length === 1
           ? localValue[0] : localValue;
-        __updateState({ value: stateValue }, { initial: true });
+        __callbackRef.current.__updateState({ value: stateValue }, { initial: true });
         initialized.current = true;
       }
     }, []);
@@ -399,31 +409,91 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       }
     }, [__value]);
 
-    // onChange: update local state, fire traced callback
+    // onChange: stable reference — delegates to ref for current callback
     const onChange = React.useCallback((newValue: any) => {
       setLocalValue(
         config.formatExternalValue
           ? config.formatExternalValue(newValue, nativeProps)
           : newValue
       );
-      __onDidChange?.(newValue);
-    }, [__onDidChange]);
+      __callbackRef.current.__onDidChange?.(newValue);
+    }, [__callbackRef]);
 
-    // API registration helper
+    // API registration: stable reference
     const registerApi = React.useCallback((apis: Record<string, any>) => {
-      __registerComponentApi?.(apis);
-    }, [__registerComponentApi]);
+      __callbackRef.current.__registerComponentApi?.(apis);
+    }, [__callbackRef]);
+
+    // Build stable wrappers for native event props (onFocus, onBlur, etc.)
+    // Created once per event key, delegates to ref for current handler.
+    const stableEvents = React.useRef<Record<string, (...args: any[]) => any>>({});
+    for (const key of Object.keys(nativeProps)) {
+      if (typeof nativeProps[key] === 'function' && !stableEvents.current[key]) {
+        const eventKey = key;
+        stableEvents.current[eventKey] = (...args: any[]) =>
+          __callbackRef.current._native?.[eventKey]?.(...args);
+      }
+    }
+
+    const mergedProps = { ...nativeProps };
+    for (const [key, fn] of Object.entries(stableEvents.current)) {
+      mergedProps[key] = fn;
+    }
 
     return (
       <RenderComponent
         ref={ref}
-        {...nativeProps}
+        {...mergedProps}
         value={localValue}
         onChange={onChange}
         registerApi={registerApi}
       />
     );
-  }));
+  }), (prevProps, nextProps) => {
+    // Custom comparison: skip function props and __callbackRef (ref identity is stable).
+    // Only re-render when value-type props (className, enabled, placeholder, etc.) change.
+    const allKeys = new Set([...Object.keys(prevProps), ...Object.keys(nextProps)]);
+    for (const key of allKeys) {
+      if (key === '__callbackRef') continue;
+      if (typeof prevProps[key] === 'function' && typeof nextProps[key] === 'function') continue;
+      if (prevProps[key] !== nextProps[key]) return false;
+    }
+    return true;
+  });
+
+  // CallbackSync: outer component that keeps the callback ref current.
+  // NOT memoized — runs on every XMLUI evaluation (cheap, no DOM work).
+  const CallbackSync = React.forwardRef((
+    { __updateState, __initialValue, __registerComponentApi,
+      __value, __onDidChange, ...nativeProps }: any,
+    ref: any,
+  ) => {
+    const callbackRef = React.useRef<any>({ __onDidChange, __updateState, __registerComponentApi, _native: {} });
+
+    // Sync all function props into the ref (runs every render of CallbackSync)
+    callbackRef.current.__onDidChange = __onDidChange;
+    callbackRef.current.__updateState = __updateState;
+    callbackRef.current.__registerComponentApi = __registerComponentApi;
+
+    // Sync native event handlers (onFocus, onBlur, etc.)
+    for (const key of Object.keys(nativeProps)) {
+      if (typeof nativeProps[key] === 'function') {
+        callbackRef.current._native[key] = nativeProps[key];
+      }
+    }
+
+    return (
+      <MemoizedInner
+        ref={ref}
+        __callbackRef={callbackRef}
+        __initialValue={__initialValue}
+        __value={__value}
+        {...nativeProps}
+      />
+    );
+  });
+
+  const StateWrapper = CallbackSync;
 
   StateWrapper.displayName = `${type}StateWrapper`;
 

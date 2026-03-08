@@ -13,6 +13,9 @@ import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_CONCISE_VALI
  *
  * Receives `value`, `onChange`, and `registerApi` from wrapCompound's
  * StateWrapper. Everything else is native React props.
+ *
+ * Like SliderRender, this component does NOT maintain its own value state.
+ * StateWrapper manages the value lifecycle; we use `value` from props directly.
  */
 export const TextBoxRender = forwardRef(({
   value, onChange, registerApi, className,
@@ -51,25 +54,14 @@ export const TextBoxRender = forwardRef(({
     }
   }, [autoFocus]);
 
-  // Workaround for jumping caret: local state syncs with external value
-  const [localValue, setLocalValue] = useState(value ?? "");
-  useEffect(() => {
-    setLocalValue(value ?? "");
-  }, [value]);
-
-  const updateValue = useCallback(
-    (newVal: string) => {
-      setLocalValue(newVal);
-      onChange?.(newVal);
-    },
-    [onChange],
-  );
+  // StateWrapper manages value state. Use props directly — no local duplicate.
+  const displayValue: string = value ?? "";
 
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      updateValue(event.target.value);
+      onChange?.(event.target.value);
     },
-    [updateValue],
+    [onChange],
   );
 
   const focus = useCallback(() => {
@@ -79,9 +71,9 @@ export const TextBoxRender = forwardRef(({
   useEffect(() => {
     registerApi?.({
       focus,
-      setValue: (v: string) => updateValue(v),
+      setValue: (v: string) => onChange?.(v),
     });
-  }, [registerApi, focus, updateValue]);
+  }, [registerApi, focus, onChange]);
 
   return (
     <div
@@ -110,7 +102,7 @@ export const TextBoxRender = forwardRef(({
             [styles.readOnly]: readOnly,
           })}
           disabled={!enabled}
-          value={localValue}
+          value={displayValue}
           maxLength={maxLength}
           placeholder={placeholder}
           onChange={onInputChange}
@@ -123,12 +115,12 @@ export const TextBoxRender = forwardRef(({
           required={required}
         />
       </Part>
-      {!readOnly && enabled && type === "search" && localValue?.length > 0 && (
+      {!readOnly && enabled && type === "search" && displayValue.length > 0 && (
         <Part partId={PART_END_ADORNMENT}>
           <Adornment
             iconName="close"
             className={styles.adornment}
-            onClick={() => updateValue("")}
+            onClick={() => onChange?.("")}
           />
         </Part>
       )}
