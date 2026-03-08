@@ -51,6 +51,7 @@ export const iconComponentRenderer = createComponentRenderer(
         className={className}
         fallback={extractValue.asOptionalString(node.props.fallback)}
         onClick={lookupEventHandler("click")}
+        aria-label={extractValue.asOptionalString(node.props.tooltip)}
       />
     );
   },
