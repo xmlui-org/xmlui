@@ -1,6 +1,7 @@
 import styles from "./FileInput.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
+import { pushXsLog, createLogEntry } from "../../components-core/inspector/inspectorUtils";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -159,6 +160,24 @@ export const fileInputRenderer = createComponentRenderer(
   FileInputMd,
   ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, className }) => {
     const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
+    const appDidChange = lookupEventHandler("didChange");
+
+    // Wrap onDidChange to emit a value:change trace with file metadata
+    const onDidChange = (...args: any[]) => {
+      const val = args[0];
+      const fileList = Array.isArray(val) && val.length > 0 && val[0] instanceof File ? val : [];
+      if (fileList.length > 0) {
+        pushXsLog(createLogEntry("value:change", {
+          component: COMP,
+          componentLabel: node.uid || node.testId || undefined,
+          displayLabel: fileList.map((f: File) => f.name).join(", "),
+          eventName: "didChange",
+          files: fileList.map((f: File) => ({ name: f.name, size: f.size, type: f.type })),
+        }));
+      }
+      if (appDidChange) return appDidChange(...args);
+    };
+
     return (
       <FileInput
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
@@ -171,7 +190,7 @@ export const fileInputRenderer = createComponentRenderer(
         updateState={updateState}
         value={isFileArray(state?.value) ? state?.value : undefined}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        onDidChange={lookupEventHandler("didChange")}
+        onDidChange={onDidChange}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         validationStatus={extractValue(node.props.validationStatus)}

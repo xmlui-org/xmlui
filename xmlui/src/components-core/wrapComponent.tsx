@@ -137,9 +137,34 @@ function traceDisplayLabel(
   args: any[],
 ): string | undefined {
   if (traceKind === "value:change") {
-    return args[0] != null ? String(args[0]) : undefined;
+    const val = args[0];
+    if (val == null) return undefined;
+    // File or File[] — emit file metadata instead of "[object File]"
+    if (typeof File !== "undefined") {
+      if (val instanceof File) return val.name;
+      if (Array.isArray(val) && val.length > 0 && val[0] instanceof File) {
+        return val.map((f: File) => f.name).join(", ");
+      }
+    }
+    return String(val);
   }
   // For focus events, the arg is a FocusEvent object — not useful as a label
+  return undefined;
+}
+
+/**
+ * Extract file metadata from value:change args for trace enrichment.
+ * Returns undefined if the value doesn't contain File objects.
+ */
+function extractFileMetadata(args: any[]): { files: { name: string; size: number; type: string }[] } | undefined {
+  if (typeof File === "undefined") return undefined;
+  const val = args[0];
+  if (val instanceof File) {
+    return { files: [{ name: val.name, size: val.size, type: val.type }] };
+  }
+  if (Array.isArray(val) && val.length > 0 && val[0] instanceof File) {
+    return { files: val.map((f: File) => ({ name: f.name, size: f.size, type: f.type })) };
+  }
   return undefined;
 }
 
@@ -244,6 +269,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             ariaName: extractValue(node.props?.["aria-label"]) || undefined,
             ownerFileId,
             ownerSource,
+            ...extractFileMetadata(args),
           }));
         }
         if (handler) {
@@ -544,6 +570,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
               ownerFileId,
               ownerSource,
+              ...extractFileMetadata(args),
             }));
           }
           updateState({ value: args[0] });
@@ -563,6 +590,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
               ownerFileId,
               ownerSource,
+              ...extractFileMetadata(args),
             }));
           }
           if (handler) {
