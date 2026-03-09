@@ -93,6 +93,22 @@ Determines where to place the pagination button row in the layout. It works the 
 
 Available values: `start`, `center` **(default)**, `end`
 
+### `cellUserSelect` [#celluserselect]
+
+> [!DEF]  default: **"none"**
+
+This property controls whether users can select text within table cells.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected **(default)** |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
 ### `cellVerticalAlign` [#cellverticalalign]
 
 > [!DEF]  default: **"center"**
@@ -433,6 +449,22 @@ It accepts common [size values](/docs/styles-and-themes/common-units#size-values
   </Table>
 </App>
 ```
+
+### `headerUserSelect` [#headeruserselect]
+
+> [!DEF]  default: **"text"**
+
+This property controls whether users can select text within table headers.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user **(default)** |
+| `none` | Text cannot be selected |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
 
 ### `hideHeader` [#hideheader]
 
@@ -1492,7 +1524,7 @@ Change the selection in one of the tables and check how it is synced.
 
 > [!DEF]  default: **"auto"**
 
-This property controls whether users can select text within table cells. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
+This property controls whether users can select text within table cells.
 
 Available values:
 

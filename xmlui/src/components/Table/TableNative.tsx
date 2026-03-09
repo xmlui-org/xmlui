@@ -217,6 +217,8 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  headerUserSelect?: string;
+  cellUserSelect?: string;
   userSelectCell?: string;
   userSelectRow?: string;
   userSelectHeading?: string;
@@ -571,6 +573,8 @@ export const Table = forwardRef(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      headerUserSelect,
+      cellUserSelect,
       userSelectCell,
       userSelectRow,
       userSelectHeading,
@@ -588,10 +592,11 @@ export const Table = forwardRef(
   ) => {
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
-      userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+      cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
     const effectiveUserSelectRow =
       userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
     const effectiveUserSelectHeading =
+      headerUserSelect ??
       userSelectHeading ??
       getThemeVar("userSelect-heading-Table") ??
       defaultProps.userSelectHeading;
