@@ -49,6 +49,7 @@ xmlui-optimized-output
 CLAUDE.md
 .github/copilot-instructions.md
 
-
+# External projects (not part of monorepo)
+myworkdriveclient
 
 docs/scripts/component-metadata.json

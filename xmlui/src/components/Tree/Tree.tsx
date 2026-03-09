@@ -137,6 +137,13 @@ export const TreeMd = createMetadata({
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
+    overflow: {
+      description:
+        "Overrides the overflow style of the tree scroll container. When set (e.g. \"visible\"), " +
+        "the tree renders at its natural content height without internal scrolling, allowing an outer " +
+        "container to handle scrolling instead.",
+      valueType: "string",
+    },
     showScrollerFade: {
       description:
         "When enabled, displays gradient fade indicators at the top and bottom edges of the tree " +
@@ -553,6 +560,7 @@ export const treeComponentRenderer = createComponentRenderer(
         onCopyAction={lookupEventHandler("copyAction")}
         onPasteAction={lookupEventHandler("pasteAction")}
         onDeleteAction={lookupEventHandler("deleteAction")}
+        overflow={extractValue(node.props.overflow)}
         lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
