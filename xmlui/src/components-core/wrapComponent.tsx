@@ -57,6 +57,12 @@ export type WrapComponentConfig = {
   stateful?: boolean;
 
   /**
+   * Props that should be resolved via extractResourceUrl instead of extractValue.
+   * Use for props that contain logical resource URLs (e.g., image src, avatar url).
+   */
+  resourceUrls?: string[];
+
+  /**
    * When true, passes an `onNativeEvent` callback to the render component.
    * The render component can call this with any native library event object.
    * The wrapper will automatically trace it using the event's `type` field.
@@ -123,6 +129,7 @@ function mergeWithMetadata(
   booleanSet: Set<string>;
   numberSet: Set<string>;
   stringSet: Set<string>;
+  resourceUrlSet: Set<string>;
   eventMap: Record<string, string>;
   callbackMap: Record<string, string>;
   renameMap: Record<string, string>;
@@ -132,13 +139,15 @@ function mergeWithMetadata(
   const booleanSet = new Set<string>(config.booleans ?? []);
   const numberSet = new Set<string>(config.numbers ?? []);
   const stringSet = new Set<string>(config.strings ?? []);
+  const resourceUrlSet = new Set<string>(config.resourceUrls ?? []);
 
   // Auto-classify props from metadata valueType (only if not already categorised)
   if (metadata.props) {
     for (const [propName, propMeta] of Object.entries(metadata.props)) {
       if (propName === "initialValue") continue; // handled separately by wrapper
-      if (booleanSet.has(propName) || numberSet.has(propName) || stringSet.has(propName)) continue;
-      if (propMeta.valueType === "boolean") booleanSet.add(propName);
+      if (booleanSet.has(propName) || numberSet.has(propName) || stringSet.has(propName) || resourceUrlSet.has(propName)) continue;
+      if (propMeta.isResourceUrl) resourceUrlSet.add(propName);
+      else if (propMeta.valueType === "boolean") booleanSet.add(propName);
       else if (propMeta.valueType === "number") numberSet.add(propName);
       else if (propMeta.valueType === "string") stringSet.add(propName);
     }
@@ -160,6 +169,7 @@ function mergeWithMetadata(
     booleanSet,
     numberSet,
     stringSet,
+    resourceUrlSet,
     eventMap,
     callbackMap: normalizeCallbacks(config.callbacks),
     renameMap: config.rename ?? {},
@@ -257,7 +267,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
-  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet } =
+  const { booleanSet, numberSet, stringSet, resourceUrlSet, eventMap, callbackMap, renameMap, excludeSet } =
     mergeWithMetadata(metadata, config);
 
   // Collect all specially-handled XMLUI prop names so we can skip them
@@ -265,6 +275,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   const specialProps = new Set([
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
+    ...resourceUrlSet,
     "id", // handled separately via className/node
   ]);
 
@@ -281,6 +292,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     const {
       node,
       extractValue,
+      extractResourceUrl,
       lookupEventHandler,
       lookupSyncCallback,
       className,
@@ -307,12 +319,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     // --- Events (with auto-tracing) ---
-    // Always emit a semantic behavioral trace event, regardless of whether
-    // the XMLUI app defined a handler. This traces what the user did
-    // (e.g. "slider moved to 75") not what code ran.
+    // Emit a semantic behavioral trace event and/or call the XMLUI handler.
+    // Only wire up the prop if there is something to do — leaving it undefined
+    // preserves native component behaviour that checks `!!onClick` etc.
     for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
       const handler = lookupEventHandler(xmluiName);
       const traceKind = eventNameToTraceKind(xmluiName);
+      if (!handler && !traceKind) continue;
       props[reactPropName] = (...args: any[]) => {
         if (traceKind) {
           pushXsLog(createLogEntry(traceKind, {
@@ -364,6 +377,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           handler(event);
         }
       };
+    }
+
+    // --- Resource URL props ---
+    for (const key of resourceUrlSet) {
+      const rawValue = node.props?.[key];
+      props[renameMap[key] ?? key] = rawValue ? extractResourceUrl(rawValue) : undefined;
     }
 
     // --- Forward all remaining node.props ---
