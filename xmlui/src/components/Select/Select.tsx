@@ -1,7 +1,9 @@
 import styles from "./Select.module.scss";
 
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   dPlaceholder,
   dInitialValue,
@@ -207,6 +209,15 @@ export const SelectMd = createMetadata({
   },
 });
 
+type ThemedSelectProps = React.ComponentProps<typeof Select> & { className?: string };
+export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
+  function ThemedSelect({ className, ...props }: ThemedSelectProps, ref) {
+    const themeClass = useComponentThemeClass(SelectMd);
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    return <Select {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
+  },
+);
+
 export const selectComponentRenderer = createComponentRenderer(
   COMP,
   SelectMd,
@@ -230,6 +241,7 @@ export const selectComponentRenderer = createComponentRenderer(
       <Select
         multiSelect={multiSelect}
         className={className}
+        contentClassName={className}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,

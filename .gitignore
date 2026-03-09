@@ -42,8 +42,13 @@ dist
 dist-ssg
 xmlui-optimized-output
 
-# Claude Code local config
+# AI local config
 .claude
 .mcp.json
+.qwen
+CLAUDE.md
+.github/copilot-instructions.md
+
+
 
 docs/scripts/component-metadata.json

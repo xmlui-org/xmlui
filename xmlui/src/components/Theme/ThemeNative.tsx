@@ -21,6 +21,10 @@ import {
   useStyles,
 } from "../../components-core/theming/StyleContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { parseHVar } from "../../components-core/theming/hvar";
+import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
+import { useComponentRegistry } from "../ComponentRegistryContext";
+import { register } from "module";
 
 type Props = {
   id?: string;
@@ -93,11 +97,40 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     getThemeVar,
   } = useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
+  const componentRegistry = useComponentRegistry();
 
   const transformedStyles = useMemo(() => {
+    const filteredThemeCssVars = {};
+
+    Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
+      // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
+      // parseHVar correctly identifies the component part of a theme var name.
+      // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
+      // instead of a base (no-component) var.
+      const rawKey = key.replace(/^--[^-]+-/, "");
+      let componentName = parseHVar(rawKey)?.component;
+      const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
+      if (
+        !componentName ||
+        registeredComponent?.isCompoundComponent ||
+        componentName === "Input" ||
+        componentName === "Heading" ||
+        componentName === "Footer"
+      ) {
+        const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
+        filteredThemeCssVars[key] = resolvedValue;
+      }
+    });
+
+    // --- Always add the explicitly specified themeVars with the correct prefix,
+    // --- even if they don't match the componentName pattern
+    Object.entries(themeVars).forEach(([key, value]) => {
+      filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
+    });
+
     const ret = {
       "&": {
-        ...themeCssVars,
+        ...filteredThemeCssVars,
         colorScheme: themeTone,
       },
     };
@@ -142,7 +175,7 @@ export function Theme({
       };
     }
     return ret;
-  }, [isRoot, themeCssVars, themeTone, getThemeVar]);
+  }, [isRoot, themeCssVars, themeTone, getThemeVar, componentRegistry]);
 
   const className = useStyles(transformedStyles);
 
@@ -167,11 +200,13 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     currentTheme,
     currentThemeRoot,
+    fontLinks,
     getResourceUrl,
     getThemeVar,
     themeCssVars,
     themeTone,
     disableInlineStyle,
+    componentRegistry,
   ]);
 
   const { indexing } = useIndexerContext();

@@ -22,6 +22,8 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { defaultProps, NumberBox } from "./NumberBoxNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "NumberBox";
 
@@ -154,6 +156,21 @@ export const NumberBoxMd = createMetadata({
     [`paddingHorizontal-${COMP}`]: "$space-2",
   },
 });
+
+type ThemedNumberBoxProps = React.ComponentPropsWithoutRef<typeof NumberBox>;
+
+export const ThemedNumberBox = React.forwardRef<React.ElementRef<typeof NumberBox>, ThemedNumberBoxProps>(
+  function ThemedNumberBox({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(NumberBoxMd);
+    return (
+      <NumberBox
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const numberBoxComponentRenderer = createComponentRenderer(
   COMP,

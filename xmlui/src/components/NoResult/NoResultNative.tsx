@@ -4,7 +4,7 @@ import classnames from "classnames";
 
 import styles from "./NoResult.module.scss";
 
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 // Default props for the NoResult component
 export const defaultProps = {
@@ -38,7 +38,7 @@ export const NoResult = forwardRef(function NoResult(
       style={style}
       ref={forwardedRef}
     >
-      {!hideIcon && <Icon name={icon} className={styles.icon} />}
+      {!hideIcon && <ThemedIcon name={icon} className={styles.icon} />}
       {label}
     </div>
   );

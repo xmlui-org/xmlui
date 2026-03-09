@@ -3,7 +3,7 @@ import navLinkStyles from "../NavLink/NavLink.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { defaultProps, NavGroup } from "./NavGroupNative";
 
@@ -114,13 +114,13 @@ export const NavGroupMd = createMetadata({
 export const navGroupComponentRenderer = createComponentRenderer(
   COMP,
   NavGroupMd,
-  ({ node, extractValue, renderChild }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <NavGroup
         label={extractValue.asDisplayText(node.props.label)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         to={extractValue.asOptionalString(node.props.to)}
-        icon={<Icon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
+        icon={<ThemedIcon name={extractValue.asString(node.props.icon)} className={navLinkStyles.icon} />}
         node={node}
         initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
         noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator)}
@@ -131,6 +131,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
         iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
         expandIconAlignment={extractValue(node.props.expandIconAlignment)}
+        className={className}
       />
     );
   },

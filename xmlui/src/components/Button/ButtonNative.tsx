@@ -175,3 +175,4 @@ const IconLabel = ({ icon, accessibleName = "" }: IconLabelProps) => {
     </VisuallyHidden>
   );
 };
+

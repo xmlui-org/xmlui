@@ -12,15 +12,15 @@ $themeVars: (
 $componentName: "ColorPicker";
 
 // Variables for default variant
-$borderRadius-ColorPicker--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
-$borderColor-ColorPicker--default: createThemeVar("Input:borderColor-#{$componentName}--default");
-$borderWidth-ColorPicker--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
-$borderStyle-ColorPicker--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
-$boxShadow-ColorPicker--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
-$borderColor-ColorPicker--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
-$boxShadow-ColorPicker--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
-$borderColor-ColorPicker--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
-$boxShadow-ColorPicker--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
+$borderRadius-ColorPicker: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-ColorPicker: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-ColorPicker: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-ColorPicker: createThemeVar("Input:borderStyle-#{$componentName}");
+$boxShadow-ColorPicker: createThemeVar("Input:boxShadow-#{$componentName}");
+$borderColor-ColorPicker--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$boxShadow-ColorPicker--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$borderColor-ColorPicker--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-ColorPicker--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
 
 // Variables for error variant
 $borderRadius-ColorPicker--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
@@ -61,20 +61,21 @@ $width-ColorPicker: createThemeVar("Input:width-#{$componentName}");
 $height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
 
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
 
   &:not([disabled]):not([readonly]):hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
   }
 
   &:not([readonly]):focus {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
   }
 }
 
@@ -102,7 +103,7 @@ $height-ColorPicker: createThemeVar("Input:height-#{$componentName}");
       border-radius: 2px;
     }
 
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");

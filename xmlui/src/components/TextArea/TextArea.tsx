@@ -20,6 +20,8 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { type ResizeOptions, TextArea, defaultProps } from "./TextAreaNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TextArea";
 
@@ -131,6 +133,21 @@ export const TextAreaMd = createMetadata({
     [`paddingHorizontal-${COMP}`]: "$space-2",
   },
 });
+
+type ThemedTextAreaProps = React.ComponentPropsWithoutRef<typeof TextArea>;
+
+export const ThemedTextArea = React.forwardRef<React.ElementRef<typeof TextArea>, ThemedTextAreaProps>(
+  function ThemedTextArea({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TextAreaMd);
+    return (
+      <TextArea
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const textAreaComponentRenderer = createComponentRenderer(
   COMP,

@@ -7,7 +7,14 @@ import "./react-table-config.d.ts";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { createMetadata, d, dAutoFocus, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
+import {
+  createMetadata,
+  d,
+  dAutoFocus,
+  dComponent,
+  dContextMenu,
+  dInternal,
+} from "../metadata-helpers";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -21,7 +28,7 @@ import {
   defaultProps,
 } from "./TableNative";
 import type { RendererContext } from "../../abstractions/RendererDefs";
-import { PositionValues } from "../Pagination/PaginationNative";
+import { PositionValues } from "../Pagination/Pagination";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
@@ -149,7 +156,8 @@ export const TableMd = createMetadata({
         `a Boolean-like value.`,
     ),
     rowUnselectablePredicate: {
-      description: `This property defines a predicate function with a return value that determines if the ` +
+      description:
+        `This property defines a predicate function with a return value that determines if the ` +
         `row should be unselectable. The function retrieves the item to display and should return ` +
         `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
     },
@@ -269,10 +277,20 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
+    headerUserSelect: {
+      description: `This property controls whether users can select text within table headers.`,
+      valueType: "string",
+      availableValues: userSelectValues,
+      defaultValue: "text",
+    },
+    cellUserSelect: {
+      description: `This property controls whether users can select text within table cells.`,
+      valueType: "string",
+      availableValues: userSelectValues,
+      defaultValue: "none",
+    },
     userSelectCell: {
-      description:
-        `This property controls whether users can select text within table cells. ` +
-        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      description: `This property controls whether users can select text within table cells.`,
       valueType: "string",
       availableValues: userSelectValues,
       defaultValue: defaultProps.userSelectCell,
@@ -320,7 +338,8 @@ export const TableMd = createMetadata({
       signature: "sortingDidChange(columnName: string, sortDirection: 'asc' | 'desc' | null): void",
       parameters: {
         columnName: "The name of the column being sorted.",
-        sortDirection: "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.",
+        sortDirection:
+          "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.",
       },
     },
     willSort: {
@@ -356,11 +375,14 @@ export const TableMd = createMetadata({
         `(default: Ctrl+A/Cmd+A) and \`rowsSelectable\` is set to \`true\`. The component ` +
         `automatically selects all rows before invoking this handler. The handler receives ` +
         `three parameters: the currently focused row (if any), all selected items, and all selected IDs.`,
-      signature: "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused. Contains item data, row index, row ID, and selection state.",
-        selectedItems: "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
-        selectedIds: "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.",
+        selectedItems:
+          "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
+        selectedIds:
+          "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.",
       },
     },
     cutAction: {
@@ -370,7 +392,8 @@ export const TableMd = createMetadata({
         `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
         `does not automatically modify data; the handler must implement the cut logic (e.g., ` +
         `copying data to clipboard and removing from the data source).`,
-      signature: "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -383,7 +406,8 @@ export const TableMd = createMetadata({
         `(default: Ctrl+C/Cmd+C) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
         `three parameters: the focused row, selected items, and selected IDs. The handler should ` +
         `implement the copy logic (e.g., using the Clipboard API to copy selected data).`,
-      signature: "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -396,7 +420,8 @@ export const TableMd = createMetadata({
         `(default: Ctrl+V/Cmd+V) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
         `three parameters: the focused row, selected items, and selected IDs. The handler must ` +
         `implement the paste logic (e.g., reading from clipboard and inserting data into the table).`,
-      signature: "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -410,7 +435,8 @@ export const TableMd = createMetadata({
         `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
         `does not automatically remove data; the handler must implement the delete logic (e.g., ` +
         `removing selected items from the data source).`,
-      signature: "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -592,9 +618,7 @@ const TableWithColumns = memo(
       let syncAdapter: any;
       if (syncVarName !== undefined) {
         if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
-          console.error(
-            `[Table syncWithVar] Invalid variable name: "${syncVarName}"`,
-          );
+          console.error(`[Table syncWithVar] Invalid variable name: "${syncVarName}"`);
           syncAdapterHolderRef.current = null;
         } else {
           const currentSyncVarValue = extractValue(`{${syncVarName}}`);
@@ -692,9 +716,7 @@ const TableWithColumns = memo(
             paginationControlsLocation={extractValue.asOptionalString(
               node.props.paginationControlsLocation,
             )}
-            alwaysShowPagination={extractValue.asOptionalBoolean(
-              node.props.alwaysShowPagination,
-            )}
+            alwaysShowPagination={extractValue.asOptionalBoolean(node.props.alwaysShowPagination)}
             cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
             buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
             pageSizeSelectorPosition={extractValue.asOptionalString(
@@ -707,11 +729,17 @@ const TableWithColumns = memo(
             checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
             initiallySelected={extractValue(node.props.initiallySelected)}
             syncWithAppState={syncAdapter ?? extractValue(node.props.syncWithAppState)}
+            headerUserSelect={extractValue.asOptionalString(node.props.headerUserSelect)}
+            cellUserSelect={extractValue.asOptionalString(node.props.cellUserSelect)}
             userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
-            hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
-            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.alwaysShowSelectionCheckboxes)}
+            hideSelectionCheckboxes={extractValue.asOptionalBoolean(
+              node.props.hideSelectionCheckboxes,
+            )}
+            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(
+              node.props.alwaysShowSelectionCheckboxes,
+            )}
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
           />

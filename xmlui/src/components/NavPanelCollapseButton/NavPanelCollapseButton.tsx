@@ -1,6 +1,6 @@
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Button } from "../Button/ButtonNative";
-import { Icon } from "../Icon/IconNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata } from "../metadata-helpers";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 
@@ -50,7 +50,7 @@ export function NavPanelCollapseButton({
   return (
     <Button
       variant="ghost"
-      icon={<Icon name={collapsed ? iconCollapsed : icon} />}
+      icon={<ThemedIcon name={collapsed ? iconCollapsed : icon} />}
       aria-label={collapsed ? ariaLabelCollapsed : ariaLabel}
       onClick={toggle}
     />

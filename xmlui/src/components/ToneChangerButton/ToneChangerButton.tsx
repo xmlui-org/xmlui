@@ -1,7 +1,7 @@
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { Button } from "../Button/ButtonNative";
-import { Icon } from "../Icon/IconNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, dClick } from "../metadata-helpers";
 import { noop } from "lodash-es";
 
@@ -55,7 +55,7 @@ export function ToneChangerButton({
     <Button
       variant="ghost"
       style={{ flexShrink: 0 }}
-      icon={<Icon name={iconName} fallback={fallbackIcon} />}
+      icon={<ThemedIcon name={iconName} fallback={fallbackIcon} />}
       onClick={() => {
         if (activeThemeTone === "light") {
           setActiveThemeTone("dark");

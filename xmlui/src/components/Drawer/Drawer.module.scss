@@ -25,6 +25,8 @@ $zIndex-Drawer: createThemeVar("zIndex-#{$component}");
 $gap-Drawer: createThemeVar("gap-#{$component}");
 $animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
 $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
+$top-closeButton-Drawer: createThemeVar("top-closeButton-#{$component}");
+$right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
 // Slide animations
 @keyframes slideInFromLeft {
@@ -159,14 +161,11 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
 // Sticky header: outer padding (top + horizontal), no bottom — gap handles spacing
 .header {
   flex-shrink: 0;
-  display: flex;
-  align-items: flex-start;
   padding: $paddingTop-Drawer $paddingRight-Drawer 0 $paddingLeft-Drawer;
 }
 
 .headerContent {
-  flex: 1;
-  min-width: 0;
+  width: 100%;
 }
 
 // Scrollable body: outer padding (bottom + horizontal), gap-driven top margin
@@ -177,14 +176,16 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   margin-top: $gap-Drawer;
 }
 
-// Close button (×)
+// Close button (×) - floats at top-right
 .closeButton {
+  position: absolute;
+  top: $top-closeButton-Drawer;
+  right: $right-closeButton-Drawer;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
-  margin-left: auto;
   border: 0;
   border-radius: t.$borderRadius;
   background-color: transparent;
@@ -192,6 +193,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 150ms ease;
+  z-index: 10;
 
   &:hover {
     opacity: 1;

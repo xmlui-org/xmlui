@@ -4,6 +4,8 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { CodeBlock } from "./CodeBlockNative";
 import { createMetadata } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "CodeBlock";
 
@@ -43,6 +45,20 @@ export const CodeBlockMd = createMetadata({
     }
   },
 });
+
+type ThemedCodeBlockProps = React.ComponentPropsWithoutRef<typeof CodeBlock>;
+
+export const ThemedCodeBlock = React.forwardRef<HTMLDivElement, ThemedCodeBlockProps>(
+  function ThemedCodeBlock({ className, ...props }, _ref) {
+    const themeClass = useComponentThemeClass(CodeBlockMd);
+    return (
+      <CodeBlock
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+      />
+    );
+  },
+);
 
 export const codeBlockComponentRenderer = createComponentRenderer(
   "CodeBlock",

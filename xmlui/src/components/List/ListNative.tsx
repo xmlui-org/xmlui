@@ -22,7 +22,7 @@ import {
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
-import { Card } from "../Card/CardNative";
+import { ThemedCard as Card } from "../Card/Card";
 import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import {
@@ -35,8 +35,8 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
 import classnames from "classnames";
 import { useEvent } from "../../components-core/utils/misc";
-import { Spinner } from "../Spinner/SpinnerNative";
-import { Text } from "../Text/TextNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedText as Text } from "../Text/Text";
 import { MemoizedItem } from "../container-helpers";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 

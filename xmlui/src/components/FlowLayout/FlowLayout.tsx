@@ -1,11 +1,15 @@
+import React from "react";
 import styles from "./FlowLayout.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+
+export { FlowItemBreak, FlowItemWrapper } from "./FlowLayoutNative";
 import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";
@@ -90,6 +94,21 @@ export const FlowLayoutMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
+type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout>;
+
+export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLayout>, ThemedFlowLayoutProps>(
+  function ThemedFlowLayout({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(FlowLayoutMd);
+    return (
+      <FlowLayout
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
@@ -115,7 +134,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
     return (
-      <FlowLayout
+      <ThemedFlowLayout
         className={className}
         columnGap={columnGap}
         rowGap={rowGap}
@@ -155,7 +174,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             );
           },
         })}
-      </FlowLayout>
+      </ThemedFlowLayout>
     );
   },
 );

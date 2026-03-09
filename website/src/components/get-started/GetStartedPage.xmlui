@@ -24,11 +24,17 @@ You will use the XMLUI CLI (command line interface) to run demo apps locally, an
 
 Once installed you can acquire and run all three apps locally.
 
-`xmlui run https://github.com/xmlui-org/xmlui-hello-world/releases/latest/download/xmlui-hello-world.zip`
+```
+xmlui run https://github.com/xmlui-org/xmlui-hello-world/releases/latest/download/xmlui-hello-world.zip
+```
 
-`xmlui run https://github.com/xmlui-org/xmlui-weather/releases/latest/download/xmlui-weather.zip`
+```
+xmlui run https://github.com/xmlui-org/xmlui-weather/releases/latest/download/xmlui-weather.zip
+```
 
-`xmlui run https://github.com/xmlui-org/xmlui-invoice/releases/latest/download/xmlui-invoice.zip`
+```
+xmlui run https://github.com/xmlui-org/xmlui-invoice/releases/latest/download/xmlui-invoice.zip
+```
 
 See [this blog post](https://blog.xmlui.org/blog/introducing-the-xmlui-cli) for details.
 
@@ -37,7 +43,7 @@ See [this blog post](https://blog.xmlui.org/blog/introducing-the-xmlui-cli) for 
 
 Once the XMLUI CLI is installed, you can configure AI coding assistants to use its bunded MCP server. Here's a sample `claude_desktop_config.json` that works with Claude Desktop or (using `claude mcp add-from-claude-desktop`) Claude Code.
 
-```
+```json
 {
   "mcpServers": {
     "filesystem": {

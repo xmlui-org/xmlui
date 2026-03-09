@@ -36,11 +36,11 @@ import {
   triedToSubmit,
   UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
-import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
-import { Text } from "../../components/Text/TextNative";
-import { Stack } from "../../components/Stack/StackNative";
+import { ThemedModalDialog as ModalDialog } from "../../components/ModalDialog/ModalDialog";
+import { ThemedText as Text } from "../../components/Text/Text";
+import { ThemedStack as Stack } from "../../components/Stack/Stack";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
 import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
 import { type FormAction, formReset } from "../Form/formActions";

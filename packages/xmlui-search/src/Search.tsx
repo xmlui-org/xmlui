@@ -3,6 +3,7 @@ import {
   useDeferredValue,
   useId,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -41,6 +42,7 @@ type Props = {
   maxContentMatchNumber?: number;
   collapsible?: boolean;
   placeholder?: string;
+  className?: string;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -55,6 +57,7 @@ export const Search = ({
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
   collapsible = false,
   placeholder,
+  className,
 }: Props) => {
   const _id = useId();
   const inputId = id || _id;
@@ -83,12 +86,12 @@ export const Search = ({
   // render-related state
   const [show, setShow] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (results.length > 0) setShow(true);
   }, [results]);
 
   useEffect(() => {
-    setActiveIndex(results.length > 0 ? 0 : -1);
+    setActiveIndex(-1);
   }, [results]);
 
   const onClick = useCallback(() => {
@@ -155,12 +158,8 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  // flush item refs to prevent stale refs when results change drastically
-  // (e.g. from one search to another with few overlapping results)
-  itemRefs.current = [];
-  itemLinkRefs.current = [];
-
   return (
+    <span className={className}>
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
         <label htmlFor={inputId}>Search Field</label>
@@ -214,7 +213,7 @@ export const Search = ({
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
             onEscapeKeyDown={() => setShow(false)}
-            className={classnames(styles.listPanel, {
+            className={classnames(styles.listPanel, className, {
               [styles.inDrawer]: inDrawer,
             })}
           >
@@ -281,6 +280,7 @@ export const Search = ({
         </Portal>
       )}
     </Popover>
+    </span>
   );
 };
 

@@ -2,11 +2,11 @@ import React, { forwardRef, type ReactNode, useEffect } from "react";
 import classnames from "classnames";
 
 import styles from "./NavPanel.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import { Logo } from "../Logo/LogoNative";
+import { ThemedLogo as Logo } from "../Logo/Logo";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useLinkInfoContext } from "../App/LinkInfoContext";

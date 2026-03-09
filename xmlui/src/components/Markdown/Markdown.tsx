@@ -3,8 +3,9 @@ import styles from "./Markdown.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
-import type React from "react";
+import React from "react";
 import { forwardRef, useMemo } from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
@@ -26,6 +27,7 @@ export const MarkdownMd = createMetadata({
     "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
     "when you need [rich formatting](/working-with-markdown).",
   themeVars: parseScssVar(styles.themeVars),
+  themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
     content: d(
       "This property sets the markdown content to display. Alternatively, you can nest " +
@@ -216,6 +218,21 @@ export const MarkdownMd = createMetadata({
     },
   },
 });
+
+type ThemedMarkdownProps = React.ComponentPropsWithoutRef<typeof Markdown>;
+
+export const ThemedMarkdown = React.forwardRef<React.ElementRef<typeof Markdown>, ThemedMarkdownProps>(
+  function ThemedMarkdown({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(MarkdownMd);
+    return (
+      <Markdown
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const markdownComponentRenderer = createComponentRenderer(
   COMP,

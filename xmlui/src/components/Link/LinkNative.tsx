@@ -14,7 +14,7 @@ import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
 import type { BreakMode, LinkTarget, OverflowMode } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import type { To } from "react-router-dom";
 import { Part } from "../Part/Part";
 import { PART_ICON } from "../../components-core/parts";
@@ -202,7 +202,7 @@ export const LinkNative = forwardRef(function LinkNative(
       {icon && (
         <Part partId={PART_ICON}>
           <div className={styles.iconWrapper}>
-            <Icon name={icon} />
+            <ThemedIcon name={icon} />
           </div>
         </Part>
       )}

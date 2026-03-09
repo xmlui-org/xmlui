@@ -1,4 +1,6 @@
 import { Slider } from "./SliderNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -120,11 +122,11 @@ export const SliderMd = createMetadata({
     [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
     [`boxShadow-thumb-${COMP}--active`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
-    [`borderRadius-${COMP}--default`]: "$borderRadius",
-    [`borderColor-${COMP}--default`]: "transparent",
-    [`borderWidth-${COMP}--default`]: "0",
-    [`borderStyle-${COMP}--default`]: "solid",
-    [`boxShadow-${COMP}--default`]: "none",
+    [`borderRadius-${COMP}`]: "$borderRadius",
+    [`borderColor-${COMP}`]: "transparent",
+    [`borderWidth-${COMP}`]: "0",
+    [`borderStyle-${COMP}`]: "solid",
+    [`boxShadow-${COMP}`]: "none",
 
     light: {
       [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
@@ -140,6 +142,21 @@ export const SliderMd = createMetadata({
     },
   },
 });
+
+type ThemedSliderProps = React.ComponentPropsWithoutRef<typeof Slider>;
+
+export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, ThemedSliderProps>(
+  function ThemedSlider({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(SliderMd);
+    return (
+      <Slider
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const sliderComponentRenderer = createComponentRenderer(
   COMP,

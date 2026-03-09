@@ -8,11 +8,11 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { useAppContext } from "../../components-core/AppContext";
-import { Icon } from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 import { Logo } from "../../components/Logo/LogoNative";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
-import { Button } from "../../components/Button/ButtonNative";
-import { NavLink } from "../../components/NavLink/NavLinkNative";
+import { ThemedButton as Button } from "../../components/Button/Button";
+import { ThemedNavLink } from "../../components/NavLink/NavLink";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
 
@@ -76,9 +76,9 @@ export const AppHeader = ({
   const effectiveNavPanelVisible = navPanelVisible;
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
-      <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
+      <ThemedNavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
         {title}
-      </NavLink>
+      </ThemedNavLink>
     ) : (
       titleContent
     );
@@ -98,7 +98,7 @@ export const AppHeader = ({
           <Part partId={PART_HAMBURGER}>
             <Button
               onClick={toggleDrawer}
-              icon={<Icon name={"hamburger"} />}
+              icon={<ThemedIcon name={"hamburger"} />}
               variant={"ghost"}
               className={styles.drawerToggle}
               style={{ color: "inherit", flexShrink: 0 }}
@@ -116,9 +116,9 @@ export const AppHeader = ({
               <>
                 {!!logoUrl && (
                   <div className={styles.logoContainer}>
-                    <NavLink to={"/"} displayActive={false} className={styles.logoLink}>
+                    <ThemedNavLink to={"/"} displayActive={false} className={styles.logoLink}>
                       <Logo />
-                    </NavLink>
+                    </ThemedNavLink>
                   </div>
                 )}
                 {safeLogoTitle}

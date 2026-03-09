@@ -3,9 +3,11 @@ import styles from "./NavLink.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { NavLink, defaultProps } from "./NavLinkNative";
 import { LinkTargetMd } from "../abstractions";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "NavLink";
 
@@ -130,6 +132,21 @@ export const NavLinkMd = createMetadata({
   },
 });
 
+type ThemedNavLinkProps = React.ComponentPropsWithoutRef<typeof NavLink>;
+
+export const ThemedNavLink = React.forwardRef<React.ElementRef<typeof NavLink>, ThemedNavLinkProps>(
+  function ThemedNavLink({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(NavLinkMd);
+    return (
+      <NavLink
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const navLinkComponentRenderer = createComponentRenderer(
   COMP,
   NavLinkMd,
@@ -148,7 +165,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         level={extractValue.asOptionalNumber(node.props.level)}
         className={className}
         target={extractValue(node.props?.target)}
-        icon={<Icon name={iconName} className={styles.icon} />}
+        icon={<ThemedIcon name={iconName} className={styles.icon} />}
         iconAlignment={extractValue.asOptionalString(node.props.iconAlignment)}
       >
         {extractValue.asDisplayText(node.props.label) || renderChild(node.children)}

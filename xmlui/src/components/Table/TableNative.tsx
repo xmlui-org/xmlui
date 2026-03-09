@@ -43,12 +43,12 @@ import {
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
-import { Spinner } from "../Spinner/SpinnerNative";
-import { Toggle } from "../Toggle/Toggle";
-import { Icon } from "../Icon/IconNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
+import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { PaginationNative, type Position } from "../Pagination/PaginationNative";
+import { ThemedPagination as PaginationNative, type Position } from "../Pagination/Pagination";
 import { Part } from "../Part/Part";
 import {
   parseKeyBinding,
@@ -217,6 +217,8 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  headerUserSelect?: string;
+  cellUserSelect?: string;
   userSelectCell?: string;
   userSelectRow?: string;
   userSelectHeading?: string;
@@ -571,6 +573,8 @@ export const Table = forwardRef(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      headerUserSelect,
+      cellUserSelect,
       userSelectCell,
       userSelectRow,
       userSelectHeading,
@@ -588,10 +592,11 @@ export const Table = forwardRef(
   ) => {
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
-      userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+      cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
     const effectiveUserSelectRow =
       userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
     const effectiveUserSelectHeading =
+      headerUserSelect ??
       userSelectHeading ??
       getThemeVar("userSelect-heading-Table") ??
       defaultProps.userSelectHeading;
@@ -1818,14 +1823,14 @@ function ColumnOrderingIndicator({
   iconNoSort = "nosort:Table",
 }: ColumnOrderingIndicatorProps) {
   if (direction === "ascending") {
-    return <Icon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
+    return <ThemedIcon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
   } else if (direction === "descending") {
-    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
+    return <ThemedIcon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
   }
   return iconNoSort !== "-" ? (
-    <Icon name={iconNoSort} fallback="nosort" size="12" />
+    <ThemedIcon name={iconNoSort} fallback="nosort" size="12" />
   ) : (
-    <Icon name={iconNoSort} size="12" />
+    <ThemedIcon name={iconNoSort} size="12" />
   ); //nosort
 }
 

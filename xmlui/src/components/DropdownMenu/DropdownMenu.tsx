@@ -1,19 +1,23 @@
 import styles from "./DropdownMenu.module.scss";
-import type { ReactNode } from "react";
+import React from "react";
 
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
 import { createMetadata, d, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import {
   defaultDropdownMenuProps,
   defaultMenuItemProps,
   DropdownMenu,
+  DropdownMenuContext,
   MenuItem,
   MenuSeparator,
   SubMenuItem,
 } from "./DropdownMenuNative";
+
+export { DropdownMenuContext };
 import { filterSeparators } from "../menu-helpers";
 
 const DDMCOMP = "DropdownMenu";
@@ -110,6 +114,15 @@ export const DropdownMenuMd = createMetadata({
   },
 });
 
+type ThemedDropdownMenuProps = React.ComponentProps<typeof DropdownMenu> & { className?: string };
+
+export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDropdownMenuProps>(
+  function ThemedDropdownMenu({ className, ...props }: ThemedDropdownMenuProps, ref) {
+    const themeClass = useComponentThemeClass(DropdownMenuMd);
+    return <DropdownMenu {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
@@ -198,6 +211,15 @@ export const MenuItemMd = createMetadata({
   },
 });
 
+type ThemedMenuItemProps = React.ComponentProps<typeof MenuItem> & { className?: string };
+
+export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemProps>(
+  function ThemedMenuItem({ className, ...props }: ThemedMenuItemProps, ref) {
+    const themeClass = useComponentThemeClass(MenuItemMd);
+    return <MenuItem {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const menuItemRenderer = createComponentRenderer(
   MICOMP,
   MenuItemMd,
@@ -215,21 +237,21 @@ export const menuItemRenderer = createComponentRenderer(
     }
     
     return (
-      <MenuItem
+      <ThemedMenuItem
         onClick={clickHandler}
         label={extractValue(node.props?.label)}
         className={className}
         iconPosition={extractValue(node.props.iconPosition)}
         icon={
           node.props?.icon && (
-            <Icon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
+            <ThemedIcon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
           )
         }
         active={extractValue.asOptionalBoolean(node.props.active, false)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
       >
         {renderChild(node.children)}
-      </MenuItem>
+      </ThemedMenuItem>
     );
   },
 );
@@ -262,6 +284,16 @@ export const SubMenuItemMd = createMetadata({
   },
 });
 
+type ThemedSubMenuItemProps = React.ComponentProps<typeof SubMenuItem> & { className?: string };
+
+const ThemedSubMenuItem = React.forwardRef<HTMLDivElement, ThemedSubMenuItemProps>(
+  function ThemedSubMenuItem({ className, ...props }: ThemedSubMenuItemProps, ref) {
+    const themeClass = useComponentThemeClass(SubMenuItemMd);
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    return <SubMenuItem {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
+  },
+);
+
 export const subMenuItemRenderer = createComponentRenderer(
   SMCOMP,
   SubMenuItemMd,
@@ -272,18 +304,18 @@ export const subMenuItemRenderer = createComponentRenderer(
     const filteredChildren = filterSeparators(node.children, extractValue);
     
     return (
-      <SubMenuItem
+      <ThemedSubMenuItem
         label={extractValue(node.props?.label)}
         iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
         icon={
           iconName && (
-            <Icon name={iconName} fallback={iconName} />
+            <ThemedIcon name={iconName} fallback={iconName} />
           )
         }
         triggerTemplate={renderChild(node.props?.triggerTemplate)}
       >
         {renderChild(filteredChildren)}
-      </SubMenuItem>
+      </ThemedSubMenuItem>
     );
   },
 );
@@ -307,6 +339,18 @@ export const MenuSeparatorMd = createMetadata({
     [`marginHorizontal-${MSEP}`]: "12px",
   },
 });
+
+type ThemedMenuSeparatorProps = React.HTMLAttributes<HTMLDivElement>;
+const MenuSeparatorTyped = MenuSeparator as React.ForwardRefExoticComponent<
+  React.HTMLAttributes<HTMLDivElement> & React.RefAttributes<HTMLDivElement>
+>;
+
+export const ThemedMenuSeparator = React.forwardRef<HTMLDivElement, ThemedMenuSeparatorProps>(
+  function ThemedMenuSeparator({ className, ...props }: ThemedMenuSeparatorProps, ref) {
+    const themeClass = useComponentThemeClass(MenuSeparatorMd);
+    return <MenuSeparatorTyped {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
 
 export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
   return <MenuSeparator />;

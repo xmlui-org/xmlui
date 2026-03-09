@@ -1,7 +1,9 @@
 import styles from "../Toggle/Toggle.module.scss";
 
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -79,6 +81,11 @@ export const CheckboxMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
+    [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
+    [`outlineColor-${COMP}`]: `$outlineColor--focus`,
+    [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,
+    [`outlineStyle-${COMP}`]: `$outlineStyle--focus`,
     [`borderColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`backgroundColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`borderColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,
@@ -91,6 +98,20 @@ export const CheckboxMd = createMetadata({
     [`backgroundColor-${COMP}--disabled`]: "$color-surface-200",
   },
 });
+
+type ThemedToggleProps = React.ComponentPropsWithoutRef<typeof Toggle>;
+export const ThemedToggle = React.forwardRef<HTMLInputElement, ThemedToggleProps>(
+  function ThemedToggle({ className, ...props }: ThemedToggleProps, ref) {
+    const themeClass = useComponentThemeClass(CheckboxMd);
+    return (
+      <Toggle
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const checkboxComponentRenderer = createComponentRenderer(
   COMP,

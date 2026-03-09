@@ -1,7 +1,7 @@
 <Component name="DocumentPageNoTOC">
   <Stack
     width="{$props.width ? $props.width : '100%'}"
-    maxWidth="$maxWidth-content-NoToc">
+    maxWidth="$maxWidth-content-DocumentPageNoTOC">
     <Breadcrumbs useDefault="{$props.useDefault}" />
     <Markdown
       when="{$props.content || $props.url}"

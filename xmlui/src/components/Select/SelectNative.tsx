@@ -18,8 +18,8 @@ import { noop } from "../../components-core/constants";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
+import { ThemedIcon } from "../Icon/Icon";
 import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspectorUtils";
-import Icon from "../Icon/IconNative";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { HiddenOption } from "./HiddenOption";
@@ -67,6 +67,7 @@ interface SelectProps {
   // Styling
   style?: CSSProperties;
   className?: string;
+  contentClassName?: string;
   dropdownHeight?: CSSProperties["height"];
 
   // Validation
@@ -139,7 +140,7 @@ const SelectTriggerValue = ({
               ) : (
                 <span key={option.value} className={styles.badge}>
                   {option.label}
-                  <Icon
+                  <ThemedIcon
                     name="close"
                     size="sm"
                     onClick={(event) => {
@@ -217,7 +218,7 @@ const SelectTriggerActions = ({
               clearValue();
             }}
           >
-            <Icon name="close" />
+            <ThemedIcon name="close" />
           </span>
         </Part>
       )}
@@ -236,7 +237,7 @@ const SelectTriggerActions = ({
           className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
           aria-disabled={!enabled || readOnly}
         >
-          <Icon name="chevrondown" />
+          <ThemedIcon name="chevrondown" />
         </span>
       )}
     </div>
@@ -258,6 +259,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     // Styling
     style,
     className,
+    contentClassName,
     dropdownHeight,
 
     // Validation
@@ -613,7 +615,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     () =>
       emptyListTemplate ?? (
         <div className={styles.selectEmpty}>
-          <Icon name="noresult" />
+          <ThemedIcon name="noresult" />
           <span>List is empty</span>
         </div>
       ),
@@ -678,6 +680,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             options={options}
             style={style}
             className={className}
+            contentClassName={contentClassName}
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
@@ -791,13 +794,13 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               <Portal container={root}>
                 <PopoverContent
                   style={{ minWidth: panelWidth, height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
+                  className={classnames(contentClassName, styles.selectContent, styles[validationStatus])}
                   onKeyDown={handleKeyDown}
                 >
                   <div className={styles.command}>
                     {searchable ? (
                       <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
+                        <ThemedIcon name="search" />
                         <input
                           role="searchbox"
                           className={classnames(styles.commandInput)}
@@ -955,7 +958,7 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
         ) : (
           <>
             {children || label}
-            {selected && <Icon name="checkmark" />}
+            {selected && <ThemedIcon name="checkmark" />}
           </>
         )}
       </div>

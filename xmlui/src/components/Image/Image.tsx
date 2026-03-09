@@ -1,6 +1,8 @@
+import React from "react";
 import styles from "./Image.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d, dClick, dInternal } from "../metadata-helpers";
 import { Image, defaultProps } from "./ImageNative";
@@ -58,12 +60,27 @@ export const ImageMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
+type ThemedImageProps = React.ComponentPropsWithoutRef<typeof Image>;
+
+export const ThemedImage = React.forwardRef<React.ElementRef<typeof Image>, ThemedImageProps>(
+  function ThemedImage({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ImageMd);
+    return (
+      <Image
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 export const imageComponentRenderer = createComponentRenderer(
   COMP,
   ImageMd,
   ({ node, extractValue, className, extractResourceUrl }) => {
     return (
-      <Image
+      <ThemedImage
         src={node.props.src ? extractResourceUrl(node.props.src) : undefined}
         imageData={extractValue(node.props.data)}
         alt={extractValue(node.props.alt)}

@@ -18,10 +18,10 @@ import {
 } from "./components-core/renderers";
 import { wrapComponent, wrapCompound } from "./components-core/wrapComponent";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
-import { Icon } from "./components/Icon/IconNative";
+import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
-import { Stack } from "./components/Stack/StackNative";
-import { Button } from "./components/Button/ButtonNative";
+import { ThemedStack as Stack } from "./components/Stack/Stack";
+import { ThemedButton as Button } from "./components/Button/Button";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
@@ -37,19 +37,19 @@ import StandaloneExtensionManager from "./components-core/StandaloneExtensionMan
 import type { ThemeDefinition, ThemeTone } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
-import { TabItemComponent } from "./components/Tabs/TabItemNative";
-import { Tabs } from "./components/Tabs/TabsNative";
+import { ThemedTabItem as TabItemComponent } from "./components/Tabs/TabItem";
+import { ThemedTabs as Tabs } from "./components/Tabs/Tabs";
 import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
-import { Spinner } from "./components/Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "./components/Spinner/Spinner";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
-import { Text } from "./components/Text/TextNative";
+import { ThemedText as Text } from "./components/Text/Text";
 import { TextBox } from "./components/TextBox/TextBoxNative";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
-import { LinkNative } from "./components/Link/LinkNative";
+import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
 import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
@@ -62,6 +62,7 @@ import {
   SEARCH_CATEGORIES,
 } from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { useComponentThemeClass } from "./components-core/theming/utils";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
@@ -108,7 +109,10 @@ import {
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
 import { Tooltip } from "./components/Tooltip/TooltipNative";
-import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
+import {
+  ThemedDropdownMenu as DropdownMenu,
+  ThemedMenuItem as MenuItem,
+} from "./components/DropdownMenu/DropdownMenu";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 import { MemoizedItem } from "./components/container-helpers";
 
@@ -210,6 +214,7 @@ export {
   Breakout,
   useSearchContextContent,
   useAppLayoutContext,
+  useComponentThemeClass,
   StyleProvider,
   StyleRegistry,
   useEvent,
