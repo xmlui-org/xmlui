@@ -185,7 +185,8 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByTestId("drawerContent")).toBeVisible();
   });
 
-  test("position='left' renders drawer from left edge", async ({ page, initTestBed }) => {
+  test("renders drawer from correct edge for all positions", async ({ page, initTestBed }) => {
+    // left
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -194,14 +195,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    let dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("left", "0px");
-  });
 
-  test("position='right' renders drawer from right edge", async ({ page, initTestBed }) => {
+    // right
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -210,14 +209,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("right", "0px");
-  });
 
-  test("position='top' renders drawer from top edge", async ({ page, initTestBed }) => {
+    // top
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -226,14 +223,12 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("top", "0px");
-  });
 
-  test("position='bottom' renders drawer from bottom edge", async ({ page, initTestBed }) => {
+    // bottom
     await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
@@ -242,9 +237,8 @@ test.describe("Basic Functionality", () => {
         </Drawer>
       </Fragment>
     `);
-
     await page.getByTestId("openBtn").click();
-    const dialog = page.getByRole("dialog");
+    dialog = page.getByRole("dialog");
     await expect(dialog).toBeVisible();
     await expect(dialog).toHaveCSS("bottom", "0px");
   });
@@ -277,6 +271,48 @@ test.describe("Basic Functionality", () => {
 
     await page.getByTestId("openBtn").click();
     await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgb(255, 255, 0)");
+  });
+});
+
+// =============================================================================
+// HEADER TEMPLATE TESTS
+// =============================================================================
+
+test.describe("Header Template", () => {
+  test("headerTemplate renders custom content in the header", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer">
+          <property name="headerTemplate">
+            <Text testId="headerText">My Header</Text>
+          </property>
+          <Text testId="bodyText">Body content</Text>
+        </Drawer>
+      </Fragment>
+    `);
+
+    await page.getByTestId("openBtn").click();
+    await expect(page.getByTestId("headerText")).toBeVisible();
+    await expect(page.getByTestId("bodyText")).toBeVisible();
+  });
+
+  test("headerTemplate content appears before close button", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer" closeButtonVisible="true">
+          <property name="headerTemplate">
+            <Text testId="headerText">Navigation</Text>
+          </property>
+          <Text>Body</Text>
+        </Drawer>
+      </Fragment>
+    `);
+
+    await page.getByTestId("openBtn").click();
+    await expect(page.getByTestId("headerText")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close" })).toBeVisible();
   });
 });
 
@@ -429,13 +465,16 @@ test.describe("Theme Variables", () => {
     await expect(page.getByRole("dialog")).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
-  test("padding-Drawer applies padding", async ({ page, initTestBed }) => {
+  test("padding-Drawer applies padding to header and body edges", async ({ page, initTestBed }) => {
     await initTestBed(
       `
       <Fragment>
         <Button testId="openBtn" onClick="drawer.open()">Open</Button>
         <Drawer id="drawer">
-          <Text>Content</Text>
+          <property name="headerTemplate">
+            <Text testId="headerContent">Header</Text>
+          </property>
+          <Text testId="bodyContent">Content</Text>
         </Drawer>
       </Fragment>
       `,
@@ -443,7 +482,39 @@ test.describe("Theme Variables", () => {
     );
 
     await page.getByTestId("openBtn").click();
-    await expect(page.getByRole("dialog")).toHaveCSS("padding", "32px");
+    // Header: top + horizontal padding, no bottom
+    const header = page.getByTestId("headerContent").locator("..").locator("..");
+    await expect(header).toHaveCSS("padding-top", "32px");
+    await expect(header).toHaveCSS("padding-left", "32px");
+    await expect(header).toHaveCSS("padding-right", "32px");
+    await expect(header).toHaveCSS("padding-bottom", "0px");
+    // Body: bottom + horizontal padding, no top (gap handles spacing)
+    const body = page.getByTestId("bodyContent").locator("..");
+    await expect(body).toHaveCSS("padding-top", "0px");
+    await expect(body).toHaveCSS("padding-left", "32px");
+    await expect(body).toHaveCSS("padding-right", "32px");
+    await expect(body).toHaveCSS("padding-bottom", "32px");
+  });
+
+  test("gap-Drawer controls space between header and body", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer">
+          <property name="headerTemplate">
+            <Text testId="headerContent">Header</Text>
+          </property>
+          <Text testId="bodyContent">Content</Text>
+        </Drawer>
+      </Fragment>
+      `,
+      { testThemeVars: { "gap-Drawer": "20px" } },
+    );
+
+    await page.getByTestId("openBtn").click();
+    const body = page.getByTestId("bodyContent").locator("..");
+    await expect(body).toHaveCSS("margin-top", "20px");
   });
 
   test("borderRadius-Drawer applies border radius", async ({ page, initTestBed }) => {

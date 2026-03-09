@@ -489,19 +489,17 @@ test.describe("Visual States", () => {
     await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("color", "rgb(0, 255, 0)");
   });
 
-  test("component handles horizontal resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="horizontal" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "horizontal");
-  });
-
-  test("component handles vertical resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="vertical" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "vertical");
-  });
-
-  test("component handles both resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="both" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "both");
+  test("resize prop controls CSS resize property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea testId="ta-h" resize="horizontal" />
+        <TextArea testId="ta-v" resize="vertical" />
+        <TextArea testId="ta-b" resize="both" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("ta-h").getByRole("textbox")).toHaveCSS("resize", "horizontal");
+    await expect(page.getByTestId("ta-v").getByRole("textbox")).toHaveCSS("resize", "vertical");
+    await expect(page.getByTestId("ta-b").getByRole("textbox")).toHaveCSS("resize", "both");
   });
 
   test("component handles disabled visual state", async ({ initTestBed, page }) => {

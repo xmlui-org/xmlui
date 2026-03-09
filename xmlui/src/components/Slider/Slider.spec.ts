@@ -68,21 +68,15 @@ test.describe("Basic Functionality", () => {
     });
   });
 
-  [
-    { label: "NaN", value: NaN },
-    { label: "null", value: null },
-    { label: "undefined", value: undefined },
-    { label: "empty string", value: "" },
-    { label: "string not resolving to number", value: "abc" },
-  ].forEach(({ label, value }) => {
-    test(`handles ${label} gracefully`, async ({ initTestBed, page }) => {
+  test("handles non-numeric initialValue gracefully", async ({ initTestBed, page }) => {
+    for (const value of [NaN, null, undefined, "", "abc"]) {
       await initTestBed(`
         <Fragment>
           <Slider id="slider" initialValue="${value}" />
           <Text testId="slider-value" value="{slider.value}" />
         </Fragment>`);
       await expect(page.getByTestId("slider-value")).toHaveText("0");
-    });
+    }
   });
 
   test("minValue sets the lower bound", async ({ initTestBed, page }) => {

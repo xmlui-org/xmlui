@@ -14,39 +14,25 @@ test.describe("smoke tests", () => {
   });
 });
 
-test("empty name shows no initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name=""/>`);
-  await expect((await createAvatarDriver()).component).toBeEmpty();
-});
-
-test("name with symbols renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="B 'Alan"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("B'");
-});
-
-test("numeric name renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="123"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("1");
-});
-
-test("unicode name renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="孔丘"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("孔");
-});
-
-test("single name renders one initial", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("T");
-});
-
-test("three words render three initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim John Smith"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("TJS");
-});
-
-test("many words limited to three initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim John Smith Jones"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("TJS");
+test("name initials rendering for various name patterns", async ({ initTestBed, createAvatarDriver }) => {
+  await initTestBed(`
+    <Fragment>
+      <Avatar testId="v0" name="" />
+      <Avatar testId="v1" name="B 'Alan" />
+      <Avatar testId="v2" name="123" />
+      <Avatar testId="v3" name="孔丘" />
+      <Avatar testId="v4" name="Tim" />
+      <Avatar testId="v5" name="Tim John Smith" />
+      <Avatar testId="v6" name="Tim John Smith Jones" />
+    </Fragment>
+  `);
+  await expect((await createAvatarDriver("v0")).component).toBeEmpty();
+  await expect((await createAvatarDriver("v1")).component).toContainText("B'");
+  await expect((await createAvatarDriver("v2")).component).toContainText("1");
+  await expect((await createAvatarDriver("v3")).component).toContainText("孔");
+  await expect((await createAvatarDriver("v4")).component).toContainText("T");
+  await expect((await createAvatarDriver("v5")).component).toContainText("TJS");
+  await expect((await createAvatarDriver("v6")).component).toContainText("TJS");
 });
 
 test("test state initializes correctly", async ({ initTestBed }) => {

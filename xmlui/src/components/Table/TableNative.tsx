@@ -1715,6 +1715,7 @@ export const Table = forwardRef(
               ref={virtualizerRef}
               scrollRef={wrapperRef}
               startMargin={startMargin}
+              itemSize={rowHeight}
             >
               {rows.map((row, rowIndex) => (
                 <Fragment key={`${row.id}-${rowIndex}`}>
