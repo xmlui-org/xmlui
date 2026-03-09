@@ -1,47 +1,69 @@
 # Refactor $subject$
 
-I want to refactor $subject$ to make its source code more straightforward and easier to read and understand. The refactoring should result in code that 
-- contains less code lines than the original code if possible
-- does not disturb its reader to hop among numerous files
-- can be read linearly
-- contains the right amount of comments (not too verbose, not too few)
+Refactor $subject$ so the result:
+- has fewer lines than the original where possible
+- can be read linearly without hopping between files
+- has the right density of comments (not verbose, not absent)
 
-## Resources
+## Before starting
 
-These resources are essential for refactoring:
-- Component conventions: xmlui/dev-docs/conv-create-components.md
-- E2E testing conventions: xmlui/dev-docs/conv-e2e-testing.md
-- Rendering pipeline: xmlui/dev-docs/standalone-app.md
-- $additional_resources$
+Read `feature.md` at the repo root — it describes the subject, goals, files in scope, and any decisions already made.
+
+## Reference docs by subsystem
+
+Load only the docs that apply to the files being refactored:
+
+| Subsystem | Files | Docs to read |
+|---|---|---|
+| Component rendering pipeline | `components-core/rendering/` | `xmlui/dev-docs/standalone-app.md` |
+| State/container management | `components-core/containers/` | `xmlui/dev-docs/containers.md` |
+| Theming / CSS | `components-core/theming/` | `xmlui/dev-docs/theming-styling.md` |
+| Individual components | `components/ComponentName/` | `xmlui/dev-docs/conv-component-metadata.md`, `conv-component-renderer.md`, `conv-component-native.md` |
+| Parsers | `parsers/` | `xmlui/dev-docs/standalone-app.md` |
+| Form infrastructure | `components/Form*/` | `xmlui/dev-docs/form-infrastructure.md` |
+| Data / API operations | `components/APICall/`, `components/DataSource/` | `xmlui/dev-docs/data-operations.md` |
+| User-defined components | `components-core/ud-components/` | `xmlui/dev-docs/ud-components.md` |
+
+Always read the E2E testing conventions: `xmlui/dev-docs/conv-e2e-testing.md`
 
 ## Planning
 
-First, analyze the current source code. Dive deeply into the code if needed for better understanding. Collect all your findings and compact them to produce a brief report that contains enough information for a human or AI assistant to carry out the refactoring.
+Analyze the current source code. Collect findings into a concise report sufficient for a human or AI to carry out the refactoring. Break the work into sequential steps, each small enough to verify with tests.
 
-Break down the entire refactoring into a sequence of steps that can be executed one by one. Each step should provide an opportunity to create new unit/e2e tests that verify the result of the particular refactoring step.
-
-Record your findings and plan in a plan.md file beside the subject of the refactoring (in the same folder). Omit unnecessary content (like executive summaries, estimations, etc.) from the plan; strive for conciseness.
+Record findings and the step-by-step plan in `feature.md` at the repo root (under a "Refactor Plan" section). Keep it concise — no executive summaries, no estimates.
 
 ## Refactor Flow
 
-You can assume that all unit tests and E2E tests run successfully at the beginning of the refactoring activity.
+Assume all unit tests and E2E tests pass at the start.
 
-Execute the refactoring step by step. When a step completes successfully, ask for approval to proceed with the next step. Follow this flow:
+For each step:
+1. Implement the change.
+2. Verify no TypeScript/lint errors (Problems pane in VS Code).
+3. Add or update unit/E2E tests that cover the change.
+4. Confirm new tests pass.
+5. If applicable, run the full test suite for the affected component.
+6. Update the step's status in `feature.md`.
+7. Ask for approval before proceeding to the next step.
 
-1. Implement the feature described by the step.
-2. Ensure there are no linting issues in the modified files (in VS Code, you can check the Problems pane).
-3. Create new unit/e2e tests for the feature.
-4. Ensure all newly created tests run successfully.
-5. If applicable, run all unit/e2e tests for the component related to the subject of refactoring.
-6. When all of these are successful, update the step's status in the plan document.
+## Commands
 
-## Tools
+Run all commands from the workspace root (`/Users/dotneteer/source/xmlui`):
 
-You can use these commands in xmlui/package.json:
+```bash
+# Type-check without full build (fast)
+npx tsc --noEmit -p xmlui/tsconfig.json
 
-- "build:xmlui-standalone": Check if the xmlui code builds successfully. This command takes about 2 minutes, so use it infrequently, only when you have no other way to verify that the code compiles successfully.
-- "test:unit": Run unit tests. Since this command runs vitest, you can use it with arguments to run only particular unit test files. If needed, you can run all unit tests, which takes about 40 seconds.
+# Unit tests (fast, ~40s for all)
+npm run test:unit -w xmlui
 
-## Constraints
+# E2E — single component (fast feedback)
+npx playwright test ComponentName.spec.ts --reporter=line
 
-When you run e2e tests with Playwright, you must start Playwright from the workspace root. Running all e2e tests takes about 10 minutes, so never run all of them without user confirmation. See the xmlui/dev-docs/conv-e2e-testing.md document for E2E testing conventions.
+# E2E — stability check (run before declaring done)
+npx playwright test ComponentName.spec.ts --workers=10
+
+# Full build (slow, ~2 min — use only when no other way to verify)
+npm run build:xmlui-standalone -w xmlui
+```
+
+**Never run all E2E tests without user confirmation** — it takes ~10 minutes.

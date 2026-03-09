@@ -67,6 +67,7 @@
     "/^cat /Users/dotneteer/source/xmlui/xmlui/scripts/generate-docs/metadata/components/metadata\\.json \\| python3 -c \"import json,sys; d=json\\.load\\(sys\\.stdin\\); print\\(f'Total components: \\{len\\(d\\)\\}'\\); print\\('First 5:', \\[c\\['displayName'\\] for c in d\\[:5\\]\\]\\)\"$/": {
       "approve": true,
       "matchCommandLine": true
-    }
+    },
+    "mkdir": true
   }
 }
