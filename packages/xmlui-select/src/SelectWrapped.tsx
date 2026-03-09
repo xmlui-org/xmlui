@@ -143,10 +143,6 @@ function normalizeToArray(raw: any): string[] {
 }
 
 export const selectComponentRenderer = wrapCompound(COMP, SelectRender, SelectMd, {
-  booleans: ["enabled", "multiple", "clearable"],
-  events: {
-    didChange: "onDidChange",
-  },
   // These props are consumed by labelBehavior (rendered by ItemWithLabel) and
   // must NOT be forwarded to SelectRender — they would end up as unknown HTML
   // attributes on the root <div> and trigger React dev-mode warnings.

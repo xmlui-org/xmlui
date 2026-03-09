@@ -109,6 +109,65 @@ function normalizeCallbacks(
 }
 
 /**
+ * Derive booleans, numbers, strings, event map, callback map, rename map,
+ * and exclude set from metadata, then merge with the explicit config.
+ *
+ * Metadata-derived values serve as defaults; anything explicitly listed in
+ * config takes precedence (config.booleans overrides, config.events extends
+ * or overrides the convention-based derivation).
+ */
+function mergeWithMetadata(
+  metadata: ComponentMetadata,
+  config: WrapComponentConfig,
+): {
+  booleanSet: Set<string>;
+  numberSet: Set<string>;
+  stringSet: Set<string>;
+  eventMap: Record<string, string>;
+  callbackMap: Record<string, string>;
+  renameMap: Record<string, string>;
+  excludeSet: Set<string>;
+} {
+  // Seed from explicit config so they take priority
+  const booleanSet = new Set<string>(config.booleans ?? []);
+  const numberSet = new Set<string>(config.numbers ?? []);
+  const stringSet = new Set<string>(config.strings ?? []);
+
+  // Auto-classify props from metadata valueType (only if not already categorised)
+  if (metadata.props) {
+    for (const [propName, propMeta] of Object.entries(metadata.props)) {
+      if (propName === "initialValue") continue; // handled separately by wrapper
+      if (booleanSet.has(propName) || numberSet.has(propName) || stringSet.has(propName)) continue;
+      if (propMeta.valueType === "boolean") booleanSet.add(propName);
+      else if (propMeta.valueType === "number") numberSet.add(propName);
+      else if (propMeta.valueType === "string") stringSet.add(propName);
+    }
+  }
+
+  // Seed event map from explicit config first (allows non-standard overrides)
+  const eventMap = normalizeEvents(config.events);
+
+  // Auto-add any metadata events not already covered by the explicit config
+  if (metadata.events) {
+    for (const eventName of Object.keys(metadata.events)) {
+      if (!(eventName in eventMap)) {
+        eventMap[eventName] = `on${capitalize(eventName)}`;
+      }
+    }
+  }
+
+  return {
+    booleanSet,
+    numberSet,
+    stringSet,
+    eventMap,
+    callbackMap: normalizeCallbacks(config.callbacks),
+    renameMap: config.rename ?? {},
+    excludeSet: new Set(config.exclude ?? []),
+  };
+}
+
+/**
  * Map XMLUI event names to semantic trace event kinds from the
  * trace vocabulary. Convention-based: didChange → value:change,
  * gotFocus/lostFocus → focus:change. Returns undefined for
@@ -198,13 +257,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
-  const eventMap = normalizeEvents(config.events);
-  const callbackMap = normalizeCallbacks(config.callbacks);
-  const renameMap = config.rename ?? {};
-  const booleanSet = new Set(config.booleans ?? []);
-  const numberSet = new Set(config.numbers ?? []);
-  const stringSet = new Set(config.strings ?? []);
-  const excludeSet = new Set(config.exclude ?? []);
+  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet } =
+    mergeWithMetadata(metadata, config);
 
   // Collect all specially-handled XMLUI prop names so we can skip them
   // when forwarding the rest.
@@ -368,13 +422,8 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapCompoundConfig = {},
 ): ComponentRendererDef {
-  const eventMap = normalizeEvents(config.events);
-  const callbackMap = normalizeCallbacks(config.callbacks);
-  const renameMap = config.rename ?? {};
-  const booleanSet = new Set(config.booleans ?? []);
-  const numberSet = new Set(config.numbers ?? []);
-  const stringSet = new Set(config.strings ?? []);
-  const excludeSet = new Set(config.exclude ?? []);
+  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet } =
+    mergeWithMetadata(metadata, config);
 
   const specialProps = new Set([
     ...Object.keys(eventMap),

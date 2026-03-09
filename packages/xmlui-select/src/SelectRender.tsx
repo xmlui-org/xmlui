@@ -4,7 +4,7 @@ import { Select, createListCollection } from "@ark-ui/react/select";
 import { Portal } from "@ark-ui/react/portal";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import { OptionContext, HiddenOption, OptionTypeProvider, type Option, Icon } from "xmlui";
+import { OptionContext, HiddenOption, OptionTypeProvider, type Option, Icon, useTheme } from "xmlui";
 
 export type SelectItem = {
   value: string;
@@ -45,6 +45,10 @@ export const SelectRender = forwardRef(({
   children,
   ...rest
 }: any, ref: any) => {
+  const { root } = useTheme();
+  // ark-ui Portal expects a RefObject<HTMLElement | null>, not a plain HTMLElement
+  const rootRef = useRef<HTMLElement | null>(null);
+  rootRef.current = root ?? null;
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   // Collect options registered by Option children
@@ -185,7 +189,7 @@ export const SelectRender = forwardRef(({
           </Select.Trigger>
         </Select.Control>
 
-        <Portal>
+        <Portal container={rootRef}>
           <Select.Positioner>
             <Select.Content className={styles.content}>
               {collection.items.map((item) => (
