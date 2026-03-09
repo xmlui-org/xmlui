@@ -5,6 +5,7 @@
 
 export const extensionRegistry: Record<string, () => Promise<any>> = {
   "xmlui-pdf": () => import("../../../../packages/xmlui-pdf/src/index"),
+  "xmlui-search": () => import("../../../../packages/xmlui-search/src/index"),
   // Add more extensions here as needed:
   // "xmlui-spreadsheet": () => import("../../../../packages/xmlui-spreadsheet/src/index"),
   // "xmlui-animations": () => import("../../../../packages/xmlui-animations/src/index"),

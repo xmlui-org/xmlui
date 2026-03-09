@@ -201,7 +201,7 @@ export const Search = ({
             onBlur={onInputBlur}
             onKeyDown={handleKeyDown}
             aria-autocomplete="list"
-            aria-controls="dropdown-list"
+            aria-controls={`${inputId}-listbox`}
             aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
           />
         </PopoverTrigger>
