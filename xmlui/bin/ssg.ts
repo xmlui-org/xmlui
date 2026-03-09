@@ -69,17 +69,15 @@ function getOutputHtmlPath(outDir: string, routePath: string): string {
   return path.join(outDir, routePath.slice(1), "index.html");
 }
 
-function executeInlineScripts(html: string) {
-  const scriptRegex = /<script\b([^>]*)>([\s\S]*?)<\/script>/gi;
-  let match: RegExpExecArray | null;
+function executeInlineScripts(html: string): void {
+  const dom = new JSDOM(html, { runScripts: "outside-only" });
+  const document = dom.window.document;
+  const scripts = document.querySelectorAll("script:not([src])");
 
-  while ((match = scriptRegex.exec(html)) !== null) {
-    const attrs = match[1] || "";
-    const content = (match[2] || "").trim();
-    const hasSrc = /\bsrc\s*=/.test(attrs);
-
-    if (hasSrc || !content) {
-      continue;
+  scripts.forEach((script) => {
+    const content = (script.textContent || "").trim();
+    if (!content) {
+      return;
     }
 
     try {
@@ -89,7 +87,7 @@ function executeInlineScripts(html: string) {
       log(`inline script execution warning: ${preview}`);
       console.error(error);
     }
-  }
+  });
 }
 
 function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
@@ -97,17 +95,19 @@ function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
     return shellHtml;
   }
 
-  return shellHtml.replace(/<html([^>]*?)>/i, (full, attributes: string) => {
-    const classMatch = /class=["']([^"']*)["']/.exec(attributes);
-    if (!classMatch) {
-      return `<html${attributes} class="${htmlClasses}">`;
-    }
+  const dom = new JSDOM(shellHtml);
+  const document = dom.window.document;
+  const htmlElement = document.documentElement;
 
-    const currentClasses = classMatch[1].trim();
-    const merged = `${currentClasses} ${htmlClasses}`.trim();
-    const newAttributes = attributes.replace(classMatch[0], `class="${merged}"`);
-    return `<html${newAttributes}>`;
-  });
+  if (!htmlElement) {
+    return shellHtml;
+  }
+
+  const currentClasses = htmlElement.getAttribute("class") || "";
+  const merged = `${currentClasses} ${htmlClasses}`.trim();
+  htmlElement.setAttribute("class", merged);
+
+  return dom.serialize();
 }
 
 function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: string): string {
@@ -115,31 +115,45 @@ function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: s
     return shellHtml;
   }
 
-  const styleTag = `<style data-style-registry="true" data-ssr-hashes="${ssrHashes}">${ssrStyles}</style>`;
-  if (shellHtml.includes("</head>")) {
-    return shellHtml.replace("</head>", `${styleTag}</head>`);
+  const dom = new JSDOM(shellHtml);
+  const document = dom.window.document;
+  const head = document.querySelector("head");
+
+  const styleElement = document.createElement("style");
+  styleElement.setAttribute("data-style-registry", "true");
+  styleElement.setAttribute("data-ssr-hashes", ssrHashes);
+  styleElement.textContent = ssrStyles;
+
+  if (head) {
+    head.appendChild(styleElement);
+  } else {
+    document.documentElement.appendChild(styleElement);
   }
-  return `${styleTag}${shellHtml}`;
+
+  return dom.serialize();
 }
 
 function injectMarkup(shellHtml: string, markup: string): string {
-  const rootRegex = /<div([^>]*\bid=["']root["'][^>]*)>[\s\S]*?<\/div>/i;
-  if (rootRegex.test(shellHtml)) {
-    return shellHtml.replace(rootRegex, (full, attributes: string) => {
-      const attrsWithSsg = new RegExp(`\\b${XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile}=`).test(
-        attributes,
-      )
-        ? attributes
-        : `${attributes} ${XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile}="${SEARCH_INDEX_FILE_NAME}"`;
-      return `<div${attrsWithSsg}>${markup}</div>`;
-    });
+  const dom = new JSDOM(shellHtml);
+  const document = dom.window.document;
+
+  const rootDiv = document.querySelector('div[id="root"]');
+  if (rootDiv) {
+    const hasSearchIndex = rootDiv.hasAttribute(XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile);
+    if (!hasSearchIndex) {
+      rootDiv.setAttribute(XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile, SEARCH_INDEX_FILE_NAME);
+    }
+    rootDiv.innerHTML = markup;
+    return dom.serialize();
   }
 
-  if (shellHtml.includes("</body>")) {
-    return shellHtml.replace("</body>", `${markup}</body>`);
+  const body = document.querySelector("body");
+  if (body) {
+    body.insertAdjacentHTML("beforeend", markup);
+    return dom.serialize();
   }
 
-  return `${shellHtml}${markup}`;
+  return shellHtml + markup;
 }
 
 /**
