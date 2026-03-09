@@ -44,7 +44,7 @@ import {
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
-import { Toggle } from "../Toggle/Toggle";
+import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
 import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";

@@ -272,32 +272,38 @@ export const ModalDialog = React.forwardRef(
     return (
       <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
         <Dialog.Portal container={root}>
-          {isDialogRootInShadowDom && (
-            /*
-              In the Shadow DOM we can omit the Dialog.Overlay,
-              since we get the same result & the main content outside remains scrollable.
-            */
-            <div
-              className={classnames(styles.overlayBg, styles.nested, className, {
-                [styles.fullScreen]: fullScreen,
-              })}
-            >
-              {Content}
-            </div>
-          )}
-          {!isDialogRootInShadowDom && (
-            <>
-              <div className={classnames(styles.overlayBg, className)} />
-              {/* This Overlay is responsible for the focus capture & scroll-lock */}
-              <Dialog.Overlay
-                className={classnames(styles.overlay, {
+          {/* className is placed on this wrapper so that CSS custom properties
+              (theme variables) cascade to both the backdrop (.overlayBg) and
+              the dialog content, without applying layout styles like max-width
+              directly to the fixed-position backdrop. */}
+          <div className={className}>
+            {isDialogRootInShadowDom && (
+              /*
+                In the Shadow DOM we can omit the Dialog.Overlay,
+                since we get the same result & the main content outside remains scrollable.
+              */
+              <div
+                className={classnames(styles.overlayBg, styles.nested, {
                   [styles.fullScreen]: fullScreen,
                 })}
               >
                 {Content}
-              </Dialog.Overlay>
-            </>
-          )}
+              </div>
+            )}
+            {!isDialogRootInShadowDom && (
+              <>
+                <div className={classnames(styles.overlayBg)} />
+                {/* This Overlay is responsible for the focus capture & scroll-lock */}
+                <Dialog.Overlay
+                  className={classnames(styles.overlay, {
+                    [styles.fullScreen]: fullScreen,
+                  })}
+                >
+                  {Content}
+                </Dialog.Overlay>
+              </>
+            )}
+          </div>
         </Dialog.Portal>
       </Dialog.Root>
     );
