@@ -1,9 +1,8 @@
 import React from "react";
 import styles from "./TextBox.module.scss";
 
-import { wrapCompound } from "../../components-core/wrapComponent";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -22,8 +21,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { defaultProps } from "./TextBoxNative";
-import { TextBoxRender } from "./TextBoxRender";
+import { defaultProps, TextBox } from "./TextBoxNative";
 
 const COMP = "TextBox";
 
@@ -170,19 +168,13 @@ export const TextBoxMd = createMetadata({
   },
 });
 
-export const textBoxComponentRenderer = wrapCompound(COMP, TextBoxRender, TextBoxMd, {
+export const textBoxComponentRenderer = wrapComponent(COMP, TextBox, TextBoxMd, {
   booleans: ["enabled", "autoFocus", "readOnly", "required", "showPasswordToggle"],
   numbers: ["maxLength"],
   events: {
     didChange: "onDidChange",
     gotFocus: "onFocus",
     lostFocus: "onBlur",
-  },
-  parseInitialValue: (raw: any) => {
-    return raw != null ? String(raw) : "";
-  },
-  formatExternalValue: (value: any) => {
-    return value != null ? String(value) : "";
   },
 });
 
@@ -193,24 +185,18 @@ export const PasswordMd = createMetadata({
     "to input and edit passwords.",
 });
 
-// Password render: same as TextBoxRender but forces type="password"
-const PasswordRender = React.forwardRef((props: any, ref: any) =>
-  <TextBoxRender {...props} ref={ref} type="password" />
+// Password: same as TextBox but forces type="password"
+const PasswordBox = React.forwardRef((props: any, ref: any) =>
+  <TextBox {...props} ref={ref} type="password" />
 );
-PasswordRender.displayName = "PasswordRender";
+PasswordBox.displayName = "PasswordBox";
 
-export const passwordInputComponentRenderer = wrapCompound("PasswordInput", PasswordRender, PasswordMd, {
+export const passwordInputComponentRenderer = wrapComponent("PasswordInput", PasswordBox, PasswordMd, {
   booleans: ["enabled", "autoFocus", "readOnly", "required", "showPasswordToggle"],
   numbers: ["maxLength"],
   events: {
     didChange: "onDidChange",
     gotFocus: "onFocus",
     lostFocus: "onBlur",
-  },
-  parseInitialValue: (raw: any) => {
-    return raw != null ? String(raw) : "";
-  },
-  formatExternalValue: (value: any) => {
-    return value != null ? String(value) : "";
   },
 });

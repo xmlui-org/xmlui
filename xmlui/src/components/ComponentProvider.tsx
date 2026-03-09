@@ -138,8 +138,7 @@ import { blogComponentRenderer } from "./Blog/Blog";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
-import { sliderComponentRenderer } from "./Slider/Slider";
-import { sliderWrappedComponentRenderer } from "./Slider/SliderWrapped";
+import { sliderComponentRenderer } from "./Slider/SliderWrapped";
 import { knobComponentRenderer } from "./Knob/KnobWrapped";
 import { codeEditorComponentRenderer } from "./CodeEditor/CodeEditorWrapped";
 import { tiptapEditorComponentRenderer } from "./TiptapEditor/TiptapEditorWrapped";
@@ -682,7 +681,6 @@ export class ComponentRegistry {
     // --- Heavy third-party components (biggest bundle impact)
     if (process.env.VITE_USED_COMPONENTS_Slider !== "false") {
       this.registerCoreComponent(sliderComponentRenderer);
-      this.registerCoreComponent(sliderWrappedComponentRenderer);
       this.registerCoreComponent(knobComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_CodeEditor !== "false") {

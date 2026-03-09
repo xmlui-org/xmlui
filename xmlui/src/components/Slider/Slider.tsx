@@ -2,7 +2,6 @@ import { Slider } from "./SliderNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -158,43 +157,3 @@ export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, Th
   },
 );
 
-export const sliderComponentRenderer = createComponentRenderer(
-  COMP,
-  SliderMd,
-  ({
-    node,
-    extractValue,
-    lookupEventHandler,
-    lookupSyncCallback,
-    className,
-    updateState,
-    state,
-    registerComponentApi,
-  }) => {
-    return (
-      <Slider
-        validationStatus={extractValue(node.props.validationStatus)}
-        minStepsBetweenThumbs={extractValue(node.props?.minStepsBetweenThumbs)}
-        value={state.value}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        className={className}
-        step={extractValue(node.props?.step)}
-        min={extractValue(node.props?.minValue)}
-        max={extractValue(node.props?.maxValue)}
-        enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        rangeStyle={extractValue(node.props?.rangeStyle)}
-        thumbStyle={extractValue(node.props?.thumbStyle)}
-        showValues={extractValue.asOptionalBoolean(node.props?.showValues)}
-        valueFormat={lookupSyncCallback(node.props?.valueFormat)}
-      />
-    );
-  },
-);
