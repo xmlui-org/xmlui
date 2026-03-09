@@ -11,8 +11,6 @@ export type SearchItemData = { path: string; title: string; content: string; cat
 export const SEARCH_CATEGORIES = ["docs", "blog", "news", "get-started"] as const;
 export const SEARCH_DEFAULT_CATEGORY = "other";
 
-const SSG_SEARCH_INDEX_URL = "/__xmlui-search-index.json";
-
 type ISearchContext = {
   content: Record<string, SearchItemData>;
   storeContent: ({ path, title, content, category }: SearchItemData) => void;
@@ -31,11 +29,11 @@ export const SearchContextProvider = ({ children }) => {
   const [loadedExternalIndex, setLoadedExternalIndex] = useState(false);
 
   useEffect(() => {
-    if (!appContext.appGlobals?.searchIndexEnabled || !ssgEnv) {
+    if (!appContext.appGlobals?.searchIndexEnabled || !ssgEnv?.searchIndexFile) {
       return;
     }
 
-    fetch(SSG_SEARCH_INDEX_URL)
+    fetch(`/${ssgEnv.searchIndexFile}`)
       .then((res) => {
         if (!res.ok) return null;
         return res.json() as Promise<SearchItemData[]>;

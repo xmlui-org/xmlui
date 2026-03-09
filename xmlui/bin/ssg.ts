@@ -18,6 +18,7 @@ import { getViteConfig } from "./viteConfig";
 import { discoverPaths, pathExists } from "./ssg/discoverPaths";
 import { JSDOM } from "jsdom";
 import { exit } from "node:process";
+import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
 
 type SsgOptions = {
   outDir?: string;
@@ -125,9 +126,11 @@ function injectMarkup(shellHtml: string, markup: string): string {
   const rootRegex = /<div([^>]*\bid=["']root["'][^>]*)>[\s\S]*?<\/div>/i;
   if (rootRegex.test(shellHtml)) {
     return shellHtml.replace(rootRegex, (full, attributes: string) => {
-      const attrsWithSsg = /\bdata-xmlui-ssg=/.test(attributes)
+      const attrsWithSsg = new RegExp(`\\b${XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile}=`).test(
+        attributes,
+      )
         ? attributes
-        : `${attributes} data-xmlui-ssg="1"`;
+        : `${attributes} ${XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile}="${SEARCH_INDEX_FILE_NAME}"`;
       return `<div${attrsWithSsg}>${markup}</div>`;
     });
   }

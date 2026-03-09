@@ -1,6 +1,5 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-
-export type SsgEnv = Record<string, unknown>;
+import { extractSsgEnvFromRoot, type SsgEnv } from "./ssgEnv";
 
 type SsgEnvContextValue = {
   ssgEnv?: SsgEnv;
@@ -13,12 +12,7 @@ function readSsgEnvFromRoot(): SsgEnv | undefined {
     return undefined;
   }
 
-  const root = document.getElementById("root");
-  if (!root?.hasAttribute("data-xmlui-ssg")) {
-    return undefined;
-  }
-
-  return {};
+  return extractSsgEnvFromRoot(document.getElementById("root"));
 }
 
 export function SsgEnvProvider({ children }: { children: ReactNode }) {
