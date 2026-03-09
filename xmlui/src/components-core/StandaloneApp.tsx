@@ -1623,36 +1623,32 @@ function transformMainXsToGlobalTags(
   entryPoint: ComponentDef,
   mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
 ): ComponentDef {
-  const globalVars: Record<string, string> = {};
-  
+  const globalVars: Record<string, any> = {};
+
   // Process vars from Main.xmlui.xs
   if (mainXs.vars) {
     Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
-      // Use the source text directly from the parsed expression
-      let valueExpression = "";
-      
-      if (typeof varDef === "object" && varDef?.source) {
-        // Use the source text preserved by the parser
-        valueExpression = varDef.source;
-      } else if (mainXs.src) {
-        // Fallback: extract from source code using regex when we have the full source
-        const srcMatch = mainXs.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
-        if (srcMatch) {
-          valueExpression = srcMatch[1].trim();
+      // If the var has a parsed expression tree with source text, convert it
+      // to a binding expression string so useGlobalVariables can evaluate it
+      // reactively. This preserves reactivity for dependent vars (e.g.,
+      // var dummy = 3*count) and correctly handles multi-line expressions
+      // (e.g., object literals spanning multiple lines).
+      if (
+        typeof varDef === "object" &&
+        varDef !== null &&
+        (varDef as any).__PARSED__ &&
+        (varDef as any).tree
+      ) {
+        const source = (varDef as any).tree.source;
+        if (typeof source === "string") {
+          // Wrap in {…} so extractParam recognizes it as a binding expression
+          globalVars[varName] = "{" + source + "}";
+          return;
         }
       }
-      
-      if (!valueExpression) {
-        valueExpression = "0"; // Safe fallback
-      }
-      
-      // Wrap in braces if not already wrapped
-      if (!valueExpression.startsWith("{")) {
-        valueExpression = `{${valueExpression}}`;
-      }
-      
-      // Add to globalVars
-      globalVars[varName] = valueExpression;
+
+      // Fallback for vars without a parse tree (e.g., already-evaluated values)
+      globalVars[varName] = varDef;
     });
   }
   
@@ -1669,7 +1665,6 @@ function transformMainXsToGlobalTags(
         (funcDef as any).tree
       ) {
         try {
-          // Evaluate the function tree to get an actual callable function
           const evalContext: BindingTreeEvaluationContext = {
             mainThread: {
               childThreads: [],
@@ -1685,20 +1680,27 @@ function transformMainXsToGlobalTags(
           console.error(`Failed to evaluate function ${funcName}:`, error);
         }
       } else {
-        // Already evaluated or literal value
         functions[funcName] = funcDef;
       }
     });
   }
   
-  // Add the globalVars and functions to the entry point
+  // Merge globalVars: .xs vars come FIRST (for evaluation order — markup globals
+  // like global.catColors="{categoryColorMap}" can depend on .xs vars), and .xs
+  // vars take PRECEDENCE over markup globals with the same name.
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
+    const mergedGlobalVars: Record<string, any> = { ...globalVars };
+    if (entryPoint.globalVars) {
+      for (const [key, value] of Object.entries(entryPoint.globalVars)) {
+        if (!(key in globalVars)) {
+          mergedGlobalVars[key] = value;
+        }
+      }
+    }
+
     const transformedEntryPoint: ComponentDef = {
       ...entryPoint,
-      globalVars: {
-        ...entryPoint.globalVars,
-        ...globalVars
-      },
+      globalVars: mergedGlobalVars,
       functions: {
         ...entryPoint.functions,
         ...functions
