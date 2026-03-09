@@ -5,11 +5,11 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./Card.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
-import { Avatar } from "../Avatar/AvatarNative";
-import { LinkNative } from "../Link/LinkNative";
+import { ThemedAvatar as Avatar } from "../Avatar/Avatar";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import type { HeadingProps } from "../Heading/HeadingNative";
-import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
+import { ThemedHeading as Heading } from "../Heading/Heading";
+import { ThemedText as Text } from "../Text/Text";
 
 type Props = {
   style?: CSSProperties;

@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef, useCallback, useMemo, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
@@ -30,6 +30,7 @@ interface SimpleSelectProps {
   id: string;
   style: CSSProperties;
   className?: string;
+  contentClassName?: string;
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
@@ -76,6 +77,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       readOnly,
       emptyListNode,
       className,
+      contentClassName,
       modal,
       groupBy,
       groupHeaderRenderer,
@@ -214,24 +216,24 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 }}
                 tabIndex={-1}
               >
-                <Icon name="close" />
+                <ThemedIcon name="close" />
               </button>
             </Part>
           )}
           <span className={styles.action}>
-            <Icon name="chevrondown" />
+            <ThemedIcon name="chevrondown" />
           </span>
         </Trigger>
         <Portal container={root}>
           <Content
             collisionPadding={0}
-            className={styles.selectDropdownContent}
+            className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
             style={{ maxHeight: height, minWidth: panelWidth }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>
-              <Icon name="chevronup" />
+              <ThemedIcon name="chevronup" />
             </ScrollUpButton>
             <Part partId="listWrapper">
               <Viewport className={styles.selectViewport}>
@@ -277,7 +279,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               </Viewport>
             </Part>
             <ScrollDownButton className={styles.selectScrollDownButton}>
-              <Icon name="chevrondown" />
+              <ThemedIcon name="chevrondown" />
             </ScrollDownButton>
           </Content>
         </Portal>

@@ -16,8 +16,8 @@ import styles from "./ModalDialog.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
-import { Icon } from "../Icon/IconNative";
-import { Button } from "../Button/ButtonNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedButton as Button } from "../Button/Button";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import { Part } from "../Part/Part";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
@@ -259,8 +259,8 @@ export const ModalDialog = React.forwardRef(
                 variant={"ghost"}
                 themeColor={"secondary"}
                 className={styles.closeButton}
-                aria-label="Close dialog"
-                icon={<Icon name={"close"} size={"sm"} />}
+                aria-label="Close"
+                icon={<ThemedIcon name={"close"} size={"sm"} />}
                 orientation={"vertical"}
               />
             </Dialog.Close>
@@ -278,7 +278,7 @@ export const ModalDialog = React.forwardRef(
               since we get the same result & the main content outside remains scrollable.
             */
             <div
-              className={classnames(styles.overlayBg, styles.nested, {
+              className={classnames(styles.overlayBg, styles.nested, className, {
                 [styles.fullScreen]: fullScreen,
               })}
             >
@@ -287,7 +287,7 @@ export const ModalDialog = React.forwardRef(
           )}
           {!isDialogRootInShadowDom && (
             <>
-              <div className={classnames(styles.overlayBg)} />
+              <div className={classnames(styles.overlayBg, className)} />
               {/* This Overlay is responsible for the focus capture & scroll-lock */}
               <Dialog.Overlay
                 className={classnames(styles.overlay, {

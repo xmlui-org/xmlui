@@ -14,7 +14,7 @@ import styles from "./ContextMenu.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { DropdownMenuContext } from "../DropdownMenu/DropdownMenuNative";
+import { DropdownMenuContext } from "../DropdownMenu/DropdownMenu";
 
 type ContextMenuProps = {
   children?: ReactNode;

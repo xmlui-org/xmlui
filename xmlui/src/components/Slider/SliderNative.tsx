@@ -8,7 +8,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
-import { Tooltip } from "../Tooltip/TooltipNative";
+import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
 import { isNaN } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 

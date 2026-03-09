@@ -28,6 +28,7 @@ export type Tab = {
   headerRenderer?: (contextVars: any) => ReactNode;
   children?: ReactNode;
   style?: CSSProperties;
+  className?: string;
   activated?: () => void;
 };
 

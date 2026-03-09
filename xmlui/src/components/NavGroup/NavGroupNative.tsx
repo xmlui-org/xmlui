@@ -28,8 +28,8 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Icon } from "../Icon/IconNative";
-import { NavLink } from "../NavLink/NavLinkNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";
@@ -43,6 +43,7 @@ type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
   label: string;
   icon?: React.ReactNode;
   to?: string;
@@ -80,6 +81,7 @@ export const NavGroup = forwardRef(function NavGroup(
   {
     node,
     style,
+    className,
     label,
     icon,
     renderChild,
@@ -147,6 +149,7 @@ export const NavGroup = forwardRef(function NavGroup(
           {...rest}
           to={to}
           style={style}
+          className={className}
           label={label}
           icon={icon}
           node={node}
@@ -180,6 +183,7 @@ export const NavGroup = forwardRef(function NavGroup(
 
 type ExpandableNavGroupProps = {
   style?: CSSProperties;
+  className?: string;
   label: string;
   icon: ReactNode;
   node: NavGroupComponentDef;
@@ -195,6 +199,7 @@ type ExpandableNavGroupProps = {
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   {
     style = EMPTY_OBJECT,
+    className,
     label,
     icon,
     renderChild,
@@ -263,7 +268,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <div
-      className={styles.groupWrapper}
+      className={classnames(styles.groupWrapper, className)}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >
       <NavLink
@@ -285,7 +290,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       >
         {label}
         {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-        <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
+        <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
         aria-hidden={!expanded}
@@ -402,9 +407,9 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         >
           {label}
           {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
+          {level === 0 && <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
-            <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+            <ThemedIcon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}
         </NavLink>
       </Trigger>

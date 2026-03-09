@@ -12,9 +12,9 @@ import rehypeRaw from "rehype-raw";
 
 import styles from "./Markdown.module.scss";
 
-import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
-import { LinkNative } from "../Link/LinkNative";
+import { ThemedHeading as Heading } from "../Heading/Heading";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { Toggle } from "../Toggle/Toggle";
 import {
   type CodeHighlighter,
@@ -23,13 +23,14 @@ import {
 } from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
-import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
+import { ThemedCodeBlock as CodeBlock } from "../CodeBlock/CodeBlock";
+import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
 import classnames from "classnames";
-import Icon from "../Icon/IconNative";
-import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
+import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
@@ -301,27 +302,27 @@ export const Markdown = memo(
             },
             h1({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h2({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h3({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h4({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h5({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             h6({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
@@ -331,14 +332,14 @@ export const Markdown = memo(
               }
 
               return (
-                <Text variant="paragraph" className={styles.markdown} uid={id}>
+                <Text variant="paragraph" className={classnames(styles.markdown, className)} uid={id}>
                   {children}
                 </Text>
               );
             },
             code({ id, children }) {
               return (
-                <Text uid={id} variant="code">
+                <Text uid={id} className={className} variant="code">
                   {children}
                 </Text>
               );
@@ -352,21 +353,21 @@ export const Markdown = memo(
             },
             strong({ id, children }) {
               return (
-                <Text uid={id} variant="strong">
+                <Text uid={id} className={className} variant="strong">
                   {children}
                 </Text>
               );
             },
             em({ id, children }) {
               return (
-                <Text uid={id} variant="em">
+                <Text uid={id} className={className} variant="em">
                   {children}
                 </Text>
               );
             },
             del({ id, children }) {
               return (
-                <Text uid={id} variant="deleted">
+                <Text uid={id} className={className} variant="deleted">
                   {children}
                 </Text>
               );
@@ -450,7 +451,7 @@ export const Markdown = memo(
               }
 
               return (
-                <LinkNative to={href} target={target} {...(props as any)}>
+                <LinkNative className={className} to={href} target={target} {...(props as any)}>
                   {label}
                 </LinkNative>
               );
@@ -463,6 +464,7 @@ export const Markdown = memo(
                   variant="checkbox"
                   readOnly={disabled}
                   value={checked}
+                  className={className}
                   /* label={value}
                 labelPosition={"right"} */
                 />
@@ -695,14 +697,14 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     }
 
     const iconMap: Record<string, React.ReactNode> = {
-      info: <Icon name="admonition_info" />,
-      warning: <Icon name="admonition_warning" />,
-      danger: <Icon name="admonition_danger" />,
-      note: <Icon name="admonition_note" />,
-      tip: <Icon name="admonition_tip" />,
+      info: <ThemedIcon name="admonition_info" />,
+      warning: <ThemedIcon name="admonition_warning" />,
+      danger: <ThemedIcon name="admonition_danger" />,
+      note: <ThemedIcon name="admonition_note" />,
+      tip: <ThemedIcon name="admonition_tip" />,
       card: null,
-      feat: <Icon name="star" />,
-      def: <Icon name="definition" />,
+      feat: <ThemedIcon name="star" />,
+      def: <ThemedIcon name="definition" />,
     };
 
     // Render adornment blockquote with the updated structure
@@ -723,7 +725,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
         <div className={styles.admonitionContainer}>
           {iconMap[type] !== null && (
             <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-              {iconMap[type] || <Icon name="admonition_info" />}
+              {iconMap[type] || <ThemedIcon name="admonition_info" />}
             </div>
           )}
           <div className={styles.admonitionContent}>{processedChildren}</div>

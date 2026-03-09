@@ -114,13 +114,14 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     if (!root) return;
     const el = document.createElement('div');
     el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+    if (className) el.className = className;
     (root as HTMLElement).appendChild(el);
     setPortalContainer(el);
     return () => {
       (root as HTMLElement).removeChild(el);
       setPortalContainer(null);
     };
-  }, [root]);
+  }, [root, className]);
 
   const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
 
@@ -173,7 +174,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
       <Dialog.Portal container={portalContainer}>
         {/* Backdrop */}
         {hasBackdrop && (
-          <Dialog.Overlay className={styles.backdrop} />
+          <Dialog.Overlay className={classnames(styles.backdrop, className)} />
         )}
 
         {/* Drawer panel */}
@@ -192,18 +193,22 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
           onEscapeKeyDown={() => doClose()}
         >
           <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>
-          <div className={styles.header}>
-            <div className={styles.headerContent}>
-              {headerTemplate}
+          {/* Close button - floats at top-right */}
+          {closeButtonVisible && (
+            <Dialog.Close asChild>
+              <button className={styles.closeButton} aria-label="Close">
+                <Icon name="close" size="sm" />
+              </button>
+            </Dialog.Close>
+          )}
+          {/* Header with template content - full width */}
+          {!!headerTemplate && (
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                {headerTemplate}
+              </div>
             </div>
-            {closeButtonVisible && (
-              <Dialog.Close asChild>
-                <button className={styles.closeButton} aria-label="Close">
-                  <Icon name="close" />
-                </button>
-              </Dialog.Close>
-            )}
-          </div>
+          )}
           <div className={styles.body}>
             {children}
           </div>

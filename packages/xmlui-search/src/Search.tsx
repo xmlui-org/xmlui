@@ -41,6 +41,7 @@ type Props = {
   maxContentMatchNumber?: number;
   collapsible?: boolean;
   placeholder?: string;
+  className?: string;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -55,6 +56,7 @@ export const Search = ({
   maxContentMatchNumber = defaultProps.maxContentMatchNumber,
   collapsible = false,
   placeholder,
+  className,
 }: Props) => {
   const _id = useId();
   const inputId = id || _id;
@@ -161,6 +163,7 @@ export const Search = ({
   itemLinkRefs.current = [];
 
   return (
+    <span className={className}>
     <Popover open={show} onOpenChange={setShow}>
       <VisuallyHidden>
         <label htmlFor={inputId}>Search Field</label>
@@ -214,7 +217,7 @@ export const Search = ({
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
             onEscapeKeyDown={() => setShow(false)}
-            className={classnames(styles.listPanel, {
+            className={classnames(styles.listPanel, className, {
               [styles.inDrawer]: inDrawer,
             })}
           >
@@ -281,6 +284,7 @@ export const Search = ({
         </Portal>
       )}
     </Popover>
+    </span>
   );
 };
 

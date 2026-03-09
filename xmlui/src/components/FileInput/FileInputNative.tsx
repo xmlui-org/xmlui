@@ -14,8 +14,8 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
-import { TextBox } from "../TextBox/TextBoxNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;

@@ -660,7 +660,7 @@ test.describe("Validation", () => {
   test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<TextBox testId="input" validationStatus="invalid" />`, {
       testThemeVars: {
-        "borderColor-TextBox--default": "rgb(0, 0, 0)",
+        "borderColor-TextBox": "rgb(0, 0, 0)",
         "borderColor-TextBox--error": "rgb(255, 0, 0)",
         "borderColor-TextBox--warning": "rgb(255, 165, 0)",
         "borderColor-TextBox--success": "rgb(0, 255, 0)",
@@ -674,7 +674,7 @@ test.describe("Validation", () => {
   });
 
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

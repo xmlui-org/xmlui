@@ -15,6 +15,7 @@ export const defaultProps = {
 type Props = {
   children: ReactNode;
   className?: string;
+  containerClassName?: string;
   style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
@@ -33,6 +34,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   {
     children,
     className,
+    containerClassName,
     style,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
@@ -141,7 +143,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // Normal mode: use standard div with default browser scrollbar
   if (normalizedScrollStyle === "normal") {
     return (
-      <div ref={ref} className={className} style={style} {...rest}>
+      <div ref={ref} className={`${containerClassName ? `${containerClassName} ` : ""}${className || ""}`} style={style} {...rest}>
         {children}
       </div>
     );
@@ -150,7 +152,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // Overlay mode: overlay scrollbar using theme variables (always visible)
   if (normalizedScrollStyle === "overlay") {
     return (
-      <div className={styles.fadeContainer}>
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
         <OverlayScrollbarsComponent
           ref={(instance) => {
             if (instance) {
@@ -190,7 +192,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // WhenMouseOver mode: scrollbar appears on hover
   if (normalizedScrollStyle === "whenMouseOver") {
     return (
-      <div className={styles.fadeContainer}>
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
         <OverlayScrollbarsComponent
           ref={(instance) => {
             if (instance) {
@@ -230,7 +232,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
 
   // WhenScrolling mode: scrollbar appears during scroll and fades after 400ms
   return (
-    <div className={styles.fadeContainer}>
+    <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
       <OverlayScrollbarsComponent
         ref={(instance) => {
           if (instance) {

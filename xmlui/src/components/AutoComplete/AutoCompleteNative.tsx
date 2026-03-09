@@ -17,7 +17,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
-import Icon from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
 import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
@@ -422,7 +422,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     () =>
       emptyListTemplate ?? (
         <div className={styles.autoCompleteEmpty}>
-          <Icon name="noresult" />
+          <ThemedIcon name="noresult" />
           <span>List is empty</span>
         </div>
       ),
@@ -528,7 +528,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       <span key={index} className={styles.badge}>
                         {v?.label}
                         {!readOnly && (
-                          <Icon
+                          <ThemedIcon
                             name="close"
                             size="sm"
                             onClick={(event) => {
@@ -614,7 +614,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                           clearValue();
                         }}
                       >
-                        <Icon name="close" />
+                        <ThemedIcon name="close" />
                       </span>
                     )}
                     <span
@@ -627,7 +627,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         inputRef.current?.focus();
                       }}
                     >
-                      <Icon name="chevrondown" />
+                      <ThemedIcon name="chevrondown" />
                     </span>
                   </div>
                 </div>
@@ -797,14 +797,14 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
       {children ? (
         <>
           <div className={styles.autoCompleteOptionContent}>{children}</div>
-          {selected && <Icon name="checkmark" />}
+          {selected && <ThemedIcon name="checkmark" />}
         </>
       ) : optionRenderer ? (
         optionRenderer({ label, value, enabled }, selectedValue as any, false)
       ) : (
         <>
           <div className={styles.autoCompleteOptionContent}>{label}</div>
-          {selected && <Icon name="checkmark" />}
+          {selected && <ThemedIcon name="checkmark" />}
         </>
       )}
     </div>

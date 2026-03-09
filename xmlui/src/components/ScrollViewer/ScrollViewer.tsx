@@ -1,8 +1,12 @@
+import React from "react";
 import styles from "./ScrollViewer.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata } from "../../components/metadata-helpers";
 import { ScrollViewer, defaultProps } from "./ScrollViewerNative";
+import { Scroller } from "./Scroller";
+export { type ScrollStyle } from "./Scroller";
 
 const COMP = "ScrollViewer";
 const SCROLLER = "Scroller";
@@ -141,6 +145,22 @@ export const ScrollViewerMd = createMetadata({
     [`autoHideDelay-whenScrolling-${SCROLLER}`]: "400",
   },
 });
+
+type ThemedScrollerProps = React.ComponentPropsWithoutRef<typeof Scroller>;
+
+export const ThemedScroller = React.forwardRef<React.ElementRef<typeof Scroller>, ThemedScrollerProps>(
+  function ThemedScroller({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ScrollViewerMd);
+    return (
+      <Scroller
+        {...props}
+        className={className}
+        containerClassName={themeClass}
+        ref={ref}
+      />
+    );
+  },
+);
 
 export const scrollViewerComponentRenderer = createComponentRenderer(
   COMP,

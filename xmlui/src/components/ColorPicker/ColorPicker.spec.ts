@@ -120,7 +120,7 @@ test("component is keyboard accessible", async ({ page, initTestBed }) => {
 
 test.describe("Validation", () => {
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

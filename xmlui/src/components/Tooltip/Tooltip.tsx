@@ -1,8 +1,11 @@
+import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { Tooltip } from "./TooltipNative";
 import type { TooltipProps } from "./TooltipNative";
+export { parseTooltipOptions } from "./TooltipNative";
 import styles from "./Tooltip.module.scss";
 
 const COMP = "Tooltip";
@@ -106,10 +109,18 @@ export const TooltipMd = createMetadata({
   },
 });
 
+type ThemedTooltipProps = React.ComponentProps<typeof Tooltip> & { className?: string };
+export const ThemedTooltip = React.forwardRef<HTMLDivElement, ThemedTooltipProps>(
+  function ThemedTooltip({ className, ...props }: ThemedTooltipProps, ref) {
+    const themeClass = useComponentThemeClass(TooltipMd);
+    return <Tooltip {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
 export const tooltipComponentRenderer = createComponentRenderer(
   "Tooltip",
   TooltipMd,
-  ({ node, extractValue, renderChild, layoutContext }) => {
+  ({ node, extractValue, renderChild, layoutContext, className }) => {
     // If there are no children, do not render anything
     if (!node.children || node.children.length === 0) {
       return null;
@@ -121,7 +132,7 @@ export const tooltipComponentRenderer = createComponentRenderer(
     const tooltipTemplate = node.props.tooltipTemplate;
 
     return (
-      <Tooltip
+      <ThemedTooltip
         text={text}
         markdown={markdown}
         tooltipTemplate={renderChild(tooltipTemplate)}
@@ -134,9 +145,10 @@ export const tooltipComponentRenderer = createComponentRenderer(
         sideOffset={extractValue.asOptionalNumber(node.props.sideOffset)}
         alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
         avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
+        className={className}
       >
         {renderChild(node.children, layoutContext)}
-      </Tooltip>
+      </ThemedTooltip>
     );
   },
 );

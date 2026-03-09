@@ -95,6 +95,8 @@ export const DrawerMd = createMetadata({
     [`zIndex-${COMP}`]: "200",
     [`animationDuration-${COMP}`]: "250ms",
     [`animationEasing-${COMP}`]: "cubic-bezier(0.4, 0, 0.2, 1)",
+    [`top-closeButton-${COMP}`]: "$space-2",
+    [`right-closeButton-${COMP}`]: "$space-3",
   },
 });
 
