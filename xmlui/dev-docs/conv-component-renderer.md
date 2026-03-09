@@ -8,7 +8,39 @@ The renderer bridges XMLUI markup and the native React component. It is created 
 // In ComponentProvider.tsx
 import { componentNameComponentRenderer } from "./ComponentName/ComponentName";
 // ...
-this.registerCoreComponent(componentNameComponentRenderer);
+if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
+  this.registerCoreComponent(componentNameComponentRenderer);
+}
+```
+
+## Critical rule: no React hooks in renderer functions
+
+Renderer functions are **not** React components — they are plain factory functions. Never put `useState`, `useEffect`, `useRef`, `useMemo`, `useCallback`, or any other hook directly inside a renderer function. Hooks belong in the native component.
+
+```typescript
+// ❌ WRONG — hooks in renderer function
+export const componentRenderer = createComponentRenderer(COMP, ComponentMd,
+  ({ node, extractValue }) => {
+    const [state, setState] = useState();  // ← forbidden
+    useEffect(() => { ... }, []);          // ← forbidden
+    return <ComponentNative ... />;
+  },
+);
+
+// ✅ CORRECT — all hooks live in the native component
+export const componentRenderer = createComponentRenderer(COMP, ComponentMd,
+  ({ node, extractValue, state, updateState, registerComponentApi, lookupEventHandler, layoutCss }) => {
+    return (
+      <ComponentNameNative
+        value={extractValue(node.props.value)}
+        updateState={updateState}
+        registerComponentApi={registerComponentApi}
+        onDidChange={lookupEventHandler("didChange")}
+        style={layoutCss}
+      />
+    );
+  },
+);
 ```
 
 ## Renderer Skeleton

@@ -3,12 +3,14 @@
 Agent-oriented reference for the XMLUI monorepo. Read this first for any task.
 For deeper detail, refer to:
 
-- **`xmlui/conventions/`** — component checklists and refactoring templates.
-- **`xmlui/dev-docs/`** — full developer docs (architecture, testing conventions, component patterns, build system).
+- **`xmlui/dev-docs/`** — full developer docs (architecture, testing conventions, component patterns, build system, QA checklist).
 
 ---
 
 ## What is XMLUI
+
+> **User perspective**: `xmlui/dev-docs/xmlui-in-a-nutshell.md` describes XMLUI from the application developer's point of view — markup syntax, reactive binding, routing, forms, global functions. Read this to understand *what the components you build are for*.
+
 
 XMLUI is a **declarative, reactive frontend framework** for building web applications using XML markup. Users write `.xmlui` files instead of JavaScript/JSX. The framework is fully reactive — expressions in markup re-evaluate automatically when their dependencies change, similar to a spreadsheet. There is no manual state wiring.
 
@@ -64,8 +66,7 @@ xmlui-repo-root/
 │   │   ├── parsers/          # Expression / XML parsers
 │   │   └── testing/          # Test fixtures and infrastructure
 │   ├── tests/                # Unit tests (Vitest), mirrors src/ structure
-│   ├── dev-docs/             # Developer documentation
-│   └── conventions/          # AI-facing conventions and checklists
+│   └── dev-docs/             # Developer documentation, conventions, QA checklist
 ├── packages/        # Extension packages (xmlui-animations, xmlui-pdf, xmlui-spreadsheet, etc.)
 ├── docs/            # Documentation website (built-mode XMLUI app)
 ├── blog/            # Blog site

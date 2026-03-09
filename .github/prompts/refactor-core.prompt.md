@@ -1,3 +1,8 @@
+---
+agent: agent
+description: Refactor core XMLUI framework code
+---
+
 # Refactor $subject$
 
 Refactor $subject$ so the result:

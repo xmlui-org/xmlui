@@ -69,6 +69,7 @@ export const ComponentNameNative = forwardRef<HTMLDivElement, Props>(
 ## Key Rules
 
 - Always use `forwardRef` — parent components need DOM refs.
+- Wrap with `React.memo` to prevent unnecessary re-renders: `export const ComponentNameNative = memo(forwardRef(function ComponentNameNative(...) { ... }));`
 - Export `defaultProps` — the renderer and metadata both reference these.
 - Do NOT set `displayName` — not used in this codebase.
 - Do NOT use `useImperativeHandle` — use `registerComponentApi` instead.
