@@ -1,0 +1,40 @@
+{
+  "name": "xmlui-select",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "dependencies": {
+    "@ark-ui/react": "^5.8.0",
+    "classnames": "2.5.1"
+  },
+  "main": "./dist/xmlui-select.js",
+  "module": "./dist/xmlui-select.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-select.mjs",
+      "require": "./dist/xmlui-select.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": ["dist"],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "XMLUI Select component backed by @ark-ui/react"
+}
