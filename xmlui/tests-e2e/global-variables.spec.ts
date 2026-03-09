@@ -271,6 +271,50 @@ test.describe("Global variables", () => {
     await expect(page.getByTestId("countText")).toHaveText("Count: 45");
   });
 
+  // Regression test for https://github.com/xmlui-org/xmlui/issues/2867#issuecomment-4008150804
+  // .xs variables should be resolvable in global.* initialization expressions
+  test("global.* attribute can reference Main.xmlui.xs variable", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App global.catColors="{categoryColorMap}">
+        <Text testId="type">type: {typeof catColors}</Text>
+        <Text testId="label">label: {catColors?.hello?.label}</Text>
+        <ChildReader />
+      </App>
+    `,
+      {
+        noFragmentWrapper: true,
+        mainXs: `
+      var categoryColorMap = {
+        hello: { label: '#6b5a9a', background: '#f0ecf6' },
+        hi: { label: '#green', background: 'yellow' },
+      };
+    `,
+        components: [
+          `
+      <Component name="ChildReader">
+        <Fragment>
+          <Text testId="childType">child type: {typeof catColors}</Text>
+          <Text testId="childLabel">child label: {catColors?.hello?.label}</Text>
+        </Fragment>
+      </Component>
+    `,
+        ],
+      },
+    );
+
+    // Parent should see the object
+    await expect(page.getByTestId("type")).toHaveText("type: object");
+    await expect(page.getByTestId("label")).toHaveText("label: #6b5a9a");
+
+    // Child component should also see the object (reactive global)
+    await expect(page.getByTestId("childType")).toHaveText("child type: object");
+    await expect(page.getByTestId("childLabel")).toHaveText("child label: #6b5a9a");
+  });
+
   test("raises T032 error when component declares global variable", async ({
     page,
     initTestBed,
