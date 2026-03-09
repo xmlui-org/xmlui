@@ -74,6 +74,7 @@ const searchComponentRenderer = createComponentRenderer(
     const props = node.props as any;
     return (
       <Search
+        className={className}
         placeholder={extractValue.asOptionalString(props.placeholder)}
         data={extractValue(props.data)}
         limit={extractValue.asOptionalNumber(props.limit, defaultProps.limit)}

@@ -288,5 +288,7 @@ Opens the `Drawer`. Invoke with `drawerId.open()`.
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingHorizontal-Drawer | $paddingHorizontal-Drawer |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingVertical-Drawer | $paddingVertical-Drawer |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Drawer | $space-4 | $space-4 |
+| right-closeButton-Drawer | $space-3 | $space-3 |
+| top-closeButton-Drawer | $space-2 | $space-2 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-Drawer | 320px | 320px |
 | zIndex-Drawer | 200 | 200 |
