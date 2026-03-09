@@ -285,9 +285,9 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-Checkbox | $backgroundColor-primary | $backgroundColor-primary |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox | $borderColor-Input-default | $borderColor-Input-default |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox | $borderColor-Input-default | $borderColor-Input-default |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--default--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--error | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--warning | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-500 |

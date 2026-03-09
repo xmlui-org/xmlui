@@ -967,7 +967,7 @@ test.describe("Validation", () => {
 
   test(`applies correct borderColor on hover`, async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox testId="test" />`, {
-      testThemeVars: { [`borderColor-Checkbox--default--hover`]: "rgb(0, 0, 0)" },
+      testThemeVars: { [`borderColor-Checkbox--hover`]: "rgb(0, 0, 0)" },
     });
     await page.getByTestId("test").hover();
     await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");

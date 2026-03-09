@@ -701,28 +701,28 @@ test.describe("Input Adornments", () => {
 test.describe("Theme Variables", () => {
   test("backgroundColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "backgroundColor-NumberBox--default": "rgb(255, 0, 0)" },
+      testThemeVars: { "backgroundColor-NumberBox": "rgb(255, 0, 0)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(255, 0, 0)");
   });
 
   test("borderColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderColor-NumberBox--default": "rgb(0, 255, 0)" },
+      testThemeVars: { "borderColor-NumberBox": "rgb(0, 255, 0)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(0, 255, 0)");
   });
 
   test("textColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "textColor-NumberBox--default": "rgb(0, 0, 255)" },
+      testThemeVars: { "textColor-NumberBox": "rgb(0, 0, 255)" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(0, 0, 255)");
   });
 
   test("focus borderColor applies on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderColor-NumberBox--default--focus": "rgb(255, 255, 0)" },
+      testThemeVars: { "borderColor-NumberBox--focus": "rgb(255, 255, 0)" },
     });
     await page.getByRole("textbox").focus();
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 255, 0)");
@@ -737,7 +737,7 @@ test.describe("Theme Variables", () => {
 
   test("borderRadius applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderRadius-NumberBox--default": "10px" },
+      testThemeVars: { "borderRadius-NumberBox": "10px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-radius", "10px");
   });
@@ -752,28 +752,28 @@ test.describe("Theme Variables", () => {
   // Additional variant mixin theme variable tests
   test("borderWidth applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderWidth-NumberBox--default": "3px" },
+      testThemeVars: { "borderWidth-NumberBox": "3px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-width", "3px");
   });
 
   test("borderStyle applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderStyle-NumberBox--default": "dashed" },
+      testThemeVars: { "borderStyle-NumberBox": "dashed" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("border-style", "dashed");
   });
 
   test("fontSize applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "fontSize-NumberBox--default": "18px" },
+      testThemeVars: { "fontSize-NumberBox": "18px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS("font-size", "18px");
   });
 
   test("boxShadow applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "boxShadow-NumberBox--default": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px" },
+      testThemeVars: { "boxShadow-NumberBox": "rgba(0, 0, 0, 0.2) 0px 2px 4px 0px" },
     });
     await expect(page.getByTestId("input")).toHaveCSS(
       "box-shadow",
@@ -783,7 +783,7 @@ test.describe("Theme Variables", () => {
 
   test("hover borderColor applies on hover", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "borderColor-NumberBox--default--hover": "rgb(255, 100, 100)" },
+      testThemeVars: { "borderColor-NumberBox--hover": "rgb(255, 100, 100)" },
     });
     await page.getByTestId("input").hover();
     await expect(page.getByTestId("input")).toHaveCSS("border-color", "rgb(255, 100, 100)");
@@ -791,7 +791,7 @@ test.describe("Theme Variables", () => {
 
   test("hover backgroundColor applies on hover", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "backgroundColor-NumberBox--default--hover": "rgb(240, 240, 240)" },
+      testThemeVars: { "backgroundColor-NumberBox--hover": "rgb(240, 240, 240)" },
     });
     await page.getByTestId("input").hover();
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(240, 240, 240)");
@@ -799,7 +799,7 @@ test.describe("Theme Variables", () => {
 
   test("hover boxShadow applies on hover", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "boxShadow-NumberBox--default--hover": "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px" },
+      testThemeVars: { "boxShadow-NumberBox--hover": "rgba(0, 0, 0, 0.3) 0px 4px 8px 0px" },
     });
     await page.getByTestId("input").hover();
     await expect(page.getByTestId("input")).toHaveCSS(
@@ -810,7 +810,7 @@ test.describe("Theme Variables", () => {
 
   test("hover textColor applies on hover", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "textColor-NumberBox--default--hover": "rgb(50, 50, 50)" },
+      testThemeVars: { "textColor-NumberBox--hover": "rgb(50, 50, 50)" },
     });
     await page.getByTestId("input").hover();
     await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(50, 50, 50)");
@@ -818,7 +818,7 @@ test.describe("Theme Variables", () => {
 
   test("focus backgroundColor applies on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "backgroundColor-NumberBox--default--focus": "rgb(250, 250, 250)" },
+      testThemeVars: { "backgroundColor-NumberBox--focus": "rgb(250, 250, 250)" },
     });
     await page.getByRole("textbox").focus();
     await expect(page.getByTestId("input")).toHaveCSS("background-color", "rgb(250, 250, 250)");
@@ -827,7 +827,7 @@ test.describe("Theme Variables", () => {
   test("focus boxShadow applies on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
       testThemeVars: {
-        "boxShadow-NumberBox--default--focus": "rgba(0, 100, 255, 0.4) 0px 0px 0px 3px",
+        "boxShadow-NumberBox--focus": "rgba(0, 100, 255, 0.4) 0px 0px 0px 3px",
       },
     });
     await page.getByRole("textbox").focus();
@@ -839,7 +839,7 @@ test.describe("Theme Variables", () => {
 
   test("focus textColor applies on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
-      testThemeVars: { "textColor-NumberBox--default--focus": "rgb(20, 20, 20)" },
+      testThemeVars: { "textColor-NumberBox--focus": "rgb(20, 20, 20)" },
     });
     await page.getByRole("textbox").focus();
     await expect(page.getByTestId("input")).toHaveCSS("color", "rgb(20, 20, 20)");
@@ -848,10 +848,10 @@ test.describe("Theme Variables", () => {
   test("focus outline properties apply on focus", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" />`, {
       testThemeVars: {
-        "outlineWidth-NumberBox--default--focus": "2px",
-        "outlineColor-NumberBox--default--focus": "rgb(0, 123, 255)",
-        "outlineStyle-NumberBox--default--focus": "solid",
-        "outlineOffset-NumberBox--default--focus": "2px",
+        "outlineWidth-NumberBox--focus": "2px",
+        "outlineColor-NumberBox--focus": "rgb(0, 123, 255)",
+        "outlineStyle-NumberBox--focus": "solid",
+        "outlineOffset-NumberBox--focus": "2px",
       },
     });
     await page.getByRole("textbox").focus();
@@ -863,7 +863,7 @@ test.describe("Theme Variables", () => {
 
   test("placeholder textColor applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" placeholder="Enter number" />`, {
-      testThemeVars: { "textColor-placeholder-NumberBox--default": "rgb(150, 150, 150)" },
+      testThemeVars: { "textColor-placeholder-NumberBox": "rgb(150, 150, 150)" },
     });
     const input = page.getByRole("textbox");
     const placeholderColor = await input.evaluate((el: HTMLInputElement) => {
@@ -874,7 +874,7 @@ test.describe("Theme Variables", () => {
 
   test("placeholder fontSize applies correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" placeholder="Enter number" />`, {
-      testThemeVars: { "fontSize-placeholder-NumberBox--default": "14px" },
+      testThemeVars: { "fontSize-placeholder-NumberBox": "14px" },
     });
     const input = page.getByRole("textbox");
     const placeholderFontSize = await input.evaluate((el: HTMLInputElement) => {
@@ -906,7 +906,7 @@ test.describe("Theme Variables", () => {
 
   test("input text adornment colors apply correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" startText="$" endText="€" />`, {
-      testThemeVars: { "color-adornment-NumberBox--default": "rgb(0, 123, 255)" },
+      testThemeVars: { "color-adornment-NumberBox": "rgb(0, 123, 255)" },
     });
     await expect(page.getByText("$")).toHaveCSS("color", "rgb(0, 123, 255)");
     await expect(page.getByText("€")).toHaveCSS("color", "rgb(0, 123, 255)");
@@ -914,14 +914,14 @@ test.describe("Theme Variables", () => {
 
   test("input icon adornment colors apply correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" startIcon="search" endIcon="search" />`, {
-      testThemeVars: { "color-adornment-NumberBox--default": "rgb(0, 123, 255)" },
+      testThemeVars: { "color-adornment-NumberBox": "rgb(0, 123, 255)" },
     });
     await expect(page.getByRole("img").first()).toHaveCSS("color", "rgb(0, 123, 255)");
     await expect(page.getByRole("img").nth(1)).toHaveCSS("color", "rgb(0, 123, 255)");
   });
 
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

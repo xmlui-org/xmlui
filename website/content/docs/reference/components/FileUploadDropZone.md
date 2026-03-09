@@ -111,12 +111,9 @@ This component does not expose any methods.
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $backgroundColor--selected | $color-primary-300 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $backgroundColor | $backgroundColor |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $color-secondary-200 | $color-secondary-200 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone--default | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-FileUploadDropZone | $borderRadius | $borderRadius |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-FileUploadDropZone | dashed | dashed |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-FileUploadDropZone--default | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-FileUploadDropZone | 2px | 2px |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-FileUploadDropZone--default | *none* | *none* |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-dropping-FileUploadDropZone | 0.3 | 0.3 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-dropping-FileUploadDropZone | $color-primary-700 | $color-primary-700 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-FileUploadDropZone | $textColor-secondary | $textColor-secondary |

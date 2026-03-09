@@ -1062,7 +1062,7 @@ test.describe("Theme Variables", () => {
     createTimeInputDriver,
   }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "borderRadius-TimeInput--default": "10px" },
+      testThemeVars: { "borderRadius-TimeInput": "10px" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-radius", "10px");
@@ -1073,7 +1073,7 @@ test.describe("Theme Variables", () => {
     createTimeInputDriver,
   }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "borderColor-TimeInput--default": "rgb(255, 0, 0)" },
+      testThemeVars: { "borderColor-TimeInput": "rgb(255, 0, 0)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("border-color", "rgb(255, 0, 0)");
@@ -1081,7 +1081,7 @@ test.describe("Theme Variables", () => {
 
   test("applies Input textColor theme variable", async ({ initTestBed, createTimeInputDriver }) => {
     await initTestBed(`<TimeInput testId="time-input" />`, {
-      testThemeVars: { "textColor-TimeInput--default": "rgb(0, 0, 255)" },
+      testThemeVars: { "textColor-TimeInput": "rgb(0, 0, 255)" },
     });
     const driver = await createTimeInputDriver("time-input");
     await expect(driver.component).toHaveCSS("color", "rgb(0, 0, 255)");
@@ -1090,7 +1090,7 @@ test.describe("Theme Variables", () => {
   test("handles invalid validationStatus", async ({ initTestBed, page }) => {
     await initTestBed(`<TimeInput testId="timeInput" validationStatus="invalid" />`, {
       testThemeVars: {
-        "borderColor-TimeInput--default": "rgb(0, 0, 0)",
+        "borderColor-TimeInput": "rgb(0, 0, 0)",
         "borderColor-TimeInput--error": "rgb(255, 0, 0)",
         "borderColor-TimeInput--warning": "rgb(255, 165, 0)",
         "borderColor-TimeInput--success": "rgb(0, 255, 0)",
@@ -1100,7 +1100,7 @@ test.describe("Theme Variables", () => {
   });
 
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

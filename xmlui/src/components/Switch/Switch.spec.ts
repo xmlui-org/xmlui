@@ -776,7 +776,7 @@ test.describe("Theme Vars", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  test(`applies correct borderColor --default`, async ({ initTestBed, page }) => {
+  test(`applies correct borderColor`, async ({ initTestBed, page }) => {
     await initTestBed(`<Switch testId="test" />`, {
       testThemeVars: {
         "borderColor-Switch": "rgb(255, 0, 0)",
@@ -796,7 +796,7 @@ test.describe("Validation", () => {
 
   test(`applies correct borderColor on hover`, async ({ initTestBed, page }) => {
     await initTestBed(`<Switch testId="test" />`, {
-      testThemeVars: { [`borderColor-Switch--default--hover`]: "rgb(0, 0, 0)" },
+      testThemeVars: { [`borderColor-Switch--hover`]: "rgb(0, 0, 0)" },
     });
     await page.getByTestId("test").hover();
     await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");

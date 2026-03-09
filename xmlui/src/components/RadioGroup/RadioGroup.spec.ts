@@ -373,7 +373,7 @@ test("correct borderColor applied on validationStatus 'default'", async ({ initT
     </RadioGroup>`,
     {
       testThemeVars: {
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -394,7 +394,7 @@ test("correct borderColor applied on validationStatus 'error'", async ({ initTes
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--error": "rgb(255, 32, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -415,7 +415,7 @@ test("correct borderColor applied on validationStatus 'warning'", async ({ initT
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--warning": "rgb(255, 180, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -436,7 +436,7 @@ test("correct borderColor applied on validationStatus 'valid'", async ({ initTes
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--success": "rgb(0, 180, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
