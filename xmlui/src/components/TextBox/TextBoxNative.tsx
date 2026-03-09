@@ -9,7 +9,12 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
+import {
+  PART_START_ADORNMENT,
+  PART_INPUT,
+  PART_END_ADORNMENT,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+} from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
@@ -152,12 +157,16 @@ export const TextBox = forwardRef(function TextBox(
     setShowPassword((prev) => !prev);
   }, []);
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
   useEffect(() => {
@@ -224,6 +233,14 @@ export const TextBox = forwardRef(function TextBox(
     });
   }, [focus, registerComponentApi, setValue]);
 
+  const searchAriaAttributes =
+    type === "search"
+      ? {
+          "aria-controls": rest["aria-controls"],
+          "aria-autocomplete": rest["aria-autocomplete"],
+          "aria-activedescendant": rest["aria-activedescendant"],
+        }
+      : {};
   return (
     <div
       {...rest}
@@ -262,6 +279,7 @@ export const TextBox = forwardRef(function TextBox(
           autoFocus={autoFocus}
           tabIndex={enabled ? tabIndex : -1}
           required={required}
+          {...searchAriaAttributes}
         />
       </Part>
       {!readOnly && enabled && type == "search" && localValue?.length > 0 && (

@@ -49,7 +49,7 @@ function TestBed() {
       setExtensionManager(manager);
     };
     
-    loadExtensions();
+    void loadExtensions();
   }, []);
 
   if (!window.TEST_ENV) {
