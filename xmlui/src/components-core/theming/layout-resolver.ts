@@ -18,15 +18,28 @@ const defaultCompResult: ResolvedLayout = {
   issues: new Set(),
 };
 
+export type ApplyLayoutProperties = "none" | "dims" | "all";
+
 export function resolveLayoutProps(
   layoutProps: LayoutProps = EMPTY_OBJECT,
   layoutContext?: LayoutContext,
   disableInlineStyle?: boolean,
+  applyLayoutProperties?: ApplyLayoutProperties,
 ): ResolvedLayout {
+  const mode = applyLayoutProperties ?? "all";
+
+  // --- "none" mode: no layout properties at all
+  if (mode === "none") {
+    return defaultCompResult;
+  }
+
   const result: ResolvedLayout = {
     cssProps: {},
     issues: new Set(),
   };
+
+  // --- "dims" mode: only allow dimension properties
+  const dimsOnly = mode === "dims";
 
   // Get the list of layout properties to ignore from layout context
   const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
@@ -82,6 +95,15 @@ export function resolveLayoutProps(
   }
   collectCss("minHeight", false);
   collectCss("maxHeight", false);
+
+  // --- In "dims" mode, skip everything beyond dimensions
+  if (dimsOnly) {
+    // --- If we didn't set any props, return a referentially stable result
+    if (isEmpty(result.cssProps) && isEmpty(result.issues)) {
+      return defaultCompResult;
+    }
+    return result;
+  }
 
   // --- Positions
   collectCss("top", disableInlineStyle);

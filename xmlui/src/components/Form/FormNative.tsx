@@ -736,7 +736,7 @@ export const FormWithContextVar = forwardRef(function (
     extractValue.asOptionalString(node.props._data_url);
 
   const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
-  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle, appContext?.appGlobals?.applyLayoutProperties);
 
   return (
     <Slot ref={ref} style={style}>
