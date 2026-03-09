@@ -323,6 +323,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         mediaSize: appContext.mediaSize,
       },
       themeDisableInlineStyle ?? appContext.appGlobals?.disableInlineStyle,
+      appContext.appGlobals?.applyLayoutProperties,
     );
 
     // --- Old layout property resolution
@@ -334,6 +335,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     layoutContextRef,
     appContext.mediaSize,
     appContext.appGlobals?.disableInlineStyle,
+    appContext.appGlobals?.applyLayoutProperties,
     themeDisableInlineStyle,
     safeNode.props,
     valueExtractor,
