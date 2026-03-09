@@ -15,20 +15,20 @@ $themeVars: t.composePaddingVars($themeVars, $component);
 $themeVars: t.composePaddingVars($themeVars, "item-#{$component}");
 
 // Variables for default variant
-$borderRadius-AutoComplete--default: createThemeVar("Input:borderRadius-#{$component}--default");
-$borderColor-AutoComplete--default: createThemeVar("Input:borderColor-#{$component}--default");
-$borderWidth-AutoComplete--default: createThemeVar("Input:borderWidth-#{$component}--default");
-$borderStyle-AutoComplete--default: createThemeVar("Input:borderStyle-#{$component}--default");
-$fontSize-AutoComplete--default: createThemeVar("Input:fontSize-#{$component}--default");
-$backgroundColor-AutoComplete--default: createThemeVar("Input:backgroundColor-#{$component}--default");
-$boxShadow-AutoComplete--default: createThemeVar("Input:boxShadow-#{$component}--default");
-$textColor-AutoComplete--default: createThemeVar("Input:textColor-#{$component}--default");
-$borderColor-AutoComplete--default--hover: createThemeVar("Input:borderColor-#{$component}--default--hover");
-$backgroundColor-AutoComplete--default--hover: createThemeVar("Input:backgroundColor-#{$component}--default--hover");
-$boxShadow-AutoComplete--default--hover: createThemeVar("Input:boxShadow-#{$component}--default--hover");
-$textColor-AutoComplete--default--hover: createThemeVar("Input:textColor-#{$component}--default--hover");
-$textColor-placeholder-AutoComplete--default: createThemeVar("Input:textColor-placeholder-#{$component}--default");
-$fontSize-placeholder-AutoComplete--default: createThemeVar("Input:fontSize-placeholder-#{$component}--default");
+$borderRadius-AutoComplete: createThemeVar("Input:borderRadius-#{$component}");
+$borderColor-AutoComplete: createThemeVar("Input:borderColor-#{$component}");
+$borderWidth-AutoComplete: createThemeVar("Input:borderWidth-#{$component}");
+$borderStyle-AutoComplete: createThemeVar("Input:borderStyle-#{$component}");
+$fontSize-AutoComplete: createThemeVar("Input:fontSize-#{$component}");
+$backgroundColor-AutoComplete: createThemeVar("Input:backgroundColor-#{$component}");
+$boxShadow-AutoComplete: createThemeVar("Input:boxShadow-#{$component}");
+$textColor-AutoComplete: createThemeVar("Input:textColor-#{$component}");
+$borderColor-AutoComplete--hover: createThemeVar("Input:borderColor-#{$component}--hover");
+$backgroundColor-AutoComplete--hover: createThemeVar("Input:backgroundColor-#{$component}--hover");
+$boxShadow-AutoComplete--hover: createThemeVar("Input:boxShadow-#{$component}--hover");
+$textColor-AutoComplete--hover: createThemeVar("Input:textColor-#{$component}--hover");
+$textColor-placeholder-AutoComplete: createThemeVar("Input:textColor-placeholder-#{$component}");
+$fontSize-placeholder-AutoComplete: createThemeVar("Input:fontSize-placeholder-#{$component}");
 
 // Variables for error variant
 $borderRadius-AutoComplete--error: createThemeVar("Input:borderRadius-#{$component}--error");
@@ -110,25 +110,26 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
 
 // --- CSS properties of a particular AutoComplete variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$component}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$component}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$component}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$component}--#{$variantName}");
-  font-size: createThemeVar("Input:fontSize-#{$component}--#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-#{$component}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$component}--#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$component}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$component}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$component}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$component}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$component}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$component}#{$suffix}");
+  background-color: createThemeVar("Input:backgroundColor-#{$component}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$component}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$component}#{$suffix}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$component}--#{$variantName}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$component}--#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$component}--#{$variantName}--hover");
-    color: createThemeVar("Input:textColor-#{$component}--#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$component}#{$suffix}--hover");
+    background-color: createThemeVar("Input:backgroundColor-#{$component}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$component}#{$suffix}--hover");
+    color: createThemeVar("Input:textColor-#{$component}#{$suffix}--hover");
   }
 
   &::placeholder {
-    color: createThemeVar("Input:textColor-placeholder-#{$component}--#{$variantName}");
-    font-size: createThemeVar("Input:fontSize-placeholder-#{$component}--#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$component}#{$suffix}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$component}#{$suffix}");
   }
 }
 
@@ -150,7 +151,7 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     flex-wrap: wrap;
     @include t.paddingVars($themeVars, $component);
 
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");

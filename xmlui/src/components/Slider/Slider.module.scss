@@ -11,15 +11,15 @@ $themeVars: ();
 $componentName: "Slider";
 
 // Variables for default variant
-$borderRadius-Slider--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
-$borderColor-Slider--default: createThemeVar("Input:borderColor-#{$componentName}--default");
-$borderWidth-Slider--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
-$borderStyle-Slider--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
-$boxShadow-Slider--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
-$borderColor-Slider--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
-$boxShadow-Slider--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
-$borderColor-Slider--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
-$boxShadow-Slider--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
+$borderRadius-Slider: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-Slider: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-Slider: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-Slider: createThemeVar("Input:borderStyle-#{$componentName}");
+$boxShadow-Slider: createThemeVar("Input:boxShadow-#{$componentName}");
+$borderColor-Slider--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$boxShadow-Slider--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$borderColor-Slider--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-Slider--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
 
 // Variables for error variant
 $borderRadius-Slider--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
@@ -76,20 +76,21 @@ $borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName
 
 // Basic variant mixin for consistent theming
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
 
   &:hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
   }
 
   &:focus-within {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--focus");
-    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--focus");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--focus");
+    box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--focus");
   }
 }
 
@@ -122,7 +123,7 @@ $borderColor-Slider--success: createThemeVar("Input:borderColor-#{$componentName
     border-radius: 999em;
     background-color: $backgroundColor-track-Slider;
 
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");

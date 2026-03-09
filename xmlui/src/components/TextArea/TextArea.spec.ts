@@ -481,8 +481,8 @@ test.describe("Visual States", () => {
   test("component applies theme variables correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" />`, {
       testThemeVars: {
-        "backgroundColor-TextArea--default": "rgb(255, 0, 0)",
-        "textColor-TextArea--default": "rgb(0, 255, 0)",
+        "backgroundColor-TextArea": "rgb(255, 0, 0)",
+        "textColor-TextArea": "rgb(0, 255, 0)",
       },
     });
     await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("background-color", "rgb(255, 0, 0)");
@@ -1023,7 +1023,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 
 test.describe("Theme Variables", () => {
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

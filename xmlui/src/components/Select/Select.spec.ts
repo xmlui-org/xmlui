@@ -1213,7 +1213,7 @@ test.describe("Z-Index and Modal Layering", () => {
 
 test.describe("Theme Variables", () => {
   const variants = [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

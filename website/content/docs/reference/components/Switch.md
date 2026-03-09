@@ -230,7 +230,6 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Switch--warning | $borderColor-Switch--warning | $borderColor-Switch--warning |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $borderColor-Input-default | $borderColor-Input-default |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $borderColor-Input-default | $borderColor-Input-default |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--default--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--hover | *none* | *none* |
