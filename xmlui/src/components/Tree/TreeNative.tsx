@@ -117,7 +117,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
     },
@@ -131,7 +131,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
     },
@@ -160,13 +160,13 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     (e: React.MouseEvent) => {
       // Prevent default browser context menu
       e.preventDefault();
-      
+
       // Focus the item when context menu is triggered
       if (treeItem.selectable) {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
       
