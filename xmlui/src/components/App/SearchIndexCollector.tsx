@@ -12,6 +12,7 @@ import {
   SEARCH_DEFAULT_CATEGORY,
   useSearchContextSetIndexing,
   useSearchContextUpdater,
+  useSearchContextLoadedExternalIndex,
 } from "./SearchContext";
 
 const HIDDEN_STYLE: CSSProperties = {
@@ -34,6 +35,7 @@ interface SearchIndexCollectorProps {
 export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
+  const loadedExternalIndex = useSearchContextLoadedExternalIndex();
   const { root } = useTheme();
 
   const [indexState, setIndexState] = useState<{ index: number; done: boolean }>({
@@ -76,7 +78,7 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     });
   }, [pagesToIndex.length]); // Recreate if the total number of pages changes
 
-  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done) {
+  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done || loadedExternalIndex) {
     return null;
   }
 
@@ -150,7 +152,8 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
-        const categoryBasedOnUrl = pageUrl.split("/").find((segment: string) => segment.length > 0) || "";
+        const categoryBasedOnUrl =
+          pageUrl.split("/").find((segment: string) => segment.length > 0) || "";
         searchContextUpdater({
           title,
           content: textContent,

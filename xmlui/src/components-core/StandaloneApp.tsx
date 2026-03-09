@@ -60,6 +60,7 @@ import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEv
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
 import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -236,27 +237,29 @@ function StandaloneApp({
       useHashBasedRouting={useHashBasedRouting}
       waitForApiInterceptor={waitForApiInterceptor}
     >
-      <AppRoot
-        projectCompilation={projectCompilation}
-        decorateComponentsWithTestId={shouldDecorateWithTestId}
-        node={entryPoint!}
-        standalone={true}
-        debugEnabled={debugEnabled}
-        // @ts-ignore
-        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-        globalProps={globalProps}
-        globalVars={filterGlobalVars(globalVars)}
-        defaultTheme={defaultTheme}
-        defaultTone={defaultTone as ThemeTone}
-        resources={resources}
-        resourceMap={resourceMap}
-        sources={sources}
-        extensionManager={extensionManager}
-        contributes={contributes}
-        icons={icons}
-      >
-        {children}
-      </AppRoot>
+      <SsgEnvProvider>
+        <AppRoot
+          projectCompilation={projectCompilation}
+          decorateComponentsWithTestId={shouldDecorateWithTestId}
+          node={entryPoint!}
+          standalone={true}
+          debugEnabled={debugEnabled}
+          // @ts-ignore
+          routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+          globalProps={globalProps}
+          globalVars={filterGlobalVars(globalVars)}
+          defaultTheme={defaultTheme}
+          defaultTone={defaultTone as ThemeTone}
+          resources={resources}
+          resourceMap={resourceMap}
+          sources={sources}
+          extensionManager={extensionManager}
+          contributes={contributes}
+          icons={icons}
+        >
+          {children}
+        </AppRoot>
+      </SsgEnvProvider>
     </ApiInterceptorProvider>
   );
 }
