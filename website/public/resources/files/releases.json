@@ -1,5 +1,49 @@
 [
   {
+    "tag_name": "xmlui@0.12.6",
+    "published_at": "2026-03-05T14:14:47Z",
+    "changes": [
+      {
+        "description": "fix: Links in tables can't be right-clicked",
+        "commit_sha": "4a27cd3"
+      },
+      {
+        "description": "Allow sync between Table instance with syncWithVar",
+        "commit_sha": "77cde39"
+      },
+      {
+        "description": "Made pattern validation such as email, phone and url more lenient: now they accept empty values.",
+        "commit_sha": "ffc1b30"
+      },
+      {
+        "description": "Updated search functionality on website and reworked search data transformation. Also added categories for search results.",
+        "commit_sha": "66da3b5"
+      },
+      {
+        "description": "Add responsive `when-xs`, `when-sm`, `when-md`, `when-lg`, `when-xl`, `when-xxl` attributes",
+        "commit_sha": "8478033"
+      },
+      {
+        "description": "Fixed a bug where pressing enter after entering an input in the Search field on the website did not navigate to the first result.",
+        "commit_sha": "75c96b7"
+      },
+      {
+        "description": "fix: ensure header and data cells remain aligned during column resizing in Table component",
+        "commit_sha": "ee088cc"
+      },
+      {
+        "description": "Add responsive \"when\" (-xs, -sm, -md, ect.) attributes",
+        "commit_sha": "8478033"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.6.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.6/xmlui-0.12.6.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.5",
     "published_at": "2026-03-03T09:09:48Z",
     "changes": [
@@ -384,110 +428,6 @@
       {
         "name": "xmlui-0.11.32.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.32/xmlui-0.11.32.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.31",
-    "published_at": "2026-01-26T15:36:46Z",
-    "changes": [
-      {
-        "description": "Migrate Table to virtua (from @tanstack/react-virtual)",
-        "commit_sha": "796793b"
-      },
-      {
-        "description": "Experiment with deferred APICall",
-        "commit_sha": "307611c"
-      },
-      {
-        "description": "Parse async/await in scripts but raise error when executing",
-        "commit_sha": "c05a6dd"
-      },
-      {
-        "description": "Allow Column to use layout properties",
-        "commit_sha": "00f087d"
-      },
-      {
-        "description": "Parse new operator but raise error when executing",
-        "commit_sha": "10c1fa5"
-      },
-      {
-        "description": "Experimental generation of context variables",
-        "commit_sha": "78716f4"
-      },
-      {
-        "description": "Fix <li> issue with Markdown in Firefox",
-        "commit_sha": "33c99cd"
-      },
-      {
-        "description": "Fix the inconsistent URL encoding between url and queryParams",
-        "commit_sha": "e11595e"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.31.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.31/xmlui-0.11.31.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.30",
-    "published_at": "2026-01-22T12:45:26Z",
-    "changes": [
-      {
-        "description": "Add ScrollViewer component",
-        "commit_sha": "4e0379f"
-      },
-      {
-        "description": "Document and improve ContextMenu",
-        "commit_sha": "498abc1"
-      },
-      {
-        "description": "- Columns with bindTo are now sortable by default",
-        "commit_sha": "62d88a4"
-      },
-      {
-        "description": "Add QRCode component",
-        "commit_sha": "ded963e"
-      },
-      {
-        "description": "Add scrollStyle property to Stack, FlowLayout, and NavPanel",
-        "commit_sha": "4e0379f"
-      },
-      {
-        "description": "Add ContextMenu component",
-        "commit_sha": "84acbea"
-      },
-      {
-        "description": "Added completed state theme variable for ProgressBar called \"color-indicator-ProgressBar--complete\".",
-        "commit_sha": "6decfd7"
-      },
-      {
-        "description": "Added validation timeout handling for input fields. New properties include customValidationsTimeout and customValidationsTimeoutMessage.",
-        "commit_sha": "0f9326f"
-      },
-      {
-        "description": "upgrade @remix-run/react to 2.17.4, migrate imports to react-router-dom",
-        "commit_sha": "7a4974d"
-      },
-      {
-        "description": "Add contextMenu event to several components",
-        "commit_sha": "2fb95aa"
-      },
-      {
-        "description": "Add scroll fading effect",
-        "commit_sha": "05c9fd7"
-      },
-      {
-        "description": "Review markdown rendering and theming",
-        "commit_sha": "bc7addd"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.30.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.30/xmlui-0.11.30.js"
       }
     ]
   }

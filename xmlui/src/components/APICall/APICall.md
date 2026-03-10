@@ -1,5 +1,7 @@
 %-DESC-START
 
+Haho!
+
 **Key characteristics:**
 - **Manual execution**: Call `execute()` method to trigger the API request
 - **Form integration**: Commonly used in `<event name="submit">` handlers for forms
