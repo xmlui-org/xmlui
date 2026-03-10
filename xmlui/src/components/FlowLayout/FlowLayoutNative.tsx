@@ -23,6 +23,7 @@ import { normalizeCssValueForCalc, getSizeString } from "../../components-core/u
 import { useIsomorphicLayoutEffect, useMediaQuery } from "../../components-core/utils/hooks";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 import { useAppContext } from "../../components-core/AppContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type FlowItemProps = {
   children: ReactNode;
@@ -199,6 +200,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
 type FlowLayoutProps = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   columnGap: string | number;
   rowGap: string | number;
   itemWidth?: string;
@@ -223,6 +225,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
   {
     style,
     className,
+    classes,
     columnGap = 0,
     rowGap = 0,
     itemWidth = defaultProps.itemWidth,
@@ -296,7 +299,7 @@ export const FlowLayout = forwardRef(function FlowLayout(
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
       <Scroller
         style={style}
-        className={className}
+        className={classnames(classes?.[COMPONENT_PART_KEY], className)}
         ref={containerRef}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}

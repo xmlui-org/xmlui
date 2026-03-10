@@ -18,6 +18,7 @@ type SpinnerProps = {
   fullScreen?: boolean;
   style?: CSSProperties;
   classes?: Record<string, string>;
+  className?: string;
 };
 
 // source https://loading.io/css/
@@ -27,6 +28,7 @@ export const Spinner = forwardRef(function Spinner(
     fullScreen = defaultProps.fullScreen,
     style,
     classes,
+    className,
     ...rest
   }: SpinnerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -54,7 +56,7 @@ export const Spinner = forwardRef(function Spinner(
           className={styles.fullScreenSpinnerWrapper}
         >
           <div
-            className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY])}
+            className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
             style={style}
             ref={forwardedRef}
           >
@@ -69,7 +71,7 @@ export const Spinner = forwardRef(function Spinner(
     return (
       <div
         {...rest}
-        className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY])}
+        className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
         role="status"
         aria-label="Loading"
         style={style}

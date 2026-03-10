@@ -7,7 +7,6 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 type Props = {
   style?: CSSProperties;
   classes?: Record<string, string>;
-  className?: string;
   children?: ReactNode;
   overlayTemplate?: ReactNode;
   opacity?: string;
@@ -18,7 +17,6 @@ export const Backdrop = forwardRef(function Backdrop(
   {
     style,
     classes,
-    className,
     children,
     overlayTemplate,
     backgroundColor,
@@ -30,7 +28,7 @@ export const Backdrop = forwardRef(function Backdrop(
   return (
     <div
       {...rest}
-      className={classNames(styles.backdropContainer, classes?.[COMPONENT_PART_KEY], className)}
+      className={classNames(styles.backdropContainer, classes?.[COMPONENT_PART_KEY])}
       ref={forwardedRef}
       style={style}
     >

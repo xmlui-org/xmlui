@@ -317,19 +317,19 @@ Import from `../../components-core/theming/responsive-layout` in both the native
 | Blog | — | `classes` merged into className passed to sub-views |
 | Br | — | No native component; `classes` applied directly on `<br>` |
 | ContentSeparator | — | Simple divider |
+| Column | — | Passes `classes?.[COMPONENT_PART_KEY]` as className to column metadata |
+| FlowLayout | — | ThemedFlowLayout merges theme class into `classes`; native Scroller gets merged className |
+| Footer | — | Renderer merges `layoutContext.themeClassName` into `classes[COMPONENT_PART_KEY]` |
+| HtmlTags | — | Bulk-migrated; all deprecated HTML tag renderers use `classes?.[COMPONENT_PART_KEY]` |
+| IFrame | — | Simple element; `classes?.[COMPONENT_PART_KEY]` merged on `<iframe>` |
+| Icon | — | `ThemedIcon` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Icon>` |
+| Image | — | `ThemedImage` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Image>` |
+| InspectButton | — | Renderer passes `classes?.[COMPONENT_PART_KEY]` as className to `<InspectButton>` |
 
 ### Category 2 — To migrate. No parts. Simple component (no theme vars suggesting parts)
 
 | Component | Notes |
 |---|---|
-| Column | No theme vars, layout helper |
-| FlowLayout | Layout container |
-| Footer | Simple wrapper |
-| HtmlTags | Collection of basic HTML tags |
-| IFrame | Simple embed |
-| Icon | Single-element icon |
-| Image | Single-element |
-| InspectButton | Dev tool button |
 | List | Simple list container |
 | Logo | No theme vars |
 | Option | No theme vars, used inside Select |

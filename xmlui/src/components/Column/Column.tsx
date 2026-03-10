@@ -1,5 +1,6 @@
 import type React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
 import { Column, defaultProps } from "./ColumnNative";
 
@@ -94,7 +95,7 @@ export const columnComponentRenderer = createComponentRenderer(
   COMP,
   ColumnMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, className, appContext } = rendererContext;
+    const { node, renderChild, extractValue, classes, appContext } = rendererContext;
     // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
     const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
     
@@ -128,7 +129,7 @@ export const columnComponentRenderer = createComponentRenderer(
     
     return (
       <Column
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         style={Object.keys(style).length > 0 ? style : undefined}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
