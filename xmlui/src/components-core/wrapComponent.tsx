@@ -327,9 +327,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       const traceKind = eventNameToTraceKind(xmluiName);
       if (!handler && !traceKind) continue;
       props[reactPropName] = (...args: any[]) => {
-        // Push a trace so the value:change and handler events share the same traceId
+        // Push a trace so the behavioral event and handler events share the same traceId
         const traceId = traceKind ? pushTrace() : undefined;
         try {
+          let result: any;
+          if (handler) {
+            result = handler(...args);
+          }
           if (traceKind) {
             pushXsLog(createLogEntry(traceKind, {
               component: type,
@@ -342,9 +346,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
               ...extractFileMetadata(args),
             }));
           }
-          if (handler) {
-            return handler(...args);
-          }
+          return result;
         } finally {
           if (traceId) popTrace();
         }
@@ -637,6 +639,11 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         props.__onDidChange = (...args: any[]) => {
           const traceId = traceKind ? pushTrace() : undefined;
           try {
+            updateState({ value: args[0] });
+            let result: any;
+            if (handler) {
+              result = handler(...args);
+            }
             if (traceKind) {
               pushXsLog(createLogEntry(traceKind, {
                 component: type,
@@ -649,10 +656,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 ...extractFileMetadata(args),
               }));
             }
-            updateState({ value: args[0] });
-            if (handler) {
-              return handler(...args);
-            }
+            return result;
           } finally {
             if (traceId) popTrace();
           }
@@ -662,6 +666,10 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         props[reactPropName] = (...args: any[]) => {
           const traceId = traceKind ? pushTrace() : undefined;
           try {
+            let result: any;
+            if (handler) {
+              result = handler(...args);
+            }
             if (traceKind) {
               pushXsLog(createLogEntry(traceKind, {
                 component: type,
@@ -674,9 +682,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 ...extractFileMetadata(args),
               }));
             }
-            if (handler) {
-              return handler(...args);
-            }
+            return result;
           } finally {
             if (traceId) popTrace();
           }
