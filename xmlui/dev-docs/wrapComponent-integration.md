@@ -259,6 +259,56 @@ wrapComponent(COMP, ThemedImage, ImageMd, {
 
 ---
 
+## Observation: `valueType` Matters for `data` and `alt` — Native Filtering vs. `asOptionalString`
+
+During the `Image` migration, setting `valueType: "string"` on `data` and `alt` caused two regressions.
+
+**`data` prop:** `ImageNative` expects a `Blob | any` value, not a string. With `valueType: "string"`, `wrapComponent` called `extractValue.asOptionalString()`, which returned a string (or `undefined`) instead of the original Blob. The `instanceof Blob` check in `ImageNative` then always failed, so no blob URL was ever created.
+
+**`alt` prop:** `ImageNative` passes the resolved value through `safeConvertPropToString`, a custom guard that rejects objects, arrays, and functions. With `valueType: "string"`, `extractValue.asOptionalString()` ran first and eagerly converted objects to `"[object Object]"`. Because `safeConvertPropToString` receives a string it always passes it through — the custom filtering was effectively bypassed.
+
+**Fix:** Remove `valueType` from both props so plain `extractValue()` is used. The raw value reaches `ImageNative` unchanged, and the existing guards in the native component handle type checking correctly.
+
+```ts
+data: {
+  description: `This property contains the binary data that represents the image.`,
+  // No valueType — value is Blob | any, not a string
+},
+alt: {
+  description: `This optional property specifies an alternate text for the image.`,
+  // No valueType — safeConvertPropToString in ImageNative does the filtering
+},
+```
+
+**Lesson:** Do not add `valueType: "string"` just because a prop conceptually "contains text". If the native component performs its own type validation or accepts non-string values, use plain `extractValue()` (no `valueType`) so the raw value arrives intact. `valueType` should only be set when the XMLUI-to-React type coercion is actually needed and safe.
+
+---
+
+## Observation: `extractValue.asSize()` and Layout-Derived Props Block Migration — ContentSeparator
+
+`ContentSeparator` was a candidate for `wrapComponent` migration, but two blockers made it unsuitable.
+
+**`extractValue.asSize()`** is not supported by `wrapComponent`. The `thickness` and `length` props must be extracted with `asSize`, which ensures proper CSS unit handling. `wrapComponent` only knows about `boolean`, `number`, `string`, and plain `extractValue` — there is no `size` type slot in `WrapComponentConfig`.
+
+**`hasExplicitLength` — derived from layout-level props.** The renderer computes a synthetic `hasExplicitLength` prop from a combination of the declared `length` prop and the layout-injected `height` / `width` properties:
+
+```ts
+const hasExplicitLength = length !== undefined ||
+  (orientation === "vertical" && node.props.height !== undefined) ||
+  (orientation === "horizontal" && node.props.width !== undefined);
+```
+
+`height` and `width` are not declared in `ContentSeparatorMd` — they are layout properties injected by the XMLUI engine and available on `node.props` at renderer time. `wrapComponent` has no mechanism to access these, compute derived values from them, or pass the result as an additional prop.
+
+This is a direct parallel to the `Stack` case (Challenge 5): the renderer computes a prop whose value depends on multiple other props at runtime. No declarative config option can express this logic.
+
+**Takeaway:** `ContentSeparator` stays in `createComponentRenderer`. The two new disqualifying patterns to add to the pre-migration audit checklist are:
+
+- **`extractValue.asSize()` usage** — `wrapComponent` has no size extractor; the prop would arrive without proper CSS unit coercion
+- **Derived props from layout-level `node.props`** — synthetic props computed from `height`, `width`, or other engine-injected properties that are not declared in the component's metadata
+
+---
+
 ## Summary — When Does `wrapComponent` Work Well?
 
 `wrapComponent` is a good fit when:
@@ -278,3 +328,5 @@ A manual `createComponentRenderer` is still needed when:
 - Per-child `wrapChild` callbacks are needed in the layout context
 - Multiple component variants share a common render helper with hard-coded overrides
 - The native component API cannot be modified (e.g. a third-party library component)
+- A prop must be extracted with `extractValue.asSize()` (no size extractor in `wrapComponent`)
+- A synthetic prop is computed from layout-level `node.props` (`height`, `width`) that are not declared in the component's metadata
