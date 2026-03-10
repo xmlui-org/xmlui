@@ -1,10 +1,10 @@
-# wrapComponent Integration — Lessons Learned from Migrating the Link Component
+# wrapComponent Integration — Lessons Learned from Migrating Link and Card
 
 ## Background
 
 `wrapComponent` is a higher-level wrapper that automatically handles prop extraction from an XMLUI node and passes the resolved values to a React component. Its goal is to eliminate the boilerplate of manual `createComponentRenderer` implementations (explicit `extractValue`, `lookupEventHandler`, etc. calls).
 
-The first target was the `Avatar` component, followed by `Link`.
+The first target was the `Avatar` component, followed by `Link` and `Card`.
 
 ---
 
@@ -107,6 +107,56 @@ If an adapter only performs prop renaming or negation, it is better to align the
 
 ---
 
+---
+
+## Challenge 4: Children with a Layout Context
+
+### Problem
+
+Some components do not just pass children through — they wrap them in a specific layout. The original `Card` renderer used:
+
+```tsx
+{renderChild(node.children, {
+  type: "Stack",
+  orientation: "vertical",
+})}
+```
+
+The layout context instructs the XMLUI engine to wrap the children in a vertical Stack. `wrapComponent` previously only called `renderChild(node.children)` with no layout context, so this information would have been lost.
+
+### Fix
+
+A `childrenLayoutContext` option was added to `WrapComponentConfig`:
+
+```ts
+childrenLayoutContext?: LayoutContext;
+```
+
+`wrapComponent` now passes it through when rendering children:
+
+```ts
+props.children = renderChild(node.children, config.childrenLayoutContext);
+```
+
+The Card renderer becomes:
+
+```ts
+export const cardComponentRenderer = wrapComponent(
+  COMP,
+  ThemedCard,
+  CardMd,
+  {
+    childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+  },
+);
+```
+
+### Lesson
+
+When migrating a component that calls `renderChild` with a non-trivial layout context, use `childrenLayoutContext` in the `wrapComponent` config. If a component needs *different* layout contexts for different child slots, a manual `createComponentRenderer` is still required.
+
+---
+
 ## Summary — When Does `wrapComponent` Work Well?
 
 `wrapComponent` is a good fit when:
@@ -115,9 +165,11 @@ If an adapter only performs prop renaming or negation, it is better to align the
 - Every prop has a `valueType` set in the metadata
 - XMLUI event names follow the convention that maps cleanly to React prop names (e.g. `click` → `onClick`)
 - The native component directly accepts XMLUI prop conventions (`enabled`, `label`, etc.)
+- Children either need no layout context or a single uniform one (`childrenLayoutContext`)
 
-An adapter layer is only needed when:
+A manual `createComponentRenderer` is still needed when:
 
 - Complex logical transformation is required (beyond simple negation)
 - Multiple props need to be combined into one
+- Different child slots require different layout contexts
 - The native component API cannot be modified (e.g. a third-party library component)
