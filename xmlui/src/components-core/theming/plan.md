@@ -48,6 +48,12 @@ I have a function in xmlui/src/components-core/theming/parse-layout-props.ts (pa
 
 ## Implementation Plan
 
+### Implementation Flow (apply after every change)
+
+1. **Lint check**: after modifying any file, verify there are no TypeScript/lint errors.
+2. **New tests**: after creating unit or E2E tests, run them and fix any failures before proceeding.
+3. **Full component suite**: after migrating a component and adding E2E tests for it, run the complete E2E test suite for that component to confirm no regressions.
+
 ### Design Decisions
 
 - **Parallel operation**: `className` (existing) and `classes` (new) coexist. Components opt-in to `classes` one at a time.
@@ -181,6 +187,61 @@ Once several components are migrated:
 | `theming/StyleRegistry.ts` | No changes (`@media` already supported) |
 | Per-component `*.tsx` | Opt-in: use `classes` instead of / alongside `className` |
 | `tests/…/responsive-layout.test.ts` (**new**) | Unit tests for resolver |
+
+---
+
+## Migration Learnings (from Spinner)
+
+### Native component API convention
+
+Keep **both** `classes` and `className` in the native component's prop type:
+
+```typescript
+type Props = {
+  classes?: Record<string, string>;
+  className?: string;  // kept for VariantBehavior compatibility
+  // ...
+};
+```
+
+Apply them merged in the `classnames()` call on the root element:
+
+```typescript
+classnames(styles["base-class"], classes?.[COMPONENT_PART_KEY], className)
+```
+
+**Why `className` must stay**: `VariantBehavior` (and potentially other behaviors) uses `cloneElement(renderedNode, { className: variantClass })`. If the native component drops `className`, the injected class goes into `...rest` but is then immediately overridden by the explicit `className={classnames(...)}` in JSX — so the variant styling silently disappears. Keeping `className` in the signature and forwarding it preserves behavior-injected classes.
+
+### Renderer function: drop `className`, use `classes` directly
+
+```typescript
+({ node, classes, extractValue }) => {
+  return <NativeComp classes={classes} ... />;
+}
+```
+
+No need for `className?.[COMPONENT_PART_KEY] ?? className` — `classes` already contains the full merged class (theme + layout + responsive) under the `COMPONENT_PART_KEY` key, computed by `ComponentAdapter`.
+
+### ThemedComp wrapper: build `classes` from themeClass + incoming `className`
+
+```typescript
+type ThemedProps = Omit<React.ComponentProps<typeof NativeComp>, "classes"> & { className?: string };
+export const ThemedComp = React.forwardRef<HTMLDivElement, ThemedProps>(
+  function ThemedComp({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(CompMd);
+    const combinedClass = [themeClass, className].filter(Boolean).join(" ");
+    return <NativeComp {...props} classes={{ [COMPONENT_PART_KEY]: combinedClass }} ref={ref} />;
+  },
+);
+```
+
+### CSS injection order matters
+
+`useStyles` injects a `<style>` tag the **first time** a style object is seen. Tags injected later have higher source order (win ties in CSS cascade). For responsive overrides to win over base rules, the responsive `useStyles` call in `ComponentAdapter` must come **after** `useComponentStyle` and `useComponentThemeClass`.
+
+### COMPONENT_PART_KEY = `"-component"`
+
+Import from `../../components-core/theming/responsive-layout` in both the native component file and the renderer file.
 
 ---
 

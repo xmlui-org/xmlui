@@ -3,12 +3,14 @@ import { forwardRef, memo, useMemo } from "react";
 import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   size?: string;
   url?: string;
   name?: string;
   style?: CSSProperties;
+  classes?: Record<string, string>;
   className?: string;
 } & Pick<React.HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu">;
 
@@ -17,7 +19,7 @@ export const defaultProps: Pick<Props, "size"> = {
 };
 
 export const Avatar = memo(forwardRef(function Avatar(
-  { size = defaultProps.size, url, name, style, className, onClick, onContextMenu, ...rest }: Props,
+  { size = defaultProps.size, url, name, style, classes, className, onClick, onContextMenu, ...rest }: Props,
   ref: Ref<any>,
 ) {
   // Memoize the abbreviated name calculation to avoid recalculation on every render
@@ -37,6 +39,7 @@ export const Avatar = memo(forwardRef(function Avatar(
   
   // Simplified className generation by directly mapping size to styles
   const commonClassNames = classnames(
+    classes?.[COMPONENT_PART_KEY],
     className,
     styles.container,
     !isCustomSize && (styles[size as keyof typeof styles] || styles.sm), // Only apply predefined size class

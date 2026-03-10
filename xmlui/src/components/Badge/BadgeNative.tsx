@@ -2,6 +2,7 @@ import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Badge.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 export const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];
@@ -27,6 +28,7 @@ type Props = {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
   style?: CSSProperties;
+  classes?: Record<string, string>;
   className?: string;
 } & Pick<React.HTMLAttributes<HTMLDivElement>, "onContextMenu">;
 
@@ -35,7 +37,7 @@ export const defaultProps: Pick<Props, "variant"> = {
 };
 
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = defaultProps.variant, style, className, onContextMenu, ...rest }: Props,
+  { children, color, variant = defaultProps.variant, style, classes, className, onContextMenu, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -47,6 +49,7 @@ export const Badge = forwardRef(function Badge(
           [styles.badge]: variant === "badge",
           [styles.pill]: variant === "pill",
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       onContextMenu={onContextMenu}

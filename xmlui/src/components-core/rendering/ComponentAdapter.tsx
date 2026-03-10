@@ -35,6 +35,8 @@ import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
+import { buildResponsiveStyleObjects, buildCompositeStyleObject, COMPONENT_PART_KEY } from "../theming/responsive-layout";
+import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 
 // --- The available properties of Component
@@ -351,7 +353,38 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const themeClassName = useComponentThemeClass(descriptor);
 
-  const className = `${themeClassName} ${styleClassName}`;
+  // --- Collect extended layout props: keys with part and/or breakpoint suffixes
+  // --- (e.g. "fontSize-label", "padding-md", "color-input-lg")
+  // --- NOTE: these hooks are intentionally placed AFTER styleClassName and themeClassName to
+  // --- ensure the responsive @media rules are injected later in source order, giving them
+  // --- higher cascade priority over the base rules at the matching breakpoints.
+  const extendedLayoutProps = useMemo(() => {
+    if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
+    const extended: Record<string, any> = {};
+    for (const key of Object.keys(safeNode.props)) {
+      const parsed = parseLayoutProperty(key);
+      if (typeof parsed === "string") continue; // invalid key
+      if (parsed.component) continue; // component-scoped, not a layout prop
+      // Only collect keys that have a part or breakpoint suffix — base keys are already
+      // handled by the existing layoutOptionKeys pass above
+      if (parsed.part || (parsed.screenSizes && parsed.screenSizes.length > 0)) {
+        extended[key] = valueExtractor(safeNode.props[key], true);
+      }
+    }
+    return extended;
+  }, [safeNode.props, valueExtractor]);
+
+  // --- Build composite responsive style object covering root + all parts
+  const responsiveStyleObject = useMemo(
+    () => buildCompositeStyleObject(buildResponsiveStyleObjects(extendedLayoutProps)),
+    [extendedLayoutProps],
+  );
+
+  const stableResponsiveStyleObject = useShallowCompareMemoize(responsiveStyleObject);
+  // Always call useStyles (Rules of Hooks) — returns undefined when object is empty
+  const responsiveClassName = useStyles(stableResponsiveStyleObject);
+
+  const className = [themeClassName, styleClassName, responsiveClassName].filter(Boolean).join(" ");
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
@@ -441,7 +474,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     renderChild: memoedRenderChild,
     registerComponentApi: memoedRegisterComponentApi,
     className,
-    classes: { "-component": className },
+    classes: { [COMPONENT_PART_KEY]: className },
     layoutContext: layoutContextRef?.current,
     uid,
     logInteraction,
