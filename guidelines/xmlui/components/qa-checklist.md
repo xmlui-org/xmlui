@@ -1,6 +1,6 @@
 # XMLUI Component QA Checklist
 
-Use this when reviewing or verifying XMLUI components against conventions. For implementation details, see the sub-files listed in `xmlui/dev-docs/conv-create-components.md`.
+Use this when reviewing or verifying XMLUI components against conventions. For implementation details, see the sub-files listed in `guidelines/xmlui/components/overview.md`.
 
 ## Scope
 
@@ -69,7 +69,7 @@ Use this when reviewing or verifying XMLUI components against conventions. For i
 
 ## Styling (`ComponentName.module.scss`)
 
-- [ ] Includes the required `$themeVars` boilerplate (see `conv-component-styling.md`)
+- [ ] Includes the required `$themeVars` boilerplate (see `styling.md`)
 - [ ] All theme variables declared with `createThemeVar(...)`
 - [ ] Ends with `:export { themeVars: t.json-stringify($themeVars); }`
 - [ ] CSS class names use camelCase in SCSS, applied via `classnames`

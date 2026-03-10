@@ -6,14 +6,17 @@ This is the index. For detailed reference, read the focused sub-files listed bel
 
 | Topic | File | When to read |
 |---|---|---|
-| Metadata API | [conv-component-metadata.md](./conv-component-metadata.md) | Always — every component has metadata |
-| Renderer | [conv-component-renderer.md](./conv-component-renderer.md) | Always — every component has a renderer |
-| Native component pattern | [conv-component-native.md](./conv-component-native.md) | Always for complex components; skip for trivial single-file components |
-| SCSS & theme variables | [conv-component-styling.md](./conv-component-styling.md) | Visual components only |
-| Parts pattern | [conv-component-parts.md](./conv-component-parts.md) | Components with multiple stylable sub-elements |
-| State management | [conv-component-state.md](./conv-component-state.md) | Components that hold or expose state |
-| E2E testing | [conv-e2e-testing.md](./conv-e2e-testing.md) | When creating or updating E2E tests |
-| Unit testing | [conv-unit-testing.md](./conv-unit-testing.md) | When creating or updating unit tests |
+| Metadata API | [metadata.md](./metadata.md) | Always — every component has metadata |
+| Renderer | [renderer.md](./renderer.md) | Always — every component has a renderer |
+| Native component pattern | [native.md](./native.md) | Always for complex components; skip for trivial single-file components |
+| SCSS & theme variables | [styling.md](./styling.md) | Visual components only |
+| Parts pattern | [parts.md](./parts.md) | Components with multiple stylable sub-elements |
+| State management | [state.md](./state.md) | Components that hold or expose state |
+| Behaviors | [behaviors.md](./behaviors.md) | Auto-attached cross-cutting behaviors (label, tooltip, animation, …) |
+| XMLUI markup patterns | [../markup.md](../markup.md) | Writing XMLUI markup, variables, scoping, scripting |
+| Data operations | [../data.md](../data.md) | DataSource, APICall, loader state, file ops |
+| E2E testing | [e2e.md](../testing/e2e.md) | When creating or updating E2E tests |
+| Unit testing | [unit.md](../testing/unit.md) | When creating or updating unit tests |
 
 ## Quick Rules
 

@@ -72,4 +72,4 @@ defaultThemeVars: {
 
 ## Parts Styling
 
-Each part gets its own theme variable scope. Apply `partClassName()` in the native component so tests and theme rules can target individual parts (see `conv-component-parts.md`).
+Each part gets its own theme variable scope. Apply `partClassName()` in the native component so tests and theme rules can target individual parts (see `parts.md`).
