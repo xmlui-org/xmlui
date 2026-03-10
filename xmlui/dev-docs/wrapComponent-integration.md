@@ -344,6 +344,44 @@ The rendered content is either the display text, XMLUI children, or a non-breaki
 
 ---
 
+## Observation: Clean Migration Without a `ThemedX` Wrapper — ToneChangerButton and TreeDisplay
+
+Two additional components were migrated cleanly with no new challenges.
+
+**ToneChangerButton** had no `ThemedX` wrapper — the component handles its own rendering via `useThemes()` and delegates theming to the `Button` and `Icon` it renders internally. `wrapComponent` passed props directly to the `ToneChangerButton` function component without any adapter. The only fix needed was adding `valueType: "string"` to `lightToDarkIcon` and `darkToLightIcon`, which were previously declared without `valueType`.
+
+**TreeDisplay** had an existing `ThemedTreeDisplay` wrapper but the original renderer was passing props directly to `TreeDisplay` (bypassing the wrapper), which meant the theme class was not being applied. The migration to `wrapComponent(COMP, ThemedTreeDisplay, TreeDisplayMd)` simultaneously fixed this gap and eliminated the boilerplate renderer. All props already had `valueType` set correctly.
+
+**Lesson:** `wrapComponent` does not require a `ThemedX` wrapper. If a component handles theming internally (e.g. by composing already-themed components), pass the component function directly. Conversely, if a `ThemedX` wrapper exists, always prefer it over the bare native component — otherwise the theme class will not be applied.
+
+**Secondary lesson (TreeDisplay):** When migrating, check whether the original renderer used the `ThemedX` wrapper or bypassed it. A bypass is a pre-existing bug — the migration is a good opportunity to fix it at no extra cost.
+
+---
+
+## Observation: Dynamic Whitelist-Based Prop Forwarding Blocks Migration — Text
+
+`Text` was the next candidate after `TreeDisplay` but cannot be migrated. The decisive blocker is a pattern not seen before: **dynamic whitelist-based prop forwarding**.
+
+The renderer filters `node.props` at runtime against a static whitelist (`VariantPropsKeys`) and spreads the matching entries onto the native component:
+
+```ts
+const variantSpecificProps: VariantProps = Object.fromEntries(
+  Object.entries(variantSpecific)
+    .filter(([key, _]) => VariantPropsKeys.includes(key as any))
+    .map(([key, value]) => [key, extractValue(value)]),
+);
+
+return <Text ... {...variantSpecificProps}>;
+```
+
+This is fundamentally different from `wrapComponent`'s forwarding model. `wrapComponent` forwards every key present in `node.props` (with optional type coercion per key). The `Text` renderer actively selects a subset of props based on a runtime inclusion test — a level of filtering that has no equivalent in `WrapComponentConfig`.
+
+The two additional blockers from `Badge` also appear here: `extractValue.asDisplayText(value)` and the `value || renderChild(node.children)` conditional children pattern.
+
+**Takeaway:** `Text` stays in `createComponentRenderer`. The new disqualifying pattern: **dynamic prop subsetting** — when the renderer iterates `node.props` and selectively forwards only keys that pass a runtime test (whitelist, type check, or similar), `wrapComponent` cannot replicate this because its forwarding model is unconditional (all declared props are forwarded, none are filtered mid-flight).
+
+---
+
 ## Summary — When Does `wrapComponent` Work Well?
 
 `wrapComponent` is a good fit when:
@@ -368,3 +406,4 @@ A manual `createComponentRenderer` is still needed when:
 - A React prop is produced by combining or transforming multiple XMLUI props at runtime (beyond simple renaming or negation)
 - A prop requires `extractValue.asDisplayText()` or other non-standard extractors not supported by `wrapComponent`
 - The children slot has conditional selection logic (e.g. display text vs. children vs. fallback placeholder)
+- The renderer dynamically subsets `node.props` using a runtime whitelist or type test before forwarding
