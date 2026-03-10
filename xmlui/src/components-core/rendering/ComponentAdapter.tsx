@@ -381,7 +381,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   const stableResponsiveStyleObject = useShallowCompareMemoize(responsiveStyleObject);
-  // Always call useStyles (Rules of Hooks) — returns undefined when object is empty
+  
+  // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
   const responsiveClassName = useStyles(stableResponsiveStyleObject);
 
   const className = [themeClassName, styleClassName, responsiveClassName].filter(Boolean).join(" ");

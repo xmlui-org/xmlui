@@ -297,3 +297,112 @@ Import from `../../components-core/theming/responsive-layout` in both the native
   - Apply per-part classes for each `<Part partId={...}>` alongside SCSS module classes
   - Test that responsive part-targeted props (e.g., `fontSize-label-md`) work
 - **Why third**: Complex multi-part validation; confirms the system scales
+
+---
+
+## Component Migration Inventory
+
+### Category 1 — Already migrated to `classes`
+
+| Component | Parts | Notes |
+|---|---|---|
+| Avatar | — | Simple component, no parts |
+| Badge | — | Simple component, no parts |
+| Spinner | — | Simple component, no parts |
+| Checkbox | label, input | Delegates to Toggle; `classes` threaded through |
+| Switch | label, input | Delegates to Toggle; `classes` threaded through |
+| RatingInput | input | Single part; root div IS the input part |
+| TextBox | label, startAdornment, endAdornment, input | Multi-part; ThemedTextBox merges theme class into `classes` |
+| Backdrop | — | Simple overlay |
+| Blog | — | `classes` merged into className passed to sub-views |
+| Br | — | No native component; `classes` applied directly on `<br>` |
+| ContentSeparator | — | Simple divider |
+
+### Category 2 — To migrate. No parts. Simple component (no theme vars suggesting parts)
+
+| Component | Notes |
+|---|---|
+| Column | No theme vars, layout helper |
+| FlowLayout | Layout container |
+| Footer | Simple wrapper |
+| HtmlTags | Collection of basic HTML tags |
+| IFrame | Simple embed |
+| Icon | Single-element icon |
+| Image | Single-element |
+| InspectButton | Dev tool button |
+| List | Simple list container |
+| Logo | No theme vars |
+| Option | No theme vars, used inside Select |
+| Pages | Router container |
+| PositionedContainer | Layout helper |
+| QRCode | Single-element |
+| ResponsiveBar | Layout helper |
+| ScrollViewer | Scroll wrapper |
+| SpaceFiller | Layout spacer |
+| Stack | Layout container |
+| StickyBox | Layout helper |
+| StickySection | Layout helper |
+| ToneSwitch | Simple toggle |
+
+### Category 3 — To migrate. No parts declared. Theme vars suggest parts should be added
+
+| Component | Suggested parts (from theme vars) |
+|---|---|
+| Accordion | header, icon, content |
+| AccordionItem | (sub-component of Accordion) |
+| App | navPanel, content, header |
+| AppHeader | drawerToggle, logo |
+| AutoComplete | menu, item, badge |
+| Carousel | control, indicator |
+| DatePicker | menu, item, value, selectedItem |
+| Drawer | navPanel, content, header, closeButton |
+| FormItem | label, requiredMark, optionalTag |
+| Heading | anchor |
+| Markdown | headings (H1–H6), admonition |
+| NavGroup | dropdown, items |
+| NoResult | icon |
+| ProgressBar | indicator |
+| Tabs | trigger, list, arrow |
+| TabItem | (sub-component of Tabs) |
+| Text | secondary, title, subtitle, (many text variants) |
+| Tooltip | arrow |
+| Tree | row |
+| TreeDisplay | connect |
+
+### Category 4 — To migrate. Has parts, parts are used (`<Part>`) in native component
+
+| Component | Parts | `<Part>` count in native |
+|---|---|---|
+| DateInput | day, month, year, clearButton, conciseValidationFeedback | 5 |
+| ExpandableItem | summary, content | 2 |
+| Form | buttonRow, validationSummary | 2 |
+| Link | icon | 1 |
+| ModalDialog | content, title | 2 |
+| NavPanel | (layout parts) | 1 |
+| NumberBox | label, startAdornment, endAdornment, input, spinnerButtonUp, spinnerButtonDown | 6 |
+| Pagination | buttonRow, pageInfo, pageSizeSelector | 3 |
+| Select | clearButton, item, menu | 3 |
+| Table | table, pagination | 1 |
+| TextArea | label, startAdornment, endAdornment, input | 4 |
+| TimeInput | hour, minute, second, ampm, clearButton | 5 |
+
+### Category 5 — To migrate. Has parts declared but NOT used (`<Part>`) in native component
+
+| Component | Declared parts | Notes |
+|---|---|---|
+| Button | icon | Icon rendered directly, no `<Part>` wrapper |
+| Card | avatar, title, subtitle | Multi-element but no `<Part>` wrappers |
+| CodeBlock | header, content | Sections rendered without `<Part>` |
+| ContextMenu | content | No `<Part>` in native |
+| DropdownMenu | content | No `<Part>` in native |
+| FileInput | label, input | No `<Part>` in native |
+| NavLink | indicator | No `<Part>` in native |
+| RadioGroup | label | No `<Part>` in native |
+| Slider | label, track, thumb | No `<Part>` in native |
+| Splitter | primaryPanel, secondaryPanel | No `<Part>` in native |
+
+### Non-visual / data-only components (no migration needed)
+
+These components do not render visible DOM or do not accept `className`. They do not need `classes` migration:
+
+APICall, AppState, Bookmark, Breakout, CarouselItem, ChangeListener, Fragment, HoverCard, IncludeMarkup, Items, LabelList, Legend, MessageListener, NestedApp, AppWithCodeView, NavPanelCollapseButton, PageMetaTitle, ProfileMenu, Queue, RadioItem, RealTimeAdapter, Redirect, SelectionStore, Theme, Timer, Toast, ToneChangerButton, FormSection

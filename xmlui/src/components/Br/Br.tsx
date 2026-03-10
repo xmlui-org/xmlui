@@ -40,11 +40,11 @@ export const BrCapitalizedMd = createMetadata({
 export const brComponentRenderer = createComponentRenderer(
   COMP,
   BrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <br className={className} {...props}>
+      <br className={classes?.["-component"]} {...props}>
         {renderChild(node.children)}
       </br>
     );
@@ -57,11 +57,11 @@ export const brComponentRenderer = createComponentRenderer(
 export const BrComponentRenderer = createComponentRenderer(
   BR,
   BrCapitalizedMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <br className={className} {...props}>
+      <br className={classes?.["-component"]} {...props}>
         {renderChild(node.children)}
       </br>
     );

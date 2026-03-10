@@ -38,10 +38,10 @@ export const BackdropMd = createMetadata({
 export const backdropComponentRenderer = createComponentRenderer(
   COMP,
   BackdropMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, classes }) => {
     return (
       <Backdrop
-        className={className}
+        classes={classes}
         overlayTemplate={renderChild(node.props?.overlayTemplate)}
         backgroundColor={extractValue.asOptionalString(node.props.backgroundColor, undefined)}
         opacity={extractValue.asOptionalString(node.props.opacity, undefined)}

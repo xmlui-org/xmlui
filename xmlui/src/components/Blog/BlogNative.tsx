@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import classnames from "classnames";
 
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { ThemedLinkNative as LinkNative } from "../Link/Link";
@@ -58,11 +59,13 @@ function getBlurb(md: string | undefined, maxLen = 200): string {
 const blogBasePath = "/blog";
 
 type Props = {
+  classes?: Record<string, string>;
   className?: string;
   style?: CSSProperties;
 };
 
-export function Blog({ className, style }: Props) {
+export function Blog({ classes, className, style }: Props) {
+  const mergedClassName = classnames(classes?.[COMPONENT_PART_KEY], className);
   const { slug } = useParams<{ slug?: string }>();
   const { appGlobals, mediaSize } = useAppContext();
   const { getThemeVar } = useTheme();
@@ -101,7 +104,7 @@ export function Blog({ className, style }: Props) {
         prefetchedContent={prefetchedContent}
         blogBasePath={blogBasePath}
         formatDate={formatDate}
-        className={className}
+        className={mergedClassName}
         style={style}
         showToc={tableOfContentsEnabled && mediaSize.sizeIndex > 3}
         showTags={showTagsEnabled}
@@ -119,7 +122,7 @@ export function Blog({ className, style }: Props) {
         blogBasePath={blogBasePath}
         formatDate={formatDate}
         getBlurb={getBlurb}
-        className={className}
+        className={mergedClassName}
         style={style}
       />
     );
@@ -133,7 +136,7 @@ export function Blog({ className, style }: Props) {
       formatDate={formatDate}
       getBlurb={getBlurb}
       showTags={showTagsEnabled}
-      className={className}
+      className={mergedClassName}
       style={style}
     />
   );
