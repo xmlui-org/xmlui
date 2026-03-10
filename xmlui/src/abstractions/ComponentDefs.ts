@@ -221,6 +221,10 @@ export type ComponentPropertyMetadata = {
   // information to validate the property value.
   readonly valueType?: PropertyValueType;
 
+  // When true, wrapComponent resolves this prop via extractResourceUrl instead of
+  // extractValue, enabling XMLUI resource path resolution (e.g. relative paths).
+  readonly isResourceUrl?: boolean;
+
   // This field defines the available values of the property. The rendering engine
   // uses this information to validate the property value.
   readonly availableValues?: readonly PropertyValueDescription[];

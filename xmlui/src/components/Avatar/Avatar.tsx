@@ -1,12 +1,12 @@
 import styles from "./Avatar.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Avatar";
 
@@ -38,6 +38,7 @@ export const AvatarMd = createMetadata({
         `This property specifies the URL of the image to display in the ${COMP}. ` +
         "If neither this property nor \`name\` is defined, an empty avatar is displayed.",
       valueType: "string",
+      isResourceUrl: true,
     },
   },
   events: {
@@ -63,19 +64,8 @@ export const ThemedAvatar = React.forwardRef<HTMLDivElement, ThemedAvatarProps>(
   },
 );
 
-export const avatarComponentRenderer = createComponentRenderer(
+export const avatarComponentRenderer = wrapComponent(
   COMP,
+  Avatar,
   AvatarMd,
-  ({ node, extractValue, lookupEventHandler, className, extractResourceUrl }) => {
-    return (
-      <Avatar
-        className={className}
-        size={extractValue.asOptionalString(node.props?.size)}
-        url={node.props.url ? extractResourceUrl(node.props.url) : undefined}
-        name={extractValue(node.props.name)}
-        onClick={lookupEventHandler("click")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      />
-    );
-  },
 );

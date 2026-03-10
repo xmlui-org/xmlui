@@ -16,6 +16,7 @@ import {
   createComponentRenderer,
   createUserDefinedComponentRenderer,
 } from "./components-core/renderers";
+import { wrapComponent, wrapCompound } from "./components-core/wrapComponent";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
 import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
@@ -54,6 +55,8 @@ import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerBut
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { Theme } from "./components/Theme/ThemeNative";
+import { OptionContext, useOption } from "./components/Select/OptionContext";
+
 import {
   type SearchItemData,
   useSearchContextContent,
@@ -114,6 +117,9 @@ import {
 } from "./components/DropdownMenu/DropdownMenu";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 import { MemoizedItem } from "./components/container-helpers";
+import { HiddenOption } from "./components/Select/HiddenOption";
+import OptionTypeProvider from "./components/Option/OptionTypeProvider";
+import type { Option } from "./components/abstractions";
 
 export type {
   ThemeDefinition,
@@ -225,4 +231,11 @@ export {
   MemoizedItem,
   SEARCH_DEFAULT_CATEGORY,
   SEARCH_CATEGORIES,
+  wrapComponent,
+  wrapCompound,
+  HiddenOption,
+  OptionTypeProvider,
+  Option,
+  OptionContext,
+  useOption,
 };
