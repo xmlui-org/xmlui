@@ -15,6 +15,7 @@ import { ThemedButton as Button } from "../../components/Button/Button";
 import { ThemedNavLink } from "../../components/NavLink/NavLink";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const PART_HAMBURGER = "hamburger";
 
@@ -25,6 +26,7 @@ type Props = {
   logoContent?: ReactNode;
   canRestrictContentWidth?: boolean;
   className?: string;
+  classes?: Record<string, string>;
   title?: string;
   navPanelVisible?: boolean;
   showLogo?: boolean;
@@ -60,6 +62,7 @@ export const AppHeader = ({
   style = EMPTY_OBJECT,
   logoContent,
   className,
+  classes,
   canRestrictContentWidth,
   navPanelVisible = true,
   toggleDrawer,
@@ -88,7 +91,7 @@ export const AppHeader = ({
   }, []);
 
   return (
-    <div {...rest} className={classnames(styles.header, className)} style={style} role="banner">
+    <div {...rest} className={classnames(styles.header, classes?.[COMPONENT_PART_KEY], className)} style={style} role="banner">
       <div
         className={classnames(styles.headerInner, {
           [styles.full]: !canRestrictContentWidth,
@@ -139,6 +142,7 @@ type AppContextAwareAppHeaderProps = {
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   className?: string;
+  classes?: Record<string, string>;
   title?: string;
   titleContent?: ReactNode;
   showLogo?: boolean;
@@ -151,6 +155,7 @@ export function AppContextAwareAppHeader({
   profileMenu,
   style,
   className,
+  classes,
   title,
   titleContent,
   showLogo = true,
@@ -184,6 +189,7 @@ export function AppContextAwareAppHeader({
       profileMenu={profileMenu}
       style={style}
       className={className}
+      classes={classes}
       title={title}
       titleContent={titleContent}
       registerSubNavPanelSlot={registerSubNavPanelSlot}

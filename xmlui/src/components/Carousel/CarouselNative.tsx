@@ -10,6 +10,7 @@ import styles from "./Carousel.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
 import { ThemedIcon } from "../Icon/Icon";
 import type { OrientationOptions } from "../abstractions";
@@ -19,6 +20,7 @@ type CarouselApi = UseEmblaCarouselType[1];
 export type CarouselProps = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   orientation?: OrientationOptions;
   indicators?: boolean;
   controls?: boolean;
@@ -64,6 +66,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     children,
     style,
     className,
+    classes,
     indicators = defaultProps.indicators,
     onDisplayDidChange = noop,
     autoplay = defaultProps.autoplay,
@@ -224,7 +227,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         {...rest}
         style={style}
         ref={ref}
-        className={classnames(styles.carousel, className)}
+        className={classnames(styles.carousel, classes?.[COMPONENT_PART_KEY], className)}
         role="region"
         tabIndex={-1}
         aria-roledescription="carousel"

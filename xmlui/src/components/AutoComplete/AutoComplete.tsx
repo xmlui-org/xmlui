@@ -196,12 +196,12 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
     renderChild,
     lookupEventHandler,
     registerComponentApi,
-    className,
+    classes,
   }) => {
     return (
       <AutoComplete
         multi={extractValue.asOptionalBoolean(node.props.multi)}
-        className={className}
+        classes={classes}
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}

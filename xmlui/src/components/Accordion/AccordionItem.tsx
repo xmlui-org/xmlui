@@ -5,6 +5,7 @@ import {
   AccordionItemComponent,
   defaultProps,
 } from "../../components/Accordion/AccordionItemNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "AccordionItem";
 
@@ -33,10 +34,10 @@ export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, className } = rendererContext;
+    const { node, renderChild, extractValue, classes } = rendererContext;
     return (
       <AccordionItemComponent
-        className={className}
+        classes={classes}
         id={extractValue(node.uid)}
         header={extractValue(node.props.header)}
         initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}

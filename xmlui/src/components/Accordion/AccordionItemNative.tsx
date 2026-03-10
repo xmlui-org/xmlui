@@ -14,6 +14,7 @@ import styles from "../../components/Accordion/Accordion.module.scss";
 
 import { useAccordionContext } from "../../components/Accordion/AccordionContext";
 import { ThemedIcon } from "../../components/Icon/Icon";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 function defaultRenderer(header: string) {
   return <div>{header}</div>;
@@ -37,6 +38,7 @@ type Props = {
 
   style?: React.CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
 };
 
 export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> = {
@@ -53,6 +55,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     initiallyExpanded = defaultProps.initiallyExpanded,
     style,
     className,
+    classes,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -98,7 +101,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
       id={itemId}
       key={itemId}
       value={itemId}
-      className={classnames(styles.item, className)}
+      className={classnames(styles.item, classes?.[COMPONENT_PART_KEY], className)}
       ref={forwardedRef}
       style={style}
     >

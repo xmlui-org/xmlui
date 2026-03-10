@@ -325,36 +325,30 @@ Import from `../../components-core/theming/responsive-layout` in both the native
 | Icon | — | `ThemedIcon` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Icon>` |
 | Image | — | `ThemedImage` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Image>` |
 | InspectButton | — | Renderer passes `classes?.[COMPONENT_PART_KEY]` as className to `<InspectButton>` |
-
-### Category 2 — To migrate. No parts. Simple component (no theme vars suggesting parts)
-
-| Component | Notes |
-|---|---|
-| List | Simple list container |
-| Logo | No theme vars |
-| Option | No theme vars, used inside Select |
-| Pages | Router container |
-| PositionedContainer | Layout helper |
-| QRCode | Single-element |
-| ResponsiveBar | Layout helper |
-| ScrollViewer | Scroll wrapper |
-| SpaceFiller | Layout spacer |
-| Stack | Layout container |
-| StickyBox | Layout helper |
-| StickySection | Layout helper |
-| ToneSwitch | Simple toggle |
+| List | — | `classes` passed to ListNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| Logo | — | `classes?.[COMPONENT_PART_KEY]` forwarded as className to LogoNative/Image |
+| Option | — | `classes?.[COMPONENT_PART_KEY]` passed as className to OptionNative |
+| Pages | — | `classes` passed to RouteWrapper; `classes?.[COMPONENT_PART_KEY]` merged on page root div |
+| QRCode | — | `classes` passed to QRCodeNative; `classes?.[COMPONENT_PART_KEY]` merged on container div |
+| ResponsiveBar | — | `classes` passed to ResponsiveBarNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| ScrollViewer | — | `classes` passed to ScrollViewerNative; `classes?.[COMPONENT_PART_KEY]` merged on root element in both render paths |
+| SpaceFiller | — | Native accepts `classes`/`className` for VariantBehavior compat; renderer intentionally ignores layout props (preserves flex-grow-spacer behavior) |
+| Stack | — | `classes` passed through `RenderStackPars` helper; `classes?.[COMPONENT_PART_KEY]` merged on StackNative root; all 5 renderers (Stack, VStack, HStack, CVStack, CHStack) updated |
+| StickyBox | — | `classes` passed to StickyBoxNative; `classes?.[COMPONENT_PART_KEY]` merged into `wrapperClassName` |
+| StickySection | — | `classes` passed to StickySectionNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| ToneSwitch | — | `classes` passed to ToneSwitchNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| Accordion | — | `classes` passed to AccordionNative; `classes?.[COMPONENT_PART_KEY]` merged on RAccordion.Root |
+| AccordionItem | — | `classes` passed to AccordionItemNative; `classes?.[COMPONENT_PART_KEY]` merged on RAccordion.Item |
+| App | — | `classes` passed to App (AppNative); `classes?.[COMPONENT_PART_KEY]` added to `wrapperBaseClasses` |
+| AppHeader | — | `classes` passed through `AppContextAwareAppHeader` → `AppHeader`; `classes?.[COMPONENT_PART_KEY]` merged on root div; `layoutContext?.themeClassName` kept as `className` |
+| AutoComplete | — | `classes` passed to AutoComplete; `classes?.[COMPONENT_PART_KEY]` merged on root trigger div |
+| Carousel | — | `classes` passed to CarouselComponent; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| DatePicker | — | `classes` passed to DatePicker; `classes?.[COMPONENT_PART_KEY]` merged on both inline root and PopoverTrigger className |
 
 ### Category 3 — To migrate. No parts declared. Theme vars suggest parts should be added
 
 | Component | Suggested parts (from theme vars) |
 |---|---|
-| Accordion | header, icon, content |
-| AccordionItem | (sub-component of Accordion) |
-| App | navPanel, content, header |
-| AppHeader | drawerToggle, logo |
-| AutoComplete | menu, item, badge |
-| Carousel | control, indicator |
-| DatePicker | menu, item, value, selectedItem |
 | Drawer | navPanel, content, header, closeButton |
 | FormItem | label, requiredMark, optionalTag |
 | Heading | anchor |

@@ -135,10 +135,10 @@ export const CarouselMd = createMetadata({
 export const carouselComponentRenderer = createComponentRenderer(
   COMP,
   CarouselMd,
-  ({ node, renderChild, className, extractValue, lookupEventHandler, registerComponentApi }) => {
+  ({ node, renderChild, classes, extractValue, lookupEventHandler, registerComponentApi }) => {
     return (
       <CarouselComponent
-        className={className}
+        classes={classes}
         stopAutoplayOnInteraction={extractValue.asOptionalBoolean(
           node.props?.stopAutoplayOnInteraction,
         )}
