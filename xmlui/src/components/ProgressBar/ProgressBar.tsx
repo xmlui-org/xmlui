@@ -34,11 +34,11 @@ export const ProgressBarMd = createMetadata({
 export const progressBarComponentRenderer = createComponentRenderer(
   COMP,
   ProgressBarMd,
-  ({ node, extractValue, className }) => {
+  ({ node, extractValue, classes }) => {
     return (
       <ProgressBar
         value={Math.max(0, Math.min(1, extractValue(node.props.value)))}
-        className={className}
+        classes={classes}
       />
     );
   },

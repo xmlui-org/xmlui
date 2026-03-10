@@ -20,6 +20,7 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
 import { Link } from "react-router-dom";
 import { useAppContext } from "../../components-core/AppContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export type HeadingProps = {
@@ -33,6 +34,7 @@ export type HeadingProps = {
   ellipses?: boolean;
   title?: string;
   className?: string;
+  classes?: Record<string, string>;
   showAnchor?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   [furtherProps: string]: any;
@@ -62,6 +64,7 @@ export const Heading = forwardRef(function Heading(
     preserveLinebreaks,
     ellipses = defaultProps.ellipses,
     className,
+    classes,
     omitFromToc = defaultProps.omitFromToc,
     showAnchor,
     registerComponentApi,
@@ -148,7 +151,7 @@ export const Heading = forwardRef(function Heading(
       id={uid}
       title={title}
       style={{ ...sx, ...style, ...getMaxLinesStyle(maxLines) }}
-      className={classnames(styles.heading, styles[Element], className, {
+      className={classnames(styles.heading, styles[Element], classes?.[COMPONENT_PART_KEY], className, {
         [styles.truncateOverflow]: maxLines > 0,
         [styles.preserveLinebreaks]: preserveLinebreaks,
         [styles.noEllipsis]: !ellipses,

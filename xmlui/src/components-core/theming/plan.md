@@ -344,36 +344,31 @@ Import from `../../components-core/theming/responsive-layout` in both the native
 | AutoComplete | — | `classes` passed to AutoComplete; `classes?.[COMPONENT_PART_KEY]` merged on root trigger div |
 | Carousel | — | `classes` passed to CarouselComponent; `classes?.[COMPONENT_PART_KEY]` merged on root div |
 | DatePicker | — | `classes` passed to DatePicker; `classes?.[COMPONENT_PART_KEY]` merged on both inline root and PopoverTrigger className |
-
-### Category 3 — To migrate. No parts declared. Theme vars suggest parts should be added
-
-| Component | Suggested parts (from theme vars) |
-|---|---|
-| Drawer | navPanel, content, header, closeButton |
-| FormItem | label, requiredMark, optionalTag |
-| Heading | anchor |
-| Markdown | headings (H1–H6), admonition |
-| NavGroup | dropdown, items |
-| NoResult | icon |
-| ProgressBar | indicator |
-| Tabs | trigger, list, arrow |
-| TabItem | (sub-component of Tabs) |
-| Text | secondary, title, subtitle, (many text variants) |
-| Tooltip | arrow |
-| Tree | row |
-| TreeDisplay | connect |
+| Drawer | — | `classes` passed to DrawerNative; `classes?.[COMPONENT_PART_KEY]` added to portal container className and Dialog.Content classnames |
+| FormItem | — | `classes` passed to FormItem; `classnames` import added to FormItemNative; `classes?.[COMPONENT_PART_KEY]` merged on ItemWithLabel root |
+| Heading | — | `classes` passed through renderHeading helper to Heading; all 7 renderers (Heading, H1–H6) updated; `classes?.[COMPONENT_PART_KEY]` merged on root heading element |
+| Markdown | — | `classes` propagated renderer → TransformedMarkdown → Markdown native; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| NoResult | — | `classes` passed to NoResult; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| NavGroup | — | `classes` passed to NavGroup; `classes?.[COMPONENT_PART_KEY]` merged on root div of ExpandableNavGroup (DropDownNavGroup has no className) |
+| ProgressBar | — | `classes` passed to ProgressBar; `classes?.[COMPONENT_PART_KEY]` merged on wrapper div |
+| Tabs | — | `classes` passed to Tabs; `classes?.[COMPONENT_PART_KEY]` merged on root element in both accordion and standard views |
+| TabItem | — | `classes` passed to TabItemComponent; `classes?.[COMPONENT_PART_KEY]` merged with tabsContent on Content root; `classes?` added to shared `Tab` type in abstractions.ts |
+| Text | — | `classes` passed to Text; `classes?.[COMPONENT_PART_KEY]` merged on root element classnames |
+| Tooltip | — | `classes` passed to Tooltip; `classes?.[COMPONENT_PART_KEY]` merged on RadixTooltip.Content root |
+| Tree | — | `classes` passed to TreeComponent; `classes?.[COMPONENT_PART_KEY]` merged on Scroller (root wrapper) |
+| TreeDisplay | — | `classes` passed to TreeDisplay; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| DateInput | day, month, year, clearButton, conciseValidationFeedback | `classes` passed to DateInput; `classes?.[COMPONENT_PART_KEY]` merged on root wrapper div |
+| ExpandableItem | summary, content | `classes` passed to ExpandableItem; `classes?.[COMPONENT_PART_KEY]` merged on root div |
+| Form | buttonRow, validationSummary | `classes` passed through FormWithContextVar → Form; `classes?.[COMPONENT_PART_KEY]` merged on root `<form>` element |
+| Link | icon | `classes` passed to LinkNative; `classes?.[COMPONENT_PART_KEY]` merged on root Node element |
+| ModalDialog | content, title | `classes` passed to ModalDialog; `classes?.[COMPONENT_PART_KEY]` merged on Dialog.Content root |
+| NavPanel | footer | `classes` passed through NavPanelWithBuiltNavHierarchy → NavPanel; `classes?.[COMPONENT_PART_KEY]` merged on root div in both NavPanel and DrawerNavPanel; `classnames` import removed from renderer |
+| NumberBox | label, startAdornment, endAdornment, input, spinnerButtonUp, spinnerButtonDown | `classes` passed to NumberBox; `classes?.[COMPONENT_PART_KEY]` merged on root div |
 
 ### Category 4 — To migrate. Has parts, parts are used (`<Part>`) in native component
 
 | Component | Parts | `<Part>` count in native |
 |---|---|---|
-| DateInput | day, month, year, clearButton, conciseValidationFeedback | 5 |
-| ExpandableItem | summary, content | 2 |
-| Form | buttonRow, validationSummary | 2 |
-| Link | icon | 1 |
-| ModalDialog | content, title | 2 |
-| NavPanel | (layout parts) | 1 |
-| NumberBox | label, startAdornment, endAdornment, input, spinnerButtonUp, spinnerButtonDown | 6 |
 | Pagination | buttonRow, pageInfo, pageSizeSelector | 3 |
 | Select | clearButton, item, menu | 3 |
 | Table | table, pagination | 1 |

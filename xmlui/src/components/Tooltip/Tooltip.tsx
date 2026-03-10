@@ -120,7 +120,7 @@ export const ThemedTooltip = React.forwardRef<HTMLDivElement, ThemedTooltipProps
 export const tooltipComponentRenderer = createComponentRenderer(
   "Tooltip",
   TooltipMd,
-  ({ node, extractValue, renderChild, layoutContext, className }) => {
+  ({ node, extractValue, renderChild, layoutContext, classes }) => {
     // If there are no children, do not render anything
     if (!node.children || node.children.length === 0) {
       return null;
@@ -132,7 +132,7 @@ export const tooltipComponentRenderer = createComponentRenderer(
     const tooltipTemplate = node.props.tooltipTemplate;
 
     return (
-      <ThemedTooltip
+      <Tooltip
         text={text}
         markdown={markdown}
         tooltipTemplate={renderChild(tooltipTemplate)}
@@ -145,10 +145,10 @@ export const tooltipComponentRenderer = createComponentRenderer(
         sideOffset={extractValue.asOptionalNumber(node.props.sideOffset)}
         alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
         avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
-        className={className}
+        classes={classes}
       >
         {renderChild(node.children, layoutContext)}
-      </ThemedTooltip>
+      </Tooltip>
     );
   },
 );

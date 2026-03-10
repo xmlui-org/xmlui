@@ -52,9 +52,10 @@ export const tabItemComponentRenderer = createComponentRenderer(
   COMP,
   TabItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, lookupEventHandler } = rendererContext;
+    const { node, renderChild, extractValue, lookupEventHandler, classes } = rendererContext;
     return (
       <TabItemComponent
+        classes={classes}
         id={extractValue(node.uid)}
         label={extractValue(node.props.label)}
         activated={lookupEventHandler("activated")}
