@@ -81,6 +81,14 @@
     "/^node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| grep -E \"\\^\\\\\\[ERR\\\\\\]\\|\\^Error\\|\\^node:\" \\| head -20$/": {
       "approve": true,
       "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1; echo \"EXIT: \\$\\?\"; ls -lt /Users/dotneteer/source/xmlui/website/content/docs/reference/components/ \\| head -3$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| grep -v \"\\^\\\\\\[WARN\\\\\\]\" \\| head -20; echo \"EXIT: \\$\\?\"; ls -lt /Users/dotneteer/source/xmlui/website/content/docs/reference/components/ \\| head -3$/": {
+      "approve": true,
+      "matchCommandLine": true
     }
   }
 }

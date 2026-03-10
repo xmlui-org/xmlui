@@ -654,6 +654,10 @@ The `loadedField` property specifies which field in node data indicates whether 
 
 The property name in source data for display text.
 
+### `overflow` [#overflow]
+
+Overrides the overflow style of the tree scroll container. When set (e.g. "visible"), the tree renders at its natural content height without internal scrolling, allowing an outer container to handle scrolling instead.
+
 ### `parentIdField` [#parentidfield]
 
 > [!DEF]  default: **"parentId"**

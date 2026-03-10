@@ -19,7 +19,6 @@ export class DocsGenerator {
   folders = {
     sourceFolder: null,
     outFolder: null,
-    examplesFolder: null,
   };
 
   constructor(metadata, folders, { excludeComponentStatuses }) {
