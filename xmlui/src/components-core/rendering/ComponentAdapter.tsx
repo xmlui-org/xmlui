@@ -441,6 +441,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     renderChild: memoedRenderChild,
     registerComponentApi: memoedRegisterComponentApi,
     className,
+    classes: { "-component": className },
     layoutContext: layoutContextRef?.current,
     uid,
     logInteraction,
