@@ -1,6 +1,6 @@
 import React from "react";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
-import type { ComponentRendererDef } from "../abstractions/RendererDefs";
+import type { ComponentRendererDef, LayoutContext } from "../abstractions/RendererDefs";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry } from "./inspector/inspectorUtils";
 
@@ -71,6 +71,13 @@ export type WrapComponentConfig = {
    * wrap libraries with their own event systems (e.g., ECharts, Monaco, etc.).
    */
   captureNativeEvents?: boolean;
+
+  /**
+   * Optional layout context passed to renderChild when rendering node.children.
+   * Use this when the component needs to wrap its children in a specific layout,
+   * e.g. { type: "Stack", orientation: "vertical" }.
+   */
+  childrenLayoutContext?: LayoutContext;
 };
 
 /**
@@ -410,7 +417,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     // --- Render children if the node has any ---
     if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
-      props.children = renderChild(node.children);
+      props.children = renderChild(node.children, config.childrenLayoutContext);
     }
 
     return <Component {...props} />;
