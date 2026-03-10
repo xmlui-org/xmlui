@@ -468,6 +468,7 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
     if (attachedResources.current[resourceUrl]) {
       return;
     }
+    attachedResources.current[resourceUrl] = true;
     const icon = await (await fetch(resourceUrl)).text();
 
     const div = document.createElement("div");
@@ -491,10 +492,7 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
     d.id = resourceUrl;
     d.setAttributeNS(null, "viewBox", attrs["viewBox"]);
 
-    if (!attachedResources.current[resourceUrl]) {
-      spriteRootRef.current!.appendChild(d);
-      attachedResources.current[resourceUrl] = true;
-    }
+    spriteRootRef.current!.appendChild(d);
     const customIcon = {
       name: resourceUrl,
       attributes: attrs,
