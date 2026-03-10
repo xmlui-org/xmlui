@@ -5,6 +5,7 @@ import Icon from "./IconNative";
 import type { IconBaseProps } from "./IconNative";
 import { createMetadata, d } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import React from "react";
 
 const COMP = "Icon";
@@ -43,24 +44,25 @@ export const IconMd = createMetadata({
   },
 });
 
-type ThemedIconProps = IconBaseProps & { className?: string };
+type ThemedIconProps = IconBaseProps & { className?: string; classes?: Record<string, string> };
 
 export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(
-  function ThemedIcon({ className, ...props }: ThemedIconProps, ref) {
+  function ThemedIcon({ className, classes, ...props }: ThemedIconProps, ref) {
     const themeClass = useComponentThemeClass(IconMd);
-    return <Icon {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
+    return <Icon {...props} className={mergedClass} ref={ref} />;
   },
 );
 
 export const iconComponentRenderer = createComponentRenderer(
   COMP,
   IconMd,
-  ({ node, extractValue, className, lookupEventHandler }) => {
+  ({ node, extractValue, classes, lookupEventHandler }) => {
     return (
       <Icon
         name={extractValue.asOptionalString(node.props.name)}
         size={extractValue(node.props.size)}
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         fallback={extractValue.asOptionalString(node.props.fallback)}
         onClick={lookupEventHandler("click")}
       />

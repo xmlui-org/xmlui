@@ -85,7 +85,7 @@ export const IFrameMd = createMetadata({
 export const iframeComponentRenderer = createComponentRenderer(
   COMP,
   IFrameMd,
-  ({ node, extractValue, className, extractResourceUrl, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, classes, extractResourceUrl, lookupEventHandler, registerComponentApi }) => {
     return (
       <IFrame
         src={extractResourceUrl(node.props.src)}
@@ -94,7 +94,7 @@ export const iframeComponentRenderer = createComponentRenderer(
         name={extractValue.asOptionalString(node.props.name)}
         referrerPolicy={extractValue.asOptionalString(node.props.referrerPolicy) as any}
         sandbox={extractValue.asOptionalString(node.props.sandbox)}
-        className={className}
+        classes={classes}
         onLoad={lookupEventHandler("load")}
         registerComponentApi={registerComponentApi}
       />

@@ -58,7 +58,7 @@ export const ContentSeparatorMd = createMetadata({
 export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
-  ({ node, className, extractValue }) => {
+  ({ node, classes, extractValue }) => {
     const orientation = extractValue(node.props.orientation);
     const length = extractValue.asSize(node.props.length);
     
@@ -73,7 +73,7 @@ export const contentSeparatorComponentRenderer = createComponentRenderer(
         thickness={extractValue.asSize(node.props.thickness)}
         length={length}
         hasExplicitLength={hasExplicitLength}
-        className={className}
+        classes={classes}
       />
     );
   },

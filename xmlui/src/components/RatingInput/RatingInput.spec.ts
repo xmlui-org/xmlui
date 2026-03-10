@@ -125,3 +125,62 @@ test.describe("Api", () => {
     await expect(page.getByTestId("setBtn")).toHaveText("5");
   });
 });
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<RatingInput testId="test" width-md="300px" />`);
+    const container = page.getByTestId("test");
+
+    // Below md — width should NOT be 300px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(container).not.toHaveCSS("width", "300px");
+
+    // At md — width should be 300px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(container).toHaveCSS("width", "300px");
+
+    // Well above md — width should still be 300px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(container).toHaveCSS("width", "300px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<RatingInput testId="test" width="200px" />`);
+    const container = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(container).toHaveCSS("width", "200px");
+    }
+  });
+
+  test("breakpoint width overrides base width at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<RatingInput testId="test" width="150px" width-lg="400px" />`);
+    const container = page.getByTestId("test");
+
+    // Below lg — base 150px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(container).toHaveCSS("width", "150px");
+
+    // At lg — 400px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(container).toHaveCSS("width", "400px");
+  });
+
+  test("width-input-md targets input part at md viewport", async ({ page, initTestBed }) => {
+    await initTestBed(`<RatingInput testId="test" width-input-md="350px" />`);
+    const container = page.getByTestId("test");
+
+    // Below md — not 350px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(container).not.toHaveCSS("width", "350px");
+
+    // At md — 350px (self-selector matches since root div IS the input part)
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(container).toHaveCSS("width", "350px");
+  });
+});

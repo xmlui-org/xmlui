@@ -1,7 +1,9 @@
 import React from "react";
+import classnames from "classnames";
 import styles from "./FlowLayout.module.scss";
 
 import { createComponentRenderer } from "../../components-core/renderers";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -94,15 +96,21 @@ export const FlowLayoutMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout>;
+type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout> & {
+  classes?: Record<string, string>;
+};
 
 export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLayout>, ThemedFlowLayoutProps>(
-  function ThemedFlowLayout({ className, ...props }, ref) {
+  function ThemedFlowLayout({ className, classes, ...props }, ref) {
     const themeClass = useComponentThemeClass(FlowLayoutMd);
+    const mergedClasses = {
+      ...classes,
+      [COMPONENT_PART_KEY]: classnames(themeClass, classes?.[COMPONENT_PART_KEY], className),
+    };
     return (
       <FlowLayout
         {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        classes={mergedClasses}
         ref={ref}
       />
     );
@@ -112,7 +120,7 @@ export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLay
 export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
-  ({ node, renderChild, className, extractValue, registerComponentApi, lookupEventHandler }) => {
+  ({ node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -135,7 +143,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
 
     return (
       <ThemedFlowLayout
-        className={className}
+        classes={classes}
         columnGap={columnGap}
         rowGap={rowGap}
         itemWidth={itemWidth}

@@ -5,7 +5,7 @@ import { Blog } from "./BlogNative";
 const COMP = "Blog";
 
 export const BlogMd = createMetadata({
-  status: "stable",
+  status: "internal",
   description:
     "`Blog` renders blog list or a single post based on the current route and appGlobals.blog. " +
     "appGlobals.blog must be an object with required `posts` (array of post objects). " +
@@ -18,7 +18,7 @@ export const BlogMd = createMetadata({
 export const blogComponentRenderer = createComponentRenderer(
   COMP,
   BlogMd,
-  ({ className }) => {
-    return <Blog className={className} />;
+  ({ classes }) => {
+    return <Blog classes={classes} />;
   },
 );

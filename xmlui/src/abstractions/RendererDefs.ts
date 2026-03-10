@@ -54,6 +54,11 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 
   className?: string;
 
+  // Per-part class map. "-component" holds the class for the outermost DOM element
+  // (same as className). Other keys correspond to declared part names.
+  // Components opt-in to using this instead of className.
+  classes?: Record<string, string>;
+
   // Log a user interaction for inspector/debugging (no-op when xsVerbose is false)
   logInteraction: LogInteractionFn;
 }

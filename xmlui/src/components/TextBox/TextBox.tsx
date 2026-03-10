@@ -27,6 +27,7 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { TextBox, defaultProps } from "./TextBoxNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "TextBox";
 
@@ -175,16 +176,20 @@ export const TextBoxMd = createMetadata({
 
 type ThemedTextBoxProps = React.ComponentProps<typeof TextBox> & { className?: string };
 export const ThemedTextBox = React.forwardRef<HTMLDivElement, ThemedTextBoxProps>(
-  function ThemedTextBox({ className, ...props }: ThemedTextBoxProps, ref) {
+  function ThemedTextBox({ className, classes, ...props }: ThemedTextBoxProps, ref) {
     const themeClass = useComponentThemeClass(TextBoxMd);
-    return <TextBox {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const themedClasses: Record<string, string> = {
+      ...(classes ?? {}),
+      [COMPONENT_PART_KEY]: [themeClass, classes?.[COMPONENT_PART_KEY]].filter(Boolean).join(" "),
+    };
+    return <TextBox {...props} className={className} classes={themedClasses} ref={ref} />;
   },
 );
 
 type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
 
 function renderTextBox(
-  className: string | undefined,
+  classes: Record<string, string> | undefined,
   state: any,
   updateState: (componentState: any) => void,
   extractValue: ValueExtractor,
@@ -201,7 +206,7 @@ function renderTextBox(
   return (
     <ThemedTextBox
       type={type}
-      className={className}
+      classes={classes}
       value={state.value}
       updateState={updateState}
       initialValue={extractValue(node.props.initialValue)}
@@ -241,11 +246,11 @@ export const textBoxComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    className,
+    classes,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      className,
+      classes,
       state,
       updateState,
       extractValue,
@@ -272,11 +277,11 @@ export const passwordInputComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    className,
+    classes,
     registerComponentApi,
   }) => {
     return renderTextBox(
-      className,
+      classes,
       state,
       updateState,
       extractValue,

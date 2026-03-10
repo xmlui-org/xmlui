@@ -4,6 +4,7 @@ import classnames from "classnames";
 
 import styles from "./IFrame.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   src?: string;
@@ -14,8 +15,9 @@ type Props = {
   sandbox?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   registerComponentApi?: RegisterComponentApiFn;
-} & Pick<React.HTMLAttributes<HTMLIFrameElement>, "onLoad">;
+} & Pick<React.HTMLAttributes<HTMLIFrameElement>, "onLoad">
 
 export const IFrame = memo(forwardRef(function IFrame(
   {
@@ -27,6 +29,7 @@ export const IFrame = memo(forwardRef(function IFrame(
     sandbox,
     style,
     className,
+    classes,
     onLoad,
     registerComponentApi,
     ...rest
@@ -63,7 +66,7 @@ export const IFrame = memo(forwardRef(function IFrame(
       name={name}
       referrerPolicy={referrerPolicy}
       sandbox={sandbox}
-      className={classnames(className, styles.iframe)}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.iframe)}
       style={style}
       onLoad={onLoad}
     />

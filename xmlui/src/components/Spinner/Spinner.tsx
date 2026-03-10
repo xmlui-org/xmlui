@@ -6,6 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Spinner, defaultProps } from "./SpinnerNative";
 import { createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Spinner";
 
@@ -34,21 +35,22 @@ export const SpinnerMd = createMetadata({
   },
 });
 
-type ThemedSpinnerProps = React.ComponentProps<typeof Spinner> & { className?: string };
+type ThemedSpinnerProps = Omit<React.ComponentProps<typeof Spinner>, "classes"> & { className?: string };
 export const ThemedSpinner = React.forwardRef<HTMLDivElement, ThemedSpinnerProps>(
   function ThemedSpinner({ className, ...props }: ThemedSpinnerProps, ref) {
     const themeClass = useComponentThemeClass(SpinnerMd);
-    return <Spinner {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const combinedClass = [themeClass, className].filter(Boolean).join(" ");
+    return <Spinner {...props} classes={{ [COMPONENT_PART_KEY]: combinedClass }} ref={ref} />;
   },
 );
 
 export const spinnerComponentRenderer = createComponentRenderer(
   COMP,
   SpinnerMd,
-  ({ node, className, extractValue }) => {
+  ({ node, classes, extractValue }) => {
     return (
       <Spinner
-        className={className}
+        classes={classes}
         delay={extractValue.asOptionalNumber(node.props.delay)}
         fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
       />

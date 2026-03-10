@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useState } from "react";
 import styles from "./Spinner.module.scss";
 import classnames from "classnames";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const PART_RING = "ring";
 
@@ -16,6 +17,7 @@ type SpinnerProps = {
   delay?: number;
   fullScreen?: boolean;
   style?: CSSProperties;
+  classes?: Record<string, string>;
   className?: string;
 };
 
@@ -25,6 +27,7 @@ export const Spinner = forwardRef(function Spinner(
     delay = defaultProps.delay,
     fullScreen = defaultProps.fullScreen,
     style,
+    classes,
     className,
     ...rest
   }: SpinnerProps,
@@ -53,7 +56,7 @@ export const Spinner = forwardRef(function Spinner(
           className={styles.fullScreenSpinnerWrapper}
         >
           <div
-            className={classnames(styles["lds-ring"], className)}
+            className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
             style={style}
             ref={forwardedRef}
           >
@@ -68,7 +71,7 @@ export const Spinner = forwardRef(function Spinner(
     return (
       <div
         {...rest}
-        className={classnames(styles["lds-ring"], className)}
+        className={classnames(styles["lds-ring"], classes?.[COMPONENT_PART_KEY], className)}
         role="status"
         aria-label="Loading"
         style={style}

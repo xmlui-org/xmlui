@@ -6,6 +6,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { sizeMd } from "../../components/abstractions";
 import { Avatar, defaultProps } from "./AvatarNative";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Avatar";
@@ -56,11 +57,12 @@ export const AvatarMd = createMetadata({
   },
 });
 
-type ThemedAvatarProps = React.ComponentProps<typeof Avatar> & { className?: string };
+type ThemedAvatarProps = Omit<React.ComponentProps<typeof Avatar>, "classes"> & { className?: string };
 export const ThemedAvatar = React.forwardRef<HTMLDivElement, ThemedAvatarProps>(
   function ThemedAvatar({ className, ...props }: ThemedAvatarProps, ref) {
     const themeClass = useComponentThemeClass(AvatarMd);
-    return <Avatar {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const combinedClass = [themeClass, className].filter(Boolean).join(" ");
+    return <Avatar {...props} classes={{ [COMPONENT_PART_KEY]: combinedClass }} ref={ref} />;
   },
 );
 

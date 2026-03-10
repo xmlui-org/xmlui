@@ -7,6 +7,7 @@ import type { CSSProperties, ReactNode } from "react";
 import PiFileCode from "../Icon/svg/pi-file-code.svg?react";
 import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "InspectButton";
 export const InspectButtonMd = createMetadata({
@@ -43,7 +44,7 @@ function InspectButton({ children, style, className }: { children: ReactNode; st
 export const inspectButtonComponentRenderer = createComponentRenderer(
   COMP,
   InspectButtonMd,
-  ({ renderChild, node, className }) => {
-    return <InspectButton className={className}>{renderChild(node.children)}</InspectButton>;
+  ({ renderChild, node, classes }) => {
+    return <InspectButton className={classes?.[COMPONENT_PART_KEY]}>{renderChild(node.children)}</InspectButton>;
   },
 );

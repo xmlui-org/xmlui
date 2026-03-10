@@ -29,14 +29,14 @@ export const componentRenderer = createComponentRenderer(COMP, ComponentMd,
 
 // ✅ CORRECT — all hooks live in the native component
 export const componentRenderer = createComponentRenderer(COMP, ComponentMd,
-  ({ node, extractValue, state, updateState, registerComponentApi, lookupEventHandler, layoutCss }) => {
+  ({ node, extractValue, state, updateState, registerComponentApi, lookupEventHandler, classes }) => {
     return (
       <ComponentNameNative
         value={extractValue(node.props.value)}
         updateState={updateState}
         registerComponentApi={registerComponentApi}
         onDidChange={lookupEventHandler("didChange")}
-        style={layoutCss}
+        classes={classes}
       />
     );
   },
@@ -54,7 +54,7 @@ export const componentNameComponentRenderer = createComponentRenderer(
   "ComponentName",
   ComponentNameMd,
   ({ node, extractValue, state, updateState, renderChild, lookupEventHandler,
-     registerComponentApi, layoutCss, appContext }) => {
+     registerComponentApi, classes, appContext }) => {
     return (
       <ComponentNameNative
         label={extractValue.asDisplayText(node.props.label)}
@@ -65,7 +65,7 @@ export const componentNameComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         onClick={lookupEventHandler("click")}
         onDidChange={lookupEventHandler("didChange")}
-        style={layoutCss}
+        classes={classes}
       >
         {renderChild(node.children)}
       </ComponentNameNative>
@@ -86,9 +86,36 @@ export const componentNameComponentRenderer = createComponentRenderer(
 | `lookupEventHandler(name)` | Returns a callback for the named event |
 | `registerComponentApi` | Pass to native to register imperative API methods |
 | `updateState` | Pass to native to update container state |
-| `layoutCss` | Pre-computed layout styles — always pass as `style` |
+| `className` | Pre-computed CSS class string for the outermost element (legacy — prefer `classes`) |
+| `classes` | Per-part class map; use `classes?.["-component"]` for the outermost element and `classes?.["partName"]` for named parts |
 | `uid` | Unique component instance ID |
 | `appContext` | Global app functions: `navigate`, `toast`, `confirm` |
+
+### `className` vs `classes`
+
+Components are being incrementally migrated from `className` to `classes`. Prefer `classes` for any new or migrated component.
+
+- **`className`** — a single CSS class string covering base layout and theme styles for the outermost DOM element.
+- **`classes`** — a `Record<string, string>` where:
+  - `classes?.["-component"]` targets the outermost DOM element (same coverage as `className`, plus responsive `@media` rules).
+  - `classes?.["partName"]` targets a named part (e.g. `"input"`, `"label"`, `"startAdornment"`), enabling part-scoped responsive props such as `fontSize-label-md`.
+
+Pass `classes` down to the native component. The native component applies each entry to the corresponding DOM element alongside its SCSS module classes.
+
+```typescript
+// Native component Props type
+type Props = {
+  classes?: Record<string, string>;
+  className?: string; // keep for VariantBehavior / ThemedXxx compat
+  // ...
+};
+
+// Apply in JSX
+<div className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.root, { ... })} />
+//                          ↑ outermost                    ↑ legacy fallback
+```
+
+`COMPONENT_PART_KEY` is the `"-component"` constant exported from `theming/responsive-layout`.
 
 ## Value Extraction
 

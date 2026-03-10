@@ -2,10 +2,11 @@ import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode } fro
 
 import styles from "./Backdrop.module.scss";
 import classNames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   style?: CSSProperties;
-  className?: string;
+  classes?: Record<string, string>;
   children?: ReactNode;
   overlayTemplate?: ReactNode;
   opacity?: string;
@@ -15,7 +16,7 @@ type Props = {
 export const Backdrop = forwardRef(function Backdrop(
   {
     style,
-    className,
+    classes,
     children,
     overlayTemplate,
     backgroundColor,
@@ -27,7 +28,7 @@ export const Backdrop = forwardRef(function Backdrop(
   return (
     <div
       {...rest}
-      className={classNames(styles.backdropContainer, className)}
+      className={classNames(styles.backdropContainer, classes?.[COMPONENT_PART_KEY])}
       ref={forwardedRef}
       style={style}
     >
