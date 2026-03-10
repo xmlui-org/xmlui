@@ -1,12 +1,12 @@
 import styles from "./Spinner.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Spinner, defaultProps } from "./SpinnerNative";
 import { createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Spinner";
 
@@ -44,16 +44,8 @@ export const ThemedSpinner = React.forwardRef<HTMLDivElement, ThemedSpinnerProps
   },
 );
 
-export const spinnerComponentRenderer = createComponentRenderer(
+export const spinnerComponentRenderer = wrapComponent(
   COMP,
+  ThemedSpinner,
   SpinnerMd,
-  ({ node, classes, extractValue }) => {
-    return (
-      <Spinner
-        classes={classes}
-        delay={extractValue.asOptionalNumber(node.props.delay)}
-        fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
-      />
-    );
-  },
 );
