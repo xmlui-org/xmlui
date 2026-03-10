@@ -295,6 +295,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       extractResourceUrl,
       lookupEventHandler,
       lookupSyncCallback,
+      renderChild,
       className,
       updateState,
       state,
@@ -405,6 +406,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           props[reactKey] = extractValue(rawValue);
         }
       }
+    }
+
+    // --- Render children if the node has any ---
+    if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+      props.children = renderChild(node.children);
     }
 
     return <Component {...props} />;
