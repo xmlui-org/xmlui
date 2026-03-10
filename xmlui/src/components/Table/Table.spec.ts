@@ -2911,6 +2911,41 @@ test.describe("Keyboard Shortcuts", () => {
       const result = await testStateDriver.testState();
       expect(result.action).toBe("paste");
     });
+
+    test("does not fire App onKeyDown when Table handles Ctrl+V", async ({ initTestBed, page }) => {
+      // Regression test: Table must call preventDefault() so that document-level
+      // listeners (e.g. App.onKeyDown) can detect the event was already handled
+      // via event.defaultPrevented and avoid double-processing.
+      const { testStateDriver } = await initTestBed(`
+        <App
+          var.appKeyCount="{0}"
+          onKeyDown="event => { if (!event.defaultPrevented && (event.ctrlKey || event.metaKey) && event.key === 'v') appKeyCount = appKeyCount + 1; testState = appKeyCount; }"
+        >
+          <Table
+            data='{${JSON.stringify(sampleData)}}'
+            rowsSelectable="true"
+            testId="table"
+            autoFocus="true"
+            onPasteAction="(row) => {}"
+          >
+            <Column bindTo="name"/>
+          </Table>
+        </App>
+      `);
+
+      const firstRow = page.locator("tbody tr").first();
+      await firstRow.click();
+
+      const isMac = process.platform === 'darwin';
+      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      await page.keyboard.press(pasteKey);
+
+      // App-level handler must NOT count this as unhandled, because Table
+      // called event.preventDefault() and the App handler checks defaultPrevented.
+      await page.waitForTimeout(200);
+      const count = await testStateDriver.testState();
+      expect(count).toBe(0);
+    });
   });
 
   test.describe("custom key bindings", () => {

@@ -404,8 +404,12 @@ function useTableKeyboardActions({
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
-          // Prevent default browser behavior immediately when key matches
+          // Prevent default browser behavior immediately when key matches.
+          // Also stop propagation so parent React onKeyDown handlers don't double-fire.
+          // Note: document-level listeners will still receive the event but can check
+          // event.defaultPrevented to detect that this shortcut was already handled.
           event.preventDefault();
+          event.stopPropagation();
 
           // If rowsSelectable is false, prevent default but don't execute any actions
           if (!rowsSelectable) {
