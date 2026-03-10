@@ -1,6 +1,7 @@
 import type { MediaBreakpointType } from "../../abstractions/AppContextDefs";
 import type { StyleObjectType } from "./StyleRegistry";
-import { parseLayoutProperty, toCssPropertyName } from "./parse-layout-props";
+import { parseLayoutProperty, toCssPropertyNames } from "./parse-layout-props";
+import type { ParsedLayout } from "./parse-layout-props";
 import { toCssVar } from "./layout-resolver";
 import { layoutOptionKeys } from "../descriptorHelper";
 
@@ -70,45 +71,49 @@ export function buildResponsiveStyleObjects(
     return partStyles[part];
   }
 
+  // Collect all valid entries first so we can enforce compound-before-specific ordering.
+  type ValidEntry = { parsed: ParsedLayout; cssProps: readonly string[]; value: string };
+  const validEntries: ValidEntry[] = [];
+
   for (const propKey of Object.keys(props)) {
     const parsed = parseLayoutProperty(propKey);
-    if (typeof parsed === "string") {
-      // Not a valid layout property — skip
-      continue;
-    }
-
-    // Skip component-scoped props (those target a specific component type, not a part)
-    if (parsed.component) continue;
-
-    // Only accept base properties that are known layout option keys
+    if (typeof parsed === "string") continue; // not a valid layout property
+    if (parsed.component) continue;           // component-scoped, skip
     if (!layoutOptionKeySet.has(parsed.property)) continue;
 
-    // Skip state-only props for now (future phase)
-    // We still handle props that have states alongside part/breakpoint info
-
-    const cssPropName = toCssPropertyName(parsed.property);
-    // Skip properties that map to empty string (shorthand-only, e.g. paddingVertical)
-    if (cssPropName === "") continue;
+    const cssProps = toCssPropertyNames(parsed.property);
+    if (cssProps.length === 0) continue; // non-CSS or suppressed
 
     const value = resolveValue(props[propKey]);
     if (value === undefined) continue;
 
+    validEntries.push({ parsed, cssProps, value });
+  }
+
+  // Compound expansions (e.g. paddingVertical → padding-top + padding-bottom) are applied
+  // before specific properties (e.g. paddingTop → padding-top) so that specific ones
+  // always win when both are present, regardless of their declaration order.
+  validEntries.sort((a, b) => b.cssProps.length - a.cssProps.length);
+
+  for (const { parsed, cssProps, value } of validEntries) {
     const partKey = parsed.part ?? COMPONENT_PART_KEY;
     const entry = getOrCreatePart(partKey);
 
-    if (!parsed.screenSizes || parsed.screenSizes.length === 0) {
-      // Base rule (applies at all widths, or acts as xs)
-      entry.base[cssPropName] = value;
-    } else {
-      for (const size of parsed.screenSizes) {
-        if (size === "xs") {
-          // xs is the base — no media query
-          entry.base[cssPropName] = value;
-        } else {
-          if (!entry.breakpoints[size]) {
-            entry.breakpoints[size] = {};
+    for (const cssPropName of cssProps) {
+      if (!parsed.screenSizes || parsed.screenSizes.length === 0) {
+        // Base rule (applies at all widths, or acts as xs)
+        entry.base[cssPropName] = value;
+      } else {
+        for (const size of parsed.screenSizes) {
+          if (size === "xs") {
+            // xs is the base — no media query
+            entry.base[cssPropName] = value;
+          } else {
+            if (!entry.breakpoints[size]) {
+              entry.breakpoints[size] = {};
+            }
+            entry.breakpoints[size]![cssPropName] = value;
           }
-          entry.breakpoints[size]![cssPropName] = value;
         }
       }
     }

@@ -14,13 +14,44 @@ export type ParsedLayout = {
  * These properties don't follow the standard camelCase-to-kebab-case conversion.
  */
 export const CSS_PROPERTY_EXCEPTIONS: Record<string, string> = {
+  // --- Renamed properties: camelCase XMLUI name → actual CSS property name
   textColor: "color",
+  radiusTopLeft: "border-top-left-radius",
+  radiusTopRight: "border-top-right-radius",
+  radiusBottomLeft: "border-bottom-left-radius",
+  radiusBottomRight: "border-bottom-right-radius",
+  // --- Shorthand / composite properties that expand to multiple CSS properties.
+  // --- toCssPropertyName returns "" (→ skipped) to preserve backward compatibility;
+  // --- toCssPropertyNames returns the full expansion array instead.
   paddingVertical: "",
   paddingHorizontal: "",
   marginVertical: "",
   marginHorizontal: "",
   borderVertical: "",
   borderHorizontal: "",
+  // --- Non-CSS layout properties: XMLUI-specific concepts handled by the layout resolver,
+  // --- not expressible as a single CSS property on the element.
+  orientation: "",
+  horizontalAlignment: "",
+  verticalAlignment: "",
+  wrapContent: "",
+  canShrink: "",
+};
+
+/**
+ * Compound XMLUI layout properties that expand into multiple CSS properties.
+ *
+ * When a compound property (e.g. `paddingVertical`) and one of its constituent
+ * properties (e.g. `paddingBottom`) are both specified, the constituent wins because
+ * `buildResponsiveStyleObjects` processes compound expansions first and specific ones last.
+ */
+export const CSS_PROPERTY_EXPANSIONS: Record<string, readonly string[]> = {
+  paddingVertical:   ["padding-top", "padding-bottom"],
+  paddingHorizontal: ["padding-left", "padding-right"],
+  marginVertical:    ["margin-top", "margin-bottom"],
+  marginHorizontal:  ["margin-left", "margin-right"],
+  borderVertical:    ["border-top", "border-bottom"],
+  borderHorizontal:  ["border-left", "border-right"],
 };
 
 export function parseLayoutProperty(prop: string, parseComponent: boolean = false): ParsedLayout | string {
@@ -137,6 +168,27 @@ export function toCssPropertyName(property: string): string {
 
   // Convert camelCase to kebab-case
   return property.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+}
+
+/**
+ * Returns all CSS property names for a given XMLUI property name.
+ *
+ * - **Empty array**: property produces no CSS output (non-CSS XMLUI prop or explicitly suppressed).
+ * - **Single-element array**: standard 1:1 mapping (e.g. `fontSize` → `["font-size"]`).
+ * - **Multi-element array**: compound property that expands to multiple CSS declarations
+ *   (e.g. `paddingVertical` → `["padding-top", "padding-bottom"]`).
+ *
+ * Callers processing multiple props together should emit compound expansions before
+ * specific properties so that `paddingTop` always overrides `paddingVertical`'s
+ * `padding-top` contribution, regardless of declaration order.
+ */
+export function toCssPropertyNames(property: string): readonly string[] {
+  if (property in CSS_PROPERTY_EXPANSIONS) {
+    return CSS_PROPERTY_EXPANSIONS[property];
+  }
+  const single = toCssPropertyName(property);
+  if (single === "") return [];
+  return [single];
 }
 
 function isValidPropertyName(name: string): boolean {
