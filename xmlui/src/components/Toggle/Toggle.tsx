@@ -18,6 +18,7 @@ import type { ValidationStatus } from "../abstractions";
 import { PART_INPUT } from "../../components-core/parts";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type ToggleProps = {
   id?: string;
@@ -34,6 +35,7 @@ type ToggleProps = {
   onBlur?: () => void;
   variant?: "checkbox" | "switch";
   indeterminate?: boolean;
+  classes?: Record<string, string>;
   className?: string;
   required?: boolean;
   autoFocus?: boolean;
@@ -69,6 +71,7 @@ export const Toggle = forwardRef(function Toggle(
     onBlur = noop,
     variant = "checkbox",
     indeterminate = defaultProps.indeterminate,
+    classes,
     className,
     required,
     autoFocus,
@@ -187,20 +190,27 @@ export const Toggle = forwardRef(function Toggle(
           onBlur={handleOnBlur}
           autoFocus={autoFocus}
           style={style}
-          className={classnames(className, styles.resetAppearance, {
-            [styles.checkbox]: variant === "checkbox",
-            [styles.switch]: variant === "switch",
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-            [styles.forceHover]: forceHover,
-          })}
+          className={classnames(
+            !inputRenderer ? classes?.[COMPONENT_PART_KEY] : undefined,
+            className,
+            styles.resetAppearance,
+            {
+              [styles.checkbox]: variant === "checkbox",
+              [styles.switch]: variant === "switch",
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+              [styles.forceHover]: forceHover,
+            },
+          )}
         />
       </Part>
     );
   }, [
     rest,
+    classes,
     className,
+    inputRenderer,
     ref,
     style,
     id,
@@ -220,7 +230,7 @@ export const Toggle = forwardRef(function Toggle(
   ]);
 
   return inputRenderer ? (
-    <label className={styles.label}>
+    <label className={classnames(styles.label, classes?.[COMPONENT_PART_KEY])}>
       <div className={styles.inputContainer}>{input}</div>
       {inputRenderer({
         $checked: transformToLegitValue(value),

@@ -9,8 +9,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import {
-  PART_START_ADORNMENT,
+import { PART_START_ADORNMENT,
   PART_INPUT,
   PART_END_ADORNMENT,
   PART_CONCISE_VALIDATION_FEEDBACK,
@@ -18,6 +17,7 @@ import {
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -35,6 +35,7 @@ type Props = {
   updateState?: UpdateStateFn;
   initialValue?: string;
   style?: CSSProperties;
+  classes?: Record<string, string>;
   className?: string;
   maxLength?: number;
   enabled?: boolean;
@@ -114,6 +115,7 @@ export const TextBox = forwardRef(function TextBox(
     updateState = defaultProps.updateState,
     initialValue = defaultProps.initialValue,
     style,
+    classes,
     className,
     maxLength,
     enabled = defaultProps.enabled,
@@ -245,7 +247,7 @@ export const TextBox = forwardRef(function TextBox(
     <div
       {...rest}
       ref={ref}
-      className={classnames(className, styles.inputRoot, {
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
         [styles.disabled]: !enabled,
         [styles.readOnly]: readOnly,
         [styles.error]: validationStatus === "error",

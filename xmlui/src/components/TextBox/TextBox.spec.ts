@@ -1314,3 +1314,66 @@ test.describe("Validation Feedback", () => {
     await expect(labels).toHaveCount(1);
   });
 });
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width-md="400px" />`);
+    const textBox = page.getByTestId("test");
+
+    // Below md — width should NOT be 400px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(textBox).not.toHaveCSS("width", "400px");
+
+    // At md — width should be 400px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(textBox).toHaveCSS("width", "400px");
+
+    // Well above md — width should still be 400px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(textBox).toHaveCSS("width", "400px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width="250px" />`);
+    const textBox = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(textBox).toHaveCSS("width", "250px");
+    }
+  });
+
+  test("breakpoint width overrides base at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width="150px" width-lg="500px" />`);
+    const textBox = page.getByTestId("test");
+
+    // Below lg — base 150px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(textBox).toHaveCSS("width", "150px");
+
+    // At lg — 500px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(textBox).toHaveCSS("width", "500px");
+  });
+
+  test("multiple breakpoints stack correctly (mobile-first)", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width-sm="200px" width-md="350px" />`);
+    const textBox = page.getByTestId("test");
+
+    // xs — no rule applies
+    await page.setViewportSize({ width: 400, height: 600 });
+    await expect(textBox).not.toHaveCSS("width", "200px");
+
+    // sm — 200px
+    await page.setViewportSize({ width: 600, height: 600 });
+    await expect(textBox).toHaveCSS("width", "200px");
+
+    // md — 350px overrides
+    await page.setViewportSize({ width: 800, height: 600 });
+    await expect(textBox).toHaveCSS("width", "350px");
+  });
+});

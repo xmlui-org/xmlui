@@ -1214,3 +1214,49 @@ test.describe("Behaviors and Parts", () => {
     await expect(labels).toHaveCount(1);
   });
 });
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width-md="200px" />`);
+    const checkbox = page.getByTestId("test");
+
+    // Below md — width should NOT be 200px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(checkbox).not.toHaveCSS("width", "200px");
+
+    // At md — width should be 200px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "200px");
+
+    // Well above md — width should still be 200px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(checkbox).toHaveCSS("width", "200px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width="150px" />`);
+    const checkbox = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(checkbox).toHaveCSS("width", "150px");
+    }
+  });
+
+  test("breakpoint width overrides base at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width="100px" width-lg="300px" />`);
+    const checkbox = page.getByTestId("test");
+
+    // Below lg — base 100px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "100px");
+
+    // At lg — 300px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "300px");
+  });
+});

@@ -6,6 +6,7 @@ import { PART_INPUT } from "../../components-core/parts";
 import type { ValidationStatus } from "../abstractions";
 import { noop } from "../../components-core/constants";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   validationStatus?: ValidationStatus;
@@ -22,6 +23,7 @@ type Props = {
   maxRating?: number;
   enabled?: boolean;
   readOnly?: boolean;
+  classes?: Record<string, string>;
   className?: string;
   onDidChange?: (value: number) => void;
   updateState?: UpdateStateFn;
@@ -69,6 +71,7 @@ export function RatingInput({
   maxRating = defaultProps.maxRating,
   enabled = defaultProps.enabled,
   readOnly = defaultProps.readOnly,
+  classes,
   className,
   updateState = defaultProps.updateState,
   onFocus = defaultProps.onFocus,
@@ -166,6 +169,8 @@ export function RatingInput({
         ref={containerRef}
         className={[
           styles.container,
+          classes?.[COMPONENT_PART_KEY],
+          classes?.[PART_INPUT],
           className,
           !enabled ? styles.disabled : "",
           readOnly ? styles.readOnly : "",

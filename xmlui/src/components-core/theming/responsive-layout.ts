@@ -182,34 +182,36 @@ export function buildCompositeStyleObject(
         }
       }
     } else {
-      // Named part — scope under data-part-id attribute selector
-      const partSelector = `& [data-part-id="${partKey}"]`;
+      // Named part — emit rules under BOTH selectors:
+      // 1. &[data-part-id="x"]  (self, no space): matches when the component root itself IS the
+      //    part element (e.g. RatingInput, where Part/Slot puts data-part-id on the root div).
+      // 2. & [data-part-id="x"] (descendant, space): matches when the part is a child of the root
+      //    (e.g. DateInput where day/month/year are descendant elements).
+      const selfSel = `&[data-part-id="${partKey}"]`;
+      const descSel = `& [data-part-id="${partKey}"]`;
+
+      function mergePartStyles(target: StyleObjectType, sel: string, styles: object) {
+        const existing = target[sel] as StyleObjectType | undefined;
+        if (existing) {
+          Object.assign(existing, styles);
+        } else {
+          target[sel] = { ...styles } as StyleObjectType;
+        }
+      }
+
       for (const [selector, value] of Object.entries(styleObj)) {
         if (selector === "&") {
-          const existing = composite[partSelector] as StyleObjectType | undefined;
-          if (existing) {
-            Object.assign(existing, value);
-          } else {
-            composite[partSelector] = { ...(value as object) } as StyleObjectType;
-          }
+          mergePartStyles(composite, selfSel, value as object);
+          mergePartStyles(composite, descSel, value as object);
         } else if (selector.startsWith("@media")) {
-          // @media wrapping for a part: @media { & [data-part-id="x"] { ... } }
-          const mediaKey = selector;
-          const existingMedia = composite[mediaKey] as StyleObjectType | undefined;
           const innerPartStyles = (value as StyleObjectType)["&"] as StyleObjectType | undefined;
           if (innerPartStyles) {
-            if (existingMedia) {
-              const existingPart = (existingMedia as StyleObjectType)[partSelector] as StyleObjectType | undefined;
-              if (existingPart) {
-                Object.assign(existingPart, innerPartStyles);
-              } else {
-                (existingMedia as StyleObjectType)[partSelector] = { ...innerPartStyles } as StyleObjectType;
-              }
-            } else {
-              composite[mediaKey] = {
-                [partSelector]: { ...innerPartStyles } as StyleObjectType,
-              } as StyleObjectType;
+            if (!composite[selector]) {
+              composite[selector] = {} as StyleObjectType;
             }
+            const mediaObj = composite[selector] as StyleObjectType;
+            mergePartStyles(mediaObj, selfSel, innerPartStyles);
+            mergePartStyles(mediaObj, descSel, innerPartStyles);
           }
         }
       }

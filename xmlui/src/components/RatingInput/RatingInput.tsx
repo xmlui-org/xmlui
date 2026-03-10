@@ -119,7 +119,7 @@ export const ratingInputComponentRenderer = createComponentRenderer(
     updateState,
     lookupEventHandler,
     extractValue,
-    className,
+    classes,
     registerComponentApi,
   }) => {
     const props = (node.props ?? {}) as Record<string, unknown>;
@@ -133,7 +133,7 @@ export const ratingInputComponentRenderer = createComponentRenderer(
 
     return (
       <RatingInput
-        className={className}
+        classes={classes}
         value={state?.value}
         updateState={updateState}
         initialValue={extractValue.asOptionalNumber(props.initialValue)}

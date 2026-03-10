@@ -148,22 +148,24 @@ describe("buildCompositeStyleObject", () => {
     expect((composite["@media (min-width: 768px)"] as any)["&"]).toEqual({ "font-size": "18px" });
   });
 
-  it("scopes named part base styles under data-part-id selector", () => {
+  it("scopes named part base styles under both self and descendant data-part-id selectors", () => {
     const styleObjects = buildResponsiveStyleObjects({ "fontSize-label": "12px" });
     const composite = buildCompositeStyleObject(styleObjects);
-    const partSelector = '& [data-part-id="label"]';
-    expect(composite[partSelector]).toBeDefined();
-    expect((composite[partSelector] as any)["font-size"]).toBe("12px");
+    const selfSel = '&[data-part-id="label"]';
+    const descSel = '& [data-part-id="label"]';
+    expect((composite[selfSel] as any)["font-size"]).toBe("12px");
+    expect((composite[descSel] as any)["font-size"]).toBe("12px");
   });
 
-  it("scopes named part @media styles under data-part-id inside @media rule", () => {
+  it("scopes named part @media styles under both selectors inside @media rule", () => {
     const styleObjects = buildResponsiveStyleObjects({ "fontSize-label-md": "14px" });
     const composite = buildCompositeStyleObject(styleObjects);
     const media = composite["@media (min-width: 768px)"] as any;
     expect(media).toBeDefined();
-    const partSelector = '& [data-part-id="label"]';
-    expect(media[partSelector]).toBeDefined();
-    expect(media[partSelector]["font-size"]).toBe("14px");
+    const selfSel = '&[data-part-id="label"]';
+    const descSel = '& [data-part-id="label"]';
+    expect(media[selfSel]["font-size"]).toBe("14px");
+    expect(media[descSel]["font-size"]).toBe("14px");
   });
 
   it("combines component-root and part styles in one object", () => {
@@ -173,6 +175,8 @@ describe("buildCompositeStyleObject", () => {
     });
     const composite = buildCompositeStyleObject(styleObjects);
     expect(composite["font-size"]).toBe("16px");
+    // Part styles appear under both self and descendant selectors
+    expect((composite['&[data-part-id="label"]'] as any)["color"]).toBe("blue");
     expect((composite['& [data-part-id="label"]'] as any)["color"]).toBe("blue");
   });
 
