@@ -1,10 +1,10 @@
-# wrapComponent Integration — Lessons Learned from Migrating Link and Card
+# wrapComponent Integration — Lessons Learned from Migrating Link, Card, Spinner, Icon, and Image
 
 ## Background
 
 `wrapComponent` is a higher-level wrapper that automatically handles prop extraction from an XMLUI node and passes the resolved values to a React component. Its goal is to eliminate the boilerplate of manual `createComponentRenderer` implementations (explicit `extractValue`, `lookupEventHandler`, etc. calls).
 
-The first target was the `Avatar` component, followed by `Link` and `Card`.
+The first target was the `Avatar` component, followed by `Link`, `Card`, `Spinner`, `Icon`, and `Image`.
 
 ---
 
@@ -181,6 +181,81 @@ This cross-prop default logic cannot be expressed in metadata.
 - **Shared render helpers across variants** — multiple component types call a common function with hard-coded overrides
 
 Stack is the canonical example of a component that belongs in `createComponentRenderer` and should stay there.
+
+---
+
+## Challenge 6: The `d()` Helper Carries No `valueType`
+
+The `d()` helper is a convenience shorthand for declaring a prop with only a description string. It produces an object with no `valueType` field — so `wrapComponent`'s auto-detection skips it entirely, and the prop is forwarded with a plain `extractValue()` call regardless of its actual type.
+
+This surfaced during the `Icon` migration, where `name`, `size`, and `fallback` were all declared with `d()`:
+
+```ts
+// Before — no valueType, wrapComponent cannot infer the type
+name: d("The name of the icon to display."),
+```
+
+**Fix:** Convert every `d()` declaration that needs a specific type to the object form with an explicit `valueType`:
+
+```ts
+// After
+name: {
+  description: "The name of the icon to display.",
+  valueType: "string",
+},
+```
+
+**Lesson:** `d()` is fine for truly untyped props (e.g. `animation`, internal-only props), but should not be used for props with a known type. When migrating a component, scan all props for `d()` usage and convert those that have a meaningful type. This is a recurring pattern — it appeared in Link (`maxLines`), Icon (`name`, `size`, `fallback`), Image (`src`, `data`, `alt`, `aspectRatio`), and Card (`avatarUrl`).
+
+---
+
+## Challenge 7: Props Resolved via `extractResourceUrl` — `isResourceUrl`
+
+Some props contain logical resource URLs that must be resolved through `extractResourceUrl` rather than plain `extractValue`. The `Image` component's `src` prop is the clearest example: the original renderer called `extractResourceUrl(node.props.src)` explicitly.
+
+`wrapComponent` supports this natively — no manual renderer code is needed. There are two equivalent approaches:
+
+**Option A — metadata flag (preferred):** Add `isResourceUrl: true` to the prop definition. `wrapComponent` reads this flag and automatically routes the prop through `extractResourceUrl`:
+
+```ts
+src: {
+  description: "...",
+  valueType: "string",
+  isResourceUrl: true,
+},
+```
+
+**Option B — config override:** Pass the prop name in `resourceUrls` in the `wrapComponent` config:
+
+```ts
+wrapComponent(COMP, ThemedImage, ImageMd, { resourceUrls: ["src"] });
+```
+
+Option A is preferred because the intent is expressed directly in the metadata, where it serves as documentation as well.
+
+**Lesson:** For any prop that previously called `extractResourceUrl`, add `isResourceUrl: true` to its metadata entry. The auto-detection in `wrapComponent` handles the rest.
+
+---
+
+## Challenge 8: Prop Name Mismatch Between XMLUI and React — `rename`
+
+XMLUI prop names and React component prop names are sometimes different. The `Image` component exposed this: the XMLUI markup uses `data`, but `ImageNative` expects `imageData`. The original renderer bridged this manually:
+
+```ts
+imageData={extractValue(node.props.data)}
+```
+
+`wrapComponent` handles this via the `rename` config option, which maps XMLUI prop names to React prop names:
+
+```ts
+wrapComponent(COMP, ThemedImage, ImageMd, {
+  rename: { data: "imageData" },
+});
+```
+
+`wrapComponent` extracts `node.props.data`, applies the appropriate type converter (from metadata), and forwards the value as `imageData` to the React component.
+
+**Lesson:** When the XMLUI prop name differs from the React prop name, use `rename` in the config. Do not introduce an adapter component just for a name mapping — `rename` is the right tool for this.
 
 ---
 
