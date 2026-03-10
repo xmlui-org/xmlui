@@ -79,7 +79,7 @@ export const AppMd = createMetadata({
       defaultValue: defaultProps.defaultTheme,
     },
     autoDetectTone: {
-      description: 
+      description:
         'This boolean property enables automatic detection of the system theme preference. ' +
         'When set to true and no defaultTone is specified, the app will automatically use ' +
         '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
@@ -133,7 +133,7 @@ export const AppMd = createMetadata({
       },
     },
     didNavigate: {
-      description: 
+      description:
         `This event fires after the app has completed any navigation (including Link clicks, browser back/forward, ` +
         `and programmatic navigation).`,
       signature: "(to: string | number, queryParams?: Record<string, any>) => Promise<void>",
@@ -187,17 +187,17 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   // --- Extract app components
   const extracted = extractAppComponents(node.children);
   const { AppHeader, Footer, Pages, restChildren } = extracted;
-  
+
   // --- Enhance NavPanel with page navigation inline
   const { NavPanel: originalNavPanel } = extracted;
-  
+
   let NavPanel = originalNavPanel;
-  
+
   if (Pages && !processedNavRef.current) {
     processedNavRef.current = true;
-    
+
     const extraNavs = extractNavPanelFromPages(Pages, originalNavPanel, extractValue);
-    
+
     if (extraNavs?.length) {
       if (originalNavPanel) {
         NavPanel = {
@@ -214,12 +214,15 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     }
   }
 
-  const applyDefaultContentPadding = !Pages;
-  const footerSticky = Footer?.props?.sticky !== undefined 
+  // Determine if default content padding should be applied
+  // Only apply if Pages is not present AND padding/paddingTop is not explicitly set
+  const hasExplicitPadding = node.props.padding !== undefined
+  const applyDefaultContentPadding = !Pages && !hasExplicitPadding;
+  const footerSticky = Footer?.props?.sticky !== undefined
     ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
     : true;
   const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
-  
+
   // When scrollWholePage is false, pageContentContainer is a vertical flex container
   // Pass layout context so children can properly resolve star sizing
   const contentLayoutContext = !scrollWholePage ? { type: "Stack" as const, orientation: "vertical" as const } : undefined;

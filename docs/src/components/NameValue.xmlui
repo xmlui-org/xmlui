@@ -1,6 +1,0 @@
-<Component name="NameValue">
-  <Card width="20%">
-    <Text>Name: { $props.name} </Text>
-    <Text>Value: { $props.value} </Text>
-  </Card>
-</Component>

@@ -44,7 +44,7 @@ $outlineStyle-Checkbox--success--focus: createThemeVar("Input:outlineStyle-Check
 $outlineOffset-Checkbox--success--focus: createThemeVar("Input:outlineOffset-Checkbox--success--focus");
 
 // Variables for Checkbox - hover and disabled states
-$borderColor-Checkbox--default--hover: createThemeVar("Input:borderColor-Checkbox--default--hover");
+$borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover");
 $backgroundColor-Checkbox--disabled: createThemeVar("Input:backgroundColor-Checkbox--disabled");
 $borderColor-Checkbox--disabled: createThemeVar("Input:borderColor-Checkbox--disabled");
 
@@ -110,7 +110,7 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
 
 @mixin hoverAndDisabledState($componentName) {
   &:not([readonly]):not(:disabled):hover {
-    border-color: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
+    border-color: createThemeVar("Input:borderColor-#{$componentName}--hover");
   }
 
   &:disabled {
@@ -187,7 +187,7 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
     @include hoverAndDisabledState("Checkbox");
 
     .forceHover {
-      border-color: $borderColor-Checkbox--default--hover;
+      border-color: $borderColor-Checkbox--hover;
       // Don't override background-color - let the existing background rules apply
     }
 

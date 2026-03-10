@@ -56,7 +56,7 @@ async function generateContextVariablesSummary() {
   let markdown = generateMarkdown(sortedContextVars);
 
   // Write to file
-  const outputPath = join(FOLDERS.docsRoot, "content", "pages", "context-variables2.md");
+  const outputPath = join(FOLDERS.docsRoot, "pages", "context-variables2.md");
   await writeFile(outputPath, markdown, "utf8");
 
   logger.info(`Context variables summary generated: ${outputPath}`);

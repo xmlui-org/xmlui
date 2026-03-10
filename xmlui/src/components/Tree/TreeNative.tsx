@@ -117,7 +117,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
     },
@@ -131,7 +131,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
     },
@@ -160,16 +160,16 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     (e: React.MouseEvent) => {
       // Prevent default browser context menu
       e.preventDefault();
-      
+
       // Focus the item when context menu is triggered
       if (treeItem.selectable) {
         onSelection(treeItem);
         // Ensure tree container maintains focus after mouse selection
         setTimeout(() => {
-          treeContainerRef.current?.focus();
+          treeContainerRef.current?.focus({ preventScroll: true });
         }, 0);
       }
-      
+
       // Use lookupEventHandler with context containing item variables
       if (lookupEventHandler) {
         const handler = lookupEventHandler("contextMenu", {
@@ -185,7 +185,7 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
           },
           ephemeral: true, // Don't cache this handler since context changes per row
         });
-        
+
         handler?.(e);
       }
     },
@@ -398,6 +398,7 @@ interface TreeComponentProps {
   expandRotation?: number;
   scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
   showScrollerFade?: boolean;
+  overflow?: string;
   autoLoadAfter?: number;
   spinnerDelay?: number;
   onItemClick?: (node: FlatTreeNode) => void;
@@ -459,6 +460,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     lookupEventHandler,
     itemRenderer,
     className,
+    overflow,
   } = props;
   // Internal selection state for uncontrolled usage
   // Initialize with selectedValue if provided and no onSelectionChanged handler (uncontrolled mode)
@@ -703,7 +705,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       const timestamp = expandedTimestamps.get(nodeId);
       const collapsedTime = collapsedTimestamps.get(nodeId);
       const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
-      
+
       return {
         ...node,
         expandedTimestamp: timestamp,
@@ -912,19 +914,19 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         const currentLoadingState = nodeStates.get(node.key) || "unloaded";
         const collapsedTime = collapsedTimestamps.get(node.key);
         const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
-        
+
         // Step 4: Read per-node autoLoadAfter from data field
         const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
-        const nodeAutoLoadAfter = autoLoadAfterFieldName in node 
-          ? (node as any)[autoLoadAfterFieldName] 
+        const nodeAutoLoadAfter = autoLoadAfterFieldName in node
+          ? (node as any)[autoLoadAfterFieldName]
           : undefined;
-        
+
         // Priority: setAutoLoadAfter > node data field > component prop
-        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined 
-          ? explicitAutoLoadAfter 
+        const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
+          ? explicitAutoLoadAfter
           : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
-        
-        const shouldAutoReload = 
+
+        const shouldAutoReload =
           isDynamic && // Only auto-reload dynamic nodes
           currentLoadingState === "loaded" && // Node was previously loaded
           loadChildren && // loadChildren handler exists
@@ -1184,11 +1186,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       } else {
         // Collapsing the node
         const currentLoadingState = nodeStates.get(node.key) || "unloaded";
-        
+
         // Record collapse timestamp for dynamic nodes (Step 4: Auto-load feature)
         if (currentLoadingState === "loaded" && loadChildren) {
           setCollapsedTimestamps((prev) => new Map(prev).set(node.key, Date.now()));
-          
+
           // Check if autoLoadAfter is 0, mark node as unloaded immediately
           const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
           const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
@@ -1198,11 +1200,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
             ? explicitAutoLoadAfter
             : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
-          
+
           // If autoLoadAfter is 0, immediately mark node as unloaded
           if (effectiveAutoLoadAfter === 0) {
             setNodeStates((prev) => new Map(prev).set(node.key, "unloaded"));
-            
+
             // Update the loaded field in source data
             updateInternalData((prevData) => {
               const currentData = prevData ?? data;
@@ -1238,7 +1240,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             });
           }
         }
-        
+
         const nodeToCollapse = Object.values(treeItemsById).find(
           (n) => String(n.key) === String(node.key),
         );
@@ -1287,7 +1289,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
 
       // Check for keyboard actions (cut, copy, paste, delete)
       const isCtrlOrCmd = e.ctrlKey || e.metaKey;
-      
+
       if (currentNode && isCtrlOrCmd && e.key === "x" && onCutAction) {
         // Cut action (Ctrl/Cmd+X)
         e.preventDefault();
@@ -1295,7 +1297,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         onCutAction(currentNode);
         return;
       }
-      
+
       if (currentNode && isCtrlOrCmd && e.key === "c" && onCopyAction) {
         // Copy action (Ctrl/Cmd+C)
         e.preventDefault();
@@ -1303,7 +1305,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         onCopyAction(currentNode);
         return;
       }
-      
+
       if (currentNode && isCtrlOrCmd && e.key === "v" && onPasteAction) {
         // Paste action (Ctrl/Cmd+V)
         e.preventDefault();
@@ -1311,7 +1313,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         onPasteAction(currentNode);
         return;
       }
-      
+
       if (currentNode && e.key === "Delete" && onDeleteAction) {
         // Delete action
         e.preventDefault();
@@ -1608,7 +1610,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           const currentLoadingState = nodeStates.get(nodeId) || "unloaded";
           if (currentLoadingState === "loaded" && loadChildren) {
             setCollapsedTimestamps((prev) => new Map(prev).set(nodeId, Date.now()));
-            
+
             // Issue #2786 fix: Check if autoLoadAfter is 0, mark node as unloaded immediately
             const explicitAutoLoadAfter = autoLoadAfterMap.get(nodeId);
             const autoLoadAfterFieldName = fieldConfig.autoLoadAfterField || "autoLoadAfter";
@@ -1619,11 +1621,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             const effectiveAutoLoadAfter = explicitAutoLoadAfter !== undefined
               ? explicitAutoLoadAfter
               : (nodeAutoLoadAfter !== undefined ? nodeAutoLoadAfter : autoLoadAfter);
-            
+
             // If autoLoadAfter is 0, immediately mark node as unloaded
             if (effectiveAutoLoadAfter === 0) {
               setNodeStates((prev) => new Map(prev).set(nodeId, "unloaded"));
-              
+
               // Update the loaded field in source data
               setInternalData((prevData) => {
                 const currentData = prevData ?? data;
@@ -2281,20 +2283,20 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         if (activeState) {
           return activeState;
         }
-        
+
         // Fallback to checking loaded field from source data
         const node = getNodeById(nodeId);
         if (node && node.loaded === false) {
           return "unloaded";
         }
-        
+
         // Default to loaded
         return "loaded";
       },
 
       markNodeLoaded: (nodeId: string | number) => {
         setNodeState(nodeId, "loaded");
-        
+
         // Also update the loaded field in source data
         updateInternalData((prevData) => {
           const currentData = prevData ?? data;
@@ -2335,7 +2337,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       markNodeUnloaded: (nodeId: string | number) => {
         setNodeState(nodeId, "unloaded");
         treeApiMethods.collapseNode(nodeId);
-        
+
         // Also update the loaded field in source data
         updateInternalData((prevData) => {
           const currentData = prevData ?? data;
@@ -2381,30 +2383,30 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         const virtualizer = listRef.current;
         const scrollOffset = virtualizer.scrollOffset;
         const viewportSize = virtualizer.viewportSize;
-        
+
         // Calculate the visible range
         const startOffset = scrollOffset;
         const endOffset = scrollOffset + viewportSize;
-        
+
         // Find items within the visible range
         const visibleItems: FlatTreeNode[] = [];
-        
+
         for (let i = 0; i < flatTreeData.length; i++) {
           const itemOffset = virtualizer.getItemOffset(i);
           const itemSize = virtualizer.getItemSize(i);
           const itemEnd = itemOffset + itemSize;
-          
+
           // Check if item is at least partially visible in the viewport
           if (itemEnd > startOffset && itemOffset < endOffset) {
             visibleItems.push(flatTreeData[i]);
           }
-          
+
           // Stop if we've passed the visible range
           if (itemOffset >= endOffset) {
             break;
           }
         }
-        
+
         return visibleItems;
       },
 
@@ -2540,7 +2542,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       onFocus={handleTreeFocus}
       onBlur={handleTreeBlur}
       onKeyDown={handleKeyDown}
-      style={{ height: "100%", overflow: "auto" }}
+      style={{ height: overflow ? "auto" : "100%", overflow: overflow ?? "auto" }}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
     >

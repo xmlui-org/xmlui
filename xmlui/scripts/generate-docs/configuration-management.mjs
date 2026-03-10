@@ -170,11 +170,11 @@ export class PathResolver {
 
     while (depth < maxDepth) {
       try {
-        // Check if this directory contains both 'docs' and 'xmlui' (workspace structure)
-        const docsPath = join(currentDir, "docs");
+        // Check if this directory contains both 'website' and 'xmlui' (workspace structure)
+        const websitePath = join(currentDir, "website");
         const xmluiPath = join(currentDir, "xmlui");
         
-        if (existsSync(docsPath) && existsSync(xmluiPath)) {
+        if (existsSync(websitePath) && existsSync(xmluiPath)) {
           return currentDir;
         }
       } catch {

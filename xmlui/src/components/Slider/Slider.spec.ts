@@ -2,7 +2,6 @@
  * Testing Notes: the Driver needs to account for the correct positioning of the indicators on the slider
  */
 
-import { validationStatusValues } from "../abstractions";
 import { getBounds, SKIP_REASON } from "../../testing/component-test-helpers";
 import { expect, test } from "../../testing/fixtures";
 
@@ -628,7 +627,7 @@ test.describe("Validation", () => {
   });
 
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

@@ -3,6 +3,7 @@ import {
   useDeferredValue,
   useId,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -85,12 +86,12 @@ export const Search = ({
   // render-related state
   const [show, setShow] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (results.length > 0) setShow(true);
   }, [results]);
 
   useEffect(() => {
-    setActiveIndex(results.length > 0 ? 0 : -1);
+    setActiveIndex(-1);
   }, [results]);
 
   const onClick = useCallback(() => {
@@ -157,11 +158,6 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
-  // flush item refs to prevent stale refs when results change drastically
-  // (e.g. from one search to another with few overlapping results)
-  itemRefs.current = [];
-  itemLinkRefs.current = [];
-
   return (
     <span className={className}>
     <Popover open={show} onOpenChange={setShow}>
@@ -205,7 +201,7 @@ export const Search = ({
             onBlur={onInputBlur}
             onKeyDown={handleKeyDown}
             aria-autocomplete="list"
-            aria-controls="dropdown-list"
+            aria-controls={`${inputId}-listbox`}
             aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
           />
         </PopoverTrigger>

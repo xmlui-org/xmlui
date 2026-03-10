@@ -442,6 +442,7 @@
         />
         <NavLink icon="palette" label="Palettes" to="/docs/palettes" />
         <NavLink icon="icons" label="Icons" to="/docs/icons" />
+        <NavLink icon="settings" label="App Globals" to="/docs/app-globals" />
         <NavLink icon="glossary" label="Glossary" to="/docs/glossary" />
       </NavGroup>
       <NavLink
@@ -498,10 +499,6 @@
     </Page>
     <Page
       url="/blog/:slug"
-      staticPaths="{
-            posts.map((p) => {
-              return { params: { slug: p.slug } };
-            })}"
     >
       <script>
           var post = posts.find(p => p.slug === $routeParams.slug)
@@ -719,6 +716,9 @@
     </Page>
     <Page url="/docs/globals">
       <DocumentPage content="{appGlobals.docsContent['pages/globals.md']}" />
+    </Page>
+    <Page url="/docs/app-globals">
+      <DocumentPage content="{appGlobals.docsContent['pages/app-globals.md']}" />
     </Page>
     <Page url="/docs/helper-tags">
       <DocumentPage

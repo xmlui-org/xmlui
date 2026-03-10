@@ -12,15 +12,15 @@ $themeVars: (
 $componentName: "ColorPicker";
 
 // Variables for default variant
-$borderRadius-ColorPicker--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
-$borderColor-ColorPicker--default: createThemeVar("Input:borderColor-#{$componentName}--default");
-$borderWidth-ColorPicker--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
-$borderStyle-ColorPicker--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
-$boxShadow-ColorPicker--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
-$borderColor-ColorPicker--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
-$boxShadow-ColorPicker--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
-$borderColor-ColorPicker--default--focus: createThemeVar("Input:borderColor-#{$componentName}--default--focus");
-$boxShadow-ColorPicker--default--focus: createThemeVar("Input:boxShadow-#{$componentName}--default--focus");
+$borderRadius-ColorPicker: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-ColorPicker: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-ColorPicker: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-ColorPicker: createThemeVar("Input:borderStyle-#{$componentName}");
+$boxShadow-ColorPicker: createThemeVar("Input:boxShadow-#{$componentName}");
+$borderColor-ColorPicker--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$boxShadow-ColorPicker--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$borderColor-ColorPicker--focus: createThemeVar("Input:borderColor-#{$componentName}--focus");
+$boxShadow-ColorPicker--focus: createThemeVar("Input:boxShadow-#{$componentName}--focus");
 
 // Variables for error variant
 $borderRadius-ColorPicker--error: createThemeVar("Input:borderRadius-#{$componentName}--error");

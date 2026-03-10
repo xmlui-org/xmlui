@@ -1,4 +1,4 @@
-import React from "react";
+import type { ComponentProps } from "react";
 import { createComponentRenderer, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
 import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
@@ -84,7 +84,7 @@ const searchComponentRenderer = createComponentRenderer(
   },
 );
 
-type ThemedSearchProps = React.ComponentProps<typeof Search>;
+type ThemedSearchProps = ComponentProps<typeof Search>;
 
 export const ThemedSearch = function ThemedSearch({ className, ...props }: ThemedSearchProps) {
   const themeClass = useComponentThemeClass(SearchMd);

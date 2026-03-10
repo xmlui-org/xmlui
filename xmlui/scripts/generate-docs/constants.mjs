@@ -277,7 +277,6 @@ export const FILE_PATHS = {
 // Path constants for resolving workspace locations
 export const PATH_CONSTANTS = {
   XMLUI_SRC_COMPONENTS: "xmlui/src/components",
-  DOCS_COMPONENT_SAMPLES: "docs/component-samples",
   WORKSPACE: "workspace",
   PACKAGES: "packages",
 };
