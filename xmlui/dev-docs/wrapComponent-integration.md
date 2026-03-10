@@ -309,6 +309,41 @@ This is a direct parallel to the `Stack` case (Challenge 5): the renderer comput
 
 ---
 
+## Observation: Multi-Prop Computed React Props Block Migration — Badge
+
+`Badge` was audited for migration but is not a `wrapComponent` candidate. Three distinct blockers were identified.
+
+**`extractValue.asDisplayText()`** — the `value` prop must be extracted with `asDisplayText`, a converter that `wrapComponent` does not support (only `boolean`, `number`, `string`, and plain `extractValue` are available).
+
+**`color` — a React prop computed from two XMLUI props.** `BadgeNative` accepts a `color` prop, but there is no corresponding `color` prop in the XMLUI markup. Instead, `color` is derived at render time by combining the resolved `colorMap` object with the resolved `value` string, then transforming each color string through `resolveColor()`:
+
+```ts
+const colorMap = extractValue(node.props?.colorMap);
+const resolvedColor = colorMap[value];
+if (typeof resolvedColor === "string") {
+  colorValue = resolveColor(resolvedColor);     // "$token" → "var(--token)"
+} else if (isBadgeColors(resolvedColor)) {
+  colorValue = {
+    label: resolveColor(resolvedColor.label),
+    background: resolveColor(resolvedColor.background),
+  };
+}
+```
+
+This is a many-to-one transformation: two XMLUI props are merged and transformed to produce one React prop. `wrapComponent` can rename one prop to another, but it has no mechanism to merge and transform multiple props into a single derived prop.
+
+**Complex children fallback.** The children slot has three-level fallback logic:
+
+```ts
+{value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
+```
+
+The rendered content is either the display text, XMLUI children, or a non-breaking space — chosen at runtime. `childrenLayoutContext` only controls how children are rendered when they exist; it cannot express this conditional selection logic.
+
+**Takeaway:** `Badge` stays in `createComponentRenderer`. A new disqualifying pattern is confirmed: when a React prop is the result of a runtime transformation that combines or derives from multiple XMLUI props (beyond simple renaming or negation), `wrapComponent` is not suitable.
+
+---
+
 ## Summary — When Does `wrapComponent` Work Well?
 
 `wrapComponent` is a good fit when:
@@ -330,3 +365,6 @@ A manual `createComponentRenderer` is still needed when:
 - The native component API cannot be modified (e.g. a third-party library component)
 - A prop must be extracted with `extractValue.asSize()` (no size extractor in `wrapComponent`)
 - A synthetic prop is computed from layout-level `node.props` (`height`, `width`) that are not declared in the component's metadata
+- A React prop is produced by combining or transforming multiple XMLUI props at runtime (beyond simple renaming or negation)
+- A prop requires `extractValue.asDisplayText()` or other non-standard extractors not supported by `wrapComponent`
+- The children slot has conditional selection logic (e.g. display text vs. children vs. fallback placeholder)
