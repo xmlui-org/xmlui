@@ -2,7 +2,7 @@ import React from "react";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import type { ComponentRendererDef } from "../abstractions/RendererDefs";
 import { createComponentRenderer } from "./renderers";
-import { pushXsLog, createLogEntry } from "./inspector/inspectorUtils";
+import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
 
 /**
  * Configuration for wrapComponent. Only specify what can't be inferred
@@ -327,20 +327,26 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       const traceKind = eventNameToTraceKind(xmluiName);
       if (!handler && !traceKind) continue;
       props[reactPropName] = (...args: any[]) => {
-        if (traceKind) {
-          pushXsLog(createLogEntry(traceKind, {
-            component: type,
-            componentLabel: node.uid || node.testId || undefined,
-            displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-            eventName: xmluiName,
-            ariaName: extractValue(node.props?.["aria-label"]) || undefined,
-            ownerFileId,
-            ownerSource,
-            ...extractFileMetadata(args),
-          }));
-        }
-        if (handler) {
-          return handler(...args);
+        // Push a trace so the value:change and handler events share the same traceId
+        const traceId = traceKind ? pushTrace() : undefined;
+        try {
+          if (traceKind) {
+            pushXsLog(createLogEntry(traceKind, {
+              component: type,
+              componentLabel: node.uid || node.testId || undefined,
+              displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+              eventName: xmluiName,
+              ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ownerFileId,
+              ownerSource,
+              ...extractFileMetadata(args),
+            }));
+          }
+          if (handler) {
+            return handler(...args);
+          }
+        } finally {
+          if (traceId) popTrace();
         }
       };
     }
@@ -629,40 +635,50 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         // didChange is special: StateWrapper's onChange calls this.
         // It traces, calls updateState, and calls the XMLUI handler.
         props.__onDidChange = (...args: any[]) => {
-          if (traceKind) {
-            pushXsLog(createLogEntry(traceKind, {
-              component: type,
-              componentLabel: node.uid || node.testId || undefined,
-              displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-              eventName: xmluiName,
-              ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
-              ownerFileId,
-              ownerSource,
-              ...extractFileMetadata(args),
-            }));
-          }
-          updateState({ value: args[0] });
-          if (handler) {
-            return handler(...args);
+          const traceId = traceKind ? pushTrace() : undefined;
+          try {
+            if (traceKind) {
+              pushXsLog(createLogEntry(traceKind, {
+                component: type,
+                componentLabel: node.uid || node.testId || undefined,
+                displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                eventName: xmluiName,
+                ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
+                ownerFileId,
+                ownerSource,
+                ...extractFileMetadata(args),
+              }));
+            }
+            updateState({ value: args[0] });
+            if (handler) {
+              return handler(...args);
+            }
+          } finally {
+            if (traceId) popTrace();
           }
         };
       } else {
         // Non-didChange events (gotFocus, lostFocus) pass through as native props
         props[reactPropName] = (...args: any[]) => {
-          if (traceKind) {
-            pushXsLog(createLogEntry(traceKind, {
-              component: type,
-              componentLabel: node.uid || node.testId || undefined,
-              displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-              eventName: xmluiName,
-              ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
-              ownerFileId,
-              ownerSource,
-              ...extractFileMetadata(args),
-            }));
-          }
-          if (handler) {
-            return handler(...args);
+          const traceId = traceKind ? pushTrace() : undefined;
+          try {
+            if (traceKind) {
+              pushXsLog(createLogEntry(traceKind, {
+                component: type,
+                componentLabel: node.uid || node.testId || undefined,
+                displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                eventName: xmluiName,
+                ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
+                ownerFileId,
+                ownerSource,
+                ...extractFileMetadata(args),
+              }));
+            }
+            if (handler) {
+              return handler(...args);
+            }
+          } finally {
+            if (traceId) popTrace();
           }
         };
       }
