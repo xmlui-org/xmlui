@@ -114,7 +114,7 @@ export const NavGroupMd = createMetadata({
 export const navGroupComponentRenderer = createComponentRenderer(
   COMP,
   NavGroupMd,
-  ({ node, extractValue, renderChild, classes }) => {
+  ({ node, extractValue, renderChild, className }) => {
     return (
       <NavGroup
         label={extractValue.asDisplayText(node.props.label)}
@@ -131,7 +131,7 @@ export const navGroupComponentRenderer = createComponentRenderer(
         iconVerticalCollapsed={extractValue.asOptionalString(node.props.iconVerticalCollapsed)}
         iconAlignment={extractValue.asOptionalString(node.props.iconAlignment, "center")}
         expandIconAlignment={extractValue(node.props.expandIconAlignment)}
-        classes={classes}
+        className={className}
       />
     );
   },

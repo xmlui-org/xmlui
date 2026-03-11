@@ -126,7 +126,7 @@ export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDrop
 export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, classes, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, registerComponentApi, className, lookupEventHandler }) => {
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
@@ -137,7 +137,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
         label={extractValue(node.props?.label)}
         registerComponentApi={registerComponentApi}
         onWillOpen={lookupEventHandler("willOpen")}
-        classes={classes}
+        className={className}
         alignment={extractValue(node.props?.alignment)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
@@ -223,7 +223,7 @@ export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemPro
 export const menuItemRenderer = createComponentRenderer(
   MICOMP,
   MenuItemMd,
-  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, classes }) => {
+  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, className }) => {
     const clickEventHandler = lookupEventHandler("click");
 
     // Use the XMLUI click handler if defined, otherwise fall back to navigation
@@ -240,7 +240,8 @@ export const menuItemRenderer = createComponentRenderer(
       <ThemedMenuItem
         onClick={clickHandler}
         label={extractValue(node.props?.label)}
-        classes={classes}
+        className={className}
+        iconPosition={extractValue(node.props.iconPosition)}
         icon={
           node.props?.icon && (
             <ThemedIcon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />

@@ -17,7 +17,6 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // =============================================================================
 // Types
@@ -46,7 +45,6 @@ export interface DrawerProps {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   className?: string;
-  classes?: Record<string, string>;
   /** Inline styles applied directly to the drawer panel (overrides theme vars) */
   style?: CSSProperties;
 }
@@ -100,7 +98,6 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     registerComponentApi,
     children,
     className,
-    classes,
     style,
   },
   _ref,
@@ -117,7 +114,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     if (!root) return;
     const el = document.createElement('div');
     el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
-    if (className || classes?.[COMPONENT_PART_KEY]) el.className = classnames(classes?.[COMPONENT_PART_KEY], className);
+    if (className) el.className = className;
     (root as HTMLElement).appendChild(el);
     setPortalContainer(el);
     return () => {
@@ -188,7 +185,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
             [styles.right]:  position === "right",
             [styles.top]:    position === "top",
             [styles.bottom]: position === "bottom",
-          }, classes?.[COMPONENT_PART_KEY], className)}
+          }, className)}
           style={style}
           aria-label="Drawer"
           onAnimationEnd={handlePanelAnimationEnd}

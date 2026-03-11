@@ -3,7 +3,6 @@ import classnames from "classnames";
 import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./Pagination.module.scss";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedButton as Button } from "../Button/Button";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { ThemedText as Text } from "../Text/Text";
@@ -44,7 +43,6 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps: Required<
@@ -107,7 +105,6 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     updateState,
     style,
     className,
-    classes,
     ...rest
   },
   ref,
@@ -202,7 +199,6 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             [styles.paginationVertical]: orientation === "vertical",
             [styles.paginationHorizontal]: orientation === "horizontal",
           },
-          classes?.[COMPONENT_PART_KEY],
           className,
         )}
         style={style}
@@ -459,7 +455,6 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           [styles.paginationVertical]: orientation === "vertical",
           [styles.paginationHorizontal]: orientation === "horizontal",
         },
-        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={style}

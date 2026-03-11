@@ -170,7 +170,7 @@ export const timeInputComponentRenderer = createComponentRenderer(
     state,
     updateState,
     extractValue,
-    classes,
+    className,
     lookupEventHandler,
     registerComponentApi,
   }) => {
@@ -179,7 +179,7 @@ export const timeInputComponentRenderer = createComponentRenderer(
 
     return (
       <TimeInputNative
-        classes={classes}
+        className={className}
         initialValue={extractedInitialValue}
         value={stateValue}
         updateState={updateState}

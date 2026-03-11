@@ -51,7 +51,6 @@ import { cloneDeep, get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { Part } from "../Part/Part";
 import { MemoizedItem } from "../container-helpers";
 import type { RequireLabelMode } from "../abstractions";
@@ -249,7 +248,6 @@ type Props = {
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   enabled?: boolean;
   cancelLabel?: string;
   saveLabel?: string;
@@ -329,7 +327,6 @@ const Form = forwardRef(function (
     children,
     style,
     className,
-    classes,
     enabled = true,
     cancelLabel = defaultProps.cancelLabel,
     saveLabel = defaultProps.saveLabel,
@@ -623,7 +620,7 @@ const Form = forwardRef(function (
         {...rest}
         noValidate={true}
         style={style}
-        className={classnames(styles.formWrapper, classes?.[COMPONENT_PART_KEY], className)}
+        className={classnames(styles.formWrapper, className)}
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
@@ -677,7 +674,7 @@ export const FormWithContextVar = forwardRef(function (
     renderChild,
     extractValue,
     style,
-    classes,
+    className,
     lookupEventHandler,
     registerComponentApi,
     appContext,
@@ -686,7 +683,7 @@ export const FormWithContextVar = forwardRef(function (
     renderChild: RenderChildFn;
     extractValue: ValueExtractor;
     style?: CSSProperties;
-    classes?: Record<string, string>;
+    className?: string;
     lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
     registerComponentApi: RegisterComponentApiFn;
     appContext?: any;
@@ -758,7 +755,7 @@ export const FormWithContextVar = forwardRef(function (
         formState={formState}
         dispatch={dispatch}
         id={node.uid}
-        classes={classes}
+        className={className}
         cancelLabel={extractValue(node.props.cancelLabel)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}

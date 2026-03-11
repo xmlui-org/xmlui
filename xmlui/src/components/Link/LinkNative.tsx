@@ -11,7 +11,6 @@ import classnames from "classnames";
 
 import styles from "./Link.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { BreakMode, LinkTarget, OverflowMode } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
@@ -35,7 +34,6 @@ type Props = {
   onClick?: () => void;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   noIndicator?: boolean;
   maxLines?: number;
   preserveLinebreaks?: boolean;
@@ -73,9 +71,8 @@ export const LinkNative = forwardRef(function LinkNative(
     verticalAlignment,
     style,
     className,
-    classes,
     noIndicator = defaultProps.noIndicator,
-    maxLines = 0,
+    maxLines = 1,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
     overflowMode,
@@ -186,9 +183,8 @@ export const LinkNative = forwardRef(function LinkNative(
       target={target}
       onClick={onClick}
       className={classnames(
-        styles.container,
-        classes?.[COMPONENT_PART_KEY],
         className,
+        styles.container,
         {
           [styles.noIndicator]: noIndicator,
           [styles.iconLink]: iconLink,

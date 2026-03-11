@@ -28,18 +28,12 @@ test.describe("Responsive when-* attributes", () => {
   // when-md="true" — Tailwind mobile-first semantics
   // ---------------------------------------------------------------------------
   test.describe("when-md only", () => {
-    // Below md: no responsive rule matches → no explicit base → lowest rule (md=true) is truthy
-    //           → inferred base is false → hidden.
+    // Below md: no responsive rule matches → falls back to base when (undefined → visible).
     // At md+: when-md="true" matches → visible.
-    // Result: hidden below md, visible at md+.
-    test("hidden below md, visible at md+", async ({ page, initTestBed }) => {
+    // Result: visible at ALL breakpoints.
+    test("visible at all breakpoints", async ({ page, initTestBed }) => {
       const MARKUP = `<Text testId="t" value="hello" when-md="true" />`;
-      for (const vp of [VP.xs, VP.sm]) {
-        await page.setViewportSize(vp);
-        await initTestBed(MARKUP);
-        await expect(page.getByTestId("t")).not.toBeVisible();
-      }
-      for (const vp of [VP.md, VP.lg, VP.xl, VP.xxl]) {
+      for (const vp of Object.values(VP)) {
         await page.setViewportSize(vp);
         await initTestBed(MARKUP);
         await expect(page.getByTestId("t")).toBeVisible();
@@ -172,8 +166,8 @@ test.describe("Responsive when-* attributes", () => {
   // c03 |  f   |  _      |  _      | hidden  | hidden    (no responsive, base f)
   // c04 |  _   |  t      |  _      | visible | visible   (xs=t, md inherits xs=t)
   // c05 |  _   |  f      |  _      | hidden  | hidden    (xs=f, md inherits xs=f)
-  // c06 |  _   |  _      |  t      | hidden  | visible   (xs: no match→infer hidden; md: md=t)
-  // c07 |  _   |  _      |  f      | visible | hidden    (xs: no match→infer visible; md: md=f)
+  // c06 |  _   |  _      |  t      | visible | visible   (xs: no match→base _=true; md: md=t)
+  // c07 |  _   |  _      |  f      | visible | hidden    (xs: no match→base _=true; md: md=f)
   // c08 |  t   |  t      |  _      | visible | visible   (base ignored; xs=t; md inherits)
   // c09 |  t   |  f      |  _      | hidden  | hidden    (base ignored; xs=f; md inherits)
   // c10 |  t   |  _      |  t      | visible | visible   (xs: no match→base t=true; md: md=t)
@@ -238,8 +232,8 @@ test.describe("Responsive when-* attributes", () => {
     await hidden("c03");  // no responsive, base f  → hidden
     await visible("c04"); // xs=t                   → visible
     await hidden("c05");  // xs=f                   → hidden
-    await hidden("c06");  // only md=t, no xs match → infer: lowest truthy → hidden
-    await visible("c07"); // only md=f, no xs match → infer: lowest falsy  → visible
+    await visible("c06"); // only md=t, no xs match → fallback base _=true → visible
+    await visible("c07"); // only md=f, no xs match → fallback base _=true → visible
     await visible("c08"); // base ignored; xs=t     → visible
     await hidden("c09");  // base ignored; xs=f     → hidden
     await visible("c10"); // only md=t, no xs match → fallback base t=true → visible

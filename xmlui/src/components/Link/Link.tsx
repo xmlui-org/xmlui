@@ -179,14 +179,14 @@ export const ThemedLinkNative = React.forwardRef<HTMLDivElement, ThemedLinkNativ
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, classes }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     return (
       <LinkNative
         to={extractValue(node.props.to)}
         icon={extractValue(node.props.icon)}
         active={extractValue.asOptionalBoolean(node.props.active, false)}
         target={extractValue(node.props?.target)}
-        classes={classes}
+        className={className}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
         verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}

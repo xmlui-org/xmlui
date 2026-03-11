@@ -4,13 +4,10 @@
     <VStack width="*">
       <Text fontSize="$fontSize-lg">
         {$props.children}
-        <Text variant="strong" fontSize="$fontSize-lg">
-          {$props.title}
-        </Text>
-        <Slot>
-          {$props.benefit}
-        </Slot>
+        <Text variant="strong" fontSize="$fontSize-lg">{$props.title}</Text>
+        <Slot>{$props.benefit}</Slot>
       </Text>
     </VStack>
   </HStack>
 </Component>
+

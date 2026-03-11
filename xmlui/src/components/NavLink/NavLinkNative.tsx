@@ -6,7 +6,6 @@ import type { To } from "react-router-dom";
 import classnames from "classnames";
 
 import styles from "./NavLink.module.scss";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { LinkAria, LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
 import { getAppLayoutOrientation } from "../App/AppNative";
@@ -35,7 +34,6 @@ type Props = {
   level?: number;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
   iconAlignment?: "baseline" | "start" | "center" | "end";
@@ -61,7 +59,6 @@ export const NavLink = forwardRef(function NavLink(
     forceActive,
     exact,
     className,
-    classes,
     ...rest
   }: Props,
   ref: Ref<any>,
@@ -94,7 +91,7 @@ export const NavLink = forwardRef(function NavLink(
     };
   }, [effectiveLevel, style, layoutIsVertical]);
 
-  const baseClasses = classnames(styles.content, styles.base, classes?.[COMPONENT_PART_KEY], className, {
+  const baseClasses = classnames(styles.content, styles.base, className, {
     [styles.disabled]: disabled,
     [styles.vertical]: safeVertical,
     [styles.includeHoverIndicator]: displayActive && !noIndicator,

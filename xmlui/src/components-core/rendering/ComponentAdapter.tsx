@@ -17,7 +17,6 @@ import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
 import { useComponentStyle, useStyles } from "../theming/StyleContext";
-import type { StyleObjectType } from "../theming/StyleRegistry";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
@@ -36,7 +35,7 @@ import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
-import { buildResponsiveStyleObjects, buildCompositeStyleObject, buildWhenStyleObject, isVisibleAtAnyBreakpoint, COMPONENT_PART_KEY } from "../theming/responsive-layout";
+import { buildResponsiveStyleObjects, buildCompositeStyleObject, COMPONENT_PART_KEY } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 
@@ -366,9 +365,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       const parsed = parseLayoutProperty(key);
       if (typeof parsed === "string") continue; // invalid key
       if (parsed.component) continue; // component-scoped, not a layout prop
-      // Only collect keys that have a part, breakpoint, or state suffix — base keys are already
+      // Only collect keys that have a part or breakpoint suffix — base keys are already
       // handled by the existing layoutOptionKeys pass above
-      if (parsed.part || (parsed.screenSizes && parsed.screenSizes.length > 0) || (parsed.states && parsed.states.length > 0)) {
+      if (parsed.part || (parsed.screenSizes && parsed.screenSizes.length > 0)) {
         extended[key] = valueExtractor(safeNode.props[key], true);
       }
     }
@@ -381,38 +380,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [extendedLayoutProps],
   );
 
-  // --- Build responsive display rules from when / when-* attributes (SSR only)
-  // In normal (client-side) mode the component is either rendered or not based on the
-  // runtime `currentWhenValue`, so CSS display rules add no value.
-  // In SSR mode (`document` is undefined) we need media-query display rules so the
-  // browser shows/hides the pre-rendered HTML correctly before JS hydration.
-  const isSSR = typeof document === "undefined";
-  const whenStyleObject = useMemo(
-    () => (isSSR ? buildWhenStyleObject(safeNode.when, safeNode.responsiveWhen) : {}),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isSSR, safeNode.when, safeNode.responsiveWhen],
-  );
-
-  // --- Merge layout responsive styles and when-display styles into one object
-  const mergedStyleObject = useMemo(() => {
-    const hasLayout = responsiveStyleObject && Object.keys(responsiveStyleObject).length > 0;
-    const hasWhen = whenStyleObject && Object.keys(whenStyleObject).length > 0;
-    if (!hasLayout && !hasWhen) return responsiveStyleObject; // stable empty ref
-    if (!hasWhen) return responsiveStyleObject;
-    if (!hasLayout) return whenStyleObject as StyleObjectType;
-    // Deep-merge: both may have @media keys that need combining
-    const merged = { ...responsiveStyleObject } as Record<string, any>;
-    for (const [key, val] of Object.entries(whenStyleObject)) {
-      if (key.startsWith("@media") && merged[key]) {
-        merged[key] = { ...merged[key] as object, ...val as object };
-      } else {
-        merged[key] = val;
-      }
-    }
-    return merged as StyleObjectType;
-  }, [responsiveStyleObject, whenStyleObject]);
-
-  const stableResponsiveStyleObject = useShallowCompareMemoize(mergedStyleObject);
+  const stableResponsiveStyleObject = useShallowCompareMemoize(responsiveStyleObject);
   
   // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
   const responsiveClassName = useStyles(stableResponsiveStyleObject);
@@ -487,22 +455,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );
 
-  // --- Decide whether to skip rendering entirely
-  // SSR mode (no `document`): render the component if it is visible at ANY breakpoint
-  // and rely on CSS display rules (from buildWhenStyleObject) to hide/show per viewport.
-  // Normal mode (client-side): trust the runtime `currentWhenValue` which reflects the
-  // actual viewport — don't render at all when the component should be hidden.
+  // --- If when is false, don't render the component
   if (!currentWhenValue) {
-    const isSSR = typeof document === "undefined";
-    if (isSSR) {
-      const staticVisibility = isVisibleAtAnyBreakpoint(safeNode.when, safeNode.responsiveWhen);
-      if (staticVisibility !== true) {
-        return null;
-      }
-      // SSR + visible at some breakpoint → fall through and render with CSS classes
-    } else {
-      return null;
-    }
+    return null;
   }
 
   const rendererContext: RendererContext<any> = {

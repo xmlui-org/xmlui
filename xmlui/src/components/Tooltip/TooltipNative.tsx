@@ -1,12 +1,10 @@
 import { type ReactNode, type ForwardedRef, forwardRef } from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
-import classnames from "classnames";
 
 import styles from "./Tooltip.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Markdown } from "../Markdown/Markdown";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type TooltipOptions = {
   /**
@@ -85,7 +83,6 @@ type TooltipProps = TooltipOptions & {
    * Optional extra CSS class names to apply to the tooltip content element
    */
   className?: string;
-  classes?: Record<string, string>;
 };
 
 export type { TooltipProps, TooltipOptions };
@@ -118,7 +115,6 @@ export const Tooltip = forwardRef(function Tooltip({
   children,
   open,
   className,
-  classes,
 }: TooltipProps, ref: ForwardedRef<HTMLDivElement>) {
   const { root } = useTheme();
   const showTooltip = !!(text || markdown || tooltipTemplate);
@@ -131,7 +127,7 @@ export const Tooltip = forwardRef(function Tooltip({
           {showTooltip && (
             <RadixTooltip.Content
               ref={ref}
-              className={classnames(styles.content, classes?.[COMPONENT_PART_KEY], className)}
+              className={`${styles.content}${className ? ` ${className}` : ""}`}
               side={side}
               align={align}
               sideOffset={sideOffset}

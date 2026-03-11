@@ -65,10 +65,10 @@ export const ThemedTreeDisplay = React.forwardRef<React.ElementRef<typeof TreeDi
 export const treeDisplayComponentRenderer = createComponentRenderer(
   COMP,
   TreeDisplayMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
     return (
       <TreeDisplay
-        classes={classes}
+        className={className}
         content={extractValue.asOptionalString(node.props.content)}
         itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
         onContextMenu={lookupEventHandler("contextMenu")}

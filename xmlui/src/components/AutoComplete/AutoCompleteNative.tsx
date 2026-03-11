@@ -25,7 +25,6 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
@@ -44,7 +43,6 @@ type AutoCompleteProps = {
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
@@ -105,7 +103,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
     emptyListTemplate,
     style,
     className,
-    classes,
     children,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
@@ -505,7 +502,6 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 ref={forwardedRef}
                 style={style}
                 className={classnames(
-                  classes?.[COMPONENT_PART_KEY],
                   className,
                   styles.badgeListWrapper,
                   styles[validationStatus],

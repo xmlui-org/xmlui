@@ -3,7 +3,6 @@ import { forwardRef, useEffect, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./StickySection.module.scss";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // =====================================================================================================================
 // StickySection React component
@@ -18,7 +17,6 @@ type Props = {
   uid?: string;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
 };
 
 const DATA_ATTR_TOP = "data-sticky-section-top";
@@ -71,7 +69,7 @@ function recomputeZIndices(attr: string, scrollParent: HTMLElement) {
 }
 
 export const StickySection = forwardRef<HTMLDivElement, Props>(function StickySection(
-  { children, stickTo = defaultProps.stickTo, uid, style, className, classes },
+  { children, stickTo = defaultProps.stickTo, uid, style, className },
   ref,
 ) {
   const innerRef = useRef<HTMLDivElement>(null);
@@ -115,7 +113,6 @@ export const StickySection = forwardRef<HTMLDivElement, Props>(function StickySe
       className={classnames(
         styles.stickySection,
         stickTo === "top" ? styles.stickToTop : styles.stickToBottom,
-        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={style}

@@ -47,9 +47,9 @@ export const ToneSwitchMd = createMetadata({
 export const toneSwitchComponentRenderer = createComponentRenderer(
   COMP, 
   ToneSwitchMd, 
-  ({ node, extractValue, classes }) => {
+  ({ node, extractValue, className }) => {
     return <ToneSwitch
-      classes={classes}
+      className={className}
       iconLight={extractValue(node.props.iconLight)}
       iconDark={extractValue(node.props.iconDark)}
     />;

@@ -16,7 +16,6 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormContextPart } from "../Form/FormContext";
 import { ThemedIcon } from "../Icon/Icon";
 
@@ -71,7 +70,6 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -180,7 +178,6 @@ export const DatePicker = forwardRef(function DatePicker(
     disabledDates = defaultProps.disabledDates,
     style,
     className,
-    classes,
     registerComponentApi,
     inline = defaultProps.inline,
     startText,
@@ -460,7 +457,7 @@ export const DatePicker = forwardRef(function DatePicker(
       ref={ref}
       {...rest}
       style={style}
-      className={classnames(styles.inlinePickerMenu, classes?.[COMPONENT_PART_KEY], className)}
+      className={classnames(styles.inlinePickerMenu, className)}
       tabIndex={0}
     >
       <DayPicker
@@ -497,7 +494,6 @@ export const DatePicker = forwardRef(function DatePicker(
         style={style}
         aria-expanded={open}
         className={classnames(
-          classes?.[COMPONENT_PART_KEY],
           className,
           styles.datePicker,
           {

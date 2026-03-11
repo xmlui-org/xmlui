@@ -1195,11 +1195,11 @@ test.describe("maxLines", () => {
     expect(longHeight).toBeLessThan(shortHeight * 3);
   });
 
-  test("no maxLines – link can grow to full height", async ({ initTestBed, createLinkDriver }) => {
+  test("maxLines='0' – link can grow to full height", async ({ initTestBed, createLinkDriver }) => {
     await initTestBed(`
       <VStack>
         <Link testId="linkShort" to="/" width="200px">Short</Link>
-        <Link testId="linkLong" to="/" width="200px">${LONG_LABEL}</Link>
+        <Link testId="linkLong" to="/" width="200px" maxLines="0">${LONG_LABEL}</Link>
       </VStack>
     `);
     const shortDriver = await createLinkDriver("linkShort");

@@ -39,7 +39,7 @@ export const PageMd = createMetadata({
 export const pageRenderer = createComponentRenderer(
   PAGE,
   PageMd,
-  ({ node, extractValue, renderChild, classes }) => {
+  ({ node, extractValue, renderChild, className }) => {
     const paddings = extractPaddings(extractValue, node.props);
     return (
       <TableOfContentsProvider>
@@ -48,7 +48,7 @@ export const pageRenderer = createComponentRenderer(
           uid={node.uid}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
-          classes={classes}
+          className={className}
           {...paddings}
         />
       </TableOfContentsProvider>
