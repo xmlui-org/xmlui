@@ -504,6 +504,7 @@ export default function useRowSelection({
     if (event.key === "ArrowDown") {
       // --- Move/extend the selection to the item below the focused one
       event.preventDefault();
+      event.stopPropagation();
       let newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 1);
       if (focusedIndex !== visibleItems.length - 1) {
         toggleRowIndex(newFocusIndex, event);
@@ -512,12 +513,14 @@ export default function useRowSelection({
     if (event.key === "PageDown") {
       // --- Move/extend the selection to the item 8 items below the focused one
       event.preventDefault();
+      event.stopPropagation();
       const newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 8);
       toggleRowIndex(newFocusIndex, event);
     }
     if (event.key === "ArrowUp") {
       // --- Move/extend the selection to the item above the focused one
       event.preventDefault();
+      event.stopPropagation();
       let newFocusIndex = Math.max(0, focusedIndex - 1);
       if (focusedIndex >= 0) {
         toggleRowIndex(newFocusIndex, event);
@@ -526,6 +529,7 @@ export default function useRowSelection({
     if (event.key === "PageUp") {
       // --- Move/extend the selection to the item 8 items above the focused one
       event.preventDefault();
+      event.stopPropagation();
       const newFocusIndex = Math.max(0, focusedIndex - 8);
       toggleRowIndex(newFocusIndex, event);
     }

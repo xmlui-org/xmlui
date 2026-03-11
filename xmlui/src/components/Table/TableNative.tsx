@@ -406,44 +406,39 @@ function useTableKeyboardActions({
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
-          // Prevent default browser behavior immediately when key matches
-          event.preventDefault();
-
-          // If rowsSelectable is false, prevent default but don't execute any actions
-          if (!rowsSelectable) {
-            return true; // Event handled (prevented), but don't execute action
-          }
-
           // Call the appropriate handler
           let handled = false;
           switch (action) {
             case "selectAll":
-              // First, select all items via the API
-              selectionApi.selectAll();
+              // Only handle selectAll if rows are selectable
+              if (rowsSelectable) {
+                // First, select all items via the API
+                selectionApi.selectAll();
 
-              // Build the selectedRowIdMap for all items (since selectAll selects everything)
-              const allSelectedRowIdMap: Record<string, boolean> = {};
-              data.forEach((item: any) => {
-                allSelectedRowIdMap[String(item[idKey])] = true;
-              });
+                // Build the selectedRowIdMap for all items (since selectAll selects everything)
+                const allSelectedRowIdMap: Record<string, boolean> = {};
+                data.forEach((item: any) => {
+                  allSelectedRowIdMap[String(item[idKey])] = true;
+                });
 
-              // Build context with all items selected
-              const [row, allItems, allIds] = buildActionContext(
-                data, // All data items are selected
-                allSelectedRowIdMap,
-                focusedIndex,
-                data,
-                idKey,
-              );
+                // Build context with all items selected
+                const [row, allItems, allIds] = buildActionContext(
+                  data, // All data items are selected
+                  allSelectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
 
-              // Finally, invoke the event handler if provided
-              if (onSelectAllAction) {
-                onSelectAllAction(row, allItems, allIds);
+                // Finally, invoke the event handler if provided
+                if (onSelectAllAction) {
+                  onSelectAllAction(row, allItems, allIds);
+                }
+                handled = true;
               }
-              handled = true;
               break;
             case "cut":
-              if (onCutAction) {
+              if (rowsSelectable && onCutAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -456,7 +451,7 @@ function useTableKeyboardActions({
               }
               break;
             case "copy":
-              if (onCopyAction) {
+              if (rowsSelectable && onCopyAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -482,7 +477,7 @@ function useTableKeyboardActions({
               }
               break;
             case "delete":
-              if (onDeleteAction) {
+              if (rowsSelectable && onDeleteAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -497,6 +492,10 @@ function useTableKeyboardActions({
           }
 
           if (handled) {
+            // Prevent default browser behavior when key matches and action is handled.
+            // Also stop propagation so parent React onKeyDown handlers don't double-fire.
+            event.preventDefault();
+            event.stopPropagation();
             return true; // Signal that the event was handled
           }
         }

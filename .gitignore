@@ -44,12 +44,12 @@ xmlui-optimized-output
 
 # AI local config
 .claude
+.gemini
 .mcp.json
 .qwen
 CLAUDE.md
+GEMINI.md
 .github/copilot-instructions.md
 
-# External projects (not part of monorepo)
-myworkdriveclient
 
 docs/scripts/component-metadata.json
