@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo, useEffect } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
@@ -23,6 +24,7 @@ type RouteWrapperProps = {
   layoutContext?: LayoutContext;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   uid?: string;
 };
 
@@ -32,6 +34,7 @@ export function RouteWrapper({
   layoutContext,
   style,
   className,
+  classes,
   uid,
 }: RouteWrapperProps) {
   const params = useParams();
@@ -59,7 +62,7 @@ export function RouteWrapper({
   return (
     <div
       key={JSON.stringify(params)}
-      className={classnames(className, styles.pageWrapper, "xmlui-page-root")}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.pageWrapper, "xmlui-page-root")}
       style={style}
     >
       {renderChild(wrappedWithContainer, layoutContext)}

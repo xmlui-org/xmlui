@@ -154,10 +154,10 @@ export const ThemedCard = React.forwardRef<React.ElementRef<typeof Card>, Themed
 export const cardComponentRenderer = createComponentRenderer(
   "Card",
   CardMd,
-  ({ node, extractValue, renderChild, className, registerComponentApi, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, classes, registerComponentApi, lookupEventHandler }) => {
     return (
       <Card
-        className={className}
+        classes={classes}
         title={extractValue.asOptionalString(node.props.title)}
         linkTo={extractValue.asOptionalString(node.props.linkTo)}
         subtitle={extractValue.asOptionalString(node.props.subtitle)}

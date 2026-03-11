@@ -124,7 +124,7 @@ export const radioGroupRenderer = createComponentRenderer(
   ({
     node,
     extractValue,
-    className,
+    classes,
     state,
     updateState,
     lookupEventHandler,
@@ -135,7 +135,7 @@ export const radioGroupRenderer = createComponentRenderer(
       <ThemedRadioGroup
         autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        className={className}
+        classes={classes}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         updateState={updateState}

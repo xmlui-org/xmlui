@@ -1,6 +1,7 @@
 import { type CSSProperties } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./TimeInput.module.scss";
 import { PartialInput } from "../Input/PartialInput";
 import { InputDivider } from "../Input/InputDivider";
@@ -46,6 +47,7 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onDidChange?: (newValue: string | null) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -92,6 +94,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     updateState,
     style,
     className,
+    classes,
     onDidChange,
     onFocus,
     onBlur,
@@ -647,6 +650,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           [styles.disabled]: !enabled,
           [styles.readOnly]: readOnly,
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={{ ...style, gap }}

@@ -36,6 +36,7 @@ import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // --- Slot Components ---
 
@@ -78,6 +79,7 @@ type Props = {
   navPanelInDrawer?: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
@@ -188,6 +190,7 @@ export function App({
   renderChild,
   name,
   className,
+  classes,
   applyDefaultContentPadding,
   registerComponentApi,
   footerSticky = true,
@@ -448,6 +451,7 @@ export function App({
 
   const wrapperBaseClasses = [
     className,
+    classes?.[COMPONENT_PART_KEY],
     styles.appContainer,
     {
       [styles.scrollWholePage]: scrollWholePage,

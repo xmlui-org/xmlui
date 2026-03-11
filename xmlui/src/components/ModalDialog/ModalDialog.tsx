@@ -122,7 +122,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
     node,
     contextVars,
     extractValue,
-    className,
+    classes,
     renderChild,
     lookupEventHandler,
     registerComponentApi,
@@ -157,7 +157,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
 
     return (
       <ModalDialog
-        className={className}
+        classes={classes}
         fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
         title={extractValue(node.props?.title)}
         titleTemplate={renderChild(node.props?.titleTemplate)}

@@ -32,11 +32,29 @@ function resolveValue(raw: unknown): string | undefined {
   return str.replace(themeVarCapturesRegex, (match) => toCssVar(match.trim()));
 }
 
+/**
+ * Maps XMLUI state names (used after `--` in layout property keys) to CSS pseudo-class selectors.
+ * Only these states are supported; any other state name is silently ignored.
+ */
+const STATE_TO_PSEUDO: Record<string, string> = {
+  hover: "&:hover",
+  focus: "&:focus",
+  active: "&:active",
+  focusVisible: "&:focus-visible",
+  focusWithin: "&:focus-within",
+  disabled: "&:disabled",
+};
+
 type PartStyles = {
   // base (xs / no media query) CSS props
   base: Record<string, string>;
   // per-breakpoint CSS props
   breakpoints: Partial<Record<MediaBreakpointType, Record<string, string>>>;
+  // per-state CSS props (each state has its own base + breakpoints)
+  states: Record<string, {
+    base: Record<string, string>;
+    breakpoints: Partial<Record<MediaBreakpointType, Record<string, string>>>;
+  }>;
 };
 
 /**
@@ -50,9 +68,8 @@ type PartStyles = {
  *   `fontSize-sm`      → font-size at ≥576 px on the component root
  *   `fontSize-label`   → base font-size on the "label" part
  *   `fontSize-label-md`→ font-size at ≥768 px on the "label" part
- *
- * State suffixes (`--hover` etc.) are recognised by the parser but ignored here
- * — they are reserved for a future phase.
+ *   `backgroundColor--hover` → background-color on hover on the component root
+ *   `color-label--focus`     → color on focus on the "label" part
  *
  * Returns a map of part key → `StyleObjectType` compatible with `useStyles`.
  * The component-root part is keyed as `"-component"`.
@@ -66,7 +83,7 @@ export function buildResponsiveStyleObjects(
 
   function getOrCreatePart(part: string): PartStyles {
     if (!partStyles[part]) {
-      partStyles[part] = { base: {}, breakpoints: {} };
+      partStyles[part] = { base: {}, breakpoints: {}, states: {} };
     }
     return partStyles[part];
   }
@@ -99,20 +116,45 @@ export function buildResponsiveStyleObjects(
     const partKey = parsed.part ?? COMPONENT_PART_KEY;
     const entry = getOrCreatePart(partKey);
 
+    // Determine the pseudo-class selector for state suffixes (e.g. --hover → &:hover).
+    // If multiple states are present (e.g. --hover--focus), combine them into a compound
+    // selector (e.g. &:hover:focus). Unrecognised state names cause the entry to be skipped.
+    let pseudoSelector: string | undefined;
+    if (parsed.states && parsed.states.length > 0) {
+      const pseudoParts: string[] = [];
+      for (const state of parsed.states) {
+        const pseudo = STATE_TO_PSEUDO[state];
+        if (!pseudo) {
+          pseudoSelector = undefined;
+          pseudoParts.length = 0;
+          break; // unknown state, skip entire entry
+        }
+        // Extract the ":pseudo" part (skip the "&" prefix)
+        pseudoParts.push(pseudo.slice(1));
+      }
+      if (pseudoParts.length === 0) continue;
+      pseudoSelector = `&${pseudoParts.join("")}`;
+    }
+
+    // Pick the target bucket: either a state-scoped sub-bucket or the top-level one
+    const target = pseudoSelector
+      ? (entry.states[pseudoSelector] ??= { base: {}, breakpoints: {} })
+      : entry;
+
     for (const cssPropName of cssProps) {
       if (!parsed.screenSizes || parsed.screenSizes.length === 0) {
         // Base rule (applies at all widths, or acts as xs)
-        entry.base[cssPropName] = value;
+        target.base[cssPropName] = value;
       } else {
         for (const size of parsed.screenSizes) {
           if (size === "xs") {
             // xs is the base — no media query
-            entry.base[cssPropName] = value;
+            target.base[cssPropName] = value;
           } else {
-            if (!entry.breakpoints[size]) {
-              entry.breakpoints[size] = {};
+            if (!target.breakpoints[size]) {
+              target.breakpoints[size] = {};
             }
-            entry.breakpoints[size]![cssPropName] = value;
+            target.breakpoints[size]![cssPropName] = value;
           }
         }
       }
@@ -125,18 +167,50 @@ export function buildResponsiveStyleObjects(
   for (const [partKey, styles] of Object.entries(partStyles)) {
     const styleObj: StyleObjectType = {};
 
-    // Base CSS props go directly on the selector ("&" = current element)
+    // --- Emission order matters for CSS cascade: pseudo selectors BEFORE @media so that
+    // --- media-scoped overrides (e.g. @media sm { :hover }) come later in source order
+    // --- and beat base pseudo rules (e.g. :hover) at matching viewports.
+
+    // 1. Base CSS props go directly on the selector ("&" = current element)
     if (Object.keys(styles.base).length > 0) {
       styleObj["&"] = styles.base as StyleObjectType;
     }
 
-    // Breakpoint-specific props become @media rules
+    // 2. State-specific base props become pseudo-class selectors (e.g. "&:hover")
+    //    Emitted before @media so that breakpoint-scoped overrides win in the cascade.
+    for (const [pseudoSel, stateStyles] of Object.entries(styles.states)) {
+      if (Object.keys(stateStyles.base).length > 0) {
+        styleObj[pseudoSel] = {
+          ...((styleObj[pseudoSel] as StyleObjectType) ?? {}),
+          ...stateStyles.base,
+        } as StyleObjectType;
+      }
+    }
+
+    // 3. Breakpoint-specific props become @media rules
     for (const [size, bpProps] of Object.entries(styles.breakpoints) as [MediaBreakpointType, Record<string, string>][]) {
       const minWidth = BREAKPOINT_MIN_WIDTH[size];
       if (minWidth === undefined || Object.keys(bpProps).length === 0) continue;
       styleObj[`@media (min-width: ${minWidth}px)`] = {
         "&": bpProps as StyleObjectType,
       } as StyleObjectType;
+    }
+
+    // 4. State props within breakpoints — merge into the @media entries created above
+    for (const [pseudoSel, stateStyles] of Object.entries(styles.states)) {
+      for (const [size, bpProps] of Object.entries(stateStyles.breakpoints) as [MediaBreakpointType, Record<string, string>][]) {
+        const minWidth = BREAKPOINT_MIN_WIDTH[size];
+        if (minWidth === undefined || Object.keys(bpProps).length === 0) continue;
+        const mediaKey = `@media (min-width: ${minWidth}px)`;
+        if (!styleObj[mediaKey]) {
+          styleObj[mediaKey] = {} as StyleObjectType;
+        }
+        const mediaObj = styleObj[mediaKey] as StyleObjectType;
+        mediaObj[pseudoSel] = {
+          ...((mediaObj[pseudoSel] as StyleObjectType) ?? {}),
+          ...bpProps,
+        } as StyleObjectType;
+      }
     }
 
     if (Object.keys(styleObj).length > 0) {
@@ -160,6 +234,15 @@ export function buildCompositeStyleObject(
 ): StyleObjectType {
   const composite: StyleObjectType = {};
 
+  function mergeInto(target: StyleObjectType, key: string, styles: object) {
+    const existing = target[key] as StyleObjectType | undefined;
+    if (existing) {
+      Object.assign(existing, styles);
+    } else {
+      target[key] = { ...styles } as StyleObjectType;
+    }
+  }
+
   for (const [partKey, styleObj] of Object.entries(styleObjects)) {
     if (partKey === COMPONENT_PART_KEY) {
       // Merge root styles directly into composite
@@ -168,17 +251,19 @@ export function buildCompositeStyleObject(
           // Direct CSS props on the root element
           Object.assign(composite, value);
         } else if (selector.startsWith("@media")) {
-          // Media query — merge inner "&" content
-          const existing = composite[selector] as StyleObjectType | undefined;
-          if (existing) {
-            const inner = (existing["&"] ?? {}) as StyleObjectType;
-            Object.assign(inner, (value as StyleObjectType)["&"]);
-            (existing as StyleObjectType)["&"] = inner;
-          } else {
-            composite[selector] = value as StyleObjectType;
+          // Media query — merge all inner selectors ("&", "&:hover", etc.)
+          if (!composite[selector]) {
+            composite[selector] = {} as StyleObjectType;
+          }
+          const mediaObj = composite[selector] as StyleObjectType;
+          for (const [innerSel, innerVal] of Object.entries(
+            value as StyleObjectType,
+          )) {
+            mergeInto(mediaObj, innerSel, innerVal as object);
           }
         } else {
-          composite[selector] = value as StyleObjectType;
+          // Pseudo-class selectors like "&:hover" or other nested selectors
+          mergeInto(composite, selector, value as object);
         }
       }
     } else {
@@ -190,33 +275,234 @@ export function buildCompositeStyleObject(
       const selfSel = `&[data-part-id="${partKey}"]`;
       const descSel = `& [data-part-id="${partKey}"]`;
 
-      function mergePartStyles(target: StyleObjectType, sel: string, styles: object) {
-        const existing = target[sel] as StyleObjectType | undefined;
-        if (existing) {
-          Object.assign(existing, styles);
-        } else {
-          target[sel] = { ...styles } as StyleObjectType;
-        }
-      }
-
       for (const [selector, value] of Object.entries(styleObj)) {
         if (selector === "&") {
-          mergePartStyles(composite, selfSel, value as object);
-          mergePartStyles(composite, descSel, value as object);
+          // Base CSS props for this part
+          mergeInto(composite, selfSel, value as object);
+          mergeInto(composite, descSel, value as object);
         } else if (selector.startsWith("@media")) {
-          const innerPartStyles = (value as StyleObjectType)["&"] as StyleObjectType | undefined;
-          if (innerPartStyles) {
-            if (!composite[selector]) {
-              composite[selector] = {} as StyleObjectType;
-            }
-            const mediaObj = composite[selector] as StyleObjectType;
-            mergePartStyles(mediaObj, selfSel, innerPartStyles);
-            mergePartStyles(mediaObj, descSel, innerPartStyles);
+          // Breakpoint rules for this part
+          if (!composite[selector]) {
+            composite[selector] = {} as StyleObjectType;
           }
+          const mediaObj = composite[selector] as StyleObjectType;
+          for (const [innerSel, innerVal] of Object.entries(
+            value as StyleObjectType,
+          )) {
+            if (innerSel === "&") {
+              mergeInto(mediaObj, selfSel, innerVal as object);
+              mergeInto(mediaObj, descSel, innerVal as object);
+            } else {
+              // Pseudo selector inside media for named part — nest under part selectors
+              if (!mediaObj[selfSel]) mediaObj[selfSel] = {} as StyleObjectType;
+              if (!mediaObj[descSel]) mediaObj[descSel] = {} as StyleObjectType;
+              mergeInto(
+                mediaObj[selfSel] as StyleObjectType,
+                innerSel,
+                innerVal as object,
+              );
+              mergeInto(
+                mediaObj[descSel] as StyleObjectType,
+                innerSel,
+                innerVal as object,
+              );
+            }
+          }
+        } else {
+          // Pseudo-class selector for named part (e.g. "&:hover") — nest under part selectors
+          if (!composite[selfSel]) composite[selfSel] = {} as StyleObjectType;
+          if (!composite[descSel]) composite[descSel] = {} as StyleObjectType;
+          mergeInto(
+            composite[selfSel] as StyleObjectType,
+            selector,
+            value as object,
+          );
+          mergeInto(
+            composite[descSel] as StyleObjectType,
+            selector,
+            value as object,
+          );
         }
       }
     }
   }
 
   return composite;
+}
+
+// ---------------------------------------------------------------------------
+// Responsive "when" → CSS display rules
+// ---------------------------------------------------------------------------
+
+/** Breakpoint names in ascending order (matches MediaBreakpointKeys). */
+const BREAKPOINT_ORDER: readonly MediaBreakpointType[] = [
+  "xs", "sm", "md", "lg", "xl", "xxl",
+];
+
+/**
+ * Resolves a raw `when` / `when-*` value to a boolean.
+ * Returns `undefined` when the value is missing or is a dynamic expression that
+ * cannot be evaluated at CSS-generation time.
+ */
+function resolveStaticWhen(value: string | boolean | undefined): boolean | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value === "boolean") return value;
+  const trimmed = value.trim();
+  if (trimmed === "false") return false;
+  if (trimmed === "true") return true;
+  // Dynamic expression (e.g. "{someVar}") — cannot resolve statically
+  return undefined;
+}
+
+/**
+ * Builds a `StyleObjectType` containing `display` rules derived from the base
+ * `when` attribute and its responsive variants (`when-sm`, `when-md`, …).
+ *
+ * Rules:
+ * - A falsy value produces `display: none`.
+ * - A truthy value produces `display: revert` (undoes a lower-breakpoint `none`).
+ * - An absent or dynamic (expression) value produces nothing.
+ *
+ * The resulting object can be merged into the composite style object or passed
+ * directly to `useStyles`.  For the typical pattern
+ *
+ *   `<Text when="false" when-md="true" />`
+ *
+ * the output is:
+ *
+ * ```
+ * { display: "none", "@media (min-width: 768px)": { "&": { display: "revert" } } }
+ * ```
+ *
+ * This is a pure function and safe to unit-test directly.
+ */
+/**
+ * Determines whether a component is visible at ANY breakpoint based on static
+ * analysis of `when` and responsive `when-*` attributes.
+ *
+ * Returns:
+ * - `true`  — the component is visible at at least one breakpoint → render with CSS
+ * - `false` — the component is provably hidden at ALL breakpoints → skip rendering
+ * - `undefined` — cannot determine statically (dynamic expressions) → use runtime check
+ *
+ * This drives the SSR decision: when `true`, ComponentAdapter renders the component
+ * and relies on CSS `display` rules to control per-breakpoint visibility.
+ */
+export function isVisibleAtAnyBreakpoint(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+): boolean | undefined {
+  const hasResponsiveRules = !!responsiveWhen && Object.keys(responsiveWhen).length > 0;
+  const baseWhen = resolveStaticWhen(responsiveWhen?.xs) ?? resolveStaticWhen(when);
+
+  if (!hasResponsiveRules) {
+    // No responsive rules — purely based on base `when`
+    return baseWhen; // undefined if dynamic, true/false if static
+  }
+
+  // Walk all breakpoints: if ANY resolves to true, the component is visible somewhere
+  let anyTrue = baseWhen === true;
+  let anyStatic = baseWhen !== undefined;
+
+  for (const bp of BREAKPOINT_ORDER) {
+    if (bp === "xs") continue;
+    const value = resolveStaticWhen(responsiveWhen![bp]);
+    if (value === undefined) continue;
+    anyStatic = true;
+    if (value === true) {
+      anyTrue = true;
+    }
+  }
+
+  if (!anyStatic && baseWhen === undefined) {
+    // All values are dynamic → can't determine
+    return undefined;
+  }
+
+  // If base is undefined (no explicit base `when`) and responsive rules exist,
+  // the component is visible at breakpoints without rules (mobile-first default).
+  // But buildWhenStyleObject infers base=hidden when the lowest rule is truthy,
+  // so we only need to check anyTrue here.
+  if (anyTrue) return true;
+
+  // If we got here with a defined base that is false and no responsive rule is true,
+  // the component is hidden everywhere.
+  if (baseWhen === false) return false;
+
+  // Base is undefined + all responsive rules are false:
+  // The default `when` is true (component visible), but responsive overrides hide it
+  // at their breakpoints. The component is still visible at non-covered breakpoints.
+  return true;
+}
+
+export function buildWhenStyleObject(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+): StyleObjectType {
+  const style: StyleObjectType = {};
+
+  const hasResponsiveRules = !!responsiveWhen && Object.keys(responsiveWhen).length > 0;
+
+  // --- Determine the base (xs) display state ---
+  // Priority:
+  //  1. Explicit `when-xs` attribute
+  //  2. Explicit base `when` attribute (static value only)
+  //  3. No explicit base, but responsive rules are defined →
+  //     infer from the *lowest* statically-resolved responsive rule:
+  //       • If that rule is truthy  ("show from bp up") → base must be hidden (display: none)
+  //       • If that rule is falsy   ("hide from bp up") → base is visible; no CSS needed
+  //     This matches the spec: responsive rules are the exclusive source of truth for
+  //     visibility, so breakpoints below the lowest rule follow the same "hide when
+  //     no rule matches" default.
+  let baseDisplay: boolean | undefined;
+
+  if (responsiveWhen?.xs !== undefined) {
+    baseDisplay = resolveStaticWhen(responsiveWhen.xs);
+  } else {
+    const staticWhen = resolveStaticWhen(when);
+    if (staticWhen !== undefined) {
+      baseDisplay = staticWhen;
+    } else if (hasResponsiveRules) {
+      // Find the lowest bp with a statically-known value
+      for (const bp of BREAKPOINT_ORDER) {
+        if (bp === "xs") continue;
+        const value = resolveStaticWhen(responsiveWhen![bp]);
+        if (value === undefined) continue; // missing or dynamic — keep searching
+        // If the lowest rule is truthy, hide below it; if falsy, visible below (no CSS needed)
+        if (value === true) baseDisplay = false;
+        break;
+      }
+    }
+  }
+
+  if (baseDisplay === false) {
+    style.display = "none";
+  } else if (baseDisplay === true) {
+    style.display = "revert";
+  }
+
+  if (!hasResponsiveRules) return style;
+
+  // --- Walk breakpoints sm..xxl, emitting @media rules when visibility changes ---
+  let prevKnown: boolean | undefined = baseDisplay;
+
+  for (const bp of BREAKPOINT_ORDER) {
+    if (bp === "xs") continue; // handled as base above
+
+    const value = resolveStaticWhen(responsiveWhen![bp]);
+    if (value === undefined) continue; // not set or dynamic — skip
+
+    if (value !== prevKnown) {
+      const minWidth = BREAKPOINT_MIN_WIDTH[bp];
+      if (minWidth !== undefined) {
+        const mediaKey = `@media (min-width: ${minWidth}px)`;
+        style[mediaKey] = {
+          "&": { display: value ? "revert" : "none" },
+        } as StyleObjectType;
+      }
+    }
+    prevKnown = value;
+  }
+
+  return style;
 }

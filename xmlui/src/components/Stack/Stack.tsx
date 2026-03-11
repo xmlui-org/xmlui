@@ -15,6 +15,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayout";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Stack";
 
@@ -220,7 +221,7 @@ type CHStackComponentDef = ComponentDef<typeof CHStackMd>;
 type RenderStackPars = {
   node: any;
   extractValue: ValueExtractor;
-  className?: string;
+  classes?: Record<string, string>;
   lookupEventHandler: (
     eventName: keyof NonNullable<StackComponentDef["events"]>,
   ) => AsyncFunction | undefined;
@@ -238,7 +239,7 @@ type RenderStackPars = {
 function renderDockLayout({
   node,
   extractValue,
-  className,
+  classes,
   lookupEventHandler,
   renderChild,
   scrollStyle,
@@ -303,7 +304,7 @@ function renderDockLayout({
       orientation="vertical"
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
-      className={className}
+      classes={classes}
       onClick={lookupEventHandler("click")}
       onContextMenu={lookupEventHandler("contextMenu")}
       onMount={lookupEventHandler("mounted")}
@@ -355,7 +356,7 @@ function renderDockLayout({
 function renderStack({
   node,
   extractValue,
-  className,
+  classes,
   orientation,
   horizontalAlignment,
   verticalAlignment,
@@ -376,7 +377,7 @@ function renderStack({
     (child) => child != null
   );
   if (allChildren.some((child) => (child.props as any)?.dock != null)) {
-    return renderDockLayout({ node, extractValue, className, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi });
+    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi });
   }
 
   // Use FlowLayout when orientation is horizontal and wrapContent is true
@@ -388,7 +389,7 @@ function renderStack({
 
     return (
       <FlowLayout
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         columnGap={columnGap}
         rowGap={rowGap}
         itemWidth={itemWidth}
@@ -442,7 +443,7 @@ function renderStack({
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
-      className={className}
+      classes={classes}
       onClick={lookupEventHandler("click")}
       onContextMenu={lookupEventHandler("contextMenu")}
       onMount={lookupEventHandler("mounted")}
@@ -461,7 +462,7 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
@@ -475,7 +476,7 @@ export const stackComponentRenderer = createComponentRenderer(
     return renderStack({
       node,
       extractValue,
-      className,
+      classes,
       orientation,
       horizontalAlignment,
       verticalAlignment,
@@ -493,7 +494,7 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
@@ -501,7 +502,7 @@ export const vStackComponentRenderer = createComponentRenderer(
     return renderStack({
       node,
       extractValue,
-      className,
+      classes,
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
@@ -517,7 +518,7 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
@@ -526,7 +527,7 @@ export const hStackComponentRenderer = createComponentRenderer(
     return renderStack({
       node,
       extractValue,
-      className,
+      classes,
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",
@@ -543,13 +544,13 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
       node,
       extractValue,
-      className,
+      classes,
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
@@ -565,14 +566,14 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
     return renderStack({
       node,
       extractValue,
-      className,
+      classes,
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",

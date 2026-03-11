@@ -12,6 +12,7 @@ import React, {
 } from "react";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./RadioGroup.module.scss";
 
@@ -31,6 +32,7 @@ type RadioGroupProps = {
   enabled?: boolean;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   validationStatus?: ValidationStatus;
   label?: string;
   labelPosition?: string;
@@ -90,6 +92,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
     registerComponentApi,
     style,
     className,
+    classes,
     ...rest
   }: RadioGroupProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -198,7 +201,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
           disabled={!enabled}
           required={required}
           aria-readonly={readOnly}
-          className={classnames(className, styles.radioGroupContainer, {
+          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
             [styles.focused]: focused,
             [styles.disabled]: !enabled,
           })}

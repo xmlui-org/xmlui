@@ -1,6 +1,7 @@
 import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { ThemedScroller as Scroller } from "../ScrollViewer/ScrollViewer";
@@ -413,6 +414,7 @@ interface TreeComponentProps {
   lookupEventHandler?: any;
   itemRenderer: (item: any) => ReactNode;
   className?: string;
+  classes?: Record<string, string>;
 }
 
 export const TreeComponent = memo((props: TreeComponentProps) => {
@@ -460,6 +462,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     lookupEventHandler,
     itemRenderer,
     className,
+    classes,
     overflow,
   } = props;
   // Internal selection state for uncontrolled usage
@@ -2534,7 +2537,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   return (
     <Scroller
       ref={treeContainerRef}
-      className={classnames(styles.wrapper, className)}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className)}
       role="tree"
       aria-label="Tree navigation"
       aria-multiselectable="false"
