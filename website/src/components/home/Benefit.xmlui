@@ -1,9 +1,5 @@
 <Component name="Benefit">
-  <HStack
-    gap="$space-3"
-    width-md="100%"
-    width="50%"
-  >
+  <HStack gap="$space-3">
     <Icon name="valid" marginTop="6px" height="24px" width="24px" />
     <VStack width="*">
       <Text fontSize="$fontSize-lg">
