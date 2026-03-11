@@ -58,6 +58,56 @@ function HoverCapture({ children, componentType, componentLabel, ariaName, owner
 }
 
 /**
+ * Generic hover capture for canvas-rendered components.
+ * Wraps children in a display:contents div that captures mousemove
+ * on canvas elements and emits throttled native:hover trace events.
+ */
+function HoverCapture({ children, componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession }: {
+  children: React.ReactNode;
+  componentType: string;
+  componentLabel?: string;
+  ariaName?: string;
+  ownerFileId?: string;
+  ownerSource?: any;
+  hoverSession: { traceId: string | undefined; lastTs: number };
+}) {
+  const THROTTLE_MS = 300;
+  const SESSION_GAP_MS = 500;
+
+  const handleMouseMove = React.useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName !== 'CANVAS') return;
+    const now = Date.now();
+    if (now - hoverSession.lastTs < THROTTLE_MS) return;
+
+    // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
+    if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
+      hoverSession.traceId = pushTrace();
+      popTrace();
+    }
+    hoverSession.lastTs = now;
+
+    pushXsLog(createLogEntry('native:hover', {
+      traceId: hoverSession.traceId,
+      componentType,
+      componentLabel: componentLabel || componentType,
+      eventName: 'hover',
+      ariaName: ariaName || undefined,
+      offsetX: e.nativeEvent.offsetX,
+      offsetY: e.nativeEvent.offsetY,
+      ownerFileId,
+      ownerSource,
+    }));
+  }, [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession]);
+
+  return (
+    <div style={{ display: 'contents' }} onMouseMoveCapture={handleMouseMove}>
+      {children}
+    </div>
+  );
+}
+
+/**
  * Configuration for wrapComponent. Only specify what can't be inferred
  * from conventions.
  */
