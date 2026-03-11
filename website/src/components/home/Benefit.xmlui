@@ -3,7 +3,6 @@
     <Icon name="valid" marginTop="6px" height="24px" width="24px" />
     <VStack width="*">
       <Text fontSize="$fontSize-lg">
-        {$props.children}
         <Text variant="strong" fontSize="$fontSize-lg">
           {$props.title}
         </Text>

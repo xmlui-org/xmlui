@@ -2,7 +2,8 @@
   <Link
       active="true"
       to="{$props.to}"
-      width="{$props.width}"
+      width="100%"
+      width-md="50%"
       height="$space-18"
       tooltip="{$props.label}"
   >

@@ -5,16 +5,16 @@
         columnGap="$space-8"
         rowGap="$space-8"
     >
-        <Benefit  width="50%"width-md="100%" title="Simple.">
+        <Benefit  width="50%" width-md="100%" title="Simple.">
             No CSS or React expertise required.
         </Benefit>
-        <Benefit width="50%"width-md="100%" title="Semantic.">
+        <Benefit width="50%" width-md="100%" title="Semantic.">
             Humans and AIs can reason together.
         </Benefit>
-        <Benefit width="50%"width-md="100%" title="Connected.">
+        <Benefit width="50%" width-md="100%" title="Connected.">
             Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="50%"width-md="100%" title="Deployable.">
+        <Benefit width="50%" width-md="100%" title="Deployable.">
             Drop files onto a static webserver.
         </Benefit>
     </FlowLayout>

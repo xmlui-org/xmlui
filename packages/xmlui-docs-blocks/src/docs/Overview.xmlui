@@ -19,7 +19,6 @@
                     to="{$item.to}"
                     label="{$item.label}"
                     icon="{getCardIcon($item, appGlobals.navSections)}"
-                    width="{getCardWidth(mediaSize)}"
                 />
             </Items>
         </FlowLayout>
