@@ -519,7 +519,7 @@ const TableWithColumns = memo(
         lookupEventHandler,
         lookupAction,
         lookupSyncCallback,
-        className,
+        classes,
         registerComponentApi,
       }: Pick<
         RendererContext,
@@ -528,7 +528,7 @@ const TableWithColumns = memo(
         | "renderChild"
         | "lookupEventHandler"
         | "lookupAction"
-        | "className"
+        | "classes"
         | "registerComponentApi"
         | "lookupSyncCallback"
       >,
@@ -665,7 +665,7 @@ const TableWithColumns = memo(
             {renderChild(node.children)}
           </TableContext.Provider>
           <Table
-            className={className}
+            classes={classes}
             ref={ref}
             data={data}
             columns={columns}
@@ -765,7 +765,7 @@ export const tableComponentRenderer = createComponentRenderer(
     lookupEventHandler,
     lookupAction,
     lookupSyncCallback,
-    className,
+    classes,
     registerComponentApi,
   }) => {
     return (
@@ -775,7 +775,7 @@ export const tableComponentRenderer = createComponentRenderer(
         lookupEventHandler={lookupEventHandler as any}
         lookupAction={lookupAction}
         lookupSyncCallback={lookupSyncCallback}
-        className={className}
+        classes={classes}
         renderChild={renderChild}
         registerComponentApi={registerComponentApi}
       />

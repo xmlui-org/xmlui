@@ -11,6 +11,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
 
 import styles from "./DropdownMenu.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -44,6 +45,7 @@ type DropdownMenuProps = {
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
@@ -78,6 +80,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     registerComponentApi,
     style,
     className,
+    classes,
     onWillOpen,
     alignment = defaultDropdownMenuProps.alignment,
     disabled = false,
@@ -169,7 +172,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             ref={contentRef}
             align={alignment}
             style={style}
-            className={classnames(styles.DropdownMenuContent, className, {
+            className={classnames(styles.DropdownMenuContent, classes?.[COMPONENT_PART_KEY], className, {
               [styles.compact]: compact,
             })}
             tabIndex={-1}
@@ -191,6 +194,7 @@ type MenuItemProps = {
   label?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   to?: string;
   active?: boolean;
   enabled?: boolean;
@@ -214,6 +218,7 @@ export const MenuItem = forwardRef(function MenuItem(
     active = defaultMenuItemProps.active,
     enabled = true,
     compact = false,
+    classes,
   }: MenuItemProps,
   ref,
 ) {
@@ -233,7 +238,7 @@ export const MenuItem = forwardRef(function MenuItem(
   return (
     <DropdownMenuPrimitive.Item
       style={style}
-      className={classnames(className, styles.DropdownMenuItem, {
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.DropdownMenuItem, {
         [styles.active]: active,
         [styles.disabled]: !enabled,
         [styles.compact]: compact,
