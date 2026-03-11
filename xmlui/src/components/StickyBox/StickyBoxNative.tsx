@@ -4,6 +4,7 @@ import classnames from "classnames";
 import { RenderPropSticky } from "react-sticky-el";
 import styles from "./StickyBox.module.scss";
 import { useRealBackground, useScrollParent } from "../../components-core/utils/hooks";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // --- NOTE: React.StrictMode produces error logs using this component. Deployed apps are okay.
 // See here: https://github.com/gm0t/react-sticky-el/issues/82
@@ -20,10 +21,11 @@ type Props = {
   uid?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   to: "top" | "bottom";
 };
 
-export function StickyBox({ children, uid, style, to = defaultProps.to, className }: Props) {
+export function StickyBox({ children, uid, style, to = defaultProps.to, className, classes }: Props) {
   const sentinelRef = useRef(null);
   const [wrapper, setWrapper] = useState(null);
   const [stuck, setStuck] = useState(false);
@@ -38,7 +40,7 @@ export function StickyBox({ children, uid, style, to = defaultProps.to, classNam
       // scrollParent.setAttribute("data-xmlui-scroll-padding", true);
     }
   }, [scrollParent, wrapper]);
-  const wrapperClassName = classnames(styles.wrapper, className);
+  const wrapperClassName = classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className);
   const stickyStyles = {
     backgroundColor: realBackground,
     ...style,

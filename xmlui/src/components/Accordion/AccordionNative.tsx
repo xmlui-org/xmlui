@@ -7,9 +7,11 @@ import styles from "./Accordion.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { AccordionContext } from "../../components/Accordion/AccordionContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   className?: string;
+  classes?: Record<string, string>;
   style?: React.CSSProperties;
   children?: React.ReactNode;
   triggerPosition?: "start" | "end";
@@ -34,6 +36,7 @@ export const defaultProps: Pick<
 export const AccordionComponent = forwardRef(function AccordionComponent(
   {
     className,
+    classes,
     style,
     children,
     hideIcon = defaultProps.hideIcon,
@@ -163,7 +166,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
         ref={forwardedRef}
         value={expandedItems}
         type="multiple"
-        className={classnames(styles.root, className)}
+        className={classnames(styles.root, classes?.[COMPONENT_PART_KEY], className)}
         onValueChange={(value) => {
           setExpandedItems(value);
           if (typeof window !== "undefined") {

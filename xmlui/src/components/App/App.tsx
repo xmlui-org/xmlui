@@ -180,7 +180,7 @@ export const AppMd = createMetadata({
 });
 
 
-function AppNode({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) {
+function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
@@ -231,7 +231,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     <AppComponent
       scrollWholePage={scrollWholePage}
       noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
-      className={className}
+      classes={classes}
       layout={extractValue(node.props.layout)}
       loggedInUser={extractValue(node.props.loggedInUser)}
       onReady={lookupEventHandler("ready")}
@@ -266,13 +266,13 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     return (
       <AppNode
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        className={className}
+        classes={classes}
         lookupEventHandler={lookupEventHandler}
         registerComponentApi={registerComponentApi}
       />

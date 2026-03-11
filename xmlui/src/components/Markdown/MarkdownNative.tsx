@@ -34,6 +34,7 @@ import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/Expand
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { BreakMode, OverflowMode } from "../abstractions";
 
 // Default props for the Markdown component
@@ -50,6 +51,7 @@ type MarkdownProps = {
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
@@ -103,6 +105,7 @@ export const Markdown = memo(
       children,
       style,
       className,
+      classes,
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
@@ -242,6 +245,7 @@ export const Markdown = memo(
           { [styles.truncateLinks]: truncateLinks },
           overflowClasses,
           breakClasses,
+          classes?.[COMPONENT_PART_KEY],
           className,
         )}
         style={style}

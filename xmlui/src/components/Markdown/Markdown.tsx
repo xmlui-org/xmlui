@@ -237,7 +237,7 @@ export const ThemedMarkdown = React.forwardRef<React.ElementRef<typeof Markdown>
 export const markdownComponentRenderer = createComponentRenderer(
   COMP,
   MarkdownMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, classes }) => {
     let renderedChildren = "";
 
     // 1. Static content prop fallback
@@ -262,7 +262,7 @@ export const markdownComponentRenderer = createComponentRenderer(
 
     return (
       <TransformedMarkdown
-        className={className}
+        classes={classes}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
         removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
         codeHighlighter={extractValue(node.props.codeHighlighter)}
@@ -285,6 +285,7 @@ type TransformedMarkdownProps = {
   removeIndents?: boolean;
   removeBr?: boolean;
   className?: string;
+  classes?: Record<string, string>;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
@@ -302,6 +303,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       removeIndents,
       removeBr,
       className,
+      classes,
       extractValue,
       codeHighlighter,
       showHeadingAnchors,
@@ -352,6 +354,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         removeBr={removeBr}
         codeHighlighter={codeHighlighter}
         className={className}
+        classes={classes}
         showHeadingAnchors={showHeadingAnchors}
         grayscale={grayscale}
         truncateLinks={truncateLinks}

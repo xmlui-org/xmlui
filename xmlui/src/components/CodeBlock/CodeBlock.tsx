@@ -63,9 +63,9 @@ export const ThemedCodeBlock = React.forwardRef<HTMLDivElement, ThemedCodeBlockP
 export const codeBlockComponentRenderer = createComponentRenderer(
   "CodeBlock",
   CodeBlockMd,
-  ({ node, renderChild, className }) => {
+  ({ node, renderChild, classes }) => {
     return (
-      <CodeBlock className={className}>
+      <CodeBlock classes={classes}>
         {renderChild(node.children)}
       </CodeBlock>
     );

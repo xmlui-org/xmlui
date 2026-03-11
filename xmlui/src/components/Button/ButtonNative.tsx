@@ -1,5 +1,6 @@
 import React, { type CSSProperties, useRef, useEffect } from "react";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Button.module.scss";
 
@@ -34,6 +35,7 @@ type Props = {
   gap?: string | number;
   autoFocus?: boolean;
   contextualLabel?: string;
+  classes?: Record<string, string>;
 } & Pick<
   React.HTMLAttributes<HTMLButtonElement>,
   | "onClick"
@@ -89,6 +91,7 @@ export const Button = React.forwardRef(function Button(
     onBlur,
     style,
     gap,
+    classes,
     className,
     autoFocus = defaultProps.autoFocus,
     contextualLabel,
@@ -141,6 +144,7 @@ export const Button = React.forwardRef(function Button(
           [styles.alignStart]: contentPosition === "start",
           [styles.alignEnd]: contentPosition === "end",
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       autoFocus={autoFocus}

@@ -167,6 +167,9 @@ export const LinkMd = createMetadata({
   },
 });
 
+/**
+ * This function defines the renderer for the Link component.
+ */
 type ThemedLinkNativeProps = React.ComponentProps<typeof LinkNative> & { className?: string };
 export const ThemedLinkNative = React.forwardRef<HTMLDivElement, ThemedLinkNativeProps>(
   function ThemedLinkNative({ className, ...props }: ThemedLinkNativeProps, ref) {

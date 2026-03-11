@@ -115,11 +115,11 @@ export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, Themed
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, className, registerComponentApi, lookupEventHandler }) => {
+  ({ extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler }) => {
     return (
       <Tabs
         id={node?.uid}
-        className={className}
+        classes={classes}
         headerRenderer={
           node?.props?.headerTemplate
             ? (item) => (

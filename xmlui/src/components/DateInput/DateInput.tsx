@@ -234,14 +234,14 @@ export const dateInputComponentRenderer = createComponentRenderer(
     state,
     updateState,
     extractValue,
-    className,
+    classes,
     lookupEventHandler,
     registerComponentApi,
   }) => {
     return (
       <DateInput
         id={node.uid}
-        className={className}
+        classes={classes}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}

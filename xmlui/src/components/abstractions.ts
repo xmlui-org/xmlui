@@ -29,6 +29,7 @@ export type Tab = {
   children?: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   activated?: () => void;
 };
 

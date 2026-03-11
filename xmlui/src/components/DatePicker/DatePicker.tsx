@@ -204,13 +204,13 @@ export const datePickerComponentRenderer = createComponentRenderer(
     state,
     updateState,
     extractValue,
-    className,
+    classes,
     lookupEventHandler,
     registerComponentApi,
   }) => {
     return (
       <DatePicker
-        className={className}
+        classes={classes}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}

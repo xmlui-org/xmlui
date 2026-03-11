@@ -5,7 +5,6 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
 import { useCallback, useMemo } from "react";
-import classnames from "classnames";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 
@@ -259,7 +258,7 @@ export const NavPanelMd = createMetadata({
 function NavPanelWithBuiltNavHierarchy({
   node,
   renderChild,
-  className,
+  classes,
   layoutContext,
   extractValue,
   appContext,
@@ -302,7 +301,8 @@ function NavPanelWithBuiltNavHierarchy({
     <NavPanel
       logoContent={renderChild(node.props.logoTemplate)}
       footerContent={footerContent}
-      className={classnames(layoutContext?.themeClassName, className)}
+      className={layoutContext?.themeClassName}
+      classes={classes}
       inDrawer={layoutContext?.inDrawer}
       renderChild={renderChild}
       navLinks={navLinks}
@@ -317,12 +317,12 @@ function NavPanelWithBuiltNavHierarchy({
 export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
-  ({ node, renderChild, className, layoutContext, extractValue, appContext }) => {
+  ({ node, renderChild, classes, layoutContext, extractValue, appContext }) => {
     return (
       <NavPanelWithBuiltNavHierarchy
         node={node}
         renderChild={renderChild}
-        className={className}
+        classes={classes}
         layoutContext={layoutContext}
         extractValue={extractValue}
         appContext={appContext}

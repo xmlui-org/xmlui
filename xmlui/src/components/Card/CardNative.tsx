@@ -1,6 +1,7 @@
 import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect, useMemo } from "react";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Card.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
@@ -14,6 +15,7 @@ import { ThemedText as Text } from "../Text/Text";
 type Props = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   children?: ReactNode;
   title?: string;
   subtitle?: string;
@@ -42,6 +44,7 @@ export const Card = forwardRef(function Card(
     verticalAlignment,
     style,
     className,
+    classes,
     title,
     subtitle,
     linkTo,
@@ -130,6 +133,7 @@ export const Card = forwardRef(function Card(
         },
         alignmentClasses.horizontal,
         alignmentClasses.vertical,
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={style}

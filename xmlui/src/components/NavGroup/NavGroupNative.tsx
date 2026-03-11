@@ -28,6 +28,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
@@ -44,6 +45,7 @@ type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 type Props = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   label: string;
   icon?: React.ReactNode;
   to?: string;
@@ -82,6 +84,7 @@ export const NavGroup = forwardRef(function NavGroup(
     node,
     style,
     className,
+    classes,
     label,
     icon,
     renderChild,
@@ -150,6 +153,7 @@ export const NavGroup = forwardRef(function NavGroup(
           to={to}
           style={style}
           className={className}
+          classes={classes}
           label={label}
           icon={icon}
           node={node}
@@ -184,6 +188,7 @@ export const NavGroup = forwardRef(function NavGroup(
 type ExpandableNavGroupProps = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   label: string;
   icon: ReactNode;
   node: NavGroupComponentDef;
@@ -200,6 +205,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   {
     style = EMPTY_OBJECT,
     className,
+    classes,
     label,
     icon,
     renderChild,
@@ -268,7 +274,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <div
-      className={classnames(styles.groupWrapper, className)}
+      className={classnames(styles.groupWrapper, classes?.[COMPONENT_PART_KEY], className)}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >
       <NavLink
