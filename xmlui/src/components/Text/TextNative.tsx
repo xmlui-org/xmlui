@@ -15,6 +15,7 @@ import {
 } from "../abstractions";
 import type { RegisterComponentApiFn } from "../..";
 import { useComponentStyle } from "../../components-core/theming/StyleContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { toCssVar } from "../../components-core/theming/layout-resolver";
 
@@ -108,6 +109,7 @@ type TextProps = {
   breakMode?: BreakMode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onContextMenu?: any;
   registerComponentApi?: RegisterComponentApiFn;
   [variantSpecificProps: string]: any;
@@ -128,6 +130,7 @@ export const Text = forwardRef(function Text(
     maxLines = defaultProps.maxLines,
     style,
     className,
+    classes,
     children,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
     ellipses = defaultProps.ellipses,
@@ -327,6 +330,7 @@ export const Text = forwardRef(function Text(
           ...overflowClasses,
           ...breakClasses,
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={{

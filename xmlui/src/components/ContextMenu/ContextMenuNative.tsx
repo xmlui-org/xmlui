@@ -11,6 +11,7 @@ import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import classnames from "classnames";
 
 import styles from "./ContextMenu.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
@@ -22,6 +23,7 @@ type ContextMenuProps = {
   updateState?: (state: any) => void;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   compact?: boolean;
   menuWidth?: string;
 };
@@ -33,6 +35,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
     updateState,
     style,
     className,
+    classes,
     compact = false,
     menuWidth,
     ...rest
@@ -153,7 +156,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
   }, [open, position, contentReady, getContainerInfo]);
 
   return (
-    <DropdownMenuContext.Provider value={{ closeMenu }}>
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classes?.[COMPONENT_PART_KEY] }}>
       <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={(isOpen) => {
@@ -183,7 +186,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
                 ...(menuWidth && { width: menuWidth }),
               };
             })()}
-            className={classnames(styles.ContextMenuContent, className, {
+            className={classnames(styles.ContextMenuContent, classes?.[COMPONENT_PART_KEY], className, {
               [styles.compact]: compact,
             })}
             tabIndex={-1}

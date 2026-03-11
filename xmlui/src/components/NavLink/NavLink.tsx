@@ -150,7 +150,7 @@ export const ThemedNavLink = React.forwardRef<React.ElementRef<typeof NavLink>, 
 export const navLinkComponentRenderer = createComponentRenderer(
   COMP,
   NavLinkMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, classes }) => {
     const iconName = extractValue.asString(node.props.icon);
     return (
       <NavLink
@@ -163,7 +163,7 @@ export const navLinkComponentRenderer = createComponentRenderer(
         forceActive={extractValue.asOptionalBoolean(node.props.active)}
         exact={extractValue.asOptionalBoolean(node.props.exact)}
         level={extractValue.asOptionalNumber(node.props.level)}
-        className={className}
+        classes={classes}
         target={extractValue(node.props?.target)}
         icon={<ThemedIcon name={iconName} className={styles.icon} />}
         iconAlignment={extractValue.asOptionalString(node.props.iconAlignment)}

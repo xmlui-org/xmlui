@@ -34,6 +34,7 @@ import {
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import styles from "./List.module.scss";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useEvent } from "../../components-core/utils/misc";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { ThemedText as Text } from "../Text/Text";
@@ -223,6 +224,7 @@ type DynamicHeightListProps = {
   idKey?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   emptyListPlaceholder?: ReactNode;
   groupsInitiallyExpanded?: boolean;
   defaultGroups: Array<string>;
@@ -301,6 +303,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
     idKey = defaultProps.idKey,
     style,
     className,
+    classes,
     emptyListPlaceholder,
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
@@ -501,6 +504,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
             {
               [styles.hasOutsideScroll]: hasOutsideScroll,
             },
+            classes?.[COMPONENT_PART_KEY],
             className,
           )}
         >

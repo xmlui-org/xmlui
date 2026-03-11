@@ -215,7 +215,7 @@ export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(
 export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
-  ({ node, extractValue, className, renderChild, registerComponentApi, lookupEventHandler }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler }) => {
     const {
       variant,
       maxLines,
@@ -237,7 +237,7 @@ export const textComponentRenderer = createComponentRenderer(
       <Text
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
-        className={className}
+        classes={classes}
         preserveLinebreaks={extractValue.asOptionalBoolean(
           preserveLinebreaks,
           defaultProps.preserveLinebreaks,

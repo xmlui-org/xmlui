@@ -21,6 +21,7 @@ import { ThemedButton as Button } from "../Button/Button";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 import { Part } from "../Part/Part";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const PART_TITLE = "title";
 const PART_CONTENT = "content";
@@ -40,6 +41,7 @@ type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onClose?: OnClose;
   onOpen?: OnOpen;
   children?: ReactNode;
@@ -139,6 +141,7 @@ export const ModalDialog = React.forwardRef(
       titleTemplate,
       closeButtonVisible = defaultProps.closeButtonVisible,
       className,
+      classes,
       onOpen,
       onClose,
       externalAnimation = true,
@@ -224,6 +227,7 @@ export const ModalDialog = React.forwardRef(
               [styles.contentAnimation]: !externalAnimation,
             },
             styles.content,
+            classes?.[COMPONENT_PART_KEY],
             className,
           )}
           onPointerDownOutside={(event) => {
@@ -276,7 +280,7 @@ export const ModalDialog = React.forwardRef(
               (theme variables) cascade to both the backdrop (.overlayBg) and
               the dialog content, without applying layout styles like max-width
               directly to the fixed-position backdrop. */}
-          <div className={className}>
+          <div className={classnames(classes?.[COMPONENT_PART_KEY], className)}>
             {isDialogRootInShadowDom && (
               /*
                 In the Shadow DOM we can omit the Dialog.Overlay,

@@ -165,7 +165,7 @@ export const ThemedScroller = React.forwardRef<React.ElementRef<typeof Scroller>
 export const scrollViewerComponentRenderer = createComponentRenderer(
   COMP,
   ScrollViewerMd,
-  ({ node, extractValue, renderChild, className }) => {
+  ({ node, extractValue, renderChild, classes }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
     const header = node.props.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
@@ -173,7 +173,7 @@ export const scrollViewerComponentRenderer = createComponentRenderer(
 
     return (
       <ScrollViewer 
-        className={className} 
+        classes={classes} 
         scrollStyle={scrollStyle as any}
         showScrollerFade={showScrollerFade}
         header={header}

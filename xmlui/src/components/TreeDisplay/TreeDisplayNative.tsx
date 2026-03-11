@@ -1,5 +1,6 @@
 import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode, useMemo } from "react";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./TreeDisplay.module.scss";
 
@@ -13,6 +14,7 @@ type TreeNode = {
 type Props = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   children?: ReactNode;
   content?: string;
   itemHeight?: number;
@@ -220,7 +222,7 @@ const renderTreeNode = (
 };
 
 export const TreeDisplay = forwardRef(function TreeDisplay(
-  { style, className, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight, onContextMenu }: Props,
+  { style, className, classes, children, content = defaultProps.content, itemHeight = defaultProps.itemHeight, onContextMenu }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const contentString = (content || children?.toString() || "").toString();
@@ -228,7 +230,7 @@ export const TreeDisplay = forwardRef(function TreeDisplay(
   const treeNodes = useMemo(() => parseTreeContent(contentString), [contentString]);
 
   return (
-    <div className={classnames(styles.treeDisplay, className)} style={style} ref={forwardedRef} onContextMenu={onContextMenu}>
+    <div className={classnames(styles.treeDisplay, classes?.[COMPONENT_PART_KEY], className)} style={style} ref={forwardedRef} onContextMenu={onContextMenu}>
       <div className={styles.content}>
         {treeNodes.map((node, index) => renderTreeNode(node, index, itemHeight, 0, []))}
       </div>

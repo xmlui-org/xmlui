@@ -12,6 +12,7 @@ import {
 } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
 import { AccordionComponent, defaultProps } from "./AccordionNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Accordion";
 
@@ -109,10 +110,10 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
-  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi, className }) => {
+  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
     return (
       <AccordionComponent
-        className={className}
+        classes={classes}
         triggerPosition={extractValue(node.props?.triggerPosition)}
         collapsedIcon={extractValue(node.props.collapsedIcon)}
         expandedIcon={extractValue(node.props.expandedIcon)}

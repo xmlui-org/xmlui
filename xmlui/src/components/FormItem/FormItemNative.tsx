@@ -8,10 +8,12 @@ import {
   useId,
   useMemo,
 } from "react";
+import classnames from "classnames";
 
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type {
   FormControlType,
   FormItemValidations,
@@ -57,6 +59,7 @@ type Props = {
   children?: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   bindTo: string;
   type?: FormControlType;
   labelPosition?: LabelPosition;
@@ -165,6 +168,7 @@ export const FormItem = memo(function FormItem({
   // ---
   style,
   className,
+  classes,
   bindTo,
   type = defaultProps.type,
   label,
@@ -543,7 +547,7 @@ export const FormItem = memo(function FormItem({
         onBlur={onBlur}
         style={style}
         requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
-        className={className}
+        className={classnames(classes?.[COMPONENT_PART_KEY], className)}
         validationResult={validationResult}
       >
         {formControl}

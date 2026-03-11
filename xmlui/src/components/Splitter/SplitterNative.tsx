@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Splitter.module.scss";
 
@@ -20,6 +21,7 @@ type SplitterProps = {
   children: React.ReactNode[] | React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   splitterTemplate?: React.ReactNode;
   orientation?: OrientationOptions;
   floating?: boolean;
@@ -39,6 +41,7 @@ export const Splitter = ({
   children,
   style,
   className,
+  classes,
   swapped = defaultProps.swapped,
   floating = defaultProps.floating,
   splitterTemplate,
@@ -224,6 +227,7 @@ export const Splitter = ({
           [styles.vertical]: orientation === "vertical",
           [styles.dragging]: isDragging,
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={style}

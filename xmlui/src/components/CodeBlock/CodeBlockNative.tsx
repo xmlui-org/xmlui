@@ -1,5 +1,6 @@
 import type React from "react";
 import styles from "./CodeBlock.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedText as Text } from "../Text/Text";
 import {
   type CodeHighlighterMeta,
@@ -20,6 +21,7 @@ type CodeBlockProps = {
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
 };
 
 export const defaultProps = {
@@ -32,13 +34,14 @@ export function CodeBlock({
   textToCopy,
   style,
   className,
+  classes,
   ...rest
 }: CodeBlockProps) {
   if (!meta) {
     return (
       <div
         {...rest}
-        className={classnames(className, styles.codeBlock, "global-codeBlock")}
+        className={classnames(styles.codeBlock, classes?.[COMPONENT_PART_KEY], className, "global-codeBlock")}
         style={style}
       >
         <div className={styles.codeBlockContent}>{children}</div>
@@ -46,7 +49,7 @@ export function CodeBlock({
     );
   }
   return (
-    <div className={classnames(styles.codeBlock)} style={style}>
+    <div className={classnames(styles.codeBlock, classes?.[COMPONENT_PART_KEY], className)} style={style}>
       {meta.filename && (
         <div className={styles.codeBlockHeader}>
           <Text variant="em">{meta.filename}</Text>
