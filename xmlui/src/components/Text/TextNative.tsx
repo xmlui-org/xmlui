@@ -335,6 +335,14 @@ export const Text = forwardRef(function Text(
       )}
       style={{
         ...style,
+        // When truncation is active the element must be able to shrink inside flex parents.
+        // The layout resolver injects flex-shrink:0 via a CSS class (for Stack children);
+        // an inline style always wins over a class, so we override it here to allow Text
+        // to compress to its available space, which is the prerequisite for ellipsis to fire.
+        ...(((!overflowMode && maxLines > 0) || overflowMode === "ellipsis") && {
+          flexShrink: 1,
+          minWidth: 0,
+        }),
         // Apply maxLines style for "ellipsis" mode and default behavior
         // "none", "scroll", and "flow" modes ignore maxLines for predictable, reliable behavior
         ...(overflowMode === "ellipsis" || (!overflowMode && maxLines)

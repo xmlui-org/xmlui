@@ -3826,3 +3826,119 @@ test.describe("syncWithVar property", () => {
     await expect(firstRowCheckbox).toBeChecked();
   });
 });
+
+// =============================================================================
+// STACK INSIDE TABLE CELL — overflow fix (Step 3)
+// =============================================================================
+
+test.describe("Stack inside table cell", () => {
+  test("Stack in column template renders within column bounds (does not overflow)", async ({
+    page,
+    initTestBed,
+  }) => {
+    // A 200px-wide column with a Stack child that has no explicit width.
+    // Before the fix, the Stack would push past the column boundary because
+    // cellContent had no width:100%, so the Stack's own default sizing would win.
+    await initTestBed(`
+      <Table testId="table" data='{[{"name":"Alice"},{"name":"Bob"}]}'>
+        <Column bindTo="name" width="200px" testId="col">
+          <Stack testId="cellStack">
+            <Text>{$item.name}</Text>
+          </Stack>
+        </Column>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Get the column header to determine the declared column width
+    const firstCell = page.locator("td").first();
+    const cellBounds = await firstCell.boundingBox();
+    expect(cellBounds).not.toBeNull();
+
+    // Every Stack injected into a cell must fit within the column width
+    const stacks = page.getByTestId("cellStack");
+    const count = await stacks.count();
+    expect(count).toBeGreaterThan(0);
+    for (let i = 0; i < count; i++) {
+      const stackBounds = await stacks.nth(i).boundingBox();
+      expect(stackBounds).not.toBeNull();
+      // Stack width should not exceed the cell width
+      expect(stackBounds!.width).toBeLessThanOrEqual(cellBounds!.width + 1); // +1px tolerance
+    }
+  });
+
+  test("Text with maxLines='1' inside Link>HStack in a column template shows ellipsis", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Regression test: Chrome resolves `inline-flex; width: fit-content` as max-content,
+    // so `max-width: 100%` clips the link's outer box but the internal flex layout runs
+    // unconstrained — Text never gets a bounded width and text-overflow:ellipsis never fires.
+    // The fix: template cellContent uses display:grid so inline-flex children are stretched
+    // to the grid column width, giving Text a definite available width.
+    await initTestBed(`
+      <Table testId="table" data='{[{"id":1},{"id":2}]}' width="400px">
+        <Column header="ID" width="80px"><Text>{$item.id}</Text></Column>
+        <Column header="Name" width="200px">
+          <Link testId="cell-link">
+            <HStack testId="cell-hstack">
+              <Icon name="home" />
+              <Text testId="cell-text" value="This is a very long name that should be truncated" maxLines="1" />
+            </HStack>
+          </Link>
+        </Column>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    const cellLinks = page.getByTestId("cell-link");
+    const count = await cellLinks.count();
+    expect(count).toBeGreaterThan(0);
+
+    const firstLink = cellLinks.first();
+    const linkBounds = await firstLink.boundingBox();
+    expect(linkBounds).not.toBeNull();
+
+    // The link must not overflow the column width (200px)
+    expect(linkBounds!.width).toBeLessThanOrEqual(201);
+
+    // The text element must be narrower than its content — if it were rendered
+    // at full content width the ellipsis would not fire.  Its scrollWidth should
+    // exceed its clientWidth, proving truncation is active.
+    const cellTexts = page.getByTestId("cell-text");
+    const firstText = cellTexts.first();
+
+    // DEBUG: check computed dimensions
+    const debugInfo = await firstText.evaluate((el) => {
+      const link = el.closest("[data-testid='cell-link']")?.parentElement?.parentElement;
+      const cellContent = el.closest("[data-testid='cell-link']")?.parentElement;
+      return {
+        textScrollWidth: el.scrollWidth,
+        textClientWidth: el.clientWidth,
+        textDisplay: window.getComputedStyle(el).display,
+        textWhiteSpace: window.getComputedStyle(el).whiteSpace,
+        textOverflow: window.getComputedStyle(el).textOverflow,
+        textFlexShrink: window.getComputedStyle(el).flexShrink,
+        textMinWidth: window.getComputedStyle(el).minWidth,
+        textWidth: window.getComputedStyle(el).width,
+        // parent (HStack) info
+        hstackWidth: (el.parentElement as HTMLElement)?.offsetWidth,
+        hstackDisplay: el.parentElement ? window.getComputedStyle(el.parentElement).display : null,
+        // link info
+        linkWidth: (el.parentElement?.parentElement as HTMLElement)?.offsetWidth,
+        linkComputedWidth: el.parentElement?.parentElement ? window.getComputedStyle(el.parentElement.parentElement).width : null,
+        // cellContent info
+        cellContentClass: el.parentElement?.parentElement?.parentElement?.className,
+        cellContentDisplay: el.parentElement?.parentElement?.parentElement ? window.getComputedStyle(el.parentElement.parentElement.parentElement).display : null,
+      };
+    });
+    console.log("DEBUG INFO:", JSON.stringify(debugInfo, null, 2));
+
+    const isOverflowing = await firstText.evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(isOverflowing).toBe(true);
+  });
+});

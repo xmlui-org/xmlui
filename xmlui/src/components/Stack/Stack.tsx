@@ -106,6 +106,25 @@ const stackMd = createMetadata({
         "For horizontal stacks, defaults to 'fit-content' (children size to their content).",
       valueType: "string",
     },
+    overflow: {
+      description:
+        "Shorthand that sets both `overflowX` and `overflowY` on the Stack in a single prop. " +
+        "Equivalent to setting both `overflowX` and `overflowY` to the same value. " +
+        "When an explicit `overflowX` or `overflowY` layout prop is also set on the same Stack, " +
+        "the individual prop takes precedence on its axis.",
+      availableValues: ["visible", "hidden", "auto", "scroll"],
+      valueType: "string",
+    },
+    canShrinkContent: {
+      description:
+        "When `true`, child elements are allowed to shrink below their natural size inside " +
+        "the Stack (sets `flex-shrink: 1` on each child instead of the default `0`). " +
+        "Useful when the Stack is placed in a constrained container such as a table cell, " +
+        "a split panel, or another fixed-size Stack, and you want children to compress " +
+        "rather than overflow the boundary.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     dock: {
       description:
         "When set on a child of a Stack, activates DockPanel layout in the parent Stack. " +
@@ -233,6 +252,8 @@ type RenderStackPars = {
   showScrollerFade?: boolean;
   wrapContent?: boolean;
   itemWidth?: string;
+  overflow?: string;
+  canShrinkContent?: boolean;
   registerComponentApi?: (api: any) => void;
 };
 
@@ -244,6 +265,8 @@ function renderDockLayout({
   renderChild,
   scrollStyle,
   showScrollerFade,
+  overflow,
+  canShrinkContent,
   registerComponentApi,
 }: RenderStackPars) {
   const allChildren = (Array.isArray(node.children) ? node.children : [node.children]).filter(
@@ -304,6 +327,7 @@ function renderDockLayout({
       orientation="vertical"
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
+      style={overflow ? { overflow } as React.CSSProperties : undefined}
       classes={classes}
       onClick={lookupEventHandler("click")}
       onContextMenu={lookupEventHandler("contextMenu")}
@@ -366,6 +390,8 @@ function renderStack({
   showScrollerFade,
   wrapContent,
   itemWidth,
+  overflow,
+  canShrinkContent,
   registerComponentApi,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
@@ -377,7 +403,7 @@ function renderStack({
     (child) => child != null
   );
   if (allChildren.some((child) => (child.props as any)?.dock != null)) {
-    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi });
+    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, overflow, canShrinkContent, registerComponentApi });
   }
 
   // Use FlowLayout when orientation is horizontal and wrapContent is true
@@ -443,6 +469,7 @@ function renderStack({
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
+      style={overflow ? { overflow } as React.CSSProperties : undefined}
       classes={classes}
       onClick={lookupEventHandler("click")}
       onContextMenu={lookupEventHandler("contextMenu")}
@@ -454,6 +481,7 @@ function renderStack({
         type: "Stack",
         orientation,
         itemWidth,
+        canShrinkContent,
       })}
     </Stack>
   );
@@ -473,6 +501,8 @@ export const stackComponentRenderer = createComponentRenderer(
       node.props?.itemWidth,
       orientation === "vertical" ? "100%" : "fit-content"
     );
+    const overflow = extractValue.asOptionalString(node.props?.overflow);
+    const canShrinkContent = extractValue.asOptionalBoolean(node.props?.canShrinkContent, false);
     return renderStack({
       node,
       extractValue,
@@ -484,6 +514,8 @@ export const stackComponentRenderer = createComponentRenderer(
       showScrollerFade,
       wrapContent,
       itemWidth,
+      overflow,
+      canShrinkContent,
       lookupEventHandler,
       renderChild,
       registerComponentApi,
@@ -499,6 +531,8 @@ export const vStackComponentRenderer = createComponentRenderer(
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
+    const overflow = extractValue.asOptionalString(node.props?.overflow);
+    const canShrinkContent = extractValue.asOptionalBoolean(node.props?.canShrinkContent, false);
     return renderStack({
       node,
       extractValue,
@@ -510,6 +544,8 @@ export const vStackComponentRenderer = createComponentRenderer(
       verticalAlignment,
       scrollStyle,
       itemWidth,
+      overflow,
+      canShrinkContent,
       registerComponentApi,
     });
   },
@@ -524,6 +560,8 @@ export const hStackComponentRenderer = createComponentRenderer(
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+    const overflow = extractValue.asOptionalString(node.props?.overflow);
+    const canShrinkContent = extractValue.asOptionalBoolean(node.props?.canShrinkContent, false);
     return renderStack({
       node,
       extractValue,
@@ -536,6 +574,8 @@ export const hStackComponentRenderer = createComponentRenderer(
       scrollStyle,
       wrapContent,
       itemWidth,
+      overflow,
+      canShrinkContent,
       registerComponentApi,
     });
   },
@@ -547,6 +587,8 @@ export const cvStackComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
+    const overflow = extractValue.asOptionalString(node.props?.overflow);
+    const canShrinkContent = extractValue.asOptionalBoolean(node.props?.canShrinkContent, false);
     return renderStack({
       node,
       extractValue,
@@ -558,6 +600,8 @@ export const cvStackComponentRenderer = createComponentRenderer(
       verticalAlignment: "center",
       scrollStyle,
       itemWidth,
+      overflow,
+      canShrinkContent,
       registerComponentApi,
     });
   },
@@ -570,6 +614,8 @@ export const chStackComponentRenderer = createComponentRenderer(
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+    const overflow = extractValue.asOptionalString(node.props?.overflow);
+    const canShrinkContent = extractValue.asOptionalBoolean(node.props?.canShrinkContent, false);
     return renderStack({
       node,
       extractValue,
@@ -582,6 +628,8 @@ export const chStackComponentRenderer = createComponentRenderer(
       scrollStyle,
       wrapContent,
       itemWidth,
+      overflow,
+      canShrinkContent,
       registerComponentApi,
     });
   },

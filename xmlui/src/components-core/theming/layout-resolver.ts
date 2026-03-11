@@ -47,8 +47,8 @@ export function resolveLayoutProps(
 
   // --- Adjust flex
   if (!!getOrientation(layoutContext)) {
-    // --- In a container, we always use "flex-shrink: 0"
-    result.cssProps.flexShrink = 0;
+    // --- In a container, we always use "flex-shrink: 0" unless the parent Stack set canShrinkContent
+    result.cssProps.flexShrink = layoutContext?.canShrinkContent ? 1 : 0;
   }
 
   // --- Dimensions: widht and height is not considered to be inline styles

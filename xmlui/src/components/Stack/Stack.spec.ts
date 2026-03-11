@@ -1744,3 +1744,101 @@ test.describe("Dock Layout", () => {
     expect(stretch2.height).toBeCloseTo(PARENT_H - 50, 0);
   });
 });
+
+// =============================================================================
+// OVERFLOW PROP TESTS
+// =============================================================================
+
+test.describe("overflow prop", () => {
+  test("overflow=hidden sets overflow: hidden on the scroll container", async ({ page, initTestBed }) => {
+    await initTestBed(`<Stack testId="stack" overflow="hidden"><Text>content</Text></Stack>`);
+    const stack = page.getByTestId("stack");
+    const overflowX = await stack.evaluate((el) => getComputedStyle(el).overflowX);
+    const overflowY = await stack.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowX).toBe("hidden");
+    expect(overflowY).toBe("hidden");
+  });
+
+  test("overflow=auto sets overflow: auto on both axes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Stack testId="stack" overflow="auto"><Text>content</Text></Stack>`);
+    const stack = page.getByTestId("stack");
+    const overflowX = await stack.evaluate((el) => getComputedStyle(el).overflowX);
+    const overflowY = await stack.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowX).toBe("auto");
+    expect(overflowY).toBe("auto");
+  });
+
+  test("overflow=scroll sets overflow: scroll on both axes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Stack testId="stack" overflow="scroll"><Text>content</Text></Stack>`);
+    const stack = page.getByTestId("stack");
+    const overflowX = await stack.evaluate((el) => getComputedStyle(el).overflowX);
+    const overflowY = await stack.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowX).toBe("scroll");
+    expect(overflowY).toBe("scroll");
+  });
+
+  test("overflow=visible sets overflow: visible on both axes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Stack testId="stack" overflow="visible"><Text>content</Text></Stack>`);
+    const stack = page.getByTestId("stack");
+    const overflowX = await stack.evaluate((el) => getComputedStyle(el).overflowX);
+    const overflowY = await stack.evaluate((el) => getComputedStyle(el).overflowY);
+    expect(overflowX).toBe("visible");
+    expect(overflowY).toBe("visible");
+  });
+
+  test("overflow=hidden prevents content overflow", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" overflow="hidden" width="100px" height="100px">
+        <Stack testId="child" width="300px" height="300px" />
+      </Stack>
+    `);
+    const parent = await getBounds(page.getByTestId("parent"));
+    // Parent should be constrained to its declared size despite the large child
+    expect(parent.width).toBeCloseTo(100, 0);
+    expect(parent.height).toBeCloseTo(100, 0);
+  });
+
+  test("overflow is absent when prop is not set", async ({ page, initTestBed }) => {
+    await initTestBed(`<Stack testId="stack"><Text>content</Text></Stack>`);
+    const stack = page.getByTestId("stack");
+    // No inline overflow style — browser default (visible) should be used
+    const overflowInline = await stack.evaluate((el) => (el as HTMLElement).style.overflow);
+    expect(overflowInline).toBe("");
+  });
+});
+
+// =============================================================================
+// CANSHRINK CONTENT PROP TESTS
+// =============================================================================
+
+test.describe("canShrinkContent prop", () => {
+  test("canShrinkContent=true allows children to shrink below natural size", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" orientation="horizontal" width="200px" canShrinkContent="true" gap="0">
+        <Stack testId="child1" width="150px" height="50px" />
+        <Stack testId="child2" width="150px" height="50px" />
+      </Stack>
+    `);
+    const child1 = await getBounds(page.getByTestId("child1"));
+    const child2 = await getBounds(page.getByTestId("child2"));
+    // Each child's natural width is 150px but the parent is only 200px wide.
+    // With canShrinkContent the children should compress so both fit.
+    expect(child1.width).toBeLessThan(150);
+    expect(child2.width).toBeLessThan(150);
+    expect(child1.width + child2.width).toBeCloseTo(200, 1);
+  });
+
+  test("canShrinkContent=false (default) children do not shrink", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="parent" orientation="horizontal" width="200px" gap="0">
+        <Stack testId="child1" width="150px" height="50px" />
+        <Stack testId="child2" width="150px" height="50px" />
+      </Stack>
+    `);
+    const child1 = await getBounds(page.getByTestId("child1"));
+    const child2 = await getBounds(page.getByTestId("child2"));
+    // Default flex-shrink: 0 — children keep their declared widths even if they overflow
+    expect(child1.width).toBeCloseTo(150, 0);
+    expect(child2.width).toBeCloseTo(150, 0);
+  });
+});

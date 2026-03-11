@@ -1752,7 +1752,9 @@ export const Table = forwardRef(
                         } as CSSProperties}
                       >
                         <div
-                          className={styles.cellContent}
+                          className={classnames(styles.cellContent, {
+                            [styles.templateCell]: !!cellRenderer,
+                          })}
                           style={{
                             userSelect:
                               effectiveUserSelectCell as React.CSSProperties["userSelect"],

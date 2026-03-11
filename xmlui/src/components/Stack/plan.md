@@ -194,9 +194,9 @@ All steps are independent and can be executed in any order. The order above is s
 
 ## Step Status
 
-- [ ] Step 1 — `dock` prop
-- [ ] Step 2 — `overflow` and `canShrinkContent` props
-- [ ] Step 3 — Table cell overflow fix
+- [x] Step 1 — `dock` prop
+- [x] Step 2 — `overflow` and `canShrinkContent` props
+- [x] Step 3 — Table cell overflow fix
 - [ ] Step 4 — `scrollable` convenience prop
 - [ ] Step 5 — `truncate` prop
 - [ ] Step 6 — Radix ScrollArea integration

@@ -374,6 +374,7 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     overflow-wrap: break-word;
     white-space: nowrap;
     max-width: 100%;
+    min-width: 0; /* allow shrinking in flex parents so ellipsis fires at the true boundary */
     vertical-align: baseline;
     line-height: normal;
     text-overflow: ellipsis;

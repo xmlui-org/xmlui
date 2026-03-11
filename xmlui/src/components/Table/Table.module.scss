@@ -288,7 +288,21 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    width: 100%;
+    min-width: 0;
     @include t.paddingVars($themeVars, "cell-#{$component}");
+
+    // When the cell uses a custom template (cellRenderer), switch to grid layout so
+    // that inline-flex children (e.g. Link wrapping an HStack) receive a definite
+    // bounded inline size from the grid track.  This is necessary because Chrome
+    // resolves `display: inline-flex; width: fit-content` as max-content regardless
+    // of the available width in the containing block, so max-width:100% clips the
+    // outer box but the internal flex layout runs unconstrained — preventing
+    // text-overflow:ellipsis from firing on Text children.
+    &.templateCell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .headerWrapper {
