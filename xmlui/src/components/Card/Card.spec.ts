@@ -160,6 +160,40 @@ test.describe("Event Handling", () => {
     await expect.poll(testStateDriver.testState).toEqual(true);
   });
 
+  test("doubleClick event is triggered when Card is double-clicked", async ({
+    initTestBed,
+    createCardDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Card onDoubleClick="testState = true" />`,
+    );
+    await (await createCardDriver()).component.dblclick();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
+  test("doubleClick receives the mouse event", async ({ initTestBed, createCardDriver }) => {
+    const { testStateDriver } = await initTestBed(
+      `<Card onDoubleClick="(ev) => testState = ev.type" />`,
+    );
+    await (await createCardDriver()).component.dblclick();
+    await expect.poll(testStateDriver.testState).toEqual("dblclick");
+  });
+
+  test("click event does not fire on the second click of a double-click", async ({
+    initTestBed,
+    createCardDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Card
+        onClick="testState = (testState || 0) + 1"
+        onDoubleClick="() => {}"
+      />
+    `);
+    await (await createCardDriver()).component.dblclick();
+    // Only the first click of the double-click should increment the counter
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+
   test("Card click does not interfere with link click", async ({
     page,
     initTestBed,

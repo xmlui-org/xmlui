@@ -27,6 +27,7 @@ type Props = {
   horizontalAlignment?: string;
   verticalAlignment?: string;
   onClick?: any;
+  onDoubleClick?: any;
   onContextMenu?: any;
   registerComponentApi?: (api: any) => void;
 };
@@ -52,6 +53,7 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || defaultProps.showAvatar,
     avatarSize,
     onClick,
+    onDoubleClick,
     onContextMenu,
     registerComponentApi,
     ...rest
@@ -127,7 +129,7 @@ export const Card = forwardRef(function Card(
       className={classnames(
         styles.wrapper,
         {
-          [styles.isClickable]: !!onClick,
+          [styles.isClickable]: !!onClick || !!onDoubleClick,
           [styles.vertical]: orientation === "vertical",
           [styles.horizontal]: orientation === "horizontal",
         },
@@ -137,7 +139,17 @@ export const Card = forwardRef(function Card(
         className,
       )}
       style={style}
-      onClick={onClick}
+      onClick={(event) => {
+        // Prevent onClick from firing on the second click of a double-click,
+        // which ensures onDoubleClick fires cleanly without triggering onClick twice.
+        if (event.detail >= 2) return;
+        onClick?.(event);
+      }}
+      onDoubleClick={(event) => {
+        // Prevent browser text selection on double-click
+        event.preventDefault();
+        onDoubleClick?.(event);
+      }}
       onContextMenu={onContextMenu}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
