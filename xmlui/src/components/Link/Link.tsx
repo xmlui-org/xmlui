@@ -1,12 +1,12 @@
 import styles from "./Link.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { LinkTargetMd, alignmentOptionValues, type OverflowMode, type BreakMode } from "../abstractions";
+import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
 import { LinkNative, defaultProps } from "./LinkNative";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Link";
 
@@ -60,12 +60,14 @@ export const LinkMd = createMetadata({
       valueType: "string",
       defaultValue: "start",
     },
-    maxLines: d(
-      "This property determines the maximum number of lines the component can wrap to. " +
+    maxLines: {
+      description:
+        "This property determines the maximum number of lines the component can wrap to. " +
         "If there is no space to display all the contents, the component displays up to as " +
         "many lines as specified in this property. When the value is not defined, there is " +
         "no limit on the displayed lines.",
-    ),
+      valueType: "number",
+    },
     preserveLinebreaks: {
       description: `This property indicates if linebreaks should be preserved when displaying text.`,
       valueType: "boolean",
@@ -176,35 +178,8 @@ export const ThemedLinkNative = React.forwardRef<HTMLDivElement, ThemedLinkNativ
   },
 );
 
-export const localLinkComponentRenderer = createComponentRenderer(
+export const localLinkComponentRenderer = wrapComponent(
   COMP,
+  ThemedLinkNative,
   LinkMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, classes }) => {
-    return (
-      <LinkNative
-        to={extractValue(node.props.to)}
-        icon={extractValue(node.props.icon)}
-        active={extractValue.asOptionalBoolean(node.props.active, false)}
-        target={extractValue(node.props?.target)}
-        classes={classes}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
-        horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
-        verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
-        onClick={lookupEventHandler("click")}
-        noIndicator={extractValue.asOptionalBoolean(node.props.noIndicator, false)}
-        maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
-        preserveLinebreaks={extractValue.asOptionalBoolean(
-          node.props.preserveLinebreaks,
-          defaultProps.preserveLinebreaks,
-        )}
-        ellipses={extractValue.asOptionalBoolean(node.props.ellipses, defaultProps.ellipses)}
-        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
-        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
-      >
-        {node.props.label
-          ? extractValue.asDisplayText(node.props.label)
-          : renderChild(node.children)}
-      </LinkNative>
-    );
-  },
 );
