@@ -280,7 +280,7 @@ export const ModalDialog = React.forwardRef(
               (theme variables) cascade to both the backdrop (.overlayBg) and
               the dialog content, without applying layout styles like max-width
               directly to the fixed-position backdrop. */}
-          <div className={className}>
+          <div className={classnames(classes?.[COMPONENT_PART_KEY], className)}>
             {isDialogRootInShadowDom && (
               /*
                 In the Shadow DOM we can omit the Dialog.Overlay,

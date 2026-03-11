@@ -156,7 +156,7 @@ export const ContextMenu = forwardRef(function ContextMenu(
   }, [open, position, contentReady, getContainerInfo]);
 
   return (
-    <DropdownMenuContext.Provider value={{ closeMenu }}>
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classes?.[COMPONENT_PART_KEY] }}>
       <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={(isOpen) => {

@@ -121,7 +121,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: className }}>
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classnames(classes?.[COMPONENT_PART_KEY], className) }}>
       <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={async (isOpen) => {
