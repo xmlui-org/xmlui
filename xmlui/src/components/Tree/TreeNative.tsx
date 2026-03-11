@@ -1405,6 +1405,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       }
 
       if (handled) {
+        e.stopPropagation();
         setFocusedIndex(newIndex);
       }
     },
