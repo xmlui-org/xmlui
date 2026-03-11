@@ -3259,9 +3259,9 @@ test.describe("Keyboard Shortcuts", () => {
       expect(state).toBeNull();
     });
 
-    test("does not trigger onPaste when rowsSelectable is false", async ({ initTestBed, page }) => {
+    test("triggers onPaste even when rowsSelectable is false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="false"
           testId="table"
@@ -3274,17 +3274,16 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       const isMac = process.platform === 'darwin';
       const pasteKey = isMac ? 'Meta+V' : 'Control+V';
       await page.keyboard.press(pasteKey);
       await page.waitForTimeout(100);
 
-      // Should NOT have triggered the handler (testState remains null)
+      // Should have triggered the handler
       const state = await testStateDriver.testState();
-      expect(state).toBeNull();
+      expect(state).toEqual({ triggered: true });
     });
-
     test("keyboard actions work when rowsSelectable is explicitly true", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Table 
