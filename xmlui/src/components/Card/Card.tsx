@@ -87,6 +87,13 @@ export const CardMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    doubleClick: {
+      description: `This event is triggered when the ${COMP} is double-clicked.`,
+      signature: "doubleClick(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event object.",
+      },
+    },
     contextMenu: dContextMenu(COMP),
   },
   apis: {
