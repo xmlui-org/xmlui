@@ -436,7 +436,7 @@ function useTableKeyboardActions({
               }
               break;
             case "cut":
-              if (onCutAction) {
+              if (rowsSelectable && onCutAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -449,7 +449,7 @@ function useTableKeyboardActions({
               }
               break;
             case "copy":
-              if (onCopyAction) {
+              if (rowsSelectable && onCopyAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -475,7 +475,7 @@ function useTableKeyboardActions({
               }
               break;
             case "delete":
-              if (onDeleteAction) {
+              if (rowsSelectable && onDeleteAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
