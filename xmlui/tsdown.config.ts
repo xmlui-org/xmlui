@@ -22,6 +22,15 @@ export default defineConfig([
     clean: false,
   },
   {
+    name: "xmlui-node",
+    entry: "bin/node.ts",
+    outDir: "dist/for-node",
+    format: ["esm", "commonjs"],
+    shims: true,
+    dts: true,
+    clean: false,
+  },
+  {
     name: "language-server",
     entry: "src/language-server/server.ts",
     outDir: "dist/for-node",

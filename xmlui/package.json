@@ -179,6 +179,10 @@
           "import": "./dist/for-node/vite-xmlui-plugin.js",
           "require": "./dist/for-node/vite-xmlui-plugin.js"
         },
+        "./node": {
+          "import": "./dist/for-node/node.js",
+          "require": "./dist/for-node/node.js"
+        },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",
           "require": "./dist/lib/syntax-monaco.js"
@@ -218,6 +222,10 @@
     "./vite-xmlui-plugin": {
       "import": "./bin/vite-xmlui-plugin.ts",
       "require": "./bin/vite-xmlui-plugin.ts"
+    },
+    "./node": {
+      "import": "./bin/node.ts",
+      "require": "./bin/node.ts"
     },
     "./language-server": {
       "import": "./src/language-server/server.ts",

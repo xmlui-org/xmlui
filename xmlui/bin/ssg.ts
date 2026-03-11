@@ -9,14 +9,14 @@
 
 import "tsx";
 import { build as viteBuild, createServer, type InlineConfig, type Plugin } from "vite";
-import { mkdir, readdir, readFile, rm, writeFile, cp } from "node:fs/promises";
 import { rmSync } from "node:fs";
+import { mkdir, readdir, readFile, rm, writeFile, cp, stat } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
-import { discoverPaths, pathExists } from "./ssg/discoverPaths";
-import { parse, type HTMLElement } from "node-html-parser";
+import { parse } from "node-html-parser";
+import { discoverRoutes } from "./ssg/discoverRoutes";
 import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
 
 type SsgOptions = {
@@ -573,7 +573,6 @@ export const ssg = async ({
   const ssrBuildPath = path.resolve(cwd, ".xmlui-ssg-ssr");
   const ssrBundlePath = path.join(ssrBuildPath, "render.mjs");
   const builtIndexPath = path.join(outPath, "index.html");
-  const sourceIndexPath = path.resolve(cwd, "index.html");
   const tempEntryPath = path.resolve(cwd, TEMP_ENTRY_FILE_NAME);
 
   log(`starting in ${cwd}`);
@@ -598,9 +597,8 @@ export const ssg = async ({
   await cp(distPath, outPath, { recursive: true });
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
-  const mainXmluiPath = path.resolve(cwd, "src", "Main.xmlui");
-  const mainXmluiTextContent = await readFile(mainXmluiPath, "utf-8");
-  const pathsToRender = await discoverPaths(mainXmluiTextContent, { contentDir });
+  const routeStore = await discoverRoutes({ srcDir: "src", contentDir });
+  const pathsToRender = routeStore.staticRoutes;
   // Collision detection: a discovered page route must not share the base name of the fallback file.
   const fallbackBaseName = fallbackFile.replace(/\.html$/i, "");
   const fallbackRoute = fallbackBaseName.startsWith("/")
@@ -687,7 +685,7 @@ export const ssg = async ({
       throw new Error("failed to load renderPath from temporary SSG entry module");
     }
 
-    const searchIndex: SearchItemData[] = new Array(pathsToRender.length);
+    const searchIndex: SearchItemData[] = Array.from({ length: pathsToRender.length });
     let nextRouteIndex = 0;
     const workerCount = Math.min(SSG_WRITE_CONCURRENCY, pathsToRender.length);
 
@@ -736,3 +734,12 @@ export const ssg = async ({
 
   log(`completed. static files are in ${outPath}`);
 };
+
+async function pathExists(targetPath: string): Promise<boolean> {
+  try {
+    await stat(targetPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
