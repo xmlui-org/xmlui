@@ -1212,20 +1212,7 @@ export const Table = forwardRef(
     // ResizeObserver. If VirtualTableRow identity changes (useMemo recreates it),
     // React remounts all <tr> elements, but the effect doesn't re-run (index is the
     // same), so the new DOM nodes are never observed → rows stay visibility:hidden.
-    const rowStateRef = useRef({
-      focusedIndex,
-      rowDisabledPredicate,
-      noBottomBorder,
-      effectiveUserSelectRow,
-      toggleRow,
-      checkAllRows,
-      enableMultiRowSelection,
-      tolerancePixels,
-      setHoveredRowId,
-      lookupEventHandler,
-      rowDoubleClick,
-    });
-    rowStateRef.current = {
+    const rowState = {
       focusedIndex,
       rowDisabledPredicate,
       noBottomBorder,
@@ -1238,6 +1225,8 @@ export const Table = forwardRef(
       lookupEventHandler,
       rowDoubleClick,
     };
+    const rowStateRef = useRef(rowState);
+    rowStateRef.current = rowState;
 
     // Custom row component for Virtualizer — created once, reads current values from refs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
