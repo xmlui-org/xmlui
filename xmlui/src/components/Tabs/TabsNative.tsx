@@ -21,7 +21,6 @@ import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
 import { noop } from "../../components-core/constants";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   id?: string;
@@ -39,7 +38,6 @@ type Props = {
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   className?: string;
-  classes?: Record<string, string>;
   distributeEvenly?: boolean;
   onDidChange?: (index: number, id: string, label: string) => void;
   onContextMenu?: any;
@@ -65,7 +63,6 @@ export const Tabs = forwardRef(function Tabs(
     id,
     registerComponentApi,
     className,
-    classes,
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
     onContextMenu,
@@ -152,7 +149,7 @@ export const Tabs = forwardRef(function Tabs(
           {...rest}
           id={tabsId}
           ref={forwardedRef}
-          className={classnames(styles.tabs, styles.accordionView, classes?.[COMPONENT_PART_KEY], className)}
+          className={classnames(className, styles.tabs, styles.accordionView)}
           style={style}
         >
           <RTabsRoot
@@ -233,7 +230,7 @@ export const Tabs = forwardRef(function Tabs(
         {...rest}
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(styles.tabs, classes?.[COMPONENT_PART_KEY], className)}
+        className={classnames(className, styles.tabs)}
         value={`${currentTab}`}
         onContextMenu={onContextMenu}
         onValueChange={(tab) => {

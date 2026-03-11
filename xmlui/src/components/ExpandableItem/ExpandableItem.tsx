@@ -145,7 +145,7 @@ export const ThemedExpandableItem = React.forwardRef<React.ElementRef<typeof Exp
 export const expandableItemComponentRenderer = createComponentRenderer(
   COMP,
   ExpandableItemMd,
-  ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, classes }) => {
+  ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, className }) => {
     // Handle summary as either a string or a component definition
     const summaryProp = node.props?.summary;
     const summaryContent = summaryProp
@@ -188,7 +188,7 @@ export const expandableItemComponentRenderer = createComponentRenderer(
           defaultExpandableItemProps.fullWidthSummary,
         )}
         onExpandedChange={lookupEventHandler("expandedChange")}
-        classes={classes}
+        className={className}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}

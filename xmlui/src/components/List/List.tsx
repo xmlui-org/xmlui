@@ -157,7 +157,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     node,
     extractValue,
     renderChild,
-    classes,
+    className,
     layoutContext,
     lookupEventHandler,
     registerComponentApi,
@@ -167,7 +167,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     return (
       <ListNative
         registerComponentApi={registerComponentApi}
-        classes={classes}
+        className={className}
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         items={extractValue(node.props.items) || extractValue(node.props.data)}
         limit={extractValue(node.props.limit)}

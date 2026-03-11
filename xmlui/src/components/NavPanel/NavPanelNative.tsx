@@ -1,6 +1,5 @@
 import React, { forwardRef, type ReactNode, useEffect } from "react";
 import classnames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./NavPanel.module.scss";
 import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
@@ -278,7 +277,6 @@ function DrawerNavPanel({
   footerContent,
   children,
   className,
-  classes,
   style,
   scrollStyle = defaultProps.scrollStyle,
   showScrollerFade = defaultProps.showScrollerFade,
@@ -286,7 +284,6 @@ function DrawerNavPanel({
 }: {
   children: ReactNode;
   className?: string;
-  classes?: Record<string, string>;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   footerContent?: ReactNode;
@@ -298,7 +295,7 @@ function DrawerNavPanel({
     <NavPanelContext.Provider value={contextValue}>
       <div
         {...rest}
-        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.hasFooter]: hasFooter })}
+        className={classnames(styles.wrapper, className, { [styles.hasFooter]: hasFooter })}
         style={style}
       >
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
@@ -325,7 +322,6 @@ function DrawerNavPanel({
 type Props = {
   children: ReactNode;
   className?: string;
-  classes?: Record<string, string>;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   footerContent?: ReactNode;
@@ -343,7 +339,6 @@ export const NavPanel = forwardRef(function NavPanel(
     logoContent,
     footerContent,
     className,
-    classes,
     inDrawer = defaultProps.inDrawer,
     renderChild,
     navLinks,
@@ -382,7 +377,6 @@ export const NavPanel = forwardRef(function NavPanel(
         logoContent={safeLogoContent}
         footerContent={hasFooter ? footerContent : undefined}
         className={className}
-        classes={classes}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}
       >
@@ -395,7 +389,7 @@ export const NavPanel = forwardRef(function NavPanel(
     <div
       {...rest}
       ref={forwardedRef}
-      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
+      className={classnames(styles.wrapper, className, {
         [styles.horizontal]: horizontal,
         [styles.vertical]: vertical,
         [styles.condensed]: isCondensed,

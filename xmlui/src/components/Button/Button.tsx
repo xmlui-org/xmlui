@@ -199,7 +199,7 @@ export const ThemedButton = React.forwardRef<HTMLButtonElement, ThemedButtonProp
 export const buttonComponentRenderer = createComponentRenderer(
   "Button",
   ButtonMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, classes }) => {
+  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
     const iconName = extractValue.asString(node.props.icon);
     const label = extractValue.asDisplayText(node.props.label);
     const renderedChildren = hasRenderableChildren(node.children)
@@ -221,7 +221,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         onContextMenu={lookupEventHandler("contextMenu")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
-        classes={classes}
+        className={className}
         contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
       >
         {renderedChildren}

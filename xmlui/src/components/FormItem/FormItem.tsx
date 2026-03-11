@@ -258,7 +258,7 @@ export const formItemComponentRenderer = createComponentRenderer(
     node,
     renderChild,
     extractValue,
-    classes,
+    className,
     layoutContext,
     lookupEventHandler,
     registerComponentApi,
@@ -350,7 +350,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
         regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
         //  ----
-        classes={classes}
+        className={className}
         layoutContext={layoutContext}
         labelBreak={extractValue.asOptionalBoolean(labelBreak)}
         labelWidth={extractValue.asOptionalString(labelWidth)}

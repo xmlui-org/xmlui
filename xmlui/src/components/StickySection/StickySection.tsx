@@ -36,12 +36,12 @@ export const StickySectionMd = createMetadata({
 export const stickySectionComponentRenderer = createComponentRenderer(
   COMP,
   StickySectionMd,
-  ({ node, renderChild, extractValue, classes }) => {
+  ({ node, renderChild, extractValue, className }) => {
     return (
       <StickySection
         uid={node.uid}
         stickTo={extractValue.asOptionalString(node.props?.stickTo)}
-        classes={classes}
+        className={className}
       >
         {renderChild(node.children)}
       </StickySection>

@@ -1,16 +1,14 @@
 import type { ForwardedRef } from "react";
 import { forwardRef, useEffect, useId } from "react";
 import { Content } from "@radix-ui/react-tabs";
-import classnames from "classnames";
 
 import styles from "../Tabs/Tabs.module.scss";
 
 import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  { children, label, headerRenderer, style, id, className, classes, activated, ...rest }: Tab,
+  { children, label, headerRenderer, style, id, className, activated, ...rest }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerId = useId();
@@ -49,7 +47,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
       {...rest}
       key={innerId}
       value={innerId}
-      className={classnames(styles.tabsContent, classes?.[COMPONENT_PART_KEY], className)}
+      className={className ? `${styles.tabsContent} ${className}` : styles.tabsContent}
       ref={forwardedRef}
       style={{ ...style, order: contentOrder }}
     >

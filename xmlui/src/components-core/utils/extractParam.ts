@@ -238,27 +238,10 @@ export function resolveResponsiveWhen(
     }
   }
 
-  // No responsive rule matched for the current viewport (all rules are above it).
-  // If an explicit base `when` is set, honour it.
-  if (when !== undefined) {
-    return shouldKeep(when, componentState, appContext);
-  }
-
-  // No base `when` and no rule covers the current viewport — infer the implied base
-  // from the *lowest* defined responsive rule (mirrors buildWhenStyleObject logic):
-  //   lowest rule is truthy  → visibility is opt-in, so implied base is false (hidden)
-  //   lowest rule is falsy   → visibility is opt-out, so implied base is true  (visible)
-  // Walk ascending (xs → xxl) to find the first defined rule.
-  for (const bp of MediaBreakpointKeys) {
-    if (responsiveWhen![bp] !== undefined) {
-      const lowestValue =
-        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ?? true;
-      return !lowestValue;
-    }
-  }
-
-  // Responsive rules map was non-empty but nothing found — should not happen.
-  return true;
+  // No responsive rule matched — fall back to base `when` (same as if no responsive
+  // attrs were set at all). This means a lone `when-md="false"` on a component that has
+  // no base `when` will be visible at xs/sm, because undefined `when` defaults to true.
+  return shouldKeep(when, componentState, appContext);
 }
 
 /**

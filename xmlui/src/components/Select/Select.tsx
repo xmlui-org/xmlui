@@ -228,7 +228,7 @@ export const selectComponentRenderer = createComponentRenderer(
     extractValue,
     renderChild,
     lookupEventHandler,
-    classes,
+    className,
     registerComponentApi,
     ...rest
   }) => {
@@ -240,7 +240,8 @@ export const selectComponentRenderer = createComponentRenderer(
     return (
       <Select
         multiSelect={multiSelect}
-        classes={classes}
+        className={className}
+        contentClassName={className}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,

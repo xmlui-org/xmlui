@@ -8,7 +8,6 @@ import {
 } from "react";
 import { useState } from "react";
 import classNames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./ExpandableItem.module.scss";
 
@@ -24,7 +23,6 @@ type ExpandableItemProps = {
   children?: ReactNode;
   summary?: ReactNode;
   className?: string;
-  classes?: Record<string, string>;
   style?: CSSProperties;
   initiallyExpanded?: boolean;
   enabled?: boolean;
@@ -57,7 +55,6 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
     summary,
     children,
     className,
-    classes,
     style,
     initiallyExpanded = defaultExpandableItemProps.initiallyExpanded,
     enabled = defaultExpandableItemProps.enabled,
@@ -156,7 +153,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
   return (
     <div
       {...rest}
-      className={classNames(styles.expandableItem, classes?.[COMPONENT_PART_KEY], className, {
+      className={classNames(styles.expandableItem, className, {
         [styles.open]: isOpen,
         [styles.disabled]: !enabled,
         [styles.withSwitch]: withSwitch,

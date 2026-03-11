@@ -475,7 +475,7 @@ export const TreeMd = createMetadata({
 export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
     // Default item template if none is provided:
     //   <HStack verticalAlignment="center">
     //     <Icon when="{$item.icon}" name="{$item.icon}" />
@@ -506,7 +506,7 @@ export const treeComponentRenderer = createComponentRenderer(
     return (
       <TreeComponent
         registerComponentApi={registerComponentApi}
-        classes={classes}
+        className={className}
         data={extractValue(node.props.data)}
         dataFormat={extractValue(node.props.dataFormat)}
         idField={extractValue(node.props.idField)}

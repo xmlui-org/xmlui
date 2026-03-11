@@ -57,26 +57,17 @@ At any given viewport width, XMLUI looks for the **most specific rule that appli
 
 - At `md` it tries `when-md`, then `when-sm`, then `when-xs`.
 - The first defined value wins.
-- If no rule matches (no rule is defined at or below the current breakpoint), the fallback depends on whether base `when` is set:
-  - **`when` is explicitly set** → its value is used as-is.
-  - **`when` is absent** → the base visibility is *inferred* as the **opposite of the lowest defined `when-*` rule**. A truthy lowest rule implies the component is opt-in (hidden by default below the breakpoint); a falsy lowest rule implies it is opt-out (visible by default below the breakpoint).
+- If no value matches (no rule at or below the current breakpoint), XMLUI falls back to the base `when` attribute — or `true` if `when` is also absent.
 
-This inference makes single-attribute patterns convenient:
-
-- `when-md="true"` → visible at `md` and above, **hidden below** (inferred base = opposite of `true`).
-- `when-md="false"` → hidden at `md` and above, **visible below** (inferred base = opposite of `false`).
+This means a lone responsive attribute acts as a **one-sided switch**. For example, `when-md="false"` hides the component at `md` and above while leaving it visible below `md` (the fallback is the base `when`, which defaults to visible).
 
 ### Examples
 
 **Visible only from `md` upward:**
 
-At `md` and above `when-md="true"` applies. Below `md` the walk finds no rule; since `when` is absent, the base is inferred as the opposite of `true` — hidden. The shorthand and the explicit form are equivalent:
+The component is visible at `md` and above. Below `md` the walk finds no responsive rule and falls back to the base `when` — here, `false`.
 
 ```xmlui
-<!-- shorthand: inferred base -->
-<Text when-md="true" value="Only on medium screens and above" />
-
-<!-- explicit: same effect, intent is stated -->
 <Text when="false" when-md="true" value="Only on medium screens and above" />
 ```
 
@@ -86,7 +77,7 @@ At `md` and above `when-md="true"` applies. Below `md` the walk finds no rule; s
 <Text when-md="false" value="Hidden on medium screens and above" />
 ```
 
-At `xs` and `sm` the walk finds no rule; since `when` is absent, the base is inferred as the opposite of `false` — visible. At `md` and above, `when-md="false"` applies.
+At `xs` and `sm` the walk finds no rule and falls back to the base `when` (absent = visible). At `md` and above, `when-md="false"` applies.
 
 **Different content for small and large screens:**
 
@@ -116,16 +107,12 @@ At `xs` and `sm` the walk finds no rule; since `when` is absent, the base is inf
 
 The base `when` is only consulted when the walk from the current breakpoint downward finds **no** matching responsive rule. Once any responsive rule applies, the base `when` is ignored for that breakpoint.
 
-When no rule matches **and `when` is absent**, the base visibility is inferred as the opposite of the lowest defined `when-*` rule (see above).
-
 | `when` | `when-xs` | `when-md` | Result at `xs` | Result at `md` |
 |--------|-----------|-----------|----------------|----------------|
 | (absent) | (absent) | (absent) | visible | visible |
 | `false` | (absent) | (absent) | hidden | hidden |
-| (absent) | (absent) | `true` | **hidden** (inferred: opposite of `true`) | visible |
-| (absent) | (absent) | `false` | **visible** (inferred: opposite of `false`) | hidden |
-| (absent) | `true` | (absent) | visible | visible (inherits `when-xs`) |
-| (absent) | `true` | `false` | visible | hidden |
-| (absent) | `false` | `true` | hidden | visible |
-| `false` | (absent) | `true` | hidden (explicit `when`) | visible |
-| `true` | (absent) | `false` | visible (explicit `when`) | hidden |
+| — | `true` | (absent) | visible | visible (inherits `when-xs`) |
+| — | `true` | `false` | visible | hidden |
+| — | `false` | `true` | hidden | visible |
+| `false` | (absent) | `true` | hidden | visible |
+| `true` | (absent) | `false` | visible | hidden |

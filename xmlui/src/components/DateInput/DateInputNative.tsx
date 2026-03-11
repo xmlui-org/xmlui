@@ -1,7 +1,6 @@
 import React, { type CSSProperties } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./DateInput.module.scss";
 import { format, parse, isValid } from "date-fns";
 import { PartialInput, type BlurDirection } from "../Input/PartialInput";
@@ -66,7 +65,6 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   onDidChange?: (newValue: string | null) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -126,7 +124,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     updateState,
     style,
     className,
-    classes,
     onDidChange,
     onFocus,
     onBlur,
@@ -780,7 +777,6 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
           [styles.disabled]: !enabled,
           [styles.readOnly]: readOnly,
         },
-        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={{ ...style, gap }}

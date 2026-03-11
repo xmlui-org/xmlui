@@ -173,7 +173,7 @@ export const ThemedFileInput = React.forwardRef<HTMLDivElement, ThemedFileInputP
 export const fileInputRenderer = createComponentRenderer(
   COMP,
   FileInputMd,
-  ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
+  ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, className }) => {
     const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
     return (
       <FileInput
@@ -202,7 +202,7 @@ export const fileInputRenderer = createComponentRenderer(
         parseAs={extractValue.asOptionalString(node.props.parseAs) as "csv" | "json" | undefined}
         csvOptions={extractValue(node.props.csvOptions)}
         onParseError={lookupEventHandler("parseError")}
-        classes={classes}
+        className={className}
       />
     );
   },

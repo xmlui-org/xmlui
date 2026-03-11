@@ -113,7 +113,7 @@ export const drawerComponentRenderer = createComponentRenderer(
     renderChild,
     lookupEventHandler,
     registerComponentApi,
-    classes,
+    className,
   }) => {
     // Read layout properties that should override the corresponding theme variables
     const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
@@ -129,7 +129,7 @@ export const drawerComponentRenderer = createComponentRenderer(
         onOpen={lookupEventHandler("open")}
         onClose={lookupEventHandler("close")}
         registerComponentApi={registerComponentApi}
-        classes={classes}
+        className={className}
         style={backgroundColor ? { backgroundColor } : undefined}
       >
         {renderChild(node.children)}

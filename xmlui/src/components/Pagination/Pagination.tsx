@@ -183,7 +183,7 @@ export const ThemedPagination = React.forwardRef<React.ElementRef<typeof Paginat
 export const paginationComponentRenderer = createComponentRenderer(
   COMP,
   PaginationMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, classes }) => {
+  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, className }) => {
     let maxVisiblePages = extractValue.asOptionalNumber(
       node.props.maxVisiblePages,
       defaultProps.maxVisiblePages,
@@ -207,7 +207,7 @@ export const paginationComponentRenderer = createComponentRenderer(
     }
 
     return (
-      <PaginationNative
+      <ThemedPagination
         enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
         itemCount={extractValue.asOptionalNumber(node.props.itemCount)}
         pageSize={extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize)}
@@ -245,7 +245,7 @@ export const paginationComponentRenderer = createComponentRenderer(
         onPageSizeDidChange={lookupEventHandler("pageSizeDidChange")}
         registerComponentApi={registerComponentApi}
         updateState={updateState}
-        classes={classes}
+        className={className}
       />
     );
   },

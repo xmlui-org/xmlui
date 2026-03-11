@@ -5,7 +5,6 @@ import QRCodeLib from "react-qr-code";
 
 import styles from "./QRCode.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   value: string;
@@ -16,7 +15,6 @@ type Props = {
   title?: string;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
 };
 
 export const defaultProps: Required<Pick<Props, "size" | "level" | "color" | "backgroundColor">> = {
@@ -37,7 +35,6 @@ export const QRCodeNative = memo(
       title,
       style,
       className,
-      classes,
       ...rest
     }: Props,
     ref: Ref<HTMLDivElement>,
@@ -51,7 +48,7 @@ export const QRCodeNative = memo(
       <div
         {...rest}
         ref={ref}
-        className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.container)}
+        className={classnames(className, styles.container)}
         style={{
           ...style,
           width: effectiveSize,

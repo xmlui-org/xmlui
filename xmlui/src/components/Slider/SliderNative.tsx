@@ -8,7 +8,6 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import classnames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
 import { isNaN } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -19,7 +18,6 @@ export type Props = {
   initialValue?: number | number[];
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   step?: number;
   max?: number;
   min?: number;
@@ -108,7 +106,6 @@ export const Slider = forwardRef(
       id,
       style,
       className,
-      classes,
       step = defaultProps.step,
       min = defaultProps.min,
       max = defaultProps.max,
@@ -277,7 +274,7 @@ export const Slider = forwardRef(
     }, [displayValue.length]);
 
       return (
-          <div {...rest} ref={ref} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container>
+          <div {...rest} ref={ref} style={style} className={classnames(styles.sliderContainer, className)} data-slider-container>
             <Root
               ref={inputRef}
               minStepsBetweenThumbs={minStepsBetweenThumbs}

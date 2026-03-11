@@ -11,7 +11,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -68,7 +67,6 @@ interface SelectProps {
   style?: CSSProperties;
   className?: string;
   contentClassName?: string;
-  classes?: Record<string, string>;
   dropdownHeight?: CSSProperties["height"];
 
   // Validation
@@ -261,7 +259,6 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     style,
     className,
     contentClassName,
-    classes,
     dropdownHeight,
 
     // Validation
@@ -672,7 +669,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             id={id}
             options={options}
             style={style}
-            className={classnames(className, classes?.[COMPONENT_PART_KEY])}
+            className={className}
             contentClassName={contentClassName}
             onFocus={onFocus}
             onBlur={onBlur}
@@ -722,7 +719,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   onBlur={onBlur}
                   disabled={!enabled}
                   aria-expanded={open}
-                  className={classnames(styles.selectTrigger, classes?.[COMPONENT_PART_KEY], className, styles[validationStatus], {
+                  className={classnames(className, styles.selectTrigger, styles[validationStatus], {
                     [styles.disabled]: !enabled,
                     [styles.multi]: multiSelect,
                   })}

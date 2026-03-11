@@ -25,7 +25,6 @@ import {
 } from "virtua";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Table.module.scss";
 
@@ -196,7 +195,6 @@ type TableProps = {
   willSort?: AsyncFunction;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   uid?: string;
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
@@ -551,7 +549,6 @@ export const Table = forwardRef(
       lookupEventHandler,
       style,
       className,
-      classes,
       noDataRenderer,
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
@@ -1462,7 +1459,7 @@ export const Table = forwardRef(
     return (
       <div
         {...rest}
-        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.noScroll]: hasOutsideScroll })}
+        className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={0}
         onKeyDown={compositeKeyDown}
         onClick={(e) => {

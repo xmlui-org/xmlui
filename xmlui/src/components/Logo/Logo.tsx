@@ -3,7 +3,6 @@ import { createMetadata } from "../metadata-helpers";
 import { Logo, defaultProps } from "./LogoNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Logo";
 
@@ -46,10 +45,10 @@ export const ThemedLogo = React.forwardRef<React.ElementRef<typeof Logo>, Themed
 export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
-  ({ node, classes, extractValue }) => {
+  ({ node, className, extractValue }) => {
     return (
       <Logo
-        className={classes?.[COMPONENT_PART_KEY]}
+        className={className}
         inline={extractValue.asOptionalBoolean(node.props.inline)}
         alt={extractValue(node.props.alt)}
       />

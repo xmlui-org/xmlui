@@ -1,8 +1,6 @@
 import React, { forwardRef, type ReactNode, type CSSProperties } from "react";
-import classnames from "classnames";
 import { Scroller, type ScrollStyle } from "./Scroller";
 import styles from "./ScrollViewer.module.scss";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,
@@ -14,7 +12,6 @@ type Props = {
   header?: ReactNode;
   footer?: ReactNode;
   className?: string;
-  classes?: Record<string, string>;
   style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
@@ -30,7 +27,6 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
     header,
     footer,
     className,
-    classes,
     style,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
@@ -57,7 +53,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
       overflow: "auto",
     };
     return (
-      <div ref={ref} className={classnames(styles.headerFooterWrapper, classes?.[COMPONENT_PART_KEY], className)} style={style}>
+      <div ref={ref} className={`${styles.headerFooterWrapper} ${className || ""}`} style={style}>
         {header && <div className={styles.stickyHeader}>{header}</div>}
         <Scroller
           className={styles.scrollerFlex}
@@ -83,7 +79,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
   return (
     <Scroller
       ref={ref}
-      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+      className={className}
       style={containerStyle}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}

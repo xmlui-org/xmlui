@@ -5,17 +5,24 @@ import { Toggle } from "../Toggle/Toggle";
 import styles from "./ToneSwitch.module.scss";
 import classnames from "classnames";
 import { noop } from "../../components-core/constants";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // Default icons for light and dark modes
 const DEFAULT_LIGHT_ICON = "sun";
 const DEFAULT_DARK_ICON = "moon";
 
 export type ToneSwitchProps = {
+  /**
+   * Icon to display for light mode
+   * @default "sun"
+   */
   iconLight?: string;
+
+  /**
+   * Icon to display for dark mode
+   * @default "moon"
+   */
   iconDark?: string;
   className?: string;
-  classes?: Record<string, string>;
   onChange?: (tone: "light" | "dark") => void;
 };
 
@@ -24,7 +31,6 @@ export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function T
     iconLight = DEFAULT_LIGHT_ICON,
     iconDark = DEFAULT_DARK_ICON,
     className,
-    classes,
     onChange = noop,
     ...rest
   }: ToneSwitchProps,
@@ -43,7 +49,7 @@ export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function T
       {...rest}
       ref={ref}
       style={{ width: "fit-content", display: "inline-block" }}
-      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+      className={className}
     >
       <Toggle
         value={activeThemeTone === "dark"}

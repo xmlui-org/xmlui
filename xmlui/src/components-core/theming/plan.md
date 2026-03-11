@@ -325,60 +325,81 @@ Import from `../../components-core/theming/responsive-layout` in both the native
 | Icon | — | `ThemedIcon` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Icon>` |
 | Image | — | `ThemedImage` merges theme class + `classes[COMPONENT_PART_KEY]` into className on `<Image>` |
 | InspectButton | — | Renderer passes `classes?.[COMPONENT_PART_KEY]` as className to `<InspectButton>` |
-| List | — | `classes` passed to ListNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| Logo | — | `classes?.[COMPONENT_PART_KEY]` forwarded as className to LogoNative/Image |
-| Option | — | `classes?.[COMPONENT_PART_KEY]` passed as className to OptionNative |
-| Pages | — | `classes` passed to RouteWrapper; `classes?.[COMPONENT_PART_KEY]` merged on page root div |
-| QRCode | — | `classes` passed to QRCodeNative; `classes?.[COMPONENT_PART_KEY]` merged on container div |
-| ResponsiveBar | — | `classes` passed to ResponsiveBarNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| ScrollViewer | — | `classes` passed to ScrollViewerNative; `classes?.[COMPONENT_PART_KEY]` merged on root element in both render paths |
-| SpaceFiller | — | Native accepts `classes`/`className` for VariantBehavior compat; renderer intentionally ignores layout props (preserves flex-grow-spacer behavior) |
-| Stack | — | `classes` passed through `RenderStackPars` helper; `classes?.[COMPONENT_PART_KEY]` merged on StackNative root; all 5 renderers (Stack, VStack, HStack, CVStack, CHStack) updated |
-| StickyBox | — | `classes` passed to StickyBoxNative; `classes?.[COMPONENT_PART_KEY]` merged into `wrapperClassName` |
-| StickySection | — | `classes` passed to StickySectionNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| ToneSwitch | — | `classes` passed to ToneSwitchNative; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| Accordion | — | `classes` passed to AccordionNative; `classes?.[COMPONENT_PART_KEY]` merged on RAccordion.Root |
-| AccordionItem | — | `classes` passed to AccordionItemNative; `classes?.[COMPONENT_PART_KEY]` merged on RAccordion.Item |
-| App | — | `classes` passed to App (AppNative); `classes?.[COMPONENT_PART_KEY]` added to `wrapperBaseClasses` |
-| AppHeader | — | `classes` passed through `AppContextAwareAppHeader` → `AppHeader`; `classes?.[COMPONENT_PART_KEY]` merged on root div; `layoutContext?.themeClassName` kept as `className` |
-| AutoComplete | — | `classes` passed to AutoComplete; `classes?.[COMPONENT_PART_KEY]` merged on root trigger div |
-| Carousel | — | `classes` passed to CarouselComponent; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| DatePicker | — | `classes` passed to DatePicker; `classes?.[COMPONENT_PART_KEY]` merged on both inline root and PopoverTrigger className |
-| Drawer | — | `classes` passed to DrawerNative; `classes?.[COMPONENT_PART_KEY]` added to portal container className and Dialog.Content classnames |
-| FormItem | — | `classes` passed to FormItem; `classnames` import added to FormItemNative; `classes?.[COMPONENT_PART_KEY]` merged on ItemWithLabel root |
-| Heading | — | `classes` passed through renderHeading helper to Heading; all 7 renderers (Heading, H1–H6) updated; `classes?.[COMPONENT_PART_KEY]` merged on root heading element |
-| Markdown | — | `classes` propagated renderer → TransformedMarkdown → Markdown native; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| NoResult | — | `classes` passed to NoResult; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| NavGroup | — | `classes` passed to NavGroup; `classes?.[COMPONENT_PART_KEY]` merged on root div of ExpandableNavGroup (DropDownNavGroup has no className) |
-| ProgressBar | — | `classes` passed to ProgressBar; `classes?.[COMPONENT_PART_KEY]` merged on wrapper div |
-| Tabs | — | `classes` passed to Tabs; `classes?.[COMPONENT_PART_KEY]` merged on root element in both accordion and standard views |
-| TabItem | — | `classes` passed to TabItemComponent; `classes?.[COMPONENT_PART_KEY]` merged with tabsContent on Content root; `classes?` added to shared `Tab` type in abstractions.ts |
-| Text | — | `classes` passed to Text; `classes?.[COMPONENT_PART_KEY]` merged on root element classnames |
-| Tooltip | — | `classes` passed to Tooltip; `classes?.[COMPONENT_PART_KEY]` merged on RadixTooltip.Content root |
-| Tree | — | `classes` passed to TreeComponent; `classes?.[COMPONENT_PART_KEY]` merged on Scroller (root wrapper) |
-| TreeDisplay | — | `classes` passed to TreeDisplay; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| DateInput | day, month, year, clearButton, conciseValidationFeedback | `classes` passed to DateInput; `classes?.[COMPONENT_PART_KEY]` merged on root wrapper div |
-| ExpandableItem | summary, content | `classes` passed to ExpandableItem; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| Form | buttonRow, validationSummary | `classes` passed through FormWithContextVar → Form; `classes?.[COMPONENT_PART_KEY]` merged on root `<form>` element |
-| Link | icon | `classes` passed to LinkNative; `classes?.[COMPONENT_PART_KEY]` merged on root Node element |
-| ModalDialog | content, title | `classes` passed to ModalDialog; `classes?.[COMPONENT_PART_KEY]` merged on Dialog.Content root |
-| NavPanel | footer | `classes` passed through NavPanelWithBuiltNavHierarchy → NavPanel; `classes?.[COMPONENT_PART_KEY]` merged on root div in both NavPanel and DrawerNavPanel; `classnames` import removed from renderer |
-| NumberBox | label, startAdornment, endAdornment, input, spinnerButtonUp, spinnerButtonDown | `classes` passed to NumberBox; `classes?.[COMPONENT_PART_KEY]` merged on root div |
-| Pagination | buttonRow, pageInfo, pageSizeSelector | `classes` passed to PaginationNative directly (bypasses ThemedPagination); `classes?.[COMPONENT_PART_KEY]` merged on both `<nav>` root elements |
-| Select | clearButton, item, menu | `classes` passed to Select; `classes?.[COMPONENT_PART_KEY]` merged on SimpleSelect className and PopoverTrigger className; `contentClassName` removed from renderer |
-| Table | table, pagination | `classes` passed through TableWithColumns → Table; `classes?.[COMPONENT_PART_KEY]` merged on root wrapper div; Pick type updated from `"className"` to `"classes"` |
-| TextArea | label, startAdornment, endAdornment, input | `classes` passed to TextArea; `classes?.[COMPONENT_PART_KEY]` merged on all three root `<div className={styles.container}>` branches; local `classes` variable renamed to `textareaClasses` |
-| TimeInput | hour, minute, second, ampm, clearButton | `classes` passed to TimeInputNative; `classes?.[COMPONENT_PART_KEY]` merged on root timeInputWrapper div |
-| Button | icon | `classes` passed to Button; `classes?.[COMPONENT_PART_KEY]` merged on root `<button>` element; `classes?` added as explicit prop alongside Pick<HTMLAttributes> |
-| Card | avatar, title, subtitle | `classes` passed to Card; `classes?.[COMPONENT_PART_KEY]` merged on root wrapper div |
-| CodeBlock | header, content | `classes` passed to CodeBlock; `classes?.[COMPONENT_PART_KEY]` merged on root div in both branches (with and without meta) |
-| ContextMenu | content | `classes` passed to ContextMenu; `classes?.[COMPONENT_PART_KEY]` merged on DropdownMenuPrimitive.Content className |
-| DropdownMenu | content | `classes` passed to DropdownMenu and MenuItem; `classes?.[COMPONENT_PART_KEY]` merged on DropdownMenuContent and DropdownMenuItem root classnames |
-| FileInput | label, input | `classes` passed to FileInput; `classes?.[COMPONENT_PART_KEY]` merged on root container div |
-| NavLink | indicator | `classes` passed to NavLink; `classes?.[COMPONENT_PART_KEY]` included in `baseClasses` (applies to both button and RrdNavLink branches) |
-| RadioGroup | label | `classes` passed directly to `<RadioGroup>` (renderer switched from `<ThemedRadioGroup>` to direct native); `classes?.[COMPONENT_PART_KEY]` merged on root InnerRadioGroup.Root className |
-| Slider | label, track, thumb | `classes` passed to Slider; `classes?.[COMPONENT_PART_KEY]` merged on root sliderContainer div |
-| Splitter | primaryPanel, secondaryPanel | `classes` passed through all three renderers (splitterComponentRenderer, vSplitterComponentRenderer, hSplitterComponentRenderer) → SplitterRenderer helper → Splitter; `classes?.[COMPONENT_PART_KEY]` merged on root splitter div |
+
+### Category 2 — To migrate. No parts. Simple component (no theme vars suggesting parts)
+
+| Component | Notes |
+|---|---|
+| List | Simple list container |
+| Logo | No theme vars |
+| Option | No theme vars, used inside Select |
+| Pages | Router container |
+| PositionedContainer | Layout helper |
+| QRCode | Single-element |
+| ResponsiveBar | Layout helper |
+| ScrollViewer | Scroll wrapper |
+| SpaceFiller | Layout spacer |
+| Stack | Layout container |
+| StickyBox | Layout helper |
+| StickySection | Layout helper |
+| ToneSwitch | Simple toggle |
+
+### Category 3 — To migrate. No parts declared. Theme vars suggest parts should be added
+
+| Component | Suggested parts (from theme vars) |
+|---|---|
+| Accordion | header, icon, content |
+| AccordionItem | (sub-component of Accordion) |
+| App | navPanel, content, header |
+| AppHeader | drawerToggle, logo |
+| AutoComplete | menu, item, badge |
+| Carousel | control, indicator |
+| DatePicker | menu, item, value, selectedItem |
+| Drawer | navPanel, content, header, closeButton |
+| FormItem | label, requiredMark, optionalTag |
+| Heading | anchor |
+| Markdown | headings (H1–H6), admonition |
+| NavGroup | dropdown, items |
+| NoResult | icon |
+| ProgressBar | indicator |
+| Tabs | trigger, list, arrow |
+| TabItem | (sub-component of Tabs) |
+| Text | secondary, title, subtitle, (many text variants) |
+| Tooltip | arrow |
+| Tree | row |
+| TreeDisplay | connect |
+
+### Category 4 — To migrate. Has parts, parts are used (`<Part>`) in native component
+
+| Component | Parts | `<Part>` count in native |
+|---|---|---|
+| DateInput | day, month, year, clearButton, conciseValidationFeedback | 5 |
+| ExpandableItem | summary, content | 2 |
+| Form | buttonRow, validationSummary | 2 |
+| Link | icon | 1 |
+| ModalDialog | content, title | 2 |
+| NavPanel | (layout parts) | 1 |
+| NumberBox | label, startAdornment, endAdornment, input, spinnerButtonUp, spinnerButtonDown | 6 |
+| Pagination | buttonRow, pageInfo, pageSizeSelector | 3 |
+| Select | clearButton, item, menu | 3 |
+| Table | table, pagination | 1 |
+| TextArea | label, startAdornment, endAdornment, input | 4 |
+| TimeInput | hour, minute, second, ampm, clearButton | 5 |
+
+### Category 5 — To migrate. Has parts declared but NOT used (`<Part>`) in native component
+
+| Component | Declared parts | Notes |
+|---|---|---|
+| Button | icon | Icon rendered directly, no `<Part>` wrapper |
+| Card | avatar, title, subtitle | Multi-element but no `<Part>` wrappers |
+| CodeBlock | header, content | Sections rendered without `<Part>` |
+| ContextMenu | content | No `<Part>` in native |
+| DropdownMenu | content | No `<Part>` in native |
+| FileInput | label, input | No `<Part>` in native |
+| NavLink | indicator | No `<Part>` in native |
+| RadioGroup | label | No `<Part>` in native |
+| Slider | label, track, thumb | No `<Part>` in native |
+| Splitter | primaryPanel, secondaryPanel | No `<Part>` in native |
 
 ### Non-visual / data-only components (no migration needed)
 

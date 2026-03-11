@@ -113,7 +113,7 @@ export const ResponsiveBarMd = createMetadata({
 export const responsiveBarComponentRenderer = createComponentRenderer(
   COMP,
   ResponsiveBarMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
+  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const children = Array.isArray(node.children) ? node.children : node.children ? [node.children] : [];
     
     const renderChildWithContext = (childNode: any, isOverflow: boolean) => (
@@ -137,7 +137,7 @@ export const responsiveBarComponentRenderer = createComponentRenderer(
         onClick={lookupEventHandler("click")}
         onWillOpen={lookupEventHandler("willOpen")}
         registerComponentApi={registerComponentApi}
-        classes={classes}
+        className={className}
         childNodes={children}
         renderChildFn={renderChildWithContext}
       >

@@ -84,7 +84,7 @@ export const QRCodeMd = createMetadata({
 export const qrCodeComponentRenderer = createComponentRenderer(
   COMP,
   QRCodeMd,
-  ({ node, extractValue, classes, lookupEventHandler }) => {
+  ({ node, extractValue, className, lookupEventHandler }) => {
     const value = extractValue.asString(node.props.value);
     const size = extractValue.asOptionalNumber(node.props.size);
     const level = extractValue.asOptionalString(node.props.level) as "L" | "M" | "Q" | "H" | undefined;
@@ -94,7 +94,7 @@ export const qrCodeComponentRenderer = createComponentRenderer(
 
     return (
       <QRCodeNative
-        classes={classes}
+        className={className}
         value={value}
         size={size}
         level={level}

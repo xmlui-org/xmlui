@@ -2,7 +2,6 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
 import { OptionNative, defaultProps } from "./OptionNative";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Option";
 
@@ -39,7 +38,7 @@ export const OptionMd = createMetadata({
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
-  ({ node, extractValue, classes, renderChild, layoutContext }) => {
+  ({ node, extractValue, className, renderChild, layoutContext }) => {
     const label = extractValue.asOptionalString(node.props.label);
     let value = extractValue(node.props.value);
     if (label === undefined && value === undefined) {
@@ -66,7 +65,7 @@ export const optionComponentRenderer = createComponentRenderer(
         value={value !== undefined && value !== "" ? value : label}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         keywords={extractValue.asOptionalStringArray(node.props.keywords)}
-        className={classes?.[COMPONENT_PART_KEY]}
+        className={className}
         optionRenderer={
           node.children?.length > 0
             ? !hasTextNodeChild

@@ -71,14 +71,14 @@ describe("resolveResponsiveWhen", () => {
   });
 
   // --- Test: No matching rule below defined breakpoint returns false
-  it("when-md=true at xs (sizeIndex=0): lowest rule is truthy \u2192 implied base is hidden (false)", () => {
+  it("when-md=true at xs (sizeIndex=0) has no matching rule — falls back to base when (undefined → true)", () => {
     const result = resolveResponsiveWhen(undefined, { md: "true" }, emptyState, mockAppContext(0));
-    expect(result).equal(false);
+    expect(result).equal(true);
   });
 
-  it("when-md=true at sm (sizeIndex=1): lowest rule is truthy \u2192 implied base is hidden (false)", () => {
+  it("when-md=true at sm (sizeIndex=1) has no matching rule — falls back to base when (undefined → true)", () => {
     const result = resolveResponsiveWhen(undefined, { md: "true" }, emptyState, mockAppContext(1));
-    expect(result).equal(false);
+    expect(result).equal(true);
   });
 
   // --- Test: Multiple rules, most specific wins (walk down from current)
@@ -194,8 +194,8 @@ describe("resolveResponsiveWhen", () => {
     expect(result).equal(true);
   });
 
-  it("Cascade test: when-xxl=true at sm (sizeIndex=1): lowest rule is truthy \u2192 implied base is hidden (false)", () => {
+  it("Cascade test: when-xxl=true at sm (sizeIndex=1) has no match — falls back to base when (undefined → true)", () => {
     const result = resolveResponsiveWhen(undefined, { xxl: "true" }, emptyState, mockAppContext(1));
-    expect(result).equal(false);
+    expect(result).equal(true);
   });
 });

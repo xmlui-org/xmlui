@@ -11,7 +11,6 @@ import classnames from "classnames";
 
 import styles from "./ResponsiveBar.module.scss";
 import { useResizeObserver } from "../../components-core/utils/hooks";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedDropdownMenu as DropdownMenu, ThemedMenuItem as MenuItem } from "../DropdownMenu/DropdownMenu";
 import type { AlignmentOptions } from "../abstractions";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -111,7 +110,6 @@ type ResponsiveBarProps = {
   reverse?: boolean; // Reverse the direction of children
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   onClick?: () => void;
   onWillOpen?: () => Promise<boolean | undefined>;
   registerComponentApi?: RegisterComponentApiFn;
@@ -182,7 +180,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
     reverse = defaultResponsiveBarProps.reverse,
     style,
     className,
-    classes,
     onClick,
     onWillOpen,
     registerComponentApi,
@@ -487,7 +484,6 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       className={classnames(
         styles.responsiveBar, 
         orientation === "vertical" ? styles.vertical : styles.horizontal,
-        classes?.[COMPONENT_PART_KEY],
         className
       )}
       style={{

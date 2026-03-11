@@ -66,7 +66,7 @@ export const ContextMenuMd = createMetadata({
 export const contextMenuComponentRenderer = createComponentRenderer(
   CMCOMP,
   ContextMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, classes, state, updateState }) => {
+  ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
@@ -82,7 +82,7 @@ export const contextMenuComponentRenderer = createComponentRenderer(
       <ContextMenu
         registerComponentApi={registerComponentApi}
         updateState={updateState}
-        classes={classes}
+        className={className}
         menuWidth={extractValue(node.props.menuWidth)}
       >
         {renderChild(nodeWithContextVars)}

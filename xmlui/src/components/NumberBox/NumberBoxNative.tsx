@@ -13,7 +13,6 @@ import styles from "./NumberBox.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useEvent } from "../../components-core/utils/misc";
 import {
   clamp,
@@ -66,7 +65,6 @@ type Props = {
   initialValue?: number | string | null;
   style?: CSSProperties;
   className?: string;
-  classes?: Record<string, string>;
   step?: number | string;
   enabled?: boolean;
   placeholder?: string;
@@ -106,7 +104,6 @@ export const NumberBox = forwardRef(function NumberBox(
     initialValue,
     style,
     className,
-    classes,
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
@@ -606,7 +603,7 @@ export const NumberBox = forwardRef(function NumberBox(
   return (
     <div
       {...rest}
-      className={classnames(styles.inputRoot, classes?.[COMPONENT_PART_KEY], className, {
+      className={classnames(className, styles.inputRoot, {
         [styles.readOnly]: readOnly,
         [styles.disabled]: !enabled,
         [styles.noSpinBox]: !hasSpinBox,
