@@ -353,7 +353,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // They must not be forwarded to the native component as React props, because that
     // would pass raw XMLUI theme variable strings (e.g. "$textColor-secondary") to DOM
     // elements or SVG renderers where they are invalid and cause unexpected rendering.
-    ...layoutOptionKeys,
+    // Exception: if a layout prop is explicitly declared in the component's metadata props,
+    // it has component-specific meaning (e.g. Card's "orientation") and must be forwarded.
+    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
   ]);
 
   // Detect whether this is a stateful component
@@ -592,7 +594,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
     "id",
-    ...layoutOptionKeys,
+    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
   ]);
 
   const isStateful =
