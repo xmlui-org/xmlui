@@ -1,5 +1,6 @@
 import type React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
 import { Column, defaultProps } from "./ColumnNative";
@@ -141,6 +142,7 @@ export const columnComponentRenderer = createComponentRenderer(
         maxWidth={extractValue(node.props.maxWidth)}
         nodeChildren={node.children}
         renderChild={renderChild}
+        layoutContext={rendererContext.layoutContext as LayoutContext}
         id={node.uid}
       />
     );
