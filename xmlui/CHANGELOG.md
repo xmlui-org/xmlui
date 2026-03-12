@@ -1,5 +1,26 @@
 # xmlui
 
+## 0.12.7
+
+### Patch Changes
+
+- 3139ddc: Implement responsive layout properties
+- 92db16f: improve: enhance wrapComponent functionality with metadata merging
+- 2693f67: Add `mockData` property to `DataSource` for development and testing
+- 420bae7: Add headerUserSelect and cellUserSelect properties to Table
+- a72eb6d: Gather a search index into a json file at SSG time, which the client fetches.
+- 1b8c544: Fix Table rows occasionally rendering as blank despite valid data by passing `itemSize={rowHeight}` to the virtua Virtualizer component
+- be9a99b: Add applyLayoutProperties configuration option
+- 12c1131: Fix ContextMenu and ModalDialog theming regressions
+- 12c1131: Theme variables optimization ready for review
+- 90fd13f: Add dock property to Stack
+- 5b4ec41: Remove HoverCard and PositionedContainer
+- 9791592: Fix Select regression
+- f1aa401: feat: integrate wrapComponent into core components where possible
+- 985a7be: Fix theme variable optimization regressions
+- 12c1131: Fix portal styling issues with ModalDialog and Search
+- 3286eb2: Global variables regression fixes
+
 ## 0.12.6
 
 ### Patch Changes

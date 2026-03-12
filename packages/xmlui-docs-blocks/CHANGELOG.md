@@ -1,5 +1,11 @@
 # xmlui-docs-blocks
 
+## 0.0.5
+
+### Patch Changes
+
+- 12c1131: Theme variables optimization ready for review
+
 ## 0.0.4
 
 ### Patch Changes
