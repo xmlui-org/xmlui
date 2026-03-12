@@ -140,6 +140,10 @@ Set the HTTP method.
 
 Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
+### `mockData` [#mockdata]
+
+Provide data directly instead of fetching from a URL. When set, the component resolves immediately with this value — no network request is made. Intended for development and testing. Supports reactive expressions: when the bound value changes, the DataSource re-resolves with the updated data.
+
 ### `nextPageSelector` [#nextpageselector]
 
 When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
@@ -273,9 +277,7 @@ Set an optional function to perform a final transformation of the response data.
 
 ### `url` [#url]
 
-> [!DEF]  This property is required.
-
-Set the URL.
+Set the URL. Required unless `mockData` is provided, in which case the component returns the mock data directly without making a network request.
 
 ## Events [#events]
 
