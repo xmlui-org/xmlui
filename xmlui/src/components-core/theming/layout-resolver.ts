@@ -49,14 +49,11 @@ export function resolveLayoutProps(
   // --- Inside a TableCell, reset min-width to 0 so nested flex containers
   // --- (HStack, Link, etc.) can shrink below their content width, allowing
   // --- text-overflow: ellipsis to work on descendant Text components. (#2936)
-  // --- Also set overflow: hidden so the truncation constraint propagates
-  // --- through each intermediate container in the chain.
+  // --- The Text component's own overflow CSS handles clipping; we do NOT set
+  // --- overflow: hidden here because that would clip flow-mode text reflow.
   const insideTableCell = isInsideLayout(layoutContext, "TableCell");
   if (insideTableCell && !layoutProps.minWidth) {
     result.cssProps.minWidth = 0;
-  }
-  if (insideTableCell && !layoutProps.overflow) {
-    result.cssProps.overflow = "hidden";
   }
 
   // --- Adjust flex
@@ -64,7 +61,11 @@ export function resolveLayoutProps(
     // --- In a container, we normally use "flex-shrink: 0" to prevent items
     // --- from collapsing. Inside a TableCell however, items must be allowed
     // --- to shrink so that text truncation / ellipsis works. (#2936)
-    if (!insideTableCell) {
+    // --- We set flexShrink: 1 explicitly (not just omit 0) so the inline style
+    // --- overrides any SCSS class that sets flex-shrink: 0 (e.g. overflowFlow).
+    if (insideTableCell) {
+      result.cssProps.flexShrink = 1;
+    } else {
       result.cssProps.flexShrink = 0;
     }
   }
