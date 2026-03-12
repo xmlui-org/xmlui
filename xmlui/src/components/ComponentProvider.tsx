@@ -60,14 +60,12 @@ import {
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
 import { dynamicHeightListComponentRenderer } from "./List/List";
-import { positionedContainerComponentRenderer } from "./PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
-import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
 import { navPanelRenderer } from "./NavPanel/NavPanel";
 import { pageRenderer, pagesRenderer } from "./Pages/Pages";
@@ -579,13 +577,11 @@ export class ComponentRegistry {
       this.registerCoreComponent(queueComponentRenderer);
       this.registerCoreComponent(qrCodeComponentRenderer);
       this.registerCoreComponent(includeMarkupComponentRenderer);
-      this.registerCoreComponent(positionedContainerComponentRenderer);
       this.registerCoreComponent(changeListenerComponentRenderer);
       this.registerCoreComponent(realTimeAdapterComponentRenderer);
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
-      this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
       this.registerCoreComponent(radioItemComponentRenderer);
       this.registerCoreComponent(fileInputRenderer);

@@ -26,7 +26,6 @@ import { FooterMd } from "./Footer/Footer";
 import { FormMd } from "./Form/Form";
 import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
-import { HoverCardMd } from "./HoverCard/HoverCard";
 import { IconMd } from "./Icon/Icon";
 import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
@@ -44,7 +43,6 @@ import { NoResultMd } from "./NoResult/NoResult";
 import { NumberBoxMd } from "./NumberBox/NumberBox";
 import { PageMetaTitleMd } from "./PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "./Pages/Pages";
-import { PositionedContainerMd } from "./PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "./ProgressBar/ProgressBar";
 import { QueueMd } from "./Queue/Queue";
 import { RadioGroupMd } from "./RadioGroup/RadioGroup";
@@ -368,7 +366,6 @@ export const collectedComponentMetadata = {
   H4: H4Md,
   H5: H5Md,
   H6: H6Md,
-  HoverCard: HoverCardMd,
   Icon: IconMd,
   IFrame: IFrameMd,
   Image: ImageMd,
@@ -391,7 +388,6 @@ export const collectedComponentMetadata = {
   Page: PageMd,
   Pages: PagesMd,
   Pagination: PaginationMd,
-  PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   QRCode: QRCodeMd,
   Queue: QueueMd,
