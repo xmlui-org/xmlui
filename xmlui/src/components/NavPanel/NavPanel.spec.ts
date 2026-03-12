@@ -1322,3 +1322,120 @@ test.describe("showScrollerFade", () => {
     await expect(fadeOverlays).toHaveCount(2);
   });
 });
+
+// =============================================================================
+// DYNAMIC LINK TESTS
+// =============================================================================
+
+const DYNAMIC_LINKS_CODE = `
+  <App var.links="{ [{ id: 1 }, { id: 2 }, { id: 3 }] }">
+    <NavPanel>
+      <Items data="{links}">
+        <NavLink to="/link/{$item.id}" label="Item {$item.id}"/>
+      </Items>
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Button testId="add-btn" onClick="links.push({ id: links.length + 1 })">Add Link</Button>
+        <Button testId="remove-btn" onClick="links.pop()">Remove Link</Button>
+      </Page>
+      <Page url="/link/:id">
+        <h1>Link {$routeParams.id}</h1>
+      </Page>
+    </Pages>
+  </App>
+`;
+
+test.describe("dynamic link creation", () => {
+  test("renders initial links from dynamic data", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+  });
+
+  test("initial links have correct hrefs derived from item data", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toHaveAttribute("href", /\/link\/1/);
+    await expect(page.getByRole("link", { name: "Item 2" })).toHaveAttribute("href", /\/link\/2/);
+    await expect(page.getByRole("link", { name: "Item 3" })).toHaveAttribute("href", /\/link\/3/);
+  });
+
+  test("adds a new link when data array grows", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 4" })).not.toBeAttached();
+
+    await page.getByTestId("add-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 4" })).toHaveAttribute("href", /\/link\/4/);
+  });
+
+  test("removes the last link when data array shrinks", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+
+    await page.getByTestId("remove-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 3" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).toBeVisible();
+  });
+
+  test("reflects multiple sequential additions", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await page.getByTestId("add-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 5" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 4" })).toHaveAttribute("href", /\/link\/4/);
+    await expect(page.getByRole("link", { name: "Item 5" })).toHaveAttribute("href", /\/link\/5/);
+  });
+
+  test("addition then removal restores the previous link count", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+
+    await page.getByTestId("remove-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+  });
+
+  test("can reduce links below initial count", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("remove-btn").click();
+    await page.getByTestId("remove-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 3" })).not.toBeAttached();
+  });
+
+  test("clicking an existing link navigates to the correct page", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByRole("link", { name: "Item 2" }).click();
+
+    await expect(page.getByRole("heading", { name: "Link 2" })).toBeVisible();
+  });
+
+  test("clicking a newly added link navigates to the correct page", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+
+    await page.getByRole("link", { name: "Item 4" }).click();
+
+    await expect(page.getByRole("heading", { name: "Link 4" })).toBeVisible();
+  });
+});
