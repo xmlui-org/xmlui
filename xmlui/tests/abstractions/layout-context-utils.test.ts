@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { createChildLayoutContext } from "../../src/abstractions/layout-context-utils";
+import {
+  createChildLayoutContext,
+  getLayoutDepth,
+  findAncestorLayout,
+  isInsideLayout,
+  getLayoutPath,
+} from "../../src/abstractions/layout-context-utils";
 import type { LayoutContext } from "../../src/abstractions/RendererDefs";
 
 describe("createChildLayoutContext", () => {
@@ -63,5 +69,101 @@ describe("createChildLayoutContext", () => {
     // plain.depth is undefined so (undefined ?? -1) + 1 = 0.
     expect(child.depth).toBe(0);
     expect(child.parent).toBe(plain);
+  });
+});
+
+describe("getLayoutDepth", () => {
+  it("returns -1 for undefined (no layout boundary established)", () => {
+    expect(getLayoutDepth(undefined)).toBe(-1);
+  });
+
+  it("returns the depth of a root context", () => {
+    const ctx = createChildLayoutContext(undefined, { type: "Stack" });
+    expect(getLayoutDepth(ctx)).toBe(0);
+  });
+
+  it("returns the depth of a nested context", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const mid = createChildLayoutContext(root, { type: "Table" });
+    const leaf = createChildLayoutContext(mid, { type: "TableCell" });
+    expect(getLayoutDepth(leaf)).toBe(2);
+  });
+});
+
+describe("findAncestorLayout", () => {
+  it("returns undefined when context is undefined", () => {
+    expect(findAncestorLayout(undefined, () => true)).toBeUndefined();
+  });
+
+  it("finds the context itself when predicate matches", () => {
+    const ctx = createChildLayoutContext(undefined, { type: "Table" });
+    expect(findAncestorLayout(ctx, (c) => c.type === "Table")).toBe(ctx);
+  });
+
+  it("finds an ancestor further up the chain", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const mid = createChildLayoutContext(root, { type: "Table" });
+    const leaf = createChildLayoutContext(mid, { type: "TableCell" });
+    expect(findAncestorLayout(leaf, (c) => c.type === "Stack")).toBe(root);
+  });
+
+  it("returns undefined when no ancestor matches", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const child = createChildLayoutContext(root, { type: "Table" });
+    expect(findAncestorLayout(child, (c) => c.type === "Card")).toBeUndefined();
+  });
+});
+
+describe("isInsideLayout", () => {
+  it("returns false for undefined context", () => {
+    expect(isInsideLayout(undefined, "Stack")).toBe(false);
+  });
+
+  it("returns true when the context itself matches", () => {
+    const ctx = createChildLayoutContext(undefined, { type: "Stack" });
+    expect(isInsideLayout(ctx, "Stack")).toBe(true);
+  });
+
+  it("returns true when an ancestor matches", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const mid = createChildLayoutContext(root, { type: "Table" });
+    const leaf = createChildLayoutContext(mid, { type: "TableCell" });
+    expect(isInsideLayout(leaf, "Stack")).toBe(true);
+  });
+
+  it("returns true when any of multiple supplied types matches", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const child = createChildLayoutContext(root, { type: "Table" });
+    expect(isInsideLayout(child, "Card", "Stack")).toBe(true);
+  });
+
+  it("returns false when no ancestor matches any supplied type", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const child = createChildLayoutContext(root, { type: "Table" });
+    expect(isInsideLayout(child, "Card", "Form")).toBe(false);
+  });
+});
+
+describe("getLayoutPath", () => {
+  it("returns empty array for undefined context", () => {
+    expect(getLayoutPath(undefined)).toEqual([]);
+  });
+
+  it("returns a single-element array for a root context", () => {
+    const ctx = createChildLayoutContext(undefined, { type: "Stack" });
+    expect(getLayoutPath(ctx)).toEqual(["Stack"]);
+  });
+
+  it("returns the path from root to leaf in order", () => {
+    const root = createChildLayoutContext(undefined, { type: "Stack" });
+    const mid = createChildLayoutContext(root, { type: "Table" });
+    const leaf = createChildLayoutContext(mid, { type: "TableCell" });
+    expect(getLayoutPath(leaf)).toEqual(["Stack", "Table", "TableCell"]);
+  });
+
+  it("records undefined type as empty string", () => {
+    const root = createChildLayoutContext(undefined, {});
+    const child = createChildLayoutContext(root, { type: "Stack" });
+    expect(getLayoutPath(child)).toEqual(["", "Stack"]);
   });
 });

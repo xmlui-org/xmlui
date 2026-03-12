@@ -24,3 +24,62 @@ export function createChildLayoutContext(
     parent,
   };
 }
+
+/**
+ * Returns the nesting depth of a layout context.
+ * Returns `-1` when context is `undefined` (no layout boundary has been
+ * established yet, i.e., the component is at the root level).
+ */
+export function getLayoutDepth(context: LayoutContext | undefined): number {
+  return context?.depth ?? -1;
+}
+
+/**
+ * Walks the `parent` chain and returns the first ancestor (inclusive of
+ * `context` itself) whose `type` satisfies the predicate, or `undefined`
+ * if none match.
+ *
+ * @param context  - The starting layout context.
+ * @param predicate - Returns `true` for the ancestor you are looking for.
+ */
+export function findAncestorLayout(
+  context: LayoutContext | undefined,
+  predicate: (ctx: LayoutContext) => boolean,
+): LayoutContext | undefined {
+  let current = context;
+  while (current !== undefined) {
+    if (predicate(current)) return current;
+    current = current.parent;
+  }
+  return undefined;
+}
+
+/**
+ * Returns `true` when `context` or any of its ancestors has a `type` that
+ * is included in `types`.
+ *
+ * @param context - The layout context to inspect.
+ * @param types   - One or more layout type names to match against.
+ */
+export function isInsideLayout(
+  context: LayoutContext | undefined,
+  ...types: string[]
+): boolean {
+  const typeSet = new Set(types);
+  return findAncestorLayout(context, (ctx) => typeSet.has(ctx.type ?? "")) !== undefined;
+}
+
+/**
+ * Returns an ordered array of layout `type` strings from the root down to
+ * `context`, e.g. `["Stack", "Table", "TableCell"]`.
+ * Entries whose `type` is `undefined` are recorded as `""`.
+ */
+export function getLayoutPath(context: LayoutContext | undefined): string[] {
+  const path: string[] = [];
+  let current = context;
+  while (current !== undefined) {
+    path.unshift(current.type ?? "");
+    current = current.parent;
+  }
+  return path;
+}
