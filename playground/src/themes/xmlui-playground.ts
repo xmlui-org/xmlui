@@ -1,8 +1,8 @@
 import type { ThemeDefinition } from "xmlui";
 
-export const DefaultDocsTheme: ThemeDefinition = {
-  name: "XMLUI Documentation Theme",
-  id: "docs-theme",
+export const XmluiPlaygroundTheme: ThemeDefinition = {
+  name: "XMLUI Playground Theme",
+  id: "xmlui-playground-theme",
   extends: ["xmlui"],
   themeVars: {
     backgroundColor: "$color-surface-0",
@@ -26,4 +26,4 @@ export const DefaultDocsTheme: ThemeDefinition = {
   resources: {},
 };
 
-export default DefaultDocsTheme;
+export default XmluiPlaygroundTheme;

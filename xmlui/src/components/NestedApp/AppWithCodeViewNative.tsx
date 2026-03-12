@@ -9,7 +9,7 @@ import { createQueryString, withoutTrailingSlash } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
 import Logo from "./logo.svg?react";
-import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { ThemedIcon } from "../Icon/Icon";
 
 type AppWithCodeViewNativeProps = {
@@ -68,19 +68,21 @@ export function AppWithCodeViewNative({
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
+  const { activeThemeTone, activeThemeId } = useTheme();
+  const { themes: allThemes } = useThemes();
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
+    const themeForExport = allThemes.find((t) => t.id === activeThemeId);
     const data = {
       standalone: {
         app,
         components,
         config: {
           name: title,
-          themes: [currentTheme],
+          themes: themeForExport ? [themeForExport] : [],
           defaultTheme: activeTheme,
         },
         api: api,
@@ -97,7 +99,7 @@ export function AppWithCodeViewNative({
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
     window.open(`${safePopOutUrl}/#${appQueryString}`, "_blank");
-  }, [app, components, title, activeTheme, api, activeTone, safePopOutUrl]);
+  }, [allThemes, app, components, title, activeTheme, api, activeThemeId, activeTone, activeThemeTone, safePopOutUrl]);
 
   if (withFrame) {
     return (
