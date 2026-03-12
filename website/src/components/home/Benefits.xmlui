@@ -14,7 +14,7 @@
         <Benefit width="100%" width-md="50%" title="Connected.">
             Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="50%" width-md="100%" title="Deployable.">
+        <Benefit width="100%" width-md="50%" title="Deployable.">
             Drop files onto a static webserver.
         </Benefit>
     </FlowLayout>

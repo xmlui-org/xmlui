@@ -16,6 +16,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
 import { alignmentOptionValues } from "../abstractions";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayout";
+import { collectResponsiveWidthProps } from "../FlowLayout/flow-layout-utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Stack";
@@ -420,11 +421,13 @@ function renderStack({
             const width = extractValue((node.props as any)?.width);
             const minWidth = extractValue((node.props as any)?.minWidth);
             const maxWidth = extractValue((node.props as any)?.maxWidth);
+            const responsiveWidthProps = collectResponsiveWidthProps(node.props, extractValue);
             return (
               <FlowItemWrapper
                 width={width}
                 minWidth={minWidth}
                 maxWidth={maxWidth}
+                responsiveWidthProps={responsiveWidthProps}
                 forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
