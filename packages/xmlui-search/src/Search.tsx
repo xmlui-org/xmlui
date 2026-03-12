@@ -32,7 +32,7 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classNames from "classnames";
 
 type Props = {
@@ -179,7 +179,7 @@ export const Search = ({
             contextualLabel="Open search"
           />
         ) : (
-          <PopoverTrigger asChild>
+          <PopoverAnchor asChild>
             <TextBox
               id={inputId}
               ref={inputRef}
@@ -202,7 +202,7 @@ export const Search = ({
               aria-controls={`${inputId}-listbox`}
               aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
             />
-          </PopoverTrigger>
+          </PopoverAnchor>
         )}
         {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
           <Portal container={_root}>
