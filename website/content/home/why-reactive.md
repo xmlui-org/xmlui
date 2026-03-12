@@ -4,7 +4,7 @@ Your apps are reactive out of the box. It's easy. No React expertise required.
 
 ```xmlui-pg display name="Watch the table reactively update when lines.value changes" /id="lines"/ /lines.value/
 <App>
-  <Select id="lines" initialValue="bakerloo">
+  <Select id="lines" initialValue="bakerloo" dropdownHeight="180px">
     <Items data="https://api.tfl.gov.uk/line/mode/tube/status">
         <Option value="{$item.id}" label="{$item.name}" />
     </Items>

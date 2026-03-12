@@ -4,6 +4,7 @@ import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import {
   dPlaceholder,
   dInitialValue,
@@ -241,6 +242,7 @@ export const selectComponentRenderer = createComponentRenderer(
       <Select
         multiSelect={multiSelect}
         classes={classes}
+        contentClassName={classes?.[COMPONENT_PART_KEY]}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,
