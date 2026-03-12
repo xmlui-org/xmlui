@@ -1,8 +1,58 @@
 import React from "react";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
-import type { ComponentRendererDef } from "../abstractions/RendererDefs";
+import type { ComponentRendererDef, LayoutContext } from "../abstractions/RendererDefs";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
+
+/**
+ * Generic hover capture for canvas-rendered components.
+ * Wraps children in a display:contents div that captures mousemove
+ * on canvas elements and emits throttled native:hover trace events.
+ */
+function HoverCapture({ children, componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession }: {
+  children: React.ReactNode;
+  componentType: string;
+  componentLabel?: string;
+  ariaName?: string;
+  ownerFileId?: string;
+  ownerSource?: any;
+  hoverSession: { traceId: string | undefined; lastTs: number };
+}) {
+  const THROTTLE_MS = 300;
+  const SESSION_GAP_MS = 500;
+
+  const handleMouseMove = React.useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName !== 'CANVAS') return;
+    const now = Date.now();
+    if (now - hoverSession.lastTs < THROTTLE_MS) return;
+
+    // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
+    if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
+      hoverSession.traceId = pushTrace();
+      popTrace();
+    }
+    hoverSession.lastTs = now;
+
+    pushXsLog(createLogEntry('native:hover', {
+      traceId: hoverSession.traceId,
+      componentType,
+      componentLabel: componentLabel || componentType,
+      eventName: 'hover',
+      ariaName: ariaName || undefined,
+      offsetX: e.nativeEvent.offsetX,
+      offsetY: e.nativeEvent.offsetY,
+      ownerFileId,
+      ownerSource,
+    }));
+  }, [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession]);
+
+  return (
+    <div style={{ display: 'contents' }} onMouseMoveCapture={handleMouseMove}>
+      {children}
+    </div>
+  );
+}
 
 /**
  * Configuration for wrapComponent. Only specify what can't be inferred
@@ -71,6 +121,13 @@ export type WrapComponentConfig = {
    * wrap libraries with their own event systems (e.g., ECharts, Monaco, etc.).
    */
   captureNativeEvents?: boolean;
+
+  /**
+   * Optional layout context passed to renderChild when rendering node.children.
+   * Use this when the component needs to wrap its children in a specific layout,
+   * e.g. { type: "Stack", orientation: "vertical" }.
+   */
+  childrenLayoutContext?: LayoutContext;
 };
 
 /**
@@ -196,6 +253,20 @@ function eventNameToTraceKind(xmluiName: string): string | undefined {
 }
 
 /**
+ * End a trace, deferring popTrace to a microtask for value:change events
+ * so the trace context survives through React's state batching and into
+ * downstream re-renders (e.g., DataSource URL re-evaluation).
+ */
+function endTrace(traceId: string | undefined, traceKind: string | undefined): void {
+  if (!traceId) return;
+  if (traceKind === "value:change") {
+    Promise.resolve().then(() => popTrace());
+  } else {
+    popTrace();
+  }
+}
+
+/**
  * Derive a human-readable displayLabel for a trace event.
  * For value:change, the first arg is the new value (number/string).
  * For focus:change, the first arg is a FocusEvent — use the event name instead.
@@ -295,6 +366,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       extractResourceUrl,
       lookupEventHandler,
       lookupSyncCallback,
+      renderChild,
       className,
       updateState,
       state,
@@ -307,6 +379,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     const nodeSource = (node as any).debug?.source;
     const ownerFileId = nodeSource?.fileId;
     const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
+
+    // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
+    const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
     // --- Always pass through XMLUI plumbing ---
     props.className = className;
@@ -324,7 +399,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // preserves native component behaviour that checks `!!onClick` etc.
     for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
       const handler = lookupEventHandler(xmluiName);
-      const traceKind = eventNameToTraceKind(xmluiName);
+      const traceKind = xsVerbose ? eventNameToTraceKind(xmluiName) : undefined;
       if (!handler && !traceKind) continue;
       props[reactPropName] = (...args: any[]) => {
         // Push a trace so the behavioral event and handler events share the same traceId
@@ -348,7 +423,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           }
           return result;
         } finally {
-          if (traceId) popTrace();
+          endTrace(traceId, traceKind);
         }
       };
     }
@@ -359,21 +434,56 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture ---
-    // When captureNativeEvents is enabled (per-component config or appGlobals),
-    // pass an onNativeEvent callback that the render component can call with
-    // any native library event. The event flows into the trace system automatically.
-    if (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents) {
+    // Hover-related events (mouseover, mouseout) join the current hover session
+    // so they appear in the same trace as native:hover events from HoverCapture.
+    // Non-hover events (click, legendselectchanged, etc.) get their own trace.
+    const nativeEventsEnabled = xsVerbose && (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
+    const hoverSession = nativeEventsEnabled ? { traceId: undefined as string | undefined, lastTs: 0 } : undefined;
+
+    if (nativeEventsEnabled) {
+      const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
+      const SESSION_GAP_MS = 500;
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
         const traceKind = `native:${eventType}`;
+
+        // Extract canvas-relative coordinates from the native DOM event.
+        // Libraries wrap the MouseEvent at different depths:
+        //   ECharts: event.event.event (ZRender wrapper → DOM MouseEvent)
+        //   React synthetic: event.nativeEvent
+        //   Direct: event.offsetX
+        const domEvent =
+          event?.event?.event || event?.event?.nativeEvent ||
+          event?.event || event?.nativeEvent;
+        const offsetX = domEvent?.offsetX ?? event?.offsetX;
+        const offsetY = domEvent?.offsetY ?? event?.offsetY;
+
+        let traceId: string;
+        if (HOVER_EVENTS.has(eventType)) {
+          // Join the hover session (or start one if none active / session expired)
+          const now = Date.now();
+          if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
+            hoverSession.traceId = pushTrace();
+            popTrace();
+          }
+          hoverSession.lastTs = now;
+          traceId = hoverSession.traceId;
+        } else {
+          // Non-hover events get their own trace
+          traceId = pushTrace();
+          popTrace();
+        }
+
         pushXsLog(createLogEntry(traceKind, {
+          traceId,
           componentType: type,
           componentLabel: xmluiId || type,
           displayLabel: event?.displayLabel || undefined,
           eventName: eventType,
           ariaName: extractValue(node.props?.["aria-label"]) || undefined,
           nativeEvent: event,
+          ...(typeof offsetX === "number" && { offsetX, offsetY }),
           ownerFileId,
           ownerSource,
         }));
@@ -415,7 +525,27 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
-    return <Component {...props} />;
+    // --- Render children if the node has any ---
+    if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+      props.children = renderChild(node.children, config.childrenLayoutContext);
+    }
+
+    const rendered = <Component {...props} />;
+    if (nativeEventsEnabled && hoverSession) {
+      return (
+        <HoverCapture
+          componentType={type}
+          componentLabel={node.uid || node.testId || type}
+          ariaName={extractValue(node.props?.["aria-label"]) || undefined}
+          ownerFileId={ownerFileId}
+          ownerSource={ownerSource}
+          hoverSession={hoverSession}
+        >
+          {rendered}
+        </HoverCapture>
+      );
+    }
+    return rendered;
   });
 }
 
@@ -618,6 +748,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     const ownerFileId = nodeSource?.fileId;
     const ownerSource = nodeSource ? { start: nodeSource.start, end: nodeSource.end } : undefined;
 
+    // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
+    const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
+
     props.className = className;
 
     // State-management props go to StateWrapper as __-prefixed internals
@@ -631,7 +764,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // --- Events (with auto-tracing + auto-updateState) ---
     for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
       const handler = lookupEventHandler(xmluiName);
-      const traceKind = eventNameToTraceKind(xmluiName);
+      const traceKind = xsVerbose ? eventNameToTraceKind(xmluiName) : undefined;
 
       if (xmluiName === "didChange" && isStateful) {
         // didChange is special: StateWrapper's onChange calls this.
@@ -658,7 +791,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             }
             return result;
           } finally {
-            if (traceId) popTrace();
+            endTrace(traceId, traceKind);
           }
         };
       } else {
@@ -684,7 +817,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             }
             return result;
           } finally {
-            if (traceId) popTrace();
+            endTrace(traceId, traceKind);
           }
         };
       }
@@ -696,18 +829,51 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture (same as wrapComponent) ---
-    if (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents) {
+    const nativeEventsEnabled = xsVerbose && (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
+    const hoverSession = nativeEventsEnabled ? { traceId: undefined as string | undefined, lastTs: 0 } : undefined;
+
+    if (nativeEventsEnabled) {
+      const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
+      const SESSION_GAP_MS = 500;
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
         const traceKind = `native:${eventType}`;
+
+        // Extract canvas-relative coordinates from the native DOM event.
+        // Libraries wrap the MouseEvent at different depths:
+        //   ECharts: event.event.event (ZRender wrapper → DOM MouseEvent)
+        //   React synthetic: event.nativeEvent
+        //   Direct: event.offsetX
+        const domEvent =
+          event?.event?.event || event?.event?.nativeEvent ||
+          event?.event || event?.nativeEvent;
+        const offsetX = domEvent?.offsetX ?? event?.offsetX;
+        const offsetY = domEvent?.offsetY ?? event?.offsetY;
+
+        let traceId: string;
+        if (HOVER_EVENTS.has(eventType)) {
+          const now = Date.now();
+          if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
+            hoverSession.traceId = pushTrace();
+            popTrace();
+          }
+          hoverSession.lastTs = now;
+          traceId = hoverSession.traceId;
+        } else {
+          traceId = pushTrace();
+          popTrace();
+        }
+
         pushXsLog(createLogEntry(traceKind, {
+          traceId,
           componentType: type,
           componentLabel: xmluiId || type,
           displayLabel: event?.displayLabel || undefined,
           eventName: eventType,
           ariaName: extractValue(node.props?.["aria-label"]) || undefined,
           nativeEvent: event,
+          ...(typeof offsetX === "number" && { offsetX, offsetY }),
           ownerFileId,
           ownerSource,
         }));
@@ -740,6 +906,21 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       }
     }
 
-    return <StateWrapper {...props} />;
+    const rendered = <StateWrapper {...props} />;
+    if (nativeEventsEnabled && hoverSession) {
+      return (
+        <HoverCapture
+          componentType={type}
+          componentLabel={node.uid || node.testId || type}
+          ariaName={extractValue(node.props?.["aria-label"]) || undefined}
+          ownerFileId={ownerFileId}
+          ownerSource={ownerSource}
+          hoverSession={hoverSession}
+        >
+          {rendered}
+        </HoverCapture>
+      );
+    }
+    return rendered;
   });
 }

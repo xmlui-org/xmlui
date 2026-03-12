@@ -413,7 +413,7 @@ export const ssg = async ({
   log("building project assets");
   await build({
     buildMode: "INLINE_ALL",
-    withMock: false,
+    withMock: true,
     withHostingMetaFiles: false,
     withRelativeRoot: false,
     flatDist: false,

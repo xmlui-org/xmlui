@@ -583,11 +583,15 @@ test.describe("Positioning", () => {
 
 test("adjusts position when menu would overflow viewport", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <Card 
+    <Card
       testId="target"
-      title="Bottom Right Corner" 
-      onContextMenu="ev => menu.openAt(ev)" 
-      style="position: fixed; bottom: 0; right: 0; width: 200px; height: 100px;"
+      title="Bottom Right Corner"
+      onContextMenu="ev => menu.openAt(ev)"
+      width="200px"
+      height="100px"
+      position="absolute"
+      bottom="0"
+      right="0"
     >
       <Text value="Right click me" />
     </Card>

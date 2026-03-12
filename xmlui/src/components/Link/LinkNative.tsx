@@ -26,10 +26,11 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 
 type Props = {
   to: string | { pathname: string; queryParams?: Record<string, any> };
-  children: ReactNode;
+  children?: ReactNode;
+  label?: string;
   icon?: string;
   active?: boolean;
-  disabled?: boolean;
+  enabled?: boolean;
   horizontalAlignment?: string;
   verticalAlignment?: string;
   onClick?: () => void;
@@ -49,9 +50,9 @@ type Props = {
   >
 >;
 
-export const defaultProps: Pick<Props, "active" | "disabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
+export const defaultProps: Pick<Props, "active" | "enabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
   active: false,
-  disabled: false,
+  enabled: true,
   noIndicator: false,
   preserveLinebreaks: false,
   ellipses: true,
@@ -64,11 +65,12 @@ export const LinkNative = forwardRef(function LinkNative(
   const {
     to,
     children,
+    label,
     icon,
     active = defaultProps.active,
     onClick,
     target,
-    disabled = defaultProps.disabled,
+    enabled = defaultProps.enabled,
     horizontalAlignment,
     verticalAlignment,
     style,
@@ -83,7 +85,8 @@ export const LinkNative = forwardRef(function LinkNative(
     ...anchorProps
   } = specifyTypes(props);
 
-  const iconLink = !!icon && !children;
+  const content = label ?? children;
+  const iconLink = !!icon && !content;
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
   }, [to]) as To;
@@ -193,7 +196,7 @@ export const LinkNative = forwardRef(function LinkNative(
           [styles.noIndicator]: noIndicator,
           [styles.iconLink]: iconLink,
           [styles.active]: active,
-          [styles.disabled]: disabled,
+          [styles.disabled]: !enabled,
           // When any overflow/text feature is active the container must be
           // allowed to shrink (min-width:0) and must clip its flex children.
           [styles.textOverflowContainer]: hasOverflowFeature,
@@ -212,10 +215,10 @@ export const LinkNative = forwardRef(function LinkNative(
       )}
       {hasOverflowFeature ? (
         <span className={classnames(styles.textSpan, textSpanClasses)} style={textSpanStyle}>
-          {children}
+          {content}
         </span>
       ) : (
-        children
+        content
       )}
     </Node>
   );

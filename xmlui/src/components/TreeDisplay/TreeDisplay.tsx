@@ -1,11 +1,11 @@
 import styles from "./TreeDisplay.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "TreeDisplay";
 
@@ -62,19 +62,8 @@ export const ThemedTreeDisplay = React.forwardRef<React.ElementRef<typeof TreeDi
   },
 );
 
-export const treeDisplayComponentRenderer = createComponentRenderer(
+export const treeDisplayComponentRenderer = wrapComponent(
   COMP,
+  ThemedTreeDisplay,
   TreeDisplayMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
-    return (
-      <TreeDisplay
-        classes={classes}
-        content={extractValue.asOptionalString(node.props.content)}
-        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      >
-        {renderChild(node.children)}
-      </TreeDisplay>
-    );
-  },
 );
