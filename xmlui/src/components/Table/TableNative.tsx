@@ -1206,7 +1206,30 @@ export const Table = forwardRef(
     const rowsRef = useRef(rows);
     rowsRef.current = rows;
 
-    // Custom row component for Virtualizer - memoized to avoid recreation on every render
+    // --- Stable ref for all values accessed inside VirtualTableRow.
+    // Keeping VirtualTableRow identity stable is critical: virtua's ListItem uses
+    // useLayoutEffect(() => observe(ref, index), [index]) to register each row with
+    // ResizeObserver. If VirtualTableRow identity changes (useMemo recreates it),
+    // React remounts all <tr> elements, but the effect doesn't re-run (index is the
+    // same), so the new DOM nodes are never observed → rows stay visibility:hidden.
+    const rowState = {
+      focusedIndex,
+      rowDisabledPredicate,
+      noBottomBorder,
+      effectiveUserSelectRow,
+      toggleRow,
+      checkAllRows,
+      enableMultiRowSelection,
+      tolerancePixels,
+      setHoveredRowId,
+      lookupEventHandler,
+      rowDoubleClick,
+    };
+    const rowStateRef = useRef(rowState);
+    rowStateRef.current = rowState;
+
+    // Custom row component for Virtualizer — created once, reads current values from refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const VirtualTableRow = useMemo(() => {
       const RowComponent = forwardRef<HTMLTableRowElement, CustomItemComponentProps>(
         ({ style, children, index: rowIndex }, ref) => {
@@ -1215,6 +1238,7 @@ export const Table = forwardRef(
             console.warn(`Table: No row data found at index ${rowIndex}`);
             return null;
           }
+          const s = rowStateRef.current;
           const isFirstRow = rowIndex === 0;
           return (
             <tr
@@ -1222,13 +1246,13 @@ export const Table = forwardRef(
               ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
               style={{
                 ...style,
-                userSelect: effectiveUserSelectRow as React.CSSProperties["userSelect"],
+                userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
               }}
               className={classnames(styles.row, {
                 [styles.selected]: row.getIsSelected(),
-                [styles.focused]: focusedIndex === rowIndex,
-                [styles.disabled]: rowDisabledPredicate(row.original),
-                [styles.noBottomBorder]: noBottomBorder,
+                [styles.focused]: s.focusedIndex === rowIndex,
+                [styles.disabled]: s.rowDisabledPredicate(row.original),
+                [styles.noBottomBorder]: s.noBottomBorder,
               })}
               onClick={(event) => {
                 // On Windows, the second click of a double-click fires onClick before onDoubleClick.
@@ -1270,27 +1294,29 @@ export const Table = forwardRef(
                   const clickX = event.clientX;
                   const clickY = event.clientY;
 
-                  if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)) {
+                  const rs = rowStateRef.current;
+                  if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, rs.tolerancePixels)) {
                     // Toggle the checkbox when clicking within the boundary
                     // In single selection mode, allow deselection by checking if already selected
-                    if (!enableMultiRowSelection && row.getIsSelected()) {
-                      checkAllRows(false); // Deselect all (which is just this one row)
+                    if (!rs.enableMultiRowSelection && row.getIsSelected()) {
+                      rs.checkAllRows(false); // Deselect all (which is just this one row)
                     } else {
-                      toggleRow(row.original, { metaKey: true });
+                      rs.toggleRow(row.original, { metaKey: true });
                     }
                     return;
                   }
                 }
-                toggleRow(row.original, event);
+                rowStateRef.current.toggleRow(row.original, event);
               }}
               onDoubleClick={(event) => {
                 // Prevent browser text selection on double-click
                 event.preventDefault();
 
                 // Call external handler if provided
-                if (rowDoubleClick && typeof rowDoubleClick === "function") {
+                const { rowDoubleClick: dblClick } = rowStateRef.current;
+                if (dblClick && typeof dblClick === "function") {
                   try {
-                    rowDoubleClick(row.original);
+                    dblClick(row.original);
                   } catch (e) {
                     console.error("Error in rowDoubleClick handler:", e);
                   }
@@ -1312,15 +1338,15 @@ export const Table = forwardRef(
                     mouseX,
                     mouseY,
                     checkboxRect,
-                    tolerancePixels,
+                    rowStateRef.current.tolerancePixels,
                   );
 
                   // Update hover state and cursor based on proximity to checkbox
                   if (shouldShowHover) {
-                    setHoveredRowId(row.id);
+                    rowStateRef.current.setHoveredRowId(row.id);
                     currentRow.style.cursor = "pointer";
                   } else {
-                    setHoveredRowId(null);
+                    rowStateRef.current.setHoveredRowId(null);
                     currentRow.style.cursor = "";
                   }
                 }
@@ -1329,15 +1355,15 @@ export const Table = forwardRef(
                 // Reset cursor and hover state when leaving the row
                 const currentRow = event.currentTarget as HTMLElement;
                 currentRow.style.cursor = "";
-                setHoveredRowId(null);
+                rowStateRef.current.setHoveredRowId(null);
               }}
               onContextMenu={
-                lookupEventHandler
+                rowStateRef.current.lookupEventHandler
                   ? (event) => {
                       // Prevent default browser context menu only when a contextMenu handler is configured
                       event.preventDefault();
 
-                      const handler = lookupEventHandler("contextMenu", {
+                      const handler = rowStateRef.current.lookupEventHandler("contextMenu", {
                         context: {
                           $item: row.original,
                           $row: row.original,
@@ -1359,21 +1385,7 @@ export const Table = forwardRef(
       );
       RowComponent.displayName = "VirtualTableRow";
       return RowComponent;
-    }, [
-      focusedIndex,
-      rowDisabledPredicate,
-      noBottomBorder,
-      effectiveUserSelectRow,
-      firstRowRef,
-      toggleRow,
-      checkAllRows,
-      enableMultiRowSelection,
-      tolerancePixels,
-      wrapperRef,
-      setHoveredRowId,
-      lookupEventHandler,
-      rowDoubleClick,
-    ]);
+    }, []);
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
     const columnSizeTouched = useCallback((id: string) => {
