@@ -66,6 +66,20 @@ The `wrapChild` function from a parent layout replaces any wrapping from a grand
 
 ---
 
+## Backward Compatibility
+
+Each step is designed so that **existing behavior is preserved** after completion:
+
+- **Step 1** is purely additive — a new helper function and refined type. No existing code is touched, so nothing can break.
+- **Step 2** changes the *shape* of the context object Stack produces (adds `depth` and `parent` fields), but existing consumers only read `type`, `orientation`, and `itemWidth`. The extra fields are simply ignored by current code. No behavioral change.
+- **Steps 3–4** fix bugs: components that previously received `layoutContext === undefined` now receive a context object. The only downstream consumer is `resolveLayoutProps`, which checks `type === "Stack"` for star sizing and flex-shrink. Since new context types like `"Table"`, `"TableCell"`, etc. don't match that check, the CSS resolution produces identical results. Behavior is preserved.
+- **Step 5** wraps an existing static object with `createChildLayoutContext`, adding `depth`/`parent` — same argument as Step 2, extra fields are ignored.
+- **Steps 6–7** are purely additive (new helpers/new opt-in consumers). No existing component changes behavior unless explicitly updated.
+
+In summary: at the end of every step, the test suite should pass with no regressions.
+
+---
+
 ## Improvement Plan
 
 ### Step 1: Define a Structured `LayoutContext` Type
@@ -139,18 +153,37 @@ The `wrapChild` function from a parent layout replaces any wrapping from a grand
 
 ### Step 4: Propagate Context Through "Transparent" Components
 
-**Goal:** Components that don't create their own layout (Tooltip, Bookmark, Accordion, AccordionItem, TabItem, etc.) should forward the incoming `layoutContext` when rendering their children.
+**Goal:** Components that don't create their own layout (Tooltip, Bookmark, Accordion, AccordionItem, TabItem, etc.) should forward the incoming `layoutContext` when rendering their children — **without touching each component's source code**.
+
+**Key insight:** Instead of editing every transparent component, we can make the `renderChild` function automatically inherit the parent's context when no explicit context is passed. The change is a single fallback in `memoedRenderChild` inside `ComponentAdapter.tsx`:
+
+```typescript
+// ComponentAdapter.tsx — memoedRenderChild
+const memoedRenderChild: RenderChildFn = useCallback(
+  (children, layoutContext, pRenderContext) => {
+    return renderChild(
+      children,
+      layoutContext ?? layoutContextRef.current,  // ← fallback to parent's context
+      pRenderContext || parentRenderContext,
+      uidInfoRef,
+    );
+  },
+  [renderChild, parentRenderContext, uidInfoRef, layoutContextRef],
+);
+```
+
+With this one-line change (`layoutContext ?? layoutContextRef.current`):
+- **Transparent components** (call `renderChild(node.children)` with no second arg → `layoutContext` is `undefined`) automatically inherit the incoming context. Zero source changes needed.
+- **Layout providers** (Stack, Card, Modal, etc.) pass an explicit context object → `??` short-circuits and the explicit context is used, as before.
+- **Explicit context reset:** if a component ever needs to intentionally *block* propagation, it can pass `null` and we use `layoutContext !== undefined ? layoutContext : layoutContextRef.current` instead of `??`. (For now `??` is sufficient since no current component passes `null`.)
+
+This also applies to `MemoizedItem` usages — `MemoizedItem` calls the same `renderChild` prop (which is `memoedRenderChild`), so when Column renders cells without passing `layoutContext`, the fallback kicks in and the Table's context flows through automatically.
 
 **Changes:**
-- Audit all components that call `renderChild(node.children)` without a layout context argument (identified list: Tabs, TabItem, Accordion, AccordionItem, RadioGroup, StickySection, Badge, Drawer, DropdownMenu, etc.).
-- For components that are purely structural wrappers (their children should behave as if they were direct children of the outer layout), pass through the received `layoutContext`:
-  ```typescript
-  renderChild(node.children, layoutContext)
-  ```
-- For components that create a **new layout boundary** (e.g., a Modal body, a Drawer body), pass a new context with `createChildLayoutContext`.
-- Update `MemoizedItem` usages in these components to forward `layoutContext` where appropriate.
+- In `ComponentAdapter.tsx`, modify `memoedRenderChild` to fall back to `layoutContextRef.current`.
+- Spot-check a few components that **should** block propagation (e.g., Modal, Drawer) and verify they already pass an explicit context. If any don't but should, add an explicit context for them.
 
-**Testing:** Render `Stack(horizontal) > Tooltip > SpaceFiller`. Verify the SpaceFiller inside Tooltip still sees the Stack's horizontal orientation (i.e., context passes through).
+**Testing:** Render `Stack(horizontal) > Tooltip > SpaceFiller`. Verify the SpaceFiller inside Tooltip still sees the Stack's horizontal orientation (i.e., context passes through without any change to Tooltip's source).
 
 ---
 
@@ -170,14 +203,27 @@ The `wrapChild` function from a parent layout replaces any wrapping from a grand
 
 **Goal:** Provide utility functions that let components inspect the layout context chain.
 
+**Location:** Create a dedicated file `xmlui/src/abstractions/layout-context-utils.ts`. This file co-locates with `RendererDefs.ts` (where `LayoutContext` is defined) and keeps the type definition file free of runtime logic. It imports only the `LayoutContext` type, so it has no circular-dependency risk. Both core infrastructure (`components-core/`) and component renderers (`components/`) can import from it.
+
 **Changes:**
-- Add helpers in a new file or alongside the context definition:
+- Create `xmlui/src/abstractions/layout-context-utils.ts` with:
   ```typescript
-  function getLayoutDepth(ctx?: LayoutContext): number;
-  function findAncestorLayout(ctx: LayoutContext, type: string): LayoutContext | undefined;
-  function isInsideLayout(ctx: LayoutContext, type: string): boolean;
-  function getLayoutPath(ctx: LayoutContext): string[];  // e.g., ["Stack", "Table", "TableCell"]
+  import type { LayoutContext } from "./RendererDefs";
+
+  /** The depth of this context node (0 for root layout providers). */
+  export function getLayoutDepth(ctx?: LayoutContext): number;
+
+  /** Walk the parent chain and return the first ancestor with the given type. */
+  export function findAncestorLayout(ctx: LayoutContext, type: string): LayoutContext | undefined;
+
+  /** Whether any ancestor (including self) has the given type. */
+  export function isInsideLayout(ctx: LayoutContext, type: string): boolean;
+
+  /** Returns the type chain from root to self, e.g. ["Stack", "Table", "TableCell"]. */
+  export function getLayoutPath(ctx: LayoutContext): string[];
   ```
+- The `createChildLayoutContext` helper from Step 1 also lives in this file.
+- Re-export from `RendererDefs.ts` for convenience so existing import paths work.
 
 **Testing:** Unit tests for each helper with various context chains.
 
@@ -220,10 +266,10 @@ Steps 2–5 are independently testable after Step 1, and can be done in parallel
 
 | Step | Files |
 |------|-------|
-| 1 | `xmlui/src/abstractions/RendererDefs.ts` |
+| 1 | `xmlui/src/abstractions/RendererDefs.ts`, `xmlui/src/abstractions/layout-context-utils.ts` (new) |
 | 2 | `xmlui/src/components/Stack/Stack.tsx` |
 | 3 | `xmlui/src/components/Table/Table.tsx`, `xmlui/src/components/Column/ColumnNative.tsx` |
-| 4 | Multiple component renderers (Tooltip, Bookmark, Tabs, TabItem, Accordion, AccordionItem, etc.) |
+| 4 | `xmlui/src/components-core/rendering/ComponentAdapter.tsx` (single change) |
 | 5 | `xmlui/src/components-core/wrapComponent.tsx` |
-| 6 | New utility file or `xmlui/src/abstractions/RendererDefs.ts` |
+| 6 | `xmlui/src/abstractions/layout-context-utils.ts` (extend with query helpers) |
 | 7 | Component renderers consuming depth (Stack, SpaceFiller, etc.) |
