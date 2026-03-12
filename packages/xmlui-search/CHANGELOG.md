@@ -1,5 +1,12 @@
 # xmlui-search
 
+## 0.1.7
+
+### Patch Changes
+
+- 12c1131: Theme variables optimization ready for review
+- 12c1131: Fix portal styling issues with ModalDialog and Search
+
 ## 0.1.6
 
 ### Patch Changes
