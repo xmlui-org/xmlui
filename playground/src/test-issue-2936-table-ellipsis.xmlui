@@ -1,0 +1,75 @@
+<!--
+  Reproduction / verification for issue #2936:
+  "Text ellipsis truncation does not work inside Column with custom content
+   (Link > HStack > Text)"
+
+  Before the fix, the long text in the second column overflows into the next
+  column instead of being truncated with ellipsis.  After the layout-context
+  fix (min-width: 0 applied automatically inside TableCell), all nested flex
+  containers can shrink and text-overflow: ellipsis works correctly.
+-->
+<App>
+  <VStack padding="24px" gap="24px">
+    <Text variant="heading-3" value="Issue #2936 — Table Cell Ellipsis" />
+
+    <!-- Narrow table that forces long text to truncate -->
+    <Table
+      data="{[
+        { id: 1, name: 'Short' },
+        { id: 2, name: 'A moderately long name that should be truncated with ellipsis' },
+        { id: 3, name: 'Another very long name that definitely overflows the column when not truncated properly' },
+        { id: 4, name: 'Extra extremely verbose item name to stress-test the ellipsis truncation behavior in a constrained table cell' }
+      ]}"
+      width="400px"
+      testId="issue-2936-table"
+    >
+      <!-- Simple column to prove layout works -->
+      <Column header="ID" width="60px" bindTo="id" />
+
+      <!-- Reproduction of the exact pattern from the issue: Link > HStack > Text -->
+      <Column header="Name (Link > HStack > Text)" width="2*" bindTo="name">
+        <Link to="/">
+          <HStack gap="8px" verticalAlignment="center">
+            <Icon name="file" size="20px" />
+            <Text value="{$cell}" maxLines="1" />
+          </HStack>
+        </Link>
+      </Column>
+    </Table>
+
+    <Text variant="heading-4" value="More truncation patterns" />
+
+    <!-- Additional patterns -->
+    <Table
+      data="{[
+        { id: 1, label: 'Short', description: 'Brief' },
+        { id: 2, label: 'A very long label text', description: 'A very long description that should truncate' },
+        { id: 3, label: 'Yet another long label text for testing', description: 'Extended description spanning well beyond the available width in the table cell' }
+      ]}"
+      width="500px"
+      testId="issue-2936-patterns"
+    >
+      <Column header="ID" width="50px" bindTo="id" />
+
+      <!-- HStack > Text (no Link wrapper) -->
+      <Column header="HStack > Text" width="*" bindTo="label">
+        <HStack gap="4px" verticalAlignment="center">
+          <Icon name="star" />
+          <Text value="{$cell}" maxLines="1" />
+        </HStack>
+      </Column>
+
+      <!-- Deeply nested: Link > HStack > VStack > Text -->
+      <Column header="Deep nesting" width="*" bindTo="description">
+        <Link to="/">
+          <HStack gap="4px" verticalAlignment="center">
+            <Icon name="info" />
+            <VStack>
+              <Text value="{$cell}" maxLines="1" />
+            </VStack>
+          </HStack>
+        </Link>
+      </Column>
+    </Table>
+  </VStack>
+</App>
