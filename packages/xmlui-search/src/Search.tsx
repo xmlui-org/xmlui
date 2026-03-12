@@ -88,8 +88,8 @@ export const Search = ({
   const [show, setShow] = useState(false);
 
   useLayoutEffect(() => {
-    setActiveIndex(-1);
     if (results.length > 0) setShow(true);
+    setActiveIndex(0);
   }, [results]);
 
   const onClick = useCallback(() => {
