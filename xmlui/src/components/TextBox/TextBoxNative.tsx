@@ -224,6 +224,13 @@ export const TextBox = forwardRef(function TextBox(
     inputRef.current?.focus();
   }, []);
 
+  // Relay focus from the outer div to the inner input without triggering browser scroll.
+  // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
+  // scroll side-effect here since the host already handles scroll if desired.
+  const relayFocus = useCallback(() => {
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
+
   const setValue = useEvent((newValue) => {
     updateValue(newValue);
   });
@@ -255,7 +262,7 @@ export const TextBox = forwardRef(function TextBox(
         [styles.valid]: validationStatus === "valid",
       })}
       tabIndex={-1}
-      onFocus={focus}
+      onFocus={relayFocus}
       style={{ ...style, gap }}
     >
       <Part partId={PART_START_ADORNMENT}>
