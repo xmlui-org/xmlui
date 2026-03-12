@@ -429,3 +429,88 @@ test.describe("Basic Functionality", () => {
     });
   });
 });
+
+// =============================================================================
+// MOCK DATA TESTS
+// =============================================================================
+
+test.describe("mockData property", () => {
+  test("returns mock data without making a network request", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="{[1, 2, 3]}" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("[1,2,3]");
+  });
+
+  test("works without a url property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="hello" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("hello");
+  });
+
+  test("returns a mock object", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="{{ name: 'Alice', age: 30 }}" />
+        <Text testId="name" value="{ds.value.name}" />
+        <Text testId="age" value="{ds.value.age}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("name")).toHaveText("Alice");
+    await expect(page.getByTestId("age")).toHaveText("30");
+  });
+
+  test("loaded becomes true after data is resolved", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="ok" />
+        <Text testId="loaded" value="{ds.loaded}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("loaded")).toHaveText("true");
+  });
+
+  test("fires the onLoaded event with mock data", async ({ initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DataSource id="ds" mockData="{[42]}" onLoaded="(data) => testState = data[0]" />
+    `);
+
+    await expect.poll(() => testStateDriver.testState(), { timeout: 2000 }).toBe(42);
+  });
+
+  test("applies resultSelector to mock data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" mockData="{{ items: ['a', 'b'] }}" resultSelector="items" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText('["a","b"]');
+  });
+
+  test("is reactive: updates value when bound expression changes", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.myData="first">
+        <DataSource id="ds" mockData="{myData}" />
+        <Text testId="output" value="{ds.value}" />
+        <Button testId="btn" label="Change" onClick="myData = 'second'" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("first");
+    await page.getByTestId("btn").click();
+    await expect(page.getByTestId("output")).toHaveText("second");
+  });
+});

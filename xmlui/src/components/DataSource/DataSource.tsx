@@ -25,9 +25,18 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     url: {
-      description: `Set the URL.`,
-      isRequired: true,
+      description:
+        `Set the URL. Required unless \`mockData\` is provided, in which case ` +
+        `the component returns the mock data directly without making a network request.`,
       valueType: "string",
+    },
+    mockData: {
+      description:
+        "Provide data directly instead of fetching from a URL. When set, the component " +
+        "resolves immediately with this value — no network request is made. Intended for " +
+        "development and testing. Supports reactive expressions: when the bound value " +
+        "changes, the DataSource re-resolves with the updated data.",
+      valueType: "any",
     },
     body: {
       description: `Set the optional request body. The object you pass is serialized as a JSON string.`,

@@ -183,6 +183,28 @@ This event is triggered when the Card is right-clicked (context menu).
 
 - `event`: The mouse event object.
 
+### `doubleClick` [#doubleclick]
+
+This event is triggered when the Card is double-clicked.
+
+**Signature**: `doubleClick(event: MouseEvent): void`
+
+- `event`: The mouse event object.
+
+This event is triggered when the `Card` is double-clicked. When both `onClick` and `onDoubleClick` are used together, only the first click of the double-click fires `onClick`, so `onClick` is not called twice.
+
+```xmlui-pg copy display name="Example: doubleClick"
+<App>
+  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
+    <HStack verticalAlignment="center">
+      <Icon name="info" />
+      <Text value="Double-click me" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
+</App>
+```
+
 ## Exposed Methods [#exposed-methods]
 
 ### `scrollToBottom` [#scrolltobottom]
