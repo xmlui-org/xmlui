@@ -1,0 +1,17 @@
+{
+  "name": "xmlui-echart",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
+    "classnames": "2.5.1"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  }
+}
