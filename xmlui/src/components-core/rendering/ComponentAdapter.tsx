@@ -33,6 +33,7 @@ import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
+import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
@@ -224,11 +225,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- When a component calls renderChild without an explicit layoutContext (undefined),
   // --- we fall back to the component's own incoming context so that "transparent"
   // --- wrapper components propagate the parent layout context automatically.
+  // --- Direct-child-only properties (ignoreLayoutProps, wrapChild) are stripped
+  // --- from the fallback so they don't leak through component boundaries.
   const memoedRenderChild: RenderChildFn = useCallback(
     (children, layoutContext, pRenderContext) => {
       return renderChild(
         children,
-        layoutContext ?? layoutContextRef.current,
+        layoutContext ?? stripDirectChildProps(layoutContextRef.current),
         pRenderContext || parentRenderContext,
         uidInfoRef,
       );
@@ -365,6 +368,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const extendedLayoutProps = useMemo(() => {
     if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
     const extended: Record<string, any> = {};
+    const ignoreProps = layoutContextRef?.current?.ignoreLayoutProps as string[] || [];
     for (const key of Object.keys(safeNode.props)) {
       const parsed = parseLayoutProperty(key);
       if (typeof parsed === "string") continue; // invalid key
@@ -372,6 +376,9 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // Only collect keys that have a part, breakpoint, or state suffix — base keys are already
       // handled by the existing layoutOptionKeys pass above
       if (parsed.part || (parsed.screenSizes && parsed.screenSizes.length > 0) || (parsed.states && parsed.states.length > 0)) {
+        // Skip responsive variants of ignored layout props — the parent container
+        // (e.g. FlowItemWrapper) handles them via its own width resolution.
+        if (ignoreProps.includes(parsed.property)) continue;
         extended[key] = valueExtractor(safeNode.props[key], true);
       }
     }

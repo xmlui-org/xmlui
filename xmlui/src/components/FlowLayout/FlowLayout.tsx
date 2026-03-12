@@ -9,6 +9,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
+import { collectResponsiveWidthProps } from "./flow-layout-utils";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 
 export { FlowItemBreak, FlowItemWrapper } from "./FlowLayoutNative";
@@ -170,11 +171,13 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             const width = extractValue((node.props as any)?.width);
             const minWidth = extractValue((node.props as any)?.minWidth);
             const maxWidth = extractValue((node.props as any)?.maxWidth);
+            const responsiveWidthProps = collectResponsiveWidthProps(node.props, extractValue);
             return (
               <FlowItemWrapper
                 width={width}
                 minWidth={minWidth}
                 maxWidth={maxWidth}
+                responsiveWidthProps={responsiveWidthProps}
                 forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
