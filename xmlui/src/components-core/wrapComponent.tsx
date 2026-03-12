@@ -4,6 +4,7 @@ import type { ComponentRendererDef, LayoutContext } from "../abstractions/Render
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
+import { layoutOptionKeys } from "./descriptorHelper";
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -349,6 +350,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     ...Object.keys(callbackMap),
     ...resourceUrlSet,
     "id", // handled separately via className/node
+    // Layout props are handled by the layout resolver and applied via CSS className.
+    // They must not be forwarded to the native component as React props, because that
+    // would pass raw XMLUI theme variable strings (e.g. "$textColor-secondary") to DOM
+    // elements or SVG renderers where they are invalid and cause unexpected rendering.
+    // Exception: if a layout prop is explicitly declared in the component's metadata props,
+    // it has component-specific meaning (e.g. Card's "orientation") and must be forwarded.
+    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
   ]);
 
   // Detect whether this is a stateful component
@@ -592,6 +600,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
     "id",
+    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
   ]);
 
   const isStateful =
