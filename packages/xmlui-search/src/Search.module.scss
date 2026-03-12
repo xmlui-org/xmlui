@@ -78,7 +78,17 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   overflow-y: auto;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
-  padding: 0.75rem;
+  
+  // No padding-top: sticky headers use top: 0, which is anchored to the scroll
+  // viewport's top edge. If padding-top were set, items could scroll into that
+  // padding zone and appear above the stuck header. The visual top gap is
+  // instead provided by margin-top on the first list child, which is part of
+  // the normal scroll flow and doesn't affect sticky anchoring.
+  padding: 0 0.75rem 0.75rem;
+
+  & > :first-child {
+    margin-top: 0.75rem;
+  }
 }
 
 .input {
@@ -129,6 +139,10 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 }
 
 .categoryHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: $backgroundColor-Search;
   list-style: none;
   padding-top: 0.5rem;
   padding-bottom: 0.25rem;

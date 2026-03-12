@@ -33,6 +33,7 @@ import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import classNames from "classnames";
 
 type Props = {
   id?: string;
@@ -157,128 +158,135 @@ export const Search = ({
 
   return (
     <span className={className}>
-    <Popover open={show} onOpenChange={setShow}>
-      <VisuallyHidden>
-        <label htmlFor={inputId}>Search Field</label>
-      </VisuallyHidden>
-      {collapsible && !isExpanded && animationDirection === null ? (
-        <Button
-          variant="ghost"
-          themeColor="secondary"
-          icon={<Icon name="search" aria-hidden />}
-          onClick={() => {
-            setIsExpanded(true);
-            setAnimationDirection("expanding");
-            // Focus search input when it expands
-            setTimeout(() => {
-              inputRef.current?.focus({ preventScroll: true });
-              setAnimationDirection(null);
-            }, 300);
-          }}
-          contextualLabel="Open search"
-        />
-      ) : (
-        <PopoverTrigger asChild>
-          <TextBox
-            id={inputId}
-            ref={inputRef}
-            className={classnames(styles.input, {
-              [styles.fullWidth]: inDrawer,
-              [styles.active]: inputValue.length > 0,
-              [styles.focused]: isFocused,
-              [styles.expanding]: animationDirection === "expanding",
-              [styles.collapsing]: animationDirection === "collapsing",
-            })}
-            type="search"
-            placeholder={placeholder ?? "Type to search"}
-            value={inputValue}
-            startIcon="search"
-            onDidChange={(value) => setInputValue(value)}
-            onFocus={onInputFocus}
-            onBlur={onInputBlur}
-            onKeyDown={handleKeyDown}
-            aria-autocomplete="list"
-            aria-controls={`${inputId}-listbox`}
-            aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+      <Popover open={show} onOpenChange={setShow}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        {collapsible && !isExpanded && animationDirection === null ? (
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            icon={<Icon name="search" aria-hidden />}
+            onClick={() => {
+              setIsExpanded(true);
+              setAnimationDirection("expanding");
+              // Focus search input when it expands
+              setTimeout(() => {
+                inputRef.current?.focus({ preventScroll: true });
+                setAnimationDirection(null);
+              }, 300);
+            }}
+            contextualLabel="Open search"
           />
-        </PopoverTrigger>
-      )}
-      {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
-        <Portal container={_root}>
-          <PopoverContent
-            align="end"
-            onOpenAutoFocus={(e) => e.preventDefault()}
-            onCloseAutoFocus={(e) => e.preventDefault()}
-            onEscapeKeyDown={() => setShow(false)}
-            onFocusOutside={(e) => e.preventDefault()}
-            className={classnames(styles.listPanel, className, {
-              [styles.inDrawer]: inDrawer,
-            })}
-          >
-            <ul id={`${inputId}-listbox`} className={styles.list} role="listbox" aria-label="Search results">
-              {results.length > 0 &&
-                results.map((result, idx) => {
-                  const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
-                  const prevEffectiveCategory =
-                    idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
-                  const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
-                  const allUncategorized = results.every((r) => r.item.category == null);
-                  return (
-                    <Fragment key={`${result.item.path}-${idx}`}>
-                      {showCategoryHeader && !allUncategorized && (
-                        <li
-                          className={styles.categoryHeader}
-                          role="presentation"
-                          aria-hidden="true"
-                        >
-                          <Text
-                            style={{
-                              fontSize: "0.72em",
-                              fontWeight: 700,
-                              textTransform: "uppercase",
-                              letterSpacing: "0.05em",
-                              color: "var(--xmlui-color-secondary-800)",
-                            }}
+        ) : (
+          <PopoverTrigger asChild>
+            <TextBox
+              id={inputId}
+              ref={inputRef}
+              className={classnames(styles.input, {
+                [styles.fullWidth]: inDrawer,
+                [styles.active]: inputValue.length > 0,
+                [styles.focused]: isFocused,
+                [styles.expanding]: animationDirection === "expanding",
+                [styles.collapsing]: animationDirection === "collapsing",
+              })}
+              type="search"
+              placeholder={placeholder ?? "Type to search"}
+              value={inputValue}
+              startIcon="search"
+              onDidChange={(value) => setInputValue(value)}
+              onFocus={onInputFocus}
+              onBlur={onInputBlur}
+              onKeyDown={handleKeyDown}
+              aria-autocomplete="list"
+              aria-controls={`${inputId}-listbox`}
+              aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+            />
+          </PopoverTrigger>
+        )}
+        {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
+          <Portal container={_root}>
+            <PopoverContent
+              align="end"
+              onOpenAutoFocus={(e) => e.preventDefault()}
+              onCloseAutoFocus={(e) => e.preventDefault()}
+              onEscapeKeyDown={() => setShow(false)}
+              onFocusOutside={(e) => e.preventDefault()}
+              className={classnames(styles.listPanel, className, {
+                [styles.inDrawer]: inDrawer,
+              })}
+            >
+              <ul
+                id={`${inputId}-listbox`}
+                className={classNames(styles.list)}
+                role="listbox"
+                aria-label="Search results"
+              >
+                {results.length > 0 &&
+                  results.map((result, idx) => {
+                    const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+                    const prevEffectiveCategory =
+                      idx > 0
+                        ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY)
+                        : undefined;
+                    const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+                    let allUncategorized = results.every((r) => r.item.category == null);
+                    return (
+                      <Fragment key={`${result.item.path}-${idx}`}>
+                        {showCategoryHeader && !allUncategorized && (
+                          <li
+                            className={styles.categoryHeader}
+                            role="presentation"
+                            aria-hidden="true"
                           >
-                            {effectiveCategory}
-                          </Text>
+                            <Text
+                              style={{
+                                fontSize: "0.72em",
+                                fontWeight: 700,
+                                textTransform: "uppercase",
+                                letterSpacing: "0.05em",
+                                color: "var(--xmlui-color-secondary-800)",
+                              }}
+                            >
+                              {effectiveCategory}
+                            </Text>
+                          </li>
+                        )}
+                        <li
+                          id={`option-${idx}`}
+                          role="option"
+                          className={classnames(styles.item, styles.header, {
+                            [styles.focus]: activeIndex === idx,
+                          })}
+                          onMouseEnter={() => {
+                            setActiveIndex(idx);
+                            setNavigationSource("mouse");
+                          }}
+                          ref={(el) => (itemRefs.current[idx] = el!)}
+                          aria-selected={activeIndex === idx}
+                        >
+                          <SearchItemContent
+                            ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                            idx={idx}
+                            item={result.item}
+                            matches={result.matches}
+                            maxContentMatchNumber={maxContentMatchNumber}
+                            onClick={onClick}
+                          />
                         </li>
-                      )}
-                      <li
-                        id={`option-${idx}`}
-                        role="option"
-                        className={classnames(styles.item, styles.header, {
-                          [styles.focus]: activeIndex === idx,
-                        })}
-                        onMouseEnter={() => {
-                          setActiveIndex(idx);
-                          setNavigationSource("mouse");
-                        }}
-                        ref={(el) => (itemRefs.current[idx] = el!)}
-                        aria-selected={activeIndex === idx}
-                      >
-                        <SearchItemContent
-                          ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                          idx={idx}
-                          item={result.item}
-                          matches={result.matches}
-                          maxContentMatchNumber={maxContentMatchNumber}
-                          onClick={onClick}
-                        />
-                      </li>
-                    </Fragment>
-                  );
-                })}
-              {results.length === 0 && (
-                <div className={styles.noResults}>
-                  <Text variant="em">No results</Text>
-                </div>
-              )}
-            </ul>
-          </PopoverContent>
-        </Portal>
-      )}
-    </Popover>
+                      </Fragment>
+                    );
+                  })}
+                {results.length === 0 && (
+                  <div className={styles.noResults}>
+                    <Text variant="em">No results</Text>
+                  </div>
+                )}
+              </ul>
+            </PopoverContent>
+          </Portal>
+        )}
+      </Popover>
     </span>
   );
 };
@@ -486,7 +494,11 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     }
     result.push(
       // style is temporary, fontSize should be inherited if Text is inside other Text
-      <Text key={`${index}-highlighted`} variant="marked" style={{ fontSize: "inherit", fontWeight: "inherit" }}>
+      <Text
+        key={`${index}-highlighted`}
+        variant="marked"
+        style={{ fontSize: "inherit", fontWeight: "inherit" }}
+      >
         {text.slice(start, end + 1)}
       </Text>,
     );
