@@ -3,9 +3,10 @@ import React from "react";
 import styles from "./Stack.module.scss";
 
 import type { ComponentDef, ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { RenderChildFn, LayoutContext } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
@@ -234,6 +235,7 @@ type RenderStackPars = {
   wrapContent?: boolean;
   itemWidth?: string;
   registerComponentApi?: (api: any) => void;
+  layoutContext?: LayoutContext;
 };
 
 function renderDockLayout({
@@ -245,6 +247,7 @@ function renderDockLayout({
   scrollStyle,
   showScrollerFade,
   registerComponentApi,
+  layoutContext,
 }: RenderStackPars) {
   const allChildren = (Array.isArray(node.children) ? node.children : [node.children]).filter(
     (child) => child != null
@@ -267,13 +270,13 @@ function renderDockLayout({
 
   // Renders a homogeneous group of children — each wrapped in a flex-positioning div
   const renderGroup = (children: any[], wrapStyle: Record<string, any>) =>
-    renderChild(children, {
+    renderChild(children, createChildLayoutContext(layoutContext, {
       type: "DockLayout",
       wrapChild: (_ctx, rendered, metadata) =>
         metadata?.opaque || metadata?.nonVisual
           ? rendered
           : <div style={wrapStyle}>{rendered}</div>,
-    });
+    }));
 
   // Middle children are rendered individually so that "stretch" children can receive
   // ignoreLayoutProps while undocked children keep their own width/height props.
@@ -281,7 +284,7 @@ function renderDockLayout({
     const isStretch = (child.props as any)?.dock === "stretch";
     return (
       <React.Fragment key={index}>
-        {renderChild(child, {
+        {renderChild(child, createChildLayoutContext(layoutContext, {
           type: "DockLayout",
           ignoreLayoutProps: isStretch
             ? ["width", "minWidth", "maxWidth", "height", "minHeight", "maxHeight"]
@@ -294,7 +297,7 @@ function renderDockLayout({
               </div>
             );
           },
-        })}
+        }))}
       </React.Fragment>
     );
   });
@@ -316,7 +319,7 @@ function renderDockLayout({
       {/* Middle row: left | undocked+stretch | right — flex:1 so it consumes leftover height */}
       {needsMiddleRow && (
         <div style={{ display: "flex", flexDirection: "row", flex: 1, minHeight: 0, minWidth: 0 }}>
-          {left.length > 0 && renderChild(left, {
+          {left.length > 0 && renderChild(left, createChildLayoutContext(layoutContext, {
             type: "DockLayout",
             ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
             wrapChild: (ctx, rendered, metadata) => {
@@ -328,10 +331,10 @@ function renderDockLayout({
                 </div>
               );
             },
-          })}
+          }))}
           {middleRendered}
           {/* Right children reversed so the first-declared sits at the rightmost edge */}
-          {right.length > 0 && renderChild(right.slice().reverse(), {
+          {right.length > 0 && renderChild(right.slice().reverse(), createChildLayoutContext(layoutContext, {
             type: "DockLayout",
             ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
             wrapChild: (ctx, rendered, metadata) => {
@@ -343,7 +346,7 @@ function renderDockLayout({
                 </div>
               );
             },
-          })}
+          }))}
         </div>
       )}
 
@@ -367,6 +370,7 @@ function renderStack({
   wrapContent,
   itemWidth,
   registerComponentApi,
+  layoutContext,
 }: RenderStackPars) {
   if (!isComponentDefChildren(node.children)) {
     throw new NotAComponentDefError();
@@ -377,7 +381,7 @@ function renderStack({
     (child) => child != null
   );
   if (allChildren.some((child) => (child.props as any)?.dock != null)) {
-    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi });
+    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi, layoutContext });
   }
 
   // Use FlowLayout when orientation is horizontal and wrapContent is true
@@ -399,7 +403,7 @@ function renderStack({
         onContextMenu={lookupEventHandler("contextMenu")}
         registerComponentApi={registerComponentApi}
       >
-        {renderChild(node.children, {
+        {renderChild(node.children, createChildLayoutContext(layoutContext, {
           type: "FlowLayout",
           ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
           wrapChild: ({ node, extractValue }, renderedChild, hints) => {
@@ -427,7 +431,7 @@ function renderStack({
               </FlowItemWrapper>
             );
           },
-        })}
+        }))}
       </FlowLayout>
     );
   }
@@ -450,11 +454,11 @@ function renderStack({
       registerComponentApi={registerComponentApi}
       desktopOnly={extractValue.asOptionalBoolean(node.props?.desktopOnly)}
     >
-      {renderChild(node.children, {
+      {renderChild(node.children, createChildLayoutContext(layoutContext, {
         type: "Stack",
         orientation,
         itemWidth,
-      })}
+      }))}
     </Stack>
   );
 }
@@ -462,7 +466,7 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
@@ -487,6 +491,7 @@ export const stackComponentRenderer = createComponentRenderer(
       lookupEventHandler,
       renderChild,
       registerComponentApi,
+      layoutContext,
     });
   },
 );
@@ -494,7 +499,7 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
@@ -511,6 +516,7 @@ export const vStackComponentRenderer = createComponentRenderer(
       scrollStyle,
       itemWidth,
       registerComponentApi,
+      layoutContext,
     });
   },
 );
@@ -518,7 +524,7 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
@@ -537,6 +543,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       wrapContent,
       itemWidth,
       registerComponentApi,
+      layoutContext,
     });
   },
 );
@@ -544,7 +551,7 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
@@ -559,6 +566,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
       scrollStyle,
       itemWidth,
       registerComponentApi,
+      layoutContext,
     });
   },
 );
@@ -566,7 +574,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
     const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
@@ -583,6 +591,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       wrapContent,
       itemWidth,
       registerComponentApi,
+      layoutContext,
     });
   },
 );
