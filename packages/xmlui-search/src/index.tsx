@@ -44,8 +44,8 @@ export const SearchMd = createMetadata({
     [`borderColor-${COMP_INPUT}`]: "$color-surface-100",
     [`textColor-adornment-${COMP_INPUT}`]: "$color-secondary-500",
     [`textColor-adornment-${COMP_INPUT}--active`]: "$color-secondary-900",
-    [`paddingVertical-${COMP_INPUT}`]: "$space-4",
-    [`paddingHorizontal-${COMP_INPUT}`]: "$space-4",
+    [`paddingVertical-${COMP_INPUT}`]: "$space-2",
+    [`paddingHorizontal-${COMP_INPUT}`]: "$space-2",
 
     [`backgroundColor-${COMP_PANEL}`]: "$color-surface-0",
     [`borderRadius-${COMP_PANEL}`]: "8px",
