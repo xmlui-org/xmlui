@@ -97,9 +97,6 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-Drawer": "100%",
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
-
-    // --- Search
-    "backgroundColor-SearchItem--hover": "$color-surface-50",
   },
   resources: {},
 };

@@ -157,7 +157,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   cursor: pointer;
   
   // This style is used to denote keyboard focus
-  &.keyboardFocus {
+  &.focus {
     background-color: $backgroundColor-SearchItem--hover;
     
     // Ensures the underlying link is visible on programmatic hover

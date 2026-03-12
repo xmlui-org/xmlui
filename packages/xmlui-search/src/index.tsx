@@ -35,7 +35,6 @@ export const SearchMd = createMetadata({
     [`textColor-${COMP_INPUT}`]: "$color-secondary-900",
     [`fontSize-${COMP_INPUT}`]: "14px",
     [`fontWeight-${COMP_INPUT}`]: "400",
-    [`backgroundColor-${COMP_INPUT}`]: "$color-surface-50",
     [`fontFamily-${COMP_INPUT}`]: "$fontFamily",
     [`width-${COMP_INPUT}`]: "258px",
     [`height-${COMP_INPUT}`]: "32px",
@@ -55,7 +54,7 @@ export const SearchMd = createMetadata({
     [`borderColor-${COMP_PANEL}`]: "$color-surface-100",
     [`boxShadow-${COMP_PANEL}`]: "$boxShadow-xl",
 
-    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-500",
+    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-surface-100",
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 

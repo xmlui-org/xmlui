@@ -16,7 +16,6 @@ import {
   Text,
   TextBox,
   useSearchContextContent,
-  useTheme,
   VisuallyHidden,
   useAppLayoutContext,
   Button,
@@ -50,6 +49,8 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   maxContentMatchNumber: 3,
 };
 
+const MIN_MATCH_LENGTH = 2;
+
 export const Search = ({
   id,
   data,
@@ -61,7 +62,6 @@ export const Search = ({
 }: Props) => {
   const _id = useId();
   const inputId = id || _id;
-  const { root } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
@@ -79,7 +79,7 @@ export const Search = ({
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
-  const _root = inDrawer && inputRef.current ? inputRef.current?.closest(`div`) : root;
+  const _root = inDrawer && inputRef.current ? inputRef.current?.closest(`div`) : undefined;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -87,11 +87,8 @@ export const Search = ({
   const [show, setShow] = useState(false);
 
   useLayoutEffect(() => {
-    if (results.length > 0) setShow(true);
-  }, [results]);
-
-  useEffect(() => {
     setActiveIndex(-1);
+    if (results.length > 0) setShow(true);
   }, [results]);
 
   const onClick = useCallback(() => {
@@ -174,7 +171,7 @@ export const Search = ({
             setAnimationDirection("expanding");
             // Focus search input when it expands
             setTimeout(() => {
-              inputRef.current?.focus();
+              inputRef.current?.focus({ preventScroll: true });
               setAnimationDirection(null);
             }, 300);
           }}
@@ -206,18 +203,19 @@ export const Search = ({
           />
         </PopoverTrigger>
       )}
-      {show && results && debouncedValue && (
+      {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
         <Portal container={_root}>
           <PopoverContent
             align="end"
             onOpenAutoFocus={(e) => e.preventDefault()}
             onCloseAutoFocus={(e) => e.preventDefault()}
             onEscapeKeyDown={() => setShow(false)}
+            onFocusOutside={(e) => e.preventDefault()}
             className={classnames(styles.listPanel, className, {
               [styles.inDrawer]: inDrawer,
             })}
           >
-            <ul className={styles.list} role="listbox">
+            <ul id={`${inputId}-listbox`} className={styles.list} role="listbox" aria-label="Search results">
               {results.length > 0 &&
                 results.map((result, idx) => {
                   const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
@@ -247,9 +245,10 @@ export const Search = ({
                         </li>
                       )}
                       <li
+                        id={`option-${idx}`}
                         role="option"
                         className={classnames(styles.item, styles.header, {
-                          [styles.keyboardFocus]: activeIndex === idx,
+                          [styles.focus]: activeIndex === idx,
                         })}
                         onMouseEnter={() => {
                           setActiveIndex(idx);
@@ -308,7 +307,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
     >
       <div style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          <Text variant="subtitle">
+          <Text variant="subtitle" style={{ fontWeight: 600 }}>
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
         </div>
@@ -487,7 +486,7 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
     }
     result.push(
       // style is temporary, fontSize should be inherited if Text is inside other Text
-      <Text key={`${index}-highlighted`} variant="marked" style={{ fontSize: "inherit" }}>
+      <Text key={`${index}-highlighted`} variant="marked" style={{ fontSize: "inherit", fontWeight: "inherit" }}>
         {text.slice(start, end + 1)}
       </Text>,
     );
@@ -525,7 +524,7 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
       shouldSort: true, // <- sorts by "score"
       includeMatches: true,
       // findAllMatches: false,
-      minMatchCharLength: 2,
+      minMatchCharLength: MIN_MATCH_LENGTH,
       // location: 0,
       threshold: 0,
       // distance: 500,
@@ -575,7 +574,7 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
 
   // --- Step 3: Execute search & post-process results
   const results: SearchResult[] = useMemo(() => {
-    if (query.length <= 1) return [];
+    if (query.length < MIN_MATCH_LENGTH) return [];
 
     const limited = !query
       ? []

@@ -196,7 +196,8 @@ export const TextMd = createMetadata({
 
     [`fontWeight-${COMP}-strong`]: "$fontWeight-bold",
 
-    [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-200 r g b / 0.4)",
+    [`textColor-${COMP}-marked`]: "$color-secondary-800",
+    [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-300 r g b / 0.4)",
     
     dark: {
       [`backgroundColor-${COMP}-marked`]: "rgb(from $color-primary-400 r g b / 0.4)",
