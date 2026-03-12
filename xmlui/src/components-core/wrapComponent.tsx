@@ -377,6 +377,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       lookupSyncCallback,
       renderChild,
       className,
+      classes,
       updateState,
       state,
       registerComponentApi,
@@ -394,6 +395,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     // --- Always pass through XMLUI plumbing ---
     props.className = className;
+    props.classes = classes;
     props.registerComponentApi = registerComponentApi;
 
     if (isStateful) {
@@ -751,6 +753,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       lookupEventHandler,
       lookupSyncCallback,
       className,
+      classes,
       updateState,
       state,
       registerComponentApi,
@@ -767,6 +770,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
     props.className = className;
+    props.classes = classes;
 
     // State-management props go to StateWrapper as __-prefixed internals
     if (isStateful) {

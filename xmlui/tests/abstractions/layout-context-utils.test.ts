@@ -5,6 +5,7 @@ import {
   findAncestorLayout,
   isInsideLayout,
   getLayoutPath,
+  stripDirectChildProps,
 } from "../../src/abstractions/layout-context-utils";
 import type { LayoutContext } from "../../src/abstractions/RendererDefs";
 
@@ -165,5 +166,51 @@ describe("getLayoutPath", () => {
     const root = createChildLayoutContext(undefined, {});
     const child = createChildLayoutContext(root, { type: "Stack" });
     expect(getLayoutPath(child)).toEqual(["", "Stack"]);
+  });
+});
+
+describe("stripDirectChildProps", () => {
+  it("returns undefined for undefined context", () => {
+    expect(stripDirectChildProps(undefined)).toBeUndefined();
+  });
+
+  it("removes ignoreLayoutProps from the context", () => {
+    const ctx = createChildLayoutContext(undefined, {
+      type: "FlowLayout",
+      orientation: "horizontal",
+      ignoreLayoutProps: ["width", "minWidth", "maxWidth"],
+    });
+    const stripped = stripDirectChildProps(ctx)!;
+    expect(stripped.ignoreLayoutProps).toBeUndefined();
+    expect(stripped.type).toBe("FlowLayout");
+    expect(stripped.orientation).toBe("horizontal");
+  });
+
+  it("removes wrapChild from the context", () => {
+    const wrapChild = () => null;
+    const ctx = createChildLayoutContext(undefined, {
+      type: "Stack",
+      wrapChild,
+    });
+    const stripped = stripDirectChildProps(ctx)!;
+    expect(stripped.wrapChild).toBeUndefined();
+    expect(stripped.type).toBe("Stack");
+  });
+
+  it("preserves structural properties", () => {
+    const parent = createChildLayoutContext(undefined, { type: "Stack" });
+    const ctx = createChildLayoutContext(parent, {
+      type: "FlowLayout",
+      orientation: "horizontal",
+      itemWidth: "33%",
+      ignoreLayoutProps: ["width"],
+      wrapChild: () => null,
+    });
+    const stripped = stripDirectChildProps(ctx)!;
+    expect(stripped.type).toBe("FlowLayout");
+    expect(stripped.orientation).toBe("horizontal");
+    expect(stripped.itemWidth).toBe("33%");
+    expect(stripped.depth).toBe(1);
+    expect(stripped.parent).toBe(parent);
   });
 });

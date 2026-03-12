@@ -33,6 +33,7 @@ import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
+import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
 import { resolveLayoutProps } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
@@ -224,11 +225,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- When a component calls renderChild without an explicit layoutContext (undefined),
   // --- we fall back to the component's own incoming context so that "transparent"
   // --- wrapper components propagate the parent layout context automatically.
+  // --- Direct-child-only properties (ignoreLayoutProps, wrapChild) are stripped
+  // --- from the fallback so they don't leak through component boundaries.
   const memoedRenderChild: RenderChildFn = useCallback(
     (children, layoutContext, pRenderContext) => {
       return renderChild(
         children,
-        layoutContext ?? layoutContextRef.current,
+        layoutContext ?? stripDirectChildProps(layoutContextRef.current),
         pRenderContext || parentRenderContext,
         uidInfoRef,
       );
