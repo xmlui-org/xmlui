@@ -234,12 +234,12 @@ export const Search = ({
                           aria-hidden="true"
                         >
                           <Text
-                            variant="em"
                             style={{
                               fontSize: "0.72em",
-                              fontWeight: 600,
+                              fontWeight: 700,
                               textTransform: "uppercase",
                               letterSpacing: "0.05em",
+                              color: "var(--xmlui-color-secondary-800)",
                             }}
                           >
                             {effectiveCategory}
@@ -308,21 +308,6 @@ const SearchItemContent = forwardRef(function SearchItemContent(
     >
       <div style={{ width: "100%" }}>
         <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          {item.category && (
-            <Text
-              variant="em"
-              style={{
-                fontSize: "0.7em",
-                fontWeight: 600,
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-                opacity: 0.6,
-                flexShrink: 0,
-              }}
-            >
-              {item.category}
-            </Text>
-          )}
           <Text variant="subtitle">
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>

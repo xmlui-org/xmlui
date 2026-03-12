@@ -136,9 +136,9 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   border-bottom: 1px solid var(--xmlui-borderColor);
   margin-bottom: 0.25rem;
 
-  &:not(:first-child) {
+  /* &:not(:first-child) {
     margin-top: 0.75rem;
-  }
+  } */
 }
 
 .noResults {
@@ -149,8 +149,8 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 
 .item {
   list-style: none;
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
   padding-inline: 0.75rem;
   border-radius: $borderRadius-SearchItem;
   border: 2px solid transparent;
@@ -178,8 +178,8 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   }
 
   & > a .snippet {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
   }
 
   &.header:has(+ .content):not(:first-child) {

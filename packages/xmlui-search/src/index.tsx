@@ -52,10 +52,10 @@ export const SearchMd = createMetadata({
     [`borderRadius-${COMP_PANEL}`]: "8px",
     [`borderWidth-${COMP_PANEL}`]: "1px",
     [`borderStyle-${COMP_PANEL}`]: "solid",
-    [`borderColor-${COMP_PANEL}`]: "$color-surface-200",
+    [`borderColor-${COMP_PANEL}`]: "$color-surface-100",
     [`boxShadow-${COMP_PANEL}`]: "$boxShadow-xl",
 
-    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-50",
+    [`backgroundColor-${COMP_ITEM}--hover`]: "$color-primary-500",
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 
