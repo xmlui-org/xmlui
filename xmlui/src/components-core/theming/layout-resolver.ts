@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
+import { isInsideLayout } from "../../abstractions/layout-context-utils";
 import { EMPTY_OBJECT } from "../constants";
 import { isEmpty } from "lodash-es";
 
@@ -45,10 +46,27 @@ export function resolveLayoutProps(
   const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
   const shouldIgnore = (prop: string) => ignoreLayoutProps.includes(prop);
 
+  // --- Inside a TableCell, reset min-width to 0 so nested flex containers
+  // --- (HStack, Link, etc.) can shrink below their content width, allowing
+  // --- text-overflow: ellipsis to work on descendant Text components. (#2936)
+  // --- Also set overflow: hidden so the truncation constraint propagates
+  // --- through each intermediate container in the chain.
+  const insideTableCell = isInsideLayout(layoutContext, "TableCell");
+  if (insideTableCell && !layoutProps.minWidth) {
+    result.cssProps.minWidth = 0;
+  }
+  if (insideTableCell && !layoutProps.overflow) {
+    result.cssProps.overflow = "hidden";
+  }
+
   // --- Adjust flex
   if (!!getOrientation(layoutContext)) {
-    // --- In a container, we always use "flex-shrink: 0"
-    result.cssProps.flexShrink = 0;
+    // --- In a container, we normally use "flex-shrink: 0" to prevent items
+    // --- from collapsing. Inside a TableCell however, items must be allowed
+    // --- to shrink so that text truncation / ellipsis works. (#2936)
+    if (!insideTableCell) {
+      result.cssProps.flexShrink = 0;
+    }
   }
 
   // --- Dimensions: widht and height is not considered to be inline styles

@@ -220,17 +220,20 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Obtain the component renderer and descriptor from the component registry
-  // --- Memoizes the renderChild function
+  // --- Memoizes the renderChild function.
+  // --- When a component calls renderChild without an explicit layoutContext (undefined),
+  // --- we fall back to the component's own incoming context so that "transparent"
+  // --- wrapper components propagate the parent layout context automatically.
   const memoedRenderChild: RenderChildFn = useCallback(
     (children, layoutContext, pRenderContext) => {
       return renderChild(
         children,
-        layoutContext,
+        layoutContext ?? layoutContextRef.current,
         pRenderContext || parentRenderContext,
         uidInfoRef,
       );
     },
-    [renderChild, parentRenderContext, uidInfoRef],
+    [renderChild, parentRenderContext, uidInfoRef, layoutContextRef],
   );
 
   // --- Collect the API-bound properties and events of the component to determine

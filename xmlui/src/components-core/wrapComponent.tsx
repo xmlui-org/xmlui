@@ -1,6 +1,7 @@
 import React from "react";
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import type { ComponentRendererDef, LayoutContext } from "../abstractions/RendererDefs";
+import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
 
@@ -527,7 +528,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     // --- Render children if the node has any ---
     if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
-      props.children = renderChild(node.children, config.childrenLayoutContext);
+      props.children = renderChild(
+        node.children,
+        config.childrenLayoutContext
+          ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+          : undefined,
+      );
     }
 
     const rendered = <Component {...props} />;

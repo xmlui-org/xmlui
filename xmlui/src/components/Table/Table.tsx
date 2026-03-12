@@ -27,7 +27,8 @@ import {
   CheckboxToleranceValues,
   defaultProps,
 } from "./TableNative";
-import type { RendererContext } from "../../abstractions/RendererDefs";
+import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { PositionValues } from "../Pagination/Pagination";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
@@ -521,6 +522,7 @@ const TableWithColumns = memo(
         lookupSyncCallback,
         classes,
         registerComponentApi,
+        layoutContext,
       }: Pick<
         RendererContext,
         | "extractValue"
@@ -531,7 +533,7 @@ const TableWithColumns = memo(
         | "classes"
         | "registerComponentApi"
         | "lookupSyncCallback"
-      >,
+      > & { layoutContext?: LayoutContext },
       ref,
     ) => {
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
@@ -652,6 +654,14 @@ const TableWithColumns = memo(
       }
       syncAdapter = syncAdapterHolderRef.current;
 
+      // Memoize so the reference is stable across re-renders — ComponentWrapper
+      // is React.memo'd, so a new object would defeat memo and re-render Columns
+      // on every Table state update, causing an infinite registerColumn loop.
+      const tableChildLayoutContext = useMemo(
+        () => createChildLayoutContext(layoutContext, { type: "Table" }),
+        [layoutContext],
+      );
+
       const tableContent = (
         <>
           {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
@@ -659,10 +669,10 @@ const TableWithColumns = memo(
             This way the order of the columns is preserved.
         */}
           <TableContext.Provider value={tableContextValue} key={tableKey}>
-            {renderChild(node.children)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <TableContext.Provider value={columnRefresherContextValue}>
-            {renderChild(node.children)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <Table
             classes={classes}
@@ -676,7 +686,7 @@ const TableWithColumns = memo(
             noDataRenderer={
               node.props.noDataTemplate &&
               (() => {
-                return renderChild(node.props.noDataTemplate);
+                return renderChild(node.props.noDataTemplate, tableChildLayoutContext);
               })
             }
             hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
@@ -767,6 +777,7 @@ export const tableComponentRenderer = createComponentRenderer(
     lookupSyncCallback,
     classes,
     registerComponentApi,
+    layoutContext,
   }) => {
     return (
       <TableWithColumns
@@ -778,6 +789,7 @@ export const tableComponentRenderer = createComponentRenderer(
         classes={classes}
         renderChild={renderChild}
         registerComponentApi={registerComponentApi}
+        layoutContext={layoutContext}
       />
     );
   },
