@@ -253,6 +253,20 @@ function eventNameToTraceKind(xmluiName: string): string | undefined {
 }
 
 /**
+ * End a trace, deferring popTrace to a microtask for value:change events
+ * so the trace context survives through React's state batching and into
+ * downstream re-renders (e.g., DataSource URL re-evaluation).
+ */
+function endTrace(traceId: string | undefined, traceKind: string | undefined): void {
+  if (!traceId) return;
+  if (traceKind === "value:change") {
+    Promise.resolve().then(() => popTrace());
+  } else {
+    popTrace();
+  }
+}
+
+/**
  * Derive a human-readable displayLabel for a trace event.
  * For value:change, the first arg is the new value (number/string).
  * For focus:change, the first arg is a FocusEvent — use the event name instead.
@@ -409,7 +423,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           }
           return result;
         } finally {
-          if (traceId) popTrace();
+          endTrace(traceId, traceKind);
         }
       };
     }
@@ -777,7 +791,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             }
             return result;
           } finally {
-            if (traceId) popTrace();
+            endTrace(traceId, traceKind);
           }
         };
       } else {
@@ -803,7 +817,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             }
             return result;
           } finally {
-            if (traceId) popTrace();
+            endTrace(traceId, traceKind);
           }
         };
       }
