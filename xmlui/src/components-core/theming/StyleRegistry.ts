@@ -15,6 +15,7 @@ interface StyleCacheEntry {
   className: string;
   styleHash: string;
   css: string;
+  layer: string;
 }
 
 // --- Helper Functions ---
@@ -85,8 +86,8 @@ export class StyleRegistry {
   // NEW: A set to specifically track hashes injected by SSR.
   public ssrHashes: Set<string> = new Set();
 
-  public register(styles: StyleObjectType): StyleCacheEntry {
-    const key = stableJSONStringify(styles);
+  public register(styles: StyleObjectType, layer = "dynamic"): StyleCacheEntry {
+    const key = stableJSONStringify({ layer, styles });
     const styleHash = hashString(key);
 
     const cachedEntry = this.cache.get(styleHash);
@@ -98,7 +99,7 @@ export class StyleRegistry {
     const className = `css-${styleHash}`;
     const css = this._generateCss(`.${className}`, styles);
 
-    const entry: StyleCacheEntry = { className, styleHash, css };
+    const entry: StyleCacheEntry = { className, styleHash, css, layer };
     this.cache.set(styleHash, entry);
     return entry;
   }
@@ -153,9 +154,26 @@ export class StyleRegistry {
   }
 
   public getSsrStyles(): string {
-    const allCss = Array.from(this.cache.values()).map(entry => entry.css).join('');
-    // Wrap the entire output in our top-most layer.
-    return `@layer dynamic {${allCss}}`;
+    const orderedLayers = ["reset", "base", "components", "themes", "dynamic"];
+    const cssByLayer = new Map<string, string>();
+
+    Array.from(this.cache.values()).forEach((entry) => {
+      const current = cssByLayer.get(entry.layer) || "";
+      cssByLayer.set(entry.layer, `${current}${entry.css}`);
+    });
+
+    const extraLayers = Array.from(cssByLayer.keys()).filter((l) => !orderedLayers.includes(l));
+    const allLayers = [...orderedLayers, ...extraLayers];
+    const layerDeclarations = allLayers.join(", ");
+
+    const layeredCss = allLayers
+      .map((layer) => {
+        const css = cssByLayer.get(layer);
+        return css ? `@layer ${layer} {${css}}` : "";
+      })
+      .join("");
+
+    return `@layer ${layerDeclarations};${layeredCss}`;
   }
 
   /**

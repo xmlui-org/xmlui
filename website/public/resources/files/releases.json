@@ -1,5 +1,81 @@
 [
   {
+    "tag_name": "xmlui@0.12.7",
+    "published_at": "2026-03-12T07:34:36Z",
+    "changes": [
+      {
+        "description": "Implement responsive layout properties",
+        "commit_sha": "3139ddc"
+      },
+      {
+        "description": "improve: enhance wrapComponent functionality with metadata merging",
+        "commit_sha": "92db16f"
+      },
+      {
+        "description": "Add `mockData` property to `DataSource` for development and testing",
+        "commit_sha": "2693f67"
+      },
+      {
+        "description": "Add headerUserSelect and cellUserSelect properties to Table",
+        "commit_sha": "420bae7"
+      },
+      {
+        "description": "Gather a search index into a json file at SSG time, which the client fetches.",
+        "commit_sha": "a72eb6d"
+      },
+      {
+        "description": "Fix Table rows occasionally rendering as blank despite valid data by passing `itemSize={rowHeight}` to the virtua Virtualizer component",
+        "commit_sha": "1b8c544"
+      },
+      {
+        "description": "Add applyLayoutProperties configuration option",
+        "commit_sha": "be9a99b"
+      },
+      {
+        "description": "Fix ContextMenu and ModalDialog theming regressions",
+        "commit_sha": "12c1131"
+      },
+      {
+        "description": "Theme variables optimization ready for review",
+        "commit_sha": "12c1131"
+      },
+      {
+        "description": "Add dock property to Stack",
+        "commit_sha": "90fd13f"
+      },
+      {
+        "description": "Remove HoverCard and PositionedContainer",
+        "commit_sha": "5b4ec41"
+      },
+      {
+        "description": "Fix Select regression",
+        "commit_sha": "9791592"
+      },
+      {
+        "description": "feat: integrate wrapComponent into core components where possible",
+        "commit_sha": "f1aa401"
+      },
+      {
+        "description": "Fix theme variable optimization regressions",
+        "commit_sha": "985a7be"
+      },
+      {
+        "description": "Fix portal styling issues with ModalDialog and Search",
+        "commit_sha": "12c1131"
+      },
+      {
+        "description": "Global variables regression fixes",
+        "commit_sha": "3286eb2"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.7.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.7/xmlui-0.12.7.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.6",
     "published_at": "2026-03-05T14:14:47Z",
     "changes": [
@@ -384,50 +460,6 @@
       {
         "name": "xmlui-0.11.33.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.33/xmlui-0.11.33.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.32",
-    "published_at": "2026-01-28T12:54:00Z",
-    "changes": [
-      {
-        "description": "fix: window.\\_\\_PUBLIC_PATH prefix applying twice to icon resources, making them not resolve to anything.",
-        "commit_sha": "cda5e22"
-      },
-      {
-        "description": "Extend Table with userSelect properties",
-        "commit_sha": "e98efdf"
-      },
-      {
-        "description": "Review the async loading of Tree items",
-        "commit_sha": "7d66fac"
-      },
-      {
-        "description": "feat: Open up possibility for custom components to receive input behaviors via an API/context",
-        "commit_sha": "9bea8d0"
-      },
-      {
-        "description": "Add scrollStyle and showScrollerFade to Tree",
-        "commit_sha": "6ad3926"
-      },
-      {
-        "description": "Removed timeout properties from onValidate.",
-        "commit_sha": "f4842b1"
-      },
-      {
-        "description": "improve: Provide accessible text label for RadioGroup",
-        "commit_sha": "1055794"
-      },
-      {
-        "description": "Allow the \"new\" keyword in object literals as property name",
-        "commit_sha": "a8117ba"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.32.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.32/xmlui-0.11.32.js"
       }
     ]
   }
