@@ -18,7 +18,7 @@
     <Card title="{$item.username}" subtitle="{$item.email}"
       orientation="horizontal" avatarUrl="{$item.avatar_url}">
       <SpaceFiller />
-      <Badge when="{!mediaSize.phone}" value="{$item.status}" />
+      <Badge when-md value="{$item.status}" />
       <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
         <event name="click">
           <APICall url="/api/users/{$item.id}" method="delete"

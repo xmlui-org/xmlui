@@ -61,16 +61,6 @@ export function getRootLinks(linkInfo: LinkInfo | undefined, navSections: NavSec
 }
 
 /**
- * Card width as percentage based on media size index.
- */
-export function getCardWidth(mediaSize: MediaSize | undefined): string {
-  if (!mediaSize) return "100%";
-  if (mediaSize.sizeIndex > 4) return "33.3%";
-  if (mediaSize.sizeIndex > 2) return "50%";
-  return "100%";
-}
-
-/**
  * Resolve icon for a card item: item.icon or lookup in navSections by to/label.
  */
 export function getCardIcon(item: LinkInfo | undefined, navSections: NavSections | undefined): string {
