@@ -67,7 +67,7 @@
     <SpaceFiller />
     <Search
       collapsible="true"
-      when="{mediaSize.sizeIndex > 1}"
+      when-sm
       data="{appGlobals.staticSearchData}"
       placeholder="Search on site..."
     />
