@@ -19,7 +19,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-HomePage": "800px",
     "maxWidth-content-BlogOverview": "800px",
     "maxWidth-content-BlogPage": "800px",
-    "maxWidth-content-GetStartedPage": "800px",
+    "maxWidth-md-content-GetStartedPage": "800px",
+    "maxWidth-content-GetStartedPage": "100%",
 
     "paddingVertical-NavPanel": "0",
     "marginBottom-logo-NavPanel": "0",
