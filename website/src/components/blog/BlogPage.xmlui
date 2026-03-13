@@ -1,7 +1,7 @@
 <Component name="BlogPage">
     <script>
     function showToc() {
-        return getThemeVar("tableOfContents") !== "false" && mediaSize.sizeIndex > 3;
+        return getThemeVar("tableOfContents") !== "false";
     }
     function showTags() {
         return getThemeVar("tags") !== "false";
@@ -60,7 +60,8 @@
                     showScrollerFade="true"
                     width="$space-64"
                     omitH1
-                    when="{showToc()}"
+                    when-md="{showToc()}"
+                    when="false"
                     maxHeadingLevel="3"
                 />
             </HStack>

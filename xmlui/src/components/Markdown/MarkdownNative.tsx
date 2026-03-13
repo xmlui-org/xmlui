@@ -5,6 +5,8 @@ import React, {
   type ReactNode,
   useRef,
   useMemo,
+  useEffect,
+  useCallback,
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -34,6 +36,87 @@ import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/Expand
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
+
+// ---------------------------------------------------------------------------
+// Module-level helpers — defined outside any component so their references
+// are stable for the entire session (no new allocation on each render).
+// Neither of these closes over any component state.
+// ---------------------------------------------------------------------------
+
+function getImageKey(node: any): string {
+  return `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
+}
+
+/** Rehype plugin that unwraps a samp playground element from its surrounding <p> tag. */
+const preventPlaygroundParagraphWrap = () => {
+  return function transformer(tree: Node) {
+    visit(tree, "element", (node: any, index: number | undefined, parent: any) => {
+      if (node.tagName !== "p" || !node.children || !Array.isArray(node.children)) {
+        return;
+      }
+      const nonEmptySiblings = node.children.filter((child: any) => {
+        return !(child.type === "text" && /^\s*$/.test(child.value));
+      });
+      if (
+        nonEmptySiblings.length === 1 &&
+        nonEmptySiblings[0].type === "element" &&
+        nonEmptySiblings[0].tagName === "samp" &&
+        nonEmptySiblings[0].properties?.["data-pg-content"]
+      ) {
+        const sampElement = nonEmptySiblings[0];
+        if (parent && parent.children && Array.isArray(parent.children) && typeof index === "number") {
+          parent.children.splice(index, 1, sampElement);
+        }
+        return index;
+      }
+    });
+  };
+};
+
+/** Stable rehype plugin array — same reference across all Markdown renders. */
+const stableRehypePlugins = [rehypeRaw, preventPlaygroundParagraphWrap];
+
+/**
+ * Stable component for rendering xmlui-pg playground elements inside Markdown.
+ * Defined at module level so its identity never changes across renders.
+ */
+function PlaygroundSampRenderer(props: any) {
+  const _renderCount = useRef(0);
+  _renderCount.current++;
+
+  const markdownContentBase64 = props?.["data-pg-markdown"];
+  const markdownContent = markdownContentBase64
+    ? decodeFromBase64(markdownContentBase64)
+    : "";
+  const dataContentBase64 = props?.["data-pg-content"];
+  const jsonContent = decodeFromBase64(dataContentBase64);
+  const appProps = JSON.parse(jsonContent);
+  const content = (
+    <NestedAppAndCodeViewNative
+      markdown={markdownContent}
+      app={appProps.app}
+      config={appProps.config}
+      components={appProps.components}
+      api={appProps.api}
+      activeTheme={appProps.activeTheme}
+      activeTone={appProps.activeTone}
+      title={appProps.name}
+      height={appProps.height}
+      allowPlaygroundPopup={!appProps.noPopup}
+      withFrame={appProps.noFrame ? false : true}
+      noHeader={appProps.noHeader ?? false}
+      splitView={appProps.splitView ?? false}
+      initiallyShowCode={appProps.initiallyShowCode ?? false}
+      popOutUrl={appProps.popOutUrl}
+      immediate={appProps.immediate}
+      withSplashScreen={appProps.withSplashScreen}
+    />
+  );
+  if (appProps.noFrame === true) {
+    return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
+  }
+  return content;
+}
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { BreakMode, OverflowMode } from "../abstractions";
 
@@ -178,62 +261,27 @@ export const Markdown = memo(
     }
     children = removeIndents ? removeTextIndents(children) : children;
 
-    const getImageKey = (node: any) =>
-      `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
-
-    const markdownImgParser = () => {
+    // markdownImgParser only reads imageInfo.current (a stable ref) — safe with empty deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const markdownImgParser = useCallback(() => {
       imageInfo.current.clear();
       return function transformer(tree: Node) {
         visit(tree, "image", visitor);
+        function visitor(node: any, _: number, parent: Parent | undefined) {
+          imageInfo.current.set(
+            getImageKey(node),
+            parent.type === "paragraph" && parent.children.length > 1,
+          );
+        }
       };
+    }, []);
 
-      function visitor(node: any, _: number, parent: Parent | undefined) {
-        imageInfo.current.set(
-          getImageKey(node),
-          parent.type === "paragraph" && parent.children.length > 1,
-        );
-      }
-    };
-
-    // Prevent xmlui-pg playground elements (samp tags with data-pg-content) from being wrapped in <p> tags
-    const preventPlaygroundParagraphWrap = () => {
-      return function transformer(tree: Node) {
-        visit(tree, "element", (node: any, index: number | undefined, parent: any) => {
-          // We're looking for <p> tags that contain only a <samp> element with data-pg-content
-          if (node.tagName !== "p" || !node.children || !Array.isArray(node.children)) {
-            return;
-          }
-
-          // Filter out whitespace-only text nodes
-          const nonEmptySiblings = node.children.filter((child: any) => {
-            return !(child.type === "text" && /^\s*$/.test(child.value));
-          });
-
-          // Check if this paragraph contains only a samp element with data-pg-content
-          if (
-            nonEmptySiblings.length === 1 &&
-            nonEmptySiblings[0].type === "element" &&
-            nonEmptySiblings[0].tagName === "samp" &&
-            nonEmptySiblings[0].properties?.["data-pg-content"]
-          ) {
-            const sampElement = nonEmptySiblings[0];
-
-            // Replace the paragraph with the samp element by modifying the parent's children
-            if (
-              parent &&
-              parent.children &&
-              Array.isArray(parent.children) &&
-              typeof index === "number"
-            ) {
-              parent.children.splice(index, 1, sampElement);
-            }
-
-            // Return the sampElement to continue visiting from there
-            return index;
-          }
-        });
-      };
-    };
+    // Stable remark plugins array — only changes when markdownImgParser changes (never, with [] deps above).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const remarkPlugins = useMemo(
+      () => [remarkGfm, markdownCodeBlockParser, markdownImgParser],
+      [markdownImgParser],
+    );
 
     return (
       <div
@@ -251,8 +299,8 @@ export const Markdown = memo(
         style={style}
       >
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
-          rehypePlugins={[rehypeRaw, preventPlaygroundParagraphWrap]}
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={stableRehypePlugins}
           components={{
             details({ children, node, ...props }) {
               return (
@@ -511,40 +559,7 @@ export const Markdown = memo(
             tfoot({ children }) {
               return <tfoot className={styles.htmlTfoot}>{children}</tfoot>;
             },
-            samp({ ...props }) {
-              const markdownContentBase64 = props?.["data-pg-markdown"];
-              const markdownContent = markdownContentBase64
-                ? decodeFromBase64(markdownContentBase64)
-                : "";
-              const dataContentBase64 = props?.["data-pg-content"];
-              const jsonContent = decodeFromBase64(dataContentBase64);
-              const appProps = JSON.parse(jsonContent);
-              const content = (
-                <NestedAppAndCodeViewNative
-                  markdown={markdownContent}
-                  app={appProps.app}
-                  config={appProps.config}
-                  components={appProps.components}
-                  api={appProps.api}
-                  activeTheme={appProps.activeTheme}
-                  activeTone={appProps.activeTone}
-                  title={appProps.name}
-                  height={appProps.height}
-                  allowPlaygroundPopup={!appProps.noPopup}
-                  withFrame={appProps.noFrame ? false : true}
-                  noHeader={appProps.noHeader ?? false}
-                  splitView={appProps.splitView ?? false}
-                  initiallyShowCode={appProps.initiallyShowCode ?? false}
-                  popOutUrl={appProps.popOutUrl}
-                  immediate={appProps.immediate}
-                  withSplashScreen={appProps.withSplashScreen}
-                />
-              );
-              if (appProps.noFrame === true) {
-                return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
-              }
-              return content;
-            },
+            samp: PlaygroundSampRenderer,
             section({ children, ...props }) {
               const treeContentBase64 = props?.["data-tree-content"];
               if (treeContentBase64 !== undefined) {

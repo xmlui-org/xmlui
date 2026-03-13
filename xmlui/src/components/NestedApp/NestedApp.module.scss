@@ -29,6 +29,7 @@ $paddingHorizontal-viewControls-button-NestedApp: createThemeVar(
   "paddingHorizontal-viewControls-button-#{$component}"
 );
 $borderRadius-NestedApp: createThemeVar("borderRadius-#{$component}");
+$backgroundColor-header-NestedApp: createThemeVar("backgroundColor-header-#{$component}");
 $borderBottom-header-NestedApp: createThemeVar("borderBottom-header-#{$component}");
 $height-logo-splitView-NestedApp: createThemeVar("height-logo-splitView-#{$component}");
 $width-logo-splitView-NestedApp: createThemeVar("width-logo-splitView-#{$component}");
@@ -174,6 +175,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     background-color: $backgroundColor-frame-NestedApp;
     align-content: center;
     box-shadow: $boxShadow-NestedApp;
+    overflow: hidden;
 
     .contentContainer {
       width: 100%;
@@ -247,6 +249,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     display: flex;
     align-items: center;
     padding: 0 t.$space-2;
+    background-color: $backgroundColor-header-NestedApp;
     border-bottom: $borderBottom-header-NestedApp;
     justify-content: space-between;
 

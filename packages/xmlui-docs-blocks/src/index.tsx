@@ -25,7 +25,6 @@ import {
   getTopLevelChildren,
   getPageDescription,
   getRootLinks,
-  getCardWidth,
   getCardIcon,
 } from "./utils/overviewHelpers";
 import { XmlUiDocsThemeDefinition } from "./themes/xmlui-docs";
@@ -56,7 +55,6 @@ export default {
     getTopLevelChildren,
     getPageDescription,
     getRootLinks,
-    getCardWidth,
     getCardIcon,
   },
 };

@@ -12,7 +12,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-DocumentPageNoTOC": "700px",
     "height-AppHeader": "44px",
 
-    layout: "basic",
+    layout: "featuredWithTabs",
     tableOfContents: "false",
     tags: "false",
 
@@ -97,6 +97,24 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-Drawer": "100%",
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
+
+    // --- Search
+    "backgroundColor-SearchItem--hover": "$color-surface-50",
+
+    // --- Headlines
+    "paddingTop-Headlines": "$space-14",
+    "paddingTop-md-Headlines": "$space-20",
+    "fontSize-heading-Headlines": "36px",
+    "fontSize-md-heading-Headlines": "42px",
+    "lineHeight-heading-Headlines": "1.2",
+    "fontSize-sub-Headlines": "24px",
+    "lineHeight-sub-Headlines": "1.3",
+
+    // --- Benefit
+    "marginTop-Benefit": "6px",
+    "size-icon-Benefit": "24px",
+    "maxWidth-md-Benefit": "600px",
+    "maxWidth-Benefit": "400px",
   },
   resources: {},
 };

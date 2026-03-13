@@ -1,7 +1,7 @@
 <Component name="Benefits">
     <FlowLayout
-        maxWidth-md="600px"
-        maxWidth="400px"
+        maxWidth-md="$maxWidth-md-Benefit"
+        maxWidth="$maxWidth-Benefit"
         columnGap="$space-8"
         rowGap="$space-8"
     >

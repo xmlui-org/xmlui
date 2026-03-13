@@ -429,6 +429,14 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const className = [themeClassName, styleClassName, responsiveClassName].filter(Boolean).join(" ");
 
+  // Memoize `classes` so components wrapped in React.memo (e.g. Markdown)
+  // don't re-render when `className` is unchanged.
+  // MUST be before any conditional return to obey the Rules of Hooks.
+  const memoedClasses = useMemo(
+    () => ({ [COMPONENT_PART_KEY]: className }),
+    [className],
+  );
+
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
   // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
@@ -530,7 +538,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     renderChild: memoedRenderChild,
     registerComponentApi: memoedRegisterComponentApi,
     className,
-    classes: { [COMPONENT_PART_KEY]: className },
+    classes: memoedClasses,
     layoutContext: layoutContextRef?.current,
     uid,
     logInteraction,
