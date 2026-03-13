@@ -153,7 +153,7 @@ test.describe("Keyboard Navigation", () => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(field).toBeFocused();
 
-    await page.keyboard.press("ArrowDown");
+    // First item is already highlighted on load (activeIndex starts at 0)
     await expect(page.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
 
     await page.keyboard.press("ArrowDown");
@@ -172,8 +172,7 @@ test.describe("Keyboard Navigation", () => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(field).toBeFocused();
 
-    // Navigate to first, then second (last), then wrap back to first
-    await page.keyboard.press("ArrowDown");
+    // First item is already highlighted on load; navigate to last, then wrap back to first
     await expect(page.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowDown");
     await expect(page.getByRole("option").last()).toHaveAttribute("aria-selected", "true");
@@ -191,8 +190,7 @@ test.describe("Keyboard Navigation", () => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(field).toBeFocused();
 
-    // Move to first item, then press ArrowUp to wrap to last
-    await page.keyboard.press("ArrowDown");
+    // First item is already highlighted on load; ArrowUp wraps directly to last
     await expect(page.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
     await page.keyboard.press("ArrowUp");
     await expect(page.getByRole("option").first()).toHaveAttribute("aria-selected", "false");
@@ -316,8 +314,7 @@ test.describe("Mouse Interactions", () => {
     await expect(page.getByRole("listbox")).toBeVisible();
     await expect(field).toBeFocused();
 
-    // Keyboard selects first item
-    await page.keyboard.press("ArrowDown");
+    // First item is already highlighted on load (activeIndex=0)
     await expect(page.getByRole("option").first()).toHaveAttribute("aria-selected", "true");
 
     // Mouse hovering second item should switch the highlight
@@ -420,7 +417,7 @@ test.describe("Accessibility", () => {
     await expect(page.getByRole("option").first()).toBeVisible();
   });
 
-  test("aria-activedescendant is unset before keyboard navigation", async ({
+  test("aria-activedescendant points to first result when results are shown", async ({
     initTestBed,
     page,
   }) => {
@@ -432,7 +429,8 @@ test.describe("Accessibility", () => {
     await field.fill("button");
     await expect(page.getByRole("listbox")).toBeVisible();
 
-    await expect(field).not.toHaveAttribute("aria-activedescendant");
+    // First item is auto-selected on load, so activedescendant points to it immediately
+    await expect(field).toHaveAttribute("aria-activedescendant", "option-0");
   });
 
   test("aria-activedescendant is set after ArrowDown navigation", async ({
