@@ -37,14 +37,6 @@ import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
 
-// Diagnostics helper — mirrors the one in NestedAppNative.tsx
-function dbgPG(obj: Record<string, unknown>) {
-  console.log(JSON.stringify({ ...obj, ts: Date.now() }));
-}
-function dbgMD(obj: Record<string, unknown>) {
-  console.log(JSON.stringify({ ...obj, ts: Date.now() }));
-}
-
 // ---------------------------------------------------------------------------
 // Module-level helpers — defined outside any component so their references
 // are stable for the entire session (no new allocation on each render).
@@ -91,7 +83,6 @@ const stableRehypePlugins = [rehypeRaw, preventPlaygroundParagraphWrap];
 function PlaygroundSampRenderer(props: any) {
   const _renderCount = useRef(0);
   _renderCount.current++;
-  dbgPG({ e: "PlaygroundSampRenderer:render", count: _renderCount.current, hasContent: !!props?.["data-pg-content"] });
 
   const markdownContentBase64 = props?.["data-pg-markdown"];
   const markdownContent = markdownContentBase64
@@ -209,26 +200,6 @@ export const Markdown = memo(
     }: MarkdownProps,
     ref,
   ) {
-    // --- Diagnostics -------------------------------------------------------
-    const _mdRenderCount = useRef(0);
-    _mdRenderCount.current++;
-    const _mdPrevProps = useRef<Record<string, unknown> | null>(null);
-    useEffect(() => {
-      dbgMD({ e: "Markdown:mount" });
-      return () => { dbgMD({ e: "Markdown:unmount" }); };
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-    {
-      const curr: Record<string, unknown> = { removeIndents, removeBr, children, style, className, classes, codeHighlighter, showHeadingAnchors, grayscale, truncateLinks, openLinkInNewTab, overflowMode, breakMode };
-      const prev = _mdPrevProps.current;
-      if (prev !== null) {
-        const changed = Object.keys(curr).filter(k => curr[k] !== prev[k]);
-        if (changed.length > 0) dbgMD({ e: "Markdown:render", count: _mdRenderCount.current, propsChanged: changed });
-      } else {
-        dbgMD({ e: "Markdown:render", count: _mdRenderCount.current, initial: true });
-      }
-      _mdPrevProps.current = curr;
-    }
-    // --- End diagnostics ---------------------------------------------------
     // Determine overflow mode classes based on overflowMode
     const overflowClasses = useMemo(() => {
       const classes: Record<string, boolean> = {};
