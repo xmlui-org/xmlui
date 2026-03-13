@@ -5,10 +5,10 @@
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
-    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
-    "gen:rss": "node scripts/generate-rss.js",
-    "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
+    "gen:releases": "echo 'skipping'",
+    "gen:download-latest-xmlui-release": "echo 'skipping'",
+    "gen:rss": "echo 'skipping'",
+    "gen:sitemap": "echo 'skipping'",
     "build": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
     "build-ssg": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui ssg && mv dist-ssg/ssg-staticwebapp.config.json dist-ssg/staticwebapp.config.json",
     "preview-ssg": "npx preview-ssg ./dist-ssg"
