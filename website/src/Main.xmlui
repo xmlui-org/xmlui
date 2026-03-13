@@ -43,7 +43,7 @@
         <Logo height="$space-8" />
       </Link>
     </property>
-    <Stack desktopOnly>
+    <Stack when-md>
       <HStack gap="0">
         <NavLink
           noIndicator
@@ -73,7 +73,9 @@
     />
   </AppHeader>
   <NavPanel
-    when="{currentSegment === 'docs'}"
+    when-xs
+    when-sm
+    when-md="{currentSegment === 'docs'}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >

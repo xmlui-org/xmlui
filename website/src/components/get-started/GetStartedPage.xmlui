@@ -1,6 +1,9 @@
 <Component name="GetStartedPage">
   <CHStack>
-    <VStack maxWidth="$maxWidth-content-GetStartedPage">
+    <VStack 
+      maxWidth="$maxWidth-content-GetStartedPage"
+      maxWidth-md="$maxWidth-md-content-GetStartedPage"
+    >
       <Markdown>
         <![CDATA[
 

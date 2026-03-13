@@ -3,7 +3,7 @@ import type React from "react";
 import styles from "./Dialog.module.scss";
 
 import { ThemedText as Text } from "../Text/Text";
-import { ModalDialog } from "./ModalDialogNative";
+import { ThemedModalDialog as ModalDialog } from "./ModalDialog";
 
 export type Props = {
   title?: string;
