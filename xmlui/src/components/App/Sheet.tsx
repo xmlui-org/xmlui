@@ -38,38 +38,36 @@ const SheetContent = React.forwardRef<
     [`--${THEME_VAR_PREFIX}-right-closeButton-App`]: themeVars?.["right-closeButton-App"],
   } as React.CSSProperties;
   return (
-    <div>
-      <SheetPortal container={root}>
-        <SheetOverlay />
-        <SheetPrimitive.Content
-          forceMount={true}
-          onOpenAutoFocus={(event) => {
-            // Prevent Radix from automatically focusing the first focusable element
-            // (e.g. the search input in the mobile nav drawer).
-            event.preventDefault();
-          }}
-          ref={ref}
-          className={classnames(
-            styles.sheetContent,
-            {
-              [styles.top]: side === "top",
-              [styles.bottom]: side === "bottom",
-              [styles.left]: side === "left",
-              [styles.right]: side === "right",
-            },
-            className,
-          )}
-          style={{ ...sheetCssVars, ...style }}
-          {...props}
-        >
-          {children}
-          <SheetPrimitive.Close className={styles.close}>
-            <ThemedIcon name="close" />
-            <VisuallyHidden>Close</VisuallyHidden>
-          </SheetPrimitive.Close>
-        </SheetPrimitive.Content>
-      </SheetPortal>
-    </div>
+    <SheetPortal container={root}>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        forceMount={true}
+        onOpenAutoFocus={(event) => {
+          // Prevent Radix from automatically focusing the first focusable element
+          // (e.g. the search input in the mobile nav drawer).
+          event.preventDefault();
+        }}
+        ref={ref}
+        className={classnames(
+          styles.sheetContent,
+          {
+            [styles.top]: side === "top",
+            [styles.bottom]: side === "bottom",
+            [styles.left]: side === "left",
+            [styles.right]: side === "right",
+          },
+          className,
+        )}
+        style={{ ...sheetCssVars, ...style }}
+        {...props}
+      >
+        {children}
+        <SheetPrimitive.Close className={styles.close}>
+          <ThemedIcon name="close" />
+          <VisuallyHidden>Close</VisuallyHidden>
+        </SheetPrimitive.Close>
+      </SheetPrimitive.Content>
+    </SheetPortal>
   );
 });
 SheetContent.displayName = SheetPrimitive.Content.displayName;
