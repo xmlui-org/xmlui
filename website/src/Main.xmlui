@@ -73,6 +73,8 @@
     />
   </AppHeader>
   <NavPanel
+    when-xs
+    when-sm
     when="{currentSegment === 'docs'}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
