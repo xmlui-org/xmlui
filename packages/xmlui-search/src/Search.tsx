@@ -66,6 +66,7 @@ export const Search = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
+  const listRef = useRef<HTMLUListElement>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!collapsible);
@@ -141,18 +142,39 @@ export const Search = ({
     [activeIndex, results.length, show],
   );
 
-  // Does the scrolling to the active item
+  // Does the scrolling to the active item, accounting for the sticky category header
   useEffect(() => {
-    if (
-      navigationSource === "keyboard" &&
-      activeIndex >= 0 &&
-      itemRefs.current[activeIndex] &&
-      typeof itemRefs.current[activeIndex].scrollIntoView === "function"
-    ) {
-      itemRefs.current[activeIndex].scrollIntoView({
-        block: "nearest",
-        behavior: "instant",
-      });
+    if (navigationSource !== "keyboard" || activeIndex < 0 || !itemRefs.current[activeIndex]) return;
+
+    const item = itemRefs.current[activeIndex];
+    const scrollContainer = listRef.current;
+
+    if (!scrollContainer) {
+      item.scrollIntoView({ block: "nearest", behavior: "instant" });
+      return;
+    }
+
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+
+    // Measure any sticky category header currently pinned at the top of the scroll container
+    let stickyHeight = 0;
+    scrollContainer.querySelectorAll(`.${styles.categoryHeader}`).forEach((header) => {
+      const headerRect = header.getBoundingClientRect();
+      if (Math.abs(headerRect.top - containerRect.top) < 2) {
+        stickyHeight = Math.max(stickyHeight, headerRect.height);
+      }
+    });
+
+    const itemTop = itemRect.top - containerRect.top;
+    const itemBottom = itemRect.bottom - containerRect.top;
+
+    if (itemTop < stickyHeight) {
+      // Item is obscured by the sticky header — scroll up to reveal it
+      scrollContainer.scrollTop += itemTop - stickyHeight;
+    } else if (itemBottom > containerRect.height) {
+      // Item is below the visible area — scroll down
+      scrollContainer.scrollTop += itemBottom - containerRect.height;
     }
   }, [activeIndex, navigationSource]);
 
@@ -218,6 +240,7 @@ export const Search = ({
             >
               <ul
                 id={`${inputId}-listbox`}
+                ref={listRef}
                 className={classNames(styles.list)}
                 role="listbox"
                 aria-label="Search results"

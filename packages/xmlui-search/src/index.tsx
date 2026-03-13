@@ -61,7 +61,7 @@ export const SearchMd = createMetadata({
     dark: {
       [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
       [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
-      [`backgroundColor-${COMP_ITEM}--hover`]: "rgb(from $color-primary-200 r g b / 0.4)",
+      [`backgroundColor-${COMP_ITEM}--hover`]: "rgb(from $color-surface-200 r g b / 0.4)",
     },
   },
 });

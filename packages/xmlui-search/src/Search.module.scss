@@ -86,7 +86,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   // the normal scroll flow and doesn't affect sticky anchoring.
   padding: 0 0.75rem 0.75rem;
 
-  & > :first-child {
+  & > :first-child:not(.categoryHeader) {
     margin-top: 0.75rem;
   }
 }
@@ -144,10 +144,11 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   z-index: 1;
   background-color: $backgroundColor-Search;
   list-style: none;
-  padding-top: 0.5rem;
+  padding-top: 1.25rem;
   padding-bottom: 0.25rem;
   padding-inline: 0.75rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
+  margin-top: 0;
   margin-bottom: 0.25rem;
 
   /* &:not(:first-child) {
@@ -196,6 +197,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
     padding-bottom: 0.15rem;
   }
 
+  // Only apply to .item elements that are NOT also .categoryHeader
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
   }
