@@ -37,6 +37,13 @@ type NestedAppProps = {
   className?: string;
 };
 
+// ---------------------------------------------------------------------------
+// Diagnostics — every message is a JSON line logged unconditionally.
+// ---------------------------------------------------------------------------
+function dbgNA(obj: Record<string, unknown>) {
+  console.log(JSON.stringify({ ...obj, ts: Date.now() }));
+}
+
 function AnimatedLogo() {
   return (
     <div className={styles.loadingContainer}>
@@ -118,6 +125,27 @@ export function NestedApp({
   const [initialized, setInitialized] = useState(!withSplashScreen);
   const [revealAnimationFinished, setRevealAnimationFinished] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  // --- Diagnostics -------------------------------------------------------
+  const _diagId = useRef(`na-${Math.random().toString(36).slice(2, 8)}`);
+  const _diagPrevDeps = useRef<Record<string, unknown> | null>(null);
+
+  // Mount / unmount — fires once per React lifecycle
+  useEffect(() => {
+    dbgNA({ e: "NestedApp:mount", id: _diagId.current, withSplashScreen });
+    return () => { dbgNA({ e: "NestedApp:unmount", id: _diagId.current }); };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Track `initialized` transitions
+  useEffect(() => {
+    dbgNA({ e: "NestedApp:initialized", id: _diagId.current, value: initialized });
+  }, [initialized]);
+
+  // Track `revealAnimationFinished` transitions
+  useEffect(() => {
+    dbgNA({ e: "NestedApp:revealAnimationFinished", id: _diagId.current, value: revealAnimationFinished });
+  }, [revealAnimationFinished]);
+  // --- End diagnostics ---------------------------------------------------
 
   // Handle click outside to reset focus
   useEffect(() => {
@@ -225,6 +253,25 @@ export function NestedApp({
   }, []);
 
   useEffect(() => {
+    // --- Diagnostics: which dep changed? -----------------------------------
+    const _diagCurr: Record<string, unknown> = {
+      onInit, activeTheme, app, componentRegistry, components,
+      configAppGlobals: config?.appGlobals, configDefaultTheme: config?.defaultTheme,
+      configName: config?.name, configResources: config?.resources, configThemes: config?.themes,
+      height, mock, parentInterceptorContext, style,
+      themeStyles: theme.themeStyles, toneToApply, refreshVersion,
+    };
+    if (_diagPrevDeps.current !== null) {
+      const changed = Object.keys(_diagCurr).filter(
+        (k) => _diagCurr[k] !== _diagPrevDeps.current![k],
+      );
+      dbgNA({ e: "NestedApp:render-effect:deps-changed", id: _diagId.current, changed });
+    } else {
+      dbgNA({ e: "NestedApp:render-effect:initial", id: _diagId.current });
+    }
+    _diagPrevDeps.current = _diagCurr;
+    // --- End diagnostics ---------------------------------------------------
+
     let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(app);
     if (errors.length > 0) {
       component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
