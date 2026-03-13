@@ -47,7 +47,7 @@
     "@tanstack/react-table": "8.17.3",
     "@vitejs/plugin-react": "5.1.0",
     "adm-zip": "0.5.10",
-    "axios": "1.12.0",
+    "axios": "1.13.5",
     "chroma-js": "^3.1.2",
     "classnames": "2.5.1",
     "color": "4.2.3",
