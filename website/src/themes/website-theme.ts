@@ -12,7 +12,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-DocumentPageNoTOC": "700px",
     "height-AppHeader": "44px",
 
-    layout: "featuredWithTabs",
+    layout: "basic",
     tableOfContents: "false",
     tags: "false",
 
