@@ -184,6 +184,7 @@ export const ThemedTextBox = React.forwardRef<HTMLDivElement, ThemedTextBoxProps
 );
 
 export const textBoxComponentRenderer = wrapComponent(COMP, ThemedTextBox, TextBoxMd, {
+  exposeRegisterApi: true,
   events: {
     gotFocus: "onFocus",
     lostFocus: "onBlur",
@@ -204,6 +205,7 @@ const PasswordBox = React.forwardRef((props: any, ref: any) =>
 PasswordBox.displayName = "PasswordBox";
 
 export const passwordInputComponentRenderer = wrapComponent("PasswordInput", PasswordBox, PasswordMd, {
+  exposeRegisterApi: true,
   events: {
     gotFocus: "onFocus",
     lostFocus: "onBlur",
