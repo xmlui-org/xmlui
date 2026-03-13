@@ -73,7 +73,7 @@
     />
   </AppHeader>
   <NavPanel
-    when="{currentSegment === 'docs'}"
+    when="{mediaSize.sizeIndex <= 2 || currentSegment === 'docs'}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
@@ -999,7 +999,7 @@
             noIndicator
             to="https://demo.xmlui.org"
             label="Gallery"
-            target="_blank"
+            blank="{true}"
           />
           <Link
             noIndicator
@@ -1017,7 +1017,7 @@
             to="https://github.com/xmlui-org/xmlui"
             icon="github"
             label="GitHub"
-            target="_blank"
+            blank="{true}"
           />
           <Separator />
         </CHStack>
