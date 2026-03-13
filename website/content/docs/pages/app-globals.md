@@ -54,20 +54,21 @@ appGlobals: {
 ### `applyLayoutProperties`
 
 ```ts
-applyLayoutProperties?: "all" | "dims" | "none";
+applyLayoutProperties?: "all" | "dims" | "spacing" | "none";
 ```
 
-Controls which layout properties the rendering engine applies to components. Useful for embedding XMLUI into a host application that manages its own layout.
+Controls which layout properties the rendering engine applies to components. This restriction applies to both base properties (e.g. `backgroundColor`) and responsive variants (e.g. `backgroundColor-lg`). Useful for embedding XMLUI into a host application that manages its own layout.
 
 | Value | Behavior |
 |---|---|
 | `"all"` | All layout properties are applied (default). |
 | `"dims"` | Only dimension properties are applied: `width`, `height`, `minWidth`, `maxWidth`, `minHeight`, `maxHeight`. |
+| `"spacing"` | Dimension properties plus spacing: `gap`, `padding*`, `margin*` and their variants. Other properties like borders, colors, and typography are ignored. |
 | `"none"` | No layout properties are applied — the markup values are silently ignored. |
 
 ```ts
 appGlobals: {
-  applyLayoutProperties: "dims",
+  applyLayoutProperties: "spacing",
 }
 ```
 

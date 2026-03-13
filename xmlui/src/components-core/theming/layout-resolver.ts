@@ -19,7 +19,23 @@ const defaultCompResult: ResolvedLayout = {
   issues: new Set(),
 };
 
-export type ApplyLayoutProperties = "none" | "dims" | "all";
+export type ApplyLayoutProperties = "none" | "dims" | "spacing" | "all";
+
+/** Properties allowed in "dims" mode (dimensions only). */
+export const DIMS_ONLY_PROPS = new Set([
+  "width", "minWidth", "maxWidth",
+  "height", "minHeight", "maxHeight",
+]);
+
+/** Properties allowed in "spacing" mode (dims + gap, padding, margin and their variants). */
+export const SPACING_ONLY_PROPS = new Set([
+  ...DIMS_ONLY_PROPS,
+  "gap",
+  "padding", "paddingHorizontal", "paddingVertical",
+  "paddingTop", "paddingBottom", "paddingLeft", "paddingRight",
+  "margin", "marginHorizontal", "marginVertical",
+  "marginTop", "marginBottom", "marginLeft", "marginRight",
+]);
 
 export function resolveLayoutProps(
   layoutProps: LayoutProps = EMPTY_OBJECT,
@@ -41,6 +57,8 @@ export function resolveLayoutProps(
 
   // --- "dims" mode: only allow dimension properties
   const dimsOnly = mode === "dims";
+  // --- "spacing" mode: allow dimensions + padding + margin + gap
+  const spacingOnly = mode === "spacing";
 
   // Get the list of layout properties to ignore from layout context
   const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
@@ -166,6 +184,15 @@ export function resolveLayoutProps(
   }
   collectCss("marginTop", disableInlineStyle);
   collectCss("marginBottom", disableInlineStyle);
+
+  // --- In "spacing" mode, skip everything beyond dimensions + padding + margin
+  if (spacingOnly) {
+    // --- If we didn't set any props, return a referentially stable result
+    if (isEmpty(result.cssProps) && isEmpty(result.issues)) {
+      return defaultCompResult;
+    }
+    return result;
+  }
 
   // --- Borders
   collectCss("border", disableInlineStyle);
