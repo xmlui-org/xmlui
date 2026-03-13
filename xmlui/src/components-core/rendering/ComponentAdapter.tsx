@@ -35,9 +35,15 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
-import { resolveLayoutProps } from "../theming/layout-resolver";
+import { resolveLayoutProps, DIMS_ONLY_PROPS, SPACING_ONLY_PROPS } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
-import { buildResponsiveStyleObjects, buildCompositeStyleObject, buildWhenStyleObject, isVisibleAtAnyBreakpoint, COMPONENT_PART_KEY } from "../theming/responsive-layout";
+import {
+  buildResponsiveStyleObjects,
+  buildCompositeStyleObject,
+  buildWhenStyleObject,
+  isVisibleAtAnyBreakpoint,
+  COMPONENT_PART_KEY,
+} from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
 
@@ -367,23 +373,33 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- higher cascade priority over the base rules at the matching breakpoints.
   const extendedLayoutProps = useMemo(() => {
     if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
+    const applyMode = appContext.appGlobals?.applyLayoutProperties ?? "all";
+    // Mirror the applyLayoutProperties check that resolveLayoutProps applies to the base props
+    if (applyMode === "none") return EMPTY_OBJECT as Record<string, any>;
     const extended: Record<string, any> = {};
-    const ignoreProps = layoutContextRef?.current?.ignoreLayoutProps as string[] || [];
+    const ignoreProps = (layoutContextRef?.current?.ignoreLayoutProps as string[]) || [];
     for (const key of Object.keys(safeNode.props)) {
       const parsed = parseLayoutProperty(key);
       if (typeof parsed === "string") continue; // invalid key
       if (parsed.component) continue; // component-scoped, not a layout prop
       // Only collect keys that have a part, breakpoint, or state suffix — base keys are already
       // handled by the existing layoutOptionKeys pass above
-      if (parsed.part || (parsed.screenSizes && parsed.screenSizes.length > 0) || (parsed.states && parsed.states.length > 0)) {
+      if (
+        parsed.part ||
+        (parsed.screenSizes && parsed.screenSizes.length > 0) ||
+        (parsed.states && parsed.states.length > 0)
+      ) {
         // Skip responsive variants of ignored layout props — the parent container
         // (e.g. FlowItemWrapper) handles them via its own width resolution.
         if (ignoreProps.includes(parsed.property)) continue;
+        // In "dims" / "spacing" mode, restrict to the allowed property set
+        if (applyMode === "dims" && !DIMS_ONLY_PROPS.has(parsed.property)) continue;
+        if (applyMode === "spacing" && !SPACING_ONLY_PROPS.has(parsed.property)) continue;
         extended[key] = valueExtractor(safeNode.props[key], true);
       }
     }
     return extended;
-  }, [safeNode.props, valueExtractor]);
+  }, [safeNode.props, valueExtractor, appContext.appGlobals?.applyLayoutProperties]);
 
   // --- Build composite responsive style object covering root + all parts
   const responsiveStyleObject = useMemo(
@@ -414,7 +430,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     const merged = { ...responsiveStyleObject } as Record<string, any>;
     for (const [key, val] of Object.entries(whenStyleObject)) {
       if (key.startsWith("@media") && merged[key]) {
-        merged[key] = { ...merged[key] as object, ...val as object };
+        merged[key] = { ...(merged[key] as object), ...(val as object) };
       } else {
         merged[key] = val;
       }
@@ -423,7 +439,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   }, [responsiveStyleObject, whenStyleObject]);
 
   const stableResponsiveStyleObject = useShallowCompareMemoize(mergedStyleObject);
-  
+
   // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
   const responsiveClassName = useStyles(stableResponsiveStyleObject);
 
@@ -432,15 +448,17 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // Memoize `classes` so components wrapped in React.memo (e.g. Markdown)
   // don't re-render when `className` is unchanged.
   // MUST be before any conditional return to obey the Rules of Hooks.
-  const memoedClasses = useMemo(
-    () => ({ [COMPONENT_PART_KEY]: className }),
-    [className],
-  );
+  const memoedClasses = useMemo(() => ({ [COMPONENT_PART_KEY]: className }), [className]);
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
   // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
-  const currentWhenValue = resolveResponsiveWhen(safeNode.when, safeNode.responsiveWhen, state, appContext);
+  const currentWhenValue = resolveResponsiveWhen(
+    safeNode.when,
+    safeNode.responsiveWhen,
+    state,
+    appContext,
+  );
 
   // --- Handle init and cleanup events based on "when" condition transitions
   useEffect(() => {
