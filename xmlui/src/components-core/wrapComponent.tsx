@@ -5,6 +5,7 @@ import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
+import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -130,6 +131,13 @@ export type WrapComponentConfig = {
    * e.g. { type: "Stack", orientation: "vertical" }.
    */
   childrenLayoutContext?: LayoutContext;
+
+  /**
+   * When true, passes `registerComponentApi` to the native component so
+   * it can register runtime APIs (e.g., focus(), setValue()). Defaults to false.
+   * Only set this for components that actually call registerComponentApi.
+   */
+  exposeRegisterApi?: boolean;
 };
 
 /**
@@ -345,6 +353,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
   // Collect all specially-handled XMLUI prop names so we can skip them
   // when forwarding the rest.
+  const filteredLayoutKeys = layoutOptionKeys.filter((key) => !metadata.props?.[key]);
   const specialProps = new Set([
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
@@ -356,7 +365,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // elements or SVG renderers where they are invalid and cause unexpected rendering.
     // Exception: if a layout prop is explicitly declared in the component's metadata props,
     // it has component-specific meaning (e.g. Card's "orientation") and must be forwarded.
-    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
+    ...filteredLayoutKeys,
+    // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
+    // are also layout-only and must not be forwarded to native components.
+    ...filteredLayoutKeys.flatMap((key) =>
+      MediaBreakpointKeys.map((bp) => `${key}-${bp}`),
+    ),
   ]);
 
   // Detect whether this is a stateful component
@@ -396,7 +410,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // --- Always pass through XMLUI plumbing ---
     props.className = className;
     props.classes = classes;
-    props.registerComponentApi = registerComponentApi;
+    if (config.exposeRegisterApi) {
+      props.registerComponentApi = registerComponentApi;
+    }
 
     if (isStateful) {
       props.updateState = updateState;
@@ -598,11 +614,16 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet } =
     mergeWithMetadata(metadata, config);
 
+  const filteredLayoutKeysCompound = layoutOptionKeys.filter((key) => !metadata.props?.[key]);
   const specialProps = new Set([
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
     "id",
-    ...layoutOptionKeys.filter((key) => !metadata.props?.[key]),
+    ...filteredLayoutKeysCompound,
+    // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
+    ...filteredLayoutKeysCompound.flatMap((key) =>
+      MediaBreakpointKeys.map((bp) => `${key}-${bp}`),
+    ),
   ]);
 
   const isStateful =

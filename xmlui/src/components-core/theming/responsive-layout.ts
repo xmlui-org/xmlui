@@ -188,7 +188,12 @@ export function buildResponsiveStyleObjects(
     }
 
     // 3. Breakpoint-specific props become @media rules
-    for (const [size, bpProps] of Object.entries(styles.breakpoints) as [MediaBreakpointType, Record<string, string>][]) {
+    // Sort smallest-to-largest so that larger breakpoints always appear later in CSS source
+    // order and correctly override smaller ones when multiple queries match (equal specificity).
+    const sortedBreakpoints = (
+      Object.entries(styles.breakpoints) as [MediaBreakpointType, Record<string, string>][]
+    ).sort((a, b) => (BREAKPOINT_MIN_WIDTH[a[0]] ?? 0) - (BREAKPOINT_MIN_WIDTH[b[0]] ?? 0));
+    for (const [size, bpProps] of sortedBreakpoints) {
       const minWidth = BREAKPOINT_MIN_WIDTH[size];
       if (minWidth === undefined || Object.keys(bpProps).length === 0) continue;
       styleObj[`@media (min-width: ${minWidth}px)`] = {
@@ -198,7 +203,10 @@ export function buildResponsiveStyleObjects(
 
     // 4. State props within breakpoints — merge into the @media entries created above
     for (const [pseudoSel, stateStyles] of Object.entries(styles.states)) {
-      for (const [size, bpProps] of Object.entries(stateStyles.breakpoints) as [MediaBreakpointType, Record<string, string>][]) {
+      const sortedStateBreakpoints = (
+        Object.entries(stateStyles.breakpoints) as [MediaBreakpointType, Record<string, string>][]
+      ).sort((a, b) => (BREAKPOINT_MIN_WIDTH[a[0]] ?? 0) - (BREAKPOINT_MIN_WIDTH[b[0]] ?? 0));
+      for (const [size, bpProps] of sortedStateBreakpoints) {
         const minWidth = BREAKPOINT_MIN_WIDTH[size];
         if (minWidth === undefined || Object.keys(bpProps).length === 0) continue;
         const mediaKey = `@media (min-width: ${minWidth}px)`;
