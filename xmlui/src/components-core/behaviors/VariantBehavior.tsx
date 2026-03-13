@@ -171,22 +171,22 @@ function VariantWrapper({
   }
 
   // Generate the CSS class using useStyles hook
-  const customVariantClassName = useStyles(variantSpec);
+  const customVariantClassName = useStyles(variantSpec, { layer: "themes" });
 
   // Check if the child is ItemWithLabel (a wrapper component from labelBehavior)
   // If so, apply the className to the actual component inside ItemWithLabel instead
   const isItemWithLabel = children.type === ItemWithLabel;
-  
+
   if (isItemWithLabel && children.props?.children) {
     // Apply className to the actual component inside ItemWithLabel
     const innerChild = children.props.children as ReactElement;
     const innerClassName = innerChild.props?.className || "";
     const newInnerClassName = `${innerClassName} ${customVariantClassName || ""}`.trim();
-    
+
     const wrappedChildren = cloneElement(innerChild, {
       className: newInnerClassName,
     });
-    
+
     return cloneElement(children, {
       children: wrappedChildren,
     });
@@ -200,4 +200,3 @@ function VariantWrapper({
     className: newClassName,
   });
 }
-

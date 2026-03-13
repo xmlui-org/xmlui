@@ -172,7 +172,7 @@ export function NestedApp({
       // since we are using shadow DOM, we need to define the layers here
       // to ensure that the styles are applied correctly (the adopted styleheets setting is asynchronous, so the layer order might not be respected if we don't do this)
       // MUST BE IN SYNC WITH THE STYLESHEET ORDER IN index.scss
-      style.innerHTML = "@layer reset, base, components, dynamic;";
+      style.innerHTML = "@layer reset, base, components, themes, dynamic;";
       shadowRef.current.appendChild(style);
 
       // This should run once to prepare the stylesheets
@@ -234,10 +234,10 @@ export function NestedApp({
     // The app can be either a ComponentDef (with type property) or CompoundComponentDef (with component property)
     let appGlobalVars: Record<string, any> = {};
     if (component) {
-      if ('type' in component) {
+      if ("type" in component) {
         // It's a ComponentDef
         appGlobalVars = (component as ComponentDef).globalVars || {};
-      } else if ('component' in component) {
+      } else if ("component" in component) {
         // It's a CompoundComponentDef, get globalVars from the nested component
         appGlobalVars = (component as CompoundComponentDef).component?.globalVars || {};
       }
@@ -254,15 +254,15 @@ export function NestedApp({
       if (errors.length > 0) {
         return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
       }
-      
+
       // Extract globalVars from component definitions too
-      if (component && 'component' in component) {
+      if (component && "component" in component) {
         const compGlobalVars = (component as CompoundComponentDef).component?.globalVars;
         if (compGlobalVars) {
           appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
         }
       }
-      
+
       return component;
     });
 
@@ -385,7 +385,7 @@ function NestedAppRoot({
     return vars;
   }, [themeStylesToReset]);
 
-  const resetClassName = useStyles(themeVarReset, { prepend: true });
+  const resetClassName = useStyles(themeVarReset, { prepend: true, layer: "themes" });
 
   return (
     <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>

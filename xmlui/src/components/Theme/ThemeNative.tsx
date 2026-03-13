@@ -177,7 +177,7 @@ export function Theme({
     return ret;
   }, [isRoot, themeCssVars, themeTone, getThemeVar, componentRegistry]);
 
-  const className = useStyles(transformedStyles);
+  const className = useStyles(transformedStyles, { layer: "themes" });
 
   const [currentThemeRoot, setCurrentThemeRoot] = useState(root);
 
