@@ -16,7 +16,6 @@
             omitH1
             when-lg
             maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
-        <VStack width="$space-64" when-lg />
     </HStack>
 </Component>
     
