@@ -93,6 +93,16 @@ export const Search = ({
     setActiveIndex(0);
   }, [results]);
 
+  const onSearchButtonClick = useCallback(() => {
+    setIsExpanded(true);
+    setAnimationDirection("expanding");
+    // Focus search input when it expands
+    setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+      setAnimationDirection(null);
+    }, 300);
+  }, []);
+
   const onClick = useCallback(() => {
     setInputValue("");
     setActiveIndex(-1);
@@ -189,15 +199,7 @@ export const Search = ({
             variant="ghost"
             themeColor="secondary"
             icon={<Icon name="search" aria-hidden />}
-            onClick={() => {
-              setIsExpanded(true);
-              setAnimationDirection("expanding");
-              // Focus search input when it expands
-              setTimeout(() => {
-                inputRef.current?.focus({ preventScroll: true });
-                setAnimationDirection(null);
-              }, 300);
-            }}
+            onClick={onSearchButtonClick}
             contextualLabel="Open search"
           />
         ) : (
@@ -207,7 +209,7 @@ export const Search = ({
               ref={inputRef}
               className={classnames(styles.input, {
                 [styles.fullWidth]: inDrawer,
-                [styles.active]: inputValue.length > 0,
+                [styles.active]: inputValue.length > 0 || show,
                 [styles.focused]: isFocused,
                 [styles.expanding]: animationDirection === "expanding",
                 [styles.collapsing]: animationDirection === "collapsing",
@@ -263,13 +265,7 @@ export const Search = ({
                             aria-hidden="true"
                           >
                             <Text
-                              style={{
-                                fontSize: "0.72em",
-                                fontWeight: 700,
-                                textTransform: "uppercase",
-                                letterSpacing: "0.05em",
-                                color: "var(--xmlui-color-secondary-800)",
-                              }}
+                              className={styles.categoryHeaderText}
                             >
                               {effectiveCategory}
                             </Text>
@@ -520,7 +516,7 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
       <Text
         key={`${index}-highlighted`}
         variant="marked"
-        style={{ fontSize: "inherit", fontWeight: "inherit" }}
+        style={{ fontSize: "inherit", fontWeight: "inherit", color: "inherit" }}
       >
         {text.slice(start, end + 1)}
       </Text>,
