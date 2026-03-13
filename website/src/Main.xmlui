@@ -73,7 +73,7 @@
     />
   </AppHeader>
   <NavPanel
-    when="{mediaSize.sizeIndex <= 2 || currentSegment === 'docs'}"
+    when="{currentSegment === 'docs'}"
     scrollStyle="whenScrolling"
     showScrollerFade="true"
   >
