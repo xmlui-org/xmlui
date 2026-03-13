@@ -163,7 +163,6 @@ export const cardComponentRenderer = wrapComponent(
   ThemedCard,
   CardMd,
   {
-    exposeRegisterApi: true,
     childrenLayoutContext: { type: "Stack", orientation: "vertical" },
   },
 );

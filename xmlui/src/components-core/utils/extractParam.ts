@@ -324,18 +324,9 @@ export function removeStylesFromProps(
     delete nodeProps["class"];
   }
 
+  const filterKeys = layoutOptionKeys;
   return Object.fromEntries(
-    Object.entries(nodeProps).filter(([key]) => {
-      if (layoutOptionKeys.includes(key)) return false;
-      // Filter responsive variants like fontSize-md, backgroundColor-lg, etc.
-      const dashIdx = key.lastIndexOf("-");
-      if (dashIdx > 0) {
-        const base = key.slice(0, dashIdx);
-        const suffix = key.slice(dashIdx + 1) as any;
-        if (layoutOptionKeys.includes(base) && MediaBreakpointKeys.includes(suffix)) return false;
-      }
-      return true;
-    }),
+    Object.entries(nodeProps).filter(([key]) => !filterKeys.includes(key)),
   );
 }
 
