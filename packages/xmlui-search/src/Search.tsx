@@ -593,7 +593,22 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
       : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
 
     const mapped = postProcessSearch(limited, query);
-    return groupAndSortByCategory(mapped);
+    const sorted = groupAndSortByCategory(mapped);
+
+    // Emit app:trace when xsVerbose tracing is active
+    if ((window as any)._xsLogs) {
+      const xsTraceEvent = (window as any).xsTraceEvent;
+      if (typeof xsTraceEvent === "function") {
+        xsTraceEvent("search", {
+          term: query,
+          fuseHits: limited.length,
+          resultCount: sorted.length,
+          topResults: sorted.slice(0, 3).map((r) => r.item.title),
+        });
+      }
+    }
+
+    return sorted;
   }, [query, limit]);
 
   return results;
