@@ -1,16 +1,37 @@
-#!/usr/bin/env node
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+import { sortByVersion, XMLUI_STANDALONE_PATTERN } from "./utils";
 
-const fs = require("fs").promises;
-const path = require("path");
-const { exit } = require("process");
-const { sortByVersion, XMLUI_STANDALONE_PATTERN } = require("./utils.js");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const MD_HEADING_PATTERN = /^#{1,6} \S/;
 const MD_LIST_COMMIT_SHA_PATTERN = /^-\s*[a-f0-9]{6,40}:\s*/;
 
 const DEF_MAX_RELEASES_STR = "10";
-if (require.main === module) {
-  main();
+
+interface Options {
+  owner: string;
+  repo: string;
+  maxReleases: number;
+  outputFile: string | null;
+  writeToStdout: boolean;
+}
+
+interface ReleaseChange {
+  description: string;
+  commit_sha: string | null;
+}
+
+interface ProcessedRelease {
+  tag_name: string;
+  published_at: string;
+  changes: ReleaseChange[];
+  assets: Array<{
+    name: string;
+    browser_download_url: string;
+  }>;
 }
 
 function processEnvVars() {
@@ -24,12 +45,11 @@ function processEnvVars() {
   };
 }
 
-function processOptions(args) {
+function processOptions(args: string[]): Options {
   handleHelpOption(args);
   const envVars = processEnvVars();
 
   const writeToStdout = args.includes("--stdout");
-
   const outputFile = getOptionValue(args, "--output");
 
   const maxReleasesStr =
@@ -47,25 +67,29 @@ function processOptions(args) {
   };
 }
 
-async function getXmluiReleases(options) {
+async function getXmluiReleases(options: Options): Promise<ProcessedRelease[] | null> {
   try {
     const { Octokit } = await import("@octokit/rest");
-    const octokit = new Octokit();
+    const token = process.env.GITHUB_TOKEN;
+    const octokit = new Octokit(token ? { auth: token } : {});
+
     console.error("Fetching releases from GitHub API...");
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: options.owner,
       repo: options.repo,
     });
 
-    const xmluiReleases = releases.filter((release) => release.tag_name.startsWith("xmlui@"));
+    const xmluiReleases = (releases as any[]).filter((release) =>
+      release.tag_name.startsWith("xmlui@"),
+    );
 
     xmluiReleases.sort(sortByVersion);
     const releasesToProcess = xmluiReleases.slice(0, options.maxReleases);
 
-    const availableVersions = [];
+    const availableVersions: ProcessedRelease[] = [];
 
     for (const release of releasesToProcess) {
-      const xmluiStandaloneAsset = release.assets.find((asset) =>
+      const xmluiStandaloneAsset = release.assets.find((asset: any) =>
         XMLUI_STANDALONE_PATTERN.test(asset.name),
       );
       const changes = release.body ? parseBodyIntoChanges(release.body) : [];
@@ -86,7 +110,7 @@ async function getXmluiReleases(options) {
     }
 
     return availableVersions;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching xmlui releases:", error.message);
     if (error.status === 403) {
       console.error("Rate limit exceeded or insufficient permissions.");
@@ -95,37 +119,7 @@ async function getXmluiReleases(options) {
   }
 }
 
-async function main() {
-  const args = process.argv.slice(2);
-  const options = processOptions(args);
-  const outputFile = options.outputFile;
-
-  try {
-    const releases = await getXmluiReleases(options);
-
-    console.error(`Got ${releases.length} xmlui releases`);
-    if (releases === null) {
-      console.error("Failed to fetch xmlui releases. Exiting with code 1.");
-      process.exit(1);
-    }
-    if (outputFile === null || options.writeToStdout) {
-      console.log(JSON.stringify(releases, null, 2));
-    } else {
-      // Ensure output directory exists
-      const outputDir = path.dirname(outputFile);
-      await fs.mkdir(outputDir, { recursive: true });
-
-      // Write to file
-      await fs.writeFile(outputFile, JSON.stringify(releases, null, 2), "utf8");
-      console.error(`Successfully updated ${outputFile}`);
-    }
-  } catch (error) {
-    console.error("Error writing release info:", error);
-    process.exit(1);
-  }
-}
-
-function getOptionValue(args, optionName) {
+function getOptionValue(args: string[], optionName: string): string | null {
   const optionIndex = args.indexOf(optionName);
   if (optionIndex === -1) return null;
   const value = args[optionIndex + 1];
@@ -134,13 +128,13 @@ function getOptionValue(args, optionName) {
   return value;
 }
 
-function handleHelpOption(args) {
+function handleHelpOption(args: string[]) {
   if (args.includes("--help") || args.includes("-h")) {
     const helpMessage = `
   Fetches xmlui release information from GitHub and outputs it in JSON format.
 
   Usage:
-    ./get-releases.js [options]
+    ./get-releases.ts [options]
 
   Options:
     --output <file>    Specify the path to the output JSON file.
@@ -162,39 +156,31 @@ function handleHelpOption(args) {
   }
 }
 
-/**
- * Parse markdown body into individual changes with commit SHA and description
- * @param {string} body
- * @returns {Array<{description: string, commit_sha: string}>}
- */
-function parseBodyIntoChanges(body) {
-  const changes = [];
+function parseBodyIntoChanges(body: string): ReleaseChange[] {
+  const changes: ReleaseChange[] = [];
   const lines = body.split("\n");
 
   for (const line of lines) {
-    // Skip markdown headings
     if (MD_HEADING_PATTERN.test(line)) {
       continue;
     }
 
-    // Process list items that may contain commit SHA
     if (line.startsWith("- ")) {
       const match = line.match(MD_LIST_COMMIT_SHA_PATTERN);
       if (match) {
-        // Extract commit SHA and description
-        const commitSha = match[0].match(/[a-f0-9]{6,40}/)[0];
+        const commitShaMatch = match[0].match(/[a-f0-9]{6,40}/);
+        const commitSha = commitShaMatch ? commitShaMatch[0] : null;
         const description = line.replace(MD_LIST_COMMIT_SHA_PATTERN, "").trim();
         changes.push({
           description: description,
           commit_sha: commitSha,
         });
       } else {
-        // List item without commit SHA
-        const description = line.substring(2).trim(); // Remove "- " prefix
+        const description = line.substring(2).trim();
         if (description) {
           changes.push({
             description: description,
-            commit_sha: null, // No commit SHA available
+            commit_sha: null,
           });
         }
       }
@@ -203,3 +189,33 @@ function parseBodyIntoChanges(body) {
 
   return changes;
 }
+
+async function main() {
+  const args = process.argv.slice(2);
+  const options = processOptions(args);
+  const outputFile = options.outputFile;
+
+  try {
+    const releases = await getXmluiReleases(options);
+
+    if (releases === null) {
+      console.error("Failed to fetch xmlui releases. Exiting with code 1.");
+      process.exit(1);
+    }
+
+    console.error(`Got ${releases.length} xmlui releases`);
+    if (outputFile === null || options.writeToStdout) {
+      console.log(JSON.stringify(releases, null, 2));
+    } else {
+      const outputDir = path.dirname(outputFile);
+      await fs.mkdir(outputDir, { recursive: true });
+      await fs.writeFile(outputFile, JSON.stringify(releases, null, 2), "utf8");
+      console.error(`Successfully updated ${outputFile}`);
+    }
+  } catch (error) {
+    console.error("Error writing release info:", error);
+    process.exit(1);
+  }
+}
+
+main();

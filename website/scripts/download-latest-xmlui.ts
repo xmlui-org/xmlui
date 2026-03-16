@@ -1,23 +1,29 @@
-#!/usr/bin/env node
+import fs from "fs/promises";
+import path from "path";
+import { fileURLToPath } from "url";
+import { sortByVersion, XMLUI_STANDALONE_PATTERN } from "./utils";
 
-const fs = require("fs").promises;
-const path = require("path");
-const { sortByVersion, XMLUI_STANDALONE_PATTERN } = require("./utils.js");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-async function getLatestAssetUrl() {
+async function getLatestAssetUrl(): Promise<string> {
   const per_page = 100;
   const max_releases = 100;
 
   const url = `https://api.github.com/repos/xmlui-org/xmlui/releases?per_page=${per_page}`;
 
-  const res = await fetch(url);
+  const headers: Record<string, string> = {};
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_TOKEN}`;
+  }
+
+  const res = await fetch(url, { headers });
 
   if (!res.ok) {
     throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);
   }
 
-  /** @type {Array<any>} */
-  const releases = await res.json();
+  const releases = (await res.json()) as any[];
 
   const xmluiReleases = releases
     .filter((r) => r?.tag_name?.startsWith("xmlui@"))
@@ -26,15 +32,17 @@ async function getLatestAssetUrl() {
   const releasesToProcess = xmluiReleases.slice(0, max_releases);
 
   for (const release of releasesToProcess) {
-    const xmluiStandaloneAsset = (release.assets || []).find((asset) =>
+    const xmluiStandaloneAsset = (release.assets || []).find((asset: any) =>
       XMLUI_STANDALONE_PATTERN.test(asset.name),
     );
-    return xmluiStandaloneAsset.browser_download_url;
+    if (xmluiStandaloneAsset) {
+      return xmluiStandaloneAsset.browser_download_url;
+    }
   }
   throw new Error("No matching standalone asset found in the latest releases");
 }
 
-async function downloadFile(url) {
+async function downloadFile(url: string): Promise<Buffer> {
   const response = await fetch(url);
   if (!response.ok) {
     throw new Error(`Failed to download ${url}: ${response.status} ${response.statusText}`);
