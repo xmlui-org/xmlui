@@ -16,7 +16,7 @@ A new core XMLUI component that renders a data array as a responsive, virtualize
 
 ---
 
-## Step 1 — Scaffold: Metadata + Renderer Stub + Empty Native Component
+## ✅ Step 1 — Scaffold: Metadata + Renderer Stub + Empty Native Component
 
 **Goal**: Get the component folder created, metadata defined, renderer stubbed, and the project compiling with a minimal no-op native component.
 
@@ -71,7 +71,7 @@ A new core XMLUI component that renders a data array as a responsive, virtualize
 
 ---
 
-## Step 2 — Grid Layout with ResizeObserver + Column Calculation
+## ✅ Step 2 — Grid Layout with ResizeObserver + Column Calculation
 
 **Goal**: Implement responsive column calculation and render items in a static (non-virtualized) CSS grid.
 
@@ -91,7 +91,7 @@ A new core XMLUI component that renders a data array as a responsive, virtualize
 
 ---
 
-## Step 3 — Virtualization with `virtua`
+## ✅ Step 3 — Virtualization with `virtua`
 
 **Goal**: Replace the static grid with row-level virtualization using `virtua`'s `Virtualizer`.
 

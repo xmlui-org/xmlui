@@ -4,6 +4,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
 import { TileGridNative, defaultProps } from "./TileGridNative";
+import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreNative";
 
 const COMP = "TileGrid";
 
@@ -143,8 +144,9 @@ export const tileGridComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     const itemTemplate = node.props.itemTemplate;
+    const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
 
-    return (
+    const content = (
       <TileGridNative
         registerComponentApi={registerComponentApi}
         classes={classes}
@@ -157,7 +159,7 @@ export const tileGridComponentRenderer = createComponentRenderer(
         enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
         syncWithAppState={extractValue(node.props.syncWithAppState)}
         checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as any}
-        idKey={extractValue.asOptionalString(node.props.idKey)}
+        idKey={idKey}
         onSelectionDidChange={lookupEventHandler("selectionDidChange")}
         onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
         onCutAction={lookupEventHandler("cutAction")}
@@ -186,5 +188,7 @@ export const tileGridComponentRenderer = createComponentRenderer(
         }
       />
     );
+
+    return <StandaloneSelectionStore idKey={idKey}>{content}</StandaloneSelectionStore>;
   },
 );
