@@ -35,6 +35,10 @@ $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
 
+$componentListFooter: "SearchFooter";
+$backgroundColor-SearchFooter: createThemeVar("backgroundColor-#{$componentListFooter}");
+$borderColor-SearchFooter: createThemeVar("borderColor-#{$componentListFooter}");
+
 // Keyframe animations for collapsible search
 @keyframes expandSearch {
   from {
@@ -70,6 +74,20 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
     width: var(--radix-popover-trigger-width);
     z-index: 1;
   }
+
+  .panelFooter {
+    display: flex;
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid $borderColor-SearchFooter;
+    background-color: $backgroundColor-SearchFooter;
+    display: flex;
+    gap: 1em;
+
+    & > div {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
 }
 
 .list {
@@ -86,7 +104,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   // the normal scroll flow and doesn't affect sticky anchoring.
   padding: 0 0.75rem 0.75rem;
 
-  & > :first-child {
+  & > :first-child:not(.categoryHeader) {
     margin-top: 0.75rem;
   }
 }
@@ -102,8 +120,9 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   border-color: $borderColor-SearchInput;
   @include t.paddingVars($themeVars, $componentInput);
 
-
   &.active {
+    background-color: $backgroundColor-SearchInput--active;
+
     [data-part-id="startAdornment"],
     [data-part-id="endAdornment"] {
       color: $textColor-adornment-SearchInput--active;
@@ -144,15 +163,24 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   z-index: 1;
   background-color: $backgroundColor-Search;
   list-style: none;
-  padding-top: 0.5rem;
+  padding-top: 1.25rem;
   padding-bottom: 0.25rem;
   padding-inline: 0.75rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
+  margin-top: 0;
   margin-bottom: 0.25rem;
 
   /* &:not(:first-child) {
     margin-top: 0.75rem;
   } */
+
+  .categoryHeaderText {
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--xmlui-color-secondary-800);
+  }
 }
 
 .noResults {
@@ -196,6 +224,7 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
     padding-bottom: 0.15rem;
   }
 
+  // Only apply to .item elements that are NOT also .categoryHeader
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
   }

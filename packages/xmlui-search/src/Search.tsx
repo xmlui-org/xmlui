@@ -66,6 +66,7 @@ export const Search = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
+  const listRef = useRef<HTMLUListElement>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!collapsible);
@@ -91,6 +92,16 @@ export const Search = ({
     if (results.length > 0) setShow(true);
     setActiveIndex(0);
   }, [results]);
+
+  const onSearchButtonClick = useCallback(() => {
+    setIsExpanded(true);
+    setAnimationDirection("expanding");
+    // Focus search input when it expands
+    setTimeout(() => {
+      inputRef.current?.focus({ preventScroll: true });
+      setAnimationDirection(null);
+    }, 300);
+  }, []);
 
   const onClick = useCallback(() => {
     setInputValue("");
@@ -141,18 +152,39 @@ export const Search = ({
     [activeIndex, results.length, show],
   );
 
-  // Does the scrolling to the active item
+  // Does the scrolling to the active item, accounting for the sticky category header
   useEffect(() => {
-    if (
-      navigationSource === "keyboard" &&
-      activeIndex >= 0 &&
-      itemRefs.current[activeIndex] &&
-      typeof itemRefs.current[activeIndex].scrollIntoView === "function"
-    ) {
-      itemRefs.current[activeIndex].scrollIntoView({
-        block: "nearest",
-        behavior: "instant",
-      });
+    if (navigationSource !== "keyboard" || activeIndex < 0 || !itemRefs.current[activeIndex]) return;
+
+    const item = itemRefs.current[activeIndex];
+    const scrollContainer = listRef.current;
+
+    if (!scrollContainer) {
+      item.scrollIntoView({ block: "nearest", behavior: "instant" });
+      return;
+    }
+
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const itemRect = item.getBoundingClientRect();
+
+    // Measure any sticky category header currently pinned at the top of the scroll container
+    let stickyHeight = 0;
+    scrollContainer.querySelectorAll(`.${styles.categoryHeader}`).forEach((header) => {
+      const headerRect = header.getBoundingClientRect();
+      if (Math.abs(headerRect.top - containerRect.top) < 2) {
+        stickyHeight = Math.max(stickyHeight, headerRect.height);
+      }
+    });
+
+    const itemTop = itemRect.top - containerRect.top;
+    const itemBottom = itemRect.bottom - containerRect.top;
+
+    if (itemTop < stickyHeight) {
+      // Item is obscured by the sticky header — scroll up to reveal it
+      scrollContainer.scrollTop += itemTop - stickyHeight;
+    } else if (itemBottom > containerRect.height) {
+      // Item is below the visible area — scroll down
+      scrollContainer.scrollTop += itemBottom - containerRect.height;
     }
   }, [activeIndex, navigationSource]);
 
@@ -167,15 +199,7 @@ export const Search = ({
             variant="ghost"
             themeColor="secondary"
             icon={<Icon name="search" aria-hidden />}
-            onClick={() => {
-              setIsExpanded(true);
-              setAnimationDirection("expanding");
-              // Focus search input when it expands
-              setTimeout(() => {
-                inputRef.current?.focus({ preventScroll: true });
-                setAnimationDirection(null);
-              }, 300);
-            }}
+            onClick={onSearchButtonClick}
             contextualLabel="Open search"
           />
         ) : (
@@ -185,7 +209,7 @@ export const Search = ({
               ref={inputRef}
               className={classnames(styles.input, {
                 [styles.fullWidth]: inDrawer,
-                [styles.active]: inputValue.length > 0,
+                [styles.active]: inputValue.length > 0 || show,
                 [styles.focused]: isFocused,
                 [styles.expanding]: animationDirection === "expanding",
                 [styles.collapsing]: animationDirection === "collapsing",
@@ -218,6 +242,7 @@ export const Search = ({
             >
               <ul
                 id={`${inputId}-listbox`}
+                ref={listRef}
                 className={classNames(styles.list)}
                 role="listbox"
                 aria-label="Search results"
@@ -240,13 +265,7 @@ export const Search = ({
                             aria-hidden="true"
                           >
                             <Text
-                              style={{
-                                fontSize: "0.72em",
-                                fontWeight: 700,
-                                textTransform: "uppercase",
-                                letterSpacing: "0.05em",
-                                color: "var(--xmlui-color-secondary-800)",
-                              }}
+                              className={styles.categoryHeaderText}
                             >
                               {effectiveCategory}
                             </Text>
@@ -283,6 +302,24 @@ export const Search = ({
                   </div>
                 )}
               </ul>
+              {!inDrawer && (
+                <footer className={styles.panelFooter}>
+                  <div>
+                    <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
+                    <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
+                    <Text>Navigate</Text>
+                  </div>
+
+                  <div style={{ flex: "1" }}>
+                    <Text variant="keyboard">Enter</Text>
+                    <Text>Select</Text>
+                  </div>
+
+                  <div>
+                    <Text variant="keyboard">Esc</Text>
+                    <Text>Close</Text>
+                  </div>
+              </footer>)}
             </PopoverContent>
           </Portal>
         )}
@@ -497,7 +534,7 @@ function highlightText(text: string, ranges?: readonly RangeTuple[]) {
       <Text
         key={`${index}-highlighted`}
         variant="marked"
-        style={{ fontSize: "inherit", fontWeight: "inherit" }}
+        style={{ fontSize: "inherit", fontWeight: "inherit", color: "inherit" }}
       >
         {text.slice(start, end + 1)}
       </Text>,

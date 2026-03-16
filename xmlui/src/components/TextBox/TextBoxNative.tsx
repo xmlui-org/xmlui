@@ -288,6 +288,7 @@ export const TextBox = forwardRef(function TextBox(
           autoFocus={autoFocus}
           tabIndex={enabled ? tabIndex : -1}
           required={required}
+          autoComplete="off"
           {...searchAriaAttributes}
         />
       </Part>
