@@ -55,6 +55,12 @@ This property indicates whether the input accepts user actions (`true`) or not (
 </App>
 ```
 
+### `gap` [#gap]
+
+> [!DEF]  default: **"$gap-normal"**
+
+This property sets the gap between the radio options in the group. Accepts any valid CSS size value or a theme token (e.g. `$gap-normal`).
+
 ### `initialValue` [#initialvalue]
 
 > [!DEF]  default: **""**
@@ -74,6 +80,19 @@ This property defines the initial value of the selected option within the group.
   </RadioGroup>
 </App>
 ```
+
+### `orientation` [#orientation]
+
+> [!DEF]  default: **"vertical"**
+
+This property sets the layout direction of the radio options within the group. Use `horizontal` to arrange them in a row, or `vertical` (default) to stack them.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `horizontal` | The component will fill the available space horizontally |
+| `vertical` | The component will fill the available space vertically **(default)** |
 
 ### `readOnly` [#readonly]
 
@@ -238,6 +257,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
+| [gap](/docs/styles-and-themes/common-units/#size)-RadioGroup | $gap-normal | $gap-normal |
 | [gap](/docs/styles-and-themes/common-units/#size)-RadioGroupOption | 0.25em | 0.25em |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption--focus | *none* | *none* |

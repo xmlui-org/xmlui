@@ -19,7 +19,7 @@ import styles from "./RadioGroup.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
-import type { Option, ValidationStatus } from "../abstractions";
+import type { Option, OrientationOptions, ValidationStatus } from "../abstractions";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
 import { convertOptionValue } from "../Option/OptionNative";
@@ -30,6 +30,8 @@ type RadioGroupProps = {
   autofocus?: boolean;
   value?: string;
   enabled?: boolean;
+  orientation?: OrientationOptions;
+  gap?: string;
   style?: CSSProperties;
   className?: string;
   classes?: Record<string, string>;
@@ -50,7 +52,7 @@ type RadioGroupProps = {
 
 export const defaultProps: Pick<
   RadioGroupProps,
-  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly"
+  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly" | "orientation" | "gap"
 > = {
   value: "",
   initialValue: "",
@@ -58,6 +60,8 @@ export const defaultProps: Pick<
   validationStatus: "none" as ValidationStatus,
   required: false,
   readOnly: false,
+  orientation: "vertical",
+  gap: "$gap-normal",
 };
 
 const RadioGroupStatusContext = createContext<{
@@ -77,6 +81,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
     initialValue = defaultProps.initialValue,
     autofocus,
     enabled = defaultProps.enabled,
+    orientation = defaultProps.orientation,
+    gap,
     validationStatus = defaultProps.validationStatus,
     label,
     labelPosition,
@@ -200,10 +206,10 @@ export const RadioGroup = forwardRef(function RadioGroup(
           value={value}
           disabled={!enabled}
           required={required}
-          aria-readonly={readOnly}
-          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
+          aria-readonly={readOnly}          style={{ ...style, ...(gap != null ? { gap } : undefined) }}          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
             [styles.focused]: focused,
             [styles.disabled]: !enabled,
+            [styles.horizontal]: orientation === "horizontal",
           })}
         >
           {children}

@@ -8,6 +8,7 @@ $themeVars: ();
 }
 
 $gap-RadioGroupOption: createThemeVar("gap-RadioGroupOption");
+$gap-RadioGroup: createThemeVar("gap-RadioGroup");
 
 // --- Borders
 
@@ -66,8 +67,13 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
   .radioGroupContainer {
     display: flex;
     flex-direction: column;
-    gap: t.$space-2;
+    gap: $gap-RadioGroup;
     background-color: $backgroundColor-RadioGroup;
+
+    &.horizontal {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   }
 
   .radioOptionContainer {

@@ -765,3 +765,144 @@ test.describe("Behaviors and Parts", () => {
     await expect(labels).toHaveCount(1);
   });
 });
+
+// =============================================================================
+// ORIENTATION TESTS
+// =============================================================================
+
+test.describe("orientation property", () => {
+  test("defaults to vertical layout", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    await expect(group).toBeVisible();
+
+    // Vertical means options are stacked — each item's top should be below the previous one
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    expect(box1.y).toBeGreaterThan(box0.y);
+    expect(box2.y).toBeGreaterThan(box1.y);
+  });
+
+  test("vertical orientation stacks options in a column", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="vertical">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    expect(box1.y).toBeGreaterThan(box0.y);
+    expect(box2.y).toBeGreaterThan(box1.y);
+  });
+
+  test("horizontal orientation places options side by side", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="horizontal">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    // All items share the same vertical position and are arranged left to right
+    expect(box0.y).toBeCloseTo(box1.y, -1);
+    expect(box1.y).toBeCloseTo(box2.y, -1);
+    expect(box1.x).toBeGreaterThan(box0.x);
+    expect(box2.x).toBeGreaterThan(box1.x);
+  });
+
+  test("horizontal orientation still allows selecting options and fires didChange", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <RadioGroup orientation="horizontal" onDidChange="(value) => testState = value">
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+      </RadioGroup>
+    `);
+
+    await page.getByRole("radiogroup").getByRole("radio").nth(1).click();
+    await expect.poll(testStateDriver.testState).toBe("b");
+  });
+});
+
+// =============================================================================
+// GAP PROPERTY TESTS
+// =============================================================================
+
+test.describe("gap property", () => {
+  test("gap prop increases spacing between options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup gap="40px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // The vertical distance between consecutive options should reflect the large gap
+    expect(box1.y - (box0.y + box0.height)).toBeGreaterThanOrEqual(35);
+  });
+
+  test("gap prop with zero removes spacing between options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup gap="0px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // With zero gap the next item starts immediately after the previous one
+    expect(box1.y - (box0.y + box0.height)).toBeLessThan(2);
+  });
+
+  test("gap is applied in horizontal orientation too", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="horizontal" gap="50px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // The horizontal distance between the end of item 0 and start of item 1 should be ≥ 45px
+    expect(box1.x - (box0.x + box0.width)).toBeGreaterThanOrEqual(45);
+  });
+});
