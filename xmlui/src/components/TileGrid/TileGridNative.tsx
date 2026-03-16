@@ -2,7 +2,7 @@ import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } f
 import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import type { CustomItemComponent, CustomItemComponentProps } from "virtua";
+import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import styles from "./TileGrid.module.scss";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
@@ -21,6 +21,63 @@ function parsePx(value: string | undefined, fallback: number): number {
   if (!value) return fallback;
   const n = parseFloat(value);
   return isNaN(n) ? fallback : n;
+}
+
+/**
+ * Pure function that computes the next focused index for 2-D grid keyboard navigation.
+ * Returns null when the key is not a navigation key.
+ *
+ * @param key    - KeyboardEvent.key value
+ * @param ctrl   - true when Ctrl or Cmd is held
+ * @param focusedIndex - current focused flat index (-1 = nothing focused)
+ * @param count  - total number of items
+ * @param cols   - number of columns in the grid
+ * @param visibleRows - number of fully visible rows (used for PageUp/PageDown)
+ */
+export function computeNextFocusIndex({
+  key,
+  ctrl,
+  focusedIndex,
+  count,
+  cols,
+  visibleRows,
+}: {
+  key: string;
+  ctrl: boolean;
+  focusedIndex: number;
+  count: number;
+  cols: number;
+  visibleRows: number;
+}): number | null {
+  if (count === 0) return null;
+  // First key press when nothing is focused always lands on item 0.
+  if (focusedIndex < 0) return 0;
+  switch (key) {
+    case "ArrowLeft":
+      return Math.max(0, focusedIndex - 1);
+    case "ArrowRight":
+      return Math.min(count - 1, focusedIndex + 1);
+    case "ArrowUp": {
+      const prev = focusedIndex - cols;
+      return prev < 0 ? focusedIndex : prev;
+    }
+    case "ArrowDown": {
+      const next = focusedIndex + cols;
+      return next >= count ? focusedIndex : next;
+    }
+    case "Home":
+      return ctrl ? 0 : Math.floor(focusedIndex / cols) * cols;
+    case "End":
+      return ctrl
+        ? count - 1
+        : Math.min(count - 1, Math.floor(focusedIndex / cols) * cols + cols - 1);
+    case "PageUp":
+      return Math.max(0, focusedIndex - visibleRows * cols);
+    case "PageDown":
+      return Math.min(count - 1, focusedIndex + visibleRows * cols);
+    default:
+      return null;
+  }
 }
 
 // Custom virtua item component — renders each row div with the correct style.
@@ -117,14 +174,17 @@ export const TileGridNative = memo(
     // --- refs
     const outerRef = useRef<HTMLDivElement | null>(null);
     const composedRef = ref ? composeRefs(outerRef, ref) : outerRef;
+    const virtualizerRef = useRef<VirtualizerHandle>(null);
 
-    // --- container width for column calculation
+    // --- container dimensions for column/page calculation
     const [containerWidth, setContainerWidth] = useState(0);
+    const [containerHeight, setContainerHeight] = useState(0);
     const [resolvedGapPx, setResolvedGapPx] = useState(() => parsePx(gap, 8));
     const handleResize = useCallback<ResizeObserverCallback>((entries) => {
       const entry = entries[0];
       if (entry) {
         setContainerWidth(entry.contentRect.width);
+        setContainerHeight(entry.contentRect.height);
         // getComputedStyle resolves var() references for regular CSS properties,
         // so we read columnGap (which we also set on the wrapper element as the
         // gap value) to get the actual numeric pixel value.
@@ -153,6 +213,9 @@ export const TileGridNative = memo(
     // Row height = tile height + gap (gap is added as paddingBottom on each row)
     const rowSize = itemHeightPx + gapPx;
 
+    // How many rows fit in the visible area (used for PageUp/PageDown)
+    const visibleRows = containerHeight > 0 ? Math.max(1, Math.floor(containerHeight / rowSize)) : 5;
+
     const items = data ?? [];
     const count = items.length;
 
@@ -166,7 +229,7 @@ export const TileGridNative = memo(
     }, [items, count, cols]);
 
     // --- selection
-    const { toggleRow, checkAllRows, selectedRowIdMap, selectedItems, selectionApi, onKeyDown } =
+    const { toggleRow, checkAllRows, selectedRowIdMap, selectedItems, selectionApi, toggleRowIndex } =
       useRowSelection({
         items,
         visibleItems: items,
@@ -175,6 +238,19 @@ export const TileGridNative = memo(
         onSelectionDidChange,
         syncWithAppState,
       });
+
+    // --- independent focus-indicator index
+    // Kept separate from useRowSelection's internal focusedIndex so that
+    // Ctrl/Cmd+navigation can move the focus ring without changing the selection
+    // (standard Windows Ctrl+Arrow / Ctrl+Home/End behaviour).
+    const [focusedTileIndex, setFocusedTileIndex] = useState(-1);
+
+    // --- auto-scroll to keep focused tile visible
+    useEffect(() => {
+      if (focusedTileIndex >= 0) {
+        virtualizerRef.current?.scrollToIndex(Math.floor(focusedTileIndex / cols), { align: "nearest" });
+      }
+    }, [focusedTileIndex, cols]);
 
     useEffect(() => {
       registerComponentApi?.({
@@ -186,49 +262,103 @@ export const TileGridNative = memo(
       });
     }, [registerComponentApi, selectionApi]);
 
-    // --- keyboard shortcut handler
+    // --- keyboard shortcut handler (action keys + 2-D grid navigation)
     const handleKeyDown = useCallback(
       (event: KeyboardEvent<HTMLDivElement>) => {
         if (!itemsSelectable) return;
         const nativeEvent = event.nativeEvent;
-        const selectedItems = selectionApi.getSelectedItems();
-        const selectedIds = selectionApi.getSelectedIds();
+        const currentSelectedItems = selectionApi.getSelectedItems();
+        const currentSelectedIds = selectionApi.getSelectedIds();
 
+        // --- Action shortcuts (Cut / Copy / Paste / Delete / SelectAll)
         if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.selectAll)) {
           event.preventDefault();
           event.stopPropagation();
           selectionApi.selectAll();
-          onSelectAllAction?.(selectedItems, selectedIds);
-        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.cut) && onCutAction) {
+          onSelectAllAction?.(currentSelectedItems, currentSelectedIds);
+          return;
+        }
+        if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.cut) && onCutAction) {
           event.preventDefault();
           event.stopPropagation();
-          onCutAction(null, selectedItems, selectedIds);
-        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.copy) && onCopyAction) {
+          onCutAction(null, currentSelectedItems, currentSelectedIds);
+          return;
+        }
+        if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.copy) && onCopyAction) {
           event.preventDefault();
           event.stopPropagation();
-          onCopyAction(null, selectedItems, selectedIds);
-        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.paste) && onPasteAction) {
+          onCopyAction(null, currentSelectedItems, currentSelectedIds);
+          return;
+        }
+        if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.paste) && onPasteAction) {
           event.preventDefault();
           event.stopPropagation();
-          onPasteAction(null, selectedItems, selectedIds);
-        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.delete) && onDeleteAction) {
+          onPasteAction(null, currentSelectedItems, currentSelectedIds);
+          return;
+        }
+        if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.delete) && onDeleteAction) {
           event.preventDefault();
           event.stopPropagation();
-          onDeleteAction(null, selectedItems, selectedIds);
-        } else {
-          // Delegate to useRowSelection's navigation handler
-          onKeyDown(event as any);
+          onDeleteAction(null, currentSelectedItems, currentSelectedIds);
+          return;
+        }
+
+        // --- Space: toggle selection of the focused tile without moving focus
+        if (event.key === " " && focusedTileIndex >= 0) {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleRowIndex(focusedTileIndex, { metaKey: true });
+          return;
+        }
+
+        // --- 2-D grid navigation
+        const NAV_KEYS = [
+          "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+          "Home", "End", "PageUp", "PageDown",
+        ];
+        if (!NAV_KEYS.includes(event.key)) return;
+
+        if (count === 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const ctrl = event.ctrlKey || event.metaKey;
+        const shift = event.shiftKey;
+
+        const newIndex = computeNextFocusIndex({
+          key: event.key,
+          ctrl,
+          focusedIndex: focusedTileIndex,
+          count,
+          cols,
+          visibleRows,
+        });
+
+        if (newIndex !== null) {
+          if (ctrl && !shift) {
+            // Ctrl/Cmd without Shift: move the focus ring without touching the selection.
+            // This matches Windows Ctrl+Arrow / Ctrl+Home / Ctrl+End behaviour and lets
+            // the user reposition the focus anchor before doing a Shift+navigation.
+            setFocusedTileIndex(newIndex);
+          } else {
+            toggleRowIndex(newIndex, { shiftKey: shift });
+            setFocusedTileIndex(newIndex);
+          }
         }
       },
       [
         itemsSelectable,
+        count,
+        cols,
+        visibleRows,
+        focusedTileIndex,
         selectionApi,
+        toggleRowIndex,
         onSelectAllAction,
         onCutAction,
         onCopyAction,
         onPasteAction,
         onDeleteAction,
-        onKeyDown,
       ],
     );
 
@@ -248,6 +378,7 @@ export const TileGridNative = memo(
       >
         {!loading && rows.length > 0 && (
           <Virtualizer
+            ref={virtualizerRef}
             scrollRef={outerRef}
             itemSize={rowSize}
             item={RowItem as CustomItemComponent}
@@ -268,17 +399,20 @@ export const TileGridNative = memo(
                       key={item[idKey] ?? globalIndex}
                       className={classnames(styles.tileWrapper, {
                         [styles.selected]: isSelected,
+                        [styles.focused]: itemsSelectable && globalIndex === focusedTileIndex,
                       })}
                       style={{ width: itemWidth, height: itemHeight }}
                       role="gridcell"
                       aria-selected={itemsSelectable ? isSelected : undefined}
                       onClick={
                         itemsSelectable
-                          ? (e) =>
+                          ? (e) => {
+                              setFocusedTileIndex(globalIndex);
                               toggleRow(item, {
                                 shiftKey: e.shiftKey,
                                 metaKey: e.metaKey || e.ctrlKey,
-                              })
+                              });
+                            }
                           : undefined
                       }
                       onDoubleClick={
@@ -296,8 +430,10 @@ export const TileGridNative = memo(
                             styles.checkboxOverlay,
                             styles[checkboxPosition],
                           )}
+                          onMouseDown={(e) => e.preventDefault()}
                         >
                           <Toggle
+                            tabIndex={-1}
                             aria-label={`Select ${item[idKey] ?? globalIndex}`}
                             value={isSelected}
                             onDidChange={() => toggleRow(item, { metaKey: true })}

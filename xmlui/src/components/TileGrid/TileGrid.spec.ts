@@ -131,7 +131,7 @@ test.describe("Theme Variables", () => {
           <Text>tile</Text>
         </TileGrid>
       `,
-      { testThemeVars: { "backgroundColor-TileGrid-item": "rgb(255, 0, 0)" } },
+      { testThemeVars: { "backgroundColor-item-TileGrid": "rgb(255, 0, 0)" } },
     );
     const tile = page.getByRole("gridcell").first();
     await expect(tile).toBeVisible();
@@ -149,7 +149,7 @@ test.describe("Theme Variables", () => {
           <Text>tile</Text>
         </TileGrid>
       `,
-      { testThemeVars: { "borderRadius-TileGrid-item": "12px" } },
+      { testThemeVars: { "borderRadius-item-TileGrid": "12px" } },
     );
     const tile = page.getByRole("gridcell").first();
     await expect(tile).toBeVisible();

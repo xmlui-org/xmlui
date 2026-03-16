@@ -148,6 +148,10 @@ export const TileGridMd = createMetadata({
     [`offsetVertical-checkbox-${COMP}`]: "4px",
     [`offsetHorizontal-checkbox-${COMP}`]: "4px",
     [`userSelect-item-${COMP}`]: "none",
+    [`outlineColor-item-${COMP}--focus`]: "$color-primary-500",
+    [`outlineWidth-item-${COMP}--focus`]: "2px",
+    [`outlineStyle-item-${COMP}--focus`]: "solid",
+    [`outlineOffset-item-${COMP}--focus`]: "-2px",
   },
 });
 
