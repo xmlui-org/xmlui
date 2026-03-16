@@ -6,56 +6,7 @@ import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
-
-/**
- * Generic hover capture for canvas-rendered components.
- * Wraps children in a display:contents div that captures mousemove
- * on canvas elements and emits throttled native:hover trace events.
- */
-function HoverCapture({ children, componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession }: {
-  children: React.ReactNode;
-  componentType: string;
-  componentLabel?: string;
-  ariaName?: string;
-  ownerFileId?: string;
-  ownerSource?: any;
-  hoverSession: { traceId: string | undefined; lastTs: number };
-}) {
-  const THROTTLE_MS = 300;
-  const SESSION_GAP_MS = 500;
-
-  const handleMouseMove = React.useCallback((e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    if (target.tagName !== 'CANVAS') return;
-    const now = Date.now();
-    if (now - hoverSession.lastTs < THROTTLE_MS) return;
-
-    // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
-    if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
-      hoverSession.traceId = pushTrace();
-      popTrace();
-    }
-    hoverSession.lastTs = now;
-
-    pushXsLog(createLogEntry('native:hover', {
-      traceId: hoverSession.traceId,
-      componentType,
-      componentLabel: componentLabel || componentType,
-      eventName: 'hover',
-      ariaName: ariaName || undefined,
-      offsetX: e.nativeEvent.offsetX,
-      offsetY: e.nativeEvent.offsetY,
-      ownerFileId,
-      ownerSource,
-    }));
-  }, [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession]);
-
-  return (
-    <div style={{ display: 'contents' }} onMouseMoveCapture={handleMouseMove}>
-      {children}
-    </div>
-  );
-}
+import { MemoizedItem } from "../components/container-helpers";
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -432,6 +383,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     specialProps.add("initialValue");
   }
 
+  // When childrenAsTemplate is active, `data` is consumed internally for iteration
+  // and should not be forwarded as a React prop.
+  if (metadata.childrenAsTemplate) {
+    specialProps.add("data");
+    specialProps.add(metadata.childrenAsTemplate);
+  }
+
   return createComponentRenderer(type, metadata, (context) => {
     const {
       node,
@@ -602,8 +560,35 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
-    // --- Render children if the node has any ---
-    if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+    // --- Render children ---
+    // When childrenAsTemplate is declared in metadata, children are treated as
+    // an item template: the component's `data` prop provides an array and each
+    // item is rendered using the template with $item / $itemIndex context vars,
+    // matching the pattern used by List, TileGrid, and other data components.
+    const templatePropName = metadata.childrenAsTemplate;
+    if (templatePropName && node.props?.[templatePropName]) {
+      const itemTemplate = node.props[templatePropName];
+      const data = extractValue(node.props.data);
+      if (Array.isArray(data)) {
+        const childLayoutCtx = config.childrenLayoutContext
+          ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+          : undefined;
+        props.children = data.map((item: any, index: number) => (
+          <MemoizedItem
+            node={itemTemplate as any}
+            key={item?.id ?? index}
+            renderChild={renderChild}
+            layoutContext={childLayoutCtx}
+            contextVars={{
+              $item: item,
+              $itemIndex: index,
+              $isFirst: index === 0,
+              $isLast: index === data.length - 1,
+            }}
+          />
+        ));
+      }
+    } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
       props.children = renderChild(
         node.children,
         config.childrenLayoutContext
