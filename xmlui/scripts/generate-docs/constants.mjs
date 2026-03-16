@@ -274,6 +274,8 @@ export const FILE_PATHS = {
   EXTENSIONS_JSON: "extensions.json",
 };
 
+export const DOCS_COMPONENTS_PATH = "docs/reference/components";
+
 // Path constants for resolving workspace locations
 export const PATH_CONSTANTS = {
   XMLUI_SRC_COMPONENTS: "xmlui/src/components",

@@ -25,6 +25,7 @@ import {
   ERROR_CONTEXTS,
   COMPONENT_NAV_ERRORS,
   EXTENSIONS_NAVIGATION,
+  DOCS_COMPONENTS_PATH,
 } from "./constants.mjs";
 import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
 
@@ -161,7 +162,7 @@ async function generateComponentsOverview(overviewFile, summaryTitle, components
       const description = originalMetadata?.description || TEXT_CONSTANTS.NO_DESCRIPTION_AVAILABLE;
 
       // Format the table row with correct relative path
-      return `| [${componentName}](/docs/reference/components/${componentName}) | ${description} |`;
+      return `| [${componentName}](/${DOCS_COMPONENTS_PATH}/${componentName}) | ${description} |`;
     });
 
     // Combine header and rows
