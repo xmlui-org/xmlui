@@ -103,6 +103,8 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   @include t.paddingVars($themeVars, $componentInput);
 
   &.active {
+    background-color: $backgroundColor-SearchInput--active;
+    
     [data-part-id="startAdornment"],
     [data-part-id="endAdornment"] {
       color: $textColor-adornment-SearchInput--active;
