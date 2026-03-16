@@ -8,17 +8,20 @@ $themeVars: ();
 }
 
 $component: "TileGrid";
-$backgroundColor-TileGrid-item: createThemeVar("backgroundColor-#{$component}-item");
-$backgroundColor-TileGrid-item--hover: createThemeVar(
-  "backgroundColor-#{$component}-item--hover"
+$backgroundColor-item-TileGrid: createThemeVar("backgroundColor-item-#{$component}");
+$backgroundColor-item-TileGrid--hover: createThemeVar(
+  "backgroundColor-item-#{$component}--hover"
 );
-$backgroundColor-TileGrid-item--selected: createThemeVar(
-  "backgroundColor-#{$component}-item--selected"
+$backgroundColor-item-TileGrid--selected: createThemeVar(
+  "backgroundColor-item-#{$component}--selected"
 );
-$backgroundColor-TileGrid-item--selected-hover: createThemeVar(
-  "backgroundColor-#{$component}-item--selected-hover"
+$backgroundColor-item-TileGrid--selected--hover: createThemeVar(
+  "backgroundColor-item-#{$component}--selected--hover"
 );
-$borderRadius-TileGrid-item: createThemeVar("borderRadius-#{$component}-item");
+$borderRadius-item-TileGrid: createThemeVar("borderRadius-item-#{$component}");
+$offsetVertical-checkbox-TileGrid: createThemeVar("offsetVertical-checkbox-#{$component}");
+$offsetHorizontal-checkbox-TileGrid: createThemeVar("offsetHorizontal-checkbox-#{$component}");
+$userSelect-item-TileGrid: createThemeVar("userSelect-item-#{$component}");
 
 @layer components {
   .tileGridWrapper {
@@ -38,20 +41,20 @@ $borderRadius-TileGrid-item: createThemeVar("borderRadius-#{$component}-item");
     position: relative;
     box-sizing: border-box;
     flex-shrink: 0;
-    background-color: $backgroundColor-TileGrid-item;
-    border-radius: $borderRadius-TileGrid-item;
+    background-color: $backgroundColor-item-TileGrid;
+    border-radius: $borderRadius-item-TileGrid;
     overflow: hidden;
     cursor: pointer;
 
     &:hover {
-      background-color: $backgroundColor-TileGrid-item--hover;
+      background-color: $backgroundColor-item-TileGrid--hover;
     }
 
     &.selected {
-      background-color: $backgroundColor-TileGrid-item--selected;
+      background-color: $backgroundColor-item-TileGrid--selected;
 
       &:hover {
-        background-color: $backgroundColor-TileGrid-item--selected-hover;
+        background-color: $backgroundColor-item-TileGrid--selected--hover;
       }
     }
   }
@@ -59,6 +62,14 @@ $borderRadius-TileGrid-item: createThemeVar("borderRadius-#{$component}-item");
   .tileContent {
     width: 100%;
     height: 100%;
+    user-select: $userSelect-item-TileGrid;
+  }
+
+  .selectedIndicator {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
   }
 
   .checkboxOverlay {
@@ -67,23 +78,23 @@ $borderRadius-TileGrid-item: createThemeVar("borderRadius-#{$component}-item");
     pointer-events: auto;
 
     &.topStart {
-      top: 4px;
-      inset-inline-start: 4px;
+      top: $offsetVertical-checkbox-TileGrid;
+      inset-inline-start: $offsetHorizontal-checkbox-TileGrid;
     }
 
     &.topEnd {
-      top: 4px;
-      inset-inline-end: 4px;
+      top: $offsetVertical-checkbox-TileGrid;
+      inset-inline-end: $offsetHorizontal-checkbox-TileGrid;
     }
 
     &.bottomStart {
-      bottom: 4px;
-      inset-inline-start: 4px;
+      bottom: $offsetVertical-checkbox-TileGrid;
+      inset-inline-start: $offsetHorizontal-checkbox-TileGrid;
     }
 
     &.bottomEnd {
-      bottom: 4px;
-      inset-inline-end: 4px;
+      bottom: $offsetVertical-checkbox-TileGrid;
+      inset-inline-end: $offsetHorizontal-checkbox-TileGrid;
     }
   }
 }

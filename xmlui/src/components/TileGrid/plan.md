@@ -110,55 +110,11 @@ A new core XMLUI component that renders a data array as a responsive, virtualize
 
 ---
 
-## Step 4 — Selection Logic
+## ✅ Step 4 — Selection Logic
 
-**Goal**: Implement tile selection mirroring Table's selection behavior.
+## ✅ Step 5 — Selection Checkbox UI
 
-**Implementation:**
-1. Reuse `useRowSelection` hook from `Table/useRowSelection.tsx`
-2. Wire `itemsSelectable`, `enableMultiSelection`, `syncWithAppState`, `onSelectionDidChange`
-3. Single-click selects a tile; Ctrl/Cmd+Click for multi-select; Shift+Click for range
-4. Set `$selected` context variable per tile based on selection state
-5. Apply selected/hover CSS classes per tile using theme variables (no per-tile `<Theme>` instances)
-
-**Verify**: Selection works with click, Ctrl+Click, Shift+Click; `$selected` is reactive.
-
-**E2E tests**:
-- Click selects a tile
-- Ctrl+Click toggles selection
-- Shift+Click selects a range
-- `selectionDidChange` fires with correct data
-- `$selected` context variable updates
-
----
-
-## Step 5 — Selection Checkbox UI
-
-**Goal**: Add selection checkboxes to each tile with configurable position.
-
-**Implementation:**
-1. Import `ThemedToggle` from `Checkbox/Checkbox` (same as Table)
-2. Render a checkbox overlay inside each tile wrapper
-3. Position using CSS `position: absolute` with `inset-*` / logical properties based on `checkboxPosition` prop:
-   - `topStart` → `top: 4px; inset-inline-start: 4px`
-   - `topEnd` → `top: 4px; inset-inline-end: 4px`
-   - `bottomStart` → `bottom: 4px; inset-inline-start: 4px`
-   - `bottomEnd` → `bottom: 4px; inset-inline-end: 4px`
-4. Checkbox is only visible when `itemsSelectable` is true
-5. Clicking the checkbox toggles selection (with `metaKey: true` for additive behavior)
-6. Show checkboxes on hover or when tile is selected (fade-in transition, like Table rows)
-
-**Verify**: Checkboxes appear at the correct position; clicking them toggles selection.
-
-**E2E tests**:
-- Checkbox visible on hover
-- Checkbox always visible when selected
-- Checkbox position matches `checkboxPosition` prop
-- Checkbox click toggles selection without triggering double-click
-
----
-
-## Step 6 — Keyboard Shortcuts
+## ✅ Step 6 — Keyboard Shortcuts
 
 **Goal**: Wire keyboard actions for cut/copy/paste/delete/selectAll.
 
@@ -178,23 +134,19 @@ A new core XMLUI component that renders a data array as a responsive, virtualize
 
 ---
 
-## Step 7 — AppState Sync + Loading State
+## ✅ Step 7 — syncWithVar + Loading Placeholder
 
-**Goal**: Implement bidirectional AppState sync and loading placeholder.
+**Goal**: Implement `syncWithVar` (same pattern as Table) and a loading placeholder.
 
 **Implementation:**
-1. `syncWithAppState` — bidirectional sync using the same state machine as Table's `useRowSelection` (already built into the hook)
-2. Loading state: when `loading` is true, render shimmer/placeholder tiles instead of data
-
-**Verify**: Selection syncs with AppState; loading state shows placeholders.
-
-**E2E tests**:
-- `syncWithAppState` keeps external state in sync
-- `loading` prop shows placeholder state
+1. Replace `syncWithAppState` with `syncWithVar` in metadata (string: variable name)
+2. Build a `syncWithAppState`-compatible adapter in the renderer (like Table's `TableWithColumns`)
+3. Pass `lookupAction` down to `TileGridNative` to enable the adapter
+4. Loading state: when `loading` is true, render shimmer/placeholder tiles
 
 ---
 
-## Step 8 — Changeset
+## 🔄 Step 8 — Changeset
 
 **Goal**: Add a changeset for the new component.
 

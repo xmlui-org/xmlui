@@ -397,3 +397,219 @@ test.describe("Selection", () => {
     await expect(firstCell).toHaveAttribute("aria-selected", "true");
   });
 });
+
+// =============================================================================
+// STEP 6: Keyboard Shortcuts + Double-click
+// =============================================================================
+
+test.describe("Keyboard Shortcuts", () => {
+  const selectableMarkup = `
+    <TileGrid
+      data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+      itemWidth="120px"
+      itemHeight="80px"
+      itemsSelectable="true"
+    >
+      <Text>{$item.name}</Text>
+    </TileGrid>
+  `;
+
+  test("Ctrl+A selects all tiles", async ({ initTestBed, page }) => {
+    await initTestBed(selectableMarkup);
+    // Click first tile to give the grid focus
+    await page.getByRole("gridcell").nth(0).click();
+    const isMac = process.platform === "darwin";
+    await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+    const cells = page.getByRole("gridcell");
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(2)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("selectAllAction event fires on Ctrl+A", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        onSelectAllAction="testState = 'fired'"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    await page.getByRole("gridcell").nth(0).click();
+    const isMac = process.platform === "darwin";
+    await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+    await expect.poll(testStateDriver.testState).toEqual("fired");
+  });
+
+  test("Delete key fires deleteAction with selected items", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        onDeleteAction="testState = 'deleted'"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    await page.getByRole("gridcell").nth(0).click();
+    await page.keyboard.press("Delete");
+    await expect.poll(testStateDriver.testState).toEqual("deleted");
+  });
+
+  test("double-click fires itemDoubleClick event with item", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'Alpha'},{id:2,name:'Beta'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        onItemDoubleClick="testState = 'dblclicked'"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    await page.getByRole("gridcell").nth(0).dblclick();
+    await expect.poll(testStateDriver.testState).toEqual("dblclicked");
+  });
+});
+
+// =============================================================================
+// STEP 7: syncWithVar
+// =============================================================================
+
+test.describe("syncWithVar property", () => {
+  const syncData = `[{id: 1, name: 'Apple'},{id: 2, name: 'Banana'},{id: 3, name: 'Carrot'}]`;
+
+  const tileTemplate = `<Text>{$item.name}</Text>`;
+
+  test("tile selection updates the synced global variable's selectedIds", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <TileGrid
+          syncWithVar="syncState"
+          itemsSelectable="true"
+          data="{${syncData}}"
+          itemWidth="120px"
+          itemHeight="80px"
+        >
+          ${tileTemplate}
+        </TileGrid>
+        <Text testId="sync-display">{JSON.stringify(syncState)}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByRole("grid")).toBeVisible();
+    await page.getByRole("gridcell").nth(0).click();
+
+    const display = page.getByTestId("sync-display");
+    await expect(display).toContainText('"selectedIds"');
+    await expect(display).toContainText("1");
+  });
+
+  test("initial selectedIds in the variable pre-selects the matching tiles on load", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{selectedIds: [1]}}">
+        <TileGrid
+          syncWithVar="syncState"
+          itemsSelectable="true"
+          data="{${syncData}}"
+          itemWidth="120px"
+          itemHeight="80px"
+        >
+          ${tileTemplate}
+        </TileGrid>
+      </Fragment>
+    `);
+
+    await expect(page.getByRole("grid")).toBeVisible();
+    const cells = page.getByRole("gridcell");
+    // Tile with id=1 should be pre-selected
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    // Others should not be selected
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "false");
+    await expect(cells.nth(2)).toHaveAttribute("aria-selected", "false");
+  });
+
+  test("deselecting a tile clears selectedIds in the variable", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment var.syncState="{{}}">
+        <TileGrid
+          syncWithVar="syncState"
+          itemsSelectable="true"
+          data="{${syncData}}"
+          itemWidth="120px"
+          itemHeight="80px"
+        >
+          ${tileTemplate}
+        </TileGrid>
+        <Text testId="sync-display">{JSON.stringify(syncState)}</Text>
+      </Fragment>
+    `);
+
+    await expect(page.getByRole("grid")).toBeVisible();
+    // Select, then deselect the first tile via its checkbox
+    const firstCheckbox = page.getByRole("checkbox").first();
+    await firstCheckbox.click();
+    await expect(firstCheckbox).toBeChecked();
+    await firstCheckbox.click();
+    await expect(firstCheckbox).not.toBeChecked();
+
+    await expect(page.getByTestId("sync-display")).toContainText('"selectedIds":[]');
+  });
+
+  test("invalid variable name does not crash the grid and it still renders", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TileGrid
+        syncWithVar="123invalid"
+        itemsSelectable="true"
+        data="{${syncData}}"
+        itemWidth="120px"
+        itemHeight="80px"
+      >
+        ${tileTemplate}
+      </TileGrid>
+    `);
+
+    await expect(page.getByRole("grid")).toBeVisible();
+    await expect(page.getByRole("gridcell")).toHaveCount(3);
+  });
+
+  test("non-existent variable name renders grid with local-only selection", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TileGrid
+        syncWithVar="noSuchVar"
+        itemsSelectable="true"
+        data="{${syncData}}"
+        itemWidth="120px"
+        itemHeight="80px"
+      >
+        ${tileTemplate}
+      </TileGrid>
+    `);
+
+    await expect(page.getByRole("grid")).toBeVisible();
+    // Selection should still work locally
+    await page.getByRole("gridcell").nth(0).click();
+    await expect(page.getByRole("gridcell").nth(0)).toHaveAttribute("aria-selected", "true");
+  });
+});

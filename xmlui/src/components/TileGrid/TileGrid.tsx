@@ -1,12 +1,22 @@
+import { useRef } from "react";
 import styles from "./TileGrid.module.scss";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
+import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import { TileGridNative, defaultProps } from "./TileGridNative";
 import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreNative";
 
 const COMP = "TileGrid";
+
+const userSelectValues: PropertyValueDescription[] = [
+  { value: "auto", description: "Default text selection behavior" },
+  { value: "text", description: "Text can be selected by the user" },
+  { value: "none", description: "Text cannot be selected" },
+  { value: "contain", description: "Selection is contained within this element" },
+  { value: "all", description: "The entire element content is selected as one unit" },
+];
 
 export const TileGridMd = createMetadata({
   status: "experimental",
@@ -31,7 +41,7 @@ export const TileGridMd = createMetadata({
       defaultValue: defaultProps.itemHeight,
     },
     gap: {
-      description: "Gap between tiles, e.g. `\"8px\"`.",
+      description: "Gap between tiles, e.g. `\"8px\"` or a theme variable like `\"$gap-normal\"`.",
       valueType: "string",
       defaultValue: defaultProps.gap,
     },
@@ -54,9 +64,10 @@ export const TileGridMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiSelection,
     },
-    syncWithAppState: d(
-      `An AppState instance to synchronize the grid's selection state with. The grid will ` +
-        `read from and write to the \`selectedIds\` property of the AppState object.`,
+    syncWithVar: d(
+      `The name of a global variable to synchronize the grid's selection state with. ` +
+        `The named variable must reference an object; the grid will read from and write to its ` +
+        `\`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
     ),
     checkboxPosition: {
       description:
@@ -77,6 +88,12 @@ export const TileGridMd = createMetadata({
         "Used to track selection state.",
       valueType: "string",
       defaultValue: defaultProps.idKey,
+    },
+    itemUserSelect: {
+      description: `This property controls whether users can select text within tiles.`,
+      valueType: "string",
+      availableValues: userSelectValues,
+      defaultValue: defaultProps.itemUserSelect,
     },
     itemTemplate: dComponent(
       `The template used to render each tile. Use the [\`$item\`](#item) context variable to ` +
@@ -123,13 +140,18 @@ export const TileGridMd = createMetadata({
 
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`backgroundColor-${COMP}-item`]: "transparent",
-    [`backgroundColor-${COMP}-item--hover`]: "$color-surface-200",
-    [`backgroundColor-${COMP}-item--selected`]: "$color-primary-100",
-    [`backgroundColor-${COMP}-item--selected-hover`]: "$color-primary-200",
-    [`borderRadius-${COMP}-item`]: "$borderRadius",
+    [`backgroundColor-item-${COMP}`]: "transparent",
+    [`backgroundColor-item-${COMP}--hover`]: "$color-surface-100",
+    [`backgroundColor-item-${COMP}--selected`]: "$color-surface-100",
+    [`backgroundColor-item-${COMP}--selected--hover`]: "$color-primary-100",
+    [`borderRadius-item-${COMP}`]: "$borderRadius",
+    [`offsetVertical-checkbox-${COMP}`]: "4px",
+    [`offsetHorizontal-checkbox-${COMP}`]: "4px",
+    [`userSelect-item-${COMP}`]: "none",
   },
 });
+
+const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
 export const tileGridComponentRenderer = createComponentRenderer(
   COMP,
@@ -141,10 +163,47 @@ export const tileGridComponentRenderer = createComponentRenderer(
     classes,
     layoutContext,
     lookupEventHandler,
+    lookupAction,
     registerComponentApi,
   }) => {
     const itemTemplate = node.props.itemTemplate;
     const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
+    const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+
+    // Keep lookupAction current without breaking the stable adapter reference (same pattern as Table).
+    const lookupActionRef = useRef(lookupAction);
+    lookupActionRef.current = lookupAction;
+    const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+
+    let syncAdapter: any;
+    if (syncVarName !== undefined) {
+      if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
+        console.error(`[TileGrid syncWithVar] Invalid variable name: "${syncVarName}"`);
+        syncAdapterHolderRef.current = null;
+      } else {
+        const currentValue = extractValue(`{${syncVarName}}`);
+        if (currentValue != null) {
+          if (!syncAdapterHolderRef.current) {
+            syncAdapterHolderRef.current = {
+              value: currentValue,
+              update: ({ selectedIds }: { selectedIds: string[] }) => {
+                const valueJson = JSON.stringify(selectedIds);
+                const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
+                const handler = lookupActionRef.current?.(expr, { ephemeral: true });
+                handler?.();
+              },
+            };
+          } else {
+            syncAdapterHolderRef.current.value = currentValue;
+          }
+        } else {
+          syncAdapterHolderRef.current = null;
+        }
+      }
+    } else {
+      syncAdapterHolderRef.current = null;
+    }
+    syncAdapter = syncAdapterHolderRef.current;
 
     const content = (
       <TileGridNative
@@ -153,13 +212,14 @@ export const tileGridComponentRenderer = createComponentRenderer(
         data={extractValue(node.props.data)}
         itemWidth={extractValue.asOptionalString(node.props.itemWidth)}
         itemHeight={extractValue.asOptionalString(node.props.itemHeight)}
-        gap={extractValue.asOptionalString(node.props.gap)}
+        gap={extractValue.asSize(node.props.gap) ?? defaultProps.gap}
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         itemsSelectable={extractValue.asOptionalBoolean(node.props.itemsSelectable)}
         enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
-        syncWithAppState={extractValue(node.props.syncWithAppState)}
+        syncWithAppState={syncAdapter}
         checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as any}
         idKey={idKey}
+        itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
         onSelectionDidChange={lookupEventHandler("selectionDidChange")}
         onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
         onCutAction={lookupEventHandler("cutAction")}

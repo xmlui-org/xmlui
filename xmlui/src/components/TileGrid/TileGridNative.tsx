@@ -1,5 +1,5 @@
 import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { CustomItemComponent, CustomItemComponentProps } from "virtua";
@@ -11,6 +11,10 @@ import { useResizeObserver } from "../../components-core/utils/hooks";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import useRowSelection from "../Table/useRowSelection";
 import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
+import {
+  parseKeyBinding,
+  matchesKeyEvent,
+} from "../../parsers/keybinding-parser/keybinding-parser";
 
 // Parses a CSS pixel value string (e.g. "120px") to its numeric value.
 function parsePx(value: string | undefined, fallback: number): number {
@@ -42,6 +46,7 @@ export type TileGridProps = {
   syncWithAppState?: any;
   checkboxPosition?: CheckboxPosition;
   idKey?: string;
+  itemUserSelect?: string;
   itemRenderer?: (item: any, index: number, count: number, selected: boolean) => ReactNode;
   onSelectionDidChange?: AsyncFunction;
   onItemDoubleClick?: AsyncFunction;
@@ -57,6 +62,14 @@ export type TileGridProps = {
   classes?: Record<string, string>;
 };
 
+const DEFAULT_KEY_BINDINGS = {
+  selectAll: parseKeyBinding("CmdOrCtrl+A"),
+  cut: parseKeyBinding("CmdOrCtrl+X"),
+  copy: parseKeyBinding("CmdOrCtrl+C"),
+  paste: parseKeyBinding("CmdOrCtrl+V"),
+  delete: parseKeyBinding("Delete"),
+};
+
 export const defaultProps = {
   itemWidth: "120px",
   itemHeight: "140px",
@@ -66,10 +79,11 @@ export const defaultProps = {
   enableMultiSelection: true,
   checkboxPosition: "topStart" as CheckboxPosition,
   idKey: "id",
+  itemUserSelect: "none",
 };
 
 // =====================================================================================================================
-// TileGrid native React component — virtualized grid (Steps 3-5)
+// TileGrid native React component — virtualized grid (Steps 3-7)
 
 export const TileGridNative = memo(
   forwardRef<HTMLDivElement, TileGridProps>(function TileGridNative(
@@ -83,8 +97,15 @@ export const TileGridNative = memo(
       itemsSelectable = defaultProps.itemsSelectable,
       enableMultiSelection = defaultProps.enableMultiSelection,
       checkboxPosition = defaultProps.checkboxPosition,
+      itemUserSelect = defaultProps.itemUserSelect,
       syncWithAppState,
       onSelectionDidChange,
+      onItemDoubleClick,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      onSelectAllAction,
       itemRenderer,
       registerComponentApi,
       style,
@@ -99,17 +120,29 @@ export const TileGridNative = memo(
 
     // --- container width for column calculation
     const [containerWidth, setContainerWidth] = useState(0);
+    const [resolvedGapPx, setResolvedGapPx] = useState(() => parsePx(gap, 8));
     const handleResize = useCallback<ResizeObserverCallback>((entries) => {
       const entry = entries[0];
       if (entry) {
         setContainerWidth(entry.contentRect.width);
+        // getComputedStyle resolves var() references for regular CSS properties,
+        // so we read columnGap (which we also set on the wrapper element as the
+        // gap value) to get the actual numeric pixel value.
+        if (outerRef.current) {
+          const computedGap = parseFloat(
+            window.getComputedStyle(outerRef.current).columnGap,
+          );
+          if (!isNaN(computedGap)) setResolvedGapPx(computedGap);
+        }
       }
     }, []);
     useResizeObserver(outerRef, handleResize);
 
     // --- column calculation
     const itemWidthPx = parsePx(itemWidth, 120);
-    const gapPx = parsePx(gap, 8);
+    // resolvedGapPx is updated via getComputedStyle so CSS custom properties
+    // (e.g. var(--xmlui-gap-normal)) are resolved to actual pixel values.
+    const gapPx = resolvedGapPx;
     const itemHeightPx = parsePx(itemHeight, 140);
 
     const cols =
@@ -133,7 +166,7 @@ export const TileGridNative = memo(
     }, [items, count, cols]);
 
     // --- selection
-    const { toggleRow, checkAllRows, selectedRowIdMap, selectedItems, selectionApi } =
+    const { toggleRow, checkAllRows, selectedRowIdMap, selectedItems, selectionApi, onKeyDown } =
       useRowSelection({
         items,
         visibleItems: items,
@@ -153,6 +186,52 @@ export const TileGridNative = memo(
       });
     }, [registerComponentApi, selectionApi]);
 
+    // --- keyboard shortcut handler
+    const handleKeyDown = useCallback(
+      (event: KeyboardEvent<HTMLDivElement>) => {
+        if (!itemsSelectable) return;
+        const nativeEvent = event.nativeEvent;
+        const selectedItems = selectionApi.getSelectedItems();
+        const selectedIds = selectionApi.getSelectedIds();
+
+        if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.selectAll)) {
+          event.preventDefault();
+          event.stopPropagation();
+          selectionApi.selectAll();
+          onSelectAllAction?.(selectedItems, selectedIds);
+        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.cut) && onCutAction) {
+          event.preventDefault();
+          event.stopPropagation();
+          onCutAction(null, selectedItems, selectedIds);
+        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.copy) && onCopyAction) {
+          event.preventDefault();
+          event.stopPropagation();
+          onCopyAction(null, selectedItems, selectedIds);
+        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.paste) && onPasteAction) {
+          event.preventDefault();
+          event.stopPropagation();
+          onPasteAction(null, selectedItems, selectedIds);
+        } else if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.delete) && onDeleteAction) {
+          event.preventDefault();
+          event.stopPropagation();
+          onDeleteAction(null, selectedItems, selectedIds);
+        } else {
+          // Delegate to useRowSelection's navigation handler
+          onKeyDown(event as any);
+        }
+      },
+      [
+        itemsSelectable,
+        selectionApi,
+        onSelectAllAction,
+        onCutAction,
+        onCopyAction,
+        onPasteAction,
+        onDeleteAction,
+        onKeyDown,
+      ],
+    );
+
     return (
       <div
         ref={composedRef}
@@ -161,9 +240,11 @@ export const TileGridNative = memo(
           classes?.[COMPONENT_PART_KEY],
           className,
         )}
-        style={style}
+        style={{ ...style, columnGap: gap }}
         role="grid"
         aria-label="Tile grid"
+        tabIndex={itemsSelectable ? 0 : undefined}
+        onKeyDown={itemsSelectable ? handleKeyDown : undefined}
       >
         {!loading && rows.length > 0 && (
           <Virtualizer
@@ -200,7 +281,15 @@ export const TileGridNative = memo(
                               })
                           : undefined
                       }
+                      onDoubleClick={
+                        onItemDoubleClick
+                          ? () => onItemDoubleClick(item)
+                          : undefined
+                      }
                     >
+                      {itemsSelectable && isSelected && (
+                        <div className={styles.selectedIndicator} />
+                      )}
                       {itemsSelectable && (
                         <div
                           className={classnames(
@@ -215,7 +304,7 @@ export const TileGridNative = memo(
                           />
                         </div>
                       )}
-                      <div className={styles.tileContent}>
+                      <div className={styles.tileContent} style={{ userSelect: itemUserSelect as React.CSSProperties["userSelect"] }}>
                         {itemRenderer?.(item, globalIndex, count, isSelected)}
                       </div>
                     </div>

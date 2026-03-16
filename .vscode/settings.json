@@ -97,6 +97,11 @@
     "/^node -e \"const mod = require\\('\\./xmlui/src/components/FlowLayout/flow-layout-utils\\.ts'\\); console\\.log\\('Module loads OK'\\);\" 2>&1 \\|\\| echo \"Note: Direct require fails but this is expected - TypeScript needs compilation\"$/": {
       "approve": true,
       "matchCommandLine": true
+    },
+    "npm run type-check:xmlui": true,
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && npm run 2>&1 \\| grep -E \"\\^\\\\s\\+\\(test\\|type\\|build\\|check\\)\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
     }
   }
 }

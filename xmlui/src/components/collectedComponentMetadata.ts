@@ -208,15 +208,13 @@ import { TimerMd } from "./Timer/Timer";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
 import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
-import { ScrollViewer } from "./ScrollViewer/ScrollViewerNative";
 import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 import { ContextMenuMd } from "./ContextMenu/ContextMenu";
-import QRCode from "react-qr-code";
 import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
-import { StickySection } from "./StickySection/StickySectionNative";
 import { StickySectionMd } from "./StickySection/StickySection";
 import { DrawerMd } from "./Drawer/Drawer";
+import { TileGridMd } from "./TileGrid/TileGrid";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -421,6 +419,7 @@ export const collectedComponentMetadata = {
   Text: TextMd,
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
+  TileGrid: TileGridMd,
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
   TimeInput: TimeInputMd,

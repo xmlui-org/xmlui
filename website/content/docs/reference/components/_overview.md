@@ -105,6 +105,7 @@
 | [TextArea](/docs/reference/components/TextArea) | `TextArea` provides a multiline text input area. |
 | [TextBox](/docs/reference/components/TextBox) | `TextBox` captures user text input for forms, search fields, and data entry with support for validation, icons, and formatting hints. |
 | [Theme](/docs/reference/components/Theme) | `Theme` creates styling contexts to customize the appearance of nested components without using CSS. |
+| [TileGrid](/docs/reference/components/TileGrid) | `TileGrid` renders a data array as a responsive, virtualized tile grid. It auto-calculates the number of columns based on the container width, tile width, and gap, and only renders visible rows — making it suitable for large datasets. |
 | [TimeInput](/docs/reference/components/TimeInput) | `TimeInput` provides time input with support for 12-hour and 24-hour formats and configurable precision for hours, minutes, and seconds. |
 | [Timer](/docs/reference/components/Timer) | `Timer` is a non-visual component that fires events at regular intervals. It can be enabled or disabled and ensures that the timer event handler completes before firing the next event. |
 | [ToneChangerButton](/docs/reference/components/ToneChangerButton) | `ToneChangerButton` enables the user to switch between light and dark modes. |
