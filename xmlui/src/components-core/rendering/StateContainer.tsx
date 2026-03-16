@@ -367,6 +367,9 @@ export const StateContainer = memo(
           // Global variable (not shadowed by local)
           if (isRoot) {
             // Root container should handle global var updates itself
+            // Use stableCurrentGlobalVars as localVars so the reducer can see
+            // the original structure of the global variable (e.g., the full array)
+            // when applying path-based updates like push operations.
             dispatch({
               type: ContainerActionKind.STATE_PART_CHANGED,
               payload: {
@@ -374,7 +377,7 @@ export const StateContainer = memo(
                 value: newValue,
                 target,
                 actionType: action,
-                localVars: resolvedLocalVars,
+                localVars: stableCurrentGlobalVars,
               },
             });
           } else {

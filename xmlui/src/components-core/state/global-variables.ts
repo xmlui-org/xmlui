@@ -110,7 +110,11 @@ export function useGlobalVariables(
 
   // Build a dependency map for triggering re-evaluation when global dependencies change
   // This includes actual runtime values of globals that other globals depend on
-  const globalDepValueMap = useMemo(() => {
+  // IMPORTANT: This map is stabilized with useShallowCompareMemoize to prevent
+  // unrelated componentState changes (e.g., loader results) from triggering
+  // global variable re-evaluation. Only changes to actual global variable keys
+  // in componentState will propagate.
+  const globalDepValueMap = useShallowCompareMemoize(useMemo(() => {
     const depMap: Record<string, any> = {};
     const allCurrentGlobals = { ...parentGlobalVars, ...nodeGlobalVars };
 
@@ -145,7 +149,7 @@ export function useGlobalVariables(
     }
 
     return depMap;
-  }, [globalDependencies, parentGlobalVars, nodeGlobalVars, componentStateWithApis]);
+  }, [globalDependencies, parentGlobalVars, nodeGlobalVars, componentStateWithApis]));
 
   // ========================================================================
   // STEP 3: EVALUATE GLOBAL VARIABLES
@@ -186,7 +190,7 @@ export function useGlobalVariables(
     const evaluatedNodeGlobals: Record<string, any> = {};
     if (nodeGlobalVars) {
       // Merge parent globals with node globals for evaluation context
-      // START with componentStateWithApis values for any globals that have been updated at runtime
+      // START with runtime values for any globals that have been updated at runtime
       // This is KEY for reactivity: when count++ updates count, subsequent globals can see the new value
       let globalsForContext = { ...evaluatedParentGlobals, ...evaluatedNodeGlobals };
 
@@ -197,15 +201,17 @@ export function useGlobalVariables(
         }
 
         // CRITICAL: If this global was updated at runtime, use the runtime value directly
+        // from globalDepValueMap (which tracks runtime:key entries).
         // Don't re-evaluate the original expression (which would give the old value)
-        if (key in componentStateWithApis) {
-          evaluatedNodeGlobals[key] = componentStateWithApis[key];
-          globalsForContext[key] = componentStateWithApis[key];
+        const runtimeKey = `runtime:${key}`;
+        if (runtimeKey in globalDepValueMap) {
+          evaluatedNodeGlobals[key] = globalDepValueMap[runtimeKey];
+          globalsForContext[key] = globalDepValueMap[runtimeKey];
           continue;
         }
 
         if (typeof value === "string") {
-          // CRITICAL: For evaluation, use componentStateWithApis values if they exist
+          // For evaluation, use runtime values from globalDepValueMap if they exist
           // This ensures that when a global is updated (e.g., count++), we see the NEW value, not the old one
           const evalContext: Record<string, any> = {};
 
@@ -213,9 +219,10 @@ export function useGlobalVariables(
           if (nodeGlobalVars) {
             for (const [globalKey] of Object.entries(nodeGlobalVars)) {
               if (!globalKey.startsWith("__")) {
-                // Prefer componentStateWithApis value (runtime updated) over initially evaluated value
-                if (globalKey in componentStateWithApis) {
-                  evalContext[globalKey] = componentStateWithApis[globalKey];
+                // Prefer runtime value (from globalDepValueMap) over initially evaluated value
+                const rk = `runtime:${globalKey}`;
+                if (rk in globalDepValueMap) {
+                  evalContext[globalKey] = globalDepValueMap[rk];
                 } else if (globalKey in globalsForContext) {
                   evalContext[globalKey] = globalsForContext[globalKey];
                 }
@@ -260,7 +267,6 @@ export function useGlobalVariables(
     appContext,
     globalDepValueMap,
     globalDependencies,
-    componentStateWithApis,
   ]);
 
   // ========================================================================
