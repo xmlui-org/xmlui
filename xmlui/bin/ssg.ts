@@ -8,8 +8,9 @@
  */
 
 import "tsx";
-import { build as viteBuild, type InlineConfig } from "vite";
+import { build as viteBuild, createServer, type InlineConfig, type Plugin } from "vite";
 import { mkdir, readdir, readFile, rm, writeFile, cp } from "node:fs/promises";
+import { rmSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import vm from "node:vm";
@@ -17,7 +18,6 @@ import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { discoverPaths, pathExists } from "./ssg/discoverPaths";
 import { JSDOM } from "jsdom";
-import { exit } from "node:process";
 import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
 
 type SsgOptions = {
@@ -48,6 +48,7 @@ const SEARCH_DEFAULT_CATEGORY = "other";
 type SearchItemData = { path: string; title: string; content: string; category?: string };
 
 const SEARCH_INDEX_FILE_NAME = "__xmlui-search-index.json";
+const SEARCH_INDEX_STUB_JSON = "[]";
 const SSG_WRITE_CONCURRENCY = 16;
 const EXTENSION_FILE_CANDIDATES = [
   "extensions.ts",
@@ -67,6 +68,23 @@ function getOutputHtmlPath(outDir: string, routePath: string): string {
     return path.join(outDir, "index.html");
   }
   return path.join(outDir, routePath.slice(1), "index.html");
+}
+
+function isHtmlNavigationRequest(url: string, acceptHeader?: string): boolean {
+  if (!acceptHeader?.includes("text/html")) {
+    return false;
+  }
+
+  const pathname = new URL(url, "http://localhost").pathname;
+  if (pathname === `/${SEARCH_INDEX_FILE_NAME}`) {
+    return false;
+  }
+
+  if (pathname.startsWith("/@") || pathname.startsWith("/__vite") || pathname.startsWith("/__id")) {
+    return false;
+  }
+
+  return !path.basename(pathname).includes(".");
 }
 
 function executeInlineScripts(html: string): void {
@@ -390,12 +408,193 @@ async function getWorkspaceExtensionAliases(cwd: string): Promise<Record<string,
   return aliases;
 }
 
+function mergeAliases(existingAlias: unknown, extensionAliases: Record<string, string>) {
+  if (Array.isArray(existingAlias)) {
+    return [
+      ...existingAlias,
+      ...Object.entries(extensionAliases).map(([find, replacement]) => ({ find, replacement })),
+    ];
+  }
+  if (existingAlias && typeof existingAlias === "object") {
+    return { ...(existingAlias as Record<string, string>), ...extensionAliases };
+  }
+  return { ...extensionAliases };
+}
+
+function prioritizeTypeScriptExtensions(
+  extensions: readonly string[] | undefined,
+): string[] | undefined {
+  if (!extensions) {
+    return undefined;
+  }
+
+  const priority = new Map<string, number>([
+    [".ts", 0],
+    [".tsx", 1],
+    [".jsx", 2],
+    [".js", 3],
+  ]);
+
+  return [...extensions].sort((left, right) => {
+    const leftPriority = priority.get(left) ?? 100;
+    const rightPriority = priority.get(right) ?? 100;
+    return leftPriority - rightPriority;
+  });
+}
+
+async function runDebugSsgServer() {
+  const cwd = process.cwd();
+  const sourceIndexPath = path.resolve(cwd, "index.html");
+  const tempEntryPath = path.resolve(cwd, TEMP_ENTRY_FILE_NAME);
+
+  log(`starting debug server in ${cwd}`);
+
+  const sourceHtml = await readFile(sourceIndexPath, "utf-8");
+  executeInlineScripts(sourceHtml);
+
+  const extensionImportSpecifiers = await getExtensionImportSpecifiers(cwd);
+  if (extensionImportSpecifiers.length > 0) {
+    log(`detected extensions: ${extensionImportSpecifiers.join(", ")}`);
+  }
+
+  log("creating SSR module");
+  await writeFile(tempEntryPath, getSsgEntrySource(extensionImportSpecifiers), "utf-8");
+
+  process.once("exit", () => {
+    try {
+      rmSync(tempEntryPath, { force: true });
+    } catch {
+      // ignore cleanup issues during process exit
+    }
+  });
+
+  const viteConfig = await getViteConfig({});
+  const extensionAliases = await getWorkspaceExtensionAliases(cwd);
+  if (Object.keys(extensionAliases).length > 0) {
+    log(`using workspace extension aliases: ${Object.keys(extensionAliases).join(", ")}`);
+  }
+
+  const mergedAlias = mergeAliases(viteConfig.resolve?.alias, extensionAliases);
+  const basePlugins = Array.isArray(viteConfig.plugins)
+    ? viteConfig.plugins
+    : viteConfig.plugins
+      ? [viteConfig.plugins]
+      : [];
+
+  const ssgDebugPlugin: Plugin = {
+    name: "xmlui-ssg-debug",
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        const requestUrl = req.originalUrl || req.url || "/";
+        const pathname = new URL(requestUrl, "http://localhost").pathname;
+
+        if (pathname === `/${SEARCH_INDEX_FILE_NAME}`) {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.end(SEARCH_INDEX_STUB_JSON);
+          return;
+        }
+
+        if (!isHtmlNavigationRequest(requestUrl, req.headers.accept)) {
+          next();
+          return;
+        }
+
+        try {
+          const shellHtml = await readFile(sourceIndexPath, "utf-8");
+          const transformedShell = await server.transformIndexHtml(requestUrl, shellHtml, req.originalUrl);
+          const renderModule = (await server.ssrLoadModule(
+            `${pathToFileURL(tempEntryPath).href}?t=${Date.now()}`,
+          )) as RenderModule;
+
+          if (!renderModule?.renderPath) {
+            throw new Error("failed to load renderPath from temporary SSG entry module");
+          }
+
+          const rendered = renderModule.renderPath(requestUrl);
+          const finalHtml = applyRenderToShell(transformedShell, rendered);
+
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "text/html");
+          res.end(finalHtml);
+        } catch (error) {
+          const err = error as Error;
+          server.ssrFixStacktrace(err);
+          res.statusCode = 500;
+          res.setHeader("Content-Type", "text/plain");
+          res.end(err.stack || err.message || String(err));
+        }
+      });
+    },
+  };
+
+  const server = await createServer({
+    ...viteConfig,
+    resolve: {
+      ...viteConfig.resolve,
+      alias: mergedAlias,
+      extensions: prioritizeTypeScriptExtensions(viteConfig.resolve?.extensions),
+    },
+    define: {
+      ...viteConfig.define,
+      "process.env.VITE_BUILD_MODE": '"ALL"',
+      "process.env.VITE_DEV_MODE": true,
+      "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
+      "process.env.VITE_MOCK_ENABLED": true,
+      "process.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
+      "process.env.VITE_USER_COMPONENTS_Inspect": '"true"',
+    },
+    plugins: [...basePlugins, ssgDebugPlugin],
+  } as InlineConfig);
+
+  if (!server.httpServer) {
+    throw new Error("HTTP server not available");
+  }
+
+  let cleanedUp = false;
+  const cleanup = async () => {
+    if (cleanedUp) {
+      return;
+    }
+    cleanedUp = true;
+    await rm(tempEntryPath, { force: true });
+  };
+
+  const shutdown = async (signal: NodeJS.Signals) => {
+    log(`received ${signal}, shutting down debug server`);
+    await server.close();
+    await cleanup();
+    process.exit(0);
+  };
+
+  process.once("SIGINT", () => {
+    void shutdown("SIGINT");
+  });
+  process.once("SIGTERM", () => {
+    void shutdown("SIGTERM");
+  });
+
+  try {
+    await server.listen();
+    server.printUrls();
+    log(`serving search index stub at /${SEARCH_INDEX_FILE_NAME}`);
+  } catch (error) {
+    await cleanup();
+    throw error;
+  }
+}
+
 export const ssg = async ({
   outDir = "dist-ssg",
   fallbackFile = "200",
   debug = false,
   contentDir = "content",
 }: SsgOptions = {}) => {
+  if (debug) {
+    await runDebugSsgServer();
+    return;
+  }
+
   const cwd = process.cwd();
   const outPath = path.resolve(cwd, outDir);
   const distPath = path.resolve(cwd, "dist");
@@ -562,13 +761,8 @@ export const ssg = async ({
     await writeFile(fallbackOutputFile, fallbackHtml, "utf-8");
     log(`wrote ${fallbackOutputFile}`);
   } finally {
-    if (debug) {
-      log(`debug mode: preserved SSR entry at ${tempEntryPath}`);
-      log(`debug mode: preserved SSR build at ${ssrBuildPath}`);
-    } else {
-      await rm(tempEntryPath, { force: true });
-      await rm(ssrBuildPath, { recursive: true, force: true });
-    }
+    await rm(tempEntryPath, { force: true });
+    await rm(ssrBuildPath, { recursive: true, force: true });
   }
 
   log(`completed. static files are in ${outPath}`);
