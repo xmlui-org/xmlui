@@ -1,8 +1,8 @@
 # VStack [#vstack]
 
-This component is inherited from [Stack](/components/Stack)
+This component is inherited from [Stack](/docs/reference/components/Stack)
 
-See also: [CHStack](/components/CHStack), [CVStack](/components/CVStack), [HStack](/components/HStack)
+See also: [CHStack](/docs/reference/components/CHStack), [CVStack](/docs/reference/components/CVStack), [HStack](/docs/reference/components/HStack)
 
 `VStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation.
 

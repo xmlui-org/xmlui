@@ -19,6 +19,7 @@ import {
   SECTION_REFERENCE_KEYS,
   COMMON_TABLE_HEADERS,
   FILE_EXTENSIONS,
+  DOCS_COMPONENTS_PATH,
 } from "./constants.mjs";
 import { collectedBehaviorMetadata } from "../../dist/metadata/behaviors.js";
 import { canBehaviorAttachToComponent } from "../../dist/metadata/behavior-evaluator.js";
@@ -94,10 +95,10 @@ export class MetadataProcessor {
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
-      result += addParentLinkLine(parent.displayName, basename(this.outFolder));
+      result += addParentLinkLine(parent.displayName, DOCS_COMPONENTS_PATH);
 
       const siblings = findSiblings(this.metadata, component);
-      result += addSiblingLinkLine(siblings, basename(this.outFolder));
+      result += addSiblingLinkLine(siblings, DOCS_COMPONENTS_PATH);
 
       result += fileData || "There is no description for this component as of yet.";
       result += `\n\n`;
