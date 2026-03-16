@@ -10,7 +10,12 @@ async function getLatestAssetUrl() {
 
   const url = `https://api.github.com/repos/xmlui-org/xmlui/releases?per_page=${per_page}`;
 
-  const res = await fetch(url);
+  const headers = {};
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_TOKEN}`;
+  }
+
+  const res = await fetch(url, { headers });
 
   if (!res.ok) {
     throw new Error(`GitHub API error: ${res.status} ${res.statusText}`);

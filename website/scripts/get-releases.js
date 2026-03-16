@@ -50,7 +50,8 @@ function processOptions(args) {
 async function getXmluiReleases(options) {
   try {
     const { Octokit } = await import("@octokit/rest");
-    const octokit = new Octokit();
+    const token = process.env.GITHUB_TOKEN;
+    const octokit = new Octokit(token ? { auth: token } : {});
     console.error("Fetching releases from GitHub API...");
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: options.owner,

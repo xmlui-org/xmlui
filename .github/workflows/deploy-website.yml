@@ -26,6 +26,8 @@ jobs:
 
       - name: build xmlui-website
         run: npx turbo run build-ssg --filter="xmlui-website"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy site
         uses: azure/static-web-apps-deploy@v1
