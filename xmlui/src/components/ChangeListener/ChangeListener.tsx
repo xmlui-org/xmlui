@@ -21,10 +21,20 @@ export const ChangeListenerMd = createMetadata({
     },
     throttleWaitInMs: {
       description:
-        `This variable sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
+        `This property sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
         `event handler. All changes within that throttling time will only fire the \`didChange\` event once.`,
       valueType: "number",
       defaultValue: defaultProps.throttleWaitInMs,
+    },
+    debounceWaitInMs: {
+      description:
+        `This property sets a debounce wait time (in milliseconds) to apply when executing the \`didChange\` ` +
+        `event handler. The \`didChange\` event will only fire after the listened value has been stable for ` +
+        `the specified duration. This is useful for search-as-you-type scenarios where you want to wait ` +
+        `until the user stops typing before firing the event. When both \`debounceWaitInMs\` and ` +
+        `\`throttleWaitInMs\` are set, debounce takes precedence.`,
+      valueType: "number",
+      defaultValue: defaultProps.debounceWaitInMs,
     },
   },
   events: {
@@ -47,6 +57,7 @@ export const changeListenerComponentRenderer = createComponentRenderer(
       <ChangeListener
         listenTo={extractValue(node.props.listenTo)}
         throttleWaitInMs={extractValue(node.props.throttleWaitInMs)}
+        debounceWaitInMs={extractValue(node.props.debounceWaitInMs)}
         onChange={lookupEventHandler("didChange")}
       />
     );

@@ -11,8 +11,8 @@ import {
   dEnabled,
   dGotFocus,
   dInitialValue,
-  dInternal,
   dLostFocus,
+  dOrientation,
   dReadonly,
   dRequired,
   dValidationStatus,
@@ -56,10 +56,19 @@ export const RadioGroupMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
-    orientation: dInternal(
-      `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
-        `options within the radio group.`,
-    ),
+    orientation: {
+      ...dOrientation(defaultProps.orientation),
+      description:
+        "This property sets the layout direction of the radio options within the group. " +
+        "Use `horizontal` to arrange them in a row, or `vertical` (default) to stack them.",
+    },
+    gap: {
+      description:
+        "This property sets the gap between the radio options in the group. " +
+        "Accepts any valid CSS size value or a theme token (e.g. `$gap-normal`).",
+      valueType: "string",
+      defaultValue: defaultProps.gap,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -81,6 +90,7 @@ export const RadioGroupMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    [`gap-RadioGroup`]: "$gap-normal",
     [`gap-${RGOption}`]: "0.25em",
     [`borderWidth-${RGOption}`]: "1px",
     [`borderWidth-${RGOption}-validation`]: `2px`,
@@ -135,6 +145,8 @@ export const radioGroupRenderer = createComponentRenderer(
       <ThemedRadioGroup
         autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+        orientation={extractValue(node.props.orientation)}
+        gap={extractValue.asSize(node.props.gap)}
         classes={classes}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}

@@ -198,3 +198,155 @@ test("component works with conditional rendering", async ({ page, initTestBed })
   await page.getByTestId("button").click();
   await expect(page.getByTestId("text")).toHaveText("4");
 });
+
+// =============================================================================
+// DEBOUNCEWAITINMS TESTS
+// =============================================================================
+
+test("debounceWaitInMs delays handler until the debounce period expires", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await expect(page.getByTestId("text")).toHaveText("0|0");
+
+  await page.getByTestId("button").click();
+
+  // Advance to T=100 — still within the 300ms debounce window, handler not fired yet
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Advance to T=300 — debounce window expires, handler fires
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("1|1");
+});
+
+test("debounceWaitInMs fires handler only once for rapid consecutive changes", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  // Click 3 times rapidly without advancing time
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+
+  // Advance to T=100 — still within the 300ms debounce window, handler has not fired
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("3|0");
+
+  // Advance to T=300 — debounce window expires, handler fires exactly once
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("3|1");
+});
+
+test("debounceWaitInMs resets timer on each change within the window", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  // First change
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Advance 200ms — still within debounce window
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Second change — resets the debounce timer
+  await page.getByTestId("button").click();
+  await expect(page.getByTestId("text")).toHaveText("2|0");
+
+  // Advance another 200ms — 400ms since first change but only 200ms since last change
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("2|0");
+
+  // Advance 100ms more — now 300ms since last change, debounce fires
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("2|1");
+});
+
+test("debounceWaitInMs passes correct prevValue and newValue to handler", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.result="{''}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{result}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{200}"
+        onDidChange="chg => result = chg.prevValue + '|' + chg.newValue" />
+    </VStack>
+  `);
+
+  await page.getByTestId("button").click();
+  await page.clock.fastForward(200);
+
+  await expect(page.getByTestId("text")).toHaveText("0|1");
+});
+
+test("debounceWaitInMs takes precedence over throttleWaitInMs when both are set", async ({
+  page,
+  initTestBed,
+}) => {
+  await page.clock.install();
+  await initTestBed(`
+    <VStack var.counter="{0}" var.fireCount="{0}">
+      <Button testId="button" onClick="counter++">Increment</Button>
+      <Text testId="text">{counter}|{fireCount}</Text>
+      <ChangeListener
+        listenTo="{counter}"
+        debounceWaitInMs="{300}"
+        throttleWaitInMs="{50}"
+        onDidChange="fireCount++" />
+    </VStack>
+  `);
+
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+  await page.getByTestId("button").click();
+
+  // Advance past throttle window — if throttle were active it would have fired by now
+  await page.clock.fastForward(100);
+  await expect(page.getByTestId("text")).toHaveText("3|0");
+
+  // Advance to full debounce window
+  await page.clock.fastForward(200);
+  await expect(page.getByTestId("text")).toHaveText("3|1");
+});

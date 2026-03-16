@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from "react";
-import { isEqual, throttle } from "lodash-es";
+import { useCallback, useEffect, useMemo, useRef } from "react";
+import { debounce, isEqual, throttle } from "lodash-es";
 import { usePrevious } from "../../components-core/utils/hooks";
 
 // =====================================================================================================================
@@ -9,31 +9,54 @@ type Props = {
   listenTo: any;
   onChange?: (newValue: any) => void;
   throttleWaitInMs?: number;
+  debounceWaitInMs?: number;
 };
 
-export const defaultProps: Pick<Props, "throttleWaitInMs"> = {
+export const defaultProps: Pick<Props, "throttleWaitInMs" | "debounceWaitInMs"> = {
   throttleWaitInMs: 0,
+  debounceWaitInMs: 0,
 };
 
-export function ChangeListener({ listenTo, onChange, throttleWaitInMs = defaultProps.throttleWaitInMs }: Props) {
+export function ChangeListener({
+  listenTo,
+  onChange,
+  throttleWaitInMs = defaultProps.throttleWaitInMs,
+  debounceWaitInMs = defaultProps.debounceWaitInMs,
+}: Props) {
   const prevValue = usePrevious(listenTo);
 
-  const throttledOnChange = useMemo(() => {
-    if (throttleWaitInMs !== 0 && onChange) {
-      return throttle(onChange, throttleWaitInMs, {
+  // Keep a ref to the latest onChange to avoid recreating debounce/throttle
+  // wrappers when the handler identity changes between renders (which happens
+  // because XMLUI creates a new handler function on every render cycle).
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+
+  // A stable callback that always calls the latest onChange via the ref.
+  // With empty deps, this never changes, so useMemo below only re-runs when
+  // the wait-time values actually change.
+  const stableOnChange = useCallback((args: any) => {
+    onChangeRef.current?.(args);
+  }, []);
+
+  const debouncedOrThrottledOnChange = useMemo(() => {
+    if (debounceWaitInMs !== 0) {
+      return debounce(stableOnChange, debounceWaitInMs);
+    }
+    if (throttleWaitInMs !== 0) {
+      return throttle(stableOnChange, throttleWaitInMs, {
         leading: true,
       });
     }
-    return onChange;
-  }, [onChange, throttleWaitInMs]);
+    return stableOnChange;
+  }, [stableOnChange, throttleWaitInMs, debounceWaitInMs]);
 
   useEffect(() => {
-    if (throttledOnChange && !isEqual(prevValue, listenTo)) {
-      throttledOnChange?.({
+    if (!isEqual(prevValue, listenTo)) {
+      debouncedOrThrottledOnChange?.({
         prevValue,
         newValue: listenTo,
       });
     }
-  }, [listenTo, throttledOnChange, prevValue]);
+  }, [listenTo, debouncedOrThrottledOnChange, prevValue]);
   return null;
 }
