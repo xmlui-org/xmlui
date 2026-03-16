@@ -566,28 +566,35 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // item is rendered using the template with $item / $itemIndex context vars,
     // matching the pattern used by List, TileGrid, and other data components.
     const templatePropName = metadata.childrenAsTemplate;
-    if (templatePropName && node.props?.[templatePropName]) {
+    const data = templatePropName ? extractValue(node.props.data) : undefined;
+    if (templatePropName && node.props?.[templatePropName] && Array.isArray(data)) {
       const itemTemplate = node.props[templatePropName];
-      const data = extractValue(node.props.data);
-      if (Array.isArray(data)) {
-        const childLayoutCtx = config.childrenLayoutContext
+      const childLayoutCtx = config.childrenLayoutContext
+        ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+        : undefined;
+      props.children = data.map((item: any, index: number) => (
+        <MemoizedItem
+          node={itemTemplate as any}
+          key={item?.id ?? index}
+          renderChild={renderChild}
+          layoutContext={childLayoutCtx}
+          contextVars={{
+            $item: item,
+            $itemIndex: index,
+            $isFirst: index === 0,
+            $isLast: index === data.length - 1,
+          }}
+        />
+      ));
+    } else if (templatePropName && node.props?.[templatePropName] && !Array.isArray(data)) {
+      // childrenAsTemplate moved children into the template prop, but no data was provided —
+      // render the template prop as normal children (inline children mode)
+      props.children = renderChild(
+        node.props[templatePropName],
+        config.childrenLayoutContext
           ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
-          : undefined;
-        props.children = data.map((item: any, index: number) => (
-          <MemoizedItem
-            node={itemTemplate as any}
-            key={item?.id ?? index}
-            renderChild={renderChild}
-            layoutContext={childLayoutCtx}
-            contextVars={{
-              $item: item,
-              $itemIndex: index,
-              $isFirst: index === 0,
-              $isLast: index === data.length - 1,
-            }}
-          />
-        ));
-      }
+          : undefined,
+      );
     } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
       props.children = renderChild(
         node.children,
