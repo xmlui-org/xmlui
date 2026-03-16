@@ -207,28 +207,41 @@ export function resolveResponsiveWhen(
   const sizeIndex = appContext?.mediaSize?.sizeIndex;
 
   if (sizeIndex === undefined) {
-    // --- SSR mode: `document` is not available, so the viewport breakpoint is unknown.
-    if (typeof document === "undefined") {
-      // Point 1: Render the component if it would be visible at *any* breakpoint.
-      // This ensures SSR output includes the component for crawlers and initial HTML.
-      const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
-        if (responsiveWhen[bp] === undefined) return false;
-        return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
-      });
-      if (isVisibleAtAnyBreakpoint) {
-        // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
-        // and attach its class name to the component so the browser can apply the correct
-        // visibility on first paint before React hydration runs.
+    // --- Viewport is unknown (SSR or first client render before media queries resolve).
+    // --- Use a deterministic fallback in both environments: keep the component if it can be
+    // --- visible at any breakpoint. CSS media-query display rules can then control first paint.
+    for (let i = 0; i < MediaBreakpointKeys.length; i++) {
+      if (
+        resolveResponsiveWhenAtBreakpointIndex(
+          when,
+          responsiveWhen,
+          i,
+          componentState,
+          appContext,
+        )
+      ) {
         return true;
       }
-      return false;
     }
-
-    // Client-side but sizeIndex not yet computed (media queries still resolving on first
-    // render). Suppress rendering to avoid a flash where multiple mutually-exclusive
-    // responsive components briefly appear together before the breakpoint is known.
     return false;
   }
+
+  return resolveResponsiveWhenAtBreakpointIndex(
+    when,
+    responsiveWhen,
+    sizeIndex,
+    componentState,
+    appContext,
+  );
+}
+
+function resolveResponsiveWhenAtBreakpointIndex(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>>,
+  sizeIndex: number,
+  componentState: ContainerState,
+  appContext?: AppContextObject,
+): boolean {
 
   // Walk from current breakpoint down to xs (Tailwind mobile-first)
   for (let i = sizeIndex; i >= 0; i--) {
