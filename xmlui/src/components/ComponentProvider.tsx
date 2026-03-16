@@ -60,6 +60,7 @@ import {
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
 import { dynamicHeightListComponentRenderer } from "./List/List";
+import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
@@ -462,6 +463,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerCoreComponent(dynamicHeightListComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TileGrid !== "false") {
+      this.registerCoreComponent(tileGridComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_App !== "false") {

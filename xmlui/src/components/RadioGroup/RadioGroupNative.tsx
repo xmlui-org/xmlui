@@ -197,7 +197,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
       <RadioGroupStatusContext.Provider value={contextValue}>
         <InnerRadioGroup.Root
           {...rest}
-          style={style}
+          style={{ ...style, ...(gap != null ? { gap } : undefined) }}
           ref={radioGroupRef}
           id={id}
           onBlur={handleOnBlur}
@@ -206,7 +206,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
           value={value}
           disabled={!enabled}
           required={required}
-          aria-readonly={readOnly}          style={{ ...style, ...(gap != null ? { gap } : undefined) }}          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
+          aria-readonly={readOnly}
+          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
             [styles.focused]: focused,
             [styles.disabled]: !enabled,
             [styles.horizontal]: orientation === "horizontal",

@@ -527,6 +527,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/TileGrid",
+          "label": "TileGrid",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/TimeInput",
           "label": "TimeInput",
           "icon": "component"
