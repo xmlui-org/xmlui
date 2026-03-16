@@ -7,6 +7,7 @@ const COMP = "Search";
 const COMP_INPUT = `${COMP}Input`;
 const COMP_PANEL = `${COMP}Panel`;
 const COMP_ITEM = `${COMP}Item`;
+const COMP_FOOTER = `${COMP}Footer`;
 
 export const SearchMd = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
@@ -58,10 +59,14 @@ export const SearchMd = createMetadata({
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 
+    [`backgroundColor-${COMP_FOOTER}`]: "$color-surface-50",
+    [`borderColor-${COMP_FOOTER}`]: "$color-surface-100",
+
     dark: {
       [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
       [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
       [`backgroundColor-${COMP_ITEM}--hover`]: "rgb(from $color-surface-200 r g b / 0.4)",
+      [`borderColor-${COMP_FOOTER}`]: "$color-surface-300",
     },
   },
 });

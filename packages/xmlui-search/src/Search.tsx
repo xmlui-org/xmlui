@@ -302,6 +302,24 @@ export const Search = ({
                   </div>
                 )}
               </ul>
+              {!inDrawer && (
+                <footer className={styles.panelFooter}>
+                  <div>
+                    <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
+                    <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
+                    <Text>Navigate</Text>
+                  </div>
+
+                  <div style={{ flex: "1" }}>
+                    <Text variant="keyboard">Enter</Text>
+                    <Text>Select</Text>
+                  </div>
+
+                  <div>
+                    <Text variant="keyboard">Esc</Text>
+                    <Text>Close</Text>
+                  </div>
+              </footer>)}
             </PopoverContent>
           </Portal>
         )}
