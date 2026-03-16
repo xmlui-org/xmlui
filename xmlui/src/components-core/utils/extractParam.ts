@@ -212,13 +212,7 @@ export function resolveResponsiveWhen(
     // --- visible at any breakpoint. CSS media-query display rules can then control first paint.
     for (let i = 0; i < MediaBreakpointKeys.length; i++) {
       if (
-        resolveResponsiveWhenAtBreakpointIndex(
-          when,
-          responsiveWhen,
-          i,
-          componentState,
-          appContext,
-        )
+        resolveResponsiveWhenAtBreakpointIndex(when, responsiveWhen, i, componentState, appContext)
       ) {
         return true;
       }
@@ -242,12 +236,14 @@ function resolveResponsiveWhenAtBreakpointIndex(
   componentState: ContainerState,
   appContext?: AppContextObject,
 ): boolean {
-
   // Walk from current breakpoint down to xs (Tailwind mobile-first)
   for (let i = sizeIndex; i >= 0; i--) {
     const bp = MediaBreakpointKeys[i];
     if (responsiveWhen[bp] !== undefined) {
-      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+      return (
+        asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ??
+        true
+      );
     }
   }
 
@@ -265,7 +261,8 @@ function resolveResponsiveWhenAtBreakpointIndex(
   for (const bp of MediaBreakpointKeys) {
     if (responsiveWhen![bp] !== undefined) {
       const lowestValue =
-        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ?? true;
+        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ??
+        true;
       return !lowestValue;
     }
   }
@@ -327,9 +324,7 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
  * @param nodeProps properties to clean
  * @returns only component-specific properties
  */
-export function removeStylesFromProps(
-  nodeProps: Record<string, any>,
-) {
+export function removeStylesFromProps(nodeProps: Record<string, any>) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
@@ -371,11 +366,7 @@ export class PropsTrasform<T extends NodeProps> {
 
   private usedKeys: (keyof T)[] = [];
 
-  constructor(
-    extractValue: ValueExtractor,
-    extractResourceUrl: ResourceUrlExtractor,
-    props: T,
-  ) {
+  constructor(extractValue: ValueExtractor, extractResourceUrl: ResourceUrlExtractor, props: T) {
     this.extractValue = extractValue;
     this.extractResourceUrl = extractResourceUrl;
     this.nodeProps = removeStylesFromProps(props) as T;

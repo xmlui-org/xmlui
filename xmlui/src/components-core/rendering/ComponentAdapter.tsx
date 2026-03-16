@@ -36,7 +36,11 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
-import { resolveLayoutProps, DIMS_ONLY_PROPS, SPACING_ONLY_PROPS } from "../theming/layout-resolver";
+import {
+  resolveLayoutProps,
+  DIMS_ONLY_PROPS,
+  SPACING_ONLY_PROPS,
+} from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
 import {
   buildResponsiveStyleObjects,
@@ -46,7 +50,6 @@ import {
   COMPONENT_PART_KEY,
 } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
-import { is } from "immer/dist/internal.js";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
