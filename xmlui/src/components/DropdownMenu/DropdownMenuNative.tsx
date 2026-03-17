@@ -45,6 +45,7 @@ type DropdownMenuProps = {
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
   className?: string;
+  contentClassName?: string;
   classes?: Record<string, string>;
   alignment?: AlignmentOptions;
   onWillOpen?: () => Promise<boolean | undefined>;
@@ -80,6 +81,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     registerComponentApi,
     style,
     className,
+    contentClassName,
     classes,
     onWillOpen,
     alignment = defaultDropdownMenuProps.alignment,
@@ -121,7 +123,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
   const contentRef = useRef<HTMLDivElement>(null);
 
   return (
-    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classnames(classes?.[COMPONENT_PART_KEY], className) }}>
+    <DropdownMenuContext.Provider value={{ closeMenu, contentClassName: classnames(contentClassName, classes?.[COMPONENT_PART_KEY], className) }}>
       <DropdownMenuPrimitive.Root
         open={open}
         onOpenChange={async (isOpen) => {
@@ -172,7 +174,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
             ref={contentRef}
             align={alignment}
             style={style}
-            className={classnames(styles.DropdownMenuContent, classes?.[COMPONENT_PART_KEY], className, {
+            className={classnames(styles.DropdownMenuContent, contentClassName, classes?.[COMPONENT_PART_KEY], className, {
               [styles.compact]: compact,
             })}
             tabIndex={-1}

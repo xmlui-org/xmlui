@@ -27,6 +27,7 @@ import {
 } from "./DatePickerNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "DatePicker";
 
@@ -186,10 +187,12 @@ type ThemedDatePickerProps = React.ComponentPropsWithoutRef<typeof DatePicker>;
 export const ThemedDatePicker = React.forwardRef<React.ElementRef<typeof DatePicker>, ThemedDatePickerProps>(
   function ThemedDatePicker({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(DatePickerMd);
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
     return (
       <DatePicker
         {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        className={combinedClassName}
+        contentClassName={combinedClassName}
         ref={ref}
       />
     );
@@ -211,6 +214,7 @@ export const datePickerComponentRenderer = createComponentRenderer(
     return (
       <DatePicker
         classes={classes}
+        contentClassName={classes?.[COMPONENT_PART_KEY]}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}

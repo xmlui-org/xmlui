@@ -64,6 +64,7 @@ type AutoCompleteProps = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  contentClassName?: string;
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -120,6 +121,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    contentClassName,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -641,7 +643,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
           <Portal container={root}>
             <PopoverContent
               style={{ width, height: dropdownHeight }}
-              className={styles.popoverContent}
+              className={classnames(contentClassName, styles.popoverContent)}
               align="start"
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
