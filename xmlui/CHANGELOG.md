@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.12.9
+
+### Patch Changes
+
+- 39b3847: Retry patch release
+
 ## 0.12.8
 
 ### Patch Changes
