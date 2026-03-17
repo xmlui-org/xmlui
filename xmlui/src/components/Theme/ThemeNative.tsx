@@ -311,9 +311,14 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
       documentElement.classList.add(...classNames);
+      const portalContainer = insideShadowRoot
+        ? domRoot.getElementById("nested-app-portal-root")
+        : null;
+      portalContainer?.classList.add(...classNames);
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);
+        portalContainer?.classList.remove(...classNames);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
