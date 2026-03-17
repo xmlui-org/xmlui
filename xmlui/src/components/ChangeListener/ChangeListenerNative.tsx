@@ -25,6 +25,13 @@ export function ChangeListener({
 }: Props) {
   const prevValue = usePrevious(listenTo);
 
+  // Track whether the component has completed its initial mount so we only
+  // fire onChange for genuine value *changes*, not for the initial render.
+  // On the first render, usePrevious returns undefined regardless of the
+  // initial listenTo value, which would otherwise cause onChange to fire
+  // spuriously on mount.
+  const isMountedRef = useRef(false);
+
   // Keep a ref to the latest onChange to avoid recreating debounce/throttle
   // wrappers when the handler identity changes between renders (which happens
   // because XMLUI creates a new handler function on every render cycle).
@@ -51,6 +58,10 @@ export function ChangeListener({
   }, [stableOnChange, throttleWaitInMs, debounceWaitInMs]);
 
   useEffect(() => {
+    if (!isMountedRef.current) {
+      isMountedRef.current = true;
+      return;
+    }
     if (!isEqual(prevValue, listenTo)) {
       debouncedOrThrottledOnChange?.({
         prevValue,
