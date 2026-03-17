@@ -371,18 +371,32 @@ export function nodeToComponentDef(
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
             return;
           }
-          collectElementHelper(
-            usesStack,
-            comp,
-            child,
-
-            (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
-            (name, value) => {
-              if (!isComponent(comp)) return;
-              comp.globalVars ??= {};
-              comp.globalVars[name] = value;
-            },
-          );
+          {
+            // Extract storageKey before delegating to collectElementHelper so
+            // collectValue does not report it as an unknown attribute.
+            const storageKey = getAttributes(child)
+              .map(segmentAttr)
+              .find((a) => a.name === "storageKey")?.value;
+            collectElementHelper(
+              usesStack,
+              comp,
+              child,
+              (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
+              (name, value) => {
+                if (!isComponent(comp)) return;
+                comp.globalVars ??= {};
+                comp.globalVars[name] = value;
+                if (storageKey) {
+                  // Store as metadata key (prefixed with "__") so the runtime
+                  // can initialise from / persist to localStorage without
+                  // exposing the key as a normal variable.
+                  comp.globalVars[`__storageKey_${name}`] = storageKey;
+                }
+              },
+              undefined, // nameValidator
+              ["storageKey"], // extraAllowedAttrs
+            );
+          }
           return;
 
         case "loaders":
@@ -568,9 +582,10 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     element: Node,
     allowName = true,
+    extraAllowedAttrs: string[] = [],
   ): { name?: string; value: any; valueContentNode?: Node } | null {
     const elementName = getComponentName(element, getText);
-    // --- Accept only "name", "value"
+    // --- Accept only "name", "value" (and any explicitly allowed extras)
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
       (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
@@ -581,7 +596,8 @@ export function nodeToComponentDef(
     const attrNodes = getAttributes(element);
     const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const attrProps = attrsSegmented.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
+    const allAllowedAttrs = extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
+    const attrProps = attrsSegmented.filter((attr) => allAllowedAttrs.indexOf(attr.name) >= 0);
     if (attrsSegmented.length > attrProps.length) {
       reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
       return null;
@@ -713,11 +729,12 @@ export function nodeToComponentDef(
     getter: (name: string) => any,
     setter: (name: string, value: string, valueNode?: Node) => void,
     nameValidator?: (name: string) => void,
+    extraAllowedAttrs: string[] = [],
   ): void {
     // --- Compound component do not have a uses
 
     // --- Get the value
-    const valueInfo = collectValue(usesStack, child);
+    const valueInfo = collectValue(usesStack, child, true, extraAllowedAttrs);
     if (!valueInfo) {
       return;
     }

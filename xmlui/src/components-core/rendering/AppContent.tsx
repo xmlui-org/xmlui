@@ -28,6 +28,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { localStorageFunctions } from "../appContext/local-storage-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -969,6 +970,9 @@ export function AppContent({
 
       // --- Math-related
       ...mathFunctions,
+
+      // --- Local storage utilities
+      ...localStorageFunctions,
 
       // --- File Utilities
       formatFileSizeInBytes,
