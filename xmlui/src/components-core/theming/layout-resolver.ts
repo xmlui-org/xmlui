@@ -264,6 +264,21 @@ export function resolveLayoutProps(
   collectCss("whiteSpace", disableInlineStyle);
   collectCss("transform", disableInlineStyle);
 
+  // --- Scroll snap
+  collectCss("scrollSnapType", disableInlineStyle);
+  collectCss("scrollSnapAlign", disableInlineStyle);
+  collectCss("scrollSnapStop", disableInlineStyle);
+  collectCss("scrollPadding", disableInlineStyle);
+  collectCss("scrollPaddingTop", disableInlineStyle);
+  collectCss("scrollPaddingRight", disableInlineStyle);
+  collectCss("scrollPaddingBottom", disableInlineStyle);
+  collectCss("scrollPaddingLeft", disableInlineStyle);
+  collectCss("scrollMargin", disableInlineStyle);
+  collectCss("scrollMarginTop", disableInlineStyle);
+  collectCss("scrollMarginRight", disableInlineStyle);
+  collectCss("scrollMarginBottom", disableInlineStyle);
+  collectCss("scrollMarginLeft", disableInlineStyle);
+
   // --- Outline
   collectCss("outline", disableInlineStyle);
   collectCss("outlineWidth", disableInlineStyle);
@@ -490,6 +505,21 @@ export type LayoutProps = {
   opacity?: string | number;
   transform?: string;
 
+  // --- Scroll snap
+  scrollSnapType?: string;
+  scrollSnapAlign?: string;
+  scrollSnapStop?: string;
+  scrollPadding?: string | number;
+  scrollPaddingTop?: string | number;
+  scrollPaddingRight?: string | number;
+  scrollPaddingBottom?: string | number;
+  scrollPaddingLeft?: string | number;
+  scrollMargin?: string | number;
+  scrollMarginTop?: string | number;
+  scrollMarginRight?: string | number;
+  scrollMarginBottom?: string | number;
+  scrollMarginLeft?: string | number;
+
   // --- Typography
   color?: string;
   fontFamily?: string;
@@ -601,6 +631,21 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   overflowY: [],
   zIndex: [],
   opacity: [],
+
+  // --- Scroll snap
+  scrollSnapType: [],
+  scrollSnapAlign: [],
+  scrollSnapStop: [],
+  scrollPadding: [],
+  scrollPaddingTop: [],
+  scrollPaddingRight: [],
+  scrollPaddingBottom: [],
+  scrollPaddingLeft: [],
+  scrollMargin: [],
+  scrollMarginTop: [],
+  scrollMarginRight: [],
+  scrollMarginBottom: [],
+  scrollMarginLeft: [],
 
   // --- Typography
   color: [],
