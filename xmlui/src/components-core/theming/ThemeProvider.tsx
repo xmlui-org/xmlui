@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   generateBaseFontSizes,
   generateBaseSpacings,
@@ -274,7 +274,16 @@ function ThemeProvider({
     return defaultTone;
   });
 
+  // Sync activeThemeTone when defaultTone CHANGES after mount.
+  // The initial value is already set synchronously by useState above, so we
+  // skip the first run to avoid overriding a tone that was set programmatically
+  // (e.g., restored from localStorage by the App component's init effect).
+  const isToneInitialMount = useRef(true);
   useEffect(() => {
+    if (isToneInitialMount.current) {
+      isToneInitialMount.current = false;
+      return;
+    }
     if (defaultTone) {
       setActiveThemeTone(defaultTone);
     }

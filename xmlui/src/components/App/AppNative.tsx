@@ -4,6 +4,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -100,6 +101,8 @@ type Props = {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone?: boolean;
+  persistTone?: boolean;
+  toneStorageKey?: string;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
@@ -112,6 +115,8 @@ export const defaultProps: Pick<
   | "defaultTone"
   | "defaultTheme"
   | "autoDetectTone"
+  | "persistTone"
+  | "toneStorageKey"
   | "onReady"
   | "onMessageReceived"
   | "onKeyDown"
@@ -124,6 +129,8 @@ export const defaultProps: Pick<
   defaultTone: undefined,
   defaultTheme: undefined,
   autoDetectTone: false,
+  persistTone: false,
+  toneStorageKey: "appTone",
   onReady: noop,
   onMessageReceived: noop,
   onKeyDown: noop,
@@ -187,6 +194,8 @@ export function App({
   defaultTone,
   defaultTheme,
   autoDetectTone = defaultProps.autoDetectTone,
+  persistTone = defaultProps.persistTone,
+  toneStorageKey = defaultProps.toneStorageKey,
   renderChild,
   name,
   className,
@@ -197,7 +206,7 @@ export function App({
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
-  const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
+  const { setActiveThemeTone, setActiveThemeId, activeThemeTone, themes } = useThemes();
   const mounted = useRef(false);
 
   // Validate and sanitize layout input with explicit validation
@@ -241,9 +250,21 @@ export function App({
     defaultTone,
     defaultTheme,
     autoDetectTone,
+    persistTone,
+    toneStorageKey,
     setActiveThemeTone,
     setActiveThemeId,
   });
+
+  // Persist tone to localStorage whenever it changes
+  useEffect(() => {
+    if (!persistTone) return;
+    try {
+      localStorage.setItem(toneStorageKey, JSON.stringify(activeThemeTone));
+    } catch {
+      // QuotaExceededError / SecurityError — degrade gracefully
+    }
+  }, [persistTone, toneStorageKey, activeThemeTone]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -649,29 +670,57 @@ function useThemeInitialization({
   defaultTone,
   defaultTheme,
   autoDetectTone,
+  persistTone,
+  toneStorageKey,
   setActiveThemeTone,
   setActiveThemeId,
 }: {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone: boolean;
+  persistTone: boolean;
+  toneStorageKey: string;
   setActiveThemeTone: (tone: "dark" | "light") => void;
   setActiveThemeId: (id: string) => void;
 }) {
   const mounted = useRef(false);
 
-  // Initial theme and tone setup - runs once on mount
-  useEffect(() => {
+  // Initial theme and tone setup - runs once on mount.
+  // useLayoutEffect fires synchronously before the browser paints, preventing
+  // a flash where the default (light) tone is visible before the stored tone loads.
+  useLayoutEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
 
-    // Set tone: explicit defaultTone, or auto-detect from system
-    if (defaultTone === "dark" || defaultTone === "light") {
-      setActiveThemeTone(defaultTone as any);
-    } else if (autoDetectTone) {
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const detectedTone = systemPrefersDark ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
+    // Resolve tone: persisted value wins, then explicit defaultTone, then auto-detect
+    let resolvedTone: "dark" | "light" | undefined;
+
+    if (persistTone) {
+      try {
+        const stored = localStorage.getItem(toneStorageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (parsed === "dark" || parsed === "light") {
+            resolvedTone = parsed;
+          }
+        }
+      } catch {
+        // Corrupt value — fall through to other strategies
+      }
+    }
+
+    if (!resolvedTone) {
+      // Set tone: explicit defaultTone, or auto-detect from system
+      if (defaultTone === "dark" || defaultTone === "light") {
+        resolvedTone = defaultTone;
+      } else if (autoDetectTone) {
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        resolvedTone = systemPrefersDark ? "dark" : "light";
+      }
+    }
+
+    if (resolvedTone) {
+      setActiveThemeTone(resolvedTone);
     }
 
     // Set theme ID if provided
@@ -682,7 +731,7 @@ function useThemeInitialization({
     return () => {
       mounted.current = false;
     };
-  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId]);
+  }, [defaultTone, defaultTheme, autoDetectTone, persistTone, toneStorageKey, setActiveThemeTone, setActiveThemeId]);
 
   // Listen for system theme changes when autoDetectTone is enabled
   useEffect(() => {
