@@ -207,34 +207,43 @@ export function resolveResponsiveWhen(
   const sizeIndex = appContext?.mediaSize?.sizeIndex;
 
   if (sizeIndex === undefined) {
-    // --- SSR mode: `document` is not available, so the viewport breakpoint is unknown.
-    if (typeof document === "undefined") {
-      // Point 1: Render the component if it would be visible at *any* breakpoint.
-      // This ensures SSR output includes the component for crawlers and initial HTML.
-      const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
-        if (responsiveWhen[bp] === undefined) return false;
-        return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
-      });
-      if (isVisibleAtAnyBreakpoint) {
-        // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
-        // and attach its class name to the component so the browser can apply the correct
-        // visibility on first paint before React hydration runs.
+    // --- Viewport is unknown (SSR or first client render before media queries resolve).
+    // --- Use a deterministic fallback in both environments: keep the component if it can be
+    // --- visible at any breakpoint. CSS media-query display rules can then control first paint.
+    for (let i = 0; i < MediaBreakpointKeys.length; i++) {
+      if (
+        resolveResponsiveWhenAtBreakpointIndex(when, responsiveWhen, i, componentState, appContext)
+      ) {
         return true;
       }
-      return false;
     }
-
-    // Client-side but sizeIndex not yet computed (media queries still resolving on first
-    // render). Suppress rendering to avoid a flash where multiple mutually-exclusive
-    // responsive components briefly appear together before the breakpoint is known.
     return false;
   }
 
+  return resolveResponsiveWhenAtBreakpointIndex(
+    when,
+    responsiveWhen,
+    sizeIndex,
+    componentState,
+    appContext,
+  );
+}
+
+function resolveResponsiveWhenAtBreakpointIndex(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>>,
+  sizeIndex: number,
+  componentState: ContainerState,
+  appContext?: AppContextObject,
+): boolean {
   // Walk from current breakpoint down to xs (Tailwind mobile-first)
   for (let i = sizeIndex; i >= 0; i--) {
     const bp = MediaBreakpointKeys[i];
     if (responsiveWhen[bp] !== undefined) {
-      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+      return (
+        asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ??
+        true
+      );
     }
   }
 
@@ -252,7 +261,8 @@ export function resolveResponsiveWhen(
   for (const bp of MediaBreakpointKeys) {
     if (responsiveWhen![bp] !== undefined) {
       const lowestValue =
-        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ?? true;
+        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ??
+        true;
       return !lowestValue;
     }
   }
@@ -314,9 +324,7 @@ export function resolveAndCleanProps<T extends Record<string, any>>(
  * @param nodeProps properties to clean
  * @returns only component-specific properties
  */
-export function removeStylesFromProps(
-  nodeProps: Record<string, any>,
-) {
+export function removeStylesFromProps(nodeProps: Record<string, any>) {
   if (nodeProps.hasOwnProperty("style")) {
     delete nodeProps["style"];
   }
@@ -358,11 +366,7 @@ export class PropsTrasform<T extends NodeProps> {
 
   private usedKeys: (keyof T)[] = [];
 
-  constructor(
-    extractValue: ValueExtractor,
-    extractResourceUrl: ResourceUrlExtractor,
-    props: T,
-  ) {
+  constructor(extractValue: ValueExtractor, extractResourceUrl: ResourceUrlExtractor, props: T) {
     this.extractValue = extractValue;
     this.extractResourceUrl = extractResourceUrl;
     this.nodeProps = removeStylesFromProps(props) as T;
