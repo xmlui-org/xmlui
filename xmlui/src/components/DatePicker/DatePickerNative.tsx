@@ -101,6 +101,7 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  contentClassName?: string;
 };
 
 export const enum WeekDays {
@@ -198,6 +199,7 @@ export const DatePicker = forwardRef(function DatePicker(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    contentClassName,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -550,7 +552,7 @@ export const DatePicker = forwardRef(function DatePicker(
           role="menu"
           align={"start"}
           sideOffset={5}
-          className={styles.datePickerMenu}
+          className={classnames(contentClassName, styles.datePickerMenu)}
           onFocus={handleOnMenuFocus}
           onBlur={handleOnMenuBlur}
           onInteractOutside={handleOnMenuBlur}
