@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
+import toast from "react-hot-toast";
 import yaml from "js-yaml";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
@@ -808,6 +809,21 @@ function useStandalone(
   });
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
+  const [pendingLintToasts, setPendingLintToasts] = useState<string[]>([]);
+
+  // --- Show Strict-severity lint warnings after the Toaster (inside NotificationToast)
+  // --- has committed. Effects in children fire before parent effects, so by the time
+  // --- this fires, NotificationToast has already queued its setShouldRender(true).
+  // --- React then processes that state update, mounts the Toaster, and its useState
+  // --- initialises from react-hot-toast's module-level memoryState — which already
+  // --- contains the toasts fired here.
+  useEffect(() => {
+    if (pendingLintToasts.length === 0) return;
+    const timer = setTimeout(() => {
+      pendingLintToasts.forEach((msg) => toast.error(msg, { duration: 8000 }));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pendingLintToasts]);
 
   // --- This function extracts the global variables and functions from the combined
   // --- pre-built Globals.xs module.
@@ -1009,10 +1025,11 @@ function useStandalone(
           }
         }
         
-        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
+        const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(appDef, metadataProvider);
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
+        setPendingLintToasts(toastMessages);
 
         discoverCompilationDependencies({
           projectCompilation: resolvedRuntime.projectCompilation,
@@ -1091,7 +1108,7 @@ function useStandalone(
           themes,
         };
 
-        const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+        const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(newAppDef, metadataProvider);
         if (lintErrorComponent) {
           newAppDef.entryPoint = lintErrorComponent;
         }
@@ -1101,6 +1118,7 @@ function useStandalone(
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(newAppDef);
+        setPendingLintToasts(toastMessages);
         return;
       }
 
@@ -1439,7 +1457,7 @@ function useStandalone(
         entryPoint: entryPointWithCodeBehind,
       };
 
-      const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+      const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(newAppDef, metadataProvider);
 
       const errorComponent: ComponentDef | null =
         errorComponents.length > 0
@@ -1465,6 +1483,7 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
+      setPendingLintToasts(toastMessages);
       
       // --- Collect and merge globalVars from parsed components
       const parsedGlobals: Record<string, any> = {};
@@ -1740,7 +1759,7 @@ export default StandaloneApp;
 function processAppLinting(
   appDef: StandaloneAppDescription,
   metadataProvider: MetadataProvider,
-): null | ComponentDef {
+): { errorComponent: ComponentDef | null; toastMessages: string[] } {
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
   if (lintSeverity !== LintSeverity.Skip) {
@@ -1753,11 +1772,18 @@ function processAppLinting(
       if (lintSeverity === LintSeverity.Warning) {
         allComponentLints.forEach(printComponentLints);
       } else if (lintSeverity === LintSeverity.Error) {
-        return lintErrorsComponent(allComponentLints);
+        return { errorComponent: lintErrorsComponent(allComponentLints), toastMessages: [] };
+      } else if (lintSeverity === LintSeverity.Strict) {
+        allComponentLints.forEach(printComponentLints);
+        const toastMessages = allComponentLints.map(({ componentName, lints }) => {
+          const messages = lints.map(({ message }) => message).join("\n");
+          return `Lint issues in '${componentName}':\n${messages}`;
+        });
+        return { errorComponent: null, toastMessages };
       }
     }
-    return null;
   }
+  return { errorComponent: null, toastMessages: [] };
 }
 
 function discoverCompilationDependencies({

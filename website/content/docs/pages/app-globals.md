@@ -152,7 +152,7 @@ appGlobals: {
 ### `lintSeverity`
 
 ```ts
-lintSeverity?: "warning" | "error" | "skip"; // default: "warning"
+lintSeverity?: "warning" | "error" | "strict" | "skip"; // default: "warning"
 ```
 
 Controls how the XMLUI engine reports markup linting issues at startup.
@@ -161,6 +161,7 @@ Controls how the XMLUI engine reports markup linting issues at startup.
 |---|---|
 | `"warning"` | Issues are printed to the browser console as warnings (default). |
 | `"error"` | Issues block app rendering and are displayed as an error screen. |
+| `"strict"` | Issues are displayed as toast notifications in the UI and also printed to the browser console. |
 | `"skip"` | Linting is disabled entirely. |
 
 ```ts
