@@ -28,6 +28,7 @@ export interface ContainerAction {
     isRefetching?: any;
     loaded?: any;
     pageInfo?: any;
+    responseHeaders?: Record<string, string>;
     path?: any;
     target?: any;
     actionType?: any;

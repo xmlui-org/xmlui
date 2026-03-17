@@ -278,6 +278,7 @@ type APICall = {
   onSuccess?: string | ((...args: any[]) => Promise<any>);
   onProgress?: string;
   onError?: string;
+  onResponseHeaders?: (headers: Record<string, string>) => void;
 } & ApiOperationDef;
 
 export async function callApi(
@@ -302,6 +303,7 @@ export async function callApi(
     uid: actionUid,
     onProgress,
     omitTransactionId,
+    onResponseHeaders,
 
     //operation
     headers,
@@ -406,6 +408,7 @@ export async function callApi(
       omitTransactionId,
       resolveBindingExpressions,
       onProgress: _onProgress,
+      onResponseHeaders,
     });
 
     // Trace API call completion

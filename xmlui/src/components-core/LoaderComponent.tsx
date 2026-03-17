@@ -99,8 +99,8 @@ export function LoaderComponent({
   );
 
   const memoedLoaderLoaded = useCallback(
-    (data: any, pageInfo: any) => {
-      dispatch(loaderLoaded(uid, data, pageInfo));
+    (data: any, pageInfo: any, responseHeaders?: Record<string, string>) => {
+      dispatch(loaderLoaded(uid, data, pageInfo, responseHeaders));
     },
     [dispatch, uid],
   );
@@ -158,13 +158,14 @@ function loaderIsRefetchingChanged(uid: symbol, isRefetching: boolean) {
 }
 
 // Signs that a particular loader (`uid`) has just fetched its data (`pageInfo`) successfully.
-function loaderLoaded(uid: symbol, data: any, pageInfo?: any) {
+function loaderLoaded(uid: symbol, data: any, pageInfo?: any, responseHeaders?: Record<string, string>) {
   return {
     type: ContainerActionKind.LOADER_LOADED,
     payload: {
       uid,
       data,
       pageInfo,
+      responseHeaders,
     },
   };
 }

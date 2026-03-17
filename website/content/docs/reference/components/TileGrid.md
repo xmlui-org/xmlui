@@ -402,6 +402,65 @@ The `$selected` context variable reflects the tile's selection state inside the 
 
 The template used to render each tile. Use the [`$item`](#item) context variable to access the current data item, [`$itemIndex`](#itemIndex) for the zero-based index, and [`$selected`](#selected) to respond to the tile's selection state.
 
+### `itemUserSelect` [#itemuserselect]
+
+> [!DEF]  default: **"none"**
+
+This property controls whether users can select text within tiles.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected **(default)** |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
+Controls whether users can select text within tiles.
+
+Available values: `auto` (default text selection behavior), `text` (text can be selected), `none` (text cannot be selected), `contain` (selection is contained within this element), `all` (entire element content is selected as one unit).
+
+```xmlui copy /itemUserSelect="text"/
+<App>
+  <TileGrid
+    data="{[...]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemUserSelect="text"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: itemUserSelect"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'},
+      {id: 5, name: 'Milk', category: 'dairy'},
+      {id: 6, name: 'Cheese', category: 'dairy'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemUserSelect="text"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
 ### `itemWidth` [#itemwidth]
 
 > [!DEF]  default: **"120px"**
@@ -695,3 +754,8 @@ This component does not expose any methods.
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-item-TileGrid | $borderRadius | $borderRadius |
 | [offset](/docs/styles-and-themes/common-units/#size-values)Horizontal-checkbox-TileGrid | 4px | 4px |
 | [offset](/docs/styles-and-themes/common-units/#size-values)Vertical-checkbox-TileGrid | 4px | 4px |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--focus | $color-primary-500 | $color-primary-500 |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-item-TileGrid--focus | -2px | -2px |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-item-TileGrid--focus | solid | solid |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-item-TileGrid--focus | 2px | 2px |
+| userSelect-item-TileGrid | none | none |

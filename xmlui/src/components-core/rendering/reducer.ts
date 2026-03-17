@@ -52,7 +52,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         break;
       }
       case ContainerActionKind.LOADER_LOADED: {
-        const { data, pageInfo } = action.payload;
+        const { data, pageInfo, responseHeaders } = action.payload;
         // Preserve any existing state properties (e.g., custom component state)
         state[uid] = {
           ...state[uid],
@@ -61,6 +61,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
           inProgress: false,
           loaded: data !== undefined,
           pageInfo,
+          responseHeaders,
         };
         storeNextValue(state[uid]);
         break;

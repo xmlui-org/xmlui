@@ -180,6 +180,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   
   // Track last result and execution context for cancel() method
   const lastResultRef = useRef<any>(null);
+  const lastResponseHeadersRef = useRef<Record<string, string> | undefined>(undefined);
   const executionContextRef = useRef<ActionExecutionContext | null>(null);
 
   // Initialize state with default values
@@ -192,6 +193,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         loaded: false,
         lastResult: undefined,
         lastError: undefined,
+        lastResponseHeaders: undefined,
         // Expose context variables for deferred mode
         ...(deferredMode && { 
           $statusData: deferredStateRef.current.statusData,
@@ -462,6 +464,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
       }
       
       try {
+        let capturedResponseHeaders: Record<string, string> | undefined;
         const result = await callApi(
           executionContext,
           {
@@ -473,6 +476,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             onProgress: node.events?.progress,
             onBeforeRequest: node.events?.beforeRequest,
             onSuccess: onSuccess ?? node.events?.success,
+            onResponseHeaders: (h) => { capturedResponseHeaders = h; lastResponseHeadersRef.current = h; },
           },
           {
             resolveBindingExpressions: true,
@@ -488,7 +492,8 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             inProgress: false, 
             loaded: true, 
             lastResult: result,
-            lastError: undefined 
+            lastError: undefined,
+            lastResponseHeaders: capturedResponseHeaders,
           });
         }
         

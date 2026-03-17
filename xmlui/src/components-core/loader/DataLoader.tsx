@@ -398,6 +398,9 @@ function DataLoader({
             },
             resolveBindingExpressions: true,
             omitTransactionId: !!(loader.props as any).omitTransactionId,
+            onResponseHeaders: (h) => {
+              pendingResponseHeadersRef.current = h;
+            },
           });
 
           // Trace API call completion
@@ -452,6 +455,8 @@ function DataLoader({
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };
+
+  const pendingResponseHeadersRef = useRef<Record<string, string> | undefined>(undefined);
 
   const loadingToastIdRef = useRef<string | undefined>(undefined);
   const inProgress: LoaderInProgressChangedFn = useCallback(
@@ -513,7 +518,7 @@ function DataLoader({
         pendingTraceIdRef.current = undefined;
       }
 
-      loaderLoaded(data, pageInfo);
+      loaderLoaded(data, pageInfo, data !== undefined ? pendingResponseHeadersRef.current : undefined);
       // console.log("[DataLoader] After loaderLoaded() call");
 
       const completedMessage = extractParam(

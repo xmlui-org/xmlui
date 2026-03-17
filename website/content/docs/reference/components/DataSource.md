@@ -148,6 +148,12 @@ Provide data directly instead of fetching from a URL. When set, the component re
 
 When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
 
+### `omitTransactionId` [#omittransactionid]
+
+> [!DEF]  default: **"false"**
+
+When set to `true`, the `x-ue-client-tx-id` request header will not be added to outgoing requests. Use this when the target API does not allow custom request headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).
+
 ### `pollIntervalInSeconds` [#pollintervalinseconds]
 
 Set the interval for periodic data fetching. If the data changes on refresh, XMLUI will re-render components that refer directly or indirectly to the `DataSource`. If not set or set to zero, the component does not poll for data.
@@ -323,6 +329,12 @@ This property indicates if the data has been loaded.
 This method requests the re-fetch of the data.
 
 **Signature**: `refetch(): void`
+
+### `responseHeaders` [#responseheaders]
+
+This property retrieves the HTTP response headers from the last successful fetch. Returns an object whose keys are header names and values are header values, or `undefined` if no fetch has completed yet.
+
+**Signature**: `get responseHeaders(): Record<string, string> | undefined`
 
 ### `value` [#value]
 
