@@ -72,7 +72,7 @@ $borderColor-SearchFooter: createThemeVar("borderColor-#{$componentListFooter}")
 
   &.inDrawer {
     width: var(--radix-popover-trigger-width);
-    z-index: 1;
+    z-index: 2;
   }
 
   .panelFooter {
