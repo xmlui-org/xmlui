@@ -7,7 +7,6 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
   color: "$color-primary-500",
   themeVars: {
     // --- App layout
-    "width-navPanel-App": "280px",
     "maxWidth-content-App": "1000px",
     "maxWidth-content-DocumentPageNoTOC": "700px",
     "height-AppHeader": "44px",
@@ -27,10 +26,9 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "$color-surface-0",
-    "fontSize": "15px",
-    "fontFamily-monospace":
-      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    backgroundColor: "$color-surface-0",
+    fontSize: "15px",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
@@ -59,8 +57,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
     "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
     "textColor-TableOfContentsItem--active": "$color-surface-900",
-    "borderLeft-TableOfContentsItem--active":
-      "2px solid $color-surface-900",
+    "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
