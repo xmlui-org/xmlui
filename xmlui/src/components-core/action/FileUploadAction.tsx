@@ -22,6 +22,7 @@ export type UploadActionParams = {
   chunkSizeInBytes?: number;
   onError?: string;
   onProgress?: (...args: any) => void;
+  omitTransactionId?: boolean;
 } & UploadOperationDef;
 
 async function uploadFile(
@@ -42,6 +43,7 @@ async function uploadFile(
     chunkSizeInBytes,
     onProgress,
     fieldName,
+    omitTransactionId,
   }: UploadActionParams,
   { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
@@ -92,6 +94,7 @@ async function uploadFile(
             _onProgress?.(overallProgressEvent);
           },
           resolveBindingExpressions,
+          omitTransactionId,
         });
       }
     } else {
@@ -100,6 +103,7 @@ async function uploadFile(
         params: stateContext,
         onUploadProgress: _onProgress,
         resolveBindingExpressions,
+        omitTransactionId,
       });
     }
   } catch (e) {
