@@ -615,7 +615,6 @@ export const NumberBox = forwardRef(function NumberBox(
         [styles.valid]: validationStatus === "valid",
         [styles.rtl]: direction === "rtl",
       })}
-      id={id}
       ref={forwardedRef}
       tabIndex={-1}
       onFocus={() => {
@@ -630,8 +629,12 @@ export const NumberBox = forwardRef(function NumberBox(
       <Part partId={PART_INPUT}>
         <input
           id={id}
+          role="spinbutton"
           type="text"
           inputMode="numeric"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={isUsableNumber(valueStrRep, integersOnly) ? toUsableNumber(valueStrRep, integersOnly) as number : undefined}
           className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
@@ -671,7 +674,6 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="up"
               type="button"
-              role="spinbutton"
               variant={"ghost"}
               themeColor={"secondary"}
               tabIndex={-1}
@@ -687,7 +689,6 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="down"
               type="button"
-              role="spinbutton"
               tabIndex={-1}
               variant={"ghost"}
               themeColor={"secondary"}
