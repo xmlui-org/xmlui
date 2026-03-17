@@ -1,7 +1,7 @@
 {
   "name": "xmlui-website",
   "private": true,
-  "version": "0.0.15",
+  "version": "0.0.16",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
