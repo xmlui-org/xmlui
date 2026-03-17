@@ -16,6 +16,7 @@ export enum LintSeverity {
   Skip,
   Warning,
   Error,
+  Strict,
 }
 
 export enum LintDiagKind {
@@ -47,9 +48,12 @@ export function getLintSeverity(lintSeverityOption: string | undefined): LintSev
     case "skip":
       return LintSeverity.Skip;
       break;
+    case "strict":
+      return LintSeverity.Strict;
+      break;
     default:
       console.warn(
-        `Invalid lint severity option '${lintSeverityOption}'. Must be one of: 'warning', 'error', 'skip'. Defaulting to 'warning'.`,
+        `Invalid lint severity option '${lintSeverityOption}'. Must be one of: 'warning', 'error', 'skip', 'strict'. Defaulting to 'warning'.`,
       );
       return LintSeverity.Warning;
       break;
