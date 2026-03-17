@@ -269,6 +269,7 @@ type APICall = {
   completedNotificationMessage?: string;
   errorNotificationMessage?: string;
   credentials?: "omit" | "same-origin" | "include";
+  omitTransactionId?: boolean;
 
   uid?: string | symbol;
   when?: string;
@@ -300,6 +301,7 @@ export async function callApi(
     errorNotificationMessage,
     uid: actionUid,
     onProgress,
+    omitTransactionId,
 
     //operation
     headers,
@@ -401,6 +403,7 @@ export async function callApi(
       operation,
       params: stateContext,
       transactionId: clientTxId,
+      omitTransactionId,
       resolveBindingExpressions,
       onProgress: _onProgress,
     });

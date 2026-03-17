@@ -250,6 +250,7 @@ export default class RestApiProxy {
     parseOptions,
     resolveBindingExpressions = false,
     transactionId = randomUUID(),
+    omitTransactionId = false,
     onProgress,
   }: {
     abortSignal?: AbortSignal;
@@ -260,6 +261,7 @@ export default class RestApiProxy {
       asFile?: boolean;
     };
     transactionId?: string;
+    omitTransactionId?: boolean;
     resolveBindingExpressions?: boolean;
     onProgress?: OnProgressFn;
   }): Promise<any> => {
@@ -290,6 +292,7 @@ export default class RestApiProxy {
           }
         : undefined,
       transactionId,
+      omitTransactionId,
       onUploadProgress: onProgress,
     });
   };
@@ -301,6 +304,7 @@ export default class RestApiProxy {
     onUploadProgress,
     abortSignal,
     transactionId = randomUUID(),
+    omitTransactionId = false,
     resolveBindingExpressions = false,
   }: {
     abortSignal?: AbortSignal;
@@ -309,6 +313,7 @@ export default class RestApiProxy {
     chunk?: FileChunk;
     onUploadProgress?: OnProgressFn;
     transactionId?: string;
+    omitTransactionId?: boolean;
     resolveBindingExpressions?: boolean;
   }) => {
     const { file, asForm, formParams, fieldName } = this.extractParam(
@@ -355,6 +360,7 @@ export default class RestApiProxy {
         onUploadProgress,
         abortSignal,
         transactionId,
+        omitTransactionId,
       });
     }
 
@@ -384,6 +390,7 @@ export default class RestApiProxy {
               onUploadProgress,
               abortSignal,
               transactionId,
+              omitTransactionId,
             }),
           );
         } catch (e) {
@@ -475,6 +482,7 @@ export default class RestApiProxy {
     onUploadProgress,
     parseResponse = this.tryParseResponse,
     transactionId,
+    omitTransactionId = false,
   }: {
     operation: ApiOperationDef;
     abortSignal?: AbortSignal;
@@ -490,9 +498,15 @@ export default class RestApiProxy {
     onUploadProgress?: OnProgressFn;
     parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
     transactionId: string;
+    omitTransactionId?: boolean;
     resolveBindingExpressions: boolean;
   }) => {
-    const includeClientTxId = method && method !== "get" && !!transactionId;
+    const includeClientTxId =
+      method &&
+      method !== "get" &&
+      !!transactionId &&
+      this.appContext?.appGlobals?.enableTransactionIds !== false &&
+      !omitTransactionId;
     const headersWithoutContentType = { ...this.getHeaders(), ["Content-Type"]: undefined };
     let url = this.generateFullApiUrl(relativePath, queryParams);
     const hasBody = body !== undefined;

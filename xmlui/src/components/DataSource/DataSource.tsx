@@ -122,6 +122,14 @@ export const DataSourceMd = createMetadata({
         "parts. If you do not need this behavior, set this property to `false`.",
       defaultValue: "true",
     },
+    omitTransactionId: {
+      description:
+        "When set to `true`, the `x-ue-client-tx-id` request header will not be added " +
+        "to outgoing requests. Use this when the target API does not allow custom request " +
+        "headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).",
+      valueType: "boolean",
+      defaultValue: "false",
+    },
   },
   events: {
     loaded: {

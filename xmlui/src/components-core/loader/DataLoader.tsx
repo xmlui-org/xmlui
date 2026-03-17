@@ -397,6 +397,7 @@ function DataLoader({
               $pageParams: pageParams,
             },
             resolveBindingExpressions: true,
+            omitTransactionId: !!(loader.props as any).omitTransactionId,
           });
 
           // Trace API call completion
