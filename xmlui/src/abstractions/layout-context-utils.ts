@@ -85,6 +85,25 @@ export function getLayoutPath(context: LayoutContext | undefined): string[] {
 }
 
 /**
+ * Counts how many ancestors (inclusive of `context` itself) satisfy `predicate`.
+ *
+ * @param context   - The starting layout context.
+ * @param predicate - Returns `true` for every node to count.
+ */
+export function countAncestorLayouts(
+  context: LayoutContext | undefined,
+  predicate: (ctx: LayoutContext) => boolean,
+): number {
+  let count = 0;
+  let current = context;
+  while (current !== undefined) {
+    if (predicate(current)) count++;
+    current = current.parent;
+  }
+  return count;
+}
+
+/**
  * Returns a copy of `context` with direct-child-only properties removed.
  * `ignoreLayoutProps` and `wrapChild` are meant for immediate children of a
  * layout container and must not leak through component boundaries when the

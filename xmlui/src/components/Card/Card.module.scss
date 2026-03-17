@@ -32,6 +32,14 @@ $verticalAlignment-title-Card: createThemeVar("verticalAlignment-title-#{$compon
     &:hover {
       background-color: $backgroundColor-Card--hover;
     }
+
+    // Nested Card: tighter padding, sunken background, no outer shadow
+    .wrapper {
+      padding: t.$space-2;
+      background-color: t.$backgroundColor;
+      box-shadow: none;
+    }
+
     .avatarWrapper {
       display: flex;
       flex-direction: row;

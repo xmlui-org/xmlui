@@ -1,6 +1,6 @@
 import styles from "./Heading.module.scss";
 
-import React from "react";
+import React, { type CSSProperties } from "react";
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
@@ -11,6 +11,7 @@ import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
 import { d, createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { countAncestorLayouts } from "../../abstractions/layout-context-utils";
 
 const COMP = "Heading";
 
@@ -176,7 +177,7 @@ export const H1Md = createMetadata({
     [`fontSize-${H1}`]: "$fontSize-2xl",
     [`lineHeight-${H1}`]: "$lineHeight-tight",
     [`marginTop-${H1}`]: "0",
-    [`marginBottom-${H1}`]: "0",
+    [`marginBottom-${H1}`]: "$space-6",
     [`fontSize-${H1}-markdown`]: "$fontSize-2xl",
     [`marginTop-${H1}-markdown`]: "0",
     [`marginBottom-${H1}-markdown`]: "$space-6",
@@ -208,7 +209,7 @@ export const H2Md = createMetadata({
     [`fontSize-${H2}`]: "$fontSize-xl",
     [`lineHeight-${H2}`]: "$lineHeight-tight",
     [`marginTop-${H2}`]: "0",
-    [`marginBottom-${H2}`]: "0",
+    [`marginBottom-${H2}`]: "$space-4",
     [`fontSize-${H2}-markdown`]: "$fontSize-xl",
     [`marginTop-${H2}-markdown`]: "$space-10",
     [`marginBottom-${H2}-markdown`]: "$space-3",
@@ -240,7 +241,7 @@ export const H3Md = createMetadata({
     [`fontSize-${H3}`]: "$fontSize-lg",
     [`lineHeight-${H3}`]: "$lineHeight-tight",
     [`marginTop-${H3}`]: "0",
-    [`marginBottom-${H3}`]: "0",
+    [`marginBottom-${H3}`]: "$space-3",
     [`fontSize-${H3}-markdown`]: "$fontSize-lg",
     [`marginTop-${H3}-markdown`]: "$space-6",
     [`marginBottom-${H3}-markdown`]: "$space-2",
@@ -272,7 +273,7 @@ export const H4Md = createMetadata({
     [`fontSize-${H4}`]: "$fontSize-base",
     [`lineHeight-${H4}`]: "$lineHeight-tight",
     [`marginTop-${H4}`]: "0",
-    [`marginBottom-${H4}`]: "0",
+    [`marginBottom-${H4}`]: "$space-2",
     [`fontSize-${H4}-markdown`]: "$fontSize-base",
     [`marginTop-${H4}-markdown`]: "$space-5",
     [`marginBottom-${H4}-markdown`]: "$space-1",
@@ -304,7 +305,7 @@ export const H5Md = createMetadata({
     [`fontSize-${H5}`]: "$fontSize-sm",
     [`lineHeight-${H5}`]: "$lineHeight-tight",
     [`marginTop-${H5}`]: "0",
-    [`marginBottom-${H5}`]: "0",
+    [`marginBottom-${H5}`]: "$space-1",
     [`fontSize-${H5}-markdown`]: "$fontSize-sm",
     [`marginTop-${H5}-markdown`]: "0",
     [`marginBottom-${H5}-markdown`]: "$space-0",
@@ -336,7 +337,7 @@ export const H6Md = createMetadata({
     [`fontSize-${H6}`]: "$fontSize-xs",
     [`lineHeight-${H6}`]: "$lineHeight-tight",
     [`marginTop-${H6}`]: "0",
-    [`marginBottom-${H6}`]: "0",
+    [`marginBottom-${H6}`]: "$space-1",
     [`fontSize-${H6}-markdown`]: "$fontSize-xs",
     [`marginTop-${H6}-markdown`]: "0",
     [`marginBottom-${H6}-markdown`]: "$space-0",
@@ -349,6 +350,31 @@ export const H6Md = createMetadata({
   },
 });
 
+// Font-size CSS variables for H1→H6 in descending order.
+// Using per-heading variables (not raw scale tokens) so theme overrides
+// on e.g. fontSize-H2 are respected when H1 is demoted inside a Card.
+const HEADING_FONT_SIZES = [
+  "var(--xmlui-fontSize-H1)", // 0 — H1 baseline
+  "var(--xmlui-fontSize-H2)", // 1
+  "var(--xmlui-fontSize-H3)", // 2
+  "var(--xmlui-fontSize-H4)", // 3
+  "var(--xmlui-fontSize-H5)", // 4
+  "var(--xmlui-fontSize-H6)", // 5
+];
+
+/**
+ * Returns the CSS font-size value for a heading at `baseIndex` demoted by
+ * `cardDepth` nesting levels, or `undefined` when no shift is needed.
+ */
+function headingFontSizeAtCardDepth(
+  baseIndex: number,
+  cardDepth: number,
+): string | undefined {
+  if (cardDepth === 0) return undefined;
+  const shifted = Math.min(baseIndex + cardDepth, HEADING_FONT_SIZES.length - 1);
+  return HEADING_FONT_SIZES[shifted];
+}
+
 type HeadingComponentDef = ComponentDef<typeof HeadingMd>;
 
 type RenderHeadingProps = {
@@ -358,6 +384,7 @@ type RenderHeadingProps = {
   level: string;
   renderChild: RenderChildFn;
   registerComponentApi?: (api: any) => void;
+  sx?: CSSProperties;
 };
 
 function renderHeading({
@@ -367,6 +394,7 @@ function renderHeading({
   level,
   renderChild,
   registerComponentApi,
+  sx,
 }: RenderHeadingProps) {
   const { maxLines, preserveLinebreaks, ellipses, showAnchor, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
@@ -387,6 +415,7 @@ function renderHeading({
       classes={classes}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
       registerComponentApi={registerComponentApi}
+      sx={sx}
       {...resolveAndCleanProps(restProps, extractValue)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
@@ -412,14 +441,14 @@ export const headingComponentRenderer = createComponentRenderer(
 export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    const fontSize = headingFontSizeAtCardDepth(0, cardDepth);
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0, ...(fontSize && { fontSize }) }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h1",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h1", renderChild, registerComponentApi, sx,
     } as any);
   },
 );
@@ -427,14 +456,14 @@ export const h1ComponentRenderer = createComponentRenderer(
 export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    const fontSize = headingFontSizeAtCardDepth(1, cardDepth);
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0, ...(fontSize && { fontSize }) }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h2",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h2", renderChild, registerComponentApi, sx,
     } as any);
   },
 );
@@ -442,14 +471,14 @@ export const h2ComponentRenderer = createComponentRenderer(
 export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    const fontSize = headingFontSizeAtCardDepth(2, cardDepth);
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0, ...(fontSize && { fontSize }) }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h3",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h3", renderChild, registerComponentApi, sx,
     } as any);
   },
 );
@@ -457,14 +486,14 @@ export const h3ComponentRenderer = createComponentRenderer(
 export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    const fontSize = headingFontSizeAtCardDepth(3, cardDepth);
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0, ...(fontSize && { fontSize }) }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h4",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h4", renderChild, registerComponentApi, sx,
     } as any);
   },
 );
@@ -472,14 +501,14 @@ export const h4ComponentRenderer = createComponentRenderer(
 export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    const fontSize = headingFontSizeAtCardDepth(4, cardDepth);
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0, ...(fontSize && { fontSize }) }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h5",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h5", renderChild, registerComponentApi, sx,
     } as any);
   },
 );
@@ -487,14 +516,14 @@ export const h5ComponentRenderer = createComponentRenderer(
 export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
+  ({ node, extractValue, classes, renderChild, registerComponentApi, layoutContext }) => {
+    const cardDepth = countAncestorLayouts(layoutContext, (ctx) => ctx.host === "Card");
+    // H6 is already the smallest size — no fontSize shift possible, only margin suppression
+    const sx: CSSProperties | undefined = cardDepth > 0
+      ? { marginTop: 0, marginBottom: 0 }
+      : undefined;
     return renderHeading({
-      node,
-      extractValue,
-      classes,
-      level: "h6",
-      renderChild,
-      registerComponentApi,
+      node, extractValue, classes, level: "h6", renderChild, registerComponentApi, sx,
     } as any);
   },
 );

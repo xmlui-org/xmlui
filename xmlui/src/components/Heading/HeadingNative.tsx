@@ -18,7 +18,6 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import type { HeadingLevel } from "./abstractions";
-import { Link } from "react-router-dom";
 import { useAppContext } from "../../components-core/AppContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";

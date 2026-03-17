@@ -126,7 +126,7 @@ export const CardMd = createMetadata({
     [`boxShadow-${COMP}`]: "none",
     [`backgroundColor-${COMP}`]: "$color-surface-raised",
     [`backgroundColor-${COMP}--hover`]: "$color-surface-raised",
-    [`gap-${COMP}`]: "var(--stack-gap-default)",
+    [`gap-${COMP}`]: "$space-2",
     [`gap-title-${COMP}`]: "$gap-none",
     [`gap-avatar-${COMP}`]: "$gap-normal",
     [`verticalAlignment-title-${COMP}`]: "center",
@@ -164,6 +164,6 @@ export const cardComponentRenderer = wrapComponent(
   CardMd,
   {
     exposeRegisterApi: true,
-    childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+    childrenLayoutContext: { type: "Stack", orientation: "vertical", host: "Card" },
   },
 );

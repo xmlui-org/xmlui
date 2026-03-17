@@ -270,7 +270,7 @@ function eventNameToTraceKind(xmluiName: string): string | undefined {
 function endTrace(traceId: string | undefined, traceKind: string | undefined): void {
   if (!traceId) return;
   if (traceKind === "value:change") {
-    Promise.resolve().then(() => popTrace());
+    void Promise.resolve().then(() => popTrace());
   } else {
     popTrace();
   }
