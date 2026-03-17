@@ -1,0 +1,109 @@
+<!--
+  Reproduction / exploration for issue #2976:
+  "Support scroll-snap layout props on containers"
+
+  The use case: a StickyBox header sits at the top of a scrollable list of cards.
+  As the user scrolls, cards are visually clipped — part of each card disappears
+  behind the sticky header, giving a jarring cut-off effect.
+
+  CURRENT BEHAVIOUR (before the fix):
+    scrollSnapType and scrollSnapAlign are not supported as layout props, so there
+    is no way to make cards snap cleanly to the bottom edge of the sticky header.
+    Scroll freely — cards will stop at arbitrary positions under the header.
+
+  DESIRED BEHAVIOUR (after implementing the feature):
+    Add  scrollSnapType="y mandatory"  and  scrollPaddingTop="<headerHeight>"  to
+    the scroll container, and  scrollSnapAlign="start"  to each card.  Every card
+    will then snap so its top edge aligns exactly at the sticky-header boundary.
+
+  TO ACTIVATE snap after implementation, uncomment the two attributes marked
+  SNAP-CONTAINER on the outer VStack, and the scrollSnapAlign="start" on every Card.
+
+  Demo layout
+  ──────────────────────────────────────────────────────────────────────
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  StickyBox  (position: sticky, sticks at the top of the viewport)   │
+  └─────────────────────────────────────────────────────────────────────┘
+  │  Card 1  (tall — 300 px)                                            │
+  │  Card 2  (tall — 300 px)                                            │
+  │  Card 3  (tall — 300 px)                                            │
+  │  ...                                                                │
+  Scroll this column: cards will clip behind the sticky header.
+  ──────────────────────────────────────────────────────────────────────
+-->
+<App>
+  <!--
+    SNAP-CONTAINER: when scroll-snap is implemented, add to this VStack:
+      scrollSnapType="y mandatory"
+      scrollPaddingTop="88px"   (match the sticky header's rendered height)
+  -->
+  <VStack height="100vh" overflowY="auto" gap="0px" testId="scroll-container">
+
+    <!-- Sticky header that sits above the card list -->
+    <StickyBox to="top">
+      <VStack backgroundColor="$color-surface-raised" padding="16px" gap="4px"
+              borderBottom="1px solid $color-border"
+              boxShadow="0 2px 8px rgba(0,0,0,0.15)">
+        <Text variant="heading-2" value="Issue #2976 — Scroll Snap" />
+        <Text
+          value="Scroll the list below. Without scroll-snap, cards stop at arbitrary positions and are clipped behind this header. After the feature lands, add scrollSnapType + scrollPaddingTop here and scrollSnapAlign='start' to each Card."
+          color="$color-text-secondary"
+        />
+      </VStack>
+    </StickyBox>
+
+    <!-- List of tall cards — each ~300 px so partial clipping behind header is obvious -->
+    <VStack padding="16px" gap="16px">
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" once the feature is implemented -->
+      <Card height="300px" testId="card-1">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 1" />
+          <Text value="Scroll past this. Without snap it stops at an arbitrary position — part of the card hides behind the sticky header above." />
+          <Text value="With scrollSnapAlign='start' here, and scrollSnapType='y mandatory' + scrollPaddingTop on the outer VStack, this card snaps cleanly to the sticky-header boundary." />
+        </VStack>
+      </Card>
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" -->
+      <Card height="300px" testId="card-2">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 2" />
+          <Text value="Another tall card. Without snap, half of it can disappear behind the sticky header mid-scroll." />
+        </VStack>
+      </Card>
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" -->
+      <Card height="300px" testId="card-3">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 3" />
+          <Text value="Card 3 content." />
+        </VStack>
+      </Card>
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" -->
+      <Card height="300px" testId="card-4">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 4" />
+          <Text value="Card 4 content." />
+        </VStack>
+      </Card>
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" -->
+      <Card height="300px" testId="card-5">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 5" />
+          <Text value="Card 5 content." />
+        </VStack>
+      </Card>
+
+      <!-- SNAP-ITEM: add scrollSnapAlign="start" -->
+      <Card height="300px" testId="card-6">
+        <VStack padding="24px" gap="12px">
+          <Text variant="heading-3" value="Card 6" />
+          <Text value="Card 6 — the last card in the list." />
+        </VStack>
+      </Card>
+
+    </VStack>
+  </VStack>
+</App>
