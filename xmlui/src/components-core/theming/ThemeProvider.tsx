@@ -304,14 +304,40 @@ function ThemeProvider({
     return defaultTheme;
   });
 
+  // Sync activeThemeId when defaultTheme or availableThemeIds change (HMR use case).
+  // - Skip the first run (initial value already set by useState).
+  // - When only availableThemeIds changes (async theme loading in standalone mode),
+  //   do NOT reset — that would override a theme restored from localStorage by App.
+  // - Only reset when defaultTheme itself changes (explicit prop update / HMR).
+  const prevDefaultThemeRef = useRef(defaultTheme);
+  const isThemeInitialMount = useRef(true);
   useIsomorphicLayoutEffect(() => {
-    //we sync the activeThemeId with the default theme (mostly for HMR)
+    const prevDefault = prevDefaultThemeRef.current;
+    prevDefaultThemeRef.current = defaultTheme;
+
+    console.log('[ThemeProvider] theme effect fired, isThemeInitialMount:', isThemeInitialMount.current, 'prevDefault:', prevDefault, 'defaultTheme:', defaultTheme, 'availableThemeIds:', availableThemeIds);
+
+    if (isThemeInitialMount.current) {
+      isThemeInitialMount.current = false;
+      return;
+    }
+
+    // availableThemeIds changed but defaultTheme is the same → do nothing
+    if (prevDefault === defaultTheme) return;
+
+    // defaultTheme changed (HMR or prop update) → sync to new default
     if (defaultTheme && availableThemeIds.includes(defaultTheme)) {
+      console.log('[ThemeProvider] defaultTheme changed, setting activeThemeId to:', defaultTheme);
       setActiveThemeId(defaultTheme);
     } else {
+      console.log('[ThemeProvider] defaultTheme changed, setting activeThemeId to first available:', availableThemeIds[0]);
       setActiveThemeId(availableThemeIds[0]);
     }
   }, [availableThemeIds, defaultTheme]);
+
+  useEffect(() => {
+    console.log('[ThemeProvider] activeThemeId changed to:', activeThemeId);
+  }, [activeThemeId]);
 
   const activeTheme: ThemeDefinition = useMemo(() => {
     let foundTheme: ThemeDefinition;

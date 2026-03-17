@@ -87,17 +87,24 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.autoDetectTone,
     },
-    persistTone: {
+    persistTheme: {
       description:
-        'When set to `true`, the current theme tone ("light" or "dark") is automatically ' +
-        'saved to `localStorage` and restored on the next visit. The persisted value takes ' +
-        'precedence over `defaultTone` and `autoDetectTone`.',
+        'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
+        'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
+        'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
       valueType: "boolean",
-      defaultValue: defaultProps.persistTone,
+      defaultValue: defaultProps.persistTheme,
+    },
+    themeStorageKey: {
+      description:
+        'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
+        'Change this if you need to namespace the key per-app or per-user.',
+      valueType: "string",
+      defaultValue: defaultProps.themeStorageKey,
     },
     toneStorageKey: {
       description:
-        'The `localStorage` key used to persist the tone when `persistTone` is `true`. ' +
+        'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
         'Change this if you need to namespace the key per-app or per-user.',
       valueType: "string",
       defaultValue: defaultProps.toneStorageKey,
@@ -264,8 +271,10 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       defaultTone={extractValue(node.props.defaultTone)}
       defaultTheme={extractValue(node.props.defaultTheme)}
       autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
-      persistTone={extractValue.asOptionalBoolean(node.props.persistTone, false)}
+      persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
+      themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
+
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}
       footer={renderChild(Footer)}
