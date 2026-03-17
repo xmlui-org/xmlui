@@ -298,9 +298,7 @@ function DrawerNavPanel({
     <NavPanelContext.Provider value={contextValue}>
       <div
         {...rest}
-        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
-          [styles.hasFooter]: hasFooter,
-        })}
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.hasFooter]: hasFooter })}
         style={style}
       >
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
