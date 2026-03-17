@@ -42,6 +42,8 @@ type ToggleProps = {
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
   forceHover?: boolean;
+  tabIndex?: number;
+  "aria-label"?: string;
 };
 
 export const defaultProps: Pick<
@@ -78,6 +80,8 @@ export const Toggle = forwardRef(function Toggle(
     registerComponentApi,
     inputRenderer,
     forceHover = false,
+    tabIndex,
+    "aria-label": ariaLabel,
     ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
@@ -178,6 +182,8 @@ export const Toggle = forwardRef(function Toggle(
           role={variant}
           checked={legitValue}
           disabled={!enabled}
+          tabIndex={tabIndex}
+          aria-label={ariaLabel}
           required={required}
           readOnly={readOnly}
           aria-readonly={readOnly}
@@ -215,6 +221,8 @@ export const Toggle = forwardRef(function Toggle(
     style,
     id,
     enabled,
+    tabIndex,
+    ariaLabel,
     handleOnBlur,
     handleOnFocus,
     onInputChange,

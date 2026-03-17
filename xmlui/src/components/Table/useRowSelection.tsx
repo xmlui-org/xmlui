@@ -535,9 +535,13 @@ export default function useRowSelection({
     }
   });
 
+  // Keep a ref to the callback so the effect below only fires when selectedItems
+  // changes — not when the parent re-renders and passes a new function reference.
+  const onSelectionDidChangeRef = useRef(onSelectionDidChange);
+  onSelectionDidChangeRef.current = onSelectionDidChange;
+
   useEffect(() => {
-    // console.log("selection DID CHANGE?");
-    void onSelectionDidChange?.(selectedItems);
+    void onSelectionDidChangeRef.current?.(selectedItems);
     if (selectedItems.length > 0 && typeof window !== "undefined") {
       const w = window as any;
       if (Array.isArray(w._xsLogs)) {
@@ -553,7 +557,7 @@ export default function useRowSelection({
         });
       }
     }
-  }, [selectedItems, onSelectionDidChange]);
+  }, [selectedItems]);
 
   /**
    * This operation checks or clears all rows

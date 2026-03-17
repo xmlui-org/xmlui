@@ -399,6 +399,88 @@ test.describe("Selection", () => {
 });
 
 // =============================================================================
+// hideSelectionCheckboxes property
+// =============================================================================
+
+test.describe("hideSelectionCheckboxes property", () => {
+  test("hides checkboxes when true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        hideSelectionCheckboxes="true"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    const checkboxes = page.getByRole("checkbox");
+    await expect(checkboxes).toHaveCount(0);
+  });
+
+  test("selection still works via click when checkboxes are hidden", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        hideSelectionCheckboxes="true"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("Ctrl+click multi-selection works when checkboxes are hidden", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+        hideSelectionCheckboxes="true"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await cells.nth(1).click({ modifiers: ["Meta"] });
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("checkboxes are visible when hideSelectionCheckboxes is false (default)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    const checkboxes = page.getByRole("checkbox");
+    await expect(checkboxes.first()).toBeVisible();
+  });
+});
+
+// =============================================================================
 // STEP 6: Keyboard Shortcuts + Double-click
 // =============================================================================
 
