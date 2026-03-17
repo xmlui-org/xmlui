@@ -193,7 +193,7 @@ export const FormItem = memo(function FormItem({
   invalidMessages,
   validationResult,
   validationInProgress,
-  layoutContext, // Destructured to prevent passing to ItemWithLabel
+  layoutContext,
   ...rest
 }: Props & { layoutContext?: any }) {
   const validations: FormItemValidations = useShallowCompareMemoize({
@@ -549,6 +549,7 @@ export const FormItem = memo(function FormItem({
         requireLabelMode={requireLabelMode ?? itemRequireLabelMode}
         className={classnames(classes?.[COMPONENT_PART_KEY], className)}
         validationResult={validationResult}
+        layoutContext={layoutContext}
       >
         {formControl}
       </ItemWithLabel>

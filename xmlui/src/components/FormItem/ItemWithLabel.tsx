@@ -97,6 +97,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+
+  // When rendered inside a horizontal Stack, validation messages must not push sibling
+  // inputs out of alignment, and required markers should reserve consistent space so
+  // all labels in the same row have the same height.
+  const isInHorizontalStack = layoutContext?.orientation === "horizontal";
+
   const [inputElement, setInputElement] = useState<HTMLElement | null>(null);
   const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
 
@@ -189,8 +195,13 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   })}
                 >
                   {label}
-                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
-                    required && <span className={styles.requiredMark}>*</span>}
+                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && (
+                    required
+                      ? <span className={styles.requiredMark}>*</span>
+                      : isInHorizontalStack
+                        ? <span className={styles.requiredMark} style={{ visibility: "hidden" }}>*</span>
+                        : null
+                  )}
                   {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                     !required && <span className={styles.optionalTag}> (Optional)</span>}
                   {validationInProgress && (
@@ -207,7 +218,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               </Part>
             </div>
           )}
-          <div className={styles.wrapper}>
+          <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
             <Part partId={PART_LABELED_ITEM}>
               {cloneElement(children as ReactElement, {
                 id: !isInputTemplateUsed ? inputId : undefined,
@@ -216,7 +227,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               })}
             </Part>
             {validationResult && (
-              <div className={styles.validationResultWrapper}>{validationResult}</div>
+              <div className={classnames(styles.validationResultWrapper, { [styles.validationMessageAbsolute]: isInHorizontalStack })}>{validationResult}</div>
             )}
           </div>
         </div>
@@ -261,8 +272,13 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 })}
               >
                 {label}
-                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
-                  required && <span className={styles.requiredMark}>*</span>}
+                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && (
+                  required
+                    ? <span className={styles.requiredMark}>*</span>
+                    : isInHorizontalStack
+                      ? <span className={styles.requiredMark} style={{ visibility: "hidden" }}>*</span>
+                      : null
+                )}
                 {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                   !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (
@@ -274,7 +290,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             </Part>
           </div>
         )}
-        <div className={styles.wrapper}>
+        <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
               id: !isInputTemplateUsed ? inputId : undefined,
@@ -283,7 +299,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             })}
           </Part>
           {validationResult && (
-            <div className={styles.validationResultWrapper}>{validationResult}</div>
+            <div className={classnames(styles.validationResultWrapper, { [styles.validationMessageAbsolute]: isInHorizontalStack })}>{validationResult}</div>
           )}
         </div>
       </div>

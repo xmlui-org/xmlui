@@ -1,4 +1,5 @@
 import React from "react";
+import type { CSSProperties } from "react";
 
 import styles from "./Stack.module.scss";
 
@@ -377,6 +378,33 @@ function renderStack({
     throw new NotAComponentDefError();
   }
 
+  // --- Auto-spacing experiments using LayoutContext depth ---
+  //
+  // These experiments demonstrate how to use the nesting depth of the layout context
+  // to automatically adjust spacing without requiring explicit property settings.
+  //
+  // When this Stack is rendered inside an existing layout context (depth >= 0), we
+  // can infer that it is nested and apply context-sensitive defaults.
+  const parentDepth = layoutContext?.depth ?? -1;
+  const isNested = parentDepth >= 0;
+
+  // Experiment 1: Auto-tight gap for nested Stacks.
+  // Real-life scenario: a content area has sections (top-level VStack with normal gap),
+  // and each section contains a sub-list or form (nested VStack). The nested one
+  // should naturally use a tighter gap without requiring an explicit gap="$gap-tight".
+  const autoGapStyle: CSSProperties | undefined =
+    !node.props?.gap && isNested ? { gap: "var(--xmlui-gap-tight)" } : undefined;
+
+  // Experiment 2: Auto-center vertical alignment for nested horizontal Stacks.
+  // Real-life scenario: toolbar rows and button groups placed inside a content VStack
+  // almost always want their children vertically centered. Instead of writing
+  // verticalAlignment="center" on every HStack inside another layout, the context
+  // detects the nesting and applies it automatically.
+  const effectiveVerticalAlignment =
+    !node.props?.verticalAlignment && orientation === "horizontal" && isNested
+      ? "center"
+      : verticalAlignment;
+
   // If any direct child carries a dock prop, delegate to DockPanel layout.
   const allChildren = (Array.isArray(node.children) ? node.children : [node.children]).filter(
     (child) => child != null
@@ -398,7 +426,7 @@ function renderStack({
         columnGap={columnGap}
         rowGap={rowGap}
         itemWidth={itemWidth}
-        verticalAlignment={verticalAlignment || "start"}
+        verticalAlignment={effectiveVerticalAlignment || "start"}
         scrollStyle={scrollStyle as any}
         showScrollerFade={showScrollerFade}
         onContextMenu={lookupEventHandler("contextMenu")}
@@ -444,12 +472,13 @@ function renderStack({
     <Stack
       orientation={orientation}
       horizontalAlignment={horizontalAlignment}
-      verticalAlignment={verticalAlignment}
+      verticalAlignment={effectiveVerticalAlignment}
       reverse={extractValue(node.props?.reverse)}
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
+      style={autoGapStyle}
       classes={classes}
       onClick={lookupEventHandler("click")}
       onContextMenu={lookupEventHandler("contextMenu")}

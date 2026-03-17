@@ -7,7 +7,7 @@ import {
   useMemo,
 } from "react";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { LayoutContext, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { FormItemValidations, ValidationSeverity } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { useIsInsideFormItem } from "./FormItemNative";
@@ -45,6 +45,7 @@ type FormBindingWrapperProps = {
   invalidMessages?: string[];
   validationResult?: ReactNode;
   validationInProgress?: boolean;
+  layoutContext?: LayoutContext;
 };
 
 export function FormBindingWrapper({
@@ -66,6 +67,7 @@ export function FormBindingWrapper({
   invalidMessages,
   validationResult,
   validationInProgress,
+  layoutContext,
 }: FormBindingWrapperProps) {
   const validations = useShallowCompareMemoize(validationsInput);
   const defaultId = useId();
@@ -183,6 +185,7 @@ export function FormBindingWrapper({
       cloneStyle={true}
       validationResult={validationResult}
       requireLabelMode={requireLabelMode ?? formRequireLabelMode}
+      layoutContext={layoutContext}
     >
       {enhancedInput}
     </ItemWithLabel>

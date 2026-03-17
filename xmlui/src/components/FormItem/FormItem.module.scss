@@ -55,7 +55,7 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
 
     &.start {
       flex-direction: row;
-      align-items: flex-start;
+      align-items: center;
       justify-content: start;
       gap: 0.5em;
     }
@@ -125,6 +125,21 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
 
   .validationResultWrapper {
     width: 100%;
+  }
+
+  // When a FormItem is inside a horizontal Stack, the validation message must not
+  // push sibling inputs out of alignment. We anchor the wrapper and float the
+  // message absolutely below the input so it overlaps rather than reflows.
+  .validationAnchor {
+    position: relative;
+  }
+
+  .validationMessageAbsolute {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    white-space: nowrap;
+    z-index: 1;
   }
 
   .helperTextContainer {
