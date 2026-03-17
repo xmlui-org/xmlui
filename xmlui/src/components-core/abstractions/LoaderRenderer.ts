@@ -24,7 +24,7 @@ export interface LoaderRendererDef {
 }
 
 export type LoaderInProgressChangedFn = (isInProgress: boolean) => void;
-export type LoaderLoadedFn = (data: any, pageInfo?: any) => void;
+export type LoaderLoadedFn = (data: any, pageInfo?: any, responseHeaders?: Record<string, string>) => void;
 export type LoaderErrorFn = (error: any) => void;
 export type TransformResultFn = (data: any) => any;
 

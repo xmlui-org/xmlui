@@ -372,6 +372,12 @@ The error from the most recent failed API call execution.
 
 **Signature**: `lastError: any`
 
+### `lastResponseHeaders` [#lastresponseheaders]
+
+This property retrieves the HTTP response headers from the last successful API call execution, or `undefined` if no successful call has completed yet.
+
+**Signature**: `get lastResponseHeaders(): Record<string, string> | undefined`
+
 ### `lastResult` [#lastresult]
 
 The result from the most recent successful API call execution.

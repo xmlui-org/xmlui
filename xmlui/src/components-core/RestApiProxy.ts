@@ -252,6 +252,7 @@ export default class RestApiProxy {
     transactionId = randomUUID(),
     omitTransactionId = false,
     onProgress,
+    onResponseHeaders,
   }: {
     abortSignal?: AbortSignal;
     operation: ApiOperationDef;
@@ -264,12 +265,14 @@ export default class RestApiProxy {
     omitTransactionId?: boolean;
     resolveBindingExpressions?: boolean;
     onProgress?: OnProgressFn;
+    onResponseHeaders?: (headers: Record<string, string>) => void;
   }): Promise<any> => {
     return await this.executeOperation({
       operation,
       abortSignal,
       contextParams: params,
       resolveBindingExpressions,
+      onResponseHeaders,
       parseResponse: parseOptions?.asFile
         ? async (response) => {
             //we can't access content-disposition header if it's a CORS request: The suggested workaround was adding Access-Control-Expose-Headers:Content-Disposition to the response header on the server.
@@ -483,6 +486,7 @@ export default class RestApiProxy {
     parseResponse = this.tryParseResponse,
     transactionId,
     omitTransactionId = false,
+    onResponseHeaders,
   }: {
     operation: ApiOperationDef;
     abortSignal?: AbortSignal;
@@ -500,6 +504,7 @@ export default class RestApiProxy {
     transactionId: string;
     omitTransactionId?: boolean;
     resolveBindingExpressions: boolean;
+    onResponseHeaders?: (headers: Record<string, string>) => void;
   }) => {
     const includeClientTxId =
       method &&
@@ -569,6 +574,10 @@ export default class RestApiProxy {
           withCredentials: credentials === "include",
         });
         setLastApiStatus(transactionId, response.status);
+        if (onResponseHeaders) {
+          const axiosHeaders = response.headers as Record<string, string>;
+          onResponseHeaders(axiosHeaders);
+        }
         return await parseResponse(
           response,
           this.appContext?.appGlobals?.logRestApiErrors ?? false,
@@ -591,6 +600,13 @@ export default class RestApiProxy {
         throw await this.raiseError(response);
       }
       setLastApiStatus(transactionId, response.status);
+      if (onResponseHeaders) {
+        const fetchHeaders: Record<string, string> = {};
+        response.headers.forEach((value: string, key: string) => {
+          fetchHeaders[key] = value;
+        });
+        onResponseHeaders(fetchHeaders);
+      }
       const parsedResponse = await parseResponse(
         response.clone(),
         this.appContext?.appGlobals?.logRestApiErrors ?? false,

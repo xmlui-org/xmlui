@@ -172,5 +172,12 @@ export const DataSourceMd = createMetadata({
       description: "This method requests the re-fetch of the data.",
       signature: "refetch(): void",
     },
+    responseHeaders: {
+      description:
+        "This property retrieves the HTTP response headers from the last successful fetch. " +
+        "Returns an object whose keys are header names and values are header values, or `undefined` " +
+        "if no fetch has completed yet.",
+      signature: "get responseHeaders(): Record<string, string> | undefined",
+    },
   },
 });

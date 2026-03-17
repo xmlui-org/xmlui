@@ -337,6 +337,12 @@ export const APICallMd = createMetadata({
       description: "The error from the most recent failed API call execution.",
       signature: "lastError: any",
     },
+    lastResponseHeaders: {
+      description:
+        "This property retrieves the HTTP response headers from the last successful " +
+        "API call execution, or `undefined` if no successful call has completed yet.",
+      signature: "get lastResponseHeaders(): Record<string, string> | undefined",
+    },
     stopPolling: {
       description: "Manually stop polling in deferred mode. The operation continues on the server.",
       signature: "stopPolling(): void",
