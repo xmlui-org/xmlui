@@ -319,6 +319,55 @@ This property only has an effect when `itemsSelectable` is `true`.
 
 %-PROP-END
 
+%-PROP-START hideSelectionCheckboxes
+
+If `true`, hides the per-tile selection checkboxes while keeping all selection logic intact.
+Tiles can still be selected by clicking, via the API (`selectId`, `selectAll`), or with keyboard shortcuts.
+
+This is useful when you want click-based selection without the visual checkbox overlay.
+
+```xmlui copy /hideSelectionCheckboxes="true"/
+<App>
+  <TileGrid
+    data="{[...]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    hideSelectionCheckboxes="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxes"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'},
+      {id: 5, name: 'Milk', category: 'dairy'},
+      {id: 6, name: 'Cheese', category: 'dairy'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    hideSelectionCheckboxes="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START checkboxPosition
 
 Controls where the per-tile selection checkbox is placed relative to the tile corner.

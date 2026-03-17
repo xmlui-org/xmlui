@@ -69,6 +69,12 @@ export const TileGridMd = createMetadata({
         `The named variable must reference an object; the grid will read from and write to its ` +
         `\`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
     ),
+    hideSelectionCheckboxes: {
+      description:
+        "If `true`, hides selection checkboxes. Selection logic still works via click, API, and keyboard.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideSelectionCheckboxes,
+    },
     checkboxPosition: {
       description:
         "Controls the position of the per-tile selection checkbox relative to the tile, " +
@@ -222,6 +228,7 @@ export const tileGridComponentRenderer = createComponentRenderer(
         enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
         syncWithAppState={syncAdapter}
         checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as any}
+        hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
         idKey={idKey}
         itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
         onSelectionDidChange={lookupEventHandler("selectionDidChange")}

@@ -33,6 +33,7 @@ $outlineOffset-item-TileGrid--focus: createThemeVar("outlineOffset-item-#{$compo
     position: relative;
     width: 100%;
     height: 100%;
+    outline: none;
   }
 
   .tileRow {

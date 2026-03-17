@@ -102,6 +102,7 @@ export type TileGridProps = {
   enableMultiSelection?: boolean;
   syncWithAppState?: any;
   checkboxPosition?: CheckboxPosition;
+  hideSelectionCheckboxes?: boolean;
   idKey?: string;
   itemUserSelect?: string;
   itemRenderer?: (item: any, index: number, count: number, selected: boolean) => ReactNode;
@@ -135,6 +136,7 @@ export const defaultProps = {
   itemsSelectable: false,
   enableMultiSelection: true,
   checkboxPosition: "topStart" as CheckboxPosition,
+  hideSelectionCheckboxes: false,
   idKey: "id",
   itemUserSelect: "none",
 };
@@ -154,6 +156,7 @@ export const TileGridNative = memo(
       itemsSelectable = defaultProps.itemsSelectable,
       enableMultiSelection = defaultProps.enableMultiSelection,
       checkboxPosition = defaultProps.checkboxPosition,
+      hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
       itemUserSelect = defaultProps.itemUserSelect,
       syncWithAppState,
       onSelectionDidChange,
@@ -252,11 +255,29 @@ export const TileGridNative = memo(
       }
     }, [focusedTileIndex, cols]);
 
+    // Refs for values used inside the component API so the effect doesn't re-run
+    // when data/idKey change (which would trigger registerComponentApi on every render).
+    const itemsRef = useRef(items);
+    itemsRef.current = items;
+    const idKeyRef = useRef(idKey);
+    idKeyRef.current = idKey;
+
     useEffect(() => {
       registerComponentApi?.({
-        clearSelection: () => selectionApi.clearSelection(),
+        clearSelection: () => {
+          selectionApi.clearSelection();
+          setFocusedTileIndex(-1);
+        },
         selectAll: () => selectionApi.selectAll(),
-        selectId: (id: any) => selectionApi.selectId(id),
+        selectId: (id: any) => {
+          selectionApi.selectId(id);
+          // Move focus to the selected item (first if array).
+          const targetId = String(Array.isArray(id) ? id[0] : id);
+          const idx = itemsRef.current.findIndex(
+            (item) => String(item[idKeyRef.current]) === targetId,
+          );
+          setFocusedTileIndex(idx >= 0 ? idx : -1);
+        },
         getSelectedItems: () => selectionApi.getSelectedItems(),
         getSelectedIds: () => selectionApi.getSelectedIds(),
       });
@@ -376,7 +397,7 @@ export const TileGridNative = memo(
         tabIndex={itemsSelectable ? 0 : undefined}
         onKeyDown={itemsSelectable ? handleKeyDown : undefined}
       >
-        {!loading && rows.length > 0 && (
+        {!loading && rows.length > 0 && containerWidth > 0 && (
           <Virtualizer
             ref={virtualizerRef}
             scrollRef={outerRef}
@@ -407,10 +428,17 @@ export const TileGridNative = memo(
                       onClick={
                         itemsSelectable
                           ? (e) => {
-                              setFocusedTileIndex(globalIndex);
+                              const isCtrl = e.metaKey || e.ctrlKey;
+                              // Ctrl/Cmd+Click on an already-selected tile deselects it;
+                              // clear focus so no outline remains (matches Table behaviour).
+                              if (isCtrl && isSelected) {
+                                setFocusedTileIndex(-1);
+                              } else {
+                                setFocusedTileIndex(globalIndex);
+                              }
                               toggleRow(item, {
                                 shiftKey: e.shiftKey,
-                                metaKey: e.metaKey || e.ctrlKey,
+                                metaKey: isCtrl,
                               });
                             }
                           : undefined
@@ -424,19 +452,28 @@ export const TileGridNative = memo(
                       {itemsSelectable && isSelected && (
                         <div className={styles.selectedIndicator} />
                       )}
-                      {itemsSelectable && (
+                      {itemsSelectable && !hideSelectionCheckboxes && (
                         <div
                           className={classnames(
                             styles.checkboxOverlay,
                             styles[checkboxPosition],
                           )}
                           onMouseDown={(e) => e.preventDefault()}
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <Toggle
                             tabIndex={-1}
                             aria-label={`Select ${item[idKey] ?? globalIndex}`}
                             value={isSelected}
-                            onDidChange={() => toggleRow(item, { metaKey: true })}
+                            onDidChange={() => {
+                              // When unchecking via checkbox, clear focus (matches Table behaviour).
+                              if (isSelected) {
+                                setFocusedTileIndex(-1);
+                              } else {
+                                setFocusedTileIndex(globalIndex);
+                              }
+                              toggleRow(item, { metaKey: true });
+                            }}
                           />
                         </div>
                       )}
