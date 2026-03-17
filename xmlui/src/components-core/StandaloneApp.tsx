@@ -953,7 +953,24 @@ function useStandalone(
     // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
     const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
     const mainXsData = (mainXs as any)?.default ?? mainXs;
-    return extractGlobals({ ...(mainXsData?.vars || {}), ...(mainXsData?.functions || {}) });
+    const extracted = extractGlobals({ ...(mainXsData?.vars || {}), ...(mainXsData?.functions || {}) });
+
+    // Also include markup globals (global.* attributes) and entry-point functions
+    // from the app definition so they are available on the very first render.
+    // Without this, child components' onInit handlers fire before globals are in scope.
+    const resolvedRuntime = resolveRuntime(runtime);
+    const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+    if (appDef?.entryPoint) {
+      const ep = appDef.entryPoint as ComponentDef;
+      if (ep.globalVars) {
+        Object.assign(extracted, ep.globalVars);
+      }
+      if (ep.functions) {
+        Object.assign(extracted, ep.functions);
+      }
+    }
+
+    return extracted;
   });
 
   useIsomorphicLayoutEffect(() => {
