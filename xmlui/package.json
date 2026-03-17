@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.12.7",
+  "version": "0.12.8",
   "sideEffects": false,
   "type": "module",
   "scripts": {
