@@ -321,6 +321,10 @@ export const Search = ({
     setSelectedCategories(new Set());
   }, []);
 
+  const refocusInput = useCallback(() => {
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
+
   // Shared results list JSX — used by both overlay and popover modes
   const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
 
@@ -329,7 +333,7 @@ export const Search = ({
       {/* F — Did You Mean banner */}
       {suggestion && enableSpellCorrection && (
         <li role="presentation" aria-hidden="true">
-          <DidYouMeanBanner suggestion={suggestion} onAccept={(s) => setInputValue(s)} />
+          <DidYouMeanBanner suggestion={suggestion} onAccept={(s) => { setInputValue(s); refocusInput(); }} />
         </li>
       )}
       {results.length > 0 &&
@@ -378,7 +382,7 @@ export const Search = ({
           <NoResultsPanel
             message={noResultsMessage}
             suggestedQueries={suggestedQueries}
-            onQuerySelect={(q) => setInputValue(q)}
+            onQuerySelect={(q) => { setInputValue(q); refocusInput(); }}
             showSuggestion={!suggestion || !enableSpellCorrection}
           />
         </li>
@@ -390,7 +394,7 @@ export const Search = ({
     <div className={styles.loadMoreRow}>
       <Text className={styles.resultCount}>{`Showing ${results.length} of ${sortedResults.length}`}</Text>
       {hasMore && (
-        <button className={styles.loadMoreButton} onClick={() => setPage((p) => p + 1)}>
+        <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={() => { setPage((p) => p + 1); refocusInput(); }}>
           Load more
         </button>
       )}
@@ -470,10 +474,10 @@ export const Search = ({
                     <OverlayCategoryTabs
                       categories={availableCategories}
                       selectedCategories={selectedCategories}
-                      onSelectOne={(cat: string) => setSelectedCategories(new Set([cat]))}
-                      onClearAll={clearCategories}
+                      onSelectOne={(cat: string) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
+                      onClearAll={() => { clearCategories(); refocusInput(); }}
                     />
-                    <SortControl sortOrder={sortOrder} onSortChange={setSortOrder} />
+                    <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
                   </div>
                 )}
 
@@ -563,11 +567,11 @@ export const Search = ({
                     <CategoryFilterBar
                       categories={availableCategories}
                       selectedCategories={selectedCategories}
-                      onToggle={toggleCategory}
-                      onClearAll={clearCategories}
+                      onToggle={(cat) => { toggleCategory(cat); refocusInput(); }}
+                      onClearAll={() => { clearCategories(); refocusInput(); }}
                     />
                   )}
-                  <SortControl sortOrder={sortOrder} onSortChange={setSortOrder} />
+                  <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
                 </div>
               )}
               <ul
@@ -615,6 +619,7 @@ function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggesti
             <button
               key={q}
               className={styles.noResultsSuggestionChip}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => onQuerySelect(q)}
             >
               {q}
@@ -642,6 +647,7 @@ function CategoryFilterBar({ categories, selectedCategories, onToggle, onClearAl
         className={classnames(styles.categoryFilterChip, {
           [styles.categoryFilterChipActive]: selectedCategories.size === 0,
         })}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={onClearAll}
       >
         All
@@ -652,6 +658,7 @@ function CategoryFilterBar({ categories, selectedCategories, onToggle, onClearAl
           className={classnames(styles.categoryFilterChip, {
             [styles.categoryFilterChipActive]: selectedCategories.has(cat),
           })}
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => onToggle(cat)}
         >
           {cat}
@@ -675,6 +682,7 @@ function SortControl({ sortOrder, onSortChange }: SortControlProps) {
         className={classnames(styles.sortButton, {
           [styles.sortButtonActive]: sortOrder === "relevance",
         })}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => onSortChange("relevance")}
       >
         Relevance
@@ -683,6 +691,7 @@ function SortControl({ sortOrder, onSortChange }: SortControlProps) {
         className={classnames(styles.sortButton, {
           [styles.sortButtonActive]: sortOrder === "date",
         })}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => onSortChange("date")}
       >
         Date
@@ -725,6 +734,7 @@ function OverlayCategoryTabs({
         role="tab"
         aria-selected={allActive}
         className={classnames(styles.overlayTab, { [styles.overlayTabActive]: allActive })}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={onClearAll}
       >
         All content
@@ -737,6 +747,7 @@ function OverlayCategoryTabs({
             role="tab"
             aria-selected={active}
             className={classnames(styles.overlayTab, { [styles.overlayTabActive]: active })}
+            onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelectOne(cat)}
           >
             {getCategoryLabel(cat)}
@@ -760,6 +771,7 @@ function DidYouMeanBanner({ suggestion, onAccept }: DidYouMeanBannerProps) {
       <Text className={styles.didYouMeanText}>Did you mean: </Text>
       <button
         className={styles.didYouMeanSuggestion}
+        onMouseDown={(e) => e.preventDefault()}
         onClick={() => onAccept(suggestion)}
       >
         {suggestion}
