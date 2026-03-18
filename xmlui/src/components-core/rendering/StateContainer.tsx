@@ -380,6 +380,16 @@ export const StateContainer = memo(
                 localVars: stableCurrentGlobalVars,
               },
             });
+            // Persist to localStorage if the global variable declares a storageKey.
+            // Combine the variable's storageKey with any nested sub-path so that
+            // both simple (count++) and nested (prefs.name = "Jane") updates are
+            // written to the correct location.
+            const storageKeyMeta = node.globalVars?.[`__storageKey_${key}`];
+            if (storageKeyMeta && typeof storageKeyMeta === "string") {
+              const subPath = pathArray.slice(1).join(".");
+              const writeKey = subPath ? `${storageKeyMeta}.${subPath}` : storageKeyMeta;
+              appContext.writeLocalStorage(writeKey, newValue);
+            }
           } else {
             // Non-root containers bubble globals to parent
             parentStatePartChanged(pathArray, newValue, target, action);
@@ -403,7 +413,7 @@ export const StateContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, parentStatePartChanged],
+      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, node.globalVars, appContext, parentStatePartChanged],
     );
 
     // ========================================================================

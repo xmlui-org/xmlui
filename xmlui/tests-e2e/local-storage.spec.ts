@@ -1,0 +1,267 @@
+import { expect, test } from "../src/testing/fixtures";
+
+// =============================================================================
+// LOCAL STORAGE PERSISTENCE — E2E SMOKE TESTS
+// =============================================================================
+// These tests verify that:
+//   1. The four global functions (readLocalStorage, writeLocalStorage,
+//      deleteLocalStorage, clearLocalStorage) work correctly in a running app.
+//   2. A <global> tag with storageKey initialises from localStorage without a
+//      flash (stored value wins on first render) and writes back on every change.
+
+test.describe("Local storage global functions", () => {
+  test("readLocalStorage returns stored value", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("greeting", JSON.stringify("hello"));
+    });
+
+    await initTestBed(
+      `
+      <App>
+        <Text testId="out">{readLocalStorage("greeting", "default")}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("hello");
+  });
+
+  test("readLocalStorage returns fallback when key is absent", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="out">{readLocalStorage("absent", "fallback")}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("fallback");
+  });
+
+  test("writeLocalStorage persists a value readable by readLocalStorage", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App var.val="{readLocalStorage('kw', 'initial')}">
+        <Text testId="before">{val}</Text>
+        <Button testId="save" label="Save" onClick="writeLocalStorage('kw', 99)" />
+        <Button testId="read" label="Read" onClick="val = readLocalStorage('kw', 0)" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("before")).toHaveText("initial");
+    await page.getByTestId("save").click();
+    await page.getByTestId("read").click();
+    await expect(page.getByTestId("before")).toHaveText("99");
+  });
+
+  test("deleteLocalStorage removes the entry", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("toDelete", JSON.stringify("bye"));
+    });
+
+    await initTestBed(
+      `
+      <App var.val="{readLocalStorage('toDelete', 'gone')}">
+        <Text testId="out">{val}</Text>
+        <Button testId="del" label="Del" onClick="deleteLocalStorage('toDelete')" />
+        <Button testId="read" label="Read" onClick="val = readLocalStorage('toDelete', 'gone')" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("bye");
+    await page.getByTestId("del").click();
+    await page.getByTestId("read").click();
+    await expect(page.getByTestId("out")).toHaveText("gone");
+  });
+
+  test("clearLocalStorage wipes all entries", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("a", JSON.stringify(1));
+      localStorage.setItem("b", JSON.stringify(2));
+    });
+
+    await initTestBed(
+      `
+      <App var.val="{readLocalStorage('a', 0)}">
+        <Text testId="out">{val}</Text>
+        <Button testId="clearAll" label="Clear" onClick="clearLocalStorage()" />
+        <Button testId="read" label="Read" onClick="val = readLocalStorage('a', 0)" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("1");
+    await page.getByTestId("clearAll").click();
+    await page.getByTestId("read").click();
+    await expect(page.getByTestId("out")).toHaveText("0");
+  });
+
+  test("clearLocalStorage with prefix removes only matching entries", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Use root-level keys that match readLocalStorage's dot-path semantics:
+    //   "app"   → root key "app", sub-path "tone"/"lang"
+    //   "other" → root key "other", sub-path "data"
+    await page.addInitScript(() => {
+      localStorage.setItem("app", JSON.stringify({ tone: "dark", lang: "en" }));
+      localStorage.setItem("other", JSON.stringify({ data: "keep" }));
+    });
+
+    await initTestBed(
+      `
+      <App var.tone="{readLocalStorage('app.tone', 'gone')}" var.other="{readLocalStorage('other.data', 'gone')}">
+        <Button testId="clearApp" label="Clear app" onClick="clearLocalStorage('app')" />
+        <Button testId="readTone" label="Read tone" onClick="tone = readLocalStorage('app.tone', 'gone')" />
+        <Button testId="readOther" label="Read other" onClick="other = readLocalStorage('other.data', 'gone')" />
+        <Text testId="tone">{tone}</Text>
+        <Text testId="other">{other}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    // Verify initial values read correctly from seeded storage
+    await expect(page.getByTestId("tone")).toHaveText("dark");
+    await expect(page.getByTestId("other")).toHaveText("keep");
+
+    await page.getByTestId("clearApp").click();
+    await page.getByTestId("readTone").click();
+    await page.getByTestId("readOther").click();
+    // "app" was cleared; "other" was not touched
+    await expect(page.getByTestId("tone")).toHaveText("gone");
+    await expect(page.getByTestId("other")).toHaveText("keep");
+  });
+});
+
+test.describe("<global> storageKey — persistence and initialisation", () => {
+  test("global variable initialises from stored value without flash", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Pre-seed localStorage so the value is there on first load
+    await page.addInitScript(() => {
+      localStorage.setItem("tone", JSON.stringify("dark"));
+    });
+
+    await initTestBed(
+      `
+      <App>
+        <global name="tone" value="light" storageKey="tone" />
+        <Text testId="out">{tone}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    // Must show "dark" (from storage) on the very first render — no "light" flash
+    await expect(page.getByTestId("out")).toHaveText("dark");
+  });
+
+  test("global variable uses default value when storage is empty", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App>
+        <global name="tone" value="light" storageKey="tone" />
+        <Text testId="out">{tone}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("light");
+  });
+
+  test("changing global writes value back to localStorage", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <global name="tone" value="light" storageKey="tone" />
+        <Text testId="out">{tone}</Text>
+        <Button testId="toggle" label="Toggle"
+          onClick="tone = tone === 'light' ? 'dark' : 'light'" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("light");
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("out")).toHaveText("dark");
+
+    // Verify the new value was persisted to localStorage
+    const stored = await page.evaluate(() => localStorage.getItem("tone"));
+    expect(JSON.parse(stored!)).toBe("dark");
+  });
+
+  test("reloading the page restores the persisted value", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <global name="count" value="{0}" storageKey="count" />
+        <Text testId="out">{count}</Text>
+        <Button testId="inc" label="Inc" onClick="count++" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("out")).toHaveText("0");
+    await page.getByTestId("inc").click();
+    await page.getByTestId("inc").click();
+    await page.getByTestId("inc").click();
+    await expect(page.getByTestId("out")).toHaveText("3");
+
+    // Reload — persisted value should be restored
+    await page.reload();
+    await expect(page.getByTestId("out")).toHaveText("3");
+  });
+
+  test("storageKey with dot-path reads and writes nested subkey", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("myApp", JSON.stringify({ v1: { tone: "dark", lang: "fr" } }));
+    });
+
+    await initTestBed(
+      `
+      <App>
+        <global name="tone" value="light" storageKey="myApp.v1.tone" />
+        <Text testId="out">{tone}</Text>
+        <Button testId="toggle" label="Toggle"
+          onClick="tone = tone === 'light' ? 'dark' : 'light'" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    // Initialised from stored nested value
+    await expect(page.getByTestId("out")).toHaveText("dark");
+
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("out")).toHaveText("light");
+
+    // The nested entry is updated; sibling "lang" is preserved
+    const stored = await page.evaluate(() => {
+      const raw = localStorage.getItem("myApp");
+      return JSON.parse(raw!);
+    });
+    expect(stored.v1.tone).toBe("light");
+    expect(stored.v1.lang).toBe("fr");
+  });
+});

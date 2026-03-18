@@ -255,6 +255,34 @@ export type AppContextObject = {
   scrollBookmarkIntoView: (bookmarkId: string, smoothScrolling?: boolean) => void;
 
   // ==============================================================================================
+  // Local Storage Utilities
+
+  // Reads a value from localStorage using dot-path key semantics. Returns `fallback`
+  // if the key is absent, unparseable, or any error occurs.
+  readLocalStorage: (key: string, fallback?: any) => any;
+
+  // Writes a value to localStorage using dot-path key semantics. Dot-path keys
+  // merge into the existing root entry rather than replacing it.
+  writeLocalStorage: (key: string, value: any) => void;
+
+  // Deletes a value from localStorage using dot-path key semantics.
+  // Removes the entire entry for simple keys; unsets a sub-path for dot-path keys.
+  deleteLocalStorage: (key: string) => void;
+
+  // Clears localStorage entries. With no argument, wipes all entries.
+  // With a prefix, removes only entries whose root key starts with that prefix.
+  clearLocalStorage: (prefix?: string) => void;
+
+  // Alias for clearLocalStorage. Removes localStorage entries.
+  // No argument wipes all entries; with a prefix removes only matching entries.
+  // Preferred name for app-level "Reset settings" actions.
+  resetLocalStorage: (prefix?: string) => void;
+
+  // Returns all current localStorage entries as a plain object, with values JSON-parsed
+  // where possible. Non-JSON values are returned as raw strings.
+  getAllLocalStorage: () => Record<string, any>;
+
+  // ==============================================================================================
   // AppState Global State Management
 
   // This object provides methods for managing global application state with support for

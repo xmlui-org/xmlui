@@ -87,6 +87,28 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.autoDetectTone,
     },
+    persistTheme: {
+      description:
+        'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
+        'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
+        'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
+      valueType: "boolean",
+      defaultValue: defaultProps.persistTheme,
+    },
+    themeStorageKey: {
+      description:
+        'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
+        'Change this if you need to namespace the key per-app or per-user.',
+      valueType: "string",
+      defaultValue: defaultProps.themeStorageKey,
+    },
+    toneStorageKey: {
+      description:
+        'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
+        'Change this if you need to namespace the key per-app or per-user.',
+      valueType: "string",
+      defaultValue: defaultProps.toneStorageKey,
+    },
   },
   events: {
     ready: {
@@ -249,6 +271,10 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       defaultTone={extractValue(node.props.defaultTone)}
       defaultTheme={extractValue(node.props.defaultTheme)}
       autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
+      persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
+      themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
+      toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
+
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}
       footer={renderChild(Footer)}

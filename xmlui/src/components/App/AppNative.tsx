@@ -4,6 +4,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -103,6 +104,9 @@ type Props = {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone?: boolean;
+  persistTheme?: boolean;
+  toneStorageKey?: string;
+  themeStorageKey?: string;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
@@ -115,6 +119,9 @@ export const defaultProps: Pick<
   | "defaultTone"
   | "defaultTheme"
   | "autoDetectTone"
+  | "persistTheme"
+  | "toneStorageKey"
+  | "themeStorageKey"
   | "onReady"
   | "onMessageReceived"
   | "onKeyDown"
@@ -127,6 +134,9 @@ export const defaultProps: Pick<
   defaultTone: undefined,
   defaultTheme: undefined,
   autoDetectTone: false,
+  persistTheme: false,
+  toneStorageKey: "appTone",
+  themeStorageKey: "appTheme",
   onReady: noop,
   onMessageReceived: noop,
   onKeyDown: noop,
@@ -190,6 +200,9 @@ export function App({
   defaultTone,
   defaultTheme,
   autoDetectTone = defaultProps.autoDetectTone,
+  persistTheme = defaultProps.persistTheme,
+  toneStorageKey = defaultProps.toneStorageKey,
+  themeStorageKey = defaultProps.themeStorageKey,
   renderChild,
   name,
   className,
@@ -200,7 +213,7 @@ export function App({
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
-  const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
+  const { setActiveThemeTone, setActiveThemeId, activeThemeTone, activeThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
   // Validate and sanitize layout input with explicit validation
@@ -250,9 +263,31 @@ export function App({
     defaultTone,
     defaultTheme,
     autoDetectTone,
+    persistTheme,
+    toneStorageKey,
+    themeStorageKey,
     setActiveThemeTone,
     setActiveThemeId,
   });
+
+  // Persist tone and theme ID to localStorage whenever they change (when persistTheme is true)
+  useEffect(() => {
+    if (!persistTheme) return;
+    try {
+      localStorage.setItem(toneStorageKey, JSON.stringify(activeThemeTone));
+    } catch {
+      // QuotaExceededError / SecurityError — degrade gracefully
+    }
+  }, [persistTheme, toneStorageKey, activeThemeTone]);
+
+  useEffect(() => {
+    if (!persistTheme) return;
+    try {
+      localStorage.setItem(themeStorageKey, JSON.stringify(activeThemeId));
+    } catch {
+      // QuotaExceededError / SecurityError — degrade gracefully
+    }
+  }, [persistTheme, themeStorageKey, activeThemeId]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -658,40 +693,89 @@ function useThemeInitialization({
   defaultTone,
   defaultTheme,
   autoDetectTone,
+  persistTheme,
+  toneStorageKey,
+  themeStorageKey,
   setActiveThemeTone,
   setActiveThemeId,
 }: {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone: boolean;
+  persistTheme: boolean;
+  toneStorageKey: string;
+  themeStorageKey: string;
   setActiveThemeTone: (tone: "dark" | "light") => void;
   setActiveThemeId: (id: string) => void;
 }) {
   const mounted = useRef(false);
 
-  // Initial theme and tone setup - runs once on mount
-  useEffect(() => {
+  // Initial theme and tone setup - runs once on mount.
+  // useLayoutEffect fires synchronously before the browser paints, preventing
+  // a flash where the default tone/theme is visible before the stored values load.
+  // NOTE: the stored tone/theme are pre-applied at the ThemeProvider level
+  // (via AppWrapper's resolveStoredTheme helper), so this effect is mainly a
+  // safety net for edge cases where that synchronous read is unavailable.
+  useLayoutEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
 
-    // Set tone: explicit defaultTone, or auto-detect from system
-    if (defaultTone === "dark" || defaultTone === "light") {
-      setActiveThemeTone(defaultTone as any);
-    } else if (autoDetectTone) {
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const detectedTone = systemPrefersDark ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
+    // Resolve tone: persisted value wins, then explicit defaultTone, then auto-detect
+    let resolvedTone: "dark" | "light" | undefined;
+
+    if (persistTheme) {
+      try {
+        const stored = localStorage.getItem(toneStorageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (parsed === "dark" || parsed === "light") {
+            resolvedTone = parsed;
+          }
+        }
+      } catch {
+        // Corrupt value — fall through to other strategies
+      }
     }
 
-    // Set theme ID if provided
-    if (defaultTheme) {
-      setActiveThemeId(defaultTheme);
+    if (!resolvedTone) {
+      if (defaultTone === "dark" || defaultTone === "light") {
+        resolvedTone = defaultTone;
+      } else if (autoDetectTone) {
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        resolvedTone = systemPrefersDark ? "dark" : "light";
+      }
+    }
+
+    if (resolvedTone) {
+      setActiveThemeTone(resolvedTone);
+    }
+
+    // Resolve theme ID: persisted value wins, then explicit defaultTheme
+    let resolvedTheme: string | undefined;
+    if (persistTheme) {
+      try {
+        const stored = localStorage.getItem(themeStorageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (typeof parsed === "string" && parsed.length > 0) {
+            resolvedTheme = parsed;
+          }
+        }
+      } catch {
+        // Corrupt value — fall through to defaultTheme
+      }
+    }
+    if (!resolvedTheme && defaultTheme) {
+      resolvedTheme = defaultTheme;
+    }
+    if (resolvedTheme) {
+      setActiveThemeId(resolvedTheme);
     }
 
     return () => {
       mounted.current = false;
     };
-  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId]);
+  }, [defaultTone, defaultTheme, autoDetectTone, persistTheme, toneStorageKey, themeStorageKey, setActiveThemeTone, setActiveThemeId]);
 
   // Listen for system theme changes when autoDetectTone is enabled
   useEffect(() => {

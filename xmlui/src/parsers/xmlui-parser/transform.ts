@@ -371,18 +371,38 @@ export function nodeToComponentDef(
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
             return;
           }
-          collectElementHelper(
-            usesStack,
-            comp,
-            child,
-
-            (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
-            (name, value) => {
-              if (!isComponent(comp)) return;
-              comp.globalVars ??= {};
-              comp.globalVars[name] = value;
-            },
-          );
+          {
+            // Extract storageKey and persist before delegating to collectElementHelper
+            // so collectValue does not report them as unknown attributes.
+            const attrs = getAttributes(child).map(segmentAttr);
+            const storageKey = attrs.find((a) => a.name === "storageKey")?.value;
+            const persistAttr = attrs.find((a) => a.name === "persist")?.value;
+            const shouldPersist =
+              persistAttr === "true" || persistAttr === "{true}" || persistAttr === "1";
+            collectElementHelper(
+              usesStack,
+              comp,
+              child,
+              (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
+              (name, value) => {
+                if (!isComponent(comp)) return;
+                comp.globalVars ??= {};
+                comp.globalVars[name] = value;
+                // Determine the effective storage key:
+                //   1. An explicit storageKey attribute always wins.
+                //   2. persist="true" without storageKey falls back to the variable name.
+                // Store as a "__storageKey_<name>" metadata entry so the runtime can
+                // initialise from / persist to localStorage without exposing the key as
+                // a normal variable.
+                const effectiveStorageKey = storageKey ?? (shouldPersist ? name : undefined);
+                if (effectiveStorageKey) {
+                  comp.globalVars[`__storageKey_${name}`] = effectiveStorageKey;
+                }
+              },
+              undefined, // nameValidator
+              ["storageKey", "persist"], // extraAllowedAttrs
+            );
+          }
           return;
 
         case "loaders":
@@ -568,9 +588,10 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     element: Node,
     allowName = true,
+    extraAllowedAttrs: string[] = [],
   ): { name?: string; value: any; valueContentNode?: Node } | null {
     const elementName = getComponentName(element, getText);
-    // --- Accept only "name", "value"
+    // --- Accept only "name", "value" (and any explicitly allowed extras)
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
       (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
@@ -581,7 +602,8 @@ export function nodeToComponentDef(
     const attrNodes = getAttributes(element);
     const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const attrProps = attrsSegmented.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
+    const allAllowedAttrs = extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
+    const attrProps = attrsSegmented.filter((attr) => allAllowedAttrs.indexOf(attr.name) >= 0);
     if (attrsSegmented.length > attrProps.length) {
       reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
       return null;
@@ -713,11 +735,12 @@ export function nodeToComponentDef(
     getter: (name: string) => any,
     setter: (name: string, value: string, valueNode?: Node) => void,
     nameValidator?: (name: string) => void,
+    extraAllowedAttrs: string[] = [],
   ): void {
     // --- Compound component do not have a uses
 
     // --- Get the value
-    const valueInfo = collectValue(usesStack, child);
+    const valueInfo = collectValue(usesStack, child, true, extraAllowedAttrs);
     if (!valueInfo) {
       return;
     }
