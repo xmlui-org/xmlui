@@ -216,9 +216,13 @@ export const Search = ({
   }, []);
 
   const onClick = useCallback(() => {
-    setInputValue("");
-    setActiveIndex(-1);
-  }, []);
+    if (useOverlay) {
+      closeOverlay();
+    } else {
+      setInputValue("");
+      setActiveIndex(-1);
+    }
+  }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
@@ -253,8 +257,12 @@ export const Search = ({
         if (results.length === 0) return;
         e.preventDefault();
         const targetIndex = activeIndex >= 0 ? activeIndex : 0;
-        setActiveIndex(-1);
-        setShow(false);
+        if (useOverlay) {
+          closeOverlay();
+        } else {
+          setActiveIndex(-1);
+          setShow(false);
+        }
         itemLinkRefs.current[targetIndex]?.click();
       } else if (e.key === "Escape") {
         if (useOverlay) {
