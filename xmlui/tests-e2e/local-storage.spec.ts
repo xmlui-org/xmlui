@@ -110,25 +110,35 @@ test.describe("Local storage global functions", () => {
     page,
     initTestBed,
   }) => {
+    // Use root-level keys that match readLocalStorage's dot-path semantics:
+    //   "app"   → root key "app", sub-path "tone"/"lang"
+    //   "other" → root key "other", sub-path "data"
     await page.addInitScript(() => {
-      localStorage.setItem("app.tone", JSON.stringify("dark"));
-      localStorage.setItem("app.lang", JSON.stringify("en"));
-      localStorage.setItem("other.data", JSON.stringify("keep"));
+      localStorage.setItem("app", JSON.stringify({ tone: "dark", lang: "en" }));
+      localStorage.setItem("other", JSON.stringify({ data: "keep" }));
     });
 
     await initTestBed(
       `
-      <App>
-        <Button testId="clearApp" label="Clear app.*" onClick="clearLocalStorage('app.')" />
-        <Text testId="tone">{readLocalStorage("app.tone", "gone")}</Text>
-        <Text testId="other">{readLocalStorage("other.data", "gone")}</Text>
+      <App var.tone="{readLocalStorage('app.tone', 'gone')}" var.other="{readLocalStorage('other.data', 'gone')}">
+        <Button testId="clearApp" label="Clear app" onClick="clearLocalStorage('app')" />
+        <Button testId="readTone" label="Read tone" onClick="tone = readLocalStorage('app.tone', 'gone')" />
+        <Button testId="readOther" label="Read other" onClick="other = readLocalStorage('other.data', 'gone')" />
+        <Text testId="tone">{tone}</Text>
+        <Text testId="other">{other}</Text>
       </App>
     `,
       { noFragmentWrapper: true },
     );
 
+    // Verify initial values read correctly from seeded storage
+    await expect(page.getByTestId("tone")).toHaveText("dark");
+    await expect(page.getByTestId("other")).toHaveText("keep");
+
     await page.getByTestId("clearApp").click();
-    // Re-read after clear
+    await page.getByTestId("readTone").click();
+    await page.getByTestId("readOther").click();
+    // "app" was cleared; "other" was not touched
     await expect(page.getByTestId("tone")).toHaveText("gone");
     await expect(page.getByTestId("other")).toHaveText("keep");
   });

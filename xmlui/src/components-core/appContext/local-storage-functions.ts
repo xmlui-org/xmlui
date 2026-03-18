@@ -170,9 +170,61 @@ export function clearLocalStorage(prefix?: string): void {
   }
 }
 
+/**
+ * Resets (removes) localStorage entries.
+ *
+ * This is the recommended programmatic escape hatch for app authors — call it
+ * from a "Reset settings" button or from a script to clear persisted data so
+ * the next page load starts from default values.
+ *
+ * - No argument: removes ALL entries (`localStorage.clear()`).
+ * - With `prefix`: removes only entries whose **root key** starts with the prefix.
+ *
+ * All errors are silently swallowed.
+ *
+ * @example
+ *   resetLocalStorage()           // wipes everything
+ *   resetLocalStorage("count")    // removes the "count" entry
+ *   resetLocalStorage("myApp.v1") // removes all entries prefixed "myApp.v1"
+ */
+export function resetLocalStorage(prefix?: string): void {
+  clearLocalStorage(prefix);
+}
+
+/**
+ * Returns all current localStorage entries as a plain object.
+ *
+ * Each key maps to its JSON-parsed value when the stored string is valid JSON,
+ * or to the raw string otherwise. Entries that cannot be read at all are omitted.
+ *
+ * Silently returns an empty object when localStorage is unavailable
+ * (e.g. private browsing, SecurityError).
+ *
+ * @example
+ *   getAllLocalStorage()  // { count: 5, prefs: { theme: "dark" }, rawKey: "hello" }
+ */
+export function getAllLocalStorage(): Record<string, any> {
+  try {
+    const result: Record<string, any> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k === null) continue;
+      const parsed = safeRead(k);
+      // safeRead returns undefined when the value is absent or invalid JSON;
+      // fall back to the raw string so non-JSON entries are still visible.
+      result[k] = parsed !== undefined ? parsed : localStorage.getItem(k);
+    }
+    return result;
+  } catch {
+    return {};
+  }
+}
+
 export const localStorageFunctions = {
   readLocalStorage,
   writeLocalStorage,
   deleteLocalStorage,
   clearLocalStorage,
+  resetLocalStorage,
+  getAllLocalStorage,
 };

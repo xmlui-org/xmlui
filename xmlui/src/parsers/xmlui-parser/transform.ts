@@ -372,11 +372,13 @@ export function nodeToComponentDef(
             return;
           }
           {
-            // Extract storageKey before delegating to collectElementHelper so
-            // collectValue does not report it as an unknown attribute.
-            const storageKey = getAttributes(child)
-              .map(segmentAttr)
-              .find((a) => a.name === "storageKey")?.value;
+            // Extract storageKey and persist before delegating to collectElementHelper
+            // so collectValue does not report them as unknown attributes.
+            const attrs = getAttributes(child).map(segmentAttr);
+            const storageKey = attrs.find((a) => a.name === "storageKey")?.value;
+            const persistAttr = attrs.find((a) => a.name === "persist")?.value;
+            const shouldPersist =
+              persistAttr === "true" || persistAttr === "{true}" || persistAttr === "1";
             collectElementHelper(
               usesStack,
               comp,
@@ -386,15 +388,19 @@ export function nodeToComponentDef(
                 if (!isComponent(comp)) return;
                 comp.globalVars ??= {};
                 comp.globalVars[name] = value;
-                if (storageKey) {
-                  // Store as metadata key (prefixed with "__") so the runtime
-                  // can initialise from / persist to localStorage without
-                  // exposing the key as a normal variable.
-                  comp.globalVars[`__storageKey_${name}`] = storageKey;
+                // Determine the effective storage key:
+                //   1. An explicit storageKey attribute always wins.
+                //   2. persist="true" without storageKey falls back to the variable name.
+                // Store as a "__storageKey_<name>" metadata entry so the runtime can
+                // initialise from / persist to localStorage without exposing the key as
+                // a normal variable.
+                const effectiveStorageKey = storageKey ?? (shouldPersist ? name : undefined);
+                if (effectiveStorageKey) {
+                  comp.globalVars[`__storageKey_${name}`] = effectiveStorageKey;
                 }
               },
               undefined, // nameValidator
-              ["storageKey"], // extraAllowedAttrs
+              ["storageKey", "persist"], // extraAllowedAttrs
             );
           }
           return;

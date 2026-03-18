@@ -186,6 +186,11 @@
           to="/docs/guides/refactoring"
         />
         <NavLink
+          icon="globals"
+          label="Local Persistence"
+          to="/docs/guides/local-persistence"
+        />
+        <NavLink
           icon="build"
           label="Build a HelloWorld Component"
           to="/docs/guides/build-hello-world-component"
@@ -679,6 +684,11 @@
     <Page url="/docs/guides/refactoring">
       <DocumentPageNoTOC
         content="{appGlobals.docsContent['pages/refactoring.md']}"
+      />
+    </Page>
+    <Page url="/docs/guides/local-persistence">
+      <DocumentPage
+        content="{appGlobals.docsContent['pages/local-persistence.md']}"
       />
     </Page>
     <Page url="/docs/styles-and-themes/layout-props">

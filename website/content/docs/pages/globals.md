@@ -363,6 +363,126 @@ This function returns the type of the specified file.
 - If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
 - Otherwise, it returns undefined.
 
+## Local Storage Utilities
+
+### `clearLocalStorage`
+
+```ts
+function clearLocalStorage(prefix?: string): void;
+```
+
+Clears `localStorage` entries.
+
+- No argument: removes all entries (`localStorage.clear()`).
+- With `prefix`: removes only entries whose root key starts with the prefix.
+- Silently handles errors.
+
+**Examples:**
+
+```ts
+clearLocalStorage()           // wipes all localStorage for this app
+clearLocalStorage("myApp.v1") // removes all entries prefixed "myApp.v1"
+```
+
+### `deleteLocalStorage`
+
+```ts
+function deleteLocalStorage(key: string): void;
+```
+
+Removes a value from `localStorage`.
+
+- For a simple key: removes the entire entry.
+- For a dot-path key: reads the root entry, removes the sub-path, and writes the updated root back.
+- No-op if the key / sub-path doesn't exist.
+- Silently handles errors.
+
+**Examples:**
+
+```ts
+deleteLocalStorage("count")          // removes the "count" entry entirely
+deleteLocalStorage("prefs.theme")    // removes only prefs.theme from "prefs" entry
+```
+
+### `getAllLocalStorage`
+
+```ts
+function getAllLocalStorage(): Record<string, any>;
+```
+
+Returns all current `localStorage` entries as a plain object. Values are JSON-parsed where possible; non-JSON entries are returned as raw strings. Returns an empty object if `localStorage` is unavailable.
+
+**Example:**
+
+```xmlui
+<Button
+  label="Inspect storage"
+  onClick="toast(JSON.stringify(getAllLocalStorage()))"
+/>
+```
+
+---
+
+### `readLocalStorage`
+
+```ts
+function readLocalStorage(key: string, fallback?: any): any;
+```
+
+Reads a value from `localStorage` using dot-path key semantics. The `key` is a dot-separated path where the first segment is the localStorage entry and the rest is a property path inside the parsed JSON value.
+
+- If the entry exists and is valid JSON, returns the value (or sub-path if specified).
+- If the entry is missing, unparseable, or any error occurs, returns `fallback`.
+- Silently handles `QuotaExceededError` and `SecurityError`.
+
+**Examples:**
+
+```ts
+readLocalStorage("count")                    
+readLocalStorage("prefs.theme.tone")         
+readLocalStorage("missing", "default value") 
+```
+
+### `resetLocalStorage`
+
+```ts
+function resetLocalStorage(prefix?: string): void;
+```
+
+Alias for `clearLocalStorage`. Removes `localStorage` entries; recommended name for app-level "Reset settings" actions.
+
+- No argument: removes all entries.
+- With `prefix`: removes only entries whose root key starts with the prefix.
+
+**Example:**
+
+```xmlui
+<Button
+  label="Reset all settings"
+  onClick="resetLocalStorage(); location.reload()"
+/>
+```
+
+### `writeLocalStorage`
+
+```ts
+function writeLocalStorage(key: string, value: any): void;
+```
+
+Writes a value to `localStorage` using dot-path key semantics.
+
+- For a simple key (no dots): JSON-stringifies and stores the value. Removes the entry if `value` is `undefined`.
+- For a dot-path key: reads the root entry, sets the sub-path using lodash semantics, and writes the updated root back.
+- Silently handles errors (quota exceeded, security errors, etc.).
+
+**Examples:**
+
+```ts
+writeLocalStorage("count", 42)               // stores {"count": 42} as JSON
+writeLocalStorage("prefs.theme", "dark")     // merges into existing "prefs" entry
+writeLocalStorage("temp", undefined)         // removes the "temp" entry
+```
+
 ## Math Utilities
 
 ### `avg`

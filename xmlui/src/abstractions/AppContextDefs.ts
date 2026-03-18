@@ -273,6 +273,15 @@ export type AppContextObject = {
   // With a prefix, removes only entries whose root key starts with that prefix.
   clearLocalStorage: (prefix?: string) => void;
 
+  // Alias for clearLocalStorage. Removes localStorage entries.
+  // No argument wipes all entries; with a prefix removes only matching entries.
+  // Preferred name for app-level "Reset settings" actions.
+  resetLocalStorage: (prefix?: string) => void;
+
+  // Returns all current localStorage entries as a plain object, with values JSON-parsed
+  // where possible. Non-JSON values are returned as raw strings.
+  getAllLocalStorage: () => Record<string, any>;
+
   // ==============================================================================================
   // AppState Global State Management
 

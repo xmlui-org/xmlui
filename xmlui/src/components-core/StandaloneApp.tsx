@@ -62,6 +62,7 @@ import { MetadataProvider } from "../language-server/services/common/metadata-ut
 import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
+import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -69,6 +70,54 @@ const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+
+// ---------------------------------------------------------------------------
+// Storage escape hatch — runs at module-init time, BEFORE React or the router
+// are instantiated. By the time BrowserRouter reads globalThis.location the
+// param has already been stripped; HashRouter and MemoryRouter are unaffected.
+// Uses globalThis instead of window so this module is safe to import in
+// Node.js / SSR environments where window is undefined.
+// ---------------------------------------------------------------------------
+
+/**
+ * Registers `globalThis.XMLUI_RESET_STORAGE` and `globalThis.XMLUI_GET_STORAGE`
+ * console helpers and processes the `?xmlui-reset` URL escape hatch.
+ *
+ * Called once at module-init time when a browser environment is detected.
+ * Extracted into a function so the SSR guard is a single top-level check.
+ */
+function initStorageGlobals(): void {
+  // Primary: URL query parameter  ?xmlui-reset[=prefix]
+  const _resetParams = new URLSearchParams(globalThis.location.search);
+  const _resetValue = _resetParams.get("xmlui-reset");
+  if (_resetValue !== null) {
+    clearLocalStorage(_resetValue === "" || _resetValue === "true" ? undefined : _resetValue);
+    _resetParams.delete("xmlui-reset");
+    const _newSearch = _resetParams.toString();
+    globalThis.history.replaceState(
+      null,
+      "",
+      globalThis.location.pathname +
+        (_newSearch ? "?" + _newSearch : "") +
+        globalThis.location.hash,
+    );
+  }
+
+  // Secondary: globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
+  // Clears the matching localStorage entries and reloads the page.
+  (globalThis as any).XMLUI_RESET_STORAGE = (key?: string) => {
+    clearLocalStorage(key);
+    globalThis.location.reload();
+  };
+
+  // Diagnostic: globalThis.XMLUI_GET_STORAGE() — returns all current localStorage entries
+  // as a plain object (values JSON-parsed where possible).
+  (globalThis as any).XMLUI_GET_STORAGE = () => getAllLocalStorage();
+}
+
+if (typeof globalThis.window !== "undefined") {
+  initStorageGlobals();
+}
 
 type RuntimeProps = {
   default?: any;
@@ -160,12 +209,12 @@ function StandaloneApp({
     }
   }, [runtime]);
 
-  // Helper to filter out internal metadata (__tree_* keys) from globalVars
-  // Exposes only the actual variable values to the renderer
+  // Helper to filter out internal metadata (__tree_* keys) from globalVars.
+  // Preserves __storageKey_* entries which are needed for localStorage persistence.
   const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
     const filtered: Record<string, any> = {};
     for (const [key, value] of Object.entries(vars)) {
-      if (!key.startsWith("__")) {
+      if (!key.startsWith("__") || key.startsWith("__storageKey_")) {
         filtered[key] = value;
       }
     }
@@ -214,11 +263,13 @@ function StandaloneApp({
     return null;
   }
 
-  // --- The app may use a mocked API already defined in `window.XMLUI_MOCK_API`
+  // --- The app may use a mocked API already defined in `globalThis.XMLUI_MOCK_API`
   // --- or within the standalone app's definition, in `apiInterceptor`.
   const mockedApi =
     // @ts-ignore
-    typeof window !== "undefined" && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
+    typeof globalThis.window !== "undefined" && (globalThis as any).XMLUI_MOCK_API
+      ? (globalThis as any).XMLUI_MOCK_API
+      : apiInterceptor;
 
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
@@ -227,7 +278,7 @@ function StandaloneApp({
     decorateComponentsWithTestId ||
     appGlobals?.xsVerbose === true ||
     // @ts-ignore
-    (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
+    (typeof globalThis.window !== "undefined" ? (globalThis as any).XMLUI_MOCK_TEST_ID : false);
 
   // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
@@ -246,7 +297,7 @@ function StandaloneApp({
           standalone={true}
           debugEnabled={debugEnabled}
           // @ts-ignore
-          routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+          routerBaseName={typeof globalThis.window !== "undefined" ? (globalThis as any).__PUBLIC_PATH || "" : ""}
           globalProps={globalProps}
           globalVars={filterGlobalVars(globalVars)}
           defaultTheme={defaultTheme}

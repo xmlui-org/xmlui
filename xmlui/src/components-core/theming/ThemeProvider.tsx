@@ -315,8 +315,6 @@ function ThemeProvider({
     const prevDefault = prevDefaultThemeRef.current;
     prevDefaultThemeRef.current = defaultTheme;
 
-    console.log('[ThemeProvider] theme effect fired, isThemeInitialMount:', isThemeInitialMount.current, 'prevDefault:', prevDefault, 'defaultTheme:', defaultTheme, 'availableThemeIds:', availableThemeIds);
-
     if (isThemeInitialMount.current) {
       isThemeInitialMount.current = false;
       return;
@@ -327,17 +325,11 @@ function ThemeProvider({
 
     // defaultTheme changed (HMR or prop update) → sync to new default
     if (defaultTheme && availableThemeIds.includes(defaultTheme)) {
-      console.log('[ThemeProvider] defaultTheme changed, setting activeThemeId to:', defaultTheme);
       setActiveThemeId(defaultTheme);
     } else {
-      console.log('[ThemeProvider] defaultTheme changed, setting activeThemeId to first available:', availableThemeIds[0]);
       setActiveThemeId(availableThemeIds[0]);
     }
   }, [availableThemeIds, defaultTheme]);
-
-  useEffect(() => {
-    console.log('[ThemeProvider] activeThemeId changed to:', activeThemeId);
-  }, [activeThemeId]);
 
   const activeTheme: ThemeDefinition = useMemo(() => {
     let foundTheme: ThemeDefinition;

@@ -35,6 +35,8 @@ The top-level localStorage entry is always the **first dot-segment**. If the sto
 | `writeLocalStorage` | `(key: string, value: any) → void` | For a simple key: JSON-stringify & store whole value (remove if `undefined`). For a dot-path: read root, set subpath with lodash `set`, re-serialise & store. |
 | `deleteLocalStorage` | `(key: string) → void` | For a simple key: remove entry. For a dot-path: read root, delete subpath with lodash `unset`, re-serialise & store. |
 | `clearLocalStorage` | `(prefix?: string) → void` | No args → remove all entries. With prefix → remove only entries whose **root key** starts with `prefix`. |
+| `resetLocalStorage` | `(prefix?: string) → void` | Alias for `clearLocalStorage`. Preferred name for app-level "Reset settings" actions. |
+| `getAllLocalStorage` | `() → Record<string, any>` | Returns all current localStorage entries as a plain object. Values are JSON-parsed where possible; raw strings otherwise. Returns `{}` on any error. |
 
 All functions silently catch any `QuotaExceededError` / `SecurityError` (private browsing, disabled storage) and degrade gracefully (reads return `fallback`; writes/deletes become no-ops).
 
@@ -46,17 +48,36 @@ Use lodash `get` / `set` / `unset` for subpath traversal; these are already a tr
 
 ## 2 · Reactive Storage Binding via the `<global>` Tag
 
-The `<global>` tag already accepts `name` and `value`. Add an optional **`storageKey`** attribute to it.  
+The `<global>` tag already accepts `name` and `value`. Add two optional persistence attributes:
+
+| Attribute | Type | Default | Description |
+|---|---|---|---|
+| `storageKey` | `string` | — | Explicit localStorage key (dot-path). Implies persistence when present. |
+| `persist` | `boolean` | `false` | When `true`, persists under the variable's own `name` if no `storageKey` is given. |
+
 The name `storageKey` (rather than `localStorageKey`) is intentionally provider-agnostic — future providers (sessionStorage, IndexedDB, remote KV) can plug in without renaming the attribute.
 
 ```xmlui
-<!-- Persist the whole variable -->
+<!-- Persist with an explicit key -->
 <global name="tone" value="light" storageKey="myApp.v1.tone" />
 
-<!-- Persist only a subfield — variable holds just the name string,
-     but it is stored/loaded as prefs.userName inside the "prefs" entry -->
+<!-- Persist using the variable name itself as the storage key -->
+<global name="count" value="{0}" persist="true" />
+
+<!-- persist="true" + storageKey: the explicit key wins -->
+<global name="count" value="{0}" persist="true" storageKey="myApp.v1.count" />
+
+<!-- Persist only a subfield of an existing entry -->
 <global name="userName" value="" storageKey="myApp.v1.prefs.userName" />
 ```
+
+### Effective storage key resolution (parse time)
+
+1. `storageKey="foo"` present → effective key = `"foo"` (explicit always wins).
+2. `persist="true"` + no `storageKey` → effective key = the variable's `name`.
+3. Neither `storageKey` nor `persist="true"` → no persistence.
+
+The parser stores the effective key as `__storageKey_<name>` metadata; the runtime logic is unchanged.
 
 Behaviour when `storageKey` is present:
 
@@ -115,12 +136,84 @@ This gives apps a "factory reset" escape hatch — useful on version upgrade or 
 
 ---
 
-## 4 · Implementation Steps
+## 5 · Escape Hatch — Emergency Storage Reset
 
-1. **Create `appContext/local-storage-functions.ts`** — implement the four functions + helper for safe JSON round-trip.
-2. **Wire into AppContent** — import and spread `localStorageFunctions` into `appContextValue`.
-3. **Extend the `<global>` tag** — add `storageKey` as an optional attribute; hook up init-read and change-write logic in the global-variable implementation (in `components-core/state/`).
-4. **Unit tests** — mock `localStorage` via `vi.stubGlobal`; cover: normal round-trip, parse error fallback, quota exceeded, security error, missing key, prefix clear.
-5. **E2E smoke test** — standalone app that persists and restores a theme-tone toggle across page reloads.
-6. **Documentation** — add a guide page and reference entries for the four global functions and the `storageKey` attribute.
-7. **Changeset** — `"xmlui": patch`, description: "Add local storage persistence (global functions + reactive binding)".
+### Problem
+
+A catch-22 can occur if persisted values drive the app into a broken state at startup (e.g. a count value that triggers invalid logic, a corrupt theme ID that throws inside `ThemeProvider`, etc.). The user cannot reach a "Reset settings" button because the app never finishes loading.
+
+### Recommended mechanism: URL query parameter `?xmlui-reset`
+
+Check for a special URL query parameter **before** any localStorage values are read (i.e. at the very top of the standalone app's startup flow). When present:
+
+1. Clear the relevant entries (or all entries with a prefix, or the entire storage).
+2. Remove the parameter from the URL via `history.replaceState` so the reset does not re-trigger on the next navigation.
+3. Continue with a clean state.
+
+#### Usage
+
+| URL | Effect |
+|---|---|
+| `?xmlui-reset` | Clear **all** `localStorage` entries for this app |
+| `?xmlui-reset=count` | Clear only the entry with root key `count` |
+| `?xmlui-reset=myApp.v1` | Clear all entries whose root key starts with `myApp.v1` |
+
+This approach is the most robust escape hatch because:
+- Works even when the app fails to render at all (only needs a URL change, not DevTools).
+- The URL can be shared with support teams or end-users without requiring console access.
+- Self-removing (`history.replaceState`) — the reset fires exactly once and the clean URL is bookmarkable.
+- No server-side changes needed; purely client-side.
+
+#### Secondary mechanism: `window.XMLUI_RESET_STORAGE(key?)`
+
+A callable function registered on `window` for developer use from the browser console. It combines the clear and reload into one step — no need to set a variable and call `reload()` separately.
+
+```js
+// Clear all storage and reload
+window.XMLUI_RESET_STORAGE();
+
+// Clear only entries whose root key starts with "count", then reload
+window.XMLUI_RESET_STORAGE("count");
+
+// Clear all entries under a version-namespaced prefix, then reload
+window.XMLUI_RESET_STORAGE("myApp.v1");
+```
+
+The function calls `clearLocalStorage(key)` then `window.location.reload()`. It is registered at module-init time alongside the URL parameter check.
+
+#### Diagnostic: `window.XMLUI_GET_STORAGE()`
+
+Returns the current localStorage contents as a plain JavaScript object (same as the `getAllLocalStorage()` global function). Useful for inspecting what is persisted without opening the Application tab in DevTools.
+
+```js
+window.XMLUI_GET_STORAGE();
+// → { count: 5, appTheme: "dark", appTone: "dark", "myApp.v1": { prefs: { ... } } }
+```
+
+Also available inside XMLUI markup / scripts as `getAllLocalStorage()`.
+
+### Implementation
+
+1. In `StandaloneApp.tsx`, add a module-level block (outside any component, runs at import time) that:
+   - Reads `new URLSearchParams(window.location.search).get("xmlui-reset")`.
+   - If the value is `null` / absent — do nothing.
+   - If the value is `""`, `"true"`, or any other string — call `clearLocalStorage(value || undefined)` (prefix-based clear already implemented).
+   - Clean up: `history.replaceState(null, "", url_without_param)` — router never sees the parameter.
+   - Register `window.XMLUI_RESET_STORAGE = (key?) => { clearLocalStorage(key); location.reload(); }`.
+   - The entire block is guarded by `typeof window !== "undefined"` for SSR safety.
+2. Document the mechanism with a note in the `storageKey` attribute guide.
+
+---
+
+## 6 · Implementation Steps (updated)
+
+1. **Create `appContext/local-storage-functions.ts`** — implement the five functions (`readLocalStorage`, `writeLocalStorage`, `deleteLocalStorage`, `clearLocalStorage`, `resetLocalStorage`) + `getAllLocalStorage` + helper for safe JSON round-trip. ✅
+2. **Wire into AppContent** — import and spread `localStorageFunctions` into `appContextValue`. ✅
+3. **Extend the `<global>` tag** — add `storageKey` and `persist` optional attributes; hook up init-read and change-write logic in the global-variable implementation (in `components-core/state/`). ✅
+4. **App-level `persistTheme` / `toneStorageKey` / `themeStorageKey` props** — synchronously resolve stored theme/tone in `AppWrapper` before `ThemeProvider` mounts. ✅
+5. **Fix `filterGlobalVars`** — preserve `__storageKey_*` metadata keys that were incorrectly stripped. ✅
+6. **Escape hatch** — `?xmlui-reset[=prefix]` URL parameter + `window.XMLUI_RESET_STORAGE` global + `window.XMLUI_GET_STORAGE` diagnostic + `getAllLocalStorage()` XMLUI global function. ✅
+7. **Unit tests** — mock `localStorage` via `vi.stubGlobal`; cover: normal round-trip, parse error fallback, quota exceeded, security error, missing key, prefix clear. ✅ (22 tests)
+8. **E2E smoke test** — standalone app that persists and restores values across page reloads. ✅ (file created)
+9. **Documentation** — `website/content/docs/pages/local-persistence.md` guide page covering global functions, `storageKey`/`persist` attributes, `persistTheme` prop, schema versioning, and escape hatch. NavLink added between Refactoring and Build a HelloWorld Component. ✅
+10. **Changeset** — `"xmlui": patch`. ⏳

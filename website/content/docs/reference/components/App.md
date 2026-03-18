@@ -386,6 +386,12 @@ Optional application name (visible in the browser tab). When you do not define t
 
 This boolean property specifies whether the scrollbar gutters should be hidden.
 
+### `persistTheme` [#persisttheme]
+
+> [!DEF]  default: **false**
+
+When set to `true`, both the current theme ID and tone ("light" or "dark") are automatically saved to `localStorage` and restored on the next visit. The persisted values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.
+
 ### `scrollWholePage` [#scrollwholepage]
 
 > [!DEF]  default: **true**
@@ -453,6 +459,18 @@ Here is a more complex example built on star-sizing:
   </Footer>
 </App>
 ```
+
+### `themeStorageKey` [#themestoragekey]
+
+> [!DEF]  default: **"appTheme"**
+
+The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. Change this if you need to namespace the key per-app or per-user.
+
+### `toneStorageKey` [#tonestoragekey]
+
+> [!DEF]  default: **"appTone"**
+
+The `localStorage` key used to persist the tone when `persistTheme` is `true`. Change this if you need to namespace the key per-app or per-user.
 
 ## Events [#events]
 
