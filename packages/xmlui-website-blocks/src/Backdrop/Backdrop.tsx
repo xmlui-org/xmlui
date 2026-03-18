@@ -1,11 +1,12 @@
 import styles from "./Backdrop.module.scss";
 
 import { createComponentRenderer, createMetadata, dComponent, parseScssVar } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import { Backdrop } from "./BackdropNative";
 
 const COMP = "Backdrop";
 
-export const BackdropMd = createMetadata({
+export const BackdropMd: ComponentMetadata = createMetadata({
   status: "stable",
   description:
     `The \`${COMP}\` component is a semi-transparent overlay that appears on ` +

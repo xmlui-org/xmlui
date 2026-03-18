@@ -46,7 +46,6 @@ import { PageMd, PagesMd } from "./Pages/Pages";
 import { ProgressBarMd } from "./ProgressBar/ProgressBar";
 import { QueueMd } from "./Queue/Queue";
 import { RadioGroupMd } from "./RadioGroup/RadioGroup";
-import { RealTimeAdapterMd } from "./RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "./Redirect/Redirect";
 import { SelectMd } from "./Select/Select";
 import { SelectionStoreMd } from "./SelectionStore/SelectionStore";
@@ -386,7 +385,6 @@ export const collectedComponentMetadata = {
   QRCode: QRCodeMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
-  RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   ResponsiveBar: ResponsiveBarMd,
   ScrollViewer: ScrollViewerMd,

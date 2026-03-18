@@ -1,6 +1,7 @@
 import styles from "./Carousel.module.scss";
 
 import { createComponentRenderer, parseScssVar, createMetadata, d } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 
 const dDidChange = (componentName: string) => d(`This event is fired when the displayed content of the ${componentName} changes.`);
 const orientationOptionMd = ["horizontal", "vertical"];
@@ -8,7 +9,7 @@ import { CarouselComponent, defaultProps } from "./CarouselNative";
 
 const COMP = "CarouselNew";
 
-export const CarouselMd = createMetadata({
+export const CarouselMd: ComponentMetadata = createMetadata({
   status: "stable",
   description:
     `This component displays a slideshow by cycling through elements (images, text, or ` +

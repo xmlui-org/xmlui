@@ -64,7 +64,6 @@ import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
-import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
 import { appRenderer } from "./App/App";
@@ -580,7 +579,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(qrCodeComponentRenderer);
       this.registerCoreComponent(includeMarkupComponentRenderer);
       this.registerCoreComponent(changeListenerComponentRenderer);
-      this.registerCoreComponent(realTimeAdapterComponentRenderer);
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
@@ -621,7 +619,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
     this.registerCoreComponent(drawerComponentRenderer);
-
 
     if (process.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
       this.registerCoreComponent(htmlATagRenderer);
