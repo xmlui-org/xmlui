@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.12.10
+
+### Patch Changes
+
+- 166139f: fix error callback running on previous failed ApiCall after component mounts, as if the current call failed.
+- bb6dfd8: Add bootstrap-like column widths
+- 83c84c6: Remove RealTimeAdapter component
+- d456b4b: Move Backdrop and Breakout to the xmlui-website-blocks extension
+- bd49e49: Add experimental local storage persistence
+
 ## 0.12.9
 
 ### Patch Changes
