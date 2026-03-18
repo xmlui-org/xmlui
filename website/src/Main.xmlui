@@ -1071,7 +1071,6 @@
             <PageNotFound />
           </Page>
         </Pages>
-
         <ScrollToTop marginBottom="$space-4" />
         <Footer sticky="{false}" paddingVertical="$space-4">
           <Text fontWeight="400">
