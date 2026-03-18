@@ -2,9 +2,9 @@
 
 import { build } from "./build";
 import { start } from "./start";
+import { ssg } from "./ssg";
 
 import { preview } from "./preview";
-import { ssg } from "./ssg";
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import AdmZip from "adm-zip";
