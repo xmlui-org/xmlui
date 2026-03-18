@@ -10,6 +10,9 @@ export const GridLayoutMd = createMetadata({
     "dashboard-style grid. Items are positioned on an explicit grid with " +
     "configurable columns, row height, and responsive breakpoints.",
   props: {
+    data: d(
+      "The array of items to render. Each item is exposed as `$item` inside the child template.",
+    ),
     layout: {
       description:
         "Array of layout items. Each item: { i: string, x: number, y: number, w: number, h: number }. " +
@@ -51,7 +54,17 @@ export const GridLayoutMd = createMetadata({
       "string",
       "vertical",
     ),
+    itemTemplate: d(
+      "The template used to render each item. Use `$item` to access the current data item.",
+    ),
   },
+  contextVars: {
+    $item: d("The current data item."),
+    $itemIndex: d("The zero-based index of the current item."),
+    $isFirst: d("`true` when this is the first item."),
+    $isLast: d("`true` when this is the last item."),
+  },
+  childrenAsTemplate: "itemTemplate",
 });
 
 // mergeWithMetadata infers types from valueType in metadata.

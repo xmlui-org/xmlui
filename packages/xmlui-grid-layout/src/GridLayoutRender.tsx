@@ -1,7 +1,24 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
+
+function flattenChildren(children: React.ReactNode): React.ReactNode[] {
+  const flat: React.ReactNode[] = [];
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child) && child.props.children) {
+      const inner = child.props.children;
+      if (Array.isArray(inner)) {
+        inner.forEach((c: React.ReactNode) => flat.push(c));
+      } else {
+        flat.push(child);
+      }
+    } else {
+      flat.push(child);
+    }
+  });
+  return flat;
+}
 
 /** Resolve a CSS value (possibly a var() reference) to a pixel number. */
 function resolveCssLength(value: string, fallback: number): number {
@@ -83,9 +100,11 @@ export function GridLayoutRender({
     });
   }, [onNativeEvent]);
 
-  // Map children to grid items using layout
-  const childArray = React.Children.toArray(children);
+  // Flatten children (unwrap XMLUI Items/template wrapper elements)
+  const flatChildren = flattenChildren(children);
 
+  // react-grid-layout matches children to layout items by child.key.
+  // Ensure each child div has a key and data-grid matching the layout.
   return (
     <ResponsiveGridLayout
       className={className}
@@ -101,10 +120,10 @@ export function GridLayoutRender({
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
     >
-      {childArray.map((child, i) => {
-        const key = currentLayout[i]?.i || String(i);
+      {flatChildren.map((child, i) => {
+        const key = currentLayout[i]?.i ?? String(i);
         return (
-          <div key={key} style={{ overflow: "auto" }}>
+          <div key={key} data-grid={currentLayout[i] || { i: key, x: 0, y: Infinity, w: 6, h: 4 }} style={{ overflow: "auto" }}>
             {child}
           </div>
         );
