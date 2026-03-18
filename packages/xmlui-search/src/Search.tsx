@@ -201,6 +201,7 @@ export const Search = ({
             icon={<Icon name="search" aria-hidden />}
             onClick={onSearchButtonClick}
             contextualLabel="Open search"
+            className={styles.searchToggleButton}
           />
         ) : (
           <PopoverAnchor asChild>

@@ -39,6 +39,11 @@ $componentListFooter: "SearchFooter";
 $backgroundColor-SearchFooter: createThemeVar("backgroundColor-#{$componentListFooter}");
 $borderColor-SearchFooter: createThemeVar("borderColor-#{$componentListFooter}");
 
+$componentButton: "SearchToggleButton";
+$textColor-SearchToggleButton: createThemeVar("textColor-#{$componentButton}");
+$textColor-SearchToggleButton--hover: createThemeVar("textColor-#{$componentButton}--hover");
+$backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$componentButton}--hover");
+
 // Keyframe animations for collapsible search
 @keyframes expandSearch {
   from {
@@ -227,6 +232,15 @@ $borderColor-SearchFooter: createThemeVar("borderColor-#{$componentListFooter}")
   // Only apply to .item elements that are NOT also .categoryHeader
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
+  }
+}
+
+.searchToggleButton {
+  color: $textColor-SearchToggleButton !important;
+
+  &:hover {
+    background: $backgroundColor-SearchToggleButton--hover !important;
+    color: $textColor-SearchToggleButton--hover !important;
   }
 }
 
