@@ -120,6 +120,7 @@
                 showPreviewMetadata="false"
                 pageSize="8"
                 enableSpellCorrection="true"
+                mode="inline"
               />
             </Stack>
           </Fragment>

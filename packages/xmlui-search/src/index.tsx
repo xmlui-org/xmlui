@@ -15,6 +15,9 @@ const COMP_FILTER_CHIP = `${COMP}FilterChip`;
 const COMP_SORT_BUTTON = `${COMP}SortButton`;
 const COMP_RESULT_COUNT = `${COMP}ResultCount`;
 const COMP_DID_YOU_MEAN = `${COMP}DidYouMean`;
+const COMP_OVERLAY = `${COMP}Overlay`;
+const COMP_OVERLAY_PANEL = `${COMP}OverlayPanel`;
+const COMP_OVERLAY_TAB = `${COMP}OverlayTab`;
 
 export const SearchMd = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
@@ -65,6 +68,11 @@ export const SearchMd = createMetadata({
       description: `If true, shows a "Did you mean?" suggestion when the search returns no results but a close match exists.`,
       valueType: "boolean",
       defaultValue: true,
+    },
+    mode: {
+      description: `Controls how the search panel appears. "overlay" (default) opens a centered full-screen overlay when the search button is clicked. "inline" uses the original expand-in-place animation inside the navbar.`,
+      valueType: "string",
+      defaultValue: "overlay",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -128,6 +136,15 @@ export const SearchMd = createMetadata({
     // F — Did You Mean
     [`textColor-${COMP_DID_YOU_MEAN}`]: "$color-secondary-700",
 
+    // G — Overlay
+    [`backgroundColor-${COMP_OVERLAY}`]: "rgba(0, 0, 0, 0.45)",
+    [`backgroundColor-${COMP_OVERLAY_PANEL}`]: "$color-surface-0",
+    [`borderRadius-${COMP_OVERLAY_PANEL}`]: "12px",
+    [`boxShadow-${COMP_OVERLAY_PANEL}`]: "$boxShadow-xl",
+    [`textColor-${COMP_OVERLAY_TAB}`]: "$color-secondary-500",
+    [`textColor-${COMP_OVERLAY_TAB}--active`]: "$color-primary-600",
+    [`borderColor-${COMP_OVERLAY_TAB}--active`]: "$color-primary-500",
+
     dark: {
       [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
       [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
@@ -156,6 +173,7 @@ const searchComponentRenderer = createComponentRenderer(
         defaultSortOrder={extractValue.asOptionalString(props.defaultSortOrder) as "relevance" | "date" | undefined}
         pageSize={extractValue.asOptionalNumber(props.pageSize)}
         enableSpellCorrection={extractValue.asOptionalBoolean(props.enableSpellCorrection, true)}
+        mode={extractValue.asOptionalString(props.mode) as "overlay" | "inline" | undefined}
       />
     );
   },

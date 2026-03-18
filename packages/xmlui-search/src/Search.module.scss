@@ -107,18 +107,18 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
     z-index: 2;
   }
 
-  .panelFooter {
-    display: flex;
-    padding: 0.75rem 1.25rem;
-    border-top: 1px solid $borderColor-SearchFooter;
-    background-color: $backgroundColor-SearchFooter;
-    display: flex;
-    gap: 1em;
+}
 
-    & > div {
-      display: flex;
-      gap: 0.5rem;
-    }
+.panelFooter {
+  display: flex;
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid $borderColor-SearchFooter;
+  background-color: $backgroundColor-SearchFooter;
+  gap: 1em;
+
+  & > div {
+    display: flex;
+    gap: 0.5rem;
   }
 }
 
@@ -380,6 +380,115 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
       opacity: 0.8;
     }
   }
+}
+
+// G — Overlay mode
+$backgroundColor-SearchOverlay: createThemeVar("backgroundColor-SearchOverlay");
+$backgroundColor-SearchOverlayPanel: createThemeVar("backgroundColor-SearchOverlayPanel");
+$borderRadius-SearchOverlayPanel: createThemeVar("borderRadius-SearchOverlayPanel");
+$boxShadow-SearchOverlayPanel: createThemeVar("boxShadow-SearchOverlayPanel");
+$textColor-SearchOverlayTab: createThemeVar("textColor-SearchOverlayTab");
+$textColor-SearchOverlayTab--active: createThemeVar("textColor-SearchOverlayTab--active");
+$borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlayTab--active");
+
+.overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  background: $backgroundColor-SearchOverlay;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+.overlayPanel {
+  background: $backgroundColor-SearchOverlayPanel;
+  border-radius: $borderRadius-SearchOverlayPanel;
+  box-shadow: $boxShadow-SearchOverlayPanel;
+  width: 640px;
+  max-width: calc(100vw - 2rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.overlayInputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+
+  .overlaySearchIcon {
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .overlayInput {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 1rem;
+    padding: 0 !important;
+  }
+
+  .overlayCloseButton {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      opacity: 1;
+      background: $backgroundColor-SearchItem--hover;
+    }
+  }
+}
+
+.overlayControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+}
+
+.overlayTabs {
+  display: flex;
+  gap: 0;
+
+  .overlayTab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: $textColor-SearchOverlayTab;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      color: $textColor-SearchOverlayTab--active;
+    }
+
+    &.overlayTabActive {
+      color: $textColor-SearchOverlayTab--active;
+      border-bottom-color: $borderColor-SearchOverlayTab--active;
+    }
+  }
+}
+
+.overlayList {
+  max-height: 420px;
 }
 
 // F — Did You Mean banner

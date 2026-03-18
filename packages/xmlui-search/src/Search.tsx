@@ -33,6 +33,7 @@ import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
 import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
+import { createPortal } from "react-dom";
 import classNames from "classnames";
 
 type Props = {
@@ -56,6 +57,10 @@ type Props = {
   pageSize?: number;
   // F — Did You Mean
   enableSpellCorrection?: boolean;
+  // G — Display mode
+  /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
+   *  "inline": the current expand-in-place animation inside the navbar. */
+  mode?: "overlay" | "inline";
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -80,7 +85,10 @@ export const Search = ({
   defaultSortOrder = "relevance",
   pageSize,
   enableSpellCorrection = true,
+  mode = "overlay",
 }: Props) => {
+  // G — overlay mode is only active when collapsible=true AND mode="overlay"
+  const useOverlay = mode === "overlay" && collapsible;
   const _id = useId();
   const inputId = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -93,6 +101,27 @@ export const Search = ({
   const [animationDirection, setAnimationDirection] = useState<"expanding" | "collapsing" | null>(
     null,
   );
+
+  // G — overlay open state
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+
+  const openOverlay = useCallback(() => {
+    setIsOverlayOpen(true);
+  }, []);
+
+  const closeOverlay = useCallback(() => {
+    setIsOverlayOpen(false);
+    setInputValue("");
+    setShow(false);
+    setActiveIndex(-1);
+  }, []);
+
+  // Auto-focus the input when the overlay opens
+  useEffect(() => {
+    if (isOverlayOpen) {
+      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 50);
+    }
+  }, [isOverlayOpen]);
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
@@ -228,8 +257,12 @@ export const Search = ({
         setShow(false);
         itemLinkRefs.current[targetIndex]?.click();
       } else if (e.key === "Escape") {
-        setActiveIndex(-1);
-        setShow(false);
+        if (useOverlay) {
+          closeOverlay();
+        } else {
+          setActiveIndex(-1);
+          setShow(false);
+        }
       }
     },
     [activeIndex, results.length, show],
@@ -288,6 +321,188 @@ export const Search = ({
     setSelectedCategories(new Set());
   }, []);
 
+  // Shared results list JSX — used by both overlay and popover modes
+  const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
+
+  const resultsListJsx = (
+    <>
+      {/* F — Did You Mean banner */}
+      {suggestion && enableSpellCorrection && (
+        <li role="presentation" aria-hidden="true">
+          <DidYouMeanBanner suggestion={suggestion} onAccept={(s) => setInputValue(s)} />
+        </li>
+      )}
+      {results.length > 0 &&
+        results.map((result, idx) => {
+          const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+          const prevEffectiveCategory =
+            idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
+          const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+          const allUncategorized = results.every((r) => r.item.category == null);
+          return (
+            <Fragment key={`${result.item.path}-${idx}`}>
+              {showCategoryHeader && !allUncategorized && (
+                <li className={styles.categoryHeader} role="presentation" aria-hidden="true">
+                  <Text className={styles.categoryHeaderText}>{effectiveCategory}</Text>
+                </li>
+              )}
+              <li
+                id={`option-${idx}`}
+                role="option"
+                className={classnames(styles.item, styles.header, {
+                  [styles.focus]: activeIndex === idx,
+                })}
+                onMouseEnter={() => {
+                  setActiveIndex(idx);
+                  setNavigationSource("mouse");
+                }}
+                ref={(el) => (itemRefs.current[idx] = el!)}
+                aria-selected={activeIndex === idx}
+              >
+                <SearchItemContent
+                  ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                  idx={idx}
+                  item={result.item}
+                  matches={result.matches}
+                  maxContentMatchNumber={maxContentMatchNumber}
+                  onClick={onClick}
+                  showPreviewMetadata={showPreviewMetadata}
+                />
+              </li>
+            </Fragment>
+          );
+        })}
+      {/* A — Zero results UX */}
+      {results.length === 0 && (
+        <li role="presentation" aria-hidden="true">
+          <NoResultsPanel
+            message={noResultsMessage}
+            suggestedQueries={suggestedQueries}
+            onQuerySelect={(q) => setInputValue(q)}
+            showSuggestion={!suggestion || !enableSpellCorrection}
+          />
+        </li>
+      )}
+    </>
+  );
+
+  const loadMoreJsx = (hasMore || totalCount > effectivePageSize) && results.length > 0 && (
+    <div className={styles.loadMoreRow}>
+      <Text className={styles.resultCount}>{`Showing ${results.length} of ${sortedResults.length}`}</Text>
+      {hasMore && (
+        <button className={styles.loadMoreButton} onClick={() => setPage((p) => p + 1)}>
+          Load more
+        </button>
+      )}
+    </div>
+  );
+
+  const footerJsx = (
+    <footer className={styles.panelFooter}>
+      <div>
+        <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
+        <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
+        <Text>Navigate</Text>
+      </div>
+      <div style={{ flex: "1" }}>
+        <Text variant="keyboard">Enter</Text>
+        <Text>Select</Text>
+      </div>
+      <div>
+        <Text variant="keyboard">Esc</Text>
+        <Text>Close</Text>
+      </div>
+    </footer>
+  );
+
+  // G — Overlay mode render
+  if (useOverlay) {
+    return (
+      <span className={className}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        {/* Toggle button — always visible when overlay is closed */}
+        {!isOverlayOpen && (
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            icon={<Icon name="search" aria-hidden />}
+            onClick={openOverlay}
+            contextualLabel="Open search"
+            className={styles.searchToggleButton}
+          />
+        )}
+        {/* Overlay */}
+        {isOverlayOpen && createPortal(
+          // Wrap with className so theme CSS vars are in scope for the portal
+          <div className={className}>
+            {/* Backdrop — click outside to close */}
+            <div className={styles.overlayBackdrop} onClick={closeOverlay}>
+              <div
+                className={styles.overlayPanel}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Input row */}
+                <div className={styles.overlayInputRow}>
+                  <Icon name="search" className={styles.overlaySearchIcon} />
+                  <TextBox
+                    id={inputId}
+                    ref={inputRef}
+                    className={styles.overlayInput}
+                    type="search"
+                    placeholder={placeholder ?? "Type to search…"}
+                    value={inputValue}
+                    onDidChange={(value) => setInputValue(value)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls={`${inputId}-listbox`}
+                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                  />
+                </div>
+
+                {/* Category tabs + sort — only when there's a query */}
+                {hasQuery && (
+                  <div className={styles.overlayControls}>
+                    <OverlayCategoryTabs
+                      categories={availableCategories}
+                      selectedCategories={selectedCategories}
+                      onSelectOne={(cat: string) => setSelectedCategories(new Set([cat]))}
+                      onClearAll={clearCategories}
+                    />
+                    <SortControl sortOrder={sortOrder} onSortChange={setSortOrder} />
+                  </div>
+                )}
+
+                {/* Results */}
+                {hasQuery && (
+                  <>
+                    <ul
+                      id={`${inputId}-listbox`}
+                      ref={listRef}
+                      className={classNames(styles.list, styles.overlayList)}
+                      role="listbox"
+                      aria-label="Search results"
+                    >
+                      {resultsListJsx}
+                    </ul>
+                    {loadMoreJsx}
+                  </>
+                )}
+                {/* Footer always visible in overlay */}
+                {footerJsx}
+              </div>
+            </div>
+          </div>, document.body
+        )}
+      </span>
+    );
+  }
+
+  // G — Inline / Popover mode (original behavior)
   return (
     <span className={className}>
       <Popover open={show} onOpenChange={setShow}>
@@ -329,7 +544,7 @@ export const Search = ({
             />
           </PopoverAnchor>
         )}
-        {show && allResults && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
+        {show && allResults && hasQuery && (
           <Portal container={_root}>
             <PopoverContent
               align="end"
@@ -362,111 +577,10 @@ export const Search = ({
                 role="listbox"
                 aria-label="Search results"
               >
-                {/* F — Did You Mean banner */}
-                {suggestion && enableSpellCorrection && (
-                  <li role="presentation" aria-hidden="true">
-                    <DidYouMeanBanner
-                      suggestion={suggestion}
-                      onAccept={(s) => setInputValue(s)}
-                    />
-                  </li>
-                )}
-                {results.length > 0 &&
-                  results.map((result, idx) => {
-                    const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
-                    const prevEffectiveCategory =
-                      idx > 0
-                        ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY)
-                        : undefined;
-                    const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
-                    let allUncategorized = results.every((r) => r.item.category == null);
-                    return (
-                      <Fragment key={`${result.item.path}-${idx}`}>
-                        {showCategoryHeader && !allUncategorized && (
-                          <li
-                            className={styles.categoryHeader}
-                            role="presentation"
-                            aria-hidden="true"
-                          >
-                            <Text
-                              className={styles.categoryHeaderText}
-                            >
-                              {effectiveCategory}
-                            </Text>
-                          </li>
-                        )}
-                        <li
-                          id={`option-${idx}`}
-                          role="option"
-                          className={classnames(styles.item, styles.header, {
-                            [styles.focus]: activeIndex === idx,
-                          })}
-                          onMouseEnter={() => {
-                            setActiveIndex(idx);
-                            setNavigationSource("mouse");
-                          }}
-                          ref={(el) => (itemRefs.current[idx] = el!)}
-                          aria-selected={activeIndex === idx}
-                        >
-                          <SearchItemContent
-                            ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                            idx={idx}
-                            item={result.item}
-                            matches={result.matches}
-                            maxContentMatchNumber={maxContentMatchNumber}
-                            onClick={onClick}
-                            showPreviewMetadata={showPreviewMetadata}
-                          />
-                        </li>
-                      </Fragment>
-                    );
-                  })}
-                {/* A — Zero results UX (shown only when no suggestion) */}
-                {results.length === 0 && (
-                  <li role="presentation" aria-hidden="true">
-                    <NoResultsPanel
-                      message={noResultsMessage}
-                      suggestedQueries={suggestedQueries}
-                      onQuerySelect={(q) => setInputValue(q)}
-                      showSuggestion={!suggestion || !enableSpellCorrection}
-                    />
-                  </li>
-                )}
+                {resultsListJsx}
               </ul>
-              {/* E — Load more + result count */}
-              {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
-                <div className={styles.loadMoreRow}>
-                  <Text className={styles.resultCount}>
-                    {`Showing ${results.length} of ${sortedResults.length}`}
-                  </Text>
-                  {hasMore && (
-                    <button
-                      className={styles.loadMoreButton}
-                      onClick={() => setPage((p) => p + 1)}
-                    >
-                      Load more
-                    </button>
-                  )}
-                </div>
-              )}
-              {!inDrawer && (
-                <footer className={styles.panelFooter}>
-                  <div>
-                    <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
-                    <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
-                    <Text>Navigate</Text>
-                  </div>
-
-                  <div style={{ flex: "1" }}>
-                    <Text variant="keyboard">Enter</Text>
-                    <Text>Select</Text>
-                  </div>
-
-                  <div>
-                    <Text variant="keyboard">Esc</Text>
-                    <Text>Close</Text>
-                  </div>
-              </footer>)}
+              {loadMoreJsx}
+              {!inDrawer && footerJsx}
             </PopoverContent>
           </Portal>
         )}
@@ -573,6 +687,62 @@ function SortControl({ sortOrder, onSortChange }: SortControlProps) {
       >
         Date
       </button>
+    </div>
+  );
+}
+
+// --- G: OverlayCategoryTabs sub-component
+
+/** Maps raw category keys to user-friendly display labels. */
+function getCategoryLabel(cat: string): string {
+  const labels: Record<string, string> = {
+    docs: "Documentation",
+    blog: "Blog",
+    news: "News",
+    "get-started": "Get Started",
+    other: "Other",
+  };
+  return labels[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+type OverlayCategoryTabsProps = {
+  categories: string[];
+  selectedCategories: Set<string>;
+  onSelectOne: (cat: string) => void;
+  onClearAll: () => void;
+};
+
+function OverlayCategoryTabs({
+  categories,
+  selectedCategories,
+  onSelectOne,
+  onClearAll,
+}: OverlayCategoryTabsProps) {
+  const allActive = selectedCategories.size === 0;
+  return (
+    <div className={styles.overlayTabs} role="tablist" aria-label="Filter by category">
+      <button
+        role="tab"
+        aria-selected={allActive}
+        className={classnames(styles.overlayTab, { [styles.overlayTabActive]: allActive })}
+        onClick={onClearAll}
+      >
+        All content
+      </button>
+      {categories.map((cat) => {
+        const active = selectedCategories.size === 1 && selectedCategories.has(cat);
+        return (
+          <button
+            key={cat}
+            role="tab"
+            aria-selected={active}
+            className={classnames(styles.overlayTab, { [styles.overlayTabActive]: active })}
+            onClick={() => onSelectOne(cat)}
+          >
+            {getCategoryLabel(cat)}
+          </button>
+        );
+      })}
     </div>
   );
 }
