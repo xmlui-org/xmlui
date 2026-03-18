@@ -45,6 +45,8 @@ export function GridLayoutRender({
   breakpoints,
   cols,
   className,
+  draggableHandle,
+  draggableCancel,
   onNativeEvent,
   children,
 }: {
@@ -58,11 +60,13 @@ export function GridLayoutRender({
   breakpoints?: Record<string, number>;
   cols?: Record<string, number>;
   className?: string;
+  draggableHandle?: string;
+  draggableCancel?: string;
   onNativeEvent?: (event: any) => void;
   children?: React.ReactNode;
 }) {
   const defaultBreakpoints = breakpoints || { lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 };
-  const defaultCols = cols || { lg: columns, md: columns, sm: Math.max(1, columns - 4), xs: Math.max(1, columns - 6), xxs: Math.max(1, columns - 8) };
+  const defaultCols = cols || { lg: columns, md: columns, sm: columns, xs: columns, xxs: columns };
 
   const [resolvedGap, setResolvedGap] = useState(() => resolveCssLength(gap, 16));
   const [currentLayout, setCurrentLayout] = useState<any[]>(layout || []);
@@ -117,13 +121,17 @@ export function GridLayoutRender({
       isResizable={resizable}
       compactType={compactType as any}
       onLayoutChange={handleLayoutChange}
+      draggableHandle={draggableHandle || ""}
+      draggableCancel={draggableCancel || ""}
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
     >
       {flatChildren.map((child, i) => {
-        const key = currentLayout[i]?.i ?? String(i);
+        const layoutItem = currentLayout[i];
+        const key = layoutItem?.i ?? `_gl_${i}`;
+        const dataGrid = layoutItem || { i: key, x: 0, y: Infinity, w: 6, h: 4 };
         return (
-          <div key={key} data-grid={currentLayout[i] || { i: key, x: 0, y: Infinity, w: 6, h: 4 }} style={{ overflow: "auto" }}>
+          <div key={key} data-grid={dataGrid} style={{ overflow: "auto" }}>
             {child}
           </div>
         );
