@@ -48,6 +48,7 @@ import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUp
 import { iconComponentRenderer } from "./Icon/Icon";
 import { iframeComponentRenderer } from "./IFrame/IFrame";
 import { itemsComponentRenderer } from "./Items/Items";
+import { masonryComponentRenderer } from "./Masonry/Masonry";
 import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
 import { imageComponentRenderer } from "./Image/Image";
 import { pageMetaTitleComponentRenderer } from "./PageMetaTitle/PageMetaTitle";
@@ -531,6 +532,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Items !== "false") {
       this.registerCoreComponent(itemsComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_Masonry !== "false") {
+      this.registerCoreComponent(masonryComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
       this.registerCoreComponent(selectionStoreComponentRenderer);
