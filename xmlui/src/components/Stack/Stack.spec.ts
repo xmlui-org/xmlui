@@ -1558,6 +1558,36 @@ test.describe("itemWidth property", () => {
     expect(item1Width).toBeGreaterThan(0);
     expect(item2Width).toBeGreaterThan(item1Width);
   });
+
+  test("HStack itemWidth resolves theme variable shorthand (e.g. $col-3)", async ({ page, initTestBed }) => {
+    // $col-3 = (100/12 * 3) = 25% of the container width (Bootstrap-style grid)
+    // In a 1200px container with gap="0": 4 items × 300px = 1200px (4 items per row)
+    await initTestBed(`
+      <HStack testId="stack" width="1200px" itemWidth="$col-3" wrapContent gap="0">
+        <Items data="{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]}">
+          <Stack testId="item-{$itemIndex}" height="24px" />
+        </Items>
+      </HStack>
+    `);
+
+    // Items must have a positive width — before the fix, $col-3 was passed as a literal
+    // unresolved string which broke the CSS width rule and items collapsed to zero width
+    const { width: item0Width } = await getBounds(page.getByTestId("item-0"));
+    expect(item0Width).toBeGreaterThan(0);
+
+    // Items on the same row should share the same top position
+    const { top: item0Top } = await getBounds(page.getByTestId("item-0"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item-3"));
+    expect(item0Top).toBe(item3Top);
+
+    // Item 4 must wrap to the next row (proving the layout computed a valid width)
+    const { top: item4Top } = await getBounds(page.getByTestId("item-4"));
+    expect(item4Top).toBeGreaterThan(item0Top);
+
+    // The last item wraps further still
+    const { top: item15Top } = await getBounds(page.getByTestId("item-15"));
+    expect(item15Top).toBeGreaterThan(item4Top);
+  });
 });
 
 // =============================================================================

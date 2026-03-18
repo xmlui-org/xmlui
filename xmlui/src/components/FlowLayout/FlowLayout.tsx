@@ -134,7 +134,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
     const scrollStyle = extractValue.asOptionalString(
       node.props.scrollStyle,
