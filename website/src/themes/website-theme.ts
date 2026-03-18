@@ -97,7 +97,10 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "right-CloseButton": "$space-3",
 
     // --- Search
+    "textColor-SearchToggleButton": "$color-surface-500",
+    "textColor-SearchToggleButton--hover": "$color-surface-700",
     "backgroundColor-SearchItem--hover": "$color-surface-50",
+
 
     // --- Headlines
     "paddingTop-Headlines": "$space-14",
