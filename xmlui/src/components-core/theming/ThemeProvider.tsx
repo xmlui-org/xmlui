@@ -350,8 +350,14 @@ function ThemeProvider({
 
   useIsomorphicLayoutEffect(() => {
     if (typeof document !== "undefined") {
-      if(domRoot instanceof ShadowRoot){
-        setRoot(domRoot.getElementById("nested-app-root"));
+      if (domRoot instanceof ShadowRoot) {
+        let portalContainer = domRoot.getElementById("nested-app-portal-root");
+        if (!portalContainer) {
+          portalContainer = document.createElement("div");
+          portalContainer.id = "nested-app-portal-root";
+          domRoot.appendChild(portalContainer);
+        }
+        setRoot(portalContainer);
       } else {
         setRoot(document.body);
       }

@@ -23,6 +23,7 @@ import {
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "AutoComplete";
 
@@ -175,10 +176,12 @@ type ThemedAutoCompleteProps = React.ComponentPropsWithoutRef<typeof AutoComplet
 export const ThemedAutoComplete = React.forwardRef<React.ElementRef<typeof AutoComplete>, ThemedAutoCompleteProps>(
   function ThemedAutoComplete({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(AutoCompleteMd);
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
     return (
       <AutoComplete
         {...props}
-        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        className={combinedClassName}
+        contentClassName={combinedClassName}
         ref={ref}
       />
     );
@@ -202,6 +205,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
       <AutoComplete
         multi={extractValue.asOptionalBoolean(node.props.multi)}
         classes={classes}
+        contentClassName={classes?.[COMPONENT_PART_KEY]}
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}

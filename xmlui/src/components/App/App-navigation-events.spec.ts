@@ -322,6 +322,19 @@ test.describe("Navigation Events", () => {
     await detailBtn.click();
     await expect(page.locator(".xmlui-page-root")).toContainText("Product Detail");
 
+    // Wait for all navigation events (will + did for both navigations = 4 events).
+    // didNavigate fires asynchronously after the navigation completes, so we poll
+    // until testState reflects at least 4 entries.
+    await expect
+      .poll(
+        async () => {
+          const log = await testStateDriver.testState();
+          return Array.isArray(log) ? log.length : 0;
+        },
+        { timeout: 5000 },
+      )
+      .toBeGreaterThanOrEqual(4);
+
     const log = await testStateDriver.testState();
     // Should have logged 4 events: 2 for products, 2 for detail
     expect(log.length).toBeGreaterThanOrEqual(4);

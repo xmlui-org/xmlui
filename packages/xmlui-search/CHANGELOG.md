@@ -1,5 +1,12 @@
 # xmlui-search
 
+## 0.1.8
+
+### Patch Changes
+
+- e01af43: Fixed selected nav link on navpanel appearing above search results panel dropdown in the drawer.
+- 3e243f0: Added keyboard hints to bottom of search panel. Selected items in results list are not obscured by group header on keyboard nav. Removed browser native suggetions. Some small stylistic updates.
+
 ## 0.1.7
 
 ### Patch Changes

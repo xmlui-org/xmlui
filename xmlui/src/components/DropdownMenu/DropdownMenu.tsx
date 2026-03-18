@@ -4,6 +4,7 @@ import React from "react";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
 import { createMetadata, d, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
@@ -119,7 +120,8 @@ type ThemedDropdownMenuProps = React.ComponentProps<typeof DropdownMenu> & { cla
 export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDropdownMenuProps>(
   function ThemedDropdownMenu({ className, ...props }: ThemedDropdownMenuProps, ref) {
     const themeClass = useComponentThemeClass(DropdownMenuMd);
-    return <DropdownMenu {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    return <DropdownMenu {...props} className={combinedClassName} contentClassName={combinedClassName} ref={ref} />;
   },
 );
 
@@ -138,6 +140,7 @@ export const dropdownMenuComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         onWillOpen={lookupEventHandler("willOpen")}
         classes={classes}
+        contentClassName={classes?.[COMPONENT_PART_KEY]}
         alignment={extractValue(node.props?.alignment)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}

@@ -1,5 +1,32 @@
 # xmlui-website
 
+## 0.0.16
+
+### Patch Changes
+
+- 551775b: fix: Improve styling flexibility and theme handling across components
+- Updated dependencies [f889233]
+- Updated dependencies [6ccb0e6]
+- Updated dependencies [20be424]
+- Updated dependencies [70a091c]
+- Updated dependencies [551775b]
+- Updated dependencies [7e5c62f]
+- Updated dependencies [41552d1]
+- Updated dependencies [7d85f4a]
+- Updated dependencies [fe26c40]
+- Updated dependencies [a9e8c42]
+- Updated dependencies [8660487]
+- Updated dependencies [3211bce]
+- Updated dependencies [2a5d32f]
+- Updated dependencies [36e79df]
+- Updated dependencies [e01af43]
+- Updated dependencies [3e243f0]
+- Updated dependencies [c6aea4f]
+- Updated dependencies [2f368e4]
+- Updated dependencies [9031871]
+  - xmlui@0.12.8
+  - xmlui-search@0.1.8
+
 ## 0.0.15
 
 ### Patch Changes

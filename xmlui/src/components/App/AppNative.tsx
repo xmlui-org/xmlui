@@ -89,7 +89,10 @@ type Props = {
   onMessageReceived?: (data: any, event: MessageEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
   onKeyUp?: (event: KeyboardEvent) => void;
-  onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
+  onWillNavigate?: (
+    to: string | number,
+    queryParams?: Record<string, any>,
+  ) => false | void | null | undefined;
   onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
@@ -228,7 +231,13 @@ export function App({
     ? (normalized as AppLayoutType)
     : "condensed-sticky";
   const appContext = useAppContext();
-  const { setLoggedInUser, setNavigationHandlers, mediaSize, forceRefreshAnchorScroll, appGlobals } = appContext;
+  const {
+    setLoggedInUser,
+    setNavigationHandlers,
+    mediaSize,
+    forceRefreshAnchorScroll,
+    appGlobals,
+  } = appContext;
   const hasRegisteredHeader = header !== undefined;
 
   // Check if NavPanel exists and is actually displayed

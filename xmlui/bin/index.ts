@@ -224,7 +224,7 @@ yargs(hideBin(process.argv))
         })
         .option("debug", {
           type: "boolean",
-          description: "Preserve intermediate SSR files for debugging",
+          description: "Run SSG in Vite SSR debug mode",
           hidden: true,
         })
         .option("contentDir", {

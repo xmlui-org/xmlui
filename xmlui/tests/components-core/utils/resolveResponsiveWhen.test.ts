@@ -1,4 +1,4 @@
-import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import type { ContainerState } from "../../../src/components-core/rendering/ContainerWrapper";
 import type { AppContextObject } from "../../../src/abstractions/AppContextDefs";
 import { resolveResponsiveWhen } from "../../../src/components-core/utils/extractParam";
@@ -137,27 +137,17 @@ describe("resolveResponsiveWhen", () => {
   });
 
   // --- Test: sizeIndex undefined
-  // The SSR path is taken when `document` is not defined. Because Vitest runs in a
-  // jsdom environment, we stub `document` away for these tests. The client-side
-  // "suppress flash" path (document defined, sizeIndex undefined) is covered by E2E tests.
-  describe("SSR mode (no document)", () => {
-    beforeEach(() => {
-      vi.stubGlobal("document", undefined);
-    });
-    afterEach(() => {
-      vi.unstubAllGlobals();
-    });
-
-    it("no breakpoint evaluates to true → returns false", () => {
+  // --- In this mode viewport is unknown (SSR and first client render share this behavior).
+  // --- The resolver keeps components that are visible at any breakpoint.
+  describe("sizeIndex undefined", () => {
+    it("base=true + when-md=false → returns true (visible at xs/sm)", () => {
       const appCtx = { mediaSize: undefined } as any;
-      // only when-md=false; no true value at any breakpoint → hidden in SSR
       const result = resolveResponsiveWhen("true", { md: "false" }, emptyState, appCtx);
-      expect(result).equal(false);
+      expect(result).equal(true);
     });
 
-    it("at least one breakpoint evaluates to true → returns true", () => {
+    it("when-md=true → returns true (visible at md and above)", () => {
       const appCtx = { mediaSize: undefined } as any;
-      // when-md=true exists → component is visible somewhere → render in SSR
       const result = resolveResponsiveWhen(undefined, { md: "true" }, emptyState, appCtx);
       expect(result).equal(true);
     });
@@ -173,14 +163,18 @@ describe("resolveResponsiveWhen", () => {
       const result = resolveResponsiveWhen(undefined, { xs: "false", md: "false", lg: "false" }, emptyState, appCtx);
       expect(result).equal(false);
     });
+
+    it("base=true + when-md=true → returns true", () => {
+      const appCtx = { mediaSize: undefined } as any;
+      const result = resolveResponsiveWhen("true", { md: "true" }, emptyState, appCtx);
+      expect(result).equal(true);
+    });
   });
 
-  // --- Test: client-side flash prevention (document defined, sizeIndex not yet computed)
-  it("client-side: sizeIndex undefined → returns false (suppress rendering flash)", () => {
-    // document IS defined (jsdom) and sizeIndex is undefined → flash-prevention branch.
+  it("sizeIndex undefined is deterministic across environments", () => {
     const appCtx = { mediaSize: undefined } as any;
     const result = resolveResponsiveWhen("true", { md: "true" }, emptyState, appCtx);
-    expect(result).equal(false);
+    expect(result).equal(true);
   });
 
   // --- Test: Complex cascade (xs → xxl)

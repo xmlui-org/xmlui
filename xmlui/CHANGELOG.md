@@ -1,5 +1,33 @@
 # xmlui
 
+## 0.12.9
+
+### Patch Changes
+
+- 39b3847: Retry patch release
+
+## 0.12.8
+
+### Patch Changes
+
+- f889233: Add `TileGrid` component — a responsive, virtualized tile grid
+- 6ccb0e6: Fix Markdown xmlui-pg regression
+- 20be424: Fix issues with mobile NavPanel
+- 70a091c: Add "spacing" to applyLayoutProperties
+- 551775b: fix: Improve styling flexibility and theme handling across components
+- 7e5c62f: Implement scroll-snap related layout properties
+- 41552d1: Fix responsive width properties (e.g. `width-md`) not working on FlowLayout/HStack-wrap children; eliminate layout flash by using CSS @media rules instead of JS-based sizeIndex detection
+- 7d85f4a: Add debounceWaitInMs property to ChangeListener
+- fe26c40: Initialize global variables of App before children are initialized
+- a9e8c42: DataSource and APICall now return repsonse headers
+- 8660487: Make transaction IDs optional to avoid CORS preflight failures with third-party APIs.
+- 3211bce: Fix NavGroup trigger alignment
+- 2a5d32f: fix: playground - theme handing
+- 36e79df: fix: wrapComponent - prevent layout props from being forwarded to native components unless explicitly declared in metadata
+- c6aea4f: Upgrade `react-router-dom` from 6.26.2 to 6.30.3 to address CVE-2025-68470 (XSS via Open Redirects in `@remix-run/router`). `axios` was already upgraded to 1.13.5 to address CVE-2026-25639 (DoS via `__proto__` key in `mergeConfig`).
+- 2f368e4: Fix dependency regression with global variables
+- 9031871: Add "strict" setting so lintSeverity
+
 ## 0.12.7
 
 ### Patch Changes

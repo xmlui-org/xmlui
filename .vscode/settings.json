@@ -102,6 +102,7 @@
     "/^cd /Users/dotneteer/source/xmlui/xmlui && npm run 2>&1 \\| grep -E \"\\^\\\\s\\+\\(test\\|type\\|build\\|check\\)\" \\| head -20$/": {
       "approve": true,
       "matchCommandLine": true
-    }
+    },
+    "git fetch": true
   }
 }

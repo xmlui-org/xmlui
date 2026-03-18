@@ -85,7 +85,7 @@ test("component passes both previous and new values to the handler", async ({
 
 test("component handles complex data types", async ({ page, initTestBed }) => {
   await initTestBed(`
-    <VStack var.data="{{ a: 1, b: [2, { counter: 10}] }}" var.clone="{0}">
+    <VStack var.data="{{ a: 1, b: [2, { counter: 10}] }}" var.clone="{10}">
       <Button testId="incRelevant" onClick="data.b[1].counter++">Increment</Button>
       <Button testId="incIrrelevant" onClick="data.a++">Increment irrelevant</Button>
       <Text testId="text">{clone}</Text>
@@ -138,11 +138,11 @@ test("component doesn't fire on identical primitive values", async ({ page, init
     </VStack>
   `);
 
-  await expect(page.getByTestId("text")).toHaveText("0|1|1");
+  await expect(page.getByTestId("text")).toHaveText("0|0|1");
   await page.locator("button").click();
-  await expect(page.getByTestId("text")).toHaveText("1|1|1");
+  await expect(page.getByTestId("text")).toHaveText("1|0|1");
   await page.locator("button").click();
-  await expect(page.getByTestId("text")).toHaveText("2|1|1");
+  await expect(page.getByTestId("text")).toHaveText("2|0|1");
 });
 
 // =============================================================================
@@ -161,11 +161,11 @@ test("component works with multiple listeners on the same value", async ({ page,
     </VStack>
   `);
 
-  await expect(page.getByTestId("text")).toHaveText("0|1|1");
+  await expect(page.getByTestId("text")).toHaveText("0|0|0");
   await page.locator("button").click();
-  await expect(page.getByTestId("text")).toHaveText("1|2|2");
+  await expect(page.getByTestId("text")).toHaveText("1|1|1");
   await page.locator("button").click();
-  await expect(page.getByTestId("text")).toHaveText("2|3|3");
+  await expect(page.getByTestId("text")).toHaveText("2|2|2");
 });
 
 test("component works with conditional rendering", async ({ page, initTestBed }) => {
@@ -190,8 +190,10 @@ test("component works with conditional rendering", async ({ page, initTestBed })
   await expect(page.getByTestId("text")).toHaveText("0");
   await page.getByTestId("button").click();
   await expect(page.getByTestId("text")).toHaveText("0");
+  // ChangeListener mounts with show=true but does not fire on initial mount.
+  // The next counter change (button click) will be detected as the first change.
   await page.getByTestId("showButton").click();
-  await expect(page.getByTestId("text")).toHaveText("3");
+  await expect(page.getByTestId("text")).toHaveText("0");
   await page.getByTestId("button").click();
   await expect(page.getByTestId("text")).toHaveText("4");
   await page.getByTestId("showButton").click();
