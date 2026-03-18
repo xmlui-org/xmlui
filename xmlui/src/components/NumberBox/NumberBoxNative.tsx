@@ -189,9 +189,11 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [value]);
 
   // --- Initialize the related field with the input's initial value
+  // Validate initialValue: only store usable numbers, reject non-numeric strings
   useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
-  }, [initialValue, updateState]);
+    const parsed = toUsableNumber(initialValue, integersOnly);
+    updateState({ value: isEmptyLike(initialValue) ? null : parsed }, { initial: true });
+  }, [initialValue, integersOnly, updateState]);
 
   // --- Handle the value change events for this input
   const updateValue = useCallback(

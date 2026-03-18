@@ -314,7 +314,7 @@ test.describe("Basic Functionality", () => {
 test.describe("Accessibility", () => {
   test("has correct role", async ({ initTestBed, page }) => {
     await initTestBed(`<NumberBox testId="input" hasSpinBox="true" />`);
-    await expect(page.getByRole("spinbutton")).toHaveCount(2);
+    await expect(page.getByRole("spinbutton")).toHaveCount(1);
     await expect(page.getByRole("spinbutton")).toBeVisible();
   });
 

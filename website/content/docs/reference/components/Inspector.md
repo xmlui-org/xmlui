@@ -29,7 +29,7 @@ Enable tracing in your `config.json`:
 
 Place `<Inspector />` wherever you want the icon to appear, typically in the `AppHeader`:
 
-```xmlui-pg copy display name="Example: Basic usage"
+```xmlui
 <App>
   <AppHeader>
     <Text value="My App" fontWeight="bold" />
@@ -48,7 +48,7 @@ Path to the inspector HTML file. The file must be accessible from the app's root
 - Type: `string`
 - Default: `"xmlui/xs-diff.html"`
 
-```xmlui-pg copy display name="Example: custom src"
+```xmlui
 <App>
   <AppHeader>
     <SpaceFiller />
@@ -93,7 +93,7 @@ Opens the inspector dialog programmatically.
 
 **Signature**: `open(): void`
 
-```xmlui-pg copy display name="Example: programmatic open"
+```xmlui
 <App>
   <AppHeader>
     <Button label="Open Inspector" onClick="myInspector.open()" />
