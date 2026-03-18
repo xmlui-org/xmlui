@@ -14,6 +14,14 @@ To use the Inspector, your app needs two files in its `xmlui/` directory alongsi
 1. **`xs-diff.html`** — the Inspector viewer (from [trace-tools](https://github.com/user/trace-tools))
 2. **`xmlui-parser.es.js`** — the standalone XMLUI parser from the same place
 
+Optionally, include **`xs-trace.js`** (from the same repo) in your app's root directory and load it via a `<script>` tag. This provides three helpers for injecting app-level traces into the Inspector timeline:
+
+- **`window.xsTrace(label, fn)`** — wraps a function call and records its duration
+- **`window.xsTraceEvent(label, data)`** — emits a semantic event with a data payload
+- **`window.xsTraceWith(label, fn, extractData)`** — combines both: times the function and attaches data extracted from its result
+
+All three emit entries with kind `"app:trace"` that appear in the Inspector timeline alongside engine-generated events. They are no-ops when tracing is disabled (`window._xsLogs` is undefined).
+
 Enable tracing in your `config.json`:
 
 ```json
