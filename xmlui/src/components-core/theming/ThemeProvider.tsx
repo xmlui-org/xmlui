@@ -3,6 +3,7 @@ import {
   generateBaseFontSizes,
   generateBaseSpacings,
   generateBaseTones,
+  generateBootstrapBaseColumns,
   generateBorderSegments,
   generateButtonTones,
   generatePaddingSegments,
@@ -130,6 +131,7 @@ export function useCompiledTheme(
         }))
         .slice(0, themeDefChain.length - 1),
       {
+        ...generateBootstrapBaseColumns(mergedThemeVars),
         ...generateBaseSpacings(mergedThemeVars),
         ...generatePaddingSegments(mergedThemeVars),
         ...generateBorderSegments(mergedThemeVars),
