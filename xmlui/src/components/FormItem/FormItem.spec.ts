@@ -1075,11 +1075,9 @@ test.describe("Accessibility", () => {
       </Form>
     `);
 
-    await expect(page.getByRole("textbox").first()).toBeVisible();
+    await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByRole("checkbox")).toBeVisible();
-    // Number inputs in XMLUI appear as textbox with inputmode="numeric"
-    const numberInputs = page.getByRole("textbox");
-    await expect(numberInputs).toHaveCount(2); // text and number both use textbox role
+    await expect(page.getByRole("spinbutton")).toBeVisible();
   });
 });
 
