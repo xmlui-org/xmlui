@@ -1,12 +1,18 @@
-import { getBoundingRect, SKIP_REASON } from "../../testing/component-test-helpers";
-import { test, expect } from "../../testing/fixtures";
+import { test, expect } from "xmlui/testing";
+import type { Locator } from "@playwright/test";
+
+const EXT = { extensionIds: "xmlui-website-blocks" };
+
+function getBoundingRect(locator: Locator) {
+  return locator.evaluate((element) => element.getBoundingClientRect());
+}
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
 // =============================================================================
 
 test("component renders with basic content", async ({ page, initTestBed }) => {
-  await initTestBed(`<Breakout>Content inside breakout</Breakout>`);
+  await initTestBed(`<Breakout>Content inside breakout</Breakout>`, EXT);
 
   await expect(page.getByText("Content inside breakout")).toBeVisible();
 });
@@ -16,7 +22,7 @@ test("component renders with basic content", async ({ page, initTestBed }) => {
 // =============================================================================
 
 test("children are focusable", async ({ page, initTestBed }) => {
-  await initTestBed(`<Breakout><Button label="focusable button" /></Breakout>`);
+  await initTestBed(`<Breakout><Button label="focusable button" /></Breakout>`, EXT);
   await expect(page.getByRole("button")).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("button")).toBeFocused();
@@ -27,7 +33,7 @@ test("children are focusable", async ({ page, initTestBed }) => {
 // =============================================================================
 
 test("has the expected CSS attributes", async ({ page, initTestBed }) => {
-  await initTestBed(`<Breakout testId="bo">Content inside breakout</Breakout>`);
+  await initTestBed(`<Breakout testId="bo">Content inside breakout</Breakout>`, EXT);
 
   const breakout = page.getByTestId("bo");
   const windowWidth = await page.evaluate(() => {
@@ -52,7 +58,7 @@ test("component maintains height based on its content", async ({ page, initTestB
       <Stack height="150px" backgroundColor="red">
         <Text>Tall content</Text>
       </Stack>
-    </Breakout>`);
+    </Breakout>`, EXT);
 
   const breakout = page.getByTestId("bo");
   const { height: boHeight } = await getBoundingRect(breakout);
@@ -76,7 +82,7 @@ test("works correctly with asymmetric layout (wider left nav)", async ({ page, i
         </Stack>
       </Stack>
       <Stack width="10%" backgroundColor="pink">Narrow right nav</Stack>
-    </HStack>`);
+    </HStack>`, EXT);
 
   const breakout = page.getByTestId("bo");
   const windowWidth = await page.evaluate(() => {

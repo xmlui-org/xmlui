@@ -55,7 +55,6 @@ import {
   FileInputDriver,
   FileUploadDropZoneDriver,
   LabelDriver,
-  BackdropDriver,
   SpinnerDriver,
   SliderDriver,
   ResponsiveBarDriver,
@@ -386,11 +385,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(ButtonDriver, testIdOrLocator);
     });
   },
-  createBackdropDriver: async ({ createDriver }, use) => {
-    await use((testIdOrLocator?: string | Locator) => {
-      return createDriver(BackdropDriver, testIdOrLocator);
-    });
-  },
   createContentSeparatorDriver: async ({ createDriver }, use) => {
     await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ContentSeparatorDriver, testIdOrLocator);
@@ -689,7 +683,6 @@ type TestDriverExtenderProps = {
     testIdOrLocator?: string | Locator,
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
-  createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
   createContentSeparatorDriver: ComponentDriverMethod<ContentSeparatorDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;

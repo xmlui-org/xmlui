@@ -142,7 +142,6 @@ import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
 import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
-import { breakoutComponentRenderer } from "./Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
 import { navPanelCollapseButtonComponentRenderer } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { toneSwitchComponentRenderer } from "./ToneSwitch/ToneSwitch";
@@ -150,7 +149,6 @@ import { apiCallRenderer } from "./APICall/APICall";
 import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
-import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import { scrollViewerComponentRenderer } from "./ScrollViewer/ScrollViewer";
 import { qrCodeComponentRenderer } from "./QRCode/QRCode";
 import { includeMarkupComponentRenderer } from "./IncludeMarkup/IncludeMarkup";
@@ -617,10 +615,8 @@ export class ComponentRegistry {
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(ratingInputComponentRenderer);
-      this.registerCoreComponent(backdropComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
     }
-    this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);

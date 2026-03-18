@@ -1,13 +1,9 @@
 import styles from "./Backdrop.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
-import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, dComponent } from "../../components/metadata-helpers";
+import { createComponentRenderer, createMetadata, dComponent, parseScssVar } from "xmlui";
 import { Backdrop } from "./BackdropNative";
 
 const COMP = "Backdrop";
-
-// See reference implementation here: https://getbootstrap.com/docs/5.3/components/alerts/
 
 export const BackdropMd = createMetadata({
   status: "stable",
@@ -39,12 +35,13 @@ export const backdropComponentRenderer = createComponentRenderer(
   COMP,
   BackdropMd,
   ({ node, extractValue, renderChild, classes }) => {
+    const props = (node.props as typeof BackdropMd.props)!;
     return (
       <Backdrop
         classes={classes}
-        overlayTemplate={renderChild(node.props?.overlayTemplate)}
-        backgroundColor={extractValue.asOptionalString(node.props.backgroundColor, undefined)}
-        opacity={extractValue.asOptionalString(node.props.opacity, undefined)}
+        overlayTemplate={renderChild(props?.overlayTemplate as any)}
+        backgroundColor={extractValue.asOptionalString(props.backgroundColor, undefined)}
+        opacity={extractValue.asOptionalString(props.opacity, undefined)}
       >
         {renderChild(node.children)}
       </Backdrop>

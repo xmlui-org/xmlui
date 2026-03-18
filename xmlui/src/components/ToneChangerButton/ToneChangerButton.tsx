@@ -17,6 +17,9 @@ export const defaultProps = {
 
 export const ToneChangerButtonMd = createMetadata({
   status: "stable",
+  deprecationMessage:
+    "The `ToneChangerButton` component is deprecated and will be removed in a future release. " +
+    "Please use the `ToneSwitch` component instead.",
   description: "`ToneChangerButton` enables the user to switch between light and dark modes.",
   props: {
     lightToDarkIcon: {

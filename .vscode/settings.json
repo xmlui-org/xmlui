@@ -4,6 +4,7 @@
   "files.eol": "\n",
   "vitest.enable": true,
   "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.exclude": ["packages/xmlui-devtools/**"],
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
