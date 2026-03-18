@@ -9,6 +9,12 @@ const COMP_PANEL = `${COMP}Panel`;
 const COMP_ITEM = `${COMP}Item`;
 const COMP_FOOTER = `${COMP}Footer`;
 const COMP_TOGGLE_BUTTON = `${COMP}ToggleButton`;
+const COMP_NO_RESULTS = `${COMP}NoResults`;
+const COMP_CATEGORY_BADGE = `${COMP}CategoryBadge`;
+const COMP_FILTER_CHIP = `${COMP}FilterChip`;
+const COMP_SORT_BUTTON = `${COMP}SortButton`;
+const COMP_RESULT_COUNT = `${COMP}ResultCount`;
+const COMP_DID_YOU_MEAN = `${COMP}DidYouMean`;
 
 export const SearchMd = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
@@ -30,6 +36,35 @@ export const SearchMd = createMetadata({
       description: `If true, the search starts collapsed as a button with a search icon. Clicking the button expands the search field with an animation. When the field is empty and loses focus, it collapses back to the button.`,
       valueType: "boolean",
       defaultValue: false,
+    },
+    suggestedQueries: {
+      description: `A list of suggested query strings shown when there are no results.`,
+    },
+    noResultsMessage: {
+      description: `Custom message displayed when the search returns no results.`,
+      valueType: "string",
+    },
+    showPreviewMetadata: {
+      description: `If true, shows a category badge and path breadcrumb below each result title.`,
+      valueType: "boolean",
+      defaultValue: true,
+    },
+    defaultSelectedCategories: {
+      description: `Initial set of selected category filters.`,
+    },
+    defaultSortOrder: {
+      description: `Default sort order for search results.`,
+      valueType: "string",
+      defaultValue: "relevance",
+    },
+    pageSize: {
+      description: `Number of results to show per page when using load more.`,
+      valueType: "number",
+    },
+    enableSpellCorrection: {
+      description: `If true, shows a "Did you mean?" suggestion when the search returns no results but a close match exists.`,
+      valueType: "boolean",
+      defaultValue: true,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -67,6 +102,32 @@ export const SearchMd = createMetadata({
     [`textColor-${COMP_TOGGLE_BUTTON}--hover`]: "$color-secondary-700",
     [`backgroundColor-${COMP_TOGGLE_BUTTON}--hover`]: "transparent",
 
+    // A — Zero-results UX
+    [`textColor-${COMP_NO_RESULTS}`]: "$color-secondary-700",
+    [`backgroundColor-${COMP_NO_RESULTS}Chip`]: "$color-surface-100",
+    [`textColor-${COMP_NO_RESULTS}Chip`]: "$color-secondary-700",
+
+    // B — Enhanced Result Previews
+    [`backgroundColor-${COMP_CATEGORY_BADGE}`]: "$color-primary-100",
+    [`textColor-${COMP_CATEGORY_BADGE}`]: "$color-primary-700",
+
+    // C — Faceted Filters
+    [`backgroundColor-${COMP_FILTER_CHIP}`]: "$color-surface-50",
+    [`backgroundColor-${COMP_FILTER_CHIP}--active`]: "$color-primary-500",
+    [`textColor-${COMP_FILTER_CHIP}`]: "$color-secondary-700",
+    [`textColor-${COMP_FILTER_CHIP}--active`]: "$color-surface-0",
+    [`borderRadius-${COMP_FILTER_CHIP}`]: "9999px",
+
+    // D — Sorting Controls
+    [`backgroundColor-${COMP_SORT_BUTTON}--active`]: "$color-secondary-200",
+    [`textColor-${COMP_SORT_BUTTON}--active`]: "$color-secondary-900",
+
+    // E — Pagination
+    [`textColor-${COMP_RESULT_COUNT}`]: "$color-secondary-500",
+
+    // F — Did You Mean
+    [`textColor-${COMP_DID_YOU_MEAN}`]: "$color-secondary-700",
+
     dark: {
       [`backgroundColor-${COMP_PANEL}`]: "$color-surface-100",
       [`borderColor-${COMP_PANEL}`]: "$color-surface-300",
@@ -88,6 +149,13 @@ const searchComponentRenderer = createComponentRenderer(
         data={extractValue(props.data)}
         limit={extractValue.asOptionalNumber(props.limit, defaultProps.limit)}
         collapsible={extractValue.asOptionalBoolean(props.collapsible, false)}
+        suggestedQueries={extractValue(props.suggestedQueries)}
+        noResultsMessage={extractValue.asOptionalString(props.noResultsMessage)}
+        showPreviewMetadata={extractValue.asOptionalBoolean(props.showPreviewMetadata, true)}
+        defaultSelectedCategories={extractValue(props.defaultSelectedCategories)}
+        defaultSortOrder={extractValue.asOptionalString(props.defaultSortOrder) as "relevance" | "date" | undefined}
+        pageSize={extractValue.asOptionalNumber(props.pageSize)}
+        enableSpellCorrection={extractValue.asOptionalBoolean(props.enableSpellCorrection, true)}
       />
     );
   },

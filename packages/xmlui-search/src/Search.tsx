@@ -32,7 +32,7 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
 import classNames from "classnames";
 
 type Props = {
@@ -43,6 +43,19 @@ type Props = {
   collapsible?: boolean;
   placeholder?: string;
   className?: string;
+  // A — Zero-results UX
+  suggestedQueries?: string[];
+  noResultsMessage?: string;
+  // B — Enhanced Result Previews
+  showPreviewMetadata?: boolean;
+  // C — Faceted Category Filters
+  defaultSelectedCategories?: string[];
+  // D — Sorting & Relevancy Controls
+  defaultSortOrder?: "relevance" | "date";
+  // E — Pagination / Load More
+  pageSize?: number;
+  // F — Did You Mean
+  enableSpellCorrection?: boolean;
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -60,6 +73,13 @@ export const Search = ({
   collapsible = false,
   placeholder,
   className,
+  suggestedQueries,
+  noResultsMessage,
+  showPreviewMetadata = true,
+  defaultSelectedCategories,
+  defaultSortOrder = "relevance",
+  pageSize,
+  enableSpellCorrection = true,
 }: Props) => {
   const _id = useId();
   const inputId = id || _id;
@@ -76,8 +96,71 @@ export const Search = ({
 
   const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
+
+  // E — Pagination state
+  const effectivePageSize = pageSize ?? limit;
+  const [page, setPage] = useState(1);
+
+  // C — Category filter state
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    () => new Set(defaultSelectedCategories ?? []),
+  );
+
+  // D — Sort order state
+  const [sortOrder, setSortOrder] = useState<"relevance" | "date">(defaultSortOrder);
+
   // --- Merge data, do search, postprocess results
-  const results = useSearch(data, limit, debouncedValue);
+  const { results: allResults, totalCount, suggestion } = useSearch(
+    data,
+    limit,
+    debouncedValue,
+    enableSpellCorrection,
+  );
+
+  // Reset page and category filter when query changes
+  useEffect(() => {
+    setPage(1);
+    setSelectedCategories(new Set(defaultSelectedCategories ?? []));
+  }, [debouncedValue]);
+
+  // C — Derive available categories from all results
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>();
+    for (const r of allResults) {
+      cats.add(r.item.category ?? SEARCH_DEFAULT_CATEGORY);
+    }
+    return Array.from(cats);
+  }, [allResults]);
+
+  // C — Filter results by selected categories
+  const categoryFilteredResults = useMemo(() => {
+    if (selectedCategories.size === 0) return allResults;
+    return allResults.filter((r) =>
+      selectedCategories.has(r.item.category ?? SEARCH_DEFAULT_CATEGORY),
+    );
+  }, [allResults, selectedCategories]);
+
+  // D — Sort filtered results
+  const sortedResults = useMemo(() => {
+    if (sortOrder === "relevance") return categoryFilteredResults;
+    return [...categoryFilteredResults].sort((a, b) => {
+      const dateA = a.item.date;
+      const dateB = b.item.date;
+      if (dateA == null && dateB == null) return 0;
+      if (dateA == null) return 1;
+      if (dateB == null) return -1;
+      const ta = typeof dateA === "string" ? new Date(dateA).getTime() : dateA;
+      const tb = typeof dateB === "string" ? new Date(dateB).getTime() : dateB;
+      return tb - ta;
+    });
+  }, [categoryFilteredResults, sortOrder]);
+
+  // E — Paginate sorted results
+  const results = useMemo(
+    () => sortedResults.slice(0, page * effectivePageSize),
+    [sortedResults, page, effectivePageSize],
+  );
+  const hasMore = results.length < sortedResults.length;
 
   const layout = useAppLayoutContext();
   const inDrawer = layout?.drawerVisible ?? false;
@@ -89,9 +172,9 @@ export const Search = ({
   const [show, setShow] = useState(false);
 
   useLayoutEffect(() => {
-    if (results.length > 0) setShow(true);
+    if (allResults.length > 0) setShow(true);
     setActiveIndex(0);
-  }, [results]);
+  }, [allResults]);
 
   const onSearchButtonClick = useCallback(() => {
     setIsExpanded(true);
@@ -188,6 +271,23 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
+  // C — Toggle category filter
+  const toggleCategory = useCallback((cat: string) => {
+    setSelectedCategories((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) {
+        next.delete(cat);
+      } else {
+        next.add(cat);
+      }
+      return next;
+    });
+  }, []);
+
+  const clearCategories = useCallback(() => {
+    setSelectedCategories(new Set());
+  }, []);
+
   return (
     <span className={className}>
       <Popover open={show} onOpenChange={setShow}>
@@ -229,7 +329,7 @@ export const Search = ({
             />
           </PopoverAnchor>
         )}
-        {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
+        {show && allResults && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
           <Portal container={_root}>
             <PopoverContent
               align="end"
@@ -241,6 +341,20 @@ export const Search = ({
                 [styles.inDrawer]: inDrawer,
               })}
             >
+              {/* C — Category filter bar + D — Sort control */}
+              {(availableCategories.length > 1 || sortOrder !== "relevance") && (
+                <div className={styles.panelControls}>
+                  {availableCategories.length > 1 && (
+                    <CategoryFilterBar
+                      categories={availableCategories}
+                      selectedCategories={selectedCategories}
+                      onToggle={toggleCategory}
+                      onClearAll={clearCategories}
+                    />
+                  )}
+                  <SortControl sortOrder={sortOrder} onSortChange={setSortOrder} />
+                </div>
+              )}
               <ul
                 id={`${inputId}-listbox`}
                 ref={listRef}
@@ -248,6 +362,15 @@ export const Search = ({
                 role="listbox"
                 aria-label="Search results"
               >
+                {/* F — Did You Mean banner */}
+                {suggestion && enableSpellCorrection && (
+                  <li role="presentation" aria-hidden="true">
+                    <DidYouMeanBanner
+                      suggestion={suggestion}
+                      onAccept={(s) => setInputValue(s)}
+                    />
+                  </li>
+                )}
                 {results.length > 0 &&
                   results.map((result, idx) => {
                     const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
@@ -292,17 +415,40 @@ export const Search = ({
                             matches={result.matches}
                             maxContentMatchNumber={maxContentMatchNumber}
                             onClick={onClick}
+                            showPreviewMetadata={showPreviewMetadata}
                           />
                         </li>
                       </Fragment>
                     );
                   })}
+                {/* A — Zero results UX (shown only when no suggestion) */}
                 {results.length === 0 && (
-                  <div className={styles.noResults}>
-                    <Text variant="em">No results</Text>
-                  </div>
+                  <li role="presentation" aria-hidden="true">
+                    <NoResultsPanel
+                      message={noResultsMessage}
+                      suggestedQueries={suggestedQueries}
+                      onQuerySelect={(q) => setInputValue(q)}
+                      showSuggestion={!suggestion || !enableSpellCorrection}
+                    />
+                  </li>
                 )}
               </ul>
+              {/* E — Load more + result count */}
+              {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
+                <div className={styles.loadMoreRow}>
+                  <Text className={styles.resultCount}>
+                    {`Showing ${results.length} of ${sortedResults.length}`}
+                  </Text>
+                  {hasMore && (
+                    <button
+                      className={styles.loadMoreButton}
+                      onClick={() => setPage((p) => p + 1)}
+                    >
+                      Load more
+                    </button>
+                  )}
+                </div>
+              )}
               {!inDrawer && (
                 <footer className={styles.panelFooter}>
                   <div>
@@ -329,10 +475,134 @@ export const Search = ({
   );
 };
 
+// --- A: NoResultsPanel sub-component
+
+type NoResultsPanelProps = {
+  message?: string;
+  suggestedQueries?: string[];
+  onQuerySelect: (query: string) => void;
+  showSuggestion: boolean;
+};
+
+function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggestion }: NoResultsPanelProps) {
+  return (
+    <div className={styles.noResultsPanel} role="status" aria-live="polite">
+      <Text variant="em" className={styles.noResultsMessage}>
+        {message ?? "No results found"}
+      </Text>
+      {showSuggestion && (
+        <Text className={styles.noResultsHint}>
+          Try broadening your search or check for typos.
+        </Text>
+      )}
+      {suggestedQueries && suggestedQueries.length > 0 && (
+        <div className={styles.noResultsSuggestions}>
+          {suggestedQueries.map((q) => (
+            <button
+              key={q}
+              className={styles.noResultsSuggestionChip}
+              onClick={() => onQuerySelect(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- C: CategoryFilterBar sub-component
+
+type CategoryFilterBarProps = {
+  categories: string[];
+  selectedCategories: Set<string>;
+  onToggle: (cat: string) => void;
+  onClearAll: () => void;
+};
+
+function CategoryFilterBar({ categories, selectedCategories, onToggle, onClearAll }: CategoryFilterBarProps) {
+  return (
+    <div className={styles.categoryFilterBar} role="group" aria-label="Filter by category">
+      <button
+        className={classnames(styles.categoryFilterChip, {
+          [styles.categoryFilterChipActive]: selectedCategories.size === 0,
+        })}
+        onClick={onClearAll}
+      >
+        All
+      </button>
+      {categories.map((cat) => (
+        <button
+          key={cat}
+          className={classnames(styles.categoryFilterChip, {
+            [styles.categoryFilterChipActive]: selectedCategories.has(cat),
+          })}
+          onClick={() => onToggle(cat)}
+        >
+          {cat}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// --- D: SortControl sub-component
+
+type SortControlProps = {
+  sortOrder: "relevance" | "date";
+  onSortChange: (order: "relevance" | "date") => void;
+};
+
+function SortControl({ sortOrder, onSortChange }: SortControlProps) {
+  return (
+    <div className={styles.sortControl} role="group" aria-label="Sort results">
+      <button
+        className={classnames(styles.sortButton, {
+          [styles.sortButtonActive]: sortOrder === "relevance",
+        })}
+        onClick={() => onSortChange("relevance")}
+      >
+        Relevance
+      </button>
+      <button
+        className={classnames(styles.sortButton, {
+          [styles.sortButtonActive]: sortOrder === "date",
+        })}
+        onClick={() => onSortChange("date")}
+      >
+        Date
+      </button>
+    </div>
+  );
+}
+
+// --- F: DidYouMeanBanner sub-component
+
+type DidYouMeanBannerProps = {
+  suggestion: string;
+  onAccept: (s: string) => void;
+};
+
+function DidYouMeanBanner({ suggestion, onAccept }: DidYouMeanBannerProps) {
+  return (
+    <div className={styles.didYouMeanBanner}>
+      <Text className={styles.didYouMeanText}>Did you mean: </Text>
+      <button
+        className={styles.didYouMeanSuggestion}
+        onClick={() => onAccept(suggestion)}
+      >
+        {suggestion}
+      </button>
+    </div>
+  );
+}
+
 type SearchItemContentProps = SearchResult & {
   idx: string | number;
   maxContentMatchNumber?: number;
   onClick?: () => void;
+  showPreviewMetadata?: boolean;
 };
 
 /**
@@ -341,7 +611,7 @@ type SearchItemContentProps = SearchResult & {
  *
  */
 const SearchItemContent = forwardRef(function SearchItemContent(
-  { idx, item, matches, maxContentMatchNumber, onClick }: SearchItemContentProps,
+  { idx, item, matches, maxContentMatchNumber, onClick, showPreviewMetadata = true }: SearchItemContentProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -357,6 +627,24 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
         </div>
+        {/* B — Preview metadata: category badge + path breadcrumb */}
+        {showPreviewMetadata && (item.category || item.path) && (
+          <div className={styles.previewMetadata}>
+            {item.category && (
+              <span className={styles.categoryBadge}>{item.category}</span>
+            )}
+            {item.path && (
+              <span className={styles.pathBreadcrumb}>
+                {parsePathBreadcrumb(item.path).map((segment, i, arr) => (
+                  <Fragment key={i}>
+                    <span className={styles.pathSegment}>{segment}</span>
+                    {i < arr.length - 1 && <span className={styles.pathSeparator}> / </span>}
+                  </Fragment>
+                ))}
+              </span>
+            )}
+          </div>
+        )}
         <div
           style={{
             width: "100%",
@@ -420,6 +708,8 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
 
         // Skip fields that have no value (e.g. optional fields like category)
         if (fieldValue === undefined) return acc;
+        // Skip non-string fields
+        if (typeof fieldValue !== "string") return acc;
 
         // --- Prefilter matches that are too short/significantly misaligned compared to the search term
         const filteredMatches = match.indices.filter((index) => {
@@ -555,7 +845,19 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-function useSearch(data: SearchItemData[], limit: number, query: string): SearchResult[] {
+/**
+ * B — Parses a URL path into breadcrumb segments, filtering empty parts.
+ */
+function parsePathBreadcrumb(path: string): string[] {
+  return path.split("/").filter((s) => s.length > 0);
+}
+
+function useSearch(
+  data: SearchItemData[],
+  limit: number,
+  query: string,
+  enableSpellCorrection: boolean,
+): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
   const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
     const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
       {
@@ -585,7 +887,24 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
       keys,
     };
   }, []);
+
+  // F — Relaxed Fuse options for "did you mean" spell correction
+  const relaxedSearchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
+    return {
+      includeScore: true,
+      shouldSort: true,
+      includeMatches: false,
+      minMatchCharLength: MIN_MATCH_LENGTH,
+      threshold: 0.6,
+      ignoreLocation: true,
+      ignoreFieldNorm: true,
+      keys: [{ name: "title", weight: 2 }, { name: "content", weight: 1 }],
+    };
+  }, []);
+
   const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
+  // F — Separate Fuse instance for spell correction suggestions
+  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], relaxedSearchOptions));
 
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
@@ -620,21 +939,34 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
 
   useEffect(() => {
     fuseRef.current.setCollection(mergedData);
+    relaxedFuseRef.current.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Step 3: Execute search & post-process results
-  const results: SearchResult[] = useMemo(() => {
-    if (query.length < MIN_MATCH_LENGTH) return [];
+  const searchOutput = useMemo(() => {
+    if (query.length < MIN_MATCH_LENGTH) {
+      return { results: [], totalCount: 0, suggestion: null };
+    }
 
-    const limited = !query
-      ? []
-      : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
+    // E — fetch more than limit to support load-more pagination
+    const fetchLimit = Math.min(limit * 10, 200);
+    const raw = fuseRef.current.search(query, { limit: fetchLimit });
+    const mapped = postProcessSearch(raw, query);
+    const grouped = groupAndSortByCategory(mapped);
 
-    const mapped = postProcessSearch(limited, query);
-    return groupAndSortByCategory(mapped);
-  }, [query, limit]);
+    // F — "Did you mean" suggestion: run only when exact search yields no results
+    let suggestion: string | null = null;
+    if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
+      const relaxed = relaxedFuseRef.current.search(query, { limit: 1 });
+      if (relaxed.length > 0) {
+        suggestion = relaxed[0].item.title;
+      }
+    }
 
-  return results;
+    return { results: grouped, totalCount: grouped.length, suggestion };
+  }, [query, limit, enableSpellCorrection]);
+
+  return searchOutput;
 }
 
 /**
@@ -664,7 +996,8 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
-type SearchItemData = { path: string; title: string; content: string; category?: string };
+// D — date field added to SearchItemData
+type SearchItemData = { path: string; title: string; content: string; category?: string; date?: string | number };
 function isSearchItemDataArray(data: any): data is SearchItemData[] {
   return (
     Array.isArray(data) &&

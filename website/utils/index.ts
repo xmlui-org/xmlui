@@ -83,11 +83,13 @@ const staticSearchData: SearchItemData[] = [
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
     const title = blogFrontmatter[key]?.title ? String(blogFrontmatter[key].title) : titleFromFileName;
+    const date = blogFrontmatter[key]?.date ? String(blogFrontmatter[key].date) : undefined;
     return {
       path: key,
       title,
       content: value,
       category: SEARCH_CATEGORIES[1], // "blog"
+      date,
     };
   }),
 ];

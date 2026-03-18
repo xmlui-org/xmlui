@@ -44,6 +44,32 @@ $textColor-SearchToggleButton: createThemeVar("textColor-#{$componentButton}");
 $textColor-SearchToggleButton--hover: createThemeVar("textColor-#{$componentButton}--hover");
 $backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$componentButton}--hover");
 
+// A — Zero-results UX
+$textColor-SearchNoResults: createThemeVar("textColor-SearchNoResults");
+$backgroundColor-SearchNoResultsChip: createThemeVar("backgroundColor-SearchNoResultsChip");
+$textColor-SearchNoResultsChip: createThemeVar("textColor-SearchNoResultsChip");
+
+// B — Enhanced Result Previews
+$backgroundColor-SearchCategoryBadge: createThemeVar("backgroundColor-SearchCategoryBadge");
+$textColor-SearchCategoryBadge: createThemeVar("textColor-SearchCategoryBadge");
+
+// C — Faceted Category Filters
+$backgroundColor-SearchFilterChip: createThemeVar("backgroundColor-SearchFilterChip");
+$backgroundColor-SearchFilterChip--active: createThemeVar("backgroundColor-SearchFilterChip--active");
+$textColor-SearchFilterChip: createThemeVar("textColor-SearchFilterChip");
+$textColor-SearchFilterChip--active: createThemeVar("textColor-SearchFilterChip--active");
+$borderRadius-SearchFilterChip: createThemeVar("borderRadius-SearchFilterChip");
+
+// D — Sorting Controls
+$backgroundColor-SearchSortButton--active: createThemeVar("backgroundColor-SearchSortButton--active");
+$textColor-SearchSortButton--active: createThemeVar("textColor-SearchSortButton--active");
+
+// E — Pagination
+$textColor-SearchResultCount: createThemeVar("textColor-SearchResultCount");
+
+// F — Did You Mean
+$textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
+
 // Keyframe animations for collapsible search
 @keyframes expandSearch {
   from {
@@ -70,6 +96,7 @@ $backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$c
 .listPanel {
   @include t.borderVars($themeVars, $componentListPanel);
   @include t.paddingVars($themeVars, $componentListPanel);
+  background-color: $backgroundColor-Search;
   overflow: hidden;
   width: 580px;
   margin-top: 4px;
@@ -192,6 +219,195 @@ $backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$c
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+// A — Zero-results UX
+.noResultsPanel {
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .noResultsMessage {
+    color: $textColor-SearchNoResults;
+  }
+
+  .noResultsHint {
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+
+  .noResultsSuggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .noResultsSuggestionChip {
+    background: $backgroundColor-SearchNoResultsChip;
+    color: $textColor-SearchNoResultsChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 9999px;
+    padding: 0.15rem 0.75rem;
+    font-size: 0.8em;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// B — Enhanced Result Previews
+.previewMetadata {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.2rem;
+
+  .categoryBadge {
+    background: $backgroundColor-SearchCategoryBadge;
+    color: $textColor-SearchCategoryBadge;
+    font-size: 0.68em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .pathBreadcrumb {
+    font-size: 0.75em;
+    opacity: 0.6;
+
+    .pathSegment {
+      // intentionally unstyled — inherits from pathBreadcrumb
+    }
+
+    .pathSeparator {
+      opacity: 0.5;
+    }
+  }
+}
+
+// C — Faceted Category Filters & D — Sort Control shared wrapper
+.panelControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0;
+  flex-wrap: wrap;
+}
+
+.categoryFilterBar {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  flex: 1;
+
+  .categoryFilterChip {
+    background: $backgroundColor-SearchFilterChip;
+    color: $textColor-SearchFilterChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: $borderRadius-SearchFilterChip;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.78em;
+    cursor: pointer;
+
+    &.categoryFilterChipActive {
+      background: $backgroundColor-SearchFilterChip--active;
+      color: $textColor-SearchFilterChip--active;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// D — Sort Control
+.sortControl {
+  display: flex;
+  gap: 0.2rem;
+  flex-shrink: 0;
+
+  .sortButton {
+    background: transparent;
+    color: $textColor-SearchFilterChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 4px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.78em;
+    cursor: pointer;
+
+    &.sortButtonActive {
+      background: $backgroundColor-SearchSortButton--active;
+      color: $textColor-SearchSortButton--active;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// E — Load More row
+.loadMoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1rem;
+  border-top: 1px solid var(--xmlui-borderColor);
+
+  .resultCount {
+    font-size: 0.78em;
+    color: $textColor-SearchResultCount;
+    opacity: 0.7;
+  }
+
+  .loadMoreButton {
+    background: transparent;
+    color: var(--xmlui-textColor-primary);
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 4px;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.8em;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+// F — Did You Mean banner
+.didYouMeanBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem 0;
+
+  .didYouMeanText {
+    font-size: 0.85em;
+    color: $textColor-SearchDidYouMean;
+  }
+
+  .didYouMeanSuggestion {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--xmlui-color-primary-500);
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }
 
 .item {
