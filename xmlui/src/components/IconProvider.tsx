@@ -490,7 +490,7 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
     const d = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
     d.innerHTML = div.children[0].innerHTML;
     d.id = resourceUrl;
-    d.setAttributeNS(null, "viewBox", attrs["viewBox"]);
+    d.setAttributeNS(null, "viewBox", attrs["viewBox"] ?? "0 0 24 24");
 
     spriteRootRef.current!.appendChild(d);
     const customIcon = {

@@ -587,7 +587,7 @@ function DataLoader({
   }, [hasMockData, appContext, loader.props.mockData, state]);
   const mockDataValue = useShallowCompareMemoize(mockDataInner);
 
-  const doLoadMock = useCallback(async () => {
+  const doLoadMock = useCallback(() => {
     return mockDataValue ?? null;
   }, [mockDataValue]);
 
