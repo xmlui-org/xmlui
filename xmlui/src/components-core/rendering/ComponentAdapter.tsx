@@ -12,7 +12,6 @@ import type {
   RendererContext,
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
-import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
@@ -36,11 +35,7 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
-import {
-  resolveLayoutProps,
-  DIMS_ONLY_PROPS,
-  SPACING_ONLY_PROPS,
-} from "../theming/layout-resolver";
+import { resolveLayoutProps, DIMS_ONLY_PROPS, SPACING_ONLY_PROPS } from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
 import {
   buildResponsiveStyleObjects,
@@ -50,6 +45,7 @@ import {
   COMPONENT_PART_KEY,
 } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
+import { is } from "immer/dist/internal.js";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -411,26 +407,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [extendedLayoutProps],
   );
 
-  const resolvedWhen = valueExtractor.asOptionalBoolean(safeNode.when);
-  const resolvedResponsiveWhen = useMemo(() => {
-    if (!safeNode.responsiveWhen || Object.keys(safeNode.responsiveWhen).length === 0) {
-      return undefined;
-    }
-    const resolved: Partial<Record<(typeof MediaBreakpointKeys)[number], boolean>> = {};
-    for (const bp of MediaBreakpointKeys) {
-      if (safeNode.responsiveWhen[bp] !== undefined) {
-        resolved[bp] = valueExtractor.asOptionalBoolean(safeNode.responsiveWhen[bp]);
-      }
-    }
-    return Object.keys(resolved).length > 0 ? resolved : undefined;
-  }, [safeNode.responsiveWhen, valueExtractor]);
-
-  // --- Build responsive display rules from when / when-* attributes.
-  // --- These rules are needed whenever viewport size is unknown on first render
-  // --- (including hydration), not only in SSR.
+  // --- Build responsive display rules from when / when-* attributes (SSR only)
+  // In normal (client-side) mode the component is either rendered or not based on the
+  // runtime `currentWhenValue`, so CSS display rules add no value.
+  // In SSR mode (`document` is undefined) we need media-query display rules so the
+  // browser shows/hides the pre-rendered HTML correctly before JS hydration.
+  const isSSR = typeof document === "undefined";
   const whenStyleObject = useMemo(
-    () => buildWhenStyleObject(resolvedWhen, resolvedResponsiveWhen),
-    [resolvedWhen, resolvedResponsiveWhen],
+    () => (isSSR ? buildWhenStyleObject(safeNode.when, safeNode.responsiveWhen) : {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSSR, safeNode.when, safeNode.responsiveWhen],
   );
 
   // --- Merge layout responsive styles and when-display styles into one object
@@ -468,8 +454,8 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
   const currentWhenValue = resolveResponsiveWhen(
-    resolvedWhen,
-    resolvedResponsiveWhen,
+    safeNode.when,
+    safeNode.responsiveWhen,
     state,
     appContext,
   );
@@ -537,16 +523,22 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );
 
-  // --- Decide whether to skip rendering entirely.
-  // --- When viewport size is known, trust `currentWhenValue`.
-  // --- When viewport size is unknown, keep only components that are visible at some breakpoint
-  // --- and let CSS media-query display rules hide/show per viewport.
+  // --- Decide whether to skip rendering entirely
+  // SSR mode (no `document`): render the component if it is visible at ANY breakpoint
+  // and rely on CSS display rules (from buildWhenStyleObject) to hide/show per viewport.
+  // Normal mode (client-side): trust the runtime `currentWhenValue` which reflects the
+  // actual viewport — don't render at all when the component should be hidden.
   if (!currentWhenValue) {
-    const staticVisibility = isVisibleAtAnyBreakpoint(resolvedWhen, resolvedResponsiveWhen);
-    if (staticVisibility !== true) {
+    const isSSR = typeof document === "undefined";
+    if (isSSR) {
+      const staticVisibility = isVisibleAtAnyBreakpoint(safeNode.when, safeNode.responsiveWhen);
+      if (staticVisibility !== true) {
+        return null;
+      }
+      // SSR + visible at some breakpoint → fall through and render with CSS classes
+    } else {
       return null;
     }
-    // Viewport unknown + visible at some breakpoint → render and let CSS media queries decide.
   }
 
   const rendererContext: RendererContext<any> = {
