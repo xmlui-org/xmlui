@@ -50,7 +50,6 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
-import { Breakout } from "./components/Breakout/BreakoutNative";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
@@ -214,7 +213,6 @@ export {
   ToneChangerButton,
   NavPanelCollapseButton,
   Logo,
-  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
   useComponentThemeClass,

@@ -69,14 +69,12 @@ import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
-import { BackdropMd } from "./Backdrop/Backdrop";
 import { BrMd } from "./Br/Br";
 import {
   HtmlAddressMd,
@@ -325,11 +323,9 @@ export const collectedComponentMetadata = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
-  Backdrop: BackdropMd,
   Badge: BadgeMd,
   Blog: BlogMd,
   Bookmark: BookmarkMd,
-  Breakout: BreakoutMd,
   Button: ButtonMd,
   Card: CardMd,
   Carousel: CarouselMd,

@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode } from "react";
-import { Button, Icon, Breakout, useTheme } from "xmlui";
+import { Button, Icon, useTheme } from "xmlui";
+import { Breakout } from "../Breakout/BreakoutNative";
 
 import styles from "./HeroSection.module.scss";
 

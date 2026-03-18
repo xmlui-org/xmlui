@@ -2,7 +2,8 @@ import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode } fro
 
 import styles from "./Backdrop.module.scss";
 import classNames from "classnames";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+
+const COMPONENT_PART_KEY = "-component";
 
 type Props = {
   style?: CSSProperties;

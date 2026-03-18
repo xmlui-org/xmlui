@@ -1,5 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
-import { createMetadata } from "../metadata-helpers";
+import { createComponentRenderer, createMetadata } from "xmlui";
 import { Breakout } from "./BreakoutNative";
 
 const COMP = "Breakout";
