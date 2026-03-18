@@ -1,5 +1,8 @@
 # FormSection [#formsection]
 
+>[!WARNING]
+> The `FormSection` component is deprecated and will be removed in a future release.
+
 `FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout).
 
 ## Behaviors [#behaviors]

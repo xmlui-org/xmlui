@@ -42,11 +42,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/Backdrop",
-          "label": "Backdrop",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Badge",
           "label": "Badge",
           "icon": "component"
@@ -64,11 +59,6 @@
         {
           "to": "/docs/reference/components/Bookmark",
           "label": "Bookmark",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Breakout",
-          "label": "Breakout",
           "icon": "component"
         },
         {
@@ -409,11 +399,6 @@
         {
           "to": "/docs/reference/components/RadioGroup",
           "label": "RadioGroup",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/RealTimeAdapter",
-          "label": "RealTimeAdapter",
           "icon": "component"
         },
         {

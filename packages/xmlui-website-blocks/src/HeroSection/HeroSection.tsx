@@ -1,11 +1,12 @@
 import styles from "./HeroSection.module.scss";
 
 import { createComponentRenderer, createMetadata, dComponent, d, parseScssVar } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import { HeroSection, defaultProps } from "./HeroSectionNative";
 
 const COMP = "HeroSection";
 
-export const HeroSectionMd = createMetadata({
+export const HeroSectionMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "HeroSection",
   parts: {

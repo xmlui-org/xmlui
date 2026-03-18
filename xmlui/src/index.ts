@@ -29,6 +29,7 @@ import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
 import type {
   ComponentRendererDef,
+  CompoundComponentRendererInfo,
   RegisterComponentApiFn,
   RendererContext,
 } from "./abstractions/RendererDefs";
@@ -125,6 +126,7 @@ export type {
   ComponentDef,
   ComponentRendererDef,
   CompoundComponentDef,
+  CompoundComponentRendererInfo,
   PropertyValueDescription,
   ComponentLike,
   StandaloneAppDescription,

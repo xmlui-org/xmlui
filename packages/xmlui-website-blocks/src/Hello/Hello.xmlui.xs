@@ -1,1 +1,0 @@
-var displayThis = "Hello, XMLUI!";
