@@ -256,6 +256,16 @@ export const Search = ({
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Escape") {
+        if (useOverlay || useDrawer) {
+          closeOverlay();
+        } else {
+          setActiveIndex(-1);
+          setShow(false);
+        }
+        return;
+      }
+
       if (!show) return;
 
       if (e.key === "ArrowDown") {
@@ -286,7 +296,7 @@ export const Search = ({
         }
       }
     },
-    [activeIndex, results.length, show],
+    [activeIndex, results.length, show, closeOverlay, useDrawer, useOverlay],
   );
 
   // Does the scrolling to the active item, accounting for the sticky category header
