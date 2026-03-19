@@ -252,6 +252,11 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/Inspector",
+          "label": "Inspector",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/IncludeMarkup",
           "label": "IncludeMarkup",
           "icon": "component"

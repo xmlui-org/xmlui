@@ -58,7 +58,7 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    await expect(page.getByRole("textbox")).toHaveValue("42");
+    await expect(page.getByRole("spinbutton")).toHaveValue("42");
   });
 
   test("NumberBox with 'bindTo' updates Form data", async ({ initTestBed, page }) => {
@@ -68,7 +68,7 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    await page.getByRole("textbox").fill("99");
+    await page.getByRole("spinbutton").fill("99");
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect.poll(testStateDriver.testState).toEqual({
@@ -109,9 +109,8 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    const textboxes = page.getByRole("textbox");
-    await textboxes.first().fill("Jane");
-    await textboxes.last().fill("30");
+    await page.getByRole("textbox").fill("Jane");
+    await page.getByRole("spinbutton").fill("30");
 
     await page.getByRole("button", { name: "Save" }).click();
 

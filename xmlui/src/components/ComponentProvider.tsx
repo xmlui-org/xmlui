@@ -257,6 +257,7 @@ import {
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
+import { inspectorComponentRenderer } from "./Inspector/Inspector";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
@@ -593,6 +594,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(navPanelCollapseButtonComponentRenderer);
       this.registerCoreComponent(toneSwitchComponentRenderer);
       this.registerCoreComponent(inspectButtonComponentRenderer);
+      this.registerCoreComponent(inspectorComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(menuItemRenderer);

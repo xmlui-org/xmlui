@@ -6,6 +6,7 @@ import { createComponentRenderer } from "./renderers";
 import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
+import { MemoizedItem } from "../components/container-helpers";
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -382,6 +383,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     specialProps.add("initialValue");
   }
 
+  // When childrenAsTemplate is active, `data` is consumed internally for iteration
+  // and should not be forwarded as a React prop.
+  if (metadata.childrenAsTemplate) {
+    specialProps.add("data");
+    specialProps.add(metadata.childrenAsTemplate);
+  }
+
   return createComponentRenderer(type, metadata, (context) => {
     const {
       node,
@@ -552,8 +560,42 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
-    // --- Render children if the node has any ---
-    if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+    // --- Render children ---
+    // When childrenAsTemplate is declared in metadata, children are treated as
+    // an item template: the component's `data` prop provides an array and each
+    // item is rendered using the template with $item / $itemIndex context vars,
+    // matching the pattern used by List, TileGrid, and other data components.
+    const templatePropName = metadata.childrenAsTemplate;
+    const data = templatePropName ? extractValue(node.props.data) : undefined;
+    if (templatePropName && node.props?.[templatePropName] && Array.isArray(data)) {
+      const itemTemplate = node.props[templatePropName];
+      const childLayoutCtx = config.childrenLayoutContext
+        ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+        : undefined;
+      props.children = data.map((item: any, index: number) => (
+        <MemoizedItem
+          node={itemTemplate as any}
+          key={item?.id ?? index}
+          renderChild={renderChild}
+          layoutContext={childLayoutCtx}
+          contextVars={{
+            $item: item,
+            $itemIndex: index,
+            $isFirst: index === 0,
+            $isLast: index === data.length - 1,
+          }}
+        />
+      ));
+    } else if (templatePropName && node.props?.[templatePropName] && !Array.isArray(data)) {
+      // childrenAsTemplate moved children into the template prop, but no data was provided —
+      // render the template prop as normal children (inline children mode)
+      props.children = renderChild(
+        node.props[templatePropName],
+        config.childrenLayoutContext
+          ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+          : undefined,
+      );
+    } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
       props.children = renderChild(
         node.children,
         config.childrenLayoutContext
