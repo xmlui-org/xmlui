@@ -1086,7 +1086,7 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies textColor-FormItemLabel theme variable", async ({
+  test("applies textColor-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1098,7 +1098,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textColor-FormItemLabel": "rgb(255, 0, 0)",
+          "textColor-label-formItem": "rgb(255, 0, 0)",
         },
       },
     );
@@ -1107,7 +1107,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("color", "rgb(255, 0, 0)");
   });
 
-  test("applies fontSize-FormItemLabel theme variable", async ({
+  test("applies fontSize-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1119,7 +1119,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontSize-FormItemLabel": "18px",
+          "fontSize-label-formItem": "18px",
         },
       },
     );
@@ -1128,7 +1128,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-size", "18px");
   });
 
-  test("applies fontWeight-FormItemLabel theme variable", async ({
+  test("applies fontWeight-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1140,7 +1140,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontWeight-FormItemLabel": "700",
+          "fontWeight-label-formItem": "700",
         },
       },
     );
@@ -1149,7 +1149,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-weight", "700");
   });
 
-  test("applies fontStyle-FormItemLabel theme variable", async ({
+  test("applies fontStyle-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1161,7 +1161,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontStyle-FormItemLabel": "italic",
+          "fontStyle-label-formItem": "italic",
         },
       },
     );
@@ -1170,7 +1170,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-style", "italic");
   });
 
-  test("applies textTransform-FormItemLabel theme variable", async ({
+  test("applies textTransform-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1182,7 +1182,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textTransform-FormItemLabel": "uppercase",
+          "textTransform-label-formItem": "uppercase",
         },
       },
     );
@@ -1191,7 +1191,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("text-transform", "uppercase");
   });
 
-  test("applies textColor-FormItemLabel-requiredMark theme variable", async ({
+  test("applies textColor-requiredMark-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1203,7 +1203,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textColor-FormItemLabel-requiredMark": "rgb(0, 255, 0)",
+          "textColor-requiredMark-formItem": "rgb(0, 255, 0)",
         },
       },
     );
