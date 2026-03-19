@@ -491,6 +491,24 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   max-height: 420px;
 }
 
+.overlayBackdropMobile {
+  background: rgba(0, 0, 0, 0.15);
+  align-items: flex-start;
+  padding-top: 0;
+}
+
+.overlayPanelMobile {
+  width: 100vw;
+  max-width: 100vw;
+  border-radius: 0;
+  min-height: 100dvh;
+
+  .overlayList {
+    max-height: none;
+    flex: 1;
+  }
+}
+
 // F — Did You Mean banner
 .didYouMeanBanner {
   display: flex;

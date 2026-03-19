@@ -87,8 +87,8 @@ export const Search = ({
   enableSpellCorrection = true,
   mode = "overlay",
 }: Props) => {
-  // G — overlay mode is only active when collapsible=true AND mode="overlay"
-  const useOverlay = mode === "overlay" && collapsible;
+  // G — overlay mode is active whenever mode="overlay"
+  const useOverlay = mode === "overlay";
   const _id = useId();
   const inputId = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -434,8 +434,8 @@ export const Search = ({
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
-        {/* Toggle button — always visible when overlay is closed */}
-        {!isOverlayOpen && (
+        {/* Trigger — either a toggle button (collapsible) or an always-visible input */}
+        {!isOverlayOpen && collapsible && (
           <Button
             variant="ghost"
             themeColor="secondary"
@@ -445,14 +445,34 @@ export const Search = ({
             className={styles.searchToggleButton}
           />
         )}
+        {!isOverlayOpen && !collapsible && (
+          <div
+            onPointerDown={(e) => { e.preventDefault(); openOverlay(); }}
+            style={{ cursor: "text" }}
+          >
+            <TextBox
+              className={classnames(styles.input, {
+                [styles.fullWidth]: inDrawer,
+              })}
+              type="search"
+              placeholder={placeholder ?? "Type to search"}
+              value=""
+              startIcon="search"
+              readOnly
+            />
+          </div>
+        )}
         {/* Overlay */}
         {isOverlayOpen && createPortal(
           // Wrap with className so theme CSS vars are in scope for the portal
           <div className={className}>
             {/* Backdrop — click outside to close */}
-            <div className={styles.overlayBackdrop} onClick={closeOverlay}>
+            <div
+              className={classnames(styles.overlayBackdrop, { [styles.overlayBackdropMobile]: inDrawer })}
+              onClick={closeOverlay}
+            >
               <div
-                className={styles.overlayPanel}
+                className={classnames(styles.overlayPanel, { [styles.overlayPanelMobile]: inDrawer })}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Search"
@@ -485,7 +505,9 @@ export const Search = ({
                       onSelectOne={(cat: string) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
                       onClearAll={() => { clearCategories(); refocusInput(); }}
                     />
-                    <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
+                    {!inDrawer && (
+                      <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
+                    )}
                   </div>
                 )}
 
@@ -504,8 +526,8 @@ export const Search = ({
                     {loadMoreJsx}
                   </>
                 )}
-                {/* Footer always visible in overlay */}
-                {footerJsx}
+                {/* Footer — hidden on mobile (inDrawer) */}
+                {!inDrawer && footerJsx}
               </div>
             </div>
           </div>, document.body
