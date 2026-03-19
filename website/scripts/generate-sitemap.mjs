@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { discoverRoutes } from "../../xmlui/bin/ssg/discoverRoutes";
+import { discoverRoutes } from "../../xmlui/src/nodejs/discoverRoutes";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -23,7 +23,7 @@ export default defineConfig([
   },
   {
     name: "xmlui-node",
-    entry: "bin/node.ts",
+    entry: "src/nodejs/index.ts",
     outDir: "dist/for-node",
     format: ["esm", "commonjs"],
     shims: true,

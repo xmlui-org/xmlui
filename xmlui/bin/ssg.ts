@@ -16,7 +16,7 @@ import { pathToFileURL } from "node:url";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { parse } from "node-html-parser";
-import { discoverRoutes } from "./ssg/discoverRoutes";
+import { discoverRoutes } from "../src/nodejs/discoverRoutes";
 import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
 
 type SsgOptions = {
