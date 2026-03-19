@@ -105,25 +105,27 @@ export const Search = ({
 
   // G — overlay open state
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [drawerOverlayTop, setDrawerOverlayTop] = useState(0);
+  const triggerRef = useRef<HTMLDivElement>(null);
 
   const openOverlay = useCallback(() => {
+    if (triggerRef.current) {
+      setDrawerOverlayTop(triggerRef.current.getBoundingClientRect().top);
+    }
+    // Set synchronously so Sheet.tsx onFocusOutside/onInteractOutside checks it immediately
+    if (useDrawer) {
+      document.body.setAttribute("data-search-overlay-open", "true");
+    }
     setIsOverlayOpen(true);
-  }, []);
+  }, [useDrawer]);
 
   const closeOverlay = useCallback(() => {
+    document.body.removeAttribute("data-search-overlay-open");
     setIsOverlayOpen(false);
     setInputValue("");
     setShow(false);
     setActiveIndex(-1);
   }, []);
-
-  // Signal to Sheet that search overlay is open so it won't close due to outside interactions
-  useEffect(() => {
-    if (isOverlayOpen && useDrawer) {
-      document.body.setAttribute("data-search-overlay-open", "true");
-      return () => document.body.removeAttribute("data-search-overlay-open");
-    }
-  }, [isOverlayOpen, useDrawer]);
 
   // Auto-focus the input when the overlay opens
   useEffect(() => {
@@ -551,7 +553,8 @@ export const Search = ({
         </VisuallyHidden>
         {/* Trigger — always in DOM so pointer events complete within the Sheet */}
         <div
-          onPointerDown={(e) => { e.preventDefault(); openOverlay(); }}
+          ref={triggerRef}
+          onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); openOverlay(); }}
           style={{ cursor: "text", visibility: isOverlayOpen ? "hidden" : undefined }}
         >
           <TextBox
@@ -566,7 +569,7 @@ export const Search = ({
         {/* Overlay via portal — drawer is already closed by the time this renders */}
         {isOverlayOpen && createPortal(
           <div className={className}>
-            <div className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}>
+            <div className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)} onClick={closeOverlay}>
               <div
                 className={classnames(styles.overlayPanel, styles.overlayPanelMobile)}
                 role="dialog"
@@ -574,23 +577,15 @@ export const Search = ({
                 aria-label="Search"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className={styles.overlayInputRow}>
-                  {/* Back button — closes overlay and reopens the drawer */}
-                  <button
-                    className={styles.drawerBackButton}
-                    onPointerDown={(e) => e.preventDefault()}
-                    onClick={closeOverlay}
-                    aria-label="Back to menu"
-                  >
-                    <Icon name="arrowleft" size="sm" />
-                  </button>
+                <div className={styles.drawerInputRow}>
                   <TextBox
                     id={inputId}
                     ref={inputRef}
-                    className={styles.overlayInput}
+                    className={classnames(styles.input, styles.fullWidth)}
                     type="search"
-                    placeholder={placeholder ?? "Type to search…"}
+                    placeholder={placeholder ?? "Type to search"}
                     value={inputValue}
+                    startIcon="search"
                     onDidChange={(value) => setInputValue(value)}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
