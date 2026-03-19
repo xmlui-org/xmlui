@@ -117,6 +117,14 @@ export const Search = ({
     setActiveIndex(-1);
   }, []);
 
+  // Signal to Sheet that search overlay is open so it won't close due to outside interactions
+  useEffect(() => {
+    if (isOverlayOpen && useDrawer) {
+      document.body.setAttribute("data-search-overlay-open", "true");
+      return () => document.body.removeAttribute("data-search-overlay-open");
+    }
+  }, [isOverlayOpen, useDrawer]);
+
   // Auto-focus the input when the overlay opens
   useEffect(() => {
     if (isOverlayOpen) {
@@ -215,13 +223,17 @@ export const Search = ({
   }, []);
 
   const onClick = useCallback(() => {
-    if (useOverlay) {
-      closeOverlay();
+    if (useOverlay || useDrawer) {
+      // For drawer mode: close overlay but don't reopen the drawer (navigation handles it)
+      setIsOverlayOpen(false);
+      setInputValue("");
+      setShow(false);
+      setActiveIndex(-1);
     } else {
       setInputValue("");
       setActiveIndex(-1);
     }
-  }, [useOverlay, closeOverlay]);
+  }, [useOverlay, useDrawer]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
@@ -530,41 +542,90 @@ export const Search = ({
     );
   }
 
-  // G — Drawer mode: inline results, no portal (safe inside Radix Sheet)
+  // G — Drawer mode: same as overlay but trigger stays in DOM (Sheet stays open)
   if (useDrawer) {
     return (
       <span className={className} style={{ display: "block" }}>
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
-        <TextBox
-          id={inputId}
-          ref={inputRef}
-          className={classnames(styles.input, styles.fullWidth)}
-          type="search"
-          placeholder={placeholder ?? "Type to search"}
-          value={inputValue}
-          startIcon="search"
-          onDidChange={(value) => setInputValue(value)}
-          onFocus={onInputFocus}
-          onKeyDown={handleKeyDown}
-          aria-autocomplete="list"
-          aria-controls={`${inputId}-listbox`}
-          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-        />
-        {hasQuery && (
-          <div className={styles.drawerResultsPanel}>
-            <ul
-              id={`${inputId}-listbox`}
-              ref={listRef}
-              className={styles.list}
-              role="listbox"
-              aria-label="Search results"
-            >
-              {resultsListJsx}
-            </ul>
-            {loadMoreJsx}
-          </div>
+        {/* Trigger — always in DOM so pointer events complete within the Sheet */}
+        <div
+          onPointerDown={(e) => { e.preventDefault(); openOverlay(); }}
+          style={{ cursor: "text", visibility: isOverlayOpen ? "hidden" : undefined }}
+        >
+          <TextBox
+            className={classnames(styles.input, styles.fullWidth)}
+            type="search"
+            placeholder={placeholder ?? "Type to search"}
+            value=""
+            startIcon="search"
+            readOnly
+          />
+        </div>
+        {/* Overlay via portal — drawer is already closed by the time this renders */}
+        {isOverlayOpen && createPortal(
+          <div className={className}>
+            <div className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}>
+              <div
+                className={classnames(styles.overlayPanel, styles.overlayPanelMobile)}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.overlayInputRow}>
+                  {/* Back button — closes overlay and reopens the drawer */}
+                  <button
+                    className={styles.drawerBackButton}
+                    onPointerDown={(e) => e.preventDefault()}
+                    onClick={closeOverlay}
+                    aria-label="Back to menu"
+                  >
+                    <Icon name="arrowleft" size="sm" />
+                  </button>
+                  <TextBox
+                    id={inputId}
+                    ref={inputRef}
+                    className={styles.overlayInput}
+                    type="search"
+                    placeholder={placeholder ?? "Type to search…"}
+                    value={inputValue}
+                    onDidChange={(value) => setInputValue(value)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls={`${inputId}-listbox`}
+                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                  />
+                </div>
+                {hasQuery && availableCategories.length > 1 && (
+                  <div className={styles.overlayControls}>
+                    <OverlayCategoryTabs
+                      categories={availableCategories}
+                      selectedCategories={selectedCategories}
+                      onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
+                      onClearAll={() => { clearCategories(); refocusInput(); }}
+                    />
+                  </div>
+                )}
+                {hasQuery && (
+                  <>
+                    <ul
+                      id={`${inputId}-listbox`}
+                      ref={listRef}
+                      className={classnames(styles.list, styles.overlayList, styles.drawerOverlayList)}
+                      role="listbox"
+                      aria-label="Search results"
+                    >
+                      {resultsListJsx}
+                    </ul>
+                    {loadMoreJsx}
+                  </>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body
         )}
       </span>
     );

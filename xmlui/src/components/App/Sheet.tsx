@@ -47,6 +47,18 @@ const SheetContent = React.forwardRef<
           // (e.g. the search input in the mobile nav drawer).
           event.preventDefault();
         }}
+        onFocusOutside={(event) => {
+          // Don't close the drawer when the search overlay steals focus
+          if (document.body.hasAttribute("data-search-overlay-open")) {
+            event.preventDefault();
+          }
+        }}
+        onInteractOutside={(event) => {
+          // Don't close the drawer when interacting with the search overlay
+          if (document.body.hasAttribute("data-search-overlay-open")) {
+            event.preventDefault();
+          }
+        }}
         ref={ref}
         className={classnames(
           styles.sheetContent,

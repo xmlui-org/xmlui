@@ -173,7 +173,7 @@ const searchComponentRenderer = createComponentRenderer(
         defaultSortOrder={extractValue.asOptionalString(props.defaultSortOrder) as "relevance" | "date" | undefined}
         pageSize={extractValue.asOptionalNumber(props.pageSize)}
         enableSpellCorrection={extractValue.asOptionalBoolean(props.enableSpellCorrection, true)}
-        mode={extractValue.asOptionalString(props.mode) as "overlay" | "inline" | undefined}
+        mode={extractValue.asOptionalString(props.mode) as "overlay" | "inline" | "drawer" | undefined}
       />
     );
   },
