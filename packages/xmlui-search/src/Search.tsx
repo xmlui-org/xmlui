@@ -17,7 +17,6 @@ import {
   TextBox,
   useSearchContextContent,
   VisuallyHidden,
-  useAppLayoutContext,
   Button,
   Icon,
   SEARCH_DEFAULT_CATEGORY,
@@ -59,8 +58,9 @@ type Props = {
   enableSpellCorrection?: boolean;
   // G — Display mode
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
-   *  "inline": the current expand-in-place animation inside the navbar. */
-  mode?: "overlay" | "inline";
+   *  "inline": the current expand-in-place animation inside the navbar.
+   *  "drawer": renders results inline below the input, no portal — safe inside a modal drawer. */
+  mode?: "overlay" | "inline" | "drawer";
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -89,6 +89,7 @@ export const Search = ({
 }: Props) => {
   // G — overlay mode is active whenever mode="overlay"
   const useOverlay = mode === "overlay";
+  const useDrawer = mode === "drawer";
   const _id = useId();
   const inputId = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -191,9 +192,7 @@ export const Search = ({
   );
   const hasMore = results.length < sortedResults.length;
 
-  const layout = useAppLayoutContext();
-  const inDrawer = layout?.drawerVisible ?? false;
-  const _root = inDrawer && inputRef.current ? inputRef.current?.closest(`div`) : undefined;
+  const _root = undefined;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -451,9 +450,7 @@ export const Search = ({
             style={{ cursor: "text" }}
           >
             <TextBox
-              className={classnames(styles.input, {
-                [styles.fullWidth]: inDrawer,
-              })}
+              className={styles.input}
               type="search"
               placeholder={placeholder ?? "Type to search"}
               value=""
@@ -468,11 +465,11 @@ export const Search = ({
           <div className={className}>
             {/* Backdrop — click outside to close */}
             <div
-              className={classnames(styles.overlayBackdrop, { [styles.overlayBackdropMobile]: inDrawer })}
+              className={styles.overlayBackdrop}
               onClick={closeOverlay}
             >
               <div
-                className={classnames(styles.overlayPanel, { [styles.overlayPanelMobile]: inDrawer })}
+                className={styles.overlayPanel}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Search"
@@ -505,9 +502,7 @@ export const Search = ({
                       onSelectOne={(cat: string) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
                       onClearAll={() => { clearCategories(); refocusInput(); }}
                     />
-                    {!inDrawer && (
-                      <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
-                    )}
+                    <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
                   </div>
                 )}
 
@@ -526,11 +521,50 @@ export const Search = ({
                     {loadMoreJsx}
                   </>
                 )}
-                {/* Footer — hidden on mobile (inDrawer) */}
-                {!inDrawer && footerJsx}
+                {footerJsx}
               </div>
             </div>
           </div>, document.body
+        )}
+      </span>
+    );
+  }
+
+  // G — Drawer mode: inline results, no portal (safe inside Radix Sheet)
+  if (useDrawer) {
+    return (
+      <span className={className} style={{ display: "block" }}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        <TextBox
+          id={inputId}
+          ref={inputRef}
+          className={classnames(styles.input, styles.fullWidth)}
+          type="search"
+          placeholder={placeholder ?? "Type to search"}
+          value={inputValue}
+          startIcon="search"
+          onDidChange={(value) => setInputValue(value)}
+          onFocus={onInputFocus}
+          onKeyDown={handleKeyDown}
+          aria-autocomplete="list"
+          aria-controls={`${inputId}-listbox`}
+          aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+        />
+        {hasQuery && (
+          <div className={styles.drawerResultsPanel}>
+            <ul
+              id={`${inputId}-listbox`}
+              ref={listRef}
+              className={styles.list}
+              role="listbox"
+              aria-label="Search results"
+            >
+              {resultsListJsx}
+            </ul>
+            {loadMoreJsx}
+          </div>
         )}
       </span>
     );
@@ -558,7 +592,6 @@ export const Search = ({
               id={inputId}
               ref={inputRef}
               className={classnames(styles.input, {
-                [styles.fullWidth]: inDrawer,
                 [styles.active]: inputValue.length > 0 || show,
                 [styles.focused]: isFocused,
                 [styles.expanding]: animationDirection === "expanding",
@@ -586,9 +619,7 @@ export const Search = ({
               onCloseAutoFocus={(e) => e.preventDefault()}
               onEscapeKeyDown={() => setShow(false)}
               onFocusOutside={(e) => e.preventDefault()}
-              className={classnames(styles.listPanel, className, {
-                [styles.inDrawer]: inDrawer,
-              })}
+              className={classnames(styles.listPanel, className)}
             >
               {/* C — Category filter bar + D — Sort control */}
               {(availableCategories.length > 1 || sortOrder !== "relevance") && (
@@ -614,7 +645,7 @@ export const Search = ({
                 {resultsListJsx}
               </ul>
               {loadMoreJsx}
-              {!inDrawer && footerJsx}
+              {footerJsx}
             </PopoverContent>
           </Portal>
         )}

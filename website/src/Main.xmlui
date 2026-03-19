@@ -120,7 +120,7 @@
                 showPreviewMetadata="false"
                 pageSize="8"
                 enableSpellCorrection="true"
-                mode="overlay"
+                mode="drawer"
               />
             </Stack>
           </Fragment>
