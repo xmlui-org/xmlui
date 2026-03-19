@@ -191,12 +191,6 @@ import {
   XmlUiThemeDefinition,
   XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
-import { BarChartMd } from "./Charts/BarChart/BarChart";
-import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
-import { LabelListMd } from "./Charts/LabelList/LabelList";
-import { LegendMd } from "./Charts/Legend/Legend";
-import { LineChartMd } from "./Charts/LineChart/LineChart";
-import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
@@ -422,12 +416,6 @@ export const collectedComponentMetadata = {
   NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
-  BarChart: BarChartMd,
-  DonutChart: DonutChartMd,
-  LabelList: LabelListMd,
-  Legend: LegendMd,
-  LineChart: LineChartMd,
-  PieChart: PieChartMd,
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {
