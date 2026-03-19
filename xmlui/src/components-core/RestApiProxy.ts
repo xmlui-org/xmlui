@@ -1,4 +1,3 @@
-import type { AxiosResponse } from "axios";
 import { isPlainObject, isUndefined, omitBy } from "lodash-es";
 
 import type { AppContextObject } from "../abstractions/AppContextDefs";
@@ -73,16 +72,8 @@ interface RestAPIAdapterPropsV2 {
   errorResponseTransform?: string;
 }
 
-function isAxiosResponse(response: AxiosResponse | Response): response is AxiosResponse {
-  return "data" in response;
-}
-
-function getContentType(response: AxiosResponse | Response): string {
-  if (isAxiosResponse(response)) {
-    return response.headers["content-type"] || response.headers["Content-Type"] || "";
-  } else {
-    return response.headers.get("content-type") || "";
-  }
+function getContentType(response: Response): string {
+  return response.headers.get("content-type") || "";
 }
 
 // --- Tests for the most common binary types
@@ -128,48 +119,41 @@ function shouldReturnAsArrayBuffer(contentType: string): boolean {
   return arrayBufferTypes.some((type) => contentType.toLowerCase().includes(type.toLowerCase()));
 }
 
-async function parseResponseBody(response: AxiosResponse | Response, logError = false) {
+async function parseResponseBody(response: Response, logError = false) {
   let resp: any;
-  if (isAxiosResponse(response)) {
-    resp = response.data;
-  } else {
-    const contentType = getContentType(response);
+  const contentType = getContentType(response);
 
-    // Handle binary content types
-    if (isBinaryContentType(contentType)) {
+  // Handle binary content types
+  if (isBinaryContentType(contentType)) {
+    try {
+      if (shouldReturnAsArrayBuffer(contentType)) {
+        resp = await response.clone().arrayBuffer();
+      } else {
+        resp = await response.clone().blob();
+      }
+    } catch (e) {
+      if (logError) {
+        console.error("Failed to parse binary response", e, contentType);
+      }
+      // Fallback to text if binary parsing fails
       try {
-        if (shouldReturnAsArrayBuffer(contentType)) {
-          resp = await response.clone().arrayBuffer();
-        } else {
-          resp = await response.clone().blob();
-        }
-      } catch (e) {
+        resp = await response.clone().text();
+      } catch (textError) {
         if (logError) {
-          console.error("Failed to parse binary response", e, contentType);
-        }
-        // Fallback to text if binary parsing fails
-        try {
-          resp = await response.clone().text();
-        } catch (textError) {
-          if (logError) {
-            console.error(
-              "Failed to parse response as text after binary parsing failed",
-              textError,
-            );
-          }
+          console.error("Failed to parse response as text after binary parsing failed", textError);
         }
       }
-    } else {
-      // Handle text-based content types (JSON, text, etc.)
+    }
+  } else {
+    // Handle text-based content types (JSON, text, etc.)
+    try {
+      resp = await response.clone().json();
+    } catch (e: any) {
       try {
-        resp = await response.clone().json();
-      } catch (e: any) {
-        try {
-          resp = await response.clone().text();
-        } catch (e) {
-          if (logError) {
-            console.error("Failed to parse response as text or JSON", response.body);
-          }
+        resp = await response.clone().text();
+      } catch (e) {
+        if (logError) {
+          console.error("Failed to parse response as text or JSON", response.body);
         }
       }
     }
@@ -227,6 +211,102 @@ export default class RestApiProxy {
   private config: RestAPIAdapterPropsV2;
   private appContext?: AppContextObject;
   public apiInstance?: IApiInterceptor;
+
+  private createAbortError() {
+    return new DOMException("The operation was aborted.", "AbortError");
+  }
+
+  private parseXhrHeaders(rawHeaders: string): Headers {
+    const headers = new Headers();
+    rawHeaders
+      .trim()
+      .split(/\r?\n/)
+      .forEach((line) => {
+        if (!line) {
+          return;
+        }
+        const colonIndex = line.indexOf(":");
+        if (colonIndex <= 0) {
+          return;
+        }
+        const key = line.slice(0, colonIndex).trim();
+        const value = line.slice(colonIndex + 1).trim();
+        headers.append(key, value);
+      });
+    return headers;
+  }
+
+  private executeWithUploadProgress = async ({
+    url,
+    options,
+    onUploadProgress,
+  }: {
+    url: string;
+    options: RequestInit;
+    onUploadProgress: OnProgressFn;
+  }): Promise<Response> => {
+    return await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const method = options.method || "GET";
+      const headers = options.headers ? new Headers(options.headers) : new Headers();
+      const abortSignal = options.signal;
+
+      const abortHandler = () => {
+        xhr.abort();
+      };
+
+      const cleanup = () => {
+        abortSignal?.removeEventListener("abort", abortHandler);
+      };
+
+      if (abortSignal?.aborted) {
+        reject(this.createAbortError());
+        return;
+      }
+
+      xhr.open(method, url, true);
+      xhr.responseType = "blob";
+      xhr.withCredentials = options.credentials === "include";
+      headers.forEach((value, key) => {
+        xhr.setRequestHeader(key, value);
+      });
+
+      xhr.upload.addEventListener("progress", (event) => {
+        const total = event.lengthComputable ? event.total : undefined;
+        onUploadProgress({
+          loaded: event.loaded,
+          total,
+          progress: total && total > 0 ? event.loaded / total : undefined,
+        });
+      });
+
+      xhr.onload = () => {
+        cleanup();
+        const responseHeaders = this.parseXhrHeaders(xhr.getAllResponseHeaders());
+        const responseBody = xhr.response ?? xhr.responseText ?? "";
+        resolve(
+          new Response(responseBody, {
+            status: xhr.status,
+            statusText: xhr.statusText,
+            headers: responseHeaders,
+          }),
+        );
+      };
+
+      xhr.onerror = () => {
+        cleanup();
+        reject(new Error("Network request failed"));
+      };
+
+      xhr.onabort = () => {
+        cleanup();
+        reject(this.createAbortError());
+      };
+
+      abortSignal?.addEventListener("abort", abortHandler, { once: true });
+      xhr.send((options.body as XMLHttpRequestBodyInit | null) ?? null);
+    });
+  };
 
   constructor(appContext?: AppContextObject, apiInstance?: IApiInterceptor) {
     const conf = appContext?.appGlobals || { apiUrl: "" };
@@ -289,9 +369,7 @@ export default class RestApiProxy {
                 if (fileNameMatch && fileNameMatch.length === 2) fileName = fileNameMatch[1];
               }
             }
-            return isAxiosResponse(response)
-              ? response.data
-              : new File([await response.clone().blob()], fileName);
+            return new File([await response.clone().blob()], fileName);
           }
         : undefined,
       transactionId,
@@ -500,7 +578,7 @@ export default class RestApiProxy {
     payloadType?: "form" | "multipart-form" | "json";
     credentials?: "omit" | "same-origin" | "include";
     onUploadProgress?: OnProgressFn;
-    parseResponse?: (response: Response | AxiosResponse, logError: boolean) => any;
+    parseResponse?: (response: Response, logError: boolean) => any;
     transactionId: string;
     omitTransactionId?: boolean;
     resolveBindingExpressions: boolean;
@@ -562,33 +640,23 @@ export default class RestApiProxy {
       ...(credentials && { credentials }),
     };
     if (onUploadProgress) {
-      //console.log("Falling back to axios. Reason: onUploadProgress specified");
-      const axios = (await import("axios")).default;
-      try {
-        const response = await axios.request({
-          url: url,
-          method: options.method,
-          headers: aggregatedHeaders,
-          data: options.body,
-          onUploadProgress,
-          withCredentials: credentials === "include",
-        });
-        setLastApiStatus(transactionId, response.status);
-        if (onResponseHeaders) {
-          const axiosHeaders = response.headers as Record<string, string>;
-          onResponseHeaders(axiosHeaders);
-        }
-        return await parseResponse(
-          response,
-          this.appContext?.appGlobals?.logRestApiErrors ?? false,
-        );
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          throw await this.raiseError(error.response);
-        } else {
-          throw error;
-        }
+      const response = await this.executeWithUploadProgress({
+        url,
+        options,
+        onUploadProgress,
+      });
+      setLastApiStatus(transactionId, response?.status);
+      if (!response.ok) {
+        throw await this.raiseError(response);
       }
+      if (onResponseHeaders) {
+        const xhrHeaders: Record<string, string> = {};
+        response.headers.forEach((value: string, key: string) => {
+          xhrHeaders[key] = value;
+        });
+        onResponseHeaders(xhrHeaders);
+      }
+      return await parseResponse(response, this.appContext?.appGlobals?.logRestApiErrors ?? false);
     } else {
       let response: any;
       if (this.apiInstance && this.apiInstance.hasMockForRequest(url, options)) {
@@ -615,15 +683,12 @@ export default class RestApiProxy {
     }
   };
 
-  private tryParseResponse = async (response: Response | AxiosResponse, logError = false) => {
+  private tryParseResponse = async (response: Response, logError = false) => {
     return await parseResponseBody(response, logError);
   };
 
   private generateFullApiUrl(relativePath: string, queryParams: Record<string, any> | undefined) {
-    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(
-      relativePath,
-      queryParams,
-    );
+    const { baseUrl: basePath, mergedParams } = normalizeUrlAndParams(relativePath, queryParams);
 
     let queryString = "";
     if (mergedParams && Object.keys(mergedParams).length > 0) {
@@ -661,42 +726,37 @@ export default class RestApiProxy {
     return `${this.config.apiUrl || ""}${basePath}${queryString}`;
   }
 
-  private raiseError = async (response: Response | AxiosResponse) => {
-    if ("config" in response) {
-      //poor man's axios response type guard
-      try {
+  private raiseError = async (response: Response) => {
+    try {
+      const parsedResponse = await parseResponseBody(response.clone());
+      const hasParsedBody =
+        parsedResponse !== undefined &&
+        parsedResponse !== null &&
+        !(typeof parsedResponse === "string" && parsedResponse.trim().length === 0);
+
+      if (hasParsedBody) {
         return new GenericBackendError(
           this.config.errorResponseTransform
             ? this.extractParam(true, this.config.errorResponseTransform, {
-                $response: response.data,
+                $response: parsedResponse,
               })
-            : response.data,
+            : parsedResponse,
           response.status,
         );
-      } catch {}
-    } else {
-      try {
-        const respObject = await response.json();
-        return new GenericBackendError(
-          this.config.errorResponseTransform
-            ? this.extractParam(true, this.config.errorResponseTransform, { $response: respObject })
-            : respObject,
-          response.status,
-        );
-      } catch {
-        return new GenericBackendError("<No error description>", response.status);
       }
+    } catch {}
+
+    if (response?.statusText || response?.status) {
+      return new GenericBackendError(response.statusText, response.status);
     }
 
-    return new Error(
-      `[!] Server responded with an error: ${response.status} - ${response.statusText}`,
-    );
+    return new Error(`[!] Server responded with an error: ${response}`);
   };
 
   private getHeaders = (): Record<string, string> => {
     return {
       ["Content-Type" as string]: "application/json; charset=UTF-8",
-      ...(this.config.headers ?? {}),
+      ...this.config.headers,
     };
   };
 }
