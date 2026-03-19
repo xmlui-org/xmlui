@@ -7,15 +7,36 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$component: "List2";
-$backgroundColor-List2: createThemeVar("backgroundColor-#{$component}");
+$component: "List";
+
+@function createThemeVarWithFallback($componentVariable, $fallbackVar) {
+  $themeVars: t.appendThemeVarWithFallback($themeVars, $componentVariable, $fallbackVar) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$backgroundColor-List: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-selected-List: createThemeVar("backgroundColor-selected-#{$component}");
+$backgroundColor-selected-List--hover: createThemeVar("backgroundColor-selected-#{$component}--hover");
+$backgroundColor-row-List--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
+
+// Variables for List selection checkbox — fall back to the Checkbox component's equivalent vars
+$borderRadius-selectionCheckbox-List: createThemeVarWithFallback("borderRadius-selectionCheckbox-#{$component}", "borderRadius-Checkbox");
+$borderColor-selectionCheckbox-List: createThemeVarWithFallback("borderColor-selectionCheckbox-#{$component}", "borderColor-Checkbox");
+$backgroundColor-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-selectionCheckbox-#{$component}", "backgroundColor-Checkbox");
+$borderColor-checked-selectionCheckbox-List: createThemeVarWithFallback("borderColor-checked-selectionCheckbox-#{$component}", "borderColor-checked-Checkbox");
+$backgroundColor-checked-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-checked-selectionCheckbox-#{$component}", "backgroundColor-checked-Checkbox");
+$backgroundColor-indicator-selectionCheckbox-List: createThemeVarWithFallback("backgroundColor-indicator-selectionCheckbox-#{$component}", "backgroundColor-indicator-Checkbox");
+$outlineWidth-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineWidth-selectionCheckbox-#{$component}--focus", "outlineWidth-Checkbox--focus");
+$outlineColor-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineColor-selectionCheckbox-#{$component}--focus", "outlineColor-Checkbox--focus");
+$outlineStyle-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineStyle-selectionCheckbox-#{$component}--focus", "outlineStyle-Checkbox--focus");
+$outlineOffset-selectionCheckbox-List--focus: createThemeVarWithFallback("outlineOffset-selectionCheckbox-#{$component}--focus", "outlineOffset-Checkbox--focus");
 
 @layer components {
   .outerListWrapper {
     overflow: auto;
     //max-height: 100%;
     overflow-anchor: none;
-    background-color: $backgroundColor-List2;
+    background-color: $backgroundColor-List;
 
     &.hasOutsideScroll {
       overflow: visible; // Let content overflow so parent can scroll
@@ -56,6 +77,87 @@ $backgroundColor-List2: createThemeVar("backgroundColor-#{$component}");
     width: 100%;
     text-align: center;
     margin-top: t.$space-4;
+  }
+
+  .row {
+    &.selectable {
+      cursor: pointer;
+    }
+
+    &.hasCheckboxes {
+      display: flex;
+      align-items: center;
+
+      > *:not(.checkboxWrapper) {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+
+    &.selected {
+      background-color: $backgroundColor-selected-List;
+    }
+
+    &.selectable:hover {
+      background-color: $backgroundColor-row-List--hover;
+    }
+
+    &.selected.focused {
+      background-color: $backgroundColor-selected-List;
+    }
+
+    &.selected:hover {
+      background-color: $backgroundColor-selected-List--hover;
+    }
+    &.hasOverlayCheckbox {
+      position: relative;
+    }
+  }
+
+  .checkboxWrapper {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 t.$space-2;
+
+    // Override the Checkbox component's theme vars with List-specific vars (with Checkbox fallback).
+    // Specificity of .checkboxWrapper input (0,1,1) beats Toggle's .checkbox (0,1,0).
+    input {
+      border-radius: $borderRadius-selectionCheckbox-List;
+      border-color: $borderColor-selectionCheckbox-List;
+      background-color: $backgroundColor-selectionCheckbox-List;
+
+      &::before {
+        box-shadow: inset 1em 1em $backgroundColor-indicator-selectionCheckbox-List;
+      }
+
+      &:checked {
+        border-color: $borderColor-checked-selectionCheckbox-List;
+        background-color: $backgroundColor-checked-selectionCheckbox-List;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:focus-visible {
+        outline-width: $outlineWidth-selectionCheckbox-List--focus;
+        outline-color: $outlineColor-selectionCheckbox-List--focus;
+        outline-style: $outlineStyle-selectionCheckbox-List--focus;
+        outline-offset: $outlineOffset-selectionCheckbox-List--focus;
+      }
+    }
+
+    &.checkboxDisabled {
+      opacity: 0.6;
+    }
+
+    &.checkboxOverlay {
+      position: absolute;
+      padding: 0;
+      z-index: 1;
+    }
   }
 
   // --- We export the theme variables to add them to the component renderer
