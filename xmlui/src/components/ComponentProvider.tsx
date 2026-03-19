@@ -261,14 +261,6 @@ import { inspectorComponentRenderer } from "./Inspector/Inspector";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
-import { areaChartComponentRenderer } from "./Charts/AreaChart/AreaChart";
-import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
-import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
-import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
-import { legendComponentRenderer } from "./Charts/Legend/Legend";
-import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
-import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
-import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
@@ -549,17 +541,6 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_Pagination !== "false") {
       this.registerCoreComponent(paginationComponentRenderer);
-    }
-
-    if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
-      this.registerCoreComponent(areaChartComponentRenderer);
-      this.registerCoreComponent(barChartComponentRenderer);
-      this.registerCoreComponent(donutChartComponentRenderer);
-      this.registerCoreComponent(labelListComponentRenderer);
-      this.registerCoreComponent(legendComponentRenderer);
-      this.registerCoreComponent(lineChartComponentRenderer);
-      this.registerCoreComponent(pieChartComponentRenderer);
-      this.registerCoreComponent(radarChartComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {

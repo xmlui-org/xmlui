@@ -108,6 +108,7 @@
     "/^cd /Users/dotneteer/source/xmlui/xmlui && node scripts/generate-docs\\.mjs 2>&1 \\| grep -i \"list\\\\\\|error\\\\\\|warn\" \\| head -20$/": {
       "approve": true,
       "matchCommandLine": true
-    }
+    },
+    "awk": true
   }
 }
