@@ -605,16 +605,21 @@ export const Search = ({
                 </div>
                 {hasQuery && (
                   <div className={styles.drawerResultsWrapper}>
-                    {availableCategories.length > 1 && (
-                      <div className={styles.overlayControls}>
-                        <OverlayCategoryTabs
-                          categories={availableCategories}
-                          selectedCategories={selectedCategories}
-                          onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
-                          onClearAll={() => { clearCategories(); refocusInput(); }}
-                        />
+                    <div className={styles.drawerControls}>
+                      {availableCategories.length > 1 && (
+                        <div className={styles.drawerCategoryRow}>
+                          <OverlayCategoryTabs
+                            categories={availableCategories}
+                            selectedCategories={selectedCategories}
+                            onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
+                            onClearAll={() => { clearCategories(); refocusInput(); }}
+                          />
+                        </div>
+                      )}
+                      <div className={styles.drawerSortRow}>
+                        <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
                       </div>
-                    )}
+                    </div>
                     <ul
                       id={`${inputId}-listbox`}
                       ref={listRef}
@@ -805,6 +810,7 @@ type SortControlProps = {
 function SortControl({ sortOrder, onSortChange }: SortControlProps) {
   return (
     <div className={styles.sortControl} role="group" aria-label="Sort results">
+      <span className={styles.sortLabel}>Sort by</span>
       <button
         className={classnames(styles.sortButton, {
           [styles.sortButtonActive]: sortOrder === "relevance",

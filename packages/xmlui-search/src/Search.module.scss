@@ -363,7 +363,14 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 // D — Sort Control
 .sortControl {
   display: flex;
-  gap: 0.2rem;
+  align-items: center;
+  gap: 0.4rem;
+
+  .sortLabel {
+    font-size: 0.78em;
+    opacity: 0.6;
+    white-space: nowrap;
+  }
   flex-shrink: 0;
 
   .sortButton {
@@ -509,6 +516,27 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   justify-content: space-between;
   padding: 0 1rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
+}
+
+.drawerControls {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+
+  .drawerCategoryRow {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--xmlui-borderColor);
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .drawerSortRow {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0.5rem 1rem;
+  }
 }
 
 .overlayTabs {
