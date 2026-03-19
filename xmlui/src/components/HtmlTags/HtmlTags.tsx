@@ -51,7 +51,7 @@ export const htmlATagRenderer = createComponentRenderer(
     const { disabled } = p.asOptionalBoolean("disabled");
     const { href, ...rest } = p.asRest();
     return (
-      <LinkNative to={href} disabled={disabled ?? false} className={classes?.[COMPONENT_PART_KEY]} {...rest}>
+      <LinkNative to={href} enabled={!(disabled ?? false)} className={classes?.[COMPONENT_PART_KEY]} {...rest}>
         {renderChild(node.children)}
       </LinkNative>
     );

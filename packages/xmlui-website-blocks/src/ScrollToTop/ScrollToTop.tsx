@@ -1,12 +1,13 @@
 import styles from "./ScrollToTop.module.scss";
 
 import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import * as ScrollToTopNative from "./ScrollToTopNative";
 
 const COMP = "ScrollToTop";
 const { ScrollToTop, defaultProps } = ScrollToTopNative;
 
-export const ScrollToTopMd = createMetadata({
+export const ScrollToTopMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "A floating button that scrolls the page to the top when clicked",
   parts: {

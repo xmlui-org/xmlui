@@ -100,7 +100,7 @@ export class ConflictError extends HttpError {
 }
 
 function convertErrorDetails(messageOrDetails: string | Record<string, any>) {
-  let details : Record<string, any> | undefined = undefined;
+  let details: Record<string, any> | undefined = undefined;
   if (messageOrDetails) {
     if (typeof messageOrDetails === "string") {
       details = {
@@ -125,7 +125,7 @@ const Errors = {
   },
   Conflict409: (messageOrDetails: string | Record<string, any>) => {
     return new ConflictError(convertErrorDetails(messageOrDetails));
-  }
+  },
 };
 
 export default Errors;

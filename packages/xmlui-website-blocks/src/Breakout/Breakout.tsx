@@ -1,9 +1,10 @@
 import { createComponentRenderer, createMetadata } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import { Breakout } from "./BreakoutNative";
 
 const COMP = "Breakout";
 
-export const BreakoutMd = createMetadata({
+export const BreakoutMd: ComponentMetadata = createMetadata({
   status: "stable",
   description:
     `The \`${COMP}\` component creates a breakout section. It allows its child to ` +

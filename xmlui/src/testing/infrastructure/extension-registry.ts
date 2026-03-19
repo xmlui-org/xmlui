@@ -4,6 +4,7 @@
 // to ensure extensions are loaded in the browser context where Vite can handle SCSS
 
 export const extensionRegistry: Record<string, () => Promise<any>> = {
+  "xmlui-recharts": () => import("../../../../packages/xmlui-recharts/src/index"),
   "xmlui-pdf": () => import("../../../../packages/xmlui-pdf/src/index"),
   "xmlui-search": () => import("../../../../packages/xmlui-search/src/index"),
   "xmlui-website-blocks": () => import("../../../../packages/xmlui-website-blocks/src/index"),

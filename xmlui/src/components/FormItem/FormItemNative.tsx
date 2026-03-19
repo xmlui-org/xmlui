@@ -23,7 +23,7 @@ import type {
 } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
-import { Toggle } from "../Toggle/Toggle";
+import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
 import { ThemedFileInput as FileInput } from "../FileInput/FileInput";
 import { ThemedNumberBox as NumberBox } from "../NumberBox/NumberBox";
 import { ThemedSelect as Select } from "../Select/Select";

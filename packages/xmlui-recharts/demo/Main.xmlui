@@ -1,0 +1,27 @@
+<App layout="condensed-sticky">
+  <DataSource
+    id="monthlyStatus"
+    url="/resources/files/monthly-status.json"
+    method="GET"
+  />
+
+  <VStack width="100%">
+    <H1>
+      BarChart
+    </H1>
+
+    <Card height="400px">
+      <BarChart
+        orientation="horizontal"
+        data="{ monthlyStatus }"
+        xKey="month"
+        yKeys="{['paid_revenue', 'sent_revenue']}"
+        stacked="true"
+        showLegend="true"
+        tickFormatter="{(value) => {
+            return window.formatMonth(value);
+          }}"
+      />
+    </Card>
+  </VStack>
+</App>

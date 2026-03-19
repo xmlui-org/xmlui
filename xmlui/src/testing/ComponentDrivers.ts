@@ -1027,7 +1027,7 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   get textBox() {
-    return this.input.getByRole("textbox");
+    return this.input.getByRole("textbox").or(this.input.getByRole("spinbutton"));
   }
 
   get checkbox() {

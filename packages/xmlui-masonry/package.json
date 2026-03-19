@@ -1,0 +1,13 @@
+{
+  "name": "xmlui-masonry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {},
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  }
+}

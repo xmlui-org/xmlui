@@ -13,11 +13,10 @@ import { mkdir, readdir, readFile, rm, writeFile, cp } from "node:fs/promises";
 import { rmSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import vm from "node:vm";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { discoverPaths, pathExists } from "./ssg/discoverPaths";
-import { JSDOM } from "jsdom";
+import { parse, type HTMLElement } from "node-html-parser";
 import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
 
 type SsgOptions = {
@@ -87,35 +86,13 @@ function isHtmlNavigationRequest(url: string, acceptHeader?: string): boolean {
   return !path.basename(pathname).includes(".");
 }
 
-function executeInlineScripts(html: string): void {
-  const dom = new JSDOM(html, { runScripts: "outside-only" });
-  const document = dom.window.document;
-  const scripts = document.querySelectorAll("script:not([src])");
-
-  scripts.forEach((script) => {
-    const content = (script.textContent || "").trim();
-    if (!content) {
-      return;
-    }
-
-    try {
-      vm.runInThisContext(content);
-    } catch (error) {
-      const preview = content.slice(0, 500);
-      log(`inline script execution warning: ${preview}`);
-      console.error(error);
-    }
-  });
-}
-
 function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
   if (!htmlClasses.trim()) {
     return shellHtml;
   }
 
-  const dom = new JSDOM(shellHtml);
-  const document = dom.window.document;
-  const htmlElement = document.documentElement;
+  const document = parse(shellHtml);
+  const htmlElement = document.querySelector("html");
 
   if (!htmlElement) {
     return shellHtml;
@@ -125,7 +102,7 @@ function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
   const merged = `${currentClasses} ${htmlClasses}`.trim();
   htmlElement.setAttribute("class", merged);
 
-  return dom.serialize();
+  return document.toString();
 }
 
 function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: string): string {
@@ -133,27 +110,22 @@ function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: s
     return shellHtml;
   }
 
-  const dom = new JSDOM(shellHtml);
-  const document = dom.window.document;
+  const document = parse(shellHtml);
   const head = document.querySelector("head");
 
-  const styleElement = document.createElement("style");
-  styleElement.setAttribute("data-style-registry", "true");
-  styleElement.setAttribute("data-ssr-hashes", ssrHashes);
-  styleElement.textContent = ssrStyles;
+  const styleElement = `<style data-style-registry="true" data-ssr-hashes="${ssrHashes}">${ssrStyles}</style>`;
 
   if (head) {
-    head.appendChild(styleElement);
+    head.append(styleElement);
   } else {
-    document.documentElement.appendChild(styleElement);
+    document.append(styleElement);
   }
 
-  return dom.serialize();
+  return document.toString();
 }
 
 function injectMarkup(shellHtml: string, markup: string): string {
-  const dom = new JSDOM(shellHtml);
-  const document = dom.window.document;
+  const document = parse(shellHtml);
 
   const rootDiv = document.querySelector('div[id="root"]');
   if (rootDiv) {
@@ -162,13 +134,13 @@ function injectMarkup(shellHtml: string, markup: string): string {
       rootDiv.setAttribute(XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile, SEARCH_INDEX_FILE_NAME);
     }
     rootDiv.innerHTML = markup;
-    return dom.serialize();
+    return document.toString();
   }
 
   const body = document.querySelector("body");
   if (body) {
     body.insertAdjacentHTML("beforeend", markup);
-    return dom.serialize();
+    return document.toString();
   }
 
   return shellHtml + markup;
@@ -180,15 +152,14 @@ function injectMarkup(shellHtml: string, markup: string): string {
  * by using JSDOM to isolate the page content and extract unescaped text.
  */
 function extractSearchEntry(pageUrl: string, markup: string, navLabel = ""): SearchItemData {
-  const dom = new JSDOM(markup);
-  const document = dom.window.document;
+  const document = parse(markup);
 
-  // Isolate the physical page content (skip header, nav, footer)
-  const pageRoot = document.querySelector(".xmlui-page-root") || document.body;
+  const pageRoot =
+    document.querySelector(".xmlui-page-root") || document.querySelector("body") || document;
 
   // Strip style and script tags (and their content)
   const elementsToRemove = pageRoot.querySelectorAll("style, script");
-  elementsToRemove.forEach((el: Element) => el.remove());
+  elementsToRemove.forEach((el) => el.remove());
 
   // Extract first h1 text as title
   const titleElement = pageRoot.querySelector("h1");
@@ -449,9 +420,6 @@ async function runDebugSsgServer() {
 
   log(`starting debug server in ${cwd}`);
 
-  const sourceHtml = await readFile(sourceIndexPath, "utf-8");
-  executeInlineScripts(sourceHtml);
-
   const extensionImportSpecifiers = await getExtensionImportSpecifiers(cwd);
   if (extensionImportSpecifiers.length > 0) {
     log(`detected extensions: ${extensionImportSpecifiers.join(", ")}`);
@@ -502,7 +470,11 @@ async function runDebugSsgServer() {
 
         try {
           const shellHtml = await readFile(sourceIndexPath, "utf-8");
-          const transformedShell = await server.transformIndexHtml(requestUrl, shellHtml, req.originalUrl);
+          const transformedShell = await server.transformIndexHtml(
+            requestUrl,
+            shellHtml,
+            req.originalUrl,
+          );
           const renderModule = (await server.ssrLoadModule(
             `${pathToFileURL(tempEntryPath).href}?t=${Date.now()}`,
           )) as RenderModule;
@@ -624,9 +596,6 @@ export const ssg = async ({
 
   log(`copying dist to ${outPath}`);
   await cp(distPath, outPath, { recursive: true });
-
-  const sourceHtml = await readFile(sourceIndexPath, "utf-8");
-  executeInlineScripts(sourceHtml);
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
   const mainXmluiPath = path.resolve(cwd, "src", "Main.xmlui");

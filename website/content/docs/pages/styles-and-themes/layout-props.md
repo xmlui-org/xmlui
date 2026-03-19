@@ -214,6 +214,10 @@ This property sets the style of an element's outline. An outline is a line that 
 
 This property sets the [color](/docs/styles-and-themes/common-units#color) of an element's outline.
 
+## `outlineOffset`
+
+This property sets the distance between the outline and the border edge of an element. Unlike `margin` or `border-spacing`, `outlineOffset` is drawn between the border and the outline.
+
 ## `overflowX`
 
 This property defines the [overflow](/docs/styles-and-themes/common-units#overflow) strategy when a component horizontally overflows the UI its parent provides.
@@ -253,6 +257,58 @@ Sets the [size](/docs/styles-and-themes/common-units#size) of the vertical paddi
 ## `right`
 
 Sets the [right](/docs/styles-and-themes/common-units#size) position of the component to the specified value.
+
+## `scrollMargin`
+
+Sets the scroll margin on all sides of an element at once. Scroll margin defines the outward offsets from the element's scroll snap area used when this element is snapped into view.
+
+## `scrollMarginBottom`
+
+Sets the scroll margin on the bottom side of an element. See `scrollMargin`.
+
+## `scrollMarginLeft`
+
+Sets the scroll margin on the left side of an element. See `scrollMargin`.
+
+## `scrollMarginRight`
+
+Sets the scroll margin on the right side of an element. See `scrollMargin`.
+
+## `scrollMarginTop`
+
+Sets the scroll margin on the top side of an element. See `scrollMargin`.
+
+## `scrollPadding`
+
+Sets the scroll padding on all sides of an element at once. Scroll padding defines offsets from the scroll port when calculating the nearest scroll snap position for a snap target.
+
+## `scrollPaddingBottom`
+
+Sets the scroll padding on the bottom side of an element. See `scrollPadding`.
+
+## `scrollPaddingLeft`
+
+Sets the scroll padding on the left side of an element. See `scrollPadding`.
+
+## `scrollPaddingRight`
+
+Sets the scroll padding on the right side of an element. See `scrollPadding`.
+
+## `scrollPaddingTop`
+
+Sets the scroll padding on the top side of an element. See `scrollPadding`.
+
+## `scrollSnapAlign`
+
+Specifies the box's snap position as an alignment of its snap area within the snap container's snapport. The two values define the snapping alignment in the block and inline axes respectively. If only one value is specified, the second value defaults to the same value.
+
+## `scrollSnapStop`
+
+Defines whether the scroll container is allowed to skip over possible snap positions. When set to `always`, the scroll container must stop at the first snap point it encounters.
+
+## `scrollSnapType`
+
+Defines how strictly snap points are enforced on the scroll container. Use it to opt into scroll snapping by setting a snap axis (`x`, `y`, or `both`) and optionally a strictness (`mandatory` or `proximity`).
 
 ## `stroke`
 

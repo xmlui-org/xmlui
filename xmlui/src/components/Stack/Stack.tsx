@@ -476,10 +476,11 @@ export const stackComponentRenderer = createComponentRenderer(
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(
-      node.props?.itemWidth,
-      orientation === "vertical" ? "100%" : "fit-content"
-    );
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(
+        node.props?.itemWidth,
+        orientation === "vertical" ? "100%" : "fit-content"
+      );
     return renderStack({
       node,
       extractValue,
@@ -506,7 +507,8 @@ export const vStackComponentRenderer = createComponentRenderer(
     const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
       node,
       extractValue,
@@ -532,7 +534,8 @@ export const hStackComponentRenderer = createComponentRenderer(
     const verticalAlignment = extractValue(node.props?.verticalAlignment);
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
     return renderStack({
       node,
       extractValue,
@@ -556,7 +559,8 @@ export const cvStackComponentRenderer = createComponentRenderer(
   CVStackMd,
   ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, "100%");
     return renderStack({
       node,
       extractValue,
@@ -580,7 +584,8 @@ export const chStackComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
     const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
     const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
     return renderStack({
       node,
       extractValue,

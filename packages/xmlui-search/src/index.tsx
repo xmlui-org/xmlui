@@ -1,5 +1,6 @@
 import type { ComponentProps } from "react";
 import { createComponentRenderer, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
 
@@ -19,7 +20,7 @@ const COMP_OVERLAY = `${COMP}Overlay`;
 const COMP_OVERLAY_PANEL = `${COMP}OverlayPanel`;
 const COMP_OVERLAY_TAB = `${COMP}OverlayTab`;
 
-export const SearchMd = createMetadata({
+export const SearchMd: ComponentMetadata = createMetadata({
   description: `The \`${COMP}\` component provides a search component.`,
   status: "experimental",
   props: {

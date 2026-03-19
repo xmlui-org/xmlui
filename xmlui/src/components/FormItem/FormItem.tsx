@@ -241,13 +241,13 @@ export const FormItemMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "textColor-FormItemLabel": "$textColor",
-    "fontSize-FormItemLabel": "$fontSize-sm",
-    "fontWeight-FormItemLabel": "$fontWeight-medium",
-    "fontStyle-FormItemLabel": "normal",
-    "textTransform-FormItemLabel": "none",
-    "textColor-FormItemLabel-requiredMark": "$color-danger-400",
-    "textColor-FormItemLabel-optionalTag": "$textColor-secondary",
+    "textColor-label-formItem": "$textColor",
+    "fontSize-label-formItem": "$fontSize-sm",
+    "fontWeight-label-formItem": "$fontWeight-medium",
+    "fontStyle-label-formItem": "normal",
+    "textTransform-label-formItem": "none",
+    "textColor-requiredMark-formItem": "$color-danger-400",
+    "textColor-optionalTag-formItem": "$textColor-secondary",
   },
 });
 
