@@ -6,12 +6,16 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$component: "Inspector";
+$color-icon-Inspector: createThemeVar("color-icon-#{$component}");
+
 @layer components {
   .iconButton {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    color: $color-icon-Inspector;
   }
 
   .icon {
