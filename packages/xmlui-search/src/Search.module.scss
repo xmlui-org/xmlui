@@ -147,15 +147,12 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
-
-.drawerInputRow {
-  padding: t.$space-4 0;
-}
-
 .drawerResultsWrapper {
   background-color: $backgroundColor-Search;
   border-radius: $borderRadius-SearchItem;
   box-shadow: t.$boxShadow-md;
+  position: absolute;
+  top: 42px;
 }
 
 .drawerBackButton {
@@ -447,6 +444,19 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   max-width: calc(100vw - 2rem);
   display: flex;
   flex-direction: column;
+  box-shadow: $boxShadow-SearchOverlayPanel;
+  position: fixed;
+  top: 20vh;
+
+  @media (max-width: 600px) {
+    border-radius: 0;
+    display: flex;
+    top: t.$space-16;
+    position: fixed;
+    flex-direction: column;
+    background: transparent;
+  }
+
 }
 
 .overlayInputRow {
@@ -536,15 +546,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   min-height: 100dvh;
 }
 
-.overlayPanelMobile {
-  border-radius: 0;
-  display: flex;
-  top: t.$space-16;
-  position: fixed;
-  flex-direction: column;
-  background: t.$backgroundColor-secondary;
-}
-
 
 // F — Did You Mean banner
 .didYouMeanBanner {
@@ -599,6 +600,7 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
     &:hover {
       color: inherit;
     }
+
     &:active {
       color: var(--xmlui-textColor-primary);
     }
@@ -624,6 +626,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   }
 }
 
-:export{
+:export {
   themeVars: t.json-stringify($themeVars)
 }

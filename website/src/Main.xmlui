@@ -112,7 +112,7 @@
           >
             <Stack padding="$space-4">
               <Search
-                marginTop="$space-4"
+                marginTop="0"
                 data="{appGlobals.staticSearchData}"
                 placeholder="Search on site..."
                 suggestedQueries="{['components', 'tutorial', 'themes', 'scripting', 'forms']}"

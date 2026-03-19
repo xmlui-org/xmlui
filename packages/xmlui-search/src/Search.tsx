@@ -479,11 +479,11 @@ export const Search = ({
           <div className={className}>
             {/* Backdrop — click outside to close */}
             <div
-              className={styles.overlayBackdrop}
+              className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
               onClick={closeOverlay}
             >
               <div
-                className={styles.overlayPanel}
+                className={classnames(styles.overlayPanel)}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Search"
