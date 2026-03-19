@@ -657,7 +657,7 @@ export function App({
       <AppLayoutContext.Provider value={layoutContextValue}>
         <LinkInfoContext.Provider value={linkInfoContextValue}>
           <SearchContextProvider>
-            <Sheet open={drawerVisible} onOpenChange={handleOpenChange}>
+            <Sheet open={drawerVisible} onOpenChange={handleOpenChange} modal={false}>
               <SheetContent side={"left"}>{memoizedNavPanelInDrawer}</SheetContent>
             </Sheet>
             {content}
