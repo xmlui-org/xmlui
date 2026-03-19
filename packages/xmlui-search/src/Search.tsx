@@ -363,7 +363,7 @@ export const Search = ({
     <>
       {/* F — Did You Mean banner */}
       {suggestion && enableSpellCorrection && (
-        <li role="presentation" aria-hidden="true">
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <DidYouMeanBanner suggestion={suggestion} onAccept={(s) => { setInputValue(s); refocusInput(); }} />
         </li>
       )}
@@ -409,7 +409,7 @@ export const Search = ({
         })}
       {/* A — Zero results UX */}
       {results.length === 0 && (
-        <li role="presentation" aria-hidden="true">
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <NoResultsPanel
             message={noResultsMessage}
             suggestedQueries={suggestedQueries}
