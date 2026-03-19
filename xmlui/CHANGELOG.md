@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.12.11
+
+### Patch Changes
+
+- 3daa045: Fix FormItem theme variable regression
+- 93a19dd: Charts moved from xmlui core to the xmlui-recharts extension
+- 8a3180d: Fix FormItem type="checkbox" regression
+- 1b695f0: fix: JSDOM preventing running xmlui commands when bundled into executable file
+- c903b50: List can handle row selection (similarly to Table)
+
 ## 0.12.10
 
 ### Patch Changes
