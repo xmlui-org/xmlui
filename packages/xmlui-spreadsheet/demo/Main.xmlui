@@ -1,3 +1,0 @@
-<App xmlns:Extensions="component-ns:XMLUIExtensions">
-  <Extensions:Spreadsheet />
-</App>
