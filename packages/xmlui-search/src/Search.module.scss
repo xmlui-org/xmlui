@@ -149,7 +149,13 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 }
 
 .drawerInputRow {
-  padding: t.$space-4 t.$space-2;
+  padding: t.$space-4 0;
+}
+
+.drawerResultsWrapper {
+  background-color: $backgroundColor-Search;
+  border-radius: $borderRadius-SearchItem;
+  box-shadow: t.$boxShadow-md;
 }
 
 .drawerBackButton {
@@ -439,7 +445,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   background: $backgroundColor-SearchOverlayPanel;
   width: 640px;
   max-width: calc(100vw - 2rem);
-  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -532,14 +537,12 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 }
 
 .overlayPanelMobile {
-
   border-radius: 0;
   display: flex;
   top: t.$space-16;
   position: fixed;
   flex-direction: column;
-  background: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 70%);
-  overflow: hidden;
+  background: t.$backgroundColor-secondary;
 }
 
 

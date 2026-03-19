@@ -593,18 +593,18 @@ export const Search = ({
                     aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
                   />
                 </div>
-                {hasQuery && availableCategories.length > 1 && (
-                  <div className={styles.overlayControls}>
-                    <OverlayCategoryTabs
-                      categories={availableCategories}
-                      selectedCategories={selectedCategories}
-                      onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
-                      onClearAll={() => { clearCategories(); refocusInput(); }}
-                    />
-                  </div>
-                )}
                 {hasQuery && (
-                  <>
+                  <div className={styles.drawerResultsWrapper}>
+                    {availableCategories.length > 1 && (
+                      <div className={styles.overlayControls}>
+                        <OverlayCategoryTabs
+                          categories={availableCategories}
+                          selectedCategories={selectedCategories}
+                          onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
+                          onClearAll={() => { clearCategories(); refocusInput(); }}
+                        />
+                      </div>
+                    )}
                     <ul
                       id={`${inputId}-listbox`}
                       ref={listRef}
@@ -615,7 +615,7 @@ export const Search = ({
                       {resultsListJsx}
                     </ul>
                     {loadMoreJsx}
-                  </>
+                  </div>
                 )}
               </div>
             </div>
