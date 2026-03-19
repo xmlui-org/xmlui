@@ -123,7 +123,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   overflow-y: auto;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
-  
+
   // No padding-top: sticky headers use top: 0, which is anchored to the scroll
   // viewport's top edge. If padding-top were set, items could scroll into that
   // padding zone and appear above the stuck header. The visual top gap is
@@ -149,8 +149,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 }
 
 .drawerInputRow {
-  padding: 0.75rem;
-  border-bottom: 1px solid var(--xmlui-borderColor);
+  padding: t.$space-4 t.$space-2;
 }
 
 .drawerBackButton {
@@ -423,7 +422,7 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 .overlayBackdrop {
   position: fixed;
   inset: 0;
-  background: $backgroundColor-SearchOverlay;
+  background: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 90%);
   z-index: 9999;
   display: flex;
   align-items: flex-start;
@@ -438,8 +437,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 
 .overlayPanel {
   background: $backgroundColor-SearchOverlayPanel;
-  border-radius: $borderRadius-SearchOverlayPanel;
-  box-shadow: $boxShadow-SearchOverlayPanel;
   width: 640px;
   max-width: calc(100vw - 2rem);
   overflow: hidden;
@@ -538,10 +535,10 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 
   border-radius: 0;
   display: flex;
-  top: t.$space-14;
+  top: t.$space-16;
   position: fixed;
   flex-direction: column;
-  background: $backgroundColor-SearchOverlayPanel;
+  background: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 70%);
   overflow: hidden;
 }
 
@@ -582,11 +579,11 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   border-radius: $borderRadius-SearchItem;
   border: 2px solid transparent;
   cursor: pointer;
-  
+
   // This style is used to denote keyboard focus
   &.focus {
     background-color: $backgroundColor-SearchItem--hover;
-    
+
     // Ensures the underlying link is visible on programmatic hover
     & > a {
       color: var(--xmlui-textColor-primary);

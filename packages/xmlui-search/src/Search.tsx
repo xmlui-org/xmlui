@@ -555,7 +555,7 @@ export const Search = ({
         <div
           ref={triggerRef}
           onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); openOverlay(); }}
-          style={{ cursor: "text", visibility: isOverlayOpen ? "hidden" : undefined }}
+          style={{ cursor: "text" }}
         >
           <TextBox
             className={classnames(styles.input, styles.fullWidth)}
