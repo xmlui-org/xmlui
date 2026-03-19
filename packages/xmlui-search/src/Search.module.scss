@@ -120,6 +120,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 .list {
   background-color: $backgroundColor-Search;
   max-height: 360px;
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
@@ -148,6 +149,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   touch-action: pan-y;
 }
 .drawerResultsWrapper {
+  width: 100%;
   background-color: $backgroundColor-Search;
   border-radius: $borderRadius-SearchItem;
   box-shadow: t.$boxShadow-md;
@@ -502,6 +504,8 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 .overlayControls {
   display: flex;
   align-items: center;
+  width: 100%;
+  overflow: auto;
   justify-content: space-between;
   padding: 0 1rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
@@ -609,12 +613,20 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   & > a .snippet {
     padding-top: 0.15rem;
     padding-bottom: 0.15rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   // Only apply to .item elements that are NOT also .categoryHeader
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
   }
+}
+
+.snippet {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
 }
 
 .searchToggleButton {
