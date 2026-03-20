@@ -76,7 +76,8 @@ export const BarChartMd = createMetadata({
       defaultValue: JSON.stringify(defaultProps.tickFormatterY),
     },
     hideTooltip: {
-      description: "Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.",
+      description:
+        "Determines whether the tooltip should be hidden. If set to `true`, tooltips will not appear on hover.",
       valueType: "boolean",
       defaultValue: defaultProps.hideTooltip,
     },

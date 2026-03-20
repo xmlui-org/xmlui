@@ -11,7 +11,8 @@ const defaultPropsDonut = {
 
 export const DonutChartMd = createMetadata({
   status: "experimental",
-  description: "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
+  description:
+    "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
     "Note that the height of the component or its parent needs to be set explicitly.",
   props: {
     data: {
@@ -56,7 +57,7 @@ export const DonutChartMd = createMetadata({
 
 export const donutChartComponentRenderer = wrapComponent(COMP, PieChart, DonutChartMd, {
   customRender: (props, context) => (
-    <PieChart {...props} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
+    <PieChart {...(props as any)} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
       {context.renderChild(context.node.children)}
     </PieChart>
   ),
