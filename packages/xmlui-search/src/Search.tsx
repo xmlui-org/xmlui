@@ -228,17 +228,14 @@ const [inputValue, setInputValue] = useState("");
   }, []);
 
   const onClick = useCallback(() => {
-    if (useOverlay || useDrawer) {
-      // For drawer mode: close overlay but don't reopen the drawer (navigation handles it)
-      setIsOverlayOpen(false);
-      setInputValue("");
-      setShow(false);
-      setActiveIndex(-1);
+    if (useOverlay) {
+      closeOverlay();
     } else {
       setInputValue("");
       setActiveIndex(-1);
     }
-  }, [useOverlay, useDrawer]);
+    // For drawer mode: do nothing extra — keep the search overlay and mobile menu open
+  }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
