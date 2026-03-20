@@ -3,8 +3,10 @@ import { defineConfig } from "tsdown";
 export default defineConfig([
   // Binary build
   {
-    name: "xmlui-node-cli",
-    external: ["vite", "tsx"],
+    name: "xmlui bin",
+    deps: {
+      neverBundle: ["vite", "tsx"],
+    },
     entry: "src/nodejs/bin/index.ts",
     outDir: "dist/nodejs/bin",
     format: ["esm"],
