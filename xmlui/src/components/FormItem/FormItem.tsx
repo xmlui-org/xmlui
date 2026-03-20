@@ -1,6 +1,6 @@
 import styles from "./FormItem.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useMemo } from "react";
 import {
@@ -251,10 +251,10 @@ export const FormItemMd = createMetadata({
   },
 });
 
-export const formItemComponentRenderer = createComponentRenderer(
-  COMP,
-  FormItemMd,
-  ({
+export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemMd, {
+  exposeRegisterApi: true,
+  exclude: ["inputTemplate"],
+  customRender: (_props, {
     node,
     renderChild,
     extractValue,
@@ -398,4 +398,4 @@ export const formItemComponentRenderer = createComponentRenderer(
       </FormItem>
     );
   },
-);
+});
