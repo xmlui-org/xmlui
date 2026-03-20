@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { createMetadata, dComponent } from "../metadata-helpers";
@@ -104,36 +104,19 @@ export const DrawerMd = createMetadata({
 // Renderer
 // =============================================================================
 
-export const drawerComponentRenderer = createComponentRenderer(
-  COMP,
-  DrawerMd,
-  ({  
-    node,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    registerComponentApi,
-    classes,
-  }) => {
+export const drawerComponentRenderer = wrapComponent(COMP, DrawerNative, DrawerMd, {
+  exposeRegisterApi: true,
+  customRender: (props, { node, extractValue, renderChild }) => {
     // Read layout properties that should override the corresponding theme variables
     const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
 
     return (
       <DrawerNative
-        position={extractValue.asOptionalString(node.props.position, defaultProps.position) as any}
-        hasBackdrop={extractValue.asOptionalBoolean(node.props.hasBackdrop, defaultProps.hasBackdrop)}
-        initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen, defaultProps.initiallyOpen)}
-        closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible, defaultProps.closeButtonVisible)}
-        closeOnClickAway={extractValue.asOptionalBoolean(node.props.closeOnClickAway, defaultProps.closeOnClickAway)}
-        headerTemplate={renderChild(node.props?.headerTemplate)}
-        onOpen={lookupEventHandler("open")}
-        onClose={lookupEventHandler("close")}
-        registerComponentApi={registerComponentApi}
-        classes={classes}
+        {...props}
         style={backgroundColor ? { backgroundColor } : undefined}
       >
         {renderChild(node.children)}
       </DrawerNative>
     );
   },
-);
+});

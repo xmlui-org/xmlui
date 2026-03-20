@@ -1,5 +1,5 @@
 import type React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
@@ -92,24 +92,21 @@ export const ColumnMd = createMetadata({
   },
 });
 
-export const columnComponentRenderer = createComponentRenderer(
-  COMP,
-  ColumnMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, classes, appContext } = rendererContext;
+export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, appContext, layoutContext }) => {
     // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
     const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
-    
+
     // Convert horizontalAlignment and verticalAlignment to CSS properties for table cells
     // since columns are not flex containers
     const horizontalAlignment = extractValue.asOptionalString(node.props.horizontalAlignment);
     const verticalAlignment = extractValue.asOptionalString(node.props.verticalAlignment);
-    
+
     const style: React.CSSProperties = {};
     if (horizontalAlignment) {
       // Use flexbox to align block-level content
       style.display = 'flex';
-      style.justifyContent = 
+      style.justifyContent =
         horizontalAlignment === 'start' ? 'flex-start' :
         horizontalAlignment === 'center' ? 'center' :
         horizontalAlignment === 'end' ? 'flex-end' :
@@ -120,14 +117,14 @@ export const columnComponentRenderer = createComponentRenderer(
       if (!style.display) {
         style.display = 'flex';
       }
-      style.alignItems = 
+      style.alignItems =
         verticalAlignment === 'start' ? 'flex-start' :
         verticalAlignment === 'center' ? 'center' :
         verticalAlignment === 'end' ? 'flex-end' :
         verticalAlignment;
       style.verticalAlign = verticalAlignment as any; // Also set verticalAlign for fallback
     }
-    
+
     return (
       <Column
         className={classes?.[COMPONENT_PART_KEY]}
@@ -142,9 +139,9 @@ export const columnComponentRenderer = createComponentRenderer(
         maxWidth={extractValue(node.props.maxWidth)}
         nodeChildren={node.children}
         renderChild={renderChild}
-        layoutContext={rendererContext.layoutContext as LayoutContext}
+        layoutContext={layoutContext as LayoutContext}
         id={node.uid}
       />
     );
   },
-);
+});
