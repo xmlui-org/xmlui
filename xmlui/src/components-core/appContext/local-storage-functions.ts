@@ -4,7 +4,7 @@ import { get as lodashGet, set as lodashSet, unset as lodashUnset } from "lodash
 // Only one listener at a time — AppContent registers (and cleans up) this during its lifecycle.
 let _storageChangeListener: (() => void) | null = null;
 
-// Flag to track if storage was reset before the listener was set up (e.g., via ?xmlui-reset URL param).
+// Flag to track if storage was reset before the listener was set up.
 // When the listener is finally registered, we check this flag and notify immediately if a reset occurred.
 let _resetOccurredBeforeListenerSetup = false;
 

@@ -28,7 +28,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
-import { localStorageFunctions, setStorageChangeListener, clearLocalStorage } from "../appContext/local-storage-functions";
+import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -129,23 +129,6 @@ export function AppContent({
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
-
-  // Handle ?xmlui-reset on client-side navigations (e.g. Actions.navigate('/page?xmlui-reset')).
-  // The module-init handler in StandaloneApp only runs once at page load; this effect
-  // catches all subsequent SPA navigations that include the parameter.
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const resetValue = params.get("xmlui-reset");
-    if (resetValue === null) return;
-    clearLocalStorage(resetValue === "" || resetValue === "true" ? undefined : resetValue);
-    params.delete("xmlui-reset");
-    const newSearch = params.toString();
-    navigateRouter(
-      location.pathname + (newSearch ? "?" + newSearch : "") + location.hash,
-      { replace: true },
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search]);
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())

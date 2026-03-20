@@ -47,11 +47,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/BarChart",
-          "label": "BarChart",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Blog",
           "label": "Blog",
           "icon": "component"
@@ -129,11 +124,6 @@
         {
           "to": "/docs/reference/components/DatePicker",
           "label": "DatePicker",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/DonutChart",
-          "label": "DonutChart",
           "icon": "component"
         },
         {
@@ -262,21 +252,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/LabelList",
-          "label": "LabelList",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Legend",
-          "label": "Legend",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/LineChart",
-          "label": "LineChart",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Link",
           "label": "Link",
           "icon": "component"
@@ -374,11 +349,6 @@
         {
           "to": "/docs/reference/components/PasswordInput",
           "label": "PasswordInput",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/PieChart",
-          "label": "PieChart",
           "icon": "component"
         },
         {
