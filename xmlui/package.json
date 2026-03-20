@@ -179,7 +179,7 @@
           "import": "./dist/nodejs/vite-xmlui-plugin.js",
           "require": "./dist/nodejs/vite-xmlui-plugin.js"
         },
-        "./node": {
+        "./nodejs": {
           "import": "./dist/nodejs/index.js",
           "require": "./dist/nodejs/index.js"
         },
@@ -200,49 +200,17 @@
   },
   "main": "./src/index.ts",
   "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
-    },
-    "./parser": {
-      "import": "./src/parsers/xmlui-parser/index.ts",
-      "require": "./src/parsers/xmlui-parser/index.ts"
-    },
-    "./*.css": {
-      "import": "./dist/lib/*.css",
-      "require": "./dist/lib/*.css"
-    },
-    "./index.scss": {
-      "import": "./src/index.scss",
-      "require": "./src/index.scss"
-    },
-    "./themes.scss": {
-      "import": "./src/components-core/theming/_themes.scss"
-    },
-    "./vite-xmlui-plugin": {
-      "import": "./src/nodejs/vite-xmlui-plugin.ts",
-      "require": "./src/nodejs/vite-xmlui-plugin.ts"
-    },
-    "./node": {
-      "import": "./src/nodejs/index.ts",
-      "require": "./src/nodejs/index.ts"
-    },
-    "./language-server": {
-      "import": "./src/language-server/server.ts",
-      "require": "./src/language-server/server.ts"
-    },
-    "./syntax/monaco": {
-      "import": "./src/syntax/monaco/index.ts",
-      "require": "./src/syntax/monaco/index.ts"
-    },
-    "./syntax/textmate": {
-      "import": "./src/syntax/textMate/index.ts",
-      "require": "./src/syntax/textMate/index.ts"
-    },
-    "./testing": {
-      "import": "./src/testing/index.ts",
-      "require": "./src/testing/index.ts"
-    }
+    ".": "./src/index.ts",
+    "./parser": "./src/parsers/xmlui-parser/index.ts",
+    "./*.css": "./dist/lib/*.css",
+    "./index.scss": "./src/index.scss",
+    "./themes.scss": "./src/components-core/theming/_themes.scss",
+    "./vite-xmlui-plugin": "./src/nodejs/vite-xmlui-plugin.ts",
+    "./nodejs": "./src/nodejs/index.ts",
+    "./language-server": "./src/language-server/server.ts",
+    "./syntax/monaco": "./src/syntax/monaco/index.ts",
+    "./syntax/textmate": "./src/syntax/textMate/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "browserslist": {
     "production": [
