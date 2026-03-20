@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./RadioGroup.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -128,39 +128,26 @@ export const ThemedRadioGroup = React.forwardRef<React.ElementRef<typeof RadioGr
   },
 );
 
-export const radioGroupRenderer = createComponentRenderer(
-  COMP,
-  RadioGroupMd,
-  ({
-    node,
-    extractValue,
-    classes,
-    state,
-    updateState,
-    lookupEventHandler,
-    renderChild,
-    registerComponentApi,
-  }) => {
-    return (
-      <ThemedRadioGroup
-        autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        orientation={extractValue(node.props.orientation)}
-        gap={extractValue.asSize(node.props.gap)}
-        classes={classes}
-        initialValue={extractValue(node.props.initialValue)}
-        value={state?.value}
-        updateState={updateState}
-        validationStatus={extractValue(node.props.validationStatus)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      >
-        {renderChild(node.children)}
-      </ThemedRadioGroup>
-    );
-  },
-);
+export const radioGroupRenderer = wrapComponent(COMP, ThemedRadioGroup, RadioGroupMd, {
+  customRender: (_props, { node, extractValue, classes, state, updateState, lookupEventHandler, renderChild, registerComponentApi }) => (
+    <ThemedRadioGroup
+      autofocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      orientation={extractValue(node.props.orientation)}
+      gap={extractValue.asSize(node.props.gap)}
+      classes={classes}
+      initialValue={extractValue(node.props.initialValue)}
+      value={state?.value}
+      updateState={updateState}
+      validationStatus={extractValue(node.props.validationStatus)}
+      onDidChange={lookupEventHandler("didChange")}
+      onFocus={lookupEventHandler("gotFocus")}
+      onBlur={lookupEventHandler("lostFocus")}
+      registerComponentApi={registerComponentApi}
+      required={extractValue.asOptionalBoolean(node.props.required)}
+      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+    >
+      {renderChild(node.children)}
+    </ThemedRadioGroup>
+  ),
+});

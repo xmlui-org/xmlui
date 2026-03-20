@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { SelectionStore, defaultProps } from "./SelectionStoreNative";
 
@@ -20,21 +20,15 @@ export const SelectionStoreMd = createMetadata({
   },
 });
 
-export const selectionStoreComponentRenderer = createComponentRenderer(
-  COMP,
-  SelectionStoreMd,
-  (rendererContext) => {
-    const { node, state, updateState, renderChild, registerComponentApi } = rendererContext;
-
-    return (
-      <SelectionStore
-        updateState={updateState}
-        idKey={node.props.idKey}
-        selectedItems={state?.value}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </SelectionStore>
-    );
-  },
-);
+export const selectionStoreComponentRenderer = wrapComponent(COMP, SelectionStore, SelectionStoreMd, {
+  customRender: (_props, { node, state, updateState, renderChild, registerComponentApi }) => (
+    <SelectionStore
+      updateState={updateState}
+      idKey={node.props.idKey}
+      selectedItems={state?.value}
+      registerComponentApi={registerComponentApi}
+    >
+      {renderChild(node.children)}
+    </SelectionStore>
+  ),
+});
