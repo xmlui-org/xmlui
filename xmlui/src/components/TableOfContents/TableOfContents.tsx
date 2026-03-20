@@ -1,6 +1,6 @@
 import styles from "./TableOfContents.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
@@ -115,20 +115,16 @@ function IndexAwareTableOfContents(props: React.ComponentProps<typeof TableOfCon
   return <TableOfContents {...props} />;
 }
 
-export const tableOfContentsRenderer = createComponentRenderer(
-  COMP,
-  TableOfContentsMd,
-  ({ className, node, extractValue, lookupEventHandler }) => {
-    return (
-      <IndexAwareTableOfContents
-        className={className}
-        smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
-        maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
-        omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
-        scrollStyle={extractValue.asOptionalString(node.props?.scrollStyle, defaultProps.scrollStyle)}
-        showScrollerFade={extractValue.asOptionalBoolean(node.props?.showScrollerFade)}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      />
-    );
-  },
-);
+export const tableOfContentsRenderer = wrapComponent(COMP, IndexAwareTableOfContents, TableOfContentsMd, {
+  customRender: (_props, { className, node, extractValue, lookupEventHandler }) => (
+    <IndexAwareTableOfContents
+      className={className}
+      smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
+      maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
+      omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
+      scrollStyle={extractValue.asOptionalString(node.props?.scrollStyle, defaultProps.scrollStyle)}
+      showScrollerFade={extractValue.asOptionalBoolean(node.props?.showScrollerFade)}
+      onContextMenu={lookupEventHandler("contextMenu")}
+    />
+  ),
+});
