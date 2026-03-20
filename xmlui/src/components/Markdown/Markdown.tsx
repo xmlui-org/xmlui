@@ -1,6 +1,6 @@
 import styles from "./Markdown.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
 import React from "react";
@@ -234,49 +234,51 @@ export const ThemedMarkdown = React.forwardRef<React.ElementRef<typeof Markdown>
   },
 );
 
-export const markdownComponentRenderer = createComponentRenderer(
+export const markdownComponentRenderer = wrapComponent(
   COMP,
   MarkdownMd,
-  ({ node, extractValue, renderChild, classes }) => {
-    let renderedChildren = "";
+  {
+    customRender(_props, { node, extractValue, renderChild, classes }) {
+      let renderedChildren = "";
 
-    // 1. Static content prop fallback
-    if (!renderedChildren) {
-      renderedChildren = extractValue.asString(node.props.content);
-    }
+      // 1. Static content prop fallback
+      if (!renderedChildren) {
+        renderedChildren = extractValue.asString(node.props.content);
+      }
 
-    // 2. "data" property fallback
-    if (!renderedChildren && typeof (node.props as any).data === "string") {
-      renderedChildren = extractValue.asString((node.props as any).data);
-    }
+      // 2. "data" property fallback
+      if (!renderedChildren && typeof (node.props as any).data === "string") {
+        renderedChildren = extractValue.asString((node.props as any).data);
+      }
 
-    // 3. Children fallback
-    if (!renderedChildren) {
-      (node.children ?? []).forEach((child) => {
-        const renderedChild = renderChild(child);
-        if (typeof renderedChild === "string") {
-          renderedChildren += renderedChild;
-        }
-      });
-    }
+      // 3. Children fallback
+      if (!renderedChildren) {
+        (node.children ?? []).forEach((child) => {
+          const renderedChild = renderChild(child);
+          if (typeof renderedChild === "string") {
+            renderedChildren += renderedChild;
+          }
+        });
+      }
 
-    return (
-      <TransformedMarkdown
-        classes={classes}
-        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
-        removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
-        codeHighlighter={extractValue(node.props.codeHighlighter)}
-        extractValue={extractValue}
-        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
-        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
-        truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
-        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
-        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
-        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
-      >
-        {renderedChildren}
-      </TransformedMarkdown>
-    );
+      return (
+        <TransformedMarkdown
+          classes={classes}
+          removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+          removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+          codeHighlighter={extractValue(node.props.codeHighlighter)}
+          extractValue={extractValue}
+          showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
+          grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+          truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
+          openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
+          overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+          breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+        >
+          {renderedChildren}
+        </TransformedMarkdown>
+      );
+    },
   },
 );
 

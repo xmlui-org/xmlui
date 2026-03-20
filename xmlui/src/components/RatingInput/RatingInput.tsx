@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -110,49 +110,53 @@ export const RatingInputMd = createMetadata({
   },
 });
 
-export const ratingInputComponentRenderer = createComponentRenderer(
+export const ratingInputComponentRenderer = wrapComponent(
   COMP,
   RatingInputMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    classes,
-    registerComponentApi,
-  }) => {
-    const props = (node.props ?? {}) as Record<string, unknown>;
-    const rawMax = extractValue(props.maxRating);
-    const maxRating =
-      typeof rawMax === "number" && Number.isFinite(rawMax)
-        ? rawMax
-        : typeof rawMax === "string" && !Number.isNaN(parseFloat(rawMax))
-          ? Number(rawMax)
-          : defaultProps.maxRating;
+  {
+    exposeRegisterApi: true,
+    exclude: ["maxRating"],
+    customRender(_props, {
+      node,
+      state,
+      updateState,
+      lookupEventHandler,
+      extractValue,
+      classes,
+      registerComponentApi,
+    }) {
+      const rawNodeProps = (node.props ?? {}) as Record<string, unknown>;
+      const rawMax = extractValue(rawNodeProps.maxRating);
+      const maxRating =
+        typeof rawMax === "number" && Number.isFinite(rawMax)
+          ? rawMax
+          : typeof rawMax === "string" && !Number.isNaN(parseFloat(rawMax))
+            ? Number(rawMax)
+            : defaultProps.maxRating;
 
-    return (
-      <RatingInput
-        classes={classes}
-        value={state?.value}
-        updateState={updateState}
-        initialValue={extractValue.asOptionalNumber(props.initialValue)}
-        maxRating={maxRating}
-        autoFocus={extractValue.asOptionalBoolean(props.autoFocus)}
-        readOnly={extractValue.asOptionalBoolean(props.readOnly)}
-        required={extractValue.asOptionalBoolean(props.required)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(props.validationIconError)}
-        enabled={extractValue.asOptionalBoolean(props.enabled)}
-        placeholder={extractValue.asOptionalString(props.placeholder)}
-        validationStatus={extractValue(props.validationStatus)}
-        invalidMessages={extractValue(props.invalidMessages)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-      />
-    );
+      return (
+        <RatingInput
+          classes={classes}
+          value={state?.value}
+          updateState={updateState}
+          initialValue={extractValue.asOptionalNumber(rawNodeProps.initialValue)}
+          maxRating={maxRating}
+          autoFocus={extractValue.asOptionalBoolean(rawNodeProps.autoFocus)}
+          readOnly={extractValue.asOptionalBoolean(rawNodeProps.readOnly)}
+          required={extractValue.asOptionalBoolean(rawNodeProps.required)}
+          verboseValidationFeedback={extractValue.asOptionalBoolean(rawNodeProps.verboseValidationFeedback)}
+          validationIconSuccess={extractValue.asOptionalString(rawNodeProps.validationIconSuccess)}
+          validationIconError={extractValue.asOptionalString(rawNodeProps.validationIconError)}
+          enabled={extractValue.asOptionalBoolean(rawNodeProps.enabled)}
+          placeholder={extractValue.asOptionalString(rawNodeProps.placeholder)}
+          validationStatus={extractValue(rawNodeProps.validationStatus)}
+          invalidMessages={extractValue(rawNodeProps.invalidMessages)}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          registerComponentApi={registerComponentApi}
+        />
+      );
+    },
   },
 );

@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
 import { OptionNative, defaultProps } from "./OptionNative";
@@ -36,55 +36,57 @@ export const OptionMd = createMetadata({
   },
 });
 
-export const optionComponentRenderer = createComponentRenderer(
+export const optionComponentRenderer = wrapComponent(
   COMP,
   OptionMd,
-  ({ node, extractValue, classes, renderChild, layoutContext }) => {
-    const label = extractValue.asOptionalString(node.props.label);
-    let value = extractValue(node.props.value);
-    if (label === undefined && value === undefined) {
-      return null;
-    }
-
-    const hasTextNodeChild =
-      node.children?.length === 1 &&
-      (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
-    const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
-
-    // Extract all extra properties (like category, etc.) for grouping and filtering
-    const extraProps: Record<string, any> = {};
-    const knownProps = new Set(["label", "value", "enabled", "keywords"]);
-    Object.keys(node.props).forEach((key) => {
-      if (!knownProps.has(key)) {
-        extraProps[key] = extractValue(node.props[key]);
+  {
+    customRender(_props, { node, extractValue, classes, renderChild, layoutContext }) {
+      const label = extractValue.asOptionalString(node.props.label);
+      let value = extractValue(node.props.value);
+      if (label === undefined && value === undefined) {
+        return null;
       }
-    });
 
-    return (
-      <OptionNative
-        label={label || textNodeChild}
-        value={value !== undefined && value !== "" ? value : label}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        keywords={extractValue.asOptionalStringArray(node.props.keywords)}
-        className={classes?.[COMPONENT_PART_KEY]}
-        optionRenderer={
-          node.children?.length > 0
-            ? !hasTextNodeChild
-              ? (contextVars) => (
-                  <MemoizedItem
-                    node={node.children}
-                    renderChild={renderChild}
-                    contextVars={contextVars}
-                    layoutContext={layoutContext}
-                  />
-                )
-              : undefined
-            : undefined
+      const hasTextNodeChild =
+        node.children?.length === 1 &&
+        (node.children[0].type === "TextNode" || node.children[0].type === "TextNodeCData");
+      const textNodeChild = hasTextNodeChild ? (renderChild(node.children) as string) : undefined;
+
+      // Extract all extra properties (like category, etc.) for grouping and filtering
+      const extraProps: Record<string, any> = {};
+      const knownProps = new Set(["label", "value", "enabled", "keywords"]);
+      Object.keys(node.props).forEach((key) => {
+        if (!knownProps.has(key)) {
+          extraProps[key] = extractValue(node.props[key]);
         }
-        {...extraProps}
-      >
-        {!hasTextNodeChild && renderChild(node.children)}
-      </OptionNative>
-    );
+      });
+
+      return (
+        <OptionNative
+          label={label || textNodeChild}
+          value={value !== undefined && value !== "" ? value : label}
+          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+          keywords={extractValue.asOptionalStringArray(node.props.keywords)}
+          className={classes?.[COMPONENT_PART_KEY]}
+          optionRenderer={
+            node.children?.length > 0
+              ? !hasTextNodeChild
+                ? (contextVars) => (
+                    <MemoizedItem
+                      node={node.children}
+                      renderChild={renderChild}
+                      contextVars={contextVars}
+                      layoutContext={layoutContext}
+                    />
+                  )
+                : undefined
+              : undefined
+          }
+          {...extraProps}
+        >
+          {!hasTextNodeChild && renderChild(node.children)}
+        </OptionNative>
+      );
+    },
   },
 );
