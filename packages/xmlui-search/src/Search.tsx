@@ -376,18 +376,19 @@ const [inputValue, setInputValue] = useState("");
           />
         </li>
       )}
-    </>
-  );
-
-  const loadMoreJsx = (hasMore || totalCount > effectivePageSize) && results.length > 0 && (
-    <div className={styles.loadMoreRow}>
-      <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
-      {hasMore && (
-        <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={() => { setPage((p) => p + 1); refocusInput(); }}>
-          Load more
-        </button>
+      {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
+          <div className={styles.loadMoreRow}>
+            <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
+            {hasMore && (
+              <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={() => { setPage((p) => p + 1); refocusInput(); }}>
+                Load more
+              </button>
+            )}
+          </div>
+        </li>
       )}
-    </div>
+    </>
   );
 
   if (useOverlay) {
@@ -480,7 +481,6 @@ const [inputValue, setInputValue] = useState("");
                     >
                       {resultsListJsx}
                     </ul>
-                    {loadMoreJsx}
                   </>
                 )}
               </div>
@@ -562,7 +562,6 @@ const [inputValue, setInputValue] = useState("");
                     >
                       {resultsListJsx}
                     </ul>
-                    {loadMoreJsx}
                   </div>
                 )}
               </div>
@@ -643,7 +642,6 @@ const [inputValue, setInputValue] = useState("");
               >
                 {resultsListJsx}
               </ul>
-              {loadMoreJsx}
             </PopoverContent>
           </Portal>
         )}
