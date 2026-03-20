@@ -23,7 +23,6 @@ import {
   SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
 import type {
-  FuseOptionKeyObject,
   FuseResult,
   FuseResultMatch,
   IFuseOptions,
@@ -34,7 +33,6 @@ import styles from "./Search.module.scss";
 import classnames from "classnames";
 import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
 import { createPortal } from "react-dom";
-import classNames from "classnames";
 
 type Props = {
   id?: string;
@@ -205,8 +203,6 @@ const [inputValue, setInputValue] = useState("");
   );
   const hasMore = results.length < sortedResults.length;
 
-  const _root = undefined;
-
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
   // render-related state
@@ -287,13 +283,6 @@ const [inputValue, setInputValue] = useState("");
           setShow(false);
         }
         itemLinkRefs.current[targetIndex]?.click();
-      } else if (e.key === "Escape") {
-        if (useOverlay) {
-          closeOverlay();
-        } else {
-          setActiveIndex(-1);
-          setShow(false);
-        }
       }
     },
     [activeIndex, results.length, show, closeOverlay, useDrawer, useOverlay],
@@ -358,6 +347,7 @@ const [inputValue, setInputValue] = useState("");
 
   // Shared results list JSX — used by both overlay and popover modes
   const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
+  const allUncategorized = results.every((r) => r.item.category == null);
 
   const resultsListJsx = (
     <>
@@ -373,7 +363,6 @@ const [inputValue, setInputValue] = useState("");
           const prevEffectiveCategory =
             idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
           const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
-          const allUncategorized = results.every((r) => r.item.category == null);
           return (
             <Fragment key={`${result.item.path}-${idx}`}>
               {showCategoryHeader && !allUncategorized && (
@@ -518,7 +507,7 @@ const [inputValue, setInputValue] = useState("");
                     <ul
                       id={`${inputId}-listbox`}
                       ref={listRef}
-                      className={classNames(styles.list, styles.overlayList)}
+                      className={classnames(styles.list, styles.overlayList)}
                       role="listbox"
                       aria-label="Search results"
                     >
@@ -664,7 +653,7 @@ const [inputValue, setInputValue] = useState("");
           </PopoverAnchor>
         )}
         {show && allResults && hasQuery && (
-          <Portal container={_root}>
+          <Portal>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
@@ -690,7 +679,7 @@ const [inputValue, setInputValue] = useState("");
               <ul
                 id={`${inputId}-listbox`}
                 ref={listRef}
-                className={classNames(styles.list)}
+                className={classnames(styles.list)}
                 role="listbox"
                 aria-label="Search results"
               >
@@ -1147,59 +1136,41 @@ function parsePathBreadcrumb(path: string): string[] {
   return path.split("/").filter((s) => s.length > 0);
 }
 
+const FUSE_SEARCH_OPTIONS: IFuseOptions<SearchItemData> = {
+  includeScore: true,
+  shouldSort: true, // <- sorts by "score"
+  includeMatches: true,
+  minMatchCharLength: MIN_MATCH_LENGTH,
+  threshold: 0,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  keys: [
+    { name: "title", weight: 2 },
+    { name: "content", weight: 1 },
+  ],
+};
+
+// F — Relaxed Fuse options for "did you mean" spell correction
+const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
+  includeScore: true,
+  shouldSort: true,
+  includeMatches: false,
+  minMatchCharLength: MIN_MATCH_LENGTH,
+  threshold: 0.6,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  keys: [{ name: "title", weight: 2 }, { name: "content", weight: 1 }],
+};
+
 function useSearch(
   data: SearchItemData[],
   limit: number,
   query: string,
   enableSpellCorrection: boolean,
 ): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
-  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
-    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
-      {
-        name: "title",
-        weight: 2,
-      },
-      {
-        name: "content",
-        weight: 1,
-      },
-    ];
-    return {
-      // isCaseSensitive: false,
-      includeScore: true,
-      // ignoreDiacritics: false,
-      shouldSort: true, // <- sorts by "score"
-      includeMatches: true,
-      // findAllMatches: false,
-      minMatchCharLength: MIN_MATCH_LENGTH,
-      // location: 0,
-      threshold: 0,
-      // distance: 500,
-      // useExtendedSearch: true,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
-      // fieldNormWeight: 1,
-      keys,
-    };
-  }, []);
-
-  // F — Relaxed Fuse options for "did you mean" spell correction
-  const relaxedSearchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
-    return {
-      includeScore: true,
-      shouldSort: true,
-      includeMatches: false,
-      minMatchCharLength: MIN_MATCH_LENGTH,
-      threshold: 0.6,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
-      keys: [{ name: "title", weight: 2 }, { name: "content", weight: 1 }],
-    };
-  }, []);
-
-  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], searchOptions));
+  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS));
   // F — Separate Fuse instance for spell correction suggestions
-  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], relaxedSearchOptions));
+  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS));
 
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
