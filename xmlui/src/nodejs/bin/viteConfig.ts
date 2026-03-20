@@ -3,7 +3,7 @@ import type { UserConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
-import { default as ViteXmlui } from "./vite-xmlui-plugin";
+import { default as ViteXmlui } from "../vite-xmlui-plugin";
 import * as path from "path";
 
 type ViteConfigData = {

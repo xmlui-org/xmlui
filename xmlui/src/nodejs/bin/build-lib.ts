@@ -5,7 +5,7 @@ import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite
 import path from "path";
 import react from "@vitejs/plugin-react";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
-import { default as ViteXmlui } from "./vite-xmlui-plugin";
+import { default as ViteXmlui } from "../vite-xmlui-plugin";
 
 export const buildLib = async ({
   watchMode,

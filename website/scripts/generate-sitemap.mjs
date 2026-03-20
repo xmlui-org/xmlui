@@ -36,7 +36,10 @@ async function main() {
 
     // Collect all URLs via discoverRoutes()
     const routeStore = await discoverRoutes({ srcDir: "src", contentDir: "content" });
-    const sortedUrls = routeStore.staticRoutes.sort().filter((p) => p !== "/404");
+    const sortedUrls = routeStore
+      .staticRoutes()
+      .sort()
+      .filter((p) => p !== "/404");
 
     console.log(`Found ${sortedUrls.length} URLs`);
 

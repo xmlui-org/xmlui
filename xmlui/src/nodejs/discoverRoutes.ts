@@ -169,12 +169,12 @@ export class RouteStore {
   constructor(private readonly routes: string[]) {}
 
   /** @returns only static routes (those that do not have `":paramname"` or `"*"` in them).*/
-  get staticRoutes() {
+  staticRoutes() {
     return this.routes.filter((r) => !r.includes(":") && !r.includes("*"));
   }
 
   /** @returns both static and dynamic routes (those that have `":paramname"` or `"*"` in them).*/
-  get allRoutes() {
+  allRoutes() {
     return this.routes;
   }
 }

@@ -5,17 +5,17 @@ export default defineConfig([
   {
     name: "xmlui-node-cli",
     external: ["vite", "tsx"],
-    entry: "bin/index.ts",
-    outDir: "dist/bin",
-    format: ["esm", "commonjs"],
+    entry: "src/nodejs/bin/index.ts",
+    outDir: "dist/nodejs/bin",
+    format: ["esm"],
     shims: true,
     clean: false,
   },
   // Vite plugin build
   {
     name: "vite-xmlui-plugin",
-    entry: "bin/vite-xmlui-plugin.ts",
-    outDir: "dist/for-node",
+    entry: "src/nodejs/vite-xmlui-plugin.ts",
+    outDir: "dist/nodejs",
     format: ["esm", "commonjs"],
     shims: true,
     dts: true,
@@ -24,7 +24,7 @@ export default defineConfig([
   {
     name: "xmlui-node",
     entry: "src/nodejs/index.ts",
-    outDir: "dist/for-node",
+    outDir: "dist/nodejs",
     format: ["esm", "commonjs"],
     shims: true,
     dts: true,
@@ -33,7 +33,7 @@ export default defineConfig([
   {
     name: "language-server",
     entry: "src/language-server/server.ts",
-    outDir: "dist/for-node",
+    outDir: "dist/nodejs",
     format: ["esm", "commonjs"],
     shims: true,
     dts: true,

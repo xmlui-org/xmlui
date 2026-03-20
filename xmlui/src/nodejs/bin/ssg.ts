@@ -16,8 +16,8 @@ import { pathToFileURL } from "node:url";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
 import { parse } from "node-html-parser";
-import { discoverRoutes } from "../src/nodejs/discoverRoutes";
-import { XMLUI_SSG_DATA_ATTRIBUTES } from "../src/components-core/rendering/ssgEnv";
+import { discoverRoutes } from "../discoverRoutes";
+import { XMLUI_SSG_DATA_ATTRIBUTES } from "../../components-core/rendering/ssgEnv";
 
 type SsgOptions = {
   outDir?: string;
@@ -598,7 +598,7 @@ export const ssg = async ({
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
   const routeStore = await discoverRoutes({ srcDir: "src", contentDir });
-  const pathsToRender = routeStore.staticRoutes;
+  const pathsToRender = routeStore.staticRoutes();
   // Collision detection: a discovered page route must not share the base name of the fallback file.
   const fallbackBaseName = fallbackFile.replace(/\.html$/i, "");
   const fallbackRoute = fallbackBaseName.startsWith("/")

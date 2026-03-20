@@ -3,19 +3,19 @@ import type { Plugin } from "vite";
 import {
   collectCodeBehindFromSourceWithImports,
   removeCodeBehindTokensFromTree,
-} from "../src/parsers/scripting/code-behind-collect";
+} from "../parsers/scripting/code-behind-collect";
 import {
   codeBehindFileExtension,
   componentFileExtension,
   moduleFileExtension,
-} from "../src/parsers/xmlui-parser/fileExtensions";
-import { Parser } from "../src/parsers/scripting/Parser";
-import { clearAllModuleCaches } from "../src/parsers/scripting/ModuleCache";
-import type { ModuleFetcher } from "../src/parsers/scripting/types";
-import { ScriptExtractor } from "../src/parsers/scripting/ScriptExtractor";
+} from "../parsers/xmlui-parser/fileExtensions";
+import { Parser } from "../parsers/scripting/Parser";
+import { clearAllModuleCaches } from "../parsers/scripting/ModuleCache";
+import type { ModuleFetcher } from "../parsers/scripting/types";
+import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as path from "path";
 import * as fs from "fs/promises";
-import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
+import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 
 export type PluginOptions = {
   // --- Add plugin options here.
@@ -29,10 +29,10 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  * Transform XMLUI files to JS objects.
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
-  let projectRoot = '';
+  let projectRoot = "";
 
   // Helper to normalize Windows paths to use forward slashes
-  const normalizePath = (p: string) => p.replace(/\\/g, '/');
+  const normalizePath = (p: string) => p.replace(/\\/g, "/");
 
   return {
     name: "vite:transform-xmlui",
@@ -46,7 +46,6 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       const normalizedId = normalizePath(id);
 
       if (xmluiExtension.test(id)) {
-
         // Use path relative to project root as fileId — matches glob keys used by _xsSourceFiles
         const fileId = projectRoot ? normalizedId.slice(projectRoot.length) : normalizedId;
 
@@ -156,22 +155,25 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         }
 
         // --- Check for critical module errors (not validation warnings) and throw if any exist
-        const hasCriticalErrors = codeBehind.moduleErrors && 
-          Object.entries(codeBehind.moduleErrors).some(([_, errors]) => 
-            errors.some(err => !err.code.startsWith("W04")) // W043, W044, W045 are validation warnings
+        const hasCriticalErrors =
+          codeBehind.moduleErrors &&
+          Object.entries(codeBehind.moduleErrors).some(
+            ([_, errors]) => errors.some((err) => !err.code.startsWith("W04")), // W043, W044, W045 are validation warnings
           );
-        
+
         if (hasCriticalErrors) {
           const errorMessages: string[] = [];
           Object.entries(codeBehind.moduleErrors!).forEach(([modulePath, errors]) => {
             errors.forEach((err) => {
               if (!err.code.startsWith("W04")) {
-                errorMessages.push(`  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`);
+                errorMessages.push(
+                  `  ${modulePath}:${err.line}:${err.column} - ${err.code}: ${err.text}`,
+                );
               }
             });
           });
           if (errorMessages.length > 0) {
-            throw new Error(`Module parsing errors:\n${errorMessages.join('\n')}`);
+            throw new Error(`Module parsing errors:\n${errorMessages.join("\n")}`);
           }
         }
 
@@ -182,20 +184,20 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
       }
       return null;
     },
-    
+
     handleHotUpdate({ file, server }) {
       // Normalize path for cross-platform consistency
       const normalizedFile = normalizePath(file);
-      
+
       // Check if the changed file is an XMLUI-related file
       const isXmluiFile = xmluiExtension.test(normalizedFile);
-      const isXsFile = xmluiScriptExtension.test(normalizedFile) || 
-                       moduleScriptExtension.test(normalizedFile);
-      
+      const isXsFile =
+        xmluiScriptExtension.test(normalizedFile) || moduleScriptExtension.test(normalizedFile);
+
       if (isXmluiFile || isXsFile) {
         // Clear module caches to ensure fresh parsing on next transform
         clearAllModuleCaches();
-        
+
         // For .xs files, we need a full page reload to ensure all imports are re-evaluated
         // This mimics stopping and restarting the dev server
         if (isXsFile) {
@@ -203,26 +205,26 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
           // Invalidate ALL modules to force complete re-transformation (mimic dev server restart)
           const allModules = Array.from(server.moduleGraph.idToModuleMap.values());
-          
+
           for (const mod of allModules) {
             server.moduleGraph.invalidateModule(mod);
           }
-          
+
           // Trigger full page reload
           server.ws.send({
-            type: 'full-reload',
-            path: '*'
+            type: "full-reload",
+            path: "*",
           });
           return [];
         }
-        
+
         // For .xmlui files, do a targeted HMR
         const module = server.moduleGraph.getModuleById(normalizedFile);
         if (module) {
           return [module];
         }
       }
-      
+
       return undefined;
     },
   };
