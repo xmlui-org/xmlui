@@ -336,13 +336,15 @@ function mergeWithMetadata(
   // Build template and renderer maps
   const templateMap = normalizeTemplates(config.templates);
   const rendererConfigs = config.renderers ?? {};
+  const excludeSet = new Set(config.exclude ?? []);
 
   // Auto-detect ComponentDef props from metadata as static templates
   if (metadata.props) {
     for (const [propName, propMeta] of Object.entries(metadata.props)) {
       if (propMeta.valueType !== "ComponentDef") continue;
-      // Skip if explicitly configured as a renderer or template
+      // Skip if explicitly configured as a renderer, template, or excluded
       if (propName in rendererConfigs || propName in templateMap) continue;
+      if (excludeSet.has(propName)) continue;
       // Auto-detect as static template with same prop name
       templateMap[propName] = propName;
     }
@@ -356,7 +358,7 @@ function mergeWithMetadata(
     eventMap,
     callbackMap: normalizeCallbacks(config.callbacks),
     renameMap: config.rename ?? {},
-    excludeSet: new Set(config.exclude ?? []),
+    excludeSet,
     templateMap,
     rendererConfigs,
   };
