@@ -1,7 +1,7 @@
 import styles from "./Tabs.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
@@ -112,37 +112,24 @@ export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, Themed
   },
 );
 
-export const tabsComponentRenderer = createComponentRenderer(
+export const tabsComponentRenderer = wrapComponent(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler }) => {
-    return (
-      <Tabs
-        id={node?.uid}
-        classes={classes}
-        headerRenderer={
-          node?.props?.headerTemplate
-            ? (item) => (
-                <MemoizedItem
-                  node={node.props.headerTemplate! as any}
-                  contextVars={{
-                    $header: item,
-                  }}
-                  renderChild={renderChild}
-                />
-              )
-            : undefined
-        }
-        activeTab={extractValue(node.props?.activeTab)}
-        orientation={extractValue(node.props?.orientation)}
-        tabAlignment={extractValue(node.props?.tabAlignment)}
-        accordionView={extractValue(node.props?.accordionView)}
-        onDidChange={lookupEventHandler("didChange")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </Tabs>
-    );
+  {
+    exposeRegisterApi: true,
+    stateful: false,
+    renderers: {
+      headerTemplate: { contextVars: (item: any) => ({ $header: item }) },
+    },
+    customRender(props, { node, renderChild }) {
+      return (
+        <Tabs
+          {...props}
+          id={node?.uid}
+        >
+          {renderChild(node.children)}
+        </Tabs>
+      );
+    },
   },
 );

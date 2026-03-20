@@ -1,7 +1,7 @@
 import styles from "./Select.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -219,118 +219,128 @@ export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
   },
 );
 
-export const selectComponentRenderer = createComponentRenderer(
+export const selectComponentRenderer = wrapComponent(
   COMP,
   SelectMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    classes,
-    registerComponentApi,
-    ...rest
-  }) => {
-    const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
-    const searchable = extractValue.asOptionalBoolean(node.props.searchable);
-    const clearable = extractValue.asOptionalBoolean(node.props.clearable);
+  {
+    exposeRegisterApi: true,
+    exclude: [
+      "optionLabelTemplate",
+      "optionTemplate",
+      "valueTemplate",
+      "emptyListTemplate",
+      "groupHeaderTemplate",
+      "ungroupedHeaderTemplate",
+    ],
+    customRender(_props, {
+      node,
+      state,
+      updateState,
+      extractValue,
+      renderChild,
+      lookupEventHandler,
+      classes,
+      registerComponentApi,
+    }) {
+      const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
+      const searchable = extractValue.asOptionalBoolean(node.props.searchable);
+      const clearable = extractValue.asOptionalBoolean(node.props.clearable);
 
-    const isControlled = node.props.value !== undefined;
-    return (
-      <Select
-        multiSelect={multiSelect}
-        classes={classes}
-        contentClassName={classes?.[COMPONENT_PART_KEY]}
-        inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
-        inProgressNotificationMessage={extractValue.asOptionalString(
-          node.props.inProgressNotificationMessage,
-        )}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        updateState={isControlled ? undefined : updateState}
-        searchable={searchable}
-        clearable={clearable}
-        initialValue={extractValue(node.props.initialValue)}
-        value={isControlled ? extractValue(node.props.value) : state?.value}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        dropdownHeight={extractValue(node.props.dropdownHeight)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        modal={extractValue.asOptionalBoolean(node.props.modal)}
-        groupBy={extractValue(node.props.groupBy)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-        groupHeaderRenderer={
-          node.props.groupHeaderTemplate
-            ? (contextVars) => {
-                return (
-                  <MemoizedItem
-                    contextVars={contextVars}
-                    node={node.props.groupHeaderTemplate}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        ungroupedHeaderRenderer={
-          node.props.ungroupedHeaderTemplate
-            ? () => {
-                return (
-                  <MemoizedItem
-                    contextVars={{}}
-                    node={node.props.ungroupedHeaderTemplate}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        valueRenderer={
-          node.props.valueTemplate
-            ? (item, removeItem) => {
-                return (
-                  <MemoizedItem
-                    contextVars={{
-                      $item: item,
-                      $itemContext: { removeItem },
-                    }}
-                    node={node.props.valueTemplate}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-        optionRenderer={
-          node.props.optionTemplate
-            ? (item, val, inTrigger) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionTemplate}
-                    contextVars={{
-                      $item: item,
-                      $selectedValue: val,
-                      $inTrigger: inTrigger,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </Select>
-    );
+      const isControlled = node.props.value !== undefined;
+      return (
+        <Select
+          multiSelect={multiSelect}
+          classes={classes}
+          contentClassName={classes?.[COMPONENT_PART_KEY]}
+          inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
+          inProgressNotificationMessage={extractValue.asOptionalString(
+            node.props.inProgressNotificationMessage,
+          )}
+          readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+          updateState={isControlled ? undefined : updateState}
+          searchable={searchable}
+          clearable={clearable}
+          initialValue={extractValue(node.props.initialValue)}
+          value={isControlled ? extractValue(node.props.value) : state?.value}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+          placeholder={extractValue.asOptionalString(node.props.placeholder)}
+          validationStatus={extractValue(node.props.validationStatus)}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          registerComponentApi={registerComponentApi}
+          emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+          dropdownHeight={extractValue(node.props.dropdownHeight)}
+          required={extractValue.asOptionalBoolean(node.props.required)}
+          modal={extractValue.asOptionalBoolean(node.props.modal)}
+          groupBy={extractValue(node.props.groupBy)}
+          verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+          validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+          validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
+          groupHeaderRenderer={
+            node.props.groupHeaderTemplate
+              ? (contextVars) => {
+                  return (
+                    <MemoizedItem
+                      contextVars={contextVars}
+                      node={node.props.groupHeaderTemplate}
+                      renderChild={renderChild}
+                    />
+                  );
+                }
+              : undefined
+          }
+          ungroupedHeaderRenderer={
+            node.props.ungroupedHeaderTemplate
+              ? () => {
+                  return (
+                    <MemoizedItem
+                      contextVars={{}}
+                      node={node.props.ungroupedHeaderTemplate}
+                      renderChild={renderChild}
+                    />
+                  );
+                }
+              : undefined
+          }
+          valueRenderer={
+            node.props.valueTemplate
+              ? (item, removeItem) => {
+                  return (
+                    <MemoizedItem
+                      contextVars={{
+                        $item: item,
+                        $itemContext: { removeItem },
+                      }}
+                      node={node.props.valueTemplate}
+                      renderChild={renderChild}
+                    />
+                  );
+                }
+              : undefined
+          }
+          optionRenderer={
+            node.props.optionTemplate
+              ? (item, val, inTrigger) => {
+                  return (
+                    <MemoizedItem
+                      node={node.props.optionTemplate}
+                      contextVars={{
+                        $item: item,
+                        $selectedValue: val,
+                        $inTrigger: inTrigger,
+                      }}
+                      renderChild={renderChild}
+                    />
+                  );
+                }
+              : undefined
+          }
+        >
+          {renderChild(node.children)}
+        </Select>
+      );
+    },
   },
 );

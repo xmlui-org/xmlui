@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./ScrollViewer.module.scss";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata } from "../../components/metadata-helpers";
@@ -162,25 +162,24 @@ export const ThemedScroller = React.forwardRef<React.ElementRef<typeof Scroller>
   },
 );
 
-export const scrollViewerComponentRenderer = createComponentRenderer(
+export const scrollViewerComponentRenderer = wrapComponent(
   COMP,
   ScrollViewerMd,
-  ({ node, extractValue, renderChild, classes }) => {
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
-    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
-    const header = node.props.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
-    const footer = node.props.footerTemplate ? renderChild(node.props.footerTemplate) : undefined;
+  {
+    exclude: ["headerTemplate", "footerTemplate"],
+    customRender(props, { node, renderChild }) {
+      const header = node.props?.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
+      const footer = node.props?.footerTemplate ? renderChild(node.props.footerTemplate) : undefined;
 
-    return (
-      <ScrollViewer 
-        classes={classes} 
-        scrollStyle={scrollStyle as any}
-        showScrollerFade={showScrollerFade}
-        header={header}
-        footer={footer}
-      >
-        {renderChild(node.children)}
-      </ScrollViewer>
-    );
-  }
+      return (
+        <ScrollViewer
+          {...props}
+          header={header}
+          footer={footer}
+        >
+          {renderChild(node.children)}
+        </ScrollViewer>
+      );
+    },
+  },
 );

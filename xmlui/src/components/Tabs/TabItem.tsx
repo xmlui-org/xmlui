@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { TabItemComponent } from "./TabItemNative";
 import { createMetadata, d, dComponent, dLabel } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
@@ -48,40 +48,24 @@ export const ThemedTabItem = React.forwardRef<React.ElementRef<typeof TabItemCom
   },
 );
 
-export const tabItemComponentRenderer = createComponentRenderer(
+export const tabItemComponentRenderer = wrapComponent(
   COMP,
   TabItemMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, lookupEventHandler, classes } = rendererContext;
-    return (
-      <TabItemComponent
-        classes={classes}
-        id={extractValue(node.uid)}
-        label={extractValue(node.props.label)}
-        activated={lookupEventHandler("activated")}
-        headerRenderer={
-          node.props.headerTemplate
-            ? (item) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.headerTemplate}
-                    contextVars={{
-                      $header: {
-                        id: item.id,
-                        index: item.index,
-                        label: item.label,
-                        isActive: item.isActive,
-                      },
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </TabItemComponent>
-    );
+  {
+    events: { activated: "activated" },
+    renderers: {
+      headerTemplate: { contextVars: (item: any) => ({ $header: item }) },
+    },
+    customRender(props, { node, extractValue, renderChild }) {
+      return (
+        <TabItemComponent
+          {...props}
+          label={extractValue.asOptionalString(node.props?.label) ?? ""}
+          id={extractValue(node.uid)}
+        >
+          {renderChild(node.children)}
+        </TabItemComponent>
+      );
+    },
   },
 );

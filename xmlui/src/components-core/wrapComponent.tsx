@@ -462,12 +462,42 @@ function extractFileMetadata(args: any[]): { files: { name: string; size: number
  * @param config - Configuration for prop mapping
  * @returns A ComponentRendererDef ready for registration
  */
+// Overload 1: with native component (type, Component, metadata, config)
 export function wrapComponent<TMd extends ComponentMetadata>(
   type: string,
   Component: React.ComponentType<any>,
   metadata: TMd,
-  config: WrapComponentConfig = {},
+  config?: WrapComponentConfig,
+): ComponentRendererDef;
+// Overload 2: without native component — customRender must be provided (type, metadata, config)
+export function wrapComponent<TMd extends ComponentMetadata>(
+  type: string,
+  metadata: TMd,
+  config: WrapComponentConfig & { customRender: NonNullable<WrapComponentConfig["customRender"]> },
+): ComponentRendererDef;
+// Implementation
+export function wrapComponent<TMd extends ComponentMetadata>(
+  type: string,
+  ComponentOrMetadata: React.ComponentType<any> | TMd,
+  metadataOrConfig: TMd | WrapComponentConfig = {} as any,
+  configParam: WrapComponentConfig = {},
 ): ComponentRendererDef {
+  let Component: React.ComponentType<any>;
+  let metadata: TMd;
+  let config: WrapComponentConfig;
+
+  if (typeof ComponentOrMetadata === "function") {
+    // Overload 1: (type, Component, metadata, config?)
+    Component = ComponentOrMetadata as React.ComponentType<any>;
+    metadata = metadataOrConfig as TMd;
+    config = configParam;
+  } else {
+    // Overload 2: (type, metadata, config-with-customRender)
+    Component = (() => null) as any;
+    metadata = ComponentOrMetadata as TMd;
+    config = (metadataOrConfig as WrapComponentConfig) ?? {};
+  }
+
   const { booleanSet, numberSet, stringSet, resourceUrlSet, eventMap, callbackMap, renameMap, excludeSet, templateMap, rendererConfigs } =
     mergeWithMetadata(metadata, config);
 
