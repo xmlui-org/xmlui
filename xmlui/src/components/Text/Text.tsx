@@ -1,7 +1,7 @@
 import styles from "./Text.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -213,45 +213,32 @@ export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(
   },
 );
 
-export const textComponentRenderer = createComponentRenderer(
-  COMP,
-  TextMd,
-  ({ node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler }) => {
-    const {
-      variant,
-      maxLines,
-      preserveLinebreaks,
-      ellipses,
-      overflowMode,
-      breakMode,
-      value,
-      ...variantSpecific
-    } = node.props;
+export const textComponentRenderer = wrapComponent(COMP, TextMd, {
+  exposeRegisterApi: true,
+  exclude: ["value"],
+  customRender(props, { node, extractValue, renderChild }) {
+    const { variant, maxLines, preserveLinebreaks, ellipses, overflowMode, breakMode, ...variantSpecific } =
+      node.props ?? {};
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)
-        .filter(([key, _]) => VariantPropsKeys.includes(key as any))
+        .filter(([key]) => VariantPropsKeys.includes(key as any))
         .map(([key, value]) => [key, extractValue(value)]),
     );
 
     return (
       <Text
+        {...props}
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
-        classes={classes}
-        preserveLinebreaks={extractValue.asOptionalBoolean(
-          preserveLinebreaks,
-          defaultProps.preserveLinebreaks,
-        )}
+        preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, defaultProps.preserveLinebreaks)}
         ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
         overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
         breakMode={extractValue(breakMode) as BreakMode | undefined}
-        registerComponentApi={registerComponentApi}
-        onContextMenu={lookupEventHandler("contextMenu")}
         {...variantSpecificProps}
       >
-        {extractValue.asDisplayText(value) || renderChild(node.children)}
+        {extractValue.asDisplayText(node.props?.value) || renderChild(node.children)}
       </Text>
     );
   },
-);
+});

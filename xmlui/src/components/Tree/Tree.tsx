@@ -1,5 +1,5 @@
 import type { ComponentDef } from "../..";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
@@ -472,10 +472,24 @@ export const TreeMd = createMetadata({
 /**
  * This function defines the renderer for the Tree component.
  */
-export const treeComponentRenderer = createComponentRenderer(
-  COMP,
-  TreeMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
+export const treeComponentRenderer = wrapComponent(COMP, TreeMd, {
+  exposeRegisterApi: true,
+  exclude: ["itemTemplate", "data"],
+  events: {
+    selectionDidChange: "onSelectionChanged",
+    nodeDidExpand: "onNodeExpanded",
+    nodeDidCollapse: "onNodeCollapsed",
+    loadChildren: "loadChildren",
+    cutAction: "onCutAction",
+    copyAction: "onCopyAction",
+    pasteAction: "onPasteAction",
+    deleteAction: "onDeleteAction",
+    // contextMenu is handled manually via lookupEventHandler below
+    contextMenu: "_unusedContextMenu",
+  },
+  customRender(props, { node, extractValue, renderChild, lookupEventHandler }) {
+    // Strip the dummy contextMenu prop before spreading (contextMenu is handled via lookupEventHandler)
+    const { _unusedContextMenu: _ignored, ...treeProps } = props as any;
     // Default item template if none is provided:
     //   <HStack verticalAlignment="center">
     //     <Icon when="{$item.icon}" name="{$item.icon}" />
@@ -505,77 +519,20 @@ export const treeComponentRenderer = createComponentRenderer(
     };
     return (
       <TreeComponent
-        registerComponentApi={registerComponentApi}
-        classes={classes}
-        data={extractValue(node.props.data)}
-        dataFormat={extractValue(node.props.dataFormat)}
-        idField={extractValue(node.props.idField)}
-        nameField={extractValue(node.props.nameField)}
-        iconField={extractValue(node.props.iconField)}
-        iconExpandedField={extractValue(node.props.iconExpandedField)}
-        iconCollapsedField={extractValue(node.props.iconCollapsedField)}
-        parentIdField={extractValue(node.props.parentIdField)}
-        childrenField={extractValue(node.props.childrenField)}
-        selectableField={extractValue(node.props.selectableField)}
-        dynamicField={extractValue(node.props.dynamicField)}
-        loadedField={extractValue(node.props.loadedField)}
-        autoLoadAfterField={extractValue(node.props.autoLoadAfterField)}
-        dynamic={extractValue.asOptionalBoolean(node.props.dynamic, defaultProps.dynamic)}
-        selectedValue={extractValue(node.props.selectedValue)}
-        selectedId={extractValue(node.props.selectedId)}
-        defaultExpanded={extractValue(node.props.defaultExpanded)}
-        autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
-        itemClickExpands={extractValue.asOptionalBoolean(node.props.itemClickExpands)}
-        iconCollapsed={extractValue(node.props.iconCollapsed)}
-        iconExpanded={extractValue(node.props.iconExpanded)}
-        iconSize={extractValue(node.props.iconSize)}
-        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
-        fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
-        animateExpand={extractValue.asOptionalBoolean(
-          node.props.animateExpand,
-          defaultProps.animateExpand,
-        )}
-        expandRotation={extractValue.asOptionalNumber(
-          node.props.expandRotation,
-          defaultProps.expandRotation,
-        )}
-        spinnerDelay={extractValue.asOptionalNumber(
-          node.props.spinnerDelay,
-          defaultProps.spinnerDelay,
-        )}
-        scrollStyle={extractValue.asOptionalString(
-          node.props.scrollStyle,
-          defaultProps.scrollStyle,
-        )}
-        showScrollerFade={extractValue.asOptionalBoolean(
-          node.props.showScrollerFade,
-          defaultProps.showScrollerFade,
-        )}
-        autoLoadAfter={extractValue.asOptionalNumber(node.props.autoLoadAfter)}
-        onSelectionChanged={lookupEventHandler("selectionDidChange")}
-        onNodeExpanded={lookupEventHandler("nodeDidExpand")}
-        onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
-        loadChildren={lookupEventHandler("loadChildren")}
-        onCutAction={lookupEventHandler("cutAction")}
-        onCopyAction={lookupEventHandler("copyAction")}
-        onPasteAction={lookupEventHandler("pasteAction")}
-        onDeleteAction={lookupEventHandler("deleteAction")}
-        overflow={extractValue(node.props.overflow)}
+        {...treeProps}
+        data={extractValue(node.props?.data)}
         lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
         itemRenderer={(flatTreeNode: any) => {
           const itemContext = {
-            id: flatTreeNode.id, // $item.id - Internal unique identifier
-            name: flatTreeNode.displayName, // $item.name - Primary display text
-            depth: flatTreeNode.depth, // $item.depth - Nesting level (0-based)
-            isExpanded: flatTreeNode.isExpanded, // $item.isExpanded - Expansion state
-            hasChildren: flatTreeNode.hasChildren, // $item.hasChildren - Children indicator
-            // - icon, iconExpanded, iconCollapsed (from icon fields)
-            // - uid, path, parentIds, selectable, children (TreeNode internals)
-            // - All original source data properties (custom fields)
+            id: flatTreeNode.id,
+            name: flatTreeNode.displayName,
+            depth: flatTreeNode.depth,
+            isExpanded: flatTreeNode.isExpanded,
+            hasChildren: flatTreeNode.hasChildren,
             ...flatTreeNode,
           };
 
-          return node.props.itemTemplate ? (
+          return node.props?.itemTemplate ? (
             <MemoizedItem
               node={node.props.itemTemplate}
               contextVars={{ $item: itemContext }}
@@ -592,4 +549,4 @@ export const treeComponentRenderer = createComponentRenderer(
       />
     );
   },
-);
+});

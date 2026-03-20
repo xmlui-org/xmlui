@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import styles from "./TileGrid.module.scss";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
@@ -163,22 +163,13 @@ export const TileGridMd = createMetadata({
 
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
-export const tileGridComponentRenderer = createComponentRenderer(
-  COMP,
-  TileGridMd,
-  ({
-    node,
-    extractValue,
-    renderChild,
-    classes,
-    layoutContext,
-    lookupEventHandler,
-    lookupAction,
-    registerComponentApi,
-  }) => {
-    const itemTemplate = node.props.itemTemplate;
-    const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
-    const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+export const tileGridComponentRenderer = wrapComponent(COMP, TileGridMd, {
+  exposeRegisterApi: true,
+  exclude: ["data", "itemTemplate", "syncWithVar", "gap", "idKey"],
+  customRender(props, { node, extractValue, renderChild, layoutContext, lookupAction }) {
+    const itemTemplate = node.props?.itemTemplate;
+    const idKey = extractValue.asOptionalString(node.props?.idKey) ?? defaultProps.idKey;
+    const syncVarName = extractValue.asOptionalString(node.props?.syncWithVar);
 
     // Keep lookupAction current without breaking the stable adapter reference (same pattern as Table).
     const lookupActionRef = useRef(lookupAction);
@@ -217,27 +208,11 @@ export const tileGridComponentRenderer = createComponentRenderer(
 
     const content = (
       <TileGridNative
-        registerComponentApi={registerComponentApi}
-        classes={classes}
-        data={extractValue(node.props.data)}
-        itemWidth={extractValue.asOptionalString(node.props.itemWidth)}
-        itemHeight={extractValue.asOptionalString(node.props.itemHeight)}
-        gap={extractValue.asSize(node.props.gap) ?? defaultProps.gap}
-        loading={extractValue.asOptionalBoolean(node.props.loading)}
-        itemsSelectable={extractValue.asOptionalBoolean(node.props.itemsSelectable)}
-        enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
-        syncWithAppState={syncAdapter}
-        checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as any}
-        hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
+        {...props}
+        data={extractValue(node.props?.data)}
         idKey={idKey}
-        itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
-        onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-        onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
-        onCutAction={lookupEventHandler("cutAction")}
-        onCopyAction={lookupEventHandler("copyAction")}
-        onPasteAction={lookupEventHandler("pasteAction")}
-        onDeleteAction={lookupEventHandler("deleteAction")}
-        onSelectAllAction={lookupEventHandler("selectAllAction")}
+        gap={extractValue.asSize(node.props?.gap) ?? defaultProps.gap}
+        syncWithAppState={syncAdapter}
         itemRenderer={
           itemTemplate
             ? (item, index, count, selected) => (
@@ -262,4 +237,4 @@ export const tileGridComponentRenderer = createComponentRenderer(
 
     return <StandaloneSelectionStore idKey={idKey}>{content}</StandaloneSelectionStore>;
   },
-);
+});

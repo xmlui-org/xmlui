@@ -1,5 +1,5 @@
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
 import { Theme, defaultProps } from "./ThemeNative";
 
@@ -40,22 +40,20 @@ export const ThemeMd = createMetadata({
   opaque: true,
 });
 
-export const themeComponentRenderer = createComponentRenderer(
-  COMP,
-  ThemeMd,
-  ({ node, extractValue, renderChild, layoutContext, appContext }) => {
+export const themeComponentRenderer = wrapComponent(COMP, ThemeMd, {
+  customRender(_props, { node, extractValue, renderChild, layoutContext, appContext }) {
     const { tone, ...restProps } = node.props;
     const toastDuration = appContext?.appGlobals?.notifications?.duration;
     let themeTone = extractValue.asOptionalString(tone);
     if (themeTone && themeTone !== "dark") {
       themeTone = "light";
     }
-    
+
     const themeId = extractValue.asOptionalString(node.props.themeId);
     const isRoot = extractValue.asOptionalBoolean(node.props.root);
     const disableInlineStyle = extractValue.asOptionalBoolean(node.props.disableInlineStyle);
     const themeVars = extractValue(restProps);
-    
+
     // Determine if Theme actually does anything meaningful
     // If no theme properties are set and applyIf is not explicitly set, default to false
     const hasThemeId = !!themeId;
@@ -63,14 +61,14 @@ export const themeComponentRenderer = createComponentRenderer(
     const hasThemeVars = themeVars && Object.keys(themeVars).length > 0;
     const hasDisableInlineStyle = disableInlineStyle !== undefined;
     const hasExplicitApplyIf = node.props.applyIf !== undefined;
-    
+
     const isMeaningfulTheme = isRoot || hasThemeId || hasTone || hasThemeVars || hasDisableInlineStyle;
-    
+
     // If applyIf is explicitly set, use that value; otherwise, only apply if theme is meaningful
-    const applyIf = hasExplicitApplyIf 
+    const applyIf = hasExplicitApplyIf
       ? extractValue.asOptionalBoolean(node.props.applyIf)
       : isMeaningfulTheme;
-    
+
     return (
       <Theme
         id={themeId}
@@ -86,4 +84,4 @@ export const themeComponentRenderer = createComponentRenderer(
       />
     );
   },
-);
+});
