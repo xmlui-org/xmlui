@@ -683,6 +683,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             node={template}
             contextVars={ctxDef(...args)}
             renderChild={renderChild}
+            layoutContext={context.layoutContext}
           />
         );
       } else {
@@ -699,6 +700,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
               node={template}
               contextVars={contextVars}
               renderChild={renderChild}
+              layoutContext={context.layoutContext}
             />
           );
         };
@@ -743,8 +745,10 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       // item is rendered using the template with $item / $itemIndex context vars,
       // matching the pattern used by List, TileGrid, and other data components.
       const templatePropName = metadata.childrenAsTemplate;
-      const data = templatePropName ? extractValue(node.props.data) : undefined;
-      if (templatePropName && node.props?.[templatePropName] && Array.isArray(data)) {
+      // Skip childrenAsTemplate auto-rendering when the template prop is handled as a renderer
+      const templateHandledAsRenderer = templatePropName ? templatePropName in rendererConfigs : false;
+      const data = templatePropName && !templateHandledAsRenderer ? extractValue(node.props.data) : undefined;
+      if (templatePropName && !templateHandledAsRenderer && node.props?.[templatePropName] && Array.isArray(data)) {
         const itemTemplate = node.props[templatePropName];
         const childLayoutCtx = config.childrenLayoutContext
           ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
@@ -763,7 +767,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             }}
           />
         ));
-      } else if (templatePropName && node.props?.[templatePropName] && !Array.isArray(data)) {
+      } else if (templatePropName && !templateHandledAsRenderer && node.props?.[templatePropName] && !Array.isArray(data)) {
         // childrenAsTemplate moved children into the template prop, but no data was provided —
         // render the template prop as normal children (inline children mode)
         props.children = renderChild(
@@ -1171,6 +1175,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
             node={template}
             contextVars={ctxDef(...args)}
             renderChild={renderChild}
+            layoutContext={context.layoutContext}
           />
         );
       } else {
@@ -1187,6 +1192,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               node={template}
               contextVars={contextVars}
               renderChild={renderChild}
+              layoutContext={context.layoutContext}
             />
           );
         };

@@ -1,7 +1,7 @@
 import styles from "../Toggle/Toggle.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -21,7 +21,6 @@ import {
   dValidationStatus,
 } from "../../components/metadata-helpers";
 import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
-import { MemoizedItem } from "../container-helpers";
 
 export const defaultProps = {
   ...toggleDefaultProps,
@@ -113,54 +112,27 @@ export const ThemedToggle = React.forwardRef<HTMLInputElement, ThemedToggleProps
   },
 );
 
-export const checkboxComponentRenderer = createComponentRenderer(
+export const checkboxComponentRenderer = wrapComponent(
   COMP,
+  Toggle,
   CheckboxMd,
-  ({
-    node,
-    extractValue,
-    classes,
-    updateState,
-    lookupEventHandler,
-    state,
-    registerComponentApi,
-    renderChild,
-    layoutContext,
-  }) => {
-    const inputTemplate = node.props.inputTemplate;
-    return (
-      <Toggle
-        inputRenderer={
-          inputTemplate
-            ? (contextVars) => (
-                <MemoizedItem
-                  contextVars={contextVars}
-                  node={inputTemplate}
-                  renderChild={renderChild}
-                  layoutContext={layoutContext}
-                />
-              )
-            : undefined
-        }
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        classes={classes}
-        initialValue={extractValue.asOptionalBoolean(
-          node.props.initialValue,
-          defaultProps.initialValue,
-        )}
-        value={state?.value}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        onClick={lookupEventHandler("click")}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        indeterminate={extractValue.asOptionalBoolean(node.props.indeterminate)}
-        registerComponentApi={registerComponentApi}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-      />
-    );
+  {
+    booleans: ["indeterminate"],
+    events: { click: "onClick", gotFocus: "onFocus", lostFocus: "onBlur", didChange: "onDidChange" },
+    renderers: {
+      inputTemplate: {
+        reactProp: "inputRenderer",
+        contextVars: (contextVars: Record<string, any>) => contextVars,
+      },
+    },
+    exposeRegisterApi: true,
+    customRender: (props, { node, extractValue }) => {
+      // initialValue needs explicit boolean coercion (e.g. "" → false, "false" → false)
+      props.initialValue = extractValue.asOptionalBoolean(
+        node.props?.initialValue,
+        defaultProps.initialValue,
+      );
+      return <Toggle {...props} />;
+    },
   },
 );
