@@ -1,10 +1,9 @@
 import styles from "./Inspector.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
 import { Inspector, defaultProps } from "./InspectorNative";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Inspector";
 
@@ -41,20 +40,7 @@ export const InspectorMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const inspectorComponentRenderer = createComponentRenderer(
-  COMP,
-  InspectorMd,
-  ({ node, extractValue, classes, registerComponentApi }) => {
-    return (
-      <Inspector
-        src={extractValue.asOptionalString(node.props.src)}
-        tooltip={extractValue.asOptionalString(node.props.tooltip)}
-        dialogTitle={extractValue.asOptionalString(node.props.dialogTitle)}
-        dialogWidth={extractValue.asOptionalString(node.props.dialogWidth)}
-        dialogHeight={extractValue.asOptionalString(node.props.dialogHeight)}
-        classes={classes}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
+export const inspectorComponentRenderer = wrapComponent(COMP, Inspector, InspectorMd, {
+  strings: ["tooltip", "dialogTitle", "dialogWidth", "dialogHeight"],
+  exposeRegisterApi: true,
+});
