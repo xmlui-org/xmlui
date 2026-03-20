@@ -46,7 +46,7 @@ type Props = {
   noResultsMessage?: string;
   showPreviewMetadata?: boolean;
   defaultSelectedCategories?: string[];
-  defaultSortOrder?: "relevance" | "date";
+  // defaultSortOrder?: "relevance" | "date";
   pageSize?: number;
   enableSpellCorrection?: boolean;
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
@@ -74,7 +74,7 @@ export const Search = ({
   noResultsMessage,
   showPreviewMetadata = true,
   defaultSelectedCategories,
-  defaultSortOrder = "relevance",
+  // defaultSortOrder = "relevance",
   pageSize,
   enableSpellCorrection = true,
   mode = "overlay",
@@ -136,7 +136,7 @@ const [inputValue, setInputValue] = useState("");
     () => new Set(defaultSelectedCategories ?? []),
   );
 
-  const [sortOrder, setSortOrder] = useState<"relevance" | "date">(defaultSortOrder);
+  // const [sortOrder, setSortOrder] = useState<"relevance" | "date">(defaultSortOrder);
 
   // --- Merge data, do search, postprocess results
   const { results: allResults, totalCount, suggestion } = useSearch(
@@ -167,25 +167,11 @@ const [inputValue, setInputValue] = useState("");
     );
   }, [allResults, selectedCategories]);
 
-  const sortedResults = useMemo(() => {
-    if (sortOrder === "relevance") return categoryFilteredResults;
-    return [...categoryFilteredResults].sort((a, b) => {
-      const dateA = a.item.date;
-      const dateB = b.item.date;
-      if (dateA == null && dateB == null) return 0;
-      if (dateA == null) return 1;
-      if (dateB == null) return -1;
-      const ta = typeof dateA === "string" ? new Date(dateA).getTime() : dateA;
-      const tb = typeof dateB === "string" ? new Date(dateB).getTime() : dateB;
-      return tb - ta;
-    });
-  }, [categoryFilteredResults, sortOrder]);
-
   const results = useMemo(
-    () => sortedResults.slice(0, page * effectivePageSize),
-    [sortedResults, page, effectivePageSize],
+    () => categoryFilteredResults.slice(0, page * effectivePageSize),
+    [categoryFilteredResults, page, effectivePageSize],
   );
-  const hasMore = results.length < sortedResults.length;
+  const hasMore = results.length < categoryFilteredResults.length;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
@@ -395,7 +381,7 @@ const [inputValue, setInputValue] = useState("");
 
   const loadMoreJsx = (hasMore || totalCount > effectivePageSize) && results.length > 0 && (
     <div className={styles.loadMoreRow}>
-      <Text className={styles.resultCount}>{`Showing ${results.length} of ${sortedResults.length}`}</Text>
+      <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
       {hasMore && (
         <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={() => { setPage((p) => p + 1); refocusInput(); }}>
           Load more
@@ -479,7 +465,6 @@ const [inputValue, setInputValue] = useState("");
                       onSelectOne={(cat: string) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
                       onClearAll={() => { clearCategories(); refocusInput(); }}
                     />
-                    <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
                   </div>
                 )}
 
@@ -567,9 +552,6 @@ const [inputValue, setInputValue] = useState("");
                           />
                         </div>
                       )}
-                      <div className={styles.drawerSortRow}>
-                        <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
-                      </div>
                     </div>
                     <ul
                       id={`${inputId}-listbox`}
@@ -642,18 +624,14 @@ const [inputValue, setInputValue] = useState("");
               onFocusOutside={(e) => e.preventDefault()}
               className={classnames(styles.listPanel, className)}
             >
-              {/* C — Category filter bar + D — Sort control */}
-              {(availableCategories.length > 1 || sortOrder !== "relevance") && (
+              {availableCategories.length > 1 && (
                 <div className={styles.panelControls}>
-                  {availableCategories.length > 1 && (
-                    <CategoryFilterBar
-                      categories={availableCategories}
-                      selectedCategories={selectedCategories}
-                      onToggle={(cat) => { toggleCategory(cat); refocusInput(); }}
-                      onClearAll={() => { clearCategories(); refocusInput(); }}
-                    />
-                  )}
-                  <SortControl sortOrder={sortOrder} onSortChange={(o) => { setSortOrder(o); refocusInput(); }} />
+                  <CategoryFilterBar
+                    categories={availableCategories}
+                    selectedCategories={selectedCategories}
+                    onToggle={(cat) => { toggleCategory(cat); refocusInput(); }}
+                    onClearAll={() => { clearCategories(); refocusInput(); }}
+                  />
                 </div>
               )}
               <ul
@@ -749,38 +727,6 @@ function CategoryFilterBar({ categories, selectedCategories, onToggle, onClearAl
   );
 }
 
-// --- D: SortControl sub-component
-
-type SortControlProps = {
-  sortOrder: "relevance" | "date";
-  onSortChange: (order: "relevance" | "date") => void;
-};
-
-function SortControl({ sortOrder, onSortChange }: SortControlProps) {
-  return (
-    <div className={styles.sortControl} role="group" aria-label="Sort results">
-      <span className={styles.sortLabel}>Sort by</span>
-      <button
-        className={classnames(styles.sortButton, {
-          [styles.sortButtonActive]: sortOrder === "relevance",
-        })}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => onSortChange("relevance")}
-      >
-        Relevance
-      </button>
-      <button
-        className={classnames(styles.sortButton, {
-          [styles.sortButtonActive]: sortOrder === "date",
-        })}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => onSortChange("date")}
-      >
-        Date
-      </button>
-    </div>
-  );
-}
 
 // --- G: OverlayCategoryTabs sub-component
 
