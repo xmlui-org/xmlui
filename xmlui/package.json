@@ -121,7 +121,7 @@
     "rollup-plugin-copy": "^3.5.0",
     "serve": "14.2.0",
     "terser": "^5.44.0",
-    "tsdown": "^0.15.12",
+    "tsdown": "^0.21.4",
     "typescript": "5.7.3",
     "vitest": "^4.0.16"
   },
@@ -140,12 +140,12 @@
     "src/syntax"
   ],
   "bin": {
-    "xmlui": "./bin/bootstrap.js"
+    "xmlui": "./src/nodejs/bin/bootstrap.js"
   },
   "clean-package": {
     "replace": {
       "bin": {
-        "xmlui": "dist/bin/index.js"
+        "xmlui": "dist/nodejs/bin/index.js"
       },
       "main": "./dist/standalone/xmlui-standalone.umd.js",
       "module": "./dist/lib/xmlui.js",
@@ -156,8 +156,8 @@
           "require": "./dist/standalone/xmlui-standalone.umd.js"
         },
         "./language-server": {
-          "import": "./dist/for-node/server.js",
-          "require": "./dist/for-node/server.js"
+          "import": "./dist/nodejs/server.js",
+          "require": "./dist/nodejs/server.js"
         },
         "./parser": {
           "import": "./dist/lib/xmlui-parser.js",
@@ -176,8 +176,12 @@
           "require": "./dist/lib/scss/components-core/theming/_themes.scss"
         },
         "./vite-xmlui-plugin": {
-          "import": "./dist/for-node/vite-xmlui-plugin.js",
-          "require": "./dist/for-node/vite-xmlui-plugin.js"
+          "import": "./dist/nodejs/vite-xmlui-plugin.js",
+          "require": "./dist/nodejs/vite-xmlui-plugin.js"
+        },
+        "./nodejs": {
+          "import": "./dist/nodejs/index.js",
+          "require": "./dist/nodejs/index.js"
         },
         "./syntax/monaco": {
           "import": "./dist/lib/syntax-monaco.js",
@@ -196,45 +200,17 @@
   },
   "main": "./src/index.ts",
   "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts"
-    },
-    "./parser": {
-      "import": "./src/parsers/xmlui-parser/index.ts",
-      "require": "./src/parsers/xmlui-parser/index.ts"
-    },
-    "./*.css": {
-      "import": "./dist/lib/*.css",
-      "require": "./dist/lib/*.css"
-    },
-    "./index.scss": {
-      "import": "./src/index.scss",
-      "require": "./src/index.scss"
-    },
-    "./themes.scss": {
-      "import": "./src/components-core/theming/_themes.scss"
-    },
-    "./vite-xmlui-plugin": {
-      "import": "./bin/vite-xmlui-plugin.ts",
-      "require": "./bin/vite-xmlui-plugin.ts"
-    },
-    "./language-server": {
-      "import": "./src/language-server/server.ts",
-      "require": "./src/language-server/server.ts"
-    },
-    "./syntax/monaco": {
-      "import": "./src/syntax/monaco/index.ts",
-      "require": "./src/syntax/monaco/index.ts"
-    },
-    "./syntax/textmate": {
-      "import": "./src/syntax/textMate/index.ts",
-      "require": "./src/syntax/textMate/index.ts"
-    },
-    "./testing": {
-      "import": "./src/testing/index.ts",
-      "require": "./src/testing/index.ts"
-    }
+    ".": "./src/index.ts",
+    "./parser": "./src/parsers/xmlui-parser/index.ts",
+    "./*.css": "./dist/lib/*.css",
+    "./index.scss": "./src/index.scss",
+    "./themes.scss": "./src/components-core/theming/_themes.scss",
+    "./vite-xmlui-plugin": "./src/nodejs/vite-xmlui-plugin.ts",
+    "./nodejs": "./src/nodejs/index.ts",
+    "./language-server": "./src/language-server/server.ts",
+    "./syntax/monaco": "./src/syntax/monaco/index.ts",
+    "./syntax/textmate": "./src/syntax/textMate/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "browserslist": {
     "production": [
