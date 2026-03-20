@@ -251,3 +251,112 @@ Before attempting a migration, check the renderer for these signals:
 - React prop produced by combining or transforming multiple XMLUI props
 - Children slot has conditional selection logic (display text vs. children vs. fallback)
 - Renderer dynamically subsets `node.props` via a runtime whitelist or type test
+
+---
+
+## Templates, Renderers, and contentClassName
+
+Three features added to `wrapComponent` (and `wrapCompound`) that unlock migration for components using `dComponent()` template props and portal-based dropdowns.
+
+### Auto-Detection of ComponentDef Props
+
+Props with `valueType: "ComponentDef"` in metadata are automatically detected. By default they are rendered as static React nodes via `renderChild()` and passed to the native component using the same prop name — no config needed.
+
+```ts
+// metadata has: emptyListTemplate: dComponent("..."),
+// wrapComponent auto-detects it and does: renderChild(node.props.emptyListTemplate)
+export const myRenderer = wrapComponent(COMP, MyComponent, MyMd);
+```
+
+### `templates` — Rename Static Template Props
+
+Use when the React prop name differs from the XMLUI prop name:
+
+```ts
+wrapComponent(COMP, MyComponent, MyMd, {
+  templates: { headerTemplate: "header" },
+  // or array form to keep same name:
+  // templates: ["headerTemplate"],
+});
+```
+
+### `renderers` — Render-Prop Templates with Context Variables
+
+Use for template props that the native component invokes as callbacks, passing runtime data (e.g., the current list item) to the XMLUI template via context variables.
+
+```ts
+wrapComponent(COMP, AutoComplete, AutoCompleteMd, {
+  renderers: {
+    // Positional form: args[0] → $item, args[1] → $selectedValue, args[2] → $inTrigger
+    optionTemplate: {
+      contextVars: ["$item", "$selectedValue", "$inTrigger"],
+    },
+  },
+});
+```
+
+Convention: `optionTemplate` maps to React prop `optionRenderer` (replaces `Template` suffix with `Renderer`). Override with `reactProp`:
+
+```ts
+renderers: {
+  itemTemplate: {
+    reactProp: "renderItem",  // custom React prop name
+    contextVars: ["$item"],
+  },
+}
+```
+
+Use `null` to skip a callback argument position:
+
+```ts
+contextVars: ["$item", null, "$index"]  // args[1] is skipped
+```
+
+For computed context variables, use a function:
+
+```ts
+renderers: {
+  itemTemplate: {
+    reactProp: "itemRenderer",
+    contextVars: (item, _key, rowIndex, count, isSelected) => ({
+      $item: item,
+      $itemIndex: rowIndex,
+      $isFirst: rowIndex === 0,
+      $isLast: rowIndex === count - 1,
+      $isSelected: isSelected,
+    }),
+  },
+}
+```
+
+When a renderer is defined for a prop, auto-detection skips it (no duplicate handling). When the template prop is absent in markup, the render-prop callback is `undefined` — matching the manual pattern.
+
+### `contentClassName` — Portal Theme Class Forwarding
+
+Components with Radix portals (Select, AutoComplete, DatePicker) need theme classes forwarded to the portal content. Enable with:
+
+```ts
+wrapComponent(COMP, MyComponent, MyMd, {
+  contentClassName: true,
+});
+// equivalent to: props.contentClassName = classes?.[COMPONENT_PART_KEY]
+```
+
+### Example: Complete AutoComplete-Style Migration
+
+```ts
+export const autoCompleteComponentRenderer = wrapComponent(
+  COMP,
+  AutoComplete,
+  AutoCompleteMd,
+  {
+    contentClassName: true,
+    exposeRegisterApi: true,
+    renderers: {
+      optionTemplate: {
+        contextVars: ["$item", "$selectedValue", "$inTrigger"],
+      },
+    },
+  },
+);
+```

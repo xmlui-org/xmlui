@@ -7,6 +7,7 @@ import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/insp
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 import { MemoizedItem } from "../components/container-helpers";
+import { COMPONENT_PART_KEY } from "./theming/responsive-layout";
 
 /**
  * Generic hover capture for canvas-rendered components.
@@ -139,6 +140,68 @@ export type WrapComponentConfig = {
    * Only set this for components that actually call registerComponentApi.
    */
   exposeRegisterApi?: boolean;
+
+  /**
+   * Props holding XMLUI component definitions (valueType: "ComponentDef")
+   * that should be rendered as React nodes via renderChild and passed to
+   * the native component.
+   *
+   * - Array form: ["emptyListTemplate"] — prop name stays the same.
+   * - Object form: { emptyListTemplate: "emptyList" } — maps XMLUI prop to React prop name.
+   *
+   * ComponentDef props not listed here or in `renderers` are auto-detected
+   * from metadata and treated as static templates with the same prop name.
+   */
+  templates?: string[] | Record<string, string>;
+
+  /**
+   * Template props (valueType: "ComponentDef") that should be converted to
+   * render-prop callbacks. The callback wraps the template in MemoizedItem
+   * with context variables derived from the callback's runtime arguments.
+   *
+   * Maps XMLUI prop name → RendererConfig.
+   */
+  renderers?: Record<string, RendererConfig>;
+
+  /**
+   * When true, passes classes[COMPONENT_PART_KEY] as contentClassName
+   * to the native component. Used by portal-rendering components
+   * (e.g., Select, AutoComplete, DatePicker).
+   */
+  contentClassName?: boolean;
+
+  /**
+   * Custom render function. When provided, called instead of `<Component {...props} />`.
+   * Receives the already-extracted props and the raw renderer context.
+   *
+   * Use for components where the rendered output or children layout depends on
+   * runtime prop values (e.g., different layout modes based on orientation).
+   * Auto children rendering is skipped when customRender is provided.
+   */
+  customRender?: (props: Record<string, any>, context: any) => React.ReactNode;
+};
+
+/**
+ * Configuration for a render-prop template.
+ */
+export type RendererConfig = {
+  /**
+   * The React prop name on the native component.
+   * Defaults to replacing "Template" with "Renderer" in the XMLUI prop name
+   * (e.g., optionTemplate → optionRenderer).
+   */
+  reactProp?: string;
+
+  /**
+   * Maps callback arguments to context variables injected into the template.
+   *
+   * - Array form: positional mapping, e.g. ["$item", "$selectedValue"]
+   *   Each entry maps args[i] to the named context variable.
+   *   Use null to skip a position.
+   * - Function form: receives all callback args, returns context vars object.
+   *   Use for computed vars (e.g., $isFirst: rowIndex === 0).
+   */
+  contextVars: (string | null)[] | ((...args: any[]) => Record<string, any>);
 };
 
 /**
@@ -163,6 +226,34 @@ function normalizeEvents(
     return result;
   }
   return events;
+}
+
+/**
+ * Normalize template config into a Record<xmluiPropName, reactPropName>.
+ */
+function normalizeTemplates(
+  templates: string[] | Record<string, string> | undefined,
+): Record<string, string> {
+  if (!templates) return {};
+  if (Array.isArray(templates)) {
+    const result: Record<string, string> = {};
+    for (const name of templates) {
+      result[name] = name;
+    }
+    return result;
+  }
+  return { ...templates };
+}
+
+/**
+ * Derive the default React prop name for a render-prop template.
+ * Replaces trailing "Template" with "Renderer", or appends "Renderer".
+ */
+function templateToRendererName(templateProp: string): string {
+  if (templateProp.endsWith("Template")) {
+    return templateProp.slice(0, -"Template".length) + "Renderer";
+  }
+  return templateProp + "Renderer";
 }
 
 /**
@@ -202,6 +293,8 @@ function mergeWithMetadata(
   callbackMap: Record<string, string>;
   renameMap: Record<string, string>;
   excludeSet: Set<string>;
+  templateMap: Record<string, string>;
+  rendererConfigs: Record<string, RendererConfig>;
 } {
   // Seed from explicit config so they take priority
   const booleanSet = new Set<string>(config.booleans ?? []);
@@ -233,6 +326,21 @@ function mergeWithMetadata(
     }
   }
 
+  // Build template and renderer maps
+  const templateMap = normalizeTemplates(config.templates);
+  const rendererConfigs = config.renderers ?? {};
+
+  // Auto-detect ComponentDef props from metadata as static templates
+  if (metadata.props) {
+    for (const [propName, propMeta] of Object.entries(metadata.props)) {
+      if (propMeta.valueType !== "ComponentDef") continue;
+      // Skip if explicitly configured as a renderer or template
+      if (propName in rendererConfigs || propName in templateMap) continue;
+      // Auto-detect as static template with same prop name
+      templateMap[propName] = propName;
+    }
+  }
+
   return {
     booleanSet,
     numberSet,
@@ -242,6 +350,8 @@ function mergeWithMetadata(
     callbackMap: normalizeCallbacks(config.callbacks),
     renameMap: config.rename ?? {},
     excludeSet: new Set(config.exclude ?? []),
+    templateMap,
+    rendererConfigs,
   };
 }
 
@@ -349,7 +459,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
-  const { booleanSet, numberSet, stringSet, resourceUrlSet, eventMap, callbackMap, renameMap, excludeSet } =
+  const { booleanSet, numberSet, stringSet, resourceUrlSet, eventMap, callbackMap, renameMap, excludeSet, templateMap, rendererConfigs } =
     mergeWithMetadata(metadata, config);
 
   // Collect all specially-handled XMLUI prop names so we can skip them
@@ -359,6 +469,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
     ...resourceUrlSet,
+    ...Object.keys(templateMap),
+    ...Object.keys(rendererConfigs),
     "id", // handled separately via className/node
     // Layout props are handled by the layout resolver and applied via CSS className.
     // They must not be forwarded to the native component as React props, because that
@@ -538,6 +650,55 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       props[renameMap[key] ?? key] = rawValue ? extractResourceUrl(rawValue) : undefined;
     }
 
+    // --- Static templates (render ComponentDef props as React nodes) ---
+    for (const [xmluiProp, reactProp] of Object.entries(templateMap)) {
+      const template = node.props?.[xmluiProp];
+      if (template) {
+        props[reactProp] = renderChild(template);
+      }
+    }
+
+    // --- Render-prop templates (ComponentDef → callback with MemoizedItem) ---
+    for (const [xmluiProp, rendererConfig] of Object.entries(rendererConfigs)) {
+      const template = node.props?.[xmluiProp];
+      if (!template) continue;
+
+      const reactProp = rendererConfig.reactProp ?? templateToRendererName(xmluiProp);
+      const ctxDef = rendererConfig.contextVars;
+
+      if (typeof ctxDef === "function") {
+        props[reactProp] = (...args: any[]) => (
+          <MemoizedItem
+            node={template}
+            contextVars={ctxDef(...args)}
+            renderChild={renderChild}
+          />
+        );
+      } else {
+        props[reactProp] = (...args: any[]) => {
+          const contextVars: Record<string, any> = {};
+          for (let i = 0; i < ctxDef.length; i++) {
+            const name = ctxDef[i];
+            if (name !== null) {
+              contextVars[name] = args[i];
+            }
+          }
+          return (
+            <MemoizedItem
+              node={template}
+              contextVars={contextVars}
+              renderChild={renderChild}
+            />
+          );
+        };
+      }
+    }
+
+    // --- Content class name for portal components ---
+    if (config.contentClassName) {
+      props.contentClassName = classes?.[COMPONENT_PART_KEY];
+    }
+
     // --- Forward all remaining node.props ---
     if (node.props) {
       for (const [key, rawValue] of Object.entries(node.props)) {
@@ -561,50 +722,55 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     // --- Render children ---
-    // When childrenAsTemplate is declared in metadata, children are treated as
-    // an item template: the component's `data` prop provides an array and each
-    // item is rendered using the template with $item / $itemIndex context vars,
-    // matching the pattern used by List, TileGrid, and other data components.
-    const templatePropName = metadata.childrenAsTemplate;
-    const data = templatePropName ? extractValue(node.props.data) : undefined;
-    if (templatePropName && node.props?.[templatePropName] && Array.isArray(data)) {
-      const itemTemplate = node.props[templatePropName];
-      const childLayoutCtx = config.childrenLayoutContext
-        ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
-        : undefined;
-      props.children = data.map((item: any, index: number) => (
-        <MemoizedItem
-          node={itemTemplate as any}
-          key={item?.id ?? index}
-          renderChild={renderChild}
-          layoutContext={childLayoutCtx}
-          contextVars={{
-            $item: item,
-            $itemIndex: index,
-            $isFirst: index === 0,
-            $isLast: index === data.length - 1,
-          }}
-        />
-      ));
-    } else if (templatePropName && node.props?.[templatePropName] && !Array.isArray(data)) {
-      // childrenAsTemplate moved children into the template prop, but no data was provided —
-      // render the template prop as normal children (inline children mode)
-      props.children = renderChild(
-        node.props[templatePropName],
-        config.childrenLayoutContext
+    let rendered: React.ReactNode;
+    if (config.customRender) {
+      // Custom rendering: caller handles children and component selection.
+      rendered = config.customRender(props, context);
+    } else {
+      // When childrenAsTemplate is declared in metadata, children are treated as
+      // an item template: the component's `data` prop provides an array and each
+      // item is rendered using the template with $item / $itemIndex context vars,
+      // matching the pattern used by List, TileGrid, and other data components.
+      const templatePropName = metadata.childrenAsTemplate;
+      const data = templatePropName ? extractValue(node.props.data) : undefined;
+      if (templatePropName && node.props?.[templatePropName] && Array.isArray(data)) {
+        const itemTemplate = node.props[templatePropName];
+        const childLayoutCtx = config.childrenLayoutContext
           ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
-          : undefined,
-      );
-    } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
-      props.children = renderChild(
-        node.children,
-        config.childrenLayoutContext
-          ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
-          : undefined,
-      );
+          : undefined;
+        props.children = data.map((item: any, index: number) => (
+          <MemoizedItem
+            node={itemTemplate as any}
+            key={item?.id ?? index}
+            renderChild={renderChild}
+            layoutContext={childLayoutCtx}
+            contextVars={{
+              $item: item,
+              $itemIndex: index,
+              $isFirst: index === 0,
+              $isLast: index === data.length - 1,
+            }}
+          />
+        ));
+      } else if (templatePropName && node.props?.[templatePropName] && !Array.isArray(data)) {
+        // childrenAsTemplate moved children into the template prop, but no data was provided —
+        // render the template prop as normal children (inline children mode)
+        props.children = renderChild(
+          node.props[templatePropName],
+          config.childrenLayoutContext
+            ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+            : undefined,
+        );
+      } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+        props.children = renderChild(
+          node.children,
+          config.childrenLayoutContext
+            ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
+            : undefined,
+        );
+      }
+      rendered = <Component {...props} />;
     }
-
-    const rendered = <Component {...props} />;
     if (nativeEventsEnabled && hoverSession) {
       return (
         <HoverCapture
@@ -653,13 +819,15 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapCompoundConfig = {},
 ): ComponentRendererDef {
-  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet } =
+  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet, templateMap, rendererConfigs } =
     mergeWithMetadata(metadata, config);
 
   const filteredLayoutKeysCompound = layoutOptionKeys.filter((key) => !metadata.props?.[key]);
   const specialProps = new Set([
     ...Object.keys(eventMap),
     ...Object.keys(callbackMap),
+    ...Object.keys(templateMap),
+    ...Object.keys(rendererConfigs),
     "id",
     ...filteredLayoutKeysCompound,
     // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
@@ -815,6 +983,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       extractValue,
       lookupEventHandler,
       lookupSyncCallback,
+      renderChild,
       className,
       classes,
       updateState,
@@ -966,6 +1135,55 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           handler(event);
         }
       };
+    }
+
+    // --- Static templates (render ComponentDef props as React nodes) ---
+    for (const [xmluiProp, reactProp] of Object.entries(templateMap)) {
+      const template = node.props?.[xmluiProp];
+      if (template) {
+        props[reactProp] = renderChild(template);
+      }
+    }
+
+    // --- Render-prop templates (ComponentDef → callback with MemoizedItem) ---
+    for (const [xmluiProp, rendererConfig] of Object.entries(rendererConfigs)) {
+      const template = node.props?.[xmluiProp];
+      if (!template) continue;
+
+      const reactProp = rendererConfig.reactProp ?? templateToRendererName(xmluiProp);
+      const ctxDef = rendererConfig.contextVars;
+
+      if (typeof ctxDef === "function") {
+        props[reactProp] = (...args: any[]) => (
+          <MemoizedItem
+            node={template}
+            contextVars={ctxDef(...args)}
+            renderChild={renderChild}
+          />
+        );
+      } else {
+        props[reactProp] = (...args: any[]) => {
+          const contextVars: Record<string, any> = {};
+          for (let i = 0; i < ctxDef.length; i++) {
+            const name = ctxDef[i];
+            if (name !== null) {
+              contextVars[name] = args[i];
+            }
+          }
+          return (
+            <MemoizedItem
+              node={template}
+              contextVars={contextVars}
+              renderChild={renderChild}
+            />
+          );
+        };
+      }
+    }
+
+    // --- Content class name for portal components ---
+    if (config.contentClassName) {
+      props.contentClassName = classes?.[COMPONENT_PART_KEY];
     }
 
     // --- Forward all remaining node.props ---
