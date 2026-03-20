@@ -142,6 +142,13 @@ export type WrapComponentConfig = {
   exposeRegisterApi?: boolean;
 
   /**
+   * When true, passes `node.uid` as the `uid` prop to the native component.
+   * Use for components that need their XMLUI id as an HTML anchor / DOM id
+   * (e.g., Bookmark).
+   */
+  passUid?: boolean;
+
+  /**
    * Props holding XMLUI component definitions (valueType: "ComponentDef")
    * that should be rendered as React nodes via renderChild and passed to
    * the native component.
@@ -472,6 +479,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     ...Object.keys(templateMap),
     ...Object.keys(rendererConfigs),
     "id", // handled separately via className/node
+    "ref", // XMLUI ref attribute — must never be forwarded as a React string ref
     // Layout props are handled by the layout resolver and applied via CSS className.
     // They must not be forwarded to the native component as React props, because that
     // would pass raw XMLUI theme variable strings (e.g. "$textColor-secondary") to DOM
@@ -532,6 +540,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     props.classes = classes;
     if (config.exposeRegisterApi) {
       props.registerComponentApi = registerComponentApi;
+    }
+    if (config.passUid) {
+      props.uid = extractValue(node.uid);
     }
 
     if (isStateful) {
@@ -829,6 +840,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     ...Object.keys(templateMap),
     ...Object.keys(rendererConfigs),
     "id",
+    "ref",
     ...filteredLayoutKeysCompound,
     // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
     ...filteredLayoutKeysCompound.flatMap((key) =>

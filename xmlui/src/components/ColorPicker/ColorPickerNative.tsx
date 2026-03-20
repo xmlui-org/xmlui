@@ -135,7 +135,7 @@ export const ColorPicker = forwardRef(
             [styles.valid]: validationStatus === "valid",
           })}
           style={style}
-          disabled={!enabled}
+          disabled={!enabled || readOnly}
           onFocus={handleOnFocus}
           onChange={onInputChange}
           readOnly={readOnly}
