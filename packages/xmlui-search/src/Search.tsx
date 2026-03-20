@@ -11,6 +11,7 @@ import {
   Fragment,
   type ForwardedRef,
 } from "react";
+import { flushSync } from "react-dom";
 import {
   LinkNative,
   Text,
@@ -116,7 +117,16 @@ export const Search = ({
     if (useDrawer) {
       document.body.setAttribute("data-search-overlay-open", "true");
     }
-    setIsOverlayOpen(true);
+    // flushSync forces React to render the overlay synchronously so inputRef is populated
+    // before we call focus(), keeping us within the user gesture context on mobile
+    flushSync(() => {
+      setIsOverlayOpen(true);
+    });
+    // Focus the native <input> directly (not the wrapper div) to reliably trigger
+    // the virtual keyboard on mobile — the div relay goes through React events and
+    // loses the gesture context on iOS Safari
+    const nativeInput = inputRef.current?.querySelector?.("input") ?? inputRef.current;
+    nativeInput?.focus({ preventScroll: true });
   }, [useDrawer]);
 
   const closeOverlay = useCallback(() => {
@@ -127,14 +137,7 @@ export const Search = ({
     setActiveIndex(-1);
   }, []);
 
-  // Auto-focus the input when the overlay opens
-  useEffect(() => {
-    if (isOverlayOpen) {
-      setTimeout(() => inputRef.current?.focus({ preventScroll: true }), 50);
-    }
-  }, [isOverlayOpen]);
-
-  const [inputValue, setInputValue] = useState("");
+const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
   // E — Pagination state
@@ -432,24 +435,6 @@ export const Search = ({
     </div>
   );
 
-  const footerJsx = (
-    <footer className={styles.panelFooter}>
-      <div>
-        <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
-        <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
-        <Text>Navigate</Text>
-      </div>
-      <div style={{ flex: "1" }}>
-        <Text variant="keyboard">Enter</Text>
-        <Text>Select</Text>
-      </div>
-      <div>
-        <Text variant="keyboard">Esc</Text>
-        <Text>Close</Text>
-      </div>
-    </footer>
-  );
-
   // G — Overlay mode render
   if (useOverlay) {
     return (
@@ -545,7 +530,6 @@ export const Search = ({
                     {loadMoreJsx}
                   </>
                 )}
-                {footerJsx}
               </div>
             </div>
           </div>, document.body
@@ -716,7 +700,6 @@ export const Search = ({
                 {resultsListJsx}
               </ul>
               {loadMoreJsx}
-              {footerJsx}
             </PopoverContent>
           </Portal>
         )}

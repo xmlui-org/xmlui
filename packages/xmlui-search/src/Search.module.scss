@@ -104,20 +104,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 
 }
 
-.panelFooter {
-  display: flex;
-  padding: 0.75rem 1.25rem;
-  border-top: 1px solid $borderColor-SearchFooter;
-  background-color: $backgroundColor-SearchFooter;
-  gap: 1em;
-
-  & > div {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-}
-
 .list {
   background-color: $backgroundColor-Search;
   max-height: 360px;
@@ -450,13 +436,14 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 
 .overlayPanel {
   background: $backgroundColor-SearchOverlayPanel;
-  width: 640px;
+  width: 680px;
   max-width: calc(100vw - 2rem);
   display: flex;
   flex-direction: column;
   box-shadow: $boxShadow-SearchOverlayPanel;
   position: fixed;
   top: 20vh;
+  border-radius: t.$space-2_5;
 
   @media (max-width: 600px) {
     border-radius: 0;
@@ -474,7 +461,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--xmlui-borderColor);
 
   .overlaySearchIcon {
     flex-shrink: 0;
