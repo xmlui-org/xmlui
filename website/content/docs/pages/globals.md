@@ -463,6 +463,27 @@ Alias for `clearLocalStorage`. Removes `localStorage` entries; recommended name 
 />
 ```
 
+### `storageTimestamp`
+
+```ts
+get storageTimestamp: number;
+```
+
+A read-only value that is updated to `Date.now()` after every `localStorage` mutation performed via the XMLUI storage functions (`writeLocalStorage`, `deleteLocalStorage`, `clearLocalStorage`, `resetLocalStorage`) and the App `persistTheme` feature. Starts at `0` on page load (no mutations yet).
+
+Use it with `ChangeListener` to reactively respond to any storage change:
+
+```xmlui
+<App var.storageContent="">
+  <ChangeListener
+    listenTo="{storageTimestamp}"
+    onDidChange="storageContent = JSON.stringify(getAllLocalStorage(), null, 2)"
+  />
+  <Button label="Save" onClick="writeLocalStorage('prefs.theme', 'dark')" />
+  <Text>{storageContent}</Text>
+</App>
+```
+
 ### `writeLocalStorage`
 
 ```ts

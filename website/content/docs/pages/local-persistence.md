@@ -179,18 +179,6 @@ Call `resetLocalStorage()` to wipe all localStorage entries, or pass a prefix to
 
 `resetLocalStorage` removes the entry from localStorage but does not automatically reset the in-memory variable — set it explicitly if you want the UI to reflect the default immediately (as shown above).
 
-### Via URL: `?xmlui-reset`
-
-Navigate to the app with `?xmlui-reset` appended. XMLUI clears localStorage *before* rendering starts — an effective escape hatch even when a bad persisted value prevents the app from loading at all:
-
-| URL | Effect |
-|---|---|
-| `https://myapp.com/?xmlui-reset` | Clear **all** localStorage for this app |
-| `https://myapp.com/?xmlui-reset=count` | Clear only the `count` entry |
-| `https://myapp.com/?xmlui-reset=myApp.v1` | Clear all entries whose key starts with `myApp.v1` |
-
-The parameter is self-removing via `history.replaceState` — it fires exactly once and is not visible in the URL afterwards.
-
 ### From the browser console
 
 Two console helpers are available on `window`:

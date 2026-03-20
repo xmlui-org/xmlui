@@ -3718,3 +3718,279 @@ test.describe("Api", () => {
     expect(data.lastName).toEqual("Rose");
   });
 });
+
+// =============================================================================
+// FORM PERSISTENCE (persist / storageKey / doNotPersistFields / keepOnCancel)
+// =============================================================================
+
+test.describe("Form persistence — localStorage temporary save", () => {
+  test("persist saves form data to localStorage as user types", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+
+    // Wait for the autosave to fire
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form"));
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.name).toBe("Alice");
+  });
+
+  test("persist restores saved form data on reload", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-reload", JSON.stringify({ name: "Bob" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-reload">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await expect(nameInput.field).toHaveValue("Bob");
+  });
+
+  test("persist clears localStorage on successful submit", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-submit", JSON.stringify({ name: "Carol" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-submit"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // After submit, localStorage entry should be gone
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-submit"));
+    expect(stored).toBeNull();
+  });
+
+  test("keepOnCancel=false (default) clears localStorage on cancel", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-cancel-default", JSON.stringify({ name: "Dave" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-cancel-default">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-cancel-default"));
+    expect(stored).toBeNull();
+  });
+
+  test("keepOnCancel=true keeps localStorage on cancel", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-keep", JSON.stringify({ name: "Eve" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-keep" keepOnCancel="true">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-keep"));
+    expect(stored).not.toBeNull();
+  });
+
+  test("keepOnCancel=false explicitly clears localStorage on cancel", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-cancel", JSON.stringify({ name: "Dave" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-cancel" keepOnCancel="false">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-cancel"));
+    expect(stored).toBeNull();
+  });
+
+  test("doNotPersistFields excludes specified fields from localStorage save", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-exclude"
+            doNotPersistFields="{['secret']}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+        <FormItem label="Secret" bindTo="secret" testId="secretField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    const secretItem = await createFormItemDriver("secretField");
+    const secretInput = await createTextBoxDriver(secretItem.input);
+    await nameInput.field.fill("Frank");
+    await secretInput.field.fill("password123");
+
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-exclude"));
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.name).toBe("Frank");
+    expect(parsed.secret).toBeUndefined();
+  });
+
+  test("when persist is not set, no localStorage entry is created", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" storageKey="test-form-no-persist">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Grace");
+
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-no-persist"));
+    expect(stored).toBeNull();
+  });
+});
+
+// =============================================================================
+// dataAfterSubmit PROPERTY
+// =============================================================================
+
+test.describe("dataAfterSubmit property", () => {
+  test('"keep" (default) preserves submitted data in the form', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("Alice");
+  });
+
+  test('"reset" restores the form to its initial data after submit', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="reset"
+            data="{ {name: 'Initial'} }"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Changed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("Initial");
+  });
+
+  test('"clear" empties the form after submit', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="clear"
+            data="{ {name: 'Initial'} }"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Changed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("");
+  });
+
+  test('"clear" empties form even when no data prop is set', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="clear" onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Typed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("");
+  });
+});

@@ -59,7 +59,6 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
@@ -81,29 +80,13 @@ const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
 /**
  * Registers `globalThis.XMLUI_RESET_STORAGE` and `globalThis.XMLUI_GET_STORAGE`
- * console helpers and processes the `?xmlui-reset` URL escape hatch.
+ * console helpers.
  *
  * Called once at module-init time when a browser environment is detected.
  * Extracted into a function so the SSR guard is a single top-level check.
  */
 function initStorageGlobals(): void {
-  // Primary: URL query parameter  ?xmlui-reset[=prefix]
-  const _resetParams = new URLSearchParams(globalThis.location.search);
-  const _resetValue = _resetParams.get("xmlui-reset");
-  if (_resetValue !== null) {
-    clearLocalStorage(_resetValue === "" || _resetValue === "true" ? undefined : _resetValue);
-    _resetParams.delete("xmlui-reset");
-    const _newSearch = _resetParams.toString();
-    globalThis.history.replaceState(
-      null,
-      "",
-      globalThis.location.pathname +
-        (_newSearch ? "?" + _newSearch : "") +
-        globalThis.location.hash,
-    );
-  }
-
-  // Secondary: globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
+  // globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
   // Clears the matching localStorage entries and reloads the page.
   (globalThis as any).XMLUI_RESET_STORAGE = (key?: string) => {
     clearLocalStorage(key);

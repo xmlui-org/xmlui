@@ -55,6 +55,11 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import { Part } from "../Part/Part";
 import { MemoizedItem } from "../container-helpers";
 import type { RequireLabelMode } from "../abstractions";
+import {
+  deleteLocalStorage,
+  readLocalStorage,
+  writeLocalStorage,
+} from "../../components-core/appContext/local-storage-functions";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -274,6 +279,13 @@ type Props = {
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  persist?: boolean;
+  storageKey?: string;
+  doNotPersistFields?: string[];
+  keepOnCancel?: boolean;
+  onPersistClear?: () => void;
+  dataAfterSubmit?: "keep" | "reset" | "clear";
+  onClearAfterSubmit?: () => void;
 };
 
 export const defaultProps: Pick<
@@ -291,6 +303,8 @@ export const defaultProps: Pick<
   | "itemRequireLabelMode"
   | "validationIconSuccess"
   | "validationIconError"
+  | "keepOnCancel"
+  | "dataAfterSubmit"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
@@ -305,6 +319,8 @@ export const defaultProps: Pick<
   itemRequireLabelMode: "markRequired",
   validationIconSuccess: "checkmark",
   validationIconError: "error",
+  keepOnCancel: false,
+  dataAfterSubmit: "keep" as const,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -354,6 +370,13 @@ const Form = forwardRef(function (
     verboseValidationFeedback,
     validationIconSuccess = defaultProps.validationIconSuccess,
     validationIconError = defaultProps.validationIconError,
+    persist,
+    storageKey,
+    doNotPersistFields,
+    keepOnCancel = defaultProps.keepOnCancel,
+    onPersistClear,
+    dataAfterSubmit = defaultProps.dataAfterSubmit,
+    onClearAfterSubmit,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -361,6 +384,9 @@ const Form = forwardRef(function (
   const formRef = useRef<HTMLFormElement>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
+
+  // Resolve the effective storage key for persistence
+  const persistKey = persist ? (storageKey || id || "form-data") : undefined;
 
   const isEnabled = enabled && !formState.submitInProgress;
   const isDirty = useMemo(() => {
@@ -405,6 +431,10 @@ const Form = forwardRef(function (
   ]);
 
   const doCancel = useEvent(() => {
+    if (persistKey && !keepOnCancel) {
+      deleteLocalStorage(persistKey);
+      onPersistClear?.();
+    }
     onCancel?.();
     void requestModalFormClose();
   });
@@ -488,16 +518,28 @@ const Form = forwardRef(function (
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
+      // Clear any persisted form data after successful submit
+      if (persistKey) {
+        deleteLocalStorage(persistKey);
+        onPersistClear?.();
+      }
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
         void requestModalFormClose();
       }
-      // we only reset the form automatically if the initial value is empty ()
-      if (initialValue === EMPTY_OBJECT) {
+      if (dataAfterSubmit === "reset") {
         flushSync(() => {
           doReset();
         });
+      } else if (dataAfterSubmit === "clear") {
+        flushSync(() => {
+          onClearAfterSubmit?.();
+          doReset();
+        });
+      } else {
+        // "keep" (default): fire the reset event (backward compat) without resetting form state
+        onReset?.();
       }
       if (prevFocused && typeof (prevFocused as HTMLElement).focus === "function") {
         (prevFocused as HTMLElement).focus();
@@ -596,6 +638,37 @@ const Form = forwardRef(function (
     return isDirty;
   }, [isDirty]);
 
+  // Load persisted form data on mount when persist is enabled
+  useEffect(() => {
+    if (!persistKey) return;
+    const saved = readLocalStorage(persistKey);
+    if (saved && typeof saved === "object") {
+      Object.entries(saved).forEach(([key, value]) => {
+        dispatch({
+          type: FormActionKind.FIELD_VALUE_CHANGED,
+          payload: { uid: key, value },
+        });
+      });
+    }
+    // Run only on mount (persistKey should not change)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persistKey]);
+
+  // Autosave form data to localStorage whenever subject changes and persist is enabled
+  useEffect(() => {
+    if (!persistKey) return;
+    if (Object.keys(formState.subject).length === 0) return;
+    const dataToSave = Object.entries(formState.subject).reduce(
+      (acc, [key, value]) => {
+        if (!key.endsWith(UNBOUND_FIELD_SUFFIX) && !(doNotPersistFields?.includes(key))) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+    writeLocalStorage(persistKey, dataToSave);
+  }, [persistKey, formState.subject, doNotPersistFields]);
 
   useEffect(() => {
     registerComponentApi?.({
@@ -694,6 +767,16 @@ export const FormWithContextVar = forwardRef(function (
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
+  // Track which resetVersion was triggered by a "clear" submit so that
+  // effectiveInitialValue stays EMPTY_OBJECT for that cycle (and won't flip
+  // back, which would cause FormItem re-initialization to restore old data).
+  const [clearedAtResetVersion, setClearedAtResetVersion] = useState<number | null>(null);
+
+  // Build a stable callback that captures the *current* resetVersion so that
+  // when called inside flushSync it sets the correct target version.
+  const handleClearAfterSubmit = useCallback(() => {
+    setClearedAtResetVersion((formState.resetVersion ?? 0) + 1);
+  }, [formState.resetVersion]);
 
   const $data = useMemo(() => {
     const updateData = (change: any) => {
@@ -724,9 +807,15 @@ export const FormWithContextVar = forwardRef(function (
     };
   }, [$data, node.children]);
 
-  const initialValue = extractValue(node.props.data);
+  const rawInitialValue = extractValue(node.props.data);
+  // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.
+  // Once the user triggers another reset the versions differ and raw data is restored.
+  const effectiveInitialValue =
+    clearedAtResetVersion !== null && clearedAtResetVersion === formState.resetVersion
+      ? EMPTY_OBJECT
+      : rawInitialValue;
   const submitMethod =
-    extractValue.asOptionalString(node.props.submitMethod) || (initialValue ? "put" : "post");
+    extractValue.asOptionalString(node.props.submitMethod) || (rawInitialValue ? "put" : "post");
   const inProgressNotificationMessage =
     extractValue.asOptionalString(node.props.inProgressNotificationMessage) || "";
   const completedNotificationMessage =
@@ -791,7 +880,7 @@ export const FormWithContextVar = forwardRef(function (
             $data,
           },
         })}
-        initialValue={initialValue}
+        initialValue={effectiveInitialValue}
         buttonRow={
           node.props.buttonRowTemplate ? (
             <MemoizedItem
@@ -804,6 +893,12 @@ export const FormWithContextVar = forwardRef(function (
           ) : undefined
         }
         registerComponentApi={registerComponentApi}
+        persist={!!extractValue.asOptionalString(node.props.persist) || extractValue.asOptionalBoolean(node.props.persist)}
+        storageKey={extractValue.asOptionalString(node.props.storageKey)}
+        doNotPersistFields={extractValue(node.props.doNotPersistFields) as string[] | undefined}
+        keepOnCancel={extractValue.asOptionalBoolean(node.props.keepOnCancel)}
+        dataAfterSubmit={extractValue.asOptionalString(node.props.dataAfterSubmit) as "keep" | "reset" | "clear" | undefined}
+        onClearAfterSubmit={handleClearAfterSubmit}
         enabled={
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
           !extractValue.asOptionalBoolean((node.props as any).loading, false)

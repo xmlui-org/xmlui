@@ -28,7 +28,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
-import { localStorageFunctions } from "../appContext/local-storage-functions";
+import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -96,7 +96,15 @@ export function AppContent({
   // Note: Startup trace initialization happens during render (near xsVerbose definition)
   // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
-  
+
+  // Bumped to Date.now() on every localStorage mutation — allows markup to react
+  // to storage changes via ChangeListener listenTo="{storageTimestamp}"
+  const [storageTimestamp, setStorageTimestamp] = useState<number>(0);
+  useEffect(() => {
+    setStorageChangeListener(() => setStorageTimestamp(Date.now()));
+    return () => setStorageChangeListener(null);
+  }, []);
+
   // --- Navigation event handlers state
   const [navigationHandlers, setNavigationHandlersState] = useState<{
     onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
@@ -973,6 +981,7 @@ export function AppContent({
 
       // --- Local storage utilities
       ...localStorageFunctions,
+      storageTimestamp,
 
       // --- File Utilities
       formatFileSizeInBytes,
@@ -1047,6 +1056,7 @@ export function AppContent({
     root,
     AppState,
     pubSubService,
+    storageTimestamp,
   ]);
 
   return (

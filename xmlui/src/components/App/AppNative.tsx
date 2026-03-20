@@ -36,6 +36,7 @@ import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { writeLocalStorage } from "../../components-core/appContext/local-storage-functions";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -261,23 +262,16 @@ export function App({
     setActiveThemeId,
   });
 
-  // Persist tone and theme ID to localStorage whenever they change (when persistTheme is true)
+  // Persist tone and theme ID to localStorage whenever they change (when persistTheme is true).
+  // Use writeLocalStorage so that storageTimestamp is updated and ChangeListener consumers are notified.
   useEffect(() => {
     if (!persistTheme) return;
-    try {
-      localStorage.setItem(toneStorageKey, JSON.stringify(activeThemeTone));
-    } catch {
-      // QuotaExceededError / SecurityError — degrade gracefully
-    }
+    writeLocalStorage(toneStorageKey, activeThemeTone);
   }, [persistTheme, toneStorageKey, activeThemeTone]);
 
   useEffect(() => {
     if (!persistTheme) return;
-    try {
-      localStorage.setItem(themeStorageKey, JSON.stringify(activeThemeId));
-    } catch {
-      // QuotaExceededError / SecurityError — degrade gracefully
-    }
+    writeLocalStorage(themeStorageKey, activeThemeId);
   }, [persistTheme, themeStorageKey, activeThemeId]);
 
   useEffect(() => {
