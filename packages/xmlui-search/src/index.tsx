@@ -111,33 +111,26 @@ export const SearchMd: ComponentMetadata = createMetadata({
     [`textColor-${COMP_TOGGLE_BUTTON}--hover`]: "$color-secondary-700",
     [`backgroundColor-${COMP_TOGGLE_BUTTON}--hover`]: "transparent",
 
-    // A — Zero-results UX
     [`textColor-${COMP_NO_RESULTS}`]: "$color-secondary-700",
     [`backgroundColor-${COMP_NO_RESULTS}Chip`]: "$color-surface-100",
     [`textColor-${COMP_NO_RESULTS}Chip`]: "$color-secondary-700",
 
-    // B — Enhanced Result Previews
     [`backgroundColor-${COMP_CATEGORY_BADGE}`]: "$color-primary-100",
     [`textColor-${COMP_CATEGORY_BADGE}`]: "$color-primary-700",
 
-    // C — Faceted Filters
     [`backgroundColor-${COMP_FILTER_CHIP}`]: "$color-surface-50",
     [`backgroundColor-${COMP_FILTER_CHIP}--active`]: "$color-primary-500",
     [`textColor-${COMP_FILTER_CHIP}`]: "$color-secondary-700",
     [`textColor-${COMP_FILTER_CHIP}--active`]: "$color-surface-0",
     [`borderRadius-${COMP_FILTER_CHIP}`]: "9999px",
 
-    // D — Sorting Controls
     [`backgroundColor-${COMP_SORT_BUTTON}--active`]: "$color-secondary-200",
     [`textColor-${COMP_SORT_BUTTON}--active`]: "$color-secondary-900",
 
-    // E — Pagination
     [`textColor-${COMP_RESULT_COUNT}`]: "$color-secondary-500",
 
-    // F — Did You Mean
     [`textColor-${COMP_DID_YOU_MEAN}`]: "$color-secondary-700",
 
-    // G — Overlay
     [`backgroundColor-${COMP_OVERLAY}`]: "rgba(0, 0, 0, 0.45)",
     [`backgroundColor-${COMP_OVERLAY_PANEL}`]: "$color-surface-0",
     [`borderRadius-${COMP_OVERLAY_PANEL}`]: "12px",

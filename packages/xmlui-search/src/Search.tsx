@@ -42,20 +42,13 @@ type Props = {
   collapsible?: boolean;
   placeholder?: string;
   className?: string;
-  // A — Zero-results UX
   suggestedQueries?: string[];
   noResultsMessage?: string;
-  // B — Enhanced Result Previews
   showPreviewMetadata?: boolean;
-  // C — Faceted Category Filters
   defaultSelectedCategories?: string[];
-  // D — Sorting & Relevancy Controls
   defaultSortOrder?: "relevance" | "date";
-  // E — Pagination / Load More
   pageSize?: number;
-  // F — Did You Mean
   enableSpellCorrection?: boolean;
-  // G — Display mode
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
    *  "inline": the current expand-in-place animation inside the navbar.
    *  "drawer": renders results inline below the input, no portal — safe inside a modal drawer. */
@@ -86,7 +79,6 @@ export const Search = ({
   enableSpellCorrection = true,
   mode = "overlay",
 }: Props) => {
-  // G — overlay mode is active whenever mode="overlay"
   const useOverlay = mode === "overlay";
   const useDrawer = mode === "drawer";
   const _id = useId();
@@ -102,7 +94,6 @@ export const Search = ({
     null,
   );
 
-  // G — overlay open state
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [drawerOverlayTop, setDrawerOverlayTop] = useState(0);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -138,16 +129,13 @@ export const Search = ({
 const [inputValue, setInputValue] = useState("");
   const debouncedValue = useDeferredValue(inputValue);
 
-  // E — Pagination state
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
 
-  // C — Category filter state
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     () => new Set(defaultSelectedCategories ?? []),
   );
 
-  // D — Sort order state
   const [sortOrder, setSortOrder] = useState<"relevance" | "date">(defaultSortOrder);
 
   // --- Merge data, do search, postprocess results
@@ -164,7 +152,6 @@ const [inputValue, setInputValue] = useState("");
     setSelectedCategories(new Set(defaultSelectedCategories ?? []));
   }, [debouncedValue]);
 
-  // C — Derive available categories from all results
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
     for (const r of allResults) {
@@ -173,7 +160,6 @@ const [inputValue, setInputValue] = useState("");
     return Array.from(cats);
   }, [allResults]);
 
-  // C — Filter results by selected categories
   const categoryFilteredResults = useMemo(() => {
     if (selectedCategories.size === 0) return allResults;
     return allResults.filter((r) =>
@@ -181,7 +167,6 @@ const [inputValue, setInputValue] = useState("");
     );
   }, [allResults, selectedCategories]);
 
-  // D — Sort filtered results
   const sortedResults = useMemo(() => {
     if (sortOrder === "relevance") return categoryFilteredResults;
     return [...categoryFilteredResults].sort((a, b) => {
@@ -196,7 +181,6 @@ const [inputValue, setInputValue] = useState("");
     });
   }, [categoryFilteredResults, sortOrder]);
 
-  // E — Paginate sorted results
   const results = useMemo(
     () => sortedResults.slice(0, page * effectivePageSize),
     [sortedResults, page, effectivePageSize],
@@ -324,7 +308,6 @@ const [inputValue, setInputValue] = useState("");
     }
   }, [activeIndex, navigationSource]);
 
-  // C — Toggle category filter
   const toggleCategory = useCallback((cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
@@ -421,7 +404,6 @@ const [inputValue, setInputValue] = useState("");
     </div>
   );
 
-  // G — Overlay mode render
   if (useOverlay) {
     return (
       <span className={className}>
@@ -524,7 +506,6 @@ const [inputValue, setInputValue] = useState("");
     );
   }
 
-  // G — Drawer mode: same as overlay but trigger stays in DOM (Sheet stays open)
   if (useDrawer) {
     return (
       <span className={className} style={{ display: "block" }}>
@@ -611,7 +592,6 @@ const [inputValue, setInputValue] = useState("");
     );
   }
 
-  // G — Inline / Popover mode (original behavior)
   return (
     <span className={className}>
       <Popover open={show} onOpenChange={setShow}>
@@ -1150,7 +1130,6 @@ const FUSE_SEARCH_OPTIONS: IFuseOptions<SearchItemData> = {
   ],
 };
 
-// F — Relaxed Fuse options for "did you mean" spell correction
 const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
   includeScore: true,
   shouldSort: true,
@@ -1169,7 +1148,6 @@ function useSearch(
   enableSpellCorrection: boolean,
 ): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
   const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS));
-  // F — Separate Fuse instance for spell correction suggestions
   const relaxedFuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS));
 
   // --- Convert data to a format better handled by the search engine
@@ -1214,13 +1192,11 @@ function useSearch(
       return { results: [], totalCount: 0, suggestion: null };
     }
 
-    // E — fetch more than limit to support load-more pagination
     const fetchLimit = Math.min(limit * 10, 200);
     const raw = fuseRef.current.search(query, { limit: fetchLimit });
     const mapped = postProcessSearch(raw, query);
     const grouped = groupAndSortByCategory(mapped);
 
-    // F — "Did you mean" suggestion: run only when exact search yields no results
     let suggestion: string | null = null;
     if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
       const relaxed = relaxedFuseRef.current.search(query, { limit: 1 });
@@ -1262,7 +1238,6 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
-// D — date field added to SearchItemData
 type SearchItemData = { path: string; title: string; content: string; category?: string; date?: string | number };
 function isSearchItemDataArray(data: any): data is SearchItemData[] {
   return (

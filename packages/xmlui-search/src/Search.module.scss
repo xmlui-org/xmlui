@@ -44,30 +44,24 @@ $textColor-SearchToggleButton: createThemeVar("textColor-#{$componentButton}");
 $textColor-SearchToggleButton--hover: createThemeVar("textColor-#{$componentButton}--hover");
 $backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$componentButton}--hover");
 
-// A — Zero-results UX
 $textColor-SearchNoResults: createThemeVar("textColor-SearchNoResults");
 $backgroundColor-SearchNoResultsChip: createThemeVar("backgroundColor-SearchNoResultsChip");
 $textColor-SearchNoResultsChip: createThemeVar("textColor-SearchNoResultsChip");
 
-// B — Enhanced Result Previews
 $backgroundColor-SearchCategoryBadge: createThemeVar("backgroundColor-SearchCategoryBadge");
 $textColor-SearchCategoryBadge: createThemeVar("textColor-SearchCategoryBadge");
 
-// C — Faceted Category Filters
 $backgroundColor-SearchFilterChip: createThemeVar("backgroundColor-SearchFilterChip");
 $backgroundColor-SearchFilterChip--active: createThemeVar("backgroundColor-SearchFilterChip--active");
 $textColor-SearchFilterChip: createThemeVar("textColor-SearchFilterChip");
 $textColor-SearchFilterChip--active: createThemeVar("textColor-SearchFilterChip--active");
 $borderRadius-SearchFilterChip: createThemeVar("borderRadius-SearchFilterChip");
 
-// D — Sorting Controls
 $backgroundColor-SearchSortButton--active: createThemeVar("backgroundColor-SearchSortButton--active");
 $textColor-SearchSortButton--active: createThemeVar("textColor-SearchSortButton--active");
 
-// E — Pagination
 $textColor-SearchResultCount: createThemeVar("textColor-SearchResultCount");
 
-// F — Did You Mean
 $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 
 // Keyframe animations for collapsible search
@@ -241,7 +235,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   align-items: center;
 }
 
-// A — Zero-results UX
 .noResultsPanel {
   padding: 1rem 0.75rem;
   display: flex;
@@ -279,7 +272,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
-// B — Enhanced Result Previews
 .previewMetadata {
   display: flex;
   align-items: center;
@@ -312,7 +304,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
-// C — Faceted Category Filters & D — Sort Control shared wrapper
 .panelControls {
   display: flex;
   align-items: center;
@@ -347,7 +338,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
-// D — Sort Control
 .sortControl {
   display: flex;
   align-items: center;
@@ -380,7 +370,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
-// E — Load More row
 .loadMoreRow {
   display: flex;
   align-items: center;
@@ -409,7 +398,6 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 }
 
-// G — Overlay mode
 $backgroundColor-SearchOverlay: createThemeVar("backgroundColor-SearchOverlay");
 $backgroundColor-SearchOverlayPanel: createThemeVar("backgroundColor-SearchOverlayPanel");
 $borderRadius-SearchOverlayPanel: createThemeVar("borderRadius-SearchOverlayPanel");
@@ -566,7 +554,6 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 }
 
 
-// F — Did You Mean banner
 .didYouMeanBanner {
   display: flex;
   align-items: center;
