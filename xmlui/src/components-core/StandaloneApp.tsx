@@ -59,10 +59,9 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
-import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
+import { clearLocalStorage, getAllLocalStorage, markStorageResetBeforeListenerSetup } from "./appContext/local-storage-functions";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -92,6 +91,8 @@ function initStorageGlobals(): void {
   const _resetValue = _resetParams.get("xmlui-reset");
   if (_resetValue !== null) {
     clearLocalStorage(_resetValue === "" || _resetValue === "true" ? undefined : _resetValue);
+    // Mark that a reset occurred so AppContent can update storageTimestamp when its listener is set up.
+    markStorageResetBeforeListenerSetup();
     _resetParams.delete("xmlui-reset");
     const _newSearch = _resetParams.toString();
     globalThis.history.replaceState(

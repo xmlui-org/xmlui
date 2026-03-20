@@ -282,6 +282,12 @@ export type AppContextObject = {
   // where possible. Non-JSON values are returned as raw strings.
   getAllLocalStorage: () => Record<string, any>;
 
+  // Timestamp (Date.now()) of the last localStorage mutation performed via the XMLUI
+  // storage functions. Starts at 0 (no mutations since page load). Use with ChangeListener
+  // to reactively respond to any storage change:
+  //   <ChangeListener listenTo="{storageTimestamp}" onChange="..." />
+  storageTimestamp: number;
+
   // ==============================================================================================
   // AppState Global State Management
 

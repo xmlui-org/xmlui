@@ -265,3 +265,106 @@ test.describe("<global> storageKey — persistence and initialisation", () => {
     expect(stored.v1.lang).toBe("fr");
   });
 });
+
+test.describe("storageTimestamp — reactive notification on mutations", () => {
+  test("storageTimestamp starts at 0 before any mutation", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="ts">{storageTimestamp}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("ts")).toHaveText("0");
+  });
+
+  test("storageTimestamp updates after writeLocalStorage", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="ts">{storageTimestamp}</Text>
+        <Button testId="write" label="Write" onClick="writeLocalStorage('x', 42)" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("ts")).toHaveText("0");
+    await page.getByTestId("write").click();
+    // storageTimestamp should now be a non-zero number (Date.now())
+    const ts = await page.getByTestId("ts").textContent();
+    expect(Number(ts)).toBeGreaterThan(0);
+  });
+
+  test("storageTimestamp updates after deleteLocalStorage", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("myKey", JSON.stringify("hello"));
+    });
+
+    await initTestBed(
+      `
+      <App>
+        <Text testId="ts">{storageTimestamp}</Text>
+        <Button testId="del" label="Delete" onClick="deleteLocalStorage('myKey')" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("ts")).toHaveText("0");
+    await page.getByTestId("del").click();
+    const ts = await page.getByTestId("ts").textContent();
+    expect(Number(ts)).toBeGreaterThan(0);
+  });
+
+  test("storageTimestamp updates after clearLocalStorage", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("a", JSON.stringify(1));
+    });
+
+    await initTestBed(
+      `
+      <App>
+        <Text testId="ts">{storageTimestamp}</Text>
+        <Button testId="clear" label="Clear" onClick="clearLocalStorage()" />
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("ts")).toHaveText("0");
+    await page.getByTestId("clear").click();
+    const ts = await page.getByTestId("ts").textContent();
+    expect(Number(ts)).toBeGreaterThan(0);
+  });
+
+  test("ChangeListener with storageTimestamp triggers on storage mutation", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <App var.storageContent="none">
+        <ChangeListener
+          listenTo="{storageTimestamp}"
+          onDidChange="storageContent = JSON.stringify(getAllLocalStorage(), null, 2);"
+        />
+        <Button testId="write" label="Write" onClick="writeLocalStorage('greeting', 'hello')" />
+        <Text testId="content">{storageContent}</Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("content")).toHaveText("none");
+    await page.getByTestId("write").click();
+
+    // After the write, ChangeListener fires and storageContent is updated to JSON
+    await expect(page.getByTestId("content")).not.toHaveText("none");
+    const content = await page.getByTestId("content").textContent();
+    const parsed = JSON.parse(content!);
+    expect(parsed.greeting).toBe("hello");
+  });
+});
