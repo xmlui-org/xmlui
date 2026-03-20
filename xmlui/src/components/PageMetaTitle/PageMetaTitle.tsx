@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { PageMetaTitle, defaultProps } from "./PageMetaTilteNative";
 
@@ -17,10 +17,8 @@ export const PageMetaTitleMd = createMetadata({
   },
 });
 
-export const pageMetaTitleComponentRenderer = createComponentRenderer(
-  COMP,
-  PageMetaTitleMd,
-  ({ node, extractValue, renderChild }) => {
-    return <PageMetaTitle title={extractValue(node.props.value) || renderChild(node.children)} />;
-  },
-);
+export const pageMetaTitleComponentRenderer = wrapComponent(COMP, PageMetaTitle, PageMetaTitleMd, {
+  customRender: (_props, { node, extractValue, renderChild }) => (
+    <PageMetaTitle title={extractValue(node.props.value) || renderChild(node.children)} />
+  ),
+});

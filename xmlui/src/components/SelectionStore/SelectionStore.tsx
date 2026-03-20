@@ -6,6 +6,7 @@ const COMP = "SelectionStore";
 
 export const SelectionStoreMd = createMetadata({
   status: "deprecated",
+  deprecationMessage: `The \`${COMP}\` component is deprecated and will be removed in a future release.`,
   description:
     `The \`${COMP}\` is a non-visual component that may wrap components (items) and manage ` +
     `their selection state to accommodate the usage of other actions.`,
