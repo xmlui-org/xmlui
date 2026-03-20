@@ -1,18 +1,10 @@
 import styles from "./Accordion.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import {
-  createMetadata,
-  dCollapse,
-  dDidChange,
-  dExpand,
-  dExpanded,
-  dFocus,
-} from "../../components/metadata-helpers";
+import { createMetadata, dFocus } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
 import { AccordionComponent, defaultProps } from "./AccordionNative";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Accordion";
 
@@ -107,23 +99,4 @@ export const AccordionMd = createMetadata({
   },
 });
 
-export const accordionComponentRenderer = createComponentRenderer(
-  COMP,
-  AccordionMd,
-  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
-    return (
-      <AccordionComponent
-        classes={classes}
-        triggerPosition={extractValue(node.props?.triggerPosition)}
-        collapsedIcon={extractValue(node.props.collapsedIcon)}
-        expandedIcon={extractValue(node.props.expandedIcon)}
-        hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
-        rotateExpanded={extractValue(node.props.rotateExpanded)}
-        onDisplayDidChange={lookupEventHandler("displayDidChange")}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </AccordionComponent>
-    );
-  },
-);
+export const accordionComponentRenderer = wrapComponent(COMP, AccordionComponent, AccordionMd);
