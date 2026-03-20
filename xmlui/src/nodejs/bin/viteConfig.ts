@@ -1,5 +1,5 @@
 import { createLogger, defineConfig } from "vite";
-import type { UserConfig } from "vite";
+import type { UserConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
@@ -36,7 +36,7 @@ export async function getViteConfig({
   }
 
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])] as any,
+    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}) as Plugin, ...(overrides.plugins || [])],
     customLogger: logger,
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
