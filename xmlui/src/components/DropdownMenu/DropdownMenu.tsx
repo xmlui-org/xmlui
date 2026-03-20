@@ -2,6 +2,7 @@ import styles from "./DropdownMenu.module.scss";
 import React from "react";
 
 import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -354,6 +355,9 @@ export const ThemedMenuSeparator = React.forwardRef<HTMLDivElement, ThemedMenuSe
   },
 );
 
-export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
-  return <MenuSeparator />;
-});
+export const menuSeparatorRenderer = wrapComponent(
+  MSEP,
+  MenuSeparator,
+  MenuSeparatorMd,
+  { customRender: () => <MenuSeparator /> },
+);

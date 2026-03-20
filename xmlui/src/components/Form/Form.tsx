@@ -1,6 +1,6 @@
 import styles from "./Form.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
@@ -270,11 +270,12 @@ export const FormMd = createMetadata({
   },
 });
 
-export const formComponentRenderer = createComponentRenderer(
+export const formComponentRenderer = wrapComponent(
   COMP,
+  FormWithContextVar,
   FormMd,
-  ({ node, renderChild, extractValue, classes, lookupEventHandler, registerComponentApi, appContext }) => {
-    return (
+  {
+    customRender: (_props, { node, renderChild, extractValue, lookupEventHandler, classes, registerComponentApi, appContext }) => (
       <FormWithContextVar
         node={node as any}
         renderChild={renderChild}
@@ -284,6 +285,6 @@ export const formComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         appContext={appContext}
       />
-    );
+    ),
   },
 );

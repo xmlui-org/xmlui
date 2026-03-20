@@ -480,6 +480,10 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     ...Object.keys(rendererConfigs),
     "id", // handled separately via className/node
     "ref", // XMLUI ref attribute — must never be forwarded as a React string ref
+    "style", // XMLUI style attribute contains CSS custom-property strings ("--color: red").
+             // The layout processor converts this into the className/inline styles on the
+             // wrapper element. Forwarding it as a React prop would pass an invalid string
+             // to the native component and cause a React error.
     // Layout props are handled by the layout resolver and applied via CSS className.
     // They must not be forwarded to the native component as React props, because that
     // would pass raw XMLUI theme variable strings (e.g. "$textColor-secondary") to DOM
@@ -845,6 +849,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     ...Object.keys(rendererConfigs),
     "id",
     "ref",
+    "style", // same reasoning as in wrapComponent
     ...filteredLayoutKeysCompound,
     // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
     ...filteredLayoutKeysCompound.flatMap((key) =>
