@@ -183,6 +183,6 @@ export const localLinkComponentRenderer = wrapComponent(
   ThemedLinkNative,
   LinkMd,
   {
-    deriveAriaLabel: (props) => props.label || props.to,
+    deriveAriaLabel: (props) => props.label,
   },
 );
