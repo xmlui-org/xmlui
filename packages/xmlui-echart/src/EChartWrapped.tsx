@@ -40,4 +40,18 @@ export const echartComponentRenderer = wrapComponent(COMP, EChartRender, EChartM
   exposeRegisterApi: true,
   strings: ["width", "height", "renderer"],
   captureNativeEvents: true,
+  deriveAriaLabel: (props) => {
+    const option = props.option;
+    if (!option?.series) return "Chart";
+    const types = [
+      ...new Set(
+        (Array.isArray(option.series) ? option.series : [option.series]).map(
+          (s: any) => s.type,
+        ),
+      ),
+    ];
+    const title = option.title?.text;
+    const chartType = types.join("/") + " chart";
+    return title ? `${title} — ${chartType}` : chartType;
+  },
 });

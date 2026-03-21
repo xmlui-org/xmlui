@@ -45,6 +45,7 @@ export const TiptapEditorMd = createMetadata({
       signature: "getHTML(): string",
     },
   },
+  defaultAriaLabel: "Rich text editor",
 });
 
 export const tiptapEditorComponentRenderer = wrapCompound(

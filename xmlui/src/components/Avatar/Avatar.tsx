@@ -70,4 +70,7 @@ export const avatarComponentRenderer = wrapComponent(
   COMP,
   Avatar,
   AvatarMd,
+  {
+    deriveAriaLabel: (props) => props.name,
+  },
 );

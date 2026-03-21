@@ -27,6 +27,7 @@ export const SpinnerMd = createMetadata({
       defaultValue: defaultProps.fullScreen,
     },
   },
+  defaultAriaLabel: "Loading",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`size-${COMP}`]: "2.5em",

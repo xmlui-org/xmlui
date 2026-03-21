@@ -165,5 +165,6 @@ export const cardComponentRenderer = wrapComponent(
   {
     exposeRegisterApi: true,
     childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+    deriveAriaLabel: (props) => props.title,
   },
 );

@@ -31,6 +31,7 @@ export const TreeDisplayMd = createMetadata({
   events: {
     contextMenu: dContextMenu(COMP),
   },
+  defaultAriaLabel: "Tree",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-CodeBlock",
