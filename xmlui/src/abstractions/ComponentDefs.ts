@@ -369,6 +369,11 @@ export type ComponentMetadata<
 
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
+
+  // Default aria-label for screen readers when the app author doesn't provide one.
+  // Wrapper authors set this to a human-readable string describing the component's
+  // purpose (e.g., "Loading" for Spinner, "Toggle color mode" for ToneChangerButton).
+  defaultAriaLabel?: string;
 };
 
 export interface ParentRenderContext {

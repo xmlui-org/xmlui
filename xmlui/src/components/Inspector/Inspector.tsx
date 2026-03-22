@@ -38,6 +38,9 @@ export const InspectorMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`color-icon-${COMP}`]: "$color-surface-500",
+  },
 });
 
 export const inspectorComponentRenderer = wrapComponent(COMP, Inspector, InspectorMd, {

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { discoverPaths } from "./discover-urls-coppied-from-ssg.mjs";
+import { discoverRoutes } from "../../xmlui/src/nodejs/discoverRoutes";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,9 +34,12 @@ async function main() {
   try {
     console.log("Generating sitemap...");
 
-    // Collect all URLs via discoverPaths()
-    const urls = await discoverPaths();
-    const sortedUrls = urls.sort().filter((p) => p !== "/404");
+    // Collect all URLs via discoverRoutes()
+    const routeStore = await discoverRoutes({ srcDir: "src", contentDir: "content" });
+    const sortedUrls = routeStore
+      .staticRoutes()
+      .sort()
+      .filter((p) => p !== "/404");
 
     console.log(`Found ${sortedUrls.length} URLs`);
 

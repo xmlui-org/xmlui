@@ -63,4 +63,7 @@ export const iconComponentRenderer = wrapComponent(
   COMP,
   ThemedIcon,
   IconMd,
+  {
+    deriveAriaLabel: (props) => props.name,
+  },
 );

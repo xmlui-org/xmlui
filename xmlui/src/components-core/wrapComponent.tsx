@@ -209,6 +209,19 @@ export type RendererConfig = {
    *   Use for computed vars (e.g., $isFirst: rowIndex === 0).
    */
   contextVars: (string | null)[] | ((...args: any[]) => Record<string, any>);
+
+  /*
+   * Derives a default aria-label from the component's resolved props.
+   * Called after all props are extracted but before rendering. The returned
+   * string is used as aria-label on the DOM element and as ariaName in traces,
+   * unless the app author provides an explicit aria-label in markup.
+   *
+   * Use this to point at the prop that already describes what this instance is:
+   *   deriveAriaLabel: (props) => props.name        // Avatar
+   *   deriveAriaLabel: (props) => props.alt          // Image
+   *   deriveAriaLabel: (props) => props.placeholder  // TextBox
+   */
+  deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
 };
 
 /**
@@ -516,6 +529,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     specialProps.add(metadata.childrenAsTemplate);
   }
 
+  // aria-label is handled by the aria-label resolution cascade, not generic forwarding.
+  specialProps.add("aria-label");
+
   return createComponentRenderer(type, metadata, (context) => {
     const {
       node,
@@ -540,6 +556,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
+
+    // --- Resolve aria-label cascade ---
+    // Computed after prop forwarding (below) but declared here so event handler
+    // closures can read the final value when they fire at interaction time.
+    let ariaLabel: string | undefined;
 
     // --- Always pass through XMLUI plumbing ---
     props.className = className;
@@ -579,7 +600,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
               componentLabel: node.uid || node.testId || undefined,
               displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
               eventName: xmluiName,
-              ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+              ariaName: ariaLabel,
               ownerFileId,
               ownerSource,
               ...extractFileMetadata(args),
@@ -645,7 +666,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           componentLabel: xmluiId || type,
           displayLabel: event?.displayLabel || undefined,
           eventName: eventType,
-          ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+          ariaName: ariaLabel,
           nativeEvent: event,
           ...(typeof offsetX === "number" && { offsetX, offsetY }),
           ownerFileId,
@@ -740,6 +761,19 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
+    // --- Resolve aria-label cascade ---
+    // 1. App author's explicit aria-label (always wins)
+    // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
+    // 3. Metadata defaultAriaLabel (static fallback)
+    const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
+    ariaLabel = explicitAriaLabel
+      || config.deriveAriaLabel?.(props)
+      || metadata.defaultAriaLabel
+      || undefined;
+    if (ariaLabel) {
+      props["aria-label"] = ariaLabel;
+    }
+
     // --- Render children ---
     let rendered: React.ReactNode;
     if (config.customRender) {
@@ -797,7 +831,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         <HoverCapture
           componentType={type}
           componentLabel={node.uid || node.testId || type}
-          ariaName={extractValue(node.props?.["aria-label"]) || undefined}
+          ariaName={ariaLabel}
           ownerFileId={ownerFileId}
           ownerSource={ownerSource}
           hoverSession={hoverSession}
@@ -866,6 +900,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   if (isStateful) {
     specialProps.add("initialValue");
   }
+
+  // aria-label is handled by the aria-label resolution cascade, not generic forwarding.
+  specialProps.add("aria-label");
 
   // StateWrapper uses an outer/inner split to solve the stale-closure
   // problem with React.memo.  XMLUI's createComponentRenderer creates new
@@ -1024,6 +1061,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
+    // --- Resolve aria-label cascade ---
+    let ariaLabel: string | undefined;
+
     props.className = className;
     props.classes = classes;
 
@@ -1057,7 +1097,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 componentLabel: node.uid || node.testId || undefined,
                 displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                 eventName: xmluiName,
-                ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
+                ariaName: ariaLabel,
                 ownerFileId,
                 ownerSource,
                 ...extractFileMetadata(args),
@@ -1083,7 +1123,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 componentLabel: node.uid || node.testId || undefined,
                 displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                 eventName: xmluiName,
-                ariaName: extractValue(node.props?.["aria-label"]) || extractValue(node.props?.["placeholder"]) || undefined,
+                ariaName: ariaLabel,
                 ownerFileId,
                 ownerSource,
                 ...extractFileMetadata(args),
@@ -1145,7 +1185,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           componentLabel: xmluiId || type,
           displayLabel: event?.displayLabel || undefined,
           eventName: eventType,
-          ariaName: extractValue(node.props?.["aria-label"]) || undefined,
+          ariaName: ariaLabel,
           nativeEvent: event,
           ...(typeof offsetX === "number" && { offsetX, offsetY }),
           ownerFileId,
@@ -1231,13 +1271,24 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       }
     }
 
+    // --- Resolve aria-label cascade ---
+    const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
+    ariaLabel = explicitAriaLabel
+      || extractValue(node.props?.["placeholder"])
+      || config.deriveAriaLabel?.(props)
+      || metadata.defaultAriaLabel
+      || undefined;
+    if (ariaLabel) {
+      props["aria-label"] = ariaLabel;
+    }
+
     const rendered = <StateWrapper {...props} />;
     if (nativeEventsEnabled && hoverSession) {
       return (
         <HoverCapture
           componentType={type}
           componentLabel={node.uid || node.testId || type}
-          ariaName={extractValue(node.props?.["aria-label"]) || undefined}
+          ariaName={ariaLabel}
           ownerFileId={ownerFileId}
           ownerSource={ownerSource}
           hoverSession={hoverSession}
