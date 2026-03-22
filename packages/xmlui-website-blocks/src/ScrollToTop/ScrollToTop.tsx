@@ -1,6 +1,6 @@
 import styles from "./ScrollToTop.module.scss";
 
-import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import * as ScrollToTopNative from "./ScrollToTopNative";
 
@@ -70,22 +70,7 @@ export const ScrollToTopMd: ComponentMetadata = createMetadata({
   },
 });
 
-export const scrollToTopComponentRenderer = createComponentRenderer(
-  COMP,
-  ScrollToTopMd,
-  ({ node, extractValue, className, lookupEventHandler }) => {
-    const props = (node.props as typeof ScrollToTopMd.props)!;
-    
-    return (
-      <ScrollToTop
-        className={className}
-        position={extractValue.asOptionalString(props.position, defaultProps.position)}
-        visible={extractValue.asOptionalBoolean(props.visible, defaultProps.visible)}
-        threshold={extractValue.asOptionalNumber(props.threshold, defaultProps.threshold)}
-        icon={extractValue.asOptionalString(props.icon, defaultProps.icon)}
-        behavior={extractValue.asOptionalString(props.behavior, defaultProps.behavior) as "smooth" | "instant" | "auto"}
-        onClick={lookupEventHandler("click")} // This is not an error.
-      />
-    );
-  },
-);
+export const scrollToTopComponentRenderer = wrapComponent(COMP, ScrollToTop, ScrollToTopMd, {
+  booleans: ["visible"],
+  numbers: ["threshold"],
+});

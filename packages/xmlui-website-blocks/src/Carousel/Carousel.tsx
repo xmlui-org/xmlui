@@ -1,6 +1,6 @@
 import styles from "./Carousel.module.scss";
 
-import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
 import { CarouselComponent, defaultProps } from "./CarouselNative";
 
 const COMP = "CarouselNew";
@@ -129,32 +129,6 @@ export const CarouselMd = createMetadata({
   },
 });
 
-export const carouselComponentRenderer = createComponentRenderer(
-  COMP,
-  CarouselMd,
-  ({ node, renderChild, classes, extractValue, lookupEventHandler, registerComponentApi }) => {
-    const props = node.props as Record<string, any>;
-    return (
-      <CarouselComponent
-        classes={classes}
-        stopAutoplayOnInteraction={extractValue.asOptionalBoolean(
-          props?.stopAutoplayOnInteraction,
-        )}
-        autoplayInterval={extractValue.asOptionalNumber(props?.autoplayInterval)}
-        transitionDuration={extractValue.asOptionalNumber(props?.transitionDuration)}
-        indicators={extractValue.asOptionalBoolean(props?.indicators)}
-        controls={extractValue.asOptionalBoolean(props?.controls)}
-        orientation={extractValue(props?.orientation)}
-        onDisplayDidChange={lookupEventHandler("displayDidChange")}
-        autoplay={extractValue.asOptionalBoolean(props?.autoplay)}
-        registerComponentApi={registerComponentApi}
-        loop={extractValue.asOptionalBoolean(props?.loop)}
-        startIndex={extractValue.asOptionalNumber(props?.startIndex)}
-        prevIcon={extractValue(props?.prevIcon)}
-        nextIcon={extractValue(props?.nextIcon)}
-      >
-        {renderChild(node.children)}
-      </CarouselComponent>
-    );
-  },
-);
+export const carouselComponentRenderer = wrapComponent(COMP, CarouselComponent, CarouselMd, {
+  exposeRegisterApi: true,
+});
