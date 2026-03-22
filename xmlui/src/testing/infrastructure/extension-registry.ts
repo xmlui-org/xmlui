@@ -11,6 +11,8 @@ export const extensionRegistry: Record<string, () => Promise<any>> = {
   "xmlui-animations": () => import("../../../../packages/xmlui-animations/src/index"),
   "xmlui-docs-blocks": () => import("../../../../packages/xmlui-docs-blocks/src/index"),
   "xmlui-echart": () => import("../../../../packages/xmlui-echart/src/index"),
+  "xmlui-gauge": () => import("../../../../packages/xmlui-gauge/src/index"),
+  "xmlui-masonry": () => import("../../../../packages/xmlui-masonry/src/index"),
   // Add more extensions here as needed:
   // "xmlui-spreadsheet": () => import("../../../../packages/xmlui-spreadsheet/src/index"),
 };
