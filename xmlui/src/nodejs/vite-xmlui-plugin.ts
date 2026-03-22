@@ -80,7 +80,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
             // --- Display any module errors or warnings found
             if (codeBehind.moduleErrors && Object.keys(codeBehind.moduleErrors).length > 0) {
-              Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]) => {
+              Object.entries(codeBehind.moduleErrors).forEach(([modulePath, errors]: [string, any]) => {
                 errors.forEach((err) => {
                   this.warn(`[${modulePath}:${err.line}:${err.column}] ${err.code}: ${err.text}`);
                 });
