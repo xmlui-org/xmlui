@@ -1,4 +1,6 @@
-import { test, expect } from "../../testing/fixtures";
+import { test, expect } from "xmlui/testing";
+
+const EXT = { extensionIds: "xmlui-website-blocks" };
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -6,12 +8,12 @@ import { test, expect } from "../../testing/fixtures";
 
 test.describe("Basic Functionality", () => {
   test("component renders", async ({ page, initTestBed }) => {
-    await initTestBed(`<Carousel testId="carousel"></Carousel>`);
+    await initTestBed(`<Carousel testId="carousel"></Carousel>`, EXT);
     await expect(page.getByTestId("carousel")).toBeVisible();
   });
 
   test("component renders with correct role", async ({ page, initTestBed }) => {
-    await initTestBed(`<Carousel></Carousel>`);
+    await initTestBed(`<Carousel></Carousel>`, EXT);
     await expect(page.getByRole("region")).toBeVisible();
   });
 
@@ -24,7 +26,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     const slides = page.getByRole("region").getByRole("group");
     await expect(slides).toHaveCount(3);
     await expect(slides.nth(0)).toContainText("Slide 1");
@@ -39,7 +41,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     await expect(page.getByRole("region").getByRole("group").nth(1)).toBeInViewport();
   });
 
@@ -50,7 +52,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     await expect(page.getByRole("button", { name: "Previous Slide" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Next Slide" })).toBeVisible();
   });
@@ -62,7 +64,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     // Click next button
     await page.getByRole("button", { name: "Next Slide" }).click();
 
@@ -77,7 +79,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     // Verify we start on slide 2
     await expect(page.getByRole("region").getByRole("group").nth(1)).toBeInViewport();
 
@@ -96,7 +98,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
 
     // Click on the third indicator
     const indicators = page.getByRole("tab", { name: "Go to slide 3" });
@@ -114,7 +116,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     // Verify we're on the last slide
     await expect(page.getByRole("region").getByRole("group").nth(2)).toBeInViewport();
 
@@ -132,7 +134,7 @@ test.describe("Basic Functionality", () => {
         <CarouselItem>Slide 2</CarouselItem>
         <CarouselItem>Slide 3</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     const slides = page.getByRole("region").getByRole("group");
 
     // Verify first slide is initially visible
@@ -155,7 +157,7 @@ test.describe("Accessibility", () => {
         <CarouselItem>Slide 1</CarouselItem>
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     const carousel = page.getByRole("region");
     const slides = carousel.getByRole("group");
 
@@ -168,7 +170,7 @@ test.describe("Accessibility", () => {
       <Carousel indicators="true">
         <CarouselItem>Slide 1</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     const carousel = page.getByRole("region");
     const slides = carousel.getByRole("group");
 
@@ -182,7 +184,7 @@ test.describe("Accessibility", () => {
         <CarouselItem>Slide 1</CarouselItem>
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     const prevControl = page.getByRole("button", { name: "Previous Slide" });
     const nextControl = page.getByRole("button", { name: "Next Slide" });
 
@@ -197,7 +199,7 @@ test.describe("Accessibility", () => {
       <CarouselItem>Slide 2</CarouselItem>
       <CarouselItem>Slide 3</CarouselItem>
     </Carousel>
-  `);
+  `, EXT);
 
     // Focus the carousel container
     await page.getByRole("region").focus();
@@ -230,7 +232,8 @@ test.describe("Visual States", () => {
       `<Carousel width="500px">
         <CarouselItem>Slide 1</CarouselItem>
         <CarouselItem>Slide 2</CarouselItem>
-      </Carousel>`
+      </Carousel>`,
+      { ...EXT },
     );
     const carousel = page.getByRole("region");
     await expect(carousel).toHaveCSS("width", "500px");
@@ -241,7 +244,8 @@ test.describe("Visual States", () => {
       `<Carousel height="500px">
         <CarouselItem>Slide 1</CarouselItem>
         <CarouselItem>Slide 2</CarouselItem>
-      </Carousel>`
+      </Carousel>`,
+      { ...EXT },
     );
     const carousel = page.getByRole("region");
     await expect(carousel).toHaveCSS("height", "500px");
@@ -254,6 +258,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-control-Carousel": "rgb(255, 0, 0)",
         },
@@ -270,6 +275,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-control-Carousel": "rgb(0, 0, 255)",
         },
@@ -286,6 +292,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "width-indicator-Carousel": "20px",
         },
@@ -302,6 +309,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "height-control-Carousel": "50px",
         },
@@ -318,6 +326,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "width-control-Carousel": "50px",
         },
@@ -334,6 +343,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "borderRadius-control-Carousel": "10px",
         },
@@ -350,6 +360,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-control-hover-Carousel": "rgb(255, 165, 0)",
         },
@@ -367,6 +378,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-control-hover-Carousel": "rgb(255, 255, 255)",
         },
@@ -384,6 +396,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-control-active-Carousel": "rgb(0, 128, 0)",
         },
@@ -402,6 +415,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-control-active-Carousel": "rgb(255, 255, 0)",
         },
@@ -419,6 +433,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 1</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-control-disabled-Carousel": "rgb(200, 200, 200)",
         },
@@ -434,6 +449,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 1</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-control-disabled-Carousel": "rgb(150, 150, 150)",
         },
@@ -450,6 +466,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "height-indicator-Carousel": "15px",
         },
@@ -466,6 +483,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-indicator-Carousel": "rgb(100, 100, 100)",
         },
@@ -482,6 +500,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-indicator-Carousel": "rgb(50, 50, 50)",
         },
@@ -498,6 +517,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-indicator-hover-Carousel": "rgb(150, 150, 255)",
         },
@@ -515,6 +535,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-indicator-hover-Carousel": "rgb(255, 100, 100)",
         },
@@ -532,6 +553,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "backgroundColor-indicator-active-Carousel": "rgb(0, 0, 255)",
         },
@@ -548,6 +570,7 @@ test.describe("Visual States", () => {
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>`,
       {
+        ...EXT,
         testThemeVars: {
           "textColor-indicator-active-Carousel": "rgb(255, 255, 255)",
         },
@@ -576,7 +599,7 @@ test.describe("Edge Cases", () => {
       <Carousel>
         ${carouselItems}
       </Carousel>
-    `);
+    `, EXT);
 
     // Verify carousel renders
     await expect(page.getByRole("region")).toBeVisible();
@@ -605,7 +628,7 @@ test.describe("Edge Cases", () => {
       <Carousel indicators="true" controls="false">
         ${carouselItems}
       </Carousel>
-    `);
+    `, EXT);
 
     // Verify carousel renders
     await expect(page.getByRole("region").getByRole("tab")).toHaveCount(20);
@@ -617,7 +640,7 @@ test.describe("Edge Cases", () => {
         <CarouselItem>Slide 1</CarouselItem>
         <CarouselItem>Slide 2</CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
 
     // Verify carousel container renders
     await expect(page.getByRole("region")).toBeVisible();
@@ -650,7 +673,7 @@ test.describe("Integration", () => {
           <Card title="Card 2" />
         </CarouselItem>
       </Carousel>
-    `);
+    `, EXT);
     await expect(page.getByRole("group").first()).toContainText("Card 1");
     await expect(page.getByRole("group").last()).toContainText("Card 2");
   });
@@ -664,6 +687,7 @@ test.describe("Integration", () => {
           </Carousel>    
         `,
       {
+        ...EXT,
         resources: {
           "icon.test": "resources/bell.svg",
         },
@@ -682,6 +706,7 @@ test.describe("Integration", () => {
           </Carousel>    
         `,
       {
+        ...EXT,
         resources: {
           "icon.test": "resources/bell.svg",
         },

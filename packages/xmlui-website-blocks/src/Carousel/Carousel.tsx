@@ -3,7 +3,7 @@ import styles from "./Carousel.module.scss";
 import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
 import { CarouselComponent, defaultProps } from "./CarouselNative";
 
-const COMP = "CarouselNew";
+const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
   status: "stable",
@@ -130,5 +130,8 @@ export const CarouselMd = createMetadata({
 });
 
 export const carouselComponentRenderer = wrapComponent(COMP, CarouselComponent, CarouselMd, {
+  booleans: ["indicators", "controls", "autoplay", "loop", "stopAutoplayOnInteraction"],
+  numbers: ["startIndex", "transitionDuration", "autoplayInterval"],
+  events: { displayDidChange: "onDisplayDidChange" },
   exposeRegisterApi: true,
 });

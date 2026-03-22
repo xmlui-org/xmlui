@@ -6,7 +6,6 @@ export const CarouselContext = createContext({
   unRegister: (id: string) => {},
   itemProps: {},
 });
-
 export const useCarousel = () => {
   const context = useContext(CarouselContext);
   if (!context) {
@@ -16,7 +15,7 @@ export const useCarousel = () => {
 };
 
 export function useCarouselContextValue(isTabbed: boolean) {
-  const [carouselItems, setCarouselItems] = useState([]);
+  const [carouselItems, setCarouselItems] = useState<any[]>([]);
 
   const carouselContextValue = useMemo(() => {
     return {

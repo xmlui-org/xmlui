@@ -68,7 +68,6 @@ import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
@@ -321,7 +320,6 @@ export const collectedComponentMetadata = {
   Bookmark: BookmarkMd,
   Button: ButtonMd,
   Card: CardMd,
-  Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,

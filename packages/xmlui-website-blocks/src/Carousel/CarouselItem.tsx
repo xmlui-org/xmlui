@@ -1,18 +1,11 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 import { CarouselItemComponent } from "./CarouselItemNative";
 
-const COMP = "CarouselItemNew";
+const COMP = "CarouselItem";
 
 export const CarouselItemMd = createMetadata({
   status: "stable",
-  description: "A slide item for the CarouselNew component.",
+  description: "A slide item for the Carousel component.",
 });
 
-export const carouselItemNewComponentRenderer = createComponentRenderer(
-  COMP,
-  CarouselItemMd,
-  (rendererContext) => {
-    const { node, renderChild } = rendererContext;
-    return <CarouselItemComponent>{renderChild(node.children)}</CarouselItemComponent>;
-  },
-);
+export const carouselItemComponentRenderer = wrapComponent(COMP, CarouselItemComponent, CarouselItemMd);
