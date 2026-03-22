@@ -1,7 +1,7 @@
 import styles from "./LabelList.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
-import { parseScssVar, createComponentRenderer, createMetadata } from "xmlui";
+import { parseScssVar, wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "LabelList";
 
@@ -30,16 +30,6 @@ export const LabelListMd = createMetadata({
   },
 });
 
-export const labelListComponentRenderer = createComponentRenderer(
-  COMP,
-  LabelListMd,
-  ({ extractValue, node, className }: any) => {
-    return (
-      <LabelList
-        key={extractValue(node.props?.dataKey)}
-        position={extractValue.asOptionalString(node.props?.position)}
-        className={className}
-      />
-    );
-  },
-);
+export const labelListComponentRenderer = wrapComponent(COMP, LabelList, LabelListMd, {
+  rename: { key: "nameKey" },
+});

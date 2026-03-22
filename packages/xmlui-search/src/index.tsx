@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { createComponentRenderer, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
+import { wrapComponent, createMetadata, parseScssVar, useComponentThemeClass } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import { Search, defaultProps } from "./Search";
 import styles from "./Search.module.scss";
@@ -77,22 +77,7 @@ export const SearchMd: ComponentMetadata = createMetadata({
   },
 });
 
-const searchComponentRenderer = createComponentRenderer(
-  COMP,
-  SearchMd,
-  ({ node, extractValue, className }) => {
-    const props = node.props as any;
-    return (
-      <Search
-        className={className}
-        placeholder={extractValue.asOptionalString(props.placeholder)}
-        data={extractValue(props.data)}
-        limit={extractValue.asOptionalNumber(props.limit, defaultProps.limit)}
-        collapsible={extractValue.asOptionalBoolean(props.collapsible, false)}
-      />
-    );
-  },
-);
+const searchComponentRenderer = wrapComponent(COMP, Search, SearchMd);
 
 type ThemedSearchProps = ComponentProps<typeof Search>;
 

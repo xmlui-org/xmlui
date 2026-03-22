@@ -1,19 +1,8 @@
-import { createComponentRenderer, createMetadata, d, parseScssVar, type ComponentMetadata } from "xmlui";
+import { wrapComponent, createMetadata, d, parseScssVar, type ComponentMetadata } from "xmlui";
 import { LazyPdf } from "./LazyPdfNative";
 import styles from "./Pdf.module.scss";
-import type { Annotation } from "./types/annotation.types";
 
 const COMP = "Pdf";
-
-// Default prop values (duplicated from PdfNative to avoid static import)
-const defaultProps = {
-  mode: "view" as "view" | "edit",
-  scale: 1.0,
-  annotations: [] as Annotation[],
-  horizontalAlignment: "start" as "start" | "center" | "end",
-  verticalAlignment: "start" as "start" | "center" | "end",
-  scrollStyle: "normal" as "normal" | "overlay" | "whenMouseOver" | "whenScrolling",
-};
 
 export const PdfMd: ComponentMetadata = createMetadata({
   description: `The \`${COMP}\` component provides a PDF viewer with annotation and signing capabilities.`,
@@ -29,11 +18,11 @@ export const PdfMd: ComponentMetadata = createMetadata({
       `Example: \`data={arrayBuffer}\` or \`data={blob}\` or \`data="data:application/pdf;base64,..."\`.`,
     ),
     mode: {
-      description: `Display mode: "view" for read-only or "edit" for annotation editing. Default: "${defaultProps.mode}".`,
+      description: `Display mode: "view" for read-only or "edit" for annotation editing. Default: "view".`,
       valueType: "string",
     },
     scale: {
-      description: `Zoom level for the PDF pages. Default: ${defaultProps.scale}.`,
+      description: `Zoom level for the PDF pages. Default: 1.0.`,
       valueType: "number",
     },
     currentPage: {
@@ -470,38 +459,7 @@ export const PdfMd: ComponentMetadata = createMetadata({
   },
 });
 
-export const pdfComponentRenderer = createComponentRenderer(
-  COMP,
-  PdfMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, updateState, state, uid, className }) => {
-    const props = node.props as typeof PdfMd.props;
-    
-    return (
-      <LazyPdf
-        id={String(uid)}
-        className={className}
-        src={extractValue(props?.src)}
-        data={extractValue(props?.data)}
-        mode={extractValue.asOptionalString(props?.mode, defaultProps.mode) as "view" | "edit"}
-        scale={extractValue.asOptionalNumber(props?.scale, defaultProps.scale)}
-        currentPage={extractValue.asOptionalNumber(props?.currentPage)}
-        annotations={extractValue(props?.annotations) || defaultProps.annotations}
-        signatureData={extractValue(props?.signatureData)}
-        horizontalAlignment={extractValue.asOptionalString(props?.horizontalAlignment, defaultProps.horizontalAlignment) as "start" | "center" | "end"}
-        verticalAlignment={extractValue.asOptionalString(props?.verticalAlignment, defaultProps.verticalAlignment) as "start" | "center" | "end"}
-        scrollStyle={extractValue.asOptionalString(props?.scrollStyle, defaultProps.scrollStyle) as "normal" | "overlay" | "whenMouseOver" | "whenScrolling"}
-        onDocumentLoad={lookupEventHandler("documentLoad")}
-        onPageChange={lookupEventHandler("pageChange")}
-        onAnnotationCreate={lookupEventHandler("annotationCreate")}
-        onAnnotationUpdate={lookupEventHandler("annotationUpdate")}
-        onAnnotationDelete={lookupEventHandler("annotationDelete")}
-        onAnnotationSelect={lookupEventHandler("annotationSelect")}
-        onSignatureCapture={lookupEventHandler("signatureCapture")}
-        onSignatureApply={lookupEventHandler("signatureApply")}
-        onExportRequest={lookupEventHandler("exportRequest")}
-        registerComponentApi={registerComponentApi}
-        updateState={updateState}
-      />
-    );
-  },
-);
+export const pdfComponentRenderer = wrapComponent(COMP, LazyPdf, PdfMd, {
+  exposeRegisterApi: true,
+  stateful: true,
+});

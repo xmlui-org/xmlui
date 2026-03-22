@@ -36,7 +36,7 @@ export async function getViteConfig({
   }
 
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])],
+    plugins: [react(), svgr(), ViteYaml(), ViteXmlui({}), ...(overrides.plugins || [])] as any,
     customLogger: logger,
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
