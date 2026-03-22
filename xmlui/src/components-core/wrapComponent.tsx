@@ -14,7 +14,15 @@ import { COMPONENT_PART_KEY } from "./theming/responsive-layout";
  * Wraps children in a display:contents div that captures mousemove
  * on canvas elements and emits throttled native:hover trace events.
  */
-function HoverCapture({ children, componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession }: {
+function HoverCapture({
+  children,
+  componentType,
+  componentLabel,
+  ariaName,
+  ownerFileId,
+  ownerSource,
+  hoverSession,
+}: {
   children: React.ReactNode;
   componentType: string;
   componentLabel?: string;
@@ -26,34 +34,39 @@ function HoverCapture({ children, componentType, componentLabel, ariaName, owner
   const THROTTLE_MS = 300;
   const SESSION_GAP_MS = 500;
 
-  const handleMouseMove = React.useCallback((e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    if (target.tagName !== 'CANVAS') return;
-    const now = Date.now();
-    if (now - hoverSession.lastTs < THROTTLE_MS) return;
+  const handleMouseMove = React.useCallback(
+    (e: React.MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.tagName !== "CANVAS") return;
+      const now = Date.now();
+      if (now - hoverSession.lastTs < THROTTLE_MS) return;
 
-    // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
-    if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
-      hoverSession.traceId = pushTrace();
-      popTrace();
-    }
-    hoverSession.lastTs = now;
+      // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
+      if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
+        hoverSession.traceId = pushTrace();
+        popTrace();
+      }
+      hoverSession.lastTs = now;
 
-    pushXsLog(createLogEntry('native:hover', {
-      traceId: hoverSession.traceId,
-      componentType,
-      componentLabel: componentLabel || componentType,
-      eventName: 'hover',
-      ariaName: ariaName || undefined,
-      offsetX: e.nativeEvent.offsetX,
-      offsetY: e.nativeEvent.offsetY,
-      ownerFileId,
-      ownerSource,
-    }));
-  }, [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession]);
+      pushXsLog(
+        createLogEntry("native:hover", {
+          traceId: hoverSession.traceId,
+          componentType,
+          componentLabel: componentLabel || componentType,
+          eventName: "hover",
+          ariaName: ariaName || undefined,
+          offsetX: e.nativeEvent.offsetX,
+          offsetY: e.nativeEvent.offsetY,
+          ownerFileId,
+          ownerSource,
+        }),
+      );
+    },
+    [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession],
+  );
 
   return (
-    <div style={{ display: 'contents' }} onMouseMoveCapture={handleMouseMove}>
+    <div style={{ display: "contents" }} onMouseMoveCapture={handleMouseMove}>
       {children}
     </div>
   );
@@ -186,6 +199,19 @@ export type WrapComponentConfig = {
    * Auto children rendering is skipped when customRender is provided.
    */
   customRender?: (props: Record<string, any>, context: any) => React.ReactNode;
+
+  /*
+   * Derives a default aria-label from the component's resolved props.
+   * Called after all props are extracted but before rendering. The returned
+   * string is used as aria-label on the DOM element and as ariaName in traces,
+   * unless the app author provides an explicit aria-label in markup.
+   *
+   * Use this to point at the prop that already describes what this instance is:
+   *   deriveAriaLabel: (props) => props.name        // Avatar
+   *   deriveAriaLabel: (props) => props.alt          // Image
+   *   deriveAriaLabel: (props) => props.placeholder  // TextBox
+   */
+  deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
 };
 
 /**
@@ -209,19 +235,6 @@ export type RendererConfig = {
    *   Use for computed vars (e.g., $isFirst: rowIndex === 0).
    */
   contextVars: (string | null)[] | ((...args: any[]) => Record<string, any>);
-
-  /*
-   * Derives a default aria-label from the component's resolved props.
-   * Called after all props are extracted but before rendering. The returned
-   * string is used as aria-label on the DOM element and as ariaName in traces,
-   * unless the app author provides an explicit aria-label in markup.
-   *
-   * Use this to point at the prop that already describes what this instance is:
-   *   deriveAriaLabel: (props) => props.name        // Avatar
-   *   deriveAriaLabel: (props) => props.alt          // Image
-   *   deriveAriaLabel: (props) => props.placeholder  // TextBox
-   */
-  deriveAriaLabel?: (props: Record<string, any>) => string | undefined;
 };
 
 /**
@@ -326,7 +339,13 @@ function mergeWithMetadata(
   if (metadata.props) {
     for (const [propName, propMeta] of Object.entries(metadata.props)) {
       if (propName === "initialValue") continue; // handled separately by wrapper
-      if (booleanSet.has(propName) || numberSet.has(propName) || stringSet.has(propName) || resourceUrlSet.has(propName)) continue;
+      if (
+        booleanSet.has(propName) ||
+        numberSet.has(propName) ||
+        stringSet.has(propName) ||
+        resourceUrlSet.has(propName)
+      )
+        continue;
       if (propMeta.isResourceUrl) resourceUrlSet.add(propName);
       else if (propMeta.valueType === "boolean") booleanSet.add(propName);
       else if (propMeta.valueType === "number") numberSet.add(propName);
@@ -414,11 +433,7 @@ function endTrace(traceId: string | undefined, traceKind: string | undefined): v
  * For value:change, the first arg is the new value (number/string).
  * For focus:change, the first arg is a FocusEvent — use the event name instead.
  */
-function traceDisplayLabel(
-  traceKind: string,
-  xmluiName: string,
-  args: any[],
-): string | undefined {
+function traceDisplayLabel(traceKind: string, xmluiName: string, args: any[]): string | undefined {
   if (traceKind === "value:change") {
     const val = args[0];
     if (val == null) return undefined;
@@ -439,7 +454,9 @@ function traceDisplayLabel(
  * Extract file metadata from value:change args for trace enrichment.
  * Returns undefined if the value doesn't contain File objects.
  */
-function extractFileMetadata(args: any[]): { files: { name: string; size: number; type: string }[] } | undefined {
+function extractFileMetadata(
+  args: any[],
+): { files: { name: string; size: number; type: string }[] } | undefined {
   if (typeof File === "undefined") return undefined;
   const val = args[0];
   if (val instanceof File) {
@@ -481,8 +498,18 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapComponentConfig = {},
 ): ComponentRendererDef {
-  const { booleanSet, numberSet, stringSet, resourceUrlSet, eventMap, callbackMap, renameMap, excludeSet, templateMap, rendererConfigs } =
-    mergeWithMetadata(metadata, config);
+  const {
+    booleanSet,
+    numberSet,
+    stringSet,
+    resourceUrlSet,
+    eventMap,
+    callbackMap,
+    renameMap,
+    excludeSet,
+    templateMap,
+    rendererConfigs,
+  } = mergeWithMetadata(metadata, config);
 
   // Collect all specially-handled XMLUI prop names so we can skip them
   // when forwarding the rest.
@@ -496,9 +523,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     "id", // handled separately via className/node
     "ref", // XMLUI ref attribute — must never be forwarded as a React string ref
     "style", // XMLUI style attribute contains CSS custom-property strings ("--color: red").
-             // The layout processor converts this into the className/inline styles on the
-             // wrapper element. Forwarding it as a React prop would pass an invalid string
-             // to the native component and cause a React error.
+    // The layout processor converts this into the className/inline styles on the
+    // wrapper element. Forwarding it as a React prop would pass an invalid string
+    // to the native component and cause a React error.
     // Layout props are handled by the layout resolver and applied via CSS className.
     // They must not be forwarded to the native component as React props, because that
     // would pass raw XMLUI theme variable strings (e.g. "$textColor-secondary") to DOM
@@ -508,15 +535,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     ...filteredLayoutKeys,
     // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
     // are also layout-only and must not be forwarded to native components.
-    ...filteredLayoutKeys.flatMap((key) =>
-      MediaBreakpointKeys.map((bp) => `${key}-${bp}`),
-    ),
+    ...filteredLayoutKeys.flatMap((key) => MediaBreakpointKeys.map((bp) => `${key}-${bp}`)),
   ]);
 
   // Detect whether this is a stateful component
   const isStateful =
-    config.stateful ??
-    !!(metadata.props?.["initialValue"] || metadata.events?.["didChange"]);
+    config.stateful ?? !!(metadata.props?.["initialValue"] || metadata.events?.["didChange"]);
 
   if (isStateful) {
     specialProps.add("initialValue");
@@ -595,16 +619,18 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             result = handler(...args);
           }
           if (traceKind) {
-            pushXsLog(createLogEntry(traceKind, {
-              component: type,
-              componentLabel: node.uid || node.testId || undefined,
-              displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-              eventName: xmluiName,
-              ariaName: ariaLabel,
-              ownerFileId,
-              ownerSource,
-              ...extractFileMetadata(args),
-            }));
+            pushXsLog(
+              createLogEntry(traceKind, {
+                component: type,
+                componentLabel: node.uid || node.testId || undefined,
+                displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                eventName: xmluiName,
+                ariaName: ariaLabel,
+                ownerFileId,
+                ownerSource,
+                ...extractFileMetadata(args),
+              }),
+            );
           }
           return result;
         } finally {
@@ -622,8 +648,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // Hover-related events (mouseover, mouseout) join the current hover session
     // so they appear in the same trace as native:hover events from HoverCapture.
     // Non-hover events (click, legendselectchanged, etc.) get their own trace.
-    const nativeEventsEnabled = xsVerbose && (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
-    const hoverSession = nativeEventsEnabled ? { traceId: undefined as string | undefined, lastTs: 0 } : undefined;
+    const nativeEventsEnabled =
+      xsVerbose &&
+      (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
+    const hoverSession = nativeEventsEnabled
+      ? { traceId: undefined as string | undefined, lastTs: 0 }
+      : undefined;
 
     if (nativeEventsEnabled) {
       const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
@@ -639,8 +669,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         //   React synthetic: event.nativeEvent
         //   Direct: event.offsetX
         const domEvent =
-          event?.event?.event || event?.event?.nativeEvent ||
-          event?.event || event?.nativeEvent;
+          event?.event?.event || event?.event?.nativeEvent || event?.event || event?.nativeEvent;
         const offsetX = domEvent?.offsetX ?? event?.offsetX;
         const offsetY = domEvent?.offsetY ?? event?.offsetY;
 
@@ -660,18 +689,20 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           popTrace();
         }
 
-        pushXsLog(createLogEntry(traceKind, {
-          traceId,
-          componentType: type,
-          componentLabel: xmluiId || type,
-          displayLabel: event?.displayLabel || undefined,
-          eventName: eventType,
-          ariaName: ariaLabel,
-          nativeEvent: event,
-          ...(typeof offsetX === "number" && { offsetX, offsetY }),
-          ownerFileId,
-          ownerSource,
-        }));
+        pushXsLog(
+          createLogEntry(traceKind, {
+            traceId,
+            componentType: type,
+            componentLabel: xmluiId || type,
+            displayLabel: event?.displayLabel || undefined,
+            eventName: eventType,
+            ariaName: ariaLabel,
+            nativeEvent: event,
+            ...(typeof offsetX === "number" && { offsetX, offsetY }),
+            ownerFileId,
+            ownerSource,
+          }),
+        );
 
         // Also fire as an XMLUI event if a handler is registered
         // with the native event name (e.g., legendselectchanged in XMLUI)
@@ -766,10 +797,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
     // 3. Metadata defaultAriaLabel (static fallback)
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
-    ariaLabel = explicitAriaLabel
-      || config.deriveAriaLabel?.(props)
-      || metadata.defaultAriaLabel
-      || undefined;
+    ariaLabel =
+      explicitAriaLabel ||
+      config.deriveAriaLabel?.(props) ||
+      metadata.defaultAriaLabel ||
+      undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
     }
@@ -786,9 +818,17 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       // matching the pattern used by List, TileGrid, and other data components.
       const templatePropName = metadata.childrenAsTemplate;
       // Skip childrenAsTemplate auto-rendering when the template prop is handled as a renderer
-      const templateHandledAsRenderer = templatePropName ? templatePropName in rendererConfigs : false;
-      const data = templatePropName && !templateHandledAsRenderer ? extractValue(node.props.data) : undefined;
-      if (templatePropName && !templateHandledAsRenderer && node.props?.[templatePropName] && Array.isArray(data)) {
+      const templateHandledAsRenderer = templatePropName
+        ? templatePropName in rendererConfigs
+        : false;
+      const data =
+        templatePropName && !templateHandledAsRenderer ? extractValue(node.props.data) : undefined;
+      if (
+        templatePropName &&
+        !templateHandledAsRenderer &&
+        node.props?.[templatePropName] &&
+        Array.isArray(data)
+      ) {
         const itemTemplate = node.props[templatePropName];
         const childLayoutCtx = config.childrenLayoutContext
           ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
@@ -807,7 +847,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             }}
           />
         ));
-      } else if (templatePropName && !templateHandledAsRenderer && node.props?.[templatePropName] && !Array.isArray(data)) {
+      } else if (
+        templatePropName &&
+        !templateHandledAsRenderer &&
+        node.props?.[templatePropName] &&
+        !Array.isArray(data)
+      ) {
         // childrenAsTemplate moved children into the template prop, but no data was provided —
         // render the template prop as normal children (inline children mode)
         props.children = renderChild(
@@ -816,7 +861,10 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             ? createChildLayoutContext(context.layoutContext, config.childrenLayoutContext)
             : undefined,
         );
-      } else if (node.children && (Array.isArray(node.children) ? node.children.length > 0 : true)) {
+      } else if (
+        node.children &&
+        (Array.isArray(node.children) ? node.children.length > 0 : true)
+      ) {
         props.children = renderChild(
           node.children,
           config.childrenLayoutContext
@@ -874,8 +922,17 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   metadata: TMd,
   config: WrapCompoundConfig = {},
 ): ComponentRendererDef {
-  const { booleanSet, numberSet, stringSet, eventMap, callbackMap, renameMap, excludeSet, templateMap, rendererConfigs } =
-    mergeWithMetadata(metadata, config);
+  const {
+    booleanSet,
+    numberSet,
+    stringSet,
+    eventMap,
+    callbackMap,
+    renameMap,
+    excludeSet,
+    templateMap,
+    rendererConfigs,
+  } = mergeWithMetadata(metadata, config);
 
   const filteredLayoutKeysCompound = layoutOptionKeys.filter((key) => !metadata.props?.[key]);
   const specialProps = new Set([
@@ -888,14 +945,11 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     "style", // same reasoning as in wrapComponent
     ...filteredLayoutKeysCompound,
     // Responsive variants of layout props (e.g. fontSize-md, backgroundColor-lg)
-    ...filteredLayoutKeysCompound.flatMap((key) =>
-      MediaBreakpointKeys.map((bp) => `${key}-${bp}`),
-    ),
+    ...filteredLayoutKeysCompound.flatMap((key) => MediaBreakpointKeys.map((bp) => `${key}-${bp}`)),
   ]);
 
   const isStateful =
-    config.stateful ??
-    !!(metadata.props?.["initialValue"] || metadata.events?.["didChange"]);
+    config.stateful ?? !!(metadata.props?.["initialValue"] || metadata.events?.["didChange"]);
 
   if (isStateful) {
     specialProps.add("initialValue");
@@ -918,120 +972,145 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   //   - Uses the ref from CallbackSync for all callback invocations
   //   - Provides stable onChange/registerApi references to RenderComponent
 
-  const MemoizedInner = React.memo(React.forwardRef((
-    { __callbackRef, __initialValue, __value, ...nativeProps }: any,
-    ref: any,
-  ) => {
-    const [localValue, setLocalValue] = React.useState(() =>
-      config.parseInitialValue
-        ? config.parseInitialValue(__initialValue, nativeProps)
-        : __initialValue
-    );
+  const MemoizedInner = React.memo(
+    React.forwardRef(
+      ({ __callbackRef, __initialValue, __value, ...nativeProps }: any, ref: any) => {
+        const [localValue, setLocalValue] = React.useState(() =>
+          config.parseInitialValue
+            ? config.parseInitialValue(__initialValue, nativeProps)
+            : __initialValue,
+        );
 
-    // Initial state setup (once on mount)
-    const initialized = React.useRef(false);
-    React.useEffect(() => {
-      if (!initialized.current && __callbackRef.current.__updateState && localValue !== undefined) {
-        const stateValue = Array.isArray(localValue) && localValue.length === 1
-          ? localValue[0] : localValue;
-        __callbackRef.current.__updateState({ value: stateValue }, { initial: true });
-        initialized.current = true;
+        // Initial state setup (once on mount)
+        const initialized = React.useRef(false);
+        React.useEffect(() => {
+          if (
+            !initialized.current &&
+            __callbackRef.current.__updateState &&
+            localValue !== undefined
+          ) {
+            const stateValue =
+              Array.isArray(localValue) && localValue.length === 1 ? localValue[0] : localValue;
+            __callbackRef.current.__updateState({ value: stateValue }, { initial: true });
+            initialized.current = true;
+          }
+        }, []);
+
+        // Sync external value changes
+        React.useEffect(() => {
+          if (__value !== undefined) {
+            const formatted = config.formatExternalValue
+              ? config.formatExternalValue(__value, nativeProps)
+              : __value;
+            setLocalValue(formatted);
+          }
+        }, [__value]);
+
+        // onChange: stable reference — delegates to ref for current callback
+        const onChange = React.useCallback(
+          (newValue: any) => {
+            setLocalValue(
+              config.formatExternalValue
+                ? config.formatExternalValue(newValue, nativeProps)
+                : newValue,
+            );
+            __callbackRef.current.__onDidChange?.(newValue);
+          },
+          [__callbackRef],
+        );
+
+        // API registration: stable reference
+        const registerApi = React.useCallback(
+          (apis: Record<string, any>) => {
+            __callbackRef.current.__registerComponentApi?.(apis);
+          },
+          [__callbackRef],
+        );
+
+        // Build stable wrappers for native event props (onFocus, onBlur, etc.)
+        // Created once per event key, delegates to ref for current handler.
+        const stableEvents = React.useRef<Record<string, (...args: any[]) => any>>({});
+        for (const key of Object.keys(nativeProps)) {
+          if (typeof nativeProps[key] === "function" && !stableEvents.current[key]) {
+            const eventKey = key;
+            stableEvents.current[eventKey] = (...args: any[]) =>
+              __callbackRef.current._native?.[eventKey]?.(...args);
+          }
+        }
+
+        const mergedProps = { ...nativeProps };
+        for (const [key, fn] of Object.entries(stableEvents.current)) {
+          mergedProps[key] = fn;
+        }
+
+        return (
+          <RenderComponent
+            ref={ref}
+            {...mergedProps}
+            value={localValue}
+            onChange={onChange}
+            registerApi={registerApi}
+          />
+        );
+      },
+    ),
+    (prevProps, nextProps) => {
+      // Custom comparison: skip function props and __callbackRef (ref identity is stable).
+      // Only re-render when value-type props (className, enabled, placeholder, etc.) change.
+      const allKeys = new Set([...Object.keys(prevProps), ...Object.keys(nextProps)]);
+      for (const key of allKeys) {
+        if (key === "__callbackRef") continue;
+        if (typeof prevProps[key] === "function" && typeof nextProps[key] === "function") continue;
+        if (prevProps[key] !== nextProps[key]) return false;
       }
-    }, []);
-
-    // Sync external value changes
-    React.useEffect(() => {
-      if (__value !== undefined) {
-        const formatted = config.formatExternalValue
-          ? config.formatExternalValue(__value, nativeProps)
-          : __value;
-        setLocalValue(formatted);
-      }
-    }, [__value]);
-
-    // onChange: stable reference — delegates to ref for current callback
-    const onChange = React.useCallback((newValue: any) => {
-      setLocalValue(
-        config.formatExternalValue
-          ? config.formatExternalValue(newValue, nativeProps)
-          : newValue
-      );
-      __callbackRef.current.__onDidChange?.(newValue);
-    }, [__callbackRef]);
-
-    // API registration: stable reference
-    const registerApi = React.useCallback((apis: Record<string, any>) => {
-      __callbackRef.current.__registerComponentApi?.(apis);
-    }, [__callbackRef]);
-
-    // Build stable wrappers for native event props (onFocus, onBlur, etc.)
-    // Created once per event key, delegates to ref for current handler.
-    const stableEvents = React.useRef<Record<string, (...args: any[]) => any>>({});
-    for (const key of Object.keys(nativeProps)) {
-      if (typeof nativeProps[key] === 'function' && !stableEvents.current[key]) {
-        const eventKey = key;
-        stableEvents.current[eventKey] = (...args: any[]) =>
-          __callbackRef.current._native?.[eventKey]?.(...args);
-      }
-    }
-
-    const mergedProps = { ...nativeProps };
-    for (const [key, fn] of Object.entries(stableEvents.current)) {
-      mergedProps[key] = fn;
-    }
-
-    return (
-      <RenderComponent
-        ref={ref}
-        {...mergedProps}
-        value={localValue}
-        onChange={onChange}
-        registerApi={registerApi}
-      />
-    );
-  }), (prevProps, nextProps) => {
-    // Custom comparison: skip function props and __callbackRef (ref identity is stable).
-    // Only re-render when value-type props (className, enabled, placeholder, etc.) change.
-    const allKeys = new Set([...Object.keys(prevProps), ...Object.keys(nextProps)]);
-    for (const key of allKeys) {
-      if (key === '__callbackRef') continue;
-      if (typeof prevProps[key] === 'function' && typeof nextProps[key] === 'function') continue;
-      if (prevProps[key] !== nextProps[key]) return false;
-    }
-    return true;
-  });
+      return true;
+    },
+  );
 
   // CallbackSync: outer component that keeps the callback ref current.
   // NOT memoized — runs on every XMLUI evaluation (cheap, no DOM work).
-  const CallbackSync = React.forwardRef((
-    { __updateState, __initialValue, __registerComponentApi,
-      __value, __onDidChange, ...nativeProps }: any,
-    ref: any,
-  ) => {
-    const callbackRef = React.useRef<any>({ __onDidChange, __updateState, __registerComponentApi, _native: {} });
+  const CallbackSync = React.forwardRef(
+    (
+      {
+        __updateState,
+        __initialValue,
+        __registerComponentApi,
+        __value,
+        __onDidChange,
+        ...nativeProps
+      }: any,
+      ref: any,
+    ) => {
+      const callbackRef = React.useRef<any>({
+        __onDidChange,
+        __updateState,
+        __registerComponentApi,
+        _native: {},
+      });
 
-    // Sync all function props into the ref (runs every render of CallbackSync)
-    callbackRef.current.__onDidChange = __onDidChange;
-    callbackRef.current.__updateState = __updateState;
-    callbackRef.current.__registerComponentApi = __registerComponentApi;
+      // Sync all function props into the ref (runs every render of CallbackSync)
+      callbackRef.current.__onDidChange = __onDidChange;
+      callbackRef.current.__updateState = __updateState;
+      callbackRef.current.__registerComponentApi = __registerComponentApi;
 
-    // Sync native event handlers (onFocus, onBlur, etc.)
-    for (const key of Object.keys(nativeProps)) {
-      if (typeof nativeProps[key] === 'function') {
-        callbackRef.current._native[key] = nativeProps[key];
+      // Sync native event handlers (onFocus, onBlur, etc.)
+      for (const key of Object.keys(nativeProps)) {
+        if (typeof nativeProps[key] === "function") {
+          callbackRef.current._native[key] = nativeProps[key];
+        }
       }
-    }
 
-    return (
-      <MemoizedInner
-        ref={ref}
-        __callbackRef={callbackRef}
-        __initialValue={__initialValue}
-        __value={__value}
-        {...nativeProps}
-      />
-    );
-  });
+      return (
+        <MemoizedInner
+          ref={ref}
+          __callbackRef={callbackRef}
+          __initialValue={__initialValue}
+          __value={__value}
+          {...nativeProps}
+        />
+      );
+    },
+  );
 
   const StateWrapper = CallbackSync;
 
@@ -1092,16 +1171,18 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               result = handler(...args);
             }
             if (traceKind) {
-              pushXsLog(createLogEntry(traceKind, {
-                component: type,
-                componentLabel: node.uid || node.testId || undefined,
-                displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-                eventName: xmluiName,
-                ariaName: ariaLabel,
-                ownerFileId,
-                ownerSource,
-                ...extractFileMetadata(args),
-              }));
+              pushXsLog(
+                createLogEntry(traceKind, {
+                  component: type,
+                  componentLabel: node.uid || node.testId || undefined,
+                  displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                  eventName: xmluiName,
+                  ariaName: ariaLabel,
+                  ownerFileId,
+                  ownerSource,
+                  ...extractFileMetadata(args),
+                }),
+              );
             }
             return result;
           } finally {
@@ -1118,16 +1199,18 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               result = handler(...args);
             }
             if (traceKind) {
-              pushXsLog(createLogEntry(traceKind, {
-                component: type,
-                componentLabel: node.uid || node.testId || undefined,
-                displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-                eventName: xmluiName,
-                ariaName: ariaLabel,
-                ownerFileId,
-                ownerSource,
-                ...extractFileMetadata(args),
-              }));
+              pushXsLog(
+                createLogEntry(traceKind, {
+                  component: type,
+                  componentLabel: node.uid || node.testId || undefined,
+                  displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                  eventName: xmluiName,
+                  ariaName: ariaLabel,
+                  ownerFileId,
+                  ownerSource,
+                  ...extractFileMetadata(args),
+                }),
+              );
             }
             return result;
           } finally {
@@ -1143,8 +1226,12 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture (same as wrapComponent) ---
-    const nativeEventsEnabled = xsVerbose && (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
-    const hoverSession = nativeEventsEnabled ? { traceId: undefined as string | undefined, lastTs: 0 } : undefined;
+    const nativeEventsEnabled =
+      xsVerbose &&
+      (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
+    const hoverSession = nativeEventsEnabled
+      ? { traceId: undefined as string | undefined, lastTs: 0 }
+      : undefined;
 
     if (nativeEventsEnabled) {
       const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
@@ -1160,8 +1247,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         //   React synthetic: event.nativeEvent
         //   Direct: event.offsetX
         const domEvent =
-          event?.event?.event || event?.event?.nativeEvent ||
-          event?.event || event?.nativeEvent;
+          event?.event?.event || event?.event?.nativeEvent || event?.event || event?.nativeEvent;
         const offsetX = domEvent?.offsetX ?? event?.offsetX;
         const offsetY = domEvent?.offsetY ?? event?.offsetY;
 
@@ -1179,18 +1265,20 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           popTrace();
         }
 
-        pushXsLog(createLogEntry(traceKind, {
-          traceId,
-          componentType: type,
-          componentLabel: xmluiId || type,
-          displayLabel: event?.displayLabel || undefined,
-          eventName: eventType,
-          ariaName: ariaLabel,
-          nativeEvent: event,
-          ...(typeof offsetX === "number" && { offsetX, offsetY }),
-          ownerFileId,
-          ownerSource,
-        }));
+        pushXsLog(
+          createLogEntry(traceKind, {
+            traceId,
+            componentType: type,
+            componentLabel: xmluiId || type,
+            displayLabel: event?.displayLabel || undefined,
+            eventName: eventType,
+            ariaName: ariaLabel,
+            nativeEvent: event,
+            ...(typeof offsetX === "number" && { offsetX, offsetY }),
+            ownerFileId,
+            ownerSource,
+          }),
+        );
 
         // Also fire as an XMLUI event if a handler is registered
         const handler = lookupEventHandler(eventType);
@@ -1273,11 +1361,12 @@ export function wrapCompound<TMd extends ComponentMetadata>(
 
     // --- Resolve aria-label cascade ---
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
-    ariaLabel = explicitAriaLabel
-      || extractValue(node.props?.["placeholder"])
-      || config.deriveAriaLabel?.(props)
-      || metadata.defaultAriaLabel
-      || undefined;
+    ariaLabel =
+      explicitAriaLabel ||
+      extractValue(node.props?.["placeholder"]) ||
+      config.deriveAriaLabel?.(props) ||
+      metadata.defaultAriaLabel ||
+      undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
     }
