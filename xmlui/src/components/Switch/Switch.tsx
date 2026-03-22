@@ -1,6 +1,6 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -93,39 +93,45 @@ export const SwitchMd = createMetadata({
   },
 });
 
-export const switchComponentRenderer = createComponentRenderer(
+export const switchComponentRenderer = wrapComponent(
   COMP,
+  Toggle,
   SwitchMd,
-  ({
-    node,
-    extractValue,
-    classes,
-    updateState,
-    state,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    return (
-      <Toggle
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        classes={classes}
-        initialValue={extractValue.asOptionalBoolean(
-          node.props.initialValue,
-          defaultProps.initialValue,
-        )}
-        value={state?.value}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        onClick={lookupEventHandler("click")}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        variant="switch"
-        registerComponentApi={registerComponentApi}
-      />
-    );
+  {
+    exposeRegisterApi: true,
+    stateful: true,
+    events: [],
+    customRender(_props, {
+      node,
+      extractValue,
+      classes,
+      updateState,
+      state,
+      lookupEventHandler,
+      registerComponentApi,
+    }) {
+      return (
+        <Toggle
+          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+          classes={classes}
+          initialValue={extractValue.asOptionalBoolean(
+            node.props.initialValue,
+            defaultProps.initialValue,
+          )}
+          value={state?.value}
+          readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+          validationStatus={extractValue(node.props.validationStatus)}
+          updateState={updateState}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+          onClick={lookupEventHandler("click")}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          required={extractValue.asOptionalBoolean(node.props.required)}
+          variant="switch"
+          registerComponentApi={registerComponentApi}
+        />
+      );
+    },
   },
 );
