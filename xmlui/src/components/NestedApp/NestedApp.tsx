@@ -1,6 +1,6 @@
 import styles from "./NestedApp.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { defaultProps } from "./defaultProps";
@@ -82,21 +82,17 @@ export const NestedAppMd = createMetadata({
   },
 });
 
-export const nestedAppComponentRenderer = createComponentRenderer(
-  COMP,
-  NestedAppMd,
-  ({ node, extractValue, className }) => {
-    return (
-      <IndexAwareNestedApp
-        app={node.props?.app}
-        className={className}
-        api={extractValue(node.props?.api)}
-        components={extractValue(node.props?.components)}
-        config={extractValue(node.props?.config)}
-        activeTheme={extractValue(node.props?.activeTheme)}
-        activeTone={extractValue(node.props?.activeTone)}
-        height={extractValue(node.props?.height)}
-      />
-    );
-  },
-);
+export const nestedAppComponentRenderer = wrapComponent(COMP, IndexAwareNestedApp, NestedAppMd, {
+  customRender: (_props, { node, extractValue, className }) => (
+    <IndexAwareNestedApp
+      app={node.props?.app}
+      className={className}
+      api={extractValue(node.props?.api)}
+      components={extractValue(node.props?.components)}
+      config={extractValue(node.props?.config)}
+      activeTheme={extractValue(node.props?.activeTheme)}
+      activeTone={extractValue(node.props?.activeTone)}
+      height={extractValue(node.props?.height)}
+    />
+  ),
+});

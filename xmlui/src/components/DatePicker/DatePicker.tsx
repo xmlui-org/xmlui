@@ -1,6 +1,6 @@
 import styles from "./DatePicker.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -27,7 +27,6 @@ import {
 } from "./DatePickerNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "DatePicker";
 
@@ -199,51 +198,20 @@ export const ThemedDatePicker = React.forwardRef<React.ElementRef<typeof DatePic
   },
 );
 
-export const datePickerComponentRenderer = createComponentRenderer(
+export const datePickerComponentRenderer = wrapComponent(
   COMP,
+  DatePicker,
   DatePickerMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    classes,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    return (
-      <DatePicker
-        classes={classes}
-        contentClassName={classes?.[COMPONENT_PART_KEY]}
-        mode={extractValue(node.props?.mode)}
-        value={state?.value}
-        initialValue={extractValue(node.props.initialValue)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        dateFormat={extractValue(node.props.dateFormat)}
-        showWeekNumber={extractValue.asOptionalBoolean(node.props.showWeekNumber)}
-        weekStartsOn={extractValue(node.props.weekStartsOn)}
-        startDate={extractValue(node.props.startDate)}
-        endDate={extractValue(node.props.endDate)}
-        disabledDates={extractValue(node.props.disabledDates)}
-        inline={extractValue.asOptionalBoolean(node.props.inline)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-        invalidMessages={extractValue(node.props.invalidMessages)}
-      />
-    );
+  {
+    events: { didChange: "onDidChange", gotFocus: "onFocus", lostFocus: "onBlur" },
+    booleans: ["verboseValidationFeedback"],
+    strings: ["validationIconSuccess", "validationIconError"],
+    exclude: ["invalidMessages"],
+    contentClassName: true,
+    exposeRegisterApi: true,
+    customRender: (props, { node, extractValue }) => {
+      props.invalidMessages = extractValue(node.props.invalidMessages);
+      return <DatePicker {...props} />;
+    },
   },
 );

@@ -9,7 +9,7 @@
  * text components for better semantic markup.
  */
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
 import { createMetadata } from "../metadata-helpers";
 
@@ -34,36 +34,44 @@ export const BrCapitalizedMd = createMetadata({
   isHtmlTag: true,
 });
 
+function BrNative(_props: any) { return null; }
+
 /**
  * Renderer for the br component
  */
-export const brComponentRenderer = createComponentRenderer(
+export const brComponentRenderer = wrapComponent(
   COMP,
+  BrNative,
   BrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <br className={classes?.["-component"]} {...props}>
-        {renderChild(node.children)}
-      </br>
-    );
+  {
+    customRender: (_props, { node, renderChild, extractValue, extractResourceUrl, classes }) => {
+      const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
+      const props = p.asRest();
+      return (
+        <br className={classes?.["-component"]} {...props}>
+          {renderChild(node.children)}
+        </br>
+      );
+    },
   },
 );
 
 /**
  * Renderer for the Br component (capitalized variant)
  */
-export const BrComponentRenderer = createComponentRenderer(
+export const BrComponentRenderer = wrapComponent(
   BR,
+  BrNative,
   BrCapitalizedMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
-    const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
-    const props = p.asRest();
-    return (
-      <br className={classes?.["-component"]} {...props}>
-        {renderChild(node.children)}
-      </br>
-    );
+  {
+    customRender: (_props, { node, renderChild, extractValue, extractResourceUrl, classes }) => {
+      const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
+      const props = p.asRest();
+      return (
+        <br className={classes?.["-component"]} {...props}>
+          {renderChild(node.children)}
+        </br>
+      );
+    },
   },
 );

@@ -1,6 +1,6 @@
 import styles from "./NavPanel.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
@@ -314,19 +314,15 @@ function NavPanelWithBuiltNavHierarchy({
   );
 }
 
-export const navPanelRenderer = createComponentRenderer(
-  COMP,
-  NavPanelMd,
-  ({ node, renderChild, classes, layoutContext, extractValue, appContext }) => {
-    return (
-      <NavPanelWithBuiltNavHierarchy
-        node={node}
-        renderChild={renderChild}
-        classes={classes}
-        layoutContext={layoutContext}
-        extractValue={extractValue}
-        appContext={appContext}
-      />
-    );
-  },
-);
+export const navPanelRenderer = wrapComponent(COMP, NavPanel, NavPanelMd, {
+  customRender: (_props, context) => (
+    <NavPanelWithBuiltNavHierarchy
+      node={context.node as any}
+      renderChild={context.renderChild}
+      classes={context.classes}
+      layoutContext={context.layoutContext}
+      extractValue={context.extractValue}
+      appContext={context.appContext}
+    />
+  ),
+});

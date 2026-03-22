@@ -5,7 +5,7 @@ import styles from "./Splitter.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ValueExtractor, LookupEventHandlerFn } from "../../abstractions/RendererDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -175,46 +175,37 @@ function SplitterRenderer({
   );
 }
 
-export const splitterComponentRenderer = createComponentRenderer(
-  COMP,
-  SplitterMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
-    return SplitterRenderer({
+export const splitterComponentRenderer = wrapComponent(COMP, Splitter, SplitterMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, lookupEventHandler }) =>
+    SplitterRenderer({
       node,
       extractValue,
       classes,
       renderChild,
       lookupEventHandler: lookupEventHandler as any,
-    });
-  },
-);
+    }),
+});
 
-export const vSplitterComponentRenderer = createComponentRenderer(
-  "VSplitter",
-  VSplitterMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
-    return SplitterRenderer({
+export const vSplitterComponentRenderer = wrapComponent("VSplitter", Splitter, VSplitterMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, lookupEventHandler }) =>
+    SplitterRenderer({
       node,
       extractValue,
       classes,
       renderChild,
       orientation: "vertical",
       lookupEventHandler: lookupEventHandler as any,
-    });
-  },
-);
+    }),
+});
 
-export const hSplitterComponentRenderer = createComponentRenderer(
-  "HSplitter",
-  HSplitterMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
-    return SplitterRenderer({
+export const hSplitterComponentRenderer = wrapComponent("HSplitter", Splitter, HSplitterMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, lookupEventHandler }) =>
+    SplitterRenderer({
       node,
       extractValue,
       classes,
       renderChild,
       orientation: "horizontal",
       lookupEventHandler: lookupEventHandler as any,
-    });
-  },
-);
+    }),
+});

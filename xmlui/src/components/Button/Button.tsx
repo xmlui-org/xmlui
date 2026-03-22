@@ -8,7 +8,7 @@ import {
   buttonTypesMd,
   iconPositionMd,
 } from "../abstractions";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -196,36 +196,30 @@ export const ThemedButton = React.forwardRef<HTMLButtonElement, ThemedButtonProp
   },
 );
 
-export const buttonComponentRenderer = createComponentRenderer(
+export const buttonComponentRenderer = wrapComponent(
   "Button",
+  Button,
   ButtonMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, classes }) => {
-    const iconName = extractValue.asString(node.props.icon);
-    const label = extractValue.asDisplayText(node.props.label);
-    const renderedChildren = hasRenderableChildren(node.children)
-      ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
-      : label;
-    return (
-      <Button
-        type={extractValue.asOptionalString(node.props.type)}
-        variant={extractValue.asOptionalString(node.props.variant)}
-        themeColor={extractValue.asOptionalString(node.props.themeColor)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        size={extractValue.asOptionalString(node.props.size)}
-        icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
-        orientation={extractValue.asOptionalString(node.props.orientation)}
-        contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
-        onClick={lookupEventHandler("click")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        classes={classes}
-        contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
-      >
-        {renderedChildren}
-      </Button>
-    );
+  {
+    booleans: ["autoFocus"],
+    strings: ["variant", "themeColor", "size", "iconPosition", "orientation", "contentPosition", "contextualLabel"],
+    events: { click: "onClick", contextMenu: "onContextMenu", gotFocus: "onFocus", lostFocus: "onBlur" },
+    exclude: ["icon", "label", "enabled"],
+    customRender: (props, { node, extractValue, renderChild }) => {
+      const iconName = extractValue.asString(node.props.icon);
+      const label = extractValue.asDisplayText(node.props.label);
+      const renderedChildren = hasRenderableChildren(node.children)
+        ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
+        : label;
+      return (
+        <Button
+          {...props}
+          icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
+          disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+        >
+          {renderedChildren}
+        </Button>
+      );
+    },
   },
 );

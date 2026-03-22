@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import styles from "./FlowLayout.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
@@ -118,10 +118,8 @@ export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLay
   },
 );
 
-export const flowLayoutComponentRenderer = createComponentRenderer(
-  COMP,
-  FlowLayoutMd,
-  ({ node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
+export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowLayoutMd, {
+  customRender: (_props, { node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -189,4 +187,4 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       </ThemedFlowLayout>
     );
   },
-);
+});

@@ -1,6 +1,6 @@
 import styles from "./FileInput.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -170,10 +170,9 @@ export const ThemedFileInput = React.forwardRef<HTMLDivElement, ThemedFileInputP
   },
 );
 
-export const fileInputRenderer = createComponentRenderer(
-  COMP,
-  FileInputMd,
-  ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
+export const fileInputRenderer = wrapComponent(COMP, FileInput, FileInputMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, { node, state, updateState, extractValue, lookupEventHandler, registerComponentApi, classes }) => {
     const iconName = extractValue.asOptionalString(node.props.buttonIcon) || DEFAULT_ICON;
     return (
       <FileInput
@@ -206,4 +205,4 @@ export const fileInputRenderer = createComponentRenderer(
       />
     );
   },
-);
+});

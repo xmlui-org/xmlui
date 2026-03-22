@@ -1,6 +1,6 @@
 import styles from "./AppWithCodeView.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { AppWithCodeViewNative } from "./AppWithCodeViewNative";
 import { defaultProps } from "./defaultProps";
@@ -73,49 +73,52 @@ It supports both side-by-side and stacked layouts.`,
   defaultThemeVars: {},
 });
 
-export const appWithCodeViewComponentRenderer = createComponentRenderer(
+export const appWithCodeViewComponentRenderer = wrapComponent(
   COMP,
+  AppWithCodeViewNative,
   AppWithCodeViewMd,
-  ({ node, extractValue, renderChild }) => {
-    let renderedChildren = "";
+  {
+    exclude: ["markdown", "app", "api", "components", "config", "activeTheme", "activeTone", "title", "height"],
+    customRender(_props, { node, extractValue, renderChild }) {
+      let renderedChildren = "";
 
-    // 1. Static content prop fallback
-    if (!renderedChildren) {
-      renderedChildren = extractValue.asString(node.props.markdown);
-    }
+      // 1. Static content prop fallback
+      if (!renderedChildren) {
+        renderedChildren = extractValue.asString(node.props.markdown);
+      }
 
-    // 2. "data" property fallback
-    if (!renderedChildren && typeof (node.props as any).data === "string") {
-      renderedChildren = extractValue.asString((node.props as any).data);
-    }
+      // 2. "data" property fallback
+      if (!renderedChildren && typeof (node.props as any).data === "string") {
+        renderedChildren = extractValue.asString((node.props as any).data);
+      }
 
-    // 3. Children fallback
-    if (!renderedChildren) {
-      (node.children ?? []).forEach((child) => {
-        const renderedChild = renderChild(child);
-        console.log("renderedChild", renderedChild);
-        if (typeof renderedChild === "string") {
-          renderedChildren += renderedChild;
-        }
-      });
-    }
+      // 3. Children fallback
+      if (!renderedChildren) {
+        (node.children ?? []).forEach((child) => {
+          const renderedChild = renderChild(child);
+          if (typeof renderedChild === "string") {
+            renderedChildren += renderedChild;
+          }
+        });
+      }
 
-    return (
-      <AppWithCodeViewNative
-        markdown={renderedChildren}
-        splitView={extractValue.asOptionalBoolean(node.props?.splitView)}
-        app={node.props?.app}
-        api={extractValue(node.props?.api)}
-        components={extractValue(node.props?.components)}
-        config={extractValue(node.props?.config)}
-        activeTheme={extractValue(node.props?.activeTheme)}
-        activeTone={extractValue(node.props?.activeTone)}
-        title={extractValue(node.props?.title)}
-        height={extractValue(node.props?.height)}
-        allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
-        withFrame={extractValue.asOptionalBoolean(node.props?.withFrame)}
-        allowReset={extractValue.asOptionalBoolean(node.props?.allowReset)}
-      />
-    );
+      return (
+        <AppWithCodeViewNative
+          markdown={renderedChildren}
+          splitView={extractValue.asOptionalBoolean(node.props?.splitView)}
+          app={node.props?.app}
+          api={extractValue(node.props?.api)}
+          components={extractValue(node.props?.components)}
+          config={extractValue(node.props?.config)}
+          activeTheme={extractValue(node.props?.activeTheme)}
+          activeTone={extractValue(node.props?.activeTone)}
+          title={extractValue(node.props?.title)}
+          height={extractValue(node.props?.height)}
+          allowPlaygroundPopup={extractValue.asOptionalBoolean(node.props?.allowPlaygroundPopup)}
+          withFrame={extractValue.asOptionalBoolean(node.props?.withFrame)}
+          allowReset={extractValue.asOptionalBoolean(node.props?.allowReset)}
+        />
+      );
+    },
   },
 );

@@ -1,6 +1,6 @@
 import styles from "./ContextMenu.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
@@ -63,21 +63,20 @@ export const ContextMenuMd = createMetadata({
   },
 });
 
-export const contextMenuComponentRenderer = createComponentRenderer(
-  CMCOMP,
-  ContextMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, classes, state, updateState }) => {
+export const contextMenuComponentRenderer = wrapComponent(CMCOMP, ContextMenu, ContextMenuMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, { node, extractValue, renderChild, registerComponentApi, updateState, state, classes }) => {
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
-    
+
     // Wrap filtered children with $context variable
     const nodeWithContextVars: ContainerWrapperDef = {
       type: "Container",
       contextVars: { $context: state.$context },
       children: filteredChildren,
     };
-    
+
     return (
       <ContextMenu
         registerComponentApi={registerComponentApi}
@@ -89,4 +88,4 @@ export const contextMenuComponentRenderer = createComponentRenderer(
       </ContextMenu>
     );
   },
-);
+});

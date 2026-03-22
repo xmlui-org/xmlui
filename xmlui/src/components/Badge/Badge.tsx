@@ -1,6 +1,6 @@
 import styles from "./Badge.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   Badge,
@@ -59,36 +59,39 @@ export const BadgeMd = createMetadata({
   },
 });
 
-export const badgeComponentRenderer = createComponentRenderer(
+export const badgeComponentRenderer = wrapComponent(
   COMP,
+  Badge,
   BadgeMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler }) => {
-    const value = extractValue.asDisplayText(node.props.value);
-    const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
-      node.props?.colorMap,
-    );
-    let colorValue: string | BadgeColors | undefined;
-    if (colorMap && value) {
-      const resolvedColor = colorMap[value];
-      if (typeof resolvedColor === "string") {
-        colorValue = resolveColor(resolvedColor);
-      } else if (isBadgeColors(resolvedColor)) {
-        colorValue = {
-          label: resolveColor(resolvedColor.label),
-          background: resolveColor(resolvedColor.background),
-        };
+  {
+    events: { contextMenu: "onContextMenu" },
+    exclude: ["value", "colorMap"],
+    customRender: (props, { node, extractValue, renderChild }) => {
+      const value = extractValue.asDisplayText(node.props.value);
+      const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
+        node.props?.colorMap,
+      );
+      let colorValue: string | BadgeColors | undefined;
+      if (colorMap && value) {
+        const resolvedColor = colorMap[value];
+        if (typeof resolvedColor === "string") {
+          colorValue = resolveColor(resolvedColor);
+        } else if (isBadgeColors(resolvedColor)) {
+          colorValue = {
+            label: resolveColor(resolvedColor.label),
+            background: resolveColor(resolvedColor.background),
+          };
+        }
       }
-    }
-    return (
-      <Badge
-        variant={extractValue(node.props.variant)}
-        color={colorValue}
-        classes={classes}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      >
-        {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
-      </Badge>
-    );
+      return (
+        <Badge
+          {...props}
+          color={colorValue}
+        >
+          {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
+        </Badge>
+      );
+    },
   },
 );
 

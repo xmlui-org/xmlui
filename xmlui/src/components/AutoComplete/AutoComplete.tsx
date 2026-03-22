@@ -1,8 +1,6 @@
 import styles from "./AutoComplete.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { MemoizedItem } from "../container-helpers";
 import {
   dPlaceholder,
   dInitialValue,
@@ -23,7 +21,7 @@ import {
 import { AutoComplete, defaultProps } from "./AutoCompleteNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "AutoComplete";
 
@@ -87,6 +85,21 @@ export const AutoCompleteMd = createMetadata({
       description: "internal radix modal prop",
       valueType: "boolean",
     },
+    verboseValidationFeedback: {
+      description: "Enables a concise validation summary (icon) in input components.",
+      valueType: "boolean" as const,
+      isInternal: true,
+    },
+    validationIconSuccess: {
+      description: "Icon to display for valid state when concise validation summary is enabled.",
+      valueType: "string" as const,
+      isInternal: true,
+    },
+    validationIconError: {
+      description: "Icon to display for error state when concise validation summary is enabled.",
+      valueType: "string" as const,
+      isInternal: true,
+    },
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -100,18 +113,6 @@ export const AutoCompleteMd = createMetadata({
       parameters: {
         item: "The newly created item value.",
       },
-    },
-    verboseValidationFeedback: {
-      description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
-    },
-    validationIconSuccess: {
-      description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
-    },
-    validationIconError: {
-      description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
     },
   },
   apis: {
@@ -188,65 +189,23 @@ export const ThemedAutoComplete = React.forwardRef<React.ElementRef<typeof AutoC
   },
 );
 
-export const autoCompleteComponentRenderer = createComponentRenderer(
+export const autoCompleteComponentRenderer = wrapComponent(
   COMP,
+  AutoComplete,
   AutoCompleteMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    registerComponentApi,
-    classes,
-  }) => {
-    return (
-      <AutoComplete
-        multi={extractValue.asOptionalBoolean(node.props.multi)}
-        classes={classes}
-        contentClassName={classes?.[COMPONENT_PART_KEY]}
-        updateState={updateState}
-        initialValue={extractValue(node.props.initialValue)}
-        value={state?.value}
-        creatable={extractValue.asOptionalBoolean(node.props.creatable)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        onItemCreated={lookupEventHandler("itemCreated")}
-        registerComponentApi={registerComponentApi}
-        emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        dropdownHeight={extractValue(node.props.dropdownHeight)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen)}
-        modal={extractValue.asOptionalBoolean(node.props.modal)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-        optionRenderer={
-          node.props.optionTemplate
-            ? (item, val, inTrigger) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.optionTemplate}
-                    contextVars={{
-                      $item: item,
-                      $selectedValue: val,
-                      $inTrigger: inTrigger,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </AutoComplete>
-    );
+  {
+    contentClassName: true,
+    exposeRegisterApi: true,
+    events: {
+      gotFocus: "onFocus",
+      lostFocus: "onBlur",
+      didChange: "onDidChange",
+      itemCreated: "onItemCreated",
+    },
+    renderers: {
+      optionTemplate: {
+        contextVars: ["$item", "$selectedValue", "$inTrigger"],
+      },
+    },
   },
 );

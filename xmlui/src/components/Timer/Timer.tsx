@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { Timer, defaultProps } from "./TimerNative";
 import { createMetadata } from "../metadata-helpers";
 
@@ -59,19 +59,18 @@ export const TimerMd = createMetadata({
   },
 });
 
-export const timerComponentRenderer = createComponentRenderer(
-  COMP,
-  TimerMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi }) => {
-    return (
-      <Timer
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        interval={extractValue.asOptionalNumber(node.props.interval)}
-        initialDelay={extractValue.asOptionalNumber(node.props.initialDelay)}
-        once={extractValue.asOptionalBoolean(node.props.once)}
-        onTick={lookupEventHandler("tick")}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
+export const timerComponentRenderer = wrapComponent(COMP, Timer, TimerMd, {
+  exposeRegisterApi: true,
+  // interval and initialDelay are valueType: "number" — asOptionalNumber throws for
+  // non-numeric strings. Use customRender to preserve exact original extraction.
+  customRender: (_props, { node, extractValue, lookupEventHandler, registerComponentApi }) => (
+    <Timer
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      interval={extractValue.asOptionalNumber(node.props.interval)}
+      initialDelay={extractValue.asOptionalNumber(node.props.initialDelay)}
+      once={extractValue.asOptionalBoolean(node.props.once)}
+      onTick={lookupEventHandler("tick")}
+      registerComponentApi={registerComponentApi}
+    />
+  ),
+});
