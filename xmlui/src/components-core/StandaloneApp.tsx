@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+
 import toast from "react-hot-toast";
 import yaml from "js-yaml";
 
@@ -1672,18 +1672,14 @@ export function startApp(
     if (rootElement.innerHTML.trim().length > 0) {
       contentRoot = ReactDOM.hydrateRoot(
         rootElement,
-        <BrowserRouter>
-          <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-        </BrowserRouter>,
+        <StandaloneApp runtime={runtime} extensionManager={extensionManager} />,
       );
       return contentRoot;
     }
     contentRoot = ReactDOM.createRoot(rootElement);
   }
   contentRoot.render(
-    <BrowserRouter>
-      <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-    </BrowserRouter>,
+    <StandaloneApp runtime={runtime} extensionManager={extensionManager} />,
   );
   return contentRoot;
 }

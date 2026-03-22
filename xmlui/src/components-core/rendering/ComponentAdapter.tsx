@@ -130,7 +130,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const resolvedLabel = useMemo(() => {
     const props = safeNode.props || {};
     const rawLabel =
-      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder ?? props["aria-label"];
     if (rawLabel === undefined) return undefined;
     // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
     return extractParam(state, rawLabel, appContext, true);

@@ -581,6 +581,43 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
+    // Wrap registerComponentApi to emit method:call for every registered method
+    const tracedRegisterComponentApi = xsVerbose
+      ? (apis: Record<string, any>) => {
+          const traced: Record<string, any> = {};
+          for (const [name, fn] of Object.entries(apis)) {
+            if (typeof fn === "function") {
+              traced[name] = (...args: any[]) => {
+                const traceId = pushTrace();
+                try {
+                  const result = fn(...args);
+                  pushXsLog(
+                    createLogEntry("method:call", {
+                      component: type,
+                      componentLabel: node.uid || node.testId || undefined,
+                      displayLabel: `${node.uid || type}.${name}(${args.map((a) => JSON.stringify(a)).join(", ")})`,
+                      ownerFileId,
+                      ownerSource,
+                    }),
+                  );
+                  return result;
+                } finally {
+                  popTrace(traceId);
+                }
+              };
+            } else {
+              traced[name] = fn;
+            }
+          }
+          registerComponentApi(traced);
+        }
+      : registerComponentApi;
+
+    // Patch context so customRender sees the traced version
+    if (xsVerbose) {
+      context = { ...context, registerComponentApi: tracedRegisterComponentApi };
+    }
+
     // --- Resolve aria-label cascade ---
     // Computed after prop forwarding (below) but declared here so event handler
     // closures can read the final value when they fire at interaction time.
@@ -590,7 +627,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     props.className = className;
     props.classes = classes;
     if (config.exposeRegisterApi) {
-      props.registerComponentApi = registerComponentApi;
+      props.registerComponentApi = tracedRegisterComponentApi;
     }
     if (config.passUid) {
       props.uid = extractValue(node.uid);
@@ -1140,6 +1177,38 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
+    // Wrap registerComponentApi to emit method:call for every registered method
+    const tracedRegisterComponentApi = xsVerbose
+      ? (apis: Record<string, any>) => {
+          const traced: Record<string, any> = {};
+          for (const [name, fn] of Object.entries(apis)) {
+            if (typeof fn === "function") {
+              traced[name] = (...args: any[]) => {
+                const traceId = pushTrace();
+                try {
+                  const result = fn(...args);
+                  pushXsLog(
+                    createLogEntry("method:call", {
+                      component: type,
+                      componentLabel: node.uid || node.testId || undefined,
+                      displayLabel: `${node.uid || type}.${name}(${args.map((a) => JSON.stringify(a)).join(", ")})`,
+                      ownerFileId,
+                      ownerSource,
+                    }),
+                  );
+                  return result;
+                } finally {
+                  popTrace(traceId);
+                }
+              };
+            } else {
+              traced[name] = fn;
+            }
+          }
+          registerComponentApi(traced);
+        }
+      : registerComponentApi;
+
     // --- Resolve aria-label cascade ---
     let ariaLabel: string | undefined;
 
@@ -1152,7 +1221,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       props.__value = state.value;
       props.__initialValue = extractValue(node.props?.initialValue);
     }
-    props.__registerComponentApi = registerComponentApi;
+    props.__registerComponentApi = tracedRegisterComponentApi;
 
     // --- Events (with auto-tracing + auto-updateState) ---
     for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
