@@ -146,6 +146,28 @@ export function useGlobalVariables(
           depMap[`runtime:${globalKey}`] = componentValue;
         }
       }
+
+      // Track live-reference sentinels for reactive API bindings.
+      // When a global was assigned a component API (e.g. myData = ds), its
+      // runtime value in componentState is the sentinel { __liveApiRef__: "ds" }.
+      // We add the *current* API value to depMap so that when the API changes
+      // (e.g. DataSource fetches new data) this map changes, triggering the
+      // global to re-evaluate with the fresh API value.
+      for (const globalKey of Object.keys(nodeGlobalVars)) {
+        if (!globalKey.startsWith("__")) {
+          const runtimeValue = componentStateWithApis[globalKey];
+          if (
+            runtimeValue &&
+            typeof runtimeValue === "object" &&
+            typeof runtimeValue.__liveApiRef__ === "string"
+          ) {
+            const apiKey = runtimeValue.__liveApiRef__;
+            if (apiKey in componentStateWithApis) {
+              depMap[`liveApiValue:${globalKey}`] = componentStateWithApis[apiKey];
+            }
+          }
+        }
+      }
     }
 
     return depMap;
@@ -205,8 +227,21 @@ export function useGlobalVariables(
         // Don't re-evaluate the original expression (which would give the old value)
         const runtimeKey = `runtime:${key}`;
         if (runtimeKey in globalDepValueMap) {
-          evaluatedNodeGlobals[key] = globalDepValueMap[runtimeKey];
-          globalsForContext[key] = globalDepValueMap[runtimeKey];
+          let runtimeValue = globalDepValueMap[runtimeKey];
+          // If the runtime value is a live-reference sentinel ({ __liveApiRef__: "ds" }),
+          // resolve it to the current component API value so the binding stays reactive.
+          if (
+            runtimeValue &&
+            typeof runtimeValue === "object" &&
+            typeof runtimeValue.__liveApiRef__ === "string"
+          ) {
+            const liveKey = `liveApiValue:${key}`;
+            if (liveKey in globalDepValueMap) {
+              runtimeValue = globalDepValueMap[liveKey];
+            }
+          }
+          evaluatedNodeGlobals[key] = runtimeValue;
+          globalsForContext[key] = runtimeValue;
           continue;
         }
 
