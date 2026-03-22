@@ -444,6 +444,15 @@ function traceDisplayLabel(traceKind: string, xmluiName: string, args: any[]): s
         return val.map((f: File) => f.name).join(", ");
       }
     }
+    // ChangeListener passes { prevValue, newValue } — show a diff summary
+    if (typeof val === "object" && val !== null && "prevValue" in val && "newValue" in val) {
+      const prev = val.prevValue;
+      const next = val.newValue;
+      if (Array.isArray(next)) {
+        return `${(prev || []).length} → ${next.length} items`;
+      }
+      return `${JSON.stringify(prev)?.slice(0, 30)} → ${JSON.stringify(next)?.slice(0, 30)}`;
+    }
     return String(val);
   }
   // For focus events, the arg is a FocusEvent object — not useful as a label
@@ -581,43 +590,6 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
-    // Wrap registerComponentApi to emit method:call for every registered method
-    const tracedRegisterComponentApi = xsVerbose
-      ? (apis: Record<string, any>) => {
-          const traced: Record<string, any> = {};
-          for (const [name, fn] of Object.entries(apis)) {
-            if (typeof fn === "function") {
-              traced[name] = (...args: any[]) => {
-                const traceId = pushTrace();
-                try {
-                  const result = fn(...args);
-                  pushXsLog(
-                    createLogEntry("method:call", {
-                      component: type,
-                      componentLabel: node.uid || node.testId || undefined,
-                      displayLabel: `${node.uid || type}.${name}(${args.map((a) => JSON.stringify(a)).join(", ")})`,
-                      ownerFileId,
-                      ownerSource,
-                    }),
-                  );
-                  return result;
-                } finally {
-                  popTrace(traceId);
-                }
-              };
-            } else {
-              traced[name] = fn;
-            }
-          }
-          registerComponentApi(traced);
-        }
-      : registerComponentApi;
-
-    // Patch context so customRender sees the traced version
-    if (xsVerbose) {
-      context = { ...context, registerComponentApi: tracedRegisterComponentApi };
-    }
-
     // --- Resolve aria-label cascade ---
     // Computed after prop forwarding (below) but declared here so event handler
     // closures can read the final value when they fire at interaction time.
@@ -627,7 +599,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     props.className = className;
     props.classes = classes;
     if (config.exposeRegisterApi) {
-      props.registerComponentApi = tracedRegisterComponentApi;
+      props.registerComponentApi = registerComponentApi;
     }
     if (config.passUid) {
       props.uid = extractValue(node.uid);
@@ -656,6 +628,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             result = handler(...args);
           }
           if (traceKind) {
+            // For ChangeListener didChange, include prevValue/newValue for diff rendering
+            const changeListenerDiff: Record<string, any> = {};
+            if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+              changeListenerDiff.prevValue = args[0].prevValue;
+              changeListenerDiff.newValue = args[0].newValue;
+            }
             pushXsLog(
               createLogEntry(traceKind, {
                 component: type,
@@ -666,6 +644,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
                 ownerFileId,
                 ownerSource,
                 ...extractFileMetadata(args),
+                ...changeListenerDiff,
               }),
             );
           }
@@ -1177,38 +1156,6 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // All tracing (pushTrace, pushXsLog, HoverCapture) is gated on xsVerbose.
     const xsVerbose = context.appContext?.appGlobals?.xsVerbose === true;
 
-    // Wrap registerComponentApi to emit method:call for every registered method
-    const tracedRegisterComponentApi = xsVerbose
-      ? (apis: Record<string, any>) => {
-          const traced: Record<string, any> = {};
-          for (const [name, fn] of Object.entries(apis)) {
-            if (typeof fn === "function") {
-              traced[name] = (...args: any[]) => {
-                const traceId = pushTrace();
-                try {
-                  const result = fn(...args);
-                  pushXsLog(
-                    createLogEntry("method:call", {
-                      component: type,
-                      componentLabel: node.uid || node.testId || undefined,
-                      displayLabel: `${node.uid || type}.${name}(${args.map((a) => JSON.stringify(a)).join(", ")})`,
-                      ownerFileId,
-                      ownerSource,
-                    }),
-                  );
-                  return result;
-                } finally {
-                  popTrace(traceId);
-                }
-              };
-            } else {
-              traced[name] = fn;
-            }
-          }
-          registerComponentApi(traced);
-        }
-      : registerComponentApi;
-
     // --- Resolve aria-label cascade ---
     let ariaLabel: string | undefined;
 
@@ -1221,7 +1168,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       props.__value = state.value;
       props.__initialValue = extractValue(node.props?.initialValue);
     }
-    props.__registerComponentApi = tracedRegisterComponentApi;
+    props.__registerComponentApi = registerComponentApi;
 
     // --- Events (with auto-tracing + auto-updateState) ---
     for (const [xmluiName, reactPropName] of Object.entries(eventMap)) {
@@ -1259,7 +1206,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           }
         };
       } else {
-        // Non-didChange events (gotFocus, lostFocus) pass through as native props
+        // Non-didChange events (gotFocus, lostFocus, ChangeListener didChange) pass through as native props
         props[reactPropName] = (...args: any[]) => {
           const traceId = traceKind ? pushTrace() : undefined;
           try {
@@ -1268,6 +1215,12 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               result = handler(...args);
             }
             if (traceKind) {
+              // For ChangeListener didChange, include prevValue/newValue for diff rendering
+              const changeListenerDiff: Record<string, any> = {};
+              if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+                changeListenerDiff.prevValue = args[0].prevValue;
+                changeListenerDiff.newValue = args[0].newValue;
+              }
               pushXsLog(
                 createLogEntry(traceKind, {
                   component: type,
@@ -1278,6 +1231,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                   ownerFileId,
                   ownerSource,
                   ...extractFileMetadata(args),
+                  ...changeListenerDiff,
                 }),
               );
             }
