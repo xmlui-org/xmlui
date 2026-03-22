@@ -138,8 +138,6 @@ import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
-import { carouselComponentRenderer } from "./Carousel/Carousel";
-import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
 import { navPanelCollapseButtonComponentRenderer } from "./NavPanelCollapseButton/NavPanelCollapseButton";
@@ -513,9 +511,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerCoreComponent(accordionItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
-      this.registerCoreComponent(carouselItemComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
@@ -592,7 +587,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(nestedAppComponentRenderer);
       this.registerCoreComponent(appWithCodeViewComponentRenderer);
       // --- New Bootstrap-inspired components
-      this.registerCoreComponent(carouselComponentRenderer);
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(ratingInputComponentRenderer);

@@ -8,7 +8,8 @@ import classnames from "classnames";
 
 import styles from "./Carousel.module.scss";
 
-import { RegisterComponentApiFn, Icon } from "xmlui";
+import type { RegisterComponentApiFn } from "xmlui";
+import { Icon } from "xmlui";
 import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
 
 // Matches the COMPONENT_PART_KEY constant from xmlui internals
@@ -85,11 +86,11 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const referenceElement = useRef(null);
+  const referenceElement = useRef<HTMLDivElement>(null);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [plugins, setPlugins] = useState([]);
+  const [plugins, setPlugins] = useState<NonNullable<Parameters<typeof useEmblaCarousel>[1]>>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators);
+  const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators ?? true);
   const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const [carouselRef, api] = useEmblaCarousel(
@@ -172,7 +173,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   }, [api]);
 
   const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event: KeyboardEvent) => {
       if (orientation === "horizontal") {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
