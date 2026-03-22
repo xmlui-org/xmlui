@@ -1,8 +1,7 @@
 import { defaultProps, PieChart } from "./PieChartNative";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
-import { parseScssVar, createComponentRenderer, createMetadata, d } from "xmlui";
-import type { LabelPosition } from "recharts/types/component/Label";
+import { parseScssVar, wrapComponent, createMetadata, d } from "xmlui";
 
 const COMP = "PieChart";
 
@@ -58,23 +57,4 @@ export const PieChartMd = createMetadata({
   },
 });
 
-export const pieChartComponentRenderer = createComponentRenderer(
-  COMP,
-  PieChartMd,
-  ({ extractValue, node, className, renderChild }) => {
-    return (
-      <PieChart
-        showLabelList={extractValue.asOptionalBoolean(node.props?.showLabelList)}
-        labelListPosition={extractValue.asOptionalString(node.props?.labelListPosition) as LabelPosition}
-        data={extractValue(node.props?.data)}
-        className={className}
-        showLabel={extractValue.asOptionalBoolean(node.props?.showLabel)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
-        dataKey={extractValue(node.props?.dataKey)}
-        nameKey={extractValue(node.props?.nameKey)}
-      >
-        {renderChild(node.children)}
-      </PieChart>
-    );
-  },
-);
+export const pieChartComponentRenderer = wrapComponent(COMP, PieChart, PieChartMd);

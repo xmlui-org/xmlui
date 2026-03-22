@@ -1,5 +1,5 @@
 import { BarChart, defaultProps } from "./BarChartNative";
-import { createComponentRenderer, createMetadata, MemoizedItem } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "BarChart";
 
@@ -19,7 +19,6 @@ export const BarChartMd = createMetadata({
     yKeys: {
       description:
         "Specifies the key in the data objects that will be used to label the different data series.",
-      valueType: "string",
     },
     stacked: {
       description:
@@ -92,44 +91,10 @@ export const BarChartMd = createMetadata({
   },
 });
 
-export const barChartComponentRenderer = createComponentRenderer(
-  COMP,
-  BarChartMd,
-  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
-    return (
-      <BarChart
-        className={className}
-        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
-        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
-        data={extractValue(node.props?.data)}
-        layout={extractValue(node.props?.orientation)}
-        nameKey={extractValue(node.props?.xKey)}
-        dataKeys={extractValue(node.props?.yKeys)}
-        stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
-        hideX={extractValue.asOptionalBoolean(node.props?.hideX)}
-        hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
-        hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
-        hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
-        hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
-        tooltipRenderer={
-          node.props.tooltipTemplate
-            ? (tooltipData) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.tooltipTemplate}
-                    contextVars={{
-                      $tooltip: tooltipData,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </BarChart>
-    );
+export const barChartComponentRenderer = wrapComponent(COMP, BarChart, BarChartMd, {
+  rename: { yKeys: "dataKeys", orientation: "layout", xKey: "nameKey" },
+  callbacks: ["tickFormatterX", "tickFormatterY"],
+  renderers: {
+    tooltipTemplate: { reactProp: "tooltipRenderer", contextVars: ["$tooltip"] },
   },
-);
+});

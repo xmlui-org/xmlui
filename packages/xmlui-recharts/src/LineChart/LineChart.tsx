@@ -1,5 +1,5 @@
 import { defaultProps, LineChart } from "./LineChartNative";
-import { createComponentRenderer, createMetadata, d, parseScssVar, MemoizedItem } from "xmlui";
+import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
 import styles from "./LineChart.module.scss";
 
 const COMP = "LineChart";
@@ -25,7 +25,6 @@ export const LineChartMd = createMetadata({
     yKeys: {
       description:
       "This property specifies the keys in the data objects that should be used for rendering the lines.",
-      valueType: "string",
     },
     hideX: {
       description:
@@ -85,46 +84,11 @@ export const LineChartMd = createMetadata({
   },
 });
 
-export const lineChartComponentRenderer = createComponentRenderer(
-  COMP,
-  LineChartMd,
-  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
-    return (
-      <LineChart
-        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
-        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
-        hideTickX={extractValue(node.props?.hideTickX)}
-        hideTickY={extractValue(node.props?.hideTickY)}
-        data={extractValue(node.props?.data)}
-        className={className}
-        dataKeys={extractValue(node.props?.yKeys)}
-        nameKey={extractValue(node.props?.xKey)}
-        hideX={extractValue(node.props?.hideX)}
-        hideY={extractValue(node.props?.hideY)}
-        hideTooltip={extractValue(node.props?.hideTooltip)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
-        marginTop={extractValue.asOptionalNumber(node.props?.marginTop)}
-        marginRight={extractValue.asOptionalNumber(node.props?.marginRight)}
-        marginBottom={extractValue.asOptionalNumber(node.props?.marginBottom)}
-        marginLeft={extractValue.asOptionalNumber(node.props?.marginLeft)}
-        tooltipRenderer={
-          node.props.tooltipTemplate
-            ? (tooltipData) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.tooltipTemplate}
-                    contextVars={{
-                      $tooltip: tooltipData,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </LineChart>
-    );
+export const lineChartComponentRenderer = wrapComponent(COMP, LineChart, LineChartMd, {
+  rename: { yKeys: "dataKeys", xKey: "nameKey" },
+  callbacks: ["tickFormatterX", "tickFormatterY"],
+  numbers: ["marginTop", "marginRight", "marginBottom", "marginLeft"],
+  renderers: {
+    tooltipTemplate: { reactProp: "tooltipRenderer", contextVars: ["$tooltip"] },
   },
-);
+});

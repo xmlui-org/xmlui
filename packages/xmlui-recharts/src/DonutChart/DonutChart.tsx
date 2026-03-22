@@ -1,4 +1,4 @@
-import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 
@@ -54,35 +54,10 @@ export const DonutChartMd = createMetadata({
   },
 });
 
-export const donutChartComponentRenderer = createComponentRenderer(
-  COMP,
-  DonutChartMd,
-  ({ extractValue, node, className, renderChild }) => {
-    return (
-      <PieChart
-        showLabelList={extractValue.asOptionalBoolean(
-          node.props?.showLabelList,
-          defaultPropsDonut.showLabelList,
-        )}
-        innerRadius={extractValue.asOptionalNumber(
-          node.props?.innerRadius,
-          defaultPropsDonut.innerRadius,
-        )}
-        data={extractValue(node.props?.data)}
-        className={className}
-        showLabel={extractValue.asOptionalBoolean(
-          node.props?.showLabel,
-          defaultPropsDonut.showLabel,
-        )}
-        dataKey={extractValue(node.props?.dataKey)}
-        nameKey={extractValue(node.props?.nameKey)}
-        showLegend={extractValue.asOptionalBoolean(
-          node.props?.showLegend,
-          defaultPropsDonut.showLegend,
-        )}
-      >
-        {renderChild(node.children)}
-      </PieChart>
-    );
-  },
-);
+export const donutChartComponentRenderer = wrapComponent(COMP, PieChart, DonutChartMd, {
+  customRender: (props, context) => (
+    <PieChart {...props} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
+      {context.renderChild(context.node.children)}
+    </PieChart>
+  ),
+});

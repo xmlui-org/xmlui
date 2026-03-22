@@ -1,5 +1,5 @@
 import { AreaChart, defaultProps } from "./AreaChartNative";
-import { createComponentRenderer, createMetadata, MemoizedItem } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "AreaChart";
 
@@ -18,7 +18,6 @@ export const AreaChartMd = createMetadata({
       description:
         "This property specifies the keys in the data objects that should be used for rendering the chart elements. " +
         "E.g. 'value' or 'amount'.",
-      valueType: "string",
     },
     nameKey: {
       description:
@@ -92,44 +91,9 @@ export const AreaChartMd = createMetadata({
 });
 
 // Component renderer
-export const areaChartComponentRenderer = createComponentRenderer(
-  COMP,
-  AreaChartMd,
-  ({ extractValue, node, className, lookupSyncCallback, renderChild }: any) => {
-    return (
-      <AreaChart
-        className={className}
-        tickFormatterX={lookupSyncCallback(node.props?.tickFormatterX)}
-        tickFormatterY={lookupSyncCallback(node.props?.tickFormatterY)}
-        data={extractValue(node.props?.data)}
-        nameKey={extractValue(node.props?.nameKey)}
-        dataKeys={extractValue(node.props?.dataKeys)}
-        hideX={extractValue.asOptionalBoolean(node.props?.hideX)}
-        hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
-        hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
-        hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
-        hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
-        stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
-        curved={extractValue.asOptionalBoolean(node.props?.curved)}
-        tooltipRenderer={
-          node.props.tooltipTemplate
-            ? (tooltipData) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.tooltipTemplate}
-                    contextVars={{
-                      $tooltip: tooltipData,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </AreaChart>
-    );
+export const areaChartComponentRenderer = wrapComponent(COMP, AreaChart, AreaChartMd, {
+  callbacks: ["tickFormatterX", "tickFormatterY"],
+  renderers: {
+    tooltipTemplate: { reactProp: "tooltipRenderer", contextVars: ["$tooltip"] },
   },
-);
+});
