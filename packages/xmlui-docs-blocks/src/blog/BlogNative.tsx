@@ -3,18 +3,21 @@ import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import classnames from "classnames";
 
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { useAppContext } from "../../components-core/AppContext";
-import { useTheme } from "../../components-core/theming/ThemeContext";
-import { ThemedLinkNative as LinkNative } from "../Link/Link";
-import { ThemedText as Text } from "../Text/Text";
-import { ThemedHeading as Heading } from "../Heading/Heading";
-import { ThemedImage as Image } from "../Image/Image";
-import { ThemedMarkdown as Markdown } from "../Markdown/Markdown";
-import { ThemedTableOfContents as TableOfContents } from "../TableOfContents/TableOfContents";
-import { ThemedTabs as Tabs } from "../Tabs/Tabs";
-import { ThemedTabItem as TabItemComponent } from "../Tabs/TabItem";
-import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "../FlowLayout/FlowLayout";
+import {
+  COMPONENT_PART_KEY,
+  useAppContext,
+  useTheme,
+  LinkNative,
+  Text,
+  Heading,
+  Image,
+  Markdown,
+  TableOfContents,
+  Tabs,
+  TabItem as TabItemComponent,
+  FlowLayout,
+  FlowItemWrapper,
+} from "xmlui";
 import styles from "./Blog.module.scss";
 
 type BlogPost = {
