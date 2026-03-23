@@ -4,13 +4,13 @@ Agent-oriented reference for the XMLUI monorepo. Read this first for any task.
 For deeper detail, refer to:
 
 - **`xmlui/dev-docs/`** — architecture & subsystem reference (rendering, containers, theming, forms, etc.)
-- **`guidelines/`** — contribution conventions and patterns (components, testing, QA checklist); organized under `guidelines/xmlui/`. Key files: `guidelines/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `guidelines/xmlui/data.md` (DataSource/APICall patterns), `guidelines/xmlui/components/overview.md` (component authoring), `guidelines/xmlui/components/behaviors.md` (auto-attached behaviors), `guidelines/xmlui/testing/e2e.md` (E2E conventions).
+- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/components/overview.md` (component authoring), `.ai/xmlui/components/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing/e2e.md` (E2E conventions).
 
 ---
 
 ## What is XMLUI
 
-> **User perspective**: `guidelines/xmlui/overview.md` describes XMLUI from the application developer's point of view — markup syntax, reactive binding, routing, forms, global functions. Read this to understand *what the components you build are for*.
+> **User perspective**: `.ai/xmlui/overview.md` describes XMLUI from the application developer's point of view — markup syntax, reactive binding, routing, forms, global functions. Read this to understand *what the components you build are for*.
 
 
 XMLUI is a **declarative, reactive frontend framework** for building web applications using XML markup. Users write `.xmlui` files instead of JavaScript/JSX. The framework is fully reactive — expressions in markup re-evaluate automatically when their dependencies change, similar to a spreadsheet. There is no manual state wiring.

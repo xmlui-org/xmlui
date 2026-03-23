@@ -1,6 +1,6 @@
 # XMLUI Component QA Checklist
 
-Use this when reviewing or verifying XMLUI components against conventions. For implementation details, see the sub-files listed in `guidelines/xmlui/components/overview.md`.
+Use this when reviewing or verifying XMLUI components against conventions. For implementation details, see the sub-files listed in `.ai/xmlui/components/overview.md`.
 
 ## Scope
 
