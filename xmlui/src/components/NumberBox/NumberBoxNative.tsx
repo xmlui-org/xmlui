@@ -137,6 +137,7 @@ export const NumberBox = forwardRef(function NumberBox(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    "aria-label": ariaLabel,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -618,6 +619,7 @@ export const NumberBox = forwardRef(function NumberBox(
         [styles.rtl]: direction === "rtl",
       })}
       ref={forwardedRef}
+      aria-label={ariaLabel}
       tabIndex={-1}
       onFocus={() => {
         inputRef.current?.focus();
@@ -682,6 +684,7 @@ export const NumberBox = forwardRef(function NumberBox(
               className={styles.spinnerButton}
               disabled={!enabled || readOnly}
               ref={upButton}
+              aria-label={ariaLabel ? `Increase ${ariaLabel}` : "Increase"}
             >
               <ThemedIcon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
@@ -697,6 +700,7 @@ export const NumberBox = forwardRef(function NumberBox(
               className={styles.spinnerButton}
               disabled={!enabled || readOnly}
               ref={downButton}
+              aria-label={ariaLabel ? `Decrease ${ariaLabel}` : "Decrease"}
             >
               <ThemedIcon
                 name={spinnerDownIcon || "spinnerDown:NumberBox"}

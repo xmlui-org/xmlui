@@ -4,6 +4,7 @@ import classnames from "classnames";
 import styles from "./Inspector.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { normalizePath } from "../../components-core/utils/misc";
 import SearchCodeIcon from "../Icon/svg/l-search-code.svg?react";
 
 type Props = {
@@ -86,7 +87,7 @@ export function Inspector({
               </button>
             </div>
             <iframe
-              src={src}
+              src={normalizePath(src)}
               className={styles.iframe}
               data-testid="InspectorFrame"
             />

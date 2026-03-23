@@ -672,7 +672,8 @@ export function AppContent({
 
       const inspectEl = withInspectId || closestInspect;
       const testIdEl = withTestId || closestTestId;
-      const nearest = inspectEl || testIdEl || target;
+      const componentTypeEl = target?.closest?.("[data-component-type]") as HTMLElement | null;
+      const nearest = inspectEl || testIdEl || componentTypeEl || target;
 
       const inspectId = inspectEl?.getAttribute?.("data-inspectid") || undefined;
       const testId = testIdEl?.getAttribute?.("data-testid") || undefined;
