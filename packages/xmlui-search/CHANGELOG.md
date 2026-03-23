@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.9
+
+### Patch Changes
+
+- 2ea178a: Fixed slow input field response on keyboard input.
+
 ## 0.1.8
 
 ### Patch Changes
