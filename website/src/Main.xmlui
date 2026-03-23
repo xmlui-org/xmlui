@@ -102,7 +102,7 @@
 
           </property>
           <Fragment
-            when="{mediaSize.sizeIndex <= 2}"
+            when-lg="false"
           >
             <Stack padding="$space-4">
               <Search
@@ -128,7 +128,8 @@
           </Fragment>
           <Stack
             gap="0"
-            paddingTop="{mediaSize.sizeIndex > 2 ? '$space-4' : '0'}"
+            paddingTop-lg="$space-4"
+            paddingTop="0"
           >
             <NavGroup
               initiallyExpanded="{true}"
