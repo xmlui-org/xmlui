@@ -4,6 +4,7 @@ import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useIsTouchDevice } from "../../components-core/utils/hooks";
 
 export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
 
@@ -52,10 +53,15 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   const autoHideDelayMouseOver = parseInt(getThemeVar("autoHideDelay-whenMouseOver-Scroller") || "200", 10);
   const autoHideDelayScrolling = parseInt(getThemeVar("autoHideDelay-whenScrolling-Scroller") || "400", 10);
 
+  // On touch/mobile devices, always use native scrollbars for better UX
+  const isTouchDevice = useIsTouchDevice();
+
   // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
-  const normalizedScrollStyle = (["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
-    ? scrollStyle
-    : "normal") as ScrollStyle;
+  const normalizedScrollStyle = (isTouchDevice
+    ? "normal"
+    : ["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
+      ? scrollStyle
+      : "normal") as ScrollStyle;
 
   // Update fade indicators based on scroll position
   const updateFadeIndicators = React.useCallback(() => {
