@@ -297,17 +297,27 @@ Just submitting the form as is also produces the same error.
 
 %-PROP-START regex
 
-In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
+The following example showcases the `regex` property in action.
+Submit the form as is or type in any kind of input.
 
 ```xmlui-pg copy display name="Example: regex"
 <App>
   <Form
     data="{{ password: 'PASSWORD123' }}"
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem regex="^[a-z]+$" bindTo="password" />
+    <FormItem regex="{'^[a-z]+$'}" bindTo="password" />
   </Form>
 </App>
 ```
+
+> [!WARNING]
+> **Mind the curly braces when defining regular expressions!**
+>
+> While patterns such as `"^[a-z]+$"` is correctly handled as a string, using quantifiers in regular expressions can be incorrectly interpreted by the framework as a binding expression. Thus `"^[a-z]{2}(_[A-Z]{2})?$"` becomes `"^[a-z]2(_[A-Z]2)?$"` after evaluation.
+>
+> Either write the expression in a different way, such as `^[a-z][a-z](_[A-Z][A-Z])?$`,
+>
+> OR pass it as a string inside a binding expression like this: `{'^[a-z]{2}(_[A-Z]{2})?$'}`.
 
 %-PROP-END
 

@@ -285,6 +285,12 @@ class FormItemValidator {
     if (regex === undefined) {
       return undefined;
     }
+    if (this.value === undefined || this.value === null || this.value === "") {
+      return {
+        isValid: true,
+        severity: "valid",
+      };
+    }
     return {
       isValid: isRegexValid(this.value, regex),
       invalidMessage: regexInvalidMessage || "Input is not in the correct format",

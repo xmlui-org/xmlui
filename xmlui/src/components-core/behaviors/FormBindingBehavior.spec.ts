@@ -2149,6 +2149,124 @@ test.describe("Phone Pattern Validation", () => {
 });
 
 // =============================================================================
+// REGEX VALIDATION TESTS
+// =============================================================================
+
+test.describe("Regex Validation", () => {
+  test("shows error for value not matching regex", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    await fieldInput.field.fill("abc123");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).toContainText("Letters only");
+  });
+
+  test("does not show error for value matching regex", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    await fieldInput.field.fill("hello");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("does not show error for empty value (optional field)", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    // Make the field dirty then clear — empty is valid for optional fields
+    await fieldInput.field.fill("x");
+    await fieldInput.field.clear();
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("regex with brace quantifiers works when passed as JS expression", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    // Patterns containing curly braces (e.g. {3}) must be wrapped in a JS string
+    // expression — regex="{'^pattern{N}$'}" — to prevent XMLUI's expression
+    // parser from consuming the braces as reactive expressions.
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="{'^[a-z]{3}$'}"
+          regexInvalidMessage="Must be exactly 3 lowercase letters"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+
+    // "ab" is too short — should fail
+    await fieldInput.field.fill("ab");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).toContainText("Must be exactly 3 lowercase letters");
+
+    // "abc" matches exactly — should pass
+    await fieldInput.field.fill("abc");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).not.toContainText("Must be exactly 3 lowercase letters");
+  });
+});
+
+// =============================================================================
 // STYLING TESTS
 // =============================================================================
 
