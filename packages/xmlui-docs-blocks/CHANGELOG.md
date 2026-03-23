@@ -1,5 +1,11 @@
 # xmlui-docs-blocks
 
+## 0.0.6
+
+### Patch Changes
+
+- fffde0d: Move Blog component from xmlui core to xmlui-docs-blocks extension package
+
 ## 0.0.5
 
 ### Patch Changes

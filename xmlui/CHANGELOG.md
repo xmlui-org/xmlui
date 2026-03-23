@@ -1,5 +1,21 @@
 # xmlui
 
+## 0.12.12
+
+### Patch Changes
+
+- 44546ae: Fix tab-out issue with PasswordInput
+- 0a4c214: expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project
+- 6dda27c: Ignore scrollStyle and showScrollerFade on mobile devices
+- d65101f: Wire Inspector icon color through theme system so it responds to theme changes
+- 82f5ad4: Experiment with persisting unsubmitted Form data
+- fffde0d: Move Blog component from xmlui core to xmlui-docs-blocks extension package
+- c9871a9: Fix DataSource reactivity through variables
+- 7e0dab5: Improve component property name linting with responsive properties and behavior properties
+- 894a635: Fix Select regression in Form (versus FormItem type="select")
+- 77254bc: Move Carousel to xmlui-website-blocks extension
+- 679b397: Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).
+
 ## 0.12.11
 
 ### Patch Changes
