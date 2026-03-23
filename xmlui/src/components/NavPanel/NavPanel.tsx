@@ -4,9 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import { useComponentRegistry } from "../ComponentRegistryContext";
 
 const COMP = "NavPanel";
 
