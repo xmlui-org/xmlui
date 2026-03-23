@@ -294,18 +294,6 @@ const [inputValue, setInputValue] = useState("");
     }
   }, [activeIndex, navigationSource]);
 
-  const toggleCategory = useCallback((cat: string) => {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      if (next.has(cat)) {
-        next.delete(cat);
-      } else {
-        next.add(cat);
-      }
-      return next;
-    });
-  }, []);
-
   const clearCategories = useCallback(() => {
     setSelectedCategories(new Set());
   }, []);
@@ -624,11 +612,11 @@ const [inputValue, setInputValue] = useState("");
               className={classnames(styles.listPanel, className)}
             >
               {availableCategories.length > 1 && (
-                <div className={styles.panelControls}>
-                  <CategoryFilterBar
+                <div className={styles.overlayControls}>
+                  <OverlayCategoryTabs
                     categories={availableCategories}
                     selectedCategories={selectedCategories}
-                    onToggle={(cat) => { toggleCategory(cat); refocusInput(); }}
+                    onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
                     onClearAll={() => { clearCategories(); refocusInput(); }}
                   />
                 </div>
@@ -636,7 +624,7 @@ const [inputValue, setInputValue] = useState("");
               <ul
                 id={`${inputId}-listbox`}
                 ref={listRef}
-                className={classnames(styles.list)}
+                className={classnames(styles.list, styles.overlayList)}
                 role="listbox"
                 aria-label="Search results"
               >
@@ -688,42 +676,6 @@ function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggesti
   );
 }
 
-// --- C: CategoryFilterBar sub-component
-
-type CategoryFilterBarProps = {
-  categories: string[];
-  selectedCategories: Set<string>;
-  onToggle: (cat: string) => void;
-  onClearAll: () => void;
-};
-
-function CategoryFilterBar({ categories, selectedCategories, onToggle, onClearAll }: CategoryFilterBarProps) {
-  return (
-    <div className={styles.categoryFilterBar} role="group" aria-label="Filter by category">
-      <button
-        className={classnames(styles.categoryFilterChip, {
-          [styles.categoryFilterChipActive]: selectedCategories.size === 0,
-        })}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={onClearAll}
-      >
-        All
-      </button>
-      {categories.map((cat) => (
-        <button
-          key={cat}
-          className={classnames(styles.categoryFilterChip, {
-            [styles.categoryFilterChipActive]: selectedCategories.has(cat),
-          })}
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => onToggle(cat)}
-        >
-          {cat}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 
 // --- G: OverlayCategoryTabs sub-component

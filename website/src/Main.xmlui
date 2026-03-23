@@ -77,6 +77,7 @@
           <SpaceFiller />
           <Search
             collapsible="true"
+            mode="inline"
             when-sm
             data="{appGlobals.staticSearchData}"
             placeholder="Search on site..."
