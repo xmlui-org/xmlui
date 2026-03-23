@@ -1,6 +1,16 @@
 {
   "excludeComponentStatuses": ["deprecated", "internal"],
   "cleanFolder": true,
-  "includeByName": ["xmlui-animations", "xmlui-website-blocks", "xmlui-pdf"],
+  "includeByName": [
+    "xmlui-animations",
+    "xmlui-docs-blocks",
+    "xmlui-echart",
+    "xmlui-gauge",
+    "xmlui-masonry",
+    "xmlui-pdf",
+    "xmlui-recharts",
+    "xmlui-tiptap-editor",
+    "xmlui-website-blocks"
+  ],
   "excludeByName": []
 }

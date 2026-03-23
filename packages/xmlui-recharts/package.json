@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "xmlui start",
-    "build:extension": "xmlui build-lib"
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
   }
 }
