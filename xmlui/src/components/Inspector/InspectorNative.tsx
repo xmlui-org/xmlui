@@ -63,6 +63,7 @@ export function Inspector({
         onClick={() => setOpen(true)}
         title={tooltip}
         role="button"
+        aria-label="Inspector"
         data-testid="Inspector"
       >
         <SearchCodeIcon className={styles.icon} />

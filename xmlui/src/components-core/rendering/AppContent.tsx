@@ -44,6 +44,9 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  createLogEntry,
+  pushTrace,
+  popTrace,
   splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
@@ -510,6 +513,11 @@ export function AppContent({
     }
     if (!w._xsCurrentTrace) {
       w._xsCurrentTrace = w._xsStartupTrace;
+    }
+    // Expose tracing flag and helpers for state-layers method:call instrumentation
+    w.__xsVerbose = true;
+    if (!w.__xsTraceHelpers) {
+      w.__xsTraceHelpers = { pushTrace, popTrace, pushXsLog, createLogEntry };
     }
   }
 

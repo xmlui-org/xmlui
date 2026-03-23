@@ -189,7 +189,7 @@ export const textBoxComponentRenderer = wrapComponent(COMP, ThemedTextBox, TextB
     gotFocus: "onFocus",
     lostFocus: "onBlur",
   },
-  deriveAriaLabel: (props) => props.placeholder,
+  deriveAriaLabel: (props) => props.label || props.placeholder,
 });
 
 export const PasswordMd = createMetadata({
@@ -211,5 +211,5 @@ export const passwordInputComponentRenderer = wrapComponent("PasswordInput", Pas
     gotFocus: "onFocus",
     lostFocus: "onBlur",
   },
-  deriveAriaLabel: (props) => props.placeholder,
+  deriveAriaLabel: (props) => props.label || props.placeholder,
 });

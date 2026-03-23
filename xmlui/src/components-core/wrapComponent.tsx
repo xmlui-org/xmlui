@@ -444,6 +444,15 @@ function traceDisplayLabel(traceKind: string, xmluiName: string, args: any[]): s
         return val.map((f: File) => f.name).join(", ");
       }
     }
+    // ChangeListener passes { prevValue, newValue } — show a diff summary
+    if (typeof val === "object" && val !== null && "prevValue" in val && "newValue" in val) {
+      const prev = val.prevValue;
+      const next = val.newValue;
+      if (Array.isArray(next)) {
+        return `${(prev || []).length} → ${next.length} items`;
+      }
+      return `${JSON.stringify(prev)?.slice(0, 30)} → ${JSON.stringify(next)?.slice(0, 30)}`;
+    }
     return String(val);
   }
   // For focus events, the arg is a FocusEvent object — not useful as a label
@@ -619,6 +628,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             result = handler(...args);
           }
           if (traceKind) {
+            // For ChangeListener didChange, include prevValue/newValue for diff rendering
+            const changeListenerDiff: Record<string, any> = {};
+            if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+              changeListenerDiff.prevValue = args[0].prevValue;
+              changeListenerDiff.newValue = args[0].newValue;
+            }
             pushXsLog(
               createLogEntry(traceKind, {
                 component: type,
@@ -629,6 +644,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
                 ownerFileId,
                 ownerSource,
                 ...extractFileMetadata(args),
+                ...changeListenerDiff,
               }),
             );
           }
@@ -792,15 +808,40 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
+    // --- Emit data:bind trace when a data prop resolves to an array with changed length ---
+    if (xsVerbose && Array.isArray(props.data)) {
+      const bindKey = node.uid || node.testId || type;
+      const w = typeof window !== "undefined" ? (window as any) : {};
+      if (!w.__xsDataBindCounts) w.__xsDataBindCounts = {};
+      const prevCount = w.__xsDataBindCounts[bindKey];
+      const currCount = props.data.length;
+      if (prevCount !== currCount && (prevCount !== undefined || currCount > 0)) {
+        w.__xsDataBindCounts[bindKey] = currCount;
+        pushXsLog(
+          createLogEntry("data:bind", {
+            component: type,
+            componentLabel: node.uid || node.testId || undefined,
+            displayLabel: `${bindKey}: ${prevCount ?? 0} → ${currCount} items`,
+            prevCount: prevCount ?? 0,
+            rowCount: currCount,
+            ownerFileId,
+            ownerSource,
+          }),
+        );
+      }
+    }
+
     // --- Resolve aria-label cascade ---
     // 1. App author's explicit aria-label (always wins)
     // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
     // 3. Metadata defaultAriaLabel (static fallback)
+    // 4. Component's label prop (matches browser accessible name computation)
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
     ariaLabel =
       explicitAriaLabel ||
       config.deriveAriaLabel?.(props) ||
       metadata.defaultAriaLabel ||
+      props.label ||
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
@@ -1190,7 +1231,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           }
         };
       } else {
-        // Non-didChange events (gotFocus, lostFocus) pass through as native props
+        // Non-didChange events (gotFocus, lostFocus, ChangeListener didChange) pass through as native props
         props[reactPropName] = (...args: any[]) => {
           const traceId = traceKind ? pushTrace() : undefined;
           try {
@@ -1199,6 +1240,12 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               result = handler(...args);
             }
             if (traceKind) {
+              // For ChangeListener didChange, include prevValue/newValue for diff rendering
+              const changeListenerDiff: Record<string, any> = {};
+              if (traceKind === "value:change" && args[0] && typeof args[0] === "object" && "prevValue" in args[0] && "newValue" in args[0]) {
+                changeListenerDiff.prevValue = args[0].prevValue;
+                changeListenerDiff.newValue = args[0].newValue;
+              }
               pushXsLog(
                 createLogEntry(traceKind, {
                   component: type,
@@ -1209,6 +1256,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                   ownerFileId,
                   ownerSource,
                   ...extractFileMetadata(args),
+                  ...changeListenerDiff,
                 }),
               );
             }
@@ -1360,12 +1408,16 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Resolve aria-label cascade ---
+    // Matches browser accessible name computation:
+    // 1. Explicit aria-label, 2. Component's deriveAriaLabel, 3. defaultAriaLabel,
+    // 4. label prop (associated <label>), 5. placeholder (last resort)
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
     ariaLabel =
       explicitAriaLabel ||
-      extractValue(node.props?.["placeholder"]) ||
       config.deriveAriaLabel?.(props) ||
       metadata.defaultAriaLabel ||
+      props.label ||
+      extractValue(node.props?.["placeholder"]) ||
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;

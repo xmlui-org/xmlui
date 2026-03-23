@@ -481,6 +481,33 @@ const Form = forwardRef(function (
     const validationResult = doValidate();
 
     if (!validationResult.isValid) {
+      // Emit validation:error trace event when xsVerbose is enabled
+      if (typeof window !== "undefined" && (window as any).__xsVerbose) {
+        const { pushXsLog, createLogEntry, pushTrace, popTrace } = (window as any).__xsTraceHelpers || {};
+        if (pushXsLog && createLogEntry) {
+          // Don't push a new trace — inherit the current trace context
+          // (the Save click's traceId) so validation:error lands in the same step
+          const errorFields: string[] = [];
+          const errorMessages: string[] = [];
+          for (const [field, result] of Object.entries(validationResult.validationResults)) {
+            const vr = result as any;
+            if (!vr.isValid) {
+              errorFields.push(field);
+              const msgs = (vr.validations || [])
+                .filter((v: any) => !v.isValid)
+                .map((v: any) => v.invalidMessage || "invalid");
+              errorMessages.push(...msgs);
+            }
+          }
+          pushXsLog(createLogEntry("validation:error", {
+            component: "Form",
+            componentLabel: id || undefined,
+            displayLabel: `${id || "Form"}: ${errorFields.length} error${errorFields.length > 1 ? "s" : ""}: ${errorFields.join(", ")}`,
+            errorFields,
+            errorMessages,
+          }));
+        }
+      }
       return;
     }
     if (validationResult.warnings.length > 0 && !confirmSubmitModalVisible) {
