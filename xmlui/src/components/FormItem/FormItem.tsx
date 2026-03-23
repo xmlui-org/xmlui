@@ -313,7 +313,7 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
             return (
               <MemoizedItem
                 contextVars={contextVars}
-                node={value}
+                node={value as any}
                 renderChild={renderChild}
                 layoutContext={layoutContext}
               />
@@ -346,7 +346,7 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
         patternInvalidSeverity={parseSeverity(
           extractValue.asOptionalString(patternInvalidSeverity),
         )}
-        regex={extractValue.asOptionalString(regex)}
+        regex={extractValue(regex)}
         regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
         regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
         //  ----

@@ -98,7 +98,7 @@ export const formBindingBehavior: Behavior = {
     const patternInvalidSeverity = extractValue.asOptionalString(
       componentNode.props?.patternInvalidSeverity,
     );
-    const regex = extractValue.asOptionalString(componentNode.props?.regex);
+    const regex = extractValue(componentNode.props?.regex);
     const regexInvalidMessage = extractValue.asOptionalString(
       componentNode.props?.regexInvalidMessage,
     );
