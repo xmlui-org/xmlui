@@ -56,11 +56,6 @@ export const SearchMd: ComponentMetadata = createMetadata({
     defaultSelectedCategories: {
       description: `Initial set of selected category filters.`,
     },
-    defaultSortOrder: {
-      description: `Default sort order for search results.`,
-      valueType: "string",
-      defaultValue: "relevance",
-    },
     pageSize: {
       description: `Number of results to show per page when using load more.`,
       valueType: "number",
@@ -101,6 +96,7 @@ export const SearchMd: ComponentMetadata = createMetadata({
     [`boxShadow-${COMP_PANEL}`]: "$boxShadow-xl",
 
     [`backgroundColor-${COMP_ITEM}--hover`]: "$color-surface-100",
+    [`backgroundColor-${COMP_ITEM}--focus`]: "$color-surface-100",
     [`borderColor-${COMP_ITEM}--focus`]: "$color-primary-400",
     [`borderRadius-${COMP_ITEM}`]: "4px",
 
@@ -164,7 +160,6 @@ const searchComponentRenderer = createComponentRenderer(
         noResultsMessage={extractValue.asOptionalString(props.noResultsMessage)}
         showPreviewMetadata={extractValue.asOptionalBoolean(props.showPreviewMetadata, true)}
         defaultSelectedCategories={extractValue(props.defaultSelectedCategories)}
-        defaultSortOrder={extractValue.asOptionalString(props.defaultSortOrder) as "relevance" | "date" | undefined}
         pageSize={extractValue.asOptionalNumber(props.pageSize)}
         enableSpellCorrection={extractValue.asOptionalBoolean(props.enableSpellCorrection, true)}
         mode={extractValue.asOptionalString(props.mode) as "overlay" | "inline" | "drawer" | undefined}

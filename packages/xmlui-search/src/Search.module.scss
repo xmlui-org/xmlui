@@ -33,6 +33,7 @@ $boxShadow-Search: createThemeVar("boxShadow-#{$componentListPanel}");
 $componentListItem: "SearchItem";
 $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
+$backgroundColor-SearchItem--focus: createThemeVar("backgroundColor-#{$componentListItem}--focus");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
 
 $componentListFooter: "SearchFooter";
@@ -592,7 +593,7 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 
   // This style is used to denote keyboard focus
   &.focus {
-    background-color: $backgroundColor-SearchItem--hover;
+    background-color: $backgroundColor-SearchItem--focus;
 
     // Ensures the underlying link is visible on programmatic hover
     & > a {
