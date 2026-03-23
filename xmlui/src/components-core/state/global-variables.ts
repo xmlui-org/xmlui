@@ -275,19 +275,6 @@ export function useGlobalVariables(
           // Create state with all available globals for dependency resolution
           let evaluated = extractParam(evalContext, value, appContext, false);
 
-          // If the global has a storageKey and there is no runtime override, try to
-          // seed the initial value from localStorage (synchronous read, no flash).
-          // The optional-chain guard makes the logic safe in test environments where
-          // appContext.readLocalStorage may not be provided.
-          const storageKeyMeta = nodeGlobalVars[`__storageKey_${key}`];
-          if (storageKeyMeta && typeof storageKeyMeta === "string" && appContext.readLocalStorage) {
-            const UNSET_SENTINEL: Record<string, never> = {};
-            const stored = appContext.readLocalStorage(storageKeyMeta, UNSET_SENTINEL);
-            if (stored !== UNSET_SENTINEL) {
-              evaluated = stored;
-            }
-          }
-
           evaluatedNodeGlobals[key] = evaluated;
           // Update the context for subsequent variables with the newly evaluated value
           globalsForContext[key] = evaluatedNodeGlobals[key];

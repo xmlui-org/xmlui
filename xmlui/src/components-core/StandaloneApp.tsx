@@ -193,11 +193,10 @@ function StandaloneApp({
   }, [runtime]);
 
   // Helper to filter out internal metadata (__tree_* keys) from globalVars.
-  // Preserves __storageKey_* entries which are needed for localStorage persistence.
   const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
     const filtered: Record<string, any> = {};
     for (const [key, value] of Object.entries(vars)) {
-      if (!key.startsWith("__") || key.startsWith("__storageKey_")) {
+      if (!key.startsWith("__")) {
         filtered[key] = value;
       }
     }
