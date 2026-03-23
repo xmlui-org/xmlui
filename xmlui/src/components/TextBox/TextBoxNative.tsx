@@ -227,8 +227,12 @@ export const TextBox = forwardRef(function TextBox(
   // Relay focus from the outer div to the inner input without triggering browser scroll.
   // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
   // scroll side-effect here since the host already handles scroll if desired.
-  const relayFocus = useCallback(() => {
-    inputRef.current?.focus({ preventScroll: true });
+  // Only relay when focus arrives from outside — if a child (e.g. the password toggle button)
+  // receives focus we must not steal it back, otherwise Tab navigation becomes trapped.
+  const relayFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
   }, []);
 
   const setValue = useEvent((newValue) => {
@@ -317,6 +321,7 @@ export const TextBox = forwardRef(function TextBox(
             iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
             className={classnames(styles.adornment, styles.passwordToggle)}
             onClick={togglePasswordVisibility}
+            tabIndex={-1}
           />
         </Part>
       ) : (
