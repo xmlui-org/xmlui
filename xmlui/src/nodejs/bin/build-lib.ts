@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite";
+import { build as viteBuild, defineConfig, loadEnv, type UserConfig, Plugin } from "vite";
 // @ts-ignore
 import path from "path";
 import react from "@vitejs/plugin-react";
@@ -81,10 +81,9 @@ export const buildLib = async ({
         },
       },
     },
-    plugins:
-      mode === "metadata"
-        ? [ViteXmlui({})]
-        : [react(), ViteXmlui({}), libInjectCss(), ...(overrides.plugins || [])],
+    plugins: (mode === "metadata"
+      ? [ViteXmlui({})]
+      : [react(), ViteXmlui({}), libInjectCss(), ...(overrides.plugins || [])]) as Plugin[],
   };
 
   await viteBuild(defineConfig(config));

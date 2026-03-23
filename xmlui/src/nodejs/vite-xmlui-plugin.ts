@@ -13,13 +13,11 @@ import { Parser } from "../parsers/scripting/Parser";
 import { clearAllModuleCaches } from "../parsers/scripting/ModuleCache";
 import type { ModuleFetcher } from "../parsers/scripting/types";
 import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
-import * as path from "path";
 import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
+import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 
-export type PluginOptions = {
-  // --- Add plugin options here.
-};
+export type PluginOptions = object;
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
 const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
@@ -51,7 +49,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
 
         // --- Extract script content from XMLUI markup using ScriptExtractor
         const scriptResult = ScriptExtractor.extractInlineScript(code);
-        let codeBehind;
+        let codeBehind: CollectedDeclarations;
 
         if (scriptResult) {
           const scriptContent = scriptResult.script;
@@ -102,7 +100,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         const file = {
           component,
           src: code,
-          ...(codeBehind || {}),
+          ...codeBehind,
           file: fileId,
         };
 

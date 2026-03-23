@@ -11,7 +11,8 @@ const defaultPropsDonut = {
 
 export const DonutChartMd = createMetadata({
   status: "experimental",
-  description: "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
+  description:
+    "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
     "Note that the height of the component or its parent needs to be set explicitly.",
   props: {
     data: {
@@ -28,7 +29,7 @@ export const DonutChartMd = createMetadata({
       valueType: "string",
     },
     showLabel: {
-      description: "Toggles whether to show labels (\`true\`) or not (\`false\`).",
+      description: "Toggles whether to show labels (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabel,
     },
@@ -38,12 +39,12 @@ export const DonutChartMd = createMetadata({
       defaultValue: defaultPropsDonut.innerRadius,
     },
     showLabelList: {
-      description: "Whether to show labels in a list (\`true\`) or not (\`false\`).",
+      description: "Whether to show labels in a list (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabelList,
     },
     showLegend: {
-      description: "Whether to show a legend (\`true\`) or not (\`false\`).",
+      description: "Whether to show a legend (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLegend,
     },
@@ -56,7 +57,7 @@ export const DonutChartMd = createMetadata({
 
 export const donutChartComponentRenderer = wrapComponent(COMP, PieChart, DonutChartMd, {
   customRender: (props, context) => (
-    <PieChart {...props} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
+    <PieChart {...(props as any)} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
       {context.renderChild(context.node.children)}
     </PieChart>
   ),
