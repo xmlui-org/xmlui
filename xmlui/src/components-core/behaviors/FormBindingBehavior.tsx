@@ -66,6 +66,9 @@ export const formBindingBehavior: Behavior = {
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const initialValue = extractValue(componentNode.props?.initialValue);
     const noSubmit = extractValue.asOptionalBoolean(componentNode.props?.noSubmit, false);
+    const itemIndex =
+      extractValue.asOptionalNumber(componentNode.props?.itemIndex) ??
+      extractValue.asOptionalNumber("{$itemIndex}");
 
     // Validation props used for required label display
     const required = extractValue.asOptionalBoolean(componentNode.props?.required);
@@ -141,6 +144,7 @@ export const formBindingBehavior: Behavior = {
         bindTo={bindTo}
         initialValue={initialValue}
         noSubmit={noSubmit}
+        itemIndex={itemIndex}
         validations={validations}
         label={label}
         labelPosition={labelPosition as any}
