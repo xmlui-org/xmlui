@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "Fragment";
@@ -14,14 +14,12 @@ export const FragmentMd = createMetadata({
   },
 });
 
-export const fragmentComponentRenderer = createComponentRenderer(
-  COMP,
-  FragmentMd,
-  ({ node, extractValue, renderChild, layoutContext }) => {
-    let renderedChild = renderChild(node.children, layoutContext);
-    if(Array.isArray(renderedChild)) {
-      return <Fragment key={extractValue(node.uid)}>{renderedChild}</Fragment>
+export const fragmentComponentRenderer = wrapComponent(COMP, Fragment as any, FragmentMd, {
+  customRender: (_props, { node, extractValue, renderChild, layoutContext }) => {
+    const renderedChild = renderChild(node.children, layoutContext);
+    if (Array.isArray(renderedChild)) {
+      return <Fragment key={extractValue(node.uid)}>{renderedChild}</Fragment>;
     }
     return renderedChild;
   },
-);
+});

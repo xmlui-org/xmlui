@@ -121,6 +121,14 @@ export function useMediaQuery(query: string) {
 }
 
 /**
+ * Returns true when the primary pointing device is coarse (touch), i.e. a mobile / tablet.
+ * Other components can use this to fall back to native scrollbar UX on touch devices.
+ */
+export function useIsTouchDevice() {
+  return useMediaQuery("(pointer: coarse)");
+}
+
+/**
  * This hook runs a callback function when a key is pressed in the document window.
  * @param onDocumentKeydown Callback function to run
  */

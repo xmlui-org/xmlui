@@ -5,7 +5,6 @@ import {
   AccordionItemComponent,
   defaultProps,
 } from "../../components/Accordion/AccordionItemNative";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "AccordionItem";
 

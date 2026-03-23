@@ -21,6 +21,7 @@
     "xmlui": "*"
   },
   "scripts": {
-    "build:extension": "xmlui build-lib"
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
   }
 }

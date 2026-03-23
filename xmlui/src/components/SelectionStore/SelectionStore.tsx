@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { SelectionStore, defaultProps } from "./SelectionStoreNative";
 
@@ -6,6 +6,7 @@ const COMP = "SelectionStore";
 
 export const SelectionStoreMd = createMetadata({
   status: "deprecated",
+  deprecationMessage: `The \`${COMP}\` component is deprecated and will be removed in a future release.`,
   description:
     `The \`${COMP}\` is a non-visual component that may wrap components (items) and manage ` +
     `their selection state to accommodate the usage of other actions.`,
@@ -19,21 +20,15 @@ export const SelectionStoreMd = createMetadata({
   },
 });
 
-export const selectionStoreComponentRenderer = createComponentRenderer(
-  COMP,
-  SelectionStoreMd,
-  (rendererContext) => {
-    const { node, state, updateState, renderChild, registerComponentApi } = rendererContext;
-
-    return (
-      <SelectionStore
-        updateState={updateState}
-        idKey={node.props.idKey}
-        selectedItems={state?.value}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </SelectionStore>
-    );
-  },
-);
+export const selectionStoreComponentRenderer = wrapComponent(COMP, SelectionStore, SelectionStoreMd, {
+  customRender: (_props, { node, state, updateState, renderChild, registerComponentApi }) => (
+    <SelectionStore
+      updateState={updateState}
+      idKey={node.props.idKey}
+      selectedItems={state?.value}
+      registerComponentApi={registerComponentApi}
+    >
+      {renderChild(node.children)}
+    </SelectionStore>
+  ),
+});

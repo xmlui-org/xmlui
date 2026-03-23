@@ -42,6 +42,7 @@ export const ToneChangerButtonMd = createMetadata({
   events: {
     click: dClick(COMP),
   },
+  defaultAriaLabel: "Toggle color mode",
 });
 
 export function ToneChangerButton({

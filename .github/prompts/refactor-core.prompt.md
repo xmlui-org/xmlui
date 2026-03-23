@@ -23,13 +23,13 @@ Load only the docs that apply to the files being refactored:
 | Component rendering pipeline | `components-core/rendering/` | `xmlui/dev-docs/standalone-app.md` |
 | State/container management | `components-core/containers/` | `xmlui/dev-docs/containers.md` |
 | Theming / CSS | `components-core/theming/` | `xmlui/dev-docs/theming-styling.md` |
-| Individual components | `components/ComponentName/` | `guidelines/xmlui/components/metadata.md`, `guidelines/xmlui/components/renderer.md`, `guidelines/xmlui/components/native.md` |
+| Individual components | `components/ComponentName/` | `.ai/xmlui/components/metadata.md`, `.ai/xmlui/components/renderer.md`, `.ai/xmlui/components/native.md` |
 | Parsers | `parsers/` | `xmlui/dev-docs/standalone-app.md` |
 | Form infrastructure | `components/Form*/` | `xmlui/dev-docs/form-infrastructure.md` |
 | Data / API operations | `components/APICall/`, `components/DataSource/` | `xmlui/dev-docs/data-operations.md` |
 | User-defined components | `components-core/ud-components/` | `xmlui/dev-docs/ud-components.md` |
 
-Always read the E2E testing conventions: `guidelines/xmlui/testing/e2e.md`
+Always read the E2E testing conventions: `.ai/xmlui/testing/e2e.md`
 
 ## Planning
 

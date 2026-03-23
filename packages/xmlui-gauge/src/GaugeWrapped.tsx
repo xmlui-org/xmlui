@@ -65,6 +65,7 @@ export const GaugeMd = createMetadata({
       signature: "focus(): void",
     },
   },
+  defaultAriaLabel: "Gauge",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-50",

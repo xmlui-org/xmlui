@@ -1,5 +1,36 @@
 import { get as lodashGet, set as lodashSet, unset as lodashUnset } from "lodash-es";
 
+// Module-level callback invoked after any mutating localStorage operation.
+// Only one listener at a time — AppContent registers (and cleans up) this during its lifecycle.
+let _storageChangeListener: (() => void) | null = null;
+
+// Flag to track if storage was reset before the listener was set up.
+// When the listener is finally registered, we check this flag and notify immediately if a reset occurred.
+let _resetOccurredBeforeListenerSetup = false;
+
+/** Register a callback that fires after any localStorage mutation (write, delete, clear). */
+export function setStorageChangeListener(listener: (() => void) | null): void {
+  if (listener === null) {
+    _storageChangeListener = null;
+    return;
+  }
+  _storageChangeListener = listener;
+  // If a reset happened before the listener was set up, notify now so the app can react.
+  if (_resetOccurredBeforeListenerSetup) {
+    _resetOccurredBeforeListenerSetup = false;
+    listener();
+  }
+}
+
+/** Mark that a storage reset occurred before the listener was set up. Called by initStorageGlobals(). */
+export function markStorageResetBeforeListenerSetup(): void {
+  _resetOccurredBeforeListenerSetup = true;
+}
+
+function notifyStorageChange(): void {
+  _storageChangeListener?.();
+}
+
 /**
  * Splits a dot-path key into [rootKey, subPath].
  * The root key is the first dot-segment (the actual localStorage entry name).
@@ -85,18 +116,19 @@ export function writeLocalStorage(key: string, value: any): void {
     const [rootKey, subPath] = splitStorageKey(key);
     if (!subPath) {
       safeWrite(rootKey, value);
-      return;
-    }
-    const root = safeRead(rootKey) ?? {};
-    if (value === undefined) {
-      lodashUnset(root, subPath);
     } else {
-      lodashSet(root, subPath, value);
+      const root = safeRead(rootKey) ?? {};
+      if (value === undefined) {
+        lodashUnset(root, subPath);
+      } else {
+        lodashSet(root, subPath, value);
+      }
+      safeWrite(rootKey, root);
     }
-    safeWrite(rootKey, root);
   } catch {
     // Degrade gracefully
   }
+  notifyStorageChange();
 }
 
 /**
@@ -122,15 +154,17 @@ export function deleteLocalStorage(key: string): void {
       } catch {
         // SecurityError → degrade gracefully
       }
-      return;
+    } else {
+      const root = safeRead(rootKey);
+      if (root !== undefined) {
+        lodashUnset(root, subPath);
+        safeWrite(rootKey, root);
+      }
     }
-    const root = safeRead(rootKey);
-    if (root === undefined) return;
-    lodashUnset(root, subPath);
-    safeWrite(rootKey, root);
   } catch {
     // Degrade gracefully
   }
+  notifyStorageChange();
 }
 
 /**
@@ -149,25 +183,26 @@ export function clearLocalStorage(prefix?: string): void {
   try {
     if (!prefix) {
       localStorage.clear();
-      return;
-    }
-    const keysToRemove: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const k = localStorage.key(i);
-      if (k && k.startsWith(prefix)) {
-        keysToRemove.push(k);
+    } else {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(prefix)) {
+          keysToRemove.push(k);
+        }
       }
+      keysToRemove.forEach((k) => {
+        try {
+          localStorage.removeItem(k);
+        } catch {
+          // SecurityError → degrade gracefully
+        }
+      });
     }
-    keysToRemove.forEach((k) => {
-      try {
-        localStorage.removeItem(k);
-      } catch {
-        // SecurityError → degrade gracefully
-      }
-    });
   } catch {
     // Degrade gracefully
   }
+  notifyStorageChange();
 }
 
 /**

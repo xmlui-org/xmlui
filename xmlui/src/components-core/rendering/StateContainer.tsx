@@ -312,6 +312,46 @@ export const StateContainer = memo(
     );
 
     // ========================================================================
+    // LAYER 7: RESOLVE LIVE-REFERENCE SENTINELS
+    // ========================================================================
+
+    // When an event handler sets `myVar = someComponentApi` (e.g. `myData = ds`),
+    // the event handler stores a sentinel `{ __liveApiRef__: "ds" }` as the variable
+    // value so the binding stays live instead of capturing a stale snapshot.
+    //
+    // For **implicit containers** (those without an explicit `uses` boundary), the
+    // loader state (e.g. DataSource's value/loaded) is dispatched to the *parent*
+    // reducer via parentDispatch, not to this container's own useReducer. This means
+    // `componentStateWithApis` does not contain the loader's string key ("ds"), so the
+    // sentinel can't be resolved there. However, `combinedState` — which spreads in
+    // `stateFromOutside` (the parent's combinedState) — *does* contain the loader's
+    // data. We therefore resolve sentinels here, at the fully-combined state level,
+    // where every layer is visible.
+    const resolvedCombinedState = useMemo(() => {
+      let modified = false;
+      let result = combinedState;
+      for (const key of Object.keys(combinedState)) {
+        const val = (combinedState as any)[key];
+        if (
+          val !== null &&
+          val !== undefined &&
+          typeof val === "object" &&
+          typeof val.__liveApiRef__ === "string"
+        ) {
+          const apiKey: string = val.__liveApiRef__;
+          if (apiKey in combinedState) {
+            if (!modified) {
+              result = { ...combinedState };
+              modified = true;
+            }
+            (result as any)[key] = (combinedState as any)[apiKey];
+          }
+        }
+      }
+      return result;
+    }, [combinedState]);
+
+    // ========================================================================
     // COMPONENT API REGISTRATION
     // ========================================================================
 
@@ -380,16 +420,6 @@ export const StateContainer = memo(
                 localVars: stableCurrentGlobalVars,
               },
             });
-            // Persist to localStorage if the global variable declares a storageKey.
-            // Combine the variable's storageKey with any nested sub-path so that
-            // both simple (count++) and nested (prefs.name = "Jane") updates are
-            // written to the correct location.
-            const storageKeyMeta = node.globalVars?.[`__storageKey_${key}`];
-            if (storageKeyMeta && typeof storageKeyMeta === "string") {
-              const subPath = pathArray.slice(1).join(".");
-              const writeKey = subPath ? `${storageKeyMeta}.${subPath}` : storageKeyMeta;
-              appContext.writeLocalStorage(writeKey, newValue);
-            }
           } else {
             // Non-root containers bubble globals to parent
             parentStatePartChanged(pathArray, newValue, target, action);
@@ -425,7 +455,7 @@ export const StateContainer = memo(
         <Container
           resolvedKey={resolvedKey}
           node={node}
-          componentState={combinedState}
+          componentState={resolvedCombinedState}
           globalVars={stableCurrentGlobalVars}
           dispatch={dispatch}
           parentDispatch={parentDispatch}

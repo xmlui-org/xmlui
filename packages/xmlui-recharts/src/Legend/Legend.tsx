@@ -1,4 +1,4 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 import {
   defaultProps,
   horizontalAlignmentValues,
@@ -31,15 +31,4 @@ export const LegendMd = createMetadata({
   },
 });
 
-export const legendComponentRenderer = createComponentRenderer(
-  COMP,
-  LegendMd,
-  ({ extractValue, node }: any) => {
-    return (
-      <Legend
-        align={extractValue.asOptionalString(node.props?.align)}
-        verticalAlign={extractValue.asOptionalString(node.props?.verticalAlign)}
-      />
-    );
-  },
-);
+export const legendComponentRenderer = wrapComponent(COMP, Legend, LegendMd);

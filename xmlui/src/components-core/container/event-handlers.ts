@@ -131,8 +131,32 @@ export function createEventHandlers(config: EventHandlerConfig) {
       let changes: Array<any> = [];
       const getComponentStateClone = () => {
         changes.length = 0;
-        const poj = cloneDeep({ ...stateRef.current, ...(options?.context || {}) });
-        poj["$this"] = stateRef.current[uid];
+        const originalState = stateRef.current;
+        const poj = cloneDeep({ ...originalState, ...(options?.context || {}) });
+        poj["$this"] = originalState[uid];
+
+        // Tag component API objects with their key for reference tracking.
+        // When a variable is later assigned one of these objects (e.g. myGlobal = ds),
+        // the framework can detect the reference and keep the variable in sync with
+        // the live component API value across subsequent renders.
+        for (const sym of Object.getOwnPropertySymbols(originalState)) {
+          const desc = sym.description;
+          if (
+            desc &&
+            !desc.startsWith("$") &&
+            !desc.startsWith("__") &&
+            poj[desc] &&
+            typeof poj[desc] === "object" &&
+            !Array.isArray(poj[desc])
+          ) {
+            Object.defineProperty(poj[desc], "__componentApiKey__", {
+              value: desc,
+              enumerable: false,
+              configurable: true,
+            });
+          }
+        }
+
         return buildProxy(poj, (changeInfo) => {
           const idRoot = (changeInfo.pathArray as string[])?.[0];
           if (idRoot?.startsWith("$")) {
@@ -266,13 +290,33 @@ export function createEventHandlers(config: EventHandlerConfig) {
 
             mainThreadBlockingRuns = 0;
             changes.forEach((change) => {
+              // If this is a top-level assignment of a component API value
+              // (e.g. myData = ds where ds is a DataSource), store a live-
+              // reference sentinel { __liveApiRef__: "ds" } instead of a stale
+              // deep-clone snapshot. The sentinel is resolved to the current
+              // API value at render time, keeping the variable reactive.
+              const isTopLevelSet =
+                change.pathArray.length === 1 &&
+                change.action === "set" &&
+                change.newValue != null &&
+                typeof change.newValue === "object";
+              let apiKey: string | null = null;
+              if (isTopLevelSet) {
+                try {
+                  apiKey = change.newValue.__componentApiKey__ ?? null;
+                } catch {
+                  apiKey = null;
+                }
+              }
+
               statePartChanged(
                 change.pathArray,
-                cloneDeep(change.newValue),
+                apiKey ? { __liveApiRef__: apiKey } : cloneDeep(change.newValue),
                 change.target,
                 change.action,
               );
             });
+
             let resolve: StatementPromiseResolver | null = null;
             const stateUpdatedPromise = new Promise<void>((res) => {
               resolve = () => {

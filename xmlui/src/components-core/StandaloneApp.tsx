@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+
 import toast from "react-hot-toast";
 import yaml from "js-yaml";
 
@@ -59,7 +59,6 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
@@ -81,29 +80,13 @@ const metadataProvider = new MetadataProvider(collectedComponentMetadata);
 
 /**
  * Registers `globalThis.XMLUI_RESET_STORAGE` and `globalThis.XMLUI_GET_STORAGE`
- * console helpers and processes the `?xmlui-reset` URL escape hatch.
+ * console helpers.
  *
  * Called once at module-init time when a browser environment is detected.
  * Extracted into a function so the SSR guard is a single top-level check.
  */
 function initStorageGlobals(): void {
-  // Primary: URL query parameter  ?xmlui-reset[=prefix]
-  const _resetParams = new URLSearchParams(globalThis.location.search);
-  const _resetValue = _resetParams.get("xmlui-reset");
-  if (_resetValue !== null) {
-    clearLocalStorage(_resetValue === "" || _resetValue === "true" ? undefined : _resetValue);
-    _resetParams.delete("xmlui-reset");
-    const _newSearch = _resetParams.toString();
-    globalThis.history.replaceState(
-      null,
-      "",
-      globalThis.location.pathname +
-        (_newSearch ? "?" + _newSearch : "") +
-        globalThis.location.hash,
-    );
-  }
-
-  // Secondary: globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
+  // globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
   // Clears the matching localStorage entries and reloads the page.
   (globalThis as any).XMLUI_RESET_STORAGE = (key?: string) => {
     clearLocalStorage(key);
@@ -210,11 +193,10 @@ function StandaloneApp({
   }, [runtime]);
 
   // Helper to filter out internal metadata (__tree_* keys) from globalVars.
-  // Preserves __storageKey_* entries which are needed for localStorage persistence.
   const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
     const filtered: Record<string, any> = {};
     for (const [key, value] of Object.entries(vars)) {
-      if (!key.startsWith("__") || key.startsWith("__storageKey_")) {
+      if (!key.startsWith("__")) {
         filtered[key] = value;
       }
     }
@@ -1689,18 +1671,14 @@ export function startApp(
     if (rootElement.innerHTML.trim().length > 0) {
       contentRoot = ReactDOM.hydrateRoot(
         rootElement,
-        <BrowserRouter>
-          <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-        </BrowserRouter>,
+        <StandaloneApp runtime={runtime} extensionManager={extensionManager} />,
       );
       return contentRoot;
     }
     contentRoot = ReactDOM.createRoot(rootElement);
   }
   contentRoot.render(
-    <BrowserRouter>
-      <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-    </BrowserRouter>,
+    <StandaloneApp runtime={runtime} extensionManager={extensionManager} />,
   );
   return contentRoot;
 }

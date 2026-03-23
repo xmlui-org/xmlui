@@ -94,6 +94,7 @@ export const AppMd = createMetadata({
         'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
       valueType: "boolean",
       defaultValue: defaultProps.persistTheme,
+      isInternal: true,
     },
     themeStorageKey: {
       description:
@@ -101,6 +102,7 @@ export const AppMd = createMetadata({
         'Change this if you need to namespace the key per-app or per-user.',
       valueType: "string",
       defaultValue: defaultProps.themeStorageKey,
+      isInternal: true,
     },
     toneStorageKey: {
       description:
@@ -108,6 +110,7 @@ export const AppMd = createMetadata({
         'Change this if you need to namespace the key per-app or per-user.',
       valueType: "string",
       defaultValue: defaultProps.toneStorageKey,
+      isInternal: true,
     },
   },
   events: {

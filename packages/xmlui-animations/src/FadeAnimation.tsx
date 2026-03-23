@@ -1,4 +1,4 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "FadeAnimation";
@@ -61,31 +61,37 @@ export const FadeAnimationMd = createMetadata({
   },
 });
 
-export const fadeAnimationRenderer = createComponentRenderer(
+export const fadeAnimationRenderer = wrapComponent(
   "FadeAnimation",
+  Animation,
   FadeAnimationMd,
-  ({ node, renderChild, extractValue, registerComponentApi, lookupEventHandler }) => {
-    return (
-      <Animation
-        registerComponentApi={registerComponentApi}
-        animation={{
-          from: {
-            opacity: extractValue.asOptionalNumber(node.props.from, defaultAnimationValues.from),
-          },
-          to: {
-            opacity: extractValue.asOptionalNumber(node.props.to, defaultAnimationValues.to),
-          },
-        }}
-        duration={extractValue.asOptionalNumber(node.props.duration)}
-        onStop={lookupEventHandler("stopped")}
-        onStart={lookupEventHandler("started")}
-        animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
-        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
-        loop={extractValue.asOptionalBoolean(node.props.loop)}
-        delay={extractValue.asOptionalNumber(node.props.delay)}
-      >
-        {renderChild(node.children)}
-      </Animation>
-    );
+  {
+    exposeRegisterApi: true,
+    events: [],
+    exclude: ["from", "to", "animateWhenInView", "reverse", "loop", "delay", "duration"],
+    customRender(_props, { node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) {
+      return (
+        <Animation
+          registerComponentApi={registerComponentApi}
+          animation={{
+            from: {
+              opacity: extractValue.asOptionalNumber(node.props.from, defaultAnimationValues.from),
+            },
+            to: {
+              opacity: extractValue.asOptionalNumber(node.props.to, defaultAnimationValues.to),
+            },
+          }}
+          duration={extractValue.asOptionalNumber(node.props.duration)}
+          onStop={lookupEventHandler("stopped")}
+          onStart={lookupEventHandler("started")}
+          animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
+          reverse={extractValue.asOptionalBoolean(node.props.reverse)}
+          loop={extractValue.asOptionalBoolean(node.props.loop)}
+          delay={extractValue.asOptionalNumber(node.props.delay)}
+        >
+          {renderChild(node.children)}
+        </Animation>
+      );
+    },
   },
 );

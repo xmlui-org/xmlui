@@ -109,6 +109,7 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "awk": true
+    "awk": true,
+    "git stash": true
   }
 }

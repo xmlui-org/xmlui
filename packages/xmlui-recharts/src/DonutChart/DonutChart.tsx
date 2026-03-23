@@ -1,4 +1,4 @@
-import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
+import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 
@@ -11,7 +11,8 @@ const defaultPropsDonut = {
 
 export const DonutChartMd = createMetadata({
   status: "experimental",
-  description: "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
+  description:
+    "A derivative of [PieChart](/components/PieChart) with a hollow center. " +
     "Note that the height of the component or its parent needs to be set explicitly.",
   props: {
     data: {
@@ -28,7 +29,7 @@ export const DonutChartMd = createMetadata({
       valueType: "string",
     },
     showLabel: {
-      description: "Toggles whether to show labels (\`true\`) or not (\`false\`).",
+      description: "Toggles whether to show labels (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabel,
     },
@@ -38,12 +39,12 @@ export const DonutChartMd = createMetadata({
       defaultValue: defaultPropsDonut.innerRadius,
     },
     showLabelList: {
-      description: "Whether to show labels in a list (\`true\`) or not (\`false\`).",
+      description: "Whether to show labels in a list (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabelList,
     },
     showLegend: {
-      description: "Whether to show a legend (\`true\`) or not (\`false\`).",
+      description: "Whether to show a legend (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLegend,
     },
@@ -54,35 +55,10 @@ export const DonutChartMd = createMetadata({
   },
 });
 
-export const donutChartComponentRenderer = createComponentRenderer(
-  COMP,
-  DonutChartMd,
-  ({ extractValue, node, className, renderChild }) => {
-    return (
-      <PieChart
-        showLabelList={extractValue.asOptionalBoolean(
-          node.props?.showLabelList,
-          defaultPropsDonut.showLabelList,
-        )}
-        innerRadius={extractValue.asOptionalNumber(
-          node.props?.innerRadius,
-          defaultPropsDonut.innerRadius,
-        )}
-        data={extractValue(node.props?.data)}
-        className={className}
-        showLabel={extractValue.asOptionalBoolean(
-          node.props?.showLabel,
-          defaultPropsDonut.showLabel,
-        )}
-        dataKey={extractValue(node.props?.dataKey)}
-        nameKey={extractValue(node.props?.nameKey)}
-        showLegend={extractValue.asOptionalBoolean(
-          node.props?.showLegend,
-          defaultPropsDonut.showLegend,
-        )}
-      >
-        {renderChild(node.children)}
-      </PieChart>
-    );
-  },
-);
+export const donutChartComponentRenderer = wrapComponent(COMP, PieChart, DonutChartMd, {
+  customRender: (props, context) => (
+    <PieChart {...(props as any)} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
+      {context.renderChild(context.node.children)}
+    </PieChart>
+  ),
+});

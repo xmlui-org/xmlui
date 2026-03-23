@@ -1,12 +1,11 @@
 import styles from "./NavPanel.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import { useComponentRegistry } from "../ComponentRegistryContext";
 
 const COMP = "NavPanel";
 
@@ -219,7 +218,8 @@ export const NavPanelMd = createMetadata({
         `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -230,7 +230,7 @@ export const NavPanelMd = createMetadata({
         `panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue ` +
         `to users that additional content is available by scrolling. The indicators automatically appear and ` +
         `disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ` +
-        `"whenScrolling" scroll styles.`,
+        `"whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.`,
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -314,19 +314,15 @@ function NavPanelWithBuiltNavHierarchy({
   );
 }
 
-export const navPanelRenderer = createComponentRenderer(
-  COMP,
-  NavPanelMd,
-  ({ node, renderChild, classes, layoutContext, extractValue, appContext }) => {
-    return (
-      <NavPanelWithBuiltNavHierarchy
-        node={node}
-        renderChild={renderChild}
-        classes={classes}
-        layoutContext={layoutContext}
-        extractValue={extractValue}
-        appContext={appContext}
-      />
-    );
-  },
-);
+export const navPanelRenderer = wrapComponent(COMP, NavPanel, NavPanelMd, {
+  customRender: (_props, context) => (
+    <NavPanelWithBuiltNavHierarchy
+      node={context.node as any}
+      renderChild={context.renderChild}
+      classes={context.classes}
+      layoutContext={context.layoutContext}
+      extractValue={context.extractValue}
+      appContext={context.appContext}
+    />
+  ),
+});

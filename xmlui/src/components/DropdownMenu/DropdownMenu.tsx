@@ -1,10 +1,9 @@
 import styles from "./DropdownMenu.module.scss";
 import React from "react";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { alignmentOptionMd, buttonThemeMd, buttonVariantMd, iconPositionMd } from "../abstractions";
 import { createMetadata, d, dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
@@ -125,35 +124,25 @@ export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDrop
   },
 );
 
-export const dropdownMenuComponentRenderer = createComponentRenderer(
-  DDMCOMP,
-  DropdownMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, classes, lookupEventHandler }) => {
+export const dropdownMenuComponentRenderer = wrapComponent(DDMCOMP, DropdownMenu, DropdownMenuMd, {
+  exposeRegisterApi: true,
+  contentClassName: true,
+  exclude: ["enabled"],
+  customRender: (props, { node, extractValue, renderChild }) => {
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
-    
+
     return (
       <DropdownMenu
-        triggerTemplate={renderChild(node.props?.triggerTemplate)}
-        label={extractValue(node.props?.label)}
-        registerComponentApi={registerComponentApi}
-        onWillOpen={lookupEventHandler("willOpen")}
-        classes={classes}
-        contentClassName={classes?.[COMPONENT_PART_KEY]}
-        alignment={extractValue(node.props?.alignment)}
+        {...props}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
-        triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
-        triggerButtonVariant={extractValue(node.props.triggerButtonVariant)}
-        triggerButtonIcon={extractValue(node.props.triggerButtonIcon)}
-        triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
-        modal={extractValue.asOptionalBoolean(node.props.modal)}
       >
         {renderChild(filteredChildren)}
       </DropdownMenu>
     );
   },
-);
+});
 
 const MICOMP = "MenuItem";
 
@@ -223,40 +212,37 @@ export const ThemedMenuItem = React.forwardRef<HTMLDivElement, ThemedMenuItemPro
   },
 );
 
-export const menuItemRenderer = createComponentRenderer(
-  MICOMP,
-  MenuItemMd,
-  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, classes }) => {
+export const menuItemRenderer = wrapComponent(MICOMP, ThemedMenuItem, MenuItemMd, {
+  exclude: ["icon"],
+  customRender: (props, context) => {
+    const { node, extractValue, renderChild, lookupEventHandler } = context;
+    // Use the auto-traced onClick if a click handler is defined,
+    // otherwise fall back to navigation if `to` is set.
+    let clickHandler = props.onClick;
     const clickEventHandler = lookupEventHandler("click");
-
-    // Use the XMLUI click handler if defined, otherwise fall back to navigation
-    let clickHandler = clickEventHandler;
     const to = extractValue(node.props.to);
     if (!clickEventHandler && to?.trim()) {
-      const navigateAction = lookupAction("navigate", { signError: false });
+      const navigateAction = context.lookupAction?.("navigate", { signError: false });
       clickHandler = () => {
         navigateAction?.({ pathname: to });
       };
     }
-    
+
     return (
       <ThemedMenuItem
+        {...props}
         onClick={clickHandler}
-        label={extractValue(node.props?.label)}
-        classes={classes}
         icon={
           node.props?.icon && (
             <ThemedIcon name={extractValue(node.props.icon)} fallback={extractValue(node.props.icon)} />
           )
         }
-        active={extractValue.asOptionalBoolean(node.props.active, false)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
       >
         {renderChild(node.children)}
       </ThemedMenuItem>
     );
   },
-);
+});
 
 const SMCOMP = "SubMenuItem";
 
@@ -296,31 +282,28 @@ const ThemedSubMenuItem = React.forwardRef<HTMLDivElement, ThemedSubMenuItemProp
   },
 );
 
-export const subMenuItemRenderer = createComponentRenderer(
-  SMCOMP,
-  SubMenuItemMd,
-  ({ node, renderChild, extractValue }) => {
+export const subMenuItemRenderer = wrapComponent(SMCOMP, ThemedSubMenuItem, SubMenuItemMd, {
+  exclude: ["icon"],
+  customRender: (props, { node, extractValue, renderChild }) => {
     const iconName = extractValue(node.props?.icon);
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on submenu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
-    
+
     return (
       <ThemedSubMenuItem
-        label={extractValue(node.props?.label)}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
+        {...props}
         icon={
           iconName && (
             <ThemedIcon name={iconName} fallback={iconName} />
           )
         }
-        triggerTemplate={renderChild(node.props?.triggerTemplate)}
       >
         {renderChild(filteredChildren)}
       </ThemedSubMenuItem>
     );
   },
-);
+});
 
 const MSEP = "MenuSeparator";
 
@@ -354,6 +337,9 @@ export const ThemedMenuSeparator = React.forwardRef<HTMLDivElement, ThemedMenuSe
   },
 );
 
-export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
-  return <MenuSeparator />;
-});
+export const menuSeparatorRenderer = wrapComponent(
+  MSEP,
+  MenuSeparator,
+  MenuSeparatorMd,
+  { customRender: () => <MenuSeparator /> },
+);

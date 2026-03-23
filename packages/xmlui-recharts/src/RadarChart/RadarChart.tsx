@@ -1,5 +1,5 @@
 import { RadarChart, defaultProps } from "./RadarChartNative";
-import { createComponentRenderer, createMetadata, MemoizedItem } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "RadarChart";
 
@@ -18,7 +18,6 @@ export const RadarChartMd = createMetadata({
       description:
         "This property specifies the keys in the data objects that should be used for rendering the chart elements. " +
         "E.g. 'value' or 'amount'.",
-      valueType: "string",
     },
     nameKey: {
       description:
@@ -92,42 +91,8 @@ export const RadarChartMd = createMetadata({
 });
 
 // Component renderer
-export const radarChartComponentRenderer = createComponentRenderer(
-  COMP,
-  RadarChartMd,
-  ({ extractValue, node, className, renderChild }: any) => {
-    return (
-      <RadarChart
-        className={className}
-        data={extractValue(node.props?.data)}
-        nameKey={extractValue(node.props?.nameKey)}
-        dataKeys={extractValue(node.props?.dataKeys)}
-        hideGrid={extractValue.asOptionalBoolean(node.props?.hideGrid)}
-        hideAngleAxis={extractValue.asOptionalBoolean(node.props?.hideAngleAxis)}
-        hideRadiusAxis={extractValue.asOptionalBoolean(node.props?.hideRadiusAxis)}
-        hideTooltip={extractValue.asOptionalBoolean(node.props?.hideTooltip)}
-        showLegend={extractValue.asOptionalBoolean(node.props?.showLegend)}
-        filled={extractValue.asOptionalBoolean(node.props?.filled)}
-        strokeWidth={extractValue.asOptionalNumber(node.props?.strokeWidth)}
-        fillOpacity={extractValue.asOptionalNumber(node.props?.fillOpacity)}
-        tooltipRenderer={
-          node.props.tooltipTemplate
-            ? (tooltipData) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.tooltipTemplate}
-                    contextVars={{
-                      $tooltip: tooltipData,
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </RadarChart>
-    );
+export const radarChartComponentRenderer = wrapComponent(COMP, RadarChart, RadarChartMd, {
+  renderers: {
+    tooltipTemplate: { reactProp: "tooltipRenderer", contextVars: ["$tooltip"] },
   },
-);
+});

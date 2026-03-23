@@ -183,4 +183,5 @@ export const numberBoxComponentRenderer = wrapComponent(COMP, ThemedNumberBox, N
     gotFocus: "onFocus",
     lostFocus: "onBlur",
   },
+  deriveAriaLabel: (props) => props.label || props.placeholder,
 });

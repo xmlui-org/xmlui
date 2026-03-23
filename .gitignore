@@ -41,6 +41,8 @@ coverage
 dist
 dist-ssg
 xmlui-optimized-output
+.xmlui-ssg-ssr/
+.xmlui-ssg-entry.tsx
 
 # AI local config
 .claude

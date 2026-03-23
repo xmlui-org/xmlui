@@ -1,4 +1,3 @@
-import { createComponentRenderer } from "../../components-core/renderers";
 import { ColorPicker, defaultProps } from "./ColorPickerNative";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -16,6 +15,7 @@ import {
 } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ColorPicker.module.scss";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "ColorPicker";
 
@@ -75,36 +75,15 @@ export const ThemedColorPicker = React.forwardRef<React.ElementRef<typeof ColorP
   },
 );
 
-export const colorPickerComponentRenderer = createComponentRenderer(
+export const colorPickerComponentRenderer = wrapComponent(
   "ColorPicker",
+  ColorPicker,
   ColorPickerMd,
-  ({
-    node,
-    extractValue,
-    className,
-    state,
-    lookupEventHandler,
-    registerComponentApi,
-    updateState,
-  }) => {
-    const readOnly = extractValue.asOptionalBoolean(node.props?.readOnly, false);
-    const enabled = extractValue.asOptionalBoolean(node.props?.enabled, true);
-    return (
-      <ColorPicker
-        validationStatus={extractValue(node.props.validationStatus)}
-        value={state.value}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        className={className}
-        required={extractValue.asOptionalBoolean(node.props?.required)}
-        enabled={enabled && !readOnly}
-        readOnly={readOnly}
-        autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}
-      />
-    );
+  {
+    exposeRegisterApi: true,
+    events: {
+      gotFocus: "onFocus",
+      lostFocus: "onBlur",
+    },
   },
 );

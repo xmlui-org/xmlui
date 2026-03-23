@@ -146,6 +146,28 @@ export function useGlobalVariables(
           depMap[`runtime:${globalKey}`] = componentValue;
         }
       }
+
+      // Track live-reference sentinels for reactive API bindings.
+      // When a global was assigned a component API (e.g. myData = ds), its
+      // runtime value in componentState is the sentinel { __liveApiRef__: "ds" }.
+      // We add the *current* API value to depMap so that when the API changes
+      // (e.g. DataSource fetches new data) this map changes, triggering the
+      // global to re-evaluate with the fresh API value.
+      for (const globalKey of Object.keys(nodeGlobalVars)) {
+        if (!globalKey.startsWith("__")) {
+          const runtimeValue = componentStateWithApis[globalKey];
+          if (
+            runtimeValue &&
+            typeof runtimeValue === "object" &&
+            typeof runtimeValue.__liveApiRef__ === "string"
+          ) {
+            const apiKey = runtimeValue.__liveApiRef__;
+            if (apiKey in componentStateWithApis) {
+              depMap[`liveApiValue:${globalKey}`] = componentStateWithApis[apiKey];
+            }
+          }
+        }
+      }
     }
 
     return depMap;
@@ -205,8 +227,21 @@ export function useGlobalVariables(
         // Don't re-evaluate the original expression (which would give the old value)
         const runtimeKey = `runtime:${key}`;
         if (runtimeKey in globalDepValueMap) {
-          evaluatedNodeGlobals[key] = globalDepValueMap[runtimeKey];
-          globalsForContext[key] = globalDepValueMap[runtimeKey];
+          let runtimeValue = globalDepValueMap[runtimeKey];
+          // If the runtime value is a live-reference sentinel ({ __liveApiRef__: "ds" }),
+          // resolve it to the current component API value so the binding stays reactive.
+          if (
+            runtimeValue &&
+            typeof runtimeValue === "object" &&
+            typeof runtimeValue.__liveApiRef__ === "string"
+          ) {
+            const liveKey = `liveApiValue:${key}`;
+            if (liveKey in globalDepValueMap) {
+              runtimeValue = globalDepValueMap[liveKey];
+            }
+          }
+          evaluatedNodeGlobals[key] = runtimeValue;
+          globalsForContext[key] = runtimeValue;
           continue;
         }
 
@@ -239,19 +274,6 @@ export function useGlobalVariables(
 
           // Create state with all available globals for dependency resolution
           let evaluated = extractParam(evalContext, value, appContext, false);
-
-          // If the global has a storageKey and there is no runtime override, try to
-          // seed the initial value from localStorage (synchronous read, no flash).
-          // The optional-chain guard makes the logic safe in test environments where
-          // appContext.readLocalStorage may not be provided.
-          const storageKeyMeta = nodeGlobalVars[`__storageKey_${key}`];
-          if (storageKeyMeta && typeof storageKeyMeta === "string" && appContext.readLocalStorage) {
-            const UNSET_SENTINEL: Record<string, never> = {};
-            const stored = appContext.readLocalStorage(storageKeyMeta, UNSET_SENTINEL);
-            if (stored !== UNSET_SENTINEL) {
-              evaluated = stored;
-            }
-          }
 
           evaluatedNodeGlobals[key] = evaluated;
           // Update the context for subsequent variables with the newly evaluated value

@@ -13,10 +13,10 @@ description: Extend an existing XMLUI component with new props, events, theme va
    - `xmlui/src/components/ComponentName/ComponentNameNative.tsx` — React implementation
    - `xmlui/src/components/ComponentName/ComponentName.module.scss` — theme variables (if visual)
 3. Read only the sub-files relevant to what you are adding:
-   - `guidelines/xmlui/components/metadata.md` — adding props/events/apis/contextVars
-   - `guidelines/xmlui/components/styling.md` — adding theme variables
-   - `guidelines/xmlui/components/parts.md` — adding parts
-   - `guidelines/xmlui/components/state.md` — adding stateful behavior
+   - `.ai/xmlui/components/metadata.md` — adding props/events/apis/contextVars
+   - `.ai/xmlui/components/styling.md` — adding theme variables
+   - `.ai/xmlui/components/parts.md` — adding parts
+   - `.ai/xmlui/components/state.md` — adding stateful behavior
 4. Find the component's existing E2E tests (`ComponentName.spec.ts` in the same folder) to understand current test coverage.
 
 ## Implementation steps
@@ -60,7 +60,7 @@ All existing tests must still pass.
 
 ### Step 6 — Add tests (only when explicitly requested)
 
-Add new tests to `ComponentName.spec.ts` for the new behavior. Follow `guidelines/xmlui/testing/e2e.md`.
+Add new tests to `ComponentName.spec.ts` for the new behavior. Follow `.ai/xmlui/testing/e2e.md`.
 
 ### Step 7 — Add a changeset (if user-facing)
 

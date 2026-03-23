@@ -1,6 +1,6 @@
 import styles from "./ContentSeparator.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { orientationOptionMd } from "../abstractions";
 import { ContentSeparator, defaultProps } from "./ContentSeparatorNative";
@@ -55,18 +55,16 @@ export const ContentSeparatorMd = createMetadata({
   },
 });
 
-export const contentSeparatorComponentRenderer = createComponentRenderer(
-  COMP,
-  ContentSeparatorMd,
-  ({ node, classes, extractValue }) => {
+export const contentSeparatorComponentRenderer = wrapComponent(COMP, ContentSeparator, ContentSeparatorMd, {
+  customRender: (_props, { node, extractValue, classes }) => {
     const orientation = extractValue(node.props.orientation);
     const length = extractValue.asSize(node.props.length);
-    
+
     // Check if explicit sizing is provided via length prop or layout properties
     const hasExplicitLength = length !== undefined ||
       (orientation === "vertical" && node.props.height !== undefined) ||
       (orientation === "horizontal" && node.props.width !== undefined);
-    
+
     return (
       <ContentSeparator
         orientation={orientation}
@@ -77,4 +75,4 @@ export const contentSeparatorComponentRenderer = createComponentRenderer(
       />
     );
   },
-);
+});

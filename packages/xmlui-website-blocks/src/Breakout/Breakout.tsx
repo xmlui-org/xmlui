@@ -1,4 +1,4 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import { Breakout } from "./BreakoutNative";
 
@@ -12,10 +12,4 @@ export const BreakoutMd: ComponentMetadata = createMetadata({
     `the maximum content width.`,
 });
 
-export const breakoutComponentRenderer = createComponentRenderer(
-  COMP,
-  BreakoutMd,
-  ({ node, renderChild }) => {
-    return <Breakout>{renderChild(node.children)}</Breakout>;
-  },
-);
+export const breakoutComponentRenderer = wrapComponent(COMP, Breakout, BreakoutMd);

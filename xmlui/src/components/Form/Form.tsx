@@ -1,6 +1,6 @@
 import styles from "./Form.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
@@ -137,6 +137,44 @@ export const FormMd = createMetadata({
       type: "string",
     },
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
+    persist: {
+      description:
+        "When set to `true` (or a non-empty string), the form temporarily saves its data to " +
+        "localStorage as the user types, so that unsaved changes survive a page reload or crash. " +
+        "On a successful submit the saved data is automatically cleared.",
+      type: "boolean",
+    },
+    storageKey: {
+      description:
+        "The key used to save the form's temporary data in localStorage when `persist` is enabled. " +
+        "If omitted, the form's `id` attribute is used. If the form has no `id`, the key " +
+        "defaults to `\"form-data\"`.",
+      type: "string",
+    },
+    doNotPersistFields: {
+      description:
+        "An optional list of field names (matching the `bindTo` values of nested `FormItem` " +
+        "components) that should be excluded from the temporary localStorage save. The fields " +
+        "are still submitted normally; they are only excluded from the persisted snapshot.",
+      type: "string[]",
+    },
+    keepOnCancel: {
+      description:
+        "When `persist` is enabled and the user cancels the form, this property controls " +
+        "whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
+      type: "boolean",
+      defaultValue: false,
+    },
+    dataAfterSubmit: {
+      description:
+        "Controls what happens to the form data after a successful submit. " +
+        "`\"keep\"` (default) leaves the submitted data in the form. " +
+        "`\"reset\"` restores the form to its initial data (the value of the `data` property). " +
+        "`\"clear\"` empties the form as if no `data` property were set.",
+      availableValues: ["keep", "reset", "clear"],
+      type: "string",
+      defaultValue: "keep",
+    },
   },
   events: {
     willSubmit: {
@@ -232,11 +270,12 @@ export const FormMd = createMetadata({
   },
 });
 
-export const formComponentRenderer = createComponentRenderer(
+export const formComponentRenderer = wrapComponent(
   COMP,
+  FormWithContextVar,
   FormMd,
-  ({ node, renderChild, extractValue, classes, lookupEventHandler, registerComponentApi, appContext }) => {
-    return (
+  {
+    customRender: (_props, { node, renderChild, extractValue, lookupEventHandler, classes, registerComponentApi, appContext }) => (
       <FormWithContextVar
         node={node as any}
         renderChild={renderChild}
@@ -246,6 +285,6 @@ export const formComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         appContext={appContext}
       />
-    );
+    ),
   },
 );

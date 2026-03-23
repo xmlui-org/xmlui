@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
 import { QueueWithContextVar, defaultProps } from "./QueueNative";
@@ -124,18 +124,15 @@ export const QueueMd = createMetadata({
   },
 });
 
-export const queueComponentRenderer = createComponentRenderer(
-  COMP,
-  QueueMd,
-  ({ node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => {
-    return (
-      <QueueWithContextVar
-        node={node as any}
-        renderChild={renderChild}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
+export const queueComponentRenderer = wrapComponent(COMP, QueueWithContextVar, QueueMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, { node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => (
+    <QueueWithContextVar
+      node={node as any}
+      renderChild={renderChild}
+      extractValue={extractValue}
+      lookupEventHandler={lookupEventHandler as any}
+      registerComponentApi={registerComponentApi}
+    />
+  ),
+});

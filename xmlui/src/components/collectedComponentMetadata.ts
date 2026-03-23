@@ -57,7 +57,6 @@ import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
-import { BlogMd } from "./Blog/Blog";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
@@ -68,7 +67,6 @@ import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
@@ -317,11 +315,9 @@ export const collectedComponentMetadata = {
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
-  Blog: BlogMd,
   Bookmark: BookmarkMd,
   Button: ButtonMd,
   Card: CardMd,
-  Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,

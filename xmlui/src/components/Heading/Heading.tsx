@@ -4,7 +4,7 @@ import React from "react";
 import { type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
@@ -394,107 +394,121 @@ function renderHeading({
   );
 }
 
-export const headingComponentRenderer = createComponentRenderer(
+export const headingComponentRenderer = wrapComponent(
   COMP,
+  Heading,
   HeadingMd,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node: node as HeadingComponentDef,
-      extractValue,
-      classes,
-      level: node.props.level,
-      renderChild,
-      registerComponentApi,
-    });
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as HeadingComponentDef,
+      extractValue: context.extractValue,
+      classes: context.classes,
+      level: context.node.props.level,
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h1ComponentRenderer = createComponentRenderer(
+export const h1ComponentRenderer = wrapComponent(
   H1,
+  Heading,
   H1Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h1",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h2ComponentRenderer = createComponentRenderer(
+export const h2ComponentRenderer = wrapComponent(
   H2,
+  Heading,
   H2Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h2",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h3ComponentRenderer = createComponentRenderer(
+export const h3ComponentRenderer = wrapComponent(
   H3,
+  Heading,
   H3Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h3",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h4ComponentRenderer = createComponentRenderer(
+export const h4ComponentRenderer = wrapComponent(
   H4,
+  Heading,
   H4Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h4",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h5ComponentRenderer = createComponentRenderer(
+export const h5ComponentRenderer = wrapComponent(
   H5,
+  Heading,
   H5Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h5",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );
 
-export const h6ComponentRenderer = createComponentRenderer(
+export const h6ComponentRenderer = wrapComponent(
   H6,
+  Heading,
   H6Md,
-  ({ node, extractValue, classes, renderChild, registerComponentApi }) => {
-    return renderHeading({
-      node,
-      extractValue,
-      classes,
+  {
+    exposeRegisterApi: true,
+    customRender: (_props, context) => renderHeading({
+      node: context.node as any,
+      extractValue: context.extractValue,
+      classes: context.classes,
       level: "h6",
-      renderChild,
-      registerComponentApi,
-    } as any);
+      renderChild: context.renderChild,
+      registerComponentApi: context.registerComponentApi,
+    }),
   },
 );

@@ -1,11 +1,11 @@
 import styles from "./CodeBlock.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { CodeBlock } from "./CodeBlockNative";
 import { createMetadata } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "CodeBlock";
 
@@ -60,14 +60,8 @@ export const ThemedCodeBlock = React.forwardRef<HTMLDivElement, ThemedCodeBlockP
   },
 );
 
-export const codeBlockComponentRenderer = createComponentRenderer(
+export const codeBlockComponentRenderer = wrapComponent(
   "CodeBlock",
+  CodeBlock,
   CodeBlockMd,
-  ({ node, renderChild, classes }) => {
-    return (
-      <CodeBlock classes={classes}>
-        {renderChild(node.children)}
-      </CodeBlock>
-    );
-  },
 );

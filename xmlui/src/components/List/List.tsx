@@ -2,7 +2,7 @@ import { memo, useRef } from "react";
 
 import styles from "./List.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
@@ -505,32 +505,18 @@ const ListWithSelection = memo(function ListWithSelection({
   return listContent;
 });
 
-export const dynamicHeightListComponentRenderer = createComponentRenderer(
-  COMP,
-  ListMd,
-  ({
-    node,
-    extractValue,
-    renderChild,
-    classes,
-    layoutContext,
-    lookupEventHandler,
-    lookupAction,
-    lookupSyncCallback,
-    registerComponentApi,
-  }) => {
-    return (
-      <ListWithSelection
-        node={node}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        lookupAction={lookupAction}
-        lookupSyncCallback={lookupSyncCallback}
-        classes={classes}
-        renderChild={renderChild}
-        registerComponentApi={registerComponentApi}
-        layoutContext={layoutContext}
-      />
-    );
-  },
-);
+export const dynamicHeightListComponentRenderer = wrapComponent(COMP, ListNative, ListMd, {
+  customRender: (_props, context) => (
+    <ListWithSelection
+      node={context.node as any}
+      extractValue={context.extractValue}
+      lookupEventHandler={context.lookupEventHandler as any}
+      lookupAction={context.lookupAction}
+      lookupSyncCallback={context.lookupSyncCallback}
+      classes={context.classes}
+      renderChild={context.renderChild}
+      registerComponentApi={context.registerComponentApi}
+      layoutContext={context.layoutContext}
+    />
+  ),
+});

@@ -1,6 +1,6 @@
 import styles from "./Backdrop.module.scss";
 
-import { createComponentRenderer, createMetadata, dComponent, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, dComponent, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import { Backdrop } from "./BackdropNative";
 
@@ -32,20 +32,4 @@ export const BackdropMd: ComponentMetadata = createMetadata({
   }
 });
 
-export const backdropComponentRenderer = createComponentRenderer(
-  COMP,
-  BackdropMd,
-  ({ node, extractValue, renderChild, classes }) => {
-    const props = (node.props as typeof BackdropMd.props)!;
-    return (
-      <Backdrop
-        classes={classes}
-        overlayTemplate={renderChild(props?.overlayTemplate as any)}
-        backgroundColor={extractValue.asOptionalString(props.backgroundColor, undefined)}
-        opacity={extractValue.asOptionalString(props.opacity, undefined)}
-      >
-        {renderChild(node.children)}
-      </Backdrop>
-    );
-  },
-);
+export const backdropComponentRenderer = wrapComponent(COMP, Backdrop, BackdropMd);
