@@ -57,8 +57,7 @@ function resolveStoredTheme(
   if (!appNode) return { defaultTheme, defaultTone };
 
   const rawPersist = appNode.props?.persistTheme;
-  const isPersist =
-    rawPersist === true || rawPersist === "true" || rawPersist === 1;
+  const isPersist = rawPersist === true || rawPersist === "true" || rawPersist === 1;
   if (!isPersist) return { defaultTheme, defaultTone };
 
   const themeKey: string =
@@ -79,7 +78,9 @@ function resolveStoredTheme(
       const parsed = JSON.parse(stored);
       if (typeof parsed === "string" && parsed.length > 0) resolvedTheme = parsed;
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   try {
     const stored = localStorage.getItem(toneKey);
@@ -87,7 +88,9 @@ function resolveStoredTheme(
       const parsed = JSON.parse(stored);
       if (parsed === "dark" || parsed === "light") resolvedTone = parsed as ThemeTone;
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
 
   return { defaultTheme: resolvedTheme, defaultTone: resolvedTone };
 }
@@ -299,7 +302,11 @@ export const AppWrapper = ({
 
         {/* Otherwise create our own router */}
         {shouldCreateRouter && (
-          <Router basename={Router === HashRouter ? undefined : baseName} {...routerProps}>
+          <Router
+            basename={Router === HashRouter ? undefined : baseName}
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            {...routerProps}
+          >
             {dynamicChildren}
           </Router>
         )}
