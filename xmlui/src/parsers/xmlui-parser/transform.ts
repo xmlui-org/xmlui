@@ -371,38 +371,17 @@ export function nodeToComponentDef(
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
             return;
           }
-          {
-            // Extract storageKey and persist before delegating to collectElementHelper
-            // so collectValue does not report them as unknown attributes.
-            const attrs = getAttributes(child).map(segmentAttr);
-            const storageKey = attrs.find((a) => a.name === "storageKey")?.value;
-            const persistAttr = attrs.find((a) => a.name === "persist")?.value;
-            const shouldPersist =
-              persistAttr === "true" || persistAttr === "{true}" || persistAttr === "1";
-            collectElementHelper(
-              usesStack,
-              comp,
-              child,
-              (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
-              (name, value) => {
-                if (!isComponent(comp)) return;
-                comp.globalVars ??= {};
-                comp.globalVars[name] = value;
-                // Determine the effective storage key:
-                //   1. An explicit storageKey attribute always wins.
-                //   2. persist="true" without storageKey falls back to the variable name.
-                // Store as a "__storageKey_<name>" metadata entry so the runtime can
-                // initialise from / persist to localStorage without exposing the key as
-                // a normal variable.
-                const effectiveStorageKey = storageKey ?? (shouldPersist ? name : undefined);
-                if (effectiveStorageKey) {
-                  comp.globalVars[`__storageKey_${name}`] = effectiveStorageKey;
-                }
-              },
-              undefined, // nameValidator
-              ["storageKey", "persist"], // extraAllowedAttrs
-            );
-          }
+          collectElementHelper(
+            usesStack,
+            comp,
+            child,
+            (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
+            (name, value) => {
+              if (!isComponent(comp)) return;
+              comp.globalVars ??= {};
+              comp.globalVars[name] = value;
+            },
+          );
           return;
 
         case "loaders":
