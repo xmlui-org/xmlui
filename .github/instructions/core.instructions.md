@@ -15,7 +15,7 @@ Before editing any subsystem, read its corresponding doc:
 | Rendering pipeline | `rendering/` | `xmlui/dev-docs/standalone-app.md` |
 | State / containers | `containers/` | `xmlui/dev-docs/containers.md` |
 | Theming / CSS | `theming/` | `xmlui/dev-docs/theming-styling.md` |
-| Parts | `parts/` | `guidelines/xmlui/components/parts.md` |
+| Parts | `parts/` | `.ai/xmlui/components/parts.md` |
 | Form infrastructure | `form*/` | `xmlui/dev-docs/form-infrastructure.md` |
 | User-defined components | `ud-components/` | `xmlui/dev-docs/ud-components.md` |
 

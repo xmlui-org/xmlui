@@ -60,7 +60,7 @@ Event handler rules:
 
 ## XMLUI Script Limitations (in initTestBed strings)
 
-See `guidelines/xmlui/markup.md` → *Scripting Language Semantics* for the full reference. Key rules for test strings:
+See `.ai/xmlui/markup.md` → *Scripting Language Semantics* for the full reference. Key rules for test strings:
 
 **No `new` operator:**
 ```
