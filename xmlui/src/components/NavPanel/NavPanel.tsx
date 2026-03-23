@@ -218,7 +218,8 @@ export const NavPanelMd = createMetadata({
         `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -229,7 +230,7 @@ export const NavPanelMd = createMetadata({
         `panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue ` +
         `to users that additional content is available by scrolling. The indicators automatically appear and ` +
         `disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ` +
-        `"whenScrolling" scroll styles.`,
+        `"whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.`,
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },

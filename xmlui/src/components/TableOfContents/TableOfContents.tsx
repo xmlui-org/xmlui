@@ -44,14 +44,16 @@ export const TableOfContentsMd = createMetadata({
       description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
       description: `When enabled, displays gradient fade indicators at the top and bottom edges when scrollable ` +
-        `content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.`,
+        `content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles. ` +
+        `On mobile/touch devices, this property has no effect.`,
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
