@@ -808,6 +808,29 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
+    // --- Emit data:bind trace when a data prop resolves to an array with changed length ---
+    if (xsVerbose && Array.isArray(props.data)) {
+      const bindKey = node.uid || node.testId || type;
+      const w = typeof window !== "undefined" ? (window as any) : {};
+      if (!w.__xsDataBindCounts) w.__xsDataBindCounts = {};
+      const prevCount = w.__xsDataBindCounts[bindKey];
+      const currCount = props.data.length;
+      if (prevCount !== currCount && (prevCount !== undefined || currCount > 0)) {
+        w.__xsDataBindCounts[bindKey] = currCount;
+        pushXsLog(
+          createLogEntry("data:bind", {
+            component: type,
+            componentLabel: node.uid || node.testId || undefined,
+            displayLabel: `${bindKey}: ${prevCount ?? 0} → ${currCount} items`,
+            prevCount: prevCount ?? 0,
+            rowCount: currCount,
+            ownerFileId,
+            ownerSource,
+          }),
+        );
+      }
+    }
+
     // --- Resolve aria-label cascade ---
     // 1. App author's explicit aria-label (always wins)
     // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
