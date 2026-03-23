@@ -1,6 +1,5 @@
 import {
   useCallback,
-  useDeferredValue,
   useId,
   useEffect,
   useMemo,
@@ -125,7 +124,16 @@ export const Search = ({
   }, []);
 
 const [inputValue, setInputValue] = useState("");
-  const debouncedValue = useDeferredValue(inputValue);
+  // --- Why this solution?
+  // Instead of useDeferredValue, we simply use useEffect + setTimeout to create a debounced value for the search query.
+  // This is because Fuse.js searches are expensive and run synchronously in JS.
+  // useDeferredValue can only schedule render updates in React, but cannot throttle the synchronous search calls.
+  // So using useDeferredValue or useTransition would still cause input lag while typing, because the search would run on every keystroke.
+  const [debouncedValue, setDebouncedValue] = useState("");
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(inputValue), 150);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
@@ -1008,9 +1016,6 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-/**
- * B — Parses a URL path into breadcrumb segments, filtering empty parts.
- */
 function parsePathBreadcrumb(path: string): string[] {
   return path.split("/").filter((s) => s.length > 0);
 }
@@ -1046,8 +1051,11 @@ function useSearch(
   query: string,
   enableSpellCorrection: boolean,
 ): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
-  const fuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS));
-  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS));
+  const fuseRef = useRef<Fuse<SearchItemData>>(null!);
+  if (!fuseRef.current) fuseRef.current = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
+
+  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(null!);
+  if (!relaxedFuseRef.current) relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
 
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
