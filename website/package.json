@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "xmlui": "*",
-    "xmlui-playground": "*",
     "xmlui-search": "*",
     "xmlui-hello-world": "*",
     "xmlui-website-blocks": "*",

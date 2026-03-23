@@ -137,7 +137,7 @@ const CustomIcon = forwardRef(function CustomIcon(
     return (
       <span
         ref={ref as ForwardedRef<HTMLSpanElement>}
-        style={{ display: "inline-block" }}
+        style={{ display: "inline-flex" }}
         onClick={onClick}
         onKeyDown={handleKeyDown}
         tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
