@@ -401,6 +401,7 @@ export const NavPanel = forwardRef(function NavPanel(
         [styles.condensed]: isCondensed,
         [styles.hasFooter]: hasFooter,
         [styles.collapsed]: collapsed,
+        [styles.overlayScroll]: scrollStyle !== "normal",
       })}
       style={style}
     >
