@@ -573,6 +573,51 @@ test.describe("Password Input", () => {
     await icon.click();
     await expect(icon).toBeVisible();
   });
+
+  test("Tab moves focus from showPasswordToggle input directly to next input", async ({
+    initTestBed,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <PasswordInput testId="pwd-toggle" showPasswordToggle="true" />
+        <PasswordInput testId="pwd-plain" />
+        <TextBox testId="textbox" />
+      </App>
+    `);
+    const pwdToggle = await createTextBoxDriver("pwd-toggle");
+    const pwdPlain = await createTextBoxDriver("pwd-plain");
+
+    await pwdToggle.input.focus();
+    await expect(pwdToggle.input).toBeFocused();
+
+    // Tab once — must leave the first PasswordInput entirely (skip the toggle button)
+    await page.keyboard.press("Tab");
+    await expect(pwdPlain.input).toBeFocused();
+  });
+
+  test("Tab moves focus from plain PasswordInput to TextBox", async ({
+    initTestBed,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <PasswordInput testId="pwd-toggle" showPasswordToggle="true" />
+        <PasswordInput testId="pwd-plain" />
+        <TextBox testId="textbox" />
+      </App>
+    `);
+    const pwdPlain = await createTextBoxDriver("pwd-plain");
+    const textbox = await createTextBoxDriver("textbox");
+
+    await pwdPlain.input.focus();
+    await expect(pwdPlain.input).toBeFocused();
+
+    await page.keyboard.press("Tab");
+    await expect(textbox.input).toBeFocused();
+  });
 });
 
 // =============================================================================
