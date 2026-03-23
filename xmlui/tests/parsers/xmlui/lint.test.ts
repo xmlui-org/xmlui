@@ -69,5 +69,53 @@ describe("lint", () => {
       const diags = lint({ component, metadataProvider: buttonWithPropX });
       expect(diags).toHaveLength(0);
     });
+
+    it("recognises layout prop with state variant", () => {
+      const component = transformSource(`<Button backgroundColor--hover="anything" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises layout prop with responsive variant", () => {
+      const component = transformSource(`<Button width-md="anything" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises layout prop with responsive and state variant", () => {
+      const component = transformSource(`<Button backgroundColor-md--hover="anything" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises layout prop with multiple state variants", () => {
+      const component = transformSource(`<Button color--hover--active="anything" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises behavior trigger prop (label)", () => {
+      const component = transformSource(`<Button label="My Label" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises behavior trigger prop (animation)", () => {
+      const component = transformSource(`<Button animation="fadein" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises behavior declared prop (labelPosition from label behavior)", () => {
+      const component = transformSource(`<Button labelPosition="top" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
+
+    it("recognises behavior declared prop (tooltip)", () => {
+      const component = transformSource(`<Button tooltip="Help text" />`) as ComponentDef;
+      const diags = lint({ component, metadataProvider: buttonWithPropX });
+      expect(diags).toHaveLength(0);
+    });
   });
 });
