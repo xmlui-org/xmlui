@@ -1,3 +1,4 @@
+import type { ComponentMetadata } from "xmlui";
 import { defaultProps, PieChart } from "./PieChartNative";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
@@ -5,7 +6,7 @@ import { parseScssVar, wrapComponent, createMetadata, d } from "xmlui";
 
 const COMP = "PieChart";
 
-export const PieChartMd = createMetadata({
+export const PieChartMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`PieChart` visualizes proportional data as circular segments; each slice " +
@@ -49,7 +50,7 @@ export const PieChartMd = createMetadata({
       description: "Toggles whether to show legend (\`true\`) or not (\`false\`).",
       valueType: "boolean",
       defaultValue: defaultProps.showLegend,
-    }
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

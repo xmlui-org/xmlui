@@ -24,7 +24,7 @@ export const LineChartMd = createMetadata({
     },
     yKeys: {
       description:
-      "This property specifies the keys in the data objects that should be used for rendering the lines.",
+        "This property specifies the keys in the data objects that should be used for rendering the lines.",
     },
     hideX: {
       description:

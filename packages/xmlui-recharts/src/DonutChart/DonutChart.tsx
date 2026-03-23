@@ -29,7 +29,7 @@ export const DonutChartMd = createMetadata({
       valueType: "string",
     },
     showLabel: {
-      description: "Toggles whether to show labels (\`true\`) or not (\`false\`).",
+      description: "Toggles whether to show labels (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabel,
     },
@@ -39,12 +39,12 @@ export const DonutChartMd = createMetadata({
       defaultValue: defaultPropsDonut.innerRadius,
     },
     showLabelList: {
-      description: "Whether to show labels in a list (\`true\`) or not (\`false\`).",
+      description: "Whether to show labels in a list (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLabelList,
     },
     showLegend: {
-      description: "Whether to show a legend (\`true\`) or not (\`false\`).",
+      description: "Whether to show a legend (`true`) or not (`false`).",
       valueType: "boolean",
       defaultValue: defaultPropsDonut.showLegend,
     },
