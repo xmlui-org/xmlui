@@ -21,7 +21,7 @@ const SEARCH_XS = `
 
 test.describe("Basic Functionality", () => {
   test("component renders", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search />`, {
+    await initTestBed(`<Search mode="inline" />`, {
       extensionIds: "xmlui-search",
     });
     const field = page.getByRole("searchbox");
@@ -30,7 +30,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("dropdown is hidden when input is empty", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -38,7 +38,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("dropdown appears when typing a matching query", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -49,7 +49,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("dropdown hides when input is cleared", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -64,7 +64,7 @@ test.describe("Basic Functionality", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -78,7 +78,7 @@ test.describe("Basic Functionality", () => {
   });
 
   test("single-character query does not open dropdown", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -87,21 +87,21 @@ test.describe("Basic Functionality", () => {
   });
 
   test("custom placeholder is displayed", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search placeholder="Find something..." />`, {
+    await initTestBed(`<Search mode="inline" placeholder="Find something..." />`, {
       extensionIds: "xmlui-search",
     });
     await expect(page.getByPlaceholder("Find something...")).toBeVisible();
   });
 
   test("default placeholder is displayed when none is supplied", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search />`, {
+    await initTestBed(`<Search mode="inline" />`, {
       extensionIds: "xmlui-search",
     });
     await expect(page.getByPlaceholder("Type to search")).toBeVisible();
   });
 
   test("limit prop restricts number of displayed results", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{manyItems}" limit="2" />`, {
+    await initTestBed(`<Search mode="inline" data="{manyItems}" limit="2" />`, {
       extensionIds: "xmlui-search",
       mainXs: `
         var manyItems = [
@@ -125,7 +125,7 @@ test.describe("Basic Functionality", () => {
 
 test.describe("Keyboard Navigation", () => {
   test("first ArrowDown highlights the first result", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -143,7 +143,7 @@ test.describe("Keyboard Navigation", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -162,7 +162,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("ArrowDown wraps from last result back to first", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -181,7 +181,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("ArrowUp from first result wraps to last result", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -198,7 +198,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("Escape closes the dropdown", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -216,7 +216,7 @@ test.describe("Keyboard Navigation", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -231,7 +231,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("Enter after ArrowDown closes dropdown and clears input", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -256,7 +256,7 @@ test.describe("Keyboard Navigation", () => {
 
 test.describe("Mouse Interactions", () => {
   test("hovering a result highlights it", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -274,7 +274,7 @@ test.describe("Mouse Interactions", () => {
   });
 
   test("clicking a result closes the dropdown", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -288,7 +288,7 @@ test.describe("Mouse Interactions", () => {
   });
 
   test("clicking a result clears the search input", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -305,7 +305,7 @@ test.describe("Mouse Interactions", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -332,7 +332,7 @@ test.describe("Mouse Interactions", () => {
 
 test.describe("Categories", () => {
   test("category headers are shown for categorized results", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{categorizedData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{categorizedData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -345,7 +345,7 @@ test.describe("Categories", () => {
   });
 
   test("category header shows the category name", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{categorizedData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{categorizedData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -360,7 +360,7 @@ test.describe("Categories", () => {
   });
 
   test("no category headers when all results are uncategorized", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -376,7 +376,7 @@ test.describe("Categories", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{categorizedData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{categorizedData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -398,7 +398,7 @@ test.describe("Categories", () => {
 
 test.describe("Accessibility", () => {
   test("searchbox has aria-autocomplete='list'", async ({ initTestBed, page }) => {
-    await initTestBed(`<Search />`, {
+    await initTestBed(`<Search mode="inline" />`, {
       extensionIds: "xmlui-search",
     });
     await expect(page.getByRole("searchbox")).toHaveAttribute("aria-autocomplete", "list");
@@ -408,7 +408,7 @@ test.describe("Accessibility", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -421,7 +421,7 @@ test.describe("Accessibility", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
@@ -437,7 +437,7 @@ test.describe("Accessibility", () => {
     initTestBed,
     page,
   }) => {
-    await initTestBed(`<Search data="{sampleData}" />`, {
+    await initTestBed(`<Search mode="inline" data="{sampleData}" />`, {
       extensionIds: "xmlui-search",
       mainXs: SEARCH_XS,
     });
