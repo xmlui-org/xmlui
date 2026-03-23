@@ -14,6 +14,7 @@ function resolveRelativePathname(pathname: string | number, currentPathname: str
   if (typeof pathname !== "string") return pathname;
   if (pathname.startsWith("/")) return pathname; // already absolute
   if (pathname === ".") return currentPathname; // stay on current page
+  if (pathname.startsWith("?")) return currentPathname + pathname; // query-only, preserve on current page
   if (pathname === "..") {
     const parts = currentPathname.split("/").filter(Boolean);
     parts.pop();
