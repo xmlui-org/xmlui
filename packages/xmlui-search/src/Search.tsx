@@ -2,7 +2,6 @@ import {
   useCallback,
   useId,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -10,19 +9,18 @@ import {
   Fragment,
   type ForwardedRef,
 } from "react";
+import { flushSync } from "react-dom";
 import {
   LinkNative,
   Text,
   TextBox,
   useSearchContextContent,
   VisuallyHidden,
-  useAppLayoutContext,
   Button,
   Icon,
   SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
 import type {
-  FuseOptionKeyObject,
   FuseResult,
   FuseResultMatch,
   IFuseOptions,
@@ -31,8 +29,8 @@ import type {
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import { Popover, PopoverAnchor, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import classNames from "classnames";
+import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
+import { createPortal } from "react-dom";
 
 type Props = {
   id?: string;
@@ -42,6 +40,16 @@ type Props = {
   collapsible?: boolean;
   placeholder?: string;
   className?: string;
+  suggestedQueries?: string[];
+  noResultsMessage?: string;
+  showPreviewMetadata?: boolean;
+  defaultSelectedCategories?: string[];
+  pageSize?: number;
+  enableSpellCorrection?: boolean;
+  /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
+   *  "inline": the current expand-in-place animation inside the navbar.
+   *  "drawer": renders results inline below the input, no portal — safe inside a modal drawer. */
+  mode?: "overlay" | "inline" | "drawer";
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -51,6 +59,7 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
 
 const MIN_MATCH_LENGTH = 2;
 
+
 export const Search = ({
   id,
   data,
@@ -59,7 +68,16 @@ export const Search = ({
   collapsible = false,
   placeholder,
   className,
+  suggestedQueries,
+  noResultsMessage,
+  showPreviewMetadata = true,
+  defaultSelectedCategories,
+  pageSize,
+  enableSpellCorrection = true,
+  mode = "overlay",
 }: Props) => {
+  const useOverlay = mode === "overlay";
+  const useDrawer = mode === "drawer";
   const _id = useId();
   const inputId = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +91,39 @@ export const Search = ({
     null,
   );
 
-  const [inputValue, setInputValue] = useState("");
+  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
+  const [drawerOverlayTop, setDrawerOverlayTop] = useState(0);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  const openOverlay = useCallback(() => {
+    if (triggerRef.current) {
+      setDrawerOverlayTop(triggerRef.current.getBoundingClientRect().top);
+    }
+    // Set synchronously so Sheet.tsx onFocusOutside/onInteractOutside checks it immediately
+    if (useDrawer) {
+      document.body.setAttribute("data-search-overlay-open", "true");
+    }
+    // flushSync forces React to render the overlay synchronously so inputRef is populated
+    // before we call focus(), keeping us within the user gesture context on mobile
+    flushSync(() => {
+      setIsOverlayOpen(true);
+    });
+    // Focus the native <input> directly (not the wrapper div) to reliably trigger
+    // the virtual keyboard on mobile — the div relay goes through React events and
+    // loses the gesture context on iOS Safari
+    const nativeInput = inputRef.current?.querySelector?.("input") ?? inputRef.current;
+    nativeInput?.focus({ preventScroll: true });
+  }, [useDrawer]);
+
+  const closeOverlay = useCallback(() => {
+    document.body.removeAttribute("data-search-overlay-open");
+    setIsOverlayOpen(false);
+    setInputValue("");
+    setShow(false);
+    setActiveIndex(-1);
+  }, []);
+
+const [inputValue, setInputValue] = useState("");
   // --- Why this solution?
   // Instead of useDeferredValue, we simply use useEffect + setTimeout to create a debounced value for the search query.
   // This is because Fuse.js searches are expensive and run synchronously in JS.
@@ -85,22 +135,54 @@ export const Search = ({
     return () => clearTimeout(timer);
   }, [inputValue]);
 
-  // --- Merge data, do search, postprocess results
-  const results = useSearch(data, limit, debouncedValue);
+  const effectivePageSize = pageSize ?? limit;
+  const [page, setPage] = useState(1);
 
-  const layout = useAppLayoutContext();
-  const inDrawer = layout?.drawerVisible ?? false;
-  const _root = inDrawer && inputRef.current ? inputRef.current?.closest(`div`) : undefined;
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
+    () => new Set(defaultSelectedCategories ?? []),
+  );
+
+  // --- Merge data, do search, postprocess results
+  const { results: allResults, totalCount, suggestion } = useSearch(
+    data,
+    limit,
+    debouncedValue,
+    enableSpellCorrection,
+  );
+
+  // Reset page and category filter when query changes
+  useEffect(() => {
+    setPage(1);
+    setSelectedCategories(new Set(defaultSelectedCategories ?? []));
+  }, [debouncedValue]);
+
+  const availableCategories = useMemo(() => {
+    const cats = new Set<string>();
+    for (const r of allResults) {
+      cats.add(r.item.category ?? SEARCH_DEFAULT_CATEGORY);
+    }
+    return Array.from(cats);
+  }, [allResults]);
+
+  const categoryFilteredResults = useMemo(() => {
+    if (selectedCategories.size === 0) return allResults;
+    return allResults.filter((r) =>
+      selectedCategories.has(r.item.category ?? SEARCH_DEFAULT_CATEGORY),
+    );
+  }, [allResults, selectedCategories]);
+
+  const results = categoryFilteredResults.slice(0, page * effectivePageSize);
+  const hasMore = results.length < categoryFilteredResults.length;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
 
   // render-related state
   const [show, setShow] = useState(false);
 
-  useLayoutEffect(() => {
-    if (results.length > 0) setShow(true);
+  useEffect(() => {
+    if (allResults.length > 0) setShow(true);
     setActiveIndex(0);
-  }, [results]);
+  }, [allResults]);
 
   const onSearchButtonClick = useCallback(() => {
     setIsExpanded(true);
@@ -113,9 +195,14 @@ export const Search = ({
   }, []);
 
   const onClick = useCallback(() => {
-    setInputValue("");
-    setActiveIndex(-1);
-  }, []);
+    if (useOverlay) {
+      closeOverlay();
+    } else {
+      setInputValue("");
+      setActiveIndex(-1);
+    }
+    // For drawer mode: do nothing extra — keep the search overlay and mobile menu open
+  }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
@@ -136,6 +223,16 @@ export const Search = ({
   // Handle keyboard navigation
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Escape") {
+        if (useOverlay || useDrawer) {
+          closeOverlay();
+        } else {
+          setActiveIndex(-1);
+          setShow(false);
+        }
+        return;
+      }
+
       if (!show) return;
 
       if (e.key === "ArrowDown") {
@@ -150,15 +247,16 @@ export const Search = ({
         if (results.length === 0) return;
         e.preventDefault();
         const targetIndex = activeIndex >= 0 ? activeIndex : 0;
-        setActiveIndex(-1);
-        setShow(false);
+        if (useOverlay) {
+          closeOverlay();
+        } else {
+          setActiveIndex(-1);
+          setShow(false);
+        }
         itemLinkRefs.current[targetIndex]?.click();
-      } else if (e.key === "Escape") {
-        setActiveIndex(-1);
-        setShow(false);
       }
     },
-    [activeIndex, results.length, show],
+    [activeIndex, results.length, show, closeOverlay, useDrawer, useOverlay],
   );
 
   // Does the scrolling to the active item, accounting for the sticky category header
@@ -197,6 +295,296 @@ export const Search = ({
     }
   }, [activeIndex, navigationSource]);
 
+  const clearCategories = useCallback(() => {
+    setSelectedCategories(new Set());
+  }, []);
+
+  const refocusInput = useCallback(() => {
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  const onDidYouMeanAccept = useCallback((s: string) => {
+    setInputValue(s);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onQuerySelect = useCallback((q: string) => {
+    setInputValue(q);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onLoadMore = useCallback(() => {
+    setPage((p) => p + 1);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onSelectOneCategory = useCallback((cat: string) => {
+    setSelectedCategories(new Set([cat]));
+    refocusInput();
+  }, [refocusInput]);
+
+  const onClearAllCategories = useCallback(() => {
+    clearCategories();
+    refocusInput();
+  }, [clearCategories, refocusInput]);
+
+  // Shared results list JSX — used by both overlay and popover modes
+  const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
+  const allUncategorized = results.every((r) => r.item.category == null);
+
+  const resultsListJsx = (
+    <>
+      {suggestion && enableSpellCorrection && (
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
+          <DidYouMeanBanner suggestion={suggestion} onAccept={onDidYouMeanAccept} />
+        </li>
+      )}
+      {results.length > 0 &&
+        results.map((result, idx) => {
+          const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
+          const prevEffectiveCategory =
+            idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
+          const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+          return (
+            <Fragment key={result.item.path}>
+              {showCategoryHeader && !allUncategorized && (
+                <li className={styles.categoryHeader} role="presentation" aria-hidden="true">
+                  <Text className={styles.categoryHeaderText}>{effectiveCategory}</Text>
+                </li>
+              )}
+              <li
+                id={`option-${idx}`}
+                role="option"
+                className={classnames(styles.item, styles.header, {
+                  [styles.focus]: activeIndex === idx,
+                })}
+                onMouseEnter={() => {
+                  setActiveIndex(idx);
+                  setNavigationSource("mouse");
+                }}
+                ref={(el) => (itemRefs.current[idx] = el!)}
+                aria-selected={activeIndex === idx}
+              >
+                <SearchItemContent
+                  ref={(el) => (itemLinkRefs.current[idx] = el!)}
+                  idx={idx}
+                  item={result.item}
+                  matches={result.matches}
+                  maxContentMatchNumber={maxContentMatchNumber}
+                  onClick={onClick}
+                  showPreviewMetadata={showPreviewMetadata}
+                />
+              </li>
+            </Fragment>
+          );
+        })}
+      {results.length === 0 && (
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
+          <NoResultsPanel
+            message={noResultsMessage}
+            suggestedQueries={suggestedQueries}
+            onQuerySelect={onQuerySelect}
+            showSuggestion={!suggestion || !enableSpellCorrection}
+          />
+        </li>
+      )}
+      {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
+        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
+          <div className={styles.loadMoreRow}>
+            <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
+            {hasMore && (
+              <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={onLoadMore}>
+                Load more
+              </button>
+            )}
+          </div>
+        </li>
+      )}
+    </>
+  );
+
+  if (useOverlay) {
+    return (
+      <span className={className}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        {/* Trigger — either a toggle button (collapsible) or an always-visible input */}
+        {!isOverlayOpen && collapsible && (
+          <Button
+            variant="ghost"
+            themeColor="secondary"
+            icon={<Icon name="search" aria-hidden />}
+            onClick={openOverlay}
+            contextualLabel="Open search"
+            className={styles.searchToggleButton}
+          />
+        )}
+        {!isOverlayOpen && !collapsible && (
+          <div
+            onPointerDown={(e) => { e.preventDefault(); openOverlay(); }}
+            style={{ cursor: "text" }}
+          >
+            <TextBox
+              className={styles.input}
+              type="search"
+              placeholder={placeholder ?? "Type to search"}
+              value=""
+              startIcon="search"
+              readOnly
+            />
+          </div>
+        )}
+        {/* Overlay */}
+        {isOverlayOpen && createPortal(
+          // Wrap with className so theme CSS vars are in scope for the portal
+          <div className={className}>
+            {/* Backdrop — click outside to close */}
+            <div
+              className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
+              onClick={closeOverlay}
+            >
+              <div
+                className={classnames(styles.overlayPanel)}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Input row */}
+                <div className={styles.overlayInputRow}>
+                  <Icon name="search" className={styles.overlaySearchIcon} />
+                  <TextBox
+                    id={inputId}
+                    ref={inputRef}
+                    className={styles.overlayInput}
+                    type="search"
+                    placeholder={placeholder ?? "Type to search…"}
+                    value={inputValue}
+                    onDidChange={(value) => setInputValue(value)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls={`${inputId}-listbox`}
+                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                  />
+                </div>
+
+                {/* Category tabs + sort — only when there's a query */}
+                {hasQuery && (
+                  <div className={styles.overlayControls}>
+                    <OverlayCategoryTabs
+                      categories={availableCategories}
+                      selectedCategories={selectedCategories}
+                      onSelectOne={onSelectOneCategory}
+                      onClearAll={onClearAllCategories}
+                    />
+                  </div>
+                )}
+
+                {/* Results */}
+                {hasQuery && (
+                  <>
+                    <ul
+                      id={`${inputId}-listbox`}
+                      ref={listRef}
+                      className={classnames(styles.list, styles.overlayList)}
+                      role="listbox"
+                      aria-label="Search results"
+                    >
+                      {resultsListJsx}
+                    </ul>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>, document.body
+        )}
+      </span>
+    );
+  }
+
+  if (useDrawer) {
+    return (
+      <span className={className} style={{ display: "block" }}>
+        <VisuallyHidden>
+          <label htmlFor={inputId}>Search Field</label>
+        </VisuallyHidden>
+        {/* Trigger — always in DOM so pointer events complete within the Sheet */}
+        <div
+          ref={triggerRef}
+          onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); openOverlay(); }}
+          style={{ cursor: "text" }}
+        >
+          <TextBox
+            className={classnames(styles.input, styles.fullWidth)}
+            type="search"
+            placeholder={placeholder ?? "Type to search"}
+            value=""
+            startIcon="search"
+            readOnly
+          />
+        </div>
+        {/* Overlay via portal — drawer is already closed by the time this renders */}
+        {isOverlayOpen && createPortal(
+          <div className={className}>
+            <div className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)} onClick={closeOverlay}>
+              <div
+                className={classnames(styles.overlayPanel, styles.overlayPanelMobile)}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className={styles.drawerInputRow}>
+                  <TextBox
+                    id={inputId}
+                    ref={inputRef}
+                    className={classnames(styles.input, styles.fullWidth)}
+                    type="search"
+                    placeholder={placeholder ?? "Type to search"}
+                    value={inputValue}
+                    startIcon="search"
+                    onDidChange={(value) => setInputValue(value)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls={`${inputId}-listbox`}
+                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                  />
+                </div>
+                {hasQuery && (
+                  <div className={styles.drawerResultsWrapper}>
+                    <div className={styles.drawerControls}>
+                      {availableCategories.length > 1 && (
+                        <div className={styles.drawerCategoryRow}>
+                          <OverlayCategoryTabs
+                            categories={availableCategories}
+                            selectedCategories={selectedCategories}
+                            onSelectOne={onSelectOneCategory}
+                            onClearAll={onClearAllCategories}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <ul
+                      id={`${inputId}-listbox`}
+                      ref={listRef}
+                      className={classnames(styles.list, styles.overlayList, styles.drawerOverlayList)}
+                      role="listbox"
+                      aria-label="Search results"
+                    >
+                      {resultsListJsx}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>,
+          document.body
+        )}
+      </span>
+    );
+  }
+
   return (
     <span className={className}>
       <Popover open={show} onOpenChange={setShow}>
@@ -218,7 +606,6 @@ export const Search = ({
               id={inputId}
               ref={inputRef}
               className={classnames(styles.input, {
-                [styles.fullWidth]: inDrawer,
                 [styles.active]: inputValue.length > 0 || show,
                 [styles.focused]: isFocused,
                 [styles.expanding]: animationDirection === "expanding",
@@ -238,98 +625,35 @@ export const Search = ({
             />
           </PopoverAnchor>
         )}
-        {show && results && debouncedValue && debouncedValue.length >= MIN_MATCH_LENGTH && (
-          <Portal container={_root}>
+        {show && allResults && hasQuery && (
+          <Portal>
             <PopoverContent
               align="end"
               onOpenAutoFocus={(e) => e.preventDefault()}
               onCloseAutoFocus={(e) => e.preventDefault()}
               onEscapeKeyDown={() => setShow(false)}
               onFocusOutside={(e) => e.preventDefault()}
-              className={classnames(styles.listPanel, className, {
-                [styles.inDrawer]: inDrawer,
-              })}
+              className={classnames(styles.listPanel, className)}
             >
+              {availableCategories.length > 1 && (
+                <div className={styles.overlayControls}>
+                  <OverlayCategoryTabs
+                    categories={availableCategories}
+                    selectedCategories={selectedCategories}
+                    onSelectOne={onSelectOneCategory}
+                    onClearAll={onClearAllCategories}
+                  />
+                </div>
+              )}
               <ul
                 id={`${inputId}-listbox`}
                 ref={listRef}
-                className={classNames(styles.list)}
+                className={classnames(styles.list, styles.overlayList)}
                 role="listbox"
                 aria-label="Search results"
               >
-                {results.length > 0 &&
-                  results.map((result, idx) => {
-                    const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
-                    const prevEffectiveCategory =
-                      idx > 0
-                        ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY)
-                        : undefined;
-                    const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
-                    let allUncategorized = results.every((r) => r.item.category == null);
-                    return (
-                      <Fragment key={`${result.item.path}-${idx}`}>
-                        {showCategoryHeader && !allUncategorized && (
-                          <li
-                            className={styles.categoryHeader}
-                            role="presentation"
-                            aria-hidden="true"
-                          >
-                            <Text
-                              className={styles.categoryHeaderText}
-                            >
-                              {effectiveCategory}
-                            </Text>
-                          </li>
-                        )}
-                        <li
-                          id={`option-${idx}`}
-                          role="option"
-                          className={classnames(styles.item, styles.header, {
-                            [styles.focus]: activeIndex === idx,
-                          })}
-                          onMouseEnter={() => {
-                            setActiveIndex(idx);
-                            setNavigationSource("mouse");
-                          }}
-                          ref={(el) => (itemRefs.current[idx] = el!)}
-                          aria-selected={activeIndex === idx}
-                        >
-                          <SearchItemContent
-                            ref={(el) => (itemLinkRefs.current[idx] = el!)}
-                            idx={idx}
-                            item={result.item}
-                            matches={result.matches}
-                            maxContentMatchNumber={maxContentMatchNumber}
-                            onClick={onClick}
-                          />
-                        </li>
-                      </Fragment>
-                    );
-                  })}
-                {results.length === 0 && (
-                  <div className={styles.noResults}>
-                    <Text variant="em">No results</Text>
-                  </div>
-                )}
+                {resultsListJsx}
               </ul>
-              {!inDrawer && (
-                <footer className={styles.panelFooter}>
-                  <div>
-                    <Text variant="keyboard"><Icon name="arrowup" size="sm" /></Text>
-                    <Text variant="keyboard"><Icon name="arrowdown" size="sm" /></Text>
-                    <Text>Navigate</Text>
-                  </div>
-
-                  <div style={{ flex: "1" }}>
-                    <Text variant="keyboard">Enter</Text>
-                    <Text>Select</Text>
-                  </div>
-
-                  <div>
-                    <Text variant="keyboard">Esc</Text>
-                    <Text>Close</Text>
-                  </div>
-              </footer>)}
             </PopoverContent>
           </Portal>
         )}
@@ -338,10 +662,125 @@ export const Search = ({
   );
 };
 
+type NoResultsPanelProps = {
+  message?: string;
+  suggestedQueries?: string[];
+  onQuerySelect: (query: string) => void;
+  showSuggestion: boolean;
+};
+
+function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggestion }: NoResultsPanelProps) {
+  return (
+    <div className={styles.noResultsPanel} role="status" aria-live="polite">
+      <Text variant="em" className={styles.noResultsMessage}>
+        {message ?? "No results found"}
+      </Text>
+      {showSuggestion && (
+        <Text className={styles.noResultsHint}>
+          Try broadening your search or check for typos.
+        </Text>
+      )}
+      {suggestedQueries && suggestedQueries.length > 0 && (
+        <div className={styles.noResultsSuggestions}>
+          {suggestedQueries.map((q) => (
+            <button
+              key={q}
+              className={styles.noResultsSuggestionChip}
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => onQuerySelect(q)}
+            >
+              {q}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Maps raw category keys to user-friendly display labels. */
+function getCategoryLabel(cat: string): string {
+  const labels: Record<string, string> = {
+    docs: "Documentation",
+    blog: "Blog",
+    news: "News",
+    "get-started": "Get Started",
+    other: "Other",
+  };
+  return labels[cat] ?? cat.charAt(0).toUpperCase() + cat.slice(1);
+}
+
+type OverlayCategoryTabsProps = {
+  categories: string[];
+  selectedCategories: Set<string>;
+  onSelectOne: (cat: string) => void;
+  onClearAll: () => void;
+};
+
+function OverlayCategoryTabs({
+  categories,
+  selectedCategories,
+  onSelectOne,
+  onClearAll,
+}: OverlayCategoryTabsProps) {
+  const allActive = selectedCategories.size === 0;
+  return (
+    <div className={styles.overlayTabs} role="tablist" aria-label="Filter by category">
+      <button
+        role="tab"
+        aria-selected={allActive}
+        className={classnames(styles.overlayTab, { [styles.overlayTabActive]: allActive })}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={onClearAll}
+      >
+        All content
+      </button>
+      {categories.map((cat) => {
+        const active = selectedCategories.size === 1 && selectedCategories.has(cat);
+        return (
+          <button
+            key={cat}
+            role="tab"
+            aria-selected={active}
+            className={classnames(styles.overlayTab, { [styles.overlayTabActive]: active })}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => onSelectOne(cat)}
+          >
+            {getCategoryLabel(cat)}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// --- F: DidYouMeanBanner sub-component
+
+type DidYouMeanBannerProps = {
+  suggestion: string;
+  onAccept: (s: string) => void;
+};
+
+function DidYouMeanBanner({ suggestion, onAccept }: DidYouMeanBannerProps) {
+  return (
+    <div className={styles.didYouMeanBanner}>
+      <Text className={styles.didYouMeanText}>Did you mean: </Text>
+      <button
+        className={styles.didYouMeanSuggestion}
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => onAccept(suggestion)}
+      >
+        {suggestion}
+      </button>
+    </div>
+  );
+}
+
 type SearchItemContentProps = SearchResult & {
   idx: string | number;
   maxContentMatchNumber?: number;
   onClick?: () => void;
+  showPreviewMetadata?: boolean;
 };
 
 /**
@@ -350,7 +789,7 @@ type SearchItemContentProps = SearchResult & {
  *
  */
 const SearchItemContent = forwardRef(function SearchItemContent(
-  { idx, item, matches, maxContentMatchNumber, onClick }: SearchItemContentProps,
+  { idx, item, matches, maxContentMatchNumber, onClick, showPreviewMetadata = true }: SearchItemContentProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -358,21 +797,32 @@ const SearchItemContent = forwardRef(function SearchItemContent(
       ref={forwardedRef}
       to={item.path}
       onClick={onClick}
-      style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+      className={styles.itemLink}
     >
-      <div style={{ width: "100%" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          <Text variant="subtitle" style={{ fontWeight: 600 }}>
+      <div className={styles.itemBody}>
+        <div className={styles.itemTitleRow}>
+          <Text variant="subtitle">
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
         </div>
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        {showPreviewMetadata && (item.category || item.path) && (
+          <div className={styles.previewMetadata}>
+            {item.category && (
+              <span className={styles.categoryBadge}>{item.category}</span>
+            )}
+            {item.path && (
+              <span className={styles.pathBreadcrumb}>
+                {parsePathBreadcrumb(item.path).map((segment, i, arr) => (
+                  <Fragment key={i}>
+                    <span className={styles.pathSegment}>{segment}</span>
+                    {i < arr.length - 1 && <span className={styles.pathSeparator}> / </span>}
+                  </Fragment>
+                ))}
+              </span>
+            )}
+          </div>
+        )}
+        <div className={styles.itemSnippets}>
           {/* content snippets */}
           {matches?.content?.indices &&
             formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
@@ -429,6 +879,8 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
 
         // Skip fields that have no value (e.g. optional fields like category)
         if (fieldValue === undefined) return acc;
+        // Skip non-string fields
+        if (typeof fieldValue !== "string") return acc;
 
         // --- Prefilter matches that are too short/significantly misaligned compared to the search term
         const filteredMatches = match.indices.filter((index) => {
@@ -564,40 +1016,46 @@ function pluralize(number: number, singular: string, plural: string): string {
   return `${number} ${plural}`;
 }
 
-function useSearch(data: SearchItemData[], limit: number, query: string): SearchResult[] {
-  const searchOptions: IFuseOptions<SearchItemData> = useMemo(() => {
-    const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
-      {
-        name: "title",
-        weight: 2,
-      },
-      {
-        name: "content",
-        weight: 1,
-      },
-    ];
-    return {
-      // isCaseSensitive: false,
-      includeScore: true,
-      // ignoreDiacritics: false,
-      shouldSort: true, // <- sorts by "score"
-      includeMatches: true,
-      // findAllMatches: false,
-      minMatchCharLength: MIN_MATCH_LENGTH,
-      // location: 0,
-      threshold: 0,
-      // distance: 500,
-      // useExtendedSearch: true,
-      ignoreLocation: true,
-      ignoreFieldNorm: true,
-      // fieldNormWeight: 1,
-      keys,
-    };
-  }, []);
+function parsePathBreadcrumb(path: string): string[] {
+  return path.split("/").filter((s) => s.length > 0);
+}
+
+const FUSE_SEARCH_OPTIONS: IFuseOptions<SearchItemData> = {
+  includeScore: true,
+  shouldSort: true, // <- sorts by "score"
+  includeMatches: true,
+  minMatchCharLength: MIN_MATCH_LENGTH,
+  threshold: 0,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  keys: [
+    { name: "title", weight: 2 },
+    { name: "content", weight: 1 },
+  ],
+};
+
+const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
+  includeScore: true,
+  shouldSort: true,
+  includeMatches: false,
+  minMatchCharLength: MIN_MATCH_LENGTH,
+  threshold: 0.6,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  keys: [{ name: "title", weight: 2 }, { name: "content", weight: 1 }],
+};
+
+function useSearch(
+  data: SearchItemData[],
+  limit: number,
+  query: string,
+  enableSpellCorrection: boolean,
+): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
   const fuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!fuseRef.current) {
-    fuseRef.current = new Fuse<SearchItemData>([], searchOptions);
-  }
+  if (!fuseRef.current) fuseRef.current = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
+
+  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(null!);
+  if (!relaxedFuseRef.current) relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
 
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
@@ -632,21 +1090,32 @@ function useSearch(data: SearchItemData[], limit: number, query: string): Search
 
   useEffect(() => {
     fuseRef.current.setCollection(mergedData);
+    relaxedFuseRef.current.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Step 3: Execute search & post-process results
-  const results: SearchResult[] = useMemo(() => {
-    if (query.length < MIN_MATCH_LENGTH) return [];
+  const searchOutput = useMemo(() => {
+    if (query.length < MIN_MATCH_LENGTH) {
+      return { results: [], totalCount: 0, suggestion: null };
+    }
 
-    const limited = !query
-      ? []
-      : fuseRef.current.search(query, { limit: limit ?? defaultProps.limit });
+    const fetchLimit = Math.min(limit * 10, 200);
+    const raw = fuseRef.current.search(query, { limit: fetchLimit });
+    const mapped = postProcessSearch(raw, query);
+    const grouped = groupAndSortByCategory(mapped);
 
-    const mapped = postProcessSearch(limited, query);
-    return groupAndSortByCategory(mapped);
-  }, [query, limit]);
+    let suggestion: string | null = null;
+    if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
+      const relaxed = relaxedFuseRef.current.search(query, { limit: 1 });
+      if (relaxed.length > 0) {
+        suggestion = relaxed[0].item.title;
+      }
+    }
 
-  return results;
+    return { results: grouped, totalCount: grouped.length, suggestion };
+  }, [query, limit, enableSpellCorrection]);
+
+  return searchOutput;
 }
 
 /**
@@ -676,7 +1145,7 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
-type SearchItemData = { path: string; title: string; content: string; category?: string };
+type SearchItemData = { path: string; title: string; content: string; category?: string; date?: string | number };
 function isSearchItemDataArray(data: any): data is SearchItemData[] {
   return (
     Array.isArray(data) &&
