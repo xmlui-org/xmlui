@@ -47,11 +47,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/Blog",
-          "label": "Blog",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Bookmark",
           "label": "Bookmark",
           "icon": "component"
