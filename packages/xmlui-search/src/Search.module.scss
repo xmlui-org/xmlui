@@ -632,6 +632,32 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   overflow: hidden;
 }
 
+.itemLink {
+  text-decoration: none;
+  width: 100%;
+  min-height: 36px;
+}
+
+.itemBody {
+  width: 100%;
+}
+
+.itemTitleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+
+  [data-variant="subtitle"] {
+    font-weight: 600;
+  }
+}
+
+.itemSnippets {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .searchToggleButton {
   color: $textColor-SearchToggleButton !important;
 

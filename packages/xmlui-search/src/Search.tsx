@@ -3,7 +3,6 @@ import {
   useDeferredValue,
   useId,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -46,7 +45,6 @@ type Props = {
   noResultsMessage?: string;
   showPreviewMetadata?: boolean;
   defaultSelectedCategories?: string[];
-  // defaultSortOrder?: "relevance" | "date";
   pageSize?: number;
   enableSpellCorrection?: boolean;
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
@@ -62,6 +60,7 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
 
 const MIN_MATCH_LENGTH = 2;
 
+
 export const Search = ({
   id,
   data,
@@ -74,7 +73,6 @@ export const Search = ({
   noResultsMessage,
   showPreviewMetadata = true,
   defaultSelectedCategories,
-  // defaultSortOrder = "relevance",
   pageSize,
   enableSpellCorrection = true,
   mode = "overlay",
@@ -136,8 +134,6 @@ const [inputValue, setInputValue] = useState("");
     () => new Set(defaultSelectedCategories ?? []),
   );
 
-  // const [sortOrder, setSortOrder] = useState<"relevance" | "date">(defaultSortOrder);
-
   // --- Merge data, do search, postprocess results
   const { results: allResults, totalCount, suggestion } = useSearch(
     data,
@@ -167,10 +163,7 @@ const [inputValue, setInputValue] = useState("");
     );
   }, [allResults, selectedCategories]);
 
-  const results = useMemo(
-    () => categoryFilteredResults.slice(0, page * effectivePageSize),
-    [categoryFilteredResults, page, effectivePageSize],
-  );
+  const results = categoryFilteredResults.slice(0, page * effectivePageSize);
   const hasMore = results.length < categoryFilteredResults.length;
 
   const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
@@ -178,7 +171,7 @@ const [inputValue, setInputValue] = useState("");
   // render-related state
   const [show, setShow] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (allResults.length > 0) setShow(true);
     setActiveIndex(0);
   }, [allResults]);
@@ -302,16 +295,40 @@ const [inputValue, setInputValue] = useState("");
     inputRef.current?.focus({ preventScroll: true });
   }, []);
 
+  const onDidYouMeanAccept = useCallback((s: string) => {
+    setInputValue(s);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onQuerySelect = useCallback((q: string) => {
+    setInputValue(q);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onLoadMore = useCallback(() => {
+    setPage((p) => p + 1);
+    refocusInput();
+  }, [refocusInput]);
+
+  const onSelectOneCategory = useCallback((cat: string) => {
+    setSelectedCategories(new Set([cat]));
+    refocusInput();
+  }, [refocusInput]);
+
+  const onClearAllCategories = useCallback(() => {
+    clearCategories();
+    refocusInput();
+  }, [clearCategories, refocusInput]);
+
   // Shared results list JSX — used by both overlay and popover modes
   const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
   const allUncategorized = results.every((r) => r.item.category == null);
 
   const resultsListJsx = (
     <>
-      {/* F — Did You Mean banner */}
       {suggestion && enableSpellCorrection && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
-          <DidYouMeanBanner suggestion={suggestion} onAccept={(s) => { setInputValue(s); refocusInput(); }} />
+          <DidYouMeanBanner suggestion={suggestion} onAccept={onDidYouMeanAccept} />
         </li>
       )}
       {results.length > 0 &&
@@ -321,7 +338,7 @@ const [inputValue, setInputValue] = useState("");
             idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
           const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
           return (
-            <Fragment key={`${result.item.path}-${idx}`}>
+            <Fragment key={result.item.path}>
               {showCategoryHeader && !allUncategorized && (
                 <li className={styles.categoryHeader} role="presentation" aria-hidden="true">
                   <Text className={styles.categoryHeaderText}>{effectiveCategory}</Text>
@@ -353,13 +370,12 @@ const [inputValue, setInputValue] = useState("");
             </Fragment>
           );
         })}
-      {/* A — Zero results UX */}
       {results.length === 0 && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <NoResultsPanel
             message={noResultsMessage}
             suggestedQueries={suggestedQueries}
-            onQuerySelect={(q) => { setInputValue(q); refocusInput(); }}
+            onQuerySelect={onQuerySelect}
             showSuggestion={!suggestion || !enableSpellCorrection}
           />
         </li>
@@ -369,7 +385,7 @@ const [inputValue, setInputValue] = useState("");
           <div className={styles.loadMoreRow}>
             <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
             {hasMore && (
-              <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={() => { setPage((p) => p + 1); refocusInput(); }}>
+              <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={onLoadMore}>
                 Load more
               </button>
             )}
@@ -451,8 +467,8 @@ const [inputValue, setInputValue] = useState("");
                     <OverlayCategoryTabs
                       categories={availableCategories}
                       selectedCategories={selectedCategories}
-                      onSelectOne={(cat: string) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
-                      onClearAll={() => { clearCategories(); refocusInput(); }}
+                      onSelectOne={onSelectOneCategory}
+                      onClearAll={onClearAllCategories}
                     />
                   </div>
                 )}
@@ -535,8 +551,8 @@ const [inputValue, setInputValue] = useState("");
                           <OverlayCategoryTabs
                             categories={availableCategories}
                             selectedCategories={selectedCategories}
-                            onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
-                            onClearAll={() => { clearCategories(); refocusInput(); }}
+                            onSelectOne={onSelectOneCategory}
+                            onClearAll={onClearAllCategories}
                           />
                         </div>
                       )}
@@ -616,8 +632,8 @@ const [inputValue, setInputValue] = useState("");
                   <OverlayCategoryTabs
                     categories={availableCategories}
                     selectedCategories={selectedCategories}
-                    onSelectOne={(cat) => { setSelectedCategories(new Set([cat])); refocusInput(); }}
-                    onClearAll={() => { clearCategories(); refocusInput(); }}
+                    onSelectOne={onSelectOneCategory}
+                    onClearAll={onClearAllCategories}
                   />
                 </div>
               )}
@@ -637,8 +653,6 @@ const [inputValue, setInputValue] = useState("");
     </span>
   );
 };
-
-// --- A: NoResultsPanel sub-component
 
 type NoResultsPanelProps = {
   message?: string;
@@ -675,10 +689,6 @@ function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggesti
     </div>
   );
 }
-
-
-
-// --- G: OverlayCategoryTabs sub-component
 
 /** Maps raw category keys to user-friendly display labels. */
 function getCategoryLabel(cat: string): string {
@@ -779,15 +789,14 @@ const SearchItemContent = forwardRef(function SearchItemContent(
       ref={forwardedRef}
       to={item.path}
       onClick={onClick}
-      style={{ textDecorationLine: "none", width: "100%", minHeight: "36px" }}
+      className={styles.itemLink}
     >
-      <div style={{ width: "100%" }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: "12px" }}>
-          <Text variant="subtitle" style={{ fontWeight: 600 }}>
+      <div className={styles.itemBody}>
+        <div className={styles.itemTitleRow}>
+          <Text variant="subtitle">
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
         </div>
-        {/* B — Preview metadata: category badge + path breadcrumb */}
         {showPreviewMetadata && (item.category || item.path) && (
           <div className={styles.previewMetadata}>
             {item.category && (
@@ -805,13 +814,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             )}
           </div>
         )}
-        <div
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
+        <div className={styles.itemSnippets}>
           {/* content snippets */}
           {matches?.content?.indices &&
             formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
