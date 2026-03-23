@@ -812,11 +812,13 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // 1. App author's explicit aria-label (always wins)
     // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
     // 3. Metadata defaultAriaLabel (static fallback)
+    // 4. Component's label prop (matches browser accessible name computation)
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
     ariaLabel =
       explicitAriaLabel ||
       config.deriveAriaLabel?.(props) ||
       metadata.defaultAriaLabel ||
+      props.label ||
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
@@ -1383,12 +1385,16 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     // --- Resolve aria-label cascade ---
+    // Matches browser accessible name computation:
+    // 1. Explicit aria-label, 2. Component's deriveAriaLabel, 3. defaultAriaLabel,
+    // 4. label prop (associated <label>), 5. placeholder (last resort)
     const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
     ariaLabel =
       explicitAriaLabel ||
-      extractValue(node.props?.["placeholder"]) ||
       config.deriveAriaLabel?.(props) ||
       metadata.defaultAriaLabel ||
+      props.label ||
+      extractValue(node.props?.["placeholder"]) ||
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
