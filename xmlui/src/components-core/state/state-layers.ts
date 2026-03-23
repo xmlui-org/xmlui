@@ -319,6 +319,7 @@ export function useMergedState(
         }
       }
     });
+
     return ret;
   }, [localVars, componentState]);
   return useShallowCompareMemoize(merged);
