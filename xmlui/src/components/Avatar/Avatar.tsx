@@ -4,7 +4,7 @@ import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { sizeMd } from "../../components/abstractions";
-import { Avatar, defaultProps } from "./AvatarNative";
+import { Avatar, defaultProps } from "./AvatarReact";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { wrapComponent } from "../../components-core/wrapComponent";

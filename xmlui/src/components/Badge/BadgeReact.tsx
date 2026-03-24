@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, memo, useMemo } from "react";
 import classnames from "classnames";
 
 import styles from "./Badge.module.scss";
@@ -11,15 +11,14 @@ export type BadgeColors = {
   background: string;
 };
 
-// --- Type guard for BadgeColors ---
-export function isBadgeColors(color: any): color is BadgeColors {
+export function isBadgeColors(color: unknown): color is BadgeColors {
   return (
     typeof color === "object" &&
     color !== null &&
     "label" in color &&
     "background" in color &&
-    typeof color.label === "string" &&
-    typeof color.background === "string"
+    typeof (color as BadgeColors).label === "string" &&
+    typeof (color as BadgeColors).background === "string"
   );
 }
 
@@ -36,15 +35,25 @@ export const defaultProps: Pick<Props, "variant"> = {
   variant: "badge",
 };
 
-export const Badge = forwardRef(function Badge(
+export const Badge = memo(forwardRef(function Badge(
   { children, color, variant = defaultProps.variant, style, classes, className, onContextMenu, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const mergedStyle = useMemo<CSSProperties | undefined>(() => {
+    if (!color) return style;
+    const colorStyle: CSSProperties =
+      typeof color === "string"
+        ? { backgroundColor: color }
+        : { backgroundColor: color.background, color: color.label };
+    return { ...colorStyle, ...style };
+  }, [color, style]);
+
   return (
     <div
       {...rest}
       ref={forwardedRef}
       className={classnames(
+        styles.container,
         {
           [styles.badge]: variant === "badge",
           [styles.pill]: variant === "pill",
@@ -53,16 +62,9 @@ export const Badge = forwardRef(function Badge(
         className,
       )}
       onContextMenu={onContextMenu}
-      style={{
-        ...(color
-          ? typeof color === "string"
-            ? { backgroundColor: color }
-            : { backgroundColor: color.background, color: color.label }
-          : {}),
-        ...style,
-      }}
+      style={mergedStyle}
     >
       {children}
     </div>
   );
-});
+}));
