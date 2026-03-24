@@ -10,7 +10,6 @@ import {
   Fragment,
   type ForwardedRef,
 } from "react";
-import { createPortal } from "react-dom";
 import { flushSync } from "react-dom";
 import {
   LinkNative,
@@ -440,76 +439,73 @@ export const Search = ({
           </div>
         )}
         {/* Overlay */}
-        {isOverlayOpen &&
-          createPortal(
-            // Wrap with className so theme CSS vars are in scope for the portal
-            <div className={className}>
-              {/* Backdrop — click outside to close */}
+        {isOverlayOpen && (
+          <div className={className}>
+            {/* Backdrop — click outside to close */}
+            <div
+              className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
+              onPointerDown={closeOverlay}
+            >
               <div
-                className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
-                onPointerDown={closeOverlay}
+                className={classnames(styles.overlayPanel, {
+                  [styles.overlayPanelWithResults]: hasQuery,
+                })}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Search"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
               >
-                <div
-                  className={classnames(styles.overlayPanel, {
-                    [styles.overlayPanelWithResults]: hasQuery,
-                  })}
-                  role="dialog"
-                  aria-modal="true"
-                  aria-label="Search"
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Input row */}
-                  <div className={styles.overlayInputRow}>
-                    <Icon name="search" className={styles.overlaySearchIcon} />
-                    <TextBox
-                      id={inputId}
-                      ref={inputRef}
-                      className={styles.overlayInput}
-                      type="search"
-                      placeholder={placeholder ?? "Type to search…"}
-                      value={inputValue}
-                      onDidChange={(value) => setInputValue(value)}
-                      onKeyDown={handleKeyDown}
-                      aria-autocomplete="list"
-                      aria-controls={`${inputId}-listbox`}
-                      aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                {/* Input row */}
+                <div className={styles.overlayInputRow}>
+                  <Icon name="search" className={styles.overlaySearchIcon} />
+                  <TextBox
+                    id={inputId}
+                    ref={inputRef}
+                    className={styles.overlayInput}
+                    type="search"
+                    placeholder={placeholder ?? "Type to search…"}
+                    value={inputValue}
+                    onDidChange={(value) => setInputValue(value)}
+                    onKeyDown={handleKeyDown}
+                    aria-autocomplete="list"
+                    aria-controls={`${inputId}-listbox`}
+                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                  />
+                </div>
+
+                {/* Category tabs — only when there's a query */}
+                {hasQuery && (
+                  <div className={styles.overlayControls}>
+                    <OverlayCategoryTabs
+                      categories={availableCategories}
+                      selectedCategories={selectedCategories}
+                      onSelectOne={onSelectOneCategory}
+                      onClearAll={onClearAllCategories}
                     />
                   </div>
+                )}
 
-                  {/* Category tabs — only when there's a query */}
-                  {hasQuery && (
-                    <div className={styles.overlayControls}>
-                      <OverlayCategoryTabs
-                        categories={availableCategories}
-                        selectedCategories={selectedCategories}
-                        onSelectOne={onSelectOneCategory}
-                        onClearAll={onClearAllCategories}
-                      />
-                    </div>
-                  )}
-
-                  {/* Results */}
-                  {hasQuery && (
-                    <ul
-                      id={`${inputId}-listbox`}
-                      ref={listRef}
-                      className={classnames(
-                        styles.list,
-                        styles.overlayList,
-                        styles.overlayResultsList,
-                      )}
-                      role="listbox"
-                      aria-label="Search results"
-                    >
-                      {overlayResultsListJsx}
-                    </ul>
-                  )}
-                </div>
+                {/* Results */}
+                {hasQuery && (
+                  <ul
+                    id={`${inputId}-listbox`}
+                    ref={listRef}
+                    className={classnames(
+                      styles.list,
+                      styles.overlayList,
+                      styles.overlayResultsList,
+                    )}
+                    role="listbox"
+                    aria-label="Search results"
+                  >
+                    {overlayResultsListJsx}
+                  </ul>
+                )}
               </div>
-            </div>,
-            document.body,
-          )}
+            </div>
+          </div>
+        )}
       </span>
     );
   }
