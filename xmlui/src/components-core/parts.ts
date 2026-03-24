@@ -15,3 +15,5 @@ export const PART_YEAR = "year";
 export const PART_AVATAR = "avatar";
 export const PART_TITLE = "title";
 export const PART_SUBTITLE = "subtitle";
+export const PART_HEADER = "header";
+export const PART_CONTENT = "content";

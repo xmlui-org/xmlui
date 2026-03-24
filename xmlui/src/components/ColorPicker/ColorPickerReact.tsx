@@ -1,5 +1,5 @@
-import type { CSSProperties, ForwardedRef } from "react";
-import { useEffect, useTransition } from "react";
+import type { ChangeEvent, CSSProperties, ForwardedRef } from "react";
+import { memo, useEffect, useTransition } from "react";
 import { forwardRef, useCallback, useRef } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -7,9 +7,10 @@ import type { ValidationStatus } from "../abstractions";
 import { useEvent } from "../../components-core/utils/misc";
 import styles from "./ColorPicker.module.scss";
 import classnames from "classnames";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { PART_INPUT } from "../../components-core/parts";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type Props = {
   id?: string;
@@ -17,6 +18,7 @@ type Props = {
   initialValue?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onDidChange?: (newValue: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -38,12 +40,13 @@ export const defaultProps: Pick<Props, "initialValue" | "value" | "enabled" | "v
     validationStatus: "none",
   };
 
-export const ColorPicker = forwardRef(
+export const ColorPicker = memo(forwardRef(
   (
     {
       id,
       style,
       className,
+      classes,
       updateState,
       onDidChange = noop,
       onFocus = noop,
@@ -63,11 +66,11 @@ export const ColorPicker = forwardRef(
   ) => {
     const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
-    const composedRef = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
+    const composedRef = useComposedRefs(forwardedRef, inputRef);
 
     const updateValue = useCallback(
       (value: string) => {
-        updateState({ value });
+        updateState?.({ value });
         onDidChange(value);
       },
       [onDidChange, updateState],
@@ -87,14 +90,14 @@ export const ColorPicker = forwardRef(
     );
 
     const onInputChange = useCallback(
-      (event: any) => {
+      (event: ChangeEvent<HTMLInputElement>) => {
         updateValueWithTransition(event.target.value);
       },
       [updateValueWithTransition],
     );
 
     useEffect(() => {
-      updateState({ value: initialValue }, { initial: true });
+      updateState?.({ value: initialValue }, { initial: true });
     }, [initialValue, updateState]);
 
     // --- Manage obtaining and losing the focus
@@ -121,15 +124,12 @@ export const ColorPicker = forwardRef(
       });
     }, [focus, registerComponentApi, setValue]);
 
-    {
-      /* Produces a 7 character RGB color output in hex as a string type */
-    }
     return (
       <Part partId={PART_INPUT}>
         <input
           {...rest}
           id={id}
-          className={classnames(className, styles.colorInput, {
+          className={classnames(className, classes?.[COMPONENT_PART_KEY], styles.colorInput, {
             [styles.error]: validationStatus === "error",
             [styles.warning]: validationStatus === "warning",
             [styles.valid]: validationStatus === "valid",
@@ -151,6 +151,4 @@ export const ColorPicker = forwardRef(
       </Part>
     );
   },
-);
-
-ColorPicker.displayName = "ColorPicker";
+));

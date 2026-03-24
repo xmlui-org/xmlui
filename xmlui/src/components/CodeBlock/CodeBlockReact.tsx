@@ -1,6 +1,9 @@
-import type React from "react";
+import React, { type ForwardedRef, forwardRef, memo, useCallback } from "react";
+import type { CSSProperties } from "react";
 import styles from "./CodeBlock.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_HEADER, PART_CONTENT } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 import { ThemedText as Text } from "../Text/Text";
 import {
   type CodeHighlighterMeta,
@@ -12,7 +15,6 @@ import { ThemedIcon } from "../Icon/Icon";
 import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import type { CSSProperties } from "react";
 import classnames from "classnames";
 
 type CodeBlockProps = {
@@ -28,7 +30,7 @@ export const defaultProps = {
   // No default props needed for this component currently
 };
 
-export function CodeBlock({
+export const CodeBlock = memo(forwardRef(function CodeBlock({
   children,
   meta,
   textToCopy,
@@ -36,7 +38,7 @@ export function CodeBlock({
   className,
   classes,
   ...rest
-}: CodeBlockProps) {
+}: CodeBlockProps, _ref: ForwardedRef<HTMLDivElement>) {
   if (!meta) {
     return (
       <div
@@ -44,38 +46,47 @@ export function CodeBlock({
         className={classnames(styles.codeBlock, classes?.[COMPONENT_PART_KEY], className, "global-codeBlock")}
         style={style}
       >
-        <div className={styles.codeBlockContent}>{children}</div>
+        <Part partId={PART_CONTENT}>
+          <div className={styles.codeBlockContent}>{children}</div>
+        </Part>
       </div>
     );
   }
+
+  const handleCopyClick = () => {
+    if (!textToCopy) return;
+    void navigator.clipboard.writeText(textToCopy);
+    toast.success("Code copied!");
+  };
+
   return (
-    <div className={classnames(styles.codeBlock, classes?.[COMPONENT_PART_KEY], className)} style={style}>
+    <div {...rest} className={classnames(styles.codeBlock, classes?.[COMPONENT_PART_KEY], className)} style={style}>
       {meta.filename && (
-        <div className={styles.codeBlockHeader}>
-          <Text variant="em">{meta.filename}</Text>
-        </div>
-      )}
-      <div className={styles.codeBlockContent}>
-        {children}
-        {meta.copy !== false && (
-          <div className={styles.codeBlockCopyButton}>
-            <Button
-              variant="ghost"
-              size="xs"
-              className={styles.copyButton}
-              icon={<ThemedIcon name={"copy"} aria-hidden />}
-              onClick={() => {
-                if (!textToCopy) return;
-                void navigator.clipboard.writeText(textToCopy);
-                toast.success("Code copied!");
-              }}
-            ></Button>
+        <Part partId={PART_HEADER}>
+          <div className={styles.codeBlockHeader}>
+            <Text variant="em">{meta.filename}</Text>
           </div>
-        )}
-      </div>
+        </Part>
+      )}
+      <Part partId={PART_CONTENT}>
+        <div className={styles.codeBlockContent}>
+          {children}
+          {meta.copy !== false && (
+            <div className={styles.codeBlockCopyButton}>
+              <Button
+                variant="ghost"
+                size="xs"
+                className={styles.copyButton}
+                icon={<ThemedIcon name={"copy"} aria-hidden />}
+                onClick={handleCopyClick}
+              />
+            </div>
+          )}
+        </div>
+      </Part>
     </div>
   );
-}
+}));
 
 interface CodeNode extends Node {
   lang: string | null;
