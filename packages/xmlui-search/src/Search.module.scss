@@ -439,6 +439,7 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   max-height: calc(100dvh - 20vh - 2rem);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   box-shadow: $boxShadow-SearchOverlayPanel;
   position: fixed;
   top: 20vh;
