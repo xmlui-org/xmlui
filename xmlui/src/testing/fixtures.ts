@@ -194,6 +194,9 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
+  /** Script source for Globals.xs — declarations become app-wide globals */
+  globalsXs?: string;
+  /** @deprecated Use globalsXs instead. Alias kept for backward compatibility. */
   mainXs?: string;
   noFragmentWrapper?: boolean;
   extensionIds?: string | string[];
@@ -254,16 +257,17 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       });
 
       let runtime: any;
-      if (description?.mainXs) {
-        const parsedCodeBehind = collectCodeBehindFromSource("Main", description.mainXs);
+      const globalsXsSource = description?.globalsXs ?? description?.mainXs;
+      if (globalsXsSource) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Globals", globalsXsSource);
         if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
           // Pass through the variable definitions with their source text intact
           // for StandaloneApp to process with transformMainXsToGlobalTags
           runtime = {
-            "/src/Main.xmlui.xs": {
+            "/src/Globals.xs": {
               vars: parsedCodeBehind.vars || {},
               functions: parsedCodeBehind.functions || {},
-              src: description.mainXs, // Include original source for debugging
+              src: globalsXsSource, // Include original source for debugging
             },
           };
         }

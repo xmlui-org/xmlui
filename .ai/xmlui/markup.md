@@ -70,7 +70,7 @@ Declare with `var.` prefix or `<variable>` tag — both are equivalent:
 
 ## Global Variables
 
-Declared only in the **root element** of `Main.xmlui` (or in `Main.xmlui.xs`). Visible everywhere in all files:
+Declared only in the **root element** of `Main.xmlui` (or in `Globals.xs`). Visible everywhere in all files:
 
 ```xml
 <App global.stations="{ ['Bakerloo', 'Central'] }">
@@ -209,7 +209,7 @@ function transform(data) {
 }
 ```
 
-**`Main.xmlui.xs`** is special — every variable and function declared there becomes a global visible everywhere in the app.
+**`Globals.xs`** is special — every variable and function declared there becomes a global visible everywhere in the app. `Main.xmlui.xs` declarations are local to the Main component, just like any other code-behind file.
 
 ## Context Variables
 

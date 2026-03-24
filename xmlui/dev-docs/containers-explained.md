@@ -45,7 +45,7 @@ This merged object is passed as `parentState` to every child container.
 
 ## Global Variables
 
-Global variables are declared once — in `Main.xmlui.xs`, `global.*` attributes on the root `<App>`, or `<global>` tags — and stored in the root container's `globalVars` record.
+Global variables are declared once — in `Globals.xs`, `global.*` attributes on the root `<App>`, or `<global>` tags — and stored in the root container's `globalVars` record.
 
 Each container receives `parentGlobalVars` as a prop. The `useGlobalVariables` hook re-evaluates any globals whose expressions depend on other globals that have changed, producing a stable `currentGlobalVars` object that is merged into the final state (layer 5).
 

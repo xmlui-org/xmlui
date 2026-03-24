@@ -273,7 +273,7 @@ test.describe("Global variables", () => {
 
   // Regression test for https://github.com/xmlui-org/xmlui/issues/2867#issuecomment-4008150804
   // .xs variables should be resolvable in global.* initialization expressions
-  test("global.* attribute can reference Main.xmlui.xs variable", async ({
+  test("global.* attribute can reference Globals.xs variable", async ({
     page,
     initTestBed,
   }) => {

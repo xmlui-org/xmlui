@@ -316,18 +316,18 @@ XMLUI supports application-wide global variables and functions that flow down th
 
 Global variables can be declared in three ways:
 
-**1. Main.xmlui.xs File (Code-Behind)**
-Place a `Main.xmlui.xs` file in your application root (same directory as `Main.xmlui`):
+**1. Globals.xs File (Code-Behind)**
+Place a `Globals.xs` file in your application root (same directory as `Main.xmlui`):
 
 ```
 my-app/
   ├── Main.xmlui
-  ├── Main.xmlui.xs       # Global variables in code-behind
+  ├── Globals.xs            # Global variables in code-behind
   ├── components/
   └── themes/
 ```
 
-**Main.xmlui.xs syntax:**
+**Globals.xs syntax:**
 ```javascript
 // Variables
 var count = 0;

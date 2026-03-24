@@ -66,6 +66,8 @@ import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storag
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
 const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
+const GLOBALS_FILE = "Globals.xs";
+const GLOBALS_XS_BUILT_RESOURCE = "/src/Globals.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
@@ -532,6 +534,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   let config: StandaloneAppDescription | undefined;
   let entryPoint: ComponentDef | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
+  let globalsXs: CollectedDeclarations | undefined;
   let apiInterceptor: any;
 
   // --- Process the runtime files
@@ -540,6 +543,11 @@ function resolveRuntime(runtime: Record<string, any>): {
       // --- We assume that the config file has a default export and this
       // --- export is the standalone app's configuration.
       config = value.default;
+    }
+
+    // --- Globals.xs holds app-wide global variable and function declarations.
+    if (key.endsWith("/Globals.xs") && !matchesFolder(key, "components")) {
+      globalsXs = value.default;
     }
 
     // --- We assume that the entry point is either named "Main" or "App".
@@ -631,7 +639,8 @@ function resolveRuntime(runtime: Record<string, any>): {
   // --- We have an entry point defined in the configuration file or in the main app file.
   const safeEntryPoint = config?.entryPoint || entryPoint;
 
-  // --- We may have a code-behind file. If so, we merge the variables and functions
+  // --- We may have a code-behind file for the entry point (Main.xmlui.xs).
+  // --- Its declarations are LOCAL to the Main component.
   let entryPointWithCodeBehind = {
     ...safeEntryPoint,
     vars: {
@@ -642,22 +651,13 @@ function resolveRuntime(runtime: Record<string, any>): {
     scriptError: entryPointCodeBehind?.moduleErrors,
   } as ComponentDef;
 
-  // --- Treat Main.xmlui.xs variables as globals (same as global.* prefix) so they are
-  // --- accessible to child (compound) components, not just main's local scope.
-  if (entryPointCodeBehind?.vars || entryPointCodeBehind?.functions) {
+  // --- Treat Globals.xs variables as globals (same as global.* prefix) so they are
+  // --- accessible to child (compound) components.
+  if (globalsXs?.vars || globalsXs?.functions) {
     entryPointWithCodeBehind = transformMainXsToGlobalTags(
       entryPointWithCodeBehind,
-      entryPointCodeBehind as any,
+      globalsXs as any,
     );
-    // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
-    // --- If kept in both, the expression string in globalVars always re-evaluates to
-    // --- the initial value, breaking reactivity after mutations like codeBehindCount++.
-    if (entryPointCodeBehind?.vars && entryPointWithCodeBehind.vars) {
-      const promotedKeys = Object.keys(entryPointCodeBehind.vars);
-      const remainingVars = { ...entryPointWithCodeBehind.vars };
-      promotedKeys.forEach((k) => delete remainingVars[k]);
-      entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
-    }
   }
 
   // --- Collect the component definition we pass to the rendering engine
@@ -998,11 +998,11 @@ function useStandalone(
   };
 
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    // Get the vars in Main.xmlui.xs module directly from runtime.
+    // Get the vars in Globals.xs module directly from runtime.
     // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
-    const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-    const mainXsData = (mainXs as any)?.default ?? mainXs;
-    const extracted = extractGlobals({ ...(mainXsData?.vars || {}), ...(mainXsData?.functions || {}) });
+    const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
+    const globalsXsData = (globalsXs as any)?.default ?? globalsXs;
+    const extracted = extractGlobals({ ...(globalsXsData?.vars || {}), ...(globalsXsData?.functions || {}) });
 
     // Also include markup globals (global.* attributes) and entry-point functions
     // from the app definition so they are available on the very first render.
@@ -1037,25 +1037,15 @@ function useStandalone(
           throw new Error("couldn't find the application metadata");
         }
 
-        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support.
+        // --- Transform Globals.xs variables into <global> tags for dependency support.
         // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
-        const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-        const mainXsData = (mainXs as any)?.default ?? mainXs;
-        if (mainXsData?.vars || mainXsData?.functions) {
+        const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
+        const globalsXsData = (globalsXs as any)?.default ?? globalsXs;
+        if (globalsXsData?.vars || globalsXsData?.functions) {
           appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
-            mainXsData
+            globalsXsData
           );
-          // --- Remove code-behind vars from `vars` — same reason as in resolveRuntime.
-          if (mainXsData?.vars && appDef.entryPoint) {
-            const promotedKeys = Object.keys(mainXsData.vars);
-            const ep = appDef.entryPoint as ComponentDef;
-            if (ep.vars) {
-              const remainingVars = { ...ep.vars };
-              promotedKeys.forEach((k) => delete remainingVars[k]);
-              appDef.entryPoint = { ...ep, vars: remainingVars };
-            }
-          }
         }
         
         const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(appDef, metadataProvider);
@@ -1081,7 +1071,7 @@ function useStandalone(
           Object.assign(parsedGlobals, entryPointDef.globalVars);
         }
         
-        // Collect functions from root element (from Main.xmlui.xs)
+        // Collect functions from root element (from Globals.xs)
         // Functions need to flow through globalVars to be available in compound components
         if (entryPointDef?.functions) {
           Object.assign(parsedGlobals, entryPointDef.functions);
@@ -1173,27 +1163,24 @@ function useStandalone(
         }
       }) as any;
 
-      // --- Fetch the optional Main.xmlui.xs file containing global variables and functions
+      // --- Fetch the optional Globals.xs file containing global variables and functions
       const globalsPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+          const resp = await fetchWithoutCache(GLOBALS_FILE);
           
           if (resp.ok) {
             const parsedGlobals = await parseCodeBehindResponse(resp);
             
-            const mainXs = parsedGlobals?.codeBehind;
+            const globalsXs = parsedGlobals?.codeBehind;
             const extractedGlobals = extractGlobals({
-              ...(mainXs?.vars || {}),
-              ...(mainXs?.functions || {}),
+              ...(globalsXs?.vars || {}),
+              ...(globalsXs?.functions || {}),
             });
             // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
             resolve({ ...parsedGlobals?.codeBehind, src: parsedGlobals?.src, __extractedGlobals: extractedGlobals });
           } else {
-            resolve({
-              component: errReportMessage(`Failed to load the code-behind (${MAIN_CODE_BEHIND_FILE})`),
-              file: MAIN_CODE_BEHIND_FILE,
-              hasError: true,
-            });
+            // Globals.xs is optional — resolve with null if not found
+            resolve(null);
           }
         } catch (e) {
           resolve(null);
@@ -1321,23 +1308,13 @@ function useStandalone(
           loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
       
-      // --- Transform Main.xmlui.xs variables into <global> tags for dependency support (same as pre-built path)
+      // --- Transform Globals.xs variables into <global> tags for dependency support (same as pre-built path)
       if (loadedGlobals && typeof loadedGlobals === 'object' && ((loadedGlobals as any).vars || (loadedGlobals as any).functions)) {
-        // Pass loadedGlobals directly - it has the same structure as runtime[MAIN_XS_BUILT_RESOURCE]
+        // Pass loadedGlobals directly - it has the same structure as runtime[GLOBALS_XS_BUILT_RESOURCE]
         entryPointWithCodeBehind = transformMainXsToGlobalTags(
           entryPointWithCodeBehind,
           loadedGlobals as any
         );
-        // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
-        // --- If kept in both, the local var shadows the global, so statePartChanged
-        // --- dispatches locally and the root's global state never updates — child
-        // --- components never see the mutation.
-        if ((loadedGlobals as any)?.vars && entryPointWithCodeBehind.vars) {
-          const promotedKeys = Object.keys((loadedGlobals as any).vars);
-          const remainingVars = { ...entryPointWithCodeBehind.vars };
-          promotedKeys.forEach((k) => delete remainingVars[k]);
-          entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
-        }
       }
 
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
@@ -1684,18 +1661,18 @@ export function startApp(
 }
 
 /**
- * Transform Main.xmlui.xs variables into globalVars property to leverage
+ * Transform Globals.xs variables into globalVars property to leverage
  * the existing dependency system that works correctly for globalVars
  */
 function transformMainXsToGlobalTags(
   entryPoint: ComponentDef,
-  mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
+  globalsXsDef: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
 ): ComponentDef {
   const globalVars: Record<string, any> = {};
 
-  // Process vars from Main.xmlui.xs
-  if (mainXs.vars) {
-    Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
+  // Process vars from Globals.xs
+  if (globalsXsDef.vars) {
+    Object.entries(globalsXsDef.vars).forEach(([varName, varDef]) => {
       // If the var has a parsed expression tree with source text, convert it
       // to a binding expression string so useGlobalVariables can evaluate it
       // reactively. This preserves reactivity for dependent vars (e.g.,
@@ -1720,11 +1697,11 @@ function transformMainXsToGlobalTags(
     });
   }
   
-  // Process functions from Main.xmlui.xs
+  // Process functions from Globals.xs
   // Functions are parse trees that need to be evaluated to become callable
   const functions: Record<string, any> = {};
-  if (mainXs.functions) {
-    Object.entries(mainXs.functions).forEach(([funcName, funcDef]) => {
+  if (globalsXsDef.functions) {
+    Object.entries(globalsXsDef.functions).forEach(([funcName, funcDef]) => {
       // Functions come as objects with __PARSED__ mark and tree property
       if (
         typeof funcDef === "object" &&
