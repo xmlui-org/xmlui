@@ -16,7 +16,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
-import { useComponentStyle, useStyles } from "../theming/StyleContext";
+import { useStyles } from "../theming/StyleContext";
 import type { StyleObjectType } from "../theming/StyleRegistry";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
@@ -35,7 +35,11 @@ import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
-import { resolveLayoutProps, DIMS_ONLY_PROPS, SPACING_ONLY_PROPS } from "../theming/layout-resolver";
+import {
+  resolveLayoutProps,
+  DIMS_ONLY_PROPS,
+  SPACING_ONLY_PROPS,
+} from "../theming/layout-resolver";
 import { useComponentThemeClass } from "../theming/utils";
 import {
   buildResponsiveStyleObjects,
@@ -130,7 +134,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const resolvedLabel = useMemo(() => {
     const props = safeNode.props || {};
     const rawLabel =
-      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder ?? props["aria-label"];
+      props.label ??
+      props.title ??
+      props.name ??
+      props.text ??
+      props.value ??
+      props.placeholder ??
+      props["aria-label"];
     if (rawLabel === undefined) return undefined;
     // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
     return extractParam(state, rawLabel, appContext, true);
@@ -362,15 +372,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
 
-  const styleClassName = useComponentStyle(stableLayoutCss);
-
   const themeClassName = useComponentThemeClass(descriptor);
 
   // --- Collect extended layout props: keys with part and/or breakpoint suffixes
   // --- (e.g. "fontSize-label", "padding-md", "color-input-lg")
-  // --- NOTE: these hooks are intentionally placed AFTER styleClassName and themeClassName to
-  // --- ensure the responsive @media rules are injected later in source order, giving them
-  // --- higher cascade priority over the base rules at the matching breakpoints.
   const extendedLayoutProps = useMemo(() => {
     if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
     const applyMode = appContext.appGlobals?.applyLayoutProperties ?? "all";
@@ -440,10 +445,26 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
 
   const stableResponsiveStyleObject = useShallowCompareMemoize(mergedStyleObject);
 
-  // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
-  const responsiveClassName = useStyles(stableResponsiveStyleObject);
+  // --- Merge base layout CSS and responsive/when CSS into a single useStyles call so that
+  // --- base rules and @media rules always live in the same <style> element in the correct
+  // --- source order (base first, then @media). Without this, a second component instance
+  // --- with new base styles (new hash) would inject its base <style> *after* the already-
+  // --- injected responsive <style> shared with an earlier instance, causing the base
+  // --- font-size to override the @media breakpoint override (source-order cascade bug).
+  const combinedStyleObject = useMemo((): StyleObjectType => {
+    const hasBase = stableLayoutCss && Object.keys(stableLayoutCss).length > 0;
+    const hasResponsive =
+      stableResponsiveStyleObject && Object.keys(stableResponsiveStyleObject).length > 0;
+    if (!hasBase && !hasResponsive) return EMPTY_OBJECT as StyleObjectType;
+    if (!hasBase) return stableResponsiveStyleObject;
+    if (!hasResponsive) return { "&": stableLayoutCss } as StyleObjectType;
+    return { "&": stableLayoutCss, ...stableResponsiveStyleObject } as StyleObjectType;
+  }, [stableLayoutCss, stableResponsiveStyleObject]);
 
-  const className = [themeClassName, styleClassName, responsiveClassName].filter(Boolean).join(" ");
+  // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
+  const layoutClassName = useStyles(combinedStyleObject);
+
+  const className = [themeClassName, layoutClassName].filter(Boolean).join(" ");
 
   // Memoize `classes` so components wrapped in React.memo (e.g. Markdown)
   // don't re-render when `className` is unchanged.

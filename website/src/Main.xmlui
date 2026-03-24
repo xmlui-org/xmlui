@@ -17,7 +17,18 @@
     return path;
   }
 })()}"
+  global.appTitle="{(() => {
+  const path = globalThis?.location?.pathname || '/';
+  if (!path || path === '/') return 'Home';
+  if (path.startsWith('/docs')) return 'Documentation';
+  if (path.startsWith('/blog')) return 'Blog';
+  if (path.startsWith('/get-started')) return 'Get Started';
+  if (path.startsWith('/news')) return 'News';
+  if (path.includes('/404')) return '404';
+  return 'Home';
+})()}"
 >
+  <PageMetaTitle value="{appTitle}" />
   <Theme
     width-navPanel-App="{globalThis?.location?.pathname.startsWith('/docs') ? '280px' : '0px' }"
     borderRight-navPanelWrapper-App="{globalThis?.location?.pathname.startsWith('/docs') ? '1px' : '0px' }"
@@ -31,14 +42,19 @@
         noScrollbarGutters="false"
         onDidNavigate="(ev) => {
             if (!ev || ev === '/' || ev === '') {
+            appTitle = 'Home';
             currentSegment = 'home';
             } else if (ev.startsWith('/docs')) {
+            appTitle = 'Documentation';
             currentSegment = 'docs';
             } else if (ev.startsWith('/blog')) {
+            appTitle = 'Blog';
             currentSegment = 'blog';
             } else if (ev.startsWith('/get-started')) {
+            appTitle = 'Get Started';
             currentSegment = 'get-started';
             } else if (ev.startsWith('/news')) {
+            appTitle = 'News';
             currentSegment = 'news';
             } else if (ev.includes('/404')) {
             currentSegment = '404';
