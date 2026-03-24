@@ -67,6 +67,20 @@ export function safeStringify(value: any): string {
 }
 
 /**
+ * Safely deep-clone a value, replacing circular references, functions,
+ * and DOM nodes with placeholder strings. Use when storing values in
+ * _xsLogs that will later be JSON.stringify'd during trace capture.
+ */
+export function safeClone<T>(value: T): T {
+  if (value == null || typeof value !== "object") return value;
+  try {
+    return JSON.parse(safeStringify(value));
+  } catch {
+    return "[uncloneable]" as any;
+  }
+}
+
+/**
  * Simple stringify for diff display (no circular reference handling needed).
  */
 export function simpleStringify(value: any): string {
@@ -187,8 +201,12 @@ export interface XsLogEntry {
 export function pushXsLog(entry: XsLogEntry, xsLogMax: number = 200): void {
   if (typeof window === "undefined") return;
   const w = window as any;
-  w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-  w._xsLogs.push(entry);
+  // _xsLogs is only initialized by AppContent when xsVerbose=true.
+  // If it doesn't exist, tracing is off — noop.
+  if (!Array.isArray(w._xsLogs)) return;
+  // Safe-clone the entry to prevent circular references from live objects
+  // (e.g., React Query cache) from poisoning _xsLogs and breaking JSON export.
+  w._xsLogs.push(safeClone(entry));
   if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
     splicePreservingInteractions(w._xsLogs, xsLogMax);
   }

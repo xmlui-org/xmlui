@@ -451,7 +451,11 @@ function traceDisplayLabel(traceKind: string, xmluiName: string, args: any[]): s
       if (Array.isArray(next)) {
         return `${(prev || []).length} → ${next.length} items`;
       }
-      return `${JSON.stringify(prev)?.slice(0, 30)} → ${JSON.stringify(next)?.slice(0, 30)}`;
+      try {
+        return `${JSON.stringify(prev)?.slice(0, 30)} → ${JSON.stringify(next)?.slice(0, 30)}`;
+      } catch {
+        return `[object] → [object]`;
+      }
     }
     return String(val);
   }

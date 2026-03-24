@@ -456,12 +456,26 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
-      // Emit native trace event when xsVerbose tracing is active
-      // (window._xsLogs existence is the proxy, same as InspectorContext)
+      // Emit interaction + native trace events for option selection.
+      // The interaction event is needed because Radix Select handles selection
+      // internally without firing a DOM click that AppContent can capture.
+      // Gated on _xsLogs existence (proxy for xsVerbose) to avoid work when tracing is off.
       if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
         const selectedOption = options.find((o) => String(o.value) === String(selectedValue));
+        const optionLabel = selectedOption?.label || String(selectedValue);
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: (window as any)._xsCurrentTrace,
+          kind: "interaction",
+          interaction: "click",
+          componentType: "Select",
+          componentLabel: optionLabel,
+          ariaRole: "option",
+          ariaName: optionLabel,
+        });
         pushXsLog(createLogEntry("native:selection:change", {
-          displayLabel: selectedOption?.label || String(selectedValue),
+          displayLabel: optionLabel,
           value: newSelectedValue,
         }));
       }
@@ -937,6 +951,8 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
     <div
       ref={optionRef}
       role="option"
+      aria-label={label || value}
+      data-component-type="Option"
       aria-disabled={!enabled}
       aria-selected={selected}
       className={classnames(styles.multiSelectOption, {

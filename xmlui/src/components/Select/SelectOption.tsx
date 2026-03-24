@@ -18,6 +18,8 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         className={classnames(className, styles.selectOption)}
         value={value}
         textValue={label}
+        aria-label={label || value}
+        data-component-type="Option"
         disabled={!enabled}
         onClick={(event) => {
           event.stopPropagation();

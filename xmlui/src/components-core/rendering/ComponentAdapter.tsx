@@ -14,7 +14,7 @@ import type {
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
 import { useStyles } from "../theming/StyleContext";
 import type { StyleObjectType } from "../theming/StyleRegistry";
@@ -526,20 +526,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const logInteraction = useCallback(
     (interaction: string, detail?: Record<string, any>) => {
       if (!xsVerbose) return;
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-        w._xsLogs.push({
-          ts: Date.now(),
-          traceId: getCurrentTrace(),
-          kind: "interaction",
-          componentType: safeNode.type,
-          componentLabel: resolvedLabel,
-          uid: safeNode.uid,
-          interaction,
-          detail,
-        });
-      }
+      pushXsLog({
+        ts: Date.now(),
+        traceId: getCurrentTrace(),
+        kind: "interaction",
+        componentType: safeNode.type,
+        componentLabel: resolvedLabel,
+        uid: safeNode.uid,
+        interaction,
+        detail,
+      });
     },
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );

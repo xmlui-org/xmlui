@@ -6,6 +6,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 /**
  * An interval of selected items
@@ -557,20 +558,17 @@ export default function useRowSelection({
 
   useEffect(() => {
     void onSelectionDidChangeRef.current?.(selectedItems);
-    if (selectedItems.length > 0 && typeof window !== "undefined") {
-      const w = window as any;
-      if (Array.isArray(w._xsLogs)) {
-        w._xsLogs.push({
-          ts: Date.now(),
-          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: w._xsCurrentTrace,
-          kind: "selection:change",
-          component: "Table",
-          displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
-          selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
-          selectedCount: selectedItems.length,
-        });
-      }
+    if (selectedItems.length > 0) {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "selection:change",
+        component: "Table",
+        displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
+        selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
+        selectedCount: selectedItems.length,
+      });
     }
   }, [selectedItems]);
 
