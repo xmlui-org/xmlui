@@ -37,9 +37,10 @@
                         active="{pathname.startsWith('/blog')}"
                     />
                     <NavLink
-                        to="/get-started"
                         noIndicator
                         label="Get started"
+                        to="/get-started"
+                        active="{pathname.startsWith('/get-started')}"
                     />
                 </HStack>
             </Stack>
@@ -74,48 +75,44 @@
                     <Link
                         to="/"
                         height="100%"
-                        when="{mediaSize.sizeIndex <= 2}"
+                        when-lg="false"
                     >
-                        <Logo
-                            height="$space-8"
-                        />
+                        <Logo height="$space-8" />
                     </Link>
                 </HStack>
 
                 </property>
-                <Fragment
-                    when-lg="false"
-                >
-                    <Stack padding="$space-4">
-                        <Search
-                            marginTop="0"
-                            data="{appGlobals.staticSearchData}"
-                            placeholder="Search on site..."
-                            suggestedQueries="{['components', 'tutorial', 'themes', 'scripting', 'forms']}"
-                            noResultsMessage="No results found on this site."
-                            showPreviewMetadata="false"
-                            pageSize="8"
-                            enableSpellCorrection="true"
-                            mode="inline"
-                        />
-                    </Stack>
-                </Fragment>
-                <Fragment
-                    when="{mediaSize.sizeIndex <= 2}"
-                >
-                    <NavLink
-                        noIndicator
-                        label="Home"
-                        to="/"
-                        active="{currentSegment === 'home'}"
+                <Stack padding="$space-4" when-lg="false">
+                    <Search
+                        marginTop="0"
+                        data="{appGlobals.staticSearchData}"
+                        placeholder="Search on site..."
+                        suggestedQueries="{['components', 'tutorial', 'themes', 'scripting', 'forms']}"
+                        noResultsMessage="No results found on this site."
+                        showPreviewMetadata="false"
+                        pageSize="8"
+                        enableSpellCorrection="true"
+                        mode="inline"
                     />
-                    <NavLink
-                        noIndicator
-                        label="Blog"
-                        to="/blog"
-                        active="{currentSegment === 'blog'}"
-                    />
-                </Fragment>
+                </Stack>
+                <NavLink
+                    noIndicator
+                    label="Home"
+                    to="/"
+                    active="{pathname === '/'}"
+                />
+                <NavLink
+                    noIndicator
+                    label="Blog"
+                    to="/blog"
+                    active="{pathname.startsWith('/blog')}"
+                />
+                <NavLink
+                    noIndicator
+                    label="Get started"
+                    to="/get-started"
+                    active="{pathname.startsWith('/get-started')}"
+                />
                 <Stack
                     gap="0"
                     paddingTop-lg="$space-4"
@@ -585,28 +582,25 @@
                         to="/docs/change-log"
                     />
                 </Stack>
-                <Fragment
-                    when="{mediaSize.sizeIndex <= 2}"
+                <VStack
+                    paddingBottom="$space-4"
+                    when-lg="false"
+                    gap="0"
                 >
-                    <VStack
-                        paddingBottom="$space-4"
-                        gap="0"
-                    >
-                        <NavLink
-                            to="/news"
-                            label="News & Reviews"
-                            target="_self"
-                            noIndicator
-                        />
-                        <NavLink
-                            to="https://github.com/xmlui-org/xmlui"
-                            icon="github"
-                            label="GitHub"
-                            noIndicator
-                            target="_blank"
-                        />
-                    </VStack>
-                </Fragment>
+                    <NavLink
+                        to="/news"
+                        label="News & Reviews"
+                        target="_self"
+                        noIndicator
+                    />
+                    <NavLink
+                        to="https://github.com/xmlui-org/xmlui"
+                        icon="github"
+                        label="GitHub"
+                        noIndicator
+                        target="_blank"
+                    />
+                </VStack>
             </NavPanel>
 
         <Pages
