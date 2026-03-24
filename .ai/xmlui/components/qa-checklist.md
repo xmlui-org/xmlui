@@ -1,105 +1,227 @@
 # XMLUI Component QA Checklist
 
-Use this when reviewing or verifying XMLUI components against conventions. For implementation details, see the sub-files listed in `.ai/xmlui/components/overview.md`.
-
-## Scope
-
-**Skip `HtmlTags.tsx`** — those components are deprecated and scheduled for removal. Focus reviews on core, form, layout, and advanced components.
+A focused checklist for auditing and refactoring XMLUI component implementations. Each rule is actionable and maps to a concrete pattern or prohibition in the codebase.
 
 ---
 
-## File structure
+## 1. File Structure
 
-- [ ] Folder name matches component name (PascalCase)
-- [ ] `ComponentName.tsx` — metadata + renderer (no native implementation)
-- [ ] `ComponentNameNative.tsx` — React implementation only (no metadata)
-- [ ] `ComponentName.module.scss` — present for visual components; absent for non-visual
-- [ ] `ComponentName.spec.ts` — E2E tests in the same folder
-- [ ] No `index.ts` file
+- [ ] **No `index.ts` in component folders.** Remove any found (`Input/index.ts` is a known violation). Consumers must import directly from the specific file.
+- [ ] **File layout is `ComponentName.tsx` + `ComponentNameReact.tsx` + optional `ComponentName.module.scss`.** The React implementation file is named `*React.tsx`, not `*Native.tsx`. No extra files unless they serve a clear sub-component role.
+- [ ] **Simple components may use the single-file pattern** (metadata, renderer, and React implementation together). Use the dual-file pattern for anything non-trivial to keep the React implementation independently usable.
+- [ ] **Before renaming a `*React.tsx` file, search the entire `xmlui/src/` tree for all import sites.** Not only the co-located metadata file, but also framework infrastructure files (e.g. `components-core/behaviors/`) may import from the component. Update every import before running tests.
 
 ---
 
-## Metadata (`ComponentName.tsx`)
+## 2. Metadata (`ComponentName.tsx`)
 
-- [ ] Uses `createMetadata` with `status`, `description`, `props`, `events`
-- [ ] All props have `description`, `valueType`, `defaultValue` (referencing `defaultProps`)
-- [ ] Enum props have `availableValues`
-- [ ] Required props marked `isRequired: true`
-- [ ] Theme variables: `themeVars: parseScssVar(styles.themeVars)` + `defaultThemeVars`
-- [ ] Default theme variable names follow `propertyName-ComponentName[-VariantName]`
-- [ ] Events use helpers: `dClick`, `dGotFocus`, `dLostFocus`, `dInit`, `d(...)`
-- [ ] `nonVisual: true` for non-visual components
-- [ ] `parts` declared when component has named sub-elements
+- [ ] **All props, events, APIs, contextVars, and themeVars are declared in `createMetadata`.** Missing entries break IntelliSense, docs, and validation.
+- [ ] **`defaultValue` in metadata references `defaultProps.<prop>` from the native file.** Never hardcode literal defaults in metadata.
+- [ ] **Events use the correct helper** (`dClick`, `dInit`, `dGotFocus`, `dLostFocus`, `d`, `dInternal`). Check that event key strings in metadata match the keys passed to `lookupEventHandler(...)` in the renderer.
+- [ ] **Label behavior conflict is avoided.** If the component renders its own label (e.g. Checkbox, RadioGroup), `label` must be declared in `props` metadata so the behavior does not double-wrap it.
+- [ ] **`nonVisual: true`** is set for components that produce no DOM output (Queue, Timer, DataSource, etc.). These should have no SCSS module or `themeVars`.
+- [ ] **`themeVars: parseScssVar(styles.themeVars)`** is present for visual components and absent for non-visual ones.
+- [ ] **`parts` metadata is declared** for any component with multiple stylable sub-elements (label, input, adornment, etc.), and `defaultPart` points to the element that receives layout props.
 
 ---
 
-## Renderer (`ComponentName.tsx`)
+## 3. Renderer (`ComponentName.tsx` — `createComponentRenderer`)
 
-- [ ] Uses `createComponentRenderer`
-- [ ] **No React hooks** (`useState`, `useEffect`, etc.) inside the renderer function — hooks belong in the native component
-- [ ] Every prop extracted with the correct `extractValue.*` method
-- [ ] Events wired with `lookupEventHandler("eventName")` matching metadata event keys
-- [ ] `style={layoutCss}` always passed to the native component
-- [ ] `updateState` and `registerComponentApi` passed through when the component holds state or exposes APIs
-- [ ] Registration uses the conditional guard:
+- [ ] **No React hooks inside renderer functions.** Renderer functions are plain factory functions, not React components. `useState`, `useEffect`, `useRef`, `useMemo`, `useCallback`, and all other hooks are forbidden here — move them to the native component.
+- [ ] **All prop values flow through `extractValue` helpers.** Never read `node.props.foo` raw and pass it as a typed prop without going through `extractValue`, `extractValue.asString`, `extractValue.asOptionalBoolean`, etc.
+- [ ] **`classes` (not `className`) is passed to the native component** for new or migrated components. `className` may remain for legacy VariantBehavior compatibility but `classes` should be primary.
+- [ ] **`state` and `updateState` are forwarded** to the native component whenever the component exposes reactive state to markup bindings (e.g. `{myComponent.value}`).
+- [ ] **`registerComponentApi` is forwarded** to the native component whenever the component documentation advertises imperative API methods.
+- [ ] **Event handlers use `lookupEventHandler("eventKeyInMetadata")`** — the key string must exactly match the event declared in `createMetadata`.
+- [ ] **Children are rendered via `renderChild(node.children)`**, not by accessing them directly or mapping them imperatively.
+
+---
+
+## 4. Native Component (`ComponentNameNative.tsx`)
+
+### Structure
+- [ ] **Component is wrapped with `forwardRef`.** Every native component must accept a forwarded ref so parent contexts and tests can hold a DOM reference.
+- [ ] **Component is wrapped with `React.memo`.** Prevents unnecessary re-renders when the parent re-renders with unchanged props. (`memo(forwardRef(function ComponentNameNative(...) { ... }))`).
+- [ ] **`displayName` is NOT set anywhere in the file** (or in any wrapper/sub-component defined nearby). This is a hard prohibition. Known violations: `FormNative.tsx`, `ColorPickerNative.tsx`, `TextBox.tsx` (PasswordBox), `Table.tsx`, `ModalDialogNative.tsx`, `SliderNative.tsx`, `OptionNative.tsx`.
+- [ ] **`useImperativeHandle` is NOT used.** Use `registerComponentApi` instead. Known violation: `StackNative.tsx`.
+- [ ] **`defaultProps` is exported** as a named const object from the native file, and destructuring defaults in the function signature reference those values.
+
+### Ref handling
+- [ ] **When both a forwarded ref and an internal ref are needed, use `useComposedRefs(ref, internalRef)` (from `@radix-ui/react-compose-refs`).** Never use `composeRefs(...)` directly — it returns a new callback ref object on every render, causing React to needlessly detach and reattach the ref. `useComposedRefs` wraps the result in `useCallback` for stability.
+- [ ] **Do not guard `useComposedRefs` with `ref ?` — it handles `null`/`undefined` refs internally.** `const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;` should become `const composedRef = useComposedRefs(ref, innerRef);`.
+- [ ] **The `forwardRef` callback's ref parameter must be typed `ForwardedRef<T>`, not `Ref<T>`.** `ForwardedRef` is the precise type React passes to `forwardRef` callbacks. `Ref<T>` is broader (includes deprecated string refs). Both come from `"react"` and must be explicitly imported as named types.
+
+### Props interface
+- [ ] **`Props` must extend `React.HTMLAttributes<HTMLElement>` (or the appropriate element base).** This ensures `...rest` has a defined type that includes ARIA attributes, `data-*`, and standard event handlers — not `{}`. When extending `HTMLAttributes`, **remove** the now-redundant explicit declarations of `style`, `className`, `children`, and any picked event handlers — they are all inherited and duplicating them causes confusion about which declaration governs the type.
+- [ ] **Check for orphaned imports after removing explicit prop declarations.** When `children?: React.ReactNode` is removed from Props because it's inherited from `HTMLAttributes`, the `ReactNode` import becomes unused — remove it.
+- [ ] **When `Props` extends `HTMLAttributes`, place `{...rest}` BEFORE all internally-controlled props** in any spread object (e.g. a `sharedProps` helper). This ensures internal accessibility props (`onKeyDown`, `tabIndex`) take precedence over user-supplied values from `rest`.
+- [ ] **`...rest` is spread onto the root DOM element** so arbitrary HTML attributes (ARIA, data-*, event handlers) pass through.
+- [ ] **`style` is accepted explicitly and applied to the root element.** The renderer passes `layoutCss` via `style` to control size/position.
+- [ ] **`ThemedFoo` wrappers must use a ref type that matches the union of possible rendered elements.** For example, if `Avatar` renders either `<img>` or `<div>` depending on props, the `ThemedAvatar` wrapper must be typed `React.forwardRef<HTMLImageElement | HTMLDivElement, ...>` (not `HTMLDivElement` alone). Using a single concrete element type is a silent type lie when the ref might point to a different element at runtime.
+- [ ] **Infrastructure props (`updateState`, `registerComponentApi`) are typed as optional** (`updateState?: ...`). The native component must work standalone without them.
+
+### Classes / classnames
+- [ ] **Root element `className` is built with `classnames(...)`.** Always merge: SCSS module class, `classes?.[COMPONENT_PART_KEY]` (for theme/responsive styles), and the forwarded `className` prop (for legacy VariantBehavior support).
+- [ ] **Named parts use `partClassName(PART_*)` alongside their SCSS module class** so tests can locate them via `[data-part-id='partName']`.
+
+### State management
+- [ ] **Remove dead props — props declared in the type but never used in the component body.** A common example is `gap?: string | number` that got superseded by a CSS theme variable. Dead props pollute IntelliSense, can shadow `...rest` values, and silently swallow user-provided attributes that should have reached the DOM.
+- [ ] **Avoid variable shadowing inside `useEffect` closures.** If a prop is named `id`, do not declare `const id = setTimeout(...)` inside an effect — rename the timer handle to `timeoutId`. Shadowing makes cleanup code (`clearTimeout(id)`) ambiguous at a glance.
+- [ ] **Prefer simple boolean expressions in filter predicates.** `!!string.trim().length` is a double negation converting `number→boolean→boolean` unnecessarily. Use `string.trim().length > 0` or just `string.trim()` for clarity.
+- [ ] **`children?: React.ReactNode` — do not write `React.ReactNode | React.ReactNode[]`.** `ReactNode` already includes array forms (`ReactFragment`).
+- [ ] **Mix named imports with namespace imports consistently.** If `memo` is a named import from `"react"`, don't use `React.forwardRef` alongside it. Destructure `forwardRef` and `ForwardedRef` as named imports: `import React, { forwardRef, type ForwardedRef, memo, ... } from "react"`.
+- [ ] **`COMPONENT_PART_KEY` constant (from `../../components-core/theming/responsive-layout`) must be imported and used instead of the raw string `"-component"`.** Hardcoding `"-component"` is a magic string anti-pattern.
+- [ ] **Local UI state (`useState`) is used for immediate feedback** (e.g. caret position, open/closed). Never route every keystroke through `updateState` — that causes caret-jumping in text inputs.
+- [ ] **`updateState` is called when the public value changes** (after debounce/blur if appropriate) so markup bindings stay in sync.
+- [ ] **External prop changes are synced into local state via `useEffect`**, with a ref guard to avoid loops:
   ```typescript
-  if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
-    this.registerCoreComponent(componentNameComponentRenderer);
-  }
+  useEffect(() => {
+    if (externalValue !== lastSynced.current) {
+      setLocalValue(externalValue ?? "");
+      lastSynced.current = externalValue;
+    }
+  }, [externalValue]);
   ```
+- [ ] **`registerComponentApi` is called in a `useEffect`** and all referenced functions are in the dependency array:
+  ```typescript
+  useEffect(() => {
+    registerComponentApi?.({ focus, setValue });
+  }, [registerComponentApi, focus, setValue]);
+  ```
+- [ ] **`useCallback` wraps functions passed as event handlers or into `registerComponentApi`** to maintain stable references and avoid effect re-fires.
+- [ ] **`useMemo` is used for expensive derived values** (e.g. filtered lists, sorted data, virtual row computation) — not for trivial derivations.
+
+### `useEffect` hygiene
+- [ ] **Every `useEffect` that creates a subscription, timeout, or interval returns a cleanup function.**
+- [ ] **Dependency arrays are complete and accurate.** No empty arrays when the effect uses props/state. Use ESLint `exhaustive-deps` rule as a guide.
+- [ ] **No stale closures.** If a callback inside an effect references mutable state, wrap the callback with `useCallback` and include the state in its dependency array — or use a ref to hold the latest value.
 
 ---
 
-## Native component (`ComponentNameNative.tsx`)
+## 5. SCSS / Theming
 
-- [ ] Uses `forwardRef` with a named function (`function ComponentNameNative(...)`)
-- [ ] Wrapped with `React.memo`
-- [ ] Exports `defaultProps` object — referenced by metadata
-- [ ] `Props` interface defined; optional props use `?`
-- [ ] Spreads `...rest` onto the root element
-- [ ] Accepts and applies `style` prop explicitly (passes `layoutCss` through)
-- [ ] Uses `composeRefs` when internal ref is needed alongside forwarded ref
-- [ ] Does NOT use `useImperativeHandle` — uses `registerComponentApi` instead
-- [ ] Does NOT set `displayName`
-- [ ] Has no XMLUI-specific dependencies (works standalone)
-- [ ] Imperative APIs registered in `useEffect` via `registerComponentApi?.({...})`
-- [ ] Calls `updateState?.({...})` when value changes
+- [ ] **Duplicate layout CSS across variant classes is extracted into a shared base class.** When `.badge` and `.pill` (or similar variant classes) repeat the same layout rules verbatim, extract them into a `.container` class applied alongside the variant class in the component. This is the CSS equivalent of DRY and prevents divergence.
+- [ ] **Every themed property uses `createThemeVar(...)` (not a hardcoded value).** Hardcoded colors/sizes in SCSS prevent theme overrides.
+- [ ] **Theme variable names follow the convention:** `property-ComponentName`, `property-ComponentName-Variant`, `property-ComponentName-State`.
+- [ ] **`:export { themeVars: t.json-stringify($themeVars); }` is present** at the bottom of every SCSS module so `parseScssVar` can read them.
+- [ ] **`defaultThemeVars` in metadata provides light-mode fallbacks** for every variable declared in SCSS.
+- [ ] **Disabled state uses `opacity` + `pointer-events: none`** (via a `.disabled` CSS class), not `filter: grayscale` or inline styles.
 
 ---
 
-## Styling (`ComponentName.module.scss`)
+## 6. Accessibility
 
-- [ ] Includes the required `$themeVars` boilerplate (see `styling.md`)
-- [ ] All theme variables declared with `createThemeVar(...)`
-- [ ] Ends with `:export { themeVars: t.json-stringify($themeVars); }`
-- [ ] CSS class names use camelCase in SCSS, applied via `classnames`
-
----
-
-## Parts
-
-- [ ] Parts declared in metadata `parts: { ... }` when component has stylable sub-elements
-- [ ] `partClassName(PART_*)` applied to corresponding DOM elements in the native component
-- [ ] `defaultPart` set when a sub-element should receive layout properties
+- [ ] **Interactive elements have correct ARIA roles** (`role="button"`, `role="checkbox"`, etc.) or use the correct semantic HTML element.
+- [ ] **`aria-disabled={!enabled}`** is set when the component is disabled (instead of or in addition to the `disabled` attribute, depending on the element type).
+- [ ] **`aria-label` or visible label is always present** for icon-only controls (buttons, inputs without text).
+- [ ] **Keyboard navigation is complete**: focusable elements respond to Enter/Space (activation), Escape (dismiss), and arrow keys (navigation within groups).
 
 ---
 
-## Accessibility
+## 7. E2E Tests (`ComponentName.spec.ts`)
 
-- [ ] Interactive elements are keyboard-accessible (`tabIndex={0}`, Enter/Space handlers)
-- [ ] `aria-disabled` used for disabled state
-- [ ] `aria-label` or `aria-labelledby` for elements without visible text
-- [ ] `aria-expanded` for expandable elements
-- [ ] Non-interactive elements are not focusable
+- [ ] **Test file is co-located in the component folder**, not in a separate `tests/` directory.
+- [ ] **Import is from `../../testing/fixtures`**, not from `@playwright/test` directly.
+- [ ] **Tests are grouped with `test.describe`** into categories: Basic Functionality, Accessibility, Theme Variables, Behaviors and Parts, Edge Cases.
+- [ ] **Event tests use `testState` + `expect.poll`** for async assertions. Never assert synchronously after a user interaction.
+- [ ] **Keyboard tests always verify focus with `toBeFocused()` before pressing keys.** Skipping this causes flakiness under parallel execution.
+- [ ] **Click tests `await expect(element).toBeVisible()` before clicking**, especially immediately after `initTestBed`.
+- [ ] **Semantic locators are preferred** (`getByRole`, `getByLabel`, `getByTestId`) over raw `page.locator('div.foo')`.
+- [ ] **Theme variable tests use exact `rgb(...)` colors**, not named colors like `"red"`.
+- [ ] **No `async`/`await` inside XMLUI script strings** — the framework handles async automatically. Use `delay(ms)` instead of `setTimeout`.
+- [ ] **No `new` operator in XMLUI script strings** — e.g. `throw "error"` not `throw new Error("error")`.
+- [ ] **Template props use `<property name="...">` wrapper**, not a shorthand child tag.
+- [ ] **Component drivers are used for complex interactions** (Select, Table, DatePicker) instead of raw Playwright locators.
 
 ---
 
-## Testing
+## 8. Linting & Type Safety
 
-- [ ] E2E spec covers: basic rendering, key props, events, accessibility, theme variables
-- [ ] Theme variable tests use exact CSS color values (e.g., `"rgb(255, 0, 0)"` not `"red"`)
-- [ ] Keyboard tests wait for `toBeFocused()` before pressing keys (race condition prevention)
-- [ ] No hooks or `async/await` in XMLUI markup expressions
-- [ ] Event handlers use `on` prefix (`onClick=`, not `click=`)
+- [ ] **No TypeScript errors in the VS Code Problems panel.** After any refactoring, check the Problems panel (or `tsc --noEmit`) — the file must be error-free before the work is considered done.
+- [ ] **No `as any` casts.** Replace with `as unknown as TargetType` where an unsafe cast is unavoidable, and prefer redesigning types to eliminate the need entirely.
+- [ ] **Event handler base types match usage.** When forwarding `onClick`/`onContextMenu` through a shared props object to elements of different types (e.g. `<img>` and `<div>`), type the handlers via `HTMLElement` (the common base) rather than a specific element type to avoid assignability errors.
+- [ ] **`Ref` union types are narrowed per element.** A `Ref<A | B>` cannot be directly passed to an element expecting `Ref<A>`. Either cast per-branch (`ref as Ref<HTMLImageElement>`) or keep `ref` outside the shared props object and pass it individually to each branch.
+- [ ] **`Ref<any>` is replaced with the accurate element type or union.** Use `Ref<HTMLInputElement>`, `Ref<HTMLDivElement>`, etc.
+- [ ] **Type guard parameters must use `unknown`, not `any`.** `any` disables type checking inside the guard body. Use `unknown` and cast after narrowing: `typeof (color as BadgeColors).label === "string"`.
+- [ ] **Inline style objects built inside JSX (`style={{ ... }}`) must be extracted to `useMemo`** when the component is wrapped in `React.memo`. An inline object literal creates a new reference every render, causing `memo`'s equality check to always fail for that prop.
+- [ ] **Pure constants and pure utility functions are defined at module scope**, not inside the component function body. Objects/arrays recreated on every render without `useMemo` create unnecessary GC pressure and may break referential-equality checks.
+- [ ] **Abbreviated or cryptic identifier names are expanded.** Function and variable names should be self-describing: `abbreviateName` not `abbrevName`, `calculateFontSize` not `calcFs`.
 
+---
+
+## 9. Registration
+
+- [ ] **Component is registered in `ComponentProvider.tsx`** via `this.registerCoreComponent(componentNameComponentRenderer)`.
+- [ ] **Import is a named import of the `*ComponentRenderer` export** from the `.tsx` metadata/renderer file.
+- [ ] **No duplicate registration** — search the file for the component name before adding.
+
+---
+
+## 10. HTML Void Elements
+
+- [ ] **`<br>`, `<img>`, `<input>`, `<hr>`, `<meta>`, `<link>` are void elements and must be self-closing in JSX.** Never pass children to them: `<br>{...}</br>` is invalid HTML and causes a React warning. Use `<br />` (or `<br className={...} />` etc.) instead.
+- [ ] **Custom renderer components that wrap void elements must not pass `renderChild(node.children)` inside the element.** Drop both `renderChild` from the destructured render context and any `{renderChild(node.children)}` inside the void element.
+
+---
+
+## 11. `useRef` Type Accuracy
+
+- [ ] **`useRef<T>` must use the type of the element the ref is actually attached to.** A common mistake is using `useRef<HTMLAnchorElement>` when the rendered element is a `<span>` (which requires `useRef<HTMLSpanElement>`). TypeScript may not catch this at the call site — check visually.
+- [ ] **`forwardRef` parameter type and the element the ref is attached to must agree.** `ForwardedRef<HTMLSpanElement>` must go onto a `<span>`, not a `<div>` or `<a>`.
+
+---
+
+## 12. JSDoc in Component Files
+
+- [ ] **Do not add JSDoc block comments to exports in XMLUI component files.** Descriptions live in `createMetadata({ description: "..." })`. JSDoc blocks in `.tsx` files are redundant, increase noise, and will drift out of sync with the metadata.
+
+---
+
+## Quick Anti-Pattern Reference
+
+| Anti-pattern | Rule |
+|---|---|
+| `ComponentName.displayName = "..."` | Remove. Hard prohibition. |
+| `useImperativeHandle` in native | Replace with `registerComponentApi`. |
+| Hook (`useState`, `useEffect`, …) inside renderer function | Move to native component. |
+| `index.ts` in component folder | Delete the file. |
+| Raw `node.props.foo` passed as typed prop without `extractValue` | Wrap in appropriate `extractValue.*` call. |
+| Hardcoded colors or sizes in SCSS | Replace with `createThemeVar(...)`. |
+| `defaultValue` in metadata with a literal value | Reference `defaultProps.propName` instead. |
+| `useEffect` with missing deps or no cleanup for subscriptions | Fix deps array; add cleanup return. |
+| `forwardRef` without `composeRefs` when internal ref is also needed | Use `composeRefs(ref, internalRef)`. |
+| `...rest` not spread on root element | Add `{...rest}` to root element. |
+| `style` prop not applied to root | Accept `style` explicitly and apply it. |
+| Empty `[]` dep array but effect uses props/state | Audit deps; add missing values. |
+| `as any` cast | Replace with `as unknown as T` or fix the type. |
+| Pure constant / utility defined inside component body | Move to module scope. |
+| Abbreviated identifier names (`abbrevName`, `calcFs`) | Expand to self-describing names. |
+| `Ref<A \| B>` spread into element expecting `Ref<A>` | Pass `ref` per-branch with narrowing cast. |
+| `Pick<HTMLAttributes<HTMLDivElement>, "onClick">` when element type varies | Use `HTMLElement` as the base type. |
+| `isFoo(x: any)` — `any` in type guard parameter | Change to `unknown`; cast inside the guard after narrowing. |
+| `composeRefs(ref, innerRef)` called in render (not a hook) | Replace with `useComposedRefs(ref, innerRef)` — stable across renders. |
+| `ref ? composeRefs(ref, inner) : inner` guard | Replace with `useComposedRefs(ref, inner)` — null/undefined handled internally. |
+| `Props` with no HTML base type (`...rest` typed as `{}`) | Extend `React.HTMLAttributes<HTMLElement>`; move `{...rest}` before explicit props. |
+| `{...rest}` at end of spread object when Props extends HTMLAttributes | Move `{...rest}` to the FRONT so internal props (onKeyDown, tabIndex) take precedence. |
+| `ThemedFoo = forwardRef<HTMLDivElement>` when Foo renders img or div | Use the union: `forwardRef<HTMLImageElement \| HTMLDivElement>`. |
+| Dead prop in Props (declared, destructured, never used in body) | Remove from Props and destructuring; verify no metadata or test sets it. |
+| `children?: ReactNode \| ReactNode[]` | Simplify to `children?: ReactNode` — array is already included. |
+| `React.forwardRef` mixed with named `memo` import | Destructure `forwardRef` as a named import for consistency. |
+| `classes?.["-component"]` raw string literal | Import and use `COMPONENT_PART_KEY` from `responsive-layout`. |
+| Inline `style={{ ... }}` inside `memo`-wrapped component | Extract to `useMemo` keyed on color/style deps. |
+| Duplicate layout CSS in `.badge` / `.pill` variant classes | Extract shared rules to `.container` base class. |
+| Stale `*Native` import after rename (e.g. in `VariantBehavior.tsx`) | Grep all `src/` importers before renaming; update each. |
+| `<br>{children}</br>` or any void element with children | Use self-closing `<br />`: void elements cannot have children. |
+| `useRef<HTMLAnchorElement>` on a `<span>` element | Match `useRef<T>` type to the rendered element type exactly. |
+| JSDoc block comments on exports in `.tsx` component files | Remove; descriptions belong in `createMetadata`. |
+| `useEffect` timeout with no `clearTimeout` cleanup | Return `() => clearTimeout(id)` from the effect. |
+| `(icon as any).props` to access icon props | Use `React.isValidElement(icon) ? (icon.props as Record<string, unknown>) : undefined`. |
+| Redundant fragment wrappers `<>{value}</>` | Use `{value}` directly when no key/ref is needed. |
+| `BrNative(_props: any)` placeholder | Use a typed placeholder `BrPlaceholder(_props: Record<string, never>)`. |
+| `Ref<T>` on `forwardRef` callback parameter | Use `ForwardedRef<T>` — the precise type React passes to `forwardRef` callbacks. |
+| `Pick<HTMLAttributes<T>, "onContextMenu">` when more attrs are needed | Extend `HTMLAttributes<T>` directly; remove explicit style/className/children. |
+| Explicit `style/className/children` in Props when extending `HTMLAttributes` | Remove — they are inherited; duplicate declarations are misleading. |
+| Orphaned named type import after Props refactor | Check imports after every Props change; remove unused type-only imports. |
+| `const id = setTimeout(...)` inside effect when `id` is also a prop | Rename the timer to `timeoutId` to avoid variable shadowing. |
+| `!!string.trim().length` in filter predicate | Use `string.trim().length > 0` — no double negation. |
 

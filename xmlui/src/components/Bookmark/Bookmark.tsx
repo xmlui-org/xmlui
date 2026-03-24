@@ -1,5 +1,5 @@
 import { createMetadata } from "../metadata-helpers";
-import { Bookmark, defaultProps } from "./BookmarkNative";
+import { Bookmark, defaultProps } from "./BookmarkReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Bookmark";
