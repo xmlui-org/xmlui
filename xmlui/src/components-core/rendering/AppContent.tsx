@@ -999,6 +999,7 @@ export function AppContent({
       // --- Navigation-related
       navigate,
       routerBaseName,
+      get pathname() { return globalThis?.location?.pathname; },
       setNavigationHandlers,
 
       // --- Notifications and dialogs
