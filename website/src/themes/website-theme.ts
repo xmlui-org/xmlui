@@ -27,10 +27,9 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "$color-surface-0",
-    "fontSize": "15px",
-    "fontFamily-monospace":
-      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    backgroundColor: "$color-surface-0",
+    fontSize: "15px",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
@@ -59,8 +58,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
     "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
     "textColor-TableOfContentsItem--active": "$color-surface-900",
-    "borderLeft-TableOfContentsItem--active":
-      "2px solid $color-surface-900",
+    "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
@@ -103,7 +101,6 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "textColor-SearchToggleButton": "$color-surface-500",
     "textColor-SearchToggleButton--hover": "$color-surface-700",
     "backgroundColor-SearchItem--hover": "$color-surface-50",
-
 
     // --- Headlines
     "paddingTop-Headlines": "$space-14",
