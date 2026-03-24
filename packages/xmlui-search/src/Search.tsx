@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useDeferredValue,
   useId,
   useEffect,
   useLayoutEffect,
@@ -106,16 +107,9 @@ export const Search = ({
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  // --- Why this solution?
-  // Instead of useDeferredValue, we simply use useEffect + setTimeout to create a debounced value for the search query.
-  // This is because Fuse.js searches are expensive and run synchronously in JS.
-  // useDeferredValue can only schedule render updates in React, but cannot throttle the synchronous search calls.
-  // So using useDeferredValue or useTransition would still cause input lag while typing, because the search would run on every keystroke.
-  const [debouncedValue, setDebouncedValue] = useState("");
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(inputValue), 150);
-    return () => clearTimeout(timer);
-  }, [inputValue]);
+  // --- Keep input updates urgent, but defer expensive search result updates.
+  // React can render the input immediately and let the result list lag behind slightly.
+  const deferredSearchValue = useDeferredValue(inputValue);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
@@ -129,13 +123,13 @@ export const Search = ({
     results: allResults,
     totalCount,
     suggestion,
-  } = useSearch(data, limit, debouncedValue, enableSpellCorrection);
+  } = useSearch(data, limit, deferredSearchValue, enableSpellCorrection);
 
   // Reset page and category filter when query changes
   useEffect(() => {
     setPage(1);
     setSelectedCategories(new Set(defaultSelectedCategories ?? []));
-  }, [debouncedValue]);
+  }, [deferredSearchValue]);
 
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
@@ -189,8 +183,8 @@ export const Search = ({
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
-    if (debouncedValue.length > 0) setShow(true);
-  }, [debouncedValue]);
+    if (deferredSearchValue.length > 0) setShow(true);
+  }, [deferredSearchValue]);
 
   const onInputBlur = useCallback(() => {
     setIsFocused(false);
@@ -322,7 +316,7 @@ export const Search = ({
   }, [clearCategories, refocusInput]);
 
   // Shared results list JSX — used by overlay mode
-  const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
+  const hasQuery = deferredSearchValue.length >= MIN_MATCH_LENGTH;
   const allUncategorized = results.every((r) => r.item.category == null);
 
   const overlayResultsListJsx = (
