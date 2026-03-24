@@ -558,8 +558,8 @@ export const Search = ({
                   />
                 </div>
 
-                {/* Category tabs — only when there's a query */}
-                {hasQuery && (
+                {/* Category tabs — only when there's a query and multiple categories */}
+                {hasQuery && availableCategories.length > 1 && (
                   <div className={styles.overlayControls}>
                     <OverlayCategoryTabs
                       categories={availableCategories}
