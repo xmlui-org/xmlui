@@ -24,7 +24,6 @@ import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
 
 export const defaultProps = {
   ...toggleDefaultProps,
-  labelPosition: "end",
 };
 
 const COMP = "Checkbox";

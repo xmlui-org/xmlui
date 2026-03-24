@@ -85,12 +85,8 @@ A focused checklist for auditing and refactoring XMLUI component implementations
     }
   }, [externalValue]);
   ```
-- [ ] **`registerComponentApi` is called in a `useEffect`** and all referenced functions are in the dependency array:
-  ```typescript
-  useEffect(() => {
-    registerComponentApi?.({ focus, setValue });
-  }, [registerComponentApi, focus, setValue]);
-  ```
+- [ ] **`registerComponentApi` callbacks must be extracted to `useCallback` before the `useEffect`.** Defining them inline as object literals inside the `useEffect` body prevents them from appearing in the effect's dependency array. Extract each to a named `useCallback` (with `[]` deps when they only access stable refs), then list them in `useEffect`'s deps.
+- [ ] **lodash `debounce`/`throttle` wrappers must be cancelled on unmount and when re-created.** Add a cleanup effect that calls `.cancel?.()` on the current wrapper: `useEffect(() => { const fn = ...; return () => fn.cancel?.(); }, [debouncedFn])`. Without this, a pending debounced call fires after the component unmounts.
 - [ ] **`useCallback` wraps functions passed as event handlers or into `registerComponentApi`** to maintain stable references and avoid effect re-fires.
 - [ ] **`useMemo` is used for expensive derived values** (e.g. filtered lists, sorted data, virtual row computation) — not for trivial derivations.
 
@@ -211,6 +207,7 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 | `{...rest}` at end of spread object when Props extends HTMLAttributes | Move `{...rest}` to the FRONT so internal props (onKeyDown, tabIndex) take precedence. |
 | `ThemedFoo = forwardRef<HTMLDivElement>` when Foo renders img or div | Use the union: `forwardRef<HTMLImageElement \| HTMLDivElement>`. |
 | Dead prop in Props (declared, destructured, never used in body) | Remove from Props and destructuring; verify no metadata or test sets it. |
+| `defaultProps = { ...baseDefaults, deadProp: value }` where `deadProp` is absent from Props type | Remove the dead key from `defaultProps`; it pollutes IntelliSense and may pass as `...rest` to DOM elements. |
 | `children?: ReactNode \| ReactNode[]` | Simplify to `children?: ReactNode` — array is already included. |
 | `React.forwardRef` mixed with named `memo` import | Destructure `forwardRef` as a named import for consistency. |
 | `classes?.["-component"]` raw string literal | Import and use `COMPONENT_PART_KEY` from `responsive-layout`. |
@@ -228,6 +225,8 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 | `Pick<HTMLAttributes<T>, "onContextMenu">` when more attrs are needed | Extend `HTMLAttributes<T>` directly; remove explicit style/className/children. |
 | Explicit `style/className/children` in Props when extending `HTMLAttributes` | Remove — they are inherited; duplicate declarations are misleading. |
 | `useCallback(() => (event) => {...}, [])` factory → called in render body | Inline: `useCallback((event) => {...}, [deps])` — factory-in-render produces a new function every render, defeating memoization. |
+| `registerComponentApi` callbacks defined inline in `useEffect` body | Extract to named `useCallback` variables; list them in the effect's dependency array. |
+| Lodash `debounce`/`throttle` with no cancel on unmount | Add `useEffect(() => { const fn = ...; return () => fn.cancel?.(); }, [debouncedFn])`. |
 | `useMemo(() => value, [value])` with no transformation | Remove — this recomputes on every change to `value` and returns it unchanged; use `value` directly. |
 | `forwardRef` ref param never attached to DOM or composed | Connect via `useComposedRefs(ref, internalRef)` on root element; a disconnected ref returns `null` to callers without compile error. |
 | Local `const PART_FOO = "foo"` when or as soon as it could be shared | Move to `components-core/parts.ts`; import from there everywhere (component, driver, tests). |
