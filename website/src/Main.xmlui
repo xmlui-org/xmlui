@@ -139,7 +139,7 @@
                             showPreviewMetadata="false"
                             pageSize="8"
                             enableSpellCorrection="true"
-                            mode="drawer"
+                            mode="inline"
                         />
                     </Stack>
                 </Fragment>
