@@ -11,7 +11,6 @@ $componentName: "DateInput";
 $themeVars: t.composePaddingVars($themeVars, $componentName);
 
 // Compose standard Input theme variables automatically
-$themeVars: t.composePaddingVars($themeVars, $componentName);
 $themeVars: t.composeBorderVars($themeVars, $componentName);
 
 // --- DateInput specific theme variables
@@ -234,8 +233,10 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
       }
       
       &:focus {
-        outline: 2px solid $outlineColor-DateInput--focus;
-        outline-offset: 2px;
+        outline-width: $outlineWidth-button-DateInput--focused;
+        outline-color: $outlineColor-button-DateInput--focused;
+        outline-offset: $outlineOffset-button-DateInput--focused;
+        outline-style: solid;
       }
       
       &:disabled {

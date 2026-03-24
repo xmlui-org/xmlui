@@ -47,6 +47,7 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 - [ ] **`defaultProps` is exported** as a named const object from the native file, and destructuring defaults in the function signature reference those values.
 
 ### Ref handling
+- [ ] **Verify the forwarded `ref` is actually connected to a DOM element.** `forwardRef<T, Props>` can compile without error even if the `ref` parameter is never used. Confirm the ref is applied (directly or via `useComposedRefs`) to the root element. A silently disconnected ref means `refs.current` is always `null` for callers.
 - [ ] **When both a forwarded ref and an internal ref are needed, use `useComposedRefs(ref, internalRef)` (from `@radix-ui/react-compose-refs`).** Never use `composeRefs(...)` directly — it returns a new callback ref object on every render, causing React to needlessly detach and reattach the ref. `useComposedRefs` wraps the result in `useCallback` for stability.
 - [ ] **Do not guard `useComposedRefs` with `ref ?` — it handles `null`/`undefined` refs internally.** `const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;` should become `const composedRef = useComposedRefs(ref, innerRef);`.
 - [ ] **The `forwardRef` callback's ref parameter must be typed `ForwardedRef<T>`, not `Ref<T>`.** `ForwardedRef` is the precise type React passes to `forwardRef` callbacks. `Ref<T>` is broader (includes deprecated string refs). Both come from `"react"` and must be explicitly imported as named types.
@@ -71,7 +72,9 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 - [ ] **`children?: React.ReactNode` — do not write `React.ReactNode | React.ReactNode[]`.** `ReactNode` already includes array forms (`ReactFragment`).
 - [ ] **Mix named imports with namespace imports consistently.** If `memo` is a named import from `"react"`, don't use `React.forwardRef` alongside it. Destructure `forwardRef` and `ForwardedRef` as named imports: `import React, { forwardRef, type ForwardedRef, memo, ... } from "react"`.
 - [ ] **`COMPONENT_PART_KEY` constant (from `../../components-core/theming/responsive-layout`) must be imported and used instead of the raw string `"-component"`.** Hardcoding `"-component"` is a magic string anti-pattern.
-- [ ] **Local UI state (`useState`) is used for immediate feedback** (e.g. caret position, open/closed). Never route every keystroke through `updateState` — that causes caret-jumping in text inputs.
+- [ ] **`useMemo` must perform a real computation.** `useMemo(() => value, [value])` is a no-op — it recomputes exactly when `value` changes and returns it unchanged. This adds memo overhead with zero benefit. Replace with a simple `const x = value` assignment, or remove the intermediate variable entirely.
+- [ ] **`useCallback` must not use a factory pattern in the render body.** `const createHandler = useCallback(() => (event) => {...}, [])` followed by `const handler = createHandler()` unconditionally in the render body defeats the purpose of `useCallback` — `handler` is a new function every render. Inline the handler directly: `const handler = useCallback((event) => {...}, [deps])`.
+- [ ] **Keyboard navigation that relies on element order must use the runtime order, not a hard-coded sequence.** If field layout can vary (e.g. controlled by a `dateFormat` prop), arrow-key handlers must use the computed field order (`getInputRefs()` or equivalent) to locate prev/next, not a hard-coded `month→day→year` path.
 - [ ] **`updateState` is called when the public value changes** (after debounce/blur if appropriate) so markup bindings stay in sync.
 - [ ] **External prop changes are synced into local state via `useEffect`**, with a ref guard to avoid loops:
   ```typescript
@@ -105,11 +108,14 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 - [ ] **Theme variable names follow the convention:** `property-ComponentName`, `property-ComponentName-Variant`, `property-ComponentName-State`.
 - [ ] **`:export { themeVars: t.json-stringify($themeVars); }` is present** at the bottom of every SCSS module so `parseScssVar` can read them.
 - [ ] **`defaultThemeVars` in metadata provides light-mode fallbacks** for every variable declared in SCSS.
-- [ ] **Disabled state uses `opacity` + `pointer-events: none`** (via a `.disabled` CSS class), not `filter: grayscale` or inline styles.
+- [ ] **SCSS must have no duplicate calls.** A copy-paste accident like two consecutive `$themeVars: t.composePaddingVars($themeVars, $componentName)` lines silently doubles the number of registered padding vars in `$themeVars`. Search for consecutive identical `$themeVars: t.compose*` calls.
+- [ ] **Sub-element `:focus` SCSS rules must use the sub-element's own theme variables.** A `button:focus` rule in a component's SCSS should use a button-scoped variable (e.g. `$outlineColor-button-DateInput--focused`), not the component-root variable (e.g. `$outlineColor-DateInput--focus`). Mismatches mean the user cannot independently control the button focus ring.
 
 ---
 
-## 6. Accessibility
+- [ ] **Part constants (`PART_DAY`, `PART_CLEAR_BUTTON`, etc.) that may be shared across components (drivers, specs, related components) must live in `components-core/parts.ts`, not be redeclared locally.** Add the constant to `parts.ts` and import it everywhere. Local redeclaration diverges silently when the string changes.
+- [ ] **`parts` metadata must list every part wrapped in `<Part partId={...}>` in the native component.** If a part is rendered but missing from `createMetadata({ parts: { ... } })`, end users cannot target it via `classes` and it is invisible to documentation.
+- [ ] **Remove dead browser-compatibility checks.** Variables like `isIEOrEdgeLegacy` that target IE or legacy Edge are dead in modern XMLUI apps. If the variable is declared but never changes behavior, delete it and simplify the guarded code path.
 
 - [ ] **Interactive elements have correct ARIA roles** (`role="button"`, `role="checkbox"`, etc.) or use the correct semantic HTML element.
 - [ ] **`aria-disabled={!enabled}`** is set when the component is disabled (instead of or in addition to the `disabled` attribute, depending on the element type).
@@ -221,6 +227,15 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 | `Ref<T>` on `forwardRef` callback parameter | Use `ForwardedRef<T>` — the precise type React passes to `forwardRef` callbacks. |
 | `Pick<HTMLAttributes<T>, "onContextMenu">` when more attrs are needed | Extend `HTMLAttributes<T>` directly; remove explicit style/className/children. |
 | Explicit `style/className/children` in Props when extending `HTMLAttributes` | Remove — they are inherited; duplicate declarations are misleading. |
+| `useCallback(() => (event) => {...}, [])` factory → called in render body | Inline: `useCallback((event) => {...}, [deps])` — factory-in-render produces a new function every render, defeating memoization. |
+| `useMemo(() => value, [value])` with no transformation | Remove — this recomputes on every change to `value` and returns it unchanged; use `value` directly. |
+| `forwardRef` ref param never attached to DOM or composed | Connect via `useComposedRefs(ref, internalRef)` on root element; a disconnected ref returns `null` to callers without compile error. |
+| Local `const PART_FOO = "foo"` when or as soon as it could be shared | Move to `components-core/parts.ts`; import from there everywhere (component, driver, tests). |
+| Part rendered in native component but absent from `parts:` metadata | Add to `createMetadata({ parts: { ... } })`; undeclared parts are invisible to docs and theming. |
+| `isIEOrEdgeLegacy` / IE user-agent sniffing guards | Remove — these browser checks are dead code in XMLUI; simplify the guarded path. |
+| Arrow key handler navigates fields in hard-coded order | Use `getInputRefs()` + `findIndex(r => r?.current === event.currentTarget)` to navigate by computed `dateOrder`; hard-coded order breaks when field layout is configurable. |
+| Duplicate consecutive `$themeVars: t.composeFooVars(...)` calls in SCSS | Each compose function must be called once; a second identical call is a copy-paste artifact — remove it. |
+| Sub-element `:focus` using component-root outline variable | Declare and use dedicated part-specific outline variables, e.g. `$outlineColor-button-ComponentName--focused`; component-root vars cannot control sub-element focus rings independently. |
 | Orphaned named type import after Props refactor | Check imports after every Props change; remove unused type-only imports. |
 | `const id = setTimeout(...)` inside effect when `id` is also a prop | Rename the timer to `timeoutId` to avoid variable shadowing. |
 | `!!string.trim().length` in filter predicate | Use `string.trim().length > 0` — no double negation. |

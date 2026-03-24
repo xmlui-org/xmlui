@@ -8,3 +8,7 @@ export const PART_RANGE = "range";
 export const PART_THUMB = "thumb";
 export const PART_ICON = "icon";
 export const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
+export const PART_CLEAR_BUTTON = "clearButton";
+export const PART_DAY = "day";
+export const PART_MONTH = "month";
+export const PART_YEAR = "year";
