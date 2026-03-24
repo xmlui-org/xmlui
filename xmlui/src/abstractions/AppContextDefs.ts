@@ -163,6 +163,9 @@ export type AppContextObject = {
   // This property determines the base name used for the router.
   routerBaseName: string;
 
+  // This property returns the current URL pathname (e.g. "/about"), or undefined in non-browser environments.
+  pathname: string | undefined;
+
   // This function sets navigation event handlers (willNavigate and didNavigate).
   // Used by the App component to register navigation events.
   setNavigationHandlers?: (

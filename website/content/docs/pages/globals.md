@@ -562,6 +562,14 @@ This function works with both the Table of Contents system and standalone bookma
 </App>
 ```
 
+### `pathname`
+
+```ts
+get pathname: string | undefined;
+```
+
+This property returns the current URL pathname (e.g. `"/about"`), or `undefined` in non-browser environments.
+
 ### `routerBaseName`
 
 ```ts
