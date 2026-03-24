@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useDeferredValue,
   useId,
   useEffect,
   useLayoutEffect,
@@ -106,16 +107,7 @@ export const Search = ({
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  // --- Why this solution?
-  // Instead of useDeferredValue, we simply use useEffect + setTimeout to create a debounced value for the search query.
-  // This is because Fuse.js searches are expensive and run synchronously in JS.
-  // useDeferredValue can only schedule render updates in React, but cannot throttle the synchronous search calls.
-  // So using useDeferredValue or useTransition would still cause input lag while typing, because the search would run on every keystroke.
-  const [debouncedValue, setDebouncedValue] = useState("");
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(inputValue), 150);
-    return () => clearTimeout(timer);
-  }, [inputValue]);
+  const debouncedValue = useDeferredValue(inputValue);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
@@ -974,19 +966,15 @@ const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
   ],
 };
 
+const fuse = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
+const relaxedFuse = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
+
 function useSearch(
   data: SearchItemData[],
   limit: number,
   query: string,
   enableSpellCorrection: boolean,
 ): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
-  const fuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!fuseRef.current) fuseRef.current = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
-
-  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!relaxedFuseRef.current)
-    relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
-
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
   const staticData = useMemo(() => {
@@ -1019,8 +1007,8 @@ function useSearch(
   }, [dynamicData, staticData]);
 
   useEffect(() => {
-    fuseRef.current.setCollection(mergedData);
-    relaxedFuseRef.current.setCollection(mergedData);
+    fuse.setCollection(mergedData);
+    relaxedFuse.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Execute search & post-process results
@@ -1030,13 +1018,13 @@ function useSearch(
     }
 
     const fetchLimit = Math.min(limit * 10, 200);
-    const raw = fuseRef.current.search(query, { limit: fetchLimit });
+    const raw = fuse.search(query, { limit: fetchLimit });
     const mapped = postProcessSearch(raw, query);
     const grouped = groupAndSortByCategory(mapped);
 
     let suggestion: string | null = null;
     if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
-      const relaxed = relaxedFuseRef.current.search(query, { limit: 1 });
+      const relaxed = relaxedFuse.search(query, { limit: 1 });
       if (relaxed.length > 0) {
         suggestion = relaxed[0].item.title;
       }
