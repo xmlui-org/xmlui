@@ -1236,7 +1236,7 @@ function useStandalone(
 
       let loadedEntryPointCodeBehind = null;
       if (loadedEntryPoint.component.props?.codeBehind !== undefined) {
-        // --- We have a code-behind file for the main component
+        // --- We have an explicit code-behind file for the main component
         loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
           try {
             const resp = await fetchWithoutCache(
@@ -1251,9 +1251,29 @@ function useStandalone(
             resolve(null);
           }
         })) as any;
-        if (loadedEntryPointCodeBehind.hasError) {
+        if (loadedEntryPointCodeBehind?.hasError) {
           errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
         }
+      } else {
+        // --- Try to load the convention-based Main.xmlui.xs code-behind file.
+        // --- Its declarations are LOCAL to the Main component.
+        loadedEntryPointCodeBehind = await (async () => {
+          try {
+            const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+            if (resp.ok) {
+              const parsed = await parseCodeBehindResponse(resp);
+              if (parsed.hasError) {
+                errorComponents.push(parsed.component as ComponentDef);
+                return parsed;
+              }
+              // Attach src so compilation tracking picks it up
+              return { ...parsed.codeBehind, src: parsed.src };
+            }
+          } catch (e) {
+            // Main.xmlui.xs is optional — ignore fetch failures
+          }
+          return null;
+        })();
       }
 
       // --- Check if any of the components have markup errors
