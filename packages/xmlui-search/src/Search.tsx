@@ -1,12 +1,12 @@
 import {
   useCallback,
-  useDeferredValue,
   useId,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
+  useTransition,
   forwardRef,
   Fragment,
   type ForwardedRef,
@@ -107,9 +107,15 @@ export const Search = ({
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  // --- Keep input updates urgent, but defer expensive search result updates.
-  // React can render the input immediately and let the result list lag behind slightly.
-  const deferredSearchValue = useDeferredValue(inputValue);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [, startSearchTransition] = useTransition();
+
+  const updateSearchValue = useCallback((value: string) => {
+    setInputValue(value);
+    startSearchTransition(() => {
+      setSearchQuery(value);
+    });
+  }, []);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
@@ -123,13 +129,13 @@ export const Search = ({
     results: allResults,
     totalCount,
     suggestion,
-  } = useSearch(data, limit, deferredSearchValue, enableSpellCorrection);
+  } = useSearch(data, limit, searchQuery, enableSpellCorrection);
 
   // Reset page and category filter when query changes
   useEffect(() => {
     setPage(1);
     setSelectedCategories(new Set(defaultSelectedCategories ?? []));
-  }, [deferredSearchValue]);
+  }, [defaultSelectedCategories, searchQuery]);
 
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
@@ -177,14 +183,15 @@ export const Search = ({
       closeOverlay();
     } else {
       setInputValue("");
+      setSearchQuery("");
       setActiveIndex(-1);
     }
   }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
-    if (deferredSearchValue.length > 0) setShow(true);
-  }, [deferredSearchValue]);
+    if (searchQuery.length > 0) setShow(true);
+  }, [searchQuery]);
 
   const onInputBlur = useCallback(() => {
     setIsFocused(false);
@@ -283,18 +290,18 @@ export const Search = ({
 
   const onDidYouMeanAccept = useCallback(
     (s: string) => {
-      setInputValue(s);
+      updateSearchValue(s);
       refocusInput();
     },
-    [refocusInput],
+    [refocusInput, updateSearchValue],
   );
 
   const onQuerySelect = useCallback(
     (q: string) => {
-      setInputValue(q);
+      updateSearchValue(q);
       refocusInput();
     },
-    [refocusInput],
+    [refocusInput, updateSearchValue],
   );
 
   const onLoadMore = useCallback(() => {
@@ -316,7 +323,7 @@ export const Search = ({
   }, [clearCategories, refocusInput]);
 
   // Shared results list JSX — used by overlay mode
-  const hasQuery = deferredSearchValue.length >= MIN_MATCH_LENGTH;
+  const hasQuery = searchQuery.length >= MIN_MATCH_LENGTH;
   const allUncategorized = results.every((r) => r.item.category == null);
 
   const overlayResultsListJsx = (
@@ -460,7 +467,7 @@ export const Search = ({
                     type="search"
                     placeholder={placeholder ?? "Type to search…"}
                     value={inputValue}
-                    onDidChange={(value) => setInputValue(value)}
+                    onDidChange={updateSearchValue}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
                     aria-controls={`${inputId}-listbox`}
@@ -535,7 +542,7 @@ export const Search = ({
               placeholder={placeholder ?? "Type to search"}
               value={inputValue}
               startIcon="search"
-              onDidChange={(value) => setInputValue(value)}
+              onDidChange={updateSearchValue}
               onFocus={onInputFocus}
               onBlur={onInputBlur}
               onKeyDown={handleKeyDown}
