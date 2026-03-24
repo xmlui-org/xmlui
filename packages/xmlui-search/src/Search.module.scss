@@ -96,6 +96,8 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   width: 580px;
   margin-top: 4px;
   box-shadow: $boxShadow-Search;
+  position: relative;
+  z-index: 10000;
 
   @media (max-width: 600px) {
     width: var(--radix-popover-trigger-width);
@@ -448,6 +450,11 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
     position: fixed;
     flex-direction: column;
     background: transparent;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 0;
+    overflow: hidden;
   }
 
 }
@@ -550,6 +557,17 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
 
 .overlayList {
   max-height: 420px;
+}
+
+.overlayResultsList {
+  min-height: 0;
+
+  @media (max-width: 600px) {
+    flex: 1;
+    max-height: none;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 // Drawer (mobile full-screen) overlay variants

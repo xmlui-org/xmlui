@@ -22,16 +22,11 @@ import {
   Icon,
   SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
-import type {
-  FuseResult,
-  FuseResultMatch,
-  IFuseOptions,
-  RangeTuple,
-} from "fuse.js";
+import type { FuseResult, FuseResultMatch, IFuseOptions, RangeTuple } from "fuse.js";
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
-import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
+import { Popover, PopoverAnchor, PopoverContent } from "@radix-ui/react-popover";
 
 type Props = {
   id?: string;
@@ -58,7 +53,6 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
 };
 
 const MIN_MATCH_LENGTH = 2;
-
 
 export const Search = ({
   id,
@@ -132,12 +126,11 @@ export const Search = ({
   );
 
   // --- Merge data, do search, postprocess results
-  const { results: allResults, totalCount, suggestion } = useSearch(
-    data,
-    limit,
-    debouncedValue,
-    enableSpellCorrection,
-  );
+  const {
+    results: allResults,
+    totalCount,
+    suggestion,
+  } = useSearch(data, limit, debouncedValue, enableSpellCorrection);
 
   // Reset page and category filter when query changes
   useEffect(() => {
@@ -252,7 +245,8 @@ export const Search = ({
 
   // Does the scrolling to the active item, accounting for the sticky category header
   useEffect(() => {
-    if (navigationSource !== "keyboard" || activeIndex < 0 || !itemRefs.current[activeIndex]) return;
+    if (navigationSource !== "keyboard" || activeIndex < 0 || !itemRefs.current[activeIndex])
+      return;
 
     const item = itemRefs.current[activeIndex];
     const scrollContainer = listRef.current;
@@ -294,25 +288,34 @@ export const Search = ({
     inputRef.current?.focus({ preventScroll: true });
   }, []);
 
-  const onDidYouMeanAccept = useCallback((s: string) => {
-    setInputValue(s);
-    refocusInput();
-  }, [refocusInput]);
+  const onDidYouMeanAccept = useCallback(
+    (s: string) => {
+      setInputValue(s);
+      refocusInput();
+    },
+    [refocusInput],
+  );
 
-  const onQuerySelect = useCallback((q: string) => {
-    setInputValue(q);
-    refocusInput();
-  }, [refocusInput]);
+  const onQuerySelect = useCallback(
+    (q: string) => {
+      setInputValue(q);
+      refocusInput();
+    },
+    [refocusInput],
+  );
 
   const onLoadMore = useCallback(() => {
     setPage((p) => p + 1);
     refocusInput();
   }, [refocusInput]);
 
-  const onSelectOneCategory = useCallback((cat: string) => {
-    setSelectedCategories(new Set([cat]));
-    refocusInput();
-  }, [refocusInput]);
+  const onSelectOneCategory = useCallback(
+    (cat: string) => {
+      setSelectedCategories(new Set([cat]));
+      refocusInput();
+    },
+    [refocusInput],
+  );
 
   const onClearAllCategories = useCallback(() => {
     clearCategories();
@@ -382,9 +385,15 @@ export const Search = ({
       {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <div className={styles.loadMoreRow}>
-            <Text className={styles.resultCount}>{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
+            <Text
+              className={styles.resultCount}
+            >{`Showing ${results.length} of ${categoryFilteredResults.length}`}</Text>
             {hasMore && (
-              <button className={styles.loadMoreButton} onMouseDown={(e) => e.preventDefault()} onClick={onLoadMore}>
+              <button
+                className={styles.loadMoreButton}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={onLoadMore}
+              >
                 Load more
               </button>
             )}
@@ -414,7 +423,10 @@ export const Search = ({
         )}
         {!isOverlayOpen && !collapsible && (
           <div
-            onPointerDown={(e) => { e.preventDefault(); openOverlay(); }}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              openOverlay();
+            }}
             style={{ cursor: "text" }}
           >
             <TextBox
@@ -428,67 +440,73 @@ export const Search = ({
           </div>
         )}
         {/* Overlay */}
-        {isOverlayOpen && createPortal(
-          // Wrap with className so theme CSS vars are in scope for the portal
-          <div className={className}>
-            {/* Backdrop — click outside to close */}
-            <div
-              className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
-              onClick={closeOverlay}
-            >
+        {isOverlayOpen &&
+          createPortal(
+            // Wrap with className so theme CSS vars are in scope for the portal
+            <div className={className}>
+              {/* Backdrop — click outside to close */}
               <div
-                className={classnames(styles.overlayPanel)}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Search"
-                onClick={(e) => e.stopPropagation()}
+                className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
+                onClick={closeOverlay}
               >
-                {/* Input row */}
-                <div className={styles.overlayInputRow}>
-                  <Icon name="search" className={styles.overlaySearchIcon} />
-                  <TextBox
-                    id={inputId}
-                    ref={inputRef}
-                    className={styles.overlayInput}
-                    type="search"
-                    placeholder={placeholder ?? "Type to search…"}
-                    value={inputValue}
-                    onDidChange={(value) => setInputValue(value)}
-                    onKeyDown={handleKeyDown}
-                    aria-autocomplete="list"
-                    aria-controls={`${inputId}-listbox`}
-                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-                  />
-                </div>
-
-                {/* Category tabs — only when there's a query */}
-                {hasQuery && (
-                  <div className={styles.overlayControls}>
-                    <OverlayCategoryTabs
-                      categories={availableCategories}
-                      selectedCategories={selectedCategories}
-                      onSelectOne={onSelectOneCategory}
-                      onClearAll={onClearAllCategories}
+                <div
+                  className={classnames(styles.overlayPanel)}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Search"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Input row */}
+                  <div className={styles.overlayInputRow}>
+                    <Icon name="search" className={styles.overlaySearchIcon} />
+                    <TextBox
+                      id={inputId}
+                      ref={inputRef}
+                      className={styles.overlayInput}
+                      type="search"
+                      placeholder={placeholder ?? "Type to search…"}
+                      value={inputValue}
+                      onDidChange={(value) => setInputValue(value)}
+                      onKeyDown={handleKeyDown}
+                      aria-autocomplete="list"
+                      aria-controls={`${inputId}-listbox`}
+                      aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
                     />
                   </div>
-                )}
 
-                {/* Results */}
-                {hasQuery && (
-                  <ul
-                    id={`${inputId}-listbox`}
-                    ref={listRef}
-                    className={classnames(styles.list, styles.overlayList)}
-                    role="listbox"
-                    aria-label="Search results"
-                  >
-                    {overlayResultsListJsx}
-                  </ul>
-                )}
+                  {/* Category tabs — only when there's a query */}
+                  {hasQuery && (
+                    <div className={styles.overlayControls}>
+                      <OverlayCategoryTabs
+                        categories={availableCategories}
+                        selectedCategories={selectedCategories}
+                        onSelectOne={onSelectOneCategory}
+                        onClearAll={onClearAllCategories}
+                      />
+                    </div>
+                  )}
+
+                  {/* Results */}
+                  {hasQuery && (
+                    <ul
+                      id={`${inputId}-listbox`}
+                      ref={listRef}
+                      className={classnames(
+                        styles.list,
+                        styles.overlayList,
+                        styles.overlayResultsList,
+                      )}
+                      role="listbox"
+                      aria-label="Search results"
+                    >
+                      {overlayResultsListJsx}
+                    </ul>
+                  )}
+                </div>
               </div>
-            </div>
-          </div>, document.body
-        )}
+            </div>,
+            document.body,
+          )}
       </span>
     );
   }
@@ -535,36 +553,34 @@ export const Search = ({
           </PopoverAnchor>
         )}
         {show && allResults && hasQuery && (
-          <Portal>
-            <PopoverContent
-              align="end"
-              onOpenAutoFocus={(e) => e.preventDefault()}
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              onEscapeKeyDown={() => setShow(false)}
-              onFocusOutside={(e) => e.preventDefault()}
-              className={classnames(styles.listPanel, className)}
+          <PopoverContent
+            align="end"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+            onCloseAutoFocus={(e) => e.preventDefault()}
+            onEscapeKeyDown={() => setShow(false)}
+            onFocusOutside={(e) => e.preventDefault()}
+            className={classnames(styles.listPanel, className)}
+          >
+            {availableCategories.length > 1 && (
+              <div className={styles.overlayControls}>
+                <OverlayCategoryTabs
+                  categories={availableCategories}
+                  selectedCategories={selectedCategories}
+                  onSelectOne={onSelectOneCategory}
+                  onClearAll={onClearAllCategories}
+                />
+              </div>
+            )}
+            <ul
+              id={`${inputId}-listbox`}
+              ref={listRef}
+              className={classnames(styles.list, styles.overlayList)}
+              role="listbox"
+              aria-label="Search results"
             >
-              {availableCategories.length > 1 && (
-                <div className={styles.overlayControls}>
-                  <OverlayCategoryTabs
-                    categories={availableCategories}
-                    selectedCategories={selectedCategories}
-                    onSelectOne={onSelectOneCategory}
-                    onClearAll={onClearAllCategories}
-                  />
-                </div>
-              )}
-              <ul
-                id={`${inputId}-listbox`}
-                ref={listRef}
-                className={classnames(styles.list, styles.overlayList)}
-                role="listbox"
-                aria-label="Search results"
-              >
-                {overlayResultsListJsx}
-              </ul>
-            </PopoverContent>
-          </Portal>
+              {overlayResultsListJsx}
+            </ul>
+          </PopoverContent>
         )}
       </Popover>
     </span>
@@ -578,16 +594,19 @@ type NoResultsPanelProps = {
   showSuggestion: boolean;
 };
 
-function NoResultsPanel({ message, suggestedQueries, onQuerySelect, showSuggestion }: NoResultsPanelProps) {
+function NoResultsPanel({
+  message,
+  suggestedQueries,
+  onQuerySelect,
+  showSuggestion,
+}: NoResultsPanelProps) {
   return (
     <div className={styles.noResultsPanel} role="status" aria-live="polite">
       <Text variant="em" className={styles.noResultsMessage}>
         {message ?? "No results found"}
       </Text>
       {showSuggestion && (
-        <Text className={styles.noResultsHint}>
-          Try broadening your search or check for typos.
-        </Text>
+        <Text className={styles.noResultsHint}>Try broadening your search or check for typos.</Text>
       )}
       {suggestedQueries && suggestedQueries.length > 0 && (
         <div className={styles.noResultsSuggestions}>
@@ -697,16 +716,18 @@ type SearchItemContentProps = SearchResult & {
  * Use the `item` prop to access the data original data.
  */
 const SearchItemContent = forwardRef(function SearchItemContent(
-  { idx, item, matches, maxContentMatchNumber, onClick, showPreviewMetadata = true }: SearchItemContentProps,
+  {
+    idx,
+    item,
+    matches,
+    maxContentMatchNumber,
+    onClick,
+    showPreviewMetadata = true,
+  }: SearchItemContentProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
-    <LinkNative
-      ref={forwardedRef}
-      to={item.path}
-      onClick={onClick}
-      className={styles.itemLink}
-    >
+    <LinkNative ref={forwardedRef} to={item.path} onClick={onClick} className={styles.itemLink}>
       <div className={styles.itemBody}>
         <div className={styles.itemTitleRow}>
           <Text variant="subtitle">
@@ -715,9 +736,7 @@ const SearchItemContent = forwardRef(function SearchItemContent(
         </div>
         {showPreviewMetadata && (item.category || item.path) && (
           <div className={styles.previewMetadata}>
-            {item.category && (
-              <span className={styles.categoryBadge}>{item.category}</span>
-            )}
+            {item.category && <span className={styles.categoryBadge}>{item.category}</span>}
             {item.path && (
               <span className={styles.pathBreadcrumb}>
                 {parsePathBreadcrumb(item.path).map((segment, i, arr) => (
@@ -950,7 +969,10 @@ const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
   threshold: 0.6,
   ignoreLocation: true,
   ignoreFieldNorm: true,
-  keys: [{ name: "title", weight: 2 }, { name: "content", weight: 1 }],
+  keys: [
+    { name: "title", weight: 2 },
+    { name: "content", weight: 1 },
+  ],
 };
 
 function useSearch(
@@ -963,7 +985,8 @@ function useSearch(
   if (!fuseRef.current) fuseRef.current = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
 
   const relaxedFuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!relaxedFuseRef.current) relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
+  if (!relaxedFuseRef.current)
+    relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
 
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
@@ -1053,7 +1076,13 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
-type SearchItemData = { path: string; title: string; content: string; category?: string; date?: string | number };
+type SearchItemData = {
+  path: string;
+  title: string;
+  content: string;
+  category?: string;
+  date?: string | number;
+};
 function isSearchItemDataArray(data: any): data is SearchItemData[] {
   return (
     Array.isArray(data) &&
