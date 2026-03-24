@@ -22,7 +22,13 @@ import {
   Icon,
   SEARCH_DEFAULT_CATEGORY,
 } from "xmlui";
-import type { FuseResult, FuseResultMatch, IFuseOptions, RangeTuple } from "fuse.js";
+import type {
+  FuseOptionKeyObject,
+  FuseResult,
+  FuseResultMatch,
+  IFuseOptions,
+  RangeTuple,
+} from "fuse.js";
 import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
@@ -41,9 +47,8 @@ type Props = {
   showPreviewMetadata?: boolean;
   defaultSelectedCategories?: string[];
   pageSize?: number;
-  enableSpellCorrection?: boolean;
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
-   *  "inline": popover dropdown anchored to the input with keyboard shortcut footer. */
+   * "inline": popover dropdown anchored to the input with keyboard shortcut footer. */
   mode?: "overlay" | "inline";
 };
 
@@ -51,6 +56,39 @@ export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber
   limit: 10,
   maxContentMatchNumber: 3,
 };
+
+// --- Search config (from v1)
+
+const keys: Array<FuseOptionKeyObject<SearchItemData>> = [
+  {
+    name: "title",
+    weight: 2,
+  },
+  {
+    name: "content",
+    weight: 1,
+  },
+];
+
+const searchOptions: IFuseOptions<SearchItemData> = {
+  // isCaseSensitive: false,
+  includeScore: true,
+  // ignoreDiacritics: false,
+  shouldSort: true, // <- sorts by "score"
+  includeMatches: true,
+  // findAllMatches: false,
+  minMatchCharLength: 2,
+  // location: 0,
+  threshold: 0,
+  // distance: 500,
+  // useExtendedSearch: true,
+  ignoreLocation: true,
+  ignoreFieldNorm: true,
+  // fieldNormWeight: 1,
+  keys,
+};
+
+const fuse = new Fuse<SearchItemData>([], searchOptions);
 
 const MIN_MATCH_LENGTH = 2;
 
@@ -67,23 +105,23 @@ export const Search = ({
   showPreviewMetadata = true,
   defaultSelectedCategories,
   pageSize,
-  enableSpellCorrection = true,
   mode = "overlay",
 }: Props) => {
   const useOverlay = mode === "overlay";
   const _id = useId();
   const inputId = id || _id;
+
   const inputRef = useRef<HTMLInputElement>(null);
   const itemRefs = useRef<HTMLLIElement[]>([]);
   const itemLinkRefs = useRef<HTMLDivElement[]>([]); // <- this is a messy solution
   const listRef = useRef<HTMLUListElement>(null);
+
   const [activeIndex, setActiveIndex] = useState(-1);
   const [isFocused, setIsFocused] = useState(false);
   const [isExpanded, setIsExpanded] = useState(!collapsible);
-  const [animationDirection, setAnimationDirection] = useState<"expanding" | "collapsing" | null>(
-    null,
-  );
-
+  const [animationDirection, setAnimationDirection] = useState<
+    "expanding" | "collapsing" | null
+  >(null);
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
 
   const openOverlay = useCallback(() => {
@@ -95,7 +133,8 @@ export const Search = ({
     // Focus the native <input> directly (not the wrapper div) to reliably trigger
     // the virtual keyboard on mobile — the div relay goes through React events and
     // loses the gesture context on iOS Safari
-    const nativeInput = inputRef.current?.querySelector?.("input") ?? inputRef.current;
+    const nativeInput =
+      inputRef.current?.querySelector?.("input") ?? inputRef.current;
     nativeInput?.focus({ preventScroll: true });
   }, []);
 
@@ -111,17 +150,61 @@ export const Search = ({
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
-
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
     () => new Set(defaultSelectedCategories ?? []),
   );
 
-  // --- Merge data, do search, postprocess results
-  const {
-    results: allResults,
-    totalCount,
-    suggestion,
-  } = useSearch(data, limit, debouncedValue, enableSpellCorrection);
+  // --- Data preparation
+
+  const content = useSearchContextContent();
+
+  const staticData = useMemo(() => {
+    if (!data) return [];
+    if (typeof data !== "object") {
+      console.warn("Search data should be an object with path keys and string content values");
+      return [];
+    }
+    if (!isSearchItemDataArray(data)) {
+      console.warn(
+        "Search data should be an array of objects with 'path', 'title' and 'content' string properties",
+      );
+      return [];
+    }
+    return data;
+  }, [data]);
+
+  // Does very basic deduplication of search data based on path and title, preferring entries with longer content
+  const mergedData = useMemo(() => {
+    const combined = [...staticData, ...Object.values(content ?? {})];
+    const deduped = new Map<string, SearchItemData>();
+    for (const item of combined) {
+      const key = `${item.path}::${item.title}`;
+      const existing = deduped.get(key);
+      if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
+        deduped.set(key, item);
+      }
+    }
+    return Array.from(deduped.values());
+  }, [content, staticData]);
+
+  useEffect(() => {
+    fuse.setCollection(mergedData);
+  }, [mergedData]);
+
+  // --- Search execution (v1 style — inline useMemo)
+
+  const allResults: SearchResult[] = useMemo(() => {
+    // Ignore single characters
+    if (debouncedValue.length < MIN_MATCH_LENGTH) return [];
+
+    const limited = fuse.search(debouncedValue, {
+      limit: limit ?? defaultProps.limit,
+    });
+    const mapped = postProcessSearch(limited, debouncedValue);
+    return groupAndSortByCategory(mapped);
+  }, [debouncedValue, limit]);
+
+  const totalCount = allResults.length;
 
   // Reset page and category filter when query changes
   useEffect(() => {
@@ -147,7 +230,9 @@ export const Search = ({
   const results = categoryFilteredResults.slice(0, page * effectivePageSize);
   const hasMore = results.length < categoryFilteredResults.length;
 
-  const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(null);
+  const [navigationSource, setNavigationSource] = useState<"keyboard" | "mouse" | null>(
+    null,
+  );
 
   // render-related state
   const [show, setShow] = useState(false);
@@ -155,6 +240,7 @@ export const Search = ({
   // Overlay mode: use useEffect (render doesn't need to be synchronous)
   // Inline mode: use useLayoutEffect (avoids flash of stale active index)
   const useResultEffect = useOverlay ? useEffect : useLayoutEffect;
+
   useResultEffect(() => {
     if (allResults.length > 0) setShow(true);
     setActiveIndex(0);
@@ -207,7 +293,6 @@ export const Search = ({
         }
         return;
       }
-
       if (!show) return;
 
       if (e.key === "ArrowDown") {
@@ -252,12 +337,14 @@ export const Search = ({
 
     // Measure any sticky category header currently pinned at the top of the scroll container
     let stickyHeight = 0;
-    scrollContainer.querySelectorAll(`.${styles.categoryHeader}`).forEach((header) => {
-      const headerRect = header.getBoundingClientRect();
-      if (Math.abs(headerRect.top - containerRect.top) < 2) {
-        stickyHeight = Math.max(stickyHeight, headerRect.height);
-      }
-    });
+    scrollContainer
+      .querySelectorAll(`.${styles.categoryHeader}`)
+      .forEach((header) => {
+        const headerRect = header.getBoundingClientRect();
+        if (Math.abs(headerRect.top - containerRect.top) < 2) {
+          stickyHeight = Math.max(stickyHeight, headerRect.height);
+        }
+      });
 
     const itemTop = itemRect.top - containerRect.top;
     const itemBottom = itemRect.bottom - containerRect.top;
@@ -278,14 +365,6 @@ export const Search = ({
   const refocusInput = useCallback(() => {
     inputRef.current?.focus({ preventScroll: true });
   }, []);
-
-  const onDidYouMeanAccept = useCallback(
-    (s: string) => {
-      setInputValue(s);
-      refocusInput();
-    },
-    [refocusInput],
-  );
 
   const onQuerySelect = useCallback(
     (q: string) => {
@@ -319,22 +398,26 @@ export const Search = ({
 
   const overlayResultsListJsx = (
     <>
-      {suggestion && enableSpellCorrection && (
-        <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
-          <DidYouMeanBanner suggestion={suggestion} onAccept={onDidYouMeanAccept} />
-        </li>
-      )}
       {results.length > 0 &&
         results.map((result, idx) => {
           const effectiveCategory = result.item.category ?? SEARCH_DEFAULT_CATEGORY;
           const prevEffectiveCategory =
-            idx > 0 ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY) : undefined;
+            idx > 0
+              ? (results[idx - 1].item.category ?? SEARCH_DEFAULT_CATEGORY)
+              : undefined;
           const showCategoryHeader = effectiveCategory !== prevEffectiveCategory;
+
           return (
             <Fragment key={result.item.path}>
               {showCategoryHeader && !allUncategorized && (
-                <li className={styles.categoryHeader} role="presentation" aria-hidden="true">
-                  <Text className={styles.categoryHeaderText}>{effectiveCategory}</Text>
+                <li
+                  className={styles.categoryHeader}
+                  role="presentation"
+                  aria-hidden="true"
+                >
+                  <Text className={styles.categoryHeaderText}>
+                    {effectiveCategory}
+                  </Text>
                 </li>
               )}
               <li
@@ -363,16 +446,17 @@ export const Search = ({
             </Fragment>
           );
         })}
+
       {results.length === 0 && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <NoResultsPanel
             message={noResultsMessage}
             suggestedQueries={suggestedQueries}
             onQuerySelect={onQuerySelect}
-            showSuggestion={!suggestion || !enableSpellCorrection}
           />
         </li>
       )}
+
       {(hasMore || totalCount > effectivePageSize) && results.length > 0 && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
           <div className={styles.loadMoreRow}>
@@ -401,6 +485,7 @@ export const Search = ({
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
+
         {/* Trigger — either a toggle button (collapsible) or an always-visible input */}
         {!isOverlayOpen && collapsible && (
           <Button
@@ -412,6 +497,7 @@ export const Search = ({
             className={styles.searchToggleButton}
           />
         )}
+
         {!isOverlayOpen && !collapsible && (
           <div
             onPointerDown={(e) => {
@@ -430,12 +516,16 @@ export const Search = ({
             />
           </div>
         )}
+
         {/* Overlay */}
         {isOverlayOpen && (
           <div className={className}>
             {/* Backdrop — click outside to close */}
             <div
-              className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
+              className={classnames(
+                styles.overlayBackdrop,
+                styles.overlayBackdropMobile,
+              )}
               onPointerDown={closeOverlay}
             >
               <div
@@ -462,7 +552,9 @@ export const Search = ({
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
                     aria-controls={`${inputId}-listbox`}
-                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+                    aria-activedescendant={
+                      activeIndex >= 0 ? `option-${activeIndex}` : undefined
+                    }
                   />
                 </div>
 
@@ -509,6 +601,7 @@ export const Search = ({
         <VisuallyHidden>
           <label htmlFor={inputId}>Search Field</label>
         </VisuallyHidden>
+
         {collapsible && !isExpanded && animationDirection === null ? (
           <Button
             variant="ghost"
@@ -539,10 +632,13 @@ export const Search = ({
               onKeyDown={handleKeyDown}
               aria-autocomplete="list"
               aria-controls={`${inputId}-listbox`}
-              aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
+              aria-activedescendant={
+                activeIndex >= 0 ? `option-${activeIndex}` : undefined
+              }
             />
           </PopoverAnchor>
         )}
+
         {show && allResults && hasQuery && (
           <PopoverContent
             align="end"
@@ -562,6 +658,7 @@ export const Search = ({
                 />
               </div>
             )}
+
             <ul
               id={`${inputId}-listbox`}
               ref={listRef}
@@ -578,27 +675,23 @@ export const Search = ({
   );
 };
 
+// --- Sub-components
+
 type NoResultsPanelProps = {
   message?: string;
   suggestedQueries?: string[];
   onQuerySelect: (query: string) => void;
-  showSuggestion: boolean;
 };
 
-function NoResultsPanel({
-  message,
-  suggestedQueries,
-  onQuerySelect,
-  showSuggestion,
-}: NoResultsPanelProps) {
+function NoResultsPanel({ message, suggestedQueries, onQuerySelect }: NoResultsPanelProps) {
   return (
     <div className={styles.noResultsPanel} role="status" aria-live="polite">
       <Text variant="em" className={styles.noResultsMessage}>
         {message ?? "No results found"}
       </Text>
-      {showSuggestion && (
-        <Text className={styles.noResultsHint}>Try broadening your search or check for typos.</Text>
-      )}
+      <Text className={styles.noResultsHint}>
+        Try broadening your search or check for typos.
+      </Text>
       {suggestedQueries && suggestedQueries.length > 0 && (
         <div className={styles.noResultsSuggestions}>
           {suggestedQueries.map((q) => (
@@ -648,7 +741,9 @@ function OverlayCategoryTabs({
       <button
         role="tab"
         aria-selected={allActive}
-        className={classnames(styles.overlayTab, { [styles.overlayTabActive]: allActive })}
+        className={classnames(styles.overlayTab, {
+          [styles.overlayTabActive]: allActive,
+        })}
         onMouseDown={(e) => e.preventDefault()}
         onClick={onClearAll}
       >
@@ -661,7 +756,9 @@ function OverlayCategoryTabs({
             key={cat}
             role="tab"
             aria-selected={active}
-            className={classnames(styles.overlayTab, { [styles.overlayTabActive]: active })}
+            className={classnames(styles.overlayTab, {
+              [styles.overlayTabActive]: active,
+            })}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => onSelectOne(cat)}
           >
@@ -669,28 +766,6 @@ function OverlayCategoryTabs({
           </button>
         );
       })}
-    </div>
-  );
-}
-
-// --- DidYouMeanBanner sub-component
-
-type DidYouMeanBannerProps = {
-  suggestion: string;
-  onAccept: (s: string) => void;
-};
-
-function DidYouMeanBanner({ suggestion, onAccept }: DidYouMeanBannerProps) {
-  return (
-    <div className={styles.didYouMeanBanner}>
-      <Text className={styles.didYouMeanText}>Did you mean: </Text>
-      <button
-        className={styles.didYouMeanSuggestion}
-        onMouseDown={(e) => e.preventDefault()}
-        onClick={() => onAccept(suggestion)}
-      >
-        {suggestion}
-      </button>
     </div>
   );
 }
@@ -704,7 +779,7 @@ type SearchItemContentProps = SearchResult & {
 
 /**
  * Renders a single search result.
- * Use the `item` prop to access the data original data.
+ * Use the item prop to access the data original data.
  */
 const SearchItemContent = forwardRef(function SearchItemContent(
   {
@@ -725,32 +800,44 @@ const SearchItemContent = forwardRef(function SearchItemContent(
             {highlightText(item.title, matches?.title?.indices) || item.title}
           </Text>
         </div>
+
         {showPreviewMetadata && (item.category || item.path) && (
           <div className={styles.previewMetadata}>
-            {item.category && <span className={styles.categoryBadge}>{item.category}</span>}
+            {item.category && (
+              <span className={styles.categoryBadge}>{item.category}</span>
+            )}
             {item.path && (
               <span className={styles.pathBreadcrumb}>
                 {parsePathBreadcrumb(item.path).map((segment, i, arr) => (
                   <Fragment key={i}>
                     <span className={styles.pathSegment}>{segment}</span>
-                    {i < arr.length - 1 && <span className={styles.pathSeparator}> / </span>}
+                    {i < arr.length - 1 && (
+                      <span className={styles.pathSeparator}> / </span>
+                    )}
                   </Fragment>
                 ))}
               </span>
             )}
           </div>
         )}
+
         <div className={styles.itemSnippets}>
           {/* content snippets */}
           {matches?.content?.indices &&
-            formatContentSnippet(item.content, matches.content.indices, maxContentMatchNumber).map(
-              (snippet, snipIdx) => (
-                <div key={`${item.path}-${idx}-${snipIdx}`} className={styles.snippet}>
-                  <Text>{snippet}</Text>
-                </div>
-              ),
-            )}
+            formatContentSnippet(
+              item.content,
+              matches.content.indices,
+              maxContentMatchNumber,
+            ).map((snippet, snipIdx) => (
+              <div
+                key={`${item.path}-${idx}-${snipIdx}`}
+                className={styles.snippet}
+              >
+                <Text>{snippet}</Text>
+              </div>
+            ))}
         </div>
+
         {/* Display the number of other matches if there are any */}
         {matches.content?.indices && (
           <Text variant="em">
@@ -762,21 +849,27 @@ const SearchItemContent = forwardRef(function SearchItemContent(
   );
 });
 
-// --- Utilities
+// --- Utilities (search logic from v1)
 
-function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debouncedValue: string) {
+function postProcessSearch(
+  searchResults: FuseResult<SearchItemData>[],
+  debouncedValue: string,
+) {
   // Minimum number of characters to trigger a long text search filter
   const longTextSearchThreshold = 25;
   // Number of characters needed to accept the search term as a match in the title
   const titleAcceptanceThreshold = debouncedValue.length - 1;
   // Number of character threshold to accept the search term as a match in the content
   const longContentAcceptance = Math.floor(debouncedValue.length * 0.5);
+
   // Determines the size of the area around a string index
   // used in search filtering and highlight correction
   const shortTextSearchRadius = 3;
   const longTextSearchRadius = 50;
   const textSearchRadius =
-    debouncedValue.length < longTextSearchThreshold ? shortTextSearchRadius : longTextSearchRadius;
+    debouncedValue.length < longTextSearchThreshold
+      ? shortTextSearchRadius
+      : longTextSearchRadius;
 
   return searchResults
     .map((result) => ({
@@ -784,17 +877,18 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
       score: result.score,
       matches: mapMatchIndices(result),
     }))
-    .filter((item) => Object.values(item.matches).some((match) => match.indices.length > 0));
+    .filter((item) =>
+      Object.values(item.matches).some((match) => match.indices.length > 0),
+    );
 
   // ---
-
   function mapMatchIndices(result: FuseResult<SearchItemData>) {
     return (result.matches ?? [])
       .filter((match) => !!match.key)
       .reduce<MatchesByKey>((acc, match) => {
         const matchKey = match.key as keyof SearchItemData;
-        const fieldValue = result.item[matchKey];
 
+        const fieldValue = result.item[matchKey];
         // Skip fields that have no value (e.g. optional fields like category)
         if (fieldValue === undefined) return acc;
         // Skip non-string fields
@@ -803,14 +897,17 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
         // --- Prefilter matches that are too short/significantly misaligned compared to the search term
         const filteredMatches = match.indices.filter((index) => {
           const foundSubstrLength = index[1] - index[0];
+
           // Title
           if (matchKey === "title") {
             return foundSubstrLength >= titleAcceptanceThreshold;
           }
+
           // Content: long text search
           if (debouncedValue.length >= longTextSearchThreshold) {
             return foundSubstrLength >= longContentAcceptance;
           }
+
           // Content: regular text search
           return fieldValue
             .slice(index[0], index[1] + 1)
@@ -819,221 +916,54 @@ function postProcessSearch(searchResults: FuseResult<SearchItemData>[], debounce
         });
 
         // --- Restrict highlights that are longer than the original search term
-        const highlightAdjustedMatches = filteredMatches.reduce<RangeTuple[]>((matchAcc, index) => {
-          if (matchKey === "title") {
-            if (index[1] - index[0] > debouncedValue.length) {
-              index[1] = index[0] + debouncedValue.length;
+        const highlightAdjustedMatches = filteredMatches.reduce<RangeTuple[]>(
+          (matchAcc, index) => {
+            if (matchKey === "title") {
+              if (index[1] - index[0] > debouncedValue.length) {
+                index[1] = index[0] + debouncedValue.length;
+              }
             }
-          }
 
-          const origTextLength = fieldValue.length;
-          const startIdx = Math.max(index[0] - textSearchRadius, 0);
-          const endIdx = Math.min(index[1] + textSearchRadius, origTextLength);
-          const textSnippet = fieldValue.toLocaleLowerCase();
+            const origTextLength = fieldValue.length;
+            const startIdx = Math.max(index[0] - textSearchRadius, 0);
+            const endIdx = Math.min(
+              index[1] + textSearchRadius,
+              origTextLength,
+            );
 
-          const position = textSnippet.indexOf(debouncedValue.toLocaleLowerCase(), startIdx);
-          if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
-            index[0] = position;
-            index[1] = position + debouncedValue.length - 1;
+            const textSnippet = fieldValue.toLocaleLowerCase();
+            const position = textSnippet.indexOf(
+              debouncedValue.toLocaleLowerCase(),
+              startIdx,
+            );
 
-            if (matchAcc.findIndex((m) => m[0] === index[0] && m[1] === index[1]) === -1) {
-              matchAcc.push(index);
+            if (position !== -1 && position + debouncedValue.length - 1 <= endIdx) {
+              index[0] = position;
+              index[1] = position + debouncedValue.length - 1;
+
+              if (
+                matchAcc.findIndex(
+                  (m) => m[0] === index[0] && m[1] === index[1],
+                ) === -1
+              ) {
+                matchAcc.push(index);
+              }
             }
-          }
 
-          return matchAcc;
-        }, []);
+            return matchAcc;
+          },
+          [],
+        );
 
         // Map match indexes to results
         acc[matchKey] = {
           value: match.value,
           indices: highlightAdjustedMatches,
         };
+
         return acc;
       }, {});
   }
-}
-
-/**
- * Formats a snippet of text. Determines which ranges are highlighted and how big the snippet is.
- */
-function formatContentSnippet(
-  text: string,
-  ranges?: readonly RangeTuple[],
-  maxContentMatchNumber?: number,
-) {
-  if (!ranges || ranges.length === 0) return [text.slice(0, 100)];
-  const contextLength = 50;
-
-  const limitedRanges = ranges.slice(0, maxContentMatchNumber);
-  const contextRanges: RangeTuple[] = limitedRanges.map(([start, end]) => {
-    let contextStart = 0;
-    let contextEnd = text.length - 1;
-
-    if (0 <= start - contextLength) {
-      contextStart = start - contextLength;
-    }
-    if (end + contextLength <= text.length - 1) {
-      contextEnd = end + contextLength;
-    }
-    return [contextStart, contextEnd];
-  });
-  const highlightRanges: RangeTuple[] = limitedRanges.map(([start, end], idx) => {
-    return [start - contextRanges[idx][0], end - contextRanges[idx][0]];
-  });
-
-  return contextRanges.map(([start, end], idx) => {
-    const textWithEllipsis: React.ReactNode[] = [];
-    if (start > 0) {
-      textWithEllipsis.push("...");
-    }
-
-    textWithEllipsis.push(highlightText(text.slice(start, end), [highlightRanges[idx]]));
-
-    if (end < text.length - 1) {
-      textWithEllipsis.push("...");
-    }
-    return textWithEllipsis;
-  });
-}
-
-/**
- * Highlights specified ranges in a string with JSX.
- */
-function highlightText(text: string, ranges?: readonly RangeTuple[]) {
-  if (!ranges || ranges.length === 0) return [text];
-
-  const result: React.ReactNode[] = [];
-  let lastIndex = 0;
-  ranges.forEach(([start, end], index) => {
-    if (lastIndex < start) {
-      result.push(text.slice(lastIndex, start));
-    }
-    result.push(
-      // style is temporary, fontSize should be inherited if Text is inside other Text
-      <Text
-        key={`${index}-highlighted`}
-        variant="marked"
-        style={{ fontSize: "inherit", fontWeight: "inherit", color: "inherit" }}
-      >
-        {text.slice(start, end + 1)}
-      </Text>,
-    );
-    lastIndex = end + 1;
-  });
-  if (lastIndex < text.length) {
-    result.push(text.slice(lastIndex));
-  }
-  return result;
-}
-
-function pluralize(number: number, singular: string, plural: string): string {
-  if (number === 1) {
-    return `${number} ${singular}`;
-  }
-  return `${number} ${plural}`;
-}
-
-function parsePathBreadcrumb(path: string): string[] {
-  return path.split("/").filter((s) => s.length > 0);
-}
-
-const FUSE_SEARCH_OPTIONS: IFuseOptions<SearchItemData> = {
-  includeScore: true,
-  shouldSort: true, // <- sorts by "score"
-  includeMatches: true,
-  minMatchCharLength: MIN_MATCH_LENGTH,
-  threshold: 0,
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-  keys: [
-    { name: "title", weight: 2 },
-    { name: "content", weight: 1 },
-  ],
-};
-
-const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
-  includeScore: true,
-  shouldSort: true,
-  includeMatches: false,
-  minMatchCharLength: MIN_MATCH_LENGTH,
-  threshold: 0.6,
-  ignoreLocation: true,
-  ignoreFieldNorm: true,
-  keys: [
-    { name: "title", weight: 2 },
-    { name: "content", weight: 1 },
-  ],
-};
-
-const fuse = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
-const relaxedFuse = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
-
-function useSearch(
-  data: SearchItemData[],
-  limit: number,
-  query: string,
-  enableSpellCorrection: boolean,
-): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
-  // --- Convert data to a format better handled by the search engine
-  const dynamicData = useSearchContextContent();
-  const staticData = useMemo(() => {
-    if (!data) return [];
-    if (typeof data !== "object") {
-      console.warn("Search data should be an object with path keys and string content values");
-      return [];
-    }
-    if (!isSearchItemDataArray(data)) {
-      console.warn(
-        "Search data should be an array of objects with 'path', 'title' and 'content' string properties",
-      );
-      return [];
-    }
-    return data;
-  }, [data]);
-
-  // Does very basic deduplication of search data based on path and title, preferring entries with longer content
-  const mergedData = useMemo(() => {
-    const combined = [...staticData, ...Object.values(dynamicData ?? {})];
-    const deduped = new Map<string, SearchItemData>();
-    for (const item of combined) {
-      const key = `${item.path}::${item.title}`;
-      const existing = deduped.get(key);
-      if (!existing || (item.content?.length ?? 0) > (existing.content?.length ?? 0)) {
-        deduped.set(key, item);
-      }
-    }
-    return Array.from(deduped.values());
-  }, [dynamicData, staticData]);
-
-  useEffect(() => {
-    fuse.setCollection(mergedData);
-    relaxedFuse.setCollection(mergedData);
-  }, [mergedData]);
-
-  // --- Execute search & post-process results
-  const searchOutput = useMemo(() => {
-    if (query.length < MIN_MATCH_LENGTH) {
-      return { results: [], totalCount: 0, suggestion: null };
-    }
-
-    const fetchLimit = Math.min(limit * 10, 200);
-    const raw = fuse.search(query, { limit: fetchLimit });
-    const mapped = postProcessSearch(raw, query);
-    const grouped = groupAndSortByCategory(mapped);
-
-    let suggestion: string | null = null;
-    if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
-      const relaxed = relaxedFuse.search(query, { limit: 1 });
-      if (relaxed.length > 0) {
-        suggestion = relaxed[0].item.title;
-      }
-    }
-
-    return { results: grouped, totalCount: grouped.length, suggestion };
-  }, [query, limit, enableSpellCorrection]);
-
-  return searchOutput;
 }
 
 /**
@@ -1063,6 +993,100 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
 
+/**
+ * Formats a snippet of text. Determines which ranges are highlighted and how big the snippet is.
+ */
+function formatContentSnippet(
+  text: string,
+  ranges?: readonly RangeTuple[],
+  maxContentMatchNumber?: number,
+) {
+  if (!ranges || ranges.length === 0) return [text.slice(0, 100)];
+
+  const contextLength = 50;
+  const limitedRanges = ranges.slice(0, maxContentMatchNumber);
+
+  const contextRanges: RangeTuple[] = limitedRanges.map(([start, end]) => {
+    let contextStart = 0;
+    let contextEnd = text.length - 1;
+
+    if (0 <= start - contextLength) {
+      contextStart = start - contextLength;
+    }
+    if (end + contextLength <= text.length - 1) {
+      contextEnd = end + contextLength;
+    }
+
+    return [contextStart, contextEnd];
+  });
+
+  const highlightRanges: RangeTuple[] = limitedRanges.map(([start, end], idx) => {
+    return [start - contextRanges[idx][0], end - contextRanges[idx][0]];
+  });
+
+  return contextRanges.map(([start, end], idx) => {
+    const textWithEllipsis: React.ReactNode[] = [];
+
+    if (start > 0) {
+      textWithEllipsis.push("...");
+    }
+
+    textWithEllipsis.push(highlightText(text.slice(start, end), [highlightRanges[idx]]));
+
+    if (end < text.length - 1) {
+      textWithEllipsis.push("...");
+    }
+
+    return textWithEllipsis;
+  });
+}
+
+/**
+ * Highlights specified ranges in a string with JSX.
+ */
+function highlightText(text: string, ranges?: readonly RangeTuple[]) {
+  if (!ranges || ranges.length === 0) return [text];
+
+  const result: React.ReactNode[] = [];
+  let lastIndex = 0;
+
+  ranges.forEach(([start, end], index) => {
+    if (lastIndex < start) {
+      result.push(text.slice(lastIndex, start));
+    }
+    result.push(
+      // style is temporary, fontSize should be inherited if Text is inside other Text
+      <Text
+        key={`${index}-highlighted`}
+        variant="marked"
+        style={{ fontSize: "inherit", fontWeight: "inherit", color: "inherit" }}
+      >
+        {text.slice(start, end + 1)}
+      </Text>,
+    );
+    lastIndex = end + 1;
+  });
+
+  if (lastIndex < text.length) {
+    result.push(text.slice(lastIndex));
+  }
+
+  return result;
+}
+
+function pluralize(number: number, singular: string, plural: string): string {
+  if (number === 1) {
+    return `${number} ${singular}`;
+  }
+  return `${number} ${plural}`;
+}
+
+function parsePathBreadcrumb(path: string): string[] {
+  return path.split("/").filter((s) => s.length > 0);
+}
+
+// --- Types
+
 type SearchItemData = {
   path: string;
   title: string;
@@ -1070,6 +1094,7 @@ type SearchItemData = {
   category?: string;
   date?: string | number;
 };
+
 function isSearchItemDataArray(data: any): data is SearchItemData[] {
   return (
     Array.isArray(data) &&
@@ -1084,6 +1109,7 @@ function isSearchItemDataArray(data: any): data is SearchItemData[] {
 type MatchesByKey = Partial<
   Record<keyof SearchItemData, Pick<FuseResultMatch, "indices" | "value">>
 >;
+
 type SearchResult = Omit<FuseResult<SearchItemData>, "refIndex" | "matches"> & {
   matches: MatchesByKey;
 };
