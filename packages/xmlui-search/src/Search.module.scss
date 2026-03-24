@@ -97,6 +97,9 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   margin-top: 4px;
   box-shadow: $boxShadow-Search;
 
+  @media (max-width: 600px) {
+    width: var(--radix-popover-trigger-width);
+  }
 }
 
 .list {
@@ -181,6 +184,10 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 
   &.fullWidth {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
     width: 100%;
   }
 

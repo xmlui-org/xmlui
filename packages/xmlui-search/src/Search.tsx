@@ -2,6 +2,7 @@ import {
   useCallback,
   useId,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -9,6 +10,7 @@ import {
   Fragment,
   type ForwardedRef,
 } from "react";
+import { createPortal } from "react-dom";
 import { flushSync } from "react-dom";
 import {
   LinkNative,
@@ -30,7 +32,6 @@ import Fuse from "fuse.js";
 import styles from "./Search.module.scss";
 import classnames from "classnames";
 import { Popover, PopoverAnchor, PopoverContent, Portal } from "@radix-ui/react-popover";
-import { createPortal } from "react-dom";
 
 type Props = {
   id?: string;
@@ -47,9 +48,8 @@ type Props = {
   pageSize?: number;
   enableSpellCorrection?: boolean;
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
-   *  "inline": the current expand-in-place animation inside the navbar.
-   *  "drawer": renders results inline below the input, no portal — safe inside a modal drawer. */
-  mode?: "overlay" | "inline" | "drawer";
+   *  "inline": popover dropdown anchored to the input with keyboard shortcut footer. */
+  mode?: "overlay" | "inline";
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {
@@ -77,7 +77,6 @@ export const Search = ({
   mode = "overlay",
 }: Props) => {
   const useOverlay = mode === "overlay";
-  const useDrawer = mode === "drawer";
   const _id = useId();
   const inputId = id || _id;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,17 +91,8 @@ export const Search = ({
   );
 
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-  const [drawerOverlayTop, setDrawerOverlayTop] = useState(0);
-  const triggerRef = useRef<HTMLDivElement>(null);
 
   const openOverlay = useCallback(() => {
-    if (triggerRef.current) {
-      setDrawerOverlayTop(triggerRef.current.getBoundingClientRect().top);
-    }
-    // Set synchronously so Sheet.tsx onFocusOutside/onInteractOutside checks it immediately
-    if (useDrawer) {
-      document.body.setAttribute("data-search-overlay-open", "true");
-    }
     // flushSync forces React to render the overlay synchronously so inputRef is populated
     // before we call focus(), keeping us within the user gesture context on mobile
     flushSync(() => {
@@ -113,17 +103,16 @@ export const Search = ({
     // loses the gesture context on iOS Safari
     const nativeInput = inputRef.current?.querySelector?.("input") ?? inputRef.current;
     nativeInput?.focus({ preventScroll: true });
-  }, [useDrawer]);
+  }, []);
 
   const closeOverlay = useCallback(() => {
-    document.body.removeAttribute("data-search-overlay-open");
     setIsOverlayOpen(false);
     setInputValue("");
     setShow(false);
     setActiveIndex(-1);
   }, []);
 
-const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("");
   // --- Why this solution?
   // Instead of useDeferredValue, we simply use useEffect + setTimeout to create a debounced value for the search query.
   // This is because Fuse.js searches are expensive and run synchronously in JS.
@@ -179,7 +168,10 @@ const [inputValue, setInputValue] = useState("");
   // render-related state
   const [show, setShow] = useState(false);
 
-  useEffect(() => {
+  // Overlay mode: use useEffect (render doesn't need to be synchronous)
+  // Inline mode: use useLayoutEffect (avoids flash of stale active index)
+  const useResultEffect = useOverlay ? useEffect : useLayoutEffect;
+  useResultEffect(() => {
     if (allResults.length > 0) setShow(true);
     setActiveIndex(0);
   }, [allResults]);
@@ -201,7 +193,6 @@ const [inputValue, setInputValue] = useState("");
       setInputValue("");
       setActiveIndex(-1);
     }
-    // For drawer mode: do nothing extra — keep the search overlay and mobile menu open
   }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
@@ -224,7 +215,7 @@ const [inputValue, setInputValue] = useState("");
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Escape") {
-        if (useOverlay || useDrawer) {
+        if (useOverlay) {
           closeOverlay();
         } else {
           setActiveIndex(-1);
@@ -256,7 +247,7 @@ const [inputValue, setInputValue] = useState("");
         itemLinkRefs.current[targetIndex]?.click();
       }
     },
-    [activeIndex, results.length, show, closeOverlay, useDrawer, useOverlay],
+    [activeIndex, results.length, show, closeOverlay, useOverlay],
   );
 
   // Does the scrolling to the active item, accounting for the sticky category header
@@ -328,11 +319,11 @@ const [inputValue, setInputValue] = useState("");
     refocusInput();
   }, [clearCategories, refocusInput]);
 
-  // Shared results list JSX — used by both overlay and popover modes
+  // Shared results list JSX — used by overlay mode
   const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
   const allUncategorized = results.every((r) => r.item.category == null);
 
-  const resultsListJsx = (
+  const overlayResultsListJsx = (
     <>
       {suggestion && enableSpellCorrection && (
         <li role="presentation" aria-hidden="true" style={{ listStyle: "none" }}>
@@ -403,6 +394,7 @@ const [inputValue, setInputValue] = useState("");
     </>
   );
 
+  // --- Overlay mode ---
   if (useOverlay) {
     return (
       <span className={className}>
@@ -469,7 +461,7 @@ const [inputValue, setInputValue] = useState("");
                   />
                 </div>
 
-                {/* Category tabs + sort — only when there's a query */}
+                {/* Category tabs — only when there's a query */}
                 {hasQuery && (
                   <div className={styles.overlayControls}>
                     <OverlayCategoryTabs
@@ -483,17 +475,15 @@ const [inputValue, setInputValue] = useState("");
 
                 {/* Results */}
                 {hasQuery && (
-                  <>
-                    <ul
-                      id={`${inputId}-listbox`}
-                      ref={listRef}
-                      className={classnames(styles.list, styles.overlayList)}
-                      role="listbox"
-                      aria-label="Search results"
-                    >
-                      {resultsListJsx}
-                    </ul>
-                  </>
+                  <ul
+                    id={`${inputId}-listbox`}
+                    ref={listRef}
+                    className={classnames(styles.list, styles.overlayList)}
+                    role="listbox"
+                    aria-label="Search results"
+                  >
+                    {overlayResultsListJsx}
+                  </ul>
                 )}
               </div>
             </div>
@@ -503,88 +493,7 @@ const [inputValue, setInputValue] = useState("");
     );
   }
 
-  if (useDrawer) {
-    return (
-      <span className={className} style={{ display: "block" }}>
-        <VisuallyHidden>
-          <label htmlFor={inputId}>Search Field</label>
-        </VisuallyHidden>
-        {/* Trigger — always in DOM so pointer events complete within the Sheet */}
-        <div
-          ref={triggerRef}
-          onPointerDown={(e) => { e.preventDefault(); e.stopPropagation(); openOverlay(); }}
-          style={{ cursor: "text" }}
-        >
-          <TextBox
-            className={classnames(styles.input, styles.fullWidth)}
-            type="search"
-            placeholder={placeholder ?? "Type to search"}
-            value=""
-            startIcon="search"
-            readOnly
-          />
-        </div>
-        {/* Overlay via portal — drawer is already closed by the time this renders */}
-        {isOverlayOpen && createPortal(
-          <div className={className}>
-            <div className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)} onClick={closeOverlay}>
-              <div
-                className={classnames(styles.overlayPanel, styles.overlayPanelMobile)}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Search"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className={styles.drawerInputRow}>
-                  <TextBox
-                    id={inputId}
-                    ref={inputRef}
-                    className={classnames(styles.input, styles.fullWidth)}
-                    type="search"
-                    placeholder={placeholder ?? "Type to search"}
-                    value={inputValue}
-                    startIcon="search"
-                    onDidChange={(value) => setInputValue(value)}
-                    onKeyDown={handleKeyDown}
-                    aria-autocomplete="list"
-                    aria-controls={`${inputId}-listbox`}
-                    aria-activedescendant={activeIndex >= 0 ? `option-${activeIndex}` : undefined}
-                  />
-                </div>
-                {hasQuery && (
-                  <div className={styles.drawerResultsWrapper}>
-                    <div className={styles.drawerControls}>
-                      {availableCategories.length > 1 && (
-                        <div className={styles.drawerCategoryRow}>
-                          <OverlayCategoryTabs
-                            categories={availableCategories}
-                            selectedCategories={selectedCategories}
-                            onSelectOne={onSelectOneCategory}
-                            onClearAll={onClearAllCategories}
-                          />
-                        </div>
-                      )}
-                    </div>
-                    <ul
-                      id={`${inputId}-listbox`}
-                      ref={listRef}
-                      className={classnames(styles.list, styles.overlayList, styles.drawerOverlayList)}
-                      role="listbox"
-                      aria-label="Search results"
-                    >
-                      {resultsListJsx}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
-      </span>
-    );
-  }
-
+  // --- Inline mode ---
   return (
     <span className={className}>
       <Popover open={show} onOpenChange={setShow}>
@@ -652,7 +561,7 @@ const [inputValue, setInputValue] = useState("");
                 role="listbox"
                 aria-label="Search results"
               >
-                {resultsListJsx}
+                {overlayResultsListJsx}
               </ul>
             </PopoverContent>
           </Portal>
@@ -754,7 +663,7 @@ function OverlayCategoryTabs({
   );
 }
 
-// --- F: DidYouMeanBanner sub-component
+// --- DidYouMeanBanner sub-component
 
 type DidYouMeanBannerProps = {
   suggestion: string;
@@ -786,7 +695,6 @@ type SearchItemContentProps = SearchResult & {
 /**
  * Renders a single search result.
  * Use the `item` prop to access the data original data.
- *
  */
 const SearchItemContent = forwardRef(function SearchItemContent(
   { idx, item, matches, maxContentMatchNumber, onClick, showPreviewMetadata = true }: SearchItemContentProps,
@@ -1093,7 +1001,7 @@ function useSearch(
     relaxedFuseRef.current.setCollection(mergedData);
   }, [mergedData]);
 
-  // --- Step 3: Execute search & post-process results
+  // --- Execute search & post-process results
   const searchOutput = useMemo(() => {
     if (query.length < MIN_MATCH_LENGTH) {
       return { results: [], totalCount: 0, suggestion: null };
