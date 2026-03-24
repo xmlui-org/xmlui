@@ -1,12 +1,12 @@
 import {
   useCallback,
+  useDeferredValue,
   useId,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  useTransition,
   forwardRef,
   Fragment,
   type ForwardedRef,
@@ -107,15 +107,7 @@ export const Search = ({
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [, startSearchTransition] = useTransition();
-
-  const updateSearchValue = useCallback((value: string) => {
-    setInputValue(value);
-    startSearchTransition(() => {
-      setSearchQuery(value);
-    });
-  }, []);
+  const debouncedValue = useDeferredValue(inputValue);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);
@@ -129,13 +121,13 @@ export const Search = ({
     results: allResults,
     totalCount,
     suggestion,
-  } = useSearch(data, limit, searchQuery, enableSpellCorrection);
+  } = useSearch(data, limit, debouncedValue, enableSpellCorrection);
 
   // Reset page and category filter when query changes
   useEffect(() => {
     setPage(1);
     setSelectedCategories(new Set(defaultSelectedCategories ?? []));
-  }, [defaultSelectedCategories, searchQuery]);
+  }, [debouncedValue]);
 
   const availableCategories = useMemo(() => {
     const cats = new Set<string>();
@@ -183,15 +175,14 @@ export const Search = ({
       closeOverlay();
     } else {
       setInputValue("");
-      setSearchQuery("");
       setActiveIndex(-1);
     }
   }, [useOverlay, closeOverlay]);
 
   const onInputFocus = useCallback(() => {
     setIsFocused(true);
-    if (searchQuery.length > 0) setShow(true);
-  }, [searchQuery]);
+    if (debouncedValue.length > 0) setShow(true);
+  }, [debouncedValue]);
 
   const onInputBlur = useCallback(() => {
     setIsFocused(false);
@@ -290,18 +281,18 @@ export const Search = ({
 
   const onDidYouMeanAccept = useCallback(
     (s: string) => {
-      updateSearchValue(s);
+      setInputValue(s);
       refocusInput();
     },
-    [refocusInput, updateSearchValue],
+    [refocusInput],
   );
 
   const onQuerySelect = useCallback(
     (q: string) => {
-      updateSearchValue(q);
+      setInputValue(q);
       refocusInput();
     },
-    [refocusInput, updateSearchValue],
+    [refocusInput],
   );
 
   const onLoadMore = useCallback(() => {
@@ -323,7 +314,7 @@ export const Search = ({
   }, [clearCategories, refocusInput]);
 
   // Shared results list JSX — used by overlay mode
-  const hasQuery = searchQuery.length >= MIN_MATCH_LENGTH;
+  const hasQuery = debouncedValue.length >= MIN_MATCH_LENGTH;
   const allUncategorized = results.every((r) => r.item.category == null);
 
   const overlayResultsListJsx = (
@@ -467,7 +458,7 @@ export const Search = ({
                     type="search"
                     placeholder={placeholder ?? "Type to search…"}
                     value={inputValue}
-                    onDidChange={updateSearchValue}
+                    onDidChange={(value) => setInputValue(value)}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
                     aria-controls={`${inputId}-listbox`}
@@ -542,7 +533,7 @@ export const Search = ({
               placeholder={placeholder ?? "Type to search"}
               value={inputValue}
               startIcon="search"
-              onDidChange={updateSearchValue}
+              onDidChange={(value) => setInputValue(value)}
               onFocus={onInputFocus}
               onBlur={onInputBlur}
               onKeyDown={handleKeyDown}
@@ -975,19 +966,15 @@ const FUSE_RELAXED_OPTIONS: IFuseOptions<SearchItemData> = {
   ],
 };
 
+const fuse = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
+const relaxedFuse = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
+
 function useSearch(
   data: SearchItemData[],
   limit: number,
   query: string,
   enableSpellCorrection: boolean,
 ): { results: SearchResult[]; totalCount: number; suggestion: string | null } {
-  const fuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!fuseRef.current) fuseRef.current = new Fuse<SearchItemData>([], FUSE_SEARCH_OPTIONS);
-
-  const relaxedFuseRef = useRef<Fuse<SearchItemData>>(null!);
-  if (!relaxedFuseRef.current)
-    relaxedFuseRef.current = new Fuse<SearchItemData>([], FUSE_RELAXED_OPTIONS);
-
   // --- Convert data to a format better handled by the search engine
   const dynamicData = useSearchContextContent();
   const staticData = useMemo(() => {
@@ -1020,8 +1007,8 @@ function useSearch(
   }, [dynamicData, staticData]);
 
   useEffect(() => {
-    fuseRef.current.setCollection(mergedData);
-    relaxedFuseRef.current.setCollection(mergedData);
+    fuse.setCollection(mergedData);
+    relaxedFuse.setCollection(mergedData);
   }, [mergedData]);
 
   // --- Execute search & post-process results
@@ -1031,13 +1018,13 @@ function useSearch(
     }
 
     const fetchLimit = Math.min(limit * 10, 200);
-    const raw = fuseRef.current.search(query, { limit: fetchLimit });
+    const raw = fuse.search(query, { limit: fetchLimit });
     const mapped = postProcessSearch(raw, query);
     const grouped = groupAndSortByCategory(mapped);
 
     let suggestion: string | null = null;
     if (grouped.length === 0 && enableSpellCorrection && query.length >= 3) {
-      const relaxed = relaxedFuseRef.current.search(query, { limit: 1 });
+      const relaxed = relaxedFuse.search(query, { limit: 1 });
       if (relaxed.length > 0) {
         suggestion = relaxed[0].item.title;
       }
