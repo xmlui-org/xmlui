@@ -176,6 +176,7 @@ export const Toggle = forwardRef(function Toggle(
       <Part partId={PART_INPUT}>
         <input
           {...rest}
+          data-component-type="Toggle"
           id={id}
           ref={ref}
           type="checkbox"

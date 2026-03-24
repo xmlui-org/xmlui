@@ -1201,35 +1201,41 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       const traceKind = xsVerbose ? eventNameToTraceKind(xmluiName) : undefined;
 
       if (xmluiName === "didChange" && isStateful) {
-        // didChange is special: StateWrapper's onChange calls this.
-        // It traces, calls updateState, and calls the XMLUI handler.
-        props.__onDidChange = (...args: any[]) => {
-          const traceId = traceKind ? pushTrace() : undefined;
-          try {
-            updateState({ value: args[0] });
-            let result: any;
-            if (handler) {
-              result = handler(...args);
+        // didChange for stateful components: native components call onDidChange(value)
+        // directly, so we intercept it here for tracing and XMLUI handler dispatch.
+        // When xsVerbose is off and no XMLUI handler, skip — native noop is fine.
+        if (traceKind || handler) {
+          props.onDidChange = (...args: any[]) => {
+            const traceId = traceKind ? pushTrace() : undefined;
+            try {
+              let result: any;
+              if (handler) {
+                result = handler(...args);
+              }
+              if (traceKind) {
+                pushXsLog(
+                  createLogEntry(traceKind, {
+                    component: type,
+                    componentLabel: node.uid || node.testId || undefined,
+                    displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
+                    eventName: xmluiName,
+                    ariaName: ariaLabel,
+                    ownerFileId,
+                    ownerSource,
+                    ...extractFileMetadata(args),
+                  }),
+                );
+              }
+              return result;
+            } finally {
+              endTrace(traceId, traceKind);
             }
-            if (traceKind) {
-              pushXsLog(
-                createLogEntry(traceKind, {
-                  component: type,
-                  componentLabel: node.uid || node.testId || undefined,
-                  displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
-                  eventName: xmluiName,
-                  ariaName: ariaLabel,
-                  ownerFileId,
-                  ownerSource,
-                  ...extractFileMetadata(args),
-                }),
-              );
-            }
-            return result;
-          } finally {
-            endTrace(traceId, traceKind);
-          }
-        };
+          };
+        }
+        // __onDidChange still needed for the StateWrapper onChange path
+        props.__onDidChange = props.onDidChange || ((...args: any[]) => {
+          updateState({ value: args[0] });
+        });
       } else {
         // Non-didChange events (gotFocus, lostFocus, ChangeListener didChange) pass through as native props
         props[reactPropName] = (...args: any[]) => {
@@ -1421,6 +1427,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
+    }
+    if (xsVerbose) {
+      props["data-component-type"] = type;
     }
 
     const rendered = <StateWrapper {...props} />;
