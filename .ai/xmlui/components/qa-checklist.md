@@ -218,4 +218,10 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 | `(icon as any).props` to access icon props | Use `React.isValidElement(icon) ? (icon.props as Record<string, unknown>) : undefined`. |
 | Redundant fragment wrappers `<>{value}</>` | Use `{value}` directly when no key/ref is needed. |
 | `BrNative(_props: any)` placeholder | Use a typed placeholder `BrPlaceholder(_props: Record<string, never>)`. |
+| `Ref<T>` on `forwardRef` callback parameter | Use `ForwardedRef<T>` — the precise type React passes to `forwardRef` callbacks. |
+| `Pick<HTMLAttributes<T>, "onContextMenu">` when more attrs are needed | Extend `HTMLAttributes<T>` directly; remove explicit style/className/children. |
+| Explicit `style/className/children` in Props when extending `HTMLAttributes` | Remove — they are inherited; duplicate declarations are misleading. |
+| Orphaned named type import after Props refactor | Check imports after every Props change; remove unused type-only imports. |
+| `const id = setTimeout(...)` inside effect when `id` is also a prop | Rename the timer to `timeoutId` to avoid variable shadowing. |
+| `!!string.trim().length` in filter predicate | Use `string.trim().length > 0` — no double negation. |
 
