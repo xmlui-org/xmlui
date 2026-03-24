@@ -60,11 +60,6 @@ export const SearchMd: ComponentMetadata = createMetadata({
       description: `Number of results to show per page when using load more.`,
       valueType: "number",
     },
-    enableSpellCorrection: {
-      description: `If true, shows a "Did you mean?" suggestion when the search returns no results but a close match exists.`,
-      valueType: "boolean",
-      defaultValue: true,
-    },
     mode: {
       description: `Controls how the search panel appears. "overlay" (default) opens a centered full-screen overlay when the search button is clicked. "inline" uses the original expand-in-place animation inside the navbar.`,
       valueType: "string",
