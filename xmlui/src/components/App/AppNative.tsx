@@ -30,6 +30,8 @@ import { useTheme, useThemes } from "../../components-core/theming/ThemeContext"
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
 import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderNative";
+import { AppHeaderMd } from "../AppHeader/AppHeader";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
 import { AppLayoutContext } from "../App/AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
@@ -512,6 +514,10 @@ export function App({
     throw new Error("layout type not supported: " + safeLayout);
   }
 
+  // Compute the AppHeader theme class so the auto-generated header (which bypasses
+  // the component registry) still gets its CSS variables (e.g. --xmlui-height-AppHeader).
+  const appHeaderThemeClass = useComponentThemeClass(AppHeaderMd);
+
   // Helper functions for rendering slots
   const renderHeaderSlot = () => (
     <Part partId="header">
@@ -523,7 +529,7 @@ export function App({
         )}
       >
         {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
-          <AppContextAwareAppHeader renderChild={renderChild} />
+          <AppContextAwareAppHeader renderChild={renderChild} className={appHeaderThemeClass} />
         )}
         {header}
         {config.navPanelInHeader && navPanelVisible && (
