@@ -444,19 +444,29 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   border-radius: t.$space-2_5;
 
   @media (max-width: 600px) {
-    border-radius: 0;
+    border-radius: t.$space-2_5;
     display: flex;
-    top: t.$space-16;
-    position: fixed;
+    top: auto;
+    position: relative;
     flex-direction: column;
-    background: transparent;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    background: $backgroundColor-SearchOverlayPanel;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: min(680px, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
     min-height: 0;
     overflow: hidden;
+    box-shadow: $boxShadow-SearchOverlayPanel;
   }
 
+}
+
+.overlayPanelWithResults {
+  @media (max-width: 600px) {
+    height: calc(100dvh - 3rem);
+    max-height: calc(100dvh - 3rem);
+  }
 }
 
 .overlayInputRow {
@@ -464,6 +474,10 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
 
   .overlaySearchIcon {
     flex-shrink: 0;
@@ -506,6 +520,10 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   justify-content: space-between;
   padding: 0 1rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
 }
 
 .drawerControls {
@@ -563,17 +581,23 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   min-height: 0;
 
   @media (max-width: 600px) {
-    flex: 1;
+    flex: 1 1 auto;
+    height: 0;
     max-height: none;
+    min-height: 0;
+    display: block;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
   }
 }
 
 // Drawer (mobile full-screen) overlay variants
 .overlayBackdropMobile {
-  padding-top: 0;
+  padding: 1.5rem 1rem;
   align-items: flex-start;
+  justify-content: center;
   width: 100vw;
   max-width: 100vw;
   min-height: 100dvh;

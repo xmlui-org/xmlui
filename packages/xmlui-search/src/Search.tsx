@@ -447,13 +447,16 @@ export const Search = ({
               {/* Backdrop — click outside to close */}
               <div
                 className={classnames(styles.overlayBackdrop, styles.overlayBackdropMobile)}
-                onClick={closeOverlay}
+                onPointerDown={closeOverlay}
               >
                 <div
-                  className={classnames(styles.overlayPanel)}
+                  className={classnames(styles.overlayPanel, {
+                    [styles.overlayPanelWithResults]: hasQuery,
+                  })}
                   role="dialog"
                   aria-modal="true"
                   aria-label="Search"
+                  onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => e.stopPropagation()}
                 >
                   {/* Input row */}
