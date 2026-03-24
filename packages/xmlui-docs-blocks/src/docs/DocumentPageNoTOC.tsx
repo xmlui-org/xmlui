@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./DocumentPageNoTOC.xmlui";
 
-export const DocumentPageNoTOCMd = createMetadata({
+export const DocumentPageNoTOCMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Document page without table of contents.",
   props: {

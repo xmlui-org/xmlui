@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./OverviewCard.xmlui";
 
-export const OverviewCardMd = createMetadata({
+export const OverviewCardMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Card link used in overview/section landing pages.",
   props: {

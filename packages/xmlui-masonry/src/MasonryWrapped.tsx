@@ -1,9 +1,9 @@
 import { MasonryRender } from "./MasonryRender";
-import { wrapComponent, createMetadata, d } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata, d } from "xmlui";
 
 const COMP = "Masonry";
 
-export const MasonryMd = createMetadata({
+export const MasonryMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`Masonry` arranges children in a responsive multi-column layout where " +

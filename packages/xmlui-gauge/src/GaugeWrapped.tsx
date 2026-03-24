@@ -3,6 +3,7 @@ import styles from "./Gauge.module.scss";
 import {
   wrapCompound,
   createMetadata,
+  type ComponentMetadata,
   d,
   dDidChange,
   dEnabled,
@@ -12,7 +13,7 @@ import {
 
 const COMP = "Gauge";
 
-export const GaugeMd = createMetadata({
+export const GaugeMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`Gauge` wraps the Smart UI Gauge web component, providing a circular " +

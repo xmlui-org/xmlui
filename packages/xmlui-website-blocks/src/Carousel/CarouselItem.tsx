@@ -1,9 +1,9 @@
-import { wrapComponent, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 import { CarouselItemComponent } from "./CarouselItemNative";
 
 const COMP = "CarouselItem";
 
-export const CarouselItemMd = createMetadata({
+export const CarouselItemMd: ComponentMetadata = createMetadata({
   status: "stable",
   description: "A slide item for the Carousel component.",
 });

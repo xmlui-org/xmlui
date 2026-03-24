@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./LinkButton.xmlui";
 
-export const LinkButtonMd = createMetadata({
+export const LinkButtonMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Link styled as a button with optional icon.",
   props: {
