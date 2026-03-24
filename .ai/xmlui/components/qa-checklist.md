@@ -47,12 +47,17 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 - [ ] **`defaultProps` is exported** as a named const object from the native file, and destructuring defaults in the function signature reference those values.
 
 ### Ref handling
-- [ ] **When both a forwarded ref and an internal ref are needed, use `composeRefs(ref, internalRef)`.** Never ignore the forwarded ref.
-- [ ] **When only an internal ref is needed and the forwardedRef may be null**, guard: `const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;`
+- [ ] **When both a forwarded ref and an internal ref are needed, use `useComposedRefs(ref, internalRef)` (from `@radix-ui/react-compose-refs`).** Never use `composeRefs(...)` directly — it returns a new callback ref object on every render, causing React to needlessly detach and reattach the ref. `useComposedRefs` wraps the result in `useCallback` for stability.
+- [ ] **Do not guard `useComposedRefs` with `ref ?` — it handles `null`/`undefined` refs internally.** `const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;` should become `const composedRef = useComposedRefs(ref, innerRef);`.
+- [ ] **The `forwardRef` callback's ref parameter must be typed `ForwardedRef<T>`, not `Ref<T>`.** `ForwardedRef` is the precise type React passes to `forwardRef` callbacks. `Ref<T>` is broader (includes deprecated string refs). Both come from `"react"` and must be explicitly imported as named types.
 
 ### Props interface
+- [ ] **`Props` must extend `React.HTMLAttributes<HTMLElement>` (or the appropriate element base).** This ensures `...rest` has a defined type that includes ARIA attributes, `data-*`, and standard event handlers — not `{}`. When extending `HTMLAttributes`, **remove** the now-redundant explicit declarations of `style`, `className`, `children`, and any picked event handlers — they are all inherited and duplicating them causes confusion about which declaration governs the type.
+- [ ] **Check for orphaned imports after removing explicit prop declarations.** When `children?: React.ReactNode` is removed from Props because it's inherited from `HTMLAttributes`, the `ReactNode` import becomes unused — remove it.
+- [ ] **When `Props` extends `HTMLAttributes`, place `{...rest}` BEFORE all internally-controlled props** in any spread object (e.g. a `sharedProps` helper). This ensures internal accessibility props (`onKeyDown`, `tabIndex`) take precedence over user-supplied values from `rest`.
 - [ ] **`...rest` is spread onto the root DOM element** so arbitrary HTML attributes (ARIA, data-*, event handlers) pass through.
 - [ ] **`style` is accepted explicitly and applied to the root element.** The renderer passes `layoutCss` via `style` to control size/position.
+- [ ] **`ThemedFoo` wrappers must use a ref type that matches the union of possible rendered elements.** For example, if `Avatar` renders either `<img>` or `<div>` depending on props, the `ThemedAvatar` wrapper must be typed `React.forwardRef<HTMLImageElement | HTMLDivElement, ...>` (not `HTMLDivElement` alone). Using a single concrete element type is a silent type lie when the ref might point to a different element at runtime.
 - [ ] **Infrastructure props (`updateState`, `registerComponentApi`) are typed as optional** (`updateState?: ...`). The native component must work standalone without them.
 
 ### Classes / classnames
@@ -60,6 +65,12 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 - [ ] **Named parts use `partClassName(PART_*)` alongside their SCSS module class** so tests can locate them via `[data-part-id='partName']`.
 
 ### State management
+- [ ] **Remove dead props — props declared in the type but never used in the component body.** A common example is `gap?: string | number` that got superseded by a CSS theme variable. Dead props pollute IntelliSense, can shadow `...rest` values, and silently swallow user-provided attributes that should have reached the DOM.
+- [ ] **Avoid variable shadowing inside `useEffect` closures.** If a prop is named `id`, do not declare `const id = setTimeout(...)` inside an effect — rename the timer handle to `timeoutId`. Shadowing makes cleanup code (`clearTimeout(id)`) ambiguous at a glance.
+- [ ] **Prefer simple boolean expressions in filter predicates.** `!!string.trim().length` is a double negation converting `number→boolean→boolean` unnecessarily. Use `string.trim().length > 0` or just `string.trim()` for clarity.
+- [ ] **`children?: React.ReactNode` — do not write `React.ReactNode | React.ReactNode[]`.** `ReactNode` already includes array forms (`ReactFragment`).
+- [ ] **Mix named imports with namespace imports consistently.** If `memo` is a named import from `"react"`, don't use `React.forwardRef` alongside it. Destructure `forwardRef` and `ForwardedRef` as named imports: `import React, { forwardRef, type ForwardedRef, memo, ... } from "react"`.
+- [ ] **`COMPONENT_PART_KEY` constant (from `../../components-core/theming/responsive-layout`) must be imported and used instead of the raw string `"-component"`.** Hardcoding `"-component"` is a magic string anti-pattern.
 - [ ] **Local UI state (`useState`) is used for immediate feedback** (e.g. caret position, open/closed). Never route every keystroke through `updateState` — that causes caret-jumping in text inputs.
 - [ ] **`updateState` is called when the public value changes** (after debounce/blur if appropriate) so markup bindings stay in sync.
 - [ ] **External prop changes are synced into local state via `useEffect`**, with a ref guard to avoid loops:
@@ -146,6 +157,26 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 
 ---
 
+## 10. HTML Void Elements
+
+- [ ] **`<br>`, `<img>`, `<input>`, `<hr>`, `<meta>`, `<link>` are void elements and must be self-closing in JSX.** Never pass children to them: `<br>{...}</br>` is invalid HTML and causes a React warning. Use `<br />` (or `<br className={...} />` etc.) instead.
+- [ ] **Custom renderer components that wrap void elements must not pass `renderChild(node.children)` inside the element.** Drop both `renderChild` from the destructured render context and any `{renderChild(node.children)}` inside the void element.
+
+---
+
+## 11. `useRef` Type Accuracy
+
+- [ ] **`useRef<T>` must use the type of the element the ref is actually attached to.** A common mistake is using `useRef<HTMLAnchorElement>` when the rendered element is a `<span>` (which requires `useRef<HTMLSpanElement>`). TypeScript may not catch this at the call site — check visually.
+- [ ] **`forwardRef` parameter type and the element the ref is attached to must agree.** `ForwardedRef<HTMLSpanElement>` must go onto a `<span>`, not a `<div>` or `<a>`.
+
+---
+
+## 12. JSDoc in Component Files
+
+- [ ] **Do not add JSDoc block comments to exports in XMLUI component files.** Descriptions live in `createMetadata({ description: "..." })`. JSDoc blocks in `.tsx` files are redundant, increase noise, and will drift out of sync with the metadata.
+
+---
+
 ## Quick Anti-Pattern Reference
 
 | Anti-pattern | Rule |
@@ -168,7 +199,23 @@ A focused checklist for auditing and refactoring XMLUI component implementations
 | `Ref<A \| B>` spread into element expecting `Ref<A>` | Pass `ref` per-branch with narrowing cast. |
 | `Pick<HTMLAttributes<HTMLDivElement>, "onClick">` when element type varies | Use `HTMLElement` as the base type. |
 | `isFoo(x: any)` — `any` in type guard parameter | Change to `unknown`; cast inside the guard after narrowing. |
+| `composeRefs(ref, innerRef)` called in render (not a hook) | Replace with `useComposedRefs(ref, innerRef)` — stable across renders. |
+| `ref ? composeRefs(ref, inner) : inner` guard | Replace with `useComposedRefs(ref, inner)` — null/undefined handled internally. |
+| `Props` with no HTML base type (`...rest` typed as `{}`) | Extend `React.HTMLAttributes<HTMLElement>`; move `{...rest}` before explicit props. |
+| `{...rest}` at end of spread object when Props extends HTMLAttributes | Move `{...rest}` to the FRONT so internal props (onKeyDown, tabIndex) take precedence. |
+| `ThemedFoo = forwardRef<HTMLDivElement>` when Foo renders img or div | Use the union: `forwardRef<HTMLImageElement \| HTMLDivElement>`. |
+| Dead prop in Props (declared, destructured, never used in body) | Remove from Props and destructuring; verify no metadata or test sets it. |
+| `children?: ReactNode \| ReactNode[]` | Simplify to `children?: ReactNode` — array is already included. |
+| `React.forwardRef` mixed with named `memo` import | Destructure `forwardRef` as a named import for consistency. |
+| `classes?.["-component"]` raw string literal | Import and use `COMPONENT_PART_KEY` from `responsive-layout`. |
 | Inline `style={{ ... }}` inside `memo`-wrapped component | Extract to `useMemo` keyed on color/style deps. |
 | Duplicate layout CSS in `.badge` / `.pill` variant classes | Extract shared rules to `.container` base class. |
 | Stale `*Native` import after rename (e.g. in `VariantBehavior.tsx`) | Grep all `src/` importers before renaming; update each. |
+| `<br>{children}</br>` or any void element with children | Use self-closing `<br />`: void elements cannot have children. |
+| `useRef<HTMLAnchorElement>` on a `<span>` element | Match `useRef<T>` type to the rendered element type exactly. |
+| JSDoc block comments on exports in `.tsx` component files | Remove; descriptions belong in `createMetadata`. |
+| `useEffect` timeout with no `clearTimeout` cleanup | Return `() => clearTimeout(id)` from the effect. |
+| `(icon as any).props` to access icon props | Use `React.isValidElement(icon) ? (icon.props as Record<string, unknown>) : undefined`. |
+| Redundant fragment wrappers `<>{value}</>` | Use `{value}` directly when no key/ref is needed. |
+| `BrNative(_props: any)` placeholder | Use a typed placeholder `BrPlaceholder(_props: Record<string, never>)`. |
 

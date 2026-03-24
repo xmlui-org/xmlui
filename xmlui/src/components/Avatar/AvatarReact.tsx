@@ -1,18 +1,16 @@
-import type { CSSProperties, Ref } from "react";
+import type { ForwardedRef, HTMLAttributes, KeyboardEvent, MouseEvent, Ref } from "react";
 import { forwardRef, memo, useCallback, useMemo } from "react";
 import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-type Props = {
+type Props = HTMLAttributes<HTMLElement> & {
   size?: string;
   url?: string;
   name?: string;
-  style?: CSSProperties;
   classes?: Record<string, string>;
-  className?: string;
-} & Pick<React.HTMLAttributes<HTMLElement>, "onClick" | "onContextMenu">;
+};
 
 export const defaultProps: Pick<Props, "size"> = {
   size: "sm",
@@ -40,7 +38,7 @@ function abbreviateName(name: string | null): string | null {
   return name
     .trim()
     .split(" ")
-    .filter((word) => !!word.trim().length)
+    .filter((word) => word.trim().length > 0)
     .map((word) => word[0].toUpperCase())
     .slice(0, 3)
     .join("") || null;
@@ -48,14 +46,14 @@ function abbreviateName(name: string | null): string | null {
 
 export const Avatar = memo(forwardRef(function Avatar(
   { size = defaultProps.size, url, name, style, classes, className, onClick, onContextMenu, ...rest }: Props,
-  ref: Ref<HTMLImageElement | HTMLDivElement>,
+  ref: ForwardedRef<HTMLImageElement | HTMLDivElement>,
 ) {
   const abbreviatedName = useMemo(() => abbreviateName(name ?? null), [name]);
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLElement>) => {
     if (onClick && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
-      onClick(event as unknown as React.MouseEvent<HTMLElement>);
+      onClick(event as unknown as MouseEvent<HTMLElement>);
     }
   }, [onClick]);
 
@@ -80,13 +78,13 @@ export const Avatar = memo(forwardRef(function Avatar(
   const altTxt = name ? `Avatar of ${name}` : "Avatar";
 
   const sharedProps = {
+    ...rest,
     className: commonClassNames,
     style: mergedStyle,
     onClick,
     onContextMenu,
     onKeyDown: handleKeyDown,
     tabIndex: onClick ? 0 : undefined,
-    ...rest,
   };
 
   if (url) {

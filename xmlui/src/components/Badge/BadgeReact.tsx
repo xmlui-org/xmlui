@@ -22,14 +22,11 @@ export function isBadgeColors(color: unknown): color is BadgeColors {
   );
 }
 
-type Props = {
-  children?: React.ReactNode;
+type Props = React.HTMLAttributes<HTMLDivElement> & {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
-  style?: CSSProperties;
   classes?: Record<string, string>;
-  className?: string;
-} & Pick<React.HTMLAttributes<HTMLDivElement>, "onContextMenu">;
+};
 
 export const defaultProps: Pick<Props, "variant"> = {
   variant: "badge",

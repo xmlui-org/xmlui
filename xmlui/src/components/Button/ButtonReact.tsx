@@ -1,10 +1,11 @@
-import React, { type CSSProperties, useRef, useEffect } from "react";
+import React, { type CSSProperties, type ForwardedRef, forwardRef, memo, useRef, useEffect } from "react";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Button.module.scss";
 
 import {
+  buttonVariantValues,
   isSizeType,
   type SizeType,
   type AlignmentOptions,
@@ -15,7 +16,7 @@ import {
   type IconPosition,
   type OrientationOptions,
 } from "../abstractions";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { VisuallyHidden } from "../VisuallyHidden";
 
 type Props = {
@@ -25,14 +26,13 @@ type Props = {
   themeColor?: ButtonThemeColor;
   size?: SizeType;
   disabled?: boolean;
-  children?: React.ReactNode | React.ReactNode[];
+  children?: React.ReactNode;
   icon?: React.ReactNode;
   iconPosition?: IconPosition;
   contentPosition?: AlignmentOptions;
   orientation?: OrientationOptions;
   formId?: string;
   style?: CSSProperties;
-  gap?: string | number;
   autoFocus?: boolean;
   contextualLabel?: string;
   classes?: Record<string, string>;
@@ -71,7 +71,7 @@ export const defaultProps: Pick<
   autoFocus: false,
 };
 
-export const Button = React.forwardRef(function Button(
+export const Button = memo(forwardRef(function Button(
   {
     id,
     type = defaultProps.type,
@@ -90,26 +90,23 @@ export const Button = React.forwardRef(function Button(
     onFocus,
     onBlur,
     style,
-    gap,
     classes,
     className,
     autoFocus = defaultProps.autoFocus,
     contextualLabel,
     ...rest
   }: Props,
-  ref: React.ForwardedRef<HTMLButtonElement>,
+  ref: ForwardedRef<HTMLButtonElement>,
 ) {
   const innerRef = useRef<HTMLButtonElement>(null);
-  const composedRef = ref ? composeRefs(ref, innerRef) : innerRef;
+  const composedRef = useComposedRefs(ref, innerRef);
   useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        innerRef.current?.focus();
-      }, 0);
-    }
+    if (!autoFocus) return;
+    const timeoutId = setTimeout(() => innerRef.current?.focus(), 0);
+    return () => clearTimeout(timeoutId);
   }, [autoFocus]);
 
-  if ((variant as any) === "") {
+  if (!variant || !buttonVariantValues.includes(variant as ButtonVariant)) {
     variant = defaultProps.variant;
   }
   const iconToLeft = iconPosition === "start";
@@ -147,7 +144,6 @@ export const Button = React.forwardRef(function Button(
         classes?.[COMPONENT_PART_KEY],
         className,
       )}
-      autoFocus={autoFocus}
       disabled={disabled}
       form={formId}
       style={style}
@@ -156,27 +152,28 @@ export const Button = React.forwardRef(function Button(
       onFocus={onFocus}
       onBlur={onBlur}
     >
-      {icon && iconToLeft && <>{icon}</>}
+      {icon && iconToLeft && icon}
       {children}
       {icon && !children && <IconLabel icon={icon} accessibleName={contextualLabel} />}
-      {icon && !iconToLeft && <>{icon}</>}
+      {icon && !iconToLeft && icon}
     </button>
   );
-});
+}));
 
 type IconLabelProps = {
   icon: React.ReactNode;
   accessibleName?: string;
 };
 
-const IconLabel = ({ icon, accessibleName = "" }: IconLabelProps) => {
-  // NOTE: the icon object provided is a React object with accessible props attribute.
-  // Typing might be off, because TS thinks props is not accessible.
-  const iconProps: Record<string, any> | undefined = (icon as any).props;
+const IconLabel = memo(function IconLabel({ icon, accessibleName = "" }: IconLabelProps) {
+  const iconProps = React.isValidElement(icon)
+    ? (icon.props as Record<string, unknown>)
+    : undefined;
+  const label = accessibleName || (iconProps?.name as string) || (iconProps?.alt as string) || "";
   return (
     <VisuallyHidden>
-      <span>{accessibleName || iconProps?.name || iconProps?.alt}</span>
+      <span>{label}</span>
     </VisuallyHidden>
   );
-};
+});
 

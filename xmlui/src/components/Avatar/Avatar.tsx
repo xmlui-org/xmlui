@@ -58,7 +58,7 @@ export const AvatarMd = createMetadata({
 });
 
 type ThemedAvatarProps = Omit<React.ComponentProps<typeof Avatar>, "classes"> & { className?: string };
-export const ThemedAvatar = React.forwardRef<HTMLDivElement, ThemedAvatarProps>(
+export const ThemedAvatar = React.forwardRef<HTMLImageElement | HTMLDivElement, ThemedAvatarProps>(
   function ThemedAvatar({ className, ...props }: ThemedAvatarProps, ref) {
     const themeClass = useComponentThemeClass(AvatarMd);
     const combinedClass = [themeClass, className].filter(Boolean).join(" ");
