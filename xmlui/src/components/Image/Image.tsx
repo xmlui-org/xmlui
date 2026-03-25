@@ -90,5 +90,6 @@ export const imageComponentRenderer = wrapComponent(
   ImageMd,
   {
     rename: { data: "imageData" },
+    deriveAriaLabel: (props) => props.alt,
   },
 );

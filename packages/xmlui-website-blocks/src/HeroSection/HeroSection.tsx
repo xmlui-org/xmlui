@@ -1,11 +1,12 @@
 import styles from "./HeroSection.module.scss";
 
-import { createComponentRenderer, createMetadata, dComponent, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, dComponent, d, parseScssVar } from "xmlui";
+import type { ComponentMetadata } from "xmlui";
 import { HeroSection, defaultProps } from "./HeroSectionNative";
 
 const COMP = "HeroSection";
 
-export const HeroSectionMd = createMetadata({
+export const HeroSectionMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "HeroSection",
   parts: {
@@ -157,39 +158,7 @@ export const HeroSectionMd = createMetadata({
   },
 });
 
-export const heroSectionComponentRenderer = createComponentRenderer(
-  COMP,
-  HeroSectionMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
-    const props = (node.props as typeof HeroSectionMd.props)!;
-    return (
-      <HeroSection
-        headerAlignment={extractValue(props.headerAlignment)}
-        contentPlacement={extractValue(props.contentPlacement)}
-        contentAlignment={extractValue(props.contentAlignment)}
-        headerWidth={extractValue(props.headerWidth)}
-        contentWidth={extractValue(props.contentWidth)}
-        headerTone={extractValue(props.headerTone)}
-        contentTone={extractValue(props.contentTone)}
-        gap={extractValue(props.gap)}
-        preamble={extractValue(props.preamble)}
-        headline={extractValue(props.headline)}
-        subheadline={extractValue(props.subheadline)}
-        mainText={extractValue(props.mainText)}
-        mainTextTemplate={renderChild(props.mainTextTemplate as any)}
-        ctaButtonIcon={extractValue(props.ctaButtonIcon)}
-        ctaButtonText={extractValue(props.ctaButtonText)}
-        ctaButtonTemplate={renderChild(props.ctaButtonTemplate as any)}
-        image={extractValue(props.image)}
-        imageWidth={extractValue(props.imageWidth)}
-        imageHeight={extractValue(props.imageHeight)}
-        fullWidthBackground={extractValue.asOptionalBoolean(props.fullWidthBackground)}
-        className={extractValue(className)}
-        onCtaClick={lookupEventHandler("ctaClick")}
-        backgroundTemplate={renderChild(props.backgroundTemplate as any)}
-      >
-        {renderChild(node.children)}
-      </HeroSection>
-    );
-  },
-);
+export const heroSectionComponentRenderer = wrapComponent(COMP, HeroSection, HeroSectionMd, {
+  booleans: ["fullWidthBackground"],
+  exclude: ["className"],
+});

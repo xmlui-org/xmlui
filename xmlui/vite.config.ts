@@ -1,10 +1,11 @@
 // @ts-ignore
 import path from "path";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
+import type { PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
-import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
+import { default as ViteXmlui } from "./src/nodejs/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
@@ -106,12 +107,22 @@ export default ({ mode = "lib" }) => {
       };
     }
   }
-  let plugins =
-    mode === "metadata"
-      ? [ViteXmlui({})]
-      : mode === "inspector-parser"
-        ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
-        : [react(), svgr(), ViteYaml(), ViteXmlui({}), libInjectCss(), dts({ rollupTypes: true })];
+
+  let plugins: PluginOption[] = [];
+  if (mode === "metadata") {
+    plugins = [ViteXmlui()];
+  } else if (mode === "inspector-parser") {
+    plugins = [dts({ rollupTypes: true }) as Plugin];
+  } else {
+    plugins = [
+      react(),
+      svgr(),
+      ViteYaml(),
+      ViteXmlui({}),
+      libInjectCss(),
+      dts({ rollupTypes: true }),
+    ] as Plugin[];
+  }
 
   if (mode === "lib") {
     plugins.push(

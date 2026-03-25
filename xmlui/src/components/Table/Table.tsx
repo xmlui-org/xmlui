@@ -4,7 +4,7 @@ import produce from "immer";
 import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import {
@@ -765,32 +765,18 @@ const TableWithColumns = memo(
 );
 TableWithColumns.displayName = "TableWithColumns";
 
-export const tableComponentRenderer = createComponentRenderer(
-  COMP,
-  TableMd,
-  ({
-    extractValue,
-    node,
-    renderChild,
-    lookupEventHandler,
-    lookupAction,
-    lookupSyncCallback,
-    classes,
-    registerComponentApi,
-    layoutContext,
-  }) => {
-    return (
-      <TableWithColumns
-        node={node}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        lookupAction={lookupAction}
-        lookupSyncCallback={lookupSyncCallback}
-        classes={classes}
-        renderChild={renderChild}
-        registerComponentApi={registerComponentApi}
-        layoutContext={layoutContext}
-      />
-    );
-  },
-);
+export const tableComponentRenderer = wrapComponent(COMP, Table, TableMd, {
+  customRender: (_props, { extractValue, node, renderChild, lookupEventHandler, lookupAction, lookupSyncCallback, classes, registerComponentApi, layoutContext }) => (
+    <TableWithColumns
+      node={node}
+      extractValue={extractValue}
+      lookupEventHandler={lookupEventHandler as any}
+      lookupAction={lookupAction}
+      lookupSyncCallback={lookupSyncCallback}
+      classes={classes}
+      renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
+      layoutContext={layoutContext}
+    />
+  ),
+});

@@ -8,13 +8,13 @@ import type { RenderChildFn, LayoutContext } from "../../abstractions/RendererDe
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
-import { createComponentRenderer } from "../../components-core/renderers";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { alignmentOptionValues } from "../abstractions";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayout";
 import { collectResponsiveWidthProps } from "../FlowLayout/flow-layout-utils";
@@ -88,7 +88,8 @@ const stackMd = createMetadata({
       description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -98,7 +99,8 @@ const stackMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
         "The fade indicators automatically appear/disappear based on the current scroll position. " +
         "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
-        "Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "Only works with overlay scrollbar modes (not with 'normal' mode). " +
+        "On mobile/touch devices, this property has no effect.",
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -225,9 +227,9 @@ type RenderStackPars = {
   node: any;
   extractValue: ValueExtractor;
   classes?: Record<string, string>;
-  lookupEventHandler: (
-    eventName: keyof NonNullable<StackComponentDef["events"]>,
-  ) => AsyncFunction | undefined;
+  onClick?: AsyncFunction;
+  onContextMenu?: AsyncFunction;
+  onMount?: AsyncFunction;
   renderChild: RenderChildFn;
   orientation: string;
   horizontalAlignment: string;
@@ -244,7 +246,9 @@ function renderDockLayout({
   node,
   extractValue,
   classes,
-  lookupEventHandler,
+  onClick,
+  onContextMenu,
+  onMount,
   renderChild,
   scrollStyle,
   showScrollerFade,
@@ -310,9 +314,9 @@ function renderDockLayout({
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
       classes={classes}
-      onClick={lookupEventHandler("click")}
-      onContextMenu={lookupEventHandler("contextMenu")}
-      onMount={lookupEventHandler("mounted")}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      onMount={onMount}
       registerComponentApi={registerComponentApi}
     >
       {/* Top-docked children in declaration order */}
@@ -365,7 +369,9 @@ function renderStack({
   orientation,
   horizontalAlignment,
   verticalAlignment,
-  lookupEventHandler,
+  onClick,
+  onContextMenu,
+  onMount,
   renderChild,
   scrollStyle,
   showScrollerFade,
@@ -410,7 +416,7 @@ function renderStack({
     (child) => child != null
   );
   if (allChildren.some((child) => (child.props as any)?.dock != null)) {
-    return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, lookupEventHandler, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi, layoutContext });
+      return renderDockLayout({ node, extractValue, classes, orientation, horizontalAlignment, verticalAlignment, onClick, onContextMenu, onMount, renderChild, scrollStyle, showScrollerFade, wrapContent, itemWidth, registerComponentApi, layoutContext });
   }
 
   // Use FlowLayout when orientation is horizontal and wrapContent is true
@@ -429,7 +435,7 @@ function renderStack({
         verticalAlignment={effectiveVerticalAlignment || "start"}
         scrollStyle={scrollStyle as any}
         showScrollerFade={showScrollerFade}
-        onContextMenu={lookupEventHandler("contextMenu")}
+        onContextMenu={onContextMenu}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children, createChildLayoutContext(layoutContext, {
@@ -480,9 +486,9 @@ function renderStack({
       showScrollerFade={showScrollerFade}
       style={autoGapStyle}
       classes={classes}
-      onClick={lookupEventHandler("click")}
-      onContextMenu={lookupEventHandler("contextMenu")}
-      onMount={lookupEventHandler("mounted")}
+      onClick={onClick}
+      onContextMenu={onContextMenu}
+      onMount={onMount}
       registerComponentApi={registerComponentApi}
       desktopOnly={extractValue.asOptionalBoolean(node.props?.desktopOnly)}
     >
@@ -495,135 +501,175 @@ function renderStack({
   );
 }
 
-export const stackComponentRenderer = createComponentRenderer(
+const STACK_EVENTS = {
+  click: "onClick",
+  contextMenu: "onContextMenu",
+  mounted: "onMount",
+} as const;
+
+export const stackComponentRenderer = wrapComponent(
   COMP,
+  Stack,
   StackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
-    const orientation = extractValue(node.props?.orientation) || DEFAULT_ORIENTATION;
-    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
-    const verticalAlignment = extractValue(node.props?.verticalAlignment);
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
-    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(
-      node.props?.itemWidth,
-      orientation === "vertical" ? "100%" : "fit-content"
-    );
-    return renderStack({
-      node,
-      extractValue,
-      classes,
-      orientation,
-      horizontalAlignment,
-      verticalAlignment,
-      scrollStyle,
-      showScrollerFade,
-      wrapContent,
-      itemWidth,
-      lookupEventHandler,
-      renderChild,
-      registerComponentApi,
-      layoutContext,
-    });
+  {
+    events: STACK_EVENTS,
+    exposeRegisterApi: true,
+    customRender(props, { node, extractValue, renderChild, layoutContext }) {
+      const orientation = (props.orientation as string) || DEFAULT_ORIENTATION;
+      const itemWidth =
+        extractValue.asSize(node.props?.itemWidth) ??
+        extractValue.asOptionalString(
+          node.props?.itemWidth,
+          orientation === "vertical" ? "100%" : "fit-content",
+        );
+      return renderStack({
+        node,
+        extractValue,
+        classes: props.classes,
+        orientation,
+        horizontalAlignment: props.horizontalAlignment,
+        verticalAlignment: props.verticalAlignment,
+        scrollStyle: props.scrollStyle,
+        showScrollerFade: props.showScrollerFade,
+        wrapContent: props.wrapContent,
+        itemWidth,
+        onClick: props.onClick,
+        onContextMenu: props.onContextMenu,
+        onMount: props.onMount,
+        renderChild,
+        registerComponentApi: props.registerComponentApi,
+        layoutContext,
+      });
+    },
   },
 );
 
-export const vStackComponentRenderer = createComponentRenderer(
+export const vStackComponentRenderer = wrapComponent(
   "VStack",
+  Stack,
   VStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
-    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
-    const verticalAlignment = extractValue(node.props?.verticalAlignment);
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
-    return renderStack({
-      node,
-      extractValue,
-      classes,
-      lookupEventHandler,
-      renderChild,
-      orientation: "vertical",
-      horizontalAlignment,
-      verticalAlignment,
-      scrollStyle,
-      itemWidth,
-      registerComponentApi,
-      layoutContext,
-    });
+  {
+    events: STACK_EVENTS,
+    exposeRegisterApi: true,
+    customRender(props, { node, extractValue, renderChild, layoutContext }) {
+      const itemWidth =
+        extractValue.asSize(node.props?.itemWidth) ??
+        extractValue.asOptionalString(node.props?.itemWidth, "100%");
+      return renderStack({
+        node,
+        extractValue,
+        classes: props.classes,
+        orientation: "vertical",
+        horizontalAlignment: props.horizontalAlignment,
+        verticalAlignment: props.verticalAlignment,
+        scrollStyle: props.scrollStyle,
+        showScrollerFade: props.showScrollerFade,
+        itemWidth,
+        onClick: props.onClick,
+        onContextMenu: props.onContextMenu,
+        onMount: props.onMount,
+        renderChild,
+        registerComponentApi: props.registerComponentApi,
+        layoutContext,
+      });
+    },
   },
 );
 
-export const hStackComponentRenderer = createComponentRenderer(
+export const hStackComponentRenderer = wrapComponent(
   "HStack",
+  Stack,
   HStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
-    const horizontalAlignment = extractValue(node.props?.horizontalAlignment);
-    const verticalAlignment = extractValue(node.props?.verticalAlignment);
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
-    return renderStack({
-      node,
-      extractValue,
-      classes,
-      lookupEventHandler,
-      renderChild,
-      orientation: "horizontal",
-      horizontalAlignment,
-      verticalAlignment,
-      scrollStyle,
-      wrapContent,
-      itemWidth,
-      registerComponentApi,
-      layoutContext,
-    });
+  {
+    events: STACK_EVENTS,
+    exposeRegisterApi: true,
+    customRender(props, { node, extractValue, renderChild, layoutContext }) {
+      const itemWidth =
+        extractValue.asSize(node.props?.itemWidth) ??
+        extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+      return renderStack({
+        node,
+        extractValue,
+        classes: props.classes,
+        orientation: "horizontal",
+        horizontalAlignment: props.horizontalAlignment,
+        verticalAlignment: props.verticalAlignment,
+        scrollStyle: props.scrollStyle,
+        showScrollerFade: props.showScrollerFade,
+        wrapContent: props.wrapContent,
+        itemWidth,
+        onClick: props.onClick,
+        onContextMenu: props.onContextMenu,
+        onMount: props.onMount,
+        renderChild,
+        registerComponentApi: props.registerComponentApi,
+        layoutContext,
+      });
+    },
   },
 );
 
-export const cvStackComponentRenderer = createComponentRenderer(
+export const cvStackComponentRenderer = wrapComponent(
   "CVStack",
+  Stack,
   CVStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "100%");
-    return renderStack({
-      node,
-      extractValue,
-      classes,
-      lookupEventHandler,
-      renderChild,
-      orientation: "vertical",
-      horizontalAlignment: "center",
-      verticalAlignment: "center",
-      scrollStyle,
-      itemWidth,
-      registerComponentApi,
-      layoutContext,
-    });
+  {
+    events: STACK_EVENTS,
+    exposeRegisterApi: true,
+    customRender(props, { node, extractValue, renderChild, layoutContext }) {
+      const itemWidth =
+        extractValue.asSize(node.props?.itemWidth) ??
+        extractValue.asOptionalString(node.props?.itemWidth, "100%");
+      return renderStack({
+        node,
+        extractValue,
+        classes: props.classes,
+        orientation: "vertical",
+        horizontalAlignment: "center",
+        verticalAlignment: "center",
+        scrollStyle: props.scrollStyle,
+        showScrollerFade: props.showScrollerFade,
+        itemWidth,
+        onClick: props.onClick,
+        onContextMenu: props.onContextMenu,
+        onMount: props.onMount,
+        renderChild,
+        registerComponentApi: props.registerComponentApi,
+        layoutContext,
+      });
+    },
   },
 );
 
-export const chStackComponentRenderer = createComponentRenderer(
+export const chStackComponentRenderer = wrapComponent(
   "CHStack",
+  Stack,
   CHStackMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi, layoutContext }) => {
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle, defaultProps.scrollStyle);
-    const wrapContent = extractValue.asOptionalBoolean(node.props.wrapContent, false);
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
-    return renderStack({
-      node,
-      extractValue,
-      classes,
-      lookupEventHandler,
-      renderChild,
-      orientation: "horizontal",
-      horizontalAlignment: "center",
-      verticalAlignment: "center",
-      scrollStyle,
-      wrapContent,
-      itemWidth,
-      registerComponentApi,
-      layoutContext,
-    });
+  {
+    events: STACK_EVENTS,
+    exposeRegisterApi: true,
+    customRender(props, { node, extractValue, renderChild, layoutContext }) {
+      const itemWidth =
+        extractValue.asSize(node.props?.itemWidth) ??
+        extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+      return renderStack({
+        node,
+        extractValue,
+        classes: props.classes,
+        orientation: "horizontal",
+        horizontalAlignment: "center",
+        verticalAlignment: "center",
+        scrollStyle: props.scrollStyle,
+        showScrollerFade: props.showScrollerFade,
+        wrapContent: props.wrapContent,
+        itemWidth,
+        onClick: props.onClick,
+        onContextMenu: props.onContextMenu,
+        onMount: props.onMount,
+        renderChild,
+        registerComponentApi: props.registerComponentApi,
+        layoutContext,
+      });
+    },
   },
 );

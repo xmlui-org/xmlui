@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import styles from "./FlowLayout.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
@@ -64,7 +64,8 @@ export const FlowLayoutMd = createMetadata({
         `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -74,7 +75,8 @@ export const FlowLayoutMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
         "The fade indicators automatically appear/disappear based on the current scroll position. " +
         "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
-        "Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "Only works with overlay scrollbar modes (not with 'normal' mode). " +
+        "On mobile/touch devices, this property has no effect.",
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -118,10 +120,8 @@ export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLay
   },
 );
 
-export const flowLayoutComponentRenderer = createComponentRenderer(
-  COMP,
-  FlowLayoutMd,
-  ({ node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
+export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowLayoutMd, {
+  customRender: (_props, { node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -134,7 +134,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
     const scrollStyle = extractValue.asOptionalString(
       node.props.scrollStyle,
@@ -188,4 +189,4 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       </ThemedFlowLayout>
     );
   },
-);
+});

@@ -1075,11 +1075,9 @@ test.describe("Accessibility", () => {
       </Form>
     `);
 
-    await expect(page.getByRole("textbox").first()).toBeVisible();
+    await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByRole("checkbox")).toBeVisible();
-    // Number inputs in XMLUI appear as textbox with inputmode="numeric"
-    const numberInputs = page.getByRole("textbox");
-    await expect(numberInputs).toHaveCount(2); // text and number both use textbox role
+    await expect(page.getByRole("spinbutton")).toBeVisible();
   });
 });
 
@@ -1088,7 +1086,7 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  test("applies textColor-FormItemLabel theme variable", async ({
+  test("applies textColor-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1100,7 +1098,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textColor-FormItemLabel": "rgb(255, 0, 0)",
+          "textColor-label-formItem": "rgb(255, 0, 0)",
         },
       },
     );
@@ -1109,7 +1107,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("color", "rgb(255, 0, 0)");
   });
 
-  test("applies fontSize-FormItemLabel theme variable", async ({
+  test("applies fontSize-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1121,7 +1119,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontSize-FormItemLabel": "18px",
+          "fontSize-label-formItem": "18px",
         },
       },
     );
@@ -1130,7 +1128,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-size", "18px");
   });
 
-  test("applies fontWeight-FormItemLabel theme variable", async ({
+  test("applies fontWeight-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1142,7 +1140,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontWeight-FormItemLabel": "700",
+          "fontWeight-label-formItem": "700",
         },
       },
     );
@@ -1151,7 +1149,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-weight", "700");
   });
 
-  test("applies fontStyle-FormItemLabel theme variable", async ({
+  test("applies fontStyle-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1163,7 +1161,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "fontStyle-FormItemLabel": "italic",
+          "fontStyle-label-formItem": "italic",
         },
       },
     );
@@ -1172,7 +1170,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("font-style", "italic");
   });
 
-  test("applies textTransform-FormItemLabel theme variable", async ({
+  test("applies textTransform-label-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1184,7 +1182,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textTransform-FormItemLabel": "uppercase",
+          "textTransform-label-formItem": "uppercase",
         },
       },
     );
@@ -1193,7 +1191,7 @@ test.describe("Theme Variables", () => {
     await expect(driver.label).toHaveCSS("text-transform", "uppercase");
   });
 
-  test("applies textColor-FormItemLabel-requiredMark theme variable", async ({
+  test("applies textColor-requiredMark-formItem theme variable", async ({
     initTestBed,
     createFormItemDriver,
   }) => {
@@ -1205,7 +1203,7 @@ test.describe("Theme Variables", () => {
     `,
       {
         testThemeVars: {
-          "textColor-FormItemLabel-requiredMark": "rgb(0, 255, 0)",
+          "textColor-requiredMark-formItem": "rgb(0, 255, 0)",
         },
       },
     );
@@ -1986,5 +1984,134 @@ test.describe("Phone Pattern Validation", () => {
     // Empty optional field should pass pattern validation — no warning expected
     const phoneField = page.getByTestId("phoneField");
     await expect(phoneField).not.toContainText("Not a valid phone number");
+  });
+});
+
+// =============================================================================
+// REGEX VALIDATION TESTS
+// =============================================================================
+
+test.describe("Regex Validation", () => {
+  test("shows error for value not matching regex", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldDriver = await createFormItemDriver("field");
+    const fieldInput = await createTextBoxDriver(fieldDriver.input);
+
+    await fieldInput.field.fill("abc123");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).toContainText("Letters only");
+  });
+
+  test("does not show error for value matching regex", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldDriver = await createFormItemDriver("field");
+    const fieldInput = await createTextBoxDriver(fieldDriver.input);
+
+    await fieldInput.field.fill("hello");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("does not show error for empty value (optional field)", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldDriver = await createFormItemDriver("field");
+    const fieldInput = await createTextBoxDriver(fieldDriver.input);
+
+    // Make the field dirty then clear — empty is valid for optional fields
+    await fieldInput.field.fill("x");
+    await fieldInput.field.clear();
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("regex with brace quantifiers works when passed as JS expression", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    // Patterns containing curly braces (e.g. {3}) must be wrapped in a JS string
+    // expression — regex="{'^pattern{N}$'}" — to prevent XMLUI's expression
+    // parser from consuming the braces as reactive expressions.
+    await initTestBed(`
+      <Form id="testForm">
+        <FormItem
+          testId="field"
+          bindTo="code"
+          regex="{'^[a-z]{3}$'}"
+          regexInvalidMessage="Must be exactly 3 lowercase letters"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldDriver = await createFormItemDriver("field");
+    const fieldInput = await createTextBoxDriver(fieldDriver.input);
+
+    // "ab" is too short — should fail
+    await fieldInput.field.fill("ab");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).toContainText("Must be exactly 3 lowercase letters");
+
+    // "abc" matches exactly — should pass
+    await fieldInput.field.fill("abc");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).not.toContainText("Must be exactly 3 lowercase letters");
   });
 });

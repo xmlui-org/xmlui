@@ -177,10 +177,17 @@ function DataLoader({
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
       // Capture the current trace ID when fetch is triggered
-      // This way the trace is preserved even if the handler completes before fetch does
+      // This way the trace is preserved even if the handler completes before fetch does.
+      // After startup is complete, don't capture the startup trace — otherwise
+      // DataSource re-fetches (e.g. after navigation) get incorrectly attributed to startup.
       if (typeof window !== "undefined") {
         const w = window as any;
-        pendingTraceIdRef.current = w._xsCurrentTrace;
+        const current = w._xsCurrentTrace;
+        if (current && w._xsStartupComplete && current === w._xsStartupTrace) {
+          pendingTraceIdRef.current = undefined;
+        } else {
+          pendingTraceIdRef.current = current;
+        }
       }
 
       // For CSV data type, handle directly rather than using RestApiProxy
@@ -587,7 +594,7 @@ function DataLoader({
   }, [hasMockData, appContext, loader.props.mockData, state]);
   const mockDataValue = useShallowCompareMemoize(mockDataInner);
 
-  const doLoadMock = useCallback(async () => {
+  const doLoadMock = useCallback(() => {
     return mockDataValue ?? null;
   }, [mockDataValue]);
 

@@ -1,6 +1,6 @@
 import styles from "./FormItem.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useMemo } from "react";
 import {
@@ -241,20 +241,20 @@ export const FormItemMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "textColor-FormItemLabel": "$textColor",
-    "fontSize-FormItemLabel": "$fontSize-sm",
-    "fontWeight-FormItemLabel": "$fontWeight-medium",
-    "fontStyle-FormItemLabel": "normal",
-    "textTransform-FormItemLabel": "none",
-    "textColor-FormItemLabel-requiredMark": "$color-danger-400",
-    "textColor-FormItemLabel-optionalTag": "$textColor-secondary",
+    "textColor-label-formItem": "$textColor",
+    "fontSize-label-formItem": "$fontSize-sm",
+    "fontWeight-label-formItem": "$fontWeight-medium",
+    "fontStyle-label-formItem": "normal",
+    "textTransform-label-formItem": "none",
+    "textColor-requiredMark-formItem": "$color-danger-400",
+    "textColor-optionalTag-formItem": "$textColor-secondary",
   },
 });
 
-export const formItemComponentRenderer = createComponentRenderer(
-  COMP,
-  FormItemMd,
-  ({
+export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemMd, {
+  exposeRegisterApi: true,
+  exclude: ["inputTemplate"],
+  customRender: (_props, {
     node,
     renderChild,
     extractValue,
@@ -313,7 +313,7 @@ export const formItemComponentRenderer = createComponentRenderer(
             return (
               <MemoizedItem
                 contextVars={contextVars}
-                node={value}
+                node={value as any}
                 renderChild={renderChild}
                 layoutContext={layoutContext}
               />
@@ -346,7 +346,7 @@ export const formItemComponentRenderer = createComponentRenderer(
         patternInvalidSeverity={parseSeverity(
           extractValue.asOptionalString(patternInvalidSeverity),
         )}
-        regex={extractValue.asOptionalString(regex)}
+        regex={extractValue(regex)}
         regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
         regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
         //  ----
@@ -398,4 +398,4 @@ export const formItemComponentRenderer = createComponentRenderer(
       </FormItem>
     );
   },
-);
+});

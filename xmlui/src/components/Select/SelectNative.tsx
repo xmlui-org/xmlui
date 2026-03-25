@@ -19,6 +19,7 @@ import { noop } from "../../components-core/constants";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
+import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { ThemedIcon } from "../Icon/Icon";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
@@ -455,11 +456,34 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
+      // Emit interaction + native trace events for option selection.
+      // The interaction event is needed because Radix Select handles selection
+      // internally without firing a DOM click that AppContent can capture.
+      // Gated on _xsLogs existence (proxy for xsVerbose) to avoid work when tracing is off.
+      if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+        const selectedOption = options.find((o) => String(o.value) === String(selectedValue));
+        const optionLabel = selectedOption?.label || String(selectedValue);
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: (window as any)._xsCurrentTrace,
+          kind: "interaction",
+          interaction: "click",
+          componentType: "Select",
+          componentLabel: optionLabel,
+          ariaRole: "option",
+          ariaName: optionLabel,
+        });
+        pushXsLog(createLogEntry("native:selection:change", {
+          displayLabel: optionLabel,
+          value: newSelectedValue,
+        }));
+      }
       if (!multiSelect) {
         setOpen(false);
       }
     },
-    [multiSelect, currentValue, updateState, onDidChange],
+    [multiSelect, currentValue, updateState, onDidChange, options],
   );
 
   // Clear selected value
@@ -927,6 +951,8 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
     <div
       ref={optionRef}
       role="option"
+      aria-label={label || value}
+      data-component-type="Option"
       aria-disabled={!enabled}
       aria-selected={selected}
       className={classnames(styles.multiSelectOption, {

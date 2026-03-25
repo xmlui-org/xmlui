@@ -49,15 +49,21 @@ export const IconMd = createMetadata({
   },
 });
 
-type ThemedIconProps = IconBaseProps & { className?: string; classes?: Record<string, string> };
+type ThemedIconProps = IconBaseProps & {
+  className?: string;
+  classes?: Record<string, string>;
+  tooltip?: string;
+  onClick?: React.MouseEventHandler;
+};
 
-export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(
-  function ThemedIcon({ className, classes, ...props }: ThemedIconProps, ref) {
-    const themeClass = useComponentThemeClass(IconMd);
-    const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
-    return <Icon {...props} className={mergedClass} ref={ref} />;
-  },
-);
+export const ThemedIcon = React.forwardRef<HTMLElement, ThemedIconProps>(function ThemedIcon(
+  { className, classes, tooltip, ...props }: ThemedIconProps,
+  ref,
+) {
+  const themeClass = useComponentThemeClass(IconMd);
+  const mergedClass = `${themeClass}${classes?.[COMPONENT_PART_KEY] ? ` ${classes[COMPONENT_PART_KEY]}` : ""}${className ? ` ${className}` : ""}`;
+  return <Icon {...props} className={mergedClass} ref={ref} aria-label={tooltip} />;
+});
 
 export const iconComponentRenderer = wrapComponent(
   COMP,

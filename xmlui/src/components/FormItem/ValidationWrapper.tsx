@@ -76,16 +76,13 @@ export function ValidationWrapper({
   const { parentFormItemId } = useContext(FormItemContext);
 
   const formItemId = useMemo(() => {
-    if (isFormItem) {
-      return resolveFormItemId({
-        bindTo,
-        defaultId,
-        parentFormItemId,
-        itemIndex,
-      });
-    }
-    return bindTo || defaultId;
-  }, [bindTo, defaultId, isFormItem, itemIndex, parentFormItemId]);
+    return resolveFormItemId({
+      bindTo,
+      defaultId,
+      parentFormItemId,
+      itemIndex,
+    });
+  }, [bindTo, defaultId, itemIndex, parentFormItemId]);
 
   const contextVerboseValidationFeedback = useFormContextPart(
     (value) => value?.verboseValidationFeedback,

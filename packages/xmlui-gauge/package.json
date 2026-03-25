@@ -1,0 +1,17 @@
+{
+  "name": "xmlui-gauge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "smart-webcomponents-react": "^19.0.0",
+    "classnames": "2.5.1"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  }
+}

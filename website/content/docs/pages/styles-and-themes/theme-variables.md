@@ -1290,6 +1290,26 @@ XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This s
 </App>
 ```
 
+## Column Widths [#column-widths]
+
+XMLUI provides Bootstrap-inspired column-width theme variables — `col-1` through `col-12` — that divide the available width into 12 equal parts. Each variable holds the percentage that corresponds to the number of columns it represents (e.g. `col-3` is 25%, `col-6` is 50%, `col-12` is 100%).
+
+These variables are most useful when you want items in a wrapping layout to snap to a grid, such as setting `itemWidth` on an `HStack` with `wrapContent`:
+
+```xmlui-pg display copy name="Column Widths"
+<App var.color="{['red', 'orange', 'yellow', 'green', 'blue']}">
+  <HStack itemWidth="$col-3" wrapContent="true">
+    <Items data="{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]}">
+      <Stack 
+        backgroundColor="{color[($itemIndex) % color.length]}" 
+        height="24px" />
+    </Items>
+  </HStack>
+</App>
+```
+
+The twelve column variables are `col-1`, `col-2`, ..., `col-11`, and `col-12`.
+
 ## Spacing in Layout Containers [#spacing-in-layout-containers]
 
 Besides the spacing theme variables, layout containers provide a few others that can be themed. Use these theme variables to provide consistent spacing with layout containers.

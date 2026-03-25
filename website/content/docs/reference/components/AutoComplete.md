@@ -203,18 +203,6 @@ This event is triggered when the AutoComplete has lost the focus.
 
 **Signature**: `lostFocus(): void`
 
-### `validationIconError` [#validationiconerror]
-
-Icon to display for error state when concise validation summary is enabled.
-
-### `validationIconSuccess` [#validationiconsuccess]
-
-Icon to display for valid state when concise validation summary is enabled.
-
-### `verboseValidationFeedback` [#verbosevalidationfeedback]
-
-Enables a concise validation summary (icon) in input components.
-
 ## Exposed Methods [#exposed-methods]
 
 ### `focus` [#focus]

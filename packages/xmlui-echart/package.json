@@ -2,6 +2,7 @@
   "name": "xmlui-echart",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "echarts": "^5.6.0",
@@ -12,6 +13,7 @@
     "xmlui": "*"
   },
   "scripts": {
-    "build:extension": "xmlui build-lib"
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
   }
 }

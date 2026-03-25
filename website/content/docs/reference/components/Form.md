@@ -76,6 +76,18 @@ This property sets the message to display when the form is submitted successfull
 
 This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form. If this property isnot set, the form does not have an initial value.
 
+### `dataAfterSubmit` [#dataaftersubmit]
+
+> [!DEF]  default: **"keep"**
+
+Controls what happens to the form data after a successful submit. `"keep"` (default) leaves the submitted data in the form. `"reset"` restores the form to its initial data (the value of the `data` property). `"clear"` empties the form as if no `data` property were set.
+
+Available values: `keep` **(default)**, `reset`, `clear`
+
+### `doNotPersistFields` [#donotpersistfields]
+
+An optional list of field names (matching the `bindTo` values of nested `FormItem` components) that should be excluded from the temporary localStorage save. The fields are still submitted normally; they are only excluded from the persisted snapshot.
+
 ### `enabled` [#enabled]
 
 > [!DEF]  default: **true**
@@ -191,6 +203,16 @@ Fields can override `itemRequireLabelMode` with `requireLabelMode`:
 
 This property prevents the modal from closing when the form is submitted.
 
+### `keepOnCancel` [#keeponcancel]
+
+> [!DEF]  default: **false**
+
+When `persist` is enabled and the user cancels the form, this property controls whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).
+
+### `persist` [#persist]
+
+When set to `true` (or a non-empty string), the form temporarily saves its data to localStorage as the user types, so that unsaved changes survive a page reload or crash. On a successful submit the saved data is automatically cleared.
+
 ### `saveInProgressLabel` [#saveinprogresslabel]
 
 > [!DEF]  default: **"Saving..."**
@@ -202,6 +224,10 @@ This property defines the label of the Save button to display during the form da
 > [!DEF]  default: **"Save"**
 
 This property defines the label of the Save button.
+
+### `storageKey` [#storagekey]
+
+The key used to save the form's temporary data in localStorage when `persist` is enabled. If omitted, the form's `id` attribute is used. If the form has no `id`, the key defaults to `"form-data"`.
 
 ### `submitMethod` [#submitmethod]
 

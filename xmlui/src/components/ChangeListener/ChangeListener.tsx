@@ -1,6 +1,6 @@
-import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, dDidChange } from "../metadata-helpers";
-import { ChangeListener, defaultProps } from "./ChangeListenerNative";
+import { ChangeListener, defaultProps } from "./ChangeListenerReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "ChangeListener";
 
@@ -49,17 +49,12 @@ export const ChangeListenerMd = createMetadata({
   },
 });
 
-export const changeListenerComponentRenderer = createComponentRenderer(
+export const changeListenerComponentRenderer = wrapComponent(
   COMP,
+  ChangeListener,
   ChangeListenerMd,
-  ({ node, lookupEventHandler, extractValue }) => {
-    return (
-      <ChangeListener
-        listenTo={extractValue(node.props.listenTo)}
-        throttleWaitInMs={extractValue(node.props.throttleWaitInMs)}
-        debounceWaitInMs={extractValue(node.props.debounceWaitInMs)}
-        onChange={lookupEventHandler("didChange")}
-      />
-    );
+  {
+    stateful: false,
+    events: { didChange: "onChange" },
   },
 );

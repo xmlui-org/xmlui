@@ -1,6 +1,6 @@
 import { type ReactElement, cloneElement } from "react";
 import { buttonVariantValues } from "../../components/abstractions";
-import { badgeVariantValues } from "../../components/Badge/BadgeNative";
+import { badgeVariantValues } from "../../components/Badge/BadgeReact";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { THEME_VAR_PREFIX } from "../theming/layout-resolver";
 import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";

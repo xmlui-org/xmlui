@@ -1,0 +1,15 @@
+{
+  "name": "xmlui-grid-layout",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react-grid-layout": "^1.5.0"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  }
+}

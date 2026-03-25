@@ -1,8 +1,8 @@
 # APICall Deferred Operations Plan
 
 > **Implementation References**: This plan follows conventions defined in:
-> - [overview.md](/Users/dotneteer/source/xmlui/guidelines/xmlui/components/overview.md) - Component creation patterns
-> - [e2e.md](/Users/dotneteer/source/xmlui/guidelines/xmlui/testing/e2e.md) - E2E testing patterns
+> - [overview.md](/Users/dotneteer/source/xmlui/.ai/xmlui/components/overview.md) - Component creation patterns
+> - [e2e.md](/Users/dotneteer/source/xmlui/.ai/xmlui/testing/e2e.md) - E2E testing patterns
 >
 > These documents contain essential patterns for:
 > - Component metadata, renderers, and native implementations

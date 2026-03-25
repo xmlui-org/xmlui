@@ -24,13 +24,14 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
 
     "paddingVertical-NavPanel": "0",
     "marginBottom-logo-NavPanel": "0",
+    "paddingHorizontal-NavPanel": "$space-4",
+    "paddingHorizontal-md-NavPanel": "0",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "$color-surface-0",
-    "fontSize": "15px",
-    "fontFamily-monospace":
-      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    backgroundColor: "$color-surface-0",
+    fontSize: "15px",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
@@ -59,13 +60,13 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
     "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
     "textColor-TableOfContentsItem--active": "$color-surface-900",
-    "borderLeft-TableOfContentsItem--active":
-      "2px solid $color-surface-900",
+    "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
     "fontSize-H1-markdown": "$fontSize-4xl",
-    "fontSize-H1": "$fontSize-4xl",
+    "fontSize-H1": "61px",
+    "fontSize-md-H1": "122px",
     "marginTop-H1-markdown": "$space-2",
     "marginBottom-H1-markdown": "$space-2",
     "fontSize-H2-markdown": "$fontSize-3xl",
@@ -100,6 +101,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "right-CloseButton": "$space-3",
 
     // --- Search
+    "textColor-SearchToggleButton": "$color-surface-500",
+    "textColor-SearchToggleButton--hover": "$color-surface-700",
     "backgroundColor-SearchItem--hover": "$color-surface-50",
 
     // --- Headlines

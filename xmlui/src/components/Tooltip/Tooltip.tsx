@@ -1,5 +1,5 @@
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -117,38 +117,45 @@ export const ThemedTooltip = React.forwardRef<HTMLDivElement, ThemedTooltipProps
   },
 );
 
-export const tooltipComponentRenderer = createComponentRenderer(
+export const tooltipComponentRenderer = wrapComponent(
   "Tooltip",
+  Tooltip,
   TooltipMd,
-  ({ node, extractValue, renderChild, layoutContext, classes }) => {
-    // If there are no children, do not render anything
-    if (!node.children || node.children.length === 0) {
-      return null;
-    }
+  {
+    exclude: [
+      "text", "markdown", "tooltipTemplate", "delayDuration", "skipDelayDuration",
+      "defaultOpen", "showArrow", "side", "align", "sideOffset", "alignOffset", "avoidCollisions",
+    ],
+    customRender(_props, { node, extractValue, renderChild, layoutContext, classes }) {
+      // If there are no children, do not render anything
+      if (!node.children || node.children.length === 0) {
+        return null;
+      }
 
-    // If text is not provided, do not render anything
-    const text = extractValue.asOptionalString(node.props.text);
-    const markdown = extractValue.asOptionalString(node.props.markdown);
-    const tooltipTemplate = node.props.tooltipTemplate;
+      // If text is not provided, do not render anything
+      const text = extractValue.asOptionalString(node.props.text);
+      const markdown = extractValue.asOptionalString(node.props.markdown);
+      const tooltipTemplate = node.props.tooltipTemplate;
 
-    return (
-      <Tooltip
-        text={text}
-        markdown={markdown}
-        tooltipTemplate={renderChild(tooltipTemplate)}
-        delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
-        skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
-        defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}
-        showArrow={extractValue.asOptionalBoolean(node.props.showArrow)}
-        side={extractValue.asOptionalString(node.props.side) as TooltipProps["side"]}
-        align={extractValue.asOptionalString(node.props.align) as TooltipProps["align"]}
-        sideOffset={extractValue.asOptionalNumber(node.props.sideOffset)}
-        alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
-        avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
-        classes={classes}
-      >
-        {renderChild(node.children, layoutContext)}
-      </Tooltip>
-    );
+      return (
+        <Tooltip
+          text={text}
+          markdown={markdown}
+          tooltipTemplate={renderChild(tooltipTemplate)}
+          delayDuration={extractValue.asOptionalNumber(node.props.delayDuration)}
+          skipDelayDuration={extractValue.asOptionalNumber(node.props.skipDelayDuration)}
+          defaultOpen={extractValue.asOptionalBoolean(node.props.defaultOpen)}
+          showArrow={extractValue.asOptionalBoolean(node.props.showArrow)}
+          side={extractValue.asOptionalString(node.props.side) as TooltipProps["side"]}
+          align={extractValue.asOptionalString(node.props.align) as TooltipProps["align"]}
+          sideOffset={extractValue.asOptionalNumber(node.props.sideOffset)}
+          alignOffset={extractValue.asOptionalNumber(node.props.alignOffset)}
+          avoidCollisions={extractValue.asOptionalBoolean(node.props.avoidCollisions)}
+          classes={classes}
+        >
+          {renderChild(node.children, layoutContext)}
+        </Tooltip>
+      );
+    },
   },
 );

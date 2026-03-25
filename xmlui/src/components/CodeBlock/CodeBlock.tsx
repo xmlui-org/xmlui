@@ -1,11 +1,11 @@
 import styles from "./CodeBlock.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { CodeBlock } from "./CodeBlockNative";
+import { CodeBlock } from "./CodeBlockReact";
 import { createMetadata } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "CodeBlock";
 
@@ -49,25 +49,20 @@ export const CodeBlockMd = createMetadata({
 type ThemedCodeBlockProps = React.ComponentPropsWithoutRef<typeof CodeBlock>;
 
 export const ThemedCodeBlock = React.forwardRef<HTMLDivElement, ThemedCodeBlockProps>(
-  function ThemedCodeBlock({ className, ...props }, _ref) {
+  function ThemedCodeBlock({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(CodeBlockMd);
     return (
       <CodeBlock
         {...props}
+        ref={ref}
         className={`${themeClass}${className ? ` ${className}` : ""}`}
       />
     );
   },
 );
 
-export const codeBlockComponentRenderer = createComponentRenderer(
+export const codeBlockComponentRenderer = wrapComponent(
   "CodeBlock",
+  CodeBlock,
   CodeBlockMd,
-  ({ node, renderChild, classes }) => {
-    return (
-      <CodeBlock classes={classes}>
-        {renderChild(node.children)}
-      </CodeBlock>
-    );
-  },
 );

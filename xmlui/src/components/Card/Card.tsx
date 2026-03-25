@@ -3,7 +3,7 @@ import styles from "./Card.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
-import { Card, defaultProps } from "./CardNative";
+import { Card, defaultProps } from "./CardReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -165,5 +165,6 @@ export const cardComponentRenderer = wrapComponent(
   {
     exposeRegisterApi: true,
     childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+    deriveAriaLabel: (props) => props.title,
   },
 );

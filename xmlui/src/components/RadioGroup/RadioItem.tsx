@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, dDidChange } from "../metadata-helpers";
 import { RadioItem, defaultProps } from "./RadioItemNative";
 
@@ -22,16 +22,7 @@ export const RadioItemMd = createMetadata({
   },
 });
 
-export const radioItemComponentRenderer = createComponentRenderer(
-  COMP,
-  RadioItemMd,
-  ({ node, extractValue, lookupEventHandler }) => {
-    return (
-      <RadioItem
-        checked={extractValue(node.props.checked)}
-        value={extractValue(node.props.value)}
-        onDidChange={lookupEventHandler("didChange")}
-      />
-    );
-  },
-);
+export const radioItemComponentRenderer = wrapComponent(COMP, RadioItem, RadioItemMd, {
+  stateful: false,
+  booleans: ["checked"],
+});

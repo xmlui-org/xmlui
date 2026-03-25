@@ -530,24 +530,6 @@ type MockExternalApiOptions = {
   body?: Record<string, any>;
 };
 
-export class BackdropDriver extends ComponentDriver {
-  getBackdrop() {
-    return this.component.locator("> *").first();
-  }
-
-  getOverlay() {
-    return this.component.locator("> *").nth(1);
-  }
-
-  getDefaultBackgroundColor() {
-    return "rgba(0, 0, 0, 0)"; // Default backdrop color
-  }
-
-  getDefaultOpacity() {
-    return "0.1"; // Default backdrop opacity
-  }
-}
-
 export class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
     const { status = 200, headers = {}, body = {} } = apiOptions;
@@ -1045,7 +1027,7 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   get textBox() {
-    return this.input.getByRole("textbox");
+    return this.input.getByRole("textbox").or(this.input.getByRole("spinbutton"));
   }
 
   get checkbox() {

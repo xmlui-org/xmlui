@@ -2,7 +2,7 @@ import type { To } from "react-router-dom";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 import { createUrlWithQueryParams } from "../../components/component-utils";
 import { createAction } from "./actions";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 
 /**
  * Resolves a potentially relative navigation pathname to an absolute path, using
@@ -14,6 +14,7 @@ function resolveRelativePathname(pathname: string | number, currentPathname: str
   if (typeof pathname !== "string") return pathname;
   if (pathname.startsWith("/")) return pathname; // already absolute
   if (pathname === ".") return currentPathname; // stay on current page
+  if (pathname.startsWith("?")) return currentPathname + pathname; // query-only, preserve on current page
   if (pathname === "..") {
     const parts = currentPathname.split("/").filter(Boolean);
     parts.pop();
@@ -53,21 +54,16 @@ function navigate(
       })
     : resolvedPathname;
 
-  // Trace navigation event (only when xsVerbose is enabled)
-  if (appContext?.appGlobals?.xsVerbose === true && typeof window !== "undefined") {
-    const w = window as any;
-    if (Array.isArray(w._xsLogs)) {
-      w._xsLogs.push({
-        ts: Date.now(),
-        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: getCurrentTrace(),
-        kind: "navigate",
-        from: location.pathname,
-        to: String(to),
-        queryParams,
-      });
-    }
-  }
+  // Trace navigation event — pushXsLog is a noop when xsVerbose is off
+  pushXsLog({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: getCurrentTrace(),
+    kind: "navigate",
+    from: location.pathname,
+    to: String(to),
+    queryParams,
+  });
 
   // Use appContext.navigate if available (which includes willNavigate/didNavigate handlers)
   // Otherwise fall back to the direct navigate function.

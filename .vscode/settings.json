@@ -4,6 +4,7 @@
   "files.eol": "\n",
   "vitest.enable": true,
   "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.exclude": ["packages/xmlui-devtools/**"],
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
@@ -103,6 +104,12 @@
       "approve": true,
       "matchCommandLine": true
     },
-    "git fetch": true
+    "git fetch": true,
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && node scripts/generate-docs\\.mjs 2>&1 \\| grep -i \"list\\\\\\|error\\\\\\|warn\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "awk": true,
+    "git stash": true
   }
 }

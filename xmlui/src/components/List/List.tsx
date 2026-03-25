@@ -1,11 +1,18 @@
+import { memo, useRef } from "react";
+
 import styles from "./List.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
-import { ListNative, MemoizedSection, defaultProps } from "./ListNative";
+import {
+  StandaloneSelectionStore,
+  useSelectionContext,
+} from "../SelectionStore/SelectionStoreNative";
+import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListNative";
+import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
 
 const COMP = "List";
 
@@ -108,10 +115,164 @@ export const ListMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.borderCollapse,
     },
+    rowsSelectable: d(`Indicates whether the rows are selectable (\`true\`) or not (\`false\`).`),
+    enableMultiRowSelection: {
+      description:
+        `This boolean property indicates whether you can select multiple rows in the list. ` +
+        `This property only has an effect when the rowsSelectable property is set. Setting it ` +
+        `to \`false\` limits selection to a single row.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.enableMultiRowSelection,
+    },
+    initiallySelected: d(
+      `An array of IDs that should be initially selected when the list is rendered. ` +
+        `This property only has an effect when the rowsSelectable property is set to \`true\`.`,
+    ),
+    syncWithVar: d(
+      `The name of a global variable to synchronize the list's selection state with. ` +
+        `The named variable must reference an object; the list will read from and write to its ` +
+        `'selectedIds' property. When provided, this takes precedence over ` +
+        `\`initiallySelected\`.`,
+    ),
+    rowUnselectablePredicate: {
+      description:
+        `This property defines a predicate function with a return value that determines if the ` +
+        `row should be unselectable. The function retrieves the item to display and should return ` +
+        `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
+    },
+    hideSelectionCheckboxes: {
+      description:
+        "If true, hides selection checkboxes. Selection logic still works via API and keyboard.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideSelectionCheckboxes,
+    },
+    selectionCheckboxPosition: {
+      description:
+        `Controls the placement mode of selection checkboxes. \`"before"\` (default) renders ` +
+        `the checkbox inline before the item content. \`"overlay"\` renders the checkbox ` +
+        `absolutely positioned inside the item's bounding box, overlapping the content. ` +
+        `Use \`selectionCheckboxAnchor\`, \`selectionCheckboxOffsetX\`, and ` +
+        `\`selectionCheckboxOffsetY\` to control the overlay position.`,
+      valueType: "string",
+      availableValues: selectionCheckboxPositionValues,
+      defaultValue: defaultProps.selectionCheckboxPosition,
+    },
+    selectionCheckboxAnchor: {
+      description:
+        `The corner of the item that the overlay checkbox is anchored to. Only applies when ` +
+        `\`selectionCheckboxPosition\` is \`"overlay"\`. Offsets are measured inward from the chosen corner.`,
+      valueType: "string",
+      availableValues: selectionCheckboxAnchorValues,
+      defaultValue: defaultProps.selectionCheckboxAnchor,
+    },
+    selectionCheckboxOffsetX: {
+      description:
+        `Horizontal distance of the overlay checkbox from its anchor corner. Accepts any CSS length ` +
+        `value (e.g. \`"8px"\`, \`"1rem"\`). Only applies when \`selectionCheckboxPosition\` is \`"overlay"\`.`,
+      valueType: "string",
+      defaultValue: defaultProps.selectionCheckboxOffsetX,
+    },
+    selectionCheckboxOffsetY: {
+      description:
+        `Vertical distance of the overlay checkbox from its anchor corner. Accepts any CSS length ` +
+        `value (e.g. \`"8px"\`, \`"1rem"\`). Only applies when \`selectionCheckboxPosition\` is \`"overlay"\`.`,
+      valueType: "string",
+      defaultValue: defaultProps.selectionCheckboxOffsetY,
+    },
+    selectionCheckboxSize: {
+      description:
+        `CSS size of the checkbox (e.g. \`"16px"\`, \`"20px"\`). When not set the browser default ` +
+        `size is used. Applies in both \`"before"\` and \`"overlay"\` modes.`,
+      valueType: "string",
+    },
+    keyBindings: {
+      description:
+        "This property defines keyboard shortcuts for list actions. Provide an object with " +
+        "action names as keys and keyboard shortcut strings as values. Available actions: " +
+        "\`selectAll\`, \`cut\`, \`copy\`, \`paste\`, \`delete\`. If not provided, default shortcuts are used.",
+      valueType: "any",
+    },
   },
   childrenAsTemplate: "itemTemplate",
   events: {
     contextMenu: dContextMenu(COMP),
+    rowDoubleClick: {
+      description: `This event is fired when the user double-clicks a list row. The handler receives the clicked row item as its only argument.`,
+      signature: "rowDoubleClick(item: any): void",
+      parameters: {
+        item: "The clicked list row item.",
+      },
+    },
+    selectionDidChange: {
+      description:
+        `This event is triggered when the list's current selection changes. ` +
+        `Its parameter is an array of the selected list row items.`,
+      signature: "selectionDidChange(selectedItems: any[]): void",
+      parameters: {
+        selectedItems: "An array of the selected list row items.",
+      },
+    },
+    selectAllAction: {
+      description:
+        `This event is triggered when the user presses the select all keyboard shortcut ` +
+        `(default: Ctrl+A/Cmd+A) and \`rowsSelectable\` is set to \`true\`. The component ` +
+        `automatically selects all rows before invoking this handler.`,
+      signature:
+        "selectAll(row: ListRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      parameters: {
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of all selected row items.",
+        selectedIds: "Array of all selected row IDs (as strings).",
+      },
+    },
+    cutAction: {
+      description:
+        `This event is triggered when the user presses the cut keyboard shortcut ` +
+        `(default: Ctrl+X/Cmd+X) and \`rowsSelectable\` is set to \`true\`.`,
+      signature:
+        "cut(row: ListRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      parameters: {
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
+      },
+    },
+    copyAction: {
+      description:
+        `This event is triggered when the user presses the copy keyboard shortcut ` +
+        `(default: Ctrl+C/Cmd+C) and \`rowsSelectable\` is set to \`true\`.`,
+      signature:
+        "copy(row: ListRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      parameters: {
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
+      },
+    },
+    pasteAction: {
+      description:
+        `This event is triggered when the user presses the paste keyboard shortcut ` +
+        `(default: Ctrl+V/Cmd+V) and \`rowsSelectable\` is set to \`true\`.`,
+      signature:
+        "paste(row: ListRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      parameters: {
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
+      },
+    },
+    deleteAction: {
+      description:
+        `This event is triggered when the user presses the delete keyboard shortcut ` +
+        `(default: Delete key) and \`rowsSelectable\` is set to \`true\`.`,
+      signature:
+        "delete(row: ListRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      parameters: {
+        row: "The currently focused row context, or null if no row is focused.",
+        selectedItems: "Array of selected row items.",
+        selectedIds: "Array of selected row IDs (as strings).",
+      },
+    },
   },
   apis: {
     scrollToTop: {
@@ -136,103 +297,226 @@ export const ListMd = createMetadata({
         id: "The ID of the item to scroll to.",
       },
     },
+    clearSelection: {
+      description: `This method clears the list of currently selected list rows.`,
+      signature: "clearSelection(): void",
+    },
+    getSelectedItems: {
+      description: `This method returns the list of currently selected list row items.`,
+      signature: "getSelectedItems(): Array<any>",
+    },
+    getSelectedIds: {
+      description: `This method returns the list of currently selected list row IDs.`,
+      signature: "getSelectedIds(): Array<string>",
+    },
+    selectAll: {
+      description:
+        `This method selects all the rows in the list. This method has no effect if the ` +
+        `rowsSelectable property is set to \`false\`.`,
+      signature: "selectAll(): void",
+    },
+    selectId: {
+      description:
+        `This method selects the row with the specified ID. This method has no effect if the ` +
+        `\`rowsSelectable\` property is set to \`false\`. The method argument can be a ` +
+        `single id or an array of them.`,
+      signature: "selectId(id: string | Array<string>): void",
+      parameters: {
+        id: `The ID of the row to select, or an array of IDs to select multiple rows.`,
+      },
+    },
   },
   contextVars: {
     $item: d("Current data item being rendered"),
     $itemIndex: dComponent("Zero-based index of current item"),
     $isFirst: dComponent("Boolean indicating if this is the first item"),
     $isLast: dComponent("Boolean indicating if this is the last item"),
+    $isSelected: dComponent("Boolean indicating if this item is currently selected"),
     $group: dComponent("Group information when using `groupBy` (available in group templates)"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor",
+    [`backgroundColor-selected-${COMP}`]: "$color-primary-100",
+    [`backgroundColor-selected-${COMP}--hover`]: "$color-primary-100",
+    [`backgroundColor-row-${COMP}--hover`]: "$color-primary-50",
   },
 });
 
-export const dynamicHeightListComponentRenderer = createComponentRenderer(
-  COMP,
-  ListMd,
-  ({
-    node,
-    extractValue,
-    renderChild,
-    classes,
-    layoutContext,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    const itemTemplate = node.props.itemTemplate;
-    const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
-    return (
-      <ListNative
-        registerComponentApi={registerComponentApi}
-        classes={classes}
-        loading={extractValue.asOptionalBoolean(node.props.loading)}
-        items={extractValue(node.props.items) || extractValue(node.props.data)}
-        limit={extractValue(node.props.limit)}
-        groupBy={extractValue(node.props.groupBy)}
-        orderBy={extractValue(node.props.orderBy)}
-        availableGroups={extractValue(node.props.availableGroups)}
-        scrollAnchor={node.props.scrollAnchor as any}
-        pageInfo={extractValue(node.props.pageInfo)}
-        idKey={extractValue(node.props.idKey)}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
-        requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}
-        emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
-        groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
-        defaultGroups={extractValue(node.props.defaultGroups)}
-        borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
-        fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
-        itemRenderer={
-          itemTemplate &&
-          ((item, key, rowIndex, count) => {
-            return (
-              <MemoizedItem
-                node={itemTemplate as any}
-                key={key}
-                renderChild={renderChild}
-                layoutContext={layoutContext}
-                contextVars={{
-                  $item: item,
-                  $itemIndex: rowIndex,
-                  $isFirst: rowIndex === 0,
-                  $isLast: rowIndex === count - 1,
-                }}
-              />
-            );
-          })
+const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+
+const ListWithSelection = memo(function ListWithSelection({
+  extractValue,
+  node,
+  renderChild,
+  lookupEventHandler,
+  lookupAction,
+  lookupSyncCallback,
+  classes,
+  registerComponentApi,
+  layoutContext,
+}: Pick<
+  RendererContext,
+  | "extractValue"
+  | "node"
+  | "renderChild"
+  | "lookupEventHandler"
+  | "lookupAction"
+  | "lookupSyncCallback"
+  | "classes"
+  | "registerComponentApi"
+> & { layoutContext?: LayoutContext }) {
+  const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
+  const itemTemplate = node.props.itemTemplate;
+  const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
+
+  const selectionContext = useSelectionContext();
+
+  // Build a syncWithVar-compatible adapter for global-variable sync.
+  const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+  const lookupActionRef = useRef(lookupAction);
+  lookupActionRef.current = lookupAction;
+  const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+
+  let syncAdapter: any;
+  if (syncVarName !== undefined) {
+    if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
+      console.error(`[List syncWithVar] Invalid variable name: "${syncVarName}"`);
+      syncAdapterHolderRef.current = null;
+    } else {
+      const currentSyncVarValue = extractValue(`{${syncVarName}}`);
+      if (currentSyncVarValue != null) {
+        if (!syncAdapterHolderRef.current) {
+          syncAdapterHolderRef.current = {
+            value: currentSyncVarValue,
+            update: ({ selectedIds }: { selectedIds: string[] }) => {
+              const valueJson = JSON.stringify(selectedIds);
+              const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
+              const handler = lookupActionRef.current?.(expr, { ephemeral: true });
+              handler?.();
+            },
+          };
+        } else {
+          syncAdapterHolderRef.current.value = currentSyncVarValue;
         }
-        sectionRenderer={
-          node.props.groupBy
-            ? (item, key) =>
-                (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
-                  <MemoizedSection
-                    node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
-                    renderChild={renderChild}
-                    key={key}
-                    item={item}
-                  />
-                ) : null
-            : undefined
-        }
-        sectionFooterRenderer={
-          node.props.groupFooterTemplate
-            ? (item, key) =>
-                (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
-                  <MemoizedItem
-                    node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
-                    renderChild={renderChild}
-                    key={key}
-                    contextVars={{
-                      $group: item,
-                    }}
-                  />
-                ) : null
-            : undefined
-        }
-      />
-    );
-  },
-);
+      } else {
+        syncAdapterHolderRef.current = null;
+      }
+    }
+  } else {
+    syncAdapterHolderRef.current = null;
+  }
+  syncAdapter = syncAdapterHolderRef.current;
+
+  const listContent = (
+    <ListNative
+      registerComponentApi={registerComponentApi}
+      classes={classes}
+      loading={extractValue.asOptionalBoolean(node.props.loading)}
+      items={extractValue(node.props.items) || extractValue(node.props.data)}
+      limit={extractValue(node.props.limit)}
+      groupBy={extractValue(node.props.groupBy)}
+      orderBy={extractValue(node.props.orderBy)}
+      availableGroups={extractValue(node.props.availableGroups)}
+      scrollAnchor={node.props.scrollAnchor as any}
+      pageInfo={extractValue(node.props.pageInfo)}
+      idKey={extractValue(node.props.idKey)}
+      onContextMenu={lookupEventHandler("contextMenu")}
+      requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
+      requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}
+      emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
+      groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
+      defaultGroups={extractValue(node.props.defaultGroups)}
+      borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
+      fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
+      rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+      enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
+      initiallySelected={extractValue(node.props.initiallySelected)}
+      syncWithAppState={syncAdapter}
+      rowUnselectablePredicate={lookupSyncCallback(node.props.rowUnselectablePredicate)}
+      hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
+      selectionCheckboxPosition={extractValue.asOptionalString(node.props.selectionCheckboxPosition) as any}
+      selectionCheckboxAnchor={extractValue.asOptionalString(node.props.selectionCheckboxAnchor) as any}
+      selectionCheckboxOffsetX={extractValue.asSize(node.props.selectionCheckboxOffsetX || defaultProps.selectionCheckboxOffsetX) }
+      selectionCheckboxOffsetY={extractValue.asSize(node.props.selectionCheckboxOffsetY || defaultProps.selectionCheckboxOffsetY)}
+      selectionCheckboxSize={extractValue.asSize(node.props.selectionCheckboxSize)}
+      onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+      onSelectAllAction={lookupEventHandler("selectAllAction")}
+      onCutAction={lookupEventHandler("cutAction")}
+      onCopyAction={lookupEventHandler("copyAction")}
+      onPasteAction={lookupEventHandler("pasteAction")}
+      onDeleteAction={lookupEventHandler("deleteAction")}
+      rowDoubleClick={lookupEventHandler("rowDoubleClick")}
+      keyBindings={extractValue(node.props.keyBindings)}
+      itemRenderer={
+        itemTemplate &&
+        ((item, key, rowIndex, count, isSelected) => {
+          return (
+            <MemoizedItem
+              node={itemTemplate as any}
+              key={key}
+              renderChild={renderChild}
+              layoutContext={layoutContext}
+              contextVars={{
+                $item: item,
+                $itemIndex: rowIndex,
+                $isFirst: rowIndex === 0,
+                $isLast: rowIndex === count - 1,
+                $isSelected: isSelected,
+              }}
+            />
+          );
+        })
+      }
+      sectionRenderer={
+        node.props.groupBy
+          ? (item, key) =>
+              (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+                <MemoizedSection
+                  node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
+                  renderChild={renderChild}
+                  key={key}
+                  item={item}
+                />
+              ) : null
+          : undefined
+      }
+      sectionFooterRenderer={
+        node.props.groupFooterTemplate
+          ? (item, key) =>
+              (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+                <MemoizedItem
+                  node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
+                  renderChild={renderChild}
+                  key={key}
+                  contextVars={{
+                    $group: item,
+                  }}
+                />
+              ) : null
+          : undefined
+      }
+    />
+  );
+
+  if (selectionContext === null) {
+    return <StandaloneSelectionStore idKey={idKey}>{listContent}</StandaloneSelectionStore>;
+  }
+  return listContent;
+});
+
+export const dynamicHeightListComponentRenderer = wrapComponent(COMP, ListNative, ListMd, {
+  customRender: (_props, context) => (
+    <ListWithSelection
+      node={context.node as any}
+      extractValue={context.extractValue}
+      lookupEventHandler={context.lookupEventHandler as any}
+      lookupAction={context.lookupAction}
+      lookupSyncCallback={context.lookupSyncCallback}
+      classes={context.classes}
+      renderChild={context.renderChild}
+      registerComponentApi={context.registerComponentApi}
+      layoutContext={context.layoutContext}
+    />
+  ),
+});

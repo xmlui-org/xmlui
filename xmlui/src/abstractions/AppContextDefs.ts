@@ -163,6 +163,9 @@ export type AppContextObject = {
   // This property determines the base name used for the router.
   routerBaseName: string;
 
+  // This property returns the current URL pathname (e.g. "/about"), or undefined in non-browser environments.
+  pathname: string | undefined;
+
   // This function sets navigation event handlers (willNavigate and didNavigate).
   // Used by the App component to register navigation events.
   setNavigationHandlers?: (
@@ -253,6 +256,40 @@ export type AppContextObject = {
   distinct: (arr: any[]) => any[];
   forceRefreshAnchorScroll: () => void;
   scrollBookmarkIntoView: (bookmarkId: string, smoothScrolling?: boolean) => void;
+
+  // ==============================================================================================
+  // Local Storage Utilities
+
+  // Reads a value from localStorage using dot-path key semantics. Returns `fallback`
+  // if the key is absent, unparseable, or any error occurs.
+  readLocalStorage: (key: string, fallback?: any) => any;
+
+  // Writes a value to localStorage using dot-path key semantics. Dot-path keys
+  // merge into the existing root entry rather than replacing it.
+  writeLocalStorage: (key: string, value: any) => void;
+
+  // Deletes a value from localStorage using dot-path key semantics.
+  // Removes the entire entry for simple keys; unsets a sub-path for dot-path keys.
+  deleteLocalStorage: (key: string) => void;
+
+  // Clears localStorage entries. With no argument, wipes all entries.
+  // With a prefix, removes only entries whose root key starts with that prefix.
+  clearLocalStorage: (prefix?: string) => void;
+
+  // Alias for clearLocalStorage. Removes localStorage entries.
+  // No argument wipes all entries; with a prefix removes only matching entries.
+  // Preferred name for app-level "Reset settings" actions.
+  resetLocalStorage: (prefix?: string) => void;
+
+  // Returns all current localStorage entries as a plain object, with values JSON-parsed
+  // where possible. Non-JSON values are returned as raw strings.
+  getAllLocalStorage: () => Record<string, any>;
+
+  // Timestamp (Date.now()) of the last localStorage mutation performed via the XMLUI
+  // storage functions. Starts at 0 (no mutations since page load). Use with ChangeListener
+  // to reactively respond to any storage change:
+  //   <ChangeListener listenTo="{storageTimestamp}" onChange="..." />
+  storageTimestamp: number;
 
   // ==============================================================================================
   // AppState Global State Management

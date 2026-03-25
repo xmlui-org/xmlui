@@ -534,14 +534,14 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       <span key={index} className={styles.badge}>
                         {v?.label}
                         {!readOnly && (
-                          <ThemedIcon
-                            name="close"
-                            size="sm"
+                          <span
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleOption(v.value);
                             }}
-                          />
+                          >
+                            <ThemedIcon name="close" size="sm" />
+                          </span>
                         )}
                       </span>
                     ))}

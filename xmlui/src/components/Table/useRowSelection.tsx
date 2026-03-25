@@ -6,6 +6,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 /**
  * An interval of selected items
@@ -402,6 +403,16 @@ export default function useRowSelection({
       }
 
       const targetId = walkableList[targetIndex];
+      const targetItem = visibleItems[targetIndex];
+
+      // --- If the target item is unselectable, ignore the interaction
+      if (
+        targetItem &&
+        (rowDisabledPredicate?.(targetItem) || rowUnselectablePredicate?.(targetItem))
+      ) {
+        return;
+      }
+
       const { shiftKey, metaKey, ctrlKey } = options;
 
       const singleItem = !enableMultiRowSelection || (!shiftKey && !metaKey && !ctrlKey);
@@ -451,7 +462,12 @@ export default function useRowSelection({
           }
 
           const sl = walkableList.slice(normalizedFromIdx, normalizedToIdx + 1);
-          newSelectedRowsIdsInOrder = union(newSelectedRowsIdsInOrder, sl);
+          // --- Exclude unselectable items from the range
+          const selectableSl = sl.filter((id) => {
+            const item = visibleItems.find((i) => i[idKey] === id);
+            return !item || (!rowDisabledPredicate?.(item) && !rowUnselectablePredicate?.(item));
+          });
+          newSelectedRowsIdsInOrder = union(newSelectedRowsIdsInOrder, selectableSl);
           newSelectionInterval = {
             from: from,
             to: to,
@@ -542,20 +558,17 @@ export default function useRowSelection({
 
   useEffect(() => {
     void onSelectionDidChangeRef.current?.(selectedItems);
-    if (selectedItems.length > 0 && typeof window !== "undefined") {
-      const w = window as any;
-      if (Array.isArray(w._xsLogs)) {
-        w._xsLogs.push({
-          ts: Date.now(),
-          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: w._xsCurrentTrace,
-          kind: "selection:change",
-          component: "Table",
-          displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
-          selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
-          selectedCount: selectedItems.length,
-        });
-      }
+    if (selectedItems.length > 0) {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "selection:change",
+        component: "Table",
+        displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
+        selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
+        selectedCount: selectedItems.length,
+      });
     }
   }, [selectedItems]);
 

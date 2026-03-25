@@ -10,9 +10,10 @@ interface AdornmentProps {
   text?: string;
   className?: string;
   onClick?: () => void;
+  tabIndex?: number;
 }
 
-export function Adornment({ iconName, text, className, onClick, ...rest }: AdornmentProps) {
+export function Adornment({ iconName, text, className, onClick, tabIndex, ...rest }: AdornmentProps) {
   return (
     <>
       {iconName || text ? (
@@ -23,7 +24,7 @@ export function Adornment({ iconName, text, className, onClick, ...rest }: Adorn
           })}
           role={onClick ? "button" : "presentation"}
           onClick={onClick}
-          tabIndex={onClick ? 0 : undefined}
+          tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
         >
           <ThemedIcon name={iconName} style={{ color: "inherit" }} />
           {text && (

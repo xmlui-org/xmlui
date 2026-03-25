@@ -1,5 +1,41 @@
 # xmlui
 
+## 0.12.12
+
+### Patch Changes
+
+- 44546ae: Fix tab-out issue with PasswordInput
+- 0a4c214: expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project
+- 6dda27c: Ignore scrollStyle and showScrollerFade on mobile devices
+- d65101f: Wire Inspector icon color through theme system so it responds to theme changes
+- 82f5ad4: Experiment with persisting unsubmitted Form data
+- fffde0d: Move Blog component from xmlui core to xmlui-docs-blocks extension package
+- c9871a9: Fix DataSource reactivity through variables
+- 7e0dab5: Improve component property name linting with responsive properties and behavior properties
+- 894a635: Fix Select regression in Form (versus FormItem type="select")
+- 77254bc: Move Carousel to xmlui-website-blocks extension
+- 679b397: Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).
+
+## 0.12.11
+
+### Patch Changes
+
+- 3daa045: Fix FormItem theme variable regression
+- 93a19dd: Charts moved from xmlui core to the xmlui-recharts extension
+- 8a3180d: Fix FormItem type="checkbox" regression
+- 1b695f0: fix: JSDOM preventing running xmlui commands when bundled into executable file
+- c903b50: List can handle row selection (similarly to Table)
+
+## 0.12.10
+
+### Patch Changes
+
+- 166139f: fix error callback running on previous failed ApiCall after component mounts, as if the current call failed.
+- bb6dfd8: Add bootstrap-like column widths
+- 83c84c6: Remove RealTimeAdapter component
+- d456b4b: Move Backdrop and Breakout to the xmlui-website-blocks extension
+- bd49e49: Add experimental local storage persistence
+
 ## 0.12.9
 
 ### Patch Changes

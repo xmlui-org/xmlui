@@ -1,6 +1,6 @@
 import styles from "./NavLink.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
@@ -147,10 +147,8 @@ export const ThemedNavLink = React.forwardRef<React.ElementRef<typeof NavLink>, 
   },
 );
 
-export const navLinkComponentRenderer = createComponentRenderer(
-  COMP,
-  NavLinkMd,
-  ({ node, extractValue, renderChild, classes }) => {
+export const navLinkComponentRenderer = wrapComponent(COMP, NavLink, NavLinkMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes }) => {
     const iconName = extractValue.asString(node.props.icon);
     return (
       <NavLink
@@ -172,4 +170,4 @@ export const navLinkComponentRenderer = createComponentRenderer(
       </NavLink>
     );
   },
-);
+});

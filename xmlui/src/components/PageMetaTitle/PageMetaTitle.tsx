@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { PageMetaTitle, defaultProps } from "./PageMetaTilteNative";
 
@@ -14,13 +14,23 @@ export const PageMetaTitleMd = createMetadata({
       description: `This property sets the page's title to display in the browser tab.`,
       defaultValue: defaultProps.title,
     },
+    noSuffix: {
+      description:
+        "When set to `true`, suppresses the app name suffix (e.g. `| XMLUI`) that is " +
+        "automatically appended to the page title.",
+      valueType: "boolean",
+      defaultValue: defaultProps.noSuffix,
+    },
   },
 });
 
-export const pageMetaTitleComponentRenderer = createComponentRenderer(
-  COMP,
-  PageMetaTitleMd,
-  ({ node, extractValue, renderChild }) => {
-    return <PageMetaTitle title={extractValue(node.props.value) || renderChild(node.children)} />;
+export const pageMetaTitleComponentRenderer = wrapComponent(COMP, PageMetaTitle, PageMetaTitleMd, {
+  customRender: (_props, { node, extractValue, renderChild }) => {
+    return (
+      <PageMetaTitle
+        title={extractValue(node.props.value) || renderChild(node.children)}
+        noSuffix={extractValue.asOptionalBoolean(node.props.noSuffix)}
+      />
+    );
   },
-);
+});

@@ -1,6 +1,6 @@
-import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata } from "../metadata-helpers";
-import { Bookmark, defaultProps } from "./BookmarkNative";
+import { Bookmark, defaultProps } from "./BookmarkReact";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Bookmark";
 
@@ -46,21 +46,12 @@ export const BookmarkMd = createMetadata({
   },
 });
 
-export const bookmarkComponentRenderer = createComponentRenderer(
+export const bookmarkComponentRenderer = wrapComponent(
   COMP,
+  Bookmark,
   BookmarkMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, layoutContext } = rendererContext;
-
-    return (
-      <Bookmark
-        uid={extractValue(node.uid)}
-        level={extractValue(node.props.level)}
-        title={extractValue(node.props.title)}
-        omitFromToc={extractValue.asOptionalBoolean(node.props.omitFromToc)}
-      >
-        {renderChild(node.children, layoutContext)}
-      </Bookmark>
-    );
+  {
+    passUid: true,
+    exposeRegisterApi: true,
   },
 );

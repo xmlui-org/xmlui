@@ -1,0 +1,27 @@
+{
+  "name": "xmlui-tiptap-editor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
+    "@tiptap/extension-table": "^2.12.0",
+    "@tiptap/extension-table-row": "^2.12.0",
+    "@tiptap/extension-table-cell": "^2.12.0",
+    "@tiptap/extension-table-header": "^2.12.0",
+    "@tiptap/extension-link": "^2.12.0",
+    "@tiptap/extension-task-list": "^2.12.0",
+    "@tiptap/extension-task-item": "^2.12.0",
+    "@tiptap/extension-placeholder": "^2.12.0",
+    "tiptap-markdown": "^0.8.10",
+    "classnames": "2.5.1"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  }
+}

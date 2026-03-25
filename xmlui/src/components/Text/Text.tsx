@@ -1,7 +1,7 @@
 import styles from "./Text.module.scss";
 
 import React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -213,45 +213,51 @@ export const ThemedText = React.forwardRef<HTMLElement, ThemedTextProps>(
   },
 );
 
-export const textComponentRenderer = createComponentRenderer(
+export const textComponentRenderer = wrapComponent(
   COMP,
+  Text,
   TextMd,
-  ({ node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler }) => {
-    const {
-      variant,
-      maxLines,
-      preserveLinebreaks,
-      ellipses,
-      overflowMode,
-      breakMode,
-      value,
-      ...variantSpecific
-    } = node.props;
+  {
+    exposeRegisterApi: true,
+    exclude: ["variant", "maxLines", "preserveLinebreaks", "ellipses", "overflowMode", "breakMode", "value"],
+    events: [],
+    customRender(_props, { node, extractValue, classes, renderChild, registerComponentApi, lookupEventHandler }) {
+      const {
+        variant,
+        maxLines,
+        preserveLinebreaks,
+        ellipses,
+        overflowMode,
+        breakMode,
+        value,
+        ...variantSpecific
+      } = node.props;
 
-    const variantSpecificProps: VariantProps = Object.fromEntries(
-      Object.entries(variantSpecific)
-        .filter(([key, _]) => VariantPropsKeys.includes(key as any))
-        .map(([key, value]) => [key, extractValue(value)]),
-    );
+      const variantSpecificProps: VariantProps = Object.fromEntries(
+        Object.entries(variantSpecific)
+          .filter(([key, _]) => VariantPropsKeys.includes(key as any))
+          .map(([key, value]) => [key, extractValue(value)]),
+      );
 
-    return (
-      <Text
-        variant={extractValue(variant)}
-        maxLines={extractValue.asOptionalNumber(maxLines)}
-        classes={classes}
-        preserveLinebreaks={extractValue.asOptionalBoolean(
-          preserveLinebreaks,
-          defaultProps.preserveLinebreaks,
-        )}
-        ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
-        overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
-        breakMode={extractValue(breakMode) as BreakMode | undefined}
-        registerComponentApi={registerComponentApi}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        {...variantSpecificProps}
-      >
-        {extractValue.asDisplayText(value) || renderChild(node.children)}
-      </Text>
-    );
+      return (
+        <Text
+          variant={extractValue(variant)}
+          maxLines={extractValue.asOptionalNumber(maxLines)}
+          classes={classes}
+          preserveLinebreaks={extractValue.asOptionalBoolean(
+            preserveLinebreaks,
+            defaultProps.preserveLinebreaks,
+          )}
+          ellipses={extractValue.asOptionalBoolean(ellipses, defaultProps.ellipses)}
+          overflowMode={extractValue(overflowMode) as OverflowMode | undefined}
+          breakMode={extractValue(breakMode) as BreakMode | undefined}
+          registerComponentApi={registerComponentApi}
+          onContextMenu={lookupEventHandler("contextMenu")}
+          {...variantSpecificProps}
+        >
+          {extractValue.asDisplayText(value) || renderChild(node.children)}
+        </Text>
+      );
+    },
   },
 );

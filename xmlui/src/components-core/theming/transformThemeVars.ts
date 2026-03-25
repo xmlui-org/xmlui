@@ -74,6 +74,17 @@ export function generateBaseSpacings(theme: Record<string, string> | undefined) 
   return ret;
 }
 
+export function generateBootstrapBaseColumns(theme: Record<string, string> | undefined) {
+  if (!theme) {
+    return {};
+  }
+  const ret: Record<string, string> = {};
+  for (let i = 1; i <= 12; i++) {
+    ret[`col-${i}`] = (100/12 * i).toFixed(4) + "%";
+  }
+  return ret;
+}
+
 export function generateBaseFontSizes(theme: Record<string, string> | undefined) {
   if (!theme) {
     return {};

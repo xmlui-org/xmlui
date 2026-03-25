@@ -225,10 +225,9 @@ describe("inspectorUtils", () => {
       (window as any)._xsLogs = originalXsLogs;
     });
 
-    it("creates _xsLogs array if not exists", () => {
+    it("is a noop when _xsLogs does not exist (xsVerbose off)", () => {
       pushXsLog({ ts: 123, kind: "test" });
-      expect((window as any)._xsLogs).toBeDefined();
-      expect(Array.isArray((window as any)._xsLogs)).toBe(true);
+      expect((window as any)._xsLogs).toBeUndefined();
     });
 
     it("appends to existing _xsLogs array", () => {
@@ -238,6 +237,7 @@ describe("inspectorUtils", () => {
     });
 
     it("enforces max limit", () => {
+      (window as any)._xsLogs = []; // simulate xsVerbose on
       for (let i = 0; i < 10; i++) {
         pushXsLog({ ts: i, kind: "test" }, 5);
       }
@@ -247,7 +247,7 @@ describe("inspectorUtils", () => {
     });
 
     it("uses default max of 200", () => {
-      // Just verify it doesn't throw with many entries
+      (window as any)._xsLogs = []; // simulate xsVerbose on
       for (let i = 0; i < 250; i++) {
         pushXsLog({ ts: i, kind: "test" });
       }

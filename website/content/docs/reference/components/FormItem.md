@@ -406,17 +406,27 @@ Just submitting the form as is also produces the same error.
 
 This value specifies a custom regular expression to test the input value. If this value is not set, no regular expression pattern check is done.
 
-In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
+The following example showcases the `regex` property in action.
+Submit the form as is or type in any kind of input.
 
 ```xmlui-pg copy display name="Example: regex"
 <App>
   <Form
     data="{{ password: 'PASSWORD123' }}"
     onSubmit="(toSave) => toast(JSON.stringify(toSave))">
-    <FormItem regex="^[a-z]+$" bindTo="password" />
+    <FormItem regex="{'^[a-z]+$'}" bindTo="password" />
   </Form>
 </App>
 ```
+
+> [!WARNING]
+> **Mind the curly braces when defining regular expressions!**
+>
+> While patterns such as `"^[a-z]+$"` is correctly handled as a string, using quantifiers in regular expressions can be incorrectly interpreted by the framework as a binding expression. Thus `"^[a-z]{2}(_[A-Z]{2})?$"` becomes `"^[a-z]2(_[A-Z]2)?$"` after evaluation.
+>
+> Either write the expression in a different way, such as `^[a-z][a-z](_[A-Z][A-Z])?$`,
+>
+> OR pass it as a string inside a binding expression like this: `{'^[a-z]{2}(_[A-Z]{2})?$'}`.
 
 ### `regexInvalidMessage` [#regexinvalidmessage]
 
@@ -601,16 +611,16 @@ Removes the item specified by its index from the list held by the FormItem. The 
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-FormItemLabel | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-FormItemLabel | $fontSize-sm | $fontSize-sm |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-FormItemLabel-required | *none* | *none* |
-| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-FormItemLabel | normal | normal |
-| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-FormItemLabel-required | *none* | *none* |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-FormItemLabel | $fontWeight-medium | $fontWeight-medium |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-FormItemLabel-required | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-optionalTag | $textColor-secondary | $textColor-secondary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-required | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-FormItemLabel-requiredMark | $color-danger-400 | $color-danger-400 |
-| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-FormItemLabel | none | none |
-| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-FormItemLabel-required | *none* | *none* |
+| [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-label-formItem | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem | $fontSize-sm | $fontSize-sm |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem--required | *none* | *none* |
+| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem | normal | normal |
+| [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem--required | *none* | *none* |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem | $fontWeight-medium | $fontWeight-medium |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem--required | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem | $textColor | $textColor |
+| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem--required | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-optionalTag-formItem | $textColor-secondary | $textColor-secondary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-requiredMark-formItem | $color-danger-400 | $color-danger-400 |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-label-formItem | none | none |
+| [textTransform](/docs/styles-and-themes/common-units/#textTransform)-label-formItem--required | *none* | *none* |

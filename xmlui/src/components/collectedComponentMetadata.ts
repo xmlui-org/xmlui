@@ -46,7 +46,6 @@ import { PageMd, PagesMd } from "./Pages/Pages";
 import { ProgressBarMd } from "./ProgressBar/ProgressBar";
 import { QueueMd } from "./Queue/Queue";
 import { RadioGroupMd } from "./RadioGroup/RadioGroup";
-import { RealTimeAdapterMd } from "./RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "./Redirect/Redirect";
 import { SelectMd } from "./Select/Select";
 import { SelectionStoreMd } from "./SelectionStore/SelectionStore";
@@ -58,7 +57,6 @@ import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
-import { BlogMd } from "./Blog/Blog";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
@@ -69,14 +67,11 @@ import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { BreakoutMd } from "./Breakout/Breakout";
-import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
-import { BackdropMd } from "./Backdrop/Backdrop";
 import { BrMd } from "./Br/Br";
 import {
   HtmlAddressMd,
@@ -194,12 +189,6 @@ import {
   XmlUiThemeDefinition,
   XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
-import { BarChartMd } from "./Charts/BarChart/BarChart";
-import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
-import { LabelListMd } from "./Charts/LabelList/LabelList";
-import { LegendMd } from "./Charts/Legend/Legend";
-import { LineChartMd } from "./Charts/LineChart/LineChart";
-import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
@@ -325,14 +314,10 @@ export const collectedComponentMetadata = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
-  Backdrop: BackdropMd,
   Badge: BadgeMd,
-  Blog: BlogMd,
   Bookmark: BookmarkMd,
-  Breakout: BreakoutMd,
   Button: ButtonMd,
   Card: CardMd,
-  Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,
@@ -390,7 +375,6 @@ export const collectedComponentMetadata = {
   QRCode: QRCodeMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
-  RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   ResponsiveBar: ResponsiveBarMd,
   ScrollViewer: ScrollViewerMd,
@@ -428,12 +412,6 @@ export const collectedComponentMetadata = {
   NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
-  BarChart: BarChartMd,
-  DonutChart: DonutChartMd,
-  LabelList: LabelListMd,
-  Legend: LegendMd,
-  LineChart: LineChartMd,
-  PieChart: PieChartMd,
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {

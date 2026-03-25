@@ -134,7 +134,8 @@ export const validationBehavior: Behavior = {
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const itemIndex =
       (renderedNode.props as any)?.itemIndex ??
-      extractValue.asOptionalNumber(componentNode.props?.itemIndex);
+      extractValue.asOptionalNumber(componentNode.props?.itemIndex) ??
+      extractValue.asOptionalNumber("{$itemIndex}");
     const formItemType = extractValue.asOptionalString(componentNode.props?.type);
     const inline = extractValue.asOptionalBoolean(componentNode.props?.inline);
     const verboseValidationFeedback = extractValue.asOptionalBoolean(

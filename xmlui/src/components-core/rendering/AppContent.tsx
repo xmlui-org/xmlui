@@ -28,6 +28,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -43,6 +44,9 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  createLogEntry,
+  pushTrace,
+  popTrace,
   splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
@@ -95,7 +99,15 @@ export function AppContent({
   // Note: Startup trace initialization happens during render (near xsVerbose definition)
   // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
-  
+
+  // Bumped to Date.now() on every localStorage mutation — allows markup to react
+  // to storage changes via ChangeListener listenTo="{storageTimestamp}"
+  const [storageTimestamp, setStorageTimestamp] = useState<number>(0);
+  useEffect(() => {
+    setStorageChangeListener(() => setStorageTimestamp(Date.now()));
+    return () => setStorageChangeListener(null);
+  }, []);
+
   // --- Navigation event handlers state
   const [navigationHandlers, setNavigationHandlersState] = useState<{
     onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
@@ -502,6 +514,11 @@ export function AppContent({
     if (!w._xsCurrentTrace) {
       w._xsCurrentTrace = w._xsStartupTrace;
     }
+    // Expose tracing flag and helpers for state-layers method:call instrumentation
+    w.__xsVerbose = true;
+    if (!w.__xsTraceHelpers) {
+      w.__xsTraceHelpers = { pushTrace, popTrace, pushXsLog, createLogEntry };
+    }
   }
 
   const update = useCallback(
@@ -655,7 +672,8 @@ export function AppContent({
 
       const inspectEl = withInspectId || closestInspect;
       const testIdEl = withTestId || closestTestId;
-      const nearest = inspectEl || testIdEl || target;
+      const componentTypeEl = target?.closest?.("[data-component-type]") as HTMLElement | null;
+      const nearest = inspectEl || testIdEl || componentTypeEl || target;
 
       const inspectId = inspectEl?.getAttribute?.("data-inspectid") || undefined;
       const testId = testIdEl?.getAttribute?.("data-testid") || undefined;
@@ -867,7 +885,7 @@ export function AppContent({
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
       w._xsCurrentTrace = interactionId;
       lastEventTraceId = interactionId;
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs,
         eventTs: logEventTs,
@@ -882,10 +900,7 @@ export function AppContent({
         ariaName: detail.ariaName,
         detail,
         text: safeStringify(detail),
-      });
-      if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-        splicePreservingInteractions(w._xsLogs, xsLogMax);
-      }
+      }, xsLogMax);
     };
 
     const types = ["click", "dblclick", "contextmenu", "keydown"];
@@ -902,19 +917,14 @@ export function AppContent({
   // --- Wrap toast to log calls to _xsLogs for test trace capture
   const tracedToast = useMemo(() => {
     function logToast(type: string, message: unknown) {
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        if (Array.isArray(w._xsLogs)) {
-          w._xsLogs.push({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: w._xsCurrentTrace,
-            kind: "toast",
-            toastType: type,
-            message: typeof message === "string" ? message : String(message),
-          });
-        }
-      }
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "toast",
+        toastType: type,
+        message: typeof message === "string" ? message : String(message),
+      });
     }
     const wrapper: any = (message: unknown, opts?: any) => {
       logToast("default", message);
@@ -970,6 +980,10 @@ export function AppContent({
       // --- Math-related
       ...mathFunctions,
 
+      // --- Local storage utilities
+      ...localStorageFunctions,
+      storageTimestamp,
+
       // --- File Utilities
       formatFileSizeInBytes,
       getFileExtension,
@@ -977,6 +991,7 @@ export function AppContent({
       // --- Navigation-related
       navigate,
       routerBaseName,
+      get pathname() { return globalThis?.location?.pathname; },
       setNavigationHandlers,
 
       // --- Notifications and dialogs
@@ -1043,6 +1058,7 @@ export function AppContent({
     root,
     AppState,
     pubSubService,
+    storageTimestamp,
   ]);
 
   return (
@@ -1060,20 +1076,15 @@ function signError(error: Error | string) {
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);
-  // Also log to _xsLogs when xsVerbose is active (same guard as ErrorBoundary).
-  if (typeof window !== "undefined") {
-    const w = window as any;
-    if (Array.isArray(w._xsLogs)) {
-      w._xsLogs.push({
-        ts: Date.now(),
-        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: w._xsCurrentTrace,
-        kind: "error:runtime",
-        error: message,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-    }
-  }
+  // Also log to _xsLogs — pushXsLog is a noop when xsVerbose is off
+  pushXsLog({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+    kind: "error:runtime",
+    error: message,
+    stack: error instanceof Error ? error.stack : undefined,
+  });
 }
 
 /**

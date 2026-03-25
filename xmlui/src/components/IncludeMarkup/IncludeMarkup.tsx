@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
 import { IncludeMarkupNative } from "./IncludeMarkupNative";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -43,23 +43,14 @@ export const IncludeMarkupMd = createMetadata({
   },
 });
 
-export const includeMarkupComponentRenderer = createComponentRenderer(
-  COMP,
-  IncludeMarkupMd,
-  ({ node, extractValue, renderChild, lookupEventHandler }) => {
-    const url = extractValue.asOptionalString(node.props.url);
-    const loadingContent = renderChild(node.props.loadingContent);
-    const onDidLoad = lookupEventHandler("didLoad");
-    const onDidFail = lookupEventHandler("didFail");
-
-    return (
-      <IncludeMarkupNative
-        url={url}
-        loadingContent={loadingContent as React.ReactNode}
-        onDidLoad={onDidLoad}
-        onDidFail={onDidFail}
-        renderComponent={(def) => renderChild(def as ComponentDef) as React.ReactNode}
-      />
-    );
-  },
-);
+export const includeMarkupComponentRenderer = wrapComponent(COMP, IncludeMarkupNative, IncludeMarkupMd, {
+  customRender: (props, { renderChild }) => (
+    <IncludeMarkupNative
+      url={props.url}
+      loadingContent={props.loadingContent}
+      onDidLoad={props.onDidLoad}
+      onDidFail={props.onDidFail}
+      renderComponent={(def) => renderChild(def as ComponentDef)}
+    />
+  ),
+});

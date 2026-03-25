@@ -14,14 +14,15 @@ function traceApiCall(
   details?: Record<string, any>,
 ) {
   if (appContext.appGlobals?.xsVerbose !== true) return;
+  const { _traceId, ...rest } = details || {};
   pushXsLog({
     ts: Date.now(),
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-    traceId: getCurrentTrace(),
+    traceId: _traceId || getCurrentTrace(),
     kind,
     url,
     method,
-    ...details,
+    ...rest,
   });
 }
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
@@ -395,7 +396,9 @@ export async function callApi(
       eventName: "progress",
     });
 
-    // Trace API call start
+    // Trace API call start — capture traceId before await so api:complete
+    // uses the same context (getCurrentTrace() may change after await)
+    const apiTraceId = getCurrentTrace();
     traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
@@ -411,12 +414,13 @@ export async function callApi(
       onResponseHeaders,
     });
 
-    // Trace API call completion
+    // Trace API call completion — reuse traceId from start
     traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
       transactionId: clientTxId,
       body: resolvedBody,
       result,
       status: getLastApiStatus(clientTxId),
+      _traceId: apiTraceId,
     });
 
     const onSuccessFn = typeof onSuccess === "function"

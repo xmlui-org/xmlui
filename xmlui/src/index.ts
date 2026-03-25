@@ -29,6 +29,7 @@ import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
 import type {
   ComponentRendererDef,
+  CompoundComponentRendererInfo,
   RegisterComponentApiFn,
   RendererContext,
 } from "./abstractions/RendererDefs";
@@ -50,7 +51,13 @@ import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
-import { Breakout } from "./components/Breakout/BreakoutNative";
+import { ThemedHeading as Heading } from "./components/Heading/Heading";
+import { ThemedImage as Image } from "./components/Image/Image";
+import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
+import { ThemedTableOfContents as TableOfContents } from "./components/TableOfContents/TableOfContents";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
+import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
+import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
@@ -126,6 +133,7 @@ export type {
   ComponentDef,
   ComponentRendererDef,
   CompoundComponentDef,
+  CompoundComponentRendererInfo,
   PropertyValueDescription,
   ComponentLike,
   StandaloneAppDescription,
@@ -211,10 +219,17 @@ export {
   NestedApp,
   VisuallyHidden,
   LinkNative,
+  Heading,
+  Image,
+  Markdown,
+  TableOfContents,
+  FlowLayout,
+  FlowItemWrapper,
+  COMPONENT_PART_KEY,
+  useAppContext,
   ToneChangerButton,
   NavPanelCollapseButton,
   Logo,
-  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
   useComponentThemeClass,

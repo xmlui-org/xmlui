@@ -1,5 +1,5 @@
 import type { ComponentDef } from "../..";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
@@ -132,7 +132,8 @@ export const TreeMd = createMetadata({
         'This property determines the scrollbar style. Options: "normal" uses the browser\'s default ' +
         'scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ' +
         'scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ' +
-        "only while scrolling is active and fades out after 400ms of inactivity.",
+        "only while scrolling is active and fades out after 400ms of inactivity. " +
+        "On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.",
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -150,7 +151,7 @@ export const TreeMd = createMetadata({
         "when scrollable content extends beyond the visible area. The fade effect provides a visual cue " +
         "to users that additional content is available by scrolling. The indicators automatically appear and " +
         'disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ' +
-        '"whenScrolling" scroll styles.',
+        '"whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.',
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -472,124 +473,138 @@ export const TreeMd = createMetadata({
 /**
  * This function defines the renderer for the Tree component.
  */
-export const treeComponentRenderer = createComponentRenderer(
+export const treeComponentRenderer = wrapComponent(
   COMP,
+  TreeComponent,
   TreeMd,
-  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
-    // Default item template if none is provided:
-    //   <HStack verticalAlignment="center">
-    //     <Icon when="{$item.icon}" name="{$item.icon}" />
-    //     <Text value="{$item.name}" />
-    //   </HStack>
-    const defaultItemTemplate: ComponentDef = {
-      type: "HStack",
-      props: {
-        verticalAlignment: "center",
-        gap: "$space-4",
-      },
-      children: [
-        {
-          type: "Icon",
-          when: "{$item.icon}",
-          props: {
-            name: "{$item.icon}",
-          },
+  {
+    exposeRegisterApi: true,
+    events: [],
+    exclude: [
+      "data", "dataFormat", "idField", "nameField", "iconField", "iconExpandedField",
+      "iconCollapsedField", "parentIdField", "childrenField", "selectableField",
+      "dynamicField", "loadedField", "autoLoadAfterField", "dynamic", "selectedValue",
+      "defaultExpanded", "autoExpandToSelection", "itemClickExpands", "iconCollapsed",
+      "iconExpanded", "iconSize", "itemHeight", "fixedItemSize", "animateExpand",
+      "expandRotation", "spinnerDelay", "scrollStyle", "showScrollerFade", "autoLoadAfter",
+      "overflow", "itemTemplate",
+    ],
+    customRender(_props, { node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) {
+      // Default item template if none is provided:
+      //   <HStack verticalAlignment="center">
+      //     <Icon when="{$item.icon}" name="{$item.icon}" />
+      //     <Text value="{$item.name}" />
+      //   </HStack>
+      const defaultItemTemplate: ComponentDef = {
+        type: "HStack",
+        props: {
+          verticalAlignment: "center",
+          gap: "$space-4",
         },
-        {
-          type: "Text",
-          props: {
-            value: "{$item.name}",
+        children: [
+          {
+            type: "Icon",
+            when: "{$item.icon}",
+            props: {
+              name: "{$item.icon}",
+            },
           },
-        },
-      ],
-    };
-    return (
-      <TreeComponent
-        registerComponentApi={registerComponentApi}
-        classes={classes}
-        data={extractValue(node.props.data)}
-        dataFormat={extractValue(node.props.dataFormat)}
-        idField={extractValue(node.props.idField)}
-        nameField={extractValue(node.props.nameField)}
-        iconField={extractValue(node.props.iconField)}
-        iconExpandedField={extractValue(node.props.iconExpandedField)}
-        iconCollapsedField={extractValue(node.props.iconCollapsedField)}
-        parentIdField={extractValue(node.props.parentIdField)}
-        childrenField={extractValue(node.props.childrenField)}
-        selectableField={extractValue(node.props.selectableField)}
-        dynamicField={extractValue(node.props.dynamicField)}
-        loadedField={extractValue(node.props.loadedField)}
-        autoLoadAfterField={extractValue(node.props.autoLoadAfterField)}
-        dynamic={extractValue.asOptionalBoolean(node.props.dynamic, defaultProps.dynamic)}
-        selectedValue={extractValue(node.props.selectedValue)}
-        selectedId={extractValue(node.props.selectedId)}
-        defaultExpanded={extractValue(node.props.defaultExpanded)}
-        autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
-        itemClickExpands={extractValue.asOptionalBoolean(node.props.itemClickExpands)}
-        iconCollapsed={extractValue(node.props.iconCollapsed)}
-        iconExpanded={extractValue(node.props.iconExpanded)}
-        iconSize={extractValue(node.props.iconSize)}
-        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
-        fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
-        animateExpand={extractValue.asOptionalBoolean(
-          node.props.animateExpand,
-          defaultProps.animateExpand,
-        )}
-        expandRotation={extractValue.asOptionalNumber(
-          node.props.expandRotation,
-          defaultProps.expandRotation,
-        )}
-        spinnerDelay={extractValue.asOptionalNumber(
-          node.props.spinnerDelay,
-          defaultProps.spinnerDelay,
-        )}
-        scrollStyle={extractValue.asOptionalString(
-          node.props.scrollStyle,
-          defaultProps.scrollStyle,
-        )}
-        showScrollerFade={extractValue.asOptionalBoolean(
-          node.props.showScrollerFade,
-          defaultProps.showScrollerFade,
-        )}
-        autoLoadAfter={extractValue.asOptionalNumber(node.props.autoLoadAfter)}
-        onSelectionChanged={lookupEventHandler("selectionDidChange")}
-        onNodeExpanded={lookupEventHandler("nodeDidExpand")}
-        onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
-        loadChildren={lookupEventHandler("loadChildren")}
-        onCutAction={lookupEventHandler("cutAction")}
-        onCopyAction={lookupEventHandler("copyAction")}
-        onPasteAction={lookupEventHandler("pasteAction")}
-        onDeleteAction={lookupEventHandler("deleteAction")}
-        overflow={extractValue(node.props.overflow)}
-        lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
-        itemRenderer={(flatTreeNode: any) => {
-          const itemContext = {
-            id: flatTreeNode.id, // $item.id - Internal unique identifier
-            name: flatTreeNode.displayName, // $item.name - Primary display text
-            depth: flatTreeNode.depth, // $item.depth - Nesting level (0-based)
-            isExpanded: flatTreeNode.isExpanded, // $item.isExpanded - Expansion state
-            hasChildren: flatTreeNode.hasChildren, // $item.hasChildren - Children indicator
-            // - icon, iconExpanded, iconCollapsed (from icon fields)
-            // - uid, path, parentIds, selectable, children (TreeNode internals)
-            // - All original source data properties (custom fields)
-            ...flatTreeNode,
-          };
+          {
+            type: "Text",
+            props: {
+              value: "{$item.name}",
+            },
+          },
+        ],
+      };
+      return (
+        <TreeComponent
+          registerComponentApi={registerComponentApi}
+          classes={classes}
+          data={extractValue(node.props.data)}
+          dataFormat={extractValue(node.props.dataFormat)}
+          idField={extractValue(node.props.idField)}
+          nameField={extractValue(node.props.nameField)}
+          iconField={extractValue(node.props.iconField)}
+          iconExpandedField={extractValue(node.props.iconExpandedField)}
+          iconCollapsedField={extractValue(node.props.iconCollapsedField)}
+          parentIdField={extractValue(node.props.parentIdField)}
+          childrenField={extractValue(node.props.childrenField)}
+          selectableField={extractValue(node.props.selectableField)}
+          dynamicField={extractValue(node.props.dynamicField)}
+          loadedField={extractValue(node.props.loadedField)}
+          autoLoadAfterField={extractValue(node.props.autoLoadAfterField)}
+          dynamic={extractValue.asOptionalBoolean(node.props.dynamic, defaultProps.dynamic)}
+          selectedValue={extractValue(node.props.selectedValue)}
+          selectedId={extractValue(node.props.selectedId)}
+          defaultExpanded={extractValue(node.props.defaultExpanded)}
+          autoExpandToSelection={extractValue(node.props.autoExpandToSelection)}
+          itemClickExpands={extractValue.asOptionalBoolean(node.props.itemClickExpands)}
+          iconCollapsed={extractValue(node.props.iconCollapsed)}
+          iconExpanded={extractValue(node.props.iconExpanded)}
+          iconSize={extractValue(node.props.iconSize)}
+          itemHeight={extractValue.asOptionalNumber(node.props.itemHeight, defaultProps.itemHeight)}
+          fixedItemSize={extractValue.asOptionalBoolean(node.props.fixedItemSize)}
+          animateExpand={extractValue.asOptionalBoolean(
+            node.props.animateExpand,
+            defaultProps.animateExpand,
+          )}
+          expandRotation={extractValue.asOptionalNumber(
+            node.props.expandRotation,
+            defaultProps.expandRotation,
+          )}
+          spinnerDelay={extractValue.asOptionalNumber(
+            node.props.spinnerDelay,
+            defaultProps.spinnerDelay,
+          )}
+          scrollStyle={extractValue.asOptionalString(
+            node.props.scrollStyle,
+            defaultProps.scrollStyle,
+          )}
+          showScrollerFade={extractValue.asOptionalBoolean(
+            node.props.showScrollerFade,
+            defaultProps.showScrollerFade,
+          )}
+          autoLoadAfter={extractValue.asOptionalNumber(node.props.autoLoadAfter)}
+          onSelectionChanged={lookupEventHandler("selectionDidChange")}
+          onNodeExpanded={lookupEventHandler("nodeDidExpand")}
+          onNodeCollapsed={lookupEventHandler("nodeDidCollapse")}
+          loadChildren={lookupEventHandler("loadChildren")}
+          onCutAction={lookupEventHandler("cutAction")}
+          onCopyAction={lookupEventHandler("copyAction")}
+          onPasteAction={lookupEventHandler("pasteAction")}
+          onDeleteAction={lookupEventHandler("deleteAction")}
+          overflow={extractValue(node.props.overflow)}
+          lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
+          itemRenderer={(flatTreeNode: any) => {
+            const itemContext = {
+              id: flatTreeNode.id, // $item.id - Internal unique identifier
+              name: flatTreeNode.displayName, // $item.name - Primary display text
+              depth: flatTreeNode.depth, // $item.depth - Nesting level (0-based)
+              isExpanded: flatTreeNode.isExpanded, // $item.isExpanded - Expansion state
+              hasChildren: flatTreeNode.hasChildren, // $item.hasChildren - Children indicator
+              // - icon, iconExpanded, iconCollapsed (from icon fields)
+              // - uid, path, parentIds, selectable, children (TreeNode internals)
+              // - All original source data properties (custom fields)
+              ...flatTreeNode,
+            };
 
-          return node.props.itemTemplate ? (
-            <MemoizedItem
-              node={node.props.itemTemplate}
-              contextVars={{ $item: itemContext }}
-              renderChild={renderChild}
-            />
-          ) : (
-            <MemoizedItem
-              node={defaultItemTemplate}
-              contextVars={{ $item: itemContext }}
-              renderChild={renderChild}
-            />
-          );
-        }}
-      />
-    );
+            return node.props.itemTemplate ? (
+              <MemoizedItem
+                node={node.props.itemTemplate}
+                contextVars={{ $item: itemContext }}
+                renderChild={renderChild}
+              />
+            ) : (
+              <MemoizedItem
+                node={defaultItemTemplate}
+                contextVars={{ $item: itemContext }}
+                renderChild={renderChild}
+              />
+            );
+          }}
+        />
+      );
+    },
   },
 );
