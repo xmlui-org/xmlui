@@ -100,3 +100,54 @@ describe("parseBindingExpression - Safari Compatibility", () => {
     expect(result).toBe("EXTRACTED({a})EXTRACTED({b})");
   });
 });
+
+describe("parseBindingExpression - code fence handling", () => {
+  const mockValueExtractor = ((expr: any) => `EXTRACTED(${expr})`) as any;
+
+  it("should not replace binding expressions inside a code fence", () => {
+    const input = "```\n@{value}\n```";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe("```\n@{value}\n```");
+  });
+
+  it("should replace binding expressions outside a code fence", () => {
+    const input = "Before @{value}\n```\n@{value}\n```\nAfter @{value}";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe(
+      "Before EXTRACTED({value})\n```\n@{value}\n```\nAfter EXTRACTED({value})",
+    );
+  });
+
+  it("should replace binding expressions in text between code fences", () => {
+    const input = "```\n@{a}\n```\n@{b}\n```\n@{c}\n```";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe("```\n@{a}\n```\nEXTRACTED({b})\n```\n@{c}\n```");
+  });
+
+  it("should not replace in a fenced block with a language tag", () => {
+    const input = "```xml\n@{value}\n```";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe("```xml\n@{value}\n```");
+  });
+
+  it("should handle empty binding inside code fence", () => {
+    const input = "Outside @{}\n```\n@{}\n```";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    // @{} outside is stripped; @{} inside fence is preserved
+    expect(result).toBe("Outside \n```\n@{}\n```");
+  });
+
+  it("should preserve entire content of code fence unchanged", () => {
+    const input = "```\nsome code\n@{a} @{b}\nmore code\n```\nOutside: @{a}";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe(
+      "```\nsome code\n@{a} @{b}\nmore code\n```\nOutside: EXTRACTED({a})",
+    );
+  });
+
+  it("should handle text with no trailing newline after closing fence", () => {
+    const input = "text @{a}\n```\n@{b}\n```";
+    const result = parseBindingExpression(input, mockValueExtractor);
+    expect(result).toBe("text EXTRACTED({a})\n```\n@{b}\n```");
+  });
+});

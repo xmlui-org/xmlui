@@ -512,3 +512,52 @@ test.describe("Heading ID Generation Regression", () => {
     await expect(brElements).toHaveCount(0);
   });
 });
+
+// =============================================================================
+// REGRESSION: binding expressions not replaced inside code fences
+// =============================================================================
+
+test.describe("Binding expression code-fence exclusion regression", () => {
+  test("does not replace @{} binding inside a triple-backtick code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // The expression inside the code fence must remain literal
+    await expect(driver.component).toHaveText("@{someValue}");
+  });
+
+  test("replaces @{} binding outside a code fence but not inside", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "Value: @{someValue}\n\n```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // Outside the fence: replaced; inside: literal
+    const text = await driver.component.textContent();
+    expect(text).toContain("Value: 42");
+    expect(text).toContain("@{someValue}");
+  });
+
+  test("replaces @{} binding in text after a closing code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```\n\nOutside: @{someValue}";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    const text = await driver.component.textContent();
+    // Code fence content is literal; text after the fence is replaced
+    expect(text).toContain("@{someValue}");
+    expect(text).toContain("Outside: 42");
+  });
+});
