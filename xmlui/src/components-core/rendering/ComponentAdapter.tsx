@@ -22,6 +22,7 @@ import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
+import { useFnDeps } from "../FnDepsContext";
 import { EMPTY_OBJECT } from "../constants";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { ApiBoundComponent } from "../ApiBoundComponent";
@@ -214,10 +215,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+  // --- Get the function dependencies from the parent container
+  const fnDeps = useFnDeps();
+
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Obtain a function that can execute a script synchronously
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
