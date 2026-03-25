@@ -55,7 +55,7 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
 
     &.start {
       flex-direction: row;
-      align-items: center;
+      align-items: flex-start;
       justify-content: start;
       gap: 0.5em;
     }
@@ -135,11 +135,11 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
   }
 
   .validationMessageAbsolute {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    white-space: nowrap;
-    z-index: 1;
+    position: static;
+    top: auto;
+    left: auto;
+    white-space: normal;
+    z-index: auto;
   }
 
   .helperTextContainer {
