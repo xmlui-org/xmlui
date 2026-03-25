@@ -1500,7 +1500,7 @@ export const Table = forwardRef(
           (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
           paginationControls}
 
-        <table className={styles.table} ref={tableRef}>
+        <table className={styles.table} ref={tableRef} aria-label={(rest as any)["aria-label"]}>
           {!hideHeader && (
             <>
               <thead

@@ -3,12 +3,13 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
-import { Column, defaultProps } from "./ColumnNative";
+import { Column, defaultProps } from "./ColumnReact";
 
 const COMP = "Column";
 
 export const ColumnMd = createMetadata({
   status: "stable",
+  nonVisual: true,
   description:
     "`Column` defines the structure and behavior of individual table columns " +
     "within a [`Table`](/docs/reference/components/Table) component. Each Column controls data " +
@@ -111,7 +112,7 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         horizontalAlignment === 'center' ? 'center' :
         horizontalAlignment === 'end' ? 'flex-end' :
         horizontalAlignment;
-      style.textAlign = horizontalAlignment as any; // Also set textAlign for text content
+      style.textAlign = horizontalAlignment as React.CSSProperties["textAlign"]; // Also set textAlign for text content
     }
     if (verticalAlignment) {
       if (!style.display) {
@@ -122,7 +123,7 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
         verticalAlignment === 'center' ? 'center' :
         verticalAlignment === 'end' ? 'flex-end' :
         verticalAlignment;
-      style.verticalAlign = verticalAlignment as any; // Also set verticalAlign for fallback
+      style.verticalAlign = verticalAlignment as React.CSSProperties["verticalAlign"]; // Also set verticalAlign for fallback
     }
 
     return (

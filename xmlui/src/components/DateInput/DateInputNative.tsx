@@ -1,6 +1,7 @@
 import React, { type CSSProperties } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./DateInput.module.scss";
 import { format, parse, isValid } from "date-fns";
@@ -15,21 +16,17 @@ import { ThemedIcon } from "../Icon/Icon";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-
-// Component part names
-const PART_DAY = "day";
-const PART_MONTH = "month";
-const PART_YEAR = "year";
-const PART_CLEAR_BUTTON = "clearButton";
-const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
+import {
+  PART_CLEAR_BUTTON,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+  PART_DAY,
+  PART_MONTH,
+  PART_YEAR,
+} from "../../components-core/parts";
 
 // Date validation constants
 const MIN_YEAR = 1900;
 const MAX_YEAR = 2100;
-
-// Browser compatibility checks
-const isIEOrEdgeLegacy =
-  typeof window !== "undefined" && /(MSIE|Trident\/|Edge\/)/.test(navigator.userAgent);
 
 // Date format types
 export const dateFormats = [
@@ -79,7 +76,7 @@ type Props = {
   weekStartsOn?: WeekDays;
   minValue?: string;
   maxValue?: string;
-  disabledDates?: any;
+  disabledDates?: unknown;
   inline?: boolean;
   clearable?: boolean;
   clearIcon?: string;
@@ -117,7 +114,7 @@ export const defaultProps = {
   emptyCharacter: "-",
 };
 
-export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNative(
+export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInput(
   {
     id,
     initialValue,
@@ -162,6 +159,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
   ref,
 ) {
   const dateInputRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, dateInputRef);
 
   // Refs for auto-tabbing between inputs
   const dayInputRef = useRef<HTMLInputElement>(null);
@@ -181,14 +179,9 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     return emptyCharacter;
   }, [emptyCharacter]);
 
-  // Stabilize initialValue to prevent unnecessary re-renders
-  const stableInitialValue = useMemo(() => {
-    return initialValue;
-  }, [initialValue]);
-
   // Local state management - sync with value prop
   const [localValue, setLocalValue] = useState<string | null>(() => {
-    const initial = controlledValue || stableInitialValue || null;
+    const initial = controlledValue || initialValue || null;
     return initial;
   });
 
@@ -224,15 +217,15 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
 
   useEffect(() => {
     // Initialize XMLUI state with initial value on first mount
-    if (updateState && stableInitialValue !== undefined && controlledValue === undefined) {
-      updateState({ value: stableInitialValue }, { initial: true });
+    if (updateState && initialValue !== undefined && controlledValue === undefined) {
+      updateState({ value: initialValue }, { initial: true });
       return; // Don't sync on this first run, let the state update trigger a re-render
     }
 
     // Sync with controlled value - always sync when controlledValue changes
     const newLocalValue = controlledValue || null;
     setLocalValue(newLocalValue);
-  }, [controlledValue, stableInitialValue, updateState]);
+  }, [controlledValue, initialValue, updateState]);
 
   // Get the order of date inputs based on the format
   const dateOrder = useMemo(() => {
@@ -496,47 +489,22 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     [onBlur],
   );
 
-  // Arrow key navigation handler
-  const createArrowKeyHandler = useCallback(() => {
-    return (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const { key } = event;
+  // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
+  // (defined below, after getInputRefs)
 
-      if (key === "ArrowRight") {
-        event.preventDefault();
-        const currentTarget = event.target as HTMLInputElement;
+  const clearFocusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-        // Determine next input based on current input
-        if (currentTarget === monthInputRef.current && dayInputRef.current) {
-          dayInputRef.current.focus();
-          dayInputRef.current.select();
-        } else if (currentTarget === dayInputRef.current && yearInputRef.current) {
-          yearInputRef.current.focus();
-          yearInputRef.current.select();
-        }
-      } else if (key === "ArrowLeft") {
-        event.preventDefault();
-        const currentTarget = event.target as HTMLInputElement;
-
-        // Determine previous input based on current input
-        if (currentTarget === dayInputRef.current && monthInputRef.current) {
-          monthInputRef.current.focus();
-          monthInputRef.current.select();
-        } else if (currentTarget === yearInputRef.current && dayInputRef.current) {
-          dayInputRef.current.focus();
-          dayInputRef.current.select();
-        }
-      }
+  useEffect(() => {
+    return () => {
+      if (clearFocusTimerRef.current !== null) clearTimeout(clearFocusTimerRef.current);
     };
   }, []);
-
-  // Create the arrow key handler instance
-  const handleArrowKeys = createArrowKeyHandler();
 
   const clear = useCallback(() => {
     // Reset to initial value if provided, otherwise null
     let valueToReset = clearToInitialValue
-      ? stableInitialValue !== undefined
-        ? stableInitialValue
+      ? initialValue !== undefined
+        ? initialValue
         : null
       : null;
 
@@ -561,10 +529,11 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     handleChange(valueToReset);
 
     // Focus the component after clearing
-    setTimeout(() => {
-      focus();
+    if (clearFocusTimerRef.current !== null) clearTimeout(clearFocusTimerRef.current);
+    clearFocusTimerRef.current = setTimeout(() => {
+      if (dateInputRef.current) focus();
     }, 0);
-  }, [stableInitialValue, handleChange, dateFormat, clearToInitialValue, focus]);
+  }, [initialValue, handleChange, dateFormat, clearToInitialValue, focus, dateInputRef]);
 
   function stopPropagation(event: React.FocusEvent) {
     event.stopPropagation();
@@ -671,6 +640,31 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
     return dateOrder.map((field) => refs[field as keyof typeof refs]);
   }, [dateOrder]);
 
+  // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
+  const handleArrowKeys = useCallback(
+    (event: React.KeyboardEvent<HTMLInputElement>) => {
+      const { key } = event;
+      if (key !== "ArrowLeft" && key !== "ArrowRight") return;
+
+      const inputRefs = getInputRefs();
+      const currentIndex = inputRefs.findIndex((r) => r?.current === event.currentTarget);
+      if (currentIndex === -1) return;
+
+      if (key === "ArrowRight" && currentIndex < inputRefs.length - 1) {
+        event.preventDefault();
+        const next = inputRefs[currentIndex + 1];
+        next?.current?.focus();
+        next?.current?.select();
+      } else if (key === "ArrowLeft" && currentIndex > 0) {
+        event.preventDefault();
+        const prev = inputRefs[currentIndex - 1];
+        prev?.current?.focus();
+        prev?.current?.select();
+      }
+    },
+    [getInputRefs],
+  );
+
   // Helper function to create input components in the right order
   const createDateInputs = () => {
     const inputRefs = getInputRefs();
@@ -770,7 +764,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
 
   return (
     <div
-      ref={dateInputRef}
+      ref={composedRef}
       className={classnames(
         styles.dateInputWrapper,
         {
@@ -819,7 +813,7 @@ export const DateInput = forwardRef<HTMLDivElement, Props>(function DateInputNat
       {endAdornment}
     </div>
   );
-});
+}));
 
 // Input component types
 type InputProps = {
@@ -1141,12 +1135,7 @@ function YearInput({
 // Input helper functions
 function onFocus(event: React.FocusEvent<HTMLInputElement>) {
   const { target } = event;
-
-  if (isIEOrEdgeLegacy) {
-    requestAnimationFrame(() => target.select());
-  } else {
-    target.select();
-  }
+  target.select();
 }
 
 // Utility function to parse date string into components

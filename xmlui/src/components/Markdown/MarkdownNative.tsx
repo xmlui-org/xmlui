@@ -26,7 +26,7 @@ import {
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
 import { ThemedCodeBlock as CodeBlock } from "../CodeBlock/CodeBlock";
-import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
+import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockReact";
 import classnames from "classnames";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";

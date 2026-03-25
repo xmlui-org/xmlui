@@ -1,4 +1,4 @@
-import { useCallback, useId, useMemo, useRef } from "react";
+import { memo, useCallback, useId, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
@@ -19,7 +19,7 @@ export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
   canResize: true,
 };
 
-export function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
+export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
 
@@ -76,4 +76,4 @@ export function Column({ nodeChildren, renderChild, layoutContext, ...columnMeta
     };
   }, [id, unRegisterColumn]);
   return null;
-}
+});

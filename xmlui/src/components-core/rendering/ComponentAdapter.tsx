@@ -14,7 +14,7 @@ import type {
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
 import { useStyles } from "../theming/StyleContext";
 import type { StyleObjectType } from "../theming/StyleRegistry";
@@ -22,6 +22,7 @@ import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
+import { useFnDeps } from "../FnDepsContext";
 import { EMPTY_OBJECT } from "../constants";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { ApiBoundComponent } from "../ApiBoundComponent";
@@ -214,10 +215,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+  // --- Get the function dependencies from the parent container
+  const fnDeps = useFnDeps();
+
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Obtain a function that can execute a script synchronously
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
@@ -526,20 +530,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const logInteraction = useCallback(
     (interaction: string, detail?: Record<string, any>) => {
       if (!xsVerbose) return;
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-        w._xsLogs.push({
-          ts: Date.now(),
-          traceId: getCurrentTrace(),
-          kind: "interaction",
-          componentType: safeNode.type,
-          componentLabel: resolvedLabel,
-          uid: safeNode.uid,
-          interaction,
-          detail,
-        });
-      }
+      pushXsLog({
+        ts: Date.now(),
+        traceId: getCurrentTrace(),
+        kind: "interaction",
+        componentType: safeNode.type,
+        componentLabel: resolvedLabel,
+        uid: safeNode.uid,
+        interaction,
+        detail,
+      });
     },
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );

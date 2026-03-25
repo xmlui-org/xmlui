@@ -96,7 +96,12 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   width: 580px;
   margin-top: 4px;
   box-shadow: $boxShadow-Search;
+  position: relative;
+  z-index: 10000;
 
+  @media (max-width: 600px) {
+    width: var(--radix-popover-trigger-width);
+  }
 }
 
 .list {
@@ -181,6 +186,10 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   }
 
   &.fullWidth {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
     width: 100%;
   }
 
@@ -427,22 +436,39 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   background: $backgroundColor-SearchOverlayPanel;
   width: 680px;
   max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 20vh - 2rem);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   box-shadow: $boxShadow-SearchOverlayPanel;
   position: fixed;
   top: 20vh;
   border-radius: t.$space-2_5;
 
   @media (max-width: 600px) {
-    border-radius: 0;
+    border-radius: t.$space-2_5;
     display: flex;
-    top: t.$space-16;
-    position: fixed;
+    top: auto;
+    position: relative;
     flex-direction: column;
-    background: transparent;
+    background: $backgroundColor-SearchOverlayPanel;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: min(680px, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    min-height: 0;
+    overflow: hidden;
+    box-shadow: $boxShadow-SearchOverlayPanel;
   }
 
+}
+
+.overlayPanelWithResults {
+  @media (max-width: 600px) {
+    height: calc(100dvh - 3rem);
+    max-height: calc(100dvh - 3rem);
+  }
 }
 
 .overlayInputRow {
@@ -450,6 +476,10 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
 
   .overlaySearchIcon {
     flex-shrink: 0;
@@ -492,6 +522,10 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   justify-content: space-between;
   padding: 0 1rem;
   border-bottom: 1px solid var(--xmlui-borderColor);
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
 }
 
 .drawerControls {
@@ -545,10 +579,27 @@ $borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlay
   max-height: 420px;
 }
 
+.overlayResultsList {
+  min-height: 0;
+
+  @media (max-width: 600px) {
+    flex: 1 1 auto;
+    height: 0;
+    max-height: none;
+    min-height: 0;
+    display: block;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+}
+
 // Drawer (mobile full-screen) overlay variants
 .overlayBackdropMobile {
-  padding-top: 0;
+  padding: 1.5rem 1rem;
   align-items: flex-start;
+  justify-content: center;
   width: 100vw;
   max-width: 100vw;
   min-height: 100dvh;

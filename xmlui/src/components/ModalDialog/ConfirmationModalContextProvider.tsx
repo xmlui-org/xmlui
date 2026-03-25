@@ -12,6 +12,7 @@ import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { ThemedButton as Button } from "../Button/Button";
 import { ThemedStack as Stack } from "../Stack/Stack";
 import { Dialog } from "./Dialog";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 const ConfirmationModalContext = React.createContext({
   confirm: (title: string, message?: string, actionLabel?: string) => Promise.resolve(false),
@@ -76,7 +77,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         const modalButtons = typeof title === "string"
           ? [{ label: actionLabel || "Ok", value: true }]
           : title.buttons.map(b => ({ label: b.label, value: b.value }));
-        w._xsLogs.push({
+        pushXsLog({
           ts: Date.now(),
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: w._xsCurrentTrace,
@@ -116,7 +117,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       if (w._xsPendingConfirmTrace) {
         w._xsCurrentTrace = w._xsPendingConfirmTrace;
       }
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
         traceId: w._xsCurrentTrace,
@@ -140,7 +141,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       if (w._xsPendingConfirmTrace) {
         w._xsCurrentTrace = w._xsPendingConfirmTrace;
       }
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
         traceId: w._xsCurrentTrace,

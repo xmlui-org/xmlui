@@ -16,10 +16,8 @@ $themeVars: t.composePaddingVars($themeVars, "#{$component}-pill");
 $themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
 
 @layer components {
-  .badge {
-    @include t.paddingVars($themeVars, $component);
-    @include t.borderVars($themeVars, $component);
-    @include t.textVars($themeVars, $component);
+  // Shared layout for both badge and pill variants
+  .container {
     display: inline-block;
     width: fit-content;
     height: fit-content;
@@ -27,6 +25,12 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
     min-width: fit-content;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .badge {
+    @include t.paddingVars($themeVars, $component);
+    @include t.borderVars($themeVars, $component);
+    @include t.textVars($themeVars, $component);
     text-transform: uppercase;
   }
 
@@ -34,13 +38,6 @@ $themeVars: t.composeTextVars($themeVars, "#{$component}-pill");
     @include t.paddingVars($themeVars, "#{$component}-pill");
     @include t.borderVars($themeVars, "#{$component}-pill");
     @include t.textVars($themeVars, "#{$component}-pill");
-    display: inline-block;
-    width: fit-content;
-    height: fit-content;
-    vertical-align: top;
-    min-width: fit-content;
-    overflow: hidden;
-    text-overflow: ellipsis;
     border-radius: 9999px;
   }
 }

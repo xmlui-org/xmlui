@@ -23,7 +23,7 @@ import {
   DateInputModeValues,
   defaultProps,
   WeekDays,
-} from "./DateInputNative";
+} from "./DateInputReact";
 
 const COMP = "DateInput";
 
@@ -45,6 +45,9 @@ export const DateInputMd = createMetadata({
     },
     clearButton: {
       description: "The button to clear the date input.",
+    },
+    conciseValidationFeedback: {
+      description: "The concise validation feedback indicator shown when verboseValidationFeedback is false.",
     },
   },
   props: {

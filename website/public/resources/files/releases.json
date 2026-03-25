@@ -1,5 +1,61 @@
 [
   {
+    "tag_name": "xmlui@0.12.12",
+    "published_at": "2026-03-23T15:29:46Z",
+    "changes": [
+      {
+        "description": "Fix tab-out issue with PasswordInput",
+        "commit_sha": "44546ae"
+      },
+      {
+        "description": "expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project",
+        "commit_sha": "0a4c214"
+      },
+      {
+        "description": "Ignore scrollStyle and showScrollerFade on mobile devices",
+        "commit_sha": "6dda27c"
+      },
+      {
+        "description": "Wire Inspector icon color through theme system so it responds to theme changes",
+        "commit_sha": "d65101f"
+      },
+      {
+        "description": "Experiment with persisting unsubmitted Form data",
+        "commit_sha": "82f5ad4"
+      },
+      {
+        "description": "Move Blog component from xmlui core to xmlui-docs-blocks extension package",
+        "commit_sha": "fffde0d"
+      },
+      {
+        "description": "Fix DataSource reactivity through variables",
+        "commit_sha": "c9871a9"
+      },
+      {
+        "description": "Improve component property name linting with responsive properties and behavior properties",
+        "commit_sha": "7e0dab5"
+      },
+      {
+        "description": "Fix Select regression in Form (versus FormItem type=\"select\")",
+        "commit_sha": "894a635"
+      },
+      {
+        "description": "Move Carousel to xmlui-website-blocks extension",
+        "commit_sha": "77254bc"
+      },
+      {
+        "description": "Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).",
+        "commit_sha": "679b397"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.12.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.12/xmlui-0.12.12.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.11",
     "published_at": "2026-03-19T14:32:36Z",
     "changes": [
@@ -356,90 +412,6 @@
       {
         "name": "xmlui-0.12.4.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.4/xmlui-0.12.4.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.2",
-    "published_at": "2026-02-18T11:52:16Z",
-    "changes": [
-      {
-        "description": "Fix bookmark navigation in nested apps (xmlui-pg playground examples)",
-        "commit_sha": "1ffaf6d"
-      },
-      {
-        "description": "Add itemWidth property to Stack and FlowLayout",
-        "commit_sha": "51a7021"
-      },
-      {
-        "description": "Change component document generation to the new link format",
-        "commit_sha": "c00f264"
-      },
-      {
-        "description": "Remove global variables from compnent files",
-        "commit_sha": "354669a"
-      },
-      {
-        "description": "Fix virtualization issues with List and Table",
-        "commit_sha": "23db092"
-      },
-      {
-        "description": "Fix shrinking Table selection checkbox",
-        "commit_sha": "63ef618"
-      },
-      {
-        "description": "feat: improve NavPanel by using NavSection placeholder components for dynamic nav element generation",
-        "commit_sha": "3cf2443"
-      },
-      {
-        "description": "Fix initialPrimarySize issue with Splitter",
-        "commit_sha": "3c9936d"
-      },
-      {
-        "description": "fix: handle active heading state in TableOfContents and update indicator visibility",
-        "commit_sha": "71a1220"
-      },
-      {
-        "description": "Fix <script> + code-behind function declaration regression",
-        "commit_sha": "8c51a09"
-      },
-      {
-        "description": "fix: enhance footer behavior in App component",
-        "commit_sha": "a1d6fde"
-      },
-      {
-        "description": "fix: toc - smoothScrolling",
-        "commit_sha": "a00651d"
-      },
-      {
-        "description": "APICall allows access to error response details",
-        "commit_sha": "47d70ec"
-      },
-      {
-        "description": "Actions.upload now allows field name",
-        "commit_sha": "c9bea96"
-      },
-      {
-        "description": "Fix Bookmark scrolling issue with xmlui-pg",
-        "commit_sha": "1ffaf6d"
-      },
-      {
-        "description": "Additional component metadata: \"excludeBehaviors\", \"deprecationMessage\"",
-        "commit_sha": "c853a36"
-      },
-      {
-        "description": "Remove multiple adjacent separators from DropdownMenu and ContextMenu",
-        "commit_sha": "01e2f2a"
-      },
-      {
-        "description": "fix: scroll behavior handling in TableOfContents and AppContent components",
-        "commit_sha": "a00651d"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.2.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.2/xmlui-0.12.2.js"
       }
     ]
   }

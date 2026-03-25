@@ -1,6 +1,7 @@
 import { type ReactNode, memo, useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Virtualizer, type VirtualizerHandle } from "virtua";
 import classnames from "classnames";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
@@ -801,21 +802,16 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
       }
 
       // Emit selection:change trace event
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        if (Array.isArray(w._xsLogs)) {
-          w._xsLogs.push({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: w._xsCurrentTrace,
-            kind: "selection:change",
-            component: "Tree",
-            displayLabel: node ? node.name : null,
-            selectedId: node ? String(node.key) : null,
-            selectedName: node ? node.name : null,
-          });
-        }
-      }
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "selection:change",
+        component: "Tree",
+        displayLabel: node ? node.name : null,
+        selectedId: node ? String(node.key) : null,
+        selectedName: node ? node.name : null,
+      });
     },
     [
       treeItemsById,

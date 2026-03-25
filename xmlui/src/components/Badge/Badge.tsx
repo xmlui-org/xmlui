@@ -8,7 +8,7 @@ import {
   defaultProps,
   isBadgeColors,
   type BadgeColors,
-} from "./BadgeNative";
+} from "./BadgeReact";
 import { createMetadata, dContextMenu, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 

@@ -18,7 +18,7 @@ import {
   dLostFocus,
   dOrientation,
 } from "../../components/metadata-helpers";
-import { Button, defaultProps } from "./ButtonNative";
+import { Button, defaultProps } from "./ButtonReact";
 import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import React from "react";

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef } from "react";
 import { debounce, isEqual, throttle } from "lodash-es";
 import { usePrevious } from "../../components-core/utils/hooks";
 
@@ -6,8 +6,8 @@ import { usePrevious } from "../../components-core/utils/hooks";
 // React ChangeListener component implementation
 
 type Props = {
-  listenTo: any;
-  onChange?: (newValue: any) => void;
+  listenTo: unknown;
+  onChange?: (newValue: unknown) => void;
   throttleWaitInMs?: number;
   debounceWaitInMs?: number;
 };
@@ -17,7 +17,7 @@ export const defaultProps: Pick<Props, "throttleWaitInMs" | "debounceWaitInMs"> 
   debounceWaitInMs: 0,
 };
 
-export function ChangeListener({
+export const ChangeListener = memo(function ChangeListener({
   listenTo,
   onChange,
   throttleWaitInMs = defaultProps.throttleWaitInMs,
@@ -41,7 +41,7 @@ export function ChangeListener({
   // A stable callback that always calls the latest onChange via the ref.
   // With empty deps, this never changes, so useMemo below only re-runs when
   // the wait-time values actually change.
-  const stableOnChange = useCallback((args: any) => {
+  const stableOnChange = useCallback((args: unknown) => {
     onChangeRef.current?.(args);
   }, []);
 
@@ -58,6 +58,11 @@ export function ChangeListener({
   }, [stableOnChange, throttleWaitInMs, debounceWaitInMs]);
 
   useEffect(() => {
+    const fn = debouncedOrThrottledOnChange as { cancel?: () => void };
+    return () => fn.cancel?.();
+  }, [debouncedOrThrottledOnChange]);
+
+  useEffect(() => {
     if (!isMountedRef.current) {
       isMountedRef.current = true;
       return;
@@ -70,4 +75,4 @@ export function ChangeListener({
     }
   }, [listenTo, debouncedOrThrottledOnChange, prevValue]);
   return null;
-}
+});

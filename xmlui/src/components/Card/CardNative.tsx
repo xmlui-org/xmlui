@@ -1,7 +1,21 @@
-import { type CSSProperties, type ForwardedRef, type ReactNode, forwardRef, useRef, useEffect, useMemo } from "react";
+import {
+  type CSSProperties,
+  type ForwardedRef,
+  type MouseEventHandler,
+  type ReactNode,
+  forwardRef,
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import classnames from "classnames";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_AVATAR, PART_SUBTITLE, PART_TITLE } from "../../components-core/parts";
+import { Part } from "../Part/Part";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 import styles from "./Card.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
@@ -26,10 +40,15 @@ type Props = {
   orientation?: string;
   horizontalAlignment?: string;
   verticalAlignment?: string;
-  onClick?: any;
-  onDoubleClick?: any;
-  onContextMenu?: any;
-  registerComponentApi?: (api: any) => void;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  onDoubleClick?: MouseEventHandler<HTMLDivElement>;
+  onContextMenu?: MouseEventHandler<HTMLDivElement>;
+  registerComponentApi?: RegisterComponentApiFn;
+};
+
+const TITLE_HEADING_PROPS: Partial<HeadingProps> = {
+  level: "h2",
+  maxLines: 1,
 };
 
 export const defaultProps: Pick<Props, "orientation" | "showAvatar"> = {
@@ -37,7 +56,7 @@ export const defaultProps: Pick<Props, "orientation" | "showAvatar"> = {
   showAvatar: false,
 };
 
-export const Card = forwardRef(function Card(
+export const Card = memo(forwardRef(function Card(
   {
     children,
     orientation = defaultProps.orientation,
@@ -61,10 +80,7 @@ export const Card = forwardRef(function Card(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const titleProps: Partial<HeadingProps> = {
-    level: "h2",
-    maxLines: 1,
-  };
+  const composedRef = useComposedRefs(forwardedRef, containerRef);
 
   // Create our own alignment classes using Card's styles
   const alignmentClasses = useMemo(() => {
@@ -82,50 +98,34 @@ export const Card = forwardRef(function Card(
         };
   }, [orientation, horizontalAlignment, verticalAlignment]);
 
-  // Register API methods
-  useEffect(() => {
-    if (registerComponentApi) {
-      registerComponentApi({
-        scrollToTop: (behavior: ScrollBehavior = 'instant') => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: 0,
-              behavior
-            });
-          }
-        },
-        scrollToBottom: (behavior: ScrollBehavior = 'instant') => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: containerRef.current.scrollHeight,
-              behavior
-            });
-          }
-        },
-        scrollToStart: (behavior: ScrollBehavior = 'instant') => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: 0,
-              behavior
-            });
-          }
-        },
-        scrollToEnd: (behavior: ScrollBehavior = 'instant') => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: containerRef.current.scrollWidth,
-              behavior
-            });
-          }
-        },
-      });
+  const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ top: 0, behavior });
+  }, []);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: containerRef.current.scrollHeight, behavior });
     }
-  }, [registerComponentApi]);
+  }, []);
+
+  const scrollToStart = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ left: 0, behavior });
+  }, []);
+
+  const scrollToEnd = useCallback((behavior: ScrollBehavior = "instant") => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ left: containerRef.current.scrollWidth, behavior });
+    }
+  }, []);
+
+  useEffect(() => {
+    registerComponentApi?.({ scrollToTop, scrollToBottom, scrollToStart, scrollToEnd });
+  }, [registerComponentApi, scrollToTop, scrollToBottom, scrollToStart, scrollToEnd]);
 
   return (
     <div
       {...rest}
-      ref={composeRefs(containerRef, forwardedRef)}
+      ref={composedRef}
       className={classnames(
         styles.wrapper,
         {
@@ -154,21 +154,27 @@ export const Card = forwardRef(function Card(
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <div className={styles.avatarWrapper}>
-          {showAvatar && <Avatar url={avatarUrl} name={title} size={avatarSize} />}
+          {showAvatar && (
+            <Part partId={PART_AVATAR}>
+              <Avatar url={avatarUrl} name={title} size={avatarSize} />
+            </Part>
+          )}
           <div className={styles.titleWrapper}>
-            {linkTo ? (
-              title ? (
-                <LinkNative to={linkTo + ""}>
-                  <Heading {...titleProps}>{title}</Heading>
-                </LinkNative>
-              ) : null
-            ) : title ? (
-              <Heading {...titleProps}>{title}</Heading>
-            ) : null}
+            {title && (
+              <Part partId={PART_TITLE}>
+                {linkTo ? (
+                  <LinkNative to={linkTo + ""}>
+                    <Heading {...TITLE_HEADING_PROPS}>{title}</Heading>
+                  </LinkNative>
+                ) : (
+                  <Heading {...TITLE_HEADING_PROPS}>{title}</Heading>
+                )}
+              </Part>
+            )}
             {subtitle !== undefined && (
-              <>
+              <Part partId={PART_SUBTITLE}>
                 <Text variant="secondary">{subtitle}</Text>
-              </>
+              </Part>
             )}
           </div>
         </div>
@@ -176,4 +182,4 @@ export const Card = forwardRef(function Card(
       {children}
     </div>
   );
-});
+}));

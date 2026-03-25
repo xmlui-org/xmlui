@@ -12,6 +12,7 @@ import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
+import type { FnDeps } from "../FnDepsContext";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -91,6 +92,7 @@ export function createValueExtractor(
   appContext: AppContextObject | undefined,
   referenceTrackedApi: Record<string, ComponentApi>,
   memoedVarsRef: MutableRefObject<MemoedVars>,
+  fnDeps: FnDeps = {},
 ): ValueExtractor {
   // --- Extract the parameter and retrieve as is is
   const extractor = (expression?: any, strict?: boolean): any => {
@@ -148,12 +150,19 @@ export function createValueExtractor(
         ),
       });
     }
-    const expressionDependencies = memoedVarsRef.current
+    const rawDependencies = memoedVarsRef.current
       .get(expressionString)!
       .getDependencies(expressionString, referenceTrackedApi);
+    const expressionDependencies: string[] = [];
+    for (const dep of rawDependencies) {
+      if (fnDeps[dep]) {
+        expressionDependencies.push(...fnDeps[dep]);
+      } else {
+        expressionDependencies.push(dep);
+      }
+    }
     const depValues = pickFromObject(state, expressionDependencies);
     const appContextDepValues = pickFromObject(appContext, expressionDependencies);
-    // console.log("COMP, obtain value called with", depValues, appContextDepValues, expressionDependencies);
     return memoedVarsRef.current.get(expressionString)!.obtainValue!(
       expression,
       state,
