@@ -229,15 +229,17 @@ automatically: the dropdown and the two text fields are vertically centered with
         <Option label="Individual" value="individual" />
       </HStack>
     </RadioGroup>
+    <FormItem label="Primary Contact" labelPosition="start" required="true">
       <HStack>
-        <Select bindTo="salutation" label="Primary Contact" labelPosition="start">
+        <Select bindTo="salutation" width="100px">
           <Option value="mr" label="Mr." />
           <Option value="ms" label="Ms." />
           <Option value="dr" label="Dr." />
         </Select>
-        <TextBox bindTo="contactFirstName" placeholder="Enter name" width="*" required />
-        <TextBox bindTo="contactLastName" placeholder="Last name" width="*" />
+        <TextBox bindTo="contactFirstName" placeholder="Enter name" width="1*" />
+        <TextBox bindTo="contactLastName" placeholder="Last name" width="1*" />
       </HStack>
+    </FormItem>
   </Form>
 </App>
 ```

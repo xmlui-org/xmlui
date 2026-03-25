@@ -163,6 +163,12 @@ This method returns the current value of the ColorPicker.
 
 **Signature**: `get value(): string`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`input`**: The color picker input element.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
