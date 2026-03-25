@@ -262,6 +262,7 @@ type APICall = {
   confirmTitle?: string;
   confirmMessage?: string;
   confirmButtonLabel?: string;
+  cancelButtonLabel?: string;
   params?: any;
   payloadType?: string;
   optimisticValue?: any;
@@ -288,6 +289,7 @@ export async function callApi(
     confirmTitle,
     confirmMessage,
     confirmButtonLabel,
+    cancelButtonLabel,
     params = {},
     onBeforeRequest,
     onSuccess,
@@ -322,14 +324,16 @@ export async function callApi(
   if (!shouldKeep(when, stateContext, appContext)) {
     return;
   }
-  if (confirmTitle || confirmMessage || confirmButtonLabel) {
+  if (confirmTitle || confirmMessage || confirmButtonLabel || cancelButtonLabel) {
     const title = extractParam(stateContext, confirmTitle, appContext);
     const message = extractParam(stateContext, confirmMessage, appContext);
     const buttonLabel = extractParam(stateContext, confirmButtonLabel, appContext);
+    const cancelLabel = extractParam(stateContext, cancelButtonLabel, appContext);
     const dialogCheck = await appContext.confirm(
-      title ?? "Confirm Operation",
-      message ?? "Are you sure you want to perform this operation?",
-      buttonLabel ?? "Yes",
+      title,
+      message,
+      buttonLabel,
+      cancelLabel,
     );
     if (!dialogCheck) return;
   }

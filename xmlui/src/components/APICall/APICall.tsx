@@ -14,6 +14,7 @@ export interface ApiActionComponent extends ComponentDef {
     confirmTitle?: string;
     confirmMessage?: string;
     confirmButtonLabel?: string;
+    cancelButtonLabel?: string;
     optimisticValue: any;
     getOptimisticValue: string;
     inProgressNotificationMessage?: string;
@@ -108,6 +109,12 @@ export const APICallMd = createMetadata({
     confirmButtonLabel: {
       description:
         "This optional string property enables the customization of the submit button in the " +
+        `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
+      valueType: "string",
+    },
+    cancelButtonLabel: {
+      description:
+        "This optional string property enables the customization of the cancel button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
       valueType: "string",
     },
