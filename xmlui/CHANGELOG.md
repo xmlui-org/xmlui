@@ -3,7 +3,7 @@
 ## 0.12.13
 
 ### Patch Changes
-
+- d19a909: feat: add cancelButtonLabel prop to APICall for confirm dialog
 - 61308b2: feat: xmlui-search - spotlight mode, filter by categories, suggested keywords
 - c4fc0be: Fix reactive expressions in component properties not updating when they call functions that depend on changed variables
 - 4127490: Add pathname global
