@@ -37,6 +37,7 @@ import type { NavGroupMd } from "./NavGroup";
 import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppContext } from "../../components-core/AppContext";
 
@@ -253,21 +254,16 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     }
     setExpanded((prev) => {
       const newExpanded = !prev;
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        if (Array.isArray(w._xsLogs)) {
-          w._xsLogs.push({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: w._xsCurrentTrace,
-            kind: "focus:change",
-            component: "NavGroup",
-            displayLabel: label,
-            label,
-            expanded: newExpanded,
-          });
-        }
-      }
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "focus:change",
+        component: "NavGroup",
+        displayLabel: label,
+        label,
+        expanded: newExpanded,
+      });
       return newExpanded;
     });
   };
@@ -377,21 +373,16 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
       onOpenChange={(open) => {
         if (renderCount) {
           setExpanded(open);
-          if (typeof window !== "undefined") {
-            const w = window as any;
-            if (Array.isArray(w._xsLogs)) {
-              w._xsLogs.push({
-                ts: Date.now(),
-                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-                traceId: w._xsCurrentTrace,
-                kind: "focus:change",
-                component: "NavGroup",
-                displayLabel: label,
-                label,
-                expanded: open,
-              });
-            }
-          }
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+            kind: "focus:change",
+            component: "NavGroup",
+            displayLabel: label,
+            label,
+            expanded: open,
+          });
         }
       }}
     >

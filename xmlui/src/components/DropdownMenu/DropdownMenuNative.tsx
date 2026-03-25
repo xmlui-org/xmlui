@@ -16,6 +16,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "../../components-core/constants";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import type {
   IconPosition,
   ButtonVariant,
@@ -279,20 +280,17 @@ export const SubMenuItem = forwardRef<HTMLDivElement, SubMenuItemProps>(function
 
   const handleOpenChange = useCallback((isOpen: boolean) => {
     setOpen(isOpen);
-    if (isOpen && typeof window !== "undefined") {
-      const w = window as any;
-      if (Array.isArray(w._xsLogs)) {
-        w._xsLogs.push({
-          ts: Date.now(),
-          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: w._xsCurrentTrace,
-          kind: "submenu:open",
-          displayLabel: label,
-          componentLabel: label,
-          ariaRole: "menuitem",
-          ariaName: label,
-        });
-      }
+    if (isOpen) {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "submenu:open",
+        displayLabel: label,
+        componentLabel: label,
+        ariaRole: "menuitem",
+        ariaName: label,
+      });
     }
   }, [label]);
 

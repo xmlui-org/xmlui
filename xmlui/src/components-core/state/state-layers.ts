@@ -152,7 +152,7 @@ export function mergeComponentApis(
                     createLogEntry?.("method:call", {
                       component: componentKey,
                       componentLabel: componentKey,
-                      displayLabel: `${componentKey}.${methodName}(${args.map((a: any) => JSON.stringify(a)).join(", ")})`,
+                      displayLabel: `${componentKey}.${methodName}(${args.map((a: any) => { try { return JSON.stringify(a); } catch { return "[Object]"; } }).join(", ")})`,
                     }),
                   );
                   return result;

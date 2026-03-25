@@ -3,6 +3,7 @@ import * as RAccordion from "@radix-ui/react-accordion";
 import classnames from "classnames";
 
 import styles from "./Accordion.module.scss";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -169,20 +170,15 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
         className={classnames(styles.root, classes?.[COMPONENT_PART_KEY], className)}
         onValueChange={(value) => {
           setExpandedItems(value);
-          if (typeof window !== "undefined") {
-            const w = window as any;
-            if (Array.isArray(w._xsLogs)) {
-              w._xsLogs.push({
-                ts: Date.now(),
-                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-                traceId: w._xsCurrentTrace,
-                kind: "focus:change",
-                component: "Accordion",
-                displayLabel: Array.isArray(value) ? value.join(", ") : String(value),
-                expandedItems: value,
-              });
-            }
-          }
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+            kind: "focus:change",
+            component: "Accordion",
+            displayLabel: Array.isArray(value) ? value.join(", ") : String(value),
+            expandedItems: value,
+          });
         }}
       >
         {children}
