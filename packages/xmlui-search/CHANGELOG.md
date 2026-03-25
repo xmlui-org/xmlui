@@ -1,5 +1,14 @@
 # xmlui-search
 
+## 0.1.10
+
+### Patch Changes
+
+- 61308b2: feat: xmlui-search - spotlight mode, filter by categories, suggested keywords
+- 0e81ae3: fix: search - remove relaxed fuse queries
+- 14113d5: fix: search - lagging when typing
+- d789f44: fix: scrolling issue in mobile menu
+
 ## 0.1.9
 
 ### Patch Changes
