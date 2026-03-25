@@ -128,18 +128,20 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
   }
 
   // When a FormItem is inside a horizontal Stack, the validation message must not
-  // push sibling inputs out of alignment. We anchor the wrapper and float the
-  // message absolutely below the input so it overlaps rather than reflows.
+  // push sibling inputs out of alignment. We reserve space in the normal flow
+  // so the flex items remain equal height and don't shift, avoiding overlap.
   .validationAnchor {
     position: relative;
+    padding-bottom: 22px; // Reserve space for the absolute validation message
   }
 
   .validationMessageAbsolute {
-    position: static;
-    top: auto;
-    left: auto;
-    white-space: normal;
-    z-index: auto;
+    position: absolute;
+    top: calc(100% - 22px); // Start right where the input ends (before the padding)
+    left: 0;
+    right: 0;
+    z-index: 1;
+    min-height: 22px;
   }
 
   .helperTextContainer {
