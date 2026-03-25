@@ -770,7 +770,7 @@ export const Table = forwardRef(
         const customColumn = {
           ...col,
           header: col.header ?? col.accessorKey ?? " ",
-          id: "col_" + idx,
+          id: col.id ?? col.accessorKey ?? "col_" + idx,
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
