@@ -389,18 +389,6 @@ onSubmit="
     }
   });
 
-  it.todo("script error in content text as str literal has correct pos", () => {
-    const src = `<App>
-  <event name="click">"console.log(); }"</event>
-</App>`;
-    try {
-      transformSource(src);
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(src[(err as GeneralDiag).pos]).toBe("}");
-    }
-  });
-
   it("script error in script tag has correct pos", () => {
     const src = `<App><script>console.log(); }</script></App>`;
     try {
@@ -416,6 +404,84 @@ onSubmit="
   <script>
     console.log(); }
   </script>
+</App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in content text as str literal has correct pos", () => {
+    const src = `<App>
+  <event name="click">"console.log(); }"</event>
+</App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in method content as str literal has correct pos", () => {
+    const src = `<App>
+  <method name="handler">"console.log(); }"</method>
+</App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in CData content has correct pos", () => {
+    const src = `<App><event name="click"><![CDATA[console.log(); }]]></event></App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in method CData content has correct pos", () => {
+    const src = `<App><method name="handler"><![CDATA[console.log(); }]]></method></App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in mixed CData and str literal content has correct pos", () => {
+    const src = `<App><event name="click"><![CDATA[console.log();]]>" }"</event></App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in str literal followed by CData has correct pos", () => {
+    const src = `<App><event name="click">"console.log();"<![CDATA[ }]]></event></App>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("script error in multiline str literal content has correct pos", () => {
+    const src = `<App>
+  <event name="click">"
+    console.log();
+  }"</event>
 </App>`;
     try {
       transformSource(src);

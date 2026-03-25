@@ -1,8 +1,4 @@
-import type {
-  ComponentDef,
-  ComponentMetadata,
-  CompoundComponentDef,
-} from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
@@ -12,11 +8,7 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import {
-  DIAGS_TRANSFORM,
-  TransformDiag,
-  type TransformDiagPositionless,
-} from "./diagnostics";
+import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -206,7 +198,11 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, false)! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(
+      usesStack,
+      element,
+      false,
+    )! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -431,7 +427,12 @@ export function nodeToComponentDef(
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && startSegment !== "method" && startSegment !== "var" && startSegment !== "global") {
+      if (
+        startSegment &&
+        startSegment !== "method" &&
+        startSegment !== "var" &&
+        startSegment !== "global"
+      ) {
         reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
         return;
       }
@@ -477,7 +478,7 @@ export function nodeToComponentDef(
             return;
           }
         }
-        
+
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
@@ -581,7 +582,8 @@ export function nodeToComponentDef(
     const attrNodes = getAttributes(element);
     const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const allAllowedAttrs = extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
+    const allAllowedAttrs =
+      extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
     const attrProps = attrsSegmented.filter((attr) => allAllowedAttrs.indexOf(attr.name) >= 0);
     if (attrsSegmented.length > attrProps.length) {
       reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
@@ -1162,7 +1164,7 @@ export function nodeToComponentDef(
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
       comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
-      
+
       // --- Merge pre-resolved imports if provided
       if (preResolvedImports) {
         comp.scriptCollected.functions = {
@@ -1174,7 +1176,7 @@ export function nodeToComponentDef(
           ...comp.scriptCollected.vars,
         };
       }
-      
+
       if (comp.scriptCollected.hasInvalidStatements) {
         comp.scriptError = new Error(
           `Only reactive variable and function definitions are allowed in a code-behind module.`,
@@ -1330,7 +1332,7 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
     if (child.type === "Fragment" && child.scriptCollected) {
       // Check if the script references context variables (like $item, $itemIndex, etc.)
       const hasContextVarReferences = child.script?.includes("$");
-      
+
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level
       if (!hasContextVarReferences) {
