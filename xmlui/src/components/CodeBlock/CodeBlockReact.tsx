@@ -15,7 +15,6 @@ import { ThemedIcon } from "../Icon/Icon";
 import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import type { CSSProperties } from "react";
 import classnames from "classnames";
 
 type CodeBlockProps = {

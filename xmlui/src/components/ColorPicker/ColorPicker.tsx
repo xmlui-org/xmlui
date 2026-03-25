@@ -1,4 +1,4 @@
-import { ColorPicker, defaultProps } from "./ColorPickerNative";
+import { ColorPicker, defaultProps } from "./ColorPickerReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
@@ -54,6 +54,9 @@ export const ColorPickerMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  parts: {
+    input: { description: "The color picker input element." },
+  },
   defaultThemeVars: {
     [`width-${COMP}`]: "3em",
     [`height-${COMP}`]: "1.5em",
@@ -84,6 +87,7 @@ export const colorPickerComponentRenderer = wrapComponent(
     events: {
       gotFocus: "onFocus",
       lostFocus: "onBlur",
+      didChange: "onDidChange",
     },
   },
 );

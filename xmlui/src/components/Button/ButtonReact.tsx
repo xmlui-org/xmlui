@@ -1,6 +1,8 @@
 import React, { type CSSProperties, type ForwardedRef, forwardRef, memo, useRef, useEffect } from "react";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_ICON } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 import styles from "./Button.module.scss";
 
@@ -152,10 +154,18 @@ export const Button = memo(forwardRef(function Button(
       onFocus={onFocus}
       onBlur={onBlur}
     >
-      {icon && iconToLeft && icon}
+      {icon && iconToLeft && (
+        <Part partId={PART_ICON}>
+          <span className={classes?.[PART_ICON]}>{icon}</span>
+        </Part>
+      )}
       {children}
       {icon && !children && <IconLabel icon={icon} accessibleName={contextualLabel} />}
-      {icon && !iconToLeft && icon}
+      {icon && !iconToLeft && (
+        <Part partId={PART_ICON}>
+          <span className={classes?.[PART_ICON]}>{icon}</span>
+        </Part>
+      )}
     </button>
   );
 }));

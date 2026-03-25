@@ -16,7 +16,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { PART_INPUT } from "../../components-core/parts";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -87,7 +87,7 @@ export const Toggle = forwardRef(function Toggle(
   forwardedRef: ForwardedRef<HTMLInputElement>,
 ) {
   const innerRef = React.useRef<HTMLInputElement | null>(null);
-  const ref = innerRef ? composeRefs(forwardedRef, innerRef) : forwardedRef;
+  const composedRef = useComposedRefs(forwardedRef, innerRef);
 
   const transformToLegitValue = (inp: any): boolean => {
     if (typeof inp === "undefined" || inp === null) {
@@ -178,7 +178,7 @@ export const Toggle = forwardRef(function Toggle(
           {...rest}
           data-component-type="Toggle"
           id={id}
-          ref={ref}
+          ref={composedRef}
           type="checkbox"
           role={variant}
           checked={legitValue}
@@ -218,7 +218,7 @@ export const Toggle = forwardRef(function Toggle(
     classes,
     className,
     inputRenderer,
-    ref,
+    composedRef,
     style,
     id,
     enabled,
