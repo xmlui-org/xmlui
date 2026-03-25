@@ -14,6 +14,7 @@ import type {
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ContainerActionKind } from "./rendering/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
+import { useFnDeps } from "./FnDepsContext";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import type { AppContextObject } from "../abstractions/AppContextDefs";
 
@@ -68,10 +69,13 @@ export function LoaderComponent({
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+  // --- Get the function dependencies from the parent container
+  const fnDeps = useFnDeps();
+
   // --- Memoizes the value extractor object
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Memoizes the action resolution by action definition value
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(

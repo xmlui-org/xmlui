@@ -39,6 +39,8 @@ import type {
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
+import { FnDepsProvider } from "../FnDepsContext";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -212,6 +214,8 @@ export const StateContainer = memo(
       Object.entries(varDefinitions).forEach(([key, value]) => {
         if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
           fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
+        } else if (isArrowExpressionObject(value) && value.type === T_ARROW_EXPRESSION) {
+          fnDeps[key] = collectVariableDependencies(value, referenceTrackedApi);
         }
       });
       return collectFnVarDeps(fnDeps);
@@ -452,28 +456,30 @@ export const StateContainer = memo(
 
     return (
       <ErrorBoundary node={node} location={"container"}>
-        <Container
-          resolvedKey={resolvedKey}
-          node={node}
-          componentState={resolvedCombinedState}
-          globalVars={stableCurrentGlobalVars}
-          dispatch={dispatch}
-          parentDispatch={parentDispatch}
-          setVersion={setVersion}
-          version={version}
-          statePartChanged={statePartChanged}
-          registerComponentApi={registerComponentApi}
-          parentRegisterComponentApi={parentRegisterComponentApi}
-          layoutContextRef={layoutContextRef}
-          parentRenderContext={parentRenderContext}
-          memoedVarsRef={memoedVars}
-          isImplicit={isImplicit}
-          ref={ref}
-          uidInfoRef={uidInfoRef}
-          {...rest}
-        >
-          {children}
-        </Container>
+        <FnDepsProvider value={functionDeps}>
+          <Container
+            resolvedKey={resolvedKey}
+            node={node}
+            componentState={resolvedCombinedState}
+            globalVars={stableCurrentGlobalVars}
+            dispatch={dispatch}
+            parentDispatch={parentDispatch}
+            setVersion={setVersion}
+            version={version}
+            statePartChanged={statePartChanged}
+            registerComponentApi={registerComponentApi}
+            parentRegisterComponentApi={parentRegisterComponentApi}
+            layoutContextRef={layoutContextRef}
+            parentRenderContext={parentRenderContext}
+            memoedVarsRef={memoedVars}
+            isImplicit={isImplicit}
+            ref={ref}
+            uidInfoRef={uidInfoRef}
+            {...rest}
+          >
+            {children}
+          </Container>
+        </FnDepsProvider>
       </ErrorBoundary>
     );
   }),
