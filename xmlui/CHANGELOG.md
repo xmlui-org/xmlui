@@ -1,5 +1,18 @@
 # xmlui
 
+## 0.12.13
+
+### Patch Changes
+
+- 61308b2: feat: xmlui-search - spotlight mode, filter by categories, suggested keywords
+- c4fc0be: Fix reactive expressions in component properties not updating when they call functions that depend on changed variables
+- 4127490: Add pathname global
+- f6921ed: fix: responsive table glitch
+- ed962d1: Markdown in fenced code block should not replace "@{}"
+- 333bce7: Fixed a bug where setting the regex property to a valid regular expression also tested the input if it was empty.
+- 4127490: Fix AppHeader theming
+- b133970: Fix responsive CSS generation
+
 ## 0.12.12
 
 ### Patch Changes
