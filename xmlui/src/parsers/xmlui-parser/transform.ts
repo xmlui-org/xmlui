@@ -27,6 +27,7 @@ export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
  * since they are not present in the original source text */
 interface TransformNode extends Node {
   text?: string;
+  originalKind?: SyntaxKind;
 }
 
 const HelperNode = {
@@ -854,9 +855,9 @@ export function nodeToComponentDef(
 
       if (shouldUseTextNodeElement) {
         if (shouldUseCData) {
-          newChild = createTextNodeCDataElement(textValue);
+          newChild = createTextNodeCDataElement(textValue, child.kind);
         } else {
-          newChild = createTextNodeElement(textValue);
+          newChild = createTextNodeElement(textValue, child.kind);
         }
       } else {
         newChild = {
@@ -864,6 +865,7 @@ export function nodeToComponentDef(
           text: textValue,
           pos: child.pos,
           end: child.end,
+          originalKind: child.kind,
         } as TransformNode;
       }
       childNodes[i] = newChild;
@@ -1120,7 +1122,21 @@ export function nodeToComponentDef(
         if (nodeContainingValue) {
           let diagPos: number;
           let diagEnd: number;
-          if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
+          const transformNode = nodeContainingValue as TransformNode;
+          if (transformNode.originalKind !== undefined) {
+            if (transformNode.originalKind === SyntaxKind.StringLiteral) {
+              const afterContentPos = transformNode.pos + 1;
+              diagPos = afterContentPos + errMsg.position;
+              diagEnd = afterContentPos + errMsg.end;
+            } else if (transformNode.originalKind === SyntaxKind.CData) {
+              const afterCDataPos = transformNode.pos + CDATA_PREFIX_LEN;
+              diagPos = afterCDataPos + errMsg.position;
+              diagEnd = afterCDataPos + errMsg.end;
+            } else {
+              diagPos = transformNode.pos + errMsg.position;
+              diagEnd = transformNode.pos + errMsg.end;
+            }
+          } else if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
             const afterQuotePos = nodeContainingValue.pos + 1;
             diagPos = afterQuotePos + errMsg.position;
             diagEnd = afterQuotePos + errMsg.end;
@@ -1205,9 +1221,10 @@ export function nodeToComponentDef(
   }
 }
 
-function createTextNodeCDataElement(textValue: string): Node {
+function createTextNodeCDataElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1232,12 +1249,13 @@ function createTextNodeCDataElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
-function createTextNodeElement(textValue: string): Node {
+function createTextNodeElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1262,7 +1280,7 @@ function createTextNodeElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
 function reportError(
