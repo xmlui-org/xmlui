@@ -40,20 +40,6 @@
           ]
         },
         {
-          "label": "Xmlui Echart",
-          "to": "/docs/reference/extensions/xmlui-echart/_overview",
-          "children": [
-            {
-              "label": "Extension Overview",
-              "to": "/docs/reference/extensions/xmlui-echart/_overview"
-            },
-            {
-              "label": "EChart",
-              "to": "/docs/reference/extensions/xmlui-echart/EChart"
-            }
-          ]
-        },
-        {
           "label": "Xmlui Gauge",
           "to": "/docs/reference/extensions/xmlui-gauge/_overview",
           "children": [
@@ -158,6 +144,14 @@
             {
               "label": "Extension Overview",
               "to": "/docs/reference/extensions/xmlui-website-blocks/_overview"
+            },
+            {
+              "label": "Backdrop",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Backdrop"
+            },
+            {
+              "label": "Breakout",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Breakout"
             },
             {
               "label": "Carousel",

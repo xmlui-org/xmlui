@@ -396,6 +396,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 The component has some parts that can be styled through layout properties and theme variables separately:
 
 - **`clearButton`**: The button to clear the date input.
+- **`conciseValidationFeedback`**: The concise validation feedback indicator shown when verboseValidationFeedback is false.
 - **`day`**: The day input field.
 - **`month`**: The month input field.
 - **`year`**: The year input field.

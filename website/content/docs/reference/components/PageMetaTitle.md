@@ -24,6 +24,12 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `noSuffix` [#nosuffix]
+
+> [!DEF]  default: **false**
+
+When set to `true`, suppresses the app name suffix (e.g. `| XMLUI`) that is automatically appended to the page title.
+
 ### `value` [#value]
 
 > [!DEF]  default: **"XMLUI Application"**

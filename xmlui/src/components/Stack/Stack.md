@@ -46,9 +46,6 @@ Children without a `dock` prop participate as undocked items in the middle row a
   </Stack>
 </App>
 ```
-
-%-DESC-END
-
 %-PROP-START gap
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font size of the element (See size values).

@@ -61,7 +61,7 @@ export const formBindingBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode, className } = context;
+    const { extractValue, node: componentNode, className, layoutContext } = context;
 
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const initialValue = extractValue(componentNode.props?.initialValue);
@@ -152,6 +152,7 @@ export const formBindingBehavior: Behavior = {
         labelBreak={labelBreak}
         enabled={enabled}
         requireLabelMode={requireLabelMode}
+        layoutContext={layoutContext}
       >
         {node as ReactElement}
       </FormBindingWrapper>
