@@ -92,6 +92,19 @@ const staticSearchData: SearchItemData[] = [
   }),
 ];
 
+// Build posts array from blogFrontmatter so it doesn't need to be maintained manually in index.html
+const posts = Object.entries(blogFrontmatter)
+  .filter(([, fm]) => !fm.draft)
+  .map(([key, fm]) => ({
+    title: fm.title,
+    slug: fm.slug ?? key.replace("/blog/", ""),
+    description: fm.description,
+    author: fm.author,
+    date: fm.date,
+    image: fm.image,
+    tags: fm.tags,
+  }));
+
 const prefetchedContent: Record<string, any> = {};
 
 // Filter out drafts from the main blogContent as well, so they don't show up in the UI
@@ -110,7 +123,7 @@ Object.keys(rawHomepageContent).forEach((filePath) => {
   prefetchedContent[`/pages/${fileName}`] = rawHomepageContent[filePath].default;
 });
 
-export { prefetchedContent, docsContent, staticSearchData };
+export { prefetchedContent, docsContent, staticSearchData, posts };
 
 // --- Icon loader utility
 
