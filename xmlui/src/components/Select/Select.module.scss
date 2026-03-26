@@ -125,6 +125,7 @@ $textColor-item-Select--disabled: createThemeVar("textColor-item-#{$componentNam
 $opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-#{$componentName}--disabled");
 $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentName}");
 $minHeight-Select: createThemeVar("minHeight-#{$componentName}");
+$minWidth-Select: createThemeVar("minWidth-#{$componentName}");
 $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 // --- CSS properties of a particular Select variant
@@ -178,6 +179,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     align-items: center;
     flex-wrap: wrap;
     min-height: $minHeight-Select;
+    min-width: $minWidth-Select;
     @include t.paddingVars($themeVars, $componentName);
 
     @include variant("");

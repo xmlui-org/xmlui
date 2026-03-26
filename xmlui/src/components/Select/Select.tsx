@@ -207,6 +207,7 @@ export const SelectMd = createMetadata({
     [`textColor-${COMP}--disabled`]: "$textColor--disabled",
     [`minHeight-${COMP}`]: "$space-7",
     [`minHeight-item-${COMP}`]: "$space-7",
+    [`minWidth-${COMP}`]: "$space-16",
   },
 });
 
