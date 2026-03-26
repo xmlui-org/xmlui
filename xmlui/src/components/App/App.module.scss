@@ -251,6 +251,25 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
           position: static;
         }
       }
+
+      // When scrollWholePage is false, mainContentArea becomes the scroll container
+      // instead of the appContainer (which gets overflow:clip from :not(.scrollWholePage))
+      &:not(.scrollWholePage) {
+        .mainContentArea {
+          overflow: auto;
+        }
+        // Allow pagesContainer and pageContentContainer to grow to content height
+        // so mainContentArea can scroll them into view
+        .pagesContainer {
+          overflow: initial;
+          height: auto;
+          min-height: 0;
+        }
+        .pageContentContainer {
+          overflow: initial;
+          height: auto;
+        }
+      }
     }
 
     &.scrollWholePage {
