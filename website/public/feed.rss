@@ -5,8 +5,16 @@
     <link>https://docs.xmlui.org</link>
     <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 24 Mar 2026 17:58:43 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 27 Mar 2026 13:06:49 GMT</lastBuildDate>
 
+    <item>
+      <title>Semantic tracing: how ARIA unlocks debugging, testing, and AI reasoning</title>
+      <link>https://docs.xmlui.org/semantic-trace</link>
+      <description>AI tools are writing more code than ever, and that code is a liability. The more you ship, the more you need to know: did our change break something? What exactly happens when a user clicks that button? For reactive web apps, these questions are espe...</description>
+      <pubDate>Thu, 26 Mar 2026 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://docs.xmlui.org/semantic-trace</guid>
+    </item>
     <item>
       <title>Improving the XMLUI MCP server</title>
       <link>https://docs.xmlui.org/improving-the-xmlui-mcp-server</link>
