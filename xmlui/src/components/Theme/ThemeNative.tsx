@@ -110,13 +110,24 @@ export function Theme({
       const rawKey = key.replace(/^--[^-]+-/, "");
       let componentName = parseHVar(rawKey)?.component;
       const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
-      if (
+      const inComponentThemeVars = componentRegistry.componentThemeVars.has(rawKey);
+      const allowed =
         !componentName ||
+        // Compound (user-defined) components pass through unconditionally as a
+        // safety net for theme vars that aren't statically analyzable (e.g.,
+        // dynamic expressions). The primary optimization path is via
+        // componentThemeVars in ThemeProvider, populated from auto-generated
+        // metadata in registerCompoundComponentRenderer.
         registeredComponent?.isCompoundComponent ||
         componentName === "Input" ||
         componentName === "Heading" ||
-        componentName === "Footer"
-      ) {
+        componentName === "Footer" ||
+        // Also allow any theme var explicitly referenced inside a user-defined
+        // component's template (collected by generateUdComponentMetadata).
+        // e.g. width="$width-Inc" inside IncrementButton → "width-Inc" is allowed
+        // even though "Inc" is not a registered component name.
+        inComponentThemeVars;
+      if (allowed) {
         const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
         filteredThemeCssVars[key] = resolvedValue;
       }
