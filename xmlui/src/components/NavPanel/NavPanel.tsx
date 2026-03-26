@@ -234,6 +234,31 @@ export const NavPanelMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
+    syncWithContent: {
+      description:
+        `When enabled, any page navigation automatically scrolls the corresponding navigation ` +
+        `item within the NavPanel into view, keeping the active link visible.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.syncWithContent,
+    },
+    syncScrollBehavior: {
+      description:
+        `Controls the scroll animation when \`syncWithContent\` is enabled. Use \`"smooth"\` for an ` +
+        `animated scroll or \`"instant"\` to jump immediately to the active item without animation.`,
+      valueType: "string",
+      availableValues: ["smooth", "instant"],
+      defaultValue: defaultProps.syncScrollBehavior,
+    },
+    syncScrollPosition: {
+      description:
+        `Controls the vertical alignment of the active navigation item within the NavPanel when ` +
+        `\`syncWithContent\` scrolls it into view. \`"center"\` places the item in the middle of the ` +
+        `visible area; \`"nearest"\` scrolls the minimum amount needed; \`"start"\` aligns it to the ` +
+        `top; \`"end"\` aligns it to the bottom.`,
+      valueType: "string",
+      availableValues: ["center", "nearest", "start", "end"],
+      defaultValue: defaultProps.syncScrollPosition,
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
@@ -293,6 +318,15 @@ function NavPanelWithBuiltNavHierarchy({
     defaultProps.scrollStyle,
   );
   const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+  const syncWithContent = extractValue.asOptionalBoolean(node.props.syncWithContent);
+  const syncScrollBehavior = extractValue.asOptionalString(
+    node.props.syncScrollBehavior,
+    defaultProps.syncScrollBehavior,
+  ) as ScrollBehavior | undefined;
+  const syncScrollPosition = extractValue.asOptionalString(
+    node.props.syncScrollPosition,
+    defaultProps.syncScrollPosition,
+  ) as ScrollLogicalPosition | undefined;
   const footerContent = node.props.footerTemplate
     ? renderChild(node.props.footerTemplate)
     : undefined;
@@ -308,6 +342,9 @@ function NavPanelWithBuiltNavHierarchy({
       navLinks={navLinks}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
+      syncWithContent={syncWithContent}
+      syncScrollBehavior={syncScrollBehavior}
+      syncScrollPosition={syncScrollPosition}
     >
       {renderChild(expandedChildren)}
     </NavPanel>

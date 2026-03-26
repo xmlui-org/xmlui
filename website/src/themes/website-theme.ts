@@ -40,6 +40,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "iconAlignment-NavLink": "baseline",
     "fontSize-NavLink": "14px",
     "fontWeight-NavLink": "500",
+    "backgroundColor-NavLink--active": "$color-surface-100",
     "textColor-NavLink": "$color-surface-500",
     "textColor-NavLink--active": "$color-surface-900",
     "textColor-NavLink--hover": "$color-surface-700",

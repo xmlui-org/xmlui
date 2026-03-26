@@ -76,6 +76,28 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.
 
+### `syncScrollBehavior` [#syncscrollbehavior]
+
+> [!DEF]  default: **"smooth"**
+
+Controls the scroll animation when `syncWithContent` is enabled. Use `"smooth"` for an animated scroll or `"instant"` to jump immediately to the active item without animation.
+
+Available values: `smooth` **(default)**, `instant`
+
+### `syncScrollPosition` [#syncscrollposition]
+
+> [!DEF]  default: **"center"**
+
+Controls the vertical alignment of the active navigation item within the NavPanel when `syncWithContent` scrolls it into view. `"center"` places the item in the middle of the visible area; `"nearest"` scrolls the minimum amount needed; `"start"` aligns it to the top; `"end"` aligns it to the bottom.
+
+Available values: `center` **(default)**, `nearest`, `start`, `end`
+
+### `syncWithContent` [#syncwithcontent]
+
+> [!DEF]  default: **false**
+
+When enabled, any page navigation automatically scrolls the corresponding navigation item within the NavPanel into view, keeping the active link visible.
+
 ## Events [#events]
 
 This component does not have any events.
