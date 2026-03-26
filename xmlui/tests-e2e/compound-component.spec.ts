@@ -719,6 +719,78 @@ test("method works with script", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("greeting")).toHaveText("Hello from MyComp!");
 });
 
+test("var initialized with $queryParams resolves correctly after SPA navigation", async ({
+  page,
+  initTestBed,
+}) => {
+  // Regression: var.* expressions in user-defined components could not access
+  // $queryParams because routing params were added to state AFTER variable resolution.
+  await initTestBed(
+    `
+    <App>
+      <Pages>
+        <Page url="/">
+          <Button testId="nav-btn" onClick="Actions.navigate('/filtered?filter=hello')">Go</Button>
+        </Page>
+        <Page url="/filtered">
+          <FilteredView />
+        </Page>
+      </Pages>
+    </App>
+    `,
+    {
+      components: [
+        `
+        <Component
+          name="FilteredView"
+          var.selectedFilter="{$queryParams.filter ? $queryParams.filter : 'all'}"
+        >
+          <Text testId="selected-filter">{selectedFilter}</Text>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  await page.getByTestId("nav-btn").click();
+  await expect(page.getByTestId("selected-filter")).toHaveText("hello");
+});
+
+test("var initialized with $queryParams resolves correctly on direct URL load", async ({
+  page,
+  initTestBed,
+}) => {
+  // Regression: var.* expressions in user-defined components could not access
+  // $queryParams because routing params were added to state AFTER variable resolution.
+  await initTestBed(
+    `
+    <App>
+      <Pages>
+        <Page url="/">
+          <FilteredView />
+        </Page>
+      </Pages>
+    </App>
+    `,
+    {
+      components: [
+        `
+        <Component
+          name="FilteredView"
+          var.selectedFilter="{$queryParams.filter ? $queryParams.filter : 'all'}"
+        >
+          <Text testId="selected-filter">{selectedFilter}</Text>
+        </Component>
+        `,
+      ],
+    },
+  );
+
+  // The test environment uses HashRouter, so query params belong in the hash portion
+  await page.goto("/#/?filter=hello");
+  await expect(page.getByTestId("selected-filter")).toHaveText("hello");
+});
+
 test("updateState works", async ({ page, initTestBed }) => {
   await initTestBed(
     `
