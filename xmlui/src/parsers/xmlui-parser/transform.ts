@@ -1,8 +1,4 @@
-import type {
-  ComponentDef,
-  ComponentMetadata,
-  CompoundComponentDef,
-} from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
 import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
@@ -12,11 +8,7 @@ import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import {
-  DIAGS_TRANSFORM,
-  TransformDiag,
-  type TransformDiagPositionless,
-} from "./diagnostics";
+import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -35,6 +27,7 @@ export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
  * since they are not present in the original source text */
 interface TransformNode extends Node {
   text?: string;
+  originalKind?: SyntaxKind;
 }
 
 const HelperNode = {
@@ -206,7 +199,11 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, false)! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(
+      usesStack,
+      element,
+      false,
+    )! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -431,7 +428,12 @@ export function nodeToComponentDef(
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && startSegment !== "method" && startSegment !== "var" && startSegment !== "global") {
+      if (
+        startSegment &&
+        startSegment !== "method" &&
+        startSegment !== "var" &&
+        startSegment !== "global"
+      ) {
         reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
         return;
       }
@@ -477,7 +479,7 @@ export function nodeToComponentDef(
             return;
           }
         }
-        
+
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
@@ -581,7 +583,8 @@ export function nodeToComponentDef(
     const attrNodes = getAttributes(element);
     const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const allAllowedAttrs = extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
+    const allAllowedAttrs =
+      extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
     const attrProps = attrsSegmented.filter((attr) => allAllowedAttrs.indexOf(attr.name) >= 0);
     if (attrsSegmented.length > attrProps.length) {
       reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
@@ -852,9 +855,9 @@ export function nodeToComponentDef(
 
       if (shouldUseTextNodeElement) {
         if (shouldUseCData) {
-          newChild = createTextNodeCDataElement(textValue);
+          newChild = createTextNodeCDataElement(textValue, child.kind);
         } else {
-          newChild = createTextNodeElement(textValue);
+          newChild = createTextNodeElement(textValue, child.kind);
         }
       } else {
         newChild = {
@@ -862,6 +865,7 @@ export function nodeToComponentDef(
           text: textValue,
           pos: child.pos,
           end: child.end,
+          originalKind: child.kind,
         } as TransformNode;
       }
       childNodes[i] = newChild;
@@ -1118,7 +1122,21 @@ export function nodeToComponentDef(
         if (nodeContainingValue) {
           let diagPos: number;
           let diagEnd: number;
-          if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
+          const transformNode = nodeContainingValue as TransformNode;
+          if (transformNode.originalKind !== undefined) {
+            if (transformNode.originalKind === SyntaxKind.StringLiteral) {
+              const afterContentPos = transformNode.pos + 1;
+              diagPos = afterContentPos + errMsg.position;
+              diagEnd = afterContentPos + errMsg.end;
+            } else if (transformNode.originalKind === SyntaxKind.CData) {
+              const afterCDataPos = transformNode.pos + CDATA_PREFIX_LEN;
+              diagPos = afterCDataPos + errMsg.position;
+              diagEnd = afterCDataPos + errMsg.end;
+            } else {
+              diagPos = transformNode.pos + errMsg.position;
+              diagEnd = transformNode.pos + errMsg.end;
+            }
+          } else if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
             const afterQuotePos = nodeContainingValue.pos + 1;
             diagPos = afterQuotePos + errMsg.position;
             diagEnd = afterQuotePos + errMsg.end;
@@ -1162,7 +1180,7 @@ export function nodeToComponentDef(
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
       comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
-      
+
       // --- Merge pre-resolved imports if provided
       if (preResolvedImports) {
         comp.scriptCollected.functions = {
@@ -1174,7 +1192,7 @@ export function nodeToComponentDef(
           ...comp.scriptCollected.vars,
         };
       }
-      
+
       if (comp.scriptCollected.hasInvalidStatements) {
         comp.scriptError = new Error(
           `Only reactive variable and function definitions are allowed in a code-behind module.`,
@@ -1203,9 +1221,10 @@ export function nodeToComponentDef(
   }
 }
 
-function createTextNodeCDataElement(textValue: string): Node {
+function createTextNodeCDataElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1230,12 +1249,13 @@ function createTextNodeCDataElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
-function createTextNodeElement(textValue: string): Node {
+function createTextNodeElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1260,7 +1280,7 @@ function createTextNodeElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
 function reportError(
@@ -1330,7 +1350,7 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
     if (child.type === "Fragment" && child.scriptCollected) {
       // Check if the script references context variables (like $item, $itemIndex, etc.)
       const hasContextVarReferences = child.script?.includes("$");
-      
+
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level
       if (!hasContextVarReferences) {
