@@ -182,6 +182,7 @@ export const StateContainer = memo(
       stateFromOutside,
       componentStateWithApis,
       node.contextVars,
+      routingParams,
     );
 
     // ========================================================================
