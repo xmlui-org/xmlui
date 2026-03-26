@@ -26,7 +26,7 @@ export function ApiBoundComponent({
 }: ApiBoundComponentProps) {
   const wrappedWithAdapter = useMemo(() => {
     function generateloaderUid(key: string) {
-      return `${node.uid}_data_${key}`;
+      return `${node.uid ?? node.type}_data_${key}`;
     }
 
     // Generates a string representation of an event handler function that calls 
