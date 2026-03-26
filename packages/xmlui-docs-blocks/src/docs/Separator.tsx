@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./Separator.xmlui";
 
-export const SeparatorMd = createMetadata({
+export const SeparatorMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Vertical content separator.",
   props: {},

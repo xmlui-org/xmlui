@@ -1,11 +1,11 @@
 import styles from "./LabelList.module.scss";
 import { defaultProps, LabelList } from "./LabelListNative";
 import { LabelPositionValues } from "../utils/abstractions";
-import { parseScssVar, wrapComponent, createMetadata } from "xmlui";
+import { parseScssVar, wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 
 const COMP = "LabelList";
 
-export const LabelListMd = createMetadata({
+export const LabelListMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`LabelList` adds custom data labels to chart components when automatic " +

@@ -1,9 +1,9 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { createComponentRenderer, createMetadata, type ComponentMetadata } from "xmlui";
 import { Blog } from "./BlogNative";
 
 const COMP = "Blog";
 
-export const BlogMd = createMetadata({
+export const BlogMd: ComponentMetadata = createMetadata({
   status: "internal",
   description:
     "`Blog` renders blog list or a single post based on the current route and appGlobals.blog. " +

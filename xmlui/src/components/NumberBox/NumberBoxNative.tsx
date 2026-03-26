@@ -97,6 +97,7 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  "aria-label"?: string;
 };
 
 export const NumberBox = forwardRef(function NumberBox(

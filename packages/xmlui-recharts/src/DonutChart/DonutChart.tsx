@@ -1,4 +1,4 @@
-import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
+import { wrapComponent, parseScssVar, createMetadata, type ComponentMetadata } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
 import { defaultProps, PieChart } from "../PieChart/PieChartNative";
 
@@ -9,7 +9,7 @@ const defaultPropsDonut = {
   innerRadius: 60,
 };
 
-export const DonutChartMd = createMetadata({
+export const DonutChartMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "A derivative of [PieChart](/components/PieChart) with a hollow center. " +

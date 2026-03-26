@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./DocumentLinks.xmlui";
 
-export const DocumentLinksMd = createMetadata({
+export const DocumentLinksMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Previous/Next document links using linkInfo.",
   props: {

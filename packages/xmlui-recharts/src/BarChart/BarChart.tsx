@@ -1,9 +1,9 @@
 import { BarChart, defaultProps } from "./BarChartNative";
-import { wrapComponent, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 
 const COMP = "BarChart";
 
-export const BarChartMd = createMetadata({
+export const BarChartMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`BarChart` displays data as horizontal or vertical bars, supporting both grouped " +

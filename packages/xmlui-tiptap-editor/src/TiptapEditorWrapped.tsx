@@ -2,6 +2,7 @@ import { TiptapEditorRender } from "./TiptapEditorRender";
 import {
   wrapCompound,
   createMetadata,
+  type ComponentMetadata,
   d,
   dDidChange,
   dInitialValue,
@@ -9,7 +10,7 @@ import {
 
 const COMP = "TiptapEditor";
 
-export const TiptapEditorMd = createMetadata({
+export const TiptapEditorMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`TiptapEditor` wraps the Tiptap rich-text editor as an XMLUI component. " +

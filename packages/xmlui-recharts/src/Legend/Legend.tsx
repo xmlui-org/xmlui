@@ -1,4 +1,4 @@
-import { wrapComponent, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 import {
   defaultProps,
   horizontalAlignmentValues,
@@ -8,7 +8,7 @@ import {
 
 const COMP = "Legend";
 
-export const LegendMd = createMetadata({
+export const LegendMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`Legend` provides a standalone legend for chart components when you need " +

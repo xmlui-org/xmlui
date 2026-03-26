@@ -1,10 +1,10 @@
 import { defaultProps, LineChart } from "./LineChartNative";
-import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
+import { wrapComponent, createMetadata, type ComponentMetadata, d, parseScssVar } from "xmlui";
 import styles from "./LineChart.module.scss";
 
 const COMP = "LineChart";
 
-export const LineChartMd = createMetadata({
+export const LineChartMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`LineChart` displays data as connected points over a continuous axis, ideal " +

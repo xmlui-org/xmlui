@@ -2,12 +2,13 @@ import { EChartRender } from "./EChartRender";
 import {
   wrapComponent,
   createMetadata,
+  type ComponentMetadata,
   d,
 } from "xmlui";
 
 const COMP = "EChart";
 
-export const EChartMd = createMetadata({
+export const EChartMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`EChart` wraps Apache ECharts via echarts-for-react, providing a " +
