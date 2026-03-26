@@ -4,6 +4,7 @@ import {
   docsContent,
   staticSearchData,
   prefetchedContent,
+  posts,
   shikiHighlighter,
   highlight,
   getLocalIcons,
@@ -44,6 +45,7 @@ const App: StandaloneAppDescription = {
     docsContent,
     staticSearchData,
     prefetchedContent,
+    posts,
     codeHighlighter: {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,
