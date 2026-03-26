@@ -103,6 +103,7 @@ import { ComponentRegistryContext } from "./ComponentRegistryContext";
 import { columnComponentRenderer } from "./Column/Column";
 import type { ActionFunction, ActionRendererDef } from "../abstractions/ActionDefs";
 import { apiAction } from "../components-core/action/APICall";
+import { generateUdComponentMetadata } from "../components-core/ud-metadata";
 import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
@@ -1001,6 +1002,11 @@ export class ComponentRegistry {
     { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
     namespace: string,
   ) {
+    const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
+    const mergedMetadata = metadata
+      ? { ...autoMetadata, ...metadata }
+      : autoMetadata;
+
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
@@ -1014,7 +1020,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-      metadata,
+      metadata: mergedMetadata,
     };
 
     this.registerComponentRenderer(component, namespace);

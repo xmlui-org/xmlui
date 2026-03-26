@@ -501,3 +501,102 @@ describe("generateUdComponentMetadata", () => {
     expect(meta.themeVars!["color-text"]).toBe("");
   });
 });
+
+// ---------------------------------------------------------------------------
+// Step 9: Edge case tests
+// ---------------------------------------------------------------------------
+
+describe("edge cases", () => {
+  it("collects theme vars from component referencing another component's var", () => {
+    const comp = parseCompoundDef(
+      `<Component name="MyComp">
+        <OtherComp backgroundColor="$bg-OtherComp" />
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.themeVars!["bg-OtherComp"]).toBe("");
+  });
+
+  it("collects $props from when/if conditions", () => {
+    const comp = parseCompoundDef(
+      `<Component name="MyComp">
+        <Text when="{$props.visible}" value="shown" />
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props!["visible"]).toBeDefined();
+  });
+
+  it("handles compound component with no children", () => {
+    const comp = parseCompoundDef(`<Component name="Empty"><Fragment /></Component>`);
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.status).toBe("stable");
+    expect(meta.props).toEqual({});
+    expect(meta.themeVars).toEqual({});
+  });
+
+  it("handles deeply nested tree with mixed props and theme vars", () => {
+    const comp = parseCompoundDef(
+      `<Component name="Deep">
+        <Stack padding="$space-1">
+          <Stack margin="$space-2">
+            <Stack gap="$space-3">
+              <Text value="{$props.deep}" />
+            </Stack>
+          </Stack>
+        </Stack>
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props!["deep"]).toBeDefined();
+    expect(meta.themeVars!["space-1"]).toBe("");
+    expect(meta.themeVars!["space-2"]).toBe("");
+    expect(meta.themeVars!["space-3"]).toBe("");
+  });
+
+  it("walkComponentDefTree does not infinite-loop on empty children", () => {
+    const node: ComponentDef = {
+      type: "Stack",
+      children: [],
+    } as unknown as ComponentDef;
+    const visited: string[] = [];
+    walkComponentDefTree(node, (n) => visited.push(n.type));
+    expect(visited).toEqual(["Stack"]);
+  });
+
+  it("explicit metadata overrides auto-generated fields", () => {
+    // This tests the merge semantics used in registerCompoundComponentRenderer:
+    // explicit metadata wins over auto-generated metadata.
+    const comp = parseCompoundDef(
+      `<Component name="MyComp"><Text value="{$props.label}" /></Component>`,
+    );
+    const auto = generateUdComponentMetadata(comp);
+    const explicit = { description: "Custom description" };
+    const merged = { ...auto, ...explicit };
+    expect(merged.description).toBe("Custom description");
+    expect(merged.props!["label"]).toBeDefined();
+  });
+
+  it("collects theme vars from loaders", () => {
+    // Loaders are ComponentDef nodes with layout props — should be visited
+    const node: ComponentDef = {
+      type: "Stack",
+      loaders: [
+        { type: "ApiCall", props: { padding: "$space-2" } } as unknown as ComponentDef,
+      ],
+    } as unknown as ComponentDef;
+    expect(collectThemeVarsFromComponentDef(node)["space-2"]).toBe("");
+  });
+
+  it("collects $props from slots", () => {
+    const comp = parseCompoundDef(
+      `<Component name="SlotComp">
+        <Stack>
+          <Slot name="header" content="{$props.headerContent}" />
+        </Stack>
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props!["headerContent"]).toBeDefined();
+  });
+});

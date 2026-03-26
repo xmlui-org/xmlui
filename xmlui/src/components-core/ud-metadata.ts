@@ -277,6 +277,8 @@ export function collectPropsFromComponentDef(def: ComponentDef): string[] {
     extractPropsFromRecord(node.props, found);
     extractPropsFromRecord(node.vars, found);
     extractPropsFromEventRecord(node.events, found);
+    // `when` is a special directive stored directly on the ComponentDef, not in props
+    extractPropsFromRawString(node.when, found);
   });
 
   return [...found];
@@ -328,6 +330,25 @@ function extractPropsFromEventRecord(
         extractPropsFromStatement(stmt, out);
       }
     }
+  }
+}
+
+function extractPropsFromRawString(
+  value: string | boolean | undefined,
+  out: Set<string>,
+): void {
+  if (typeof value !== "string") return;
+  try {
+    const segments = parseParameterString(value);
+    for (const segment of segments) {
+      if (segment.type === "expression") {
+        for (const prop of extractPropsFromExpression(segment.value)) {
+          out.add(prop);
+        }
+      }
+    }
+  } catch {
+    // Ignore parse errors in static analysis
   }
 }
 

@@ -112,6 +112,11 @@ export function Theme({
       const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
       if (
         !componentName ||
+        // Compound (user-defined) components pass through unconditionally as a
+        // safety net for theme vars that aren't statically analyzable (e.g.,
+        // dynamic expressions). The primary optimization path is via
+        // componentThemeVars in ThemeProvider, populated from auto-generated
+        // metadata in registerCompoundComponentRenderer.
         registeredComponent?.isCompoundComponent ||
         componentName === "Input" ||
         componentName === "Heading" ||

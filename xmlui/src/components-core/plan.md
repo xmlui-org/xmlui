@@ -214,7 +214,7 @@ export function generateUdComponentMetadata(
 
 ---
 
-### Step 7: Wire metadata generation into registration
+### Step 7: Wire metadata generation into registration ✅ DONE
 
 **File**: `xmlui/src/components/ComponentProvider.tsx`
 
@@ -270,7 +270,7 @@ This ensures:
 
 ---
 
-### Step 8: Verify ThemeNative filtering still works
+### Step 8: Verify ThemeNative filtering still works ✅ DONE
 
 **File**: `xmlui/src/components/Theme/ThemeNative.tsx`
 
@@ -286,7 +286,7 @@ Review whether the `isCompoundComponent` pass-through is still needed:
 
 ---
 
-### Step 9: Handle edge cases
+### Step 9: Handle edge cases ✅ DONE
 
 Consider and test these edge cases:
 
