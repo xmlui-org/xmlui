@@ -145,7 +145,7 @@ Return deduplicated property names.
 
 ---
 
-### Step 5: Create `collectThemeVarsFromComponentDef`
+### Step 5: Create `collectThemeVarsFromComponentDef` ✅ DONE
 
 **File**: `xmlui/src/components-core/ud-metadata.ts`
 
@@ -180,7 +180,7 @@ Note: We need to generate theme var keys in the format matching what `ThemeProvi
 
 ---
 
-### Step 6: Create `generateUdComponentMetadata`
+### Step 6: Create `generateUdComponentMetadata` ✅ DONE
 
 **File**: `xmlui/src/components-core/ud-metadata.ts`
 

@@ -1,7 +1,13 @@
-import type { ComponentDef } from "../abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  ComponentMetadata,
+  ComponentPropertyMetadata,
+} from "../abstractions/ComponentDefs";
 import type { ParsedPropertyValue, ParsedEventValue } from "../abstractions/scripting/Compilation";
 import type { Expression } from "./script-runner/ScriptingSourceTree";
 import { parseParameterString } from "./script-runner/ParameterParser";
+import { parseLayoutProperty } from "./theming/parse-layout-props";
 import {
   T_MEMBER_ACCESS_EXPRESSION,
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
@@ -373,4 +379,71 @@ function extractPropsFromExprIntoSet(expr: Expression, out: Set<string>): void {
   for (const prop of extractPropsFromExpression(expr)) {
     out.add(prop);
   }
+}
+
+/**
+ * Walks a ComponentDef tree and collects all theme variable references found in
+ * layout property string values (e.g., `padding="$space-2"` → `"space-2"`).
+ *
+ * Only plain string values are analyzed — props that use expression syntax
+ * (`{...}`) are skipped because they are dynamic and not statically analyzable.
+ *
+ * Returns a `Record<string, string>` with theme variable names as keys and `""`
+ * as values (matching the convention of `parseScssVar` output).
+ */
+export function collectThemeVarsFromComponentDef(
+  def: ComponentDef,
+): Record<string, string> {
+  const result: Record<string, string> = {};
+
+  walkComponentDefTree(def, (node) => {
+    if (!node.props) return;
+    for (const [key, value] of Object.entries(node.props)) {
+      // Only process recognized layout properties
+      const parsed = parseLayoutProperty(key);
+      if (typeof parsed === "string") continue; // parse error → not a layout prop
+
+      // Only plain string values — skip expressions (they contain "{")
+      if (typeof value !== "string" || value.includes("{")) continue;
+
+      // Extract $<themeVar> references from the value
+      for (const themeVar of extractThemeVarsFromValue(value)) {
+        result[themeVar] = "";
+      }
+    }
+  });
+
+  return result;
+}
+
+/**
+ * Generates a `ComponentMetadata` object for a user-defined component by
+ * statically analysing its CompoundComponentDef.
+ *
+ * Extracted metadata:
+ * - `status: "stable"`
+ * - `description`: includes the component name
+ * - `props`: all `$props.<member>` references found in the component tree
+ * - `themeVars`: all `$<themeVar>` references in layout property values
+ */
+export function generateUdComponentMetadata(
+  compoundDef: CompoundComponentDef,
+): ComponentMetadata {
+  const innerDef = compoundDef.component as ComponentDef;
+  const propNames = collectPropsFromComponentDef(innerDef);
+  const themeVars = collectThemeVarsFromComponentDef(innerDef);
+
+  const props = Object.fromEntries(
+    propNames.map((name) => [
+      name,
+      { description: "" } satisfies ComponentPropertyMetadata,
+    ]),
+  ) as Record<string, ComponentPropertyMetadata>;
+
+  return {
+    status: "stable",
+    description: `User-defined component: ${compoundDef.name}`,
+    props,
+    themeVars,
+  };
 }

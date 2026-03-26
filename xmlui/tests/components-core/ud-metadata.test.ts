@@ -6,6 +6,8 @@ import {
   extractThemeVarsFromValue,
   walkComponentDefTree,
   collectPropsFromComponentDef,
+  collectThemeVarsFromComponentDef,
+  generateUdComponentMetadata,
 } from "../../src/components-core/ud-metadata";
 import { xmlUiMarkupToComponent } from "../../src/components-core/xmlui-parser";
 
@@ -334,5 +336,168 @@ describe("collectPropsFromComponentDef", () => {
       `<Component name="MyComp"><Stack var:computed="{$props.base + 10}" /></Component>`,
     );
     expect(collectPropsFromComponentDef(def)).toContain("base");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// helpers for Steps 5 & 6
+// ---------------------------------------------------------------------------
+
+/** Build a minimal ComponentDef directly (bypasses the XML parser). */
+function makeNode(
+  props?: Record<string, string>,
+  children?: ComponentDef[],
+): ComponentDef {
+  return { type: "Stack", props, children } as unknown as ComponentDef;
+}
+
+/** Parse XMLUI markup and return the CompoundComponentDef (for generateUdComponentMetadata). */
+function parseCompoundDef(xml: string) {
+  const result = xmlUiMarkupToComponent(xml);
+  if (!result.component || result.errors.length > 0) {
+    throw new Error(`Parse failed: ${result.errors.map((e: any) => e.message).join("; ")}`);
+  }
+  return result.component as any;
+}
+
+describe("collectThemeVarsFromComponentDef", () => {
+  it("returns empty object when no layout props", () => {
+    const node = makeNode({ label: "hello" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({});
+  });
+
+  it("collects theme var from a layout prop string value", () => {
+    const node = makeNode({ padding: "$space-2" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({ "space-2": "" });
+  });
+
+  it("ignores layout prop with expression syntax", () => {
+    const node = makeNode({ padding: "{$props.padding}" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({});
+  });
+
+  it("ignores layout prop with plain literal (no theme var)", () => {
+    const node = makeNode({ padding: "10px" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({});
+  });
+
+  it("collects multiple theme vars from one value", () => {
+    const node = makeNode({ padding: "$space-2 $space-4" });
+    const result = collectThemeVarsFromComponentDef(node);
+    expect(result["space-2"]).toBe("");
+    expect(result["space-4"]).toBe("");
+  });
+
+  it("collects from backgroundColor layout prop", () => {
+    const node = makeNode({ backgroundColor: "$color-surface-100" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({ "color-surface-100": "" });
+  });
+
+  it("deduplicates theme vars across nodes", () => {
+    const child = makeNode({ padding: "$space-2" });
+    const parent = makeNode({ padding: "$space-2" }, [child]);
+    const result = collectThemeVarsFromComponentDef(parent);
+    expect(Object.keys(result)).toEqual(["space-2"]);
+  });
+
+  it("collects from nested children", () => {
+    const inner = makeNode({ margin: "$space-4" });
+    const outer = makeNode({ padding: "$space-2" }, [inner]);
+    const result = collectThemeVarsFromComponentDef(outer);
+    expect(result["space-2"]).toBe("");
+    expect(result["space-4"]).toBe("");
+  });
+
+  it("collects from responsive layout props", () => {
+    // padding-md is a valid responsive layout prop
+    const node = makeNode({ "padding-md": "$space-4" });
+    const result = collectThemeVarsFromComponentDef(node);
+    expect(result["space-4"]).toBe("");
+  });
+
+  it("collects from any valid camelCase prop name with theme var value", () => {
+    // parseLayoutProperty accepts any valid camelCase name — not just known CSS props
+    const node = makeNode({ customProp: "$my-color" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({ "my-color": "" });
+  });
+
+  it("ignores prop names with uppercase start (component names are invalid)", () => {
+    // A prop like "Whatever" would fail parseLayoutProperty (starts with uppercase)
+    const node = makeNode({ Whatever: "$some-var" });
+    expect(collectThemeVarsFromComponentDef(node)).toEqual({});
+  });
+});
+
+describe("generateUdComponentMetadata", () => {
+  it("returns stable status", () => {
+    const comp = parseCompoundDef(`<Component name="MyComp"><Text /></Component>`);
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.status).toBe("stable");
+  });
+
+  it("includes component name in description", () => {
+    const comp = parseCompoundDef(`<Component name="Widget"><Text /></Component>`);
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.description).toContain("Widget");
+  });
+
+  it("generates props from $props references", () => {
+    const comp = parseCompoundDef(
+      `<Component name="MyComp"><Text value="{$props.label}" /></Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props).toBeDefined();
+    expect(meta.props!["label"]).toBeDefined();
+    expect(meta.props!["label"].description).toBe("");
+  });
+
+  it("returns empty props when no $props references", () => {
+    const comp = parseCompoundDef(`<Component name="MyComp"><Text value="hello" /></Component>`);
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props).toEqual({});
+  });
+
+  it("generates themeVars from layout prop string values", () => {
+    const comp = parseCompoundDef(
+      `<Component name="MyComp"><Stack backgroundColor="$color-surface-100" /></Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.themeVars).toBeDefined();
+    expect(meta.themeVars!["color-surface-100"]).toBe("");
+  });
+
+  it("returns empty themeVars when no layout prop theme var references", () => {
+    const comp = parseCompoundDef(`<Component name="MyComp"><Text value="{$props.x}" /></Component>`);
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.themeVars).toEqual({});
+  });
+
+  it("collects both props and themeVars together", () => {
+    const comp = parseCompoundDef(
+      `<Component name="MyComp">
+        <Stack backgroundColor="$color-surface-100" padding="$space-2">
+          <Text value="{$props.title}" />
+        </Stack>
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(meta.props!["title"]).toBeDefined();
+    expect(meta.themeVars!["color-surface-100"]).toBe("");
+    expect(meta.themeVars!["space-2"]).toBe("");
+  });
+
+  it("handles multiple props and theme vars across nested tree", () => {
+    const comp = parseCompoundDef(
+      `<Component name="Card">
+        <Stack padding="$space-4">
+          <Text value="{$props.header}" />
+          <Text value="{$props.body}" color="$color-text" />
+        </Stack>
+      </Component>`,
+    );
+    const meta = generateUdComponentMetadata(comp);
+    expect(Object.keys(meta.props!).sort()).toEqual(["body", "header"]);
+    expect(meta.themeVars!["space-4"]).toBe("");
+    expect(meta.themeVars!["color-text"]).toBe("");
   });
 });
