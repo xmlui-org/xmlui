@@ -49,6 +49,201 @@ Children without a `dock` prop participate as undocked items in the middle row a
 </App>
 ```
 
+## Auto-Spacing Based on Nesting Context [#auto-spacing-based-on-nesting-context]
+
+`Stack` automatically adjusts its spacing when it detects it is rendered inside an existing layout
+context (i.e., nested inside another `Stack`, `Card`, or any other layout container).
+
+These adjustments apply only when no explicit prop is set — explicit props always take precedence.
+
+### Experiment 1: Auto-tight gap in nested Stacks [#experiment-1-auto-tight-gap-in-nested-stacks]
+
+A top-level `Stack` uses the standard `$gap-normal` spacing between its children. When a `Stack`
+is nested inside another layout, it automatically switches to `$gap-tight` so sub-groups naturally
+appear more compact without any explicit `gap` setting.
+
+The outer `VStack` below uses normal gap between the two `Card` sections. The inner `VStack` inside
+each card automatically uses tight gap between its items.
+
+```xmlui-pg copy display name="Example: auto-tight gap in nested Stacks"
+<App>
+  <VStack>
+    <Card>
+      <Text variant="strong">Team Members</Text>
+      <VStack>
+        <Text value="Alice Johnson" />
+        <Text value="Bob Smith" />
+        <Text value="Carol Williams" />
+      </VStack>
+    </Card>
+    <Card>
+      <Text variant="strong">Recent Activity</Text>
+      <VStack>
+        <Text value="Pull request merged" />
+        <Text value="Issue closed" />
+        <Text value="Comment added" />
+      </VStack>
+    </Card>
+  </VStack>
+</App>
+```
+
+To override the auto-tight gap and use normal spacing inside a nested `Stack`, set `gap` explicitly:
+
+```xmlui-pg copy display name="Example: override auto-tight gap"
+<App>
+  <VStack>
+    <Card>
+      <Text variant="strong">Sections with explicit spacing</Text>
+      <VStack gap="$gap-normal">
+        <Text value="Item A — normal gap overrides the auto-tight default" />
+        <Text value="Item B" />
+        <Text value="Item C" />
+      </VStack>
+    </Card>
+  </VStack>
+</App>
+```
+
+### Experiment 2: Auto-center vertical alignment in nested horizontal Stacks [#experiment-2-auto-center-vertical-alignment-in-nested-horizontal-stacks]
+
+A nested `HStack` automatically applies `verticalAlignment="center"` when it has no explicit
+`verticalAlignment` set. This is the most common requirement for toolbar rows, list item rows,
+and button groups where icons, text, and buttons of different heights need to line up.
+
+The rows below mix a `Badge` (small) with a multi-line description `VStack` and a `Button`. Without
+the auto-center, the items would default to `stretch` alignment and look misaligned.
+
+```xmlui-pg copy display name="Example: auto-center vertical alignment in nested HStack"
+<App>
+  <VStack>
+    <Card>
+      <HStack>
+        <Badge value="NEW" />
+        <VStack>
+          <Text variant="strong">Dark mode support</Text>
+          <Text>Automatically follows your system preference</Text>
+        </VStack>
+        <SpaceFiller />
+        <Button label="Enable" />
+      </HStack>
+      <HStack>
+        <Badge value="FIX" />
+        <VStack>
+          <Text variant="strong">Layout engine update</Text>
+          <Text>Improved nesting depth detection</Text>
+        </VStack>
+        <SpaceFiller />
+        <Button label="View" />
+      </HStack>
+    </Card>
+  </VStack>
+</App>
+```
+
+To opt out of the auto-centering and use the default `stretch` alignment, set `verticalAlignment`
+explicitly:
+
+```xmlui-pg copy display name="Example: override auto-center with explicit verticalAlignment"
+<App>
+  <VStack>
+    <Card>
+      <HStack verticalAlignment="start">
+        <Badge value="1" />
+        <VStack>
+          <Text variant="strong">Items stretch to top</Text>
+          <Text>verticalAlignment="start" overrides the auto-center default</Text>
+        </VStack>
+        <SpaceFiller />
+        <Button label="OK" />
+      </HStack>
+    </Card>
+  </VStack>
+</App>
+```
+
+### Real-life example: Two-column address form [#real-life-example-two-column-address-form]
+
+The following example shows both experiments in action simultaneously.
+
+The outer `HStack` (Billing + Shipping columns) is not nested inside any layout context, so it keeps
+the default `$gap-normal` spacing between the two columns. Each column is a `VStack` nested inside
+the `HStack` — so both automatically receive `$gap-tight` spacing for their form rows without any
+explicit `gap` prop.
+
+Within the Shipping column header, the `HStack` containing the section title and the copy button is
+also nested, so its items (of different heights) are automatically vertically centered — the icon
+and the label text line up without `verticalAlignment="center"`.
+
+```xmlui-pg copy display name="Example: two-column address form"
+<App>
+  <Form>
+    <HStack>
+      <VStack width="1*">
+        <Text variant="strong">Billing Address</Text>
+        <TextBox label="Attention" labelPosition="start" placeholder="Attention to" bindTo="billingAttention" />
+        <TextBox label="Address" labelPosition="start" placeholder="Street address" bindTo="billingAddress" />
+        <TextBox label="Address Line 2" labelPosition="start" placeholder="Apartment, suite, unit, etc." bindTo="billingAddress2" />
+        <TextBox label="City" labelPosition="start" placeholder="City" bindTo="billingCity" />
+        <TextBox label="State" labelPosition="start" placeholder="State/Province" bindTo="billingState" />
+        <TextBox label="Zip" labelPosition="start" placeholder="Postal code" bindTo="billingZip" />
+        <TextBox label="Country" labelPosition="start" placeholder="Country" bindTo="billingCountry" />
+      </VStack>
+      <VStack width="1*">
+        <HStack>
+          <Text variant="strong">Shipping Address</Text>
+          <SpaceFiller />
+          <Icon name="copy" />
+          <Text>Same as Billing address</Text>
+        </HStack>
+        <TextBox label="Attention" labelPosition="start" placeholder="Attention to" bindTo="shippingAttention" />
+        <TextBox label="Address" labelPosition="start" placeholder="Street address" bindTo="shippingAddress" />
+        <TextBox label="Address Line 2" labelPosition="start" placeholder="Apartment, suite, unit, etc." bindTo="shippingAddress2" />
+        <TextBox label="City" labelPosition="start" placeholder="City" bindTo="shippingCity" />
+        <TextBox label="State" labelPosition="start" placeholder="State/Province" bindTo="shippingState" />
+        <TextBox label="Zip" labelPosition="start" placeholder="Postal code" bindTo="shippingZip" />
+        <TextBox label="Country" labelPosition="start" placeholder="Country" bindTo="shippingCountry" />
+      </VStack>
+    </HStack>
+  </Form>
+</App>
+```
+
+### Real-life example: Composite form row with multiple inputs [#real-life-example-composite-form-row-with-multiple-inputs]
+
+The following example shows a form where a single label ("Primary Contact") governs a row of three
+inputs — a salutation dropdown, a first-name field, and a last-name field — placed side by side
+inside an `HStack`.
+
+Because the `HStack` is nested inside the `Form` layout context, **Experiment 2** kicks in
+automatically: the dropdown and the two text fields are vertically centered without any
+`verticalAlignment="center"` prop on the `HStack`.
+
+```xmlui-pg copy display name="Example: composite form row with multiple inputs"
+<App>
+  <Form>
+    <RadioGroup label="Customer Type" labelPosition="start" bindTo="customerType"
+      initialValue="business" required="true">
+      <HStack>
+        <Option label="Business" value="business" />
+        <Option label="Individual" value="individual" />
+      </HStack>
+    </RadioGroup>
+    <FormItem label="Primary Contact" labelPosition="start" required="true">
+      <HStack>
+        <Select bindTo="salutation" width="100px">
+          <Option value="mr" label="Mr." />
+          <Option value="ms" label="Ms." />
+          <Option value="dr" label="Dr." />
+        </Select>
+        <TextBox bindTo="contactFirstName" placeholder="Enter name" width="1*" />
+        <TextBox bindTo="contactLastName" placeholder="Last name" width="1*" />
+      </HStack>
+    </FormItem>
+  </Form>
+</App>
+```
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:

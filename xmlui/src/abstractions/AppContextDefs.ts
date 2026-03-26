@@ -179,7 +179,12 @@ export type AppContextObject = {
   // Instructs the browser to display a dialog with an optional message, and to
   // wait until the user either confirms or cancels the dialog. It returns a
   // boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
-  confirm: (title: string, message?: string, actionLabel?: string) => Promise<boolean>;
+  confirm: (
+    title?: string,
+    message?: string,
+    actionLabel?: string,
+    cancelLabel?: string,
+  ) => Promise<boolean>;
 
   // This method displays the specified `error` (error message) on the UI.
   signError(error: Error | string): void;

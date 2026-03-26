@@ -65,6 +65,7 @@
             when-md="{pathname.startsWith('/docs')}"
             scrollStyle="whenScrolling"
             showScrollerFade="true"
+            paddingHorizontal-md="$paddingHorizontal-md-NavPanel"
         >
             <property name="logoTemplate">
                 <HStack

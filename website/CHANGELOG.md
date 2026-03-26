@@ -1,5 +1,25 @@
 # xmlui-website
 
+## 0.0.17
+
+### Patch Changes
+
+- 0e81ae3: fix: search - remove relaxed fuse queries
+- d789f44: fix: scrolling issue in mobile menu
+- Updated dependencies [61308b2]
+- Updated dependencies [0e81ae3]
+- Updated dependencies [c4fc0be]
+- Updated dependencies [4127490]
+- Updated dependencies [14113d5]
+- Updated dependencies [f6921ed]
+- Updated dependencies [d789f44]
+- Updated dependencies [ed962d1]
+- Updated dependencies [333bce7]
+- Updated dependencies [4127490]
+- Updated dependencies [b133970]
+  - xmlui-search@0.1.10
+  - xmlui@0.12.13
+
 ## 0.0.16
 
 ### Patch Changes

@@ -671,6 +671,7 @@ test.describe("Basic Functionality", () => {
             confirmTitle="Custom Title"
             confirmMessage="Are you sure you want to proceed?"
             confirmButtonLabel="Yes, Continue"
+            cancelButtonLabel="No, Stop"
           />
           <Button testId="trigger" onClick="api.execute()" label="Execute" />
         </Fragment>
@@ -687,6 +688,7 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("Custom Title")).toBeVisible();
       await expect(page.getByText("Are you sure you want to proceed?")).toBeVisible();
       await expect(page.getByText("Yes, Continue")).toBeVisible();
+      await expect(page.getByText("No, Stop")).toBeVisible();
     });
 
     test("API call proceeds when confirmation is accepted", async ({
@@ -754,6 +756,41 @@ test.describe("Basic Functionality", () => {
       await page.getByRole("button", { name: /cancel|no/i }).click();
 
       // Should not execute API call
+      await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual(null);
+    });
+
+    test("API call is cancelled when custom cancel button is clicked", async ({
+      initTestBed,
+      createButtonDriver,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(
+        `
+        <Fragment>
+          <APICall 
+            id="api" 
+            url="/api/confirm" 
+            method="post"
+            confirmTitle="Confirm"
+            confirmMessage="Proceed?"
+            confirmButtonLabel="Proceed"
+            cancelButtonLabel="Abort"
+            onSuccess="() => testState = 'confirmed'"
+            onError="() => testState = 'error'"
+          />
+          <Button testId="trigger" onClick="api.execute()" label="Execute" />
+        </Fragment>
+      `,
+        {
+          apiInterceptor: confirmationInterceptor,
+        },
+      );
+
+      const button = await createButtonDriver("trigger");
+      await button.click();
+
+      await page.getByRole("button", { name: "Abort" }).click();
+
       await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual(null);
     });
   });
