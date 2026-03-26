@@ -92,9 +92,8 @@ const staticSearchData: SearchItemData[] = [
   }),
 ];
 
-// Build posts array from blogFrontmatter so it doesn't need to be maintained manually in index.html
-const posts = Object.entries(blogFrontmatter)
-  .filter(([, fm]) => !fm.draft)
+// Build allPosts (including drafts, for direct URL preview) and posts (excluding drafts, for listing)
+const allPosts = Object.entries(blogFrontmatter)
   .map(([key, fm]) => ({
     title: fm.title,
     slug: fm.slug ?? key.replace("/blog/", ""),
@@ -103,16 +102,16 @@ const posts = Object.entries(blogFrontmatter)
     date: fm.date,
     image: fm.image,
     tags: fm.tags,
+    draft: !!fm.draft,
   }));
+
+const posts = allPosts.filter((p) => !p.draft);
 
 const prefetchedContent: Record<string, any> = {};
 
-// Filter out drafts from the main blogContent as well, so they don't show up in the UI
-blogContent = Object.fromEntries(
-  Object.entries(blogContent).filter(([key]) => {
-    return !(blogFrontmatter[`/blog/${key}`]?.draft === true);
-  }),
-);
+// NOTE: We intentionally do NOT filter drafts from blogContent here.
+// Draft posts are excluded from the posts array (used by BlogOverview listing),
+// but their content remains available so they can be previewed via direct URL.
 // Populate prefetched blog content
 Object.keys(blogContent).forEach((fileName) => {
   prefetchedContent[`/blog/${fileName}.md`] = blogContent[fileName];
@@ -123,7 +122,7 @@ Object.keys(rawHomepageContent).forEach((filePath) => {
   prefetchedContent[`/pages/${fileName}`] = rawHomepageContent[filePath].default;
 });
 
-export { prefetchedContent, docsContent, staticSearchData, posts };
+export { prefetchedContent, docsContent, staticSearchData, posts, allPosts };
 
 // --- Icon loader utility
 

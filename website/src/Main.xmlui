@@ -635,7 +635,7 @@
                 url="/blog/:slug"
             >
                 <script>
-                    var post = appGlobals.posts.find(p => p.slug === $routeParams.slug)
+                    var post = appGlobals.allPosts.find(p => p.slug === $routeParams.slug)
                 </script>
                 <BlogPage
                     when="{post}"
