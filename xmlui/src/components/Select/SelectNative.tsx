@@ -696,6 +696,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         {useSimpleSelect ? (
           // SimpleSelect mode (Radix UI Select)
           <SimpleSelect
+            ref={forwardedRef}
             value={currentValue as SingleValueType}
             onValueChange={(val) => toggleOption(val)}
             id={id}
