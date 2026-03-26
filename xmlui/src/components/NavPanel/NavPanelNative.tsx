@@ -367,6 +367,9 @@ export const NavPanel = forwardRef(function NavPanel(
   const linkInfoContext = useLinkInfoContext();
   const localRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
+  // True when the current navigation was initiated by a click inside the NavPanel.
+  // In that case the user already sees the clicked link, so we skip scrolling.
+  const clickedInsideRef = useRef(false);
 
   const mergedRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -383,6 +386,13 @@ export const NavPanel = forwardRef(function NavPanel(
   // Scroll the active NavLink into view when the route changes
   useEffect(() => {
     if (!syncWithContent || !localRef.current) return;
+
+    // If the navigation was triggered by clicking inside the NavPanel the user
+    // already sees the link — skip scrolling to avoid it jumping under the cursor.
+    if (clickedInsideRef.current) {
+      clickedInsideRef.current = false;
+      return;
+    }
 
     const panel = localRef.current;
     let scrolled = false;
@@ -471,6 +481,7 @@ export const NavPanel = forwardRef(function NavPanel(
     <div
       {...rest}
       ref={mergedRef}
+      onMouseDown={() => { clickedInsideRef.current = true; }}
       className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
         [styles.horizontal]: horizontal,
         [styles.vertical]: vertical,
