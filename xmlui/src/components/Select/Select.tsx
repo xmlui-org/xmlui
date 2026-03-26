@@ -252,6 +252,7 @@ export const selectComponentRenderer = wrapComponent(
       const isControlled = node.props.value !== undefined;
       return (
         <Select
+          aria-label={_props["aria-label"]}
           multiSelect={multiSelect}
           classes={classes}
           contentClassName={classes?.[COMPONENT_PART_KEY]}

@@ -306,6 +306,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   forwardedRef,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const ariaLabelRef = useRef("");
+  if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+    ariaLabelRef.current = (rest as any)["aria-label"] || "";
+  }
   const [open, setOpen] = useState(false);
   const [panelWidth, setPanelWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
@@ -472,6 +476,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           componentType: "Select",
           componentLabel: optionLabel,
           ariaRole: "option",
+          selectAriaLabel: ariaLabelRef.current,
           ariaName: optionLabel,
         });
         pushXsLog(createLogEntry("native:selection:change", {

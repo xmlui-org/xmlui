@@ -277,6 +277,7 @@ export const TextBox = forwardRef(function TextBox(
           id={id}
           ref={inputRef}
           type={actualType}
+          aria-label={(rest as any)["aria-label"]}
           className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
