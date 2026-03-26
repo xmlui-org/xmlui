@@ -25,7 +25,6 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
-import { register } from "module";
 
 type Props = {
   id?: string;
@@ -106,39 +105,56 @@ export function Theme({
   const transformedStyles = useMemo(() => {
     const filteredThemeCssVars = {};
 
-    Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
-      // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
-      // parseHVar correctly identifies the component part of a theme var name.
-      // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
-      // instead of a base (no-component) var.
-      const rawKey = key.replace(/^--[^-]+-/, "");
-      let componentName = parseHVar(rawKey)?.component;
-      const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
-      const inComponentThemeVars = componentRegistry.componentThemeVars.has(rawKey);
-      const allowed =
-        !componentName ||
-        // Compound (user-defined) components pass through unconditionally as a
-        // safety net for theme vars that aren't statically analyzable (e.g.,
-        // dynamic expressions). The primary optimization path is via
-        // componentThemeVars in ThemeProvider, populated from auto-generated
-        // metadata in registerCompoundComponentRenderer.
-        registeredComponent?.isCompoundComponent ||
-        componentName === "Input" ||
-        componentName === "Heading" ||
-        componentName === "Footer" ||
-        // Also allow any theme var explicitly referenced inside a user-defined
-        // component's template (collected by generateUdComponentMetadata).
-        // e.g. width="$width-Inc" inside IncrementButton → "width-Inc" is allowed
-        // even though "Inc" is not a registered component name.
-        inComponentThemeVars;
-      if (allowed) {
-        const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
-        filteredThemeCssVars[key] = resolvedValue;
-      }
-    });
+    // Only populate the full compiled theme CSS vars on the wrapper div when:
+    //   1. An explicit `tone` is set — the wrapper must lock in a different tone's colors, OR
+    //   2. An explicit `id` is set — the wrapper switches to a different theme definition, OR
+    //   3. `themeVars` contains base vars (no component suffix, e.g. "color-primary") that
+    //      influence derived vars computed at compile time.
+    //
+    // When none of these apply (e.g. layout-only overrides like "width-navPanel-App"),
+    // skipping the compiled vars prevents the wrapper div from shadowing <html>'s CSS vars.
+    // Shadowing causes tone-switching to break: <html> updates correctly but children
+    // inherit the stale tone values from the closer ancestor div instead.
+    const needsCompiledVars =
+      tone !== undefined ||
+      id !== undefined ||
+      Object.keys(themeVars).some((key) => !parseHVar(key)?.component);
 
-    // --- Always add the explicitly specified themeVars with the correct prefix,
-    // --- even if they don't match the componentName pattern
+    if (needsCompiledVars) {
+      Object.entries({ ...themeCssVars, ...themeVars }).forEach(([key, value]) => {
+        // Strip the CSS variable prefix (e.g. "--xmlui-") before parsing so that
+        // parseHVar correctly identifies the component part of a theme var name.
+        // Without stripping, "--xmlui-backgroundColor" is parsed as component="backgroundColor"
+        // instead of a base (no-component) var.
+        const rawKey = key.replace(/^--[^-]+-/, "");
+        let componentName = parseHVar(rawKey)?.component;
+        const registeredComponent = componentRegistry.lookupComponentRenderer(componentName || "");
+        const inComponentThemeVars = componentRegistry.componentThemeVars.has(rawKey);
+        const allowed =
+          !componentName ||
+          // Compound (user-defined) components pass through unconditionally as a
+          // safety net for theme vars that aren't statically analyzable (e.g.,
+          // dynamic expressions). The primary optimization path is via
+          // componentThemeVars in ThemeProvider, populated from auto-generated
+          // metadata in registerCompoundComponentRenderer.
+          registeredComponent?.isCompoundComponent ||
+          componentName === "Input" ||
+          componentName === "Heading" ||
+          componentName === "Footer" ||
+          // Also allow any theme var explicitly referenced inside a user-defined
+          // component's template (collected by generateUdComponentMetadata).
+          // e.g. width="$width-Inc" inside IncrementButton → "width-Inc" is allowed
+          // even though "Inc" is not a registered component name.
+          inComponentThemeVars;
+        if (allowed) {
+          const resolvedValue = allThemeVarsWithResolvedHierarchicalVars[rawKey] ?? value;
+          filteredThemeCssVars[key] = resolvedValue;
+        }
+      });
+    }
+
+    // Always add the explicitly specified themeVars with the correct prefix,
+    // even if they don't match the componentName pattern
     Object.entries(themeVars).forEach(([key, value]) => {
       filteredThemeCssVars[`--${THEME_VAR_PREFIX}-${key}`] = value;
     });
@@ -190,7 +206,15 @@ export function Theme({
       };
     }
     return ret;
-  }, [isRoot, themeCssVars, themeTone, getThemeVar, componentRegistry]);
+  }, [
+    themeCssVars,
+    themeVars,
+    themeTone,
+    isRoot,
+    componentRegistry,
+    allThemeVarsWithResolvedHierarchicalVars,
+    getThemeVar,
+  ]);
 
   const className = useStyles(transformedStyles, { layer: "themes" });
 
@@ -215,13 +239,11 @@ export function Theme({
     allThemeVarsWithResolvedHierarchicalVars,
     currentTheme,
     currentThemeRoot,
-    fontLinks,
     getResourceUrl,
     getThemeVar,
     themeCssVars,
     themeTone,
     disableInlineStyle,
-    componentRegistry,
   ]);
 
   const { indexing } = useIndexerContext();
