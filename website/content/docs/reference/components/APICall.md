@@ -38,6 +38,10 @@ This optional property sets the request body. Use to pass an object that will be
 
 Optional body to send with the cancel request. Can use $result context from initial response.
 
+### `cancelButtonLabel` [#cancelbuttonlabel]
+
+This optional string property enables the customization of the cancel button in the confirmation dialog that is displayed before the `APICall` is executed.
+
 ### `cancelMethod` [#cancelmethod]
 
 > [!DEF]  default: **"post"**
