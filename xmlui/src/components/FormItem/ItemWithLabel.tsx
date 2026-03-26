@@ -12,6 +12,7 @@ import { Part } from "../Part/Part";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useFormContextPart } from "../Form/FormContext";
 
 // Component part names
 
@@ -70,7 +71,7 @@ const numberRegex = /^[0-9]+$/;
 export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
-    labelPosition = "top",
+    labelPosition,
     style = {},
     className,
     label,
@@ -97,6 +98,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+
+  const formItemLabelPosition = useFormContextPart<LabelPosition | undefined>(
+    (value) => value?.itemLabelPosition as LabelPosition | undefined,
+  );
+  const resolvedLabelPosition = labelPosition ?? formItemLabelPosition ?? "top";
 
   // When rendered inside a horizontal Stack, validation messages must not push sibling
   // inputs out of alignment, and required markers should reserve consistent space so
@@ -126,7 +132,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   }, [inputElement]);
 
   const labelWrapperHeight =
-    labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
+    resolvedLabelPosition === "start" || resolvedLabelPosition === "end" ? inputHeight : "auto";
 
   // Check if the child is a RadioGroup component
   const isRadioGroup = React.isValidElement(children) && children.type === RadioGroup;
@@ -154,10 +160,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       >
         <div
           className={classnames(styles.container, {
-            [styles.top]: labelPosition === "top",
-            [styles.bottom]: labelPosition === "bottom",
-            [styles.start]: labelPosition === "start",
-            [styles.end]: labelPosition === "end",
+            [styles.top]: resolvedLabelPosition === "top",
+            [styles.bottom]: resolvedLabelPosition === "bottom",
+            [styles.start]: resolvedLabelPosition === "start",
+            [styles.end]: resolvedLabelPosition === "end",
             [styles.shrinkToLabel]: shrinkToLabel,
           })}
           dir={rest?.direction}
@@ -240,10 +246,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
-          [styles.top]: labelPosition === "top",
-          [styles.bottom]: labelPosition === "bottom",
-          [styles.start]: labelPosition === "start",
-          [styles.end]: labelPosition === "end",
+          [styles.top]: resolvedLabelPosition === "top",
+          [styles.bottom]: resolvedLabelPosition === "bottom",
+          [styles.start]: resolvedLabelPosition === "start",
+          [styles.end]: resolvedLabelPosition === "end",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
         dir={rest?.direction}
