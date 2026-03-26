@@ -157,7 +157,7 @@ The test navigates, clicks, and assert. It's all generated from the distilled tr
 
 You can visit a live instance of the app [here](https://xmlui-org.github.io/xmlui-regression/), take that journey, and click the Inspector icon to see a visualization of the traces.
 
-![semantic trace](/resources/blog/semantic-trace.png)
+![semantic trace](/resources/blog/images/semantic-trace.png)
 
 The test also captures a fresh trace during replay and compares it semantically against the baseline — checking that the same APIs fired, the same data binds occurred, and no unexpected mutations appeared.
 
