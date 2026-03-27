@@ -816,7 +816,24 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
+    // --- Resolve aria-label cascade ---
+    // 1. App author's explicit aria-label (always wins)
+    // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
+    // 3. Metadata defaultAriaLabel (static fallback)
+    // 4. Component's label prop (matches browser accessible name computation)
+    const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
+    ariaLabel =
+      explicitAriaLabel ||
+      config.deriveAriaLabel?.(props) ||
+      metadata.defaultAriaLabel ||
+      props.label ||
+      undefined;
+    if (ariaLabel) {
+      props["aria-label"] = ariaLabel;
+    }
+
     // --- Emit data:bind trace when a data prop resolves to an array with changed length ---
+    // Placed after aria-label cascade so ariaLabel is available for the trace event.
     if (xsVerbose && Array.isArray(props.data)) {
       const bindKey = node.uid || node.testId || type;
       const w = typeof window !== "undefined" ? (window as any) : {};
@@ -838,22 +855,6 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           }),
         );
       }
-    }
-
-    // --- Resolve aria-label cascade ---
-    // 1. App author's explicit aria-label (always wins)
-    // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
-    // 3. Metadata defaultAriaLabel (static fallback)
-    // 4. Component's label prop (matches browser accessible name computation)
-    const explicitAriaLabel = extractValue(node.props?.["aria-label"]);
-    ariaLabel =
-      explicitAriaLabel ||
-      config.deriveAriaLabel?.(props) ||
-      metadata.defaultAriaLabel ||
-      props.label ||
-      undefined;
-    if (ariaLabel) {
-      props["aria-label"] = ariaLabel;
     }
 
     // --- Render children ---
