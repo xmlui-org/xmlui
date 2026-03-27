@@ -603,6 +603,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-item-Select | $space-7 | $space-7 |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-Select | $space-7 | $space-7 |
+| [minWidth](/docs/styles-and-themes/common-units/#size-values)-Select | $space-16 | $space-16 |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-text-item-Select--disabled | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--error--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--focus | *none* | *none* |

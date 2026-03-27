@@ -846,7 +846,7 @@ An array of IDs that should be initially selected when the table is rendered. Th
 
 > [!DEF]  default: **false**
 
-This property adds pagination controls to the `Table`.
+This property adds pagination controls to the `Table`. When enabled, the pagination bar is automatically hidden if all rows fit on a single page. You can omit this property and set only `pageSize` instead — pagination will then activate automatically when the data length exceeds the page size and hide itself when it does not.
 
 ```xmlui copy /isPaginated="true"/
 <App>
@@ -986,7 +986,7 @@ Determines where to place the page information in the layout. It works the same 
 
 ### `pageSize` [#pagesize]
 
-This property defines the number of rows to display per page when pagination is enabled.
+This property defines the number of rows to display per page. When set without also setting `isPaginated`, pagination is activated automatically whenever the number of data rows exceeds this value and suppressed otherwise. This makes `pageSize` the minimal way to get auto-activating, auto-hiding pagination: no conditional expressions on `isPaginated` or the position props are needed.
 
 Options
 

@@ -74,7 +74,11 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.idKey,
     },
     isPaginated: {
-      description: `This property adds pagination controls to the \`${COMP}\`.`,
+      description:
+        `This property adds pagination controls to the \`${COMP}\`. ` +
+        `When enabled, the pagination bar is automatically hidden if all rows fit on a single page. ` +
+        `You can omit this property and set only \`pageSize\` instead — pagination will then ` +
+        `activate automatically when the data length exceeds the page size and hide itself when it does not.`,
       valueType: "boolean",
       defaultValue: defaultProps.isPaginated,
     },
@@ -103,7 +107,11 @@ export const TableMd = createMetadata({
         `A runtime error is signalled if the value is not a valid JavaScript variable name.`,
     ),
     pageSize: d(
-      `This property defines the number of rows to display per page when pagination is enabled.`,
+      `This property defines the number of rows to display per page. ` +
+        `When set without also setting \`isPaginated\`, pagination is activated automatically ` +
+        `whenever the number of data rows exceeds this value and suppressed otherwise. ` +
+        `This makes \`pageSize\` the minimal way to get auto-activating, auto-hiding pagination: ` +
+        `no conditional expressions on \`isPaginated\` or the position props are needed.`,
     ),
     pageSizeOptions: {
       description:
