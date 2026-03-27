@@ -12,7 +12,8 @@ import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
-import { NotificationToast } from "./NotificationToast";
+import { NotificationToast, DEFAULT_NOTIFICATION_POSITION } from "./NotificationToast";
+import type { NotificationPosition } from "./NotificationToast";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../abstractions/ThemingDefs";
 import { useIndexerContext } from "../App/IndexerContext";
 import {
@@ -36,6 +37,7 @@ type Props = {
   node?: ComponentDef;
   tone?: ThemeTone;
   toastDuration?: number;
+  notificationPosition?: NotificationPosition;
   themeVars?: Record<string, string>;
   children?: ReactNode;
 };
@@ -44,6 +46,7 @@ export const defaultProps = {
   isRoot: false,
   applyIf: true,
   toastDuration: 5000,
+  notificationPosition: DEFAULT_NOTIFICATION_POSITION,
   themeVars: EMPTY_OBJECT,
   root: false,
 };
@@ -57,6 +60,7 @@ export function Theme({
   node,
   tone,
   toastDuration = defaultProps.toastDuration,
+  notificationPosition = defaultProps.notificationPosition,
   themeVars = defaultProps.themeVars,
   layoutContext,
   children,
@@ -259,7 +263,7 @@ export function Theme({
           {renderChild && renderChild(node.children)}
           {children}
         </ErrorBoundary>
-        <NotificationToast toastDuration={toastDuration} />
+        <NotificationToast toastDuration={toastDuration} notificationPosition={notificationPosition} />
       </>
     );
   }

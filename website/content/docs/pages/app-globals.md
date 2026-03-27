@@ -193,15 +193,29 @@ appGlobals: {
 ```ts
 notifications?: {
   duration?: number;
+  position?: "top-start" | "top-center" | "top-end" | "bottom-start" | "bottom-center" | "bottom-end";
 };
 ```
 
-Configuration for toast notifications. `duration` controls how long (in milliseconds) a notification is visible before auto-dismissing.
+Configuration for toast notifications.
+
+- `duration` — how long (in milliseconds) a notification is visible before auto-dismissing.
+- `position` — where notifications appear on screen. Defaults to `"bottom-end"`.
+
+| Position value | Description |
+|---|---|
+| `"top-start"` | Top-left corner. |
+| `"top-center"` | Top edge, horizontally centered. |
+| `"top-end"` | Top-right corner. |
+| `"bottom-start"` | Bottom-left corner. |
+| `"bottom-center"` | Bottom edge, horizontally centered. |
+| `"bottom-end"` | Bottom-right corner (default). |
 
 ```ts
 appGlobals: {
   notifications: {
     duration: 5000,
+    position: "top-end",
   },
 }
 ```
