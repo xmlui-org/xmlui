@@ -49,6 +49,7 @@ export const themeComponentRenderer = wrapComponent(
     customRender(_props, { node, extractValue, renderChild, layoutContext, appContext }) {
       const { tone, ...restProps } = node.props;
       const toastDuration = appContext?.appGlobals?.notifications?.duration;
+      const notificationPosition = appContext?.appGlobals?.notifications?.position;
       let themeTone = extractValue.asOptionalString(tone);
       if (themeTone && themeTone !== "dark") {
         themeTone = "light";
@@ -84,6 +85,7 @@ export const themeComponentRenderer = wrapComponent(
           renderChild={renderChild}
           tone={themeTone as ThemeTone}
           toastDuration={toastDuration}
+          notificationPosition={notificationPosition}
           themeVars={themeVars}
           node={node}
         />
