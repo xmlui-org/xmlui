@@ -231,6 +231,7 @@ type TableProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   alwaysShowHeader?: boolean;
+  striped?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -587,6 +588,7 @@ export const Table = forwardRef(
       onPasteAction,
       onDeleteAction,
       alwaysShowHeader = defaultProps.alwaysShowHeader,
+      striped = defaultProps.striped,
       ...rest
       // cols
     }: TableProps,
@@ -1241,6 +1243,7 @@ export const Table = forwardRef(
       setHoveredRowId,
       lookupEventHandler,
       rowDoubleClick,
+      striped,
     };
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
@@ -1270,6 +1273,8 @@ export const Table = forwardRef(
                 [styles.focused]: s.focusedIndex === rowIndex,
                 [styles.disabled]: s.rowDisabledPredicate(row.original),
                 [styles.noBottomBorder]: s.noBottomBorder,
+                [styles.evenRow]: s.striped && rowIndex % 2 === 0,
+                [styles.oddRow]: s.striped && rowIndex % 2 !== 0,
               })}
               onClick={(event) => {
                 // On Windows, the second click of a double-click fires onClick before onDoubleClick.
@@ -1958,4 +1963,5 @@ export const defaultProps = {
     delete: "Delete",
   },
   alwaysShowHeader: false,
+  striped: false,
 };

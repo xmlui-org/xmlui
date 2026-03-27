@@ -4034,3 +4034,132 @@ test.describe("Column width theme variables", () => {
     expect(Math.abs(pxBox!.width - themeBox!.width)).toBeLessThan(4);
   });
 });
+
+// =============================================================================
+// STRIPED PROPERTY TESTS
+// =============================================================================
+
+test.describe("striped property", () => {
+  test("rows have no stripe classes when striped is not set", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    for (let i = 0; i < 4; i++) {
+      await expect(rows.nth(i)).not.toHaveClass(/evenRow/);
+      await expect(rows.nth(i)).not.toHaveClass(/oddRow/);
+    }
+  });
+
+  test("rows have no stripe classes when striped is false", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="false" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    for (let i = 0; i < 4; i++) {
+      await expect(rows.nth(i)).not.toHaveClass(/evenRow/);
+      await expect(rows.nth(i)).not.toHaveClass(/oddRow/);
+    }
+  });
+
+  test("even rows (0-based index 0, 2) get evenRow class when striped is true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(0)).toHaveClass(/evenRow/);
+    await expect(rows.nth(2)).toHaveClass(/evenRow/);
+  });
+
+  test("odd rows (0-based index 1, 3) get oddRow class when striped is true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(1)).toHaveClass(/oddRow/);
+    await expect(rows.nth(3)).toHaveClass(/oddRow/);
+  });
+
+  test("even rows do not get oddRow class; odd rows do not get evenRow class", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(0)).not.toHaveClass(/oddRow/);
+    await expect(rows.nth(1)).not.toHaveClass(/evenRow/);
+    await expect(rows.nth(2)).not.toHaveClass(/oddRow/);
+    await expect(rows.nth(3)).not.toHaveClass(/evenRow/);
+  });
+
+  test("backgroundColor-evenRow-Table theme var applies to even rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: { "backgroundColor-evenRow-Table": "rgb(200, 230, 255)" },
+    });
+
+    // Even rows (index 0, 2) should use the theme color
+    await expect(page.locator("tbody tr").nth(0)).toHaveCSS("background-color", "rgb(200, 230, 255)");
+    await expect(page.locator("tbody tr").nth(2)).toHaveCSS("background-color", "rgb(200, 230, 255)");
+  });
+
+  test("backgroundColor-oddRow-Table theme var applies to odd rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: { "backgroundColor-oddRow-Table": "rgb(255, 240, 200)" },
+    });
+
+    // Odd rows (index 1, 3) should use the theme color
+    await expect(page.locator("tbody tr").nth(1)).toHaveCSS("background-color", "rgb(255, 240, 200)");
+    await expect(page.locator("tbody tr").nth(3)).toHaveCSS("background-color", "rgb(255, 240, 200)");
+  });
+
+  test("distinct even and odd colors produce alternating row backgrounds", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: {
+        "backgroundColor-evenRow-Table": "rgb(220, 240, 220)",
+        "backgroundColor-oddRow-Table": "rgb(240, 220, 220)",
+      },
+    });
+
+    const rows = page.locator("tbody tr");
+    await expect(rows.nth(0)).toHaveCSS("background-color", "rgb(220, 240, 220)");
+    await expect(rows.nth(1)).toHaveCSS("background-color", "rgb(240, 220, 220)");
+    await expect(rows.nth(2)).toHaveCSS("background-color", "rgb(220, 240, 220)");
+    await expect(rows.nth(3)).toHaveCSS("background-color", "rgb(240, 220, 220)");
+  });
+});

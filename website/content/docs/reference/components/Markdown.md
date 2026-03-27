@@ -140,6 +140,10 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `anchorTemplate` [#anchortemplate]
+
+An optional template to customize the anchor link rendered next to each heading. Requires `showHeadingAnchors` to be `true`. The template receives `$anchorId` and `$anchorHref` as context variables.
+
 ### `breakMode` [#breakmode]
 
 > [!DEF]  default: **"normal"**
