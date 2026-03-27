@@ -158,10 +158,19 @@ $textUnderlineOffset-H6: createThemeVar("Heading:textUnderlineOffset-H6");
       transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
     }
 
+    .customAnchor {
+      opacity: 0; // Hide the custom anchor template by default
+      margin-left: $gap-anchor-Heading;
+      transition: opacity 0.2s ease-in-out; // Smooth transition for visibility
+    }
+
     &:hover {
       a {
         opacity: 1;
         text-decoration: $textDecorationLine-anchor-Heading;
+      }
+      .customAnchor {
+        opacity: 1;
       }
     }
   }

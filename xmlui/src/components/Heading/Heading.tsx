@@ -9,8 +9,9 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, defaultProps } from "./HeadingNative";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
-import { d, createMetadata } from "../metadata-helpers";
+import { d, dComponent, createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Heading";
 
@@ -89,6 +90,11 @@ const SHOW_ANCHOR_DESC = {
   type: "boolean",
   defaultValue: defaultProps.showAnchor,
 };
+const ANCHOR_TEMPLATE_DESC = dComponent(
+  "An optional template to customize the anchor link rendered next to the heading when " +
+  "`showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) " +
+  "and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.",
+);
 const APIS_DESC = {
   scrollIntoView: {
     signature: "scrollIntoView()",
@@ -126,6 +132,7 @@ export const HeadingMd = createMetadata({
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -169,6 +176,7 @@ export const H1Md = createMetadata({
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -201,6 +209,7 @@ export const H2Md = createMetadata({
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -233,6 +242,7 @@ export const H3Md = createMetadata({
     preserveLinebreaks: PRESERVE_DESC,
     omitFromToc: OMIT_FROM_TOC_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -265,6 +275,7 @@ export const H4Md = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -297,6 +308,7 @@ export const H5Md = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -329,6 +341,7 @@ export const H6Md = createMetadata({
     ellipses: ELLIPSES_DESC,
     preserveLinebreaks: PRESERVE_DESC,
     showAnchor: SHOW_ANCHOR_DESC,
+    anchorTemplate: ANCHOR_TEMPLATE_DESC,
   },
   apis: APIS_DESC,
   themeVars: parseScssVar(styles.themeVars),
@@ -358,6 +371,7 @@ type RenderHeadingProps = {
   level: string;
   renderChild: RenderChildFn;
   registerComponentApi?: (api: any) => void;
+  layoutContext?: any;
 };
 
 function renderHeading({
@@ -367,8 +381,9 @@ function renderHeading({
   level,
   renderChild,
   registerComponentApi,
+  layoutContext,
 }: RenderHeadingProps) {
-  const { maxLines, preserveLinebreaks, ellipses, showAnchor, ...restProps } = node.props;
+  const { maxLines, preserveLinebreaks, ellipses, showAnchor, anchorTemplate, ...restProps } = node.props;
   delete restProps.level; // Remove level from restProps as it is handled separately
   const showAnchorValue = extractValue.asOptionalBoolean(node.props?.showAnchor);
   
@@ -376,6 +391,17 @@ function renderHeading({
   const extractedLevel = extractValue(level);
   const normalizedLevel = normalizeHeadingLevel(extractedLevel);
   
+  const anchorRenderer = anchorTemplate
+    ? (anchorId: string, anchorHref: string) => (
+        <MemoizedItem
+          node={anchorTemplate as any}
+          contextVars={{ $anchorId: anchorId, $anchorHref: anchorHref }}
+          renderChild={renderChild}
+          layoutContext={layoutContext}
+        />
+      )
+    : undefined;
+
   return (
     <Heading
       uid={node.uid}
@@ -387,6 +413,7 @@ function renderHeading({
       classes={classes}
       omitFromToc={extractValue.asOptionalBoolean(node.props?.omitFromToc)}
       registerComponentApi={registerComponentApi}
+      anchorRenderer={anchorRenderer}
       {...resolveAndCleanProps(restProps, extractValue)}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
@@ -407,6 +434,7 @@ export const headingComponentRenderer = wrapComponent(
       level: context.node.props.level,
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -424,6 +452,7 @@ export const h1ComponentRenderer = wrapComponent(
       level: "h1",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -441,6 +470,7 @@ export const h2ComponentRenderer = wrapComponent(
       level: "h2",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -458,6 +488,7 @@ export const h3ComponentRenderer = wrapComponent(
       level: "h3",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -475,6 +506,7 @@ export const h4ComponentRenderer = wrapComponent(
       level: "h4",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -492,6 +524,7 @@ export const h5ComponentRenderer = wrapComponent(
       level: "h5",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
@@ -509,6 +542,7 @@ export const h6ComponentRenderer = wrapComponent(
       level: "h6",
       renderChild: context.renderChild,
       registerComponentApi: context.registerComponentApi,
+      layoutContext: context.layoutContext,
     }),
   },
 );
