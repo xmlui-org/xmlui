@@ -499,10 +499,12 @@ const Form = forwardRef(function (
               errorMessages.push(...msgs);
             }
           }
+          const formAriaLabel = rest["aria-label"] || id;
           pushXsLog(createLogEntry("validation:error", {
             component: "Form",
-            componentLabel: id || undefined,
-            displayLabel: `${id || "Form"}: ${errorFields.length} error${errorFields.length > 1 ? "s" : ""}: ${errorFields.join(", ")}`,
+            componentLabel: formAriaLabel || undefined,
+            ariaName: formAriaLabel || undefined,
+            displayLabel: `${formAriaLabel || "Form"}: ${errorFields.length} error${errorFields.length > 1 ? "s" : ""}: ${errorFields.join(", ")}`,
             errorFields,
             errorMessages,
           }));

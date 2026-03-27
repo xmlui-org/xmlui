@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>XMLUI Blog</title>
+    <link>https://blog.xmlui.org</link>
+    <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
+    <language>en</language>
+    <lastBuildDate>Wed, 21 Jan 2026 21:53:35 GMT</lastBuildDate>
+
+    <item>
+      <title>Introducing the XMLUI CLI</title>
+      <link>https://blog.xmlui.org/introducing-the-xmlui-cli</link>
+      <description>To try XMLUI frictionlessly you can run and modify demo apps online: xmlui-hello-world, xmlui-weather. But if you use one of these as a springboard for your own app you&#39;ll want to download and run locally. For that you&#39;ll need a minimal static web se...</description>
+      <pubDate>Fri, 19 Dec 2025 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://blog.xmlui.org/introducing-the-xmlui-cli</guid>
+    </item>
+    <item>
+      <title>An XMLUI-powered blog</title>
+      <link>https://blog.xmlui.org/xmlui-powered-blog</link>
+      <description>In this post we&#39;ll explore the development of the blog engine we&#39;re using on this site. Our tagline is Practical User Interfaces Built Simply and creating this blog couldn&#39;t have been simpler. It&#39;s an XMLUI app built with a handful of core components...</description>
+      <pubDate>Tue, 28 Oct 2025 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://blog.xmlui.org/xmlui-powered-blog</guid>
+    </item>
+    <item>
+      <title>Reproducible XMLUI</title>
+      <link>https://blog.xmlui.org/xmlui-playground</link>
+      <description>The XMLUI docs are full of live working examples that use Playground, an extension package that runs XMLUI code inside an XMLUI app. We use playgrounds to bring component documentation to life. Why just tell you about the enabled property of a Checkb...</description>
+      <pubDate>Mon, 27 Oct 2025 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://blog.xmlui.org/xmlui-playground</guid>
+    </item>
+    <item>
+      <title>Introducing XMLUI</title>
+      <link>https://blog.xmlui.org/introducing-xmlui</link>
+      <description>&gt; [!TIP] &gt; Ed. note: This is the post that was discussed on Hacker News. In the mid-1990s you could create useful software without being an ace coder. You had Visual Basic, you had a rich ecosystem of components, you could wire them together to creat...</description>
+      <pubDate>Fri, 18 Jul 2025 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://blog.xmlui.org/introducing-xmlui</guid>
+    </item>
+  </channel>
+</rss>

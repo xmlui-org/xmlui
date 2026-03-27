@@ -645,7 +645,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             pushXsLog(
               createLogEntry(traceKind, {
                 component: type,
-                componentLabel: node.uid || node.testId || undefined,
+                componentLabel: ariaLabel || node.uid || undefined,
                 displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                 eventName: xmluiName,
                 ariaName: ariaLabel,
@@ -717,7 +717,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           createLogEntry(traceKind, {
             traceId,
             componentType: type,
-            componentLabel: xmluiId || type,
+            componentLabel: ariaLabel || xmluiId || type,
             displayLabel: event?.displayLabel || undefined,
             eventName: eventType,
             ariaName: ariaLabel,
@@ -828,7 +828,8 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         pushXsLog(
           createLogEntry("data:bind", {
             component: type,
-            componentLabel: node.uid || node.testId || undefined,
+            componentLabel: ariaLabel || node.uid || undefined,
+            ariaName: ariaLabel,
             displayLabel: `${bindKey}: ${prevCount ?? 0} → ${currCount} items`,
             prevCount: prevCount ?? 0,
             rowCount: currCount,
@@ -1226,7 +1227,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 pushXsLog(
                   createLogEntry(traceKind, {
                     component: type,
-                    componentLabel: node.uid || node.testId || undefined,
+                    componentLabel: ariaLabel || node.uid || undefined,
                     displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                     eventName: xmluiName,
                     ariaName: ariaLabel,
@@ -1265,7 +1266,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               pushXsLog(
                 createLogEntry(traceKind, {
                   component: type,
-                  componentLabel: node.uid || node.testId || undefined,
+                  componentLabel: ariaLabel || node.uid || undefined,
                   displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                   eventName: xmluiName,
                   ariaName: ariaLabel,
@@ -1333,7 +1334,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           createLogEntry(traceKind, {
             traceId,
             componentType: type,
-            componentLabel: xmluiId || type,
+            componentLabel: ariaLabel || xmluiId || type,
             displayLabel: event?.displayLabel || undefined,
             eventName: eventType,
             ariaName: ariaLabel,
