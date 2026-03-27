@@ -336,6 +336,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.alwaysShowHeader,
     },
+    striped: {
+      description:
+        "When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` " +
+        "and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.",
+      valueType: "boolean",
+      defaultValue: defaultProps.striped,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -515,6 +522,8 @@ export const TableMd = createMetadata({
     [`userSelect-heading-${COMP}`]: "text",
     [`userSelect-cell-${COMP}`]: "none",
     [`userSelect-row-${COMP}`]: "none",
+    [`backgroundColor-evenRow-${COMP}`]: `$backgroundColor-row-${COMP}`,
+    [`backgroundColor-oddRow-${COMP}`]: `$color-surface-100`,
   },
 });
 
@@ -760,6 +769,7 @@ const TableWithColumns = memo(
             )}
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
+            striped={extractValue.asOptionalBoolean(node.props.striped)}
           />
         </>
       );
