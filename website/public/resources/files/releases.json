@@ -1,5 +1,53 @@
 [
   {
+    "tag_name": "xmlui@0.12.13",
+    "published_at": "2026-03-25T17:28:50Z",
+    "changes": [
+      {
+        "description": "feat: add cancelButtonLabel prop to APICall for confirm dialog",
+        "commit_sha": "d19a909"
+      },
+      {
+        "description": "feat: xmlui-search - spotlight mode, filter by categories, suggested keywords",
+        "commit_sha": "61308b2"
+      },
+      {
+        "description": "Fix reactive expressions in component properties not updating when they call functions that depend on changed variables",
+        "commit_sha": "c4fc0be"
+      },
+      {
+        "description": "Add pathname global",
+        "commit_sha": "4127490"
+      },
+      {
+        "description": "fix: responsive table glitch",
+        "commit_sha": "f6921ed"
+      },
+      {
+        "description": "Markdown in fenced code block should not replace \"@{}\"",
+        "commit_sha": "ed962d1"
+      },
+      {
+        "description": "Fixed a bug where setting the regex property to a valid regular expression also tested the input if it was empty.",
+        "commit_sha": "333bce7"
+      },
+      {
+        "description": "Fix AppHeader theming",
+        "commit_sha": "4127490"
+      },
+      {
+        "description": "Fix responsive CSS generation",
+        "commit_sha": "b133970"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.13.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.13/xmlui-0.12.13.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.12",
     "published_at": "2026-03-23T15:29:46Z",
     "changes": [
@@ -388,30 +436,6 @@
       {
         "name": "xmlui-0.12.5.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.5/xmlui-0.12.5.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.4",
-    "published_at": "2026-02-25T12:11:06Z",
-    "changes": [
-      {
-        "description": "Add experimental IncludeMarkup component",
-        "commit_sha": "0aaa878"
-      },
-      {
-        "description": "Inline styles on components with the bindTo property applied will not style the label. Also fixed NumberBox adornment location when writing mode is right-to-left.",
-        "commit_sha": "7cf02a7"
-      },
-      {
-        "description": "Use the new website project as the target of component document generation",
-        "commit_sha": "48b7e46"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.4.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.4/xmlui-0.12.4.js"
       }
     ]
   }
