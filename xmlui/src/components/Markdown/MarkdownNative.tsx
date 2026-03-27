@@ -142,6 +142,7 @@ type MarkdownProps = {
   openLinkInNewTab?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -196,6 +197,7 @@ export const Markdown = memo(
       openLinkInNewTab,
       overflowMode = defaultProps.overflowMode,
       breakMode = defaultProps.breakMode,
+      anchorRenderer,
       ...rest
     }: MarkdownProps,
     ref,
@@ -354,27 +356,27 @@ export const Markdown = memo(
             },
             h1({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h2({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h3({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h4({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h5({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h6({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
