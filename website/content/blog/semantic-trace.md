@@ -71,7 +71,7 @@ Every entry names the component (Select) and adds context with an ARIA label (Tu
 
 ## From traces to tests, automatically
 
-A distiller converts raw traces into structured steps — the ARIA target, the API calls to await, the data bindings to verify — and a generator produces Playwright tests from those steps.
+The [trace-tools](https://github.com/xmlui-org/trace-tools/) kit includes a distiller that converts raw traces into structured steps — the ARIA target, the API calls to await, the data bindings to verify — and a generator that produces Playwright tests from those steps.
 
 ```typescript
 // Step 0: click the LondonTube tab
@@ -99,7 +99,7 @@ expect(Object.keys(hammersmithRoute).sort()).toEqual(
 
 Notice the selectors: `getByRole('tab', { name: 'LondonTube' })`, `getByRole('combobox', { name: 'Tube line' })`. These come straight from the ARIA labels in the markup. No fragile CSS selectors, no generated test IDs. The tests assert the shape of API responses and the direction of data changes, not hardcoded values — so they stay valid as data evolves.
 
-The test also captures a fresh trace during replay and compares it semantically against the baseline:
+The trace-tools kit also includes a comparer that captures a fresh trace during a test and matches it semantically against the baseline.
 
 ```
 Before (baseline):                    After (replay):
@@ -134,15 +134,23 @@ You can see the tests running continuously in a [GitHub Action](https://github.c
 
 ## How ARIA labels flow automatically
 
-None of this requires extra work from app developers. The system resolves labels automatically through a three-tier cascade:
+None of this requires extra work from app developers. Every XMLUI component resolves its ARIA label automatically through a cascade, so traces and tests get meaningful names without anyone having to think about it.
 
-- Static defaults in component metadata. The component author sets a fallback once. Spinner gets "Loading", ToneChangerButton gets "Toggle color mode". Every instance benefits.
+The cascade works from the bottom up. At the base, component authors set static defaults in metadata. A Spinner gets "Loading", a ToneChangerButton gets "Toggle color mode". Every instance of that component inherits the label automatically.
 
-- Dynamic derivation from existing props. A TextBox with `placeholder="Search..."` automatically gets that as its label. A Card with `title="Dashboard"` gets "Dashboard". The app developer wrote these props for functional reasons — the label comes for free.
+Next, wrapper authors can derive labels from existing props. An Avatar with `name="Alice"` gets "Alice" as its label. An Image with `alt="Dashboard screenshot"` gets that. A TextBox with `placeholder="Search..."` gets "Search...". These props were written for functional reasons — the label comes for free. Here's what that looks like in the wrapper code:
 
-- App author's explicit `aria-label`. Always wins if provided.
+```ts
+// Each Avatar instance gets a label from its name prop
+deriveAriaLabel: (props) => props.name
 
-You write `<TextBox placeholder="Search..." />` and the trace shows `[Search...]`, the screen reader announces "Search...", and Playwright finds it with `getByRole('textbox', { name: 'Search...' })`. One attribute, everywhere it's needed.
+// Each Image instance gets a label from its alt prop
+deriveAriaLabel: (props) => props.alt
+```
+
+Finally, the app author's explicit `aria-label` always wins. Write `aria-label="Tube line"` on a Select and that overrides everything else — which is exactly what the London Tube example does.
+
+The result: you write `<TextBox placeholder="Search..." />` and the trace shows `[Search...]`, the screen reader announces "Search...", and Playwright finds it with `getByRole('textbox', { name: 'Search...' })`. One attribute, everywhere it's needed.
 
 ## The ecosystem unlocked
 
