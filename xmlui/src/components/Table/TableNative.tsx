@@ -609,6 +609,13 @@ export const Table = forwardRef(
 
     const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
 
+    const effectivePageSizeOptions = useMemo(() => {
+      if (pageSizeOptions.includes(effectivePageSize)) {
+        return pageSizeOptions;
+      }
+      return [...pageSizeOptions, effectivePageSize].sort((a, b) => a - b);
+    }, [pageSizeOptions, effectivePageSize]);
+
     const effectiveIsPaginated = useMemo(() => {
       if (isPaginated !== undefined) {
         return isPaginated;
@@ -1496,7 +1503,7 @@ export const Table = forwardRef(
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         itemCount={safeData.length}
-        pageSizeOptions={pageSizeOptions}
+        pageSizeOptions={effectivePageSizeOptions}
         onPageDidChange={(page) => table.setPageIndex(page)}
         onPageSizeDidChange={(size) => table.setPageSize(size)}
         showCurrentPage={showCurrentPage}
