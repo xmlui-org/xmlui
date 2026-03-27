@@ -13,7 +13,7 @@ export type NotificationPosition =
   | "bottom-center"
   | "bottom-end";
 
-export const DEFAULT_NOTIFICATION_POSITION: NotificationPosition = "bottom-end";
+export const DEFAULT_NOTIFICATION_POSITION: NotificationPosition = "top-end";
 
 const STANDARD_CONTAINER_STYLE: CSSProperties = {
   top: 40,

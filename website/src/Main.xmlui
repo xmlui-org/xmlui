@@ -43,6 +43,12 @@
                             to="/get-started"
                             active="{pathname.startsWith('/get-started')}"
                         />
+                        <NavLink
+                            noIndicator
+                            to="/news"
+                            label="News & Reviews"
+                            active="{pathname.startsWith('/news')}"
+                        />
                     </HStack>
                 </Theme>
             </Stack>
@@ -122,6 +128,12 @@
                     label="Get started"
                     to="/get-started"
                     active="{pathname.startsWith('/get-started')}"
+                />
+                <NavLink
+                    to="/news"
+                    label="News & Reviews"
+                    target="_self"
+                    noIndicator
                 />
                 <NavGroup label="Documentation" initiallyExpanded="{true}">
                     <NavGroup
@@ -640,12 +652,6 @@
                 when-lg="false"
                 gap="0"
             >
-                <NavLink
-                    to="/news"
-                    label="News & Reviews"
-                    target="_self"
-                    noIndicator
-                />
                 <NavLink
                     to="https://github.com/xmlui-org/xmlui"
                     icon="github"
@@ -1742,17 +1748,6 @@
             <HStack verticalAlignment="center">
                 <Stack desktopOnly>
                     <CHStack>
-                        <Link
-                            noIndicator
-                            to="https://demo.xmlui.org"
-                            label="Gallery"
-                            target="_blank"
-                        />
-                        <Link
-                            noIndicator
-                            to="/news"
-                            label="News & Reviews"
-                        />
                         <Link
                             noIndicator
                             to="/docs/change-log"

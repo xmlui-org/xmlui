@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -243,7 +244,7 @@ export const ModalDialog = React.forwardRef(
           ref={composedRef}
           style={{ ...style, gap: undefined }}
         >
-          {(!!title || !!titleTemplate) && (
+          {(!!title || !!titleTemplate) ? (
             <Part partId={PART_TITLE}>
               <Dialog.Title style={{ marginTop: 0 }}>
                 <header id="dialogTitle" className={styles.dialogTitle}>
@@ -251,6 +252,10 @@ export const ModalDialog = React.forwardRef(
                 </header>
               </Dialog.Title>
             </Part>
+          ) : (
+            <VisuallyHidden>
+              <Dialog.Title />
+            </VisuallyHidden>
           )}
           <div className={styles.innerContent} style={{ gap: style?.gap }}>
             <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
