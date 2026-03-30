@@ -10,14 +10,13 @@ import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
 import { useEvent } from "./utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
-import { EMPTY_ARRAY } from "./constants";
 import { mergeProps } from "./utils/mergeProps";
 
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
   compound: ComponentDef;
   // The API of the compound component
-  api?: Record<string, string>;
+  api?: Record<string, any>;
   scriptCollected?: CollectedDeclarations;
 } & RendererContext;
 
@@ -69,11 +68,13 @@ export const CompoundComponent = forwardRef(
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
-      
+
       // Extract global variable keys from globalVars to set as 'uses'
       // This ensures the compound component only inherits globals, not parent's local vars
-      const globalKeys = globalVars ? Object.keys(globalVars).filter(k => !k.startsWith('__')) : undefined;
-      
+      const globalKeys = globalVars
+        ? Object.keys(globalVars).filter((k) => !k.startsWith("__"))
+        : undefined;
+
       return {
         type: "Container",
         api,
@@ -166,10 +167,7 @@ export const CompoundComponent = forwardRef(
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),
-        ...mergeProps(
-          ret.props,
-          restProps
-        ),
+        ...mergeProps(ret.props, restProps),
       } as any);
     }
     return React.isValidElement(ret) ? ret : <>{ret}</>;

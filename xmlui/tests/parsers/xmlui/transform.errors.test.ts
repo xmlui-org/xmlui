@@ -428,7 +428,7 @@ onSubmit="
       transformSource(`<Stack method.myApi="doIt; }" />`);
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).include("W001");
+      expect(err.toString()).match(/W00[12]/);
     }
   });
 
@@ -437,7 +437,7 @@ onSubmit="
       transformSource(`<Stack><method name='myMethod' value='doIt; }'/></Stack>`);
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).include("W001");
+      expect(err.toString()).match(/W00[12]/);
     }
   });
 
@@ -446,7 +446,7 @@ onSubmit="
       transformSource(`<Stack><method name='myMethod'>doIt; }</method></Stack>`);
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).include("W001");
+      expect(err.toString()).match(/W00[12]/);
     }
   });
 

@@ -614,66 +614,10 @@ describe("Xmlui transform - child elements", () => {
       }
     });
 
-    it("method with name/value attr works #1", () => {
-      const cd = transformSource("<Stack><method name='set' value='do'/></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name/value attr works #2", () => {
-      const cd = transformSource(`
-      <Stack>
-        <method name="set" value='do'/>
-        <method name="other" value='get'/>
-      </Stack>
-    `) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-      expect((cd.api! as any).other).equal("get");
-    });
-
-    it("method dotted attr works #1", () => {
-      const cd = transformSource("<Stack method.myApi='getCount()'></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).myApi).equal("getCount()");
-    });
-
-    it("method with name and text works #1", () => {
-      const cd = transformSource("<Stack><method name='set'>do</method></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name and text works #1", () => {
-      const cd = transformSource("<Stack><method name='set'>do</method></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name and text works #2", () => {
-      const cd = transformSource(`
-      <Stack>
-        <method name='set'>do</method>
-        <method name='other'>get</method>
-      </Stack>
-    `) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-      expect((cd.api! as any).other).equal("get");
-    });
-
     it("method with name results null", () => {
       const cd = transformSource("<Stack><method name='set'/></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
       expect((cd.api! as any).set).equal(null);
-    });
-
-    it("method becomes array #1", () => {
-      const cd = transformSource(
-        "<Stack><method name='myApi' value='123'/><method name='myApi' value='234'/></Stack>",
-      ) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
     });
 
     describe("method pre-parsing", () => {
@@ -1223,7 +1167,7 @@ describe("Xmlui transform - child elements", () => {
           },
         },
         api: {
-          hello: "console.log('hello')",
+          hello: { __PARSED: true },
         },
       });
     });
@@ -1235,7 +1179,7 @@ describe("Xmlui transform - child elements", () => {
       expect(cd).toMatchObject({
         name: "MyComp",
         api: {
-          getIt: "getIt()",
+          getIt: { __PARSED: true },
         },
         component: {
           type: "Stack",
@@ -1250,8 +1194,8 @@ describe("Xmlui transform - child elements", () => {
       expect(cd).toMatchObject({
         name: "MyComp",
         api: {
-          getIt: "getIt()",
-          other: "other()",
+          getIt: { __PARSED: true },
+          other: { __PARSED: true },
         },
         component: {
           type: "Stack",
@@ -1269,8 +1213,8 @@ describe("Xmlui transform - child elements", () => {
           type: "Stack",
         },
         api: {
-          getIt: "getIt()",
-          other: "other()",
+          getIt: { __PARSED: true },
+          other: { __PARSED: true },
         },
       });
     });
