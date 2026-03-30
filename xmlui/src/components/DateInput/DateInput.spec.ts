@@ -1590,9 +1590,236 @@ test.describe("Validation Feedback", () => {
         />
       </Form>
     `);
-    
+
     // Should only have one label with the text "Enter date"
     const labels = page.getByText("Enter date");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// KEYBOARD BEHAVIOR: CURSOR POSITION
+// =============================================================================
+
+test.describe("Keyboard behavior: cursor position", () => {
+  test("inputs use left text alignment", async ({ initTestBed, createDateInputDriver }) => {
+    await initTestBed(`<DateInput testId="dateInput" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+    await expect(driver.monthInput).toBeVisible();
+    await expect(driver.monthInput).toHaveCSS("text-align", "left");
+    await expect(driver.dayInput).toHaveCSS("text-align", "left");
+    await expect(driver.yearInput).toHaveCSS("text-align", "left");
+  });
+});
+
+// =============================================================================
+// KEYBOARD BEHAVIOR: BACKSPACE NAVIGATION
+// =============================================================================
+
+test.describe("Keyboard behavior: Backspace navigation", () => {
+  test("Backspace on an empty field moves focus to the previous field", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.monthInput).toBeVisible();
+    await expect(driver.dayInput).toBeVisible();
+
+    // day is empty — Backspace should move focus back to month
+    await driver.dayInput.focus();
+    await expect(driver.dayInput).toBeFocused();
+    await page.keyboard.press("Backspace");
+    await expect(driver.monthInput).toBeFocused();
+  });
+
+  test("Backspace clears field content first, then navigates when field becomes empty", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.dayInput).toBeVisible();
+
+    // Focus selects all text in the field ("25")
+    await driver.dayInput.focus();
+    await expect(driver.dayInput).toBeFocused();
+
+    // First Backspace deletes selected "25" → ""
+    await page.keyboard.press("Backspace");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.dayInput).toBeFocused();
+
+    // Second Backspace on empty field → moves to month
+    await page.keyboard.press("Backspace");
+    await expect(driver.monthInput).toBeFocused();
+  });
+
+  test("Backspace from year navigates to day on empty", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.yearInput).toBeVisible();
+
+    await driver.yearInput.focus();
+    await expect(driver.yearInput).toBeFocused();
+
+    // Backspace clears the selected "2024"
+    await page.keyboard.press("Backspace");
+    await expect(driver.yearInput).toHaveValue("");
+    await expect(driver.yearInput).toBeFocused();
+
+    // Backspace on empty year → moves to day (previous in MM/dd/yyyy order)
+    await page.keyboard.press("Backspace");
+    await expect(driver.dayInput).toBeFocused();
+  });
+
+  test("can delete the entire date field by field using Backspace", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.yearInput).toBeVisible();
+
+    // Start from year
+    await driver.yearInput.focus();
+    await expect(driver.yearInput).toBeFocused();
+
+    // Clear year, navigate to day
+    await page.keyboard.press("Backspace");
+    await expect(driver.yearInput).toHaveValue("");
+    await page.keyboard.press("Backspace");
+    await expect(driver.dayInput).toBeFocused();
+
+    // Clear day, navigate to month
+    await page.keyboard.press("Backspace");
+    await expect(driver.dayInput).toHaveValue("");
+    await page.keyboard.press("Backspace");
+    await expect(driver.monthInput).toBeFocused();
+
+    // Clear month
+    await page.keyboard.press("Backspace");
+    await expect(driver.monthInput).toHaveValue("");
+  });
+});
+
+// =============================================================================
+// KEYBOARD BEHAVIOR: CTRL+A / CMD+A SELECT ALL
+// =============================================================================
+
+test.describe("Keyboard behavior: Ctrl+A select all", () => {
+  test("Ctrl+A focuses the first input field", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.yearInput).toBeVisible();
+
+    // Start from year (last field)
+    await driver.yearInput.focus();
+    await expect(driver.yearInput).toBeFocused();
+
+    // Ctrl+A should jump focus to the first field (month in MM/dd/yyyy)
+    await page.keyboard.press("Control+a");
+    await expect(driver.monthInput).toBeFocused();
+  });
+
+  test("Ctrl+A followed by Backspace clears all fields at once", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.monthInput).toBeVisible();
+
+    await driver.monthInput.focus();
+    await expect(driver.monthInput).toBeFocused();
+
+    await page.keyboard.press("Control+a");
+    await page.keyboard.press("Backspace");
+
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("Ctrl+A followed by Delete clears all fields at once", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.dayInput).toBeVisible();
+
+    await driver.dayInput.focus();
+    await expect(driver.dayInput).toBeFocused();
+
+    await page.keyboard.press("Control+a");
+    await page.keyboard.press("Delete");
+
+    await expect(driver.monthInput).toHaveValue("");
+    await expect(driver.dayInput).toHaveValue("");
+    await expect(driver.yearInput).toHaveValue("");
+  });
+
+  test("Ctrl+A then Ctrl+C copies the full formatted date value to the clipboard", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.monthInput).toBeVisible();
+
+    await driver.monthInput.focus();
+    await expect(driver.monthInput).toBeFocused();
+
+    await page.keyboard.press("Control+a");
+    await page.keyboard.press("Control+c");
+
+    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clipboardText).toBe("05/25/2024");
+  });
+
+  test("typing after Ctrl+A exits select-all mode", async ({
+    initTestBed,
+    createDateInputDriver,
+    page,
+  }) => {
+    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const driver = await createDateInputDriver("dateInput");
+
+    await expect(driver.monthInput).toBeVisible();
+
+    await driver.monthInput.focus();
+    await expect(driver.monthInput).toBeFocused();
+
+    await page.keyboard.press("Control+a");
+    // Typing a digit after Ctrl+A should not clear all fields
+    await page.keyboard.press("3");
+
+    // Day and year should remain untouched
+    await expect(driver.dayInput).toHaveValue("25");
+    await expect(driver.yearInput).toHaveValue("2024");
   });
 });
