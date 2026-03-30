@@ -261,7 +261,6 @@ const TileGridWithSync = memo(
     return <StandaloneSelectionStore idKey={idKey}>{content}</StandaloneSelectionStore>;
   },
 );
-TileGridWithSync.displayName = "TileGridWithSync";
 
 export const tileGridComponentRenderer = wrapComponent(
   COMP,

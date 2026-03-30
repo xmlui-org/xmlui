@@ -222,9 +222,10 @@ export const TileGridNative = memo(
     // How many rows fit in the visible area (used for PageUp/PageDown)
     const visibleRows = containerHeight > 0 ? Math.max(1, Math.floor(containerHeight / rowSize)) : 5;
 
-    // When stretchItems is true, compute the exact tile width so every tile
-    // (including the last partial row) has the same size and tiles fill the
-    // container with no remaining space.  Sub-pixel values are fine in CSS.
+    // When stretchItems is true, compute the exact tile width so tiles in each
+    // full row have the same size and, together with the gaps, exactly fill
+    // the container width. The last row may still have remaining space if it
+    // is not completely filled. Sub-pixel values are fine in CSS.
     const effectiveItemWidth = stretchItems && cols > 0 && containerWidth > 0
       ? `${(containerWidth - gapPx * (cols - 1)) / cols}px`
       : itemWidth;
