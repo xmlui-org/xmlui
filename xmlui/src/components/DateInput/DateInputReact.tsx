@@ -184,6 +184,8 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
     const initial = controlledValue || initialValue || null;
     return initial;
   });
+  const localValueRef = useRef(localValue);
+  localValueRef.current = localValue;
 
   // Parse current value into individual components
   const [day, setDay] = useState<string | null>(null);
@@ -473,6 +475,13 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
     [componentHasFocus, onFocus],
   );
 
+  const isSelectAllActiveRef = useRef(false);
+  const [isSelectAllActive, setIsSelectAllActiveState] = useState(false);
+  const setSelectAllActive = useCallback((val: boolean) => {
+    isSelectAllActiveRef.current = val;
+    setIsSelectAllActiveState(val);
+  }, [setIsSelectAllActiveState]);
+
   // Custom blur handler that only fires lostFocus when focus leaves the entire component
   const handleComponentBlur = useCallback(
     (event: React.FocusEvent<HTMLDivElement>) => {
@@ -483,10 +492,11 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
       // If there's no related target, or the related target is not within this component, fire lostFocus
       if (!relatedTarget || !currentTarget.contains(relatedTarget)) {
         setComponentHasFocus(false);
+        setSelectAllActive(false);
         onBlur?.(event);
       }
     },
-    [onBlur],
+    [onBlur, setSelectAllActive],
   );
 
   // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
@@ -643,8 +653,47 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
   // Arrow key navigation handler — respects the actual dateOrder for the active dateFormat
   const handleArrowKeys = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
-      const { key } = event;
-      if (key !== "ArrowLeft" && key !== "ArrowRight") return;
+      const { key, ctrlKey, metaKey } = event;
+
+      // Ctrl+A / Cmd+A: activate "select all" mode across all fields
+      if ((ctrlKey || metaKey) && key === "a") {
+        event.preventDefault();
+        setSelectAllActive(true);
+        const inputRefs = getInputRefs();
+        inputRefs[0]?.current?.focus();
+        inputRefs[0]?.current?.select();
+        return;
+      }
+
+      // Ctrl+C / Cmd+C in select-all mode: copy the full formatted date value
+      if ((ctrlKey || metaKey) && key === "c" && isSelectAllActiveRef.current) {
+        event.preventDefault();
+        if (localValueRef.current) {
+          void navigator.clipboard.writeText(localValueRef.current);
+        }
+        return;
+      }
+
+      // In select-all mode: Backspace/Delete clears all fields at once
+      if (isSelectAllActiveRef.current) {
+        if (key === "Backspace" || key === "Delete") {
+          event.preventDefault();
+          setSelectAllActive(false);
+          setDay(null);
+          setMonth(null);
+          setYear(null);
+          handleChange(null);
+          const inputRefs = getInputRefs();
+          inputRefs[0]?.current?.focus();
+          return;
+        }
+        // Any other non-modifier key exits select-all mode
+        if (!["Shift", "Control", "Meta", "Alt", "CapsLock", "Tab"].includes(key)) {
+          setSelectAllActive(false);
+        }
+      }
+
+      if (key !== "ArrowLeft" && key !== "ArrowRight" && key !== "Backspace") return;
 
       const inputRefs = getInputRefs();
       const currentIndex = inputRefs.findIndex((r) => r?.current === event.currentTarget);
@@ -660,9 +709,14 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
         const prev = inputRefs[currentIndex - 1];
         prev?.current?.focus();
         prev?.current?.select();
+      } else if (key === "Backspace" && event.currentTarget.value === "" && currentIndex > 0) {
+        event.preventDefault();
+        const prev = inputRefs[currentIndex - 1];
+        prev?.current?.focus();
+        prev?.current?.select();
       }
     },
-    [getInputRefs],
+    [getInputRefs, setSelectAllActive, handleChange],
   );
 
   // Helper function to create input components in the right order
@@ -785,7 +839,12 @@ export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInp
     >
       {startAdornment}
       <div className={styles.wrapper}>
-        <div className={styles.inputGroup}>{createDateInputs()}</div>
+        <div
+          className={classnames(styles.inputGroup, { [styles.selectAllActive]: isSelectAllActive })}
+          onMouseDown={() => setSelectAllActive(false)}
+        >
+          {createDateInputs()}
+        </div>
         {clearable && (
           <Part partId={PART_CLEAR_BUTTON}>
             <button
