@@ -211,12 +211,16 @@ export const DatePicker = forwardRef(function DatePicker(
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   const selected: any = useMemo(() => {
@@ -477,13 +481,14 @@ export const DatePicker = forwardRef(function DatePicker(
         disabled={disabled}
         weekStartsOn={_weekStartsOn}
         showWeekNumber={showWeekNumber}
-        showOutsideDays
+        showOutsideDays={mode !== "range"}
         classNames={styles}
         mode={mode === "single" ? "single" : "range"}
         selected={selected}
         onSelect={handleSelect}
         autoFocus={autoFocus}
         numberOfMonths={mode === "range" ? 2 : 1}
+        pagedNavigation={mode === "range"}
         components={{
           Chevron,
         }}
@@ -570,11 +575,12 @@ export const DatePicker = forwardRef(function DatePicker(
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
-            showOutsideDays
+            showOutsideDays={mode !== "range"}
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
             numberOfMonths={mode === "range" ? 2 : 1}
+            pagedNavigation={mode === "range"}
             components={{
               Chevron,
             }}

@@ -575,7 +575,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .range_middle {
-    background-color: var(--rdp-range_middle-background-color);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_middle .day_button {
@@ -583,6 +583,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     border: unset;
     border-radius: unset;
     color: var(--rdp-range_middle-color);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_end {
