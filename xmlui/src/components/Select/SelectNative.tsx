@@ -480,6 +480,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           ariaName: optionLabel,
         });
         pushXsLog(createLogEntry("native:selection:change", {
+          component: "Select",
+          ariaName: ariaLabelRef.current || undefined,
           displayLabel: optionLabel,
           value: newSelectedValue,
         }));

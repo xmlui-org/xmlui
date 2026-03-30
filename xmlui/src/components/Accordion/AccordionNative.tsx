@@ -176,6 +176,7 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
             traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
             kind: "focus:change",
             component: "Accordion",
+            ariaName: Array.isArray(value) ? value.join(", ") : String(value),
             displayLabel: Array.isArray(value) ? value.join(", ") : String(value),
             expandedItems: value,
           });

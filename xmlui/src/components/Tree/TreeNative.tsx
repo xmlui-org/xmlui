@@ -808,6 +808,7 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
         kind: "selection:change",
         component: "Tree",
+        ariaName: node ? node.name : undefined,
         displayLabel: node ? node.name : null,
         selectedId: node ? String(node.key) : null,
         selectedName: node ? node.name : null,
