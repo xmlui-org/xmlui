@@ -1,8 +1,29 @@
 # xmlui
 
+## 0.12.14
+
+### Patch Changes
+
+- 60086b1: Fix DataSource name when no id is declared
+- e72aee2: Allow setting the toast notification position
+- c7933d4: fix: ItemWithLabel falls back to Form's itemLabelPosition from context
+- 5d2d8ac: Add striped property to Table
+- f90a550: Fix CLI bin path in published package: the `clean-package` replacement now correctly points to `dist/nodejs/bin/index.mjs` (the actual ESM output from tsdown) instead of the incorrect `dist/nodejs/bin/index.js`. This mismatch prevented `npm` from creating the `xmlui` symlink in `.bin` during install.
+- f09e2fe: Fix: Variable initializers in user-defined components can now access routing context variables
+- 46e4b62: Use `Globals.xs` instead of `Main.xmlui.xs` for global variable and function declarations. `Main.xmlui.xs` declarations are now local to the Main component, consistent with how all other code-behind files work.
+- 9adc767: fix: only deep-coppy theme vars when <Theme> needs them. This reduces the number of CSS vars present on a site.
+- 40d58ac: fix: select - label position, minWidth
+- 084b7dd: Allow user-defined components to use arbitrary theme variables
+- 90152c6: Extend headings and Markdown with anchorTemplate
+- e554b84: Column width, minWidth, and maxWidth now accept and resolve theme variables, em/rem values
+- b7f7152: NavPanel can be synched with the selected content
+- 084b7dd: Auto-generate metadata for user-defined (compound) components by statically analyzing their definition tree. This enables proper theme variable optimization — compound component theme vars are now collected into the global `componentThemeVars` set, so `ThemeProvider` resolves hierarchical variables for them correctly.
+- 9471ef6: fix: change NestedApp header background color to surface color
+
 ## 0.12.13
 
 ### Patch Changes
+
 - d19a909: feat: add cancelButtonLabel prop to APICall for confirm dialog
 - 61308b2: feat: xmlui-search - spotlight mode, filter by categories, suggested keywords
 - c4fc0be: Fix reactive expressions in component properties not updating when they call functions that depend on changed variables
