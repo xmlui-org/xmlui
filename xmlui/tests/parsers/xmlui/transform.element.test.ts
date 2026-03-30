@@ -675,6 +675,102 @@ describe("Xmlui transform - child elements", () => {
       expect(cd.type).equal("Stack");
       expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
     });
+
+    describe("method pre-parsing", () => {
+      it("inline method attr is pre-parsed", () => {
+        const cd = transformSource("<Stack method.myApi='doIt' />") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myApi;
+        expect(method.__PARSED).toBe(true);
+        const stmts = method.statements as Statement[];
+        expect(stmts.length).equal(1);
+        expect(stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+        expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
+        const id = (stmts[0] as ExpressionStatement).expr as Identifier;
+        expect(id.name).equal("doIt");
+      });
+
+      it("method with value attr is pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myMethod' value='doIt'/></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myMethod;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+        const stmts = method.statements as Statement[];
+        expect(stmts.length).equal(1);
+        expect(stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+        expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
+      });
+
+      it("method with text content is pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myMethod'>doIt</method></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myMethod;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+      });
+
+      it("multiple methods are all pre-parsed", () => {
+        const cd = transformSource(`
+        <Stack>
+          <method name="set">doIt</method>
+          <method name="get">getIt</method>
+        </Stack>
+      `) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        expect((cd.api! as any).set.__PARSED).toBe(true);
+        expect((cd.api! as any).get.__PARSED).toBe(true);
+        expect((cd.api! as any).set.source).equal("doIt");
+        expect((cd.api! as any).get.source).equal("getIt");
+      });
+
+      it("null method stays null", () => {
+        const cd = transformSource("<Stack><method name='myMethod'/></Stack>") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        expect((cd.api! as any).myMethod).equal(null);
+      });
+
+      it("source is preserved in pre-parsed method", () => {
+        const cd = transformSource("<Stack method.counter='count + 1' />") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).counter;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("count + 1");
+      });
+
+      it("parseId is a number in pre-parsed method", () => {
+        const cd = transformSource("<Stack method.myApi='doIt' />") as ComponentDef;
+        const method = (cd.api! as any).myApi;
+        expect(typeof method.parseId).equal("number");
+      });
+
+      it("compound component method attr is pre-parsed", () => {
+        const cd = transformSource(
+          "<Component name='MyComp' method.myApi='doIt'><Stack/></Component>",
+        ) as CompoundComponentDef;
+        expect(cd.name).equal("MyComp");
+        const method = (cd.api! as any).myApi;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+      });
+
+      it("method array entries are pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myApi' value='doIt'/><method name='myApi' value='getIt'/></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const methods = (cd.api! as any).myApi;
+        expect(Array.isArray(methods)).toBe(true);
+        expect(methods[0].__PARSED).toBe(true);
+        expect(methods[0].source).equal("doIt");
+        expect(methods[1].__PARSED).toBe(true);
+        expect(methods[1].source).equal("getIt");
+      });
+    });
   });
   describe("uses", () => {
     // --- Uses
