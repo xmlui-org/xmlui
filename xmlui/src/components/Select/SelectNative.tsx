@@ -318,12 +318,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
@@ -479,12 +483,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           selectAriaLabel: ariaLabelRef.current,
           ariaName: optionLabel,
         });
-        pushXsLog(createLogEntry("native:selection:change", {
-          component: "Select",
-          ariaName: ariaLabelRef.current || undefined,
-          displayLabel: optionLabel,
-          value: newSelectedValue,
-        }));
+        pushXsLog(
+          createLogEntry("native:selection:change", {
+            component: "Select",
+            ariaName: ariaLabelRef.current || undefined,
+            displayLabel: optionLabel,
+            value: newSelectedValue,
+          }),
+        );
       }
       if (!multiSelect) {
         setOpen(false);
@@ -703,7 +709,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             onValueChange={(val) => toggleOption(val)}
             id={id}
             options={options}
-            style={style}
+            style={{ ...style, height: dropdownHeight }}
             className={classnames(className, classes?.[COMPONENT_PART_KEY])}
             contentClassName={contentClassName}
             onFocus={onFocus}
@@ -754,10 +760,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   onBlur={onBlur}
                   disabled={!enabled}
                   aria-expanded={open}
-                  className={classnames(styles.selectTrigger, classes?.[COMPONENT_PART_KEY], className, styles[validationStatus], {
-                    [styles.disabled]: !enabled,
-                    [styles.multi]: multiSelect,
-                  })}
+                  className={classnames(
+                    styles.selectTrigger,
+                    classes?.[COMPONENT_PART_KEY],
+                    className,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multiSelect,
+                    },
+                  )}
                   role="combobox"
                   onClick={(event) => {
                     if (!enabled || readOnly) return;
@@ -818,8 +830,12 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: panelWidth, height: dropdownHeight }}
-                  className={classnames(contentClassName, styles.selectContent, styles[validationStatus])}
+                  style={{ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" }}
+                  className={classnames(
+                    contentClassName,
+                    styles.selectContent,
+                    styles[validationStatus],
+                  )}
                   onKeyDown={handleKeyDown}
                 >
                   <div className={styles.command}>
