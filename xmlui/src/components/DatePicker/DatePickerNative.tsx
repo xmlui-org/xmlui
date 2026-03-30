@@ -208,6 +208,7 @@ export const DatePicker = forwardRef(function DatePicker(
   const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
+  const [hoveredDate, setHoveredDate] = useState<Date | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
@@ -457,9 +458,42 @@ export const DatePicker = forwardRef(function DatePicker(
       if (mode === "single") {
         setOpen(false);
       }
+      setHoveredDate(undefined);
     },
     [onDidChange, updateState, mode, dateFormat, readOnly],
   );
+
+  const handleDayMouseEnter = useCallback(
+    (date: Date) => {
+      if (mode === "range") {
+        setHoveredDate(date);
+      }
+    },
+    [mode],
+  );
+
+  const handleDayMouseLeave = useCallback(() => {
+    setHoveredDate(undefined);
+  }, []);
+
+  const modifiers = useMemo(() => {
+    const mods: any = {};
+
+    if (mode === "range" && hoveredDate && selected?.from) {
+      // Show preview when hovering, even if a range is already selected
+      // This allows users to see what the new range would be
+      const start = selected.from < hoveredDate ? selected.from : hoveredDate;
+      const end = selected.from < hoveredDate ? hoveredDate : selected.from;
+      mods.hovered = { from: start, to: end };
+    }
+
+    // Add background to single selected date in range mode
+    if (mode === "range" && selected?.from && !selected?.to) {
+      mods.singleSelected = selected.from;
+    }
+
+    return mods;
+  }, [mode, hoveredDate, selected]);
 
   return inline ? (
     <div
@@ -489,6 +523,10 @@ export const DatePicker = forwardRef(function DatePicker(
         autoFocus={autoFocus}
         numberOfMonths={mode === "range" ? 2 : 1}
         pagedNavigation={mode === "range"}
+        modifiers={modifiers}
+        modifiersClassNames={{ hovered: styles.hovered }}
+        onDayMouseEnter={handleDayMouseEnter}
+        onDayMouseLeave={handleDayMouseLeave}
         components={{
           Chevron,
         }}
@@ -581,6 +619,10 @@ export const DatePicker = forwardRef(function DatePicker(
             onSelect={handleSelect}
             numberOfMonths={mode === "range" ? 2 : 1}
             pagedNavigation={mode === "range"}
+            modifiers={modifiers}
+            modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+            onDayMouseEnter={handleDayMouseEnter}
+            onDayMouseLeave={handleDayMouseLeave}
             components={{
               Chevron,
             }}
