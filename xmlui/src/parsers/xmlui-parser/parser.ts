@@ -28,7 +28,6 @@ const RECOVER_OPEN_TAG = [
 const RECOVER_ATTR = [SyntaxKind.Identifier, ...RECOVER_OPEN_TAG] as const;
 const RECOVER_CONTENT_LIST = [
   SyntaxKind.TextNode,
-  SyntaxKind.StringLiteral,
   SyntaxKind.CData,
   SyntaxKind.Script,
   SyntaxKind.OpenNodeStart,
@@ -113,7 +112,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       const token = peekInContent();
       switch (token.kind) {
         case SyntaxKind.TextNode:
-        case SyntaxKind.StringLiteral:
         case SyntaxKind.CData:
         case SyntaxKind.Script:
           bumpAny();
@@ -480,22 +478,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    let parseAsStringLiteral = false;
-    if (token.kind === SyntaxKind.StringLiteral) {
-      const beforeLookahead = token.end;
-      const nextToken = collectToken(true);
-      parseAsStringLiteral =
-        nextToken.kind === SyntaxKind.CData ||
-        nextToken.kind === SyntaxKind.CloseNodeStart ||
-        nextToken.kind === SyntaxKind.Script ||
-        nextToken.kind === SyntaxKind.OpenNodeStart;
-      scanner.resetTokenState(beforeLookahead);
-    }
-
     let pos: number;
-    if (parseAsStringLiteral) {
-      pos = token.pos;
-    } else if (leadingComments.length > 0) {
+    if (leadingComments.length > 0) {
       pos = leadingComments[leadingComments.length - 1].end;
     } else if (firstNonCommentTriviaIdx !== -1) {
       pos = trivia![firstNonCommentTriviaIdx].pos;
@@ -512,9 +496,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (secondCommentGroupStartIdx !== -1) {
       end = trivia![secondCommentGroupStartIdx].pos;
       scanner.resetTokenState(end);
-    } else if (parseAsStringLiteral) {
-      kind = SyntaxKind.StringLiteral;
-      end = token.end;
     } else {
       while (true) {
         const nextChar = scanner.peekChar();

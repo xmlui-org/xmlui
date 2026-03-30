@@ -32,16 +32,56 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.children![0].props! as any).value).equal("hithere");
   });
 
-  it("string literal as child #1", () => {
-    const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNode");
-    expect((cd.children![0].props! as any).value).equal("hi ");
-  });
+  describe("remove StringLiterals from ContentListNode-s", () => {
+    it("string literal as child #1", () => {
+      const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal("'hi ' ");
+    });
 
-  it("string literal as child #2", () => {
-    const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNode");
-    expect((cd.children![0].props! as any).value).equal("hi ");
+    it("string literal as child #2", () => {
+      const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal(" 'hi '");
+    });
+
+    it("string literal as child #3", () => {
+      const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal(' "123 ""abc" ');
+    });
+
+    it("CData as child", () => {
+      const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("hi");
+    });
+
+    it("string literal then text as child", () => {
+      const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal("'hi ' there");
+    });
+
+    it("string literal then CData as child", () => {
+      const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("'hi ' there");
+    });
+
+    it("string literal #2 then CData as child", () => {
+      const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("'hi' there");
+    });
+
+    it("string literal, text, CData as child", () => {
+      const cd = transformSource(
+        "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
+      ) as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("hi there 'all' people");
+    });
   });
 
   it("string literal as child #3", () => {
@@ -60,26 +100,6 @@ describe("Xmlui transform - child elements", () => {
     const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("'hi ' there");
-  });
-
-  it("string literal then CData as child", () => {
-    const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hi there");
-  });
-
-  it("string literal #2 then CData as child", () => {
-    const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hithere");
-  });
-
-  it("string literal, text, CData as child", () => {
-    const cd = transformSource(
-      "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
-    ) as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hi thereallpeople");
   });
 
   it("text and element as child #1", () => {
