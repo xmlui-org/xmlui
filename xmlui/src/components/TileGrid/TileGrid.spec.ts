@@ -695,3 +695,62 @@ test.describe("syncWithVar property", () => {
     await expect(page.getByRole("gridcell").nth(0)).toHaveAttribute("aria-selected", "true");
   });
 });
+
+// =============================================================================
+// stretchItems property
+// =============================================================================
+
+test.describe("stretchItems property", () => {
+  test("default is false — tile width equals itemWidth", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1}]}"
+        itemWidth="150px"
+        itemHeight="80px"
+      >
+        <Text>{$item.id}</Text>
+      </TileGrid>
+    `);
+    await expect(page.getByRole("gridcell").first()).toHaveCSS("width", "150px");
+  });
+
+  test("stretchItems true — tiles are stretched to fill the container evenly", async ({ initTestBed, page }) => {
+    // Use a viewport where cols × itemWidth < containerWidth so stretch makes a measurable difference.
+    // viewport=600px, itemWidth=110px, gap=0 → cols=5 (5×110=550 < 600), stretched=120px, unstretched=110px
+    await page.setViewportSize({ width: 600, height: 600 });
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1},{id:2},{id:3},{id:4},{id:5}]}"
+        itemWidth="110px"
+        itemHeight="80px"
+        gap="0px"
+        stretchItems="true"
+      >
+        <Text>{$item.id}</Text>
+      </TileGrid>
+    `);
+    const tile = page.getByRole("gridcell").first();
+    await expect(tile).toBeVisible();
+    // Tile width should be stretched beyond itemWidth (110px)
+    await expect(tile).not.toHaveCSS("width", "110px");
+    // All tiles together should fill the grid width
+    const gridBounds = await page.getByRole("grid").boundingBox();
+    const tileBounds = await tile.boundingBox();
+    const cols = await page.getByRole("gridcell").count();
+    expect(tileBounds!.width * cols).toBeCloseTo(gridBounds!.width, 0);
+  });
+
+  test("stretchItems false — tile width stays at itemWidth", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1}]}"
+        itemWidth="80px"
+        itemHeight="80px"
+        stretchItems="false"
+      >
+        <Text>{$item.id}</Text>
+      </TileGrid>
+    `);
+    await expect(page.getByRole("gridcell").first()).toHaveCSS("width", "80px");
+  });
+});

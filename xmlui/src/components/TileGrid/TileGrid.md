@@ -202,6 +202,48 @@ Accepts any valid CSS length (e.g. `"8px"`) or a theme variable (e.g. `"$gap-nor
 
 %-PROP-END
 
+%-PROP-START stretchItems
+
+When `true`, tiles grow to fill the full container width.
+The number of columns is still derived from `itemWidth`, but each tile's actual width is distributed evenly across the available space, eliminating trailing horizontal gaps.
+`itemWidth` acts as the minimum tile width that determines the column count.
+
+```xmlui copy /stretchItems="true"/
+<App>
+  <TileGrid data="{[...]}" itemWidth="120px" itemHeight="80px" stretchItems="true">
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: stretchItems"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'},
+      {id: 5, name: 'Milk', category: 'dairy'},
+      {id: 6, name: 'Cheese', category: 'dairy'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    stretchItems="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START loading
 
 When `true`, the grid hides all tile content and shows an empty placeholder.
@@ -648,7 +690,7 @@ The handler receives `(selectedItems, selectedIds)`.
 
 %-EVENT-START deleteAction
 
-Fired when the user presses Delete while the grid is focused and `itemsSelectable` is `true`.
+Fired when the user presses the Delete key while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
 The component does **not** remove items automatically — the handler must implement the removal.
 

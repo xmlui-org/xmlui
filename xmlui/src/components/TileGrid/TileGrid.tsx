@@ -1,11 +1,12 @@
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import styles from "./TileGrid.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
-import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
+import type { PropertyValueDescription, ComponentDef } from "../../abstractions/ComponentDefs";
 import { TileGridNative, defaultProps } from "./TileGridNative";
+import type { CheckboxPosition } from "./TileGridNative";
 import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreNative";
 
 const COMP = "TileGrid";
@@ -44,6 +45,13 @@ export const TileGridMd = createMetadata({
       description: "Gap between tiles, e.g. `\"8px\"` or a theme variable like `\"$gap-normal\"`.",
       valueType: "string",
       defaultValue: defaultProps.gap,
+    },
+    stretchItems: {
+      description:
+        "When `true`, tiles in each row grow to fill the full container width. " +
+        "`itemWidth` becomes the minimum tile width; the actual width is distributed evenly.",
+      valueType: "boolean",
+      defaultValue: defaultProps.stretchItems,
     },
     loading: {
       description:
@@ -126,7 +134,7 @@ export const TileGridMd = createMetadata({
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
     ),
     deleteAction: d(
-      "Fired when the user presses the Delete or Backspace key. " +
+      "Fired when the user presses the Delete key. " +
         "Receives `(focusedItem, selectedItems, selectedIds)`.",
     ),
     selectAllAction: d(
@@ -163,6 +171,98 @@ export const TileGridMd = createMetadata({
 
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
+const TileGridWithSync = memo(
+  ({ node, extractValue, renderChild, classes, layoutContext, lookupEventHandler, lookupAction, registerComponentApi }: any) => {
+    const itemTemplate = node.props.itemTemplate;
+    const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
+    const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+
+    // Keep lookupAction current without breaking the stable adapter reference (same pattern as Table).
+    const lookupActionRef = useRef(lookupAction);
+    lookupActionRef.current = lookupAction;
+    const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+
+    let syncAdapter: any;
+    if (syncVarName !== undefined) {
+      if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
+        console.error(`[TileGrid syncWithVar] Invalid variable name: "${syncVarName}"`);
+        syncAdapterHolderRef.current = null;
+      } else {
+        const currentValue = extractValue(`{${syncVarName}}`);
+        if (currentValue != null) {
+          if (!syncAdapterHolderRef.current) {
+            syncAdapterHolderRef.current = {
+              value: currentValue,
+              update: ({ selectedIds }: { selectedIds: string[] }) => {
+                const valueJson = JSON.stringify(selectedIds);
+                const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
+                const handler = lookupActionRef.current?.(expr, { ephemeral: true });
+                handler?.();
+              },
+            };
+          } else {
+            syncAdapterHolderRef.current.value = currentValue;
+          }
+        } else {
+          syncAdapterHolderRef.current = null;
+        }
+      }
+    } else {
+      syncAdapterHolderRef.current = null;
+    }
+    syncAdapter = syncAdapterHolderRef.current;
+
+    const content = (
+      <TileGridNative
+        registerComponentApi={registerComponentApi}
+        classes={classes}
+        data={extractValue(node.props.data)}
+        itemWidth={extractValue.asOptionalString(node.props.itemWidth)}
+        itemHeight={extractValue.asOptionalString(node.props.itemHeight)}
+        gap={extractValue.asSize(node.props.gap) ?? defaultProps.gap}
+        stretchItems={extractValue.asOptionalBoolean(node.props.stretchItems)}
+        loading={extractValue.asOptionalBoolean(node.props.loading)}
+        itemsSelectable={extractValue.asOptionalBoolean(node.props.itemsSelectable)}
+        enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
+        syncWithAppState={syncAdapter}
+        checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as CheckboxPosition}
+        hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
+        idKey={idKey}
+        itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
+        onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+        onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
+        onCutAction={lookupEventHandler("cutAction")}
+        onCopyAction={lookupEventHandler("copyAction")}
+        onPasteAction={lookupEventHandler("pasteAction")}
+        onDeleteAction={lookupEventHandler("deleteAction")}
+        onSelectAllAction={lookupEventHandler("selectAllAction")}
+        itemRenderer={
+          itemTemplate
+            ? (item, index, count, selected) => (
+                <MemoizedItem
+                  node={itemTemplate as ComponentDef}
+                  key={`${item?.[idKey] ?? index}`}
+                  renderChild={renderChild}
+                  layoutContext={layoutContext}
+                  contextVars={{
+                    $item: item,
+                    $itemIndex: index,
+                    $isFirst: index === 0,
+                    $isLast: index === count - 1,
+                    $selected: selected,
+                  }}
+                />
+              )
+            : undefined
+        }
+      />
+    );
+
+    return <StandaloneSelectionStore idKey={idKey}>{content}</StandaloneSelectionStore>;
+  },
+);
+TileGridWithSync.displayName = "TileGridWithSync";
+
 export const tileGridComponentRenderer = wrapComponent(
   COMP,
   TileGridNative,
@@ -170,106 +270,22 @@ export const tileGridComponentRenderer = wrapComponent(
   {
     exposeRegisterApi: true,
     exclude: [
-      "data", "itemWidth", "itemHeight", "gap", "loading", "itemsSelectable",
+      "data", "itemWidth", "itemHeight", "gap", "stretchItems", "loading", "itemsSelectable",
       "enableMultiSelection", "syncWithVar", "checkboxPosition", "hideSelectionCheckboxes",
       "idKey", "itemUserSelect", "itemTemplate",
     ],
     events: [],
-    customRender(_props, {
-      node,
-      extractValue,
-      renderChild,
-      classes,
-      layoutContext,
-      lookupEventHandler,
-      lookupAction,
-      registerComponentApi,
-    }) {
-      const itemTemplate = node.props.itemTemplate;
-      const idKey = extractValue.asOptionalString(node.props.idKey) ?? defaultProps.idKey;
-      const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
-
-      // Keep lookupAction current without breaking the stable adapter reference (same pattern as Table).
-      const lookupActionRef = useRef(lookupAction);
-      lookupActionRef.current = lookupAction;
-      const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
-
-      let syncAdapter: any;
-      if (syncVarName !== undefined) {
-        if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
-          console.error(`[TileGrid syncWithVar] Invalid variable name: "${syncVarName}"`);
-          syncAdapterHolderRef.current = null;
-        } else {
-          const currentValue = extractValue(`{${syncVarName}}`);
-          if (currentValue != null) {
-            if (!syncAdapterHolderRef.current) {
-              syncAdapterHolderRef.current = {
-                value: currentValue,
-                update: ({ selectedIds }: { selectedIds: string[] }) => {
-                  const valueJson = JSON.stringify(selectedIds);
-                  const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
-                  const handler = lookupActionRef.current?.(expr, { ephemeral: true });
-                  handler?.();
-                },
-              };
-            } else {
-              syncAdapterHolderRef.current.value = currentValue;
-            }
-          } else {
-            syncAdapterHolderRef.current = null;
-          }
-        }
-      } else {
-        syncAdapterHolderRef.current = null;
-      }
-      syncAdapter = syncAdapterHolderRef.current;
-
-      const content = (
-        <TileGridNative
-          registerComponentApi={registerComponentApi}
-          classes={classes}
-          data={extractValue(node.props.data)}
-          itemWidth={extractValue.asOptionalString(node.props.itemWidth)}
-          itemHeight={extractValue.asOptionalString(node.props.itemHeight)}
-          gap={extractValue.asSize(node.props.gap) ?? defaultProps.gap}
-          loading={extractValue.asOptionalBoolean(node.props.loading)}
-          itemsSelectable={extractValue.asOptionalBoolean(node.props.itemsSelectable)}
-          enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
-          syncWithAppState={syncAdapter}
-          checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as any}
-          hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
-          idKey={idKey}
-          itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
-          onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-          onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
-          onCutAction={lookupEventHandler("cutAction")}
-          onCopyAction={lookupEventHandler("copyAction")}
-          onPasteAction={lookupEventHandler("pasteAction")}
-          onDeleteAction={lookupEventHandler("deleteAction")}
-          onSelectAllAction={lookupEventHandler("selectAllAction")}
-          itemRenderer={
-            itemTemplate
-              ? (item, index, count, selected) => (
-                  <MemoizedItem
-                    node={itemTemplate as any}
-                    key={`${item?.id ?? index}`}
-                    renderChild={renderChild}
-                    layoutContext={layoutContext}
-                    contextVars={{
-                      $item: item,
-                      $itemIndex: index,
-                      $isFirst: index === 0,
-                      $isLast: index === count - 1,
-                      $selected: selected,
-                    }}
-                  />
-                )
-              : undefined
-          }
-        />
-      );
-
-      return <StandaloneSelectionStore idKey={idKey}>{content}</StandaloneSelectionStore>;
-    },
+    customRender: (_props, { node, extractValue, renderChild, classes, layoutContext, lookupEventHandler, lookupAction, registerComponentApi }) => (
+      <TileGridWithSync
+        node={node}
+        extractValue={extractValue}
+        lookupEventHandler={lookupEventHandler as any}
+        lookupAction={lookupAction}
+        classes={classes}
+        renderChild={renderChild}
+        registerComponentApi={registerComponentApi}
+        layoutContext={layoutContext}
+      />
+    ),
   },
 );
