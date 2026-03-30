@@ -131,6 +131,7 @@ type StandaloneAppProps = {
 
   // --- If true, the app waits for the API interceptor to be ready
   waitForApiInterceptor?: boolean;
+  helmetContext?: Record<string, unknown>;
   children?: ReactNode;
 };
 
@@ -151,6 +152,7 @@ function StandaloneApp({
   runtime,
   extensionManager,
   waitForApiInterceptor = false,
+  helmetContext,
   children,
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
@@ -292,6 +294,7 @@ function StandaloneApp({
           extensionManager={extensionManager}
           contributes={contributes}
           icons={icons}
+          helmetContext={helmetContext}
         >
           {children}
         </AppRoot>

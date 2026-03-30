@@ -31,11 +31,17 @@ type RenderResult = {
   ssrStyles: string;
   ssrHashes: string;
   htmlClasses: string;
+  titleTag: string;
+  headTags: string;
+  htmlAttributes: string;
+  bodyAttributes: string;
 };
 
 type RenderModule = {
   renderPath: (pathname: string) => RenderResult;
 };
+
+type HtmlDocument = ReturnType<typeof parse>;
 
 const TEMP_ENTRY_FILE_NAME = ".xmlui-ssg-entry.tsx";
 
@@ -86,47 +92,92 @@ function isHtmlNavigationRequest(url: string, acceptHeader?: string): boolean {
   return !path.basename(pathname).includes(".");
 }
 
-function mergeHtmlClasses(shellHtml: string, htmlClasses: string): string {
+function appendToHeadOrDocument(document: HtmlDocument, markup: string): void {
+  const head = document.querySelector("head");
+
+  if (head) {
+    head.append(markup);
+  } else {
+    document.append(markup);
+  }
+}
+
+function mergeHtmlClasses(document: HtmlDocument, htmlClasses: string): void {
   if (!htmlClasses.trim()) {
-    return shellHtml;
+    return;
   }
 
-  const document = parse(shellHtml);
   const htmlElement = document.querySelector("html");
 
   if (!htmlElement) {
-    return shellHtml;
+    return;
   }
 
   const currentClasses = htmlElement.getAttribute("class") || "";
   const merged = `${currentClasses} ${htmlClasses}`.trim();
   htmlElement.setAttribute("class", merged);
-
-  return document.toString();
 }
 
-function injectStylesIntoHead(shellHtml: string, ssrStyles: string, ssrHashes: string): string {
-  if (!ssrStyles.trim()) {
-    return shellHtml;
+function mergeAttributesIntoElement(
+  document: HtmlDocument,
+  selector: "html" | "body",
+  attributesMarkup: string,
+): void {
+  if (!attributesMarkup.trim()) {
+    return;
   }
 
-  const document = parse(shellHtml);
-  const head = document.querySelector("head");
+  const element = document.querySelector(selector);
+
+  if (!element) {
+    return;
+  }
+
+  const attributeSource = parse(`<${selector} ${attributesMarkup}></${selector}>`).querySelector(selector);
+
+  if (!attributeSource) {
+    return;
+  }
+
+  for (const [name, value] of Object.entries(attributeSource.attributes)) {
+    if (name === "class") {
+      const mergedClasses = `${element.getAttribute("class") || ""} ${value}`.trim();
+      if (mergedClasses) {
+        element.setAttribute("class", mergedClasses);
+      }
+      continue;
+    }
+    element.setAttribute(name, value);
+  }
+}
+
+function injectStylesIntoHead(document: HtmlDocument, ssrStyles: string, ssrHashes: string): void {
+  if (!ssrStyles.trim()) {
+    return;
+  }
 
   const styleElement = `<style data-style-registry="true" data-ssr-hashes="${ssrHashes}">${ssrStyles}</style>`;
-
-  if (head) {
-    head.append(styleElement);
-  } else {
-    document.append(styleElement);
-  }
-
-  return document.toString();
+  appendToHeadOrDocument(document, styleElement);
 }
 
-function injectMarkup(shellHtml: string, markup: string): string {
-  const document = parse(shellHtml);
+function injectTitleIntoHead(document: HtmlDocument, titleTag: string): void {
+  if (!titleTag.trim()) {
+    return;
+  }
 
+  document.querySelectorAll("title").forEach((title) => title.remove());
+  appendToHeadOrDocument(document, titleTag);
+}
+
+function injectHeadTags(document: HtmlDocument, headTags: string): void {
+  if (!headTags.trim()) {
+    return;
+  }
+
+  appendToHeadOrDocument(document, headTags);
+}
+
+function injectMarkup(document: HtmlDocument, markup: string): void {
   const rootDiv = document.querySelector('div[id="root"]');
   if (rootDiv) {
     const hasSearchIndex = rootDiv.hasAttribute(XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile);
@@ -134,16 +185,16 @@ function injectMarkup(shellHtml: string, markup: string): string {
       rootDiv.setAttribute(XMLUI_SSG_DATA_ATTRIBUTES.searchIndexFile, SEARCH_INDEX_FILE_NAME);
     }
     rootDiv.innerHTML = markup;
-    return document.toString();
+    return;
   }
 
   const body = document.querySelector("body");
   if (body) {
     body.insertAdjacentHTML("beforeend", markup);
-    return document.toString();
+    return;
   }
 
-  return shellHtml + markup;
+  document.append(markup);
 }
 
 /**
@@ -183,11 +234,16 @@ function extractSearchEntry(pageUrl: string, markup: string, navLabel = ""): Sea
   return { path: pageUrl, title, content, category };
 }
 
-function applyRenderToShell(shellHtml: string, renderResult: RenderResult): string {
-  let html = shellHtml;
-  html = mergeHtmlClasses(html, renderResult.htmlClasses);
-  html = injectStylesIntoHead(html, renderResult.ssrStyles, renderResult.ssrHashes);
-  html = injectMarkup(html, renderResult.markup);
+export function applyRenderToShell(shellHtml: string, renderResult: RenderResult): string {
+  const document = parse(shellHtml);
+  mergeHtmlClasses(document, renderResult.htmlClasses);
+  mergeAttributesIntoElement(document, "html", renderResult.htmlAttributes);
+  mergeAttributesIntoElement(document, "body", renderResult.bodyAttributes);
+  injectTitleIntoHead(document, renderResult.titleTag);
+  injectHeadTags(document, renderResult.headTags);
+  injectStylesIntoHead(document, renderResult.ssrStyles, renderResult.ssrHashes);
+  injectMarkup(document, renderResult.markup);
+  const html = document.toString();
   if (!html.toLowerCase().startsWith("<!doctype")) {
     return `<!DOCTYPE html>${html}`;
   }
@@ -206,6 +262,7 @@ function getSsgEntrySource(extensionImportSpecifiers: string[]): string {
 import React from "react";
 import { renderToString } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
+import type { FilledContext } from "react-helmet-async";
 import {
   StandaloneApp,
   StandaloneExtensionManager as ExtMgr,
@@ -236,20 +293,40 @@ export function renderPath(pathname: string) {
   }
 
   const registry = new StyleRegistry();
+  const helmetContext: Partial<FilledContext> = {};
   const app = (
     <StyleProvider styleRegistry={registry}>
       <StaticRouter location={pathname}>
-        <StandaloneApp runtime={runtime} extensionManager={createExtensionManager()} />
+        <StandaloneApp
+          runtime={runtime}
+          extensionManager={createExtensionManager()}
+          helmetContext={helmetContext}
+        />
       </StaticRouter>
     </StyleProvider>
   );
 
   const markup = renderToString(app);
+  const helmet = helmetContext.helmet;
   return {
     markup,
     ssrStyles: registry.getSsrStyles(),
     ssrHashes: Array.from(registry.cache.keys()).join(","),
     htmlClasses: registry.getRootClasses(),
+    titleTag: helmet?.title.toString() || "",
+    headTags: [
+      helmet?.priority.toString(),
+      helmet?.base.toString(),
+      helmet?.meta.toString(),
+      helmet?.link.toString(),
+      helmet?.style.toString(),
+      helmet?.script.toString(),
+      helmet?.noscript.toString(),
+    ]
+      .filter(Boolean)
+      .join(""),
+    htmlAttributes: helmet?.htmlAttributes.toString() || "",
+    bodyAttributes: helmet?.bodyAttributes.toString() || "",
   };
 }
 `;
