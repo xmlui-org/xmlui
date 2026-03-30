@@ -116,7 +116,6 @@ class XmluiFormatter {
           break;
         }
 
-        case SyntaxKind.StringLiteral:
         case SyntaxKind.TextNode: {
           const formattedContent = this.printContentString(c);
           if (formattedContent !== "") {
@@ -147,10 +146,7 @@ class XmluiFormatter {
       return this.printTriviaBeforeFirstTaglikeInContent(node);
     } else if (prevSibling.isTagLike()) {
       return this.printTriviaBetweenSiblingTaglikes(node, prevSibling);
-    } else if (
-      prevSibling.kind === SyntaxKind.TextNode ||
-      prevSibling.kind === SyntaxKind.StringLiteral
-    ) {
+    } else if (prevSibling.kind === SyntaxKind.TextNode) {
       return this.printTriviaBetweenTextAndTaglike(prevSibling, node);
     } else {
       // prevSibling is an error node, treat is as any taglike
@@ -213,21 +209,15 @@ class XmluiFormatter {
   addWsToCollapsedTriviaInContentList(trivias: Node[], prevContentNode: Node | null) {
     let newlinesAfterText: number | null = null;
     let newlinesFromText: string | null = null;
-    let prevContentIsText = false;
     let newlinesBeforeFirstComment = " ";
-    if (prevContentNode) {
-      prevContentIsText =
-        prevContentNode.kind === SyntaxKind.StringLiteral ||
-        prevContentNode.kind === SyntaxKind.TextNode;
 
-      if (prevContentIsText) {
-        const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(prevContentNode));
-        newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
+    if (prevContentNode?.kind === SyntaxKind.TextNode) {
+      const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(prevContentNode));
+      newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
 
-        if (newlinesAfterText > 0) {
-          newlinesFromText = this.newlineToken.repeat(newlinesAfterText);
-          newlinesBeforeFirstComment = newlinesFromText + this.indent(this.indentationLvl);
-        }
+      if (newlinesAfterText > 0) {
+        newlinesFromText = this.newlineToken.repeat(newlinesAfterText);
+        newlinesBeforeFirstComment = newlinesFromText + this.indent(this.indentationLvl);
       }
     }
 
@@ -270,15 +260,10 @@ class XmluiFormatter {
   addWsToCollapsedCloseNodeStartTrivia(trivias: Node[], lastContentNode: Node | null) {
     let newlinesAfterText: number | null = null;
     let lastContentIsText = false;
-    if (lastContentNode) {
-      if (
-        lastContentNode.kind === SyntaxKind.StringLiteral ||
-        lastContentNode.kind === SyntaxKind.TextNode
-      ) {
-        lastContentIsText = true;
-        const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(lastContentNode));
-        newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
-      }
+    if (lastContentNode?.kind === SyntaxKind.TextNode) {
+      lastContentIsText = true;
+      const trailingNewlinesInText = newlinesInTrailingWhitespace(this.getText(lastContentNode));
+      newlinesAfterText = Math.min(trailingNewlinesInText, this.maxConsecutiveNewlines);
     }
     const contentEndsInNewlines = lastContentIsText && newlinesAfterText > 0;
 

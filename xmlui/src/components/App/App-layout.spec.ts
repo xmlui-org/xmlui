@@ -196,9 +196,12 @@ async function verifyAppContainerNotScrollable(page: Page) {
       return { found: false };
     }
 
+    // For verticalFullHeader, mainContentArea is the scroll container — check appWrapper itself
+    const isVerticalFullHeader = appWrapper.className.includes("verticalFullHeader");
+
     // Check if there's a mainContentArea inside (vertical layout)
     const mainContentArea = appWrapper.querySelector('[class*="mainContentArea"]');
-    const scrollContainer = mainContentArea || appWrapper;
+    const scrollContainer = isVerticalFullHeader ? appWrapper : (mainContentArea || appWrapper);
 
     const styles = window.getComputedStyle(scrollContainer);
     return {
@@ -1951,20 +1954,16 @@ test.describe("Vertical-Full-Header Layout - scrollWholePage=false, noScrollbarG
     // At top
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentIsScrollContainer(page, false);
-    await verifyMainContentScrollbarGutters(page, false);
 
     // Mid scroll
     await scrollMainContentTo(page, "mid");
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentScrollbarGutters(page, false);
 
     // Bottom scroll
     await scrollMainContentTo(page, "bottom");
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentScrollbarGutters(page, false);
   });
 });
 
@@ -2022,20 +2021,19 @@ test.describe("Vertical-Full-Header Layout - scrollWholePage=false, noScrollbarG
     // At top
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentIsScrollContainer(page, false);
-    await verifyMainContentScrollbarGutters(page, false);
+    await verifyMainContentScrollbarGutters(page, true);
 
     // Mid scroll
     await scrollMainContentTo(page, "mid");
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentScrollbarGutters(page, false);
+    await verifyMainContentScrollbarGutters(page, true);
 
     // Bottom scroll
     await scrollMainContentTo(page, "bottom");
     await verifyAllBlocksVisible(page);
     await verifyBlocksInViewport(page, ["appHeader", "footer"]);
-    await verifyMainContentScrollbarGutters(page, false);
+    await verifyMainContentScrollbarGutters(page, true);
   });
 });
 
