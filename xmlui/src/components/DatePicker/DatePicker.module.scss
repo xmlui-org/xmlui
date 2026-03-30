@@ -328,6 +328,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     width: var(--rdp-day-width);
     height: var(--rdp-day-height);
     text-align: center;
+    transition: background-color 0.2s ease-in-out;
   }
 
   .day_button {
@@ -345,6 +346,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     height: var(--rdp-day_button-height);
     border: var(--rdp-day_button-border);
     border-radius: var(--rdp-day_button-border-radius);
+    transition: background-color 0.2s ease-in-out;
 
     &:hover {
       background-color: $backgroundColor-item-DatePicker--hover;
@@ -546,10 +548,15 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .selected {
     font-weight: t.$fontWeight-bold;
+    background-color: $backgroundColor-item-DatePicker--hover !important;
   }
 
   .selected .day_button {
     border: t.$space-0_5 solid $borderColor-selectedItem-DatePicker;
+  }
+  
+  .day.selected {
+    background-color: $backgroundColor-item-DatePicker--hover !important;
   }
 
   .outside {
@@ -566,7 +573,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .range_start {
-    background: var(--rdp-range_start-background);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_start .day_button {
@@ -575,7 +582,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .range_middle {
-    background-color: var(--rdp-range_middle-background-color);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_middle .day_button {
@@ -583,11 +590,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     border: unset;
     border-radius: unset;
     color: var(--rdp-range_middle-color);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_end {
-    background: var(--rdp-range_end-background);
-    color: var(--rdp-range_end-color);
+    background-color: $backgroundColor-item-DatePicker--hover;
   }
 
   .range_end .day_button {
@@ -597,6 +604,21 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .range_start.range_end {
     background: revert;
+  }
+
+  /* Range preview on hover - when first date is selected and hovering over another date */
+  .hovered:not(.range_start):not(.range_end) {
+    background-color: $backgroundColor-item-DatePicker--hover;
+  }
+
+  .hovered:not(.range_start):not(.range_end) .day_button {
+    background-color: $backgroundColor-item-DatePicker--hover;
+    border-color: transparent;
+  }
+
+  /* Single selected date in range mode - when only from date is selected */
+  .singleSelected {
+    background-color: $backgroundColor-item-DatePicker--hover !important;
   }
 
   .focusable {

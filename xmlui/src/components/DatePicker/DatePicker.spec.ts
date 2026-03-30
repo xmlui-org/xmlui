@@ -374,39 +374,33 @@ test("component handles readOnly mode correctly", async ({ page, initTestBed }) 
   await expect(page.getByTestId("datePicker")).toHaveText(initialDate);
 });
 
-test(
-  "component handles startDate restrictions",
-  async ({ page, initTestBed }) => {
-    await initTestBed(
-      `<DatePicker
+test("component handles startDate restrictions", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker
         testId="datePicker"
         mode="range"
         startDate="05/01/2024"
         dateFormat="MM/dd/yyyy"
         initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
       />`,
-    );
-    await page.getByTestId("datePicker").click();
-    await expect(page.getByRole('button', { name: 'Go to the Previous Month' })).toBeDisabled();
-  },
-);
+  );
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("button", { name: "Go to the Previous Month" })).toBeDisabled();
+});
 
-test(
-  "component handles endDate restrictions",
-  async ({ page, initTestBed }) => {
-    await initTestBed(
-      `<DatePicker
+test("component handles endDate restrictions", async ({ page, initTestBed }) => {
+  await initTestBed(
+    `<DatePicker
         testId="datePicker"
         mode="range"
         endDate="06/01/2024"
         initialValue="{{ from: '05/26/2024', to: '05/27/2024' }}"
         dateFormat="MM/dd/yyyy"
       />`,
-    );
-    await page.getByTestId("datePicker").click();
-    await expect(page.getByRole('button', { name: 'Go to the Next Month' })).toBeDisabled();
-  },
-);
+  );
+  await page.getByTestId("datePicker").click();
+  await expect(page.getByRole("button", { name: "Go to the Next Month" })).toBeDisabled();
+});
 
 test("component handles disabledDates correctly", async ({ page, initTestBed }) => {
   const testDay = 15;
@@ -417,11 +411,16 @@ test("component handles disabledDates correctly", async ({ page, initTestBed }) 
   );
   const testMonthName = format(today, "LLLL");
 
-  await initTestBed(`<DatePicker testId="datePicker" disabledDates="{['${testDayFormatted}']}" />`, {});
+  await initTestBed(
+    `<DatePicker testId="datePicker" disabledDates="{['${testDayFormatted}']}" />`,
+    {},
+  );
   await expect(page.getByTestId("datePicker")).toBeVisible();
   await page.getByTestId("datePicker").click();
 
-  const testDayCell = page.getByRole("grid", { name: testMonthName }).getByLabel(testDay.toString());
+  const testDayCell = page
+    .getByRole("grid", { name: testMonthName })
+    .getByLabel(testDay.toString());
   await expect(testDayCell).toBeDisabled();
 });
 
@@ -537,101 +536,125 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 // =============================================================================
 
 test.describe("Behaviors and Parts", () => {
-  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markRequired" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markRequired" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="true" requireLabelMode="markBoth" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markBoth" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).not.toContainText("*");
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markRequired">
         <DatePicker testId="test" label="Birth Date" required="false" requireLabelMode="markOptional" bindTo="birthDate" />
       </Form>
     `);
-    
+
     const label = page.getByText("Birth Date");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <DatePicker testId="test1" label="Required Field" required="true" bindTo="field1" />
         <DatePicker testId="test2" label="Optional Field" required="false" bindTo="field2" />
       </Form>
     `);
-    
+
     const requiredLabel = page.getByText("Required Field");
     const optionalLabel = page.getByText("Optional Field");
-    
+
     await expect(requiredLabel).toContainText("*");
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
@@ -644,43 +667,49 @@ test.describe("Behaviors and Parts", () => {
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <DatePicker testId="input" bindTo="input" required="{true}" />
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation by submitting empty required field
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text
     await expect(page.getByText("This field is required")).toBeVisible();
-    
+
     // Check absence of concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <DatePicker testId="input" bindTo="input" required="{true}" />
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text (should be hidden)
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Check for concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    
+
     // Check that it shows error icon
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
@@ -692,12 +721,12 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     // Helper text hidden
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Concise feedback visible
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
@@ -710,10 +739,10 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // First make it invalid
     await page.getByTestId("submit").click();
-    
+
     // Now make it valid
     await page.getByTestId("input").click();
     // Select any enabled date (usually first available in current view)
@@ -731,20 +760,23 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
-    
+
     // Check tooltip content
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <DatePicker
@@ -754,9 +786,281 @@ test.describe("Validation Feedback", () => {
         />
       </Form>
     `);
-    
+
     // Should only have one label with the text "Select date"
     const labels = page.getByText("Select date");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// RANGE MODE SPECIFIC TESTS
+// =============================================================================
+
+test.describe("Range Mode Features", () => {
+  test("range mode shows two months side by side", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DatePicker testId="datePicker" mode="range" dateFormat="MM/dd/yyyy" />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // Should have two month grids visible
+    const grids = page.getByRole("grid");
+    await expect(grids).toHaveCount(2);
+  });
+
+  test("range mode does not show outside days from adjacent months", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+        initialValue="{{ from: '03/15/2024', to: '04/15/2024' }}"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // In range mode with pagedNavigation, outside days should not be shown
+    // This prevents overlap between the two displayed months
+    const marchGrid = page.getByRole("grid", { name: "March" });
+    const aprilGrid = page.getByRole("grid", { name: "April" });
+
+    await expect(marchGrid).toBeVisible();
+    await expect(aprilGrid).toBeVisible();
+  });
+
+  test("selected range dates have background styling", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+        initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}"
+      />
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-item-DatePicker--hover": "rgb(240, 240, 240)",
+        },
+      },
+    );
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // Check that range dates have background color
+    const startDate = page
+      .getByRole("grid", { name: "May" })
+      .locator("[data-day]")
+      .filter({ hasText: /^10$/ });
+    const middleDate = page
+      .getByRole("grid", { name: "May" })
+      .locator("[data-day]")
+      .filter({ hasText: /^12$/ });
+    const endDate = page
+      .getByRole("grid", { name: "May" })
+      .locator("[data-day]")
+      .filter({ hasText: /^15$/ });
+
+    // All dates in range should have the hover background color
+    await expect(startDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(middleDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(endDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+  });
+
+  test("single selected date in range mode has background styling", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(
+      `
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+      />
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-item-DatePicker--hover": "rgb(240, 240, 240)",
+        },
+      },
+    );
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // Select first date
+    await page
+      .getByRole("grid")
+      .first()
+      .locator("[data-day]")
+      .filter({ hasText: /^10$/ })
+      .first()
+      .click();
+
+    // The single selected date should have background
+    const selectedDate = page
+      .getByRole("grid")
+      .first()
+      .locator("[data-day]")
+      .filter({ hasText: /^10$/ })
+      .first();
+    await expect(selectedDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+  });
+
+  test("hover preview shows background on intermediate dates", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+      />
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-item-DatePicker--hover": "rgb(240, 240, 240)",
+        },
+      },
+    );
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    const grid = page.getByRole("grid").first();
+
+    // Select first date (day 10)
+    await grid.locator("[data-day]").filter({ hasText: /^10$/ }).first().click();
+
+    // Hover over a later date (day 15)
+    const hoverTarget = grid.locator("[data-day]").filter({ hasText: /^15$/ }).first();
+    await hoverTarget.hover();
+
+    // Intermediate dates (11, 12, 13, 14) should have background during hover
+    const intermediateDate = grid.locator("[data-day]").filter({ hasText: /^12$/ }).first();
+    await expect(intermediateDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+  });
+
+  test("background transitions smoothly on hover", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    const grid = page.getByRole("grid").first();
+    const firstDay = grid.locator("[data-day]").first();
+
+    // Check that transition property is set for smooth animation
+    await expect(firstDay).toHaveCSS("transition", /background-color/);
+  });
+
+  test("range start and end dates maintain their styling during hover", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+        initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    const grid = page.getByRole("grid", { name: "May" });
+
+    // Hover over a date outside the range
+    const hoverTarget = grid.locator("[data-day]").filter({ hasText: /^20$/ }).first();
+    await hoverTarget.hover();
+
+    // Start and end dates should still have their button styling (circular background)
+    const startDateButton = grid
+      .locator("[data-day]")
+      .filter({ hasText: /^10$/ })
+      .first()
+      .locator("button");
+    const endDateButton = grid
+      .locator("[data-day]")
+      .filter({ hasText: /^15$/ })
+      .first()
+      .locator("button");
+
+    // These should have border radius (circular style)
+    await expect(startDateButton).toHaveCSS("border-radius", "100%");
+    await expect(endDateButton).toHaveCSS("border-radius", "100%");
+  });
+
+  test("range selection completes after selecting two dates", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    const grid = page.getByRole("grid").first();
+
+    // Select first date
+    await grid.locator("[data-day]").filter({ hasText: /^10$/ }).first().click();
+
+    // Menu should still be open
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // Select second date
+    await grid.locator("[data-day]").filter({ hasText: /^15$/ }).first().click();
+
+    // Menu should still be open (range mode doesn't auto-close)
+    await expect(page.getByRole("menu")).toBeVisible();
+
+    // Check that the range is displayed in the input
+    const datePickerText = await page.getByTestId("datePicker").textContent();
+    expect(datePickerText).toContain(" - ");
+  });
+
+  test("didChange event fires with range object", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DatePicker 
+        testId="datePicker" 
+        mode="range" 
+        dateFormat="MM/dd/yyyy"
+        onDidChange="(value) => testState = value"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    const grid = page.getByRole("grid").first();
+
+    // Select first date
+    await grid.locator("[data-day]").filter({ hasText: /^10$/ }).first().click();
+
+    // Select second date
+    await grid.locator("[data-day]").filter({ hasText: /^15$/ }).first().click();
+
+    // Check that didChange was called with a range object
+    const state = await testStateDriver.testState();
+    expect(state).toHaveProperty("from");
+    expect(state).toHaveProperty("to");
   });
 });

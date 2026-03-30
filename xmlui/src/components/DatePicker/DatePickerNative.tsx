@@ -208,15 +208,20 @@ export const DatePicker = forwardRef(function DatePicker(
   const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
+  const [hoveredDate, setHoveredDate] = useState<Date | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   const selected: any = useMemo(() => {
@@ -453,9 +458,42 @@ export const DatePicker = forwardRef(function DatePicker(
       if (mode === "single") {
         setOpen(false);
       }
+      setHoveredDate(undefined);
     },
     [onDidChange, updateState, mode, dateFormat, readOnly],
   );
+
+  const handleDayMouseEnter = useCallback(
+    (date: Date) => {
+      if (mode === "range") {
+        setHoveredDate(date);
+      }
+    },
+    [mode],
+  );
+
+  const handleDayMouseLeave = useCallback(() => {
+    setHoveredDate(undefined);
+  }, []);
+
+  const modifiers = useMemo(() => {
+    const mods: any = {};
+
+    if (mode === "range" && hoveredDate && selected?.from) {
+      // Show preview when hovering, even if a range is already selected
+      // This allows users to see what the new range would be
+      const start = selected.from < hoveredDate ? selected.from : hoveredDate;
+      const end = selected.from < hoveredDate ? hoveredDate : selected.from;
+      mods.hovered = { from: start, to: end };
+    }
+
+    // Add background to single selected date in range mode
+    if (mode === "range" && selected?.from && !selected?.to) {
+      mods.singleSelected = selected.from;
+    }
+
+    return mods;
+  }, [mode, hoveredDate, selected]);
 
   return inline ? (
     <div
@@ -477,13 +515,18 @@ export const DatePicker = forwardRef(function DatePicker(
         disabled={disabled}
         weekStartsOn={_weekStartsOn}
         showWeekNumber={showWeekNumber}
-        showOutsideDays
+        showOutsideDays={mode !== "range"}
         classNames={styles}
         mode={mode === "single" ? "single" : "range"}
         selected={selected}
         onSelect={handleSelect}
         autoFocus={autoFocus}
         numberOfMonths={mode === "range" ? 2 : 1}
+        pagedNavigation={mode === "range"}
+        modifiers={modifiers}
+        modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+        onDayMouseEnter={handleDayMouseEnter}
+        onDayMouseLeave={handleDayMouseLeave}
         components={{
           Chevron,
         }}
@@ -570,11 +613,16 @@ export const DatePicker = forwardRef(function DatePicker(
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
-            showOutsideDays
+            showOutsideDays={mode !== "range"}
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
             numberOfMonths={mode === "range" ? 2 : 1}
+            pagedNavigation={mode === "range"}
+            modifiers={modifiers}
+            modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+            onDayMouseEnter={handleDayMouseEnter}
+            onDayMouseLeave={handleDayMouseLeave}
             components={{
               Chevron,
             }}
