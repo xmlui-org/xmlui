@@ -524,7 +524,7 @@ export const DatePicker = forwardRef(function DatePicker(
         numberOfMonths={mode === "range" ? 2 : 1}
         pagedNavigation={mode === "range"}
         modifiers={modifiers}
-        modifiersClassNames={{ hovered: styles.hovered }}
+        modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
         onDayMouseEnter={handleDayMouseEnter}
         onDayMouseLeave={handleDayMouseLeave}
         components={{

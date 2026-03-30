@@ -616,6 +616,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     border-color: transparent;
   }
 
+  /* Single selected date in range mode - when only from date is selected */
+  .singleSelected {
+    background-color: $backgroundColor-item-DatePicker--hover !important;
+  }
+
   .focusable {
     cursor: pointer;
   }
