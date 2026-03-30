@@ -57,7 +57,8 @@ export function AppRoot({
   projectCompilation,
   isNested = false,
   onInit,
-  icons
+  icons,
+  helmetContext,
 }: AppWrapperProps & {
   extensionManager?: StandaloneExtensionManager;
   isNested?: boolean;
@@ -127,6 +128,7 @@ export function AppRoot({
             sources={sources}
             onInit={onInit}
             icons={icons}
+            helmetContext={helmetContext}
           >
             {children}
           </AppWrapper>

@@ -171,6 +171,9 @@ export type AppWrapperProps = {
   onInit?: () => void;
 
   icons?: Record<string, string>;
+
+  // --- Optional react-helmet-async SSR context used by SSG to collect head output.
+  helmetContext?: Record<string, unknown>;
 };
 
 /**
@@ -197,6 +200,7 @@ export const AppWrapper = ({
   projectCompilation,
   onInit,
   icons,
+  helmetContext,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -225,7 +229,7 @@ export const AppWrapper = ({
   // --- wrapped in other components that provide the necessary environment
   // --- for the app to run.
   const dynamicChildren = (
-    <HelmetProvider>
+    <HelmetProvider context={helmetContext}>
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
       <LoggerProvider>
         <LoggerInitializer />
