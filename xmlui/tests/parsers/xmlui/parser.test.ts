@@ -562,22 +562,70 @@ describe("Xmlui parser - expected parser errors", () => {
 });
 
 describe("Xmlui parser - child nodes", () => {
-  it("string child works #1", () => {
-    const { node, getText } = parseSource(`<Stack>" hello "</Stack>`);
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameId = nameNode.children[0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
+  describe("remove StringLiterals from ContentListNode-s", () => {
+    it("TextNode parsed for quoted content", () => {
+      const { node, getText } = parseSource(`<Stack>" hello "</Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
 
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameId)).equal("Stack");
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
 
-    expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
-    expect(child0.kind).toEqual(SyntaxKind.StringLiteral);
-    expect(getText(child0)).equal('" hello "');
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+      expect(child0.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child0)).equal('" hello "');
+    });
+
+    it("TextNode and CDATA parsed in content", () => {
+      const { node, getText } = parseSource(`<Stack><![CDATA[hello]]> "there"</Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
+      const child1 = childElements.children[1];
+
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
+
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+
+      expect(child0.kind).toEqual(SyntaxKind.CData);
+      expect(getText(child0)).equal("<![CDATA[hello]]>");
+
+      expect(child1.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child1)).equal(' "there"');
+    });
+
+    it("CDATA and TextNode parsed in content", () => {
+      const { node, getText } = parseSource(`<Stack> "there" <![CDATA[hello]]></Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
+      const child1 = childElements.children[1];
+
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
+
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+
+      expect(child0.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child0)).equal(' "there" ');
+
+      expect(child1.kind).toEqual(SyntaxKind.CData);
+      expect(getText(child1)).equal("<![CDATA[hello]]>");
+    });
   });
 
   it("string child works #1", () => {

@@ -847,9 +847,7 @@ export function nodeToComponentDef(
 
       let textValue = getText(child);
 
-      if (child.kind === SyntaxKind.StringLiteral) {
-        textValue = textValue.slice(1, -1);
-      } else if (child.kind === SyntaxKind.CData) {
+      if (child.kind === SyntaxKind.CData) {
         shouldUseCData = true;
       }
 
@@ -897,10 +895,7 @@ export function nodeToComponentDef(
 
   function collapseWhitespace(childNodes: TransformNode[]) {
     for (let i = 0; i < childNodes.length; ++i) {
-      if (
-        childNodes[i].kind === SyntaxKind.StringLiteral ||
-        childNodes[i].kind === SyntaxKind.TextNode
-      ) {
+      if (childNodes[i].kind === SyntaxKind.TextNode) {
         //the union is the same as \s , but took \u00a0 (non breaking space) out
         //source https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Cheatsheet
         const allSubsequentWsExceptNonBreakingSpace =
@@ -923,7 +918,7 @@ export function nodeToComponentDef(
 
   function parseEscapeCharactersInContent(childNodes: TransformNode[]) {
     for (let node of childNodes) {
-      if (node.kind === SyntaxKind.StringLiteral || node.kind === SyntaxKind.TextNode) {
+      if (node.kind === SyntaxKind.TextNode) {
         const escapedText = tryEscapeEntities(getText(node));
         if (escapedText !== null) {
           node.text = escapedText;
@@ -1040,23 +1035,7 @@ export function nodeToComponentDef(
       const node = childNodes[i - 1];
       const nextNode = childNodes[i];
 
-      if (node.kind === SyntaxKind.StringLiteral && nextNode.kind === SyntaxKind.CData) {
-        childNodes[i - 1] = {
-          pos: node.pos,
-          end: nextNode.end,
-          kind: SyntaxKind.CData,
-          text: getText(node).slice(1, -1) + getText(nextNode),
-        } as TransformNode;
-        childNodes.pop();
-      } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.StringLiteral) {
-        childNodes[i - 1] = {
-          pos: node.pos,
-          end: nextNode.end,
-          kind: SyntaxKind.CData,
-          text: getText(node) + getText(nextNode).slice(1, -1),
-        } as TransformNode;
-        childNodes.pop();
-      } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.TextNode) {
+      if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.TextNode) {
         childNodes[i - 1] = {
           pos: node.pos,
           end: nextNode.end,
@@ -1124,25 +1103,23 @@ export function nodeToComponentDef(
           let diagEnd: number;
           const transformNode = nodeContainingValue as TransformNode;
           if (transformNode.originalKind !== undefined) {
-            if (transformNode.originalKind === SyntaxKind.StringLiteral) {
-              const afterContentPos = transformNode.pos + 1;
-              diagPos = afterContentPos + errMsg.position;
-              diagEnd = afterContentPos + errMsg.end;
-            } else if (transformNode.originalKind === SyntaxKind.CData) {
+            if (transformNode.originalKind === SyntaxKind.CData) {
               const afterCDataPos = transformNode.pos + CDATA_PREFIX_LEN;
               diagPos = afterCDataPos + errMsg.position;
               diagEnd = afterCDataPos + errMsg.end;
             } else {
-              diagPos = transformNode.pos + errMsg.position;
-              diagEnd = transformNode.pos + errMsg.end;
+              const afterContentPos = transformNode.pos;
+              diagPos = afterContentPos + errMsg.position;
+              diagEnd = afterContentPos + errMsg.end;
             }
           } else if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
             const afterQuotePos = nodeContainingValue.pos + 1;
             diagPos = afterQuotePos + errMsg.position;
             diagEnd = afterQuotePos + errMsg.end;
           } else if (nodeContainingValue.kind === SyntaxKind.TextNode) {
-            diagPos = nodeContainingValue.pos + errMsg.position;
-            diagEnd = nodeContainingValue.pos + errMsg.end;
+            const afterContentPos = nodeContainingValue.pos;
+            diagPos = afterContentPos + errMsg.position;
+            diagEnd = afterContentPos + errMsg.end;
           }
           reportError(diag, diagPos, diagEnd);
         } else {
