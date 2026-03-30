@@ -12,12 +12,13 @@
 import { useCallback } from "react";
 import type { ArrowExpression } from "../script-runner/ScriptingSourceTree";
 import type { LookupActionOptions } from "../../abstractions/ActionDefs";
+import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 
 /**
  * Lookup function type for async actions
  */
 export type LookupAsyncFnInner = (
-  action: string | undefined | ArrowExpression,
+  action: string | ParsedEventValue | undefined | ArrowExpression,
   uid: symbol,
   options?: LookupActionOptions,
 ) => ((...args: any[]) => Promise<any>) | undefined;
@@ -38,7 +39,7 @@ export interface ActionLookupConfig {
   componentState: Record<string | symbol, any>;
   // Event handler function getter
   getOrCreateEventHandlerFn: (
-    src: string | any,
+    src: string | ParsedEventValue | ArrowExpression,
     uid: symbol,
     options?: LookupActionOptions,
   ) => (...args: any[]) => Promise<any>;
@@ -98,7 +99,7 @@ export function createActionLookup(config: ActionLookupConfig) {
 
   const lookupAction: LookupAsyncFnInner = useCallback(
     (
-      action: string | undefined | ArrowExpression,
+      action: string | ParsedEventValue | undefined | ArrowExpression,
       uid: symbol,
       options?: LookupActionOptions,
     ) => {
