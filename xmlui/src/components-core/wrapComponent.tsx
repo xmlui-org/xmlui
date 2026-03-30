@@ -3,7 +3,7 @@ import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import type { ComponentRendererDef, LayoutContext } from "../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../abstractions/layout-context-utils";
 import { createComponentRenderer } from "./renderers";
-import { pushXsLog, createLogEntry, pushTrace, popTrace } from "./inspector/inspectorUtils";
+import { pushXsLog, createLogEntry, pushTrace, popTrace, getCurrentTrace } from "./inspector/inspectorUtils";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { MediaBreakpointKeys } from "../abstractions/AppContextDefs";
 import { MemoizedItem } from "../components/container-helpers";
@@ -624,8 +624,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       const traceKind = xsVerbose ? eventNameToTraceKind(xmluiName) : undefined;
       if (!handler && !traceKind) continue;
       props[reactPropName] = (...args: any[]) => {
-        // Push a trace so the behavioral event and handler events share the same traceId
-        const traceId = traceKind ? pushTrace() : undefined;
+        // If an interaction trace is active (i- prefix), inherit its traceId
+        // so value:change events are grouped with the causing interaction.
+        // Don't push/pop the stack in that case — the interaction owns the trace.
+        const activeTrace = traceKind ? getCurrentTrace() : undefined;
+        const inheritInteraction = activeTrace?.startsWith("i-");
+        const traceId = traceKind && !inheritInteraction ? pushTrace() : undefined;
         try {
           let result: any;
           if (handler) {
@@ -641,7 +645,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
             pushXsLog(
               createLogEntry(traceKind, {
                 component: type,
-                componentLabel: node.uid || node.testId || undefined,
+                componentLabel: ariaLabel || node.uid || undefined,
                 displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                 eventName: xmluiName,
                 ariaName: ariaLabel,
@@ -654,7 +658,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           }
           return result;
         } finally {
-          endTrace(traceId, traceKind);
+          if (traceId) endTrace(traceId, traceKind);
         }
       };
     }
@@ -713,7 +717,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           createLogEntry(traceKind, {
             traceId,
             componentType: type,
-            componentLabel: xmluiId || type,
+            componentLabel: ariaLabel || xmluiId || type,
             displayLabel: event?.displayLabel || undefined,
             eventName: eventType,
             ariaName: ariaLabel,
@@ -812,29 +816,6 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
     }
 
-    // --- Emit data:bind trace when a data prop resolves to an array with changed length ---
-    if (xsVerbose && Array.isArray(props.data)) {
-      const bindKey = node.uid || node.testId || type;
-      const w = typeof window !== "undefined" ? (window as any) : {};
-      if (!w.__xsDataBindCounts) w.__xsDataBindCounts = {};
-      const prevCount = w.__xsDataBindCounts[bindKey];
-      const currCount = props.data.length;
-      if (prevCount !== currCount && (prevCount !== undefined || currCount > 0)) {
-        w.__xsDataBindCounts[bindKey] = currCount;
-        pushXsLog(
-          createLogEntry("data:bind", {
-            component: type,
-            componentLabel: node.uid || node.testId || undefined,
-            displayLabel: `${bindKey}: ${prevCount ?? 0} → ${currCount} items`,
-            prevCount: prevCount ?? 0,
-            rowCount: currCount,
-            ownerFileId,
-            ownerSource,
-          }),
-        );
-      }
-    }
-
     // --- Resolve aria-label cascade ---
     // 1. App author's explicit aria-label (always wins)
     // 2. Wrapper author's deriveAriaLabel (pulls from existing props)
@@ -849,6 +830,31 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       undefined;
     if (ariaLabel) {
       props["aria-label"] = ariaLabel;
+    }
+
+    // --- Emit data:bind trace when a data prop resolves to an array with changed length ---
+    // Placed after aria-label cascade so ariaLabel is available for the trace event.
+    if (xsVerbose && Array.isArray(props.data)) {
+      const bindKey = node.uid || node.testId || type;
+      const w = typeof window !== "undefined" ? (window as any) : {};
+      if (!w.__xsDataBindCounts) w.__xsDataBindCounts = {};
+      const prevCount = w.__xsDataBindCounts[bindKey];
+      const currCount = props.data.length;
+      if (prevCount !== currCount && (prevCount !== undefined || currCount > 0)) {
+        w.__xsDataBindCounts[bindKey] = currCount;
+        pushXsLog(
+          createLogEntry("data:bind", {
+            component: type,
+            componentLabel: ariaLabel || node.uid || undefined,
+            ariaName: ariaLabel,
+            displayLabel: `${bindKey}: ${prevCount ?? 0} → ${currCount} items`,
+            prevCount: prevCount ?? 0,
+            rowCount: currCount,
+            ownerFileId,
+            ownerSource,
+          }),
+        );
+      }
     }
 
     // --- Render children ---
@@ -1210,7 +1216,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         // When xsVerbose is off and no XMLUI handler, skip — native noop is fine.
         if (traceKind || handler) {
           props.onDidChange = (...args: any[]) => {
-            const traceId = traceKind ? pushTrace() : undefined;
+            const activeTrace2 = traceKind ? getCurrentTrace() : undefined;
+            const inheritInteraction2 = activeTrace2?.startsWith("i-");
+            const traceId = traceKind && !inheritInteraction2 ? pushTrace() : undefined;
             try {
               let result: any;
               if (handler) {
@@ -1220,7 +1228,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
                 pushXsLog(
                   createLogEntry(traceKind, {
                     component: type,
-                    componentLabel: node.uid || node.testId || undefined,
+                    componentLabel: ariaLabel || node.uid || undefined,
                     displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                     eventName: xmluiName,
                     ariaName: ariaLabel,
@@ -1232,7 +1240,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               }
               return result;
             } finally {
-              endTrace(traceId, traceKind);
+              if (traceId) endTrace(traceId, traceKind);
             }
           };
         }
@@ -1259,7 +1267,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
               pushXsLog(
                 createLogEntry(traceKind, {
                   component: type,
-                  componentLabel: node.uid || node.testId || undefined,
+                  componentLabel: ariaLabel || node.uid || undefined,
                   displayLabel: traceDisplayLabel(traceKind, xmluiName, args),
                   eventName: xmluiName,
                   ariaName: ariaLabel,
@@ -1327,7 +1335,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           createLogEntry(traceKind, {
             traceId,
             componentType: type,
-            componentLabel: xmluiId || type,
+            componentLabel: ariaLabel || xmluiId || type,
             displayLabel: event?.displayLabel || undefined,
             eventName: eventType,
             ariaName: ariaLabel,
