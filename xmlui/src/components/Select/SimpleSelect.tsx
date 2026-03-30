@@ -230,7 +230,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
-            style={{ maxHeight: height, minWidth: panelWidth }}
+            style={{ height: "auto", maxHeight: height, minWidth: panelWidth }}
           >
             <ScrollUpButton className={styles.selectScrollUpButton}>
               <ThemedIcon name="chevronup" />
@@ -252,7 +252,9 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                               )
                             ) : (
                               <Label className={styles.groupHeader}>
-                                {groupHeaderRenderer ? groupHeaderRenderer({ $group: groupName }) : groupName}
+                                {groupHeaderRenderer
+                                  ? groupHeaderRenderer({ $group: groupName })
+                                  : groupName}
                               </Label>
                             )}
                             {groupOptions.map((option) => (
