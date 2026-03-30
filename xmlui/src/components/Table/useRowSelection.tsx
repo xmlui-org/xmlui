@@ -565,6 +565,7 @@ export default function useRowSelection({
         traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
         kind: "selection:change",
         component: "Table",
+        ariaName: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
         displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
         selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
         selectedCount: selectedItems.length,

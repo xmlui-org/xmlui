@@ -17,6 +17,8 @@ $backgroundColor-row-Table: createThemeVar("backgroundColor-row-#{$component}");
 $backgroundColor-row-Table--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
 $backgroundColor-selected-Table: createThemeVar("backgroundColor-selected-#{$component}");
 $backgroundColor-selected-Table--hover: createThemeVar("backgroundColor-selected-#{$component}--hover");
+$backgroundColor-evenRow-Table: createThemeVar("backgroundColor-evenRow-#{$component}");
+$backgroundColor-oddRow-Table: createThemeVar("backgroundColor-oddRow-#{$component}");
 $backgroundColor-heading-Table: createThemeVar("backgroundColor-heading-#{$component}");
 $backgroundColor-heading-Table--hover: createThemeVar("backgroundColor-heading-#{$component}--hover");
 $backgroundColor-heading-Table--active: createThemeVar("backgroundColor-heading-#{$component}--active");
@@ -235,6 +237,14 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       font-size: $fontSize-row-Table;
       font-weight: $fontWeight-row-Table;
       background-color: $backgroundColor-row-Table;
+
+      &.evenRow {
+        background-color: $backgroundColor-evenRow-Table;
+      }
+
+      &.oddRow {
+        background-color: $backgroundColor-oddRow-Table;
+      }
 
       &.selected {
         background-color: $backgroundColor-selected-Table;

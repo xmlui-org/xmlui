@@ -41,6 +41,10 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `anchorTemplate` [#anchortemplate]
+
+An optional template to customize the anchor link rendered next to the heading when `showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.
+
 ### `ellipses` [#ellipses]
 
 > [!DEF]  default: **true**

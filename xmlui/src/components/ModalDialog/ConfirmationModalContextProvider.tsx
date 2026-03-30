@@ -79,6 +79,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
           traceId: w._xsCurrentTrace,
           kind: "modal:show",
           modalType: "confirmation",
+          ariaName: title,
           title,
           buttons: [
             { label: actionLabel, value: true },
@@ -112,6 +113,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         traceId: w._xsCurrentTrace,
         kind: "modal:confirm",
         modalType: "confirmation",
+        ariaName: title,
         value,
         buttonLabel,
       });
@@ -136,6 +138,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         traceId: w._xsCurrentTrace,
         kind: "modal:cancel",
         modalType: "confirmation",
+        ariaName: title,
       });
     }
     if (resolver.current) {

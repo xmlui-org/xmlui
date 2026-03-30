@@ -846,7 +846,7 @@ An array of IDs that should be initially selected when the table is rendered. Th
 
 > [!DEF]  default: **false**
 
-This property adds pagination controls to the `Table`.
+This property adds pagination controls to the `Table`. When enabled, the pagination bar is automatically hidden if all rows fit on a single page. You can omit this property and set only `pageSize` instead — pagination will then activate automatically when the data length exceeds the page size and hide itself when it does not.
 
 ```xmlui copy /isPaginated="true"/
 <App>
@@ -986,7 +986,7 @@ Determines where to place the page information in the layout. It works the same 
 
 ### `pageSize` [#pagesize]
 
-This property defines the number of rows to display per page when pagination is enabled.
+This property defines the number of rows to display per page. When set without also setting `isPaginated`, pagination is activated automatically whenever the number of data rows exceeds this value and suppressed otherwise. This makes `pageSize` the minimal way to get auto-activating, auto-hiding pagination: no conditional expressions on `isPaginated` or the position props are needed.
 
 Options
 
@@ -1473,6 +1473,81 @@ This property determines the sort order to be `ascending` or `descending`. This 
   },
 ]}' 
     sortBy="quantity" sortDirection="descending">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+### `striped` [#striped]
+
+> [!DEF]  default: **false**
+
+When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.
+
+```xmlui copy /striped="true"/
+<App>
+  <Table data='{[...]}' striped="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: striped"
+<App>
+  <Table data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' striped="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -2061,9 +2136,11 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-evenRow-Table | $backgroundColor-row-Table | $backgroundColor-row-Table |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-300 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-oddRow-Table | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-pagination-Table | $backgroundColor-Table | $backgroundColor-Table |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-50 |

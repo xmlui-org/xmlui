@@ -15,8 +15,9 @@ import {
   observePlaygroundPattern,
   observeTreeDisplay,
 } from "./utils";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dComponent } from "../metadata-helpers";
 import type { BreakMode, OverflowMode } from "../abstractions";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Markdown";
 
@@ -63,6 +64,11 @@ export const MarkdownMd = createMetadata({
         "next to headings.",
       valueType: "boolean",
     },
+    anchorTemplate: dComponent(
+      "An optional template to customize the anchor link rendered next to each heading. " +
+      "Requires `showHeadingAnchors` to be `true`. " +
+      "The template receives `$anchorId` and `$anchorHref` as context variables.",
+    ),
     grayscale: {
       description:
         "This boolean property specifies whether images should be displayed in " +
@@ -242,7 +248,7 @@ export const markdownComponentRenderer = wrapComponent(
     exclude: [
       "content", "removeIndents", "removeBr", "codeHighlighter",
       "showHeadingAnchors", "grayscale", "truncateLinks", "openLinkInNewTab",
-      "overflowMode", "breakMode",
+      "overflowMode", "breakMode", "anchorTemplate",
     ],
     customRender(_props, { node, extractValue, renderChild, classes }) {
       let renderedChildren = "";
@@ -280,6 +286,16 @@ export const markdownComponentRenderer = wrapComponent(
           openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
           overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
           breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+          anchorRenderer={node.props.anchorTemplate
+            ? (anchorId: string, anchorHref: string) => (
+                <MemoizedItem
+                  node={(node.props as any).anchorTemplate}
+                  contextVars={{ $anchorId: anchorId, $anchorHref: anchorHref }}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+          }
         >
           {renderedChildren}
         </TransformedMarkdown>
@@ -302,6 +318,7 @@ type TransformedMarkdownProps = {
   openLinkInNewTab?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -320,6 +337,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       openLinkInNewTab,
       overflowMode,
       breakMode,
+      anchorRenderer,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -369,6 +387,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         openLinkInNewTab={openLinkInNewTab}
         overflowMode={overflowMode}
         breakMode={breakMode}
+        anchorRenderer={anchorRenderer}
       >
         {markdownContent}
       </Markdown>

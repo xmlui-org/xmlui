@@ -36,6 +36,7 @@ export type HeadingProps = {
   className?: string;
   classes?: Record<string, string>;
   showAnchor?: boolean;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   [furtherProps: string]: any;
 };
@@ -67,6 +68,7 @@ export const Heading = forwardRef(function Heading(
     classes,
     omitFromToc = defaultProps.omitFromToc,
     showAnchor,
+    anchorRenderer,
     registerComponentApi,
     ...furtherProps
   }: HeadingProps,
@@ -162,21 +164,25 @@ export const Heading = forwardRef(function Heading(
       )}
       {children}
       {showAnchor && anchorId && (
-        <a
-          href={`#${anchorId}`}
-          aria-hidden="true"
-          onClick={(event) => {
-            // cmd/ctrl + click - open in new tab, don't prevent that
-            if (tableOfContentsContext) {
-              if (!event.ctrlKey && !event.metaKey) {
-                event.preventDefault();
-              }
-              tableOfContentsContext.scrollToAnchor(anchorId, true);
-            }
-          }}
-        >
-          #
-        </a>
+        anchorRenderer
+          ? <span className={styles.customAnchor}>{anchorRenderer(anchorId, `#${anchorId}`)}</span>
+          : (
+            <a
+              href={`#${anchorId}`}
+              aria-hidden="true"
+              onClick={(event) => {
+                // cmd/ctrl + click - open in new tab, don't prevent that
+                if (tableOfContentsContext) {
+                  if (!event.ctrlKey && !event.metaKey) {
+                    event.preventDefault();
+                  }
+                  tableOfContentsContext.scrollToAnchor(anchorId, true);
+                }
+              }}
+            >
+              #
+            </a>
+          )
       )}
     </Element>
   );

@@ -231,6 +231,7 @@ type TableProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   alwaysShowHeader?: boolean;
+  striped?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -587,6 +588,7 @@ export const Table = forwardRef(
       onPasteAction,
       onDeleteAction,
       alwaysShowHeader = defaultProps.alwaysShowHeader,
+      striped = defaultProps.striped,
       ...rest
       // cols
     }: TableProps,
@@ -608,6 +610,13 @@ export const Table = forwardRef(
     const tableRef = useRef<HTMLTableElement>(null);
 
     const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
+
+    const effectivePageSizeOptions = useMemo(() => {
+      if (pageSizeOptions.includes(effectivePageSize)) {
+        return pageSizeOptions;
+      }
+      return [...pageSizeOptions, effectivePageSize].sort((a, b) => a - b);
+    }, [pageSizeOptions, effectivePageSize]);
 
     const effectiveIsPaginated = useMemo(() => {
       if (isPaginated !== undefined) {
@@ -807,11 +816,21 @@ export const Table = forwardRef(
               if (allowStarSize && starSizedWidthMatch) {
                 starSizedWidth = starSizedWidthMatch[1] + "*";
               } else {
-                const pixelWidthMatch = resolvedWidth.match(/^\s*(\d+)\s*(px)?\s*$/);
+                const pixelWidthMatch = resolvedWidth.match(/^\s*(\d+(?:\.\d+)?)\s*(px)?\s*$/);
                 if (pixelWidthMatch) {
-                  width = Number(pixelWidthMatch[1]);
+                  width = parseFloat(pixelWidthMatch[1]);
                 } else {
-                  throw new Error(`Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`);
+                  const remEmMatch = resolvedWidth.match(/^\s*(\d+(?:\.\d+)?)\s*(rem|em)\s*$/);
+                  if (remEmMatch) {
+                    const rootFontSize = parseFloat(
+                      getComputedStyle(document.documentElement).fontSize,
+                    );
+                    width = parseFloat(remEmMatch[1]) * (isNaN(rootFontSize) ? 16 : rootFontSize);
+                  } else {
+                    throw new Error(
+                      `Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`,
+                    );
+                  }
                 }
               }
             }
@@ -1224,6 +1243,7 @@ export const Table = forwardRef(
       setHoveredRowId,
       lookupEventHandler,
       rowDoubleClick,
+      striped,
     };
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
@@ -1253,6 +1273,8 @@ export const Table = forwardRef(
                 [styles.focused]: s.focusedIndex === rowIndex,
                 [styles.disabled]: s.rowDisabledPredicate(row.original),
                 [styles.noBottomBorder]: s.noBottomBorder,
+                [styles.evenRow]: s.striped && rowIndex % 2 === 0,
+                [styles.oddRow]: s.striped && rowIndex % 2 !== 0,
               })}
               onClick={(event) => {
                 // On Windows, the second click of a double-click fires onClick before onDoubleClick.
@@ -1416,12 +1438,49 @@ export const Table = forwardRef(
           numberOfUnitsById[column.id] = units;
         }
       });
-      const numberOfAllUnits = Object.values(numberOfUnitsById).reduce((acc, val) => acc + val, 0);
-      columnsWithoutSize.forEach((column) => {
-        widths[column.id] = Math.floor(
-          availableWidth * (numberOfUnitsById[column.id] / numberOfAllUnits),
-        );
-      });
+      // Distribute available width respecting minSize/maxSize constraints of each column.
+      // When a column would exceed its maxSize (or fall below its minSize), pin it at
+      // that bound and redistribute the remaining space among the other star-sized columns.
+      let remaining = availableWidth;
+      const unitsMap = new Map<string, number>(
+        columnsWithoutSize.map((col) => [col.id, numberOfUnitsById[col.id]]),
+      );
+      const constrainedWidths = new Map<string, number>();
+
+      let changed = true;
+      while (changed && unitsMap.size > 0) {
+        changed = false;
+        const totalUnits = [...unitsMap.values()].reduce((s, v) => s + v, 0);
+        if (totalUnits === 0) break;
+        for (const [id, units] of [...unitsMap.entries()]) {
+          const col = columnsWithoutSize.find((c) => c.id === id)!;
+          const allocated = remaining * (units / totalUnits);
+          const maxSize = col.columnDef.maxSize ?? Number.MAX_SAFE_INTEGER;
+          const minSize = col.columnDef.minSize ?? 20;
+          if (allocated > maxSize) {
+            constrainedWidths.set(id, maxSize);
+            remaining -= maxSize;
+            unitsMap.delete(id);
+            changed = true;
+            break;
+          } else if (allocated < minSize) {
+            constrainedWidths.set(id, minSize);
+            remaining -= minSize;
+            unitsMap.delete(id);
+            changed = true;
+            break;
+          }
+        }
+      }
+
+      // Allocate remaining space to unconstrained columns
+      const finalTotalUnits = [...unitsMap.values()].reduce((s, v) => s + v, 0);
+      for (const [id, units] of unitsMap.entries()) {
+        widths[id] = Math.floor(remaining * (units / (finalTotalUnits || 1)));
+      }
+      for (const [id, w] of constrainedWidths.entries()) {
+        widths[id] = w;
+      }
       flushSync(() => {
         setColumnSizing((prev) => {
           return {
@@ -1449,7 +1508,7 @@ export const Table = forwardRef(
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         itemCount={safeData.length}
-        pageSizeOptions={pageSizeOptions}
+        pageSizeOptions={effectivePageSizeOptions}
         onPageDidChange={(page) => table.setPageIndex(page)}
         onPageSizeDidChange={(size) => table.setPageSize(size)}
         showCurrentPage={showCurrentPage}
@@ -1904,4 +1963,5 @@ export const defaultProps = {
     delete: "Delete",
   },
   alwaysShowHeader: false,
+  striped: false,
 };

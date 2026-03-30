@@ -3826,3 +3826,340 @@ test.describe("syncWithVar property", () => {
     await expect(firstRowCheckbox).toBeChecked();
   });
 });
+
+// =============================================================================
+// COLUMN WIDTH THEME VARIABLES TESTS
+// =============================================================================
+
+test.describe("Column width theme variables", () => {
+  const tableData = [
+    { id: 1, name: "Apples", quantity: 5 },
+    { id: 2, name: "Bananas", quantity: 6 },
+  ];
+
+  test("table renders without error when Column width uses a theme variable (em unit)", async ({
+    initTestBed,
+    page,
+  }) => {
+    // $space-12 resolves to "3em" — this was raising "Invalid TableColumnDef 'width' value: 3em"
+    await initTestBed(`
+      <Table data='{${JSON.stringify(tableData)}}' testId="table">
+        <Column bindTo="name" width="$space-12"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apples" }).first()).toBeVisible();
+  });
+
+  test("table renders without error when Column minWidth uses a theme variable", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(tableData)}}' testId="table">
+        <Column bindTo="name" minWidth="$space-8"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apples" }).first()).toBeVisible();
+  });
+
+  test("table renders without error when Column maxWidth uses a theme variable", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(tableData)}}' testId="table">
+        <Column bindTo="name" maxWidth="$space-24"/>
+        <Column bindTo="quantity"/>
+      </Table>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+    await expect(page.locator("td").filter({ hasText: "Apples" }).first()).toBeVisible();
+  });
+
+  test("column with maxWidth theme variable does not exceed that width while other columns absorb freed space", async ({
+    initTestBed,
+    page,
+  }) => {
+    // maxWidth="$space-12" resolves to ~48px. The name column should be capped at that,
+    // and the two remaining columns should absorb the freed space.
+    // Note: columns must bind to distinct fields so tanstack assigns them distinct IDs.
+    await initTestBed(`
+      <Table data='{[{name:"Apples", qty:5, unit:"pieces"}]}' testId="table" width="600px">
+        <Column bindTo="name" header="Name" maxWidth="$space-12"/>
+        <Column bindTo="qty" header="Qty"/>
+        <Column bindTo="unit" header="Unit"/>
+      </Table>
+    `);
+
+    const nameHeader = page.locator("thead th").nth(0);
+    const qtyHeader = page.locator("thead th").nth(1);
+    await expect(nameHeader).toBeVisible();
+    await expect(qtyHeader).toBeVisible();
+
+    const nameBox = await nameHeader.boundingBox();
+    const qtyBox = await qtyHeader.boundingBox();
+
+    expect(nameBox).not.toBeNull();
+    expect(qtyBox).not.toBeNull();
+
+    // Name column must be at most 48px (maxWidth = $space-12 = 3em ≈ 48px at 16px root)
+    expect(nameBox!.width).toBeLessThanOrEqual(52);
+
+    // The other two columns must be substantially wider than the name column,
+    // proving they absorbed the freed space.
+    expect(qtyBox!.width).toBeGreaterThan(nameBox!.width);
+  });
+
+  test("header and data cells are aligned when maxWidth is a theme variable", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Regression: the XMLUI layout system was generating a CSS max-width class and
+    // applying it to <td> cells (but not <th>), causing cell/header width mismatch.
+    await initTestBed(`
+      <Table data='{[{name:"Apples", qty:5, unit:"pieces"}]}' testId="table" width="600px">
+        <Column bindTo="name" header="Name" maxWidth="$space-12"/>
+        <Column bindTo="qty" header="Qty"/>
+        <Column bindTo="unit" header="Unit"/>
+      </Table>
+    `);
+
+    const nameHeader = page.locator("thead th").nth(0);
+    const nameCell = page.locator("tbody tr td").nth(0);
+    await expect(nameHeader).toBeVisible();
+    await expect(nameCell).toBeVisible();
+
+    const headerBox = await nameHeader.boundingBox();
+    const cellBox = await nameCell.boundingBox();
+
+    expect(headerBox).not.toBeNull();
+    expect(cellBox).not.toBeNull();
+
+    // Header and cell must have the same width (within 2px rounding tolerance)
+    expect(Math.abs(headerBox!.width - cellBox!.width)).toBeLessThan(3);
+  });
+
+  test("column width theme variable with px value is applied correctly", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Use a custom theme var with a known px value for a predictable assertion
+    await initTestBed(
+      `
+      <Table data='{[{id: 1}]}' testId="table" width="800px">
+        <Column bindTo="id" header="Col1" width="$test-col-width"/>
+        <Column bindTo="id" header="Col2"/>
+      </Table>
+    `,
+      { testThemeVars: { "test-col-width": "150px" } },
+    );
+
+    const firstHeader = page.locator("thead th").nth(0);
+    await expect(firstHeader).toBeVisible();
+
+    const headerBox = await firstHeader.boundingBox();
+    expect(headerBox).not.toBeNull();
+    // Allow ~2px tolerance for border/rendering differences
+    expect(headerBox!.width).toBeGreaterThanOrEqual(148);
+    expect(headerBox!.width).toBeLessThanOrEqual(152);
+  });
+
+  test("column width theme variable with rem value resolves to correct pixel size", async ({
+    initTestBed,
+    page,
+  }) => {
+    // 3rem at 16px root font size = 48px
+    await initTestBed(
+      `
+      <Table data='{[{id: 1}]}' testId="table" width="800px">
+        <Column bindTo="id" header="Col1" width="$test-col-width"/>
+        <Column bindTo="id" header="Col2"/>
+      </Table>
+    `,
+      { testThemeVars: { "test-col-width": "3rem" } },
+    );
+
+    const firstHeader = page.locator("thead th").nth(0);
+    await expect(firstHeader).toBeVisible();
+
+    const headerBox = await firstHeader.boundingBox();
+    expect(headerBox).not.toBeNull();
+    // 3rem * 16px = 48px; allow ~4px tolerance across environments
+    expect(headerBox!.width).toBeGreaterThanOrEqual(44);
+    expect(headerBox!.width).toBeLessThanOrEqual(52);
+  });
+
+  test("column width is consistent whether specified as px or equivalent em theme var", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Two tables side by side: one column uses "48px", the other uses "$space-12" (3em = 48px)
+    // Their rendered widths should be equal (within tolerance)
+    await initTestBed(`
+      <VStack>
+        <Table data='{[{id: 1}]}' testId="px-table" width="400px">
+          <Column bindTo="id" header="Explicit" width="48px"/>
+          <Column bindTo="id" header="Other"/>
+        </Table>
+        <Table data='{[{id: 1}]}' testId="theme-table" width="400px">
+          <Column bindTo="id" header="ThemeVar" width="$space-12"/>
+          <Column bindTo="id" header="Other"/>
+        </Table>
+      </VStack>
+    `);
+
+    const pxHeader = page.getByTestId("px-table").locator("thead th").nth(0);
+    const themeHeader = page.getByTestId("theme-table").locator("thead th").nth(0);
+
+    await expect(pxHeader).toBeVisible();
+    await expect(themeHeader).toBeVisible();
+
+    const pxBox = await pxHeader.boundingBox();
+    const themeBox = await themeHeader.boundingBox();
+
+    expect(pxBox).not.toBeNull();
+    expect(themeBox).not.toBeNull();
+
+    // The widths should match within a few pixels
+    expect(Math.abs(pxBox!.width - themeBox!.width)).toBeLessThan(4);
+  });
+});
+
+// =============================================================================
+// STRIPED PROPERTY TESTS
+// =============================================================================
+
+test.describe("striped property", () => {
+  test("rows have no stripe classes when striped is not set", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    for (let i = 0; i < 4; i++) {
+      await expect(rows.nth(i)).not.toHaveClass(/evenRow/);
+      await expect(rows.nth(i)).not.toHaveClass(/oddRow/);
+    }
+  });
+
+  test("rows have no stripe classes when striped is false", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="false" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    for (let i = 0; i < 4; i++) {
+      await expect(rows.nth(i)).not.toHaveClass(/evenRow/);
+      await expect(rows.nth(i)).not.toHaveClass(/oddRow/);
+    }
+  });
+
+  test("even rows (0-based index 0, 2) get evenRow class when striped is true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(0)).toHaveClass(/evenRow/);
+    await expect(rows.nth(2)).toHaveClass(/evenRow/);
+  });
+
+  test("odd rows (0-based index 1, 3) get oddRow class when striped is true", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(1)).toHaveClass(/oddRow/);
+    await expect(rows.nth(3)).toHaveClass(/oddRow/);
+  });
+
+  test("even rows do not get oddRow class; odd rows do not get evenRow class", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `);
+
+    const rows = page.locator("tbody tr");
+    await expect(rows).toHaveCount(4);
+
+    await expect(rows.nth(0)).not.toHaveClass(/oddRow/);
+    await expect(rows.nth(1)).not.toHaveClass(/evenRow/);
+    await expect(rows.nth(2)).not.toHaveClass(/oddRow/);
+    await expect(rows.nth(3)).not.toHaveClass(/evenRow/);
+  });
+
+  test("backgroundColor-evenRow-Table theme var applies to even rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: { "backgroundColor-evenRow-Table": "rgb(200, 230, 255)" },
+    });
+
+    // Even rows (index 0, 2) should use the theme color
+    await expect(page.locator("tbody tr").nth(0)).toHaveCSS("background-color", "rgb(200, 230, 255)");
+    await expect(page.locator("tbody tr").nth(2)).toHaveCSS("background-color", "rgb(200, 230, 255)");
+  });
+
+  test("backgroundColor-oddRow-Table theme var applies to odd rows", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: { "backgroundColor-oddRow-Table": "rgb(255, 240, 200)" },
+    });
+
+    // Odd rows (index 1, 3) should use the theme color
+    await expect(page.locator("tbody tr").nth(1)).toHaveCSS("background-color", "rgb(255, 240, 200)");
+    await expect(page.locator("tbody tr").nth(3)).toHaveCSS("background-color", "rgb(255, 240, 200)");
+  });
+
+  test("distinct even and odd colors produce alternating row backgrounds", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
+        <Column bindTo="name" header="Name"/>
+      </Table>
+    `, {
+      testThemeVars: {
+        "backgroundColor-evenRow-Table": "rgb(220, 240, 220)",
+        "backgroundColor-oddRow-Table": "rgb(240, 220, 220)",
+      },
+    });
+
+    const rows = page.locator("tbody tr");
+    await expect(rows.nth(0)).toHaveCSS("background-color", "rgb(220, 240, 220)");
+    await expect(rows.nth(1)).toHaveCSS("background-color", "rgb(240, 220, 220)");
+    await expect(rows.nth(2)).toHaveCSS("background-color", "rgb(220, 240, 220)");
+    await expect(rows.nth(3)).toHaveCSS("background-color", "rgb(240, 220, 220)");
+  });
+});

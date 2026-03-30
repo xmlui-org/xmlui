@@ -103,7 +103,12 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
     const horizontalAlignment = extractValue.asOptionalString(node.props.horizontalAlignment);
     const verticalAlignment = extractValue.asOptionalString(node.props.verticalAlignment);
 
+    const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
+
     const style: React.CSSProperties = {};
+    if (backgroundColor) {
+      style.backgroundColor = backgroundColor;
+    }
     if (horizontalAlignment) {
       // Use flexbox to align block-level content
       style.display = 'flex';
@@ -128,7 +133,6 @@ export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
 
     return (
       <Column
-        className={classes?.[COMPONENT_PART_KEY]}
         style={Object.keys(style).length > 0 ? style : undefined}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
