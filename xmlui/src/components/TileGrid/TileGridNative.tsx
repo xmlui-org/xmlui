@@ -97,6 +97,7 @@ export type TileGridProps = {
   itemWidth?: string;
   itemHeight?: string;
   gap?: string;
+  stretchItems?: boolean;
   loading?: boolean;
   itemsSelectable?: boolean;
   enableMultiSelection?: boolean;
@@ -132,6 +133,7 @@ export const defaultProps = {
   itemWidth: "120px",
   itemHeight: "140px",
   gap: "8px",
+  stretchItems: false,
   loading: false,
   itemsSelectable: false,
   enableMultiSelection: true,
@@ -151,6 +153,7 @@ export const TileGridNative = memo(
       itemWidth = defaultProps.itemWidth,
       itemHeight = defaultProps.itemHeight,
       gap = defaultProps.gap,
+      stretchItems = defaultProps.stretchItems,
       loading = defaultProps.loading,
       idKey = defaultProps.idKey,
       itemsSelectable = defaultProps.itemsSelectable,
@@ -219,7 +222,15 @@ export const TileGridNative = memo(
     // How many rows fit in the visible area (used for PageUp/PageDown)
     const visibleRows = containerHeight > 0 ? Math.max(1, Math.floor(containerHeight / rowSize)) : 5;
 
-    const items = data ?? [];
+    // When stretchItems is true, compute the exact tile width so tiles in each
+    // full row have the same size and, together with the gaps, exactly fill
+    // the container width. The last row may still have remaining space if it
+    // is not completely filled. Sub-pixel values are fine in CSS.
+    const effectiveItemWidth = stretchItems && cols > 0 && containerWidth > 0
+      ? `${(containerWidth - gapPx * (cols - 1)) / cols}px`
+      : itemWidth;
+
+    const items = useMemo(() => data ?? [], [data]);
     const count = items.length;
 
     const rows = useMemo(() => {
@@ -247,6 +258,13 @@ export const TileGridNative = memo(
     // Ctrl/Cmd+navigation can move the focus ring without changing the selection
     // (standard Windows Ctrl+Arrow / Ctrl+Home/End behaviour).
     const [focusedTileIndex, setFocusedTileIndex] = useState(-1);
+
+    // --- clamp focus when data shrinks
+    useEffect(() => {
+      if (focusedTileIndex >= count) {
+        setFocusedTileIndex(count > 0 ? count - 1 : -1);
+      }
+    }, [count, focusedTileIndex]);
 
     // --- auto-scroll to keep focused tile visible
     useEffect(() => {
@@ -296,7 +314,9 @@ export const TileGridNative = memo(
           event.preventDefault();
           event.stopPropagation();
           selectionApi.selectAll();
-          onSelectAllAction?.(currentSelectedItems, currentSelectedIds);
+          // selectAll updates React state asynchronously; pass the expected result directly.
+          const allIds = items.map(item => item[idKey]);
+          onSelectAllAction?.(items, allIds);
           return;
         }
         if (matchesKeyEvent(nativeEvent, DEFAULT_KEY_BINDINGS.cut) && onCutAction) {
@@ -373,6 +393,8 @@ export const TileGridNative = memo(
         cols,
         visibleRows,
         focusedTileIndex,
+        items,
+        idKey,
         selectionApi,
         toggleRowIndex,
         onSelectAllAction,
@@ -408,7 +430,7 @@ export const TileGridNative = memo(
               <div
                 key={rowIndex}
                 className={styles.tileRow}
-                style={{ gap, paddingBottom: gap }}
+                style={{ gap, paddingBottom: rowIndex < rows.length - 1 ? gap : undefined }}
                 role="row"
               >
                 {row.map((item, colIndex) => {
@@ -422,7 +444,7 @@ export const TileGridNative = memo(
                         [styles.selected]: isSelected,
                         [styles.focused]: itemsSelectable && globalIndex === focusedTileIndex,
                       })}
-                      style={{ width: itemWidth, height: itemHeight }}
+                      style={{ width: effectiveItemWidth, height: itemHeight }}
                       role="gridcell"
                       aria-selected={itemsSelectable ? isSelected : undefined}
                       onClick={
