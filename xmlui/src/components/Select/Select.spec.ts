@@ -357,12 +357,12 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select an option and verify
       await page.getByRole("option", { name: "opt2" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
@@ -386,12 +386,12 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select an option and verify
       await page.getByRole("option", { name: "opt2" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
@@ -415,17 +415,17 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select multiple options and verify
       await page.getByRole("option", { name: "opt1" }).click();
       await page.getByRole("option", { name: "opt3" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected values: opt1,opt3");
-      
+
       // Selected values should appear as badges with their value text
       await driver.toggleOptionsVisibility();
       await expect(page.getByText("opt1").first()).toBeVisible();
@@ -933,7 +933,7 @@ test.describe("multiSelect", () => {
 
     await expect(page.getByTestId("custom-value")).toBeVisible();
     await expect(page.getByTestId("custom-value")).toHaveText("opt1=first");
-    
+
     const driver = await createSelectDriver();
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("second");
@@ -1123,22 +1123,22 @@ test.describe("Visual State", () => {
     const simpleDropdown = page.locator("[data-state='open'][role='listbox']").first();
     const { height: simpleHeight } = await simpleDropdown.boundingBox();
     // close
-    await page.getByText('Option 1').click();
+    await page.getByText("Option 1").click();
 
     const searchableSelect = page.getByTestId("searchableSelect");
     await searchableSelect.click();
 
     // Get the dropdown content height for searchable Select
-    const searchableDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const searchableDropdown = page.getByRole("dialog").locator("[role='listbox']");
     const { height: searchableHeight } = await searchableDropdown.boundingBox();
     // close
-    await page.getByRole('listbox').getByText('Option 1').click();
+    await page.getByRole("listbox").getByText("Option 1").click();
 
     const multiSelect = page.getByTestId("multiSelect");
     await multiSelect.click();
 
     // Get the dropdown content height for multiSelect
-    const multiDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const multiDropdown = page.getByRole("dialog").locator("[role='listbox']");
     const { height: multiHeight } = await multiDropdown.boundingBox();
 
     // All dropdowns should have approximately the same height
@@ -1288,7 +1288,10 @@ test.describe("Theme Variables", () => {
     await runPerVariant(initTestBed, page, "borderColor", "border-color", "rgb(0, 0, 0)", true);
   });
 
-  test("applies correct backgroundColor on hover across variants", async ({ initTestBed, page }) => {
+  test("applies correct backgroundColor on hover across variants", async ({
+    initTestBed,
+    page,
+  }) => {
     await runPerVariant(
       initTestBed,
       page,
@@ -1503,7 +1506,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markRequired" bindTo="country">
@@ -1511,13 +1517,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markRequired" bindTo="country">
@@ -1525,13 +1534,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
@@ -1539,13 +1551,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markOptional" bindTo="country">
@@ -1553,13 +1568,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markBoth" bindTo="country">
@@ -1567,13 +1585,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markBoth" bindTo="country">
@@ -1581,13 +1602,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="required">
         <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
@@ -1595,13 +1619,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <Select testId="test1" label="Required Field" required="true" bindTo="field1">
@@ -1612,10 +1639,10 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const requiredLabel = page.getByText("Required Field");
     const optionalLabel = page.getByText("Optional Field");
-    
+
     await expect(requiredLabel).toContainText("*");
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
@@ -1742,14 +1769,14 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     const selectDriver = await createSelectDriver("testSelect");
 
-    await page.getByTestId("openBtn").click({delay: 100});
+    await page.getByTestId("openBtn").click({ delay: 100 });
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
     await expect(selectDriver.component).toBeVisible();
 
-    await selectDriver.click({delay: 100});
+    await selectDriver.click({ delay: 100 });
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
@@ -1766,22 +1793,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
+    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });
@@ -2643,7 +2670,10 @@ test.describe.skip(
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <Select testId="input" bindTo="input" required="{true}">
@@ -2652,19 +2682,22 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation by submitting empty required field
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text
     await expect(page.getByText("This field is required")).toBeVisible();
-    
+
     // Check absence of concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <Select testId="input" bindTo="input" required="{true}">
@@ -2673,17 +2706,17 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text (should be hidden)
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Check for concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    
+
     // Check that it shows error icon
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
@@ -2697,18 +2730,22 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     // Helper text hidden
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Concise feedback visible
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
   });
 
-  test("shows valid icon in concise mode when valid", async ({ initTestBed, page, createSelectDriver }) => {
+  test("shows valid icon in concise mode when valid", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <Select testId="input" bindTo="input" required="{true}" validationMode="onChanged">
@@ -2717,16 +2754,16 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     const driver = await createSelectDriver("input");
-    
+
     // First make it invalid
     await page.getByTestId("submit").click();
-    
+
     // Now make it valid
     await page.getByTestId("input").click();
     await driver.selectLabel("Option 1");
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
@@ -2741,20 +2778,23 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
-    
+
     // Check tooltip content
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <Select
@@ -2767,9 +2807,99 @@ test.describe("Validation Feedback", () => {
         </Select>
       </Form>
     `);
-    
+
     // Should only have one label with the text "Choose option"
     const labels = page.getByText("Choose option");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// CUSTOM HEIGHT TESTS
+// =============================================================================
+
+test.describe("Custom Height", () => {
+  test("custom height does not constrain dropdown options in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" initialValue="customer">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("custom height does not constrain dropdown options in searchable select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" searchable="{true}" initialValue="customer">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("custom height does not constrain dropdown options in multi-select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" multiSelect="{true}">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("selecting options works correctly with custom height", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select testId="sel" id="mySelect" height="32px">
+          <Option label="Customer" value="customer" />
+          <Option label="Vendor" value="vendor" />
+        </Select>
+        <Text testId="text">{mySelect.value}</Text>
+      </Fragment>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Vendor");
+
+    await expect(page.getByTestId("text")).toHaveText("vendor");
   });
 });
