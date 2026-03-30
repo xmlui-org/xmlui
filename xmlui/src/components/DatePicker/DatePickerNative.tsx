@@ -507,7 +507,7 @@ export const DatePicker = forwardRef(function DatePicker(
         id={id}
         required={undefined}
         captionLayout="dropdown"
-        fixedWeeks
+        fixedWeeks={mode !== "range"}
         startMonth={_startDate}
         endMonth={_endDate}
         month={inlineMonth}
@@ -603,7 +603,7 @@ export const DatePicker = forwardRef(function DatePicker(
           <DayPicker
             required={undefined}
             animate
-            fixedWeeks
+            fixedWeeks={mode !== "range"}
             autoFocus={autoFocus}
             classNames={styles}
             captionLayout="dropdown"

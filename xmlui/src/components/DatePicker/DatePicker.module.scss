@@ -193,25 +193,14 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .inlinePickerMenu {
-    padding: 0;
+    padding: t.$space-4;
     overflow-y: auto;
     width: 100%;
     max-width: fit-content;
     height: fit-content;
-
-    @include variant("");
-
-    &.error {
-      @include variant("error");
-    }
-
-    &.warning {
-      @include variant("warning");
-    }
-
-    &.valid {
-      @include variant("success");
-    }
+    background-color: $backgroundColor-menu-DatePicker;
+    border-radius: $borderRadius-menu-DatePicker;
+    border: 1px solid $rdp-accent-color;
   }
 
   .datePickerMenu {

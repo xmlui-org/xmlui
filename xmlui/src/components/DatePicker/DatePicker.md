@@ -10,7 +10,7 @@
 
 %-API-START setValue
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="500px"
+```xmlui-pg copy {3, 9, 12} display name="Example: setValue" height="506px"
 <App>
   <HStack>
     <Button
@@ -28,7 +28,7 @@
 
 %-PROP-START initialValue
 
-```xmlui-pg copy display name="Example: initialValue" height="440px"
+```xmlui-pg copy display name="Example: initialValue" height="446px"
 <App>
   <DatePicker inline initialValue="05/25/2024" />
 </App>
@@ -104,7 +104,7 @@ The table below shows the available date formats:
 | yyyyMMdd   | 20240525   |
 | MMddyyyy   | 05252024   |
 
-```xmlui-pg copy display name="Example: dateFormat" height="440px"
+```xmlui-pg copy display name="Example: dateFormat" height="446px"
 <App>
   <DatePicker
     inline
@@ -139,7 +139,7 @@ The table below shows the available date formats:
 | Friday    | 5      |
 | Saturday  | 6      |
 
-```xmlui-pg copy display name="Example: weekStartsOn" height="440px"
+```xmlui-pg copy display name="Example: weekStartsOn" height="446px"
 <App>
   <DatePicker inline weekStartsOn="1" />
 </App>
@@ -149,7 +149,7 @@ The table below shows the available date formats:
 
 %-PROP-START minValue
 
-```xmlui-pg copy display name="Example: minValue" height="440px"
+```xmlui-pg copy display name="Example: minValue" height="446px"
 <App>
   <DatePicker inline minValue="05/24/2024" />
 </App>
@@ -159,7 +159,7 @@ The table below shows the available date formats:
 
 %-PROP-START maxValue
 
-```xmlui-pg copy display name="Example: maxValue" height="440px"
+```xmlui-pg copy display name="Example: maxValue" height="446px"
 <App>
   <DatePicker inline maxValue="05/26/2024" />
 </App>
@@ -181,7 +181,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 
 > [!INFO] You can use the [getDate()](/docs/globals#getdate) function to query the current date.
 
-```xmlui-pg copy display name="Example: Disable specific dates" height="440px"
+```xmlui-pg copy display name="Example: Disable specific dates" height="446px"
 <App>
   <DatePicker
     inline
@@ -201,13 +201,13 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 | Date interval | Disable dates between two dates (exclusive) | `{before: "05/30/2024", after: "05/20/2024"}` |
 
 
-```xmlui-pg copy display name="Example: Disable weekends" height="440px"
+```xmlui-pg copy display name="Example: Disable weekends" height="446px"
 <App>
   <DatePicker inline disabledDates="{{dayOfWeek: [0, 6]}}" />
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable date range" height="440px"
+```xmlui-pg copy display name="Example: Disable date range" height="446px"
 <App>
   <DatePicker
     inline
@@ -216,7 +216,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates before today" height="440px"
+```xmlui-pg copy display name="Example: Disable dates before today" height="446px"
 <App>
   <DatePicker
     inline
@@ -225,7 +225,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 </App>
 ```
 
-```xmlui-pg copy display name="Example: Disable dates today and after" height="440px"
+```xmlui-pg copy display name="Example: Disable dates today and after" height="446px"
 <App>
   <DatePicker
     inline
@@ -235,7 +235,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
 ```
 
 
-```xmlui-pg copy display name="Example: Complex combination" height="440px"
+```xmlui-pg copy display name="Example: Complex combination" height="446px"
 <App>
   <DatePicker
     inline
