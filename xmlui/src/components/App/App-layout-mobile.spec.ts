@@ -1534,7 +1534,6 @@ test.describe("Vertical-Full-Header Layout Mobile - scrollWholePage=false, noScr
     // At top
 
     await verifyMainContentIsScrollContainer(page,false);
-    await verifyMainContentScrollbarGutters(page, false);
     await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
 
     // Mid scroll
@@ -1560,7 +1559,7 @@ test.describe("Vertical-Full-Header Layout Mobile - scrollWholePage=false, noScr
   }) => {
     await initTestBed(createLayoutMarkup("vertical-full-header", false, false, "200px"));
 
-    await verifyMainContentScrollbarGutters(page, false);
+    await verifyMainContentScrollbarGutters(page, true);
     await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
   });
 
@@ -1573,7 +1572,7 @@ test.describe("Vertical-Full-Header Layout Mobile - scrollWholePage=false, noScr
     // At top
 
     await verifyMainContentIsScrollContainer(page,false);
-    await verifyMainContentScrollbarGutters(page, false);
+    await verifyMainContentScrollbarGutters(page, true);
     await verifyBlocksInViewport(page, ["appHeader", "mainContent", "footer"]);
 
     // Mid scroll

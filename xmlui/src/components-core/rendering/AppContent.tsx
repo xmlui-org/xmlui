@@ -373,10 +373,11 @@ export function AppContent({
         if (!rootNode) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
           const id = safeDecodeHash(hash);
-          const el = document.getElementById(id);
+          // ShadowRoot doesn't have getElementById; use querySelector instead
+          const el = (rootNode as ShadowRoot).querySelector(`#${CSS.escape(id)}`);
           if (el) {
             // For nested apps, only scroll within the shadow DOM (don't cross into host document)
-            scrollAncestorsToView(el, scrollBehavior, true);
+            scrollAncestorsToView(el as HTMLElement, scrollBehavior, true);
           }
         }
       });
@@ -404,14 +405,18 @@ export function AppContent({
 
       requestAnimationFrame(() => {
         if (!rootNode) return;
-        // --- Hash from URL may be encoded (e.g. %20 for space); decode for getElementById
+        // --- Hash from URL may be encoded (e.g. %20 for space); decode for element lookup
         const id = safeDecodeHash(lastHash.current);
-        const el = document.getElementById(id);
+        // ShadowRoot doesn't have getElementById; use querySelector instead
+        const el =
+          typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot
+            ? (rootNode as ShadowRoot).querySelector(`#${CSS.escape(id)}`)
+            : document.getElementById(id);
         if (!el) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          scrollAncestorsToView(el, scrollBehavior);
+          scrollAncestorsToView(el as HTMLElement, scrollBehavior);
         } else {
-          el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+          (el as HTMLElement).scrollIntoView({ behavior: scrollBehavior, block: "start" });
         }
       });
     }
@@ -428,13 +433,17 @@ export function AppContent({
         tableOfContentsContext.scrollToAnchor(bookmarkId, smoothScrolling);
       } else {
         // Fallback if TableOfContentsContext is not available
-        const el = document.getElementById(bookmarkId);
+        const rootNode = root?.getRootNode();
+        // ShadowRoot doesn't have getElementById; use querySelector instead
+        const el =
+          typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot
+            ? (rootNode as ShadowRoot).querySelector(`#${CSS.escape(bookmarkId)}`)
+            : document.getElementById(bookmarkId);
         if (el) {
-          const rootNode = root?.getRootNode();
           if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
+            scrollAncestorsToView(el as HTMLElement, smoothScrolling ? "smooth" : "auto");
           } else {
-            el.scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
+            (el as HTMLElement).scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
           }
         }
       }
