@@ -400,6 +400,12 @@ export class XmlUiHelper {
     value: any,
     options?: XmlUiTransformOptions,
   ): XmlUiElement | null {
+    // --- Parsed handlers/events are stored as syntax trees at transform time;
+    // --- serialize them back to their original source text.
+    if (value && typeof value === "object" && value.__PARSED === true) {
+      value = value.source ?? "";
+    }
+
     // --- Do not transform undefined elements
     if (value === undefined) return null;
 

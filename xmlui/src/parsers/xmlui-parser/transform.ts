@@ -117,7 +117,8 @@ export function nodeToComponentDef(
   }
 
   function collectCompoundComponent(node: Node) {
-    const attrs = getAttributes(node).map(segmentAttr);
+    const attrNodes = getAttributes(node);
+    const attrs = attrNodes.map(segmentAttr);
     // --- Validate component name
     const compoundName = attrs.find((attr) => attr.name === "name");
     if (!compoundName) {
@@ -132,11 +133,13 @@ export function nodeToComponentDef(
 
     // --- Get "method" attributes
     let api: Record<string, any> | undefined;
-    const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
+    const apiAttrs = attrNodes
+      .map((attrNode) => ({ attrNode, segmented: segmentAttr(attrNode) }))
+      .filter(({ segmented }) => segmented.startSegment === "method");
     if (apiAttrs.length > 0) {
       api = {};
-      apiAttrs.forEach((attr) => {
-        api![attr.name] = attr.value;
+      apiAttrs.forEach(({ attrNode, segmented }) => {
+        api![segmented.name] = parseEvent(segmented.value, attrNode.children?.[2]);
       });
     }
 
@@ -396,9 +399,12 @@ export function nodeToComponentDef(
             child,
 
             (name) => (isComponent(comp) ? comp.api?.[name] : undefined),
-            (name, value) => {
+            (name, value, nodeScriptContent) => {
+              const parsedValue = Array.isArray(value)
+                ? value.map((item) => parseEvent(item, nodeScriptContent))
+                : parseEvent(value, nodeScriptContent);
               comp.api ??= {};
-              comp.api[name] = value;
+              comp.api[name] = parsedValue;
             },
           );
           return;
@@ -492,7 +498,7 @@ export function nodeToComponentDef(
           comp.globalVars[name] = value;
         } else if (startSegment === "method") {
           comp.api ??= {};
-          comp.api[name] = value;
+          comp.api[name] = parseEvent(value, attrValueStringNode);
         } else if (startSegment === "event") {
           comp.events ??= {};
           comp.events[name] = parseEvent(value, attrValueStringNode);

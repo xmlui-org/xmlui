@@ -29,7 +29,7 @@ export function ApiBoundComponent({
       return `${node.uid ?? node.type}_data_${key}`;
     }
 
-    // Generates a string representation of an event handler function that calls 
+    // Generates a string representation of an event handler function that calls
     // the appropriate action. This function is used recursively for nested actions.
     function generateEventHandler(actionComponent: any): string {
       const { type } = actionComponent;
@@ -68,20 +68,20 @@ export function ApiBoundComponent({
           } = actionComponent.props;
           return `(eventArgs) => {
             return Actions.upload({
-              asForm: ${JSON.stringify(asForm)}, 
-              formParams: ${JSON.stringify(formParams)}, 
-              queryParams: ${JSON.stringify(queryParams)}, 
-              rawBody: ${JSON.stringify(rawBody)}, 
-              body: ${JSON.stringify(body)}, 
-              url: ${JSON.stringify(url)}, 
-              headers: ${JSON.stringify(headers)}, 
-              method: ${JSON.stringify(method)}, 
-              file: ${JSON.stringify(file)}, 
-              fieldName: ${JSON.stringify(fieldName)}, 
-              params: { '$param': eventArgs }, 
-              onError: ${prepareEvent(error)}, 
-              onSuccess: ${prepareEvent(success)}, 
-              onProgress: eventArgs.onProgress, 
+              asForm: ${JSON.stringify(asForm)},
+              formParams: ${JSON.stringify(formParams)},
+              queryParams: ${JSON.stringify(queryParams)},
+              rawBody: ${JSON.stringify(rawBody)},
+              body: ${JSON.stringify(body)},
+              url: ${JSON.stringify(url)},
+              headers: ${JSON.stringify(headers)},
+              method: ${JSON.stringify(method)},
+              file: ${JSON.stringify(file)},
+              fieldName: ${JSON.stringify(fieldName)},
+              params: { '$param': eventArgs },
+              onError: ${prepareEvent(error)},
+              onSuccess: ${prepareEvent(success)},
+              onProgress: eventArgs.onProgress,
               invalidates: ${
                 invalidates === undefined ? undefined : JSON.stringify(invalidates)
               }  }, { resolveBindingExpressions: true });
@@ -92,13 +92,13 @@ export function ApiBoundComponent({
             actionComponent.props;
           return `(eventArgs) => {
             return Actions.download({
-              queryParams: ${JSON.stringify(queryParams)}, 
-              rawBody: ${JSON.stringify(rawBody)}, 
-              body: ${JSON.stringify(body)}, 
-              url: ${JSON.stringify(url)}, 
-              headers: ${JSON.stringify(headers)}, 
-              method: ${JSON.stringify(method)}, 
-              fileName: ${JSON.stringify(fileName)}, 
+              queryParams: ${JSON.stringify(queryParams)},
+              rawBody: ${JSON.stringify(rawBody)},
+              body: ${JSON.stringify(body)},
+              url: ${JSON.stringify(url)},
+              headers: ${JSON.stringify(headers)},
+              method: ${JSON.stringify(method)},
+              fileName: ${JSON.stringify(fileName)},
               params: { '$param': eventArgs },
             }, { resolveBindingExpressions: true });
           }`;
@@ -130,29 +130,29 @@ export function ApiBoundComponent({
           return `(eventArgs, options) => {
             return Actions.callApi({
               uid: ${JSON.stringify(uid)},
-              headers: ${JSON.stringify(headers)}, 
-              method: ${JSON.stringify(method)}, 
-              url: ${JSON.stringify(url)}, 
-              queryParams: ${JSON.stringify(queryParams)}, 
-              rawBody: ${JSON.stringify(rawBody)}, 
-              body: ${JSON.stringify(body)} || (options?.passAsDefaultBody ? eventArgs : undefined), 
-              confirmTitle: ${JSON.stringify(confirmTitle)}, 
-              confirmMessage: ${JSON.stringify(confirmMessage)}, 
-              confirmButtonLabel: ${JSON.stringify(confirmButtonLabel)}, 
-              cancelButtonLabel: ${JSON.stringify(cancelButtonLabel)}, 
-              inProgressNotificationMessage: ${JSON.stringify(inProgressNotificationMessage)}, 
-              completedNotificationMessage: ${JSON.stringify(completedNotificationMessage)}, 
-              errorNotificationMessage: ${JSON.stringify(errorNotificationMessage)}, 
-              params: { '$param': eventArgs }, 
-              onError: ${prepareEvent(error)}, 
-              onProgress: ${prepareEvent(progress)}, 
-              onBeforeRequest: ${prepareEvent(beforeRequest)}, 
-              onSuccess: ${prepareEvent(success)}, 
-              updates: ${JSON.stringify(updates)}, 
-              optimisticValue: ${JSON.stringify(optimisticValue)}, 
-              payloadType: ${JSON.stringify(payloadType)}, 
-              getOptimisticValue: ${JSON.stringify(getOptimisticValue)}, 
-              invalidates: ${invalidates === undefined ? undefined : JSON.stringify(invalidates)}, 
+              headers: ${JSON.stringify(headers)},
+              method: ${JSON.stringify(method)},
+              url: ${JSON.stringify(url)},
+              queryParams: ${JSON.stringify(queryParams)},
+              rawBody: ${JSON.stringify(rawBody)},
+              body: ${JSON.stringify(body)} || (options?.passAsDefaultBody ? eventArgs : undefined),
+              confirmTitle: ${JSON.stringify(confirmTitle)},
+              confirmMessage: ${JSON.stringify(confirmMessage)},
+              confirmButtonLabel: ${JSON.stringify(confirmButtonLabel)},
+              cancelButtonLabel: ${JSON.stringify(cancelButtonLabel)},
+              inProgressNotificationMessage: ${JSON.stringify(inProgressNotificationMessage)},
+              completedNotificationMessage: ${JSON.stringify(completedNotificationMessage)},
+              errorNotificationMessage: ${JSON.stringify(errorNotificationMessage)},
+              params: { '$param': eventArgs },
+              onError: ${prepareEvent(error)},
+              onProgress: ${prepareEvent(progress)},
+              onBeforeRequest: ${prepareEvent(beforeRequest)},
+              onSuccess: ${prepareEvent(success)},
+              updates: ${JSON.stringify(updates)},
+              optimisticValue: ${JSON.stringify(optimisticValue)},
+              payloadType: ${JSON.stringify(payloadType)},
+              getOptimisticValue: ${JSON.stringify(getOptimisticValue)},
+              invalidates: ${invalidates === undefined ? undefined : JSON.stringify(invalidates)},
               when: ${when === undefined ? undefined : JSON.stringify(when)} }, { resolveBindingExpressions: true });
           }`;
         }
@@ -163,10 +163,10 @@ export function ApiBoundComponent({
     }
 
     const loaders: Array<ComponentDef> = [...(node.loaders || [])];
-    const events = { ...(node.events || {}) } as any;
-    const props = { ...(node.props || {}) } as any;
-    const vars = { ...(node.vars || {}) };
-    const api = { ...(node.api || {}) };
+    const events = { ...node.events } as any;
+    const props = { ...node.props } as any;
+    const vars = { ...node.vars };
+    const api = { ...node.api };
 
     apiBoundEvents.forEach((key) => {
       const actionComponent = node.events![key];

@@ -422,4 +422,61 @@ onSubmit="
       expect(src[(err as GeneralDiag).pos]).toBe("}");
     }
   });
+
+  it("method parse error in inline attr value", () => {
+    try {
+      transformSource(`<Stack method.myApi="doIt; }" />`);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).match(/W00[12]/);
+    }
+  });
+
+  it("method parse error in method value attr", () => {
+    try {
+      transformSource(`<Stack><method name='myMethod' value='doIt; }'/></Stack>`);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).match(/W00[12]/);
+    }
+  });
+
+  it("method parse error in method text content", () => {
+    try {
+      transformSource(`<Stack><method name='myMethod'>doIt; }</method></Stack>`);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).match(/W00[12]/);
+    }
+  });
+
+  it("method parse error in inline attr has correct pos", () => {
+    const src = `<Stack method.myApi="doIt; }"/>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("method parse error in content text has correct pos", () => {
+    const src = `<Stack><method name="myApi">doIt; }</method></Stack>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
+
+  it("method parse error in CData has correct pos", () => {
+    const src = `<Stack><method name="myApi"><![CDATA[doIt; }]]></method></Stack>`;
+    try {
+      transformSource(src);
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(src[(err as GeneralDiag).pos]).toBe("}");
+    }
+  });
 });
