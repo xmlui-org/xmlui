@@ -48,7 +48,7 @@ Display mode: "view" for read-only or "edit" for annotation editing. Default: "v
 
 ### `scale`
 
-Zoom level for the PDF pages. Default: 1.
+Zoom level for the PDF pages. Default: 1.0.
 
 ### `scrollStyle`
 
