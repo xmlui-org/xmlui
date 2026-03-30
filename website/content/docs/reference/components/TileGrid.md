@@ -575,6 +575,50 @@ Use this while data is being fetched to prevent a layout flash.
 </App>
 ```
 
+### `stretchItems` [#stretchitems]
+
+> [!DEF]  default: **false**
+
+When `true`, tiles in each row grow to fill the full container width. `itemWidth` becomes the minimum tile width; the actual width is distributed evenly.
+
+When `true`, tiles grow to fill the full container width.
+The number of columns is still derived from `itemWidth`, but each tile's actual width is distributed evenly across the available space, eliminating trailing horizontal gaps.
+`itemWidth` acts as the minimum tile width that determines the column count.
+
+```xmlui copy /stretchItems="true"/
+<App>
+  <TileGrid data="{[...]}" itemWidth="120px" itemHeight="80px" stretchItems="true">
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: stretchItems"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'},
+      {id: 5, name: 'Milk', category: 'dairy'},
+      {id: 6, name: 'Cheese', category: 'dairy'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    stretchItems="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
 ### `syncWithVar` [#syncwithvar]
 
 The name of a global variable to synchronize the grid's selection state with. The named variable must reference an object; the grid will read from and write to its `selectedIds` property. A runtime error is signalled if the value is not a valid JavaScript variable name.
@@ -636,9 +680,9 @@ The handler receives `(focusedItem, selectedItems, selectedIds)`.
 
 ### `deleteAction` [#deleteaction]
 
-Fired when the user presses the Delete or Backspace key. Receives `(focusedItem, selectedItems, selectedIds)`.
+Fired when the user presses the Delete key. Receives `(focusedItem, selectedItems, selectedIds)`.
 
-Fired when the user presses Delete while the grid is focused and `itemsSelectable` is `true`.
+Fired when the user presses the Delete key while the grid is focused and `itemsSelectable` is `true`.
 The handler receives `(focusedItem, selectedItems, selectedIds)`.
 The component does **not** remove items automatically — the handler must implement the removal.
 

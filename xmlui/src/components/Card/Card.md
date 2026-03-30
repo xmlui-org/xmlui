@@ -101,7 +101,7 @@ This event is triggered when the `Card` is clicked.
 
 ```xmlui-pg copy display name="Example: click"
 <App>
-  <Card maxWidth="300px" onClick="toast('Clicked!')">
+  <Card maxWidth="300px" onClick="toast.success('Clicked!')">
     <HStack verticalAlignment="center">
       <Icon name="info" />
       <Text value="Information" variant="strong" />
