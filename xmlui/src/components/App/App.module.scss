@@ -257,6 +257,7 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       &:not(.scrollWholePage) {
         .mainContentArea {
           overflow: auto;
+          scrollbar-gutter: stable both-edges;
         }
         // Allow pagesContainer and pageContentContainer to grow to content height
         // so mainContentArea can scroll them into view
@@ -358,6 +359,9 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
     &.noScrollbarGutters {
       scrollbar-gutter: auto;
       .pagesContainer {
+        scrollbar-gutter: auto;
+      }
+      .mainContentArea {
         scrollbar-gutter: auto;
       }
     }
