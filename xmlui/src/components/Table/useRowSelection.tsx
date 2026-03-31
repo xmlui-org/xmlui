@@ -201,7 +201,6 @@ export default function useRowSelection({
   // The approach uses React's useEffect pattern which is appropriate for React-to-React communication.
   // The new AppState didUpdate event is more useful for non-React integrations.
   const appStateSelection = syncWithAppState?.value?.selectedIds;
-  const prevAppStateSelection = usePrevious(appStateSelection);
 
   // --- State machine for sync direction control
   const [syncState, setSyncState] = useState<
@@ -253,7 +252,6 @@ export default function useRowSelection({
     }
   }, [
     appStateSelection,
-    prevAppStateSelection,
     items,
     rowsSelectable,
     syncWithAppState,

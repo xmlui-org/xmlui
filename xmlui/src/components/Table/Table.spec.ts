@@ -2324,6 +2324,7 @@ test.describe("Theme Variables and Styling", () => {
       await expect(header).toHaveCSS("background-color", "rgb(255, 0, 0)");
     }
   );
+
 });
 
 // =============================================================================
