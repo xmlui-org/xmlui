@@ -21,6 +21,7 @@ $backgroundColor-item-TileGrid--selected--hover: createThemeVar(
 $borderRadius-item-TileGrid: createThemeVar("borderRadius-item-#{$component}");
 $offsetVertical-checkbox-TileGrid: createThemeVar("offsetVertical-checkbox-#{$component}");
 $offsetHorizontal-checkbox-TileGrid: createThemeVar("offsetHorizontal-checkbox-#{$component}");
+$fontSize-checkbox-TileGrid: createThemeVar("fontSize-checkbox-#{$component}");
 $userSelect-item-TileGrid: createThemeVar("userSelect-item-#{$component}");
 $outlineColor-item-TileGrid--focus: createThemeVar("outlineColor-item-#{$component}--focus");
 $outlineWidth-item-TileGrid--focus: createThemeVar("outlineWidth-item-#{$component}--focus");
@@ -88,6 +89,7 @@ $outlineOffset-item-TileGrid--focus: createThemeVar("outlineOffset-item-#{$compo
     position: absolute;
     z-index: 1;
     pointer-events: auto;
+    font-size: $fontSize-checkbox-TileGrid;
 
     &.topStart {
       top: $offsetVertical-checkbox-TileGrid;

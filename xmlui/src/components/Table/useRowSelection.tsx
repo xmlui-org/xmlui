@@ -227,14 +227,13 @@ export default function useRowSelection({
       return;
     }
 
-    // Only update if AppState selection actually changed and this wasn't caused by our own table update
-    const appStateChanged = appStateSelection !== prevAppStateSelection;
+    // Deep comparison handles late data loading and multi-source updates correctly.
     const isDifferentFromLastKnown =
       JSON.stringify([...(appStateSelection || [])].sort()) !==
       JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
     const wasNotOurUpdate = lastUpdateSourceRef.current !== "table";
 
-    if (appStateChanged && isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
+    if (isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
       // Set state machine to indicate we're updating from AppState
       setSyncState("updating_from_appstate");
 

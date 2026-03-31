@@ -834,3 +834,7 @@ Has no effect when `itemsSelectable` is `false`.
 (See the [example](#clearselection) at the `clearSelection` method.)
 
 %-API-END
+
+%-STYLE-START
+
+%-STYLE-END
