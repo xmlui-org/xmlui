@@ -1,45 +1,65 @@
 # Delegate a method
 
-Use `method.` attributes to directly delegate to internal component methods:
+Forward a user-defined component's API surface to an internal built-in component using `method.` attributes.
 
-```xmlui-pg height="350px"
----app display /myModal/ /MyModalWrapper/
+A `TaskDialog` component wraps a `ModalDialog` internally. The parent needs to open and close it by calling `taskDialog.open()` and `taskDialog.close()`, but it should not reach inside the component to talk to the `ModalDialog` directly. The `method.` shorthand on `<Component>` wires those two names to the internal dialog calls with no JavaScript required.
+
+```xmlui-pg copy display name="TaskDialog with delegated open and close methods" height="400px"
+---app display /method\./ /MyModalWrapper/
 <App>
-  <H3>Method Delegation Example</H3>
-
-  <Button
-    label="Open Modal"
-    onClick="myModal.openDialog()" />
-
-  <MyModalWrapper id="myModal" title="Hello World!" />
+  <Button label="Open Task" onClick="taskDialog.open()" />
+  <TaskDialog id="taskDialog" title="Fix login bug" assignee="Alice" />
 </App>
-
----comp display /MyModalWrapper/ /internalModal/
+---comp display /method\./ TaskDialog
 <Component
-  name="MyModalWrapper"
-  method.openDialog="internalModal.open()"
-  method.close="internalModal.close()">
-
-  <ModalDialog
-    id="internalModal"
-    title="{$props.title}"
-    maxWidth="400px">
+  name="TaskDialog"
+  method.open="internalModal.open()"
+  method.close="internalModal.close()"
+>
+  <ModalDialog id="internalModal" title="{$props.title ?? 'Task'}">
     <VStack>
-      <Text>This uses method.openDialog="internalModal.open()"</Text>
-      <Text>Direct delegation - no custom logic needed</Text>
-
-      <Button
-        label="Close"
-        onClick="internalModal.close()" />
+      <Text variant="strong">{ $props.title }</Text>
+      <Text>Assigned to: { $props.assignee }</Text>
+      <Button label="Close" onClick="internalModal.close()" />
     </VStack>
   </ModalDialog>
 </Component>
 ```
 
-**Use delegation when**: You want to expose internal methods directly without adding custom logic.
+## Key points
 
-**Pros**: Simple, no JavaScript needed, clean syntax
+**`method.` attribute shorthand**: Declare a delegated method directly on the `<Component>` tag as `method.<name>="<expression>"`. The expression is evaluated when the method is called from the parent — typically a single built-in component API call:
 
-**Cons**: No custom logic, just passes through calls
+```xmlui
+<Component
+  name="TaskDialog"
+  method.open="internalModal.open()"
+  method.close="internalModal.close()"
+>
+```
 
-**See also**: [Expose a method from a component](/docs/howto/expose-a-method-from-a-component) for adding custom logic to methods.
+**No JavaScript needed**: Delegation is pure attribute syntax. The component definition stays clean and readable — there is no `<method>` block or script to maintain.
+
+**Calling delegated methods from the parent**: Give the component an `id` and call the method as a normal function on that reference:
+
+```xmlui
+<Button onClick="taskDialog.open()" />
+<Button onClick="taskDialog.close()" />
+<TaskDialog id="taskDialog" />
+```
+
+**`method.` vs `<method>` — same semantics, different syntax**: The two forms are equivalent. `method.` is a compact attribute shorthand best suited to a single expression; `<method>` is the element form that fits multi-line bodies more naturally. Use whichever reads more clearly (see [Expose a method from a component](/docs/howto/expose-a-method-from-a-component)):
+
+```xmlui
+<!-- attribute shorthand — concise for one-liners -->
+<Component name="TaskDialog"
+  method.open="internalModal.open()"
+  method.close="internalModal.close()"
+>
+
+<!-- element form — the same thing, easier to read when the body grows -->
+<Component name="TaskDialog">
+  <method name="open">internalModal.open();</method>
+  <method name="close">internalModal.close();</method>
+</Component>
+```

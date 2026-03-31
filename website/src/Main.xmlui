@@ -322,184 +322,230 @@
                         label="How To"
                         to="/docs/howto"
                     >
-                        <NavLink
-                            icon="article"
-                            iconAlignment="baseline"
-                            label="Expose a method from a component"
-                            to="/docs/howto/expose-a-method-from-a-component"
-                        />
-                        <NavLink
-                            icon="article"
-                            iconAlignment="baseline"
-                            label="Delegate a method"
-                            to="/docs/howto/delegate-a-method"
-                        />
-                        <NavLink
-                            icon="article"
-                            iconAlignment="baseline"
-                            label="React to button click not keystrokes"
-                            to="/docs/howto/react-to-button-click-not-keystrokes"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Buffer a reactive edit"
-                            to="/docs/howto/buffer-a-reactive-edit"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Modify a value reported in a Column"
-                            to="/docs/howto/modify-a-value-reported-in-a-column"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Filter and transform data from an API"
-                            to="/docs/howto/filter-and-transform-data-from-an-api"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Group items in List by a property"
-                            to="/docs/howto/group-items-in-list-by-a-property"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Delay a DataSource until another DataSource is ready"
-                            to="/docs/howto/delay-a-datasource-until-another-datasource-is-ready"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Hide an element until its DataSource is ready"
-                            to="/docs/howto/hide-an-element-until-its-datasource-is-ready"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use built-in form validation"
-                            to="/docs/howto/use-built-in-form-validation"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Do custom form validation"
-                            to="/docs/howto/do-custom-form-validation"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Assign a complex JSON literal to a component variable"
-                            to="/docs/howto/assign-a-complex-json-literal-to-a-component-variable"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use accessors to simplify complex expressions"
-                            to="/docs/howto/use-accessors-to-simplify-complex-expressions"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Make a set of equal-width cards"
-                            to="/docs/howto/make-a-set-of-equal-width-cards"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Set the initial value of a Select from fetched data"
-                            to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Pass data to a Modal Dialog"
-                            to="/docs/howto/pass-data-to-a-modal-dialog"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Debug a component"
-                            to="/docs/howto/debug-a-component"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Share a ModalDialog across components"
-                            to="/docs/howto/share-a-modaldialog-across-components"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use the same ModalDialog to add or edit"
-                            to="/docs/howto/use-the-same-modaldialog-to-add-or-edit"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Paginate a list"
-                            to="/docs/howto/paginate-a-list"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Chain a DataSource refetch"
-                            to="/docs/howto/chain-a-refetch"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Control cache invalidation"
-                            to="/docs/howto/control-cache-invalidation"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Handle background operations"
-                            to="/docs/howto/handle-background-operations"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Update UI optimistically"
-                            to="/docs/howto/update-ui-optimistically"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Toggle multiple items with shared state"
-                            to="/docs/howto/toggle-multiple-items-with-shared-state"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Sync selections between table and list views"
-                            to="/docs/howto/sync-selections-between-table-and-list-views"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Make a table responsive"
-                            to="/docs/howto/make-a-table-responsive"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Debounce user input for API calls"
-                            to="/docs/howto/debounce-user-input-for-api-calls"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Debounce with ChangeListener"
-                            to="/docs/howto/debounce-with-changelistener"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use ModalDialog's onClose() method"
-                            to="/docs/howto/use-modal-dialog-onclose"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Copy billing data to shipping"
-                            to="/docs/howto/copy-billing-to-shipping"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Implement an authentication gate"
-                            to="/docs/howto/implement-an-authentication-gate"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Set the Width of an Input Field in an HStack"
-                            to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Stop DataSource from sending requests in a closed Dialog"
-                            to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add custom icons"
-                            to="/docs/howto/add-custom-icons"
-                        />
+                        <NavGroup label="Forms & Validation">
+                            <NavLink icon="article" label="Validate dependent fields together" to="/docs/howto/validate-dependent-fields-together" />
+                            <NavLink icon="article" label="Build a multi-step wizard form" to="/docs/howto/build-a-multi-step-wizard-form" />
+                            <NavLink icon="article" label="Reset a form after submission" to="/docs/howto/reset-a-form-after-submission" />
+                            <NavLink icon="article" label="Persist form drafts across sessions" to="/docs/howto/persist-form-drafts-across-sessions" />
+                            <NavLink icon="article" label="Prefill a form from an API response" to="/docs/howto/prefill-a-form-from-an-api-response" />
+                            <NavLink icon="article" label="Make a form read-only conditionally" to="/docs/howto/make-a-form-read-only-conditionally" />
+                            <NavLink icon="article" label="Arrange form fields side by side" to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout" />
+                            <NavLink icon="article" label="Show validation on blur, not on type" to="/docs/howto/show-validation-on-blur-not-on-type" />
+                            <NavLink icon="article" label="Add an async uniqueness check" to="/docs/howto/add-an-async-uniqueness-check" />
+                            <NavLink icon="article" label="Submit a form with file uploads" to="/docs/howto/submit-a-form-with-file-uploads" />
+                            <NavLink icon="article" label="Use built-in form validation" to="/docs/howto/use-built-in-form-validation" />
+                            <NavLink icon="article" label="Do custom form validation" to="/docs/howto/do-custom-form-validation" />
+                            <NavLink icon="article" label="Copy billing data to shipping" to="/docs/howto/copy-billing-to-shipping" />
+                            <NavLink icon="article" label="Set the initial value of a Select from fetched data" to="/docs/howto/set-the-initial-value-of-a-select-from-fetched-data" />
+                        </NavGroup>
+
+                        <NavGroup label="Data Loading & APIs">
+                            <NavLink icon="article" label="Poll an API at regular intervals" to="/docs/howto/poll-an-api-at-regular-intervals" />
+                            <NavLink icon="article" label="Transform nested API responses" to="/docs/howto/filter-and-transform-data-from-an-api" />
+                            <NavLink icon="article" label="Show a skeleton while data loads" to="/docs/howto/hide-an-element-until-its-datasource-is-ready" />
+                            <NavLink icon="article" label="Retry a failed API call" to="/docs/howto/retry-a-failed-api-call" />
+                            <NavLink icon="article" label="Track a long-running server task" to="/docs/howto/handle-background-operations" />
+                            <NavLink icon="article" label="Send custom headers per request" to="/docs/howto/send-custom-headers-per-request" />
+                            <NavLink icon="article" label="Invalidate related data after a write" to="/docs/howto/control-cache-invalidation" />
+                            <NavLink icon="article" label="Use mock data during development" to="/docs/howto/use-mock-data-during-development" />
+                            <NavLink icon="article" label="Download a file from an API" to="/docs/howto/download-a-file-from-an-api" />
+                            <NavLink icon="article" label="Cancel a deferred API operation" to="/docs/howto/cancel-a-deferred-api-operation" />
+                            <NavLink icon="article" label="Delay a DataSource until another is ready" to="/docs/howto/delay-a-datasource-until-another-datasource-is-ready" />
+                            <NavLink icon="article" label="Chain a DataSource refetch" to="/docs/howto/chain-a-refetch" />
+                            <NavLink icon="article" label="Update UI optimistically" to="/docs/howto/update-ui-optimistically" />
+                            <NavLink icon="article" label="Debounce user input for API calls" to="/docs/howto/debounce-user-input-for-api-calls" />
+                            <NavLink icon="article" label="Stop DataSource requests in a closed Dialog" to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog" />
+                        </NavGroup>
+
+                        <NavGroup label="Tables & Data Display">
+                            <NavLink icon="article" label="Pin columns in a wide table" to="/docs/howto/pin-columns-in-a-wide-table" />
+                            <NavLink icon="article" label="Add row actions with a context menu" to="/docs/howto/add-row-actions-with-a-context-menu" />
+                            <NavLink icon="article" label="Render a custom cell with components" to="/docs/howto/render-a-custom-cell-with-components" />
+                            <NavLink icon="article" label="Enable multi-row selection in a table" to="/docs/howto/enable-multi-row-selection-in-a-table" />
+                            <NavLink icon="article" label="Sort a table by a computed value" to="/docs/howto/sort-a-table-by-a-computed-value" />
+                            <NavLink icon="article" label="Highlight rows conditionally" to="/docs/howto/highlight-rows-conditionally" />
+                            <NavLink icon="article" label="Build a master–detail layout" to="/docs/howto/build-a-master-detail-layout" />
+                            <NavLink icon="article" label="Auto-size column widths with star" to="/docs/howto/auto-size-column-widths-with-star" />
+                            <NavLink icon="article" label="Modify a value reported in a Column" to="/docs/howto/modify-a-value-reported-in-a-column" />
+                            <NavLink icon="article" label="Make a table responsive" to="/docs/howto/make-a-table-responsive" />
+                            <NavLink icon="article" label="Sync selections between table and list views" to="/docs/howto/sync-selections-between-table-and-list-views" />
+                        </NavGroup>
+
+                        <NavGroup label="Lists, Trees & Iteration">
+                            <NavLink icon="article" label="Build a grouped list with headers" to="/docs/howto/group-items-in-list-by-a-property" />
+                            <NavLink icon="article" label="Lazy-load tree children on expand" to="/docs/howto/lazy-load-tree-children-on-expand" />
+                            <NavLink icon="article" label="Pre-select a tree node on load" to="/docs/howto/pre-select-a-tree-node-on-load" />
+                            <NavLink icon="article" label="Render a flat list with custom cards" to="/docs/howto/render-a-flat-list-with-custom-cards" />
+                            <NavLink icon="article" label="Add drag-and-drop reordering to a list" to="/docs/howto/add-drag-and-drop-reordering-to-a-list" />
+                            <NavLink icon="article" label="Iterate without a container element" to="/docs/howto/iterate-without-a-container-element" />
+                            <NavLink icon="article" label="Display an empty-state illustration" to="/docs/howto/display-an-empty-state-illustration" />
+                            <NavLink icon="article" label="Paginate a list" to="/docs/howto/paginate-a-list" />
+                        </NavGroup>
+
+                        <NavGroup label="Navigation & Routing">
+                            <NavLink icon="article" label="Add breadcrumb navigation" to="/docs/howto/add-breadcrumb-navigation" />
+                            <NavLink icon="article" label="Protect a page with an auth guard" to="/docs/howto/implement-an-authentication-gate" />
+                            <NavLink icon="article" label="Deep-link to a tab or section" to="/docs/howto/deep-link-to-a-tab-or-section" />
+                            <NavLink icon="article" label="Build nested page routes" to="/docs/howto/build-nested-page-routes" />
+                            <NavLink icon="article" label="Switch between hash and history routing" to="/docs/howto/switch-between-hash-and-history-routing" />
+                            <NavLink icon="article" label="Navigate programmatically" to="/docs/howto/navigate-programmatically" />
+                            <NavLink icon="article" label="Highlight the active nav link" to="/docs/howto/highlight-the-active-nav-link" />
+                            <NavLink icon="article" label="Collapse the nav panel on mobile" to="/docs/howto/collapse-the-nav-panel-on-mobile" />
+                            <NavLink icon="article" label="Make NavPanel width responsive" to="/docs/howto/make-navpanel-width-responsive" />
+                        </NavGroup>
+
+                        <NavGroup label="Layout & Responsive Design">
+                            <NavLink icon="article" label="Build a holy-grail layout" to="/docs/howto/build-a-holy-grail-layout" />
+                            <NavLink icon="article" label="Center content on the page" to="/docs/howto/center-content-on-the-page" />
+                            <NavLink icon="article" label="Create a resizable split view" to="/docs/howto/create-a-resizable-split-view" />
+                            <NavLink icon="article" label="Make a sticky header in a scroll area" to="/docs/howto/make-a-sticky-header-in-a-scroll-area" />
+                            <NavLink icon="article" label="Build a responsive card grid" to="/docs/howto/build-a-responsive-card-grid" />
+                            <NavLink icon="article" label="Show different content per breakpoint" to="/docs/howto/show-different-content-per-breakpoint" />
+                            <NavLink icon="article" label="Push a footer to the bottom" to="/docs/howto/push-a-footer-to-the-bottom" />
+                            <NavLink icon="article" label="Dock elements to panel edges" to="/docs/howto/dock-elements-to-panel-edges" />
+                            <NavLink icon="article" label="Limit content width on large screens" to="/docs/howto/limit-content-width-on-large-screens" />
+                            <NavLink icon="article" label="Make a set of equal-width cards" to="/docs/howto/make-a-set-of-equal-width-cards" />
+                        </NavGroup>
+
+                        <NavGroup label="Modals, Drawers & Overlays">
+                            <NavLink icon="article" label="Open a confirmation before delete" to="/docs/howto/open-a-confirmation-before-delete" />
+                            <NavLink icon="article" label="Build a fullscreen modal dialog" to="/docs/howto/build-a-fullscreen-modal-dialog" />
+                            <NavLink icon="article" label="Show a slide-in settings drawer" to="/docs/howto/show-a-slide-in-settings-drawer" />
+                            <NavLink icon="article" label="Return data from a closed dialog" to="/docs/howto/use-modal-dialog-onclose" />
+                            <NavLink icon="article" label="Open a context menu on right-click" to="/docs/howto/open-a-context-menu-on-right-click" />
+                            <NavLink icon="article" label="Pass data to a Modal Dialog" to="/docs/howto/pass-data-to-a-modal-dialog" />
+                            <NavLink icon="article" label="Share a ModalDialog across components" to="/docs/howto/share-a-modaldialog-across-components" />
+                            <NavLink icon="article" label="Use the same ModalDialog to add or edit" to="/docs/howto/use-the-same-modaldialog-to-add-or-edit" />
+                        </NavGroup>
+
+                        <NavGroup label="Theming & Styling">
+                            <NavLink icon="article" label="Create a custom color theme" to="/docs/howto/create-a-custom-color-theme" />
+                            <NavLink icon="article" label="Override a component's theme vars" to="/docs/howto/override-a-components-theme-vars" />
+                            <NavLink icon="article" label="Implement a dark-mode toggle" to="/docs/howto/implement-a-dark-mode-toggle" />
+                            <NavLink icon="article" label="Style text with custom variants" to="/docs/howto/style-text-with-custom-variants" />
+                            <NavLink icon="article" label="Scope a theme to a card or section" to="/docs/howto/scope-a-theme-to-a-card-or-section" />
+                            <NavLink icon="article" label="Adjust spacing globally" to="/docs/howto/adjust-spacing-globally" />
+                        </NavGroup>
+
+                        <NavGroup label="User-Defined Components">
+                            <NavLink icon="article" label="Create a reusable component" to="/docs/howto/create-a-reusable-component" />
+                            <NavLink icon="article" label="Pass a template slot to a component" to="/docs/howto/pass-a-template-slot-to-a-component" />
+                            <NavLink icon="article" label="Emit a custom event from a component" to="/docs/howto/emit-a-custom-event-from-a-component" />
+                            <NavLink icon="article" label="Set default property values" to="/docs/howto/set-default-property-values" />
+                            <NavLink icon="article" label="Compose components with nesting" to="/docs/howto/compose-components-with-nesting" />
+                            <NavLink icon="article" label="Expose a method from a component" to="/docs/howto/expose-a-method-from-a-component" />
+                            <NavLink icon="article" label="Delegate a method" to="/docs/howto/delegate-a-method" />
+                        </NavGroup>
+
+                        <NavGroup label="Scripting & Reactivity">
+                            <NavLink icon="article" label="React to value changes with debounce" to="/docs/howto/debounce-with-changelistener" />
+                            <NavLink icon="article" label="Derive a value from multiple sources" to="/docs/howto/derive-a-value-from-multiple-sources" />
+                            <NavLink icon="article" label="Use accessors for complex expressions" to="/docs/howto/use-accessors-to-simplify-complex-expressions" />
+                            <NavLink icon="article" label="Run a one-time action on page load" to="/docs/howto/run-a-one-time-action-on-page-load" />
+                            <NavLink icon="article" label="Communicate between sibling components" to="/docs/howto/communicate-between-sibling-components" />
+                            <NavLink icon="article" label="Throttle rapid value updates" to="/docs/howto/throttle-rapid-value-updates" />
+                            <NavLink icon="article" label="React to button click not keystrokes" to="/docs/howto/react-to-button-click-not-keystrokes" />
+                            <NavLink icon="article" label="Buffer a reactive edit" to="/docs/howto/buffer-a-reactive-edit" />
+                            <NavLink icon="article" label="Assign a complex JSON literal to a variable" to="/docs/howto/assign-a-complex-json-literal-to-a-component-variable" />
+                            <NavLink icon="article" label="Toggle multiple items with shared state" to="/docs/howto/toggle-multiple-items-with-shared-state" />
+                        </NavGroup>
+
+                        <NavGroup label="Menus & Toolbars">
+                            <NavLink icon="article" label="Build a toolbar with overflow menu" to="/docs/howto/build-a-toolbar-with-overflow-menu" />
+                            <NavLink icon="article" label="Add a dropdown menu to a button" to="/docs/howto/add-a-dropdown-menu-to-a-button" />
+                            <NavLink icon="article" label="Disable menu items conditionally" to="/docs/howto/disable-menu-items-conditionally" />
+                            <NavLink icon="article" label="Create a multi-level submenu" to="/docs/howto/create-a-multi-level-submenu" />
+                        </NavGroup>
+
+                        <NavGroup label="Media & Rich Content">
+                            <NavLink icon="article" label="Render a Markdown file as a page" to="/docs/howto/render-a-markdown-file-as-a-page" />
+                            <NavLink icon="article" label="Embed an external site in an IFrame" to="/docs/howto/embed-an-external-site-in-an-iframe" />
+                            <NavLink icon="article" label="Lazy-load images for performance" to="/docs/howto/lazy-load-images-for-performance" />
+                            <NavLink icon="article" label="Generate a QR code from user input" to="/docs/howto/generate-a-qr-code-from-user-input" />
+                            <NavLink icon="article" label="Display a PDF document inline" to="/docs/howto/display-a-pdf-document-inline" />
+                            <NavLink icon="article" label="Add entrance animations to content" to="/docs/howto/add-entrance-animations-to-content" />
+                        </NavGroup>
+
+                        <NavGroup label="Miscellaneous Patterns">
+                            <NavLink icon="article" label="Show toast notifications from code" to="/docs/howto/show-toast-notifications-from-code" />
+                            <NavLink icon="article" label="Set the page title dynamically" to="/docs/howto/set-the-page-title-dynamically" />
+                            <NavLink icon="article" label="Receive postMessage from an iframe" to="/docs/howto/receive-postmessage-from-an-iframe" />
+                            <NavLink icon="article" label="Build a batch-processing queue" to="/docs/howto/build-a-batch-processing-queue" />
+                            <NavLink icon="article" label="Add custom icons to the app" to="/docs/howto/add-custom-icons" />
+                            <NavLink icon="article" label="Generate a table of contents" to="/docs/howto/generate-a-table-of-contents" />
+                            <NavLink icon="article" label="Use local storage for user prefs" to="/docs/howto/use-local-storage-for-user-prefs" />
+                            <NavLink icon="article" label="Redirect users after login" to="/docs/howto/redirect-users-after-login" />
+                            <NavLink icon="article" label="Debug a component" to="/docs/howto/debug-a-component" />
+                        </NavGroup>
+
+                        <NavGroup label="Advanced Theming">
+                            <NavLink icon="article" label="Theme Button variant×color combos" to="/docs/howto/theme-button-variant-color-combos" />
+                            <NavLink icon="article" label="Style per-level Heading sizes" to="/docs/howto/style-per-level-heading-sizes" />
+                            <NavLink icon="article" label="Theme TableOfContents by depth" to="/docs/howto/theme-tableofcontents-by-depth" />
+                            <NavLink icon="article" label="Customize Select & AutoComplete menus" to="/docs/howto/customize-select-and-autocomplete-menus" />
+                            <NavLink icon="article" label="Theme form inputs for all states" to="/docs/howto/theme-form-inputs-for-all-states" />
+                            <NavLink icon="article" label="Style Markdown admonition variants" to="/docs/howto/style-markdown-admonition-variants" />
+                            <NavLink icon="article" label="Customize Tooltip appearance" to="/docs/howto/customize-tooltip-appearance" />
+                            <NavLink icon="article" label="Theme ExpandableItem transitions" to="/docs/howto/theme-expandableitem-transitions" />
+                            <NavLink icon="article" label="Style NavPanel for horizontal mode" to="/docs/howto/style-navpanel-for-horizontal-mode" />
+                            <NavLink icon="article" label="Theme multi-level NavGroup nesting" to="/docs/howto/theme-multi-level-navgroup-nesting" />
+                            <NavLink icon="article" label="Style ModalDialog overlay and parts" to="/docs/howto/style-modaldialog-overlay-and-parts" />
+                            <NavLink icon="article" label="Customize Link focus & decoration" to="/docs/howto/customize-link-focus-and-decoration" />
+                            <NavLink icon="article" label="Theme DatePicker calendar items" to="/docs/howto/theme-datepicker-calendar-items" />
+                            <NavLink icon="article" label="Style Slider track, thumb, and range" to="/docs/howto/style-slider-track-thumb-and-range" />
+                            <NavLink icon="article" label="Define custom Text variants in a theme" to="/docs/howto/define-custom-text-variants-in-a-theme" />
+                            <NavLink icon="article" label="Theme Badge colors and sizes" to="/docs/howto/theme-badge-colors-and-sizes" />
+                            <NavLink icon="article" label="Style Card and NoResult placeholders" to="/docs/howto/style-card-and-noresult-placeholders" />
+                        </NavGroup>
+
+                        <NavGroup label="Complex Property Patterns">
+                            <NavLink icon="article" label="Configure Tree data format and mapping" to="/docs/howto/configure-tree-data-format-and-mapping" />
+                            <NavLink icon="article" label="Parse uploaded files as CSV or JSON" to="/docs/howto/parse-uploaded-files-as-csv-or-json" />
+                            <NavLink icon="article" label="Disable specific dates in DatePicker" to="/docs/howto/disable-specific-dates-in-datepicker" />
+                            <NavLink icon="article" label="Handle Form willSubmit return values" to="/docs/howto/handle-form-willsubmit-return-values" />
+                            <NavLink icon="article" label="Use regex validation in FormItem" to="/docs/howto/use-regex-validation-in-formitem" />
+                            <NavLink icon="article" label="Use negative maxPrimarySize in Splitter" to="/docs/howto/use-negative-maxprimarysize-in-splitter" />
+                            <NavLink icon="article" label="Switch Tabs to accordion view" to="/docs/howto/switch-tabs-to-accordion-view" />
+                            <NavLink icon="article" label="Sync TileGrid selection across grids" to="/docs/howto/sync-tilegrid-selection-across-grids" />
+                            <NavLink icon="article" label="Configure Tooltip with string syntax" to="/docs/howto/configure-tooltip-with-string-syntax" />
+                            <NavLink icon="article" label="Control debounce vs throttle priority" to="/docs/howto/control-debounce-vs-throttle-priority" />
+                            <NavLink icon="article" label="Dock children in a Stack panel" to="/docs/howto/dock-children-in-a-stack-panel" />
+                            <NavLink icon="article" label="Communicate with IFrame content" to="/docs/howto/communicate-with-iframe-content" />
+                            <NavLink icon="article" label="Handle ContentSeparator orientation" to="/docs/howto/handle-contentseparator-orientation" />
+                            <NavLink icon="article" label="Load remote markup with IncludeMarkup" to="/docs/howto/load-remote-markup-with-includemarkup" />
+                            <NavLink icon="article" label="Stack StickySection elements" to="/docs/howto/stack-stickysection-elements" />
+                            <NavLink icon="article" label="Auto-scroll NavPanel to active item" to="/docs/howto/auto-scroll-navpanel-to-active-item" />
+                            <NavLink icon="article" label="Handle Checkbox value coercion" to="/docs/howto/handle-checkbox-value-coercion" />
+                        </NavGroup>
+
+                        <NavGroup label="Charts & Data Visualization">
+                            <NavLink icon="article" label="Build a stacked bar chart" to="/docs/howto/build-a-stacked-bar-chart" />
+                            <NavLink icon="article" label="Format chart axis ticks" to="/docs/howto/format-chart-axis-ticks" />
+                            <NavLink icon="article" label="Add custom tooltips to a chart" to="/docs/howto/add-custom-tooltips-to-a-chart" />
+                            <NavLink icon="article" label="Create an area chart with stacking" to="/docs/howto/create-an-area-chart-with-stacking" />
+                            <NavLink icon="article" label="Position labels on a pie chart" to="/docs/howto/position-labels-on-a-pie-chart" />
+                            <NavLink icon="article" label="Overlay a radar chart comparison" to="/docs/howto/overlay-a-radar-chart-comparison" />
+                            <NavLink icon="article" label="Use ECharts for advanced charting" to="/docs/howto/use-echarts-for-advanced-charting" />
+                            <NavLink icon="article" label="Create a gauge dashboard widget" to="/docs/howto/create-a-gauge-dashboard-widget" />
+                        </NavGroup>
+
+                        <NavGroup label="PDF Viewer">
+                            <NavLink icon="article" label="Embed and navigate a PDF" to="/docs/howto/embed-and-navigate-a-pdf" />
+                            <NavLink icon="article" label="Add annotations to a PDF" to="/docs/howto/add-annotations-to-a-pdf" />
+                            <NavLink icon="article" label="Capture and apply PDF signatures" to="/docs/howto/capture-and-apply-pdf-signatures" />
+                            <NavLink icon="article" label="Export a modified PDF" to="/docs/howto/export-a-modified-pdf" />
+                        </NavGroup>
+
+                        <NavGroup label="Rich Text & Masonry">
+                            <NavLink icon="article" label="Configure a TiptapEditor toolbar" to="/docs/howto/configure-a-tiptapeditor-toolbar" />
+                            <NavLink icon="article" label="Build a responsive masonry layout" to="/docs/howto/build-a-responsive-masonry-layout" />
+                        </NavGroup>
+
+                        <NavGroup label="Animation & Carousel">
+                            <NavLink icon="article" label="Chain animations on scroll into view" to="/docs/howto/chain-animations-on-scroll-into-view" />
+                            <NavLink icon="article" label="Build an auto-playing carousel" to="/docs/howto/build-an-auto-playing-carousel" />
+                            <NavLink icon="article" label="Customize carousel controls & indicators" to="/docs/howto/customize-carousel-controls-and-indicators" />
+                        </NavGroup>
                     </NavGroup>
                     <NavGroup
                         label="Reference"
@@ -1196,6 +1242,440 @@
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/add-custom-icons.md']}"
                 />
+            </Page>
+
+            <!-- New how-to articles: Forms & Validation -->
+            <Page url="/docs/howto/validate-dependent-fields-together">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/validate-dependent-fields-together.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-multi-step-wizard-form">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-multi-step-wizard-form.md']}" />
+            </Page>
+            <Page url="/docs/howto/reset-a-form-after-submission">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/reset-a-form-after-submission.md']}" />
+            </Page>
+            <Page url="/docs/howto/persist-form-drafts-across-sessions">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/persist-form-drafts-across-sessions.md']}" />
+            </Page>
+            <Page url="/docs/howto/prefill-a-form-from-an-api-response">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/prefill-a-form-from-an-api-response.md']}" />
+            </Page>
+            <Page url="/docs/howto/make-a-form-read-only-conditionally">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/make-a-form-read-only-conditionally.md']}" />
+            </Page>
+            <Page url="/docs/howto/show-validation-on-blur-not-on-type">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-validation-on-blur-not-on-type.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-an-async-uniqueness-check">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-an-async-uniqueness-check.md']}" />
+            </Page>
+            <Page url="/docs/howto/submit-a-form-with-file-uploads">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Data Loading & APIs -->
+            <Page url="/docs/howto/poll-an-api-at-regular-intervals">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/poll-an-api-at-regular-intervals.md']}" />
+            </Page>
+            <Page url="/docs/howto/retry-a-failed-api-call">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/retry-a-failed-api-call.md']}" />
+            </Page>
+            <Page url="/docs/howto/send-custom-headers-per-request">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/send-custom-headers-per-request.md']}" />
+            </Page>
+            <Page url="/docs/howto/use-mock-data-during-development">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/use-mock-data-during-development.md']}" />
+            </Page>
+            <Page url="/docs/howto/download-a-file-from-an-api">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/download-a-file-from-an-api.md']}" />
+            </Page>
+            <Page url="/docs/howto/cancel-a-deferred-api-operation">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/cancel-a-deferred-api-operation.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Tables & Data Display -->
+            <Page url="/docs/howto/pin-columns-in-a-wide-table">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/pin-columns-in-a-wide-table.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-row-actions-with-a-context-menu">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-row-actions-with-a-context-menu.md']}" />
+            </Page>
+            <Page url="/docs/howto/render-a-custom-cell-with-components">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/render-a-custom-cell-with-components.md']}" />
+            </Page>
+            <Page url="/docs/howto/enable-multi-row-selection-in-a-table">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/enable-multi-row-selection-in-a-table.md']}" />
+            </Page>
+            <Page url="/docs/howto/sort-a-table-by-a-computed-value">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/sort-a-table-by-a-computed-value.md']}" />
+            </Page>
+            <Page url="/docs/howto/highlight-rows-conditionally">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/highlight-rows-conditionally.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-master-detail-layout">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-master-detail-layout.md']}" />
+            </Page>
+            <Page url="/docs/howto/auto-size-column-widths-with-star">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/auto-size-column-widths-with-star.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Lists, Trees & Iteration -->
+            <Page url="/docs/howto/lazy-load-tree-children-on-expand">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/lazy-load-tree-children-on-expand.md']}" />
+            </Page>
+            <Page url="/docs/howto/pre-select-a-tree-node-on-load">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/pre-select-a-tree-node-on-load.md']}" />
+            </Page>
+            <Page url="/docs/howto/render-a-flat-list-with-custom-cards">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/render-a-flat-list-with-custom-cards.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-drag-and-drop-reordering-to-a-list">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-drag-and-drop-reordering-to-a-list.md']}" />
+            </Page>
+            <Page url="/docs/howto/iterate-without-a-container-element">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/iterate-without-a-container-element.md']}" />
+            </Page>
+            <Page url="/docs/howto/display-an-empty-state-illustration">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/display-an-empty-state-illustration.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Navigation & Routing -->
+            <Page url="/docs/howto/add-breadcrumb-navigation">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-breadcrumb-navigation.md']}" />
+            </Page>
+            <Page url="/docs/howto/deep-link-to-a-tab-or-section">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/deep-link-to-a-tab-or-section.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-nested-page-routes">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-nested-page-routes.md']}" />
+            </Page>
+            <Page url="/docs/howto/switch-between-hash-and-history-routing">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/switch-between-hash-and-history-routing.md']}" />
+            </Page>
+            <Page url="/docs/howto/navigate-programmatically">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/navigate-programmatically.md']}" />
+            </Page>
+            <Page url="/docs/howto/highlight-the-active-nav-link">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/highlight-the-active-nav-link.md']}" />
+            </Page>
+            <Page url="/docs/howto/collapse-the-nav-panel-on-mobile">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/collapse-the-nav-panel-on-mobile.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Layout & Responsive Design -->
+            <Page url="/docs/howto/build-a-holy-grail-layout">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-holy-grail-layout.md']}" />
+            </Page>
+            <Page url="/docs/howto/center-content-on-the-page">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/center-content-on-the-page.md']}" />
+            </Page>
+            <Page url="/docs/howto/create-a-resizable-split-view">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-a-resizable-split-view.md']}" />
+            </Page>
+            <Page url="/docs/howto/make-a-sticky-header-in-a-scroll-area">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/make-a-sticky-header-in-a-scroll-area.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-responsive-card-grid">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-responsive-card-grid.md']}" />
+            </Page>
+            <Page url="/docs/howto/show-different-content-per-breakpoint">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-different-content-per-breakpoint.md']}" />
+            </Page>
+            <Page url="/docs/howto/push-a-footer-to-the-bottom">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/push-a-footer-to-the-bottom.md']}" />
+            </Page>
+            <Page url="/docs/howto/dock-elements-to-panel-edges">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/dock-elements-to-panel-edges.md']}" />
+            </Page>
+            <Page url="/docs/howto/limit-content-width-on-large-screens">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/limit-content-width-on-large-screens.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Modals, Drawers & Overlays -->
+            <Page url="/docs/howto/open-a-confirmation-before-delete">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/open-a-confirmation-before-delete.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-fullscreen-modal-dialog">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-fullscreen-modal-dialog.md']}" />
+            </Page>
+            <Page url="/docs/howto/show-a-slide-in-settings-drawer">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-a-slide-in-settings-drawer.md']}" />
+            </Page>
+            <Page url="/docs/howto/open-a-context-menu-on-right-click">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/open-a-context-menu-on-right-click.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Theming & Styling -->
+            <Page url="/docs/howto/create-a-custom-color-theme">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-a-custom-color-theme.md']}" />
+            </Page>
+            <Page url="/docs/howto/override-a-components-theme-vars">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/override-a-components-theme-vars.md']}" />
+            </Page>
+            <Page url="/docs/howto/implement-a-dark-mode-toggle">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/implement-a-dark-mode-toggle.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-text-with-custom-variants">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-text-with-custom-variants.md']}" />
+            </Page>
+            <Page url="/docs/howto/scope-a-theme-to-a-card-or-section">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/scope-a-theme-to-a-card-or-section.md']}" />
+            </Page>
+            <Page url="/docs/howto/adjust-spacing-globally">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/adjust-spacing-globally.md']}" />
+            </Page>
+
+            <!-- New how-to articles: User-Defined Components -->
+            <Page url="/docs/howto/create-a-reusable-component">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-a-reusable-component.md']}" />
+            </Page>
+            <Page url="/docs/howto/pass-a-template-slot-to-a-component">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/pass-a-template-slot-to-a-component.md']}" />
+            </Page>
+            <Page url="/docs/howto/emit-a-custom-event-from-a-component">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/emit-a-custom-event-from-a-component.md']}" />
+            </Page>
+            <Page url="/docs/howto/set-default-property-values">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/set-default-property-values.md']}" />
+            </Page>
+            <Page url="/docs/howto/compose-components-with-nesting">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/compose-components-with-nesting.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Scripting & Reactivity -->
+            <Page url="/docs/howto/derive-a-value-from-multiple-sources">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/derive-a-value-from-multiple-sources.md']}" />
+            </Page>
+            <Page url="/docs/howto/run-a-one-time-action-on-page-load">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/run-a-one-time-action-on-page-load.md']}" />
+            </Page>
+            <Page url="/docs/howto/communicate-between-sibling-components">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/communicate-between-sibling-components.md']}" />
+            </Page>
+            <Page url="/docs/howto/throttle-rapid-value-updates">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/throttle-rapid-value-updates.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Menus & Toolbars -->
+            <Page url="/docs/howto/build-a-toolbar-with-overflow-menu">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-toolbar-with-overflow-menu.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-a-dropdown-menu-to-a-button">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-a-dropdown-menu-to-a-button.md']}" />
+            </Page>
+            <Page url="/docs/howto/disable-menu-items-conditionally">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/disable-menu-items-conditionally.md']}" />
+            </Page>
+            <Page url="/docs/howto/create-a-multi-level-submenu">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-a-multi-level-submenu.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Media & Rich Content -->
+            <Page url="/docs/howto/render-a-markdown-file-as-a-page">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/render-a-markdown-file-as-a-page.md']}" />
+            </Page>
+            <Page url="/docs/howto/embed-an-external-site-in-an-iframe">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/embed-an-external-site-in-an-iframe.md']}" />
+            </Page>
+            <Page url="/docs/howto/lazy-load-images-for-performance">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/lazy-load-images-for-performance.md']}" />
+            </Page>
+            <Page url="/docs/howto/generate-a-qr-code-from-user-input">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/generate-a-qr-code-from-user-input.md']}" />
+            </Page>
+            <Page url="/docs/howto/display-a-pdf-document-inline">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/display-a-pdf-document-inline.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-entrance-animations-to-content">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-entrance-animations-to-content.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Miscellaneous Patterns -->
+            <Page url="/docs/howto/show-toast-notifications-from-code">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-toast-notifications-from-code.md']}" />
+            </Page>
+            <Page url="/docs/howto/set-the-page-title-dynamically">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/set-the-page-title-dynamically.md']}" />
+            </Page>
+            <Page url="/docs/howto/receive-postmessage-from-an-iframe">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/receive-postmessage-from-an-iframe.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-batch-processing-queue">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-batch-processing-queue.md']}" />
+            </Page>
+            <Page url="/docs/howto/generate-a-table-of-contents">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/generate-a-table-of-contents.md']}" />
+            </Page>
+            <Page url="/docs/howto/use-local-storage-for-user-prefs">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/use-local-storage-for-user-prefs.md']}" />
+            </Page>
+            <Page url="/docs/howto/redirect-users-after-login">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/redirect-users-after-login.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Advanced Theming -->
+            <Page url="/docs/howto/theme-button-variant-color-combos">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-button-variant-color-combos.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-per-level-heading-sizes">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-per-level-heading-sizes.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-tableofcontents-by-depth">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-tableofcontents-by-depth.md']}" />
+            </Page>
+            <Page url="/docs/howto/customize-select-and-autocomplete-menus">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/customize-select-and-autocomplete-menus.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-form-inputs-for-all-states">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-form-inputs-for-all-states.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-markdown-admonition-variants">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-markdown-admonition-variants.md']}" />
+            </Page>
+            <Page url="/docs/howto/customize-tooltip-appearance">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/customize-tooltip-appearance.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-expandableitem-transitions">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-expandableitem-transitions.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-navpanel-for-horizontal-mode">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-navpanel-for-horizontal-mode.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-multi-level-navgroup-nesting">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-multi-level-navgroup-nesting.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-modaldialog-overlay-and-parts">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-modaldialog-overlay-and-parts.md']}" />
+            </Page>
+            <Page url="/docs/howto/customize-link-focus-and-decoration">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/customize-link-focus-and-decoration.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-datepicker-calendar-items">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-datepicker-calendar-items.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-slider-track-thumb-and-range">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-slider-track-thumb-and-range.md']}" />
+            </Page>
+            <Page url="/docs/howto/define-custom-text-variants-in-a-theme">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/define-custom-text-variants-in-a-theme.md']}" />
+            </Page>
+            <Page url="/docs/howto/theme-badge-colors-and-sizes">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/theme-badge-colors-and-sizes.md']}" />
+            </Page>
+            <Page url="/docs/howto/style-card-and-noresult-placeholders">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/style-card-and-noresult-placeholders.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Complex Property Patterns -->
+            <Page url="/docs/howto/configure-tree-data-format-and-mapping">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/configure-tree-data-format-and-mapping.md']}" />
+            </Page>
+            <Page url="/docs/howto/parse-uploaded-files-as-csv-or-json">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/parse-uploaded-files-as-csv-or-json.md']}" />
+            </Page>
+            <Page url="/docs/howto/disable-specific-dates-in-datepicker">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/disable-specific-dates-in-datepicker.md']}" />
+            </Page>
+            <Page url="/docs/howto/handle-form-willsubmit-return-values">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/handle-form-willsubmit-return-values.md']}" />
+            </Page>
+            <Page url="/docs/howto/use-regex-validation-in-formitem">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/use-regex-validation-in-formitem.md']}" />
+            </Page>
+            <Page url="/docs/howto/use-negative-maxprimarysize-in-splitter">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/use-negative-maxprimarysize-in-splitter.md']}" />
+            </Page>
+            <Page url="/docs/howto/switch-tabs-to-accordion-view">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/switch-tabs-to-accordion-view.md']}" />
+            </Page>
+            <Page url="/docs/howto/sync-tilegrid-selection-across-grids">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/sync-tilegrid-selection-across-grids.md']}" />
+            </Page>
+            <Page url="/docs/howto/configure-tooltip-with-string-syntax">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/configure-tooltip-with-string-syntax.md']}" />
+            </Page>
+            <Page url="/docs/howto/control-debounce-vs-throttle-priority">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/control-debounce-vs-throttle-priority.md']}" />
+            </Page>
+            <Page url="/docs/howto/dock-children-in-a-stack-panel">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/dock-children-in-a-stack-panel.md']}" />
+            </Page>
+            <Page url="/docs/howto/communicate-with-iframe-content">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/communicate-with-iframe-content.md']}" />
+            </Page>
+            <Page url="/docs/howto/handle-contentseparator-orientation">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/handle-contentseparator-orientation.md']}" />
+            </Page>
+            <Page url="/docs/howto/load-remote-markup-with-includemarkup">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/load-remote-markup-with-includemarkup.md']}" />
+            </Page>
+            <Page url="/docs/howto/stack-stickysection-elements">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/stack-stickysection-elements.md']}" />
+            </Page>
+            <Page url="/docs/howto/auto-scroll-navpanel-to-active-item">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/auto-scroll-navpanel-to-active-item.md']}" />
+            </Page>
+            <Page url="/docs/howto/handle-checkbox-value-coercion">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/handle-checkbox-value-coercion.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Charts & Data Visualization -->
+            <Page url="/docs/howto/build-a-stacked-bar-chart">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-stacked-bar-chart.md']}" />
+            </Page>
+            <Page url="/docs/howto/format-chart-axis-ticks">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/format-chart-axis-ticks.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-custom-tooltips-to-a-chart">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-custom-tooltips-to-a-chart.md']}" />
+            </Page>
+            <Page url="/docs/howto/create-an-area-chart-with-stacking">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-an-area-chart-with-stacking.md']}" />
+            </Page>
+            <Page url="/docs/howto/position-labels-on-a-pie-chart">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/position-labels-on-a-pie-chart.md']}" />
+            </Page>
+            <Page url="/docs/howto/overlay-a-radar-chart-comparison">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/overlay-a-radar-chart-comparison.md']}" />
+            </Page>
+            <Page url="/docs/howto/use-echarts-for-advanced-charting">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/use-echarts-for-advanced-charting.md']}" />
+            </Page>
+            <Page url="/docs/howto/create-a-gauge-dashboard-widget">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/create-a-gauge-dashboard-widget.md']}" />
+            </Page>
+
+            <!-- New how-to articles: PDF Viewer -->
+            <Page url="/docs/howto/embed-and-navigate-a-pdf">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/embed-and-navigate-a-pdf.md']}" />
+            </Page>
+            <Page url="/docs/howto/add-annotations-to-a-pdf">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-annotations-to-a-pdf.md']}" />
+            </Page>
+            <Page url="/docs/howto/capture-and-apply-pdf-signatures">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/capture-and-apply-pdf-signatures.md']}" />
+            </Page>
+            <Page url="/docs/howto/export-a-modified-pdf">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/export-a-modified-pdf.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Rich Text & Masonry -->
+            <Page url="/docs/howto/configure-a-tiptapeditor-toolbar">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/configure-a-tiptapeditor-toolbar.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-a-responsive-masonry-layout">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-responsive-masonry-layout.md']}" />
+            </Page>
+
+            <!-- New how-to articles: Animation & Carousel -->
+            <Page url="/docs/howto/chain-animations-on-scroll-into-view">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/chain-animations-on-scroll-into-view.md']}" />
+            </Page>
+            <Page url="/docs/howto/build-an-auto-playing-carousel">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-an-auto-playing-carousel.md']}" />
+            </Page>
+            <Page url="/docs/howto/customize-carousel-controls-and-indicators">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/customize-carousel-controls-and-indicators.md']}" />
             </Page>
 
             <Page
