@@ -74,8 +74,7 @@ export const TileGridMd = createMetadata({
     },
     syncWithVar: d(
       `The name of a global variable to synchronize the grid's selection state with. ` +
-        `The named variable must reference an object; the grid will read from and write to its ` +
-        `\`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+        `The named variable must reference an object; the grid will read from and write to its \`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
     ),
     hideSelectionCheckboxes: {
       description:

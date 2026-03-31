@@ -155,6 +155,25 @@ test.describe("Theme Variables", () => {
     await expect(tile).toBeVisible();
     await expect(tile).toHaveCSS("border-radius", "12px");
   });
+
+  test("applies fontSize-checkbox-TileGrid theme variable", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+        <TileGrid
+          data="{[{id: 1}]}"
+          itemWidth="100px"
+          itemHeight="100px"
+          itemsSelectable="true"
+        >
+          <Text>tile</Text>
+        </TileGrid>
+      `,
+      { testThemeVars: { "fontSize-checkbox-TileGrid": "24px" } },
+    );
+    const checkbox = page.getByRole("checkbox").first();
+    await expect(checkbox).toBeVisible();
+    await expect(checkbox).toHaveCSS("font-size", "24px");
+  });
 });
 
 // =============================================================================

@@ -834,3 +834,37 @@ Has no effect when `itemsSelectable` is `false`.
 (See the [example](#clearselection) at the `clearSelection` method.)
 
 %-API-END
+
+%-STYLE-START
+
+`TileGrid` supports the following theme variables.
+
+**Item appearance:**
+
+| Theme variable | Default |
+| :--- | :--- |
+| `backgroundColor-item-TileGrid` | `transparent` |
+| `backgroundColor-item-TileGrid--hover` | `$color-surface-100` |
+| `backgroundColor-item-TileGrid--selected` | `$color-surface-100` |
+| `backgroundColor-item-TileGrid--selected--hover` | `$color-primary-100` |
+| `borderRadius-item-TileGrid` | `$borderRadius` |
+| `userSelect-item-TileGrid` | `none` |
+
+**Item focus outline:**
+
+| Theme variable | Default |
+| :--- | :--- |
+| `outlineColor-item-TileGrid--focus` | `$color-primary-500` |
+| `outlineWidth-item-TileGrid--focus` | `2px` |
+| `outlineStyle-item-TileGrid--focus` | `solid` |
+| `outlineOffset-item-TileGrid--focus` | `-2px` |
+
+**Selection checkbox:**
+
+| Theme variable | Default | Description |
+| :--- | :--- | :--- |
+| `offsetVertical-checkbox-TileGrid` | `4px` | Distance from the tile's top or bottom edge |
+| `offsetHorizontal-checkbox-TileGrid` | `4px` | Distance from the tile's start or end edge |
+| `fontSize-checkbox-TileGrid` | *(inherited)* | Font size used to scale the checkbox; the checkbox dimensions are `1em × 1em`, so increasing this value makes the checkbox larger without affecting tile content |
+
+%-STYLE-END
