@@ -709,7 +709,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             onValueChange={(val) => toggleOption(val)}
             id={id}
             options={options}
-            style={{ ...style, height: dropdownHeight }}
+            style={style}
             className={classnames(className, classes?.[COMPONENT_PART_KEY])}
             contentClassName={contentClassName}
             onFocus={onFocus}
