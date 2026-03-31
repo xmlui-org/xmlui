@@ -505,6 +505,7 @@ export const TableMd = createMetadata({
     [`fontWeight-heading-${COMP}`]: "$fontWeight-bold",
     [`textTransform-heading-${COMP}`]: "uppercase",
     [`fontSize-row-${COMP}`]: "$fontSize-sm",
+    [`fontSize-checkbox-${COMP}`]: "$fontSize",
     // [`backgroundColor-${COMP}`]: "transparent",
     // [`backgroundColor-row-${COMP}`]: "inherit",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,

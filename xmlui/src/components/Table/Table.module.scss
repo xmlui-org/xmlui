@@ -32,6 +32,7 @@ $backgroundColor-pagination-Table: createThemeVar("backgroundColor-pagination-#{
 $textColor-heading-Table: createThemeVar("textColor-heading-#{$component}");
 $fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
 $fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
+$fontSize-checkbox-Table: createThemeVar("fontSize-checkbox-#{$component}");
 $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
 $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
@@ -171,7 +172,7 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       //background-color: inherit;
 
       .checkBoxWrapper {
-        font-size: t.$fontSize;
+        font-size: $fontSize-checkbox-Table;
         visibility: hidden;
 
         &.showInHeader,
