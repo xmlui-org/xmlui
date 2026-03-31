@@ -837,4 +837,10 @@ Has no effect when `itemsSelectable` is `false`.
 
 %-STYLE-START
 
+The visual appearance of `TileGrid` can be customized through theme variables. These control layout, spacing, and typography for tiles and their selection controls.
+
+| Theme variable | Description |
+|:---|:---|
+| `fontSize-checkbox-TileGrid` | Font size of the checkbox label used for tile selection. |
+
 %-STYLE-END
