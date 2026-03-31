@@ -6,7 +6,7 @@
   "tasks": {
     "build:for-node": {
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
-      "outputs": ["dist/bin/**", "dist/for-node/**"]
+      "outputs": ["dist/nodejs/**"]
     },
     "build:xmlui": {
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
