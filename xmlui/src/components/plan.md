@@ -95,6 +95,7 @@ Topics for new how-to articles, grouped by theme. Each entry has a short title (
 | 50 | Push a footer to the bottom | Use SpaceFiller between main content and Footer so the footer stays at the viewport bottom. |
 | 51 | Dock elements to panel edges | Use `dock` on Stack children to pin items to top/bottom/left/right of a container. |
 | 52 | Limit content width on large screens | Wrap content in a Stack with `maxWidth` and center it, so ultrawide monitors stay readable. |
+| — | Make a set of equal-width cards | Use `FlowLayout` with `width="*"` star sizing so stat/summary cards divide the row equally. |
 
 ---
 
@@ -416,3 +417,397 @@ Priority maps to colors: low → `$color-success`, normal → `$color-info`, hig
 3. **Scope isolation**: A variable declared in `TaskBoard` is invisible inside `TaskColumn` or `TaskCard`. Always pass needed data explicitly; use `Slot` when content should evaluate in the parent scope.
 4. **Single responsibility**: Each component has one job — `TaskCard` renders one task, `TaskColumn` groups tasks under a label, `TaskBoard` assembles the layout. This keeps each file small and independently testable.
 5. **Progressive enhancement**: Start with `TaskCard` alone (article 64), add `TaskColumn` to group it, then `TaskBoard` to orchestrate — each layer adds exactly one concern.
+
+---
+
+## ✅ Category 9 Complete
+
+---
+
+## Article Body Scenarios — Category 8: Theming & Styling
+
+All six articles use a small **settings dashboard** domain — a page with cards, headings, badges, and text — so the reader can see every theme change take visible, immediate effect. No mock API is needed; all data is inline.
+
+### Shared domain model
+
+The demo UI is a simple dashboard with a heading ("Settings"), a few cards containing form-like content (Badge status indicators, a ProgressBar, a couple of buttons), and some styled text. This gives enough surface area to show color, typography, component-specific, and spacing changes across all six articles.
+
+---
+
+### 58 · Create a custom color theme
+
+**Article file**: `create-a-custom-color-theme.md`
+
+**Scenario**: The default XMLUI blue doesn't match your brand. You want to swap the primary, secondary, and surface colors so every component in the app picks up the new palette automatically — without touching any individual component.
+
+**Demo**:
+- `---app` wraps the entire content in `<Theme>` with `color-primary`, `color-secondary`, and `color-surface` overrides (e.g. a warm amber/teal scheme).
+- Content inside: an `H2` heading, two `Button` variants (`solid/primary` and `outlined/secondary`), a `Badge`, a `ProgressBar`, a `Checkbox`, and a status `Text` using `$color-success` — all picking up the new palette automatically.
+- A second section shows just `<Theme themeId="xmlui-green">` wrapping the same content to demonstrate switching to a built-in variant.
+
+**Key points to cover**:
+1. **`color-primary`, `color-secondary`, `color-surface`** on `<Theme>` override the base hues. XMLUI generates all 11 shades (50–950) from the 500 value you supply.
+2. **Pick a mid-tone for shade 500**: Too light or too dark produces an unusable scale.
+3. **Semantic color tokens** (`$color-warn`, `$color-danger`, `$color-success`, `$color-info`) can also be overridden.
+4. **`themeId`** switches to a named built-in theme (`xmlui-green`, `xmlui-red`, etc.) without supplying individual color overrides.
+5. **Nesting**: Wrap the whole `<App>` to set the global palette, or wrap a section for a localized override (covered in more depth in article 62).
+
+---
+
+### 59 · Override a component's theme vars
+
+**Article file**: `override-a-components-theme-vars.md`
+
+**Scenario**: You want Cards in one section of your page to have a distinct look — different background, rounder corners, a heavier border — without affecting Cards elsewhere. Use component-scoped theme variables on a `<Theme>` wrapper.
+
+**Demo**:
+- `---app` shows two sections stacked vertically.
+  - **Section A** (no `<Theme>` wrapper): two default `Card` components with `title` and a child `Text`.
+  - **Section B** (wrapped in `<Theme>`): the same two `Card` instances, but the `<Theme>` sets `backgroundColor-Card`, `borderRadius-Card`, `borderColor-Card`, and `borderWidth-Card`.
+- Below both sections, a `Button` with a `<Theme>` wrapper overriding `backgroundColor-Button-primary-solid` and `backgroundColor-Button-primary-solid--hover` to show state-specific overrides.
+
+**Key points to cover**:
+1. **Naming convention**: `{property}-{part}-{Component}[--{state}]` — e.g. `backgroundColor-Card`, `borderColor-Button-secondary-outlined--hover`.
+2. **Only descendants are affected**: Placing `backgroundColor-Card` on a `<Theme>` only restyles `Card` components nested inside that `<Theme>`, not Cards elsewhere.
+3. **State suffixes**: Append `--hover`, `--focus`, `--active`, `--disabled` for interactive states.
+4. **Variant suffixes**: For components with variants (like `Button`), include the variant segments: `backgroundColor-Button-primary-solid--hover`.
+5. **Composability**: Multiple component overrides can go on the same `<Theme>` tag. This replaces CSS class stacking with a flat, declarative attribute list.
+
+---
+
+### 60 · Implement a dark-mode toggle
+
+**Article file**: `implement-a-dark-mode-toggle.md`
+
+**Scenario**: Your app should let users switch between light and dark tones and remember the choice on their next visit.
+
+**Demo**:
+- `---app` uses `<App defaultTone="light" autoDetectTone="{true}">` with a `ToneSwitch` in the `<AppHeader>`.
+- Content: a `Card` with title, subtitle, a `ProgressBar`, and two `Button` variants — enough surface to show the tone change clearly.
+- The `ToneSwitch` uses custom icons: `iconLight="sun"` and `iconDark="moon"` (the defaults, shown for documentation purposes).
+
+**Key points to cover**:
+1. **`<ToneSwitch />`**: Drop-in toggle; renders a Switch control that flips between light and dark.
+2. **`iconLight` / `iconDark`**: Customize the icons shown in each state (default: `"sun"` / `"moon"`).
+3. **`defaultTone` on `<App>`**: Sets the initial tone before any user action (`"light"` or `"dark"`).
+4. **`autoDetectTone`**: When `true`, the app follows the operating system's preference (prefers-color-scheme). This is overridden once the user clicks `ToneSwitch`.
+5. **`<Theme tone="dark">`**: For scoped dark regions without a global toggle (e.g. a dark sidebar), wrap the section in `<Theme tone="dark">`.
+
+---
+
+### 61 · Style text with custom variants
+
+**Article file**: `style-text-with-custom-variants.md`
+
+**Scenario**: Your brand guidelines define three text styles — a `pageTitle`, a `sectionLabel`, and a `caption` — with specific font sizes, weights, colors, and letter-spacing. Instead of repeating inline styles on every `Text` component, define custom variants via theme variables and apply them with `variant="pageTitle"`.
+
+**Demo**:
+- `---app` wraps content in a `<Theme>` that defines:
+  - `textColor-Text-pageTitle`, `fontSize-Text-pageTitle`, `fontWeight-Text-pageTitle`, `letterSpacing-Text-pageTitle`
+  - `textColor-Text-sectionLabel`, `fontSize-Text-sectionLabel`, `fontWeight-Text-sectionLabel`, `textTransform-Text-sectionLabel`
+  - `textColor-Text-caption`, `fontSize-Text-caption`, `fontStyle-Text-caption`
+- Below the `<Theme>`, three `<Text variant="…">` instances demonstrate each custom variant side by side.
+- A second block shows per-level `Heading` overrides (`textColor-H1`, `fontSize-H2`, `fontWeight-H3`) for contrast.
+
+**Key points to cover**:
+1. **`{cssProperty}-Text-{variantName}`**: The naming pattern. Any CSS text property works: `textColor`, `fontSize`, `fontWeight`, `fontFamily`, `textDecoration`, `lineHeight`, `textTransform`, `letterSpacing`, etc.
+2. **Apply with `variant="…"`**: `<Text variant="pageTitle">` automatically picks up all `*-Text-pageTitle` variables from the nearest `<Theme>`.
+3. **Heading per-level vars**: Use `textColor-H1`, `fontSize-H2`, `fontWeight-H3`, etc. to style heading levels independently without custom components.
+4. **Scoping**: Variants are resolved from the closest enclosing `<Theme>`. A deeply nested `<Theme>` can redefine the same variant with different values.
+5. **Reuse**: Once defined, the variant name can be used on any `<Text>` in the theme scope — no additional CSS or component files needed.
+
+---
+
+### 62 · Scope a theme to a card or section
+
+**Article file**: `scope-a-theme-to-a-card-or-section.md`
+
+**Scenario**: The main page uses a light tone, but one card should stand out with a dark tone and a different primary color — for example, a "Pro upgrade" card with an inverted palette. Wrap just that card in `<Theme>` to apply scoped styling without touching the rest of the page.
+
+**Demo**:
+- `---app` renders three cards in an `HStack`:
+  1. **Free tier card** (no `<Theme>` wrapper) — default light styling.
+  2. **Pro tier card** — wrapped in `<Theme tone="dark" color-primary="#9b59b6">`, giving it a dark background with a purple accent.
+  3. **Enterprise tier card** — wrapped in `<Theme tone="dark" color-primary="#e67e22">`, dark background with an orange accent.
+- Each card has a title heading, a price `Text`, a bullet list of features (3–4 `Text` lines), and a `Button variant="solid"` CTA.
+
+**Key points to cover**:
+1. **`<Theme>` as a scoping wrapper**: Everything inside inherits the overridden values; everything outside stays untouched.
+2. **Tone scoping**: `<Theme tone="dark">` flips only the enclosed subtree to the dark palette.
+3. **Color scoping**: `<Theme color-primary="#9b59b6">` replaces the primary color and all its shades only inside the wrapper.
+4. **`applyIf` for conditional scoping**: Use `<Theme applyIf="{condition}" …>` to toggle the theme on or off dynamically (e.g. highlight a "recommended" plan card).
+5. **Nesting themes**: A `<Theme>` inside another `<Theme>` merges its overrides on top of the parent's. Only the explicitly set variables are replaced; everything else cascades down from the outer theme.
+
+---
+
+### 63 · Adjust spacing globally
+
+**Article file**: `adjust-spacing-globally.md`
+
+**Scenario**: Your designer wants a tighter, more data-dense layout for an analytics dashboard — less padding inside Cards, smaller gaps between list items, and a more compact overall feel. Instead of overriding `padding` and `gap` on every component, set the spacing theme variables once at the root.
+
+**Demo**:
+- `---app` shows two side-by-side sections using `HStack wrapContent itemWidth="50%"`:
+  - **Default spacing** (no overrides): a `VStack` with an `H3` heading, two `Card` components (each with a `Text` child and a `Badge`), and a `Button`.
+  - **Compact spacing** (wrapped in `<Theme gap-tight="$space-1" gap-normal="$space-2" gap-loose="$space-3" padding-tight="$space-1" padding-normal="$space-2" padding-Card="$space-2">`): the same content, visibly tighter.
+- The visual difference makes the effect immediately obvious.
+
+**Key points to cover**:
+1. **Global gap tokens**: `gap-none`, `gap-tight`, `gap-normal`, `gap-loose` — all layout containers use these. Changing `gap-normal` tightens every `VStack`, `HStack`, and `Card` gap in one shot.
+2. **Global padding tokens**: `padding-none`, `padding-tight`, `padding-normal`, `padding-loose` — same idea for internal spacing.
+3. **`space-base`**: The underlying unit (`0.25em` by default). Adjusting `space-base` scales the entire spacing system proportionally.
+4. **Component-specific overrides**: `padding-Card`, `gap-Card`, `gap-VStack`, etc. override just one component type while leaving the rest at the global value.
+5. **Side-by-side comparison**: Wrapping one section in `<Theme>` and leaving the other at defaults is a practical way to preview spacing changes during development.
+
+---
+
+## Article Body Scenarios — Category 6: Layout & Responsive Design
+
+Layout articles demonstrate structural patterns that differ enough that a single cohesive API scenario does not fit all articles. The demos share a loose **Project Hub** visual theme (header with logo, content with cards and lists, footer with company info), but each article is self-contained and teaches exactly one layout concept.
+
+### Shared conventions
+
+- Use `height="350px"` on the playground block for articles that need Splitter, StickySection, or a bounded scroll area — otherwise omit it.
+- Use `scrollWholePage="false"` on `<App>` whenever the demo needs Splitter, StickySection, or a bounded scroll container.
+- All demos use inline data — no `---api` block. Layout patterns are independent of data source.
+- Avoid `gap=`, `padding=`, or `alignItems=` on layout containers unless the specific demo requires it.
+- `HStack wrapContent itemWidth="50%"` for two-column side-by-side comparisons; `itemWidth="33%"` for three-column.
+
+### Breakpoint reference
+
+| Attribute | Min width | Usage |
+|---|---|---|
+| `when-xs` | base (all) | xs is the catch-all — no media query |
+| `when-sm` | ≥ 576 px | small phones in landscape |
+| `when-md` | ≥ 768 px | tablets |
+| `when-lg` | ≥ 992 px | laptops |
+| `when-xl` | ≥ 1200 px | desktops |
+| `when-xxl` | ≥ 1400 px | ultrawide |
+
+The same suffixes work on layout property names: `width="100%" width-md="50%"`.
+
+---
+
+### 44 · Build a holy-grail layout
+
+**Article file**: `build-a-holy-grail-layout.md`
+
+**Scenario**: A new dashboard app needs the classic "holy grail" shell: a persistent top header with a logo and nav links, a left sidebar for section navigation, a scrollable main content area, and a footer with copyright. Instead of composing this by hand, use `<App layout="horizontal">` and its dedicated `<AppHeader>`, `<NavPanel>`, and `<AppFooter>` child slots.
+
+**Demo** (playground height `"350px"`):
+- `<App layout="horizontal" scrollWholePage="false">`:
+  - `<AppHeader>`: `<Text variant="strong">Project Hub</Text>` on the left, `<SpaceFiller />`, two `<NavLink>` items for *Dashboard* and *Team*.
+  - `<NavPanel>`: three `<NavLink>` items — *Overview*, *Projects*, *Reports*.
+  - Content: `<H3>Dashboard</H3>`, two `<Card>` components in `<HStack wrapContent itemWidth="50%">`.
+  - `<AppFooter>`: `<CHStack><Text>© 2025 Project Hub</Text></CHStack>`.
+
+**Key points to cover**:
+1. **`layout` prop on `<App>`**: Seven prebuilt layouts. `"horizontal"` places `NavPanel` to the left of a full-height content column with the header spanning the full row. `"condensed"` collapses the nav above the content; `"vertical"` is a full-width top header with a side nav below it.
+2. **`<AppHeader>`, `<NavPanel>`, `<AppFooter>` are named slots**: Place them as direct children of `<App>` — the framework docks them automatically. No `dock` prop is needed.
+3. **`scrollWholePage="false"`**: Pins the header and footer and makes only the content area scroll. The default (`true`) scrolls the entire page, scrolling the header out of view.
+4. **`<NavPanel>` collapses on mobile automatically**: On small breakpoints the panel hides behind a hamburger button. Add `<NavPanelCollapseButton />` in the header to expose the toggle.
+5. **`layout="desktop"`**: Edge-to-edge, no padding, fills the full viewport — use for dense data-grid dashboards. It suppresses all max-width constraints.
+
+---
+
+### 45 · Center content on the page
+
+**Article file**: `center-content-on-the-page.md`
+
+**Scenario**: A login page should show a single card perfectly centered horizontally and vertically in the viewport regardless of screen size. Use `CVStack` or alignment props on a sized `Stack`.
+
+**Demo**:
+- `<CVStack height="100vh">`:
+  - `<Card maxWidth="360px" width="100%">`: `<H4>Sign in</H4>`, `<TextBox label="Email" />`, `<TextBox label="Password" />`, `<Button label="Sign in" variant="solid" />`.
+- A second section shows the same using `<Stack horizontalAlignment="center" verticalAlignment="center" height="200px">` so readers see that `CVStack` is just syntax sugar.
+
+**Key points to cover**:
+1. **`CVStack`**: Shorthand for `Stack` with `horizontalAlignment="center"` and `verticalAlignment="center"`. The most concise way to center children in both axes.
+2. **`CHStack`**: Centres children horizontally only — useful for a horizontally centred button row or form footer.
+3. **Parent height determines the centering space**: Vertical centring only works if the parent has a defined `height`. `height="100vh"` makes the stack fill the whole viewport.
+4. **`maxWidth` on the card**: Prevents the card from stretching uncomfortably wide on desktop while still centering: `maxWidth="360px" width="100%"`.
+5. **`marginHorizontal="auto"` as an alternative**: On a block with an explicit `width` inside any container, `marginHorizontal="auto"` centers it horizontally without needing a flex parent.
+
+---
+
+### 46 · Create a resizable split view
+
+**Article file**: `create-a-resizable-split-view.md`
+
+**Scenario**: A notes application shows a list of notes on the left and the selected note's body on the right. The user drags the divider to trade off list width for reading width. Use `HSplitter` with size constraints so neither panel can collapse below a usable minimum.
+
+**Demo** (playground height `"350px"`, `scrollWholePage="false"`):
+- `<App scrollWholePage="false">`:
+  - `<HSplitter initialPrimarySize="240px" minPrimarySize="160px" maxPrimarySize="50%" height="100%">`:
+    - Left child: `<VStack>` with `<H4>Notes</H4>` and four `<Card title="Note N" />` items.
+    - Right child: `<VStack>` with `<H4>Selected Note</H4>` and a `<Text>` body paragraph.
+
+**Key points to cover**:
+1. **`Splitter` vs `HSplitter` vs `VSplitter`**: All three share the same props. `HSplitter` creates a side-by-side split; `VSplitter` stacks panels top-and-bottom. Use `Splitter orientation="horizontal"` to set it explicitly.
+2. **`initialPrimarySize`**: The starting size of the first (left/top) panel. Accepts `px`, `%`, or fractions.
+3. **`minPrimarySize` / `maxPrimarySize`**: Clamp the draggable range. Pass a negative value to `maxPrimarySize` to calculate from the trailing edge (e.g. `maxPrimarySize="-200px"` keeps at least 200px for the secondary panel).
+4. **`scrollWholePage="false"` is required**: The Splitter fills available height. Without it the app content area has natural height and the `height="100%"` on the Splitter has nothing to fill.
+5. **`floating` prop**: When `true`, the drag handle overlays both panels instead of resizing them — useful for a collapsible side panel pattern.
+
+---
+
+### 47 · Make a sticky header in a scroll area
+
+**Article file**: `make-a-sticky-header-in-a-scroll-area.md`
+
+**Scenario**: A project report page has four long sections (Requirements, Design, Implementation, Testing). As the user scrolls, each section header sticks to the viewport top so readers always know which section they are in. Use `StickySection stickTo="top"` inside a `ScrollViewer`.
+
+**Demo** (playground height `"350px"`, `scrollWholePage="false"`):
+- `<App scrollWholePage="false">`:
+  - `<ScrollViewer height="100%">`:
+    - Repeat four times: `<StickySection stickTo="top" backgroundColor="$color-primary-50"><H4>Section N — …</H4></StickySection>` followed by five `<Text>` lines of placeholder paragraph content.
+
+**Key points to cover**:
+1. **`StickySection` vs `StickyBox`**: `StickySection` implements "last-wins stacking" — as the user scrolls past each section, only the most recently scrolled-to header remains pinned. Use `StickyBox` for a permanently visible element (e.g. a "Save changes" bar) that should never disappear.
+2. **A scroll container is required**: `StickySection` must be inside a `ScrollViewer` or an element with `overflow: auto`. It does not work with the whole-page scroll — always pair it with `scrollWholePage="false"` and an explicit `height` on the scroll container.
+3. **`stickTo="top"` or `"bottom"`**: `"top"` keeps section headers pinned to the viewport top; `"bottom"` is used for scrolling footers.
+4. **Stacking behaviour**: When the next section scrolls into view, the previous header yields its pinned position. Only the closest section (by scroll position) is visible.
+5. **Style the sticky header distinctly**: Give `StickySection` a `backgroundColor` or `boxShadow` so it visually separates from the scrolling content beneath it.
+
+---
+
+### 48 · Build a responsive card grid
+
+**Article file**: `build-a-responsive-card-grid.md`
+
+**Scenario**: A team directory shows profile cards for eight colleagues. On a wide screen they should show in three or four columns; on a tablet in two; on a phone stacked in one. Show both the `TileGrid` approach (virtualized, auto-column) and the `HStack wrapContent` approach (simple, no virtualization).
+
+**Demo**:
+- Inline `team` data: 8 objects `{ name, role }`.
+- Block 1 — `TileGrid`:
+  ```xmlui
+  <TileGrid data="{team}" itemWidth="220px" itemHeight="88px">
+    <Card title="{$item.name}"><Badge value="{$item.role}" /></Card>
+  </TileGrid>
+  ```
+- Block 2 — `HStack wrapContent`:
+  ```xmlui
+  <HStack wrapContent>
+    <Items data="{team}">
+      <Card width="220px" title="{$item.name}"><Badge value="{$item.role}" /></Card>
+    </Items>
+  </HStack>
+  ```
+
+**Key points to cover**:
+1. **`TileGrid` auto-calculates columns**: It measures the container width and divides by `itemWidth` to determine how many tiles fit per row. All tiles have the same dimensions; heterogeneous heights are not supported.
+2. **`HStack wrapContent` as a simpler alternative**: Children declare their own fixed `width`. When a row is full they wrap to the next line — like CSS `flex-wrap: wrap`. Use this for short lists where tiles can have varying heights.
+3. **`itemWidth` on `TileGrid`**: The minimum tile width. The rendered tile expands to fill the calculated column width evenly.
+4. **Explicit parent `height` for `TileGrid` virtualization**: `TileGrid` only renders visible rows. Give the parent an explicit `height` (or put it in a `Splitter` panel) to activate virtualization for large lists.
+5. **`wrapContent` vs `itemWidth="33%"`**: `wrapContent` lets children set their own width (they wrap when the row fills). A fixed-percentage width on an `HStack` without `wrapContent` stretches children proportionally but they will overflow rather than wrap.
+
+---
+
+### 49 · Show different content per breakpoint
+
+**Article file**: `show-different-content-per-breakpoint.md`
+
+**Scenario**: A client list should show a full `Table` on desktop (≥768px) and a card-based `List` on phones (<768px). Both components exist in markup; `when-*` attributes mount or unmount them at the right breakpoints.
+
+**Demo**:
+- Inline `clients` data: 5 objects `{ name, status }`.
+- `<Table data="{clients}" when-md when-lg when-xl>` — visible at ≥768px with two columns.
+- `<List data="{clients}" when-xs when-sm>` with a simple card template — visible below 768px.
+- A second example showing a layout-property breakpoint: `<H4 fontSize="15px" fontSize-md="22px">Client List</H4>` so readers see both approaches in one article.
+
+**Key points to cover**:
+1. **`when-xs`, `when-sm`, `when-md`, `when-lg`, `when-xl`**: Boolean presence attributes that control component visibility at mobile-first min-width breakpoints. Breakpoints: xs = all sizes (no media query), sm ≥ 576 px, md ≥ 768 px, lg ≥ 992 px, xl ≥ 1200 px.
+2. **Listing multiple breakpoints**: `when-md when-lg when-xl` shows the element at 768px and above. `when-xs when-sm` shows it only below 768px. Each attribute is an opt-in for that tier.
+3. **`when-*="false"`**: Explicitly hide at a specific breakpoint — `when-lg="false"` removes the element on large screens while keeping it visible on smaller ones.
+4. **Layout-property breakpoints**: Properties like `padding`, `fontSize`, `width` accept a `-{breakpoint}` suffix: `width="100%" width-md="50%"` makes an element full-width on mobile and half-width on desktop.
+5. **Mobile-first cascade**: A property without a breakpoint suffix applies at all sizes as the base value. Breakpoint-suffixed values apply at that minimum width and cascade upward until a larger breakpoint overrides them.
+
+---
+
+### 50 · Push a footer to the bottom
+
+**Article file**: `push-a-footer-to-the-bottom.md`
+
+**Scenario**: A terms-of-service page has short content that doesn't fill the viewport. The page footer (copyright, links) must always appear at the bottom of the browser window — not immediately below the last paragraph. Use `SpaceFiller` inside a `minHeight="100vh"` `VStack`.
+
+**Demo**:
+- `<VStack minHeight="100vh">`:
+  - `<H3>Terms of Service</H3>`
+  - Three short `<Text>` paragraphs.
+  - `<SpaceFiller />`
+  - `<HStack>`: `<Text>© 2025 Project Hub</Text>`, `<SpaceFiller />`, `<Link label="Privacy" />`, `<Link label="Contact" />`.
+- A second section briefly shows the `<AppFooter>` approach for completeness.
+
+**Key points to cover**:
+1. **`SpaceFiller` consumes all remaining flex space**: In a vertical flex container it grows to fill all unused height, pushing any sibling that follows it to the far end.
+2. **`minHeight="100vh"` on the outer `VStack`**: The column must be at least the viewport height so there is unused space for `SpaceFiller` to absorb. Without it, the container collapses to content height and the footer follows immediately after.
+3. **`<AppFooter>` is the cleanest solution for app-level footers**: Place it as a direct child of `<App>` and it docks to the bottom automatically — no `SpaceFiller` or explicit height needed.
+4. **`dock="bottom"` as an alternative**: When using DockPanel mode on a `Stack` (when any child has a `dock` prop), assign `dock="bottom"` to the footer — no `SpaceFiller` needed, but the parent needs an explicit `height`.
+5. **`scrollWholePage="false"` + `<AppFooter>`**: The `AppFooter` stays visible at the bottom of the viewport as the content area scrolls — it never scrolls away.
+
+---
+
+### 51 · Dock elements to panel edges
+
+**Article file**: `dock-elements-to-panel-edges.md`
+
+**Scenario**: A file explorer side panel has a fixed title bar at the top displaying the folder name, a scrollable list of files in the middle, and a row of action buttons ("New File", "Delete") pinned permanently to the bottom — regardless of list length. Use the `dock` prop on `Stack` children to switch the parent into DockPanel mode.
+
+**Demo** (playground height `"350px"`):
+- `<Stack height="350px" borderWidth="1px">`:
+  - `<HStack dock="top" padding="$space-2" backgroundColor="$color-surface-100"><Icon name="folder" /><Text variant="strong">src / components</Text></HStack>`
+  - `<VStack dock="stretch">`: eight `<Card>` items representing file names.
+  - `<HStack dock="bottom" padding="$space-2" backgroundColor="$color-surface-50"><Button label="New File" /><SpaceFiller /><Button label="Delete" variant="outlined" /></HStack>`
+
+**Key points to cover**:
+1. **DockPanel mode activates automatically**: As soon as any direct child of a `Stack` receives a `dock` prop, the parent switches to DockPanel layout. No extra wrapper or mode prop is needed.
+2. **`dock` values**: `"top"` and `"bottom"` anchor full-width bars; `"left"` and `"right"` anchor full-height panels; `"stretch"` fills all remaining space between the docked siblings.
+3. **`dock="stretch"` replaces `SpaceFiller`**: One `stretch` child claims all unclaimed space. Unlike `SpaceFiller`, it also sets the element's cross-axis dimension.
+4. **Parent `height` is mandatory**: The parent `Stack` must have an explicit `height` for `dock="bottom"` to anchor to the bottom edge. Without it the container collapses to content size and the bottom-docked child simply follows the content.
+5. **Children without a `dock` prop**: They participate in the middle row alongside the `stretch` child — useful for fixed-height segments embedded in the scrollable area.
+
+---
+
+### 52 · Limit content width on large screens
+
+**Article file**: `limit-content-width-on-large-screens.md`
+
+**Scenario**: A project documentation page looks uncomfortably wide on ultrawide monitors — paragraph lines span the full browser width. Cap the readable column at 720px and center it in the viewport so text stays comfortable on any screen size.
+
+**Demo**:
+- `<CVStack>`:
+  - `<VStack maxWidth="720px" width="100%" paddingHorizontal="$space-4">`:
+    - `<H2>Project Architecture</H2>`, `<Text variant="secondary">Updated March 2025</Text>`, three `<Text>` paragraphs.
+- A brief second example showing `marginHorizontal="auto"` on a fixed-width `VStack` inside a plain container — so readers see the two equivalent approaches.
+
+**Key points to cover**:
+1. **`maxWidth` + `width="100%"`**: The element fills available width up to the cap. It automatically shrinks on narrower viewports — no separate breakpoint override needed.
+2. **Centering the constrained column**: Wrap the `VStack` in a `CVStack` or `CHStack`, or set `marginHorizontal="auto"` on the `VStack` itself. Both center the block within the full-width container.
+3. **`paddingHorizontal` inside the block**: Adds gutters between content and the `maxWidth` edge so text does not sit at the very boundary.
+4. **`App layout="desktop"` overrides max-width**: The desktop layout removes all built-in content constraints for edge-to-edge apps. Add your own `maxWidth` wrapper inside the content area if you still need a reading column.
+5. **`maxWidth-lg` for desktop-only capping**: Apply the constraint only on large screens with `maxWidth-lg="720px"` so full-width layout is preserved on mobile.
+
+---
+
+### New · Make a set of equal-width cards
+
+**Article file**: `make-a-set-of-equal-width-cards.md`
+
+**Scenario**: A dashboard header row shows four summary stat cards (Outstanding, Paid This Year, Draft Count, Sent Count). All cards must divide the available row width equally — whether there are two cards or six. Use `FlowLayout` with `width="*"` star sizing so the cards grow proportionally to fill the row.
+
+**Demo**:
+- `---api` block with an inline mock providing `{ outstanding, paid_this_year, draft_invoices, sent_invoices }`.
+- `<DataSource id="stats" url="/api/stats" />`.
+- `<FlowLayout>`:
+  - Four `<Card width="*" title="Outstanding"><Text fontSize="$fontSize-xl" fontWeight="bold">{stats.value?.outstanding}</Text></Card>` equivalents, one per field.
+
+**Key points to cover**:
+1. **Star (`*`) sizing divides remaining space equally**: `width="*"` on all children in a `FlowLayout` gives each child an equal fraction of the container width — equivalent to CSS `flex: 1`. A child with `width="2*"` takes twice as much space as one with `width="*"`.
+2. **`FlowLayout` wraps when the row fills**: Unlike `HStack` with star-sized children (which stretches into one row and never wraps), `FlowLayout` wraps children onto the next line when the minimum width is reached. Combine with `minWidth` to control the wrap threshold.
+3. **Mixing star and fixed widths**: `width="*"` children and `width="200px"` children can coexist. Fixed-width cards take their explicit size first; star-width cards share whatever remains.
+4. **`minWidth` pairs with star sizing**: `width="* " minWidth="160px"` shrinks proportionally but never below a usable minimum before wrapping to the next row.
+5. **When to use `HStack` instead**: If you want cards to stretch without ever wrapping (single row regardless of count), use `HStack` with `width="*"` on each child. `FlowLayout` is better when the number of cards is unknown or variable.
+
+---
+
+## ✅ Category 6 Complete
