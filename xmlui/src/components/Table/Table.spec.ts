@@ -2325,6 +2325,21 @@ test.describe("Theme Variables and Styling", () => {
     }
   );
 
+  test("applies fontSize-checkbox-Table theme variable to checkbox wrapper",
+    async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
+          <Column bindTo="name" header="Name"/>
+        </Table>
+      `, {
+        testThemeVars: { "fontSize-checkbox-Table": "24px" },
+      });
+
+      const checkboxWrapper = page.locator('[aria-label="Select all rows"]').first();
+      await expect(checkboxWrapper).toHaveCSS("font-size", "24px");
+    }
+  );
+
 });
 
 // =============================================================================
