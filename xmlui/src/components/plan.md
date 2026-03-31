@@ -277,3 +277,142 @@ Topics for new how-to articles, grouped by theme. Each entry has a short title (
 | 141 | Chain animations on scroll into view | Combine FadeInAnimation / SlideInAnimation with `animateWhenInView` and `delay` for staggered reveals. |
 | 142 | Build an auto-playing carousel | Configure Carousel `autoplay`, `autoplayInterval`, `loop`, and `stopAutoplayOnInteraction`. |
 | 143 | Customize carousel controls & indicators | Override Carousel theme vars for control/indicator active, hover, disabled states and sizing. |
+
+---
+
+## Article Body Scenarios — Category 9: User-Defined Components
+
+All five articles share a **project task tracker** domain. This keeps vocabulary consistent and lets the reader follow a natural progression from simple extraction to full composition. The mock API provides a flat list of tasks for articles that need data.
+
+### Shared domain model
+
+```json
+{ "id": 1, "title": "…", "priority": "low|normal|high", "status": "todo|in-progress|done", "assignee": "…", "dueDate": "YYYY-MM-DD" }
+```
+
+Priority maps to colors: low → `$color-success`, normal → `$color-info`, high → `$color-warn`.
+
+### Learnings from code review
+
+- **`Badge` uses `value=`**, not `label=`, for the displayed text.
+- **`Badge` color mapping** uses `colorMap="{{ key: 'color' }}"` — double-brace object literal inside the attribute. Theme token strings like `'$color-warn'` are valid map values.
+- **Two-column / N-column grid layouts**: use `HStack wrapContent itemWidth="50%"` (or `"33%"`). Avoid adding `gap=`, `padding=`, `alignItems=` unless there is a specific reason.
+- **Keep components simple**: don't add `padding=` or `gap=` on `Card` or inner `VStack`/`HStack` unless the design requires it.
+- **No `height=` on playground blocks** unless the content would overflow the viewport without it.
+- **Reactive computed variables**: derive filtered data with `var.todoTasks="{allTasks.filter(t => t.status === 'todo')}"` on the `<Component>` tag rather than inlining arrow-function calls directly inside child attribute values (safer, more readable).
+- **`id` is reserved**: Never use `id` as a user-defined component prop name. It is captured by the framework as the component reference (used for API access). Use descriptive names like `taskId`, `itemId`, `recordId` instead.
+- **No `$param` / `$params` in event handlers**: These context variables do not exist in `on<EventName>` attribute handlers. Use arrow function syntax to receive the payload: `onDone="(taskId) => tasks = tasks.filter(t => t.id !== taskId)"`. `$param`/`$params` are only available inside `<event>` tags on built-in components like `APICall`.
+
+---
+
+### 64 · Create a reusable component
+
+**Article file**: `create-a-reusable-component.md`
+
+**Scenario**: A project dashboard renders the same task-card layout (title, priority chip, assignee, due date) in two separate panels — *My Tasks* and *All Tasks*. The markup is copy-pasted and starts to drift. Extract the repeated block into `TaskCard.xmlui`.
+
+**Demo**:
+- `---app` renders two hardcoded `<TaskCard>` instances side by side with different prop values (no API needed to keep the demo focused).
+- `---comp TaskCard` wraps a `Card > VStack` with `Text` for title and assignee, a `Badge` for priority (color driven by expression on `$props.priority`), and a `Text` for the due date.
+- Highlight lines on the `---comp` tab showing how `$props` is accessed.
+
+**Key points to cover**:
+1. **File placement and naming**: The file is `components/TaskCard.xmlui`; the component name must match the filename and start with an uppercase letter.
+2. **Accessing props**: Use `$props.title`, `$props.priority`, etc. — `$props` is the only way to read caller-supplied values inside a user-defined component.
+3. **Graceful missing props**: Use `$props.title ?? '(untitled)'` so the component renders safely even when a prop is omitted.
+4. **Scope isolation**: Variables or IDs declared on a sibling built-in component in the parent are not visible inside `TaskCard` — they must be passed as props explicitly.
+5. **Why extract**: Changing the card layout (e.g. adding a status icon) now only requires editing `TaskCard.xmlui` once.
+
+**Mock API**: Not required. All data is hardcoded inline in `---app`.
+
+---
+
+### 65 · Pass a template slot to a component
+
+**Article file**: `pass-a-template-slot-to-a-component.md`
+
+**Scenario**: Managers need *Edit* and *Delete* buttons at the bottom of each `TaskCard`; regular employees only see a *Mark Done* button. Rather than forking `TaskCard` into two variants, add an `actionsTemplate` named slot so callers inject their own action row, while an empty footer is shown when no template is provided.
+
+**Demo**:
+- `---app` shows two `<TaskCard>` instances side by side. The first passes an `actionsTemplate` with *Edit* + *Delete* buttons. The second passes an `actionsTemplate` with just *Mark Done*. A third instance has no template, demonstrating the default content.
+- `---comp TaskCard` contains `<Slot name="actionsTemplate">` at the bottom of the `Card`, with a default `<Text variant="secondary">No actions</Text>` inside the slot tag as fallback.
+- Highlight the `<property name="actionsTemplate">` caller syntax.
+
+**Key points to cover**:
+1. **Naming rule**: Named slot names must end in `"Template"` (e.g. `actionsTemplate`, `headerTemplate`). XMLUI displays an error for non-conforming names.
+2. **Caller syntax**: Declare slot content with `<property name="actionsTemplate">…children…</property>` inside the component tag.
+3. **Default slot content**: Anything placed as a child of `<Slot>…</Slot>` in the component definition is rendered when the caller provides no template.
+4. **Scope of slot content**: Template markup is evaluated in the *caller's* scope, not the component's scope. The caller can reference its own variables freely.
+5. **Slot context variables**: The component can expose computed values back to the template via extra attributes on `<Slot>` (e.g. `<Slot name="actionsTemplate" taskId="{$props.id}" />`), which become `$taskId` inside the caller's template.
+6. **Default (unnamed) slot**: Adding `<Slot />` (no name) transposees any direct children of the component tag — useful for wrapper components.
+
+**Mock API**: Not required.
+
+---
+
+### 66 · Emit a custom event from a component
+
+**Article file**: `emit-a-custom-event-from-a-component.md`
+
+**Scenario**: A *Mark Done* button inside `TaskCard` must notify the parent so it can update its local task list immediately — without a full refetch and without the child holding a reference to the parent's state. The parent listens for the `statusChanged` event and removes the task from the list.
+
+**Demo**:
+- `---app` has `var.tasks="{[…]}"` (three sample tasks), renders `<Items data="{tasks}"><TaskCard … onStatusChanged="tasks = tasks.filter(t => t.id !== $params[0])" /></Items>`, and shows a count below.
+- `---comp TaskCard` has a *Mark Done* button whose `onClick` fires `emitEvent('statusChanged', $props.id)`. The component also displays the task title and priority.
+- Highlight how `onStatusChanged` on the caller maps to `emitEvent('statusChanged', …)` inside the component.
+
+**Key points to cover**:
+1. **`emitEvent(name, payload)`**: Call it anywhere inside a user-defined component (event handlers, scripts). The first argument is the event name; everything after it is passed as `$params` array (or `$param` for the first).
+2. **`on<EventName>` attribute**: The parent listens via the `onStatusChanged` attribute (camel-cased name with `on` prefix). The handler is a normal XMLUI expression.
+3. **Events flow up, not down**: The child emits, the parent decides what to do. The child never holds a reference to parent state.
+4. **Payload options**: Pass a scalar (id), an object (`{id, newStatus}`), or nothing at all. Accessing the payload in the parent: `$param` for the first argument, `$params[1]` for subsequent ones.
+5. **Multiple events**: A single component can emit different events for different actions (e.g. `statusChanged`, `deleted`, `edited`) — just call `emitEvent` with different names.
+
+**Mock API**: Not required (purely local state manipulation).
+
+---
+
+### 67 · Set default property values
+
+**Article file**: `set-default-property-values.md`
+
+**Scenario**: A `PriorityBadge` component (reused inside `TaskCard` and standalone in a legend) accepts a `level` prop but also has optional `size`, `showIcon`, and `outlined` props. Most call sites only care about `level`. Defaults let callers skip the boilerplate.
+
+**Demo**:
+- `---app` shows four `<PriorityBadge>` instances:
+  1. Only `level="high"` — all defaults in effect.
+  2. `level="normal" size="lg"` — overrides size.
+  3. `level="low" showIcon="{false}"` — suppresses icon.
+  4. No props at all — shows the `??` fallback text `"(none)"`.
+- `---comp PriorityBadge` accesses `$props.level ?? 'normal'`, `$props.size ?? 'sm'`, `$props.showIcon ?? true`, `$props.outlined ?? false`. Uses `Badge` with a `themeColor` expression.
+
+**Key points to cover**:
+1. **`??` (nullish coalescing) is the mechanism**: XMLUI has no `defaultProps` system for user-defined components. The only way to declare a default is `$props.x ?? defaultValue` in the component template.
+2. **`??` vs `||`**: Use `??` not `||`. The value `false` or `0` is a valid caller-supplied boolean/number; `||` would incorrectly replace it with the default.
+3. **Document defaults in the component**: Add a comment block near each `$props` access line; this doubles as the component's API documentation.
+4. **Required props**: When a prop has no sensible default, let the expression fail visibly (omit the `??`) or add an explicit `when` guard rather than silently swallowing a bad state.
+5. **Consistency**: Choose defaults that make the simplest call site work — the caller should never need to repeat the common case.
+
+**Mock API**: Not required.
+
+---
+
+### 68 · Compose components with nesting
+
+**Article file**: `compose-components-with-nesting.md`
+
+**Scenario**: Build a three-column Kanban board by composing `TaskBoard > TaskColumn > TaskCard`. `TaskColumn` receives a `title`, a `themeColor`, and a `tasks` array; it renders a coloured header, an item count Badge, and a list of `TaskCard` items. `TaskBoard` hard-codes three `TaskColumn` instances (To Do / In Progress / Done), each filtered from the full task list.
+
+**Demo**:
+- `---app` renders `<TaskBoard />`.
+- `---comp TaskBoard` declares `var.allTasks="{[…]}"` (six sample tasks, two per status). Renders an `HStack` with three `<TaskColumn>` instances, filtering `allTasks` for each status via an inline expression.
+- `---comp TaskColumn` receives `$props.title`, `$props.themeColor`, `$props.tasks`. Renders a `VStack` with a colored header `HStack` (title + count `Badge`), then `<Items data="{$props.tasks}"><TaskCard title="{$item.title}" priority="{$item.priority}" assignee="{$item.assignee}" /></Items>`.
+- `---comp TaskCard` (minimal version from article 64).
+- Highlight how `$item` is used inside `TaskColumn` — not `$props.tasks[i]`.
+
+**Key points to cover**:
+1. **Passing arrays as props**: Use `tasks="{filteredArray}"` — the curly braces evaluate the expression to make it a real array, not a string.
+2. **`$item` inside nested iteration**: When `TaskColumn` uses `<Items data="{$props.tasks}">`, the `$item` context refers to each task object in that array, not anything from an outer iteration.
+3. **Scope isolation**: A variable declared in `TaskBoard` is invisible inside `TaskColumn` or `TaskCard`. Always pass needed data explicitly; use `Slot` when content should evaluate in the parent scope.
+4. **Single responsibility**: Each component has one job — `TaskCard` renders one task, `TaskColumn` groups tasks under a label, `TaskBoard` assembles the layout. This keeps each file small and independently testable.
+5. **Progressive enhancement**: Start with `TaskCard` alone (article 64), add `TaskColumn` to group it, then `TaskBoard` to orchestrate — each layer adds exactly one concern.
