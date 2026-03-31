@@ -474,6 +474,8 @@ function renderStack({
   }
 
   // Default Stack behavior
+  // When the user explicitly sets itemWidth, wrap each child in a div so the width applies.
+  const hasExplicitItemWidth = node.props?.itemWidth != null;
   return (
     <Stack
       orientation={orientation}
@@ -496,6 +498,12 @@ function renderStack({
         type: "Stack",
         orientation,
         itemWidth,
+        ...(hasExplicitItemWidth ? {
+          wrapChild: (_ctx, renderedChild, hints) => {
+            if (hints?.opaque || hints?.nonVisual) return renderedChild;
+            return <div style={{ width: itemWidth, flexShrink: 0 }}>{renderedChild}</div>;
+          },
+        } : {}),
       }))}
     </Stack>
   );

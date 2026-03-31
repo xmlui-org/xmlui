@@ -1588,6 +1588,105 @@ test.describe("itemWidth property", () => {
     const { top: item15Top } = await getBounds(page.getByTestId("item-15"));
     expect(item15Top).toBeGreaterThan(item4Top);
   });
+
+  // --- Regression: itemWidth without wrapContent was ignored
+
+  test("HStack itemWidth (px) respected without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px" itemWidth="120px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+      </HStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    expect(item1Width).toBeCloseTo(120, 0);
+    expect(item2Width).toBeCloseTo(120, 0);
+  });
+
+  test("HStack itemWidth (%) respected without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px" itemWidth="50%">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+      </HStack>
+    `);
+
+    const { width: stackWidth } = await getBounds(page.getByTestId("stack"));
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    expect(item1Width).toBeCloseTo(stackWidth * 0.5, 0);
+    expect(item2Width).toBeCloseTo(stackWidth * 0.5, 0);
+  });
+
+  test("HStack itemWidth all items share the same width without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="600px" itemWidth="150px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Short</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Much longer text here</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Mid</Stack>
+      </HStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+    const { width: item3Width } = await getBounds(page.getByTestId("item3"));
+
+    expect(item1Width).toBeCloseTo(150, 0);
+    expect(item2Width).toBeCloseTo(150, 0);
+    expect(item3Width).toBeCloseTo(150, 0);
+  });
+
+  test("VStack itemWidth (px) respected without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <VStack testId="stack" width="400px" itemWidth="200px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+      </VStack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    expect(item1Width).toBeCloseTo(200, 0);
+    expect(item2Width).toBeCloseTo(200, 0);
+  });
+
+  test("Stack (orientation=horizontal) itemWidth respected without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Stack testId="stack" orientation="horizontal" width="400px" itemWidth="100px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+      </Stack>
+    `);
+
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    const { width: item2Width } = await getBounds(page.getByTestId("item2"));
+
+    expect(item1Width).toBeCloseTo(100, 0);
+    expect(item2Width).toBeCloseTo(100, 0);
+  });
+
+  test("HStack items stay on one row when itemWidth fits without wrapContent", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="400px" itemWidth="100px">
+        <Stack testId="item1" backgroundColor="lightblue" height="50px">Item 1</Stack>
+        <Stack testId="item2" backgroundColor="lightgreen" height="50px">Item 2</Stack>
+        <Stack testId="item3" backgroundColor="lightcoral" height="50px">Item 3</Stack>
+      </HStack>
+    `);
+
+    const { top: item1Top } = await getBounds(page.getByTestId("item1"));
+    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+
+    // All items fit on one row (no wrapping in a regular HStack)
+    expect(item1Top).toBe(item2Top);
+    expect(item2Top).toBe(item3Top);
+  });
 });
 
 // =============================================================================
