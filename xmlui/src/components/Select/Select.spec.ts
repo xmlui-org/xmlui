@@ -2902,4 +2902,58 @@ test.describe("Custom Height", () => {
 
     await expect(page.getByTestId("text")).toHaveText("vendor");
   });
+
+  test("dropdownHeight does not leak to trigger element in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" initialValue="bakerloo" dropdownHeight="300px">
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
+
+  test("dropdownHeight does not leak to trigger element in searchable select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" initialValue="bakerloo" dropdownHeight="300px" searchable>
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
+
+  test("dropdownHeight does not leak to trigger element in multi-select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="300px" multiSelect>
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
 });
