@@ -165,6 +165,7 @@ export const TileGridMd = createMetadata({
     [`outlineWidth-item-${COMP}--focus`]: "2px",
     [`outlineStyle-item-${COMP}--focus`]: "solid",
     [`outlineOffset-item-${COMP}--focus`]: "-2px",
+    [`fontSize-checkbox-${COMP}`]: "$fontSize",
   },
 });
 
