@@ -24,6 +24,7 @@ type ValidationWrapperProps = {
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
   verboseValidationFeedback?: boolean;
+  validationDisplayDelay?: number;
   itemIndex?: number;
   formItemType?: string;
   componentType?: string;
@@ -64,6 +65,7 @@ export function ValidationWrapper({
   customValidationsDebounce = 0,
   validationMode,
   verboseValidationFeedback,
+  validationDisplayDelay = 0,
   itemIndex,
   formItemType,
   componentType,
@@ -113,6 +115,7 @@ export function ValidationWrapper({
     validationResult,
     validationMode,
     effectiveVerboseValidationFeedback,
+    validationDisplayDelay,
   );
 
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });

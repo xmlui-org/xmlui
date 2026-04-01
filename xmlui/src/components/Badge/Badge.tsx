@@ -56,6 +56,7 @@ export const BadgeMd = createMetadata({
     [`fontSize-${COMP}-pill`]: "0.8em",
     [`backgroundColor-${COMP}`]: "rgb(from $color-secondary-500 r g b / 0.6)",
     [`textColor-${COMP}`]: "$const-color-surface-0",
+    [`textAlign-${COMP}`]: "center",
   },
 });
 
@@ -86,7 +87,7 @@ export const badgeComponentRenderer = wrapComponent(
       return (
         <Badge
           {...props}
-          color={colorValue}
+          color={colorValue as any}
         >
           {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
         </Badge>

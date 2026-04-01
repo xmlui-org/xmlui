@@ -324,6 +324,8 @@
                     >
                         <NavGroup label="Forms & Validation">
                             <NavLink icon="article" label="Validate dependent fields together" to="/docs/howto/validate-dependent-fields-together" />
+                            <NavLink icon="article" label="Validate a field inline with onValidate" to="/docs/howto/validate-a-field-inline-with-onvalidate" />
+                            <NavLink icon="article" label="Transform form data before submission" to="/docs/howto/transform-form-data-before-submission" />
                             <NavLink icon="article" label="Build a multi-step wizard form" to="/docs/howto/build-a-multi-step-wizard-form" />
                             <NavLink icon="article" label="Reset a form after submission" to="/docs/howto/reset-a-form-after-submission" />
                             <NavLink icon="article" label="Persist form drafts across sessions" to="/docs/howto/persist-form-drafts-across-sessions" />
@@ -332,6 +334,7 @@
                             <NavLink icon="article" label="Arrange form fields side by side" to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout" />
                             <NavLink icon="article" label="Show validation on blur, not on type" to="/docs/howto/show-validation-on-blur-not-on-type" />
                             <NavLink icon="article" label="Add an async uniqueness check" to="/docs/howto/add-an-async-uniqueness-check" />
+                            <NavLink icon="article" label="Show validation progress in the Save button" to="/docs/howto/show-validation-progress-in-the-save-button" />
                             <NavLink icon="article" label="Submit a form with file uploads" to="/docs/howto/submit-a-form-with-file-uploads" />
                             <NavLink icon="article" label="Use built-in form validation" to="/docs/howto/use-built-in-form-validation" />
                             <NavLink icon="article" label="Do custom form validation" to="/docs/howto/do-custom-form-validation" />
@@ -1248,6 +1251,12 @@
             <Page url="/docs/howto/validate-dependent-fields-together">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/validate-dependent-fields-together.md']}" />
             </Page>
+            <Page url="/docs/howto/validate-a-field-inline-with-onvalidate">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/validate-a-field-inline-with-onvalidate.md']}" />
+            </Page>
+            <Page url="/docs/howto/transform-form-data-before-submission">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/transform-form-data-before-submission.md']}" />
+            </Page>
             <Page url="/docs/howto/build-a-multi-step-wizard-form">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-multi-step-wizard-form.md']}" />
             </Page>
@@ -1268,6 +1277,9 @@
             </Page>
             <Page url="/docs/howto/add-an-async-uniqueness-check">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-an-async-uniqueness-check.md']}" />
+            </Page>
+            <Page url="/docs/howto/show-validation-progress-in-the-save-button">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-validation-progress-in-the-save-button.md']}" />
             </Page>
             <Page url="/docs/howto/submit-a-form-with-file-uploads">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}" />

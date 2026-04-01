@@ -78,7 +78,12 @@ export const validationSeverityMd: PropertyValueDescription[] = [
 
 export type ValidateEventHandler = ((value: any) => Promise<ValidateFunctionResult>) | undefined;
 
-type ValidateFunctionResult = boolean | SingleValidationResult | Array<SingleValidationResult>;
+type ValidateFunctionResult =
+  | null                        // null → valid, no error
+  | string                      // string → invalid with that string as the error message
+  | boolean
+  | SingleValidationResult
+  | Array<SingleValidationResult>;
 
 export const validationModeValues = ["errorLate", "onChanged", "onLostFocus"] as const;
 export type ValidationMode = (typeof validationModeValues)[number];

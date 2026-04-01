@@ -24,6 +24,7 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -548,6 +549,12 @@ Available values:
 > For custom controls, there is no need to explicitly set the `type` to `custom`.
 > Omitting the type and providing child components implicitly sets it to custom.
 
+### `validationDisplayDelay` [#validationdisplaydelay]
+
+> [!DEF]  default: **400**
+
+When an async `onValidate` handler takes longer than this many milliseconds, the validation result is shown immediately once it resolves — without waiting for the field to lose focus. Set to `0` to disable early display. Default: `400`.
+
 ### `validationMode` [#validationmode]
 
 > [!DEF]  default: **"errorLate"**
@@ -612,13 +619,13 @@ Removes the item specified by its index from the list held by the FormItem. The 
 | --- | --- | --- |
 | [fontFamily](/docs/styles-and-themes/common-units/#fontFamily)-label-formItem | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem | $fontSize-sm | $fontSize-sm |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem--required | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-label-formItem--required | $fontSize-sm | $fontSize-sm |
 | [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem | normal | normal |
 | [fontStyle](/docs/styles-and-themes/common-units/#fontStyle)-label-formItem--required | *none* | *none* |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem | $fontWeight-medium | $fontWeight-medium |
-| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem--required | *none* | *none* |
+| [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-label-formItem--required | $fontWeight-medium | $fontWeight-medium |
 | [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem--required | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-label-formItem--required | $textColor | $textColor |
 | [textColor](/docs/styles-and-themes/common-units/#color)-optionalTag-formItem | $textColor-secondary | $textColor-secondary |
 | [textColor](/docs/styles-and-themes/common-units/#color)-requiredMark-formItem | $color-danger-400 | $color-danger-400 |
 | [textTransform](/docs/styles-and-themes/common-units/#textTransform)-label-formItem | none | none |

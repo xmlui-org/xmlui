@@ -112,8 +112,9 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.FIELD_VALIDATED: {
-      // it means no validation happened, ignore it
-      if (action.payload.validationResult.validations.length === 0) {
+      // If there are no validation errors AND no async validation is pending, clear the entry.
+      // When partial is true we must keep the entry so callers can detect in-flight validation.
+      if (action.payload.validationResult.validations.length === 0 && !action.payload.validationResult.partial) {
         delete state.validationResults[uid];
         break;
       }
@@ -242,7 +243,7 @@ type OnSubmit = (
   params: Record<string, any> | undefined,
   options: { passAsDefaultBody: boolean },
 ) => Promise<void>;
-type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void | null | undefined | string | Record<string, any>>;
+type OnWillSubmit = (data: Record<string, any> | undefined, allData: Record<string, any> | undefined) => Promise<boolean | void | null | undefined | string | Record<string, any>>;
 type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
@@ -259,6 +260,8 @@ type Props = {
   cancelLabel?: string;
   saveLabel?: string;
   saveInProgressLabel?: string;
+  savePendingLabel?: string;
+  submitFeedbackDelay?: number;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
   onWillSubmit?: OnWillSubmit;
@@ -293,6 +296,8 @@ export const defaultProps: Pick<
   | "cancelLabel"
   | "saveLabel"
   | "saveInProgressLabel"
+  | "savePendingLabel"
+  | "submitFeedbackDelay"
   | "itemLabelPosition"
   | "itemLabelBreak"
   | "keepModalOpenOnSubmit"
@@ -309,6 +314,8 @@ export const defaultProps: Pick<
   cancelLabel: "Cancel",
   saveLabel: "Save",
   saveInProgressLabel: "Saving...",
+  savePendingLabel: "Validating...",
+  submitFeedbackDelay: 100,
   itemLabelPosition: "top",
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
@@ -337,6 +344,20 @@ function cleanUpSubject(subject: any, noSubmitFields: Record<string, boolean>) {
   );
 }
 
+// --- Remove only the UNBOUND_FIELD_SUFFIX properties, keeping noSubmit fields.
+// --- Used for willSubmit which should receive all form data including noSubmit fields.
+function cleanUpSubjectForWillSubmit(subject: any) {
+  return Object.entries(subject || {}).reduce(
+    (acc, [key, value]) => {
+      if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
+}
+
 const Form = forwardRef(function (
   {
     formState,
@@ -350,6 +371,8 @@ const Form = forwardRef(function (
     cancelLabel = defaultProps.cancelLabel,
     saveLabel = defaultProps.saveLabel,
     saveInProgressLabel = defaultProps.saveInProgressLabel,
+    savePendingLabel = defaultProps.savePendingLabel,
+    submitFeedbackDelay = defaultProps.submitFeedbackDelay,
     swapCancelAndSave,
     onWillSubmit,
     onSubmit,
@@ -384,6 +407,34 @@ const Form = forwardRef(function (
   const formRef = useRef<HTMLFormElement>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
+
+  // Check if any field has async validation in-flight (partial=true).
+  // The Save button is disabled while this is true.
+  const isValidating = useMemo(() => {
+    return Object.values(formState.validationResults).some((r) => r.partial);
+  }, [formState.validationResults]);
+
+  // Delay showing feedback labels by submitFeedbackDelay so that fast operations
+  // don't cause a visible label flash on the Save button.
+  const [showValidatingLabel, setShowValidatingLabel] = useState(false);
+  useEffect(() => {
+    if (!isValidating) {
+      setShowValidatingLabel(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowValidatingLabel(true), submitFeedbackDelay);
+    return () => clearTimeout(timer);
+  }, [isValidating, submitFeedbackDelay]);
+
+  const [showInProgressLabel, setShowInProgressLabel] = useState(false);
+  useEffect(() => {
+    if (!formState.submitInProgress) {
+      setShowInProgressLabel(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowInProgressLabel(true), submitFeedbackDelay);
+    return () => clearTimeout(timer);
+  }, [formState.submitInProgress, submitFeedbackDelay]);
 
   // Resolve the effective storage key for persistence
   const persistKey = persist ? (storageKey || id || "form-data") : undefined;
@@ -443,6 +494,12 @@ const Form = forwardRef(function (
     // Trigger validation display on all fields
     dispatch(triedToSubmit());
 
+    // If any field still has async validation in-flight (partial=true), block submission.
+    // The partial flag means sync checks passed but the async onValidate hasn't resolved yet.
+    const hasPendingAsyncValidation = Object.values(formState.validationResults).some(
+      (result) => result.partial,
+    );
+
     // Get validation results grouped by severity
     const { error, warning } = groupInvalidValidationResultsBySeverity(
       Object.values(formState.validationResults),
@@ -453,7 +510,7 @@ const Form = forwardRef(function (
 
     // Return validation result
     return {
-      isValid: error.length === 0,
+      isValid: !hasPendingAsyncValidation && error.length === 0,
       data: cleanedData,
       errors: error,
       warnings: warning,
@@ -520,7 +577,10 @@ const Form = forwardRef(function (
     dispatch(formSubmitting());
     try {
       const filteredSubject = validationResult.data;
-      const willSubmitResult = await onWillSubmit?.(filteredSubject);
+      // Pass cleaned data as first arg and full data (including noSubmit fields) as second arg.
+      // This lets willSubmit do cross-field validation while knowing exactly what onSubmit will receive.
+      const fullSubject = cleanUpSubjectForWillSubmit(formState.subject);
+      const willSubmitResult = await onWillSubmit?.(filteredSubject, fullSubject);
 
       // Handle different return values from willSubmit
       if (willSubmitResult === false) {
@@ -651,12 +711,30 @@ const Form = forwardRef(function (
   const submitButton = useMemo(
     () => (
       <Part partId={PART_SUBMIT_BUTTON} key={PART_SUBMIT_BUTTON}>
-        <Button key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
-          {formState.submitInProgress ? saveInProgressLabel : saveLabel}
+        <Button
+          key="submit"
+          type={"submit"}
+          disabled={!isEnabled || !enableSubmit || isValidating}
+        >
+          {showValidatingLabel
+            ? savePendingLabel
+            : showInProgressLabel
+              ? saveInProgressLabel
+              : saveLabel}
         </Button>
       </Part>
     ),
-    [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
+    [
+      isEnabled,
+      enableSubmit,
+      isValidating,
+      showValidatingLabel,
+      savePendingLabel,
+      showInProgressLabel,
+      formState.submitInProgress,
+      saveInProgressLabel,
+      saveLabel,
+    ],
   );
 
   const getData = useCallback(() => {
@@ -826,15 +904,41 @@ export const FormWithContextVar = forwardRef(function (
     return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
   }, [formState.subject, formState.noSubmitFields]);
 
+  // $validationIssues: { [fieldName]: SingleValidationResult[] } — only invalid entries.
+  const $validationIssues = useMemo(() => {
+    const result: Record<string, Array<SingleValidationResult>> = {};
+    Object.entries(formState.validationResults).forEach(([field, validationResult]) => {
+      const invalidResults = validationResult.validations.filter((v) => !v.isValid);
+      if (invalidResults.length > 0) {
+        result[field] = invalidResults;
+      }
+    });
+    return result;
+  }, [formState.validationResults]);
+
+  // $hasValidationIssue(fieldName?): When called without an argument, return true if ANY field has validation issues.
+  // When called with a fieldName, return true if that specific field has issues.
+  const $hasValidationIssue = useCallback(
+    (fieldName?: string) => {
+      if (fieldName === undefined) {
+        return Object.keys($validationIssues).length > 0;
+      }
+      return ($validationIssues[fieldName]?.length ?? 0) > 0;
+    },
+    [$validationIssues],
+  );
+
   const nodeWithItem = useMemo(() => {
     return {
       type: "Fragment",
       vars: {
         $data: $data,
+        $validationIssues: $validationIssues,
+        $hasValidationIssue: $hasValidationIssue,
       },
       children: node.children,
     };
-  }, [$data, node.children]);
+  }, [$data, $validationIssues, $hasValidationIssue, node.children]);
 
   const rawInitialValue = extractValue(node.props.data);
   // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.

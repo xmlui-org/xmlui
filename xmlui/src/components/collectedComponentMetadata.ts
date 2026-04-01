@@ -204,6 +204,7 @@ import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
 import { StickySectionMd } from "./StickySection/StickySection";
 import { DrawerMd } from "./Drawer/Drawer";
 import { TileGridMd } from "./TileGrid/TileGrid";
+import { FormSegmentMd } from "./FormSegment/FormSegment";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -342,6 +343,7 @@ export const collectedComponentMetadata = {
   Form: FormMd,
   FormItem: FormItemMd,
   FormSection: FormSectionMd,
+  FormSegment: FormSegmentMd,
   Heading: HeadingMd,
   H1: H1Md,
   H2: H2Md,

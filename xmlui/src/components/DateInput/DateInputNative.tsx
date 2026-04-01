@@ -112,6 +112,7 @@ export const defaultProps = {
   autoFocus: false,
   labelBreak: false,
   emptyCharacter: "-",
+  orientation: "vertical",
 };
 
 export const DateInput = memo(forwardRef<HTMLDivElement, Props>(function DateInput(

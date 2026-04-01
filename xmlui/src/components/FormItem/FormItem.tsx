@@ -78,6 +78,14 @@ export const FormItemMd = createMetadata({
       type: "number",
       defaultValue: defaultProps.customValidationsDebounce,
     },
+    validationDisplayDelay: {
+      description:
+        `When an async \`onValidate\` handler takes longer than this many milliseconds, ` +
+        `the validation result is shown immediately once it resolves — without waiting for the ` +
+        `field to lose focus. Set to \`0\` to disable early display. Default: \`400\`.`,
+      type: "number",
+      defaultValue: 400,
+    },
     validationMode: {
       description:
         `This property sets what kind of validation mode or strategy to employ for a particular ` +
@@ -242,8 +250,11 @@ export const FormItemMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "textColor-label-formItem": "$textColor",
+    "textColor-label-formItem--required": "$textColor",
     "fontSize-label-formItem": "$fontSize-sm",
+    "fontSize-label-formItem--required": "$fontSize-sm",
     "fontWeight-label-formItem": "$fontWeight-medium",
+    "fontWeight-label-formItem--required": "$fontWeight-medium",
     "fontStyle-label-formItem": "normal",
     "textTransform-label-formItem": "none",
     "textColor-requiredMark-formItem": "$color-danger-400",
@@ -289,6 +300,7 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
       regexInvalidMessage,
       regexInvalidSeverity,
       customValidationsDebounce,
+      validationDisplayDelay,
       validationMode,
       maxTextLength,
       gap,

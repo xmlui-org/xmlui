@@ -912,8 +912,12 @@ $textColor-InputLabel-required: createVar(textColor-InputLabel-required);
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
 $textColor-label-formItem: createVar(textColor-label-formItem);
+$textColor-label-formItem--required: createVar(textColor-label-formItem--required);
 $fontSize-label-formItem: createVar(fontSize-label-formItem);
+$fontSize-label-formItem--required: createVar(fontSize-label-formItem--required);
 $fontWeight-label-formItem: createVar(fontWeight-label-formItem);
+$fontWeight-label-formItem--required: createVar(fontWeight-label-formItem--required);
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Tab style variables
