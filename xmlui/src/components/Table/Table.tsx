@@ -195,6 +195,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    hideSelectionCheckboxesHeader: {
+      description:
+        "If true, the selection checkbox in the table header is never displayed, not even on hover. " +
+        "Row checkboxes are unaffected. Selection logic still works via API and keyboard.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideSelectionCheckboxesHeader,
+    },
     iconNoSort: d(
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
@@ -764,6 +771,9 @@ const TableWithColumns = memo(
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(
               node.props.hideSelectionCheckboxes,
+            )}
+            hideSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
+              node.props.hideSelectionCheckboxesHeader,
             )}
             alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(
               node.props.alwaysShowSelectionCheckboxes,

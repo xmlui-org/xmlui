@@ -203,6 +203,7 @@ type TableProps = {
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
+  hideSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxes?: boolean;
   alwaysShowSortingIndicator?: boolean;
@@ -558,6 +559,7 @@ export const Table = forwardRef(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      hideSelectionCheckboxesHeader = defaultProps.hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes = defaultProps.alwaysShowSelectionCheckboxes,
       alwaysShowPagination,
       alwaysShowSelectionCheckboxesHeader = defaultProps.alwaysShowSelectionCheckboxesHeader,
@@ -858,7 +860,7 @@ export const Table = forwardRef(
           pinTo: "left",
         },
         header: ({ table }: HeaderContext<any, unknown>) =>
-          enableMultiRowSelection ? (
+          enableMultiRowSelection && !hideSelectionCheckboxesHeader ? (
             <Toggle
               {...{
                 "aria-label": "Select all rows",
@@ -926,6 +928,7 @@ export const Table = forwardRef(
       hoveredRowId,
       headerCheckboxHovered,
       hideSelectionCheckboxes,
+      hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes,
     ]);
 
@@ -1938,6 +1941,7 @@ export const defaultProps = {
   hideHeader: false,
   hideNoDataView: false,
   hideSelectionCheckboxes: false,
+  hideSelectionCheckboxesHeader: false,
   alwaysShowSelectionCheckboxesHeader: false,
   alwaysShowSelectionCheckboxes: false,
   alwaysShowSortingIndicator: false,
