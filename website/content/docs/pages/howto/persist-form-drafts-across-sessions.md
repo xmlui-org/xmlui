@@ -7,6 +7,11 @@ A blog post editor can take a long time to fill in. If the user accidentally ref
 ```xmlui-pg copy display name="Blog post editor with draft persistence"
 ---app display
 <App>
+  <Button 
+    variant="outlined" 
+    label="Reset the temporary form data" 
+    onClick="clearLocalStorage()"
+  />
   <Form
     id="postEditor"
     persist="true"
@@ -26,6 +31,15 @@ A blog post editor can take a long time to fill in. If the user accidentally ref
     <TextArea label="Body" bindTo="body" required="true" />
   </Form>
 </App>
+---desc
+Try these steps:
+
+1. Type in some data into the form.
+2. Click the “Reset the App” button in the top-right corner of the example header. This action refreshes the example page while keeping the previously typed data.
+3. Submit the form. The successful submission clears the temporary data.
+4. Type some data again.
+5. Click the “Reset the temporary form data” button. It will clear the persisted temporary data.
+6. Click the “Reset the App” button again. This action refreshes the example page — this time, the data will be empty.
 ```
 
 ## Key points

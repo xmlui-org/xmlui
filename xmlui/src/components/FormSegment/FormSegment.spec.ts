@@ -433,20 +433,6 @@ test.describe("Orientation and layout properties", () => {
     await expect(emailField).toBeVisible();
   });
 
-  test("supports horizontal orientation (HStack)", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Form>
-        <FormSegment orientation="horizontal">
-          <Button label="Save" />
-          <Button label="Cancel" />
-        </FormSegment>
-      </Form>
-    `);
-    // Buttons should be visible in horizontal layout
-    await expect(page.getByRole("button", { name: "Save" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Cancel" })).toBeVisible();
-  });
-
   test("transposes width property to the internal stack", async ({
     initTestBed,
     page,

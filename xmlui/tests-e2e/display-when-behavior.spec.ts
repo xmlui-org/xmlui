@@ -86,6 +86,7 @@ test.describe("displayWhen behavior — form field preservation", () => {
   test("value typed into a field before it is hidden is preserved after hiding", async ({
     page,
     initTestBed,
+    createTextBoxDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <App var.showNote="{true}">
@@ -100,7 +101,8 @@ test.describe("displayWhen behavior — form field preservation", () => {
       </App>
     `);
 
-    await page.getByTestId("note").fill("preserved");
+    const noteDriver = await createTextBoxDriver("note");
+    await noteDriver.input.fill("preserved");
     await page.getByTestId("hide").click();
     // Field is now hidden but still mounted
     await expect(page.getByTestId("note")).toBeHidden();
@@ -110,7 +112,7 @@ test.describe("displayWhen behavior — form field preservation", () => {
     await expect.poll(testStateDriver.testState).toEqual("preserved");
   });
 
-  test("wizard pattern: all steps submit complete data", async ({ page, initTestBed }) => {
+  test("wizard pattern: all steps submit complete data", async ({ page, initTestBed, createTextBoxDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <App var.step="{1}">
         <Form
@@ -131,12 +133,14 @@ test.describe("displayWhen behavior — form field preservation", () => {
     `);
 
     // Step 1 — fill first name
-    await page.getByTestId("firstName").fill("Jane");
+    const firstNameDriver = await createTextBoxDriver("firstName");
+    await firstNameDriver.input.fill("Jane");
     await page.getByTestId("next").click();
 
     // Step 2 — fill last name and submit
     await expect(page.getByTestId("lastName")).toBeVisible();
-    await page.getByTestId("lastName").fill("Doe");
+    const lastNameDriver = await createTextBoxDriver("lastName");
+    await lastNameDriver.input.fill("Doe");
     await page.getByTestId("submit").click();
 
     // Both values from both steps should appear in the submitted payload
