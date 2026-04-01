@@ -207,6 +207,7 @@ export const timeInputComponentRenderer = wrapComponent(
           endIcon={extractValue(node.props.endIcon)}
           gap={extractValue.asOptionalString(node.props.gap)}
           emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
+          ariaLabel={extractValue.asOptionalString(node.props["aria-label"])}
           onDidChange={lookupEventHandler("didChange")}
           onFocus={lookupEventHandler("gotFocus")}
           onBlur={lookupEventHandler("lostFocus")}
