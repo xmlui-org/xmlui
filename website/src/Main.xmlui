@@ -334,6 +334,7 @@
                             <NavLink icon="article" label="Arrange form fields side by side" to="/docs/howto/set-width-for-input-fields-in-a-horizontal-layout" />
                             <NavLink icon="article" label="Show validation on blur, not on type" to="/docs/howto/show-validation-on-blur-not-on-type" />
                             <NavLink icon="article" label="Add an async uniqueness check" to="/docs/howto/add-an-async-uniqueness-check" />
+                            <NavLink icon="article" label="Show validation progress in the Save button" to="/docs/howto/show-validation-progress-in-the-save-button" />
                             <NavLink icon="article" label="Submit a form with file uploads" to="/docs/howto/submit-a-form-with-file-uploads" />
                             <NavLink icon="article" label="Use built-in form validation" to="/docs/howto/use-built-in-form-validation" />
                             <NavLink icon="article" label="Do custom form validation" to="/docs/howto/do-custom-form-validation" />
@@ -1276,6 +1277,9 @@
             </Page>
             <Page url="/docs/howto/add-an-async-uniqueness-check">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/add-an-async-uniqueness-check.md']}" />
+            </Page>
+            <Page url="/docs/howto/show-validation-progress-in-the-save-button">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/show-validation-progress-in-the-save-button.md']}" />
             </Page>
             <Page url="/docs/howto/submit-a-form-with-file-uploads">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/submit-a-form-with-file-uploads.md']}" />

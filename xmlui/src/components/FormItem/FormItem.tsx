@@ -78,6 +78,14 @@ export const FormItemMd = createMetadata({
       type: "number",
       defaultValue: defaultProps.customValidationsDebounce,
     },
+    validationDisplayDelay: {
+      description:
+        `When an async \`onValidate\` handler takes longer than this many milliseconds, ` +
+        `the validation result is shown immediately once it resolves — without waiting for the ` +
+        `field to lose focus. Set to \`0\` to disable early display. Default: \`400\`.`,
+      type: "number",
+      defaultValue: 400,
+    },
     validationMode: {
       description:
         `This property sets what kind of validation mode or strategy to employ for a particular ` +
@@ -292,6 +300,7 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
       regexInvalidMessage,
       regexInvalidSeverity,
       customValidationsDebounce,
+      validationDisplayDelay,
       validationMode,
       maxTextLength,
       gap,

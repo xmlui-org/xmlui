@@ -8,7 +8,7 @@ Behaviors are decorators that automatically wrap rendered components with cross-
 - **`nonVisual: true` components** — behaviors never attach.
 - Behaviors attach in a fixed order; the wrapped node from one becomes the input to the next.
 
-## The 8 Framework Behaviors
+## The 9 Framework Behaviors
 
 | Behavior | Trigger prop(s) | What it does |
 |---|---|---|
@@ -20,6 +20,7 @@ Behaviors are decorators that automatically wrap rendered components with cross-
 | pubsub | (pubsub props) | Enables publisher-subscriber messaging between components |
 | formBinding | (form props) | Binds input to the enclosing `<Form>` |
 | validation | (validation props) | Adds validation logic to form-bound inputs |
+| displayWhen | `displayWhen` | Hides via `display: none` — children stay mounted (see below) |
 
 ## Label Behavior — Critical Rule
 
@@ -65,6 +66,29 @@ ModalDialog components receive `externalAnimation={true}` to hand off animation 
 <Button tooltip="Saves all changes" tooltipOptions="right; delayDuration: 800" />
 <Button tooltipMarkdown="**Bold** description with [link](https://example.com)" />
 ```
+
+## displayWhen Behavior
+
+Controls visibility through CSS `display: none` instead of removing the component from the React tree.
+
+```xml
+<VStack displayWhen="{step === 1}">
+  <TextBox label="First Name" bindTo="firstName" required="true" />
+</VStack>
+```
+
+**Key distinction from `when`:**
+
+| Prop | React tree | DOM node | Form fields registered |
+|---|---|---|---|
+| `when="{false}"` | Unmounted | Absent | No |
+| `displayWhen="{false}"` | Mounted | Present, hidden | **Yes** |
+
+Because the subtree is never unmounted, `FormBindingWrapper` and `ValidationWrapper` remain active. This is essential for **multi-step wizard forms** — fields on hidden steps stay registered with the enclosing `<Form>`, so their values and validation state are preserved while the user navigates between steps.
+
+**Registration order matters:** `displayWhenBehavior` is registered *last*, making it the outermost wrapper. The entire composed node — label, tooltip, form binding — is hidden or revealed as a unit.
+
+**Default:** if `displayWhen` is omitted the behavior does not attach; or if the prop evaluates to `undefined`/`null`, the component defaults to visible.
 
 ## Registering Custom Behaviors (Framework Dev)
 

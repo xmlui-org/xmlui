@@ -115,6 +115,8 @@ export const behaviorPropKeys: readonly string[] = [
   "animation", "animationOptions",
   // BookmarkBehavior — triggerProps: bookmark
   "bookmark", "bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc",
+  // DisplayWhenBehavior — triggerProps: displayWhen
+  "displayWhen",
   // FormBindingBehavior — triggerProps: bindTo
   "bindTo", "initialValue", "noSubmit",
   // LabelBehavior — triggerProps: label

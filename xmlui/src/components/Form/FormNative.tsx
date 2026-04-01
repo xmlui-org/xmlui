@@ -904,15 +904,41 @@ export const FormWithContextVar = forwardRef(function (
     return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
   }, [formState.subject, formState.noSubmitFields]);
 
+  // $validationIssues: { [fieldName]: SingleValidationResult[] } — only invalid entries.
+  const $validationIssues = useMemo(() => {
+    const result: Record<string, Array<SingleValidationResult>> = {};
+    Object.entries(formState.validationResults).forEach(([field, validationResult]) => {
+      const invalidResults = validationResult.validations.filter((v) => !v.isValid);
+      if (invalidResults.length > 0) {
+        result[field] = invalidResults;
+      }
+    });
+    return result;
+  }, [formState.validationResults]);
+
+  // $hasValidationIssue(fieldName?): When called without an argument, return true if ANY field has validation issues.
+  // When called with a fieldName, return true if that specific field has issues.
+  const $hasValidationIssue = useCallback(
+    (fieldName?: string) => {
+      if (fieldName === undefined) {
+        return Object.keys($validationIssues).length > 0;
+      }
+      return ($validationIssues[fieldName]?.length ?? 0) > 0;
+    },
+    [$validationIssues],
+  );
+
   const nodeWithItem = useMemo(() => {
     return {
       type: "Fragment",
       vars: {
         $data: $data,
+        $validationIssues: $validationIssues,
+        $hasValidationIssue: $hasValidationIssue,
       },
       children: node.children,
     };
-  }, [$data, node.children]);
+  }, [$data, $validationIssues, $hasValidationIssue, node.children]);
 
   const rawInitialValue = extractValue(node.props.data);
   // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.

@@ -36,6 +36,7 @@ The following table summarizes the currently supported XMLUI behaviors.
 |---|---|---|
 | `Animation` | Applies visual animations to components with configurable duration, timing, and looping options. | `animation` |
 | `Bookmark` | Adds navigation anchors and table of contents integration to visual components. | `bookmark` |
+| `DisplayWhen` | Hides a component via `display: none` while keeping it mounted — essential for multi-step wizard forms. | `displayWhen` |
 | `FormBinding` | Binds input components directly to form data without requiring a FormItem wrapper. | `bindTo` |
 | `Label` | Wraps components with a label element for form inputs and other labeled content. | `label` |
 | `Tooltip` | Displays informational text or markdown content when hovering over visual components. | `tooltip`, `tooltipMarkdown` |
@@ -287,25 +288,73 @@ You can add validation functionality to input components with validation-related
 
 | Name | Description |
 |---|---|
+| `customValidationsDebounce` | Milliseconds to wait after the last keystroke before calling `onValidate`. Keeps server traffic low for async validators. Default: `0` (run immediately). |
 | `lengthInvalidMessage` | Custom error message to display when input length is invalid |
-| `lengthInvalidSeverity` | Severity level for length validation errors (e.g., 'error', 'warning', 'info') |
+| `lengthInvalidSeverity` | Severity level for length validation errors (`'error'`, `'warning'`) |
 | `maxLength` | Maximum length for string inputs |
 | `minLength` | Minimum length for string inputs |
 | `minValue` | Minimum value for number inputs |
 | `maxValue` | Maximum value for number inputs |
-| `pattern` | Predefined pattern name for input validation |
+| `onValidate` | Custom validation handler. Return `null`/`undefined` for valid, a `string` error message, a `boolean`, or an array of `{ isValid, invalidMessage, severity }` objects. May be `async`. |
+| `pattern` | Named pattern for input validation. Supported values: `"email"`, `"phone"`, `"url"` |
 | `patternInvalidMessage` | Custom error message to display when input does not match the pattern |
-| `patternInvalidSeverity` | Severity level for pattern validation errors (e.g., 'error', 'warning', 'info') |
+| `patternInvalidSeverity` | Severity level for pattern validation errors (`'error'`, `'warning'`) |
 | `rangeInvalidMessage` | Custom error message to display when input value is out of range |
-| `rangeInvalidSeverity` | Severity level for range validation errors (e.g., 'error', 'warning', 'info') |
-| `regex` | Regex pattern for input validation |
+| `rangeInvalidSeverity` | Severity level for range validation errors (`'error'`, `'warning'`) |
+| `regex` | Regular expression string for custom format validation |
 | `regexInvalidMessage` | Custom error message to display when input does not match the regex |
-| `regexInvalidSeverity` | Severity level for regex validation errors (e.g., 'error', 'warning', 'info') |
+| `regexInvalidSeverity` | Severity level for regex validation errors (`'error'`, `'warning'`) |
 | `required` | Whether this field is required |
-| `validationMode` | The mode to use for validating the input (e.g., 'onChange', 'onBlur', 'onSubmit') |
-| `verboseValidationFeedback` | Whether to display verbose validation feedback (e.g., show all validation errors instead of just the first one) |
+| `requiredInvalidMessage` | Custom error message to display when a required field is empty |
+| `validationDisplayDelay` | Milliseconds to wait before eagerly surfacing an async validation result while the field is still focused. Useful to avoid a flash for fast checks. Default: `0`. |
+| `validationMode` | When to display validation feedback: `'errorLate'` (default — on blur, then while focused if already invalid), `'onChanged'` (immediately while typing), `'onLostFocus'` (only after blur) |
+| `verboseValidationFeedback` | Whether to display verbose validation feedback (show all validation errors instead of just the first one) |
 
-_TBD_: Add vaildation example
+_TBD_: Add validation example
+
+## DisplayWhen
+
+This behavior makes a component invisible without removing it from the rendered output. Unlike the standard `when` attribute — which stops rendering entirely — `displayWhen` keeps the component and all its children alive at all times, just invisible to the user.
+
+This distinction is critical for **multi-step wizard forms**: fields on hidden steps remain registered with the enclosing `Form`, so their values and validation state are preserved while the user navigates between steps.
+
+**Trigger Properties**
+
+| Name | Description |
+|---|---|
+| `displayWhen` | When `false`, makes the component invisible while keeping it and its children active |
+
+The following table compares `when` and `displayWhen`:
+
+| | `when="{false}"` | `displayWhen="{false}"` |
+|---|---|---|
+| Component rendered? | No | **Yes** (invisible) |
+| Form fields registered? | No | **Yes** |
+| Use when… | Content is truly irrelevant | Hidden steps must preserve their field values |
+
+```xmlui-pg display copy /displayWhen/ name="Example: wizard form with displayWhen"
+<App var.step="{1}">
+  <Form
+    data="{{ firstName: '', lastName: '' }}"
+    hideButtonRow="{true}"
+    onSubmit="(data) => toast('Submitted: ' + data.firstName + ' ' + data.lastName)"
+  >
+    <VStack displayWhen="{step === 1}">
+      <H4>Step 1 — Personal</H4>
+      <TextBox label="First Name" bindTo="firstName" required="true" />
+      <Button label="Next" onClick="step = 2" />
+    </VStack>
+    <VStack displayWhen="{step === 2}">
+      <H4>Step 2 — Account</H4>
+      <TextBox label="Last Name" bindTo="lastName" required="true" />
+      <HStack>
+        <Button label="Back" variant="outlined" onClick="step = 1" />
+        <Button label="Submit" type="submit" themeColor="primary" />
+      </HStack>
+    </VStack>
+  </Form>
+</App>
+```
 
 ## Variant
 

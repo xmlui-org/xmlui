@@ -181,6 +181,10 @@ export const validationBehavior: Behavior = {
       componentNode.props?.customValidationsDebounce,
       0,
     );
+    const validationDisplayDelay = extractValue.asOptionalNumber(
+      componentNode.props?.validationDisplayDelay,
+      0,
+    );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
     const requireLabelMode = extractValue.asOptionalString(
       componentNode.props?.requireLabelMode,
@@ -226,6 +230,7 @@ export const validationBehavior: Behavior = {
         validations={validations}
         onValidate={onValidate}
         customValidationsDebounce={customValidationsDebounce}
+        validationDisplayDelay={validationDisplayDelay}
         validationMode={validationMode as any}
         verboseValidationFeedback={verboseValidationFeedback}
         itemIndex={itemIndex}

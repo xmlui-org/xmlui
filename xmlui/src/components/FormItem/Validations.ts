@@ -422,6 +422,7 @@ export function useValidationDisplay(
   validationResult: ValidationResult | undefined,
   validationMode: ValidationMode = defaultValidationMode,
   verboseValidationFeedback: boolean = true,
+  validationDisplayDelay: number = 0,
 ): {
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
@@ -498,6 +499,29 @@ export function useValidationDisplay(
     }
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;
+
+  // Eagerly show validation results when async validation takes longer than validationDisplayDelay.
+  // "Punish-late" mode normally hides results until blur — but a slow async check (e.g. a network
+  // call) should reveal the outcome once it settles, even if the field is still focused.
+  const isPartial = validationResult?.partial ?? false;
+  const [asyncTookLong, setAsyncTookLong] = useState(false);
+  // Reset the flag whenever the value changes (a new validation cycle begins).
+  useEffect(() => {
+    setAsyncTookLong(false);
+  }, [value]);
+  // Start a timer when async validation is in-flight for a dirty field.
+  // If it fires before validation resolves, record that it took long.
+  useEffect(() => {
+    if (!isPartial || !isDirty || validationDisplayDelay <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => setAsyncTookLong(true), validationDisplayDelay);
+    return () => clearTimeout(timer);
+  }, [isPartial, isDirty, validationDisplayDelay]);
+  // Override: once a slow async validation settles, show the result immediately.
+  if (asyncTookLong && !isPartial) {
+    isHelperTextShown = true;
+  }
 
   const [prevStableShown, setPrevStableShown] = useState(isHelperTextShown);
   if (prevStableShown !== isHelperTextShown && !validationInProgress) {
