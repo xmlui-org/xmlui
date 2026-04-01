@@ -736,6 +736,42 @@ The default value is `false`.
 
 %-PROP-END
 
+%-PROP-START hideSelectionCheckboxesHeader
+
+Hides the selection checkbox in the table header so it is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via the component API and keyboard shortcuts.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxesHeader="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxesHeader"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START checkboxTolerance
 
 The default value is `false`.

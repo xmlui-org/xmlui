@@ -410,6 +410,43 @@ test.describe("Basic Functionality", () => {
     });
   });
 
+  test.describe("hideSelectionCheckboxesHeader property", () => {
+    test("hides header checkbox when true, row checkboxes remain", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // Header checkbox must not be in the DOM
+      const headerCheckbox = page.locator("thead input[type='checkbox']");
+      await expect(headerCheckbox).toHaveCount(0);
+      // Row checkboxes still present (one per data row)
+      const rowCheckboxes = page.locator("tbody input[type='checkbox']");
+      await expect(rowCheckboxes).toHaveCount(4);
+    });
+
+    test("shows header checkbox by default (hideSelectionCheckboxesHeader false)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      const headerCheckbox = page.locator("thead input[type='checkbox']");
+      await expect(headerCheckbox).toHaveCount(1);
+    });
+
+    test("hideSelectionCheckboxesHeader has no effect when enableMultiRowSelection is false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="false" hideSelectionCheckboxesHeader="true" testId="table">
+          <Column bindTo="name"/>
+        </Table>
+      `);
+      // Single-select never renders a header checkbox regardless
+      const headerCheckbox = page.locator("thead input[type='checkbox']");
+      await expect(headerCheckbox).toHaveCount(0);
+    });
+  });
+
   test.describe("alwaysShowSelectionCheckboxes property", () => {
     test("checkboxes are always visible when alwaysShowSelectionCheckboxes is true", async ({ initTestBed, page }) => {
       await initTestBed(`
