@@ -12,7 +12,6 @@ This component supports the following behaviors:
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |

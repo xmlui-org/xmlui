@@ -20,7 +20,6 @@ This component supports the following behaviors:
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -48,7 +47,7 @@ Display mode: "view" for read-only or "edit" for annotation editing. Default: "v
 
 ### `scale`
 
-Zoom level for the PDF pages. Default: 1.0.
+Zoom level for the PDF pages. Default: 1.
 
 ### `scrollStyle`
 

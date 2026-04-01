@@ -23,11 +23,7 @@
 
 ## Behaviors [#behaviors]
 
-This component supports the following behaviors:
-
-| Behavior | Properties |
-| --- | --- |
-| Publish/Subscribe | `subscribeToTopic` |
+No behaviors are applicable to this component.
 
 ## Properties [#properties]
 

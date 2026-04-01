@@ -45,7 +45,6 @@ This component supports the following behaviors:
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -2213,6 +2212,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-cell-Table | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-checkbox-Table | $fontSize | $fontSize |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-heading-Table | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-row-Table | $fontSize-sm | $fontSize-sm |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-heading-Table | $fontWeight-bold | $fontWeight-bold |
