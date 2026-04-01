@@ -92,6 +92,22 @@ export const FormMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.saveInProgressLabel,
     },
+    savePendingLabel: {
+      description:
+        "This property defines the label of the Save button to display while " +
+        "async field validation is still in-flight. During async validation, the Submit button " +
+        "is disabled to prevent submission before validation completes.",
+      type: "string",
+      defaultValue: defaultProps.savePendingLabel,
+    },
+    submitFeedbackDelay: {
+      description:
+        "The number of milliseconds to wait before switching the Save button label to " +
+        "`saveInProgressLabel` or `savePendingLabel`. This prevents a distracting label " +
+        "flash when submit or validation completes quickly.",
+      type: "number",
+      defaultValue: defaultProps.submitFeedbackDelay,
+    },
     swapCancelAndSave: {
       description:
         `By default, the Cancel button is to the left of the Save button. Set this property to ` +
@@ -179,13 +195,15 @@ export const FormMd = createMetadata({
   events: {
     willSubmit: {
       description:
-        `The form infrastructure fires this event just before the form is submitted. The event argument ` +
-        `is the current \`data\` value to be submitted. The return value controls submission behavior: ` +
-        `returning \`false\` cancels the submission; returning a plain object submits that object instead; ` +
-        `returning \`null\`, \`undefined\`, an empty string, or any non-object value proceeds with normal submission.`,
-      signature: "willSubmit(data: Record<string, any>): false | Record<string, any> | null | undefined | void",
+        `The form infrastructure fires this event just before the form is submitted. The event receives ` +
+        `two arguments: the cleaned form data (fields marked \`noSubmit\` excluded) and the complete form data ` +
+        `(including all fields). The return value controls submission behavior: returning \`false\` cancels ` +
+        `the submission; returning a plain object submits that object instead; returning \`null\`, \`undefined\`, ` +
+        `an empty string, or any non-object value proceeds with normal submission.`,
+      signature: "willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void",
       parameters: {
-        data: "The current form data to be submitted.",
+        data: "The form data to be submitted (fields marked with noSubmit=\"true\" are excluded).",
+        allData: "The complete form data including all fields, useful for cross-field validation.",
       },
     },
     submit: {

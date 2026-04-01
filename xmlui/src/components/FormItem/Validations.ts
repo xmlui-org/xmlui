@@ -327,8 +327,18 @@ class FormItemValidator {
       throw error;
     });
 
-    if (validationFnResult === undefined) {
+    if (validationFnResult === undefined || validationFnResult === null) {
       return undefined;
+    }
+
+    if (typeof validationFnResult === "string") {
+      return [
+        {
+          isValid: false,
+          invalidMessage: validationFnResult,
+          severity: "error",
+        },
+      ];
     }
 
     if (typeof validationFnResult === "boolean") {

@@ -572,6 +572,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   // aria-label is handled by the aria-label resolution cascade, not generic forwarding.
   specialProps.add("aria-label");
 
+  // Behavior-consumed props that must never be forwarded to native React components.
+  // These are XMLUI framework props handled by auto-attached behaviors (formBindingBehavior,
+  // validationBehavior, etc.). Forwarding them causes React DOM warnings.
+  specialProps.add("bindTo");
+  specialProps.add("onValidate");
+
   return createComponentRenderer(type, metadata, (context) => {
     const {
       node,
@@ -990,6 +996,10 @@ export function wrapCompound<TMd extends ComponentMetadata>(
 
   // aria-label is handled by the aria-label resolution cascade, not generic forwarding.
   specialProps.add("aria-label");
+
+  // Behavior-consumed props that must never be forwarded to native React components.
+  specialProps.add("bindTo");
+  specialProps.add("onValidate");
 
   // StateWrapper uses an outer/inner split to solve the stale-closure
   // problem with React.memo.  XMLUI's createComponentRenderer creates new

@@ -324,6 +324,8 @@
                     >
                         <NavGroup label="Forms & Validation">
                             <NavLink icon="article" label="Validate dependent fields together" to="/docs/howto/validate-dependent-fields-together" />
+                            <NavLink icon="article" label="Validate a field inline with onValidate" to="/docs/howto/validate-a-field-inline-with-onvalidate" />
+                            <NavLink icon="article" label="Transform form data before submission" to="/docs/howto/transform-form-data-before-submission" />
                             <NavLink icon="article" label="Build a multi-step wizard form" to="/docs/howto/build-a-multi-step-wizard-form" />
                             <NavLink icon="article" label="Reset a form after submission" to="/docs/howto/reset-a-form-after-submission" />
                             <NavLink icon="article" label="Persist form drafts across sessions" to="/docs/howto/persist-form-drafts-across-sessions" />
@@ -1247,6 +1249,12 @@
             <!-- New how-to articles: Forms & Validation -->
             <Page url="/docs/howto/validate-dependent-fields-together">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/validate-dependent-fields-together.md']}" />
+            </Page>
+            <Page url="/docs/howto/validate-a-field-inline-with-onvalidate">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/validate-a-field-inline-with-onvalidate.md']}" />
+            </Page>
+            <Page url="/docs/howto/transform-form-data-before-submission">
+                <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/transform-form-data-before-submission.md']}" />
             </Page>
             <Page url="/docs/howto/build-a-multi-step-wizard-form">
                 <DocumentPageNoTOC content="{appGlobals.docsContent['pages/howto/build-a-multi-step-wizard-form.md']}" />

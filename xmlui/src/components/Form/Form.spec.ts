@@ -1185,6 +1185,57 @@ test.describe("Basic Functionality", () => {
       });
     });
 
+    test("onWillSubmit first arg excludes noSubmit fields, second arg includes them", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Form
+            data="{{ username: 'alice', password: 'secret', confirmPassword: 'secret' }}"
+            onWillSubmit="(data, allData) => { testState = { data, allData }; return false; }"
+            onSubmit="data => testState = { submitData: data }">
+            <FormItem label="Username" bindTo="username" />
+            <FormItem label="Password" bindTo="password" />
+            <FormItem label="Confirm Password" bindTo="confirmPassword" noSubmit="true" />
+          </Form>
+        </Fragment>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // first arg (data) excludes noSubmit fields
+      // second arg (allData) includes noSubmit fields
+      await expect.poll(testStateDriver.testState).toEqual({
+        data: { username: "alice", password: "secret" },
+        allData: { username: "alice", password: "secret", confirmPassword: "secret" },
+      });
+    });
+
+    test("onSubmit does not receive noSubmit fields when onWillSubmit passes through", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: 'bob', password: 'pass', confirmPassword: 'pass' }}"
+          onWillSubmit="(data, allData) => undefined"
+          onSubmit="data => testState = data">
+          <FormItem label="Username" bindTo="username" />
+          <FormItem label="Password" bindTo="password" />
+          <FormItem label="Confirm Password" bindTo="confirmPassword" noSubmit="true" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // onSubmit should NOT receive confirmPassword
+      await expect.poll(testStateDriver.testState).toEqual({
+        username: "bob",
+        password: "pass",
+      });
+    });
+
     test("nested form submit does not trigger parent form submit", async ({
       initTestBed,
       page,
@@ -1779,6 +1830,81 @@ test.describe("Basic Functionality", () => {
       // Form should not save due to validation error
       const state = await testStateDriver.testState();
       expect(state).not.toEqual("formSaved");
+    });
+
+    test("form blocks submission while async onValidate is still in-flight", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: '' }}"
+          onSubmit="data => testState = 'submitted'">
+          <FormItem
+            label="Username"
+            bindTo="username"
+            onValidate="value => {
+              delay(3000);
+              return null;
+            }"
+          />
+        </Form>
+      `);
+
+      // Fill the field to trigger async validation (delay 3000ms)
+      await page.getByRole("textbox").fill("alice");
+      // Brief pause to ensure the partial validation state is reflected in React state
+      await page.waitForTimeout(100);
+
+      // While async validation is in-flight, the Save button should be disabled
+      // and show the pending label "Validating..."
+      const saveButton = page.getByRole("button", { name: "Validating..." });
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeDisabled();
+
+      // Once async validation settles, the button re-enables and reverts to "Save"
+      await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 7000 });
+
+      // User can now click Save and the form submits
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState, { timeout: 3000 }).toEqual("submitted");
+    });
+
+    test("form does not submit after async validation fails", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: '' }}"
+          onSubmit="data => testState = 'submitted'">
+          <FormItem
+            label="Username"
+            bindTo="username"
+            onValidate="value => {
+              delay(500);
+              return 'Username is already taken';
+            }"
+          />
+        </Form>
+      `);
+
+      // Fill the field to trigger async validation (delay 500ms, returns error)
+      await page.getByRole("textbox").fill("alice");
+      await page.waitForTimeout(100);
+
+      // While async validation is in-flight, Save button shows "Validating..." and is disabled
+      await expect(page.getByRole("button", { name: "Validating..." })).toBeDisabled();
+
+      // Once validation settles and returns an error, the Save button re-enables
+      // but the form will show a validation error
+      await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 3000 });
+
+      // Clicking Save with a validation error must not submit the form
+      await page.getByRole("button", { name: "Save" }).click();
+      await page.waitForTimeout(500);
+      const state = await testStateDriver.testState();
+      expect(state).not.toEqual("submitted");
     });
 
     test("onValidate validation messages appear in correct timing order", async ({
