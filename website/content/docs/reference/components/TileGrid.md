@@ -73,7 +73,6 @@ This component supports the following behaviors:
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -838,6 +837,12 @@ This component does not expose any methods.
 
 ## Styling [#styling]
 
+The visual appearance of `TileGrid` can be customized through theme variables. These control layout, spacing, and typography for tiles and their selection controls.
+
+| Theme variable | Description |
+|:---|:---|
+| `fontSize-checkbox-TileGrid` | Font size of the checkbox label used for tile selection. |
+
 ### Theme Variables [#theme-variables]
 
 | Variable | Default Value (Light) | Default Value (Dark) |
@@ -847,6 +852,7 @@ This component does not expose any methods.
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--selected | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--selected--hover | $color-primary-100 | $color-primary-100 |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-item-TileGrid | $borderRadius | $borderRadius |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-checkbox-TileGrid | $fontSize | $fontSize |
 | [offset](/docs/styles-and-themes/common-units/#size-values)Horizontal-checkbox-TileGrid | 4px | 4px |
 | [offset](/docs/styles-and-themes/common-units/#size-values)Vertical-checkbox-TileGrid | 4px | 4px |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-item-TileGrid--focus | $color-primary-500 | $color-primary-500 |
