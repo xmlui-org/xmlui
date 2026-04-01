@@ -14,6 +14,8 @@ import { COMPONENT_PART_KEY } from "./theming/responsive-layout";
  * Wraps children in a display:contents div that captures mousemove
  * on canvas elements and emits throttled native:hover trace events.
  */
+const HOVER_CAPTURE_STYLE = { display: "contents" } as const;
+
 function HoverCapture({
   children,
   componentType,
@@ -21,7 +23,6 @@ function HoverCapture({
   ariaName,
   ownerFileId,
   ownerSource,
-  hoverSession,
 }: {
   children: React.ReactNode;
   componentType: string;
@@ -29,28 +30,30 @@ function HoverCapture({
   ariaName?: string;
   ownerFileId?: string;
   ownerSource?: any;
-  hoverSession: { traceId: string | undefined; lastTs: number };
 }) {
   const THROTTLE_MS = 300;
   const SESSION_GAP_MS = 500;
+
+  const hoverSessionRef = React.useRef({ traceId: undefined as string | undefined, lastTs: 0 });
 
   const handleMouseMove = React.useCallback(
     (e: React.MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.tagName !== "CANVAS") return;
       const now = Date.now();
-      if (now - hoverSession.lastTs < THROTTLE_MS) return;
+      const hs = hoverSessionRef.current;
+      if (now - hs.lastTs < THROTTLE_MS) return;
 
       // Start a new hover session if the gap since the last event exceeds SESSION_GAP_MS
-      if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
-        hoverSession.traceId = pushTrace();
+      if (!hs.traceId || now - hs.lastTs > SESSION_GAP_MS) {
+        hs.traceId = pushTrace();
         popTrace();
       }
-      hoverSession.lastTs = now;
+      hs.lastTs = now;
 
       pushXsLog(
         createLogEntry("native:hover", {
-          traceId: hoverSession.traceId,
+          traceId: hs.traceId,
           componentType,
           componentLabel: componentLabel || componentType,
           eventName: "hover",
@@ -62,11 +65,11 @@ function HoverCapture({
         }),
       );
     },
-    [componentType, componentLabel, ariaName, ownerFileId, ownerSource, hoverSession],
+    [componentType, componentLabel, ariaName, ownerFileId, ownerSource],
   );
 
   return (
-    <div style={{ display: "contents" }} onMouseMoveCapture={handleMouseMove}>
+    <div style={HOVER_CAPTURE_STYLE} onMouseMoveCapture={handleMouseMove}>
       {children}
     </div>
   );
@@ -669,19 +672,11 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     // --- Dynamic native event capture ---
-    // Hover-related events (mouseover, mouseout) join the current hover session
-    // so they appear in the same trace as native:hover events from HoverCapture.
-    // Non-hover events (click, legendselectchanged, etc.) get their own trace.
+    // Only enabled per-component via config.captureNativeEvents (not appGlobals).
     const nativeEventsEnabled =
-      xsVerbose &&
-      (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
-    const hoverSession = nativeEventsEnabled
-      ? { traceId: undefined as string | undefined, lastTs: 0 }
-      : undefined;
+      xsVerbose && config.captureNativeEvents;
 
     if (nativeEventsEnabled) {
-      const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
-      const SESSION_GAP_MS = 500;
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
@@ -697,21 +692,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
         const offsetX = domEvent?.offsetX ?? event?.offsetX;
         const offsetY = domEvent?.offsetY ?? event?.offsetY;
 
-        let traceId: string;
-        if (HOVER_EVENTS.has(eventType)) {
-          // Join the hover session (or start one if none active / session expired)
-          const now = Date.now();
-          if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
-            hoverSession.traceId = pushTrace();
-            popTrace();
-          }
-          hoverSession.lastTs = now;
-          traceId = hoverSession.traceId;
-        } else {
-          // Non-hover events get their own trace
-          traceId = pushTrace();
-          popTrace();
-        }
+        // Non-hover events get their own trace
+        const traceId = pushTrace();
+        popTrace();
 
         pushXsLog(
           createLogEntry(traceKind, {
@@ -925,7 +908,7 @@ export function wrapComponent<TMd extends ComponentMetadata>(
       }
       rendered = <Component {...props} />;
     }
-    if (nativeEventsEnabled && hoverSession) {
+    if (nativeEventsEnabled) {
       return (
         <HoverCapture
           componentType={type}
@@ -933,7 +916,6 @@ export function wrapComponent<TMd extends ComponentMetadata>(
           ariaName={ariaLabel}
           ownerFileId={ownerFileId}
           ownerSource={ownerSource}
-          hoverSession={hoverSession}
         >
           {rendered}
         </HoverCapture>
@@ -1293,15 +1275,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
 
     // --- Dynamic native event capture (same as wrapComponent) ---
     const nativeEventsEnabled =
-      xsVerbose &&
-      (config.captureNativeEvents || context.appContext?.appGlobals?.captureNativeEvents);
-    const hoverSession = nativeEventsEnabled
-      ? { traceId: undefined as string | undefined, lastTs: 0 }
-      : undefined;
+      xsVerbose && config.captureNativeEvents;
 
     if (nativeEventsEnabled) {
-      const HOVER_EVENTS = new Set(["mouseover", "mouseout"]);
-      const SESSION_GAP_MS = 500;
       const xmluiId = node.uid || node.testId;
       props.onNativeEvent = (event: any) => {
         const eventType = event?.type || "unknown";
@@ -1317,19 +1293,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         const offsetX = domEvent?.offsetX ?? event?.offsetX;
         const offsetY = domEvent?.offsetY ?? event?.offsetY;
 
-        let traceId: string;
-        if (HOVER_EVENTS.has(eventType)) {
-          const now = Date.now();
-          if (!hoverSession.traceId || now - hoverSession.lastTs > SESSION_GAP_MS) {
-            hoverSession.traceId = pushTrace();
-            popTrace();
-          }
-          hoverSession.lastTs = now;
-          traceId = hoverSession.traceId;
-        } else {
-          traceId = pushTrace();
-          popTrace();
-        }
+        // Non-hover events get their own trace
+        const traceId = pushTrace();
+        popTrace();
 
         pushXsLog(
           createLogEntry(traceKind, {
@@ -1445,7 +1411,7 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     }
 
     const rendered = <StateWrapper {...props} />;
-    if (nativeEventsEnabled && hoverSession) {
+    if (nativeEventsEnabled) {
       return (
         <HoverCapture
           componentType={type}
@@ -1453,7 +1419,6 @@ export function wrapCompound<TMd extends ComponentMetadata>(
           ariaName={ariaLabel}
           ownerFileId={ownerFileId}
           ownerSource={ownerSource}
-          hoverSession={hoverSession}
         >
           {rendered}
         </HoverCapture>
