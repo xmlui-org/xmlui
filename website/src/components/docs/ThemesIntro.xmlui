@@ -4,7 +4,7 @@
       <![CDATA[
 # Themes
 
-We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). You can use the dropdown to switch from the default theme (`xmlui`) to one called `earthtone`. Then use the [ToneChangerButton](/components/ToneChangerButton) to switch between light and dark modes.
+We've seen how XMLUI enables reactive data binding without requiring you to master React's complexity. The same principle applies to layout and style: XMLUI's theme system ensures that your apps look good and behave gracefully without requiring you to master the complexity of CSS (Cascading Style Sheets). You can use the dropdown to switch from the default theme (`xmlui`) to one called `earthtone`. Then use the [ToneChangerButton](/docs/reference/components/ToneChangerButton) to switch between light and dark modes.
       ]]>
     </Markdown>
     <HStack verticalAlignment="center" gap="$space-4">
@@ -22,7 +22,7 @@ We've seen how XMLUI enables reactive data binding without requiring you to mast
     </HStack>
     <Markdown>
       <![CDATA[
-You've now switched the settings for [thousands of theme variables](/styles-and-themes/theme-variable-defaults). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
+You've now switched the settings for [thousands of theme variables](/docs/styles-and-themes/theme-variable-defaults). Each theme variable defines the value that influences an aspect of a component's appearance: text color and font, background color, margin, border, padding, etc. They follow a naming convention that enables a setting to control appearance globally or in progressively more granular ways. For example, here are the variables that can control the border color of a solid button using the primary color when the mouse hovers over it:
 
 ```text
 color-primary
@@ -64,7 +64,7 @@ But we can target `Markdown` for different treatment with a more specific theme 
 ```
 
 
-On [this page](/palettes) you can see the complete set of roles and explore how different themes express them. To create a new theme you can minimally supply just three values: for `$color-primary`, `$color-secondary`, and `$color-surface`. Here is the complete definition for our custom `earthtone` theme.
+On [this page](/docs/palettes) you can see the complete set of roles and explore how different themes express them. To create a new theme you can minimally supply just three values: for `$color-primary`, `$color-secondary`, and `$color-surface`. Here is the complete definition for our custom `earthtone` theme.
 
 ```json
 {
@@ -78,7 +78,7 @@ On [this page](/palettes) you can see the complete set of roles and explore how 
 }
 ```
 
-To see how our `TubeStops` component looks with `earthtone` vs the default, we can wrap two instances of it using the [Theme](/components/Theme) component. Here we use only the default settings for both themes.
+To see how our `TubeStops` component looks with `earthtone` vs the default, we can wrap two instances of it using the [Theme](/docs/reference/components/Theme) component. Here we use only the default settings for both themes.
       ]]>
     </Markdown>
     <HStack wrapContent>

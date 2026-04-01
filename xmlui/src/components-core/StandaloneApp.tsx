@@ -1227,8 +1227,8 @@ function useStandalone(
 
           const globalsXs = parsedGlobals?.codeBehind;
           const extractedGlobals = extractGlobals({
-            ...(globalsXs?.vars || {}),
-            ...(globalsXs?.functions || {}),
+            ...globalsXs?.vars,
+            ...globalsXs?.functions,
           });
           // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
           resolve({
@@ -1252,9 +1252,12 @@ function useStandalone(
 
       // --- Fetch the themes according to the configuration
       let themePromises: Promise<ThemeDefinition>[];
+      let defaultThemeIsUrl: boolean = false;
       if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
         // --- Special case, we have only a single "defaultTheme" in the configuration
-        const fetchDefaultTheme = loadThemeFile(`themes/${config?.defaultTheme}.json`);
+        const themeUrl = toThemeUrl(config.defaultTheme);
+        defaultThemeIsUrl = themeUrl === config.defaultTheme;
+        const fetchDefaultTheme = loadThemeFile(themeUrl);
         themePromises = [fetchDefaultTheme];
       } else {
         // --- In any other case, we fetch all themes defined in the configuration
@@ -1395,16 +1398,22 @@ function useStandalone(
         );
       }
 
-      const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
+      const defaultThemeProp = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
       // --- We test whether the default theme is not from a binding
       // --- expression and is not a built-in theme already loaded. If so,
       // --- we load it from the `themes` folder.
-      if (defaultTheme && typeof defaultTheme === "string" && !defaultTheme.includes("{")) {
+      if (
+        defaultThemeProp &&
+        typeof defaultThemeProp === "string" &&
+        !defaultThemeProp.includes("{")
+      ) {
         if (
-          !builtInThemes.find((theme) => theme.id === defaultTheme) &&
-          !themes.find((theme) => theme.id === defaultTheme)
+          !builtInThemes.find((theme) => theme.id === defaultThemeProp) &&
+          !themes.find((theme) => theme.id === defaultThemeProp)
         ) {
-          themes.push(await loadThemeFile(`themes/${defaultTheme}.json`));
+          defaultThemeIsUrl = defaultThemeProp === config.defaultTheme;
+          const themeUrl = toThemeUrl(defaultThemeProp);
+          themes.push(await loadThemeFile(themeUrl));
         }
       }
 
@@ -1537,8 +1546,17 @@ function useStandalone(
       }
       // --- Let's check for errors to display
 
+      let defaultTheme = config.defaultTheme;
+      if (defaultThemeIsUrl) {
+        const themeId = themes.at(-1)?.id;
+        if (typeof themeId === "string") {
+          defaultTheme = themeId;
+        }
+      }
+
       const newAppDef = {
         ...config,
+        defaultTheme,
         themes,
         sources,
         components: componentsWithCodeBehinds as any,
@@ -1926,4 +1944,16 @@ function discoverDirectComponentDependenciesHelp(
   }
 
   return deps;
+}
+
+function toThemeUrl(themeNameOrUrl: string): string {
+  const startsWithHttp = /^https?:\/\//;
+  if (startsWithHttp.test(themeNameOrUrl)) {
+    return themeNameOrUrl;
+  }
+  let res = "themes/" + themeNameOrUrl;
+  if (!themeNameOrUrl.endsWith(".json")) {
+    res += ".json";
+  }
+  return res;
 }
