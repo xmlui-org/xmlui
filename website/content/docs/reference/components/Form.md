@@ -22,6 +22,7 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
@@ -224,9 +225,21 @@ This property defines the label of the Save button to display during the form da
 
 This property defines the label of the Save button.
 
+### `savePendingLabel` [#savependinglabel]
+
+> [!DEF]  default: **"Validating..."**
+
+This property defines the label of the Save button to display while async field validation is still in-flight. During async validation, the Submit button is disabled to prevent submission before validation completes.
+
 ### `storageKey` [#storagekey]
 
 The key used to save the form's temporary data in localStorage when `persist` is enabled. If omitted, the form's `id` attribute is used. If the form has no `id`, the key defaults to `"form-data"`.
+
+### `submitFeedbackDelay` [#submitfeedbackdelay]
+
+> [!DEF]  default: **100**
+
+The number of milliseconds to wait before switching the Save button label to `saveInProgressLabel` or `savePendingLabel`. This prevents a distracting label flash when submit or validation completes quickly.
 
 ### `submitMethod` [#submitmethod]
 
@@ -300,20 +313,49 @@ The form infrastructure fires this event when the form is submitted successfully
 
 ### `willSubmit` [#willsubmit]
 
-The form infrastructure fires this event just before the form is submitted. The event argument is the current `data` value to be submitted. The return value controls submission behavior: returning `false` cancels the submission; returning a plain object submits that object instead; returning `null`, `undefined`, an empty string, or any non-object value proceeds with normal submission.
+The form infrastructure fires this event just before the form is submitted. The event receives two arguments: the cleaned form data (fields marked `noSubmit` excluded) and the complete form data (including all fields). The return value controls submission behavior: returning `false` cancels the submission; returning a plain object submits that object instead; returning `null`, `undefined`, an empty string, or any non-object value proceeds with normal submission.
 
-**Signature**: `willSubmit(data: Record<string, any>): false | Record<string, any> | null | undefined | void`
+**Signature**: `willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void`
 
-- `data`: The current form data to be submitted.
+- `data`: The form data to be submitted (fields marked with noSubmit="true" are excluded).
+- `allData`: The complete form data including all fields, useful for cross-field validation.
 
-The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
+The `onWillSubmit` handler receives **two arguments**:
 
-```xmlui-pg display copy {4-9} name="Example: willSubmit"
+- **`data`** — the form data that will be passed to `onSubmit` (fields marked `noSubmit="true"` are already excluded).
+- **`allData`** — the complete form data including `noSubmit` fields, useful for cross-field validation.
+
+Fields marked with `noSubmit` are excluded from `onSubmit` regardless of what `willSubmit` does.
+
+The following example validates that a password and its confirmation match. The confirmation field is marked `noSubmit="true"` so it is not sent to the server, but it is available via `allData` for validation:
+
+```xmlui-pg display copy {4-11} name="Example: willSubmit with cross-field validation"
+<App>
+  <Form padding="0.5rem"
+    data="{{ username: '', password: '', confirmPassword: '' }}"
+    onWillSubmit="(data, allData) => {
+      if (allData.password !== allData.confirmPassword) {
+        toast.error('Passwords do not match');
+        return false;
+      }
+    }"
+    onSubmit="(data) => toast('Account created for ' + data.username)"
+    saveLabel="Create account">
+    <FormItem label="Username" bindTo="username" required="true" />
+    <FormItem label="Password" bindTo="password" type="password" required="true" />
+    <FormItem label="Confirm Password" bindTo="confirmPassword" type="password" required="true" noSubmit="true" />
+  </Form>
+</App>
+```
+
+The following example uses the first argument to inspect what will be submitted, and returns `false` to block submission when an age value is invalid:
+
+```xmlui-pg display copy {4-8} name="Example: willSubmit allowing data only when age is even"
 <App>
   <Form padding="0.5rem"
     data="{{ name: 'Joe', age: 43 }}"
-    onWillSubmit="(toSubmit) => {
-      if (toSubmit.age % 2) {
+    onWillSubmit="(data) => {
+      if (data.age % 2) {
         toast.error('Age must be an even number');
         return false;
       }
@@ -325,7 +367,7 @@ The following example allows saving customer data only when the age is an even n
         zeroOrPositive="true" />
     </FlowLayout>
   </Form>
-</App>  
+</App>
 ```
 
 ## Exposed Methods [#exposed-methods]

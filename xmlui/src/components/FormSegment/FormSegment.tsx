@@ -1,4 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
+import { defaultProps } from "../DateInput/DateInputNative";
 import { createMetadata, d } from "../metadata-helpers";
 import { FormSegmentNative } from "./FormSegmentNative";
 
@@ -11,17 +12,18 @@ export const FormSegmentMd = createMetadata({
     "segment-scoped context variables for the fields it contains. Use it to build " +
     "multi-step wizards, collapsible sections, or any layout that needs per-section " +
     "data and validation state without creating a nested form. Children are automatically " +
-    "wrapped in a VStack (or HStack if `orientation=\"horizontal\"`) with layout properties " +
+    'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
     "transposed from the segment.",
   props: {
-    orientation: d(
-      "Stack orientation for the implicit layout container. Use \"vertical\" (default) for a VStack " +
-        "or \"horizontal\" for an HStack. Layout properties (width, height, padding, gap, backgroundColor, " +
+    orientation: {
+      description:
+        'Stack orientation for the implicit layout container. Use "vertical" (default) for a VStack ' +
+        'or "horizontal" for an HStack. Layout properties (width, height, padding, gap, backgroundColor, ' +
         "etc.) are transposed to this container.",
-      [{ label: "vertical" }, { label: "horizontal" }],
-      "string",
-      "vertical",
-    ),
+      availableValues: ["horizontal", "vertical"],
+      valueType: "string",
+      defaultValue: defaultProps.orientation,
+    },
     fields: d(
       "An optional comma-separated list of field names (matching the `bindTo` values of " +
         "nested inputs) that belong to this segment. When omitted the segment auto-discovers " +
