@@ -202,6 +202,7 @@ type MenuItemProps = {
   active?: boolean;
   enabled?: boolean;
   compact?: boolean;
+  [key: string]: any;
 };
 
 export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"> = {
@@ -222,6 +223,7 @@ export const MenuItem = forwardRef(function MenuItem(
     enabled = true,
     compact = false,
     classes,
+    ...rest
   }: MenuItemProps,
   ref,
 ) {
@@ -240,6 +242,7 @@ export const MenuItem = forwardRef(function MenuItem(
 
   return (
     <DropdownMenuPrimitive.Item
+      {...rest}
       style={style}
       className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.DropdownMenuItem, {
         [styles.active]: active,
