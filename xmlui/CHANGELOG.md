@@ -1,5 +1,24 @@
 # xmlui
 
+## 0.12.15
+
+### Patch Changes
+
+- 90f5002: Fix Stack to respect itemWidth when wrapContent is false
+- 2623e28: Extend Form with savePendingLabel, and submitFeedbackDelay
+- db67849: feat: implement select-all, delete-all functionality in DateInput component
+- 28a77d7: Fix Select `dropdownHeight` prop leaking to the trigger element in SimpleSelect mode, causing the trigger to render at the dropdown's height instead of its normal size.
+- 0dd6e23: fix: restore Bookmark hash navigation in shadow DOM and vertical-full-header layout
+- 460a693: refactor: improve Select component formatting and styling consistency, adding e2e tests
+- 7675d1c: fix: simplify inlinePickerMenu styling and add consistent padding
+- 9df5f4b: feat: add hover preview for DatePicker range selection
+- f74d48f: fix: quoted content in markup no longer has special meaning. `<Stack>"hi"</Stack>`no longer produces the unquoted string _hi_, but rather the quoted string as-is _"hi"_. This can technically break existing code which relied on quoting text that incluced the less-than (<) character. This feature was very hidden, we don't expect users to have markup like that. In case you are affected, use the _&lt;_ entity instead, or wrap the content in a CDATA.
+- 5fa348e: Hide the experimental pub/sub behavior
+- 370b985: feat: gracefully handle html when fetching files for standalone
+- 4ee71c6: fix: preserve `PageMetaTitle` and other Helmet-managed head output during static site generation so generated HTML includes the correct page title and head tags at build time.
+- 2623e28: Form's willSubmit will receive the data with noSubmit flag too for validation. The submit event will not.
+- 2623e28: Add FormSegment component
+
 ## 0.12.14
 
 ### Patch Changes
