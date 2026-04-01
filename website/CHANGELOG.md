@@ -1,5 +1,27 @@
 # xmlui-website
 
+## 0.0.18
+
+### Patch Changes
+
+- 7675d1c: fix: simplify inlinePickerMenu styling and add consistent padding
+- Updated dependencies [90f5002]
+- Updated dependencies [2623e28]
+- Updated dependencies [db67849]
+- Updated dependencies [28a77d7]
+- Updated dependencies [0dd6e23]
+- Updated dependencies [460a693]
+- Updated dependencies [7675d1c]
+- Updated dependencies [9df5f4b]
+- Updated dependencies [f74d48f]
+- Updated dependencies [5fa348e]
+- Updated dependencies [370b985]
+- Updated dependencies [4ee71c6]
+- Updated dependencies [2623e28]
+- Updated dependencies [2623e28]
+  - xmlui@0.12.15
+  - xmlui-search@0.1.11
+
 ## 0.0.17
 
 ### Patch Changes

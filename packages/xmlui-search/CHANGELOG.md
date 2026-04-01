@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.11
+
+### Patch Changes
+
+- 5fa348e: Hide the experimental pub/sub behavior
+
 ## 0.1.10
 
 ### Patch Changes
