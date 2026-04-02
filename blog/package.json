@@ -15,8 +15,9 @@
     "@shikijs/langs": "3.4.2",
     "shiki": "^3.3.0",
     "xmlui": "*",
-    "xmlui-search": "*",
-    "xmlui-hello-world": "*"
+    "xmlui-hello-world": "*",
+    "xmlui-playground": "0.1.14",
+    "xmlui-search": "*"
   },
   "msw": {
     "workerDirectory": [

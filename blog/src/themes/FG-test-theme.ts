@@ -1,13 +1,13 @@
 import type { ThemeDefinition } from "xmlui";
 
-export const BlogAuraThemeDefinition: ThemeDefinition = {
+export const FgTestThemeDefinition: ThemeDefinition = {
   name: "Blog Aura Theme",
-  id: "blog-aura",
+  id: "FG-test-theme",
   extends: "xmlui-blog",
   color: "$color-primary-500",
   themeVars: {
     // --- Blog layout config
-    layout: "featuredWithTabs",
+    layout: "testlayoutblogoverview",
     tableOfContents: "false",
     tags: "true",
 
@@ -20,7 +20,7 @@ export const BlogAuraThemeDefinition: ThemeDefinition = {
     backgroundColor: "$color-surface-0",
     fontSize: "14px",
     "fontWeight-Text": "400",
-    "fontWeight-bold": "700",
+    "fontWeight-bold": "600",
     "textColor-primary": "$color-surface-800",
     "textColor-NavLink--active": "$color-primary",
     "fontSize-Text-info": "14px",
@@ -41,8 +41,8 @@ export const BlogAuraThemeDefinition: ThemeDefinition = {
 
     "fontFamily-H1": "IBM Plex Mono",
     "fontFamily-H2": "IBM Plex Mono",
-    "textColor-H1": "$color-primary-900",
-    "textColor-H2": "$color-primary-900",
+    "textColor-H1": "$color-primary-800",
+    "textColor-H2": "$color-primary-800",
     "fontSize-H1": "2.625rem",
     "fontSize-H2": "1.5rem",
     "borderRadius-Card": "$space-7",
@@ -64,7 +64,7 @@ export const BlogAuraThemeDefinition: ThemeDefinition = {
 
 
     // --- Blog component customization tokens
-    "fontSize-blog-overview-title": "42px",
+    "fontSize-blog-overview-title": "54px",
     "fontSize-blog-overview-post-title": "24px",
     "fontSize-blog-overview-featured-title": "24px",
     "fontSize-blog-page-title": "32px",
@@ -93,4 +93,4 @@ export const BlogAuraThemeDefinition: ThemeDefinition = {
   }
 };
 
-export default BlogAuraThemeDefinition;
+export default FgTestThemeDefinition;

@@ -8,11 +8,12 @@ import {
   highlight,
 } from "../utils";
 import { BlogAuraThemeDefinition } from "./themes/blog-aura";
+import { FgTestThemeDefinition } from "./themes/FG-test-theme";
 
 const App: StandaloneAppDescription = {
   name: "XMLUI Blog",
-  themes: [BlogAuraThemeDefinition],
-  defaultTheme: "xmlui-blog",
+  themes: [BlogAuraThemeDefinition, FgTestThemeDefinition],
+  defaultTheme: "FG-test-theme",
   resources: {
     logo: "/resources/logo.svg",
     "logo-dark": "/resources/logo-dark.svg",
