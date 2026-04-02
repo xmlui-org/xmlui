@@ -1,11 +1,7 @@
 import type React from "react";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { createPortal } from "react-dom";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import type { RegisterComponentApiFn } from "xmlui";
-
-type UpdateStateFn = (componentState: any, options?: any) => void;
-import { Icon } from "xmlui";
-import styles from "./TableSelect.module.scss";
 
 /**
  * Find the nearest focus-trapping container (Radix dialog, or body).
@@ -13,10 +9,13 @@ import styles from "./TableSelect.module.scss";
  * focus trap so the search input can receive keyboard events normally.
  */
 function findPortalContainer(from: HTMLElement | null): HTMLElement {
-  // Walk up to the nearest dialog element (Radix renders [role="dialog"])
   const dialog = from?.closest('[role="dialog"]') as HTMLElement | null;
   return dialog ?? document.body;
 }
+
+type UpdateStateFn = (componentState: any, options?: any) => void;
+import { Icon } from "xmlui";
+import styles from "./TableSelect.module.scss";
 
 export type ColumnDef = {
   key: string;
@@ -41,13 +40,6 @@ type Props = {
 export const defaultProps = {
   placeholder: "Select...",
 };
-
-type DropdownRect = {
-  top: number;
-  left: number;
-  width: number;
-};
-
 
 function resolveColumns(data: Record<string, unknown>[], columns?: ColumnDef[]): ColumnDef[] {
   if (columns && columns.length > 0) return columns;
@@ -75,18 +67,13 @@ export function TableSelect({
   // The controlled value may be any type (e.g. number from form state), so always stringify
   const toStr = (v: unknown) => (v != null && v !== "" ? String(v) : undefined);
   const effectiveValue = toStr(controlledValue) ?? internalValue;
-  const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
-  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
-  // Resolve portal container once after mount.
-  // Rendering inside the dialog's DOM subtree keeps Radix UI's focus trap happy,
-  // while position:fixed + high z-index ensures correct visual placement.
   useEffect(() => {
     setPortalContainer(findPortalContainer(triggerRef.current));
   }, []);
@@ -126,32 +113,6 @@ export function TableSelect({
     return String(matchingRow[displayKey] ?? "");
   }, [effectiveValue, valueKey, labelKey, data, resolvedColumns]);
 
-  // Calculate portal dropdown position from the trigger's bounding rect.
-  //
-  // The dialog's .content element has `transform: translate(0)` which creates a
-  // new fixed-positioning containing block. This means `position: fixed` inside the
-  // dialog portal is relative to the dialog's own top-left corner, not the viewport.
-  // We compensate by subtracting the container's offset so the dropdown lines up
-  // correctly in the viewport regardless of where the dialog is positioned.
-  const updateDropdownRect = useCallback(() => {
-    if (!triggerRef.current) return;
-    const triggerRect = triggerRef.current.getBoundingClientRect();
-
-    let offsetTop = 0;
-    let offsetLeft = 0;
-    if (portalContainer && portalContainer !== document.body) {
-      const containerRect = portalContainer.getBoundingClientRect();
-      offsetTop = containerRect.top;
-      offsetLeft = containerRect.left;
-    }
-
-    setDropdownRect({
-      top: triggerRect.bottom - offsetTop,
-      left: triggerRect.left - offsetLeft,
-      width: triggerRect.width,
-    });
-  }, [portalContainer]);
-
   // Reset highlight when filter changes
   useEffect(() => {
     setSelectedIndex(-1);
@@ -164,56 +125,15 @@ export function TableSelect({
     }
   }, [selectedIndex]);
 
-  const openDropdown = useCallback((startIndex = -1) => {
-    setFilterText("");
-    setSelectedIndex(startIndex);
-    updateDropdownRect();
-    setTimeout(() => searchInputRef.current?.focus(), 0);
-  }, [updateDropdownRect]);
-
-  const handleToggle = useCallback(() => {
-    setIsOpen((prev) => {
-      if (!prev) {
-        openDropdown();
-      }
-      return !prev;
-    });
-  }, [openDropdown]);
-
-  // Keep dropdown aligned with trigger when user scrolls or resizes
-  useEffect(() => {
-    if (!isOpen) return;
-    const onScroll = () => updateDropdownRect();
-    const onResize = () => updateDropdownRect();
-    window.addEventListener("scroll", onScroll, true);
-    window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("scroll", onScroll, true);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [isOpen, updateDropdownRect]);
-
-  // Close when clicking outside both the trigger and the portal dropdown.
-  // Use pointerdown in capture phase so we intercept before Radix Dialog's outside-click
-  // handler — this way the first click only closes the dropdown, and a second click is
-  // needed to close the modal (matching Select behaviour).
-  useEffect(() => {
-    if (!isOpen) return;
-    function handlePointerDown(event: PointerEvent) {
-      const target = event.target as Node;
-      const inTrigger = triggerRef.current?.contains(target);
-      const inDropdown = dropdownRef.current?.contains(target);
-      const inLabel = id
-        ? (target as Element).closest?.(`label[for="${id}"]`) !== null
-        : false;
-      if (!inTrigger && !inDropdown && !inLabel) {
-        event.stopPropagation();
-        setIsOpen(false);
-      }
+  const handleOpenChange = useCallback((open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      setFilterText("");
+      setSelectedIndex(-1);
+    } else {
+      setSelectedIndex(-1);
     }
-    document.addEventListener("pointerdown", handlePointerDown, true);
-    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
-  }, [isOpen, id]);
+  }, []);
 
   const closeDropdown = useCallback(() => {
     setIsOpen(false);
@@ -234,11 +154,6 @@ export function TableSelect({
       closeDropdown();
     },
     [valueKey, resolvedColumns, onChange, updateState, closeDropdown],
-  );
-
-  const handleRowClick = useCallback(
-    (row: Record<string, unknown>) => selectRow(row),
-    [selectRow],
   );
 
   const handleKeyDown = useCallback(
@@ -269,110 +184,116 @@ export function TableSelect({
   const effectiveValueKey =
     valueKey ?? (resolvedColumns.length > 0 ? resolvedColumns[0].key : null);
 
-  const dropdown = isOpen && dropdownRect ? (
-    <div
-      ref={dropdownRef}
-      className={styles.dropdown}
-      role="listbox"
-      style={{
-        position: "fixed",
-        top: dropdownRect.top,
-        left: dropdownRect.left,
-        width: dropdownRect.width,
-      }}
-    >
-      <div className={styles.searchWrapper}>
-        <Icon name="search" className={styles.searchIcon} />
-        <input
-          ref={searchInputRef}
-          type="text"
-          className={styles.searchInput}
-          placeholder="Type to search..."
-          value={filterText}
-          onChange={(e) => setFilterText(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-      </div>
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          {resolvedColumns.length > 0 && (
-            <thead className={styles.tableHead}>
-              <tr>
-                {resolvedColumns.map((col) => (
-                  <th key={col.key}>{col.label}</th>
-                ))}
-              </tr>
-            </thead>
-          )}
-          <tbody className={styles.tableBody}>
-            {filteredData.length === 0 ? (
-              <tr className={styles.emptyRow}>
-                <td colSpan={Math.max(resolvedColumns.length, 1)}>No results found</td>
-              </tr>
-            ) : (
-              filteredData.map((row, rowIndex) => {
-                const rowValue = effectiveValueKey
-                  ? String(row[effectiveValueKey] ?? "")
-                  : "";
-                const isSelected = rowValue === effectiveValue;
-                const isHighlighted = rowIndex === selectedIndex;
-                return (
-                  <tr
-                    key={rowIndex}
-                    ref={(el) => { rowRefs.current[rowIndex] = el; }}
-                    className={
-                      isHighlighted
-                        ? `${styles.highlighted}${isSelected ? ` ${styles.selected}` : ""}`
-                        : isSelected
-                          ? styles.selected
-                          : undefined
-                    }
-                    onClick={() => handleRowClick(row)}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    {resolvedColumns.map((col) => (
-                      <td key={col.key}>
-                        {row[col.key] != null ? String(row[col.key]) : ""}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  ) : null;
-
   return (
     <div className={`${styles.wrapper} ${className ?? ""}`}>
-      <button
-        ref={triggerRef}
-        id={id}
-        type="button"
-        className={`${styles.trigger}${isOpen ? ` ${styles.open}` : ""}`}
-        onClick={handleToggle}
-        onKeyDown={(e) => {
-          if (!isOpen && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+      <Popover open={isOpen} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <button
+            ref={triggerRef}
+            id={id}
+            type="button"
+            className={`${styles.trigger}${isOpen ? ` ${styles.open}` : ""}`}
+            onKeyDown={(e) => {
+              if (!isOpen && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+                e.preventDefault();
+                setIsOpen(true);
+                setSelectedIndex(e.key === "ArrowUp" ? filteredData.length - 1 : 0);
+              } else if (isOpen) {
+                handleKeyDown(e);
+              }
+            }}
+            aria-haspopup="listbox"
+            aria-expanded={isOpen}
+          >
+            <span className={`${styles.triggerText}${!displayLabel ? ` ${styles.placeholder}` : ""}`}>
+              {displayLabel ?? placeholder}
+            </span>
+            <Icon name="chevrondown" className={`${styles.chevron}${isOpen ? ` ${styles.rotated}` : ""}`} />
+          </button>
+        </PopoverTrigger>
+        <Portal container={portalContainer}>
+        <PopoverContent
+          className={styles.dropdown}
+          style={{ width: "var(--radix-popover-trigger-width)" }}
+          sideOffset={4}
+          align="start"
+          onOpenAutoFocus={(e) => {
             e.preventDefault();
-            setIsOpen(true);
-            openDropdown(e.key === "ArrowDown" || e.key === "Enter" || e.key === " " ? 0 : filteredData.length - 1);
-          } else if (isOpen) {
-            handleKeyDown(e);
-          }
-        }}
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-      >
-        <span className={`${styles.triggerText}${!displayLabel ? ` ${styles.placeholder}` : ""}`}>
-          {displayLabel ?? placeholder}
-        </span>
-        <Icon name="chevrondown" className={`${styles.chevron}${isOpen ? ` ${styles.rotated}` : ""}`} />
-      </button>
-
-      {portalContainer && createPortal(dropdown, portalContainer)}
+            searchInputRef.current?.focus();
+          }}
+          onCloseAutoFocus={(e) => {
+            // Let Radix return focus to the trigger for all close events
+            // (Escape, row selection, outside click) — same as Select behaviour.
+            e.preventDefault();
+            triggerRef.current?.focus();
+          }}
+          onKeyDown={handleKeyDown}
+          role="listbox"
+        >
+          <div className={styles.searchWrapper}>
+            <Icon name="search" className={styles.searchIcon} />
+            <input
+              ref={searchInputRef}
+              type="text"
+              className={styles.searchInput}
+              placeholder="Type to search..."
+              value={filterText}
+              onChange={(e) => setFilterText(e.target.value)}
+            />
+          </div>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              {resolvedColumns.length > 0 && (
+                <thead className={styles.tableHead}>
+                  <tr>
+                    {resolvedColumns.map((col) => (
+                      <th key={col.key}>{col.label}</th>
+                    ))}
+                  </tr>
+                </thead>
+              )}
+              <tbody className={styles.tableBody}>
+                {filteredData.length === 0 ? (
+                  <tr className={styles.emptyRow}>
+                    <td colSpan={Math.max(resolvedColumns.length, 1)}>No results found</td>
+                  </tr>
+                ) : (
+                  filteredData.map((row, rowIndex) => {
+                    const rowValue = effectiveValueKey
+                      ? String(row[effectiveValueKey] ?? "")
+                      : "";
+                    const isSelected = rowValue === effectiveValue;
+                    const isHighlighted = rowIndex === selectedIndex;
+                    return (
+                      <tr
+                        key={rowIndex}
+                        ref={(el) => { rowRefs.current[rowIndex] = el; }}
+                        className={
+                          isHighlighted
+                            ? `${styles.highlighted}${isSelected ? ` ${styles.selected}` : ""}`
+                            : isSelected
+                              ? styles.selected
+                              : undefined
+                        }
+                        onClick={() => selectRow(row)}
+                        role="option"
+                        aria-selected={isSelected}
+                      >
+                        {resolvedColumns.map((col) => (
+                          <td key={col.key}>
+                            {row[col.key] != null ? String(row[col.key]) : ""}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </PopoverContent>
+        </Portal>
+      </Popover>
     </div>
   );
 }
