@@ -22,6 +22,12 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 
 const COMP = "Stack";
 
+const starSizeRegex = /^\d*\*$/;
+function getStarSizeNumber(input: string): number {
+  const numberPart = input.slice(0, -1);
+  return numberPart === "" ? 1 : parseInt(numberPart, 10);
+}
+
 const HORIZONTAL_ALIGNMENT: ComponentPropertyMetadata = {
   description: "Manages the horizontal content alignment for each child element in the Stack.",
   availableValues: alignmentOptionValues,
@@ -501,6 +507,9 @@ function renderStack({
         ...(hasExplicitItemWidth ? {
           wrapChild: (_ctx, renderedChild, hints) => {
             if (hints?.opaque || hints?.nonVisual) return renderedChild;
+            if (itemWidth && starSizeRegex.test(itemWidth)) {
+              return <div style={{ flex: getStarSizeNumber(itemWidth), flexShrink: 1 }}>{renderedChild}</div>;
+            }
             return <div style={{ width: itemWidth, flexShrink: 0 }}>{renderedChild}</div>;
           },
         } : {}),
