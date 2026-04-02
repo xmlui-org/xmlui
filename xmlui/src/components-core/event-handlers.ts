@@ -8,16 +8,22 @@ import { EMPTY_OBJECT } from "./constants";
  * This hook sets up the mouse event handlers for the component
  * @param lookupEvent Function to lookup the event handler
  * @param shouldSkip Indicates if the event handlers should be skipped
+ * @param bubbleEvents EXPERIMENTAL: array of event names for which stopPropagation/preventDefault
+ *   should be skipped, allowing the DOM event to bubble to parent components.
  * @returns
  */
-export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldSkip: boolean) {
+export function useMouseEventHandlers(
+  lookupEvent: LookupEventHandlerFn,
+  shouldSkip: boolean,
+  bubbleEvents?: string[], // EXPERIMENTAL
+) {
   // *** Because we use nested React hooks, we cannot use an early return
   // *** when shouldSkip is true.
-  const onClick = useEventHandler("click", lookupEvent, shouldSkip);
-  const onMouseLeave = useEventHandler("mouseLeave", lookupEvent, shouldSkip);
-  const onMouseEnter = useEventHandler("mouseEnter", lookupEvent, shouldSkip);
-  const onDoubleClick = useEventHandler("doubleClick", lookupEvent, shouldSkip);
-  const onContextMenu = useEventHandler("contextMenu", lookupEvent, shouldSkip);
+  const onClick = useEventHandler("click", lookupEvent, shouldSkip, bubbleEvents);
+  const onMouseLeave = useEventHandler("mouseLeave", lookupEvent, shouldSkip, bubbleEvents);
+  const onMouseEnter = useEventHandler("mouseEnter", lookupEvent, shouldSkip, bubbleEvents);
+  const onDoubleClick = useEventHandler("doubleClick", lookupEvent, shouldSkip, bubbleEvents);
+  const onContextMenu = useEventHandler("contextMenu", lookupEvent, shouldSkip, bubbleEvents);
 
   if (shouldSkip) {
     return EMPTY_OBJECT;
@@ -38,6 +44,7 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
     eventName: string,
     lookupEvent: LookupEventHandlerFn<TMd>,
     shouldSkip: boolean,
+    bubbleEvents?: string[], // EXPERIMENTAL
   ) {
     // *** Because we use nested React hooks, we cannot use an early return
     // *** when shouldSkip is true.
@@ -48,16 +55,19 @@ export function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldS
       (event) => {
         // If the event handler is not defined, we do nothing
         if (onEvent) {
-          if (typeof event.stopPropagation === "function") {
-            event?.stopPropagation();
-          }
-          if (typeof event.preventDefault === "function") {
-            event?.preventDefault();
+          // EXPERIMENTAL: skip propagation stop if this event is listed in bubbleEvents
+          if (!bubbleEvents || !bubbleEvents.includes(eventName)) {
+            if (typeof event.stopPropagation === "function") {
+              event?.stopPropagation();
+            }
+            if (typeof event.preventDefault === "function") {
+              event?.preventDefault();
+            }
           }
           onEvent(event);
         }
       },
-      [onEvent],
+      [onEvent, bubbleEvents, eventName],
     );
     return !onEvent ? undefined : eventHandler;
   }
