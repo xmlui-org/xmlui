@@ -101,6 +101,7 @@ export type TileGridProps = {
   loading?: boolean;
   itemsSelectable?: boolean;
   enableMultiSelection?: boolean;
+  toggleSelectionOnClick?: boolean;
   syncWithAppState?: any;
   checkboxPosition?: CheckboxPosition;
   hideSelectionCheckboxes?: boolean;
@@ -137,6 +138,7 @@ export const defaultProps = {
   loading: false,
   itemsSelectable: false,
   enableMultiSelection: true,
+  toggleSelectionOnClick: false,
   checkboxPosition: "topStart" as CheckboxPosition,
   hideSelectionCheckboxes: false,
   idKey: "id",
@@ -158,6 +160,7 @@ export const TileGridNative = memo(
       idKey = defaultProps.idKey,
       itemsSelectable = defaultProps.itemsSelectable,
       enableMultiSelection = defaultProps.enableMultiSelection,
+      toggleSelectionOnClick = defaultProps.toggleSelectionOnClick,
       checkboxPosition = defaultProps.checkboxPosition,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
       itemUserSelect = defaultProps.itemUserSelect,
@@ -249,6 +252,7 @@ export const TileGridNative = memo(
         visibleItems: items,
         rowsSelectable: itemsSelectable,
         enableMultiRowSelection: enableMultiSelection,
+        toggleSelectionOnClick,
         onSelectionDidChange,
         syncWithAppState,
       });

@@ -225,6 +225,14 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiRowSelection,
     },
+    toggleSelectionOnClick: {
+      description:
+        "When `true`, a plain click toggles the row's selection state instead of replacing the " +
+        "current selection. Ctrl+Click and Shift+Click behavior is unchanged. " +
+        "Only has an effect when `rowsSelectable` is `true`.",
+      valueType: "boolean",
+      defaultValue: defaultProps.toggleSelectionOnClick,
+    },
     alwaysShowSelectionCheckboxesHeader: {
       description:
         "This property indicates when the row selection header is displayed. When the value is " +
@@ -740,6 +748,9 @@ const TableWithColumns = memo(
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
             enableMultiRowSelection={extractValue.asOptionalBoolean(
               node.props.enableMultiRowSelection,
+            )}
+            toggleSelectionOnClick={extractValue.asOptionalBoolean(
+              node.props.toggleSelectionOnClick,
             )}
             alwaysShowSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
               node.props.alwaysShowSelectionCheckboxesHeader,

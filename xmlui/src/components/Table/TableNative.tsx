@@ -177,6 +177,7 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
+  toggleSelectionOnClick?: boolean;
   initiallySelected?: string[];
   syncWithAppState?: any;
   pageSizeOptions?: number[];
@@ -536,6 +537,7 @@ export const Table = forwardRef(
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
+      toggleSelectionOnClick = defaultProps.toggleSelectionOnClick,
       initiallySelected = defaultProps.initiallySelected,
       syncWithAppState,
       pageSizeOptions = defaultProps.pageSizeOptions,
@@ -672,6 +674,7 @@ export const Table = forwardRef(
       visibleItems,
       rowsSelectable,
       enableMultiRowSelection,
+      toggleSelectionOnClick,
       rowDisabledPredicate,
       rowUnselectablePredicate,
       onSelectionDidChange,
@@ -1934,6 +1937,7 @@ export const defaultProps = {
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
+  toggleSelectionOnClick: false,
   initiallySelected: EMPTY_ARRAY,
   pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as SortingDirection,

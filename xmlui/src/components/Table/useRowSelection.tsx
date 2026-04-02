@@ -161,6 +161,7 @@ export default function useRowSelection({
   visibleItems = items,
   rowsSelectable,
   enableMultiRowSelection,
+  toggleSelectionOnClick,
   rowDisabledPredicate,
   rowUnselectablePredicate,
   onSelectionDidChange,
@@ -171,6 +172,7 @@ export default function useRowSelection({
   visibleItems: Item[];
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
+  toggleSelectionOnClick?: boolean;
   rowDisabledPredicate?: (item: any) => boolean;
   rowUnselectablePredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
@@ -412,7 +414,7 @@ export default function useRowSelection({
 
       const { shiftKey, metaKey, ctrlKey } = options;
 
-      const singleItem = !enableMultiRowSelection || (!shiftKey && !metaKey && !ctrlKey);
+      const singleItem = !enableMultiRowSelection || (!toggleSelectionOnClick && !shiftKey && !metaKey && !ctrlKey);
 
       // --- This variable will hold the newest selection interval
       let newSelectionInterval: SelectionInterval;
@@ -476,8 +478,8 @@ export default function useRowSelection({
             to: targetId,
           };
 
-          if (metaKey || ctrlKey) {
-            // --- If META key (Mac) or CTRL (Windows) is pressed, toggle the selection of the targeted item
+          if (metaKey || ctrlKey || toggleSelectionOnClick) {
+            // --- If META key (Mac) or CTRL (Windows) is pressed, or toggleSelectionOnClick is enabled, toggle the selection of the targeted item
             if (newSelectedRowsIdsInOrder.includes(targetId)) {
               newSelectedRowsIdsInOrder = newSelectedRowsIdsInOrder.filter(
                 (item) => item !== targetId,
