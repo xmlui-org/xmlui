@@ -2,6 +2,8 @@ import type React from "react";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import type { RegisterComponentApiFn } from "xmlui";
+
+type UpdateStateFn = (componentState: any, options?: any) => void;
 import { Icon } from "xmlui";
 import styles from "./TableSelect.module.scss";
 
@@ -27,9 +29,13 @@ type Props = {
   data?: Record<string, unknown>[];
   columns?: ColumnDef[];
   valueKey?: string;
+  labelKey?: string;
   placeholder?: string;
   initialValue?: string;
+  stateValue?: string;
+  value?: string; // injected by FormBindingWrapper when bindTo is used
   onChange?: (value: string) => void;
+  updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
@@ -58,12 +64,18 @@ export function TableSelect({
   valueKey,
   placeholder = defaultProps.placeholder,
   initialValue,
+  stateValue,
+  value: injectedValue,
   onChange,
+  updateState,
   registerComponentApi,
 }: Props) {
   const [isOpen, setIsOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [internalValue, setInternalValue] = useState<string>(initialValue ?? "");
+  // stateValue (from form bindTo) takes precedence over internalValue when provided
+  // injectedValue (from FormBindingWrapper bindTo) > stateValue > internalValue
+  const effectiveValue = injectedValue ?? stateValue ?? internalValue;
   const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -83,12 +95,14 @@ export function TableSelect({
   // Expose value/setValue API for XMLUI form binding (bindTo support)
   useEffect(() => {
     registerComponentApi?.({
-      value: internalValue,
+      value: effectiveValue,
       setValue: (newVal: unknown) => {
-        setInternalValue(newVal != null ? String(newVal) : "");
+        const v = newVal != null ? String(newVal) : "";
+        setInternalValue(v);
+        updateState?.({ value: v });
       },
     });
-  }, [registerComponentApi, internalValue]);
+  }, [registerComponentApi, effectiveValue, updateState]);
 
   const resolvedColumns = useMemo(() => resolveColumns(data, columns), [data, columns]);
 
@@ -105,12 +119,12 @@ export function TableSelect({
 
   // Resolve what to display in the trigger button.
   const displayLabel = useMemo(() => {
-    if (!internalValue) return null;
-    if (!valueKey || resolvedColumns.length === 0) return internalValue;
-    const matchingRow = data.find((row) => String(row[valueKey] ?? "") === internalValue);
-    if (!matchingRow) return internalValue;
+    if (!effectiveValue) return null;
+    if (!valueKey || resolvedColumns.length === 0) return effectiveValue;
+    const matchingRow = data.find((row) => String(row[valueKey] ?? "") === effectiveValue);
+    if (!matchingRow) return effectiveValue;
     return String(matchingRow[resolvedColumns[0].key] ?? "");
-  }, [internalValue, valueKey, data, resolvedColumns]);
+  }, [effectiveValue, valueKey, data, resolvedColumns]);
 
   // Calculate portal dropdown position from the trigger's bounding rect.
   //
@@ -207,11 +221,12 @@ export function TableSelect({
       if (!effectiveKey) return;
       const newValue = row[effectiveKey] != null ? String(row[effectiveKey]) : "";
       setInternalValue(newValue);
+      updateState?.({ value: newValue });
       setFilterText("");
       onChange?.(newValue);
       closeDropdown();
     },
-    [valueKey, resolvedColumns, onChange, closeDropdown],
+    [valueKey, resolvedColumns, onChange, updateState, closeDropdown],
   );
 
   const handleRowClick = useCallback(
@@ -292,7 +307,7 @@ export function TableSelect({
                 const rowValue = effectiveValueKey
                   ? String(row[effectiveValueKey] ?? "")
                   : "";
-                const isSelected = rowValue === internalValue;
+                const isSelected = rowValue === effectiveValue;
                 const isHighlighted = rowIndex === selectedIndex;
                 return (
                   <tr

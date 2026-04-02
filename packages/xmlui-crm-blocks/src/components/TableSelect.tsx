@@ -44,7 +44,7 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
     },
   },
   events: {
-    onChange: {
+    didChange: {
       description:
         "Fired when the user selects a row. Receives the value determined by `valueKey`.",
       type: "function",
@@ -97,8 +97,10 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
 export const tableSelectComponentRenderer = createComponentRenderer(
   COMP,
   TableSelectMd,
-  ({ node, extractValue, lookupEventHandler, className, registerComponentApi }) => {
+  ({ node, extractValue, lookupEventHandler, className, registerComponentApi, updateState }) => {
     const props = node.props as any;
+    // When inside a Form with bindTo, FormBindingWrapper injects a `value` prop
+    const injectedValue = props?.value !== undefined ? extractValue.asOptionalString(props.value) : undefined;
     return (
       <TableSelect
         id={extractValue.asOptionalString(props?.id)}
@@ -108,7 +110,9 @@ export const tableSelectComponentRenderer = createComponentRenderer(
         valueKey={extractValue.asOptionalString(props?.valueKey)}
         placeholder={extractValue.asOptionalString(props?.placeholder)}
         initialValue={extractValue.asOptionalString(props?.initialValue)}
-        onChange={lookupEventHandler("onChange")}
+        stateValue={injectedValue}
+        onChange={lookupEventHandler("didChange")}
+        updateState={updateState}
         registerComponentApi={registerComponentApi}
       />
     );
