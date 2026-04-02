@@ -386,7 +386,7 @@ export const TileGridNative = memo(
             // the user reposition the focus anchor before doing a Shift+navigation.
             setFocusedTileIndex(newIndex);
           } else {
-            toggleRowIndex(newIndex, { shiftKey: shift });
+            toggleRowIndex(newIndex, { shiftKey: shift, source: "keyboard" });
             setFocusedTileIndex(newIndex);
           }
         }
