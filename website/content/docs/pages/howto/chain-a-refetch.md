@@ -1,6 +1,8 @@
-# Chain a DataSource refetch from an APICall.execute
+# Chain a DataSource refetch
 
-`APICall.execute` returns a Promise, you can call `.then` to do something else.
+Call `.then()` on `APICall.execute()` to trigger a DataSource refetch after a mutation completes.
+
+When a user action changes server data — liking a post, adding a comment — the displayed list needs to reflect the change. Because `execute()` returns a Promise, you can chain `.then(() => dataSource.refetch())` to re-fetch the list as soon as the write succeeds — without relying on blanket cache invalidation.
 
 ```xmlui-pg copy display {54} name="Click the Like button"
 ---comp display
@@ -124,3 +126,21 @@
   }
 }
 ```
+
+## Key points
+
+**`execute()` returns a Promise**: This lets you chain `.then()` to run code after the API call succeeds — such as refetching a DataSource, showing a toast, or navigating to another page.
+
+**`refetch()` re-issues the DataSource's request**: Calling `timelineData.refetch()` re-sends the original query and updates every element bound to that DataSource when the fresh data arrives.
+
+**This pattern gives you surgical control**: Unlike blanket cache invalidation (which refreshes every DataSource), `.then(() => ds.refetch())` refreshes only the specific DataSource you choose.
+
+**Combine with `invalidates="{[]}"` to prevent double-fetching**: By default a successful APICall invalidates all caches. If you manually refetch in `.then()`, set `invalidates="{[]}"` on the APICall to avoid a redundant second fetch.
+
+---
+
+## See also
+
+- [Invalidate related data after a write](/docs/howto/control-cache-invalidation) — declarative cache control with the `invalidates` prop
+- [Update UI optimistically](/docs/howto/update-ui-optimistically) — instant feedback before the server responds
+- [Retry a failed API call](/docs/howto/retry-a-failed-api-call) — handling failures and retrying

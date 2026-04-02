@@ -1,6 +1,8 @@
-# Handle background operations
+# Track a long-running server task
 
-Use the Queue component for async processing that doesn't block user interaction.
+Use the `Queue` component to process items one-by-one in the background while keeping the UI responsive.
+
+When a user triggers a batch operation — uploading files, sending emails, processing records — you don't want the UI to freeze. The `Queue` component accepts items via `enqueueItems()`, calls your `onProcess` handler for each one sequentially, and provides built-in progress and result feedback slots. The rest of the page remains fully interactive while the queue drains.
 
 ```xmlui-pg copy display name="Background file processing with progress feedback"
 ---comp display {21-30} /uploadQueue/
@@ -112,3 +114,22 @@ Use the Queue component for async processing that doesn't block user interaction
 }
 ```
 
+## Key points
+
+**`enqueueItems()` starts the queue**: Pass an array of items and the Queue begins processing immediately. Each item is passed to `onProcess` one at a time.
+
+**`onProcess` handles one item at a time**: The handler receives a `processing` object with `.item` (the current item) and `.reportProgress()` (to update the progress display). Return the API call result to signal completion.
+
+**`onProcessError` handles failures without stopping the queue**: If an item fails, this handler fires with the error and the `processing` context. Return `true` to show the default error display, or handle it silently.
+
+**`progressFeedback` and `resultFeedback` are named slots**: Use `<property name="progressFeedback">` to render a custom progress indicator during processing, and `<property name="resultFeedback">` for the completion message.
+
+**The UI stays interactive during processing**: The Queue runs in React's event loop without blocking renders. In the example, the slider remains usable while files upload in the background.
+
+---
+
+## See also
+
+- [Cancel a deferred API operation](/docs/howto/cancel-a-deferred-api-operation) — abort a long-running server task
+- [Retry a failed API call](/docs/howto/retry-a-failed-api-call) — handle failures and retry
+- [Invalidate related data after a write](/docs/howto/control-cache-invalidation) — refresh caches after background processing completes

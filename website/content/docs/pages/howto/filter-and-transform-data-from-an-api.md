@@ -1,6 +1,10 @@
-# Filter and transform data from an API
+# Transform nested API responses
 
-```xmlui-pg noHeader
+Use `resultSelector` to extract a subset of the response and `transformResult` to reshape it with custom logic.
+
+APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather than a flat array. Instead of restructuring data in every consumer, let the `DataSource` do the work. `resultSelector` plucks a nested path (and supports inline `.filter()` / `.map()` calls), while `transformResult` takes a function for heavier processing like lookups or computed fields.
+
+```xmlui-pg copy display name="Extract, filter, and transform API data"
 ---app
 <App>
   <Test />
@@ -93,3 +97,21 @@
 
 </Component>
 ```
+
+## Key points
+
+**`resultSelector` plucks a path from the response**: Set it to a dot-separated key path like `"data.items"` and the DataSource's `value` will be that nested value instead of the full response object.
+
+**`resultSelector` supports inline expressions**: You can chain `.filter()`, `.map()`, or `.find()` directly — e.g., `resultSelector="data.items.filter(p => p.active)"`. The expression runs on every fetch result.
+
+**`transformResult` takes a function for complex reshaping**: Assign a function reference — `transformResult="{myTransform}"` — that receives the raw response and returns the final value. Use this when you need lookups, computed fields, or multi-step transformations.
+
+**Both can be combined**: `resultSelector` runs first (extracting a subset), then `transformResult` receives that subset. However, for most cases one or the other is sufficient.
+
+---
+
+## See also
+
+- [Use mock data during development](/docs/howto/use-mock-data-during-development) — test your selectors with inline data
+- [Show a skeleton while data loads](/docs/howto/hide-an-element-until-its-datasource-is-ready) — display a placeholder during the fetch
+- [Poll an API at regular intervals](/docs/howto/poll-an-api-at-regular-intervals) — combine transformations with automatic polling

@@ -1,6 +1,8 @@
 # Update UI optimistically
 
-For immediate user feedback, use reactive variables like `localFavorited` and `localFavoritesCount` to update UI state instantly while API calls run in the background.
+Use local reactive variables to reflect state changes instantly while the API call runs in the background.
+
+Users expect immediate feedback when they tap a like button or toggle a setting. Instead of waiting for the server round-trip, update a local variable right away and fire the API call in parallel. If the call fails, you can roll back — but in the common success case the UI feels instant.
 
 ```xmlui-pg copy display name="Click the Like button - immediate feedback"
 ---app display /localFavorited/ /localFavoritesCount/ {37-52}
@@ -142,7 +144,20 @@ For immediate user feedback, use reactive variables like `localFavorited` and `l
 
 The relationship between `onClick="{emitEvent('click')}"` in the `SocialButton` component and the `<event name="click">` handler in the main app demonstrates event propagation in XMLUI.
 
-The parent component catches the emitted click event and implements the optimistic UI update. This separation allows for:
+## Key points
 
-- Component reuse. `SocialButton` can be used anywhere without knowing what action the click should perform.
-- Flexible event handling. Different instances of `SocialButton` can handle clicks differently.
+**Local variables provide instant feedback**: Declare `var.localFavorited` and `var.localFavoritesCount` on the Card. Update them synchronously before firing the API call. The UI re-renders immediately because these are reactive variables.
+
+**`null` signals "use the server value"**: Initialize both locals to `null`. The ternary `localFavorited !== null ? localFavorited : $item.favourited` falls back to the data-source value until the user interacts. After the `.then(() => timelineData.refetch())` completes, the server data catches up and the local override is no longer needed.
+
+**The API call runs in the background**: `execute()` returns a Promise. The UI has already updated before the server responds. Chain `.then(() => timelineData.refetch())` to pull the authoritative state back from the server.
+
+**Component reuse through `emitEvent`**: `SocialButton` doesn't know what a click should do. It calls `emitEvent('click')` and the parent handles the business logic in an `<event name="click">` block. Different instances of `SocialButton` can handle clicks differently.
+
+---
+
+## See also
+
+- [Chain a DataSource refetch](/docs/howto/chain-a-refetch) — the non-optimistic version of the same pattern
+- [Invalidate related data after a write](/docs/howto/control-cache-invalidation) — declarative cache refresh
+- [Retry a failed API call](/docs/howto/retry-a-failed-api-call) — handling failures when the optimistic assumption was wrong
