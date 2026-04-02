@@ -194,6 +194,12 @@ export function TableSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
+  const closeDropdown = useCallback(() => {
+    setIsOpen(false);
+    setSelectedIndex(-1);
+    setTimeout(() => triggerRef.current?.focus(), 0);
+  }, []);
+
   const selectRow = useCallback(
     (row: Record<string, unknown>) => {
       const effectiveKey =
@@ -201,12 +207,11 @@ export function TableSelect({
       if (!effectiveKey) return;
       const newValue = row[effectiveKey] != null ? String(row[effectiveKey]) : "";
       setInternalValue(newValue);
-      setIsOpen(false);
       setFilterText("");
-      setSelectedIndex(-1);
       onChange?.(newValue);
+      closeDropdown();
     },
-    [valueKey, resolvedColumns, onChange],
+    [valueKey, resolvedColumns, onChange, closeDropdown],
   );
 
   const handleRowClick = useCallback(
@@ -218,7 +223,7 @@ export function TableSelect({
     (e: React.KeyboardEvent) => {
       switch (e.key) {
         case "Escape":
-          setIsOpen(false);
+          closeDropdown();
           break;
         case "ArrowDown":
           e.preventDefault();
@@ -236,7 +241,7 @@ export function TableSelect({
           break;
       }
     },
-    [filteredData, selectedIndex, selectRow],
+    [filteredData, selectedIndex, selectRow, closeDropdown],
   );
 
   const effectiveValueKey =
