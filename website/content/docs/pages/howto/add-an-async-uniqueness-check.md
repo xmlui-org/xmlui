@@ -18,6 +18,7 @@ A registration form must ensure the chosen username does not already exist in th
       required="true"
       minLength="3"
       customValidationsDebounce="500"
+      validationDisplayDelay="800"
       onValidate="(value) => {
         if (!value || value.length < 3) return null;
         const available = Actions.callApi({ url: '/api/users/check/' + value });
@@ -79,6 +80,10 @@ onValidate="(value) => {
 **`customValidationsDebounce="500"` prevents request-per-keystroke**: The `onValidate` function only runs after the user has stopped changing the field for 500 ms. Built-in validators (`required`, `minLength`, etc.) still fire immediately on blur — only the async handler is throttled.
 
 **The form blocks submission while the check is in-flight**: If the user presses Save while the async validator is still pending, XMLUI waits for it to resolve before proceeding. This prevents submitting a username that is currently being verified.
+
+**`validationDisplayDelay` reveals the result without requiring a blur**: Normally (`errorLate` mode) XMLUI hides validation feedback until the user leaves the field. For an instant check this is fine, but the API call in this example takes about 1 second. By the time it resolves, making the user blur the field before seeing the error feels unnecessary.
+
+`validationDisplayDelay` (default: `400` ms) starts a timer when an async check begins on a dirty field. If the check is still running when the timer fires, XMLUI reveals the result immediately once it settles — even if the field is still focused. Because the mock API here always takes 1 s, the 400 ms default kicks in on every check and the error appears right away without a blur.
 
 ---
 
