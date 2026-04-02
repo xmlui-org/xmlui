@@ -193,10 +193,13 @@ export function TableSelect({
     };
   }, [isOpen, updateDropdownRect]);
 
-  // Close when clicking outside both the trigger and the portal dropdown
+  // Close when clicking outside both the trigger and the portal dropdown.
+  // Use pointerdown in capture phase so we intercept before Radix Dialog's outside-click
+  // handler — this way the first click only closes the dropdown, and a second click is
+  // needed to close the modal (matching Select behaviour).
   useEffect(() => {
     if (!isOpen) return;
-    function handleClickOutside(event: MouseEvent) {
+    function handlePointerDown(event: PointerEvent) {
       const target = event.target as Node;
       const inTrigger = triggerRef.current?.contains(target);
       const inDropdown = dropdownRef.current?.contains(target);
@@ -204,11 +207,12 @@ export function TableSelect({
         ? (target as Element).closest?.(`label[for="${id}"]`) !== null
         : false;
       if (!inTrigger && !inDropdown && !inLabel) {
+        event.stopPropagation();
         setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
   }, [isOpen, id]);
 
   const closeDropdown = useCallback(() => {
