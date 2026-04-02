@@ -200,13 +200,16 @@ export function TableSelect({
       const target = event.target as Node;
       const inTrigger = triggerRef.current?.contains(target);
       const inDropdown = dropdownRef.current?.contains(target);
-      if (!inTrigger && !inDropdown) {
+      const inLabel = id
+        ? (target as Element).closest?.(`label[for="${id}"]`) !== null
+        : false;
+      if (!inTrigger && !inDropdown && !inLabel) {
         setIsOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen]);
+  }, [isOpen, id]);
 
   const closeDropdown = useCallback(() => {
     setIsOpen(false);
@@ -340,9 +343,10 @@ export function TableSelect({
   ) : null;
 
   return (
-    <div className={`${styles.wrapper} ${className ?? ""}`} id={id}>
+    <div className={`${styles.wrapper} ${className ?? ""}`}>
       <button
         ref={triggerRef}
+        id={id}
         type="button"
         className={`${styles.trigger}${isOpen ? ` ${styles.open}` : ""}`}
         onClick={handleToggle}
