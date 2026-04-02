@@ -171,7 +171,6 @@ export const StackMd = {
     ...stackMd.props,
   },
 };
-type StackComponentDef = ComponentDef<typeof StackMd>;
 
 type ThemedStackProps = React.ComponentProps<typeof Stack> & { className?: string };
 export const ThemedStack = React.forwardRef<HTMLDivElement, ThemedStackProps>(
@@ -215,7 +214,6 @@ export const CVStackMd = {
     ...stackMd.apis,
   },
 };
-type CVStackComponentDef = ComponentDef<typeof CVStackMd>;
 
 export const CHStackMd = {
   ...StackMd,
@@ -227,7 +225,6 @@ export const CHStackMd = {
     ...stackMd.apis,
   },
 };
-type CHStackComponentDef = ComponentDef<typeof CHStackMd>;
 
 type RenderStackPars = {
   node: any;
@@ -250,7 +247,6 @@ type RenderStackPars = {
 
 function renderDockLayout({
   node,
-  extractValue,
   classes,
   onClick,
   onContextMenu,

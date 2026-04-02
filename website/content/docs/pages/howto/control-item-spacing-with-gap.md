@@ -7,7 +7,11 @@ A tight button toolbar and a spacious card section live on the same page. Both u
 ```xmlui-pg copy display name="Compact toolbar vs spacious cards"
 ---app display
 <App>
-  <HStack gap="$gap-tight" padding="$space-2" backgroundColor="$color-surface-100">
+  <HStack 
+    gap="$gap-tight" 
+    padding="$space-2" 
+    backgroundColor="$color-surface-100"
+  >
     <Button label="Bold" icon="bold" />
     <Button label="Italic" icon="italic" />
     <Button label="Underline" icon="underline" />
@@ -75,15 +79,15 @@ A tight button toolbar and a spacious card section live on the same page. Both u
 ---app display
 <App>
   <VStack>
-    <Text>With default gap (overflows)</Text>
-    <HStack border="4px dotted $color-warn" height="40px">
-      <Stack backgroundColor="$color-info-200" width="50%" />
-      <Stack backgroundColor="$color-success-200" width="50%" />
+    <Text>With explicit gap (overflows)</Text>
+    <HStack gap="$gap-loose" border="4px dotted $color-warn" height="40px">
+      <Stack height="100%" backgroundColor="$color-info-200" width="50%" />
+      <Stack height="100%" backgroundColor="$color-success-200" width="50%" />
     </HStack>
     <Text>With gap="0" (no overflow)</Text>
     <HStack gap="0" border="4px dotted $color-success" height="40px">
-      <Stack backgroundColor="$color-info-200" width="50%" />
-      <Stack backgroundColor="$color-success-200" width="50%" />
+      <Stack height="100%" backgroundColor="$color-info-200" width="50%" />
+      <Stack height="100%" backgroundColor="$color-success-200" width="50%" />
     </HStack>
   </VStack>
 </App>

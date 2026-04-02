@@ -7,7 +7,7 @@ A tag list, a button group, or a set of filter chips should display side by side
 ```xmlui-pg copy display name="Wrapping tag list"
 ---app display
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Badge value="React" />
     <Badge value="TypeScript" />
     <Badge value="Vite" />
@@ -40,7 +40,7 @@ A tag list, a button group, or a set of filter chips should display side by side
 ```xmlui-pg copy display name="Mixed widths in a wrapping HStack"
 ---app display
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Card width="200px" title="Fixed 200 px" />
     <Card width="30%"  title="30 %" />
     <Card width="*"    title="Fills rest" />
@@ -53,7 +53,7 @@ A tag list, a button group, or a set of filter chips should display side by side
 ```xmlui-pg copy display name="Cards with minWidth guard"
 ---app display
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Card width="*" minWidth="180px" title="Card One" />
     <Card width="*" minWidth="180px" title="Card Two" />
     <Card width="*" minWidth="180px" title="Card Three" />
@@ -67,7 +67,7 @@ A tag list, a button group, or a set of filter chips should display side by side
 ```xmlui-pg copy display name="itemWidth on the HStack"
 ---app display
 <App>
-  <HStack wrapContent itemWidth="*" gap="$gap-tight">
+  <HStack wrapContent itemWidth="*">
     <Card title="Alpha" />
     <Card title="Beta" />
     <Card title="Gamma" />

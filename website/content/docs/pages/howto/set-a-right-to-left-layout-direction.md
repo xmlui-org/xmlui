@@ -48,7 +48,14 @@ Compare with the same markup using the default left-to-right direction:
 ---app display
 <App>
   <Text>English — left to right</Text>
-  <VStack direction="rtl" backgroundColor="$color-surface-50" padding="$space-3">
+  <VStack>
+    <HStack>
+      <Badge value="First" />
+      <Badge value="Second" />
+      <Badge value="Third" />
+    </HStack>
+  </VStack>
+  <VStack direction="rtl">
     <Text>Arabic section — right to left</Text>
     <HStack>
       <Badge value="أول" />

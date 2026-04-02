@@ -7,7 +7,7 @@ A mixed content row has several short tags followed by one element that must alw
 ```xmlui-pg copy display name="Forced row break between tag groups"
 ---app
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Badge value="Design" />
     <Badge value="Frontend" />
     <Badge value="Open" />
@@ -25,7 +25,7 @@ A mixed content row has several short tags followed by one element that must alw
 <HStack wrapContent>
   <Badge value="A" />
   <Badge value="B" />
-  <SpaceFiller width="100%" />   <!-- forces next item to a new row -->
+  <SpaceFiller />   <!-- forces next item to a new row -->
   <Text>Always on its own row</Text>
 </HStack>
 ```
@@ -35,14 +35,14 @@ A mixed content row has several short tags followed by one element that must alw
 ```xmlui-pg copy display name="Multiple forced row breaks"
 ---app display
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Badge value="Tag A" />
     <Badge value="Tag B" />
-    <SpaceFiller width="100%" />
+    <SpaceFiller />
     <Badge value="Tag C" />
     <Badge value="Tag D" />
     <Badge value="Tag E" />
-    <SpaceFiller width="100%" />
+    <SpaceFiller />
     <Text variant="strong">Footer row</Text>
   </HStack>
 </App>
@@ -53,9 +53,9 @@ A mixed content row has several short tags followed by one element that must alw
 ```xmlui-pg copy display name="Row break then equal-width row"
 ---app display
 <App>
-  <HStack wrapContent gap="$gap-tight">
+  <HStack wrapContent>
     <Text>Header spans the full row</Text>
-    <SpaceFiller width="100%" />
+    <SpaceFiller />
     <Card width="*" title="First quarter" />
     <Card width="*" title="Second quarter" />
     <Card width="*" title="Third quarter" />
