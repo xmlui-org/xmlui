@@ -96,6 +96,7 @@ export const ModalDialogMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`maxWidth-${COMP}`]: "450px",
+    [`maxHeight-${COMP}`]: "100%",
     [`marginBottom-title-${COMP}`]: "0",
   },
 });
