@@ -32,8 +32,7 @@ type Props = {
   labelKey?: string;
   placeholder?: string;
   initialValue?: string;
-  stateValue?: string;
-  value?: string; // injected by FormBindingWrapper when bindTo is used
+  value?: unknown;
   onChange?: (value: string) => void;
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
@@ -62,10 +61,10 @@ export function TableSelect({
   data = [],
   columns,
   valueKey,
+  labelKey,
   placeholder = defaultProps.placeholder,
   initialValue,
-  stateValue,
-  value: injectedValue,
+  value: controlledValue,
   onChange,
   updateState,
   registerComponentApi,
@@ -73,9 +72,9 @@ export function TableSelect({
   const [isOpen, setIsOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [internalValue, setInternalValue] = useState<string>(initialValue ?? "");
-  // stateValue (from form bindTo) takes precedence over internalValue when provided
-  // injectedValue (from FormBindingWrapper bindTo) > stateValue > internalValue
-  const effectiveValue = injectedValue ?? stateValue ?? internalValue;
+  // The controlled value may be any type (e.g. number from form state), so always stringify
+  const toStr = (v: unknown) => (v != null && v !== "" ? String(v) : undefined);
+  const effectiveValue = toStr(controlledValue) ?? internalValue;
   const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -123,8 +122,9 @@ export function TableSelect({
     if (!valueKey || resolvedColumns.length === 0) return effectiveValue;
     const matchingRow = data.find((row) => String(row[valueKey] ?? "") === effectiveValue);
     if (!matchingRow) return effectiveValue;
-    return String(matchingRow[resolvedColumns[0].key] ?? "");
-  }, [effectiveValue, valueKey, data, resolvedColumns]);
+    const displayKey = labelKey ?? resolvedColumns[0].key;
+    return String(matchingRow[displayKey] ?? "");
+  }, [effectiveValue, valueKey, labelKey, data, resolvedColumns]);
 
   // Calculate portal dropdown position from the trigger's bounding rect.
   //

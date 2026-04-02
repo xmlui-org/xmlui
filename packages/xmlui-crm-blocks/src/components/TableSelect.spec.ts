@@ -145,6 +145,61 @@ test.describe("Rows and Columns", () => {
     await page.getByRole("option", { name: /Alice/ }).click();
     await expect(page.getByTestId("val")).toHaveText("1");
   });
+
+  test("labelKey controls trigger display independently of valueKey", async ({ initTestBed, page }) => {
+    // valueKey="id" stores the id, labelKey="name" shows the name in trigger
+    await initTestBed(
+      `<Fragment>
+        <TableSelect id="ts" data="${DATA_3}" valueKey="id" labelKey="name" />
+        <Text testId="val">{ts.value}</Text>
+      </Fragment>`,
+      EXT,
+    );
+    await page.getByRole("button").click();
+    await page.getByRole("option", { name: /Bob/ }).click();
+    // Trigger shows the name, not the id
+    await expect(page.getByRole("button")).toContainText("Bob");
+    // But the stored value is the id
+    await expect(page.getByTestId("val")).toHaveText("2");
+  });
+
+  test("labelKey shows correct label for initialValue", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<TableSelect data="${DATA_3}" valueKey="id" labelKey="name" initialValue="3" />`,
+      EXT,
+    );
+    await expect(page.getByRole("button")).toContainText("Carol");
+  });
+
+  test("without labelKey trigger falls back to first column", async ({ initTestBed, page }) => {
+    // Without explicit columns, first auto-derived column is 'id'
+    await initTestBed(
+      `<TableSelect data="${DATA_3}" valueKey="id" initialValue="1" />`,
+      EXT,
+    );
+    // First column is 'id', so trigger shows the id value
+    await expect(page.getByRole("button")).toContainText("1");
+  });
+
+  test("labelKey works with explicit columns", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `<Fragment>
+        <TableSelect id="ts"
+          data="${DATA_3}"
+          columns="${COLS_NAME_DEPT}"
+          valueKey="id"
+          labelKey="dept" />
+        <Text testId="val">{ts.value}</Text>
+      </Fragment>`,
+      EXT,
+    );
+    await page.getByRole("button").click();
+    await page.getByRole("option", { name: /Alice/ }).click();
+    // labelKey="dept" → trigger shows "Engineering"
+    await expect(page.getByRole("button")).toContainText("Engineering");
+    // valueKey="id" → stored value is "1"
+    await expect(page.getByTestId("val")).toHaveText("1");
+  });
 });
 
 // =============================================================================

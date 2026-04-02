@@ -25,8 +25,14 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
     valueKey: {
       description:
         "The key of the field whose value is used as the select value (stored / submitted). " +
-        "Defaults to the first column's key. The trigger always shows the first column's display " +
-        "value of the matching row.",
+        "Defaults to the first column's key.",
+      valueType: "string",
+    },
+    labelKey: {
+      description:
+        "The key of the field whose value is displayed in the trigger button after a row is selected. " +
+        "Defaults to the first column's key. Use this when `valueKey` points to an ID field but you " +
+        "want to show a human-readable label (e.g. a name) in the trigger.",
       valueType: "string",
     },
     placeholder: {
@@ -97,10 +103,9 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
 export const tableSelectComponentRenderer = createComponentRenderer(
   COMP,
   TableSelectMd,
-  ({ node, extractValue, lookupEventHandler, className, registerComponentApi, updateState }) => {
+  ({ node, state, extractValue, lookupEventHandler, className, registerComponentApi, updateState }) => {
     const props = node.props as any;
-    // When inside a Form with bindTo, FormBindingWrapper injects a `value` prop
-    const injectedValue = props?.value !== undefined ? extractValue.asOptionalString(props.value) : undefined;
+    const isControlled = props?.value !== undefined;
     return (
       <TableSelect
         id={extractValue.asOptionalString(props?.id)}
@@ -108,11 +113,12 @@ export const tableSelectComponentRenderer = createComponentRenderer(
         data={extractValue(props?.data) as Record<string, unknown>[] | undefined}
         columns={extractValue(props?.columns) as any}
         valueKey={extractValue.asOptionalString(props?.valueKey)}
+        labelKey={extractValue.asOptionalString(props?.labelKey)}
         placeholder={extractValue.asOptionalString(props?.placeholder)}
         initialValue={extractValue.asOptionalString(props?.initialValue)}
-        stateValue={injectedValue}
+        value={isControlled ? extractValue(props.value) : state?.value}
         onChange={lookupEventHandler("didChange")}
-        updateState={updateState}
+        updateState={isControlled ? undefined : updateState}
         registerComponentApi={registerComponentApi}
       />
     );

@@ -13,7 +13,8 @@
       { key: 'email', label: 'Email' }
     ]}"
     valueKey="id"
+    labelKey="name"
     placeholder="Select a person..."
   />
-  <Text>Selected: {myTableSelect.value}</Text>
+  <Text>Selected ID: {myTableSelect.value}</Text>
 </VStack>
