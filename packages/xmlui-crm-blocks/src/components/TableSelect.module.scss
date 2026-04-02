@@ -9,13 +9,18 @@ $themeVars: ();
 $component: "TableSelect";
 
 $borderColor:           createThemeVar("borderColor-#{$component}");
-$borderColorFocus:      createThemeVar("borderColor-#{$component}--focus");
+$borderColorHover:      createThemeVar("borderColor-#{$component}--hover");
+$outlineColor:          createThemeVar("outlineColor-#{$component}--focus");
+$outlineWidth:          createThemeVar("outlineWidth-#{$component}--focus");
+$outlineStyle:          createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset:         createThemeVar("outlineOffset-#{$component}--focus");
 $backgroundColor:       createThemeVar("backgroundColor-#{$component}");
 $textColor:             createThemeVar("textColor-#{$component}");
 $textColorPlaceholder:  createThemeVar("textColor-placeholder-#{$component}");
 $borderRadius:          createThemeVar("borderRadius-#{$component}");
 $paddingHorizontal:     createThemeVar("paddingHorizontal-#{$component}");
 $paddingVertical:       createThemeVar("paddingVertical-#{$component}");
+$minHeight:             createThemeVar("minHeight-#{$component}");
 
 $dropdownBackground:    createThemeVar("backgroundColor-#{$component}-dropdown");
 $dropdownBorderColor:   createThemeVar("borderColor-#{$component}-dropdown");
@@ -43,24 +48,33 @@ $rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  min-height: $minHeight;
   padding: $paddingVertical $paddingHorizontal;
   background-color: $backgroundColor;
   border: 1px solid $borderColor;
   border-radius: $borderRadius;
   cursor: pointer;
-  font-size: 14px;
+  font-size: inherit;
+  font-family: inherit;
   color: $textColor;
   box-sizing: border-box;
+  appearance: none;
   transition: border-color 0.15s ease;
 
+  &:hover {
+    border-color: $borderColorHover;
+  }
+
   &:focus {
-    outline: none;
-    border-color: $borderColorFocus;
-    box-shadow: 0 0 0 3px rgb(from #{$borderColorFocus} r g b / 0.15);
+    outline-color: $outlineColor;
+    outline-width: $outlineWidth;
+    outline-style: $outlineStyle;
+    outline-offset: $outlineOffset;
+    border-color: $borderColorHover;
   }
 
   &.open {
-    border-color: $borderColorFocus;
+    border-color: $borderColorHover;
   }
 }
 
@@ -81,7 +95,7 @@ $rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
   margin-left: 8px;
   width: 16px;
   height: 16px;
-  color: $textColorPlaceholder;
+  color: inherit;
   transition: transform 0.15s ease;
 
   &.rotated {
