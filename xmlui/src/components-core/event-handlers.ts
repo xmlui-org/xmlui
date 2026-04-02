@@ -1,7 +1,7 @@
 import type { ComponentMetadata } from "../abstractions/ComponentDefs";
 import type { LookupEventHandlerFn } from "../abstractions/RendererDefs";
 import type { EventHandler} from "react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { EMPTY_OBJECT } from "./constants";
 
 /**
@@ -51,12 +51,17 @@ export function useMouseEventHandlers(
     const onEvent = shouldSkip
       ? undefined
       : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
+    // EXPERIMENTAL: keep bubbleEvents in a ref so the useCallback deps stay stable
+    // (the array reference changes every render, but the ref read is always fresh)
+    const bubbleEventsRef = useRef(bubbleEvents);
+    bubbleEventsRef.current = bubbleEvents;
     const eventHandler: EventHandler<any> = useCallback(
       (event) => {
         // If the event handler is not defined, we do nothing
         if (onEvent) {
           // EXPERIMENTAL: skip propagation stop if this event is listed in bubbleEvents
-          if (!bubbleEvents || !bubbleEvents.includes(eventName)) {
+          const bubble = bubbleEventsRef.current;
+          if (!bubble || !bubble.includes(eventName)) {
             if (typeof event.stopPropagation === "function") {
               event?.stopPropagation();
             }
@@ -67,7 +72,7 @@ export function useMouseEventHandlers(
           onEvent(event);
         }
       },
-      [onEvent, bubbleEvents, eventName],
+      [onEvent, eventName],
     );
     return !onEvent ? undefined : eventHandler;
   }
