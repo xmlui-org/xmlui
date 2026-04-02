@@ -66,10 +66,12 @@ export function TableSelect({
   const [internalValue, setInternalValue] = useState<string>(initialValue ?? "");
   const [dropdownRect, setDropdownRect] = useState<DropdownRect | null>(null);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
 
   // Resolve portal container once after mount.
   // Rendering inside the dialog's DOM subtree keeps Radix UI's focus trap happy,
@@ -136,16 +138,33 @@ export function TableSelect({
     });
   }, [portalContainer]);
 
+  // Reset highlight when filter changes
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filterText]);
+
+  // Scroll highlighted row into view
+  useEffect(() => {
+    if (selectedIndex >= 0 && rowRefs.current[selectedIndex]) {
+      rowRefs.current[selectedIndex]!.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    }
+  }, [selectedIndex]);
+
+  const openDropdown = useCallback((startIndex = -1) => {
+    setFilterText("");
+    setSelectedIndex(startIndex);
+    updateDropdownRect();
+    setTimeout(() => searchInputRef.current?.focus(), 0);
+  }, [updateDropdownRect]);
+
   const handleToggle = useCallback(() => {
     setIsOpen((prev) => {
       if (!prev) {
-        setFilterText("");
-        updateDropdownRect();
-        setTimeout(() => searchInputRef.current?.focus(), 0);
+        openDropdown();
       }
       return !prev;
     });
-  }, [updateDropdownRect]);
+  }, [openDropdown]);
 
   // Keep dropdown aligned with trigger when user scrolls or resizes
   useEffect(() => {
@@ -175,7 +194,7 @@ export function TableSelect({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  const handleRowClick = useCallback(
+  const selectRow = useCallback(
     (row: Record<string, unknown>) => {
       const effectiveKey =
         valueKey ?? (resolvedColumns.length > 0 ? resolvedColumns[0].key : null);
@@ -184,14 +203,41 @@ export function TableSelect({
       setInternalValue(newValue);
       setIsOpen(false);
       setFilterText("");
+      setSelectedIndex(-1);
       onChange?.(newValue);
     },
     [valueKey, resolvedColumns, onChange],
   );
 
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Escape") setIsOpen(false);
-  }, []);
+  const handleRowClick = useCallback(
+    (row: Record<string, unknown>) => selectRow(row),
+    [selectRow],
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      switch (e.key) {
+        case "Escape":
+          setIsOpen(false);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev + 1 < filteredData.length ? prev + 1 : prev));
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+          break;
+        case "Enter":
+          e.preventDefault();
+          if (selectedIndex >= 0 && selectedIndex < filteredData.length) {
+            selectRow(filteredData[selectedIndex]);
+          }
+          break;
+      }
+    },
+    [filteredData, selectedIndex, selectRow],
+  );
 
   const effectiveValueKey =
     valueKey ?? (resolvedColumns.length > 0 ? resolvedColumns[0].key : null);
@@ -242,10 +288,18 @@ export function TableSelect({
                   ? String(row[effectiveValueKey] ?? "")
                   : "";
                 const isSelected = rowValue === internalValue;
+                const isHighlighted = rowIndex === selectedIndex;
                 return (
                   <tr
                     key={rowIndex}
-                    className={isSelected ? styles.selected : undefined}
+                    ref={(el) => { rowRefs.current[rowIndex] = el; }}
+                    className={
+                      isHighlighted
+                        ? `${styles.highlighted}${isSelected ? ` ${styles.selected}` : ""}`
+                        : isSelected
+                          ? styles.selected
+                          : undefined
+                    }
                     onClick={() => handleRowClick(row)}
                     role="option"
                     aria-selected={isSelected}
@@ -272,7 +326,15 @@ export function TableSelect({
         type="button"
         className={`${styles.trigger}${isOpen ? ` ${styles.open}` : ""}`}
         onClick={handleToggle}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => {
+          if (!isOpen && (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            setIsOpen(true);
+            openDropdown(e.key === "ArrowDown" || e.key === "Enter" || e.key === " " ? 0 : filteredData.length - 1);
+          } else if (isOpen) {
+            handleKeyDown(e);
+          }
+        }}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
       >

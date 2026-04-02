@@ -190,6 +190,11 @@ $rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
         color: $rowSelectedTextColor;
       }
     }
+
+    &.highlighted {
+      background-color: $rowHoverBackground;
+      outline: none;
+    }
   }
 
   td {
