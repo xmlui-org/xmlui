@@ -134,4 +134,6 @@ export const behaviorPropKeys: readonly string[] = [
   "validationMode", "verboseValidationFeedback",
   // VariantBehavior — triggerProps: variant
   "variant",
+  // EXPERIMENTAL: universal prop to bypass event propagation stop for specific events
+  "bubbleEvents",
 ];

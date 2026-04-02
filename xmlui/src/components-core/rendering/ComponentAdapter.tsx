@@ -308,10 +308,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [lookupAction, safeNode.events, uid],
   );
 
+  // EXPERIMENTAL: extract bubbleEvents prop to allow selective propagation bypass
+  const bubbleEvents = safeNode.props.bubbleEvents
+    ? (valueExtractor(safeNode.props.bubbleEvents) as string[] | undefined)
+    : undefined;
+
   // --- Set up the mouse event handlers for the component
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
     descriptor?.nonVisual || isApiBound || isCompoundComponent,
+    bubbleEvents, // EXPERIMENTAL
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
