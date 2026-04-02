@@ -4,9 +4,11 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import type { RegisterComponentApiFn } from "xmlui";
 
 /**
- * Find the nearest focus-trapping container (Radix dialog, or body).
- * Rendering the portal INSIDE the dialog's DOM subtree satisfies Radix UI's
- * focus trap so the search input can receive keyboard events normally.
+ * Render the portal INSIDE the nearest Radix dialog so that the dialog's
+ * FocusScope allows focus into the search input.
+ * modal={true} on Popover then ensures its DismissableLayer (higher index)
+ * fires before the Dialog's, so the first outside-click closes only the
+ * dropdown and not the modal.
  */
 function findPortalContainer(from: HTMLElement | null): HTMLElement {
   const dialog = from?.closest('[role="dialog"]') as HTMLElement | null;
@@ -73,9 +75,11 @@ export function TableSelect({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
-
+  const [isInDialog, setIsInDialog] = useState(false);
   useEffect(() => {
-    setPortalContainer(findPortalContainer(triggerRef.current));
+    const container = findPortalContainer(triggerRef.current);
+    setPortalContainer(container);
+    setIsInDialog(container !== document.body);
   }, []);
 
   // Expose value/setValue API for XMLUI form binding (bindTo support)
@@ -186,7 +190,7 @@ export function TableSelect({
 
   return (
     <div className={`${styles.wrapper} ${className ?? ""}`}>
-      <Popover open={isOpen} onOpenChange={handleOpenChange}>
+      <Popover open={isOpen} onOpenChange={handleOpenChange} modal={isInDialog}>
         <PopoverTrigger asChild>
           <button
             ref={triggerRef}
@@ -214,12 +218,21 @@ export function TableSelect({
         <Portal container={portalContainer}>
         <PopoverContent
           className={styles.dropdown}
-          style={{ width: "var(--radix-popover-trigger-width)" }}
+          style={{ minWidth: "var(--radix-popover-trigger-width)" }}
           sideOffset={4}
           align="start"
           onOpenAutoFocus={(e) => {
             e.preventDefault();
             searchInputRef.current?.focus();
+          }}
+          onInteractOutside={(e) => {
+            // When the associated label is clicked while the dropdown is open, the browser
+            // simulates a click on the trigger button (closing it via onOpenChange). If we
+            // let Radix also close it here the two events cancel out and the dropdown
+            // stays open. Suppress the outside-interaction so only the button click fires.
+            const target = e.target as Element;
+            const isLabel = id ? target.closest?.(`label[for="${id}"]`) !== null : false;
+            if (isLabel) e.preventDefault();
           }}
           onCloseAutoFocus={(e) => {
             // Let Radix return focus to the trigger for all close events
