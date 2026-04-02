@@ -15,7 +15,7 @@ export interface TransformDiagPositionless {
 }
 
 export interface ParserDiagPositionless {
-  code: ErrCodesParser;
+  code: ErrCodesParser | ErrCodesTransform;
   message: string;
 }
 
@@ -49,7 +49,7 @@ export class TransformDiag extends Error {
 }
 
 export interface ParserDiag {
-  readonly code: ErrCodesParser;
+  readonly code: ErrCodesParser | ErrCodesTransform;
   readonly message: string;
   readonly pos: number;
   readonly end: number;
