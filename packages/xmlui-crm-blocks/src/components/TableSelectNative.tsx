@@ -3,21 +3,18 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import type { RegisterComponentApiFn } from "xmlui";
 
+type UpdateStateFn = (componentState: any, options?: any) => void;
+import { Icon } from "xmlui";
+import styles from "./TableSelect.module.scss";
+
 /**
  * Render the portal INSIDE the nearest Radix dialog so that the dialog's
  * FocusScope allows focus into the search input.
- * modal={true} on Popover then ensures its DismissableLayer (higher index)
- * fires before the Dialog's, so the first outside-click closes only the
- * dropdown and not the modal.
  */
 function findPortalContainer(from: HTMLElement | null): HTMLElement {
   const dialog = from?.closest('[role="dialog"]') as HTMLElement | null;
   return dialog ?? document.body;
 }
-
-type UpdateStateFn = (componentState: any, options?: any) => void;
-import { Icon } from "xmlui";
-import styles from "./TableSelect.module.scss";
 
 export type ColumnDef = {
   key: string;
@@ -72,15 +69,42 @@ export function TableSelect({
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const rowRefs = useRef<(HTMLTableRowElement | null)[]>([]);
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
   const [isInDialog, setIsInDialog] = useState(false);
+
   useEffect(() => {
     const container = findPortalContainer(triggerRef.current);
     setPortalContainer(container);
     setIsInDialog(container !== document.body);
   }, []);
+
+  // When inside a dialog, intercept outside pointer events in the capture phase so
+  // the first click closes only the dropdown (not the parent modal).
+  // Radix Dialog's DismissableLayer listens in the bubble phase; by stopping
+  // propagation here it never sees the event.
+  useEffect(() => {
+    if (!isOpen || !isInDialog) return;
+    function handlePointerDown(event: PointerEvent) {
+      const target = event.target as Node;
+      const inDropdown = dropdownRef.current?.contains(target);
+      const inTrigger = triggerRef.current?.contains(target);
+      const inLabel = id
+        ? (target as Element).closest?.(`label[for="${id}"]`) !== null
+        : false;
+      if (!inDropdown && !inTrigger && !inLabel) {
+        event.stopPropagation();
+        setIsOpen(false);
+        setSelectedIndex(-1);
+        // Return focus to trigger so the dialog doesn't lose focus context
+        setTimeout(() => triggerRef.current?.focus(), 0);
+      }
+    }
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handlePointerDown, true);
+  }, [isOpen, isInDialog, id]);
 
   // Expose value/setValue API for XMLUI form binding (bindTo support)
   useEffect(() => {
@@ -190,7 +214,7 @@ export function TableSelect({
 
   return (
     <div className={`${styles.wrapper} ${className ?? ""}`}>
-      <Popover open={isOpen} onOpenChange={handleOpenChange} modal={isInDialog}>
+      <Popover open={isOpen} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button
             ref={triggerRef}
@@ -216,95 +240,94 @@ export function TableSelect({
           </button>
         </PopoverTrigger>
         <Portal container={portalContainer}>
-        <PopoverContent
-          className={styles.dropdown}
-          style={{ minWidth: "var(--radix-popover-trigger-width)" }}
-          sideOffset={4}
-          align="start"
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-            searchInputRef.current?.focus();
-          }}
-          onInteractOutside={(e) => {
-            // When the associated label is clicked while the dropdown is open, the browser
-            // simulates a click on the trigger button (closing it via onOpenChange). If we
-            // let Radix also close it here the two events cancel out and the dropdown
-            // stays open. Suppress the outside-interaction so only the button click fires.
-            const target = e.target as Element;
-            const isLabel = id ? target.closest?.(`label[for="${id}"]`) !== null : false;
-            if (isLabel) e.preventDefault();
-          }}
-          onCloseAutoFocus={(e) => {
-            // Let Radix return focus to the trigger for all close events
-            // (Escape, row selection, outside click) — same as Select behaviour.
-            e.preventDefault();
-            triggerRef.current?.focus();
-          }}
-          onKeyDown={handleKeyDown}
-          role="listbox"
-        >
-          <div className={styles.searchWrapper}>
-            <Icon name="search" className={styles.searchIcon} />
-            <input
-              ref={searchInputRef}
-              type="text"
-              className={styles.searchInput}
-              placeholder="Type to search..."
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-            />
-          </div>
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              {resolvedColumns.length > 0 && (
-                <thead className={styles.tableHead}>
-                  <tr>
-                    {resolvedColumns.map((col) => (
-                      <th key={col.key}>{col.label}</th>
-                    ))}
-                  </tr>
-                </thead>
-              )}
-              <tbody className={styles.tableBody}>
-                {filteredData.length === 0 ? (
-                  <tr className={styles.emptyRow}>
-                    <td colSpan={Math.max(resolvedColumns.length, 1)}>No results found</td>
-                  </tr>
-                ) : (
-                  filteredData.map((row, rowIndex) => {
-                    const rowValue = effectiveValueKey
-                      ? String(row[effectiveValueKey] ?? "")
-                      : "";
-                    const isSelected = rowValue === effectiveValue;
-                    const isHighlighted = rowIndex === selectedIndex;
-                    return (
-                      <tr
-                        key={rowIndex}
-                        ref={(el) => { rowRefs.current[rowIndex] = el; }}
-                        className={
-                          isHighlighted
-                            ? `${styles.highlighted}${isSelected ? ` ${styles.selected}` : ""}`
-                            : isSelected
-                              ? styles.selected
-                              : undefined
-                        }
-                        onClick={() => selectRow(row)}
-                        role="option"
-                        aria-selected={isSelected}
-                      >
-                        {resolvedColumns.map((col) => (
-                          <td key={col.key}>
-                            {row[col.key] != null ? String(row[col.key]) : ""}
-                          </td>
-                        ))}
-                      </tr>
-                    );
-                  })
+          <PopoverContent
+            ref={dropdownRef}
+            className={styles.dropdown}
+            style={{ minWidth: "var(--radix-popover-trigger-width)" }}
+            sideOffset={4}
+            align="start"
+            onOpenAutoFocus={(e) => {
+              e.preventDefault();
+              searchInputRef.current?.focus();
+            }}
+            onCloseAutoFocus={(e) => {
+              e.preventDefault();
+              triggerRef.current?.focus();
+            }}
+            onInteractOutside={(e) => {
+              // When the associated label is clicked while the dropdown is open, the browser
+              // simulates a click on the trigger button (closing it via onOpenChange). If we
+              // let Radix also close it here the two events cancel out and the dropdown
+              // stays open. Suppress the outside-interaction so only the button click fires.
+              const target = e.target as Element;
+              const isLabel = id ? target.closest?.(`label[for="${id}"]`) !== null : false;
+              if (isLabel) e.preventDefault();
+            }}
+            onKeyDown={handleKeyDown}
+            role="listbox"
+          >
+            <div className={styles.searchWrapper}>
+              <Icon name="search" className={styles.searchIcon} />
+              <input
+                ref={searchInputRef}
+                type="text"
+                className={styles.searchInput}
+                placeholder="Type to search..."
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+              />
+            </div>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                {resolvedColumns.length > 0 && (
+                  <thead className={styles.tableHead}>
+                    <tr>
+                      {resolvedColumns.map((col) => (
+                        <th key={col.key}>{col.label}</th>
+                      ))}
+                    </tr>
+                  </thead>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </PopoverContent>
+                <tbody className={styles.tableBody}>
+                  {filteredData.length === 0 ? (
+                    <tr className={styles.emptyRow}>
+                      <td colSpan={Math.max(resolvedColumns.length, 1)}>No results found</td>
+                    </tr>
+                  ) : (
+                    filteredData.map((row, rowIndex) => {
+                      const rowValue = effectiveValueKey
+                        ? String(row[effectiveValueKey] ?? "")
+                        : "";
+                      const isSelected = rowValue === effectiveValue;
+                      const isHighlighted = rowIndex === selectedIndex;
+                      return (
+                        <tr
+                          key={rowIndex}
+                          ref={(el) => { rowRefs.current[rowIndex] = el; }}
+                          className={
+                            isHighlighted
+                              ? `${styles.highlighted}${isSelected ? ` ${styles.selected}` : ""}`
+                              : isSelected
+                                ? styles.selected
+                                : undefined
+                          }
+                          onClick={() => selectRow(row)}
+                          role="option"
+                          aria-selected={isSelected}
+                        >
+                          {resolvedColumns.map((col) => (
+                            <td key={col.key}>
+                              {row[col.key] != null ? String(row[col.key]) : ""}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </PopoverContent>
         </Portal>
       </Popover>
     </div>
