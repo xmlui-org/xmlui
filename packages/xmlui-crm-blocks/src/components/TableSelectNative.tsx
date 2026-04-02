@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import type React from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
 import type { RegisterComponentApiFn } from "xmlui";
+import { Icon } from "xmlui";
 import styles from "./TableSelect.module.scss";
 
 /**
@@ -41,45 +43,6 @@ type DropdownRect = {
   width: number;
 };
 
-function ChevronDownIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <path
-        d="M5 7.5L10 12.5L15 7.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SearchIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 20 20"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <circle cx="9" cy="9" r="5.5" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M13.5 13.5L17 17"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
 
 function resolveColumns(data: Record<string, unknown>[], columns?: ColumnDef[]): ColumnDef[] {
   if (columns && columns.length > 0) return columns;
@@ -246,7 +209,7 @@ export function TableSelect({
       }}
     >
       <div className={styles.searchWrapper}>
-        <SearchIcon className={styles.searchIcon} />
+        <Icon name="search" className={styles.searchIcon} />
         <input
           ref={searchInputRef}
           type="text"
@@ -316,7 +279,7 @@ export function TableSelect({
         <span className={`${styles.triggerText}${!displayLabel ? ` ${styles.placeholder}` : ""}`}>
           {displayLabel ?? placeholder}
         </span>
-        <ChevronDownIcon className={`${styles.chevron}${isOpen ? ` ${styles.rotated}` : ""}`} />
+        <Icon name="chevrondown" className={`${styles.chevron}${isOpen ? ` ${styles.rotated}` : ""}`} />
       </button>
 
       {portalContainer && createPortal(dropdown, portalContainer)}
