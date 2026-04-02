@@ -747,6 +747,12 @@ export function AppContent({
               ariaTarget = el;
               break;
             }
+            // Check for aria-label without role (e.g. div with aria-label)
+            // — the label identifies the element even without a semantic role
+            if (el.getAttribute?.("aria-label")) {
+              ariaTarget = el;
+              break;
+            }
             // Check implicit role from HTML tag
             const parentTag = el.tagName?.toLowerCase();
             if (parentTag === "tr") { ariaRole = "row"; ariaTarget = el; break; }
