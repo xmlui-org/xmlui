@@ -241,6 +241,22 @@ function DataLoader({
           console.error("Error loading CSV:", error);
           throw error;
         }
+      } else if (loader.props.dataType === "text") {
+        try {
+          const method = extractParam(state, loader.props.method, appContext) || "GET";
+          const headers = extractParam(state, loader.props.headers, appContext) || {};
+          const fetchOptions: RequestInit = { method, headers };
+          if (abortSignal) { fetchOptions.signal = abortSignal; }
+          if (rawBody) { fetchOptions.body = rawBody; }
+          const response = await fetch(url, fetchOptions);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch text: ${response.status} ${response.statusText}`);
+          }
+          return await response.text();
+        } catch (error) {
+          console.error("Error loading text:", error);
+          throw error;
+        }
       } else if (loader.props.dataType === "sql") {
         // Extract SQL query from the body or rawBody
         let sqlQuery: string = "";
@@ -682,7 +698,7 @@ export const DataLoaderMd = createMetadata({
     completedNotificationMessage: d("The message to show when the loader completes"),
     errorNotificationMessage: d("The message to show when an error occurs"),
     transformResult: d("Function for transforming the datasource result"),
-    dataType: d("Type of data to fetch (default: json, or csv, or sql)"),
+    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
     structuralSharing: d("Whether to use structural sharing for the data"),
     mockData: d("Data to return directly without making a network request (for development and testing)"),
   },

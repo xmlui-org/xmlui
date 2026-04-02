@@ -851,6 +851,21 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     if (config.customRender) {
       // Custom rendering: caller handles children and component selection.
       rendered = config.customRender(props, context);
+      // customRender builds its own JSX and may not forward aria-label/role
+      // from the resolved props. Inject them onto the root element so they
+      // always reach the DOM — this is an accessibility concern, not tracing.
+      if (rendered && React.isValidElement(rendered)) {
+        const inject: Record<string, any> = {};
+        if (props["aria-label"] && !(rendered.props as any)["aria-label"]) {
+          inject["aria-label"] = props["aria-label"];
+        }
+        if (props["role"] && !(rendered.props as any)["role"]) {
+          inject["role"] = props["role"];
+        }
+        if (Object.keys(inject).length > 0) {
+          rendered = React.cloneElement(rendered, inject);
+        }
+      }
     } else {
       // When childrenAsTemplate is declared in metadata, children are treated as
       // an item template: the component's `data` prop provides an array and each

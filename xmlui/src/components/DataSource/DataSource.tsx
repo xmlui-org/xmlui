@@ -114,6 +114,18 @@ export const DataSourceMd = createMetadata({
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,
     },
+    dataType: {
+      description:
+        "Type of data to fetch. When set to `\"text\"`, the response is returned as a raw string " +
+        "without JSON parsing. When set to `\"csv\"`, the response is parsed as CSV.",
+      availableValues: [
+        { value: "json", description: "Parse response as JSON (default)" },
+        { value: "text", description: "Return response as raw text" },
+        { value: "csv", description: "Parse response as CSV" },
+        { value: "sql", description: "Execute SQL query" },
+      ],
+      valueType: "string",
+    },
     structuralSharing: {
       description:
         "This property allows structural sharing. When turned on, `DataSource` will keep " +

@@ -153,10 +153,10 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   let _codeHighlighter = null;
   if (codeHighlighter) {
     _codeHighlighter = codeHighlighter;
-  } else {
-    _codeHighlighter = isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)
-      ? appContext?.appGlobals?.codeHighlighter
-      : null;
+  } else if (isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)) {
+    _codeHighlighter = appContext.appGlobals.codeHighlighter;
+  } else if (typeof window !== "undefined" && isCodeHighlighter((window as any).__xmluiCodeHighlighter)) {
+    _codeHighlighter = (window as any).__xmluiCodeHighlighter;
   }
 
   const defaultCodefence = (

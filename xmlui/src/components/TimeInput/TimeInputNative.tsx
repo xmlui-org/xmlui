@@ -70,6 +70,7 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
+  ariaLabel?: string;
 };
 
 export const defaultProps = {
@@ -117,6 +118,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
+    ariaLabel,
     ...rest
   },
   ref,
@@ -657,6 +659,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
       onFocusCapture={handleComponentFocus}
       onBlur={handleComponentBlur}
       data-validation-status={validationStatus}
+      aria-label={ariaLabel}
       {...rest}
     >
       {startAdornment}
@@ -681,6 +684,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
             emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} hour` : "hour"}
           />
 
           <InputDivider separator=":" />
@@ -703,6 +707,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
             emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} minute` : "minute"}
           />
 
           {/* Second input (if needed) */}
@@ -726,6 +731,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
                 emptyCharacter={processedEmptyCharacter}
+                ariaLabel={ariaLabel ? `${ariaLabel} second` : "second"}
               />
             </>
           )}
@@ -742,6 +748,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
               onAmPmSet={handleAmPmSet}
               onKeyDown={handleArrowKeys}
               value={amPm}
+              ariaLabel={ariaLabel ? `${ariaLabel} AM/PM` : "AM/PM"}
             />
           )}
         </div>
