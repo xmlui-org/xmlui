@@ -29,6 +29,7 @@ type ToggleOptions = {
   metaKey?: boolean;
   ctrlKey?: boolean;
   singleItem?: boolean;
+  source?: "pointer" | "keyboard";
 };
 
 type SelectionApi = {
@@ -161,6 +162,7 @@ export default function useRowSelection({
   visibleItems = items,
   rowsSelectable,
   enableMultiRowSelection,
+  toggleSelectionOnClick,
   rowDisabledPredicate,
   rowUnselectablePredicate,
   onSelectionDidChange,
@@ -171,6 +173,7 @@ export default function useRowSelection({
   visibleItems: Item[];
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
+  toggleSelectionOnClick?: boolean;
   rowDisabledPredicate?: (item: any) => boolean;
   rowUnselectablePredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
@@ -412,7 +415,9 @@ export default function useRowSelection({
 
       const { shiftKey, metaKey, ctrlKey } = options;
 
-      const singleItem = !enableMultiRowSelection || (!shiftKey && !metaKey && !ctrlKey);
+      const singleItem =
+        !enableMultiRowSelection ||
+        (!(toggleSelectionOnClick && options.source !== "keyboard") && !shiftKey && !metaKey && !ctrlKey);
 
       // --- This variable will hold the newest selection interval
       let newSelectionInterval: SelectionInterval;
@@ -476,8 +481,8 @@ export default function useRowSelection({
             to: targetId,
           };
 
-          if (metaKey || ctrlKey) {
-            // --- If META key (Mac) or CTRL (Windows) is pressed, toggle the selection of the targeted item
+          if (metaKey || ctrlKey || toggleSelectionOnClick) {
+            // --- If META key (Mac) or CTRL (Windows) is pressed, or toggleSelectionOnClick is enabled, toggle the selection of the targeted item
             if (newSelectedRowsIdsInOrder.includes(targetId)) {
               newSelectedRowsIdsInOrder = newSelectedRowsIdsInOrder.filter(
                 (item) => item !== targetId,
@@ -514,13 +519,20 @@ export default function useRowSelection({
     if (!rowsSelectable) {
       return;
     }
+    const keyboardOptions: ToggleOptions = {
+      shiftKey: event.shiftKey,
+      metaKey: event.metaKey,
+      ctrlKey: event.ctrlKey,
+      source: "keyboard",
+    };
+
     if (event.key === "ArrowDown") {
       // --- Move/extend the selection to the item below the focused one
       event.preventDefault();
       event.stopPropagation();
       let newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 1);
       if (focusedIndex !== visibleItems.length - 1) {
-        toggleRowIndex(newFocusIndex, event);
+        toggleRowIndex(newFocusIndex, keyboardOptions);
       }
     }
     if (event.key === "PageDown") {
@@ -528,7 +540,7 @@ export default function useRowSelection({
       event.preventDefault();
       event.stopPropagation();
       const newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 8);
-      toggleRowIndex(newFocusIndex, event);
+      toggleRowIndex(newFocusIndex, keyboardOptions);
     }
     if (event.key === "ArrowUp") {
       // --- Move/extend the selection to the item above the focused one
@@ -536,7 +548,7 @@ export default function useRowSelection({
       event.stopPropagation();
       let newFocusIndex = Math.max(0, focusedIndex - 1);
       if (focusedIndex >= 0) {
-        toggleRowIndex(newFocusIndex, event);
+        toggleRowIndex(newFocusIndex, keyboardOptions);
       }
     }
     if (event.key === "PageUp") {
@@ -544,7 +556,7 @@ export default function useRowSelection({
       event.preventDefault();
       event.stopPropagation();
       const newFocusIndex = Math.max(0, focusedIndex - 8);
-      toggleRowIndex(newFocusIndex, event);
+      toggleRowIndex(newFocusIndex, keyboardOptions);
     }
   });
 

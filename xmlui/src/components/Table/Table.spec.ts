@@ -4216,3 +4216,76 @@ test.describe("striped property", () => {
     await expect(rows.nth(3)).toHaveCSS("background-color", "rgb(240, 220, 220)");
   });
 });
+
+// =============================================================================
+// toggleSelectionOnClick property
+// =============================================================================
+
+test.describe("toggleSelectionOnClick property", () => {
+  const toggleMarkup = `
+    <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" toggleSelectionOnClick="true" testId="table">
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+    </Table>
+  `;
+
+  test("plain click selects unselected row", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const firstRow = page.locator("tbody tr").first();
+    await firstRow.click();
+    const firstCheckbox = page.locator("input[type='checkbox']").nth(1);
+    await expect(firstCheckbox).toBeChecked();
+  });
+
+  test("plain click on selected row deselects it (toggle)", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const firstRow = page.locator("tbody tr").first();
+    // First click — select
+    await firstRow.click();
+    const firstCheckbox = page.locator("input[type='checkbox']").nth(1);
+    await expect(firstCheckbox).toBeChecked();
+    // Second click — deselect
+    await firstRow.click();
+    await expect(firstCheckbox).not.toBeChecked();
+  });
+
+  test("plain click does not deselect other rows", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const rows = page.locator("tbody tr");
+    const checkboxes = page.locator("input[type='checkbox']");
+    // Select first row
+    await rows.nth(0).click();
+    await expect(checkboxes.nth(1)).toBeChecked();
+    // Click second row — first should remain selected
+    await rows.nth(1).click();
+    await expect(checkboxes.nth(1)).toBeChecked();
+    await expect(checkboxes.nth(2)).toBeChecked();
+  });
+
+  test("Shift+Click still performs range selection", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const rows = page.locator("tbody tr");
+    await rows.nth(0).click();
+    await rows.nth(2).click({ modifiers: ["Shift"] });
+    // Rows 0, 1, 2 should all be selected
+    const checkboxes = page.locator("input[type='checkbox']");
+    await expect(checkboxes.nth(1)).toBeChecked();
+    await expect(checkboxes.nth(2)).toBeChecked();
+    await expect(checkboxes.nth(3)).toBeChecked();
+  });
+
+  test("without toggleSelectionOnClick plain click replaces selection", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
+        <Column bindTo="name"/>
+      </Table>
+    `);
+    const rows = page.locator("tbody tr");
+    const checkboxes = page.locator("input[type='checkbox']");
+    await rows.nth(0).click();
+    await rows.nth(1).click();
+    // First row should be deselected (replaced), second selected
+    await expect(checkboxes.nth(1)).not.toBeChecked();
+    await expect(checkboxes.nth(2)).toBeChecked();
+  });
+});

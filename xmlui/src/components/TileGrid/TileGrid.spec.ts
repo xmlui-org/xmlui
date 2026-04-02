@@ -773,3 +773,77 @@ test.describe("stretchItems property", () => {
     await expect(page.getByRole("gridcell").first()).toHaveCSS("width", "80px");
   });
 });
+
+// =============================================================================
+// toggleSelectionOnClick property
+// =============================================================================
+
+test.describe("toggleSelectionOnClick property", () => {
+  const toggleMarkup = `
+    <TileGrid
+      data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+      itemWidth="120px"
+      itemHeight="80px"
+      itemsSelectable="true"
+      toggleSelectionOnClick="true"
+    >
+      <Text>{$item.name}</Text>
+    </TileGrid>
+  `;
+
+  test("plain click selects unselected tile", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("plain click on selected tile deselects it (toggle)", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const cells = page.getByRole("gridcell");
+    // First click — select
+    await cells.nth(0).click();
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    // Second click — deselect
+    await cells.nth(0).click();
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "false");
+  });
+
+  test("plain click does not deselect other tiles", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await cells.nth(1).click();
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("Shift+Click still performs range selection", async ({ initTestBed, page }) => {
+    await initTestBed(toggleMarkup);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await cells.nth(2).click({ modifiers: ["Shift"] });
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(cells.nth(2)).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("without toggleSelectionOnClick plain click replaces selection", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <TileGrid
+        data="{[{id:1,name:'A'},{id:2,name:'B'},{id:3,name:'C'}]}"
+        itemWidth="120px"
+        itemHeight="80px"
+        itemsSelectable="true"
+      >
+        <Text>{$item.name}</Text>
+      </TileGrid>
+    `);
+    const cells = page.getByRole("gridcell");
+    await cells.nth(0).click();
+    await cells.nth(1).click();
+    // First tile should be deselected (replaced), second selected
+    await expect(cells.nth(0)).toHaveAttribute("aria-selected", "false");
+    await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
+  });
+});

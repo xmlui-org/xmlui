@@ -361,6 +361,53 @@ This property only has an effect when `itemsSelectable` is `true`.
 
 %-PROP-END
 
+%-PROP-START toggleSelectionOnClick
+
+When `true`, a plain click toggles the tile's selection state (adds it if not selected, removes it if already selected) instead of replacing the current selection.
+This property only has an effect when `itemsSelectable` is `true`. Ctrl+Click and Shift+Click behavior is unchanged.
+
+The default value is `false`.
+
+```xmlui copy /toggleSelectionOnClick="true"/
+<App>
+  <TileGrid
+    data="{[...]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    toggleSelectionOnClick="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: toggleSelectionOnClick"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    toggleSelectionOnClick="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+%-PROP-END
+
 %-PROP-START hideSelectionCheckboxes
 
 If `true`, hides the per-tile selection checkboxes while keeping all selection logic intact.

@@ -72,6 +72,14 @@ export const TileGridMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiSelection,
     },
+    toggleSelectionOnClick: {
+      description:
+        "When `true`, a plain click toggles the tile's selection state instead of replacing " +
+        "the current selection. Ctrl+Click and Shift+Click behavior is unchanged. " +
+        "Only has an effect when `itemsSelectable` is `true`.",
+      valueType: "boolean",
+      defaultValue: defaultProps.toggleSelectionOnClick,
+    },
     syncWithVar: d(
       `The name of a global variable to synchronize the grid's selection state with. ` +
         `The named variable must reference an object; the grid will read from and write to its \`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
@@ -224,6 +232,7 @@ const TileGridWithSync = memo(
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         itemsSelectable={extractValue.asOptionalBoolean(node.props.itemsSelectable)}
         enableMultiSelection={extractValue.asOptionalBoolean(node.props.enableMultiSelection)}
+        toggleSelectionOnClick={extractValue.asOptionalBoolean(node.props.toggleSelectionOnClick)}
         syncWithAppState={syncAdapter}
         checkboxPosition={extractValue.asOptionalString(node.props.checkboxPosition) as CheckboxPosition}
         hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
@@ -270,7 +279,7 @@ export const tileGridComponentRenderer = wrapComponent(
     exposeRegisterApi: true,
     exclude: [
       "data", "itemWidth", "itemHeight", "gap", "stretchItems", "loading", "itemsSelectable",
-      "enableMultiSelection", "syncWithVar", "checkboxPosition", "hideSelectionCheckboxes",
+      "enableMultiSelection", "toggleSelectionOnClick", "syncWithVar", "checkboxPosition", "hideSelectionCheckboxes",
       "idKey", "itemUserSelect", "itemTemplate",
     ],
     events: [],
