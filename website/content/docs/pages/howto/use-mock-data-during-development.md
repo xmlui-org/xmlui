@@ -5,7 +5,7 @@ Set `mockData` on a `DataSource` to build and test your UI without a running bac
 When the backend isn't ready yet — or you want fast, deterministic tests — `mockData` lets you feed data directly into a `DataSource`. No HTTP request is made; the component resolves immediately with the value you provide. Because `mockData` accepts reactive expressions, you can even simulate data changes by binding it to a variable.
 
 ```xmlui-pg copy display name="Develop a user list with mock data"
----app display {3-11}
+---app display {4-8}
 <App>
   <DataSource
     id="users"
@@ -16,10 +16,10 @@ When the backend isn't ready yet — or you want fast, deterministic tests — `
     ]}"
   />
 
-  <VStack gap="$space-4" padding="$space-4">
+  <VStack>
     <Text variant="h5">Team Members</Text>
     <Items data="{users}">
-      <Card padding="$space-3">
+      <Card>
         <HStack verticalAlignment="center">
           <VStack>
             <Text>{$item.name}</Text>

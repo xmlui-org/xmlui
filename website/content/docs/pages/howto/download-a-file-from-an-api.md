@@ -7,19 +7,23 @@ When users need to export a report, download an attachment, or save generated co
 ```xmlui-pg copy display name="Download a report"
 ---app display {8-14}
 <App>
-  <VStack gap="$space-4" padding="$space-4">
+  <VStack>
     <Text variant="h5">Monthly Reports</Text>
 
-    <Card padding="$space-3">
-      <HStack verticalAlignment="center">
+    <Card>
+      <HStack>
         <VStack>
           <Text>Sales Report — June 2025</Text>
           <Text variant="caption">CSV · 2.4 KB</Text>
         </VStack>
+        <SpaceFiller />
         <Button
           label="Download"
           icon="download"
-          onClick="Actions.download({ url: '/api/reports/june-2025', fileName: 'sales-june-2025.csv' })"
+          onClick="Actions.download({ 
+              url: '/api/reports/june-2025', 
+              fileName: 'sales-june-2025.csv' 
+          })"
           themeColor="primary"
           variant="outlined"
         />
@@ -27,15 +31,21 @@ When users need to export a report, download an attachment, or save generated co
     </Card>
 
     <Card padding="$space-3">
-      <HStack verticalAlignment="center">
+      <HStack>
         <VStack>
           <Text>Inventory Snapshot</Text>
           <Text variant="caption">JSON · 1.1 KB</Text>
         </VStack>
+        <SpaceFiller />
         <Button
           label="Download"
           icon="download"
-          onClick="Actions.download({ url: '/api/reports/inventory', method: 'post', body: { format: 'json' }, fileName: 'inventory.json' })"
+          onClick="Actions.download({ 
+            url: '/api/reports/inventory', 
+            method: 'post', 
+            body: { format: 'json' }, 
+            fileName: 'inventory.json' 
+          })"
           variant="outlined"
         />
       </HStack>

@@ -5,18 +5,38 @@ Use the `Queue` component to process items one-by-one in the background while ke
 When a user triggers a batch operation — uploading files, sending emails, processing records — you don't want the UI to freeze. The `Queue` component accepts items via `enqueueItems()`, calls your `onProcess` handler for each one sequentially, and provides built-in progress and result feedback slots. The rest of the page remains fully interactive while the queue drains.
 
 ```xmlui-pg copy display name="Background file processing with progress feedback"
----comp display {21-30} /uploadQueue/
-<Component name="BackgroundProcessor" var.items="{[]}" var.processedCount="{0}" var.errorCount="{0}" var.completed="{false}">
+---app display {42-51} /uploadQueue/
+<App 
+  var.items="{[]}" 
+  var.processedCount="{0}" 
+  var.errorCount="{0}" 
+  var.completed="{false}"
+>
   <VStack gap="$space-4">
     <!-- Single action button -->
     <Button
       label="Upload 5 Files"
       onClick="items = [
-        { id: 1, filename: 'document.pdf', size: 2048576, type: 'application/pdf' },
-        { id: 2, filename: 'image.jpg', size: 1024000, type: 'image/jpeg' },
-        { id: 3, filename: 'corrupted-file.txt', size: 512, type: 'text/plain' },
-        { id: 4, filename: 'data.csv', size: 4096000, type: 'text/csv' },
-        { id: 5, filename: 'presentation.pptx', size: 8192000, type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }
+        { 
+          id: 1, filename: 'document.pdf', size: 2048576, 
+          type: 'application/pdf' 
+        },
+        { 
+          id: 2, filename: 'image.jpg', size: 1024000, 
+          type: 'image/jpeg'
+        },
+        { 
+          id: 3, filename: 'corrupted-file.txt', size: 512, 
+          type: 'text/plain'
+        },
+        { 
+          id: 4, filename: 'data.csv', size: 4096000, 
+          type: 'text/csv' 
+        },
+        { 
+          id: 5, filename: 'presentation.pptx', size: 8192000, 
+          type: 'application/vnd.openxmlformats-officedocument' 
+        }
       ]; uploadQueue.enqueueItems(items)"
       enabled="{!completed}"
       themeColor="primary"
@@ -36,7 +56,6 @@ When a user triggers a batch operation — uploading files, sending emails, proc
           body: processing.item
         });
         processedCount++;
-
         return result;
       }"
       onProcessError="(error, processing) => {
@@ -52,14 +71,12 @@ When a user triggers a batch operation — uploading files, sending emails, proc
 
       <property name="progressFeedback">
         <HStack>
-          <Spinner size="sm" />
           <Text>Processing item {processedCount + 1}...</Text>
         </HStack>
       </property>
 
       <property name="resultFeedback">
         <HStack>
-          <Icon name="checkmark"/>
           <Text>
             All {processedCount} items processed successfully!
           </Text>
@@ -90,10 +107,6 @@ When a user triggers a batch operation — uploading files, sending emails, proc
       </VStack>
     </Card>
   </VStack>
-</Component>
----app display
-<App>
-  <BackgroundProcessor />
 </App>
 ---api
 {
@@ -108,7 +121,7 @@ When a user triggers a batch operation — uploading files, sending emails, proc
         "size": "number",
         "type": "string"
       },
-      "handler": "delay(3000); return { success: true, message: 'File processed successfully' };"
+      "handler": "delay(1500); return { success: true, message: 'File processed successfully' };"
     }
   }
 }

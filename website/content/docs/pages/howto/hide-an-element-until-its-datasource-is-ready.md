@@ -1,4 +1,4 @@
-# Show a skeleton while data loads
+# Show a notification while data loads
 
 Use the DataSource's `loaded` and `inProgress` properties to conditionally render content or a placeholder while data is being fetched.
 
@@ -6,8 +6,21 @@ When a DataSource fetches from a slow endpoint, the UI should show a meaningful 
 
 ```xmlui-pg copy display name="Show content only after the DataSource loads"
 ---app
-<App>
-  <Test />
+<App var.nonce="{0}">
+  <DataSource
+    id="fruits"
+    url="/api/fruits?{nonce}"
+    inProgressNotificationMessage="Loading fruits"
+    when="{nonce > 0}"
+    />
+
+  <Button
+    label="Run (takes about 3s)"
+    enabled="{!fruits.inProgress}"
+    onClick="{nonce++}"
+  />
+
+  <Text when="{fruits.loaded}">Fruits: {fruits.value.length} found</Text>
 </App>
 ---api
 {
@@ -25,33 +38,13 @@ When a DataSource fetches from a slow endpoint, the UI should show a meaningful 
     }
   }
 }
----comp display /nonce/
-<Component name="Test" var.nonce="{0}">
-
-<DataSource
-  id="fruits"
-  url="/api/fruits?{nonce}"
-  inProgressNotificationMessage="Loading fruits"
-  when="{nonce > 0}"
-  />
-
-<Button
-  label="Run"
-  onClick="{nonce++}"
-/>
-
-<Fragment when="{fruits.loaded}">
-  <Text>Fruits: {fruits.value.length} found</Text>
-</Fragment>
-
-</Component>
 ```
 
 ## Key points
 
 **`loaded` becomes `true` after the first successful fetch**: Use `when="{ds.loaded}"` on any element to hide it until data is available. Before the first fetch completes, `loaded` is `false`.
 
-**`inProgress` is `true` while a fetch is in flight**: Use it to show a spinner or disable a button — `when="{ds.inProgress}"`. It toggles back to `false` when the response arrives.
+**`inProgress` is `true` while a fetch is in flight**: Bind `enabled="{!ds.inProgress}"` on a button to prevent the user from triggering another fetch while one is already running. It toggles back to `false` when the response arrives.
 
 **`inProgressNotificationMessage` shows a toast automatically**: Set a string and the framework displays a non-blocking toast during the fetch. No manual spinner wiring is needed for simple cases.
 

@@ -53,7 +53,7 @@ Network requests fail — servers time out, Wi-Fi drops, rate limits kick in. Wh
     "create-record": {
       "url": "/records",
       "method": "post",
-      "handler": "$state.attempts++; if ($state.attempts % 3 !== 0) { throw new Error('Server error — try again'); } return { id: $state.attempts, name: $requestBody.name }"
+      "handler": "$state.attempts++; if ($state.attempts % 3 !== 0) { throw Error('Server error — try again'); } return { id: $state.attempts, name: $requestBody.name }"
     }
   }
 }

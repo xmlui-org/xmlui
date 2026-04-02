@@ -473,11 +473,6 @@
                             label="Debounce user input for API calls"
                             to="/docs/howto/debounce-user-input-for-api-calls"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Stop DataSource requests in a closed Dialog"
-                            to="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
-                        />
                     </NavGroup>
 
                     <NavGroup label="Tables & Data Display">
@@ -1967,13 +1962,6 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/set-width-for-input-fields-in-a-horizontal-layout.md']}"
-                />
-            </Page>
-            <Page
-                url="/docs/howto/stop-datasource-from-sending-requests-in-a-closed-dialog"
-            >
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/stop-datasource-from-sending-requests-in-a-closed-dialog.md']}"
                 />
             </Page>
             <Page url="/docs/howto/add-custom-icons">

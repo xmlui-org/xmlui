@@ -525,6 +525,14 @@ function isConstVar(id: string, thread: LogicalThread): boolean {
   return false;
 }
 
+// --- Constructors allowed with the 'new' operator in XMLUI scripts
+export const allowedNewConstructors = new Map<string, Function>([
+  ["String", String],
+  ["Date", Date],
+  ["Blob", Blob],
+  ["Error", Error],
+]);
+
 export function evalTemplateLiteralCore(segmentValues: any[]): string {
   return segmentValues.map((value) => (typeof value === "string" ? value : `${value}`)).join("");
 }

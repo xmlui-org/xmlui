@@ -7,31 +7,9 @@ APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather 
 ```xmlui-pg copy display name="Extract, filter, and transform API data"
 ---app
 <App>
-  <Test />
-</App>
----api display
-{
-  "apiUrl": "/api",
-  "initialize": "$state.people = [
-    { id: 1, name: 'Alice', active: true,  group: 'A' },
-    { id: 2, name: 'Bob',   active: false, group: 'B' },
-    { id: 3, name: 'Carol', active: true,  group: 'A' },
-    { id: 4, name: 'Dave',  active: true,  group: 'B' }
-  ]",
-  "operations": {
-    "get-people": {
-      "url": "/people",
-      "method": "get",
-      "handler": "return { status: 'ok', data: { items: $state.people } }"
-    }
-  }
-}
----comp display
-<Component name="Test">
-
   <!--
   {
-    items:
+    people:
       [
         { id: 1, name: 'Alice', active: true,  group: 'A' },
         { id: 2, name: 'Bob',   active: false, group: 'B' },
@@ -45,32 +23,31 @@ APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather 
   <DataSource
     id="allPeople"
     url="/api/people"
-    resultSelector="data.items"
+    resultSelector="people"
   />
 
-  <!-- Use resultSelector to filter the items array -->
+  <!-- Use resultSelector to filter the users array -->
   <DataSource
     id="activePeople"
     url="/api/people"
-    resultSelector="data.items.filter(p => p.active)"
+    resultSelector="people.filter(p => p.active)"
   />
 
   <!-- Use transformResult -->
 
   <script>
-  function transformPeople (data) {
-    console.log(data);
-    const items = data.data.items;
-    const itemMap = {
-      A: 'Austin',
-      B: 'Boston'
+    function transformPeople (data) {
+      console.log(data);
+      const items = data.people;
+      const itemMap = {
+        A: 'Austin',
+        B: 'Boston'
+      };
+      return items.map(item => ({
+        ...item,
+        city: itemMap[item.group]
+      }));
     };
-    return items.map(item => ({
-      ...item,
-      city: itemMap[item.group]
-    }));
-  };
-
   </script>
 
   <DataSource
@@ -93,16 +70,31 @@ APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather 
   <List data="{transformedPeople}">
     <Text>{$item.name} ({$item.city})</Text>
   </List>
-
-
-</Component>
+</App>
+---api display
+{
+  "apiUrl": "/api",
+  "initialize": "$state.people = [
+    { id: 1, name: 'Alice', active: true,  group: 'A' },
+    { id: 2, name: 'Bob',   active: false, group: 'B' },
+    { id: 3, name: 'Carol', active: true,  group: 'A' },
+    { id: 4, name: 'Dave',  active: true,  group: 'B' }
+  ]",
+  "operations": {
+    "get-people": {
+      "url": "/people",
+      "method": "get",
+      "handler": "return { status: 'ok', people: $state.people }"
+    }
+  }
+}
 ```
 
 ## Key points
 
-**`resultSelector` plucks a path from the response**: Set it to a dot-separated key path like `"data.items"` and the DataSource's `value` will be that nested value instead of the full response object.
+**`resultSelector` plucks a path from the response**: Set it to a dot-separated key path like `"people"` and the DataSource's `value` will be that nested value instead of the full response object.
 
-**`resultSelector` supports inline expressions**: You can chain `.filter()`, `.map()`, or `.find()` directly — e.g., `resultSelector="data.items.filter(p => p.active)"`. The expression runs on every fetch result.
+**`resultSelector` supports inline expressions**: You can chain `.filter()`, `.map()`, or `.find()` directly — e.g., `resultSelector="people.filter(p => p.active)"`. The expression runs on every fetch result.
 
 **`transformResult` takes a function for complex reshaping**: Assign a function reference — `transformResult="{myTransform}"` — that receives the raw response and returns the final value. Use this when you need lookups, computed fields, or multi-step transformations.
 

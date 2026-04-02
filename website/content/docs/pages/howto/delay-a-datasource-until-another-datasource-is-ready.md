@@ -5,10 +5,6 @@ Use the `when` prop to chain DataSources so one waits for another to finish load
 When a dropdown needs data from two endpoints — users and departments — and the display label combines values from both, you must ensure the second DataSource doesn't fire until the first has resolved. Bind the second DataSource's `when` to the first's `loaded` property to create a sequential chain.
 
 ```xmlui-pg copy display name="Load departments only after users are ready"
----app
-<App>
-  <Test />
-</App>
 ---api
 {
   "apiUrl": "/api",
@@ -34,9 +30,8 @@ When a dropdown needs data from two endpoints — users and departments — and 
     }
   }
 }
----comp display /selectedId/ /nonce/
-<Component name="Test" var.selectedId="" var.nonce="{0}">
-
+---app display /selectedId/ /nonce/
+<App var.selectedId="" var.nonce="{0}">
   <DataSource
     id="users_for_ds_dependency"
     url="/api/users_for_ds_dependency?nonce"
@@ -60,18 +55,14 @@ When a dropdown needs data from two endpoints — users and departments — and 
     <Items data="{users_for_ds_dependency}">
       <Option
         value="{$item.id}"
-        label="{$item.name} ({departments_with_ds_dependency.value.find(d => d.id === $item.departmentId)?.name})"
+        label="{$item.name} ({departments_with_ds_dependency.value
+          .find(d => d.id === $item.departmentId)?.name})"
      />
     </Items>
   </Select>
 
-  <Button
-    label="Run"
-    onClick="{nonce++}"
-  />
-
-
-</Component>
+  <Button label="Run" onClick="{nonce++}"/>
+</App>
 ```
 
 ## Key points

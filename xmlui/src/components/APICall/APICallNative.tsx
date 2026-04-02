@@ -137,7 +137,12 @@ function extractProgress(
   if (!progressExtractor || !statusData) return 0;
   
   try {
-    const parser = new Parser(progressExtractor);
+    // Strip outer { } if present (XMLUI binding expression syntax: "{expr}")
+    const expression =
+      progressExtractor.startsWith("{") && progressExtractor.endsWith("}")
+        ? progressExtractor.slice(1, -1).trim()
+        : progressExtractor;
+    const parser = new Parser(expression);
     const expr = parser.parseExpr();
     
     const contextForProgress = {
@@ -161,6 +166,36 @@ function extractProgress(
   }
   
   return 0;
+}
+
+/**
+ * Evaluates a boolean condition expression against the given status data context.
+ */
+function evaluateCondition(
+  conditionExpr: string | undefined,
+  statusData: any,
+  progress: number,
+  result: any,
+  executionContext: ActionExecutionContext,
+): boolean {
+  if (!conditionExpr || !statusData) return false;
+  try {
+    const expression =
+      conditionExpr.startsWith("{") && conditionExpr.endsWith("}")
+        ? conditionExpr.slice(1, -1).trim()
+        : conditionExpr;
+    const parser = new Parser(expression);
+    const ast = parser.parseExpr();
+    const value = evalBinding(ast, {
+      localContext: { $statusData: statusData, $result: result, $progress: progress },
+      appContext: executionContext.appContext,
+      options: { defaultToOptionalMemberAccess: true },
+    });
+    return Boolean(value);
+  } catch (error) {
+    console.error("Error evaluating condition:", error);
+    return false;
+  }
 }
 
 export function APICallNative({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout }: Props) {
@@ -246,6 +281,41 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   });
   
   /**
+   * Handles polling error condition - stops polling and updates error state
+   */
+  const handlePollingError = useEvent((updatedState: DeferredState, result: any) => {
+    if (pollingIntervalRef.current) {
+      clearTimeout(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    const errorState = {
+      ...updatedState,
+      isPolling: false,
+    };
+    deferredStateRef.current = errorState;
+    updateDeferredState(errorState, updateState);
+
+    if (updateState) {
+      updateState({ inProgress: false, lastError: new Error("Operation failed") });
+    }
+
+    const errorMessage = (node.props as any)?.errorNotificationMessage;
+    if (errorMessage && toastIdRef.current) {
+      const interpolated = interpolateNotificationMessage(errorMessage, {
+        progress: errorState.progress,
+        statusData: errorState.statusData,
+        result,
+      });
+      if (interpolated) {
+        toast.error(interpolated, { id: toastIdRef.current });
+      }
+    } else if (toastIdRef.current) {
+      toast.dismiss(toastIdRef.current);
+    }
+  });
+
+  /**
    * Handles polling completion - stops polling and shows completion notification
    */
   const handlePollingCompletion = useEvent((updatedState: DeferredState, result: any) => {
@@ -260,6 +330,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     deferredStateRef.current = completionState;
     updateDeferredState(completionState, updateState);
+
+    // Mark operation as finished
+    if (updateState) {
+      updateState({ inProgress: false, loaded: true });
+    }
     
     // Show completion notification
     const completedMessage = (node.props as any)?.completedNotificationMessage;
@@ -411,8 +486,22 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
           }
         }
         
-        // Check for completion
-        if (updatedState.progress >= 100) {
+        // Evaluate completionCondition / errorCondition; fall back to progress >= 100
+        const completionConditionExpr = (node.props as any)?.completionCondition;
+        const errorConditionExpr = (node.props as any)?.errorCondition;
+
+        const isComplete = completionConditionExpr
+          ? evaluateCondition(completionConditionExpr, statusData, progress, result, executionContext)
+          : updatedState.progress >= 100;
+        const isError =
+          errorConditionExpr &&
+          evaluateCondition(errorConditionExpr, statusData, progress, result, executionContext);
+
+        if (isError) {
+          handlePollingError(updatedState, result);
+          return;
+        }
+        if (isComplete) {
           handlePollingCompletion(updatedState, result);
           return;
         }
@@ -441,9 +530,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     
     // Start polling
-    pollStatus().then(() => {
-      scheduleNextPoll();
-    });
+    pollStatus();
   });
   
   // =============================================================================
@@ -463,12 +550,27 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         updateState({ inProgress: true });
       }
       
+      // Detect deferred mode early so we can adjust behaviour for the initial POST
+      const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
+
       try {
         let capturedResponseHeaders: Record<string, string> | undefined;
+
+        // In deferred mode, strip notification props from the initial POST —
+        // notifications are managed by the polling loop instead.
+        const callProps = deferredMode
+          ? {
+              ...node.props,
+              inProgressNotificationMessage: undefined,
+              completedNotificationMessage: undefined,
+              errorNotificationMessage: undefined,
+            }
+          : node.props;
+
         const result = await callApi(
           executionContext,
           {
-            ...node.props,
+            ...callProps,
             body: node.props.body || (options?.passAsDefaultBody ? eventArgs[0] : undefined),
             uid: uid,
             params: { $param: eventArgs[0], $params: eventArgs },
@@ -486,19 +588,26 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         // Store result in ref for cancel() method
         lastResultRef.current = result;
         
-        // Store result and update state on success
+        // In deferred mode keep inProgress=true and loaded=false until polling finishes.
         if (updateState) {
-          updateState({ 
-            inProgress: false, 
-            loaded: true, 
-            lastResult: result,
-            lastError: undefined,
-            lastResponseHeaders: capturedResponseHeaders,
-          });
+          if (deferredMode) {
+            updateState({
+              lastResult: result,
+              lastError: undefined,
+              lastResponseHeaders: capturedResponseHeaders,
+            });
+          } else {
+            updateState({ 
+              inProgress: false, 
+              loaded: true, 
+              lastResult: result,
+              lastError: undefined,
+              lastResponseHeaders: capturedResponseHeaders,
+            });
+          }
         }
         
         // Handle deferred operations (polling)
-        const deferredMode = (node.props as any)?.deferredMode === "true" || (node.props as any)?.deferredMode === true;
         const statusUrl = (node.props as any)?.statusUrl;
         const pollingIntervalProp = (node.props as any)?.pollingInterval;
         
@@ -567,6 +676,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
       updateState({ 
+        inProgress: false,
         $statusData: newState.statusData,
         $progress: newState.progress,
         $polling: newState.isPolling,
@@ -628,6 +738,8 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     const elapsed = Date.now() - (newState.startTime || Date.now());
     if (updateState) {
       updateState({ 
+        inProgress: false,
+        lastError: new Error("Operation cancelled"),
         $statusData: newState.statusData,
         $progress: newState.progress,
         $polling: newState.isPolling,

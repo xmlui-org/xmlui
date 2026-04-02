@@ -36,21 +36,30 @@ Some operations — report generation, bulk imports, video encoding — take min
       />
       <Button
         label="Stop Polling"
-        onClick="exportJob.stopPolling()"
+        onClick="exportJob.stopPolling(); toast.error('Polling stopped')"
         enabled="{exportJob.inProgress}"
         variant="outlined"
       />
       <Button
         label="Cancel on Server"
-        onClick="exportJob.cancel()"
+        onClick="exportJob.cancel(); toast.error('Job cancelled')"
         enabled="{exportJob.inProgress}"
-        themeColor="error"
         variant="outlined"
       />
     </HStack>
 
-    <Text when="{exportJob.loaded}" themeColor="success">Export complete.</Text>
-    <Text when="{exportJob.lastError}" themeColor="error">Export failed or was cancelled.</Text>
+    <Text 
+      when="{exportJob.loaded}" 
+      textColor="$color-success"
+    >
+      Export complete.
+    </Text>
+    <Text 
+      when="{exportJob.lastError}" 
+      textColor="$color-error"
+    >
+      Export failed or was cancelled.
+    </Text>
   </VStack>
 </App>
 ---api

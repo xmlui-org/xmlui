@@ -5,7 +5,7 @@ Use the `headers` prop on `DataSource` or `APICall` to attach auth tokens, API k
 Many APIs require an authorization token or a custom header on every request. Both `DataSource` and `APICall` accept a `headers` prop — a key-value object that is merged into the outgoing HTTP request. You can hard-code values or bind them to reactive expressions so the header updates when the underlying value changes.
 
 ```xmlui-pg copy display name="Attach a bearer token and a custom tenant header"
----app display {5-8,19-22}
+---app display {5-8}
 <App var.token="{'abc-secret-token'}">
   <DataSource
     id="profile"
@@ -23,7 +23,7 @@ Many APIs require an authorization token or a custom header on every request. Bo
       <VStack>
         <Text>Name: {profile.value.name}</Text>
         <Text>Role: {profile.value.role}</Text>
-        <Text variant="caption">Tenant: {profile.value.tenant}</Text>
+        <Text variant="strong">Tenant: {profile.value.tenant}</Text>
       </VStack>
     </Card>
 
