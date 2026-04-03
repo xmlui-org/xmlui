@@ -94,7 +94,7 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
     [`textColor-${COMP}-header`]: "$textColor-subtitle",
 
     [`backgroundColor-${COMP}-row--hover`]: "$backgroundColor-dropdown-item--hover",
-    [`backgroundColor-${COMP}-row--selected`]: "$backgroundColor-dropdown-item--active",
+    [`backgroundColor-${COMP}-row--selected`]: "$color-primary-100",
     [`textColor-${COMP}-row--selected`]: "$textColor-primary",
     [`borderColor-${COMP}-row`]: "$borderColor",
   },
