@@ -1,6 +1,8 @@
-# Debounce with ChangeListener
+# React to value changes with debounce or throttle
 
-Use `ChangeListener` with `throttleWaitInMs` to delay reactions to value changes, reducing unnecessary operations. The following example implements search within a product catalog (sample products are Laptop, Mouse, Keyboard, etc.) using the ChangeListener component to throttle API calls.
+Use `ChangeListener` to react when a variable changes — with optional debouncing or throttling to reduce the number of times your handler fires.
+
+A `ChangeListener` watches any variable via its `listenTo` prop and calls `onDidChange` with the previous and new values. Adding `throttleWaitInMs` makes the handler fire at most once per interval during rapid changes, which is ideal for search-as-you-type scenarios. The example below shows throttled product search: as you type, the `ChangeListener` waits at most 500 ms between API calls.
 
 ```xmlui-pg copy display name="Search with ChangeListener throttling" height="400px"
 ---comp display /ChangeListener/ /throttleWaitInMs/ 
@@ -96,38 +98,23 @@ Use `ChangeListener` with `throttleWaitInMs` to delay reactions to value changes
 }
 ```
 
-## Key Points
+## Key points
 
-**Listen to the right value**: Use `listenTo` to watch the specific variable or component property that drives your logic:
+**`ChangeListener` is non-visual and does not fire on initial mount**: Place it anywhere in the component tree. It only reacts to *subsequent* changes, so setting a variable's initial value via `var.name` is safe and will not trigger the handler.
 
-```xmlui
-<!-- ✅ Correct - listens to the searchTerm variable -->
-<ChangeListener
-  listenTo="{searchTerm}"
-  throttleWaitInMs="500"
-  onDidChange="arg => handleSearch(arg.newValue)"
-/>
+**`listenTo` accepts any expression**: Watch a single variable (`{searchTerm}`), a component's property (`{searchInput.value}`), or even a derived expression (`{quantity * unitPrice}`). The listener fires whenever the evaluated result changes.
 
-<!-- ✅ Also correct - listens to component's value property -->
-<ChangeListener
-  listenTo="{searchInput.value}"
-  throttleWaitInMs="500"
-  onDidChange="arg => handleSearch(arg.newValue)"
-/>
-```
+**`throttleWaitInMs` fires immediately, then at most once per interval**: Ideal for live search, scroll tracking, and similar burst scenarios where you want *some* updates during rapid changes. Use `debounceWaitInMs` instead when only the final settled value matters.
 
-**Access previous and new values**: The event argument provides both `prevValue` and `newValue` for comparison:
+**`onDidChange` receives `{prevValue, newValue}`**: Both values are available in the event object for comparison or delta computation. Destructure only what you need: `({newValue}) => handleSearch(newValue)`.
 
-```xmlui
-<ChangeListener
-  listenTo="{userInput}"
-  throttleWaitInMs="300"
-  onDidChange="arg => {
-    if (!arg.prevValue && !arg.newValue) return; // Skip initial empty state
-    console.log(`Changed from '${arg.prevValue}' to '${arg.newValue}'`);
-  }"
-/>
-```
+---
+
+## See also
+
+- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) — throttle vs debounce explained side by side
+- [React to button click, not keystrokes](/docs/howto/react-to-button-click-not-keystrokes) — wait for explicit submit instead of reacting while typing
+- [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — compute values reactively without a listener
 
 **Handle empty values gracefully**: Consider what should happen when the watched value becomes empty:
 
