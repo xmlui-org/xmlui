@@ -174,9 +174,10 @@ export function TableSelect({
       const effectiveKey =
         valueKey ?? (resolvedColumns.length > 0 ? resolvedColumns[0].key : null);
       if (!effectiveKey) return;
-      const newValue = row[effectiveKey] != null ? String(row[effectiveKey]) : "";
+      const rawValue = row[effectiveKey];
+      const newValue = rawValue != null ? String(rawValue) : "";
       setInternalValue(newValue);
-      updateState?.({ value: newValue });
+      updateState?.({ value: rawValue ?? "" });
       setFilterText("");
       onChange?.(newValue);
       closeDropdown();
