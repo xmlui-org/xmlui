@@ -1,0 +1,20 @@
+<VStack padding="2rem">
+  <TableSelect
+    id="myTableSelect"
+    data="{[
+      { id: '1', name: 'Alice Smith', email: 'alice@example.com' },
+      { id: '2', name: 'Bob Jones', email: 'bob@example.com' },
+      { id: '3', name: 'Carol White', email: 'carol@example.com' },
+      { id: '4', name: 'Dave Brown', email: 'dave@example.com' },
+      { id: '5', name: 'Eve Davis', email: 'eve@example.com' }
+    ]}"
+    columns="{[
+      { key: 'name', label: 'Name' },
+      { key: 'email', label: 'Email' }
+    ]}"
+    valueKey="id"
+    labelKey="name"
+    placeholder="Select a person..."
+  />
+  <Text>Selected ID: {myTableSelect.value}</Text>
+</VStack>
