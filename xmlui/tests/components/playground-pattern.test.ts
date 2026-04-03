@@ -1387,6 +1387,169 @@ describe("Playground pattern parsing", () => {
       height: "300px",
     });
   });
+
+  it("Copy flag inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.display).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by app section from root, section display not inherited", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app display
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.display).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by section, section's own copy wins", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app copy
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by comp section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app
+<Button>Click me</Button>
+---comp
+<Component name="MyComponent" />
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.components).toBeDefined();
+    expect(result.components?.length).toBe(1);
+    expect(result.components?.[0].copy).toBe(true);
+    expect(result.components?.[0].display).toBeUndefined();
+    expect(result.components?.[0].content).toBe('<Component name="MyComponent" />\n');
+  });
+
+  it("No copy inherited when root has no copy flag", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display flag inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display and copy flags both inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display flag inherited by comp section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app
+<Button>Click me</Button>
+---comp
+<Component name="MyComponent" />
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.components).toBeDefined();
+    expect(result.components?.length).toBe(1);
+    expect(result.components?.[0].display).toBe(true);
+    expect(result.components?.[0].copy).toBe(true);
+    expect(result.components?.[0].content).toBe('<Component name="MyComponent" />\n');
+  });
+
+  it("No display inherited when root has no display flag", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Section's explicit display overrides inherited display", () => {
+    // --- Act - root has no display, but section declares it
+    const content = `\`\`\`xmlui-pg copy
+---app display
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
 });
 
 function base64ToString(base64: string) {

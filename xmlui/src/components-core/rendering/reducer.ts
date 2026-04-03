@@ -53,12 +53,14 @@ export function createContainerReducer(debugView: IDebugViewContext) {
       }
       case ContainerActionKind.LOADER_LOADED: {
         const { data, pageInfo, responseHeaders } = action.payload;
-        // Preserve any existing state properties (e.g., custom component state)
+        // Preserve any existing state properties (e.g., custom component state).
+        // Only clear inProgress when actual data arrives; when data is undefined
+        // (reset/cleanup call), preserve inProgress so an in-flight fetch stays visible.
         state[uid] = {
           ...state[uid],
           value: data,
           byId: Array.isArray(data) ? keyBy(data, (item) => item.$id) : undefined,
-          inProgress: false,
+          ...(data !== undefined && { inProgress: false }),
           loaded: data !== undefined,
           pageInfo,
           responseHeaders,

@@ -52,6 +52,7 @@ import { isBannedFunction } from "./bannedFunctions";
 import {
   evalArrow,
   evalAssignmentCore,
+  allowedNewConstructors,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -618,20 +619,13 @@ function evalNewExpression(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): any {
-  // --- Allowed constructors
-  const allowedConstructors = new Map<string, Function>([
-    ["String", String],
-    ["Date", Date],
-    ["Blob", Blob],
-  ]);
-
   // --- Evaluate the callee to get the constructor
   const constructorObj = evaluator(thisStack, expr.callee, evalContext, thread);
   thisStack.pop();
 
   // --- Check if the constructor is allowed
   let allowedConstructor: any = null;
-  for (const [name, ctor] of allowedConstructors) {
+  for (const [name, ctor] of allowedNewConstructors) {
     if (constructorObj === ctor) {
       allowedConstructor = ctor;
       break;

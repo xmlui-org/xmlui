@@ -1,6 +1,8 @@
-# Chain a DataSource refetch from an APICall.execute
+# Chain a DataSource refetch
 
-`APICall.execute` returns a Promise, you can call `.then` to do something else.
+Call `.then()` on `APICall.execute()` to trigger a DataSource refetch after a mutation completes.
+
+When a user action changes server data — liking a post, adding a comment — the displayed list needs to reflect the change. Because `execute()` returns a Promise, you can chain `.then(() => dataSource.refetch())` to re-fetch the list as soon as the write succeeds — without relying on blanket cache invalidation.
 
 ```xmlui-pg copy display {54} name="Click the Like button"
 ---comp display
@@ -27,35 +29,36 @@
     id="timelineData"
     url="/api/timeline"
     method="GET" />
-  <VStack gap="$space-4" padding="$space-4">
-    <Text variant="h3">Social Media Timeline</Text>
+  <VStack>
+    <H3>Social Media Timeline</H3>
     <Items data="{timelineData}">
-      <Card padding="$space-3" marginBottom="$space-2">
-        <VStack gap="$space-2">
-          <Text variant="h6">{$item.author}</Text>
+      <Card>
+        <VStack>
+          <H4>{$item.author}</H4>
           <Text>{$item.content}</Text>
-          <HStack gap="$space-4" verticalAlignment="center">
-            <HStack gap="$space-1" verticalAlignment="center">
+          <HStack verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton icon="reply" />
-              <Text variant="caption">{$item.replies_count}</Text>
+              <Text>{$item.replies_count}</Text>
             </HStack>
-            <HStack gap="$space-1" verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton icon="trending-up" />
-              <Text variant="caption">{$item.reblogs_count}</Text>
+              <Text>{$item.reblogs_count}</Text>
             </HStack>
-            <HStack gap="$space-1" verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton
-                icon="like"
-                themeColor="{$item.favourited ? 'attention' : 'secondary'}">
-                <event name="click">
+                icon='like'
+                themeColor="{$item.favourited ? 'attention' : 'secondary'}"
+                onClick="() => {
                   if ($item.favourited) {
-                    // execute returns a Promise
-                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
+                    unfavoritePost.execute($item.id)
+                    timelineData.refetch();
                   } else {
-                    favoritePost.execute($item.id).then(() => timelineData.refetch());
+                    favoritePost.execute($item.id)
+                    timelineData.refetch();
                   }
-                </event>
-              </SocialButton>
+                }
+                " />
               <Text variant="caption">{$item.favourites_count}</Text>
             </HStack>
           </HStack>
@@ -124,3 +127,21 @@
   }
 }
 ```
+
+## Key points
+
+**`execute()` returns a response from the backend**: you can run code after the API call succeeds — such as refetching a DataSource, showing a toast, or navigating to another page.
+
+**`refetch()` re-issues the DataSource's request**: Calling `timelineData.refetch()` re-sends the original query and updates every element bound to that DataSource when the fresh data arrives.
+
+**This pattern gives you surgical control**: Unlike blanket cache invalidation (which refreshes every DataSource), `ds.refetch()` refreshes only the specific DataSource you choose.
+
+**Combine with `invalidates="{[]}"` to prevent double-fetching**: By default a successful APICall invalidates all caches. If you manually refetch, set `invalidates="{[]}"` on the APICall to avoid a redundant second fetch.
+
+---
+
+## See also
+
+- [Invalidate related data after a write](/docs/howto/control-cache-invalidation) — declarative cache control with the `invalidates` prop
+- [Update UI optimistically](/docs/howto/update-ui-optimistically) — instant feedback before the server responds
+- [Retry a failed API call](/docs/howto/retry-a-failed-api-call) — handling failures and retrying

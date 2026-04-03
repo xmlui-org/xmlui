@@ -989,6 +989,8 @@ export const FormWithContextVar = forwardRef(function (
         cancelLabel={extractValue(node.props.cancelLabel)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
+        savePendingLabel={extractValue(node.props.savePendingLabel)}
+        submitFeedbackDelay={extractValue.asOptionalNumber(node.props.submitFeedbackDelay)}
         swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
         onWillSubmit={lookupEventHandler("willSubmit", {
           context: {

@@ -1,9 +1,11 @@
 # Update UI optimistically
 
-For immediate user feedback, use reactive variables like `localFavorited` and `localFavoritesCount` to update UI state instantly while API calls run in the background.
+Use local reactive variables to reflect state changes instantly while the API call runs in the background.
+
+Users expect immediate feedback when they tap a like button or toggle a setting. Instead of waiting for the server round-trip, update a local variable right away and fire the API call in parallel. If the call fails, you can roll back — but in the common success case the UI feels instant.
 
 ```xmlui-pg copy display name="Click the Like button - immediate feedback"
----app display /localFavorited/ /localFavoritesCount/ {37-52}
+---app display /localFavorited/ /localFavoritesCount/ {37-59}
 <App>
   <APICall
     id="favoritePost"
@@ -21,29 +23,35 @@ For immediate user feedback, use reactive variables like `localFavorited` and `l
     id="timelineData"
     url="/api/timeline"
     method="GET" />
-  <VStack gap="$space-4" padding="$space-4">
+  <VStack>
     <Items data="{timelineData}">
       <Card var.localFavorited="{null}" var.localFavoritesCount="{null}">
         <VStack>
           <Text>{$item.author}</Text>
           <Text>{$item.content}</Text>
-          <HStack gap="$space-4" verticalAlignment="center">
-            <HStack gap="$space-1" verticalAlignment="center">
+          <HStack verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton icon="reply" />
               <Text variant="caption">{$item.replies_count}</Text>
             </HStack>
-            <HStack gap="$space-1" verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton icon="trending-up" />
               <Text variant="caption">{$item.reblogs_count}</Text>
             </HStack>
-            <HStack gap="$space-1" verticalAlignment="center">
+            <HStack verticalAlignment="center">
               <SocialButton
                 icon="like"
-                themeColor="{(localFavorited !== null ? localFavorited : $item.favourited) ? 'attention' : 'secondary'}">
-                <event name="click">
+                themeColor="{(localFavorited !== null 
+                  ? localFavorited : $item.favourited) 
+                    ? 'attention' : 'secondary'}"
+                onClick="
                   // Get current state (local takes precedence)
-                  const currentFavorited = localFavorited !== null ? localFavorited : $item.favourited;
-                  const currentCount = localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0);
+                  const currentFavorited = localFavorited !== null 
+                    ? localFavorited 
+                    : $item.favourited;
+                  const currentCount = localFavoritesCount !== null 
+                    ? localFavoritesCount 
+                    : ($item.favourites_count || 0);
                   // Update UI optimistically
                   localFavorited = !currentFavorited;
                   localFavoritesCount = currentFavorited ?
@@ -51,14 +59,17 @@ For immediate user feedback, use reactive variables like `localFavorited` and `l
                     currentCount + 1;
                   // Make API call
                   if (currentFavorited) {
-                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
+                    unfavoritePost.execute($item.id);
+                    timelineData.refetch();
                   } else {
-                    favoritePost.execute($item.id).then(() => timelineData.refetch());
+                    favoritePost.execute($item.id);
+                    timelineData.refetch();
                   }
-                </event>
+                ">
               </SocialButton>
               <Text variant="caption">
-                {localFavoritesCount !== null ? localFavoritesCount : ($item.favourites_count || 0)}
+                {localFavoritesCount !== null 
+                  ? localFavoritesCount : ($item.favourites_count || 0)}
               </Text>
             </HStack>
           </HStack>
@@ -142,7 +153,20 @@ For immediate user feedback, use reactive variables like `localFavorited` and `l
 
 The relationship between `onClick="{emitEvent('click')}"` in the `SocialButton` component and the `<event name="click">` handler in the main app demonstrates event propagation in XMLUI.
 
-The parent component catches the emitted click event and implements the optimistic UI update. This separation allows for:
+## Key points
 
-- Component reuse. `SocialButton` can be used anywhere without knowing what action the click should perform.
-- Flexible event handling. Different instances of `SocialButton` can handle clicks differently.
+**Local variables provide instant feedback**: Declare `var.localFavorited` and `var.localFavoritesCount` on the Card. Update them synchronously before firing the API call. The UI re-renders immediately because these are reactive variables.
+
+**`null` signals "use the server value"**: Initialize both locals to `null`. The ternary `localFavorited !== null ? localFavorited : $item.favourited` falls back to the data-source value until the user interacts. After the `timelineData.refetch()` completes, the server data catches up and the local override is no longer needed.
+
+**The API call runs in the background**: `execute()` returns a Promise. The UI has already updated before the server responds. Chain `timelineData.refetch()` to pull the authoritative state back from the server.
+
+**Component reuse through `emitEvent`**: `SocialButton` doesn't know what a click should do. It calls `emitEvent('click')` and the parent handles the business logic in an `onClick` event handler. Different instances of `SocialButton` can handle clicks differently.
+
+---
+
+## See also
+
+- [Chain a DataSource refetch](/docs/howto/chain-a-refetch) — the non-optimistic version of the same pattern
+- [Invalidate related data after a write](/docs/howto/control-cache-invalidation) — declarative cache refresh
+- [Retry a failed API call](/docs/howto/retry-a-failed-api-call) — handling failures when the optimistic assumption was wrong

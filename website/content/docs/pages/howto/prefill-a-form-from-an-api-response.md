@@ -13,9 +13,9 @@ An edit-profile page should open with the user's current name, email, and job ti
   />
   <Form
     data="{{
-      name: profile.value?.name,
-      email: profile.value?.email,
-      website: profile.value?.website
+      name: profile.value.name,
+      email: profile.value.email,
+      website: profile.value.website
     }}"
     onSubmit="(data) => toast('Saved: ' + data.name)"
     saveLabel="Save changes"
@@ -33,18 +33,16 @@ An edit-profile page should open with the user's current name, email, and job ti
 
 ```xmlui
 <DataSource id="user" url="/api/users/42" />
-<Form data="{{ name: user.value?.name, role: user.value?.role }}">
+<Form data="{{ name: user.value.name, role: user.value.role }}">
   <TextBox label="Name" bindTo="name" />
   <TextBox label="Role" bindTo="role" />
 </Form>
 ```
 
-**`?.` (optional chaining) prevents errors while loading**: `DataSource` starts with `value = null`. Accessing `profile.value.name` before the response arrives throws. Use `profile.value?.name` so the field starts empty during loading and fills in once the data arrives.
-
 **`$update` triggers a form data refresh**: If the `DataSource` reloads (e.g. due to polling or manual refetch), passing a changing value via `$update` in the `data` object tells the form to re-apply the new data. Use the `DataSource`'s `value` itself as the update signal:
 
 ```xmlui
-<Form data="{{ name: user.value?.name, $update: user.value }}">
+<Form data="{{ name: user.value.name, $update: user.value }}">
   <!-- form re-populates automatically on every DataSource refresh -->
 </Form>
 ```
@@ -53,7 +51,7 @@ An edit-profile page should open with the user's current name, email, and job ti
 
 ```xmlui
 <Form
-  data="{{ name: user.value?.name }}"
+  data="{{ name: user.value.name }}"
   submitUrl="/api/users/42"
   submitMethod="put"
   completedNotificationMessage="Profile updated."
@@ -65,7 +63,7 @@ An edit-profile page should open with the user's current name, email, and job ti
 **`Form.update()` for partial programmatic updates**: Call `form.update({ city: 'Berlin' })` to change individual fields without replacing the whole `data` object — useful when a secondary API call or a dropdown selection should update related fields:
 
 ```xmlui
-<Form id="profileForm" data="{{ name: user.value?.name }}">
+<Form id="profileForm" data="{{ name: user.value.name }}">
   <TextBox label="Name" bindTo="name" />
   <Button label="Set default city" onClick="profileForm.update({ city: 'Berlin' })" />
 </Form>
