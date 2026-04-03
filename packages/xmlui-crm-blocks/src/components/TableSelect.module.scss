@@ -14,7 +14,7 @@ $outlineColor:          createThemeVar("outlineColor-#{$component}--focus");
 $outlineWidth:          createThemeVar("outlineWidth-#{$component}--focus");
 $outlineStyle:          createThemeVar("outlineStyle-#{$component}--focus");
 $outlineOffset:         createThemeVar("outlineOffset-#{$component}--focus");
-$backgroundColor:       createThemeVar("backgroundColor-#{$component}");
+$backgroundColor:       createThemeVar("Input:backgroundColor-#{$component}");
 $textColor:             createThemeVar("textColor-#{$component}");
 $textColorPlaceholder:  createThemeVar("textColor-placeholder-#{$component}");
 $borderRadius:          createThemeVar("borderRadius-#{$component}");
@@ -58,7 +58,9 @@ $rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
   font-family: inherit;
   color: $textColor;
   box-sizing: border-box;
+  -webkit-appearance: none;
   appearance: none;
+  color-scheme: inherit;
   transition: border-color 0.15s ease;
 
   &:hover {

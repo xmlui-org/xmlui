@@ -243,7 +243,7 @@ export function TableSelect({
           <PopoverContent
             ref={dropdownRef}
             className={styles.dropdown}
-            style={{ minWidth: "var(--radix-popover-trigger-width)" }}
+            style={{ width: "var(--radix-popover-trigger-width)" }}
             sideOffset={4}
             align="start"
             onOpenAutoFocus={(e) => {

@@ -75,7 +75,7 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
     [`outlineWidth-${COMP}--focus`]: "$outlineWidth--focus",
     [`outlineStyle-${COMP}--focus`]: "$outlineStyle--focus",
     [`outlineOffset-${COMP}--focus`]: "$outlineOffset--focus",
-    [`backgroundColor-${COMP}`]: "$backgroundColor-Input-default",
+    [`Input:backgroundColor-${COMP}`]: "$backgroundColor-Input-default",
     [`textColor-${COMP}`]: "$textColor-primary",
     [`textColor-placeholder-${COMP}`]: "$textColor-subtitle",
     [`borderRadius-${COMP}`]: "$borderRadius",
