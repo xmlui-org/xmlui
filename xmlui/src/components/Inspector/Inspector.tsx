@@ -13,12 +13,16 @@ export const InspectorMd = createMetadata({
     "`Inspector` provides an in-app trace viewer for XMLUI applications. " +
     "It renders a clickable icon that opens a modal dialog containing the " +
     "XMLUI Inspector (xs-diff.html), which displays interactive timelines " +
-    "of interactions, API calls, state changes, and handler timing.",
+    "of interactions, API calls, state changes, and handler timing. " +
+    "It also injects the xs-trace.js capture library into the page. " +
+    "If local files are not found, it falls back to loading from CDN.",
   props: {
     src: {
       description:
-        "Path to the inspector HTML file. The file must be accessible " +
-        "from the app's root directory.",
+        "Path to the inspector HTML file (xs-diff.html). " +
+        "The directory containing this file is also used to locate " +
+        "xs-trace.js and xmlui-parser.es.js. If the local file is not " +
+        "found, the component falls back to the CDN.",
       valueType: "string",
       defaultValue: defaultProps.src,
     },
