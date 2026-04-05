@@ -476,6 +476,7 @@
                     </NavGroup>
 
                     <NavGroup label="Tables & Data Display">
+                    <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Pin columns in a wide table"
@@ -516,6 +517,7 @@
                             label="Auto-size column widths with star"
                             to="/docs/howto/auto-size-column-widths-with-star"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Modify a value reported in a Column"
@@ -539,6 +541,7 @@
                             label="Build a grouped list with headers"
                             to="/docs/howto/group-items-in-list-by-a-property"
                         />
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Lazy-load tree children on expand"
@@ -569,6 +572,7 @@
                             label="Display an empty-state illustration"
                             to="/docs/howto/display-an-empty-state-illustration"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Paginate a list"
@@ -577,16 +581,19 @@
                     </NavGroup>
 
                     <NavGroup label="Navigation & Routing">
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Add breadcrumb navigation"
                             to="/docs/howto/add-breadcrumb-navigation"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Protect a page with an auth guard"
                             to="/docs/howto/implement-an-authentication-gate"
                         />
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Deep-link to a tab or section"
@@ -617,6 +624,7 @@
                             label="Collapse the nav panel on mobile"
                             to="/docs/howto/collapse-the-nav-panel-on-mobile"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Make NavPanel width responsive"
@@ -703,6 +711,7 @@
                     </NavGroup>
 
                     <NavGroup label="Modals, Drawers & Overlays">
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Open a confirmation before delete"
@@ -718,16 +727,19 @@
                             label="Show a slide-in settings drawer"
                             to="/docs/howto/show-a-slide-in-settings-drawer"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Return data from a closed dialog"
                             to="/docs/howto/use-modal-dialog-onclose"
                         />
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Open a context menu on right-click"
                             to="/docs/howto/open-a-context-menu-on-right-click"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Pass data to a Modal Dialog"
@@ -847,11 +859,13 @@
                             label="Throttle rapid value updates"
                             to="/docs/howto/throttle-rapid-value-updates"
                         />
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="React to button click not keystrokes"
                             to="/docs/howto/react-to-button-click-not-keystrokes"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Buffer a reactive edit"
@@ -869,6 +883,7 @@
                         />
                     </NavGroup>
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Menus & Toolbars">
                         <NavLink
                             icon="article"
@@ -891,7 +906,9 @@
                             to="/docs/howto/create-a-multi-level-submenu"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Media & Rich Content">
                         <NavLink
                             icon="article"
@@ -924,8 +941,10 @@
                             to="/docs/howto/add-entrance-animations-to-content"
                         />
                     </NavGroup>
+                    -->
 
                     <NavGroup label="Miscellaneous Patterns">
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Show toast notifications from code"
@@ -946,11 +965,13 @@
                             label="Build a batch-processing queue"
                             to="/docs/howto/build-a-batch-processing-queue"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
                         />
+                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Generate a table of contents"
@@ -966,6 +987,7 @@
                             label="Redirect users after login"
                             to="/docs/howto/redirect-users-after-login"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Debug a component"
@@ -973,6 +995,7 @@
                         />
                     </NavGroup>
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Advanced Theming">
                         <NavLink
                             icon="article"
@@ -1060,7 +1083,9 @@
                             to="/docs/howto/style-card-and-noresult-placeholders"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Complex Property Patterns">
                         <NavLink
                             icon="article"
@@ -1148,7 +1173,9 @@
                             to="/docs/howto/handle-checkbox-value-coercion"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Charts & Data Visualization">
                         <NavLink
                             icon="article"
@@ -1191,7 +1218,9 @@
                             to="/docs/howto/create-a-gauge-dashboard-widget"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="PDF Viewer">
                         <NavLink
                             icon="article"
@@ -1214,7 +1243,9 @@
                             to="/docs/howto/export-a-modified-pdf"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Rich Text & Masonry">
                         <NavLink
                             icon="article"
@@ -1227,7 +1258,9 @@
                             to="/docs/howto/build-a-responsive-masonry-layout"
                         />
                     </NavGroup>
+                    -->
 
+                    <!-- Temporarily hidden
                     <NavGroup label="Animation & Carousel">
                         <NavLink
                             icon="article"
@@ -1245,6 +1278,7 @@
                             to="/docs/howto/customize-carousel-controls-and-indicators"
                         />
                     </NavGroup>
+                    -->
                 </NavGroup>
                 <NavGroup
                     label="Reference"

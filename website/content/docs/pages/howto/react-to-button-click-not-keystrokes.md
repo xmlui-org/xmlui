@@ -1,9 +1,12 @@
-# React to button click not keystrokes
+# React to button click, not keystrokes
 
-To drive the search you can gate the `DataSource` with a `triggerSearch` variable that's initially false. The `Button` click transfers the `TextBox` value to the `submittedSearch` variable and also sets `triggerSearch` true. Now the query runs and results display.
+Decouple the `TextBox` from the `DataSource` so the search query only runs when the user explicitly clicks Search, not on every keystroke.
+
+When a `DataSource` is bound to a text input directly, it fires a new request on every character typed. Instead, keep the typed value in a local variable and only commit it to the variable that gates the `DataSource` when the user clicks the Search button. Two patterns achieve this: a boolean trigger flag, or a separate "submitted" copy of the typed value.
+
+**Pattern 1 — Boolean trigger flag**: Gate the `DataSource` with a `triggerSearch` variable that is initially `false`. The `Button` click transfers the `TextBox` value to `submittedSearch` and sets `triggerSearch` to `true`. The `DataSource` fires once, then `onDidLoad` resets the flag.
 
 ```xmlui-pg name="Try searching for 'xmlui' or 'best'"
----app display /submittedSearch/ /triggerSearch/
 <App var.submittedSearch="" var.triggerSearch="{false}">
   <DataSource
       id="searchResults"
@@ -62,7 +65,7 @@ To drive the search you can gate the `DataSource` with a `triggerSearch` variabl
 }
 ```
 
-Alternatively, you can gate the `DataSource` on an initially-empty `submittedSearch`. Update a `typedSearch` variable when the `TextBox` changes. On the `Button` click, update `typedSearch` to `submittedSearch`. Now the query runs and results display.
+**Pattern 2 — Submitted-value copy**: Keep a `typedSearch` variable for the `TextBox` and a separate `submittedSearch` variable that starts empty. The `DataSource` is gated on `submittedSearch !== ''`. On button click, copy `typedSearch` into `submittedSearch`. The `DataSource` re-fetches whenever `submittedSearch` changes.
 
 ```xmlui-pg name="Try searching for 'xmlui' or 'best'"
 ---app display /typedSearch/ /submittedSearch/
@@ -121,3 +124,21 @@ Alternatively, you can gate the `DataSource` on an initially-empty `submittedSea
   }
 }
 ```
+
+## Key points
+
+**Gate `DataSource` with `when`, not by binding `url` to live input**: Using `when="{triggerSearch}"` or `when="{submittedSearch !== ''}"` gives you full control over when a fetch fires. The `DataSource` only executes when its `when` expression is truthy.
+
+**Button `onClick` is the commit point**: Copy the typed value into the submitted variable — or flip a boolean flag — inside `onClick`. All other reactive wiring follows from that single action.
+
+**Reset the trigger after load to allow re-searching the same term**: With the boolean flag pattern, set `triggerSearch = false` in `onDidLoad`. This allows the user to click Search again with the same term and get a fresh result.
+
+**Both patterns work — choose based on whether you need re-fetch control**: The boolean flag gives you exact control over when a re-fetch happens (including re-fetching the same query). The submitted-value copy is simpler but re-fetches only when the query text changes.
+
+---
+
+## See also
+
+- [React to value changes with debounce](/docs/howto/debounce-with-changelistener) — trigger a search automatically while the user types, with throttle or debounce
+- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) — limit how often a handler fires during rapid input
+- [Buffer a reactive edit](/docs/howto/buffer-a-reactive-edit) — stage edits locally before committing them to a data source

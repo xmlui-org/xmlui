@@ -1,6 +1,8 @@
-# Toggle multiple items in a list with shared state
+# Toggle multiple items with shared state
 
-When users toggle checkboxes in a list and each toggle accumulates into a shared array (e.g., hiding sources, selecting categories), use a global variable for the shared state and update it optimistically on each click. Don't refetch the DataSource after each toggle — the refetch can overwrite your optimistic update before the API call completes.
+Use a `global` variable to accumulate selections across a list of checkboxes so every part of the UI that reads the selection stays in sync automatically.
+
+When multiple checkboxes share a single array of selected (or hidden) items, declare the array with `global.name` on the `App` element. Any descendant — including custom components — can read and write it directly without prop drilling. Because XMLUI reactivity tracks the reference, assigning a new array to the variable immediately updates all expressions that depend on it, with no `DataSource` refetch needed.
 
 ```xmlui-pg copy display name="Toggle categories to filter articles" height="600px"
 ---app display /hiddenCategories/
@@ -64,13 +66,15 @@ When users toggle checkboxes in a list and each toggle accumulates into a shared
 
 The key points:
 
-- **`hiddenCategories` is a global variable** declared with `global.hiddenCategories` on the App. The `CategoryFilter` component reads and writes it directly — no prop drilling needed. This differs from the [optimistic UI pattern](update-ui-optimistically) where each item has independent local state.
+## Key points
 
-- **No DataSource refetch after toggle.** Assigning to `hiddenCategories` is enough to trigger XMLUI's reactivity — the filtered articles list and checkbox states both update immediately. Refetching after an optimistic update risks overwriting it with stale server data (the API call may not have completed yet).
+**`global.name` on `App` makes a variable accessible everywhere**: Any descendant component, including custom components, can read and write `hiddenCategories` directly — no prop drilling or callback props needed. This differs from `var.name`, which is scoped to the subtree of the declaring element.
 
-- **Checkbox without `readOnly`.** A `readOnly` checkbox only changes visually when its `initialValue` expression is re-evaluated during a re-render. Without a DataSource refetch or other trigger, that re-render may not happen. Omitting `readOnly` lets the checkbox toggle visually on click, independent of re-render timing.
+**Do not refetch after a toggle**: Assigning a new array to `hiddenCategories` triggers XMLUI reactivity immediately — the filtered article list and checkbox states both update in the same render. Refetching a `DataSource` after an optimistic update risks overwriting it with stale server data if the API call hasn't completed yet.
 
-- **`initialValue` drives the initial state.** On first render, each checkbox reads from the `hiddenCategories` array. On subsequent clicks, the checkbox toggles visually on its own, and the `onClick` handler keeps `hiddenCategories` in sync for the filtered list.
+**Use `initialValue`, not `value`, on Checkbox**: `initialValue` sets the visual state on first render from the shared array. On subsequent clicks the checkbox toggles visually on its own; the `onClick` handler keeps `hiddenCategories` in sync for all other consumers.
+
+**Replace the array on every toggle**: Instead of mutating the existing array, assign a new one using `filter` (to remove) or spread (`[...arr, item]`) to add. XMLUI detects the reference change and re-renders all dependents.
 
 ## Persisting to a server
 
@@ -89,3 +93,11 @@ In a real application, you'd also save the hidden categories to an API. Fire the
 ```
 
 Use `invalidates="{[]}"` on the `APICall` to prevent it from refetching DataSources that would overwrite your optimistic state.
+
+---
+
+## See also
+
+- [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) — share a simple variable (not an array) between two sibling components
+- [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — compute a filtered or derived value reactively from shared state
+- [Buffer a reactive edit](/docs/howto/buffer-a-reactive-edit) — stage individual field edits before committing to state

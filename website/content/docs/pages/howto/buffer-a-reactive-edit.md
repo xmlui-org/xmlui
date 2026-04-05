@@ -1,6 +1,8 @@
 # Buffer a reactive edit
 
-When editing data in place, you can save on every keystroke but that may be overkill. Here's how to buffer changes and save only when editing completes.
+Stage a change locally while the user is editing and commit it to the data store only when focus leaves the field.
+
+Saving on every keystroke fires requests too aggressively and can cause the cursor to jump if the UI re-renders from a server response. Instead, track which row is being edited (`editingTaskId`) and keep the in-progress text in a local buffer (`editBuffer`). On focus-gain, copy the current value into the buffer. On focus-loss, write the buffer to state in a single operation and clear the editing flag.
 
 ```xmlui-pg copy display name="Buffered task editing" height="500px"
 ---app display
@@ -58,3 +60,21 @@ When editing data in place, you can save on every keystroke but that may be over
   
 </App>
 ```
+
+## Key points
+
+**`editingTaskId` tracks which row is actively being edited**: Set it to the item's `id` in `onGotFocus` and clear it on `onLostFocus`. Use `readOnly="{editingTaskId !== $item.id}"` on the `TextBox` so only the focused field accepts input.
+
+**`editBuffer` holds the in-progress text**: Initialize it from `$item.description` when focus enters, update it on every `onDidChange`, and write it to state in one call on `onLostFocus`. The original data is never touched until the user finishes editing.
+
+**Validate before committing**: Check `editBuffer.trim().length === 0` (or any other rule) before calling the update. If invalid, simply reset the editing flag without saving, leaving the original value intact.
+
+**`AppState` + immutable update keeps the list reactive**: Use `appState.update({ ...appState.value, tasks: updated })` with a mapped array rather than mutating the array in place. XMLUI detects the reference change and re-renders the `Table`.
+
+---
+
+## See also
+
+- [React to button click, not keystrokes](/docs/howto/react-to-button-click-not-keystrokes) — commit a value only when the user explicitly submits
+- [Assign a complex JSON literal to a variable](/docs/howto/assign-a-complex-json-literal-to-a-component-variable) — initialize structured state with an object literal
+- [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) — share editing state across components that are not parent–child
