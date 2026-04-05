@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import React, { createContext, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   ReactFlow,
   Background,
@@ -50,6 +50,7 @@ function flattenChildren(children: React.ReactNode): React.ReactNode[] {
 // ---------------------------------------------------------------------------
 
 const ChildrenContext = createContext<React.ReactNode[]>([]);
+
 
 // ---------------------------------------------------------------------------
 // Default custom node — renders xmlui children with handles + resizer
@@ -170,7 +171,7 @@ function XmluiEdge({
   });
 
   return (
-    <>
+    <g aria-label={data?.label || id}>
       <BaseEdge
         id={id}
         path={edgePath}
@@ -181,11 +182,15 @@ function XmluiEdge({
             ? "var(--xmlui-borderColor--focus, #3b82f6)"
             : "#475569",
           strokeWidth: selected ? 4 : 3,
+          transition: "stroke 0.3s, stroke-width 0.3s",
         }}
       />
+      {/* Hidden path for animateMotion — same bezier but discoverable by aria-label */}
+      <path d={edgePath} fill="none" stroke="none" className="pulse-path" />
       {(data?.label || data?.renderContent) && (
         <EdgeLabelRenderer>
           <div
+            aria-label={data?.label ? `${data.label} label` : undefined}
             style={{
               position: "absolute",
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
@@ -198,6 +203,7 @@ function XmluiEdge({
               display: "flex",
               alignItems: "center",
               gap: 4,
+              transition: "border-color 0.3s, box-shadow 0.3s",
             }}
           >
             {data.renderContent ?? data.label}
@@ -211,7 +217,7 @@ function XmluiEdge({
           </div>
         </EdgeLabelRenderer>
       )}
-    </>
+    </g>
   );
 }
 
@@ -271,6 +277,9 @@ export function ReactFlowCanvasRender({
   storageKey,
   className,
   onNativeEvent,
+  onPulseStep,
+  onPulseComplete,
+  onEdgeInfoClick,
   children,
 }: {
   nodes?: Node[];
@@ -288,6 +297,9 @@ export function ReactFlowCanvasRender({
   storageKey?: string;
   className?: string;
   onNativeEvent?: (event: any) => void;
+  onPulseStep?: (event: any) => void;
+  onPulseComplete?: (event: any) => void;
+  onEdgeInfoClick?: (event: any) => void;
   registerComponentApi?: (api: any) => void;
   children?: React.ReactNode;
 }) {
@@ -304,9 +316,16 @@ export function ReactFlowCanvasRender({
   const storageKeyRef = useRef(effectiveStorageKey);
   storageKeyRef.current = effectiveStorageKey;
 
-  // Stable ref for onNativeEvent to avoid stale closures in callbacks
+  // Stable refs for callbacks to avoid stale closures
   const onNativeEventRef = useRef(onNativeEvent);
   onNativeEventRef.current = onNativeEvent;
+  const onPulseStepRef = useRef(onPulseStep);
+  onPulseStepRef.current = onPulseStep;
+  console.log("[ReactFlowCanvas] onPulseStep prop:", typeof onPulseStep, !!onPulseStep);
+  const onPulseCompleteRef = useRef(onPulseComplete);
+  onPulseCompleteRef.current = onPulseComplete;
+  const onEdgeInfoClickRef = useRef(onEdgeInfoClick);
+  onEdgeInfoClickRef.current = onEdgeInfoClick;
 
   // Capture children once on mount to avoid re-render loops
   const flatChildren = flattenChildren(children);
@@ -342,12 +361,13 @@ export function ReactFlowCanvasRender({
   const addInfoClick = useCallback((data: any) => ({
     ...data,
     onInfoClick: (edgeId: string, label: string) => {
+      const evt = { edgeId, label };
       onNativeEventRef.current?.({
         type: "edgeInfoClick",
         displayLabel: `${label} (${edgeId})`,
-        edgeId,
-        label,
+        ...evt,
       });
+      onEdgeInfoClickRef.current?.(evt);
     },
   }), []);
 
@@ -368,6 +388,7 @@ export function ReactFlowCanvasRender({
 
   const [nodes, setNodes, onNodesChange] = useNodesState(makeNodes());
   const [edges, setEdges, onEdgesChange] = useEdgesState(makeEdges());
+
 
   // Expose moveNode API
   useEffect(() => {
@@ -393,6 +414,83 @@ export function ReactFlowCanvasRender({
           );
         });
       },
+      pulseEdge: (label: string, dur?: number) => {
+        const duration = dur || 1200;
+        // Clear previous
+        document.querySelectorAll(".pulse-active").forEach((el) => el.classList.remove("pulse-active"));
+        document.querySelectorAll(".pulse-dot").forEach((el) => el.remove());
+
+        const edgeGroup = document.querySelector(`g[aria-label="${label}"]`);
+        if (!edgeGroup) return;
+
+        edgeGroup.classList.add("pulse-active");
+
+        const pulsePath = edgeGroup.querySelector(".pulse-path");
+        if (pulsePath) {
+          const pathD = pulsePath.getAttribute("d");
+          if (pathD) {
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute("r", "6");
+            dot.setAttribute("fill", "#3b82f6");
+            dot.setAttribute("class", "pulse-dot");
+            dot.setAttribute("opacity", "0.9");
+
+            const anim = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+            anim.setAttribute("dur", `${duration}ms`);
+            anim.setAttribute("repeatCount", "1");
+            anim.setAttribute("path", pathD);
+            anim.setAttribute("fill", "freeze");
+
+            dot.appendChild(anim);
+            edgeGroup.appendChild(dot);
+            try { anim.beginElement(); } catch(e) {}
+
+            // Re-apply dot after React re-renders (state changes destroy the edge group)
+            const reapply = () => {
+              requestAnimationFrame(() => {
+                if (document.querySelector(".pulse-dot")) return; // still alive
+                const freshGroup = document.querySelector(`g[aria-label="${label}"]`);
+                if (!freshGroup) return;
+                freshGroup.classList.add("pulse-active");
+                const freshPath = freshGroup.querySelector(".pulse-path");
+                if (!freshPath) return;
+                const freshD = freshPath.getAttribute("d");
+                if (!freshD) return;
+                const dot2 = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                dot2.setAttribute("r", "6");
+                dot2.setAttribute("fill", "#3b82f6");
+                dot2.setAttribute("class", "pulse-dot");
+                dot2.setAttribute("opacity", "0.9");
+                const anim2 = document.createElementNS("http://www.w3.org/2000/svg", "animateMotion");
+                anim2.setAttribute("dur", `${duration * 0.8}ms`);
+                anim2.setAttribute("repeatCount", "1");
+                anim2.setAttribute("path", freshD);
+                anim2.setAttribute("fill", "freeze");
+                dot2.appendChild(anim2);
+                freshGroup.appendChild(dot2);
+                try { anim2.beginElement(); } catch(e) {}
+              });
+            };
+            // Check a few times in case React batches multiple renders
+            setTimeout(reapply, 50);
+            setTimeout(reapply, 150);
+          }
+        }
+
+        const labelEl = document.querySelector(`[aria-label="${label} label"]`);
+        if (labelEl) {
+          (labelEl as HTMLElement).style.borderColor = "#3b82f6";
+          (labelEl as HTMLElement).style.boxShadow = "0 0 8px rgba(59,130,246,0.5)";
+          setTimeout(() => {
+            (labelEl as HTMLElement).style.borderColor = "";
+            (labelEl as HTMLElement).style.boxShadow = "";
+          }, duration);
+        }
+      },
+      clearPulse: () => {
+        document.querySelectorAll(".pulse-active").forEach((el) => el.classList.remove("pulse-active"));
+        document.querySelectorAll(".pulse-dot").forEach((el) => el.remove());
+      },
       addEdge: (id: string, source: string, target: string, sourceHandle: string, targetHandle: string, label: string, noArrow?: boolean) => {
         setEdges((eds) => {
           if (eds.find((e) => e.id === id)) return eds;
@@ -407,12 +505,13 @@ export function ReactFlowCanvasRender({
             data: {
               label,
               onInfoClick: (edgeId: string, edgeLabel: string) => {
+                const evt = { edgeId, label: edgeLabel };
                 onNativeEventRef.current?.({
                   type: "edgeInfoClick",
                   displayLabel: `${edgeLabel} (${edgeId})`,
-                  edgeId,
-                  label: edgeLabel,
+                  ...evt,
                 });
+                onEdgeInfoClickRef.current?.(evt);
               },
             },
           }];
@@ -444,12 +543,13 @@ export function ReactFlowCanvasRender({
         const newEdges = addEdge({ ...connection, type: "xmlui", data: {
           label: "relates to",
           onInfoClick: (edgeId: string, label: string) => {
+            const evt = { edgeId, label };
             onNativeEventRef.current?.({
               type: "edgeInfoClick",
               displayLabel: `${label} (${edgeId})`,
-              edgeId,
-              label,
+              ...evt,
             });
+            onEdgeInfoClickRef.current?.(evt);
           },
         } }, eds);
         if (storageKeyRef.current) {
@@ -533,30 +633,48 @@ export function ReactFlowCanvasRender({
 
   return (
       <div style={{ position: "absolute", inset: 0 }} className={className}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeDragStop={onNodeDragStop}
-          onNodesDelete={onNodesDelete}
-          onEdgesDelete={onEdgesDelete}
-          onSelectionChange={onSelectionChange}
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          snapToGrid={snapToGrid}
-          snapGrid={parsedSnapGrid}
-          fitView={fitView}
-          panOnDrag={panOnDrag}
-          zoomOnScroll={zoomOnScroll}
-          deleteKeyCode="Delete"
-          multiSelectionKeyCode="Shift"
-        >
-          {showBackground && <Background gap={16} size={1} />}
-          {showControls && <Controls />}
-          {showMinimap && <MiniMap />}
-        </ReactFlow>
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onNodeDragStop={onNodeDragStop}
+            onNodesDelete={onNodesDelete}
+            onEdgesDelete={onEdgesDelete}
+            onSelectionChange={onSelectionChange}
+            nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
+            snapToGrid={snapToGrid}
+            snapGrid={parsedSnapGrid}
+            fitView={fitView}
+            panOnDrag={panOnDrag}
+            zoomOnScroll={zoomOnScroll}
+            deleteKeyCode="Delete"
+            multiSelectionKeyCode="Shift"
+          >
+            {/* Pulse animation styles and SVG filter */}
+            <style>{`
+              .pulse-active > path:first-of-type {
+                stroke: #3b82f6 !important;
+                stroke-width: 4px !important;
+              }
+            `}</style>
+            <svg style={{ position: "absolute", width: 0, height: 0 }}>
+              <defs>
+                <filter id="pulse-glow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+            </svg>
+            {showBackground && <Background gap={16} size={1} />}
+            {showControls && <Controls />}
+            {showMinimap && <MiniMap />}
+          </ReactFlow>
       </div>
   );
 }

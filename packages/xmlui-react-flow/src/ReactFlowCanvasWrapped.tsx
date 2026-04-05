@@ -102,6 +102,16 @@ export const ReactFlowCanvasMd = createMetadata({
       description: "Move a node to a new position. Args: nodeId, x, y",
       signature: "moveNode(nodeId: string, x: number, y: number): void",
     },
+    pulseEdge: {
+      description:
+        "Animate a single edge by its semantic label. " +
+        "A glowing dot travels the edge.",
+      signature: "pulseEdge(label: string, duration?: number): void",
+    },
+    clearPulse: {
+      description: "Clear all pulse animations.",
+      signature: "clearPulse(): void",
+    },
   },
 });
 
