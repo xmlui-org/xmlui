@@ -278,6 +278,7 @@ type Props = {
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
+  stickyButtonRow?: boolean;
   enableSubmit?: boolean;
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
@@ -304,6 +305,7 @@ export const defaultProps: Pick<
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
+  | "stickyButtonRow"
   | "enableSubmit"
   | "itemRequireLabelMode"
   | "validationIconSuccess"
@@ -322,6 +324,7 @@ export const defaultProps: Pick<
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
+  stickyButtonRow: false,
   enableSubmit: true,
   itemRequireLabelMode: "markRequired",
   validationIconSuccess: "checkmark",
@@ -389,6 +392,7 @@ const Form = forwardRef(function (
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty = defaultProps.hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
+    stickyButtonRow = defaultProps.stickyButtonRow,
     enableSubmit = defaultProps.enableSubmit,
     verboseValidationFeedback,
     validationIconSuccess = defaultProps.validationIconSuccess,
@@ -790,7 +794,7 @@ const Form = forwardRef(function (
   let safeButtonRow = (
     <>
       {buttonRow || (
-        <div className={styles.buttonRow}>
+        <div className={classnames(styles.buttonRow, { [styles.stickyButtonRow]: stickyButtonRow })}>
           {swapCancelAndSave && [submitButton, cancelButton]}
           {!swapCancelAndSave && [cancelButton, submitButton]}
         </div>
@@ -973,6 +977,7 @@ export const FormWithContextVar = forwardRef(function (
         itemRequireLabelMode={extractValue.asOptionalString(node.props.itemRequireLabelMode)}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
+        stickyButtonRow={extractValue.asOptionalBoolean(node.props.stickyButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
         verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
@@ -984,6 +989,8 @@ export const FormWithContextVar = forwardRef(function (
         cancelLabel={extractValue(node.props.cancelLabel)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
+        savePendingLabel={extractValue(node.props.savePendingLabel)}
+        submitFeedbackDelay={extractValue.asOptionalNumber(node.props.submitFeedbackDelay)}
         swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
         onWillSubmit={lookupEventHandler("willSubmit", {
           context: {

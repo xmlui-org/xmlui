@@ -9,7 +9,8 @@ A support ticket form has standard text fields plus an optional attachment. Addi
 <App>
   <Form
     data="{{ subject: '', description: '' }}"
-    onSubmit="(data) => toast('Ticket submitted. Attachment: ' + (data.attachment ? data.attachment[0]?.name : 'none'))"
+    onSubmit="(data) => toast.success('Ticket submitted. Attachment: ' + 
+      (data.attachment ? data.attachment[0]?.name : 'none'))"
     saveLabel="Submit ticket"
   >
     <TextBox label="Subject" bindTo="subject" required="true" />
@@ -72,18 +73,6 @@ A support ticket form has standard text fields plus an optional attachment. Addi
   onUpload="(files) => uploadFiles(files)"
   text="Drop PDFs here or click to browse"
 />
-```
-
-**`noSubmit="true"` to handle the file separately**: If you need to upload the file to a separate endpoint and only include a URL or ID in the main form payload, mark the file field `noSubmit="true"` and upload it yourself in `onWillSubmit`, then inject the resulting URL into the return object:
-
-```xmlui
-<Form onWillSubmit="async (data) => {
-  const url = await uploadToStorage(data.attachment);
-  return { ...data, attachmentUrl: url, attachment: undefined };
-}">
-  <FileInput bindTo="attachment" noSubmit="true" />
-  <!-- attachmentUrl is submitted; raw file is not -->
-</Form>
 ```
 
 ---

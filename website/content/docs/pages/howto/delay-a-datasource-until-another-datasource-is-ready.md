@@ -1,10 +1,10 @@
-# Delay a DataSource until another DataSource is ready
+# Delay a DataSource until another is ready
 
-```xmlui-pg
----app
-<App>
-  <Test />
-</App>
+Use the `when` prop to chain DataSources so one waits for another to finish loading before it fires.
+
+When a dropdown needs data from two endpoints — users and departments — and the display label combines values from both, you must ensure the second DataSource doesn't fire until the first has resolved. Bind the second DataSource's `when` to the first's `loaded` property to create a sequential chain.
+
+```xmlui-pg copy display name="Load departments only after users are ready"
 ---api
 {
   "apiUrl": "/api",
@@ -30,9 +30,8 @@
     }
   }
 }
----comp display /selectedId/ /nonce/
-<Component name="Test" var.selectedId="" var.nonce="{0}">
-
+---app display /selectedId/ /nonce/
+<App var.selectedId="" var.nonce="{0}">
   <DataSource
     id="users_for_ds_dependency"
     url="/api/users_for_ds_dependency?nonce"
@@ -56,16 +55,30 @@
     <Items data="{users_for_ds_dependency}">
       <Option
         value="{$item.id}"
-        label="{$item.name} ({departments_with_ds_dependency.value.find(d => d.id === $item.departmentId)?.name})"
+        label="{$item.name} ({departments_with_ds_dependency.value
+          .find(d => d.id === $item.departmentId)?.name})"
      />
     </Items>
   </Select>
 
-  <Button
-    label="Run"
-    onClick="{nonce++}"
-  />
-
-
-</Component>
+  <Button label="Run" onClick="{nonce++}"/>
+</App>
 ```
+
+## Key points
+
+**`when` prevents the DataSource from fetching until the condition is truthy**: In the example, `when="{users_for_ds_dependency.loaded}"` ensures the departments request doesn't fire until users have arrived.
+
+**You can chain multiple DataSources**: DataSource A's `when` can reference DataSource B's `loaded`, and DataSource C can wait for both. This creates a sequential loading pipeline.
+
+**`when` on the DataSource is different from `when` on a UI element**: On a DataSource, `when` suppresses the HTTP request entirely. On a `Select` or `Fragment`, `when` controls rendering but the request may have already fired.
+
+**`inProgressNotificationMessage` provides loading feedback per step**: Assign a different message to each DataSource in the chain so users know which step is in progress.
+
+---
+
+## See also
+
+- [Show a skeleton while data loads](/docs/howto/hide-an-element-until-its-datasource-is-ready) — display placeholders during the wait
+- [Chain a DataSource refetch](/docs/howto/chain-a-refetch) — trigger a refetch after a mutation
+- [Transform nested API responses](/docs/howto/filter-and-transform-data-from-an-api) — reshape data before rendering

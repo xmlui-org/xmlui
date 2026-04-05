@@ -130,6 +130,7 @@ export function Loader({
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
   const prevIsFetching = usePrevious(isFetching);
+  const prevIsLoading = usePrevious(isLoading);
 
   // Tracks whether at least one fetch has completed since this component mounted.
   // Prevents stale cached errors (e.g. a 401 from a prior session still in the
@@ -142,6 +143,15 @@ export function Loader({
       hasFetchCompletedRef.current = true;
     }
   }, [isLoading, isFetching, loaderInProgressChanged, prevIsFetching]);
+
+  // When a genuinely new fetch starts (query key changed, no cached data), reset the loaded
+  // state so stale data from the previous query is not shown during the new fetch.
+  // This is distinct from a background refetch (isRefetching), where old data should remain visible.
+  useIsomorphicLayoutEffect(() => {
+    if (isLoading && !prevIsLoading) {
+      loaderLoaded(undefined);
+    }
+  }, [isLoading, prevIsLoading, loaderLoaded]);
 
   useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);

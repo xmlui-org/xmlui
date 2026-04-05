@@ -2289,15 +2289,14 @@ test.describe("Deferred Mode - Step 4: Polling Loop", () => {
     
     await execButton.click();
     
-    // Wait for multiple polls (3 * 500ms + buffer)
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Check final status
-    await checkButton.click();
-    
-    const status = await expect.poll(testStateDriver.testState).not.toBeNull();
+    // Poll reactively until status is 'completed' (avoids brittle fixed waits)
+    await expect.poll(async () => {
+      await checkButton.click();
+      const state = await testStateDriver.testState();
+      return state?.status;
+    }, { timeout: 5000 }).toEqual("completed");
+
     const finalStatus = await testStateDriver.testState();
-    expect(finalStatus.status).toEqual("completed");
     expect(finalStatus.pollCount).toBeGreaterThanOrEqual(3);
   });
 
@@ -2431,8 +2430,8 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
     
     await execButton.click();
     
-    // Wait for polling to complete
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Wait until onStatusUpdate fires with 'completed'
+    await expect.poll(testStateDriver.testState, { timeout: 5000 }).toMatchObject({ lastStatus: 'completed' });
     
     // Check that updates were received
     await checkButton.click();
@@ -2475,8 +2474,8 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
     
     await execButton.click();
     
-    // Wait for polling to complete (3 polls at 500ms = ~1500ms)
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    // Wait until onStatusUpdate fires with 'completed'
+    await expect.poll(testStateDriver.testState, { timeout: 5000 }).toMatchObject({ status: 'completed' });
     
     // Check status
     await checkButton.click();
@@ -2844,10 +2843,11 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
     const execButton = await createButtonDriver("exec");
     await execButton.click();
     
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    
+    // Wait until the completion condition fires (done: true on poll 4)
+    await expect.poll(testStateDriver.testState, { timeout: 5000 }).toMatchObject({ done: true });
+
     const result = await testStateDriver.testState();
-    // Should have made 4 attempts (polls)
+    // Should have made at least 3 poll attempts before completion
     expect(result.updateCount).toBeGreaterThanOrEqual(3);
     expect(result.done).toEqual(true);
   });

@@ -359,11 +359,6 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
 
     Object.entries(icons).forEach(([iconName, svgData]) => {
       const iconKey = iconName.toLowerCase();
-      
-      // Skip if already registered
-      if (pool.has(iconKey)) {
-        return;
-      }
 
       // Decode data URI if needed
       let decodedSvgData = svgData;

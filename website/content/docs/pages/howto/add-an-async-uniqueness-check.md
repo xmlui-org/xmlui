@@ -1,22 +1,10 @@
 # Add an async uniqueness check
 
-Use an async onValidate handler with customValidationsDebounce to call an API that verifies a value is not already in use.
+Use an `onValidate` handler that returns a Promise, combined with `customValidationsDebounce`, to call an API that verifies a value is not already in use.
 
-A registration form must ensure the chosen username does not already exist in the database. Because the check requires a network call, the `onValidate` function on the field is marked `async`. Combined with `customValidationsDebounce`, the API is called only after the user has paused typing, keeping network traffic low.
+A registration form must ensure the chosen username does not already exist in the database. Because the check requires a network call, the `onValidate` function returns a Promise. Combined with `customValidationsDebounce`, the API is called only after the user has paused typing, keeping network traffic low.
 
 ```xmlui-pg copy display name="Username uniqueness check"
----api
-POST /api/usernames/check
-Content-Type: application/json
-{ "username": "alice" }
----
-{ "available": false }
----
-POST /api/usernames/check
-Content-Type: application/json
-{ "username": "bob" }
----
-{ "available": true }
 ---app display
 <App>
   <Form
@@ -25,38 +13,54 @@ Content-Type: application/json
     saveLabel="Create account"
   >
     <TextBox
-      label="Username"
+      label="Username (John and Jane is taken)"
       bindTo="username"
       required="true"
       minLength="3"
       customValidationsDebounce="500"
-      onValidate="async (value) => {
+      validationDisplayDelay="800"
+      onValidate="(value) => {
         if (!value || value.length < 3) return null;
-        const res = await context.callApi({
-          url: '/api/usernames/check',
-          method: 'POST',
-          body: { username: value }
-        });
-        return res.available ? null : '\u201c' + value + '\u201d is already taken. Please choose another.';
+        const available = Actions.callApi({ url: '/api/users/check/' + value });
+        return (available 
+          ? '\u201c' + value + '\u201d is already taken. Please choose another.' 
+          : null);
       }"
       placeholder="Choose a unique username (min. 3 characters)."
     />
     <TextBox label="Email" bindTo="email" pattern="email" required="true" />
   </Form>
 </App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.users = [
+    { id: 1, name: 'John' },
+    { id: 1, name: 'Jane' },
+  ]",
+  "operations": {
+    "check_user": {
+      "url": "/users/check/:name",
+      "method": "get",
+      "handler": "delay(2000); return $state.users.some(u => u.name === $pathParams.name)"
+    }
+  }
+}
 ```
 
 ## Key points
 
-**`onValidate` may be `async`**: Return a `Promise<string | null>` to await any asynchronous work before reporting the result. XMLUI holds the validation state as pending until the promise settles:
+**`onValidate` can call APIs and long-running operations**: When your `onValidate` handler makes an API call or other async operation, XMLUI automatically waits for it to complete. The field enters a pending state until the operation settles:
 
 ```xmlui
 <TextBox
   bindTo="username"
   customValidationsDebounce="500"
-  onValidate="async (value) => {
-    const { available } = await api.checkUsername(value);
-    return available ? null : value + ' is already taken';
+  onValidate="(value) => {
+    const available = Actions.callApi({ url: '/api/users/check/' + value });
+    return (available 
+      ? '\u201c' + value + '\u201d is already taken. Please choose another.' 
+      : null);
   }"
 />
 ```
@@ -64,10 +68,12 @@ Content-Type: application/json
 **Guard against short or empty values**: Run the API only when the input is worth checking. When the value is too short, return `null` immediately to avoid spurious requests (built-in `minLength` will surface the length error anyway):
 
 ```xmlui
-onValidate="async (v) => {
-  if (!v || v.length < 3) return null;  // let minLength handle it
-  const { available } = await checkUsername(v);
-  return available ? null : v + ' is already taken';
+onValidate="(value) => {
+  if (!value || value.length < 3) return null;
+  const available = Actions.callApi({ url: '/api/users/check/' + value });
+  return (available 
+    ? '\u201c' + value + '\u201d is already taken. Please choose another.' 
+    : null);
 }"
 ```
 
@@ -75,27 +81,9 @@ onValidate="async (v) => {
 
 **The form blocks submission while the check is in-flight**: If the user presses Save while the async validator is still pending, XMLUI waits for it to resolve before proceeding. This prevents submitting a username that is currently being verified.
 
-**Show a loading indicator during the check**: Use a variable to flag in-progress state and show a spinner or status message under the field:
+**`validationDisplayDelay` reveals the result without requiring a blur**: Normally (`errorLate` mode) XMLUI hides validation feedback until the user leaves the field. For an instant check this is fine, but the API call in this example takes about 1 second. By the time it resolves, making the user blur the field before seeing the error feels unnecessary.
 
-```xmlui
-<Form var.checking="{false}">
-  <TextBox
-    bindTo="username"
-    label="Username"
-    customValidationsDebounce="500"
-    onValidate="async (v) => {
-      checking = true;
-      try {
-        const { available } = await checkUsername(v);
-        return available ? null : v + ' is taken';
-      } finally {
-        checking = false;
-      }
-    }"
-    placeholder="{checking ? 'Checking availability\u2026' : 'Min. 3 characters'}"
-  />
-</Form>
-```
+`validationDisplayDelay` (default: `400` ms) starts a timer when an async check begins on a dirty field. If the check is still running when the timer fires, XMLUI reveals the result immediately once it settles — even if the field is still focused. Because the mock API here always takes 1 s, the 400 ms default kicks in on every check and the error appears right away without a blur.
 
 ---
 

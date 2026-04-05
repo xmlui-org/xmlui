@@ -224,26 +224,26 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
     const line = lines[i];
     if (line.startsWith("---app")) {
       const appSegment = parseSegmentProps(line);
-      pattern.app = { ...appSegment };
+      pattern.app = { copy: pattern.default?.copy, display: pattern.default?.display, ...appSegment };
       closeCurrentMode("app");
     } else if (line.startsWith("---comp")) {
       closeCurrentMode("comp");
       const compSegment = parseSegmentProps(line);
       pattern.components ??= [];
-      pattern.components.push(compSegment);
+      pattern.components.push({ copy: pattern.default?.copy, display: pattern.default?.display, ...compSegment });
     } else if (line.startsWith("---config")) {
       const configSegment = parseSegmentProps(line);
-      pattern.config ??= { ...configSegment };
+      pattern.config ??= { copy: pattern.default?.copy, display: pattern.default?.display, ...configSegment };
       closeCurrentMode("config");
     } else if (line.startsWith("---api")) {
       const apiSegment = parseSegmentProps(line);
-      pattern.api ??= { ...apiSegment };
+      pattern.api ??= { copy: pattern.default?.copy, display: pattern.default?.display, ...apiSegment };
       closeCurrentMode("api");
     } else if (line.startsWith("---desc")) {
       closeCurrentMode("desc");
       const descSegment = parseSegmentProps(line);
       pattern.descriptions ??= [];
-      pattern.descriptions.push(descSegment);
+      pattern.descriptions.push({ copy: pattern.default?.copy, display: pattern.default?.display, ...descSegment });
     } else {
       // Append the line to the current segment content
       segmentContent += line + "\n";

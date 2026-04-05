@@ -28,6 +28,8 @@ A client list should show a full `Table` on desktop (≥ 768 px) and a card-base
     </property>
   </List>
 </App>
+---desc
+Pop this app into the playground (click the leftmost icon in the example header) and then click the “Preview in full screen” icon in the playground’s toolbar. Resize the app window to see how it behaves on wide and narrow screens.
 ```
 
 ## Key points

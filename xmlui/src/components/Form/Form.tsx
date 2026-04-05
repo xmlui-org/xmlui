@@ -127,6 +127,13 @@ export const FormMd = createMetadata({
       type: "boolean",
       defaultValue: defaultProps.hideButtonRow,
     },
+    stickyButtonRow: {
+      description:
+        `When set to true, the button row sticks to the bottom of the scrollable content area. ` +
+        `Useful when the form is displayed inside a scrollable container such as a ModalDialog.`,
+      type: "boolean",
+      defaultValue: defaultProps.stickyButtonRow,
+    },
     enableSubmit: {
       description:
         `This property controls whether the submit button is enabled. When set to false, ` +
@@ -284,7 +291,9 @@ export const FormMd = createMetadata({
     "textColor-ValidationDisplay-warning": "$color-warning",
     "textColor-ValidationDisplay-info": "$color-info",
     "textColor-ValidationDisplay-valid": "$color-valid",
-    "marginTop-buttonRow-Form": "$space-4"
+    "marginTop-buttonRow-Form": "$space-4",
+    "paddingTop-buttonRow-Form": "0",
+    "backgroundColor-buttonRow-Form": "transparent",
   },
 });
 
