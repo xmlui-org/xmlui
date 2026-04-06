@@ -1,6 +1,8 @@
 # Use accessors to simplify complex expressions
 
-When working with complex API responses, you can use `var.*` accessors to extract and store nested data, making your component markup cleaner and more maintainable.
+Extract a deeply nested value into a named local variable so you can reference it cleanly throughout a component.
+
+When a deeply nested path like `weatherData.value.current_condition[0]` appears in multiple expressions, repeating it in full on every binding is noisy and error-prone. Adding `var.condition="{ weatherData.value.current_condition[0] }"` to any containing element declares a reactive local variable that evaluates once and can be referenced by the shorter name `condition` everywhere inside that element.
 
 ```xmlui-pg
 ---app display {9-10, 13, 22, 26, 29}
@@ -61,3 +63,20 @@ When working with complex API responses, you can use `var.*` accessors to extrac
 }
 ```
 
+## Key points
+
+**Declare `var.name` on any container element**: The variable is available to all descendants of the element it's declared on — the accessor's scope matches the element's subtree.
+
+**Accessors are reactive**: The expression is re-evaluated whenever any variable it references (such as `weatherData.loaded`) changes. The shorthand name `condition` always reflects the latest value.
+
+**It is just a variable — not special syntax**: `var.condition` is the same as any other `var.*` variable. You can compute, transform, or combine values in the expression, not just extract a nested path.
+
+**Use accessors for repeated paths of three or more levels**: A single-level path such as `{item.name}` is already readable. Accessors pay off when the same sub-path appears three or more times, or when the path is long enough to obscure intent.
+
+---
+
+## See also
+
+- [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — combine multiple variables into a single reactive expression
+- [Assign a complex JSON literal to a variable](/docs/howto/assign-a-complex-json-literal-to-a-component-variable) — initialize a variable with a structured object literal
+- [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) — share variables across the component tree
