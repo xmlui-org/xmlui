@@ -572,28 +572,20 @@
                     </NavGroup>
 
                     <NavGroup label="Navigation & Routing">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Add breadcrumb navigation"
                             to="/docs/howto/add-breadcrumb-navigation"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Protect a page with an auth guard"
                             to="/docs/howto/implement-an-authentication-gate"
                         />
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Deep-link to a tab or section"
                             to="/docs/howto/deep-link-to-a-tab-or-section"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build nested page routes"
-                            to="/docs/howto/build-nested-page-routes"
                         />
                         <NavLink
                             icon="article"
@@ -610,12 +602,6 @@
                             label="Highlight the active nav link"
                             to="/docs/howto/highlight-the-active-nav-link"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Collapse the nav panel on mobile"
-                            to="/docs/howto/collapse-the-nav-panel-on-mobile"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Make NavPanel width responsive"
@@ -2157,11 +2143,6 @@
                     content="{appGlobals.docsContent['pages/howto/deep-link-to-a-tab-or-section.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/build-nested-page-routes">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-nested-page-routes.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/switch-between-hash-and-history-routing">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/switch-between-hash-and-history-routing.md']}"
@@ -2175,11 +2156,6 @@
             <Page url="/docs/howto/highlight-the-active-nav-link">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/highlight-the-active-nav-link.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/collapse-the-nav-panel-on-mobile">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/collapse-the-nav-panel-on-mobile.md']}"
                 />
             </Page>
 
