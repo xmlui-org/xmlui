@@ -21,10 +21,19 @@ Other components, such as the `List`, can be hooked up with pagination using a `
 
 In this case the `DataSource` component does the heavy lifting by querying the page index, the previous and next page IDs. This can be done using variables and query parameters.
 
-```xmlui-pg
+```xmlui-pg name="Paginate a list" height="560px"
 ---app display
-<App var.pageSize="{5}" var.currentPage="{0}" var.before="{0}" var.after="{pageSize-1}">
-  <DataSource id="pagination_ds" url="/api/pagination_items" queryParams="{{ from: before, to: after }}" />
+<App 
+  var.pageSize="{5}" 
+  var.currentPage="{0}" 
+  var.before="{0}" 
+  var.after="{pageSize-1}"
+>
+  <DataSource 
+    id="pagination_ds" 
+    url="/api/pagination_items" 
+    queryParams="{{ from: before, to: after }}" 
+  />
   <Pagination
     itemCount="20"
     pageSize="{pageSize}"
@@ -54,3 +63,23 @@ In this case the `DataSource` component does the heavy lifting by querying the p
   }
 }
 ```
+
+## Key points
+
+**`Table` has pagination built in — `List` needs it wired manually**: Set `isPaginated` on `Table` and it handles page state internally. For `List` (or any component without built-in pagination), combine a `DataSource` with a `Pagination` component and wire them together through reactive variables.
+
+**`Pagination` tells you the new page; you update the variables**: The `onPageDidChange` handler receives `(page, size, total)`. Assign the new page index to `currentPage` and recalculate `before` and `after` offsets — both reactive variables are read by `DataSource`'s `queryParams`, so the data refetch happens automatically.
+
+**`queryParams` on `DataSource` drives the API slice**: Pass the offset or cursor values as query parameters using `queryParams="{{ from: before, to: after }}"`. The server-side handler uses these to return only the requested page of data. The API shape (offset/limit, cursor, page number) depends on your backend — adjust the variable names and arithmetic accordingly.
+
+**`itemCount` on `Pagination` must match the total record count from your API**: The component uses this number to calculate how many page buttons to show. If your API returns the total count in the response, read it with `resultSelector` or a separate `DataSource` and bind it to `itemCount`.
+
+**`pageSize` controls both the visual controls and the slice math**: Declare it as a reactive variable (`var.pageSize="{5}"`) so that if the user changes the page size through `Pagination`'s size selector, the same value flows into the offset recalculation in `onPageDidChange` and into the `DataSource` query automatically.
+
+---
+
+## See also
+
+- [Render a flat list with custom cards](/docs/howto/render-a-flat-list-with-custom-cards) — customize how each row in the paginated list is displayed
+- [Group items in List by a property](/docs/howto/group-items-in-list-by-a-property) — combine grouping with a paginated data source
+- [Poll an API at regular intervals](/docs/howto/poll-an-api-at-regular-intervals) — keep the current page fresh with periodic refetches
