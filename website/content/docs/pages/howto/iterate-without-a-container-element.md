@@ -8,10 +8,10 @@ Use `Items` to stamp out repeated markup inline when you do not want `List`'s vi
 ---app
 <App
   var.metrics="{[
-    { label: 'Active Users',    value: 1284,     icon: 'users'       },
-    { label: 'Open Tickets',    value: 47,        icon: 'alert-circle'},
-    { label: 'Deployments',     value: 12,        icon: 'box'         },
-    { label: 'Uptime',          value: '99.8 %',  icon: 'activity'    }
+    { label: 'Active Users', value: 1284, icon: 'users'       },
+    { label: 'Open Tickets', value: 47, icon: 'compactlist'},
+    { label: 'Deployments', value: 12, icon: 'box'         },
+    { label: 'Uptime', value: '99.8 %', icon: 'arrowup'    }
   ]}"
 >
   <FlowLayout>

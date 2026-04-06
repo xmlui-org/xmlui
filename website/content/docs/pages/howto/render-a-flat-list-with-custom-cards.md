@@ -8,11 +8,26 @@ Any component placed as a direct child of `List` becomes the item template — r
 ---app
 <App
   var.team="{[
-    { id: 1, name: 'Alice Chen',    role: 'Senior Developer', dept: 'Engineering', status: 'active'   },
-    { id: 2, name: 'Bob Martinez',  role: 'UI Designer',      dept: 'Design',      status: 'active'   },
-    { id: 3, name: 'Carol Kim',     role: 'Product Manager',  dept: 'Product',     status: 'on-leave' },
-    { id: 4, name: 'Dave Lee',      role: 'DevOps Engineer',  dept: 'Engineering', status: 'active'   },
-    { id: 5, name: 'Eve Torres',    role: 'UX Researcher',    dept: 'Design',      status: 'active'   }
+    { 
+      id: 1, name: 'Alice Chen', role: 'Senior Developer', 
+      dept: 'Engineering', status: 'active'
+    },
+    { 
+      id: 2, name: 'Bob Martinez', role: 'UI Designer',      
+      dept: 'Design', status: 'active'   
+    },
+    { 
+      id: 3, name: 'Carol Kim', role: 'Product Manager',  
+      dept: 'Product', status: 'on-leave' 
+    },
+    { 
+      id: 4, name: 'Dave Lee', role: 'DevOps Engineer',  
+      dept: 'Engineering', status: 'active'   
+    },
+    { 
+      id: 5, name: 'Eve Torres', role: 'UX Researcher',    
+      dept: 'Design', status: 'active'   
+    }
   ]}"
 >
   <List data="{team}">

@@ -36,7 +36,7 @@ When a table has more columns than fit on screen, the user must scroll to see th
   ]}"
   >
     <Column bindTo="id" header="ID" pinTo="left" width="100px" />
-    <Column bindTo="name" header="Name" pinTo="left" width="160px" />
+    <Column bindTo="name" header="Name" pinTo="left" width="140px" />
     <Column bindTo="department" header="Department" width="140px" />
     <Column bindTo="role" header="Role" width="180px" />
     <Column bindTo="location" header="Location" width="140px" />

@@ -47,6 +47,8 @@ By default, `Tree` renders the full data set up front. Setting `dynamic: true` o
 
 **`spinnerDelay` suppresses the loading flash for fast responses**: The Tree shows a loading spinner immediately by default. Set `spinnerDelay="{400}"` (milliseconds) to delay the spinner so that instant or near-instant responses appear seamless.
 
+**`autoLoadAfter` reloads a node's children when it is expanded again after being collapsed**: Set `autoLoadAfter="{3000}"` (milliseconds) on the `Tree` to automatically discard and re-fetch a node's children when the user collapses and then re-expands it after more than 3 seconds. This keeps data fresh without a full page refresh. You can also set it per node via an `autoLoadAfter` field in the node data (controlled by `autoLoadAfterField`).
+
 **`markNodeLoaded(nodeId)` cleanly finishes a dynamic node**: Call this Tree API method after confirming a node is a leaf (for example, when the API returns an empty array). It removes the expand arrow and prevents the node from being re-expanded needlessly.
 
 ---

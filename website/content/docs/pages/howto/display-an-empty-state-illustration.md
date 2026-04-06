@@ -4,7 +4,7 @@ Show a friendly placeholder with an icon and message when a `List` or `Select` h
 
 Declare an `emptyListTemplate` inside `List` using the `<property name="emptyListTemplate">` slot syntax. The template is shown automatically when the `data` array is empty or not yet loaded, and hidden the moment any items arrive — no `when` condition needed.
 
-```xmlui-pg copy display name="Task list with an empty state"
+```xmlui-pg copy display name="Task list with an empty state" height="300px"
 ---app
 <App
   var.tasks="{[
@@ -16,7 +16,7 @@ Declare an `emptyListTemplate` inside `List` using the `<property name="emptyLis
   <Button label="Clear all tasks" onClick="tasks = []" />
   <List data="{tasks}">
     <property name="emptyListTemplate">
-      <CVStack height="180px">
+      <CVStack height="140px">
         <Icon name="inbox" size="48" color="$color-surface-400" />
         <Text fontWeight="bold">No tasks yet</Text>
         <Text variant="secondary">You are all caught up!</Text>

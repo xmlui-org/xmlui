@@ -20,7 +20,7 @@ Setting `groupBy` on a `List` divides rows into named sections without you needi
     <property name="groupHeaderTemplate">
       <HStack verticalAlignment="center">
         <Text fontWeight="bold">{$group.key}</Text>
-        <Badge value="{$group.items.length}" />
+        <Badge value="{$group.count}" />
       </HStack>
     </property>
     <property name="groupFooterTemplate">

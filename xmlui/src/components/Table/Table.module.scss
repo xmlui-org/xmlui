@@ -132,7 +132,7 @@ $backgroundColor-pinnedCell-Table: createThemeVar("backgroundColor-pinnedCell-#{
   }
 
   .pinnedCell {
-    background-color: inherit;
+    background-color: $backgroundColor-pinnedCell-Table;
   }
 
   .columnCell,
