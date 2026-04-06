@@ -108,9 +108,17 @@ export const ReactFlowCanvasMd = createMetadata({
         "A glowing dot travels the edge.",
       signature: "pulseEdge(label: string, duration?: number): void",
     },
+    pulseEdgeRoundTrip: {
+      description: "Animate a dot forward then back along an edge, with arrows appearing at the appropriate ends.",
+      signature: "pulseEdgeRoundTrip(label: string, duration?: number): void",
+    },
     clearPulse: {
       description: "Clear all pulse animations.",
       signature: "clearPulse(): void",
+    },
+    getLayout: {
+      description: "Returns current node positions and sizes as a layout object.",
+      signature: "getLayout(): { nodes: Record<string, { x: number, y: number, width: number, height: number }> }",
     },
   },
 });
