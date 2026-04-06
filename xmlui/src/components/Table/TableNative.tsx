@@ -306,7 +306,7 @@ const isWithinCheckboxBoundary = (
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
 //View the index.css file for more needed styles such as border-collapse: separate
-const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => {
+const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false): CSSProperties => {
   const isPinned = column.getIsPinned();
   // const isLastLeftPinnedColumn = isPinned === "left" && column.getIsLastColumn("left");
   // const isFirstRightPinnedColumn = isPinned === "right" && column.getIsFirstColumn("right");
@@ -319,9 +319,12 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
     //   : undefined,
     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
-    opacity: isPinned ? 0.95 : undefined,
     position: isPinned ? "sticky" : "relative",
-    backgroundColor: isPinned ? "inherit" : undefined,
+    backgroundColor: isPinned
+      ? isHeader
+        ? "var(--xmlui-backgroundColor-heading-Table)"
+        : undefined
+      : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
 };
@@ -1272,6 +1275,7 @@ export const Table = forwardRef(
               ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
               style={{
                 ...style,
+                minWidth: "max-content",
                 userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
               }}
               className={classnames(styles.row, {
@@ -1708,7 +1712,7 @@ export const Table = forwardRef(
                               position: "relative",
                               width: size,
                               flexShrink: 0,
-                              ...getCommonPinningStyles(header.column),
+                              ...getCommonPinningStyles(header.column, true),
                             } as React.CSSProperties
                           }
                         >
@@ -1818,7 +1822,9 @@ export const Table = forwardRef(
                           : styles.alignCenter;
                     return (
                       <td
-                        className={classnames(styles.cell, alignmentClass, columnClassName)}
+                        className={classnames(styles.cell, alignmentClass, columnClassName, {
+                          [styles.pinnedCell]: cell.column.getIsPinned(),
+                        })}
                         key={`${cell.id}-${i}`}
                         style={{
                           width: size,

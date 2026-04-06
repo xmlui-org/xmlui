@@ -46,6 +46,7 @@ $outlineOffset-heading-Table--focus: createThemeVar('outlineOffset-heading-#{$co
 $borderBottom-cell-Table: createThemeVar("borderBottom-cell-Table");
 $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-Table");
 $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
+$backgroundColor-pinnedCell-Table: createThemeVar("backgroundColor-pinnedCell-#{$component}");
 
 @layer components {
   .wrapper {
@@ -130,6 +131,10 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     background-color: $backgroundColor-heading-Table;
   }
 
+  .pinnedCell {
+    background-color: inherit;
+  }
+
   .columnCell,
   .cell {
     display: flex;
@@ -138,6 +143,7 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    border-bottom: $borderBottom-cell-Table;
 
     &.alignTop {
       align-items: flex-start;
@@ -168,7 +174,6 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       display: flex;
       flex-direction: row;
       width: 100%;
-      border-bottom: $borderBottom-cell-Table;
       //background-color: inherit;
 
       .checkBoxWrapper {
@@ -286,11 +291,15 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       }
 
       &:last-child{
-        border-bottom: $borderBottom-last-row-Table;
+        .cell {
+          border-bottom: $borderBottom-last-row-Table;
+        }
       }
 
       &.noBottomBorder:last-child {
-        border-bottom: none;
+        .cell {
+          border-bottom: none;
+        }
       }
     }
   }
