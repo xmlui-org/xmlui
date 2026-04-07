@@ -710,11 +710,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Open a context menu on right-click"
-                            to="/docs/howto/open-a-context-menu-on-right-click"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Pass data to a Modal Dialog"
                             to="/docs/howto/pass-data-to-a-modal-dialog"
                         />
@@ -852,11 +847,6 @@
                     <NavGroup label="Menus & Toolbars">
                         <NavLink
                             icon="article"
-                            label="Build a toolbar with overflow menu"
-                            to="/docs/howto/build-a-toolbar-with-overflow-menu"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Add a dropdown menu to a button"
                             to="/docs/howto/add-a-dropdown-menu-to-a-button"
                         />
@@ -870,9 +860,13 @@
                             label="Create a multi-level submenu"
                             to="/docs/howto/create-a-multi-level-submenu"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Open a context menu on right-click"
+                            to="/docs/howto/open-a-context-menu-on-right-click"
+                        />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Media & Rich Content">
                         <NavLink
                             icon="article"
@@ -905,7 +899,6 @@
                             to="/docs/howto/add-entrance-animations-to-content"
                         />
                     </NavGroup>
-                    -->
 
                     <NavGroup label="Miscellaneous Patterns">
                         <!-- Temporarily hidden
@@ -2290,11 +2283,6 @@
             </Page>
 
             <!-- New how-to articles: Menus & Toolbars -->
-            <Page url="/docs/howto/build-a-toolbar-with-overflow-menu">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-a-toolbar-with-overflow-menu.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/add-a-dropdown-menu-to-a-button">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/add-a-dropdown-menu-to-a-button.md']}"
