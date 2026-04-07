@@ -106,6 +106,7 @@
     "@types/js-yaml": "^4.0.9",
     "@types/lodash-es": "4.17.6",
     "@types/node": "22.18.13",
+    "@types/papaparse": "5.5.2",
     "@types/react": "18.2.23",
     "@types/react-dom": "18.2.8",
     "@types/yargs": "17.0.31",
@@ -205,7 +206,9 @@
   },
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",    "./compiled-runtime": "./src/index-compiled-runtime.ts",    "./parser": "./src/parsers/xmlui-parser/index.ts",
+    ".": "./src/index.ts",
+    "./compiled-runtime": "./src/index-compiled-runtime.ts",
+    "./parser": "./src/parsers/xmlui-parser/index.ts",
     "./*.css": "./dist/lib/*.css",
     "./index.scss": "./src/index.scss",
     "./themes.scss": "./src/components-core/theming/_themes.scss",
