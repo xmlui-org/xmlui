@@ -870,8 +870,8 @@
                     <NavGroup label="Media & Rich Content">
                         <NavLink
                             icon="article"
-                            label="Render a Markdown file as a page"
-                            to="/docs/howto/render-a-markdown-file-as-a-page"
+                            label="Render Markdown content as a page"
+                            to="/docs/howto/render-markdown-content-as-a-page"
                         />
                         <NavLink
                             icon="article"
@@ -888,20 +888,9 @@
                             label="Generate a QR code from user input"
                             to="/docs/howto/generate-a-qr-code-from-user-input"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Display a PDF document inline"
-                            to="/docs/howto/display-a-pdf-document-inline"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add entrance animations to content"
-                            to="/docs/howto/add-entrance-animations-to-content"
-                        />
                     </NavGroup>
 
                     <NavGroup label="Miscellaneous Patterns">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Show toast notifications from code"
@@ -922,13 +911,11 @@
                             label="Build a batch-processing queue"
                             to="/docs/howto/build-a-batch-processing-queue"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
                         />
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Generate a table of contents"
@@ -944,7 +931,6 @@
                             label="Redirect users after login"
                             to="/docs/howto/redirect-users-after-login"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Debug a component"
@@ -2300,9 +2286,9 @@
             </Page>
 
             <!-- New how-to articles: Media & Rich Content -->
-            <Page url="/docs/howto/render-a-markdown-file-as-a-page">
+            <Page url="/docs/howto/render-markdown-content-as-a-page">
                 <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/render-a-markdown-file-as-a-page.md']}"
+                    content="{appGlobals.docsContent['pages/howto/render-markdown-content-as-a-page.md']}"
                 />
             </Page>
             <Page url="/docs/howto/embed-an-external-site-in-an-iframe">
@@ -2318,16 +2304,6 @@
             <Page url="/docs/howto/generate-a-qr-code-from-user-input">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/generate-a-qr-code-from-user-input.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/display-a-pdf-document-inline">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/display-a-pdf-document-inline.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/add-entrance-animations-to-content">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/add-entrance-animations-to-content.md']}"
                 />
             </Page>
 
