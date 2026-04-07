@@ -600,6 +600,80 @@ export const Table = memo(forwardRef(
     }: TableProps,
     forwardedRef,
   ) => {
+    const propsRef = useRef<any>({});
+    const currentProps = {
+      data,
+      columns,
+      isPaginated,
+      loading,
+      headerHeight,
+      rowsSelectable,
+      enableMultiRowSelection,
+      toggleSelectionOnClick,
+      initiallySelected,
+      syncWithAppState,
+      pageSizeOptions,
+      pageSize,
+      currentPageIndex,
+      rowDisabledPredicate,
+      rowUnselectablePredicate,
+      sortBy,
+      sortingDirection,
+      iconSortAsc,
+      iconSortDesc,
+      iconNoSort,
+      sortingDidChange,
+      willSort,
+      lookupEventHandler,
+      style,
+      className,
+      classes,
+      noDataRenderer,
+      autoFocus,
+      hideHeader,
+      hideNoDataView,
+      hideSelectionCheckboxes,
+      renderVersion,
+      hideSelectionCheckboxesHeader,
+      alwaysShowSelectionCheckboxes,
+      alwaysShowPagination,
+      alwaysShowSelectionCheckboxesHeader,
+      alwaysShowSortingIndicator,
+      registerComponentApi,
+      onSelectionDidChange,
+      noBottomBorder,
+      paginationControlsLocation,
+      cellVerticalAlign,
+      buttonRowPosition,
+      pageSizeSelectorPosition,
+      pageInfoPosition,
+      showCurrentPage,
+      showPageInfo,
+      showPageSizeSelector,
+      checkboxTolerance,
+      rowHeight,
+      rowDoubleClick,
+      headerUserSelect,
+      cellUserSelect,
+      userSelectCell,
+      userSelectRow,
+      userSelectHeading,
+      keyBindings,
+      onSelectAllAction,
+      onCutAction,
+      onCopyAction,
+      onPasteAction,
+      onDeleteAction,
+      alwaysShowHeader,
+      striped,
+    };
+    const changedProps = Object.keys(currentProps).filter((k) => (currentProps as any)[k] !== propsRef.current[k]);
+    if (changedProps.length > 0) {
+      console.log(`%c[TableNative] Re-render triggered by PROPS: ${JSON.stringify(changedProps)}`, "color: red; font-weight: bold;");
+    }
+    propsRef.current = { ...currentProps };
+    console.count("[TableNative] render");
+
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
       cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
@@ -611,14 +685,6 @@ export const Table = memo(forwardRef(
       getThemeVar("userSelect-heading-Table") ??
       defaultProps.userSelectHeading;
 
-    console.count("[TableNative] render");
-    performance.mark("table-native:render-start");
-    useLayoutEffect(() => {
-      performance.mark("table-native:render-end");
-      performance.measure("[TableNative] render+commit", "table-native:render-start", "table-native:render-end");
-      const ms = performance.getEntriesByName("[TableNative] render+commit").at(-1)?.duration.toFixed(1);
-      console.log(`[TableNative] render+commit: ${ms}ms`);
-    });
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -692,6 +758,14 @@ export const Table = memo(forwardRef(
       initiallySelected,
       syncWithAppState,
     });
+
+    const stateRef = useRef<any>({});
+    const currentState = { focusedIndex, selectedRowIdMap, visibleItems };
+    const changedStates = Object.keys(currentState).filter((k) => (currentState as any)[k] !== stateRef.current[k]);
+    if (changedStates.length > 0) {
+      console.log(`[TableNative] Re-render triggered by STATE: ${JSON.stringify(changedStates)}`);
+    }
+    stateRef.current = { ...currentState };
 
     // --- Handle keyboard actions (selectAll, cut, copy, paste, delete)
     const handleKeyboardActions = useTableKeyboardActions({
@@ -976,31 +1050,7 @@ export const Table = memo(forwardRef(
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
-    // --- DEBUG: track what changed between renders
-    const debugPrevRef = useRef<Record<string, any>>({});
-    {
-      const current: Record<string, any> = {
-        visibleItems,
-        hoveredRowId,
-        headerCheckboxHovered,
-        _sortBy,
-        _sortingDirection,
-        pagination,
-        columnSizing,
-        focusedIndex,
-        selectedRowIdMap,
-        data,
-        columns,
-        renderVersion,
-        rowsSelectable,
-      };
-      const prev = debugPrevRef.current;
-      const changed = Object.keys(current).filter(k => current[k] !== prev[k]);
-      if (changed.length > 0 && Object.keys(prev).length > 0) {
-        console.log("[TableNative] Re-render triggered by:", changed);
-      }
-      debugPrevRef.current = current;
-    }
+
 
     const columnPinning = useMemo(() => {
       const left: Array<string> = [];
@@ -1303,8 +1353,6 @@ export const Table = memo(forwardRef(
     //   • renderVersion changes  (e.g. selectMode toggled → closures must refresh)
     //   • rowIndex changes        (row at this slot changed)
     //   • isSelected changes      (the only thing that changes on a click)
-    // This means 11 TableNative renders × 19 visible rows = 209 VirtualTableRow calls,
-    // but only 1 TableMemoizedCells actually re-renders (the clicked row).
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const TableMemoizedCells = useMemo(() => {
       return memo(
@@ -1317,18 +1365,6 @@ export const Table = memo(forwardRef(
           isSelected: boolean;
           renderVersion: number;
         }) {
-          console.count("[TableMemoizedCells] render");
-
-          const debugProps = { rowIndex, isSelected: _isSelected, renderVersion: _rv };
-          const prevProps = useRef<any>(debugProps);
-          useEffect(() => {
-            const changedProps = Object.keys(debugProps).filter((k) => (debugProps as any)[k] !== prevProps.current[k]);
-            if (changedProps.length > 0) {
-              console.log("[TableMemoizedCells] Re-render triggered by props:", changedProps);
-            }
-            prevProps.current = debugProps;
-          });
-
           const row = rowsRef.current[rowIndex];
           if (!row) return null;
           const { effectiveUserSelectCell: userSelectCell, cellVerticalAlign: vertAlign } =
@@ -1376,12 +1412,10 @@ export const Table = memo(forwardRef(
             </>
           );
         },
-        (prev, next) => {
-          if (prev.renderVersion !== next.renderVersion) return false;
-          if (prev.rowIndex !== next.rowIndex) return false;
-          if (prev.isSelected !== next.isSelected) return false;
-          return true; // skip re-render
-        },
+        (prev, next) =>
+          prev.rowIndex === next.rowIndex &&
+          prev.isSelected === next.isSelected &&
+          prev.renderVersion === next.renderVersion,
       );
     }, []);
 
@@ -1537,7 +1571,11 @@ export const Table = memo(forwardRef(
                   : undefined
               }
             >
-              {children}
+              <TableMemoizedCells
+                rowIndex={rowIndex}
+                isSelected={row.getIsSelected()}
+                renderVersion={s.renderVersion}
+              />
             </tr>
           );
         },
@@ -1932,13 +1970,8 @@ export const Table = memo(forwardRef(
               startMargin={startMargin}
               itemSize={rowHeight}
             >
-              {rows.map((row, rowIndex) => (
-                <TableMemoizedCells
-                  key={row.id}
-                  rowIndex={rowIndex}
-                  isSelected={row.getIsSelected()}
-                  renderVersion={rowStateRef.current.renderVersion}
-                />
+              {rows.map((row) => (
+                <tr key={row.id} />
               ))}
             </Virtualizer>
           )}

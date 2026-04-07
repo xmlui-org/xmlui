@@ -575,19 +575,6 @@ const TableWithColumns = memo(
       > & { layoutContext?: LayoutContext },
       ref,
     ) => {
-      console.count("[TableWithColumns] render");
-      // --- DEBUG WHY DID YOU RENDER ---
-      const debugProps = { extractValue, node, renderChild, lookupEventHandler, lookupAction, lookupSyncCallback, classes, registerComponentApi, layoutContext };
-      const prevProps = useRef<any>(debugProps);
-      useEffect(() => {
-        const changedProps = Object.keys(debugProps).filter((k) => (debugProps as any)[k] !== prevProps.current[k]);
-        if (changedProps.length > 0) {
-          console.log("[TableWithColumns] Re-render triggered by props:", changedProps);
-        }
-        prevProps.current = debugProps;
-      });
-      // --- END DEBUG ---
-
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
       const data = extractValue(node.props.items) || extractValue(node.props.data);
 
@@ -595,7 +582,7 @@ const TableWithColumns = memo(
       const renderVersionRef = useRef(0);
       const prevRefreshOnRef = useRef(refreshOn);
 
-      const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+      const shouldForceRefresh = node.props.refreshOn !== undefined && prevRefreshOnRef.current !== refreshOn;
       if (shouldForceRefresh) {
         prevRefreshOnRef.current = refreshOn;
         renderVersionRef.current++;
@@ -611,6 +598,14 @@ const TableWithColumns = memo(
       const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
       const columnIdsRef = useRef([]);
       const [tableKey, setTableKey] = useState(0);
+
+      const propsRef = useRef<any>({});
+      const changedProps = Object.keys(node.props).filter((k) => node.props[k] !== propsRef.current[k]);
+      if (changedProps.length > 0) {
+        console.log(`[TableWithColumns] Re-render triggered by PROPS: ${JSON.stringify(changedProps)}`);
+      }
+      propsRef.current = { ...node.props };
+      console.count("[TableWithColumns] render");
       const tableContextValue = useMemo(() => {
         return {
           registerColumn: (column: OurColumnMetadata, id: string) => {
@@ -736,11 +731,17 @@ const TableWithColumns = memo(
       const hasContextMenu = useRef(!!node.events?.contextMenu).current;
 
       const pendingOwnWriteRef = useRef(false);
+      // Version counter for own-write detection.
+      // Each write embeds a monotonically-increasing __v number in the stored object.
+      // We compare this primitive on read-back — reliable even when XMLUI does not
+      // preserve inner array references across state evaluations.
+      const pendingOwnWriteVersionRef = useRef<number>(0);
+      const ownWriteCountRef = useRef<number>(0);
       const pendingOwnWrite = pendingOwnWriteRef.current;
       pendingOwnWriteRef.current = false; // consume immediately
 
       // Holder for the stable adapter object.
-      const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+      const syncAdapterHolderRef = useRef<{ value: any; update: any; _raw?: any; selectedIds?: any } | null>(null);
 
       let syncAdapter: any;
       if (syncVarName !== undefined) {
@@ -760,26 +761,41 @@ const TableWithColumns = memo(
                 value: currentSyncVarValue,
                 update: ({ selectedIds }: { selectedIds: string[] }) => {
                   pendingOwnWriteRef.current = true;
-                  performance.mark("table:sync-update-start");
+                  const thisVersion = ++ownWriteCountRef.current;
+                  pendingOwnWriteVersionRef.current = thisVersion;
                   const windowKey = `__tgSync_${syncVarName}`;
-                  (window as any)[windowKey] = selectedIds;
+                  (window as any)[windowKey] = { selectedIds, __v: thisVersion };
                   const handler = lookupActionRef.current?.(
-                    `{${syncVarName} = {selectedIds: window.${windowKey}}}`,
+                    `{${syncVarName} = window.${windowKey}}`,
                     { ephemeral: true },
                   );
                   startTransition(() => {
                     handler?.();
                   });
-                  performance.mark("table:sync-update-end");
-                  performance.measure("[Table] syncAdapter.update", "table:sync-update-start", "table:sync-update-end");
                 },
               };
             } else if (currentSyncVarValue !== syncAdapterHolderRef.current.value) {
-              if (pendingOwnWrite) {
-                // Update the value in-place so useRowSelection sees the latest
-                // selectedIds while the object identity stays the same.
+              // Stable across concurrent React re-render passes: treat as own write if
+              // the inner selectedIds array is the exact same reference we wrote.
+              // XMLUI evaluates `{selectedIds: window.__tgSync_x}` and preserves the
+              // window array reference, so this O(1) check is sufficient.
+              const isOwnWrite = pendingOwnWrite ||
+                (pendingOwnWriteVersionRef.current > 0 &&
+                  currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
+              console.log(`[TableWithColumns] isOwnWrite check:`, {
+                pendingOwnWrite,
+                expectedVersion: pendingOwnWriteVersionRef.current,
+                actualVersion: currentSyncVarValue?.__v,
+                isOwnWrite,
+              });
+              if (isOwnWrite) {
+                // Update value in-place — object identity is preserved, so
+                // Table (memo'd) does not re-render for this change.
                 syncAdapterHolderRef.current.value = currentSyncVarValue;
               } else {
+                // Genuine external change — reset version sentinel so stale
+                // __v values from prior writes cannot cause false positives.
+                pendingOwnWriteVersionRef.current = 0;
                 syncAdapterHolderRef.current = {
                   value: currentSyncVarValue,
                   update: syncAdapterHolderRef.current.update,
@@ -791,7 +807,41 @@ const TableWithColumns = memo(
           }
         }
       } else {
-        syncAdapterHolderRef.current = null;
+        const rawAppProp = extractValue(node.props.syncWithAppState);
+        if (rawAppProp) {
+          if (shouldForceRefresh && syncAdapterHolderRef.current) {
+             syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
+          }
+          if (!syncAdapterHolderRef.current) {
+             syncAdapterHolderRef.current = {
+               _raw: rawAppProp,
+               get value() { return this._raw.value; },
+               set value(v: any) { this._raw.value = v; },
+               get selectedIds() { return this._raw.selectedIds; },
+               set selectedIds(v: any) { this._raw.selectedIds = v; },
+               update: (arg: any) => {
+                 pendingOwnWriteRef.current = true;
+                 const target = syncAdapterHolderRef.current!._raw;
+                 if (typeof target.update === "function") target.update(arg);
+                 else if (target.value) target.value.selectedIds = arg.selectedIds;
+                 else target.selectedIds = arg.selectedIds;
+               }
+             };
+          } else if (rawAppProp !== syncAdapterHolderRef.current._raw) {
+             if (pendingOwnWrite) {
+                // Own write echo, just point _raw to new proxy, keep reference same
+                syncAdapterHolderRef.current._raw = rawAppProp;
+             } else {
+                // External update, bust React.memo
+                syncAdapterHolderRef.current = {
+                  ...syncAdapterHolderRef.current,
+                  _raw: rawAppProp
+                };
+             }
+          }
+        } else {
+          syncAdapterHolderRef.current = null;
+        }
       }
       syncAdapter = syncAdapterHolderRef.current;
 
