@@ -1097,7 +1097,7 @@ function signError(error: Error | string) {
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
     traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
     kind: "error:runtime",
-    error: message,
+    error: { message },
     stack: error instanceof Error ? error.stack : undefined,
   });
 }

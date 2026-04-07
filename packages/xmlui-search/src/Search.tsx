@@ -47,9 +47,11 @@ type Props = {
   showPreviewMetadata?: boolean;
   defaultSelectedCategories?: string[];
   pageSize?: number;
+  enableSpellCorrection?: boolean;
   /** "overlay" (default): clicking the search button opens a centered full-screen overlay.
-   * "inline": popover dropdown anchored to the input with keyboard shortcut footer. */
-  mode?: "overlay" | "inline";
+   * "inline": popover dropdown anchored to the input with keyboard shortcut footer.
+   * "drawer": opens in a side drawer panel. */
+  mode?: "overlay" | "inline" | "drawer";
 };
 
 export const defaultProps: Required<Pick<Props, "limit" | "maxContentMatchNumber">> = {

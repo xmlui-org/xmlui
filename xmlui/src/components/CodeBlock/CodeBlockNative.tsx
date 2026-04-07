@@ -1,5 +1,4 @@
-import React, { type ForwardedRef, forwardRef, memo, useCallback } from "react";
-import type { CSSProperties } from "react";
+import React, { type CSSProperties, type ForwardedRef, forwardRef, memo, useCallback } from "react";
 import styles from "./CodeBlock.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_HEADER, PART_CONTENT } from "../../components-core/parts";
@@ -15,7 +14,6 @@ import { ThemedIcon } from "../Icon/Icon";
 import toast from "react-hot-toast";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import type { CSSProperties } from "react";
 import classnames from "classnames";
 
 type CodeBlockProps = {
