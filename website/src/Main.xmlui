@@ -1014,16 +1014,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Disable specific dates in DatePicker"
-                            to="/docs/howto/disable-specific-dates-in-datepicker"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Handle Form willSubmit return values"
-                            to="/docs/howto/handle-form-willsubmit-return-values"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Use regex validation in FormItem"
                             to="/docs/howto/use-regex-validation-in-formitem"
                         />
@@ -1034,58 +1024,13 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Switch Tabs to accordion view"
-                            to="/docs/howto/switch-tabs-to-accordion-view"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Sync TileGrid selection across grids"
                             to="/docs/howto/sync-tilegrid-selection-across-grids"
                         />
                         <NavLink
                             icon="article"
-                            label="Configure Tooltip with string syntax"
-                            to="/docs/howto/configure-tooltip-with-string-syntax"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Control debounce vs throttle priority"
-                            to="/docs/howto/control-debounce-vs-throttle-priority"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Dock children in a Stack panel"
-                            to="/docs/howto/dock-children-in-a-stack-panel"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Communicate with IFrame content"
-                            to="/docs/howto/communicate-with-iframe-content"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Handle ContentSeparator orientation"
                             to="/docs/howto/handle-contentseparator-orientation"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Load remote markup with IncludeMarkup"
-                            to="/docs/howto/load-remote-markup-with-includemarkup"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Stack StickySection elements"
-                            to="/docs/howto/stack-stickysection-elements"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Auto-scroll NavPanel to active item"
-                            to="/docs/howto/auto-scroll-navpanel-to-active-item"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Handle Checkbox value coercion"
-                            to="/docs/howto/handle-checkbox-value-coercion"
                         />
                     </NavGroup>
                 </NavGroup>
@@ -2283,16 +2228,6 @@
                     content="{appGlobals.docsContent['pages/howto/parse-uploaded-files-as-csv-or-json.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/disable-specific-dates-in-datepicker">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/disable-specific-dates-in-datepicker.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/handle-form-willsubmit-return-values">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/handle-form-willsubmit-return-values.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/use-regex-validation-in-formitem">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/use-regex-validation-in-formitem.md']}"
@@ -2303,59 +2238,14 @@
                     content="{appGlobals.docsContent['pages/howto/use-negative-maxprimarysize-in-splitter.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/switch-tabs-to-accordion-view">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/switch-tabs-to-accordion-view.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/sync-tilegrid-selection-across-grids">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/sync-tilegrid-selection-across-grids.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/configure-tooltip-with-string-syntax">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/configure-tooltip-with-string-syntax.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/control-debounce-vs-throttle-priority">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/control-debounce-vs-throttle-priority.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/dock-children-in-a-stack-panel">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/dock-children-in-a-stack-panel.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/communicate-with-iframe-content">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/communicate-with-iframe-content.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/handle-contentseparator-orientation">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/handle-contentseparator-orientation.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/load-remote-markup-with-includemarkup">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/load-remote-markup-with-includemarkup.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/stack-stickysection-elements">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/stack-stickysection-elements.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/auto-scroll-navpanel-to-active-item">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/auto-scroll-navpanel-to-active-item.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/handle-checkbox-value-coercion">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/handle-checkbox-value-coercion.md']}"
                 />
             </Page>
 
