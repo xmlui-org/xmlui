@@ -672,6 +672,11 @@ export const Table = memo(forwardRef(
       console.log(`%c[TableNative] Re-render triggered by PROPS: ${JSON.stringify(changedProps)}`, "color: red; font-weight: bold;");
     }
     propsRef.current = { ...currentProps };
+    const renderStartTime = performance.now();
+    useLayoutEffect(() => {
+      const commitTime = performance.now();
+      console.log(`[TableNative] render+commit: ${(commitTime - renderStartTime).toFixed(2)}ms`);
+    });
     console.count("[TableNative] render");
 
     const { getThemeVar } = useTheme();

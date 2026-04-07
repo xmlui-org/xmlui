@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo, startTransition, useEffect } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, startTransition, useEffect, useCallback } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -15,6 +15,7 @@ import {
   dContextMenu,
   dInternal,
 } from "../metadata-helpers";
+import { useEvent } from "../../components-core/utils/misc";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -588,12 +589,6 @@ const TableWithColumns = memo(
         renderVersionRef.current++;
       }
 
-      const renderChildRef = useRef(renderChild);
-      renderChildRef.current = renderChild;
-      const stableRenderChildFnRef = useRef<typeof renderChild>(
-        ((nodeToRender: any, ctx: any) => renderChildRef.current(nodeToRender, ctx)) as any,
-      );
-
       const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
       const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
       const columnIdsRef = useRef([]);
@@ -606,6 +601,24 @@ const TableWithColumns = memo(
       }
       propsRef.current = { ...node.props };
       console.count("[TableWithColumns] render");
+
+      // Stable delegates to prevent React.memo busts on TableNative.
+      const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
+      const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
+      const stableWillSort = useEvent((...args: any[]) => lookupEventHandler("willSort")?.(...args));
+      const stableRowDoubleClick = useEvent((...args: any[]) => lookupEventHandler("rowDoubleClick")?.(...args));
+      const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
+      const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
+      const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
+      const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
+      const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
+      const stableLookupEventHandler = useEvent((...args: Parameters<typeof lookupEventHandler>) => lookupEventHandler(...args));
+
+      const rowDisabledPredicate = node.props.rowDisabledPredicate;
+      const stableRowDisabledPredicate = useEvent((item: any) => lookupSyncCallback(rowDisabledPredicate)?.(item));
+      const rowUnselectablePredicate = node.props.rowUnselectablePredicate;
+      const stableRowUnselectablePredicate = useEvent((item: any) => lookupSyncCallback(rowUnselectablePredicate)?.(item));
+
       const tableContextValue = useMemo(() => {
         return {
           registerColumn: (column: OurColumnMetadata, id: string) => {
@@ -690,46 +703,6 @@ const TableWithColumns = memo(
       const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
       const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
 
-      // Keep lookupAction current without breaking the stable adapter reference.
-      const lookupActionRef = useRef(lookupAction);
-      lookupActionRef.current = lookupAction;
-
-      // Keep lookupEventHandler and lookupSyncCallback current via refs so that
-      // stable wrappers below always call the latest XMLUI-generated functions.
-      const lookupEventHandlerRef = useRef(lookupEventHandler);
-      lookupEventHandlerRef.current = lookupEventHandler;
-      const lookupSyncCallbackRef = useRef(lookupSyncCallback);
-      lookupSyncCallbackRef.current = lookupSyncCallback;
-
-      // Node prop refs for predicates (expression strings that don't change reactively).
-      const nodePropsRowDisabledRef = useRef(node.props.rowDisabledPredicate);
-      nodePropsRowDisabledRef.current = node.props.rowDisabledPredicate;
-      const nodePropsRowUnselectableRef = useRef(node.props.rowUnselectablePredicate);
-      nodePropsRowUnselectableRef.current = node.props.rowUnselectablePredicate;
-
-      // Stable event handler and predicate wrappers — created ONCE, delegate via refs.
-      // This prevents React.memo on TableNative from being busted by new function references
-      // on every XMLUI reactive cycle.
-      const stableHandlers = useRef({
-        sortingDidChange: (...args: any[]) => lookupEventHandlerRef.current("sortingDidChange")?.(...args),
-        selectionDidChange: (...args: any[]) => lookupEventHandlerRef.current("selectionDidChange")?.(...args),
-        willSort: (...args: any[]) => lookupEventHandlerRef.current("willSort")?.(...args),
-        rowDoubleClick: (...args: any[]) => lookupEventHandlerRef.current("rowDoubleClick")?.(...args),
-        selectAllAction: (...args: any[]) => lookupEventHandlerRef.current("selectAllAction")?.(...args),
-        cutAction: (...args: any[]) => lookupEventHandlerRef.current("cutAction")?.(...args),
-        copyAction: (...args: any[]) => lookupEventHandlerRef.current("copyAction")?.(...args),
-        pasteAction: (...args: any[]) => lookupEventHandlerRef.current("pasteAction")?.(...args),
-        deleteAction: (...args: any[]) => lookupEventHandlerRef.current("deleteAction")?.(...args),
-        rowDisabledPredicate: (item: any) => lookupSyncCallbackRef.current(nodePropsRowDisabledRef.current)?.(item),
-        rowUnselectablePredicate: (item: any) => lookupSyncCallbackRef.current(nodePropsRowUnselectableRef.current)?.(item),
-        // For contextMenu: TableNative uses lookupEventHandler(name, opts) internally per-row.
-        // We pass a stable wrapper so memo doesn't bust on every XMLUI cycle.
-        lookupEventHandler: (...args: Parameters<typeof lookupEventHandler>) => lookupEventHandlerRef.current(...args),
-      });
-
-      // contextMenu presence is part of component AST — stable across renders.
-      const hasContextMenu = useRef(!!node.events?.contextMenu).current;
-
       const pendingOwnWriteRef = useRef(false);
       // Version counter for own-write detection.
       // Each write embeds a monotonically-increasing __v number in the stored object.
@@ -765,7 +738,7 @@ const TableWithColumns = memo(
                   pendingOwnWriteVersionRef.current = thisVersion;
                   const windowKey = `__tgSync_${syncVarName}`;
                   (window as any)[windowKey] = { selectedIds, __v: thisVersion };
-                  const handler = lookupActionRef.current?.(
+                  const handler = lookupAction?.(
                     `{${syncVarName} = window.${windowKey}}`,
                     { ephemeral: true },
                   );
@@ -807,41 +780,7 @@ const TableWithColumns = memo(
           }
         }
       } else {
-        const rawAppProp = extractValue(node.props.syncWithAppState);
-        if (rawAppProp) {
-          if (shouldForceRefresh && syncAdapterHolderRef.current) {
-             syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
-          }
-          if (!syncAdapterHolderRef.current) {
-             syncAdapterHolderRef.current = {
-               _raw: rawAppProp,
-               get value() { return this._raw.value; },
-               set value(v: any) { this._raw.value = v; },
-               get selectedIds() { return this._raw.selectedIds; },
-               set selectedIds(v: any) { this._raw.selectedIds = v; },
-               update: (arg: any) => {
-                 pendingOwnWriteRef.current = true;
-                 const target = syncAdapterHolderRef.current!._raw;
-                 if (typeof target.update === "function") target.update(arg);
-                 else if (target.value) target.value.selectedIds = arg.selectedIds;
-                 else target.selectedIds = arg.selectedIds;
-               }
-             };
-          } else if (rawAppProp !== syncAdapterHolderRef.current._raw) {
-             if (pendingOwnWrite) {
-                // Own write echo, just point _raw to new proxy, keep reference same
-                syncAdapterHolderRef.current._raw = rawAppProp;
-             } else {
-                // External update, bust React.memo
-                syncAdapterHolderRef.current = {
-                  ...syncAdapterHolderRef.current,
-                  _raw: rawAppProp
-                };
-             }
-          }
-        } else {
-          syncAdapterHolderRef.current = null;
-        }
+        syncAdapterHolderRef.current = null;
       }
       syncAdapter = syncAdapterHolderRef.current;
 
@@ -853,13 +792,9 @@ const TableWithColumns = memo(
         [layoutContext],
       );
 
-      const noDataRenderer = useMemo(
-        () =>
-          node.props.noDataTemplate
-            ? () => stableRenderChildFnRef.current(node.props.noDataTemplate, tableChildLayoutContext)
-            : undefined,
-        [node.props.noDataTemplate, tableChildLayoutContext]
-      );
+      const noDataRenderer = node.props.noDataTemplate
+        ? () => renderChild(node.props.noDataTemplate, tableChildLayoutContext)
+        : undefined;
 
       const tableContent = (
         <>
@@ -868,10 +803,10 @@ const TableWithColumns = memo(
             This way the order of the columns is preserved.
         */}
           <TableContext.Provider value={tableContextValue} key={tableKey}>
-            {stableRenderChildFnRef.current(node.children, tableChildLayoutContext)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <TableContext.Provider value={columnRefresherContextValue}>
-            {stableRenderChildFnRef.current(node.children, tableChildLayoutContext)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <Table
             classes={classes}
@@ -887,23 +822,23 @@ const TableWithColumns = memo(
             loading={extractValue.asOptionalBoolean(node.props.loading)}
             isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
             headerHeight={extractValue.asSize(node.props.headerHeight)}
-            rowDisabledPredicate={stableHandlers.current.rowDisabledPredicate}
-            rowUnselectablePredicate={stableHandlers.current.rowUnselectablePredicate}
+            rowDisabledPredicate={stableRowDisabledPredicate}
+            rowUnselectablePredicate={stableRowUnselectablePredicate}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-            lookupEventHandler={hasContextMenu ? stableHandlers.current.lookupEventHandler : undefined}
-            sortingDidChange={stableHandlers.current.sortingDidChange}
-            onSelectionDidChange={stableHandlers.current.selectionDidChange}
-            willSort={stableHandlers.current.willSort}
-            rowDoubleClick={stableHandlers.current.rowDoubleClick}
-            onSelectAllAction={stableHandlers.current.selectAllAction}
-            onCutAction={stableHandlers.current.cutAction}
-            onCopyAction={stableHandlers.current.copyAction}
-            onPasteAction={stableHandlers.current.pasteAction}
-            onDeleteAction={stableHandlers.current.deleteAction}
+            lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
+            sortingDidChange={stableSortingDidChange}
+            onSelectionDidChange={stableSelectionDidChange}
+            willSort={stableWillSort}
+            rowDoubleClick={stableRowDoubleClick}
+            onSelectAllAction={stableSelectAllAction}
+            onCutAction={stableCutAction}
+            onCopyAction={stableCopyAction}
+            onPasteAction={stablePasteAction}
+            onDeleteAction={stableDeleteAction}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
