@@ -160,6 +160,10 @@
           "import": "./dist/nodejs/server.js",
           "require": "./dist/nodejs/server.js"
         },
+        "./compiled-runtime": {
+          "import": "./dist/lib/compiled-runtime.js",
+          "require": "./dist/lib/compiled-runtime.js"
+        },
         "./parser": {
           "import": "./dist/lib/xmlui-parser.js",
           "require": "./dist/lib/xmlui-parser.js"
@@ -201,8 +205,7 @@
   },
   "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./parser": "./src/parsers/xmlui-parser/index.ts",
+    ".": "./src/index.ts",    "./compiled-runtime": "./src/index-compiled-runtime.ts",    "./parser": "./src/parsers/xmlui-parser/index.ts",
     "./*.css": "./dist/lib/*.css",
     "./index.scss": "./src/index.scss",
     "./themes.scss": "./src/components-core/theming/_themes.scss",
