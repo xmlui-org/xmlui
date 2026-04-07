@@ -18,15 +18,6 @@ describe("Xmlui transform - errors", () => {
       expect(err.toString()).include("W001");
     }
   });
-  it("script error has correct pos", () => {
-    const src = `<Stack/><Stack/>`;
-    try {
-      transformSource(src);
-      assert.fail("Exception expected");
-    } catch (err) {
-      console.log(err);
-    }
-  });
 
   it("script error has correct pos", () => {
     const src = `<Form

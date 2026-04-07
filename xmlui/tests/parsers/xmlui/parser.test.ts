@@ -416,6 +416,16 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.uppercaseAttr);
   });
 
+  it("Multiple script tags", () => {
+    const { errors } = parseSource(`<Stack>
+      <script></script>
+      <script></script>
+      <script></script>
+    </Stack>`);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodesTransform.multipleScriptTags);
+  });
+
   it("Text after root element", () => {
     const { errors, node } = parseSource("<A></A>ABC");
 

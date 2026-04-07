@@ -16,14 +16,17 @@ type IncompleteNode = {
 type StackFrame = {
   node: IncompleteNode | Node;
   errors: ParserDiag[];
+  scriptCount: number;
   openElementTagName?: string;
 };
 
 class ParseStack {
   private readonly frames: StackFrame[];
+  private readonly cursor: DocumentCursor;
 
-  constructor() {
+  constructor(cursor: DocumentCursor) {
     this.frames = [];
+    this.cursor = cursor;
   }
 
   get node(): IncompleteNode | Node {
@@ -41,6 +44,7 @@ class ParseStack {
         kind,
         children: [],
       },
+      scriptCount: 0,
       errors: [],
     });
   }
@@ -74,6 +78,22 @@ class ParseStack {
   }
 
   pushToken(node: Node): void {
+    if (node.kind === SyntaxKind.Script) {
+      if (this.currentFrame.scriptCount === 1) {
+        const diag = DIAGS_TRANSFORM.multipleScriptTags;
+        const { contextPos, contextEnd } = this.cursor.getSurroundingContext(node.pos, node.end, 1);
+        const err: ParserDiag = {
+          code: diag.code,
+          message: diag.message,
+          pos: node.pos,
+          end: node.end,
+          contextPos,
+          contextEnd,
+        };
+        this.pushError(err);
+      }
+      this.currentFrame.scriptCount++;
+    }
     this.node.children!.push(node);
   }
 
@@ -154,7 +174,7 @@ export function createXmlUiParser(source: string): {
 
 export function parseXmlUiMarkup(text: string): ParseResult {
   const cursor = new DocumentCursor(text);
-  const stack = new ParseStack();
+  const stack = new ParseStack(cursor);
   let peekedToken: Node | undefined;
   let errFromScanner: { message: ScannerDiagnosticMessage; prefixLength: number } | undefined =
     undefined;
@@ -511,8 +531,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       return;
     }
 
-    validateMultipleScriptTags(element);
-
     if (elementName === COMPOUND_COMPONENT_NAME) {
       validateCompoundComponentNode(element);
       return;
@@ -666,21 +684,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       } else if (nestedElementType !== childName) {
         errorAt(DIAGS_TRANSFORM.cannotMixFieldItem, child.pos, child.end);
       }
-    }
-  }
-
-  function validateMultipleScriptTags(element: Node) {
-    const children = getElementChildren(element);
-    let hasScriptTag = false;
-    for (const child of children) {
-      if (child.kind !== SyntaxKind.Script) {
-        continue;
-      }
-
-      if (hasScriptTag) {
-        errorAt(DIAGS_TRANSFORM.multipleScriptTags, child.pos, child.end);
-      }
-      hasScriptTag = true;
     }
   }
 
