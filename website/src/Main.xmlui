@@ -936,11 +936,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Theme TableOfContents by depth"
-                            to="/docs/howto/theme-tableofcontents-by-depth"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Customize Select & AutoComplete menus"
                             to="/docs/howto/customize-select-and-autocomplete-menus"
                         />
@@ -963,11 +958,6 @@
                             icon="article"
                             label="Theme ExpandableItem transitions"
                             to="/docs/howto/theme-expandableitem-transitions"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Style NavPanel for horizontal mode"
-                            to="/docs/howto/style-navpanel-for-horizontal-mode"
                         />
                         <NavLink
                             icon="article"
@@ -1011,7 +1001,6 @@
                         />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Complex Property Patterns">
                         <NavLink
                             icon="article"
@@ -1099,7 +1088,6 @@
                             to="/docs/howto/handle-checkbox-value-coercion"
                         />
                     </NavGroup>
-                    -->
                 </NavGroup>
                 <NavGroup
                     label="Reference"
@@ -2218,11 +2206,6 @@
                     content="{appGlobals.docsContent['pages/howto/style-per-level-heading-sizes.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/theme-tableofcontents-by-depth">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/theme-tableofcontents-by-depth.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/customize-select-and-autocomplete-menus">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/customize-select-and-autocomplete-menus.md']}"
@@ -2246,11 +2229,6 @@
             <Page url="/docs/howto/theme-expandableitem-transitions">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/theme-expandableitem-transitions.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/style-navpanel-for-horizontal-mode">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/style-navpanel-for-horizontal-mode.md']}"
                 />
             </Page>
             <Page url="/docs/howto/theme-multi-level-navgroup-nesting">
