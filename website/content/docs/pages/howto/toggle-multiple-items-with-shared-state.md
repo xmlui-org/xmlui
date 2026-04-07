@@ -25,38 +25,43 @@ When multiple checkboxes share a single array of selected (or hidden) items, dec
 
   <CategoryFilter
     categories="{['Technology', 'Outdoors', 'Music', 'Food'].map(
-      (name) => ({ name: name, count: articles.filter((a) => a.category === name).length })
+      (name) => ({ 
+          name: name, 
+          count: articles.filter((a) => a.category === name).length 
+      })
     )}" />
 
   <H2>Articles</H2>
   <Text variant="caption" color="$color-text-secondary">
-    {articles.filter((a) => hiddenCategories.indexOf(a.category) === -1).length} of {articles.length} shown
+    {articles.filter((a) => hiddenCategories.indexOf(a.category) === -1).length}
+    of {articles.length} shown
   </Text>
-  <Items data="{articles.filter((a) => hiddenCategories.indexOf(a.category) === -1)}">
-    <Card padding="$space-2" marginBottom="$space-1">
-      <VStack gap="$space-0">
-        <Text fontWeight="bold">{$item.title}</Text>
-        <Text fontSize="$fontSize-xs" fontStyle="italic" color="$color-text-tertiary">{$item.category}</Text>
-      </VStack>
+  <List data="{articles.filter((a) => 
+    hiddenCategories.indexOf(a.category) === -1)}"
+    height="240px"
+  >
+    <Card gap="0">
+      <H3>{$item.title}</H3>
+      <Text fontStyle="italic">{$item.category}</Text>
     </Card>
-  </Items>
+  </List>
 </App>
 ---comp display /hiddenCategories/
 <Component name="CategoryFilter">
-  <VStack gap="$space-2" padding="$space-4">
+  <VStack gap="0">
     <H2>Categories</H2>
     <Text variant="caption" color="$color-text-secondary">
       Uncheck a category to hide its articles
     </Text>
     <Items data="{$props.categories}">
-      <HStack gap="$space-2" verticalAlignment="center">
+      <HStack gap="$space-tight" verticalAlignment="center">
         <Checkbox
           initialValue="{hiddenCategories.indexOf($item.name) === -1}"
           onClick="hiddenCategories = hiddenCategories.indexOf($item.name) >= 0
             ? hiddenCategories.filter((x) => x !== $item.name)
             : [...hiddenCategories, $item.name]"
         />
-        <Text fontWeight="bold" width="30px" textAlign="right">{$item.count}</Text>
+        <Text fontWeight="bold" width="$space-4" textAlign="right">{$item.count}</Text>
         <Text>{$item.name}</Text>
       </HStack>
     </Items>
@@ -80,7 +85,7 @@ The key points:
 
 In a real application, you'd also save the hidden categories to an API. Fire the API call without waiting for it — the optimistic update has already updated the UI:
 
-```xml
+```xmlui
 <Checkbox
   initialValue="{hiddenCategories.indexOf($item.name) === -1}"
   onClick="

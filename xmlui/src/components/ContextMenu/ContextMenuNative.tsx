@@ -73,11 +73,12 @@ export const ContextMenu = forwardRef(function ContextMenu(
 
   const closeMenu = useCallback(() => {
     setOpen(false);
-    // Clear context data when closing
-    updateState?.({ $context: undefined });
+    // Do NOT clear $context here — onClick handlers (especially async ones
+    // like confirm()) may still reference it after the menu closes.
+    // $context is overwritten on the next openAt() call.
     // Reset click enablement
     setEnableClicks(true);
-  }, [updateState]);
+  }, []);
 
   const openAt = useCallback((event: MouseEvent | React.MouseEvent, context?: any) => {
     // Prevent the browser's default context menu

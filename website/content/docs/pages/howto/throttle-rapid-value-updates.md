@@ -5,8 +5,13 @@ Use `ChangeListener` with `throttleWaitInMs` to process a rapidly-changing value
 Throttling guarantees that your handler fires immediately on the first change and then no more than once per interval, even if the source changes hundreds of times in between. This is ideal for live search-as-you-type, scroll or resize tracking, or any scenario where you want *some* updates during a burst rather than waiting for the burst to end (which is what debouncing does instead).
 
 ```xmlui-pg copy display name="Throttled live search"
----app display /searchTerm/ /throttledTerm/ /updateCount/
-<App var.searchTerm="" var.throttledTerm="" var.updateCount="{0}">
+---app display /searchTerm/ /throttledTerm/ /changeCount/ /updateCount/
+<App 
+  var.searchTerm="" 
+  var.throttledTerm="" 
+  var.changeCount="{0}"
+  var.updateCount="{0}"
+>
   <ChangeListener
     listenTo="{searchTerm}"
     throttleWaitInMs="{500}"
@@ -20,7 +25,7 @@ Throttling guarantees that your handler fires immediately on the first change an
     <TextBox
       label="Search (type quickly)"
       value="{searchTerm}"
-      onDidChange="(v) => searchTerm = v"
+      onDidChange="(v) => {searchTerm = v; changeCount++}"
       placeholder="Type to search…"
     />
 
@@ -35,6 +40,10 @@ Throttling guarantees that your handler fires immediately on the first change an
           <Text variant="strong">{throttledTerm || '(none yet)'}</Text>
         </HStack>
         <HStack>
+          <Text>Input changed:</Text>
+          <Text variant="strong">{changeCount} time(s)</Text>
+        </HStack>
+        <HStack>
           <Text>Handler fired:</Text>
           <Text variant="strong">{updateCount} time(s)</Text>
         </HStack>
@@ -46,7 +55,7 @@ Throttling guarantees that your handler fires immediately on the first change an
 
 ## Key points
 
-**Throttle fires immediately, then at most once per interval**: The handler runs on the very first change, then is suppressed until the interval elapses, then fires again if the value changed — even while typing is still in progress. Debounce, by contrast, waits for the value to *stop* changing.
+**Throttle fires immediately, then at most once per interval**: The handler runs on the very first change, then is suppressed until the interval elapses, then fires again if the value changed — even while typing is still in progress. Debounce, by contrast, waits for the value to *stop* changing. In the example above, `changeCount` increments on every keystroke while `updateCount` only increments when the throttled listener fires — type quickly and you'll see the gap between them grow.
 
 **Choose throttle when you want progress updates during a burst**: Use `throttleWaitInMs` for live search suggestions, scroll-position tracking, or progress bars — cases where users benefit from seeing intermediate results. Use `debounceWaitInMs` when only the final settled value matters (e.g., before calling an expensive API).
 
