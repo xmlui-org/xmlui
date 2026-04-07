@@ -8,7 +8,7 @@ describe("Xmlui transform", () => {
       transformSource("");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T001");
+      expect(err.toString()).includes("U035");
     }
   });
 
@@ -27,7 +27,7 @@ describe("Xmlui transform", () => {
       transformSource("<Component><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T003");
+      expect(err.toString()).includes("U024");
     }
   });
 
@@ -36,22 +36,26 @@ describe("Xmlui transform", () => {
       transformSource("<Component name='haho'><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T002");
+      expect(err.toString()).includes("U025");
     }
   });
 
   it("Compound component needs a component child #1", () => {
-    const cd = transformSource(
-      "<Component name='MyComp'><!-- comment--></Component>",
-    ) as CompoundComponentDef;
-    expect(cd.component.type).equal("TextNode");
-    expect((cd.component.props as any).value).equal("");
+    try {
+      transformSource("<Component name='MyComp'><!-- comment--></Component>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("U036");
+    }
   });
 
   it("Compound component needs a component child #2", () => {
-    const cd = transformSource("<Component name='MyComp'></Component>") as CompoundComponentDef;
-    expect(cd.component.type).equal("TextNode");
-    expect((cd.component.props as any).value).equal("");
+    try {
+      transformSource("<Component name='MyComp'></Component>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString()).includes("U036");
+    }
   });
 
   it("Compound component cannot nest another one", () => {
@@ -59,7 +63,7 @@ describe("Xmlui transform", () => {
       transformSource("<Component name='MyComp'><Component name='Other'/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString()).includes("T006");
+      expect(err.toString()).includes("U021");
     }
   });
 });

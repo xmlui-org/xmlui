@@ -28,7 +28,7 @@ describe("Xmlui transform - attributes", () => {
       transformSource("<Component name='MyStack' invaAttr='a'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T021")).equal(true);
+      expect(err.toString().includes("U027")).equal(true);
     }
   });
 
@@ -37,7 +37,7 @@ describe("Xmlui transform - attributes", () => {
       transformSource("<Component invaAttr='a' name='MyStack'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T021")).equal(true);
+      expect(err.toString().includes("U027")).equal(true);
     }
   });
 

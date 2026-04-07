@@ -5,7 +5,7 @@ import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
 import { tagNameNodesWithoutErrorsMatch } from "./utils";
-import { ErrCodesParser, DIAGS_PARSER, DIAGS_TRANSFORM } from "./diagnostics";
+import { ErrCodesParser, DIAGS_PARSER } from "./diagnostics";
 import { DocumentCursor } from "../../language-server/base/text-document";
 
 type IncompleteNode = {
@@ -17,7 +17,9 @@ type StackFrame = {
   node: IncompleteNode | Node;
   errors: ParserDiag[];
   scriptCount: number;
-  openElementTagName?: string;
+  compoundCompName?: string;
+  namespaces?: Map<string, string>;
+  nonHelperChildrenSeen?: number;
 };
 
 class ParseStack {
@@ -78,41 +80,104 @@ class ParseStack {
   }
 
   pushToken(node: Node): void {
-    if (node.kind === SyntaxKind.Script) {
-      if (this.currentFrame.scriptCount === 1) {
-        const diag = DIAGS_TRANSFORM.multipleScriptTags;
-        const { contextPos, contextEnd } = this.cursor.getSurroundingContext(node.pos, node.end, 1);
-        const err: ParserDiag = {
-          code: diag.code,
-          message: diag.message,
-          pos: node.pos,
-          end: node.end,
-          contextPos,
-          contextEnd,
-        };
-        this.pushError(err);
-      }
-      this.currentFrame.scriptCount++;
-    }
     this.node.children!.push(node);
+  }
+
+  /** Tracks script tags within the current frame. Emits multipleScriptTags if a second script
+   * is encountered. Should only be called from parseFile and parseContentList. */
+  incScriptTagCount(node: Node): void {
+    if (this.currentFrame.scriptCount === 1) {
+      const diag = DIAGS_PARSER.multipleScriptTags;
+      const { contextPos, contextEnd } = this.cursor.getSurroundingContext(node.pos, node.end, 1);
+      const err: ParserDiag = {
+        code: diag.code,
+        message: diag.message,
+        pos: node.pos,
+        end: node.end,
+        contextPos,
+        contextEnd,
+      };
+      this.pushError(err);
+    }
+    this.currentFrame.scriptCount++;
   }
 
   pushError(error: ParserDiag): void {
     this.currentFrame.errors.push(error);
   }
 
-  getParentOpenElementTagName(): string | undefined {
+  /** Sets the compound component name on the current frame and initialises the non-helper
+   * children counter to 0. Called when an element with name "Component" is encountered. */
+  setCurrentCompoundCompName(name: string): void {
+    this.currentFrame.compoundCompName = name;
+    this.currentFrame.nonHelperChildrenSeen = 0;
+  }
+
+  /** Walks all ancestor frames (excluding the current frame) looking for a compound component
+   * name. Returns the name of the nearest ancestor compound component, or undefined. */
+  getAncestorCompoundCompName(): string | undefined {
     for (let i = this.frames.length - 2; i >= 0; i--) {
-      const openTagName = this.frames[i].openElementTagName;
-      if (openTagName !== undefined) {
-        return openTagName;
+      if (this.frames[i].compoundCompName !== undefined) {
+        return this.frames[i].compoundCompName;
       }
     }
     return undefined;
   }
 
-  setCurrentOpenElementTagName(tagName: string | undefined): void {
-    this.currentFrame.openElementTagName = tagName;
+  /** Initialises the namespace map on the current frame. Called once per ElementNode after
+   * attribute parsing. */
+  initCurrentNamespaces(): void {
+    this.currentFrame.namespaces = new Map();
+  }
+
+  // todo: this seems wrong, why are we storing the keys as the map values
+  /** Adds a namespace prefix to the current frame's namespace map.
+   * Returns false if the key already exists (caller should emit duplXmlns). */
+  addCurrentNamespace(key: string): boolean {
+    const map = this.currentFrame.namespaces!;
+    if (map.has(key)) {
+      return false;
+    }
+    map.set(key, key);
+    return true;
+  }
+
+  /** Resolves a namespace prefix by walking ancestor frames from innermost outward.
+   * Returns true if the prefix is declared in any ancestor, false otherwise. */
+  resolveNamespace(prefix: string): boolean {
+    for (let i = this.frames.length - 1; i >= 0; i--) {
+      if (this.frames[i].namespaces?.has(prefix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Increments the non-helper children counter on the nearest ancestor frame that
+   * has a compound component name set. */
+  incrementAncestorNonHelperCount(): void {
+    for (let i = this.frames.length - 2; i >= 0; i--) {
+      if (this.frames[i].compoundCompName !== undefined) {
+        this.frames[i].nonHelperChildrenSeen = (this.frames[i].nonHelperChildrenSeen ?? 0) + 1;
+        return;
+      }
+    }
+  }
+
+  /** Returns the number of non-helper children seen so far in the current frame (0 if not set). */
+  getCurrentNonHelperChildrenSeen(): number {
+    return this.currentFrame.nonHelperChildrenSeen ?? 0;
+  }
+
+  /** Returns the number of ElementNode frames currently on the stack. */
+  getElementNodeFrameCount(): number {
+    let count = 0;
+    for (const frame of this.frames) {
+      if (frame.node.kind === SyntaxKind.ElementNode) {
+        count++;
+      }
+    }
+    return count;
   }
 
   private get currentFrame(): StackFrame {
@@ -157,6 +222,18 @@ const HELPERS_WITH_NAME_VALUE_ONLY = new Set([
   "variable",
   "method",
   "global",
+]);
+const HELPER_NAMES = new Set([
+  "property",
+  "template",
+  "event",
+  "variable",
+  "global",
+  "loaders",
+  "uses",
+  "method",
+  "item",
+  "field",
 ]);
 const ON_PREFIX_REGEX = /^on[A-Z]/;
 const UPPERCASE_REGEX = /^[A-Z]/;
@@ -204,8 +281,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           validateSingleRootElement(fileContentListNode);
           return fileContentListNode;
         case SyntaxKind.CData:
-        case SyntaxKind.Script:
           bumpAny();
+          break;
+        case SyntaxKind.Script:
+          stack.incScriptTagCount(bumpAny());
           break;
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
@@ -234,8 +313,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       switch (token.kind) {
         case SyntaxKind.TextNode:
         case SyntaxKind.CData:
-        case SyntaxKind.Script:
           bumpAny();
+          break;
+        case SyntaxKind.Script:
+          stack.incScriptTagCount(bumpAny());
           break;
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
@@ -278,18 +359,85 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       parseAttrList();
     }
 
-    const parentTagName = stack.getParentOpenElementTagName();
     const openTagNameText = openTagName ? getTagNameNodeLastIdentifier(openTagName) : undefined;
+
+    // --- Phase 4c: namespace validation and xmlns collection
+    if (!errInName && openTagName) {
+      // Check for namespace prefix on the tag name (TagNameNode with 3 children = ns:Name)
+      if (openTagName.children!.length === 3) {
+        if (stack.getElementNodeFrameCount() === 1) {
+          // Root element cannot have a namespace prefix
+          errorAt(DIAGS_PARSER.rootCompNoNamespace, openTagName.pos, openTagName.children![0].end);
+        } else {
+          const prefix = getText(openTagName.children![0]);
+          if (!stack.resolveNamespace(prefix)) {
+            errorAt(DIAGS_PARSER.nsNotFound(prefix), openTagName.pos, openTagName.children![0].end);
+          }
+        }
+      }
+
+      // Initialise the namespace map for this frame and collect xmlns declarations
+      stack.initCurrentNamespaces();
+      const attrListNode = stack.node.children!.find(
+        (c) => c.kind === SyntaxKind.AttributeListNode,
+      );
+      if (attrListNode) {
+        for (const attr of attrListNode.children ?? []) {
+          const segmented = segmentAttr(attr);
+          if (segmented.namespace === "xmlns") {
+            const key = segmented.unsegmentedName;
+            const rawValue = segmented.value ?? "";
+            const parts = rawValue.split(":");
+            if (parts.length > 2) {
+              errorAt(
+                DIAGS_PARSER.nsValueIncorrect(
+                  rawValue,
+                  "Namespace cannot contain multiple ':' (colon).",
+                ),
+                attr.pos,
+                attr.end,
+              );
+            } else if (parts.length === 2 && parts[0] !== "component-ns") {
+              errorAt(DIAGS_PARSER.nsSchemeIncorrect(rawValue, "component-ns"), attr.pos, attr.end);
+            } else {
+              const nsValue = parts.length === 2 ? parts[1] : rawValue;
+              if (nsValue.includes("#")) {
+                errorAt(
+                  DIAGS_PARSER.nsValueIncorrect(nsValue, "Namespace cannot contain character '#'."),
+                  attr.pos,
+                  attr.end,
+                );
+              }
+            }
+            if (!stack.addCurrentNamespace(key)) {
+              errorAt(DIAGS_PARSER.duplXmlns(key), attr.pos, attr.end);
+            }
+          }
+        }
+      }
+    }
+
+    // --- Phase 4a: compound component name tracking
+    if (openTagNameText === COMPOUND_COMPONENT_NAME) {
+      const attrListNode = stack.node.children!.find(
+        (c) => c.kind === SyntaxKind.AttributeListNode,
+      );
+      const attrs = attrListNode ? (attrListNode.children ?? []).map(segmentAttr) : [];
+      const nameAttr = attrs.find((a) => !a.namespace && !a.startSegment && a.name === "name");
+      stack.setCurrentCompoundCompName(nameAttr?.value ?? "");
+    }
+
+    // --- Validate compound component nesting and invalid helper nodes
     let skipNodeValidation = false;
-    if (openTagNameText === COMPOUND_COMPONENT_NAME && parentTagName) {
-      errorAt(DIAGS_TRANSFORM.nestedCompDefs, openTagName!.pos, openTagName!.end);
+    if (
+      openTagNameText === COMPOUND_COMPONENT_NAME &&
+      stack.getAncestorCompoundCompName() !== undefined
+    ) {
+      errorAt(DIAGS_PARSER.nestedCompDefs, openTagName!.pos, openTagName!.end);
       skipNodeValidation = true;
-    } else if (parentTagName === COMPOUND_COMPONENT_NAME && openTagNameText) {
-      if (openTagNameText === COMPOUND_COMPONENT_NAME) {
-        errorAt(DIAGS_TRANSFORM.nestedCompDefs, openTagName.pos, openTagName.end);
-        skipNodeValidation = true;
-      } else if (openTagNameText === "uses" || openTagNameText === "loaders") {
-        errorAt(DIAGS_TRANSFORM.invalidNodeName(openTagNameText), openTagName.pos, openTagName.end);
+    } else if (stack.getAncestorCompoundCompName() !== undefined && openTagNameText) {
+      if (openTagNameText === "uses" || openTagNameText === "loaders") {
+        errorAt(DIAGS_PARSER.invalidNodeName(openTagNameText), openTagName!.pos, openTagName!.end);
         skipNodeValidation = true;
       }
     }
@@ -297,21 +445,52 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     switch (peek().kind) {
       case SyntaxKind.NodeClose: {
         bumpAny();
+        const hasNoNonHelperChildren =
+          openTagNameText === COMPOUND_COMPONENT_NAME &&
+          stack.getCurrentNonHelperChildrenSeen() === 0;
         const completedNode = stack.completeNode(SyntaxKind.ElementNode);
         if (!skipNodeValidation) {
           validateSimpleTransformRules(completedNode);
+        }
+        if (hasNoNonHelperChildren) {
+          errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
+        }
+        if (openTagNameText === "global" && stack.getAncestorCompoundCompName() !== undefined) {
+          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
+        }
+        if (
+          openTagNameText !== undefined &&
+          !HELPER_NAMES.has(openTagNameText) &&
+          stack.getAncestorCompoundCompName() !== undefined
+        ) {
+          stack.incrementAncestorNonHelperCount();
         }
         return;
       }
 
       case SyntaxKind.NodeEnd: {
         bumpAny();
-        stack.setCurrentOpenElementTagName(openTagNameText);
         parseContentList();
         parseClosingTag(openTagName, errInName);
+        const hasNoNonHelperChildren =
+          openTagNameText === COMPOUND_COMPONENT_NAME &&
+          stack.getCurrentNonHelperChildrenSeen() === 0;
         const completedNode = stack.completeNode(SyntaxKind.ElementNode);
         if (!skipNodeValidation) {
           validateSimpleTransformRules(completedNode);
+        }
+        if (hasNoNonHelperChildren) {
+          errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
+        }
+        if (openTagNameText === "global" && stack.getAncestorCompoundCompName() !== undefined) {
+          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
+        }
+        if (
+          openTagNameText !== undefined &&
+          !HELPER_NAMES.has(openTagNameText) &&
+          stack.getAncestorCompoundCompName() !== undefined
+        ) {
+          stack.incrementAncestorNonHelperCount();
         }
         return;
       }
@@ -545,7 +724,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         );
         if (eventNameAttr?.value && ON_PREFIX_REGEX.test(eventNameAttr.value)) {
           errorAt(
-            DIAGS_TRANSFORM.eventNoOnPrefix(eventNameAttr.value),
+            DIAGS_PARSER.eventNoOnPrefix(eventNameAttr.value),
             eventNameAttr.node.pos,
             eventNameAttr.node.end,
           );
@@ -572,9 +751,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
     );
     if (!nameAttr?.value) {
-      errorAt(DIAGS_TRANSFORM.compDefNameExp, element.pos, element.end);
+      errorAt(DIAGS_PARSER.compDefNameExp, element.pos, element.end);
     } else if (!UPPERCASE_REGEX.test(nameAttr.value)) {
-      errorAt(DIAGS_TRANSFORM.compDefNameUppercase, nameAttr.node.pos, nameAttr.node.end);
+      errorAt(DIAGS_PARSER.compDefNameUppercase, nameAttr.node.pos, nameAttr.node.end);
     }
 
     for (const attr of attrs) {
@@ -584,10 +763,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
       if (attr.startSegment) {
         if (attr.startSegment === "global") {
-          errorAt(DIAGS_TRANSFORM.globalNotAllowedInComponent, attr.node.pos, attr.node.end);
+          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, attr.node.pos, attr.node.end);
         } else if (attr.startSegment !== "method" && attr.startSegment !== "var") {
           errorAt(
-            DIAGS_TRANSFORM.invalidReusableCompAttr(attr.unsegmentedName),
+            DIAGS_PARSER.invalidReusableCompAttr(attr.unsegmentedName),
             attr.node.pos,
             attr.node.end,
           );
@@ -597,7 +776,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
       if (attr.name !== "name" && attr.name !== "codeBehind") {
         errorAt(
-          DIAGS_TRANSFORM.invalidReusableCompAttr(attr.name ?? attr.unsegmentedName),
+          DIAGS_PARSER.invalidReusableCompAttr(attr.name ?? attr.unsegmentedName),
           attr.node.pos,
           attr.node.end,
         );
@@ -615,7 +794,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
     if (invalidAttr) {
       errorAt(
-        DIAGS_TRANSFORM.onlyNameValueAttrs(elementName),
+        DIAGS_PARSER.onlyNameValueAttrs(elementName),
         invalidAttr.node.pos,
         invalidAttr.node.end,
       );
@@ -624,7 +803,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
     const nameAttr = attrs.find((attr) => attr.name === "name");
     if (!nameAttr?.value) {
-      errorAt(DIAGS_TRANSFORM.nameAttrRequired(elementName), element.pos, element.end);
+      errorAt(DIAGS_PARSER.nameAttrRequired(elementName), element.pos, element.end);
     }
   }
 
@@ -634,7 +813,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "value",
     );
     if (!valueAttr?.value || attrs.length !== 1) {
-      errorAt(DIAGS_TRANSFORM.usesValueOnly, element.pos, element.end);
+      errorAt(DIAGS_PARSER.usesValueOnly, element.pos, element.end);
     }
   }
 
@@ -644,7 +823,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
     );
     if (nameAttr) {
-      errorAt(DIAGS_TRANSFORM.cantHaveNameAttr("item"), nameAttr.node.pos, nameAttr.node.end);
+      errorAt(DIAGS_PARSER.cantHaveNameAttr("item"), nameAttr.node.pos, nameAttr.node.end);
     }
   }
 
@@ -675,14 +854,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
 
       if (childName !== "field" && childName !== "item") {
-        errorAt(DIAGS_TRANSFORM.onlyFieldOrItemChild, child.pos, child.end);
+        errorAt(DIAGS_PARSER.onlyFieldOrItemChild, child.pos, child.end);
         continue;
       }
 
       if (!nestedElementType) {
         nestedElementType = childName;
       } else if (nestedElementType !== childName) {
-        errorAt(DIAGS_TRANSFORM.cannotMixFieldItem, child.pos, child.end);
+        errorAt(DIAGS_PARSER.cannotMixFieldItem, child.pos, child.end);
       }
     }
   }
@@ -691,10 +870,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     const children = fileContentListNode.children ?? [];
     // --- Check that the nodes contains exactly only a single component root element before the EoF token
     if (children[0].kind !== SyntaxKind.ElementNode) {
-      errorAt(DIAGS_TRANSFORM.singleRootElem, children[0].pos, children[0].end);
+      errorAt(DIAGS_PARSER.singleRootElem, children[0].pos, children[0].end);
     }
     if (children.length > 2) {
-      errorAt(DIAGS_TRANSFORM.singleRootElem, children[1].pos, children[1].end);
+      errorAt(DIAGS_PARSER.singleRootElem, children[1].pos, children[1].end);
     }
   }
 

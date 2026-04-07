@@ -63,7 +63,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         transformSource("<Stack><global/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -72,7 +72,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         transformSource("<Stack><global name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
   });
@@ -85,7 +85,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
 
@@ -100,7 +100,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         `);
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
 
@@ -115,7 +115,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         `);
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });
@@ -144,7 +144,7 @@ describe("Xmlui transform - <global> helper tag", () => {
         `);
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });
@@ -256,7 +256,7 @@ describe("Xmlui transform - global.* attribute syntax", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
 
@@ -267,7 +267,7 @@ describe("Xmlui transform - global.* attribute syntax", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });
@@ -288,7 +288,7 @@ describe("Xmlui transform - global.* attribute syntax", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });
@@ -314,7 +314,7 @@ describe("Xmlui transform - global.* attribute syntax", () => {
         `);
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });
@@ -386,7 +386,7 @@ describe("Xmlui transform - <global> diagnostic errors", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
 
@@ -397,7 +397,7 @@ describe("Xmlui transform - <global> diagnostic errors", () => {
         );
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T032");
+        expect(err.toString()).includes("U026");
       }
     });
   });

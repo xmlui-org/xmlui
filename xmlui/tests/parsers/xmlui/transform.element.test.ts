@@ -142,7 +142,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><variable/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -151,7 +151,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><variable name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -223,7 +223,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><property blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T011");
+        expect(err.toString()).includes("U029");
       }
     });
 
@@ -232,7 +232,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><property/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -241,7 +241,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><property name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -355,7 +355,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><template blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T011");
+        expect(err.toString()).includes("U029");
       }
     });
 
@@ -364,7 +364,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><template/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -373,7 +373,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><template name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -495,7 +495,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T011");
+        expect(err.toString()).includes("U029");
       }
     });
 
@@ -517,7 +517,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -526,7 +526,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -535,7 +535,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event name='onClick' value='doIt'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T008");
+        expect(err.toString()).includes("U028");
       }
     });
 
@@ -592,7 +592,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T011");
+        expect(err.toString()).includes("U029");
       }
     });
 
@@ -601,7 +601,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method></method></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -610,7 +610,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T012");
+        expect(err.toString()).includes("U030");
       }
     });
 
@@ -723,7 +723,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><uses x='a'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T015");
+        expect(err.toString()).includes("U031");
       }
     });
 
@@ -732,7 +732,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><uses x='a' value='b'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).includes("T015");
+        expect(err.toString()).includes("U031");
       }
     });
 
@@ -1328,7 +1328,7 @@ describe("Xmlui transform - child elements", () => {
           `) as CompoundComponentDef;
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString()).include("T006");
+        expect(err.toString()).include("U021");
       }
     });
   });
@@ -1492,72 +1492,6 @@ describe("Xmlui transform - child elements", () => {
       ) as ComponentDef;
 
       expect(cd.children[0].type).eq("test-value.DataGrid");
-    });
-
-    describe("handled errors", () => {
-      it("errors on namespace value includeing '#'", () => {
-        try {
-          const cd = transformSource(`<App xmlns:TestNamespace="#something" />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("errors on refering to unknown namespace", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="Test.Components" >
-              <NonExistant:DataGrid />
-          </App>
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T027");
-        }
-      });
-
-      it("multiple colons in namespace value errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="component-ns:buttons-components:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("unrecognised namespace scheme errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="NON-EXISTANT:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T029");
-        }
-      });
-
-      it("duplicate namespace key errors", () => {
-        try {
-          const cd = transformSource(`
-              <App xmlns:TestNamespace="first" xmlns:TestNamespace="second" />
-              `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T025");
-        }
-      });
-
-      it("namespace on top lvl component errors", () => {
-        try {
-          const cd = transformSource(`<NonExistantNs:App />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T026");
-        }
-      });
     });
   });
 });

@@ -144,7 +144,7 @@ export function nodeToComponentDef(
     // --- Report error for global attributes (not allowed in component definitions)
     const globalsAttrs = attrs.filter((attr) => attr.startSegment === "global");
     if (globalsAttrs.length > 0) {
-      reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent);
+      // Parser already emits globalNotAllowedInComponent for these.
     }
 
     const children = getChildNodes(node);
@@ -154,9 +154,7 @@ export function nodeToComponentDef(
       (child) =>
         child.kind === SyntaxKind.ElementNode && !(getComponentName(child, getText) in HelperNode),
     );
-    if (nestedComponents.length === 0) {
-      nestedComponents.push(createTextNodeElement(""));
-    }
+    // If nestedComponents is empty the parser will have already emitted compDefNesedElem.
 
     const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
@@ -166,8 +164,7 @@ export function nodeToComponentDef(
         if (childName === HelperNode.variable) {
           nestedVars.push(child);
         } else if (childName === HelperNode.global) {
-          // Report error for global elements (not allowed in component definitions)
-          reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent, child.start, child.end);
+          // Parser already emits globalNotAllowedInComponent for global elements in component defs.
         } else if (childName in HelperNode) {
           nonVarHelperNodes.push(child);
         }
@@ -390,7 +387,7 @@ export function nodeToComponentDef(
           return;
 
         default:
-          reportError(DIAGS_TRANSFORM.invalidNodeName(childName));
+          // Parser already emits invalidNodeName for unrecognised helper node names.
           return;
       }
     });
@@ -1347,23 +1344,22 @@ function addToNamespaces(
 ) {
   let nsCommaSeparated = value.split(":");
   if (nsCommaSeparated.length > 2) {
-    return reportError(
-      DIAGS_TRANSFORM.nsValueIncorrect(value, "Namespace cannot contain multiple ':' (colon)."),
-    );
+    // Parser already emits nsValueIncorrect for this.
+    return;
   }
 
   let nsValue = value;
   if (nsCommaSeparated.length === 2) {
     if (nsCommaSeparated[0] != COMPONENT_NAMESPACE_SCHEME) {
-      return reportError(DIAGS_TRANSFORM.nsSchemeIncorrect(value, COMPONENT_NAMESPACE_SCHEME));
+      // Parser already emits nsSchemeIncorrect for this.
+      return;
     }
     nsValue = nsCommaSeparated[1];
   }
 
   if (nsValue.includes("#")) {
-    return reportError(
-      DIAGS_TRANSFORM.nsValueIncorrect(nsValue, "Namespace cannot contain character '#'."),
-    );
+    // Parser already emits nsValueIncorrect for this.
+    return;
   }
 
   switch (nsValue) {
@@ -1380,7 +1376,8 @@ function addToNamespaces(
 
   const compNamespaces = namespaceStack[namespaceStack.length - 1];
   if (compNamespaces.has(nsKey)) {
-    return reportError(DIAGS_TRANSFORM.duplXmlns(nsKey));
+    // Parser already emits duplXmlns for this — skip silently.
+    return;
   }
   compNamespaces.set(nsKey, nsValue);
 }
@@ -1406,7 +1403,8 @@ function getNamespaceResolvedComponentName(
   const namespace = getText(nameTokens[0]);
 
   if (namespaceStack.length === 0) {
-    reportError(DIAGS_TRANSFORM.rootCompNoNamespace);
+    // Parser already emits rootCompNoNamespace for this.
+    return namespace + "." + name;
   }
 
   let resolvedNamespace = undefined;
@@ -1417,7 +1415,8 @@ function getNamespaceResolvedComponentName(
     }
   }
   if (resolvedNamespace === undefined) {
-    reportError(DIAGS_TRANSFORM.nsNotFound(namespace));
+    // Parser already emits nsNotFound for this.
+    return namespace + "." + name;
   }
 
   return resolvedNamespace + "." + name;

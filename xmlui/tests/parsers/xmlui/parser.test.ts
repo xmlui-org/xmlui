@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   ErrCodesParser,
-  ErrCodesTransform,
-  TransformDiag,
 } from "../../../src/parsers/xmlui-parser/diagnostics";
 import { findTokenAtOffset } from "../../../src/parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
@@ -250,7 +248,7 @@ describe("Xmlui parser", () => {
     const { node, errors, getText } = parseSource("ABC");
 
     const error = errors[0];
-    expect(error.code).toBe(ErrCodesTransform.singleRootElem);
+    expect(error.code).toBe(ErrCodesParser.singleRootElem);
 
     const textElement = node.children![0];
     expect(textElement.kind).toBe(SyntaxKind.TextNode);
@@ -423,7 +421,7 @@ describe("Xmlui parser - expected parser errors", () => {
       <script></script>
     </Stack>`);
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodesTransform.multipleScriptTags);
+    expect(errors[0].code).toBe(ErrCodesParser.multipleScriptTags);
   });
 
   it("Text after root element", () => {
@@ -432,7 +430,7 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(node.children![0].kind).toEqual(SyntaxKind.ElementNode);
     expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
     expect(errors).toHaveLength(1);
-    expect(errors[0].code).toBe(ErrCodesTransform.singleRootElem);
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
     expect(errors[0].pos).toBe(7);
     expect(errors[0].end).toBe(10);
   });
@@ -538,7 +536,7 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`</Stack>
 </UnexpectedTag>`);
 
-    expect(errors[1].code).toBe(ErrCodesTransform.singleRootElem);
+    expect(errors[1].code).toBe(ErrCodesParser.singleRootElem);
     expect(src.substring(errors[1].pos, errors[1].end)).toEqual(`</UnexpectedTag>`);
   });
 
@@ -583,76 +581,76 @@ describe("Xmlui parser - expected parser errors", () => {
 
   it("multiple root elements", () => {
     const { errors } = parseSource("<Stack/><Stack />");
-    expect(errors[0].code).toBe(ErrCodesTransform.singleRootElem);
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
   });
 
   it("missing name in compound component", () => {
     const { errors } = parseSource("<Component />");
-    expect(errors[0].code).toBe(ErrCodesTransform.compDefNameExp);
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNameExp);
   });
 
   it("invalid name in compound component", () => {
     const { errors } = parseSource("<Component name='alma'/>");
-    expect(errors[0].code).toBe(ErrCodesTransform.compDefNameUppercase);
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNameUppercase);
   });
 
   it("compound child in compound component", () => {
     const { errors } = parseSource("<Component name='MyComp'><Component /></Component>");
-    expect(errors[0].code).toBe(ErrCodesTransform.nestedCompDefs);
+    expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
   });
 
   it("invalid attribute in compound component", () => {
     const { errors } = parseSource("<Component name='MyComp' blabla='123'><Stack/></Component>");
-    expect(errors[0].code).toBe(ErrCodesTransform.invalidReusableCompAttr);
+    expect(errors[0].code).toBe(ErrCodesParser.invalidReusableCompAttr);
   });
 
   it("event attribute starts with on", () => {
     const { errors } = parseSource("<Stack><event name='onClick' /></Stack>");
-    expect(errors[0].code).toBe(ErrCodesTransform.eventNoOnPrefix);
+    expect(errors[0].code).toBe(ErrCodesParser.eventNoOnPrefix);
   });
 
   it("uses is invalid in a compound component", () => {
     const { errors } = parseSource("<Component name='MyComp'><Stack/><uses /></Component>");
-    expect(errors[0].code).toBe(ErrCodesTransform.invalidNodeName);
+    expect(errors[0].code).toBe(ErrCodesParser.invalidNodeName);
   });
 
   it("loaders is invalid in a compound component", () => {
     const { errors } = parseSource("<Component name='MyComp'><Stack/><loaders /></Component>");
-    expect(errors[0].code).toBe(ErrCodesTransform.invalidNodeName);
+    expect(errors[0].code).toBe(ErrCodesParser.invalidNodeName);
   });
 
   it("invalid attribute in property helper", () => {
     const { errors } = parseSource("<Stack><property name='my' blabal='123'/></Stack>");
-    expect(errors[0].code).toBe(ErrCodesTransform.onlyNameValueAttrs);
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
   });
 
   it("name required in property helper", () => {
     const { errors } = parseSource("<Stack><property /></Stack>");
-    expect(errors[0].code).toBe(ErrCodesTransform.nameAttrRequired);
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
   });
 
   it("uses helper must have only a non-empty value attribute", () => {
     const { errors } = parseSource("<Stack><uses/></Stack>");
-    expect(errors[0].code).toBe(ErrCodesTransform.usesValueOnly);
+    expect(errors[0].code).toBe(ErrCodesParser.usesValueOnly);
   });
 
   it("property children can only be field or item nodes", () => {
     const { errors } = parseSource("<Stack><property name='my'><dummy /></property></Stack>");
-    expect(errors[0].code).toBe(ErrCodesTransform.onlyFieldOrItemChild);
+    expect(errors[0].code).toBe(ErrCodesParser.onlyFieldOrItemChild);
   });
 
   it("cannot mix field and item children", () => {
     const { errors } = parseSource(
       "<Stack><property name='my'><field name='my' /><item value='3'/></property></Stack>",
     );
-    expect(errors[0].code).toBe(ErrCodesTransform.cannotMixFieldItem);
+    expect(errors[0].code).toBe(ErrCodesParser.cannotMixFieldItem);
   });
 
   it("item helper cannot have a name attribute", () => {
     const { errors } = parseSource(
       "<Stack><property name='my'><item name='my' value='3'/></property></Stack>",
     );
-    expect(errors[0].code).toBe(ErrCodesTransform.cantHaveNameAttr);
+    expect(errors[0].code).toBe(ErrCodesParser.cantHaveNameAttr);
   });
 
   it("multiple script tags error in same element", () => {
@@ -662,7 +660,50 @@ describe("Xmlui parser - expected parser errors", () => {
         <script>var b = 2;</script>
       </Stack>
     `);
-    expect(errors[0].code).toBe(ErrCodesTransform.multipleScriptTags);
+    expect(errors[0].code).toBe(ErrCodesParser.multipleScriptTags);
+  });
+
+  it("nested compound component at any depth triggers nestedCompDefs", () => {
+    const { errors } = parseSource(
+      "<Component name='A'><Stack><Component name='B'/></Stack></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
+  });
+
+  it("compound component with no children triggers compDefNesedElem", () => {
+    const { errors } = parseSource("<Component name='MyComp'></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+  });
+
+  it("duplicate xmlns key triggers duplXmlns", () => {
+    const { errors } = parseSource("<App xmlns:ns='foo' xmlns:ns='bar'/>");
+    // duplAttr fires first (at attribute-parse level), then duplXmlns
+    expect(errors[1].code).toBe(ErrCodesParser.duplXmlns);
+  });
+
+  it("namespace on root element triggers rootCompNoNamespace", () => {
+    const { errors } = parseSource("<ns:App/>");
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
+  });
+
+  it("unresolved namespace prefix triggers nsNotFound", () => {
+    const { errors } = parseSource("<App><ns:Button/></App>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsNotFound);
+  });
+
+  it("namespace value with '#' triggers nsValueIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='#something'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsValueIncorrect);
+  });
+
+  it("namespace value with multiple colons triggers nsValueIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='a:b:c'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsValueIncorrect);
+  });
+
+  it("namespace value with unrecognised scheme triggers nsSchemeIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='bad-scheme:foo'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsSchemeIncorrect);
   });
 });
 
@@ -957,7 +998,7 @@ describe("namescpaces", () => {
 
   it("Single node with namespace fails #1", () => {
     const { errors } = parseSource("<ns:Stack></Stack>");
-    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
   });
   it("Single node with namespace fails #2", () => {
     const { errors } = parseSource("<Stack></ns:Stack>");
@@ -966,7 +1007,7 @@ describe("namescpaces", () => {
 
   it("Single node with namespace fails #3", () => {
     const { errors } = parseSource("<other:Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
   });
 
   it("has namespace on attribute", () => {
