@@ -918,27 +918,11 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Generate a table of contents"
-                            to="/docs/howto/generate-a-table-of-contents"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use local storage for user prefs"
-                            to="/docs/howto/use-local-storage-for-user-prefs"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Redirect users after login"
-                            to="/docs/howto/redirect-users-after-login"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Debug a component"
                             to="/docs/howto/debug-a-component"
                         />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Advanced Theming">
                         <NavLink
                             icon="article"
@@ -1026,7 +1010,6 @@
                             to="/docs/howto/style-card-and-noresult-placeholders"
                         />
                     </NavGroup>
-                    -->
 
                     <!-- Temporarily hidden
                     <NavGroup label="Complex Property Patterns">
@@ -1114,111 +1097,6 @@
                             icon="article"
                             label="Handle Checkbox value coercion"
                             to="/docs/howto/handle-checkbox-value-coercion"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Charts & Data Visualization">
-                        <NavLink
-                            icon="article"
-                            label="Build a stacked bar chart"
-                            to="/docs/howto/build-a-stacked-bar-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Format chart axis ticks"
-                            to="/docs/howto/format-chart-axis-ticks"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add custom tooltips to a chart"
-                            to="/docs/howto/add-custom-tooltips-to-a-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Create an area chart with stacking"
-                            to="/docs/howto/create-an-area-chart-with-stacking"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Position labels on a pie chart"
-                            to="/docs/howto/position-labels-on-a-pie-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Overlay a radar chart comparison"
-                            to="/docs/howto/overlay-a-radar-chart-comparison"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use ECharts for advanced charting"
-                            to="/docs/howto/use-echarts-for-advanced-charting"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Create a gauge dashboard widget"
-                            to="/docs/howto/create-a-gauge-dashboard-widget"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="PDF Viewer">
-                        <NavLink
-                            icon="article"
-                            label="Embed and navigate a PDF"
-                            to="/docs/howto/embed-and-navigate-a-pdf"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add annotations to a PDF"
-                            to="/docs/howto/add-annotations-to-a-pdf"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Capture and apply PDF signatures"
-                            to="/docs/howto/capture-and-apply-pdf-signatures"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Export a modified PDF"
-                            to="/docs/howto/export-a-modified-pdf"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Rich Text & Masonry">
-                        <NavLink
-                            icon="article"
-                            label="Configure a TiptapEditor toolbar"
-                            to="/docs/howto/configure-a-tiptapeditor-toolbar"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build a responsive masonry layout"
-                            to="/docs/howto/build-a-responsive-masonry-layout"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Animation & Carousel">
-                        <NavLink
-                            icon="article"
-                            label="Chain animations on scroll into view"
-                            to="/docs/howto/chain-animations-on-scroll-into-view"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build an auto-playing carousel"
-                            to="/docs/howto/build-an-auto-playing-carousel"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Customize carousel controls & indicators"
-                            to="/docs/howto/customize-carousel-controls-and-indicators"
                         />
                     </NavGroup>
                     -->
@@ -2326,21 +2204,6 @@
             <Page url="/docs/howto/build-a-batch-processing-queue">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/build-a-batch-processing-queue.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/generate-a-table-of-contents">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/generate-a-table-of-contents.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/use-local-storage-for-user-prefs">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/use-local-storage-for-user-prefs.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/redirect-users-after-login">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/redirect-users-after-login.md']}"
                 />
             </Page>
 
