@@ -205,10 +205,9 @@ export default function useRowSelection({
   // The new AppState didUpdate event is more useful for non-React integrations.
   const appStateSelection = syncWithAppState?.value?.selectedIds;
 
-  // --- State machine for sync direction control
-  const [syncState, setSyncState] = useState<
-    "idle" | "updating_to_appstate" | "updating_from_appstate"
-  >("idle");
+  // --- State machine for sync direction control (ref to avoid extra renders)
+  const syncStateRef = useRef<"idle" | "updating_to_appstate" | "updating_from_appstate">("idle");
+  const syncResetTimerRef = useRef<number>(0);
 
   // --- Use refs to track the last known selections to prevent update loops
   const lastAppStateSelectionRef = useRef<any[]>();
@@ -217,6 +216,17 @@ export default function useRowSelection({
   // --- Track the source of the last update to prevent echoing
   const lastUpdateSourceRef = useRef<"table" | "appstate" | null>(null);
 
+  // Helper: set sync direction and schedule reset back to idle
+  const scheduleSyncReset = () => {
+    cancelAnimationFrame(syncResetTimerRef.current);
+    syncResetTimerRef.current = requestAnimationFrame(() => {
+      syncStateRef.current = "idle";
+      syncResetTimerRef.current = requestAnimationFrame(() => {
+        lastUpdateSourceRef.current = null;
+      });
+    });
+  };
+
   // --- Sync from AppState to table selection (when AppState changes externally)
   useEffect(() => {
     // Skip if not selectable, no sync, no selection, or we're currently updating to AppState
@@ -224,7 +234,7 @@ export default function useRowSelection({
       !rowsSelectable ||
       !syncWithAppState ||
       !appStateSelection ||
-      syncState === "updating_to_appstate"
+      syncStateRef.current === "updating_to_appstate"
     ) {
       return;
     }
@@ -237,7 +247,7 @@ export default function useRowSelection({
 
     if (isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
       // Set state machine to indicate we're updating from AppState
-      setSyncState("updating_from_appstate");
+      syncStateRef.current = "updating_from_appstate";
 
       const validIds = appStateSelection.filter((id: string) =>
         items.some((item) => item[idKey] === id),
@@ -252,6 +262,7 @@ export default function useRowSelection({
 
       setSelectedRowIds(idsToSelect);
       setInitialSelectionApplied(true);
+      scheduleSyncReset();
     }
   }, [
     appStateSelection,
@@ -261,13 +272,12 @@ export default function useRowSelection({
     idKey,
     enableMultiRowSelection,
     setSelectedRowIds,
-    syncState,
   ]);
 
   // --- Sync from table selection to AppState (when user interacts with table)
   useEffect(() => {
     // Skip if not selectable, no sync, or currently updating from AppState
-    if (!rowsSelectable || !syncWithAppState || syncState === "updating_from_appstate") {
+    if (!rowsSelectable || !syncWithAppState || syncStateRef.current === "updating_from_appstate") {
       return;
     }
 
@@ -285,40 +295,23 @@ export default function useRowSelection({
 
     if (tableChanged && isDifferentFromAppState && wasNotAppStateUpdate) {
       // Set state machine to indicate we're updating to AppState
-      setSyncState("updating_to_appstate");
+      syncStateRef.current = "updating_to_appstate";
 
       // Track what we're updating to prevent loop
       lastTableSelectionRef.current = [...currentSelectionIds];
       lastAppStateSelectionRef.current = [...currentSelectionIds];
       lastUpdateSourceRef.current = "table";
 
+      performance.mark("tg:sync-effect-start");
       syncWithAppState.update?.({ selectedIds: currentSelectionIds });
+      performance.mark("tg:sync-effect-end");
+      performance.measure("[TileGrid] sync effect (update call)", "tg:sync-effect-start", "tg:sync-effect-end");
+      const ms = performance.getEntriesByName("[TileGrid] sync effect (update call)").at(-1)?.duration.toFixed(1);
+      console.log(`[TileGrid] sync effect | update call: ${ms}ms | ids: ${currentSelectionIds.length}`);
+
+      scheduleSyncReset();
     }
-  }, [selectedItems, syncWithAppState, appStateSelection, idKey, rowsSelectable, syncState]);
-
-  // --- Reset sync state machine to idle when updates are complete
-  useEffect(() => {
-    if (syncState !== "idle") {
-      // Reset to idle state in the next tick to allow the current update to complete
-      const resetTimer = requestAnimationFrame(() => {
-        setSyncState("idle");
-      });
-
-      return () => cancelAnimationFrame(resetTimer);
-    }
-  }, [syncState, appStateSelection, selectedItems]);
-
-  // --- Clear update source when sync state becomes idle
-  useEffect(() => {
-    if (syncState === "idle") {
-      // Use a separate frame to clear the source after the sync state is reset
-      const clearTimer = requestAnimationFrame(() => {
-        lastUpdateSourceRef.current = null;
-      });
-
-      return () => cancelAnimationFrame(clearTimer);
-    }
-  }, [syncState]);
+  }, [selectedItems, syncWithAppState, appStateSelection, idKey, rowsSelectable]);
 
   // --- Set initial selection when component mounts and items are available
   // Use a separate effect that runs after the refresh to ensure timing is correct

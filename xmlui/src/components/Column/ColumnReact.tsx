@@ -30,16 +30,23 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
 
   // Use a ref so that cellRenderer stays stable and doesn't re-register columns on
   // every render. createChildLayoutContext always creates new object references, so
-  // including cellLayoutContext in useCallback deps would cause an infinite loop:
-  // new context → new cellRenderer → registerColumn → state update → re-render → repeat.
+  // including cellLayoutContext in useCallback deps would cause an infinite loop
   const cellLayoutContextRef = useRef(cellLayoutContext);
   cellLayoutContextRef.current = cellLayoutContext;
 
+  const renderChildRef = useRef(renderChild);
+  renderChildRef.current = renderChild;
+
+  const nodeChildrenRef = useRef(nodeChildren);
+  nodeChildrenRef.current = nodeChildren;
+
   const cellRenderer = useCallback(
     (row: any, rowIndex: number, colIndex: number, value: any) => {
+      const childrenToRender = nodeChildrenRef.current;
+      if (!childrenToRender) return null;
       return (
         <MemoizedItem
-          node={nodeChildren!}
+          node={childrenToRender}
           contextVars={{
             $item: row,
             $rowIndex: rowIndex,
@@ -48,17 +55,18 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
             $itemIndex: rowIndex,
             $cell: value,
           }}
-          renderChild={renderChild}
+          renderChild={renderChildRef.current}
           layoutContext={cellLayoutContextRef.current}
         />
       );
     },
-    [nodeChildren, renderChild],
+    [],
   );
 
+  const hasChildren = !!nodeChildren;
   const safeCellRenderer = useMemo(() => {
-    return nodeChildren ? cellRenderer : undefined;
-  }, [cellRenderer, nodeChildren]);
+    return hasChildren ? cellRenderer : undefined;
+  }, [cellRenderer, hasChildren]);
 
   useIsomorphicLayoutEffect(() => {
     registerColumn(
@@ -68,7 +76,8 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
       },
       id,
     );
-  }, [columnMetadata, id, registerColumn, safeCellRenderer]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(columnMetadata), id, registerColumn, safeCellRenderer]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {

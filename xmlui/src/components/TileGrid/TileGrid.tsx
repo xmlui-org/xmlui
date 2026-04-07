@@ -1,10 +1,12 @@
-import { memo, useRef } from "react";
+import { memo, useMemo, useRef, startTransition } from "react";
 import styles from "./TileGrid.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
+import { EMPTY_OBJECT } from "../../components-core/constants";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
 import type { PropertyValueDescription, ComponentDef } from "../../abstractions/ComponentDefs";
+import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { TileGridNative, defaultProps } from "./TileGridNative";
 import type { CheckboxPosition } from "./TileGridNative";
 import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreNative";
@@ -83,6 +85,12 @@ export const TileGridMd = createMetadata({
     syncWithVar: d(
       `The name of a global variable to synchronize the grid's selection state with. ` +
         `The named variable must reference an object; the grid will read from and write to its \`selectedIds\` property. A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+    ),
+    refreshOn: d(
+      `An optional value that, when changed, forces all visible tiles to re-render so their ` +
+        `XMLUI event-handler closures pick up the latest reactive state. Bind to any global ` +
+        `variable whose change should invalidate tile closures (e.g. \`"{selectMode}"\`). ` +
+        `If not provided, tiles re-render on every XMLUI reactive cycle.`,
     ),
     hideSelectionCheckboxes: {
       description:
@@ -177,6 +185,47 @@ export const TileGridMd = createMetadata({
   },
 });
 
+// TileGrid-specific memoized tile. Uses a custom comparator so that:
+//   - renderVersion change  → always re-render (external XMLUI reactive cycle)
+//   - contextVars value change → re-render (e.g. $selected toggled for this tile)
+//   - everything else stable  → skip re-render
+// Kept separate from the shared MemoizedItem to avoid affecting other consumers.
+type TileGridItemProps = {
+  node: ComponentDef | Array<ComponentDef>;
+  renderChild: RenderChildFn;
+  layoutContext?: LayoutContext;
+  contextVars?: Record<string, any>;
+  renderVersion: number;
+};
+
+const TileGridMemoizedItem = memo(
+  ({ node, renderChild, layoutContext, contextVars }: TileGridItemProps) => {
+    console.count("[TileGridMemoizedItem] render");
+    return (
+      <MemoizedItem
+        node={node}
+        renderChild={renderChild}
+        layoutContext={layoutContext}
+        contextVars={contextVars}
+      />
+    );
+  },
+  (prev, next) => {
+    if (prev.renderVersion !== next.renderVersion) return false;
+    if (prev.node !== next.node) return false;
+    // renderChild and layoutContext are stable refs — no need to compare
+    const prevVars = prev.contextVars ?? EMPTY_OBJECT;
+    const nextVars = next.contextVars ?? EMPTY_OBJECT;
+    const keys = Object.keys(nextVars);
+    if (keys.length !== Object.keys(prevVars).length) return false;
+    for (const k of keys) {
+      if (prevVars[k] !== nextVars[k]) return false;
+    }
+    return true;
+  },
+);
+TileGridMemoizedItem.displayName = "TileGridMemoizedItem";
+
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
 const TileGridWithSync = memo(
@@ -190,6 +239,36 @@ const TileGridWithSync = memo(
     lookupActionRef.current = lookupAction;
     const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
 
+    // renderVersion increments only when refreshOn changes (app-declared external state
+    // that affects tile closures, e.g. selectMode). This avoids full-grid re-renders from
+    // the XMLUI reactive cycles that fire on every click/focus event.
+    // If refreshOn is not provided, we increment on every XMLUI cycle for safety.
+    const refreshOn = extractValue(node.props.refreshOn);
+    const prevRefreshOnRef = useRef<unknown>(refreshOn);
+    const renderVersionRef = useRef(0);
+
+    // pendingOwnWriteRef: set to true just before syncAdapter.update calls handler().
+    // Consumed at the top of each render to detect own-write XMLUI cycles and suppress
+    // the resulting TileGridNative re-render (in-place syncAdapter update instead of new object).
+    const pendingOwnWriteRef = useRef(false);
+    const pendingOwnWrite = pendingOwnWriteRef.current;
+    pendingOwnWriteRef.current = false;
+
+    const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+    if (shouldForceRefresh) {
+      prevRefreshOnRef.current = refreshOn;
+      renderVersionRef.current++;
+      console.log(`[TileGrid] renderVersion++ → ${renderVersionRef.current} (refreshOn changed or not provided)`);
+      // Also replace the syncAdapter object so TileGridNative.memo() fails and tiles
+      // re-render immediately with fresh closures for the new refreshOn value.
+      if (syncAdapterHolderRef.current) {
+        syncAdapterHolderRef.current = {
+          value: syncAdapterHolderRef.current.value,
+          update: syncAdapterHolderRef.current.update,
+        };
+      }
+    }
+
     let syncAdapter: any;
     if (syncVarName !== undefined) {
       if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
@@ -202,14 +281,35 @@ const TileGridWithSync = memo(
             syncAdapterHolderRef.current = {
               value: currentValue,
               update: ({ selectedIds }: { selectedIds: string[] }) => {
-                const valueJson = JSON.stringify(selectedIds);
-                const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
-                const handler = lookupActionRef.current?.(expr, { ephemeral: true });
-                handler?.();
+                const windowKey = `__tgSync_${syncVarName}`;
+                (window as any)[windowKey] = selectedIds;
+                performance.mark("tg:lookupAction-start");
+                const handler = lookupActionRef.current?.(
+                  `{${syncVarName} = {selectedIds: window.${windowKey}}}`,
+                  { ephemeral: true },
+                );
+                performance.mark("tg:lookupAction-compiled");
+                pendingOwnWriteRef.current = true;
+                startTransition(() => { handler?.(); });
+                performance.mark("tg:lookupAction-executed");
+                performance.measure("[TileGrid] lookupAction compile", "tg:lookupAction-start", "tg:lookupAction-compiled");
+                performance.measure("[TileGrid] lookupAction execute", "tg:lookupAction-compiled", "tg:lookupAction-executed");
+                const compileMs = performance.getEntriesByName("[TileGrid] lookupAction compile").at(-1)?.duration.toFixed(1);
+                const execMs = performance.getEntriesByName("[TileGrid] lookupAction execute").at(-1)?.duration.toFixed(1);
+                console.log(`[TileGrid] syncAdapter.update | compile: ${compileMs}ms | execute: ${execMs}ms | ids: ${selectedIds.length}`);
               },
             };
-          } else {
-            syncAdapterHolderRef.current.value = currentValue;
+          } else if (currentValue !== syncAdapterHolderRef.current.value) {
+            if (pendingOwnWrite) {
+              // Own-write cycle: update value in-place so TileGridNative.memo() is not triggered.
+              syncAdapterHolderRef.current.value = currentValue;
+            } else {
+              // External change (select-all etc.): new object so TileGridNative.memo() detects it.
+              syncAdapterHolderRef.current = {
+                value: currentValue,
+                update: syncAdapterHolderRef.current.update,
+              };
+            }
           }
         } else {
           syncAdapterHolderRef.current = null;
@@ -219,6 +319,43 @@ const TileGridWithSync = memo(
       syncAdapterHolderRef.current = null;
     }
     syncAdapter = syncAdapterHolderRef.current;
+
+    // Keep renderChild and layoutContext in refs so stable wrappers can always
+    // call the latest version without changing their own reference.
+    const renderChildRef = useRef(renderChild);
+    renderChildRef.current = renderChild;
+    const layoutContextRef = useRef(layoutContext);
+    layoutContextRef.current = layoutContext;
+
+    // Stable function wrappers: created once, never reassigned, always delegate
+    // to the latest ref value. MemoizedItem's comparator receives the same
+    // reference every render, so it never fails on renderChild/layoutContext.
+    const stableRenderChildFnRef = useRef<typeof renderChild>(
+      (node: any, ctx: any) => renderChildRef.current(node, ctx),
+    );
+
+    const stableItemRenderer = useMemo(
+      () =>
+        itemTemplate
+          ? (item: any, index: number, count: number, selected: boolean) => (
+              <TileGridMemoizedItem
+                node={itemTemplate as ComponentDef}
+                key={`${item?.[idKey] ?? index}`}
+                renderChild={stableRenderChildFnRef.current}
+                layoutContext={layoutContextRef.current}
+                renderVersion={renderVersionRef.current}
+                contextVars={{
+                  $item: item,
+                  $itemIndex: index,
+                  $isFirst: index === 0,
+                  $isLast: index === count - 1,
+                  $selected: selected,
+                }}
+              />
+            )
+          : undefined,
+      [itemTemplate, idKey],
+    );
 
     const content = (
       <TileGridNative
@@ -245,25 +382,7 @@ const TileGridWithSync = memo(
         onPasteAction={lookupEventHandler("pasteAction")}
         onDeleteAction={lookupEventHandler("deleteAction")}
         onSelectAllAction={lookupEventHandler("selectAllAction")}
-        itemRenderer={
-          itemTemplate
-            ? (item, index, count, selected) => (
-                <MemoizedItem
-                  node={itemTemplate as ComponentDef}
-                  key={`${item?.[idKey] ?? index}`}
-                  renderChild={renderChild}
-                  layoutContext={layoutContext}
-                  contextVars={{
-                    $item: item,
-                    $itemIndex: index,
-                    $isFirst: index === 0,
-                    $isLast: index === count - 1,
-                    $selected: selected,
-                  }}
-                />
-              )
-            : undefined
-        }
+        itemRenderer={stableItemRenderer}
       />
     );
 
@@ -279,7 +398,7 @@ export const tileGridComponentRenderer = wrapComponent(
     exposeRegisterApi: true,
     exclude: [
       "data", "itemWidth", "itemHeight", "gap", "stretchItems", "loading", "itemsSelectable",
-      "enableMultiSelection", "toggleSelectionOnClick", "syncWithVar", "checkboxPosition", "hideSelectionCheckboxes",
+      "enableMultiSelection", "toggleSelectionOnClick", "syncWithVar", "refreshOn", "checkboxPosition", "hideSelectionCheckboxes",
       "idKey", "itemUserSelect", "itemTemplate",
     ],
     events: [],

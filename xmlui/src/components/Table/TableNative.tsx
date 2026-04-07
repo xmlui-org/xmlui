@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState, memo, useLayoutEffect } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -204,6 +204,7 @@ type TableProps = {
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
+  renderVersion?: number;
   hideSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxes?: boolean;
@@ -527,7 +528,7 @@ function useTableKeyboardActions({
 }
 
 // eslint-disable-next-line react/display-name
-export const Table = forwardRef(
+export const Table = memo(forwardRef(
   (
     {
       data = defaultProps.data,
@@ -561,6 +562,7 @@ export const Table = forwardRef(
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      renderVersion = 0,
       hideSelectionCheckboxesHeader = defaultProps.hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes = defaultProps.alwaysShowSelectionCheckboxes,
       alwaysShowPagination,
@@ -608,6 +610,15 @@ export const Table = forwardRef(
       userSelectHeading ??
       getThemeVar("userSelect-heading-Table") ??
       defaultProps.userSelectHeading;
+
+    console.count("[TableNative] render");
+    performance.mark("table-native:render-start");
+    useLayoutEffect(() => {
+      performance.mark("table-native:render-end");
+      performance.measure("[TableNative] render+commit", "table-native:render-start", "table-native:render-end");
+      const ms = performance.getEntriesByName("[TableNative] render+commit").at(-1)?.duration.toFixed(1);
+      console.log(`[TableNative] render+commit: ${ms}ms`);
+    });
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -965,6 +976,32 @@ export const Table = forwardRef(
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
+    // --- DEBUG: track what changed between renders
+    const debugPrevRef = useRef<Record<string, any>>({});
+    {
+      const current: Record<string, any> = {
+        visibleItems,
+        hoveredRowId,
+        headerCheckboxHovered,
+        _sortBy,
+        _sortingDirection,
+        pagination,
+        columnSizing,
+        focusedIndex,
+        selectedRowIdMap,
+        data,
+        columns,
+        renderVersion,
+        rowsSelectable,
+      };
+      const prev = debugPrevRef.current;
+      const changed = Object.keys(current).filter(k => current[k] !== prev[k]);
+      if (changed.length > 0 && Object.keys(prev).length > 0) {
+        console.log("[TableNative] Re-render triggered by:", changed);
+      }
+      debugPrevRef.current = current;
+    }
+
     const columnPinning = useMemo(() => {
       const left: Array<string> = [];
       const right: Array<string> = [];
@@ -1250,9 +1287,92 @@ export const Table = forwardRef(
       lookupEventHandler,
       rowDoubleClick,
       striped,
+      renderVersion,
     };
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
+
+    // Stable ref for cell rendering context (effectiveUserSelectCell / cellVerticalAlign can
+    // change when theme/props change, but we don't want to recreate TableMemoizedCells for that).
+    const cellRenderStateRef = useRef({ effectiveUserSelectCell, cellVerticalAlign });
+    cellRenderStateRef.current = { effectiveUserSelectCell, cellVerticalAlign };
+
+    // TableMemoizedCells — analogous to TileGridMemoizedItem.
+    // Created ONCE (useMemo([], [])), reads latest cell data from rowsRef via closure.
+    // The custom comparator only allows a re-render when:
+    //   • renderVersion changes  (e.g. selectMode toggled → closures must refresh)
+    //   • rowIndex changes        (row at this slot changed)
+    //   • isSelected changes      (the only thing that changes on a click)
+    // This means 11 TableNative renders × 19 visible rows = 209 VirtualTableRow calls,
+    // but only 1 TableMemoizedCells actually re-renders (the clicked row).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const TableMemoizedCells = useMemo(() => {
+      return memo(
+        function TableMemoizedCellsInner({
+          rowIndex,
+          isSelected: _isSelected,
+          renderVersion: _rv,
+        }: {
+          rowIndex: number;
+          isSelected: boolean;
+          renderVersion: number;
+        }) {
+          console.count("[TableMemoizedCells] render");
+          const row = rowsRef.current[rowIndex];
+          if (!row) return null;
+          const { effectiveUserSelectCell: userSelectCell, cellVerticalAlign: vertAlign } =
+            cellRenderStateRef.current;
+          return (
+            <>
+              {row.getVisibleCells().map((cell, i) => {
+                const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                const size = cell.column.getSize();
+                const columnClassName = cell.column.columnDef?.meta?.className;
+                const columnStyle = cell.column.columnDef?.meta?.style;
+                const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
+                const alignmentClass =
+                  vertAlign === "top"
+                    ? styles.alignTop
+                    : vertAlign === "bottom"
+                      ? styles.alignBottom
+                      : styles.alignCenter;
+                return (
+                  <td
+                    className={classnames(styles.cell, alignmentClass, columnClassName)}
+                    key={`${cell.id}-${i}`}
+                    style={{
+                      width: size,
+                      "--column-width": `${size}px`,
+                      flexShrink: 0,
+                      ...getCommonPinningStyles(cell.column),
+                      ...styleWithoutWidth,
+                    } as React.CSSProperties}
+                  >
+                    <div
+                      className={styles.cellContent}
+                      style={{ userSelect: userSelectCell as React.CSSProperties["userSelect"] }}
+                    >
+                      {cellRenderer
+                        ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
+                        : (flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          ) as ReactNode)}
+                    </div>
+                  </td>
+                );
+              })}
+            </>
+          );
+        },
+        (prev, next) => {
+          if (prev.renderVersion !== next.renderVersion) return false;
+          if (prev.rowIndex !== next.rowIndex) return false;
+          if (prev.isSelected !== next.isSelected) return false;
+          return true; // skip re-render
+        },
+      );
+    }, []);
 
     // Custom row component for Virtualizer — created once, reads current values from refs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1412,7 +1532,7 @@ export const Table = forwardRef(
         },
       );
       RowComponent.displayName = "VirtualTableRow";
-      return RowComponent;
+      return RowComponent as any;
     }, []);
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
@@ -1488,7 +1608,7 @@ export const Table = forwardRef(
         widths[id] = w;
       }
       flushSync(() => {
-        setColumnSizing((prev) => {
+        setColumnSizing((prev: any) => {
           return {
             ...prev,
             ...widths,
@@ -1802,50 +1922,12 @@ export const Table = forwardRef(
               itemSize={rowHeight}
             >
               {rows.map((row, rowIndex) => (
-                <Fragment key={`${row.id}-${rowIndex}`}>
-                  {row.getVisibleCells().map((cell, i) => {
-                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                    const size = cell.column.getSize();
-                    const columnClassName = cell.column.columnDef?.meta?.className;
-                    const columnStyle = cell.column.columnDef?.meta?.style;
-                    const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
-
-                    const alignmentClass =
-                      cellVerticalAlign === "top"
-                        ? styles.alignTop
-                        : cellVerticalAlign === "bottom"
-                          ? styles.alignBottom
-                          : styles.alignCenter;
-                    return (
-                      <td
-                        className={classnames(styles.cell, alignmentClass, columnClassName)}
-                        key={`${cell.id}-${i}`}
-                        style={{
-                          width: size,
-                          "--column-width": `${size}px`,
-                          flexShrink: 0,
-                          ...getCommonPinningStyles(cell.column),
-                          ...styleWithoutWidth,
-                        } as CSSProperties}
-                      >
-                        <div
-                          className={styles.cellContent}
-                          style={{
-                            userSelect:
-                              effectiveUserSelectCell as React.CSSProperties["userSelect"],
-                          }}
-                        >
-                          {cellRenderer
-                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                            : (flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              ) as ReactNode)}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </Fragment>
+                <TableMemoizedCells
+                  key={row.id}
+                  rowIndex={rowIndex}
+                  isSelected={row.getIsSelected()}
+                  renderVersion={rowStateRef.current.renderVersion}
+                />
               ))}
             </Virtualizer>
           )}
@@ -1870,7 +1952,7 @@ export const Table = forwardRef(
       </div>
     );
   },
-);
+));
 
 type ClickableHeaderProps = {
   hasSorting?: boolean;
