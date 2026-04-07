@@ -2,68 +2,74 @@
 
 Use `ChangeListener` to react when a variable changes — with optional debouncing or throttling to reduce the number of times your handler fires.
 
-A `ChangeListener` watches any variable via its `listenTo` prop and calls `onDidChange` with the previous and new values. Adding `throttleWaitInMs` makes the handler fire at most once per interval during rapid changes, which is ideal for search-as-you-type scenarios. The example below shows throttled product search: as you type, the `ChangeListener` waits at most 500 ms between API calls.
+A `ChangeListener` watches any variable via its `listenTo` prop and calls `onDidChange` with the previous and new values. Adding `debounceWaitInMs` delays the handler until the value has been stable for that many milliseconds, which is ideal for search-as-you-type scenarios. The example below shows debounced product search: the API call fires only after the user stops typing for 500 ms.
 
-```xmlui-pg copy display name="Search with ChangeListener throttling" height="400px"
----comp display /ChangeListener/ /throttleWaitInMs/ 
-<Component 
+```xmlui-pg copy display name="Search with ChangeListener debouncing" height="400px"
+---app display /ChangeListener/ /debounceWaitInMs/ 
+<App
   name="DebouncedSearch" 
   var.searchTerm="" 
   var.results="{[]}"
   var.inProgress="{false}">
-  <VStack>
-    <TextBox
-      id="searchInput"
-      label="Search products:"
-      placeholder="Type to search..."
-      value="{searchTerm}"
-      onDidChange="e => searchTerm = e"
-    />
 
-    <ChangeListener
-      listenTo="{searchTerm}"
-      throttleWaitInMs="500"
-      onDidChange="arg => {
-        if (!arg.newValue) {
-          results = [];
-          inProgress = false;
-          return;
-        }
-        
-        inProgress = true;
-        const response = Actions.callApi({
-          url: '/api/search',
-          method: 'POST',
-          body: { query: arg.newValue }
-        });
-        results = response.status === 'ok' ? response.results : [];
+  <!-- 
+    products = [
+      { id: 1, name: 'Laptop', price: 999, category: 'Electronics' },
+      { id: 2, name: 'Mouse', price: 29, category: 'Electronics' },
+      { id: 3, name: 'Keyboard', price: 79, category: 'Electronics' },
+      { id: 4, name: 'Monitor', price: 299, category: 'Electronics' },
+      { id: 5, name: 'Desk Chair', price: 199, category: 'Furniture' },
+      { id: 6, name: 'Desk Lamp', price: 49, category: 'Furniture' }
+    ]
+  -->
+
+  <TextBox
+    id="searchInput"
+    label="Search products:"
+    placeholder="Type to search..."
+    value="{searchTerm}"
+    onDidChange="e => searchTerm = e"
+  />
+
+  <ChangeListener
+    listenTo="{searchTerm}"
+    debounceWaitInMs="500"
+    onDidChange="arg => {
+      results = [];
+      if (!arg.newValue) {
         inProgress = false;
-      }"
-    />
+        return;
+      }
+      
+      inProgress = true;
+      const response = Actions.callApi({
+        url: '/api/search',
+        method: 'POST',
+        body: { query: arg.newValue }
+      });
+      results = response.status === 'ok' ? response.results : [];
+      inProgress = false;
+    }"
+  />
 
-    <Card when="{searchTerm.length > 0}">
-      <VStack>
-        <Text when="{inProgress}" variant="em">
-          Searching for: {searchTerm}
-        </Text>
-        <Fragment when="{!inProgress}">
-          <Fragment when="{results.length > 0}">
+  <Card when="{searchTerm.length > 0}">
+    <VStack>
+      <Text when="{inProgress}" variant="em">
+        Searching for: {searchTerm}
+      </Text>
+      <Fragment when="{!inProgress}">
+        <Fragment when="{results.length > 0}">
           <H4>Found {pluralize(results.length, 'result', 'results')}</H4>
           <List data="{results}">
             {$item.name} ({$item.category}) - ${$item.price}
           </List>
-          </Fragment>
-          <Text when="{results.length === 0}">
-            No results found
-          </Text>
         </Fragment>
-      </VStack>
-    </Card>
-  </VStack>
-</Component>
----app display
-<App>
-  <DebouncedSearch />
+        <Text when="{results.length === 0}">
+          No results found
+        </Text>
+      </Fragment>
+    </VStack>
+  </Card>
 </App>
 ---api
 {
@@ -104,7 +110,17 @@ A `ChangeListener` watches any variable via its `listenTo` prop and calls `onDid
 
 **`listenTo` accepts any expression**: Watch a single variable (`{searchTerm}`), a component's property (`{searchInput.value}`), or even a derived expression (`{quantity * unitPrice}`). The listener fires whenever the evaluated result changes.
 
-**`throttleWaitInMs` fires immediately, then at most once per interval**: Ideal for live search, scroll tracking, and similar burst scenarios where you want *some* updates during rapid changes. Use `debounceWaitInMs` instead when only the final settled value matters.
+**`debounceWaitInMs` waits for the value to settle before firing**: The handler is postponed until the watched value has not changed for the specified number of milliseconds. Use this when only the *final* value matters — e.g. triggering a search API call after the user finishes typing rather than on every keystroke.
+
+**`throttleWaitInMs` fires immediately, then at most once per interval**: Unlike debounce, throttle guarantees a response at the *start* of a burst and then caps the rate. Use this when you want *some* updates during rapid changes, not just the last one — e.g. scroll tracking, live price preview, or real-time collaboration cursors.
+
+```xmlui
+<ChangeListener
+  listenTo="{sliderValue}"
+  throttleWaitInMs="200"
+  onDidChange="({newValue}) => previewPrice = newValue * unitPrice"
+/>
+```
 
 **`onDidChange` receives `{prevValue, newValue}`**: Both values are available in the event object for comparison or delta computation. Destructure only what you need: `({newValue}) => handleSearch(newValue)`.
 
@@ -112,29 +128,6 @@ A `ChangeListener` watches any variable via its `listenTo` prop and calls `onDid
 
 ## See also
 
-- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) — throttle vs debounce explained side by side
-- [React to button click, not keystrokes](/docs/howto/react-to-button-click-not-keystrokes) — wait for explicit submit instead of reacting while typing
+- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) — apply `throttleWaitInMs` when you need updates during a burst, not just at the end
 - [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — compute values reactively without a listener
-
-**Handle empty values gracefully**: Consider what should happen when the watched value becomes empty:
-
-```xmlui
-<ChangeListener
-  listenTo="{searchTerm}"
-  throttleWaitInMs="500"
-  onDidChange="arg => {
-    if (!arg.newValue) {
-      results = []; // Clear results when search is empty
-      return;
-    }
-    // Perform search with arg.newValue
-  }"
-/>
-```
-
-**Common use cases**:
-- Search inputs — throttle API calls as user types
-- Form validation — delay validation until user pauses
-- Auto-save — save changes after editing stops
-- Filters and sorting — reduce computation on rapid changes
-- State synchronization — coordinate between components
+- [Run a one-time action on page load](/docs/howto/run-a-one-time-action-on-page-load) — trigger initialisation logic once instead of watching a variable

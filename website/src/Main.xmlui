@@ -688,7 +688,6 @@
                     </NavGroup>
 
                     <NavGroup label="Modals, Drawers & Overlays">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Open a confirmation before delete"
@@ -704,19 +703,16 @@
                             label="Show a slide-in settings drawer"
                             to="/docs/howto/show-a-slide-in-settings-drawer"
                         />
-                        -->
                         <NavLink
                             icon="article"
-                            label="Return data from a closed dialog"
+                            label="Keep a ModalDialog reopenable with onClose"
                             to="/docs/howto/use-modal-dialog-onclose"
                         />
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Open a context menu on right-click"
                             to="/docs/howto/open-a-context-menu-on-right-click"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Pass data to a Modal Dialog"
@@ -836,13 +832,6 @@
                             label="Throttle rapid value updates"
                             to="/docs/howto/throttle-rapid-value-updates"
                         />
-                        <!-- Temporarily hidden
-                        <NavLink
-                            icon="article"
-                            label="React to button click not keystrokes"
-                            to="/docs/howto/react-to-button-click-not-keystrokes"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Buffer a reactive edit"
@@ -860,7 +849,6 @@
                         />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Menus & Toolbars">
                         <NavLink
                             icon="article"
@@ -883,7 +871,6 @@
                             to="/docs/howto/create-a-multi-level-submenu"
                         />
                     </NavGroup>
-                    -->
 
                     <!-- Temporarily hidden
                     <NavGroup label="Media & Rich Content">
@@ -1718,13 +1705,6 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/delegate-a-method.md']}"
-                />
-            </Page>
-            <Page
-                url="/docs/howto/react-to-button-click-not-keystrokes"
-            >
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/react-to-button-click-not-keystrokes.md']}"
                 />
             </Page>
             <Page
