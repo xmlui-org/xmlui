@@ -41,7 +41,7 @@ export const Badge = memo(forwardRef(function Badge(
     const colorStyle: CSSProperties =
       typeof color === "string"
         ? { backgroundColor: color }
-        : { backgroundColor: color.background, color: color.label };
+        : { backgroundColor: (color as BadgeColors).background, color: (color as BadgeColors).label };
     return { ...colorStyle, ...style };
   }, [color, style]);
 
