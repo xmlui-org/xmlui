@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, startTransition, useEffect } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -575,6 +575,19 @@ const TableWithColumns = memo(
       > & { layoutContext?: LayoutContext },
       ref,
     ) => {
+      console.count("[TableWithColumns] render");
+      // --- DEBUG WHY DID YOU RENDER ---
+      const debugProps = { extractValue, node, renderChild, lookupEventHandler, lookupAction, lookupSyncCallback, classes, registerComponentApi, layoutContext };
+      const prevProps = useRef<any>(debugProps);
+      useEffect(() => {
+        const changedProps = Object.keys(debugProps).filter((k) => (debugProps as any)[k] !== prevProps.current[k]);
+        if (changedProps.length > 0) {
+          console.log("[TableWithColumns] Re-render triggered by props:", changedProps);
+        }
+        prevProps.current = debugProps;
+      });
+      // --- END DEBUG ---
+
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
       const data = extractValue(node.props.items) || extractValue(node.props.data);
 
@@ -601,31 +614,44 @@ const TableWithColumns = memo(
       const tableContextValue = useMemo(() => {
         return {
           registerColumn: (column: OurColumnMetadata, id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                const existing = draft.findIndex((colId) => colId === id);
-                if (existing < 0) {
-                  draft.push(id);
+            setColumnIds((prev) => {
+              if (prev.includes(id)) return prev;
+              return [...prev, id];
+            });
+            setColumnByIds((prev) => {
+              const prevCol = prev[id];
+              // Even if it's the exact same object by reference, or same content, we only
+              // want to bail out if we don't need to change state.
+              if (prevCol === column) return prev;
+              if (prevCol) {
+                const prevKeys = Object.keys(prevCol);
+                const nextKeys = Object.keys(column);
+                if (prevKeys.length === nextKeys.length) {
+                  let isSame = true;
+                  for (let i = 0; i < prevKeys.length; i++) {
+                    const key = prevKeys[i];
+                    if ((prevCol as any)[key] !== (column as any)[key]) {
+                      isSame = false;
+                      break;
+                    }
+                  }
+                  if (isSame) return prev;
                 }
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                draft[id] = column;
-              }),
-            );
+              }
+              return { ...prev, [id]: column };
+            });
           },
           unRegisterColumn: (id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                return draft.filter((colId) => colId !== id);
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                delete draft[id];
-              }),
-            );
+            setColumnIds((prev) => {
+              if (!prev.includes(id)) return prev;
+              return prev.filter((colId) => colId !== id);
+            });
+            setColumnByIds((prev) => {
+              if (!(id in prev)) return prev;
+              const next = { ...prev };
+              delete next[id];
+              return next;
+            });
           },
         };
       }, []);
@@ -646,43 +672,12 @@ const TableWithColumns = memo(
         };
       }, []);
 
-      // HACK: manually shallow compare columnsByIds and columnIds to prevent unnecessary map creation
-      const prevDeps = useRef<{
-        columnIds: any[];
-        columnsByIds: Record<string, any>;
-        cachedColumns?: any[];
-      }>({ columnIds, columnsByIds });
       const columns = useMemo(() => {
-        let changed = false;
-        let changeReason = "";
-
-        if (prevDeps.current.columnIds !== columnIds) {
-          changed = true;
-          changeReason = "columnIds ref changed";
-        } else if (prevDeps.current.columnsByIds !== columnsByIds) {
-           const prevKeys = Object.keys(prevDeps.current.columnsByIds);
-           const newKeys = Object.keys(columnsByIds);
-           if (prevKeys.length !== newKeys.length) {
-             changed = true;
-             changeReason = "columnsByIds len changed";
-           } else {
-             for (const k of prevKeys) {
-               if (prevDeps.current.columnsByIds[k] !== columnsByIds[k]) {
-                 changed = true;
-                 changeReason = `columnsByIds[${k}] changed ref!`;
-                 break;
-               }
-             }
-           }
+        const result = new Array(columnIds.length);
+        for (let i = 0; i < columnIds.length; i++) {
+          result[i] = columnsByIds[columnIds[i]];
         }
-
-        if (changed || !prevDeps.current.cachedColumns) {
-           prevDeps.current.cachedColumns = columnIds.map((colId) => columnsByIds[colId]);
-           prevDeps.current.columnIds = columnIds;
-           prevDeps.current.columnsByIds = columnsByIds;
-        }
-        return prevDeps.current.cachedColumns;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+        return result;
       }, [columnIds, columnsByIds]);
 
       const selectionContext = useSelectionContext();

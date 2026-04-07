@@ -1318,6 +1318,17 @@ export const Table = memo(forwardRef(
           renderVersion: number;
         }) {
           console.count("[TableMemoizedCells] render");
+
+          const debugProps = { rowIndex, isSelected: _isSelected, renderVersion: _rv };
+          const prevProps = useRef<any>(debugProps);
+          useEffect(() => {
+            const changedProps = Object.keys(debugProps).filter((k) => (debugProps as any)[k] !== prevProps.current[k]);
+            if (changedProps.length > 0) {
+              console.log("[TableMemoizedCells] Re-render triggered by props:", changedProps);
+            }
+            prevProps.current = debugProps;
+          });
+
           const row = rowsRef.current[rowIndex];
           if (!row) return null;
           const { effectiveUserSelectCell: userSelectCell, cellVerticalAlign: vertAlign } =
