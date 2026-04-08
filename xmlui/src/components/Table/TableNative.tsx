@@ -1055,6 +1055,16 @@ export const Table = memo(forwardRef(
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
+    // layoutVersion tracks internal layout state changes that cells must respond to
+    // (column drag resize, window resize via recalculateStarSizes).
+    const prevColumnSizingRef = useRef(columnSizing);
+    const layoutVersionRef = useRef(0);
+    if (columnSizing !== prevColumnSizingRef.current) {
+      prevColumnSizingRef.current = columnSizing;
+      layoutVersionRef.current++;
+    }
+    const layoutVersion = layoutVersionRef.current;
+
 
 
     const columnPinning = useMemo(() => {
@@ -1342,7 +1352,7 @@ export const Table = memo(forwardRef(
       lookupEventHandler,
       rowDoubleClick,
       striped,
-      renderVersion,
+      renderVersion: renderVersion + layoutVersion,
     };
     const rowStateRef = useRef(rowState);
     rowStateRef.current = rowState;
