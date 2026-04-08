@@ -1,4 +1,3 @@
-import is from "date-fns/esm/locale/is/index.js";
 import type { Node, GetText } from "../../../parsers/xmlui-parser";
 import { SyntaxKind } from "../../../parsers/xmlui-parser";
 

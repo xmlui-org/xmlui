@@ -120,6 +120,6 @@ export function getSyntaxKindStrRepr(kind: SyntaxKind): string {
   return assertUnreachable(kind);
 }
 
-function assertUnreachable(x: never): never {
+function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
 }

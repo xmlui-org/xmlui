@@ -1,12 +1,10 @@
-import { type FoldingRange, FoldingRangeKind } from "vscode-languageserver";
+import type { FoldingRange } from "vscode-languageserver";
+import { FoldingRangeKind } from "vscode-languageserver";
 import type { Project } from "../base/project";
 import type { DocumentUri, TextDocument } from "../base/text-document";
-import { SyntaxKind, toDbgString } from "../../parsers/xmlui-parser";
-import type { GetText, Node } from "../../parsers/xmlui-parser";
+import { SyntaxKind } from "../../parsers/xmlui-parser";
+import type { Node } from "../../parsers/xmlui-parser";
 import { getOpeningTagNameNode, isSelfClosingNode } from "./common/syntax-node-utilities";
-
-const regexEndsWithNewlinePossiblyWs = /\n\s*$/;
-
 class FoldingRangeStore {
   private ranges: FoldingRange[] = [];
 
@@ -17,7 +15,11 @@ class FoldingRangeStore {
    * which starts at the same line. Only checks the last folding range for conflict,
    * so make sure to add folding ranges in order.
    */
-  tryAddFoldRange(startOffset: number, endOffset: number): void {
+  tryAddFoldRange(
+    startOffset: number,
+    endOffset: number,
+    kind: FoldingRangeKind = FoldingRangeKind.Region,
+  ): void {
     const startLine = this.doc.cursor.positionAt(startOffset).line;
     const endLine = this.doc.cursor.positionAt(endOffset).line - 1;
     if (endLine <= startLine) return;
@@ -25,6 +27,7 @@ class FoldingRangeStore {
     const range: FoldingRange = {
       startLine,
       endLine,
+      kind,
     };
 
     if (this.ranges.length === 0) {
@@ -51,19 +54,18 @@ class FoldingRangeStore {
  * Fold ranges are emitted for:
  * - Paired element tags (opening to closing tag)
  * - Self-closing tags spanning multiple lines
- * - CDATA sections spanning multiple lines
  * - Comments spanning multiple lines
+ * - Script tags spanning multiple lines
  */
 export function handleFoldingRanges(project: Project, uri: DocumentUri): FoldingRange[] | null {
   const doc = project.documents.get(uri);
   const {
     parseResult: { node: rootNode },
-    getText,
   } = doc.parse();
 
   const foldStore = new FoldingRangeStore(doc);
 
-  collectFoldingRanges(rootNode, doc, getText, foldStore);
+  collectFoldingRanges(rootNode, foldStore);
 
   return foldStore.getRangesOrNull();
 }
@@ -71,48 +73,38 @@ export function handleFoldingRanges(project: Project, uri: DocumentUri): Folding
 /**
  * Recursively walk the CST and collect folding ranges.
  */
-function collectFoldingRanges(
-  node: Node,
-  doc: TextDocument,
-  getText: GetText,
-  foldStore: FoldingRangeStore,
-): void {
+function collectFoldingRanges(node: Node, foldStore: FoldingRangeStore): void {
   if (!node) {
     return;
   }
 
   if (node.children) {
-    for (let i = 0; i < node.children.length; i++) {
-      const prevChild = i > 0 ? node.children[i - 1] : null;
-      const prevTextNode = prevChild?.kind === SyntaxKind.TextNode ? prevChild : null;
-      const c = node.children[i];
+    for (const c of node.children) {
+      // doing depth-first search so that the inner most
+      // tag fold ranges get inserted into the store first
+      // so that the surrounding ranges get thrown away,
+      // when they begin on the same line.
+      collectFoldingRanges(c, foldStore);
 
       if (c.triviaBefore) {
         for (let i = 0; i < c.triviaBefore.length; ++i) {
           const t = c.triviaBefore[i];
           if (t.kind === SyntaxKind.CommentTrivia) {
-            tryAddFoldRange(doc, t.pos, t.end);
+            foldStore.tryAddFoldRange(t.pos, t.end, "comment");
           }
         }
       }
 
       switch (c.kind) {
         case SyntaxKind.ElementNode: {
-          const range = getElementFoldRange(c, prevTextNode, doc, getText);
-          if (range) {
-            foldStore.push(range);
-          }
+          getElementFoldRange(c, foldStore);
           break;
         }
         case SyntaxKind.Script: {
-          const range = getScriptFoldRange(c, prevTextNode, doc, getText);
-          if (range) {
-            foldStore.push(range);
-          }
+          foldStore.tryAddFoldRange(c.pos, c.end);
           break;
         }
       }
-      collectFoldingRanges(c, doc, getText, foldStore);
     }
   }
 }
@@ -139,48 +131,4 @@ function getElementFoldRange(node: Node, foldStore: FoldingRangeStore) {
   }
 
   return foldStore.tryAddFoldRange(startOffset, endOffset);
-}
-
-function getScriptFoldRange(
-  node: Node,
-  prevTextNode: Node | null,
-  doc: TextDocument,
-  getText: GetText,
-): FoldingRange | null {
-  if (!isNodeOnNewline(node, prevTextNode, doc, getText)) {
-    return null;
-  }
-  return tryAddFoldRange(doc, node.pos, node.end);
-}
-
-function isNodeOnNewline(
-  node: Node,
-  prevTextNode: Node | null,
-  doc: TextDocument,
-  getText: GetText,
-): boolean {
-  const triviaNodes = node.getTriviaNodes();
-  if (triviaNodes) {
-    const onNewlineCandidate = nodeOnNewlineAccordingToTrivia(triviaNodes);
-    if (onNewlineCandidate) return true;
-  }
-  if (prevTextNode) {
-    if (regexEndsWithNewlinePossiblyWs.test(getText(prevTextNode))) {
-      return true;
-    }
-  }
-  if (doc.cursor.positionAt(node.pos).line === 0) return true;
-  return false;
-}
-
-function nodeOnNewlineAccordingToTrivia(triviaNodes: Node[]): boolean {
-  for (let i = triviaNodes.length - 1; i >= 0; i--) {
-    switch (triviaNodes[i].kind) {
-      case SyntaxKind.NewLineTrivia:
-        return true;
-      case SyntaxKind.CommentTrivia:
-        return false;
-    }
-  }
-  return false;
 }

@@ -15,23 +15,6 @@ function getFoldingRanges(source: string): FoldingRange[] {
   return handleFoldingRanges(project, uri);
 }
 
-/**
- * Helper to verify expected fold ranges.
- * startLine and endLine are 0-indexed (LSP format).
- */
-function expectFoldRange(
-  ranges: FoldingRange[],
-  startLine: number,
-  endLine: number,
-  kind?: FoldingRangeKind,
-): void {
-  const expectedRange: FoldingRange = { startLine, endLine };
-  if (kind) {
-    expectedRange.kind = kind;
-  }
-  expect(ranges).toContainEqual(expectedRange);
-}
-
 describe("Folding Ranges", () => {
   describe("Paired element tags", () => {
     it("folds script tag", () => {
@@ -40,7 +23,7 @@ describe("Folding Ranges", () => {
 </script>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Region });
     });
 
     it("doesn't fold paired tag spanning 2 lines", () => {
@@ -55,7 +38,7 @@ describe("Folding Ranges", () => {
   text
 </Button>`;
       const ranges = getFoldingRanges(source);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Region });
     });
 
     it("folds multiple paired tag", () => {
@@ -67,8 +50,8 @@ describe("Folding Ranges", () => {
 </Stack>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(2);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 4 });
-      expect(ranges).toContainEqual({ startLine: 1, endLine: 2 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 4, kind: FoldingRangeKind.Region });
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Region });
     });
 
     it("does not fold single-line paired tag", () => {
@@ -85,7 +68,7 @@ describe("Folding Ranges", () => {
 </FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 3 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 3, kind: FoldingRangeKind.Region });
     });
 
     it("folds paired tag with attributes after name", () => {
@@ -97,7 +80,7 @@ describe("Folding Ranges", () => {
 </FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 1, endLine: 4 });
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 4, kind: FoldingRangeKind.Region });
     });
 
     it("folds paired tag with attributes after name and attr", () => {
@@ -107,7 +90,7 @@ describe("Folding Ranges", () => {
 </FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 2 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
     });
 
     it("folds paired tag closing tagname on newline", () => {
@@ -118,7 +101,7 @@ describe("Folding Ranges", () => {
 FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 2 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
     });
 
     it("folds paired tag no open tagname", () => {
@@ -127,7 +110,7 @@ FlowLayout>`;
 </ FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Region });
     });
 
     it("folds paired tag no open tagname multiline open tag", () => {
@@ -137,7 +120,7 @@ FlowLayout>`;
 </ FlowLayout>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 2 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
     });
 
     it("folds tag no end for open tag", () => {
@@ -147,7 +130,7 @@ FlowLayout>`;
         </Stack>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(1);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 2 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
     });
 
     it("handles element with only whitespace", () => {
@@ -155,7 +138,7 @@ FlowLayout>`;
 
 </Container>`;
       const ranges = getFoldingRanges(source);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1 });
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Region });
     });
 
     it("handles multiple top-level elements", () => {
@@ -167,8 +150,8 @@ FlowLayout>`;
       content
     </Main>`;
       const ranges = getFoldingRanges(source);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1 }); // <Header>
-      expect(ranges).toContainEqual({ startLine: 3, endLine: 5 }); // <Main>
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Region }); // <Header>
+      expect(ranges).toContainEqual({ startLine: 3, endLine: 5, kind: FoldingRangeKind.Region }); // <Main>
     });
   });
 
@@ -183,7 +166,7 @@ FlowLayout>`;
       </Stack>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(2);
-      expect(ranges).toContainEqual({ startLine: 1, endLine: 3 });
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 3, kind: FoldingRangeKind.Region });
     });
   });
 
@@ -200,7 +183,7 @@ FlowLayout>`;
   size="large"
   color="blue" />`;
     const ranges = getFoldingRanges(source);
-    expect(ranges).toContainEqual({ startLine: 0, endLine: 2 });
+    expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
   });
 
   it("does not fold single-line self-closing tag", () => {
@@ -216,8 +199,8 @@ FlowLayout>`;
     text="Click" />
 </Stack>`;
     const ranges = getFoldingRanges(source);
-    expect(ranges).toContainEqual({ startLine: 0, endLine: 3 }); // <Stack>
-    expect(ranges).toContainEqual({ startLine: 1, endLine: 2 }); // <Button
+    expect(ranges).toContainEqual({ startLine: 0, endLine: 3, kind: FoldingRangeKind.Region }); // <Stack>
+    expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Region }); // <Button
   });
 
   describe("Comments", () => {
@@ -226,13 +209,17 @@ FlowLayout>`;
     multi-line comment
     spanning 3 lines -->`;
       const ranges = getFoldingRanges(source);
-      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Comment });
+      expect(ranges).toContainEqual({
+        startLine: 0,
+        endLine: 1,
+        kind: FoldingRangeKind.Comment,
+      });
     });
 
     it("does not fold single-line comment", () => {
       const source = `<!-- single line comment -->`;
       const ranges = getFoldingRanges(source);
-      expect(ranges.length).toBe(0);
+      expect(ranges).toBeNull();
     });
 
     it("folds comment within element", () => {
@@ -244,19 +231,26 @@ FlowLayout>`;
   </Stack>`;
       const ranges = getFoldingRanges(source);
       expect(ranges).toHaveLength(2);
-      expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Comment });
+      expect(ranges).toContainEqual({
+        startLine: 1,
+        endLine: 2,
+        kind: FoldingRangeKind.Comment,
+      });
     });
 
     it("wip", () => {
       const source = `<Stack>
-            hi there <!-- Comment
-          lines --> <Button >
+        hi there <!-- Comment
+        line
+        lines --> <Button >
           content
         </Button >
       </Stack>`;
       const ranges = getFoldingRanges(source);
-      expect(ranges).toHaveLength(2);
-      expect(ranges).toContainEqual({ startLine: 2, endLine: 3 });
+      expect(ranges).toHaveLength(3);
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 5, kind: FoldingRangeKind.Region });
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Comment });
+      expect(ranges).toContainEqual({ startLine: 3, endLine: 4, kind: FoldingRangeKind.Region });
     });
   });
 });
