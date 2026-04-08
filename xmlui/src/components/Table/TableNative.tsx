@@ -789,7 +789,7 @@ export const Table = memo(forwardRef(
           onKeyDown(event);
         }
       },
-      [handleKeyboardActions, onKeyDown],
+      [handleKeyboardActions, onKeyDown]
     );
 
     // --- Create data with order information whenever the items in the table change
