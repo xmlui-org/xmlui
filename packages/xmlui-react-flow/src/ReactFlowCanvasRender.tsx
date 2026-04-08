@@ -244,7 +244,7 @@ function XmluiEdge({
               border: "1px solid var(--xmlui-borderColor, #e2e8f0)",
               borderRadius: 4,
               padding: "2px 6px",
-              fontSize: 20,
+              fontSize: data?._canvasFontSize || 16,
               display: "flex",
               alignItems: "center",
               gap: 4,
@@ -321,6 +321,7 @@ export function ReactFlowCanvasRender({
   showControls = true,
   showBackground = true,
   showEdgeInfo = false,
+  canvasFontSize = 16,
   storageKey,
   className,
   onNativeEvent,
@@ -343,6 +344,7 @@ export function ReactFlowCanvasRender({
   showControls?: boolean;
   showBackground?: boolean;
   showEdgeInfo?: boolean;
+  canvasFontSize?: number;
   storageKey?: string;
   className?: string;
   onNativeEvent?: (event: any) => void;
@@ -404,7 +406,7 @@ export function ReactFlowCanvasRender({
         },
         data: {
           ...node.data,
-          _rc: renderCountRef.current,
+
           renderContent: childrenRef.current[i] ?? null,
         },
       };
@@ -414,9 +416,13 @@ export function ReactFlowCanvasRender({
   const showEdgeInfoRef = useRef(showEdgeInfo);
   showEdgeInfoRef.current = showEdgeInfo;
 
+  const canvasFontSizeRef = useRef(canvasFontSize);
+  canvasFontSizeRef.current = canvasFontSize;
+
   const addInfoClick = useCallback((data: any) => ({
     ...data,
     showEdgeInfo: showEdgeInfoRef.current,
+    _canvasFontSize: canvasFontSizeRef.current,
     onInfoClick: (edgeId: string, label: string) => {
       const evt = { edgeId, label };
       onNativeEventRef.current?.({
@@ -806,7 +812,7 @@ export function ReactFlowCanvasRender({
   const edgeTypes: EdgeTypes = useMemo(() => ({ xmlui: XmluiEdge }), []);
 
   return (
-      <div style={{ position: "absolute", inset: 0 }} className={className}>
+      <div style={{ position: "absolute", inset: 0, fontSize: `${canvasFontSize}px` }} className={className}>
           <ReactFlow
             nodes={nodes}
             edges={edges}
