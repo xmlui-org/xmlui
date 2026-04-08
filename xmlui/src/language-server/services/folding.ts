@@ -6,6 +6,44 @@ import type { GetText, Node } from "../../parsers/xmlui-parser";
 import { getOpeningTagNameNode, isSelfClosingNode } from "./common/syntax-node-utilities";
 
 const regexEndsWithNewlinePossiblyWs = /\n\s*$/;
+
+class FoldingRangeStore {
+  private ranges: FoldingRange[] = [];
+
+  constructor(private doc: TextDocument) {}
+
+  /**
+   * Only adds the folding range, if there's no conflicting foldrange
+   * which starts at the same line. Only checks the last folding range for conflict,
+   * so make sure to add folding ranges in order.
+   */
+  tryAddFoldRange(startOffset: number, endOffset: number): void {
+    const startLine = this.doc.cursor.positionAt(startOffset).line;
+    const endLine = this.doc.cursor.positionAt(endOffset).line - 1;
+    if (endLine <= startLine) return;
+
+    const range: FoldingRange = {
+      startLine,
+      endLine,
+    };
+
+    if (this.ranges.length === 0) {
+      this.ranges.push(range);
+      return;
+    }
+
+    const prevRange = this.ranges.at(-1);
+    if (prevRange.startLine !== startLine) {
+      this.ranges.push(range);
+    }
+  }
+
+  getRangesOrNull(): FoldingRange[] | null {
+    if (this.ranges.length === 0) return null;
+    return this.ranges;
+  }
+}
+
 /**
  * Handle folding range requests.
  * Computes fold ranges for a XMLUI document based on its CST structure.
@@ -23,15 +61,11 @@ export function handleFoldingRanges(project: Project, uri: DocumentUri): Folding
     getText,
   } = doc.parse();
 
-  const ranges: FoldingRange[] = [];
+  const foldStore = new FoldingRangeStore(doc);
 
-  collectFoldingRanges(rootNode, doc, getText, ranges);
+  collectFoldingRanges(rootNode, doc, getText, foldStore);
 
-  if (ranges.length === 0) {
-    return null;
-  }
-
-  return ranges;
+  return foldStore.getRangesOrNull();
 }
 
 /**
@@ -41,7 +75,7 @@ function collectFoldingRanges(
   node: Node,
   doc: TextDocument,
   getText: GetText,
-  ranges: FoldingRange[],
+  foldStore: FoldingRangeStore,
 ): void {
   if (!node) {
     return;
@@ -53,32 +87,37 @@ function collectFoldingRanges(
       const prevTextNode = prevChild?.kind === SyntaxKind.TextNode ? prevChild : null;
       const c = node.children[i];
 
+      if (c.triviaBefore) {
+        for (let i = 0; i < c.triviaBefore.length; ++i) {
+          const t = c.triviaBefore[i];
+          if (t.kind === SyntaxKind.CommentTrivia) {
+            tryAddFoldRange(doc, t.pos, t.end);
+          }
+        }
+      }
+
       switch (c.kind) {
         case SyntaxKind.ElementNode: {
           const range = getElementFoldRange(c, prevTextNode, doc, getText);
           if (range) {
-            ranges.push(range);
+            foldStore.push(range);
           }
           break;
         }
         case SyntaxKind.Script: {
           const range = getScriptFoldRange(c, prevTextNode, doc, getText);
           if (range) {
-            ranges.push(range);
+            foldStore.push(range);
           }
           break;
         }
       }
-      collectFoldingRanges(c, doc, getText, ranges);
+      collectFoldingRanges(c, doc, getText, foldStore);
     }
   }
 }
 
-function getElementFoldRange(node: Node, prevTextNode: Node, doc: TextDocument, getText: GetText) {
-  if (!isNodeOnNewline(node, prevTextNode, doc, getText)) {
-    return null;
-  }
-
+function getElementFoldRange(node: Node, foldStore: FoldingRangeStore) {
   let startOffset: number;
   let endOffset: number;
 
@@ -99,15 +138,7 @@ function getElementFoldRange(node: Node, prevTextNode: Node, doc: TextDocument, 
     else endOffset = node.end;
   }
 
-  const startLine = doc.cursor.positionAt(startOffset).line;
-  const endLine = doc.cursor.positionAt(endOffset).line - 1;
-  if (startLine < endLine) {
-    return {
-      startLine,
-      endLine,
-    };
-  }
-  return null;
+  return foldStore.tryAddFoldRange(startOffset, endOffset);
 }
 
 function getScriptFoldRange(
@@ -119,15 +150,7 @@ function getScriptFoldRange(
   if (!isNodeOnNewline(node, prevTextNode, doc, getText)) {
     return null;
   }
-  const startLine = doc.cursor.positionAt(node.pos).line;
-  const endLine = doc.cursor.positionAt(node.end).line - 1;
-  if (startLine < endLine) {
-    return {
-      startLine,
-      endLine,
-    };
-  }
-  return null;
+  return tryAddFoldRange(doc, node.pos, node.end);
 }
 
 function isNodeOnNewline(

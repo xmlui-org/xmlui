@@ -219,32 +219,44 @@ FlowLayout>`;
     expect(ranges).toContainEqual({ startLine: 0, endLine: 3 }); // <Stack>
     expect(ranges).toContainEqual({ startLine: 1, endLine: 2 }); // <Button
   });
-});
 
-describe("Comments", () => {
-  it("folds multi-line comment with Comment kind", () => {
-    const source = `<!-- This is a
-  multi-line comment
-  spanning 3 lines -->`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Comment });
-  });
+  describe("Comments", () => {
+    it("folds multi-line comment with Comment kind", () => {
+      const source = `<!-- This is a
+    multi-line comment
+    spanning 3 lines -->`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 1, kind: FoldingRangeKind.Comment });
+    });
 
-  it("does not fold single-line comment", () => {
-    const source = `<!-- single line comment -->`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges.length).toBe(0);
-  });
+    it("does not fold single-line comment", () => {
+      const source = `<!-- single line comment -->`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges.length).toBe(0);
+    });
 
-  it("folds comment within element", () => {
-    const source = `<Stack>
-  <!-- Comment
-    spanning
-    lines -->
-  <Button />
-</Stack>`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toHaveLength(2);
-    expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Comment });
+    it("folds comment within element", () => {
+      const source = `<Stack>
+    <!-- Comment
+      spanning
+      lines -->
+    <Button />
+  </Stack>`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toHaveLength(2);
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Comment });
+    });
+
+    it("wip", () => {
+      const source = `<Stack>
+            hi there <!-- Comment
+          lines --> <Button >
+          content
+        </Button >
+      </Stack>`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toHaveLength(2);
+      expect(ranges).toContainEqual({ startLine: 2, endLine: 3 });
+    });
   });
 });
