@@ -113,7 +113,7 @@ export function AppContent({
     onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
     onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
   }>({});
-  
+
   const setNavigationHandlers = useCallback(
     (
       onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
@@ -123,12 +123,12 @@ export function AppContent({
     },
     [],
   );
-  
+
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
   const navigateRouter = useNavigate();
   const { confirm } = useConfirm();
-  
+
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
@@ -140,13 +140,13 @@ export function AppContent({
   const navigate = useCallback(
     async (to: any, options?: any) => {
       const { onWillNavigate } = navigationHandlers;
-      
+
       // Extract queryParams if exists in options (for NavigateAction compatibility)
       const queryParams = options?.queryParams;
-      
+
       // Remove queryParams from options before passing to navigateRouter
       const { queryParams: _, ...navigateOptions } = options || {};
-      
+
       // Call willNavigate handler if defined (only for programmatic navigation)
       if (onWillNavigate) {
         const result = await onWillNavigate(to, queryParams);
@@ -155,15 +155,15 @@ export function AppContent({
           return;
         }
       }
-      
+
       // Perform the actual navigation
       navigateRouter(to, navigateOptions);
-      
+
       // didNavigate will be fired by the useEffect that watches location changes
     },
     [navigateRouter, navigationHandlers],
   );
-  
+
   // Fire didNavigate after any location change (works for all navigation types)
   useEffect(() => {
     // Skip firing didNavigate on initial render
@@ -171,13 +171,13 @@ export function AppContent({
       isInitialRenderRef.current = false;
       return;
     }
-    
+
     const currentPath = location.pathname + location.search + location.hash;
     const previousPath = previousLocationRef.current;
-    
+
     if (currentPath !== previousPath) {
       previousLocationRef.current = currentPath;
-      
+
       const { onDidNavigate } = navigationHandlers;
       if (onDidNavigate) {
         void onDidNavigate(currentPath, undefined);
@@ -315,6 +315,9 @@ export function AppContent({
   let vpSize;
   let vpSizeIndex;
   const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
+
+  const prevVpRef = useRef<{ size: string; index: number }>({ size: "lg", index: 3 });
+
   if (isViewportXlDesktop) {
     vpSize = "xxl";
     vpSizeIndex = 5;
@@ -333,7 +336,12 @@ export function AppContent({
   } else if (isViewportPhone) {
     vpSize = "xs";
     vpSizeIndex = 0;
+  } else {
+    vpSize = prevVpRef.current.size;
+    vpSizeIndex = prevVpRef.current.index;
   }
+
+  prevVpRef.current = { size: vpSize, index: vpSizeIndex };
 
   // --- Collect information about the current environment
   const isInIFrame = useIsInIFrame();
@@ -1097,8 +1105,10 @@ function signError(error: Error | string) {
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
     traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
     kind: "error:runtime",
-    error: message,
-    stack: error instanceof Error ? error.stack : undefined,
+    error: {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+    },
   });
 }
 
