@@ -116,7 +116,6 @@ export function start(connection: Connection) {
   });
 
   connection.onFoldingRanges(({ textDocument }: FoldingRangeParams) => {
-    console.log("received folding request");
     return handleFoldingRanges(project, textDocument.uri);
   });
 

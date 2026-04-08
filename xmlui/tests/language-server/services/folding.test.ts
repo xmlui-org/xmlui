@@ -168,39 +168,39 @@ FlowLayout>`;
       expect(ranges).toHaveLength(2);
       expect(ranges).toContainEqual({ startLine: 1, endLine: 3, kind: FoldingRangeKind.Region });
     });
-  });
 
-  it("doesn't fold self-closing tag spanning two lines", () => {
-    const source = `<Button
+    it("doesn't fold self-closing tag spanning two lines", () => {
+      const source = `<Button
   text="Click me" />`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toBeNull();
-  });
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toBeNull();
+    });
 
-  it("folds self-closing tag with many attributes", () => {
-    const source = `<Icon
+    it("folds self-closing tag with many attributes", () => {
+      const source = `<Icon
   name="star"
   size="large"
   color="blue" />`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
-  });
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
+    });
 
-  it("does not fold single-line self-closing tag", () => {
-    const source = `<Icon name="star" />`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toBeNull();
-  });
+    it("does not fold single-line self-closing tag", () => {
+      const source = `<Icon name="star" />`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toBeNull();
+    });
 
-  it("folds self-closing within paired tag", () => {
-    const source = `<Stack>
+    it("folds self-closing within paired tag", () => {
+      const source = `<Stack>
   <Button
     content
     text="Click" />
 </Stack>`;
-    const ranges = getFoldingRanges(source);
-    expect(ranges).toContainEqual({ startLine: 0, endLine: 3, kind: FoldingRangeKind.Region }); // <Stack>
-    expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Region }); // <Button
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 3, kind: FoldingRangeKind.Region }); // <Stack>
+      expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Region }); // <Button
+    });
   });
 
   describe("Comments", () => {
@@ -251,6 +251,19 @@ FlowLayout>`;
       expect(ranges).toContainEqual({ startLine: 0, endLine: 5, kind: FoldingRangeKind.Region });
       expect(ranges).toContainEqual({ startLine: 1, endLine: 2, kind: FoldingRangeKind.Comment });
       expect(ranges).toContainEqual({ startLine: 3, endLine: 4, kind: FoldingRangeKind.Region });
+    });
+  });
+
+  describe("confliction folding ranges", () => {
+    it("folds only the inner most element on the same line", () => {
+      const source = `<Stack><Stack>
+          <Button />
+          <Button />
+        </Stack>
+      </Stack>`;
+      const ranges = getFoldingRanges(source);
+      expect(ranges).toHaveLength(1);
+      expect(ranges).toContainEqual({ startLine: 0, endLine: 2, kind: FoldingRangeKind.Region });
     });
   });
 });
