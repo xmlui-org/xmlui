@@ -357,8 +357,13 @@ function ThemeProvider({
         if (!portalContainer) {
           portalContainer = document.createElement("div");
           portalContainer.id = "nested-app-portal-root";
-          domRoot.appendChild(portalContainer);
         }
+        // Always (re-)append so the portal container is the last child of the
+        // shadow root.  After a NestedApp reset the React-managed #nested-app-root
+        // is removed and recreated, which can leave the portal container earlier in
+        // the DOM than the new app root — causing portalled content (dropdowns,
+        // tooltips) to render behind the app.
+        domRoot.appendChild(portalContainer);
         setRoot(portalContainer);
       } else {
         setRoot(document.body);

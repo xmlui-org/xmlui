@@ -16,6 +16,11 @@ A drawer slides in from the edge of the viewport and sits on top of the main con
       <Text variant="strong" fontSize="$fontSize-lg">Settings</Text>
     </property>
     <VStack>
+      <Select label="Language">
+       <Option value="en" label="English" />
+       <Option value="es" label="Spanish" />
+       <Option value="de" label="German" />
+      </Select>
       <Checkbox 
         label="Enable notifications" 
         labelPosition="start"
