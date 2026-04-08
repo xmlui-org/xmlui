@@ -1662,10 +1662,13 @@ export const Table = memo(forwardRef(
       }
       flushSync(() => {
         setColumnSizing((prev: any) => {
-          return {
-            ...prev,
-            ...widths,
-          };
+          const next = { ...prev, ...widths };
+          table.getAllColumns().forEach((col) => {
+            if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
+              delete next[col.id];
+            }
+          });
+          return next;
         });
       });
     });
