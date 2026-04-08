@@ -15,6 +15,7 @@ import styles from "./Drawer.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { ThemeContext } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -105,7 +106,8 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
   },
   _ref,
 ) {
-  const { root } = useTheme();
+  const theme = useTheme();
+  const { root } = theme;
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // --- Create a scoped portal container appended to root. It uses
@@ -113,6 +115,14 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
   // --- drawer's own position:absolute children, and overflow:hidden clips
   // --- the exit animation to the root's bounds (stops the flash).
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+
+  // --- Create a secondary portal container for child portalled content
+  // --- (e.g. Select dropdowns, tooltips). This container sits as a sibling
+  // --- of the main portal container in `root` and has a z-index above the
+  // --- drawer panel so that overlays from components inside the drawer are
+  // --- not hidden behind it.
+  const [childPortalContainer, setChildPortalContainer] = useState<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!root) return;
     const el = document.createElement('div');
@@ -120,11 +130,27 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     if (className || classes?.[COMPONENT_PART_KEY]) el.className = classnames(classes?.[COMPONENT_PART_KEY], className);
     (root as HTMLElement).appendChild(el);
     setPortalContainer(el);
+
+    const childEl = document.createElement('div');
+    childEl.className = styles.childPortal;
+    (root as HTMLElement).appendChild(childEl);
+    setChildPortalContainer(childEl);
+
     return () => {
       (root as HTMLElement).removeChild(el);
       setPortalContainer(null);
+      (root as HTMLElement).removeChild(childEl);
+      setChildPortalContainer(null);
     };
   }, [root, className]);
+
+  // Override the theme context's portal root for children inside the drawer
+  // so that portalled content (Select dropdowns, tooltips, etc.) renders into
+  // the child portal container which stacks above the drawer panel.
+  const childTheme = useMemo(() => ({
+    ...theme,
+    root: childPortalContainer ?? root,
+  }), [theme, childPortalContainer, root]);
 
   const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
 
@@ -212,9 +238,11 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
               </div>
             </div>
           )}
-          <div className={styles.body}>
-            {children}
-          </div>
+          <ThemeContext.Provider value={childTheme}>
+            <div className={styles.body}>
+              {children}
+            </div>
+          </ThemeContext.Provider>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

@@ -148,6 +148,16 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
   }
 }
 
+// Portal target for content that child components (e.g. Select dropdowns)
+// render via useTheme().root.  It must stack above the drawer panel so
+// portalled overlays are not hidden behind the slide-in panel.
+.childPortal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: calc($zIndex-Drawer + 2);
+}
+
 // Visually hidden but accessible to screen readers
 .srOnly {
   position: absolute;
