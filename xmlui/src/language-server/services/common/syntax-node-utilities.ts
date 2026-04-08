@@ -1,3 +1,4 @@
+import is from "date-fns/esm/locale/is/index.js";
 import type { Node, GetText } from "../../../parsers/xmlui-parser";
 import { SyntaxKind } from "../../../parsers/xmlui-parser";
 
@@ -120,21 +121,45 @@ export function getAllRelevantNodesFromAncestorChain(chain: Node[], kind: Syntax
  *
  * @param node an ElementNode
  */
-function isPairedNode(node: Node): boolean {
+export function isPairedNode(node: Node): boolean {
   for (const c of node.children) {
     if (c.kind === SyntaxKind.CloseNodeStart) {
       return true;
     } else if (c.kind === SyntaxKind.NodeClose) {
       return false;
+    } else if (c.kind === SyntaxKind.NodeEnd) {
+      return true;
     }
   }
-  return true;
+
+  // without the above tokens,
+  // the node must be like this: <name attrs
+  // which will be interpreted as: <name attrs/>
+  return false;
 }
 
 /**
  *
  * @param node an ElementNode
  */
-function isSelfClosingNode(node: Node): boolean {
+export function isSelfClosingNode(node: Node): boolean {
   return !isPairedNode(node);
+}
+
+/**
+ *
+ * @param node an ElementNode
+ */
+export function getOpeningTagNameNode(node: Node, isSelfClosing: boolean): Node | null {
+  if (isSelfClosing) {
+    return node.children!.find((c) => c.kind === SyntaxKind.TagNameNode);
+  }
+
+  for (let c of node.children!) {
+    if (c.kind === SyntaxKind.TagNameNode) {
+      return c;
+    } else if (c.kind === SyntaxKind.CloseNodeStart || c.kind === SyntaxKind.NodeEnd) {
+      return null;
+    }
+  }
 }

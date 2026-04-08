@@ -14,7 +14,7 @@ export const enum SyntaxKind {
   OpenNodeStart = 6,
   /** </ */
   CloseNodeStart = 7,
-  /** > */
+  /** `>` */
   NodeEnd = 8,
   /** /> */
   NodeClose = 9,
