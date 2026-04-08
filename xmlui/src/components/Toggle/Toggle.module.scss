@@ -274,6 +274,10 @@ $borderColor-Switch--success: createThemeVar("Input:borderColor-Switch--success"
       transition: 0.3s transform;
     }
 
+    &.noTransition::before {
+      transition: none;
+    }
+
     &:checked {
       background: $backgroundColor-checked-Switch;
 
