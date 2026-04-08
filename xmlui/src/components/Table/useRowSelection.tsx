@@ -302,12 +302,7 @@ export default function useRowSelection({
       lastAppStateSelectionRef.current = [...currentSelectionIds];
       lastUpdateSourceRef.current = "table";
 
-      performance.mark("tg:sync-effect-start");
       syncWithAppState.update?.({ selectedIds: currentSelectionIds });
-      performance.mark("tg:sync-effect-end");
-      performance.measure("[TileGrid] sync effect (update call)", "tg:sync-effect-start", "tg:sync-effect-end");
-      const ms = performance.getEntriesByName("[TileGrid] sync effect (update call)").at(-1)?.duration.toFixed(1);
-      console.log(`[TileGrid] sync effect | update call: ${ms}ms | ids: ${currentSelectionIds.length}`);
 
       scheduleSyncReset();
     }

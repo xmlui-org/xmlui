@@ -595,12 +595,7 @@ const TableWithColumns = memo(
       const [tableKey, setTableKey] = useState(0);
 
       const propsRef = useRef<any>({});
-      const changedProps = Object.keys(node.props).filter((k) => node.props[k] !== propsRef.current[k]);
-      if (changedProps.length > 0) {
-        console.log(`[TableWithColumns] Re-render triggered by PROPS: ${JSON.stringify(changedProps)}`);
-      }
       propsRef.current = { ...node.props };
-      console.count("[TableWithColumns] render");
 
       // Stable delegates to prevent React.memo busts on TableNative.
       const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
@@ -755,12 +750,7 @@ const TableWithColumns = memo(
               const isOwnWrite = pendingOwnWrite ||
                 (pendingOwnWriteVersionRef.current > 0 &&
                   currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
-              console.log(`[TableWithColumns] isOwnWrite check:`, {
-                pendingOwnWrite,
-                expectedVersion: pendingOwnWriteVersionRef.current,
-                actualVersion: currentSyncVarValue?.__v,
-                isOwnWrite,
-              });
+
               if (isOwnWrite) {
                 // Update value in-place — object identity is preserved, so
                 // Table (memo'd) does not re-render for this change.

@@ -20,7 +20,6 @@ export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
 };
 
 export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
-  console.count("[Column] render");
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
 
@@ -62,7 +61,6 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
   }, [cellRenderer, nodeChildren]);
 
   useIsomorphicLayoutEffect(() => {
-    console.log("[Column] calling registerColumn", id);
     registerColumn(
       {
         ...columnMetadata,

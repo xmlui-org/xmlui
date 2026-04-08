@@ -667,17 +667,7 @@ export const Table = memo(forwardRef(
       alwaysShowHeader,
       striped,
     };
-    const changedProps = Object.keys(currentProps).filter((k) => (currentProps as any)[k] !== propsRef.current[k]);
-    if (changedProps.length > 0) {
-      console.log(`%c[TableNative] Re-render triggered by PROPS: ${JSON.stringify(changedProps)}`, "color: red; font-weight: bold;");
-    }
     propsRef.current = { ...currentProps };
-    const renderStartTime = performance.now();
-    useLayoutEffect(() => {
-      const commitTime = performance.now();
-      console.log(`[TableNative] render+commit: ${(commitTime - renderStartTime).toFixed(2)}ms`);
-    });
-    console.count("[TableNative] render");
 
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
@@ -764,14 +754,6 @@ export const Table = memo(forwardRef(
       syncWithAppState,
     });
 
-    const stateRef = useRef<any>({});
-    const currentState = { focusedIndex, selectedRowIdMap, visibleItems };
-    const changedStates = Object.keys(currentState).filter((k) => (currentState as any)[k] !== stateRef.current[k]);
-    if (changedStates.length > 0) {
-      console.log(`[TableNative] Re-render triggered by STATE: ${JSON.stringify(changedStates)}`);
-    }
-    stateRef.current = { ...currentState };
-
     // --- Handle keyboard actions (selectAll, cut, copy, paste, delete)
     const handleKeyboardActions = useTableKeyboardActions({
       keyBindings,
@@ -792,6 +774,13 @@ export const Table = memo(forwardRef(
     // --- Create composite keyboard handler that handles both actions and navigation
     const compositeKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // Modifier-only keys match no table action. Without this guard they bubble to
+        // Main.xmlui → runCodeAsync → cloneDeep(state) → ~160ms freeze per key-repeat.
+        if (event.key === "Control" || event.key === "Meta" || event.key === "Shift" || event.key === "Alt") {
+          event.stopPropagation();
+          return;
+        }
+
         // First, try to handle keyboard actions (selectAll, cut, copy, paste, delete)
         const actionHandled = handleKeyboardActions(event);
 

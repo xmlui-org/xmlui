@@ -180,16 +180,6 @@ export const TileGridNative = memo(
     },
     ref,
   ) {
-    // --- render timing (measures React render + DOM commit, not paint)
-    const renderStartRef = useRef(0);
-    renderStartRef.current = performance.now();
-    useLayoutEffect(() => {
-      const elapsed = performance.now() - renderStartRef.current;
-      if (elapsed > 1) {
-        console.log(`[TileGridNative] render+commit: ${elapsed.toFixed(1)}ms`);
-      }
-    });
-
     // --- refs
     const outerRef = useRef<HTMLDivElement | null>(null);
     const composedRef = ref ? composeRefs(outerRef, ref) : outerRef;
@@ -358,6 +348,13 @@ export const TileGridNative = memo(
           return;
         }
 
+        // Modifier-only keys match no tile-grid action. Stop propagation to prevent
+        // bubbling to Main.xmlui → runCodeAsync → cloneDeep(state) → ~160ms per key-repeat.
+        if (event.key === "Control" || event.key === "Meta" || event.key === "Shift" || event.key === "Alt") {
+          event.stopPropagation();
+          return;
+        }
+
         // --- Space: toggle selection of the focused tile without moving focus
         if (event.key === " " && focusedTileIndex >= 0) {
           event.preventDefault();
@@ -440,9 +437,7 @@ export const TileGridNative = memo(
             itemSize={rowSize}
             item={RowItem as CustomItemComponent}
           >
-            {(() => {
-              const _t0 = performance.now();
-              const _result = rows.map((row, rowIndex) => (
+            {rows.map((row, rowIndex) => (
               <div
                 key={rowIndex}
                 className={styles.tileRow}
@@ -466,7 +461,6 @@ export const TileGridNative = memo(
                       onClick={
                         itemsSelectable
                           ? (e) => {
-                              performance.mark("tg:tile-click-start");
                               const isCtrl = e.metaKey || e.ctrlKey;
                               // Ctrl/Cmd+Click on an already-selected tile deselects it;
                               // clear focus so no outline remains (matches Table behaviour).
@@ -479,10 +473,6 @@ export const TileGridNative = memo(
                                 shiftKey: e.shiftKey,
                                 metaKey: isCtrl,
                               });
-                              performance.mark("tg:tile-click-after-toggleRow");
-                              performance.measure("[TileGrid] click→toggleRow", "tg:tile-click-start", "tg:tile-click-after-toggleRow");
-                              const ms = performance.getEntriesByName("[TileGrid] click→toggleRow").at(-1)?.duration.toFixed(1);
-                              console.log(`[TileGrid] onClick | click→toggleRow: ${ms}ms | ctrl: ${isCtrl}`);
                             }
                           : undefined
                       }
@@ -527,11 +517,7 @@ export const TileGridNative = memo(
                   );
                 })}
               </div>
-            ));
-              const _elapsed = performance.now() - _t0;
-              if (_elapsed > 1) console.log(`[TileGridNative] rows.map(): ${_elapsed.toFixed(1)}ms | rows: ${rows.length} | cols: ${cols}`);
-              return _result;
-            })()}
+            ))}
           </Virtualizer>
         )}
       </div>

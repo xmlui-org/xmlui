@@ -200,7 +200,6 @@ type TileGridItemProps = {
 
 const TileGridMemoizedItem = memo(
   ({ node, renderChild, layoutContext, contextVars }: TileGridItemProps) => {
-    console.count("[TileGridMemoizedItem] render");
     return (
       <MemoizedItem
         node={node}
@@ -258,7 +257,6 @@ const TileGridWithSync = memo(
     if (shouldForceRefresh) {
       prevRefreshOnRef.current = refreshOn;
       renderVersionRef.current++;
-      console.log(`[TileGrid] renderVersion++ → ${renderVersionRef.current} (refreshOn changed or not provided)`);
       // Also replace the syncAdapter object so TileGridNative.memo() fails and tiles
       // re-render immediately with fresh closures for the new refreshOn value.
       if (syncAdapterHolderRef.current) {
@@ -283,20 +281,12 @@ const TileGridWithSync = memo(
               update: ({ selectedIds }: { selectedIds: string[] }) => {
                 const windowKey = `__tgSync_${syncVarName}`;
                 (window as any)[windowKey] = selectedIds;
-                performance.mark("tg:lookupAction-start");
                 const handler = lookupActionRef.current?.(
                   `{${syncVarName} = {selectedIds: window.${windowKey}}}`,
                   { ephemeral: true },
                 );
-                performance.mark("tg:lookupAction-compiled");
                 pendingOwnWriteRef.current = true;
                 startTransition(() => { handler?.(); });
-                performance.mark("tg:lookupAction-executed");
-                performance.measure("[TileGrid] lookupAction compile", "tg:lookupAction-start", "tg:lookupAction-compiled");
-                performance.measure("[TileGrid] lookupAction execute", "tg:lookupAction-compiled", "tg:lookupAction-executed");
-                const compileMs = performance.getEntriesByName("[TileGrid] lookupAction compile").at(-1)?.duration.toFixed(1);
-                const execMs = performance.getEntriesByName("[TileGrid] lookupAction execute").at(-1)?.duration.toFixed(1);
-                console.log(`[TileGrid] syncAdapter.update | compile: ${compileMs}ms | execute: ${execMs}ms | ids: ${selectedIds.length}`);
               },
             };
           } else if (currentValue !== syncAdapterHolderRef.current.value) {
