@@ -63,6 +63,11 @@ function TestBed() {
   if (!extensionManager) {
     return <div>Loading...</div>;
   }
+
+  // Only wait for API interceptor when the test actually provides one.
+  // This avoids unnecessary MSW service worker setup for the ~98% of tests
+  // that don't use apiInterceptor.
+  const hasApiInterceptor = !!window.TEST_ENV?.apiInterceptor;
   
   return (
     <StandaloneApp 
@@ -70,7 +75,7 @@ function TestBed() {
       runtime={window.TEST_RUNTIME} 
       extensionManager={extensionManager} 
       decorateComponentsWithTestId={true} 
-      waitForApiInterceptor={true}
+      waitForApiInterceptor={hasApiInterceptor}
     />
   );
 }
