@@ -115,6 +115,7 @@ export type TileGridProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   onSelectAllAction?: AsyncFunction;
+  onContextMenuItem?: (item: any, index: number, event: React.MouseEvent) => void;
   updateState?: (state: Record<string, unknown>) => void;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
@@ -172,6 +173,7 @@ export const TileGridNative = memo(
       onPasteAction,
       onDeleteAction,
       onSelectAllAction,
+      onContextMenuItem,
       itemRenderer,
       registerComponentApi,
       style,
@@ -479,6 +481,11 @@ export const TileGridNative = memo(
                       onDoubleClick={
                         onItemDoubleClick
                           ? () => onItemDoubleClick(item)
+                          : undefined
+                      }
+                      onContextMenu={
+                        onContextMenuItem
+                          ? (event) => { onContextMenuItem(item, globalIndex, event); }
                           : undefined
                       }
                     >

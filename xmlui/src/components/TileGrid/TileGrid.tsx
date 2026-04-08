@@ -1,4 +1,5 @@
 import { memo, useMemo, useRef, startTransition } from "react";
+import type { MouseEvent } from "react";
 import styles from "./TileGrid.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
@@ -155,6 +156,9 @@ export const TileGridMd = createMetadata({
     selectAllAction: d(
       "Fired when the user presses Ctrl/Cmd+A. Receives `(selectedItems, selectedIds)`.",
     ),
+    contextMenu: d(
+      "Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.",
+    ),
   },
 
   contextVars: {
@@ -236,6 +240,9 @@ const TileGridWithSync = memo(
     // Keep lookupAction current without breaking the stable adapter reference (same pattern as Table).
     const lookupActionRef = useRef(lookupAction);
     lookupActionRef.current = lookupAction;
+    // Keep lookupEventHandler current so the stable onContextMenuItem closure always uses the latest.
+    const lookupEventHandlerRef = useRef(lookupEventHandler);
+    lookupEventHandlerRef.current = lookupEventHandler;
     const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
 
     // renderVersion increments only when refreshOn changes (app-declared external state
@@ -324,6 +331,25 @@ const TileGridWithSync = memo(
       (node: any, ctx: any) => renderChildRef.current(node, ctx),
     );
 
+    // Stable contextMenu handler — evaluated ephemeral at click time so the XMLUI expression
+    // always runs with a fresh reactive snapshot (same mechanism as Table's onContextMenu).
+    // Only recreated if the presence of the onContextMenu attribute changes.
+    const hasContextMenu = !!node.events?.contextMenu;
+    const onContextMenuItem = useMemo(
+      () =>
+        hasContextMenu
+          ? (item: any, index: number, event: MouseEvent) => {
+              event.preventDefault();
+              const handler = lookupEventHandlerRef.current?.("contextMenu", {
+                context: { $item: item, $itemIndex: index },
+                ephemeral: true,
+              });
+              handler?.(event);
+            }
+          : undefined,
+      [hasContextMenu],
+    );
+
     const stableItemRenderer = useMemo(
       () =>
         itemTemplate
@@ -372,6 +398,7 @@ const TileGridWithSync = memo(
         onPasteAction={lookupEventHandler("pasteAction")}
         onDeleteAction={lookupEventHandler("deleteAction")}
         onSelectAllAction={lookupEventHandler("selectAllAction")}
+        onContextMenuItem={onContextMenuItem}
         itemRenderer={stableItemRenderer}
       />
     );
