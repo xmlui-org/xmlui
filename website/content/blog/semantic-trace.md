@@ -3,8 +3,7 @@ title: "Semantic tracing: how ARIA unlocks debugging, testing, and AI reasoning"
 slug: "semantic-trace"
 description: "AI writes more code than ever. With semantic traces  — enriched by ARIA labels — developers, testers, and AIs see exactly what that code does at runtime."
 author: "Jon Udell"
-date: "2026-03-26"
-draft: true
+date: "2026-04-08"
 ---
 AI tools are writing more code than ever, and that code is a liability. The more you ship, the more you need to know: did our change break something? What exactly happens when a user clicks that button? For reactive web apps, these questions are especially hard. A dropdown selection triggers an API call, which fills a table, which updates a chart. The chain of cause and effect is invisible unless you instrument it. And the tests that catch regressions in these flows? Traditionally you write them by hand, one brittle CSS selector at a time.
 
