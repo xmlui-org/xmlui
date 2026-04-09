@@ -228,7 +228,6 @@ const TileGridMemoizedItem = memo(
     return true;
   },
 );
-TileGridMemoizedItem.displayName = "TileGridMemoizedItem";
 
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
@@ -265,14 +264,6 @@ const TileGridWithSync = memo(
     if (shouldForceRefresh) {
       prevRefreshOnRef.current = refreshOn;
       renderVersionRef.current++;
-      // Also replace the syncAdapter object so TileGridNative.memo() fails and tiles
-      // re-render immediately with fresh closures for the new refreshOn value.
-      if (syncAdapterHolderRef.current) {
-        syncAdapterHolderRef.current = {
-          value: syncAdapterHolderRef.current.value,
-          update: syncAdapterHolderRef.current.update,
-        };
-      }
     }
 
     let syncAdapter: any;
@@ -400,6 +391,7 @@ const TileGridWithSync = memo(
         hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
         idKey={idKey}
         itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
+        renderVersion={renderVersionRef.current}
         onSelectionDidChange={stableSelectionDidChange}
         onItemDoubleClick={node.events?.itemDoubleClick ? stableItemDoubleClick : undefined}
         onCutAction={node.events?.cutAction ? stableCutAction : undefined}

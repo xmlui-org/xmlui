@@ -4290,3 +4290,77 @@ test.describe("toggleSelectionOnClick property", () => {
     await expect(checkboxes.nth(2)).toBeChecked();
   });
 });
+
+// refreshOn
+// =============================================================================
+
+test.describe("refreshOn Property", () => {
+  test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{parentValue}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("does not update event handler closures when refreshOn is unchanged", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{refreshWatch}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+  });
+
+  test("updates event handler closures if refreshOn is not provided", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+});

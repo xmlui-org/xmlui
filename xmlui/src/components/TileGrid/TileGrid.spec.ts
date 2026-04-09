@@ -923,3 +923,86 @@ test.describe("onContextMenu event", () => {
   });
 });
 
+
+// =============================================================================
+// refreshOn
+// =============================================================================
+
+test.describe("refreshOn Property", () => {
+  test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+          refreshOn="{parentValue}"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("does not update event handler closures when refreshOn is unchanged", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+          refreshOn="{refreshWatch}"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+  });
+
+  test("updates event handler closures if refreshOn is not provided (historic behavior)", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+});

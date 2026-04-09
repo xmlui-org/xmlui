@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState, memo, useLayoutEffect } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -324,7 +324,7 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false):
     backgroundColor: isPinned
       ? isHeader
         ? "var(--xmlui-backgroundColor-heading-Table)"
-        : undefined
+        : "var(--xmlui-backgroundColor-pinnedCell-Table)"
       : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
@@ -1518,7 +1518,6 @@ export const Table = memo(forwardRef(
           );
         },
       );
-      RowComponent.displayName = "VirtualTableRow";
       return RowComponent as any;
     }, []);
 
@@ -1818,7 +1817,7 @@ export const Table = memo(forwardRef(
                               position: "relative",
                               width: size,
                               flexShrink: 0,
-                              ...getCommonPinningStyles(header.column),
+                              ...getCommonPinningStyles(header.column, true),
                             } as React.CSSProperties
                           }
                         >

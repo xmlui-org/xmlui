@@ -1,4 +1,4 @@
-import { forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -107,6 +107,7 @@ export type TileGridProps = {
   hideSelectionCheckboxes?: boolean;
   idKey?: string;
   itemUserSelect?: string;
+  renderVersion?: number;
   itemRenderer?: (item: any, index: number, count: number, selected: boolean) => ReactNode;
   onSelectionDidChange?: AsyncFunction;
   onItemDoubleClick?: AsyncFunction;

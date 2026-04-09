@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo, startTransition, useEffect, useCallback } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -584,7 +584,7 @@ const TableWithColumns = memo(
       const renderVersionRef = useRef(0);
       const prevRefreshOnRef = useRef(refreshOn);
 
-      const shouldForceRefresh = node.props.refreshOn !== undefined && prevRefreshOnRef.current !== refreshOn;
+      const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
       if (shouldForceRefresh) {
         prevRefreshOnRef.current = refreshOn;
         renderVersionRef.current++;
