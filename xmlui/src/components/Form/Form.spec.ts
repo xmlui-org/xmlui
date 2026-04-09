@@ -818,13 +818,13 @@ test.describe("Basic Functionality", () => {
       const driver1 = await createFormItemDriver("formItem1");
       const driver2 = await createFormItemDriver("formItem2");
       const driver3 = await createFormItemDriver("formItem3");
-      
+
       await expect(driver1.label).toContainText("*");
       await expect(driver1.label).not.toContainText("(Optional)");
-      
+
       await expect(driver2.label).not.toContainText("*");
       await expect(driver2.label).toContainText("(Optional)");
-      
+
       await expect(driver3.label).toContainText("*");
       await expect(driver3.label).not.toContainText("(Optional)");
     });
@@ -841,11 +841,11 @@ test.describe("Basic Functionality", () => {
       `);
       const driver1 = await createFormItemDriver("formItem1");
       const driver2 = await createFormItemDriver("formItem2");
-      
+
       // formItem1 uses Form's itemRequireLabelMode="markRequired", so no indicator for optional field
       await expect(driver1.label).not.toContainText("*");
       await expect(driver1.label).not.toContainText("(Optional)");
-      
+
       // formItem2 overrides with requireLabelMode="markOptional", so shows optional tag
       await expect(driver2.label).not.toContainText("*");
       await expect(driver2.label).toContainText("(Optional)");
@@ -988,7 +988,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit allows submission when returning null", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'John' }}"
           onWillSubmit="data => null"
           onSubmit="data => testState = data">
@@ -1006,7 +1006,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Jane' }}"
           onWillSubmit="data => undefined"
           onSubmit="data => testState = data">
@@ -1024,7 +1024,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Bob' }}"
           onWillSubmit='data => ""'
           onSubmit="data => testState = data">
@@ -1039,7 +1039,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit allows submission when returning true", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Alice' }}"
           onWillSubmit="data => true"
           onSubmit="data => testState = data">
@@ -1057,7 +1057,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Charlie' }}"
           onWillSubmit="data => 42"
           onSubmit="data => testState = data">
@@ -1072,7 +1072,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit cancels submission when returning false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Test' }}"
           onWillSubmit="data => false"
           onSubmit="data => testState = 'submitted'">
@@ -1092,7 +1092,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Original', email: 'old@test.com' }}"
           onWillSubmit="data => ({ name: 'Modified', email: 'new@test.com', extra: 'added' })"
           onSubmit="data => testState = data">
@@ -1112,7 +1112,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit can add fields to submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'User' }}"
           onWillSubmit="data => ({ name: data.name, timestamp: 1234567890, source: 'web' })"
           onSubmit="data => testState = data">
@@ -1131,7 +1131,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit can remove fields from submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'User', password: 'secret', email: 'user@test.com' }}"
           onWillSubmit="data => ({ name: data.name, email: data.email })"
           onSubmit="data => testState = data">
@@ -1151,7 +1151,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit does not submit array when returned", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Test' }}"
           onWillSubmit="data => ['array', 'value']"
           onSubmit="data => testState = data">
@@ -1167,7 +1167,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit with complex object transformation", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ firstName: 'John', lastName: 'Doe', age: 30 }}"
           onWillSubmit="data => ({ fullName: data.firstName + ' ' + data.lastName, age: data.age })"
           onSubmit="data => testState = data">
@@ -1286,8 +1286,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <App>
-          <Form 
-            testId="outerForm" 
+          <Form
+            testId="outerForm"
             data="{{ host: 'example.com' }}"
             onSubmit="data => testState = { outer: 'submitted' }">
             <FormItem label="host" bindTo="host" />
@@ -1333,8 +1333,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <App>
-          <Form 
-            testId="outerForm" 
+          <Form
+            testId="outerForm"
             data="{{ host: 'example.com' }}"
             onSubmit="data => testState = { outer: 'submitted', host: data.host }">
             <FormItem label="host" bindTo="host" />
@@ -1666,28 +1666,28 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             onValidate="value => {
               return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 too short', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             onValidate="value => {
               return { isValid: value && value.includes('@'), invalidMessage: 'Field 2 needs @', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field3"
-            label="Field 3" 
-            bindTo="field3" 
+            label="Field 3"
+            bindTo="field3"
             type="text"
             required="true"
             requiredInvalidMessage="Field 3 is required"
@@ -1719,18 +1719,18 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Must contain test', severity: 'error' })"
@@ -1766,10 +1766,10 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field" 
-            bindTo="field1" 
+            label="Field"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             customValidationsDebounce="300"
@@ -1783,7 +1783,7 @@ test.describe("Basic Functionality", () => {
 
       // Type short value
       await input1.field.fill("ab");
-      
+
       // After debounce, validation message should appear
       await expect(field1Driver.component).toContainText("Too short", { timeout: 1000 });
     });
@@ -1796,18 +1796,18 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form onSaved="testState = 'formSaved'">
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             required="true"
             onValidate="value => ({ isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             required="true"
           />
@@ -1870,10 +1870,7 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState, { timeout: 3000 }).toEqual("submitted");
     });
 
-    test("form does not submit after async validation fails", async ({
-      initTestBed,
-      page,
-    }) => {
+    test("form does not submit after async validation fails", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ username: '' }}"
@@ -1914,10 +1911,10 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             onValidate="value => {
@@ -1928,10 +1925,10 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 error', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             validationMode="onChanged"
             onValidate="value => {
@@ -1952,17 +1949,21 @@ test.describe("Basic Functionality", () => {
 
       // Type in first field
       await input1.field.fill("ab");
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.sequence && state.sequence.includes("field1");
-      }).toBe(true);
+      await expect
+        .poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.sequence && state.sequence.includes("field1");
+        })
+        .toBe(true);
 
       // Type in second field
       await input2.field.fill("test");
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.sequence && state.sequence.includes("field2");
-      }).toBe(true);
+      await expect
+        .poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.sequence && state.sequence.includes("field2");
+        })
+        .toBe(true);
 
       // Both validations should have run
       const state = await testStateDriver.testState();
@@ -1981,9 +1982,9 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             required="true"
             requiredInvalidMessage="Field 1 required"
@@ -1992,9 +1993,9 @@ test.describe("Basic Functionality", () => {
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 1 needs test', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             required="true"
             requiredInvalidMessage="Field 2 required"
@@ -2041,9 +2042,9 @@ test.describe("Basic Functionality", () => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ field1: 'valid1', field2: 'valid2', field3: 'valid3' }}">
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -2054,9 +2055,9 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field1', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -2067,9 +2068,9 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field2', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field3"
-            label="Field 3" 
+            label="Field 3"
             bindTo="field3"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -2089,10 +2090,15 @@ test.describe("Basic Functionality", () => {
       await formDriver.submitForm();
 
       // Wait for all validations to complete and form to save
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.field1Done && state?.field2Done && state?.field3Done;
-      }, { timeout: 2000 }).toBe(true);
+      await expect
+        .poll(
+          async () => {
+            const state = await testStateDriver.testState();
+            return state?.field1Done && state?.field2Done && state?.field3Done;
+          },
+          { timeout: 2000 },
+        )
+        .toBe(true);
     });
 
     test("changing field value re-triggers onValidate in real-time", async ({
@@ -2102,9 +2108,9 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             validationMode="onChanged"
             onValidate="value => {
@@ -2144,16 +2150,16 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.length >= 5, invalidMessage: 'Field 1: minimum 5 chars', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 2: must contain test', severity: 'error' })"
@@ -2212,9 +2218,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver("form");
+      const responsePromise = driver.waitForSubmitResponse("/custom-endpoint");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/custom-endpoint");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
 
@@ -2237,9 +2243,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver();
+      const responsePromise = driver.waitForSubmitResponse("/entities/1");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/entities/1");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
 
@@ -2262,9 +2268,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver();
+      const responsePromise = driver.waitForSubmitResponse("/custom");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/custom");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
   });
@@ -2603,9 +2609,9 @@ test("mock service responds", async ({ initTestBed, createFormDriver }) => {
     },
   );
   const driver = await createFormDriver();
+  const responsePromise = driver.waitForSubmitResponse("/test");
   await driver.submitForm();
-
-  const request = await driver.getSubmitResponse("/test");
+  const request = await responsePromise;
   expect(request.ok()).toEqual(true);
 });
 
@@ -2943,8 +2949,9 @@ test("form submits to correct url", async ({ initTestBed, createFormDriver }) =>
   );
   const driver = await createFormDriver();
 
+  const responsePromise = driver.waitForSubmitResponse(endpoint);
   await driver.submitForm();
-  const response = await driver.getSubmitResponse(endpoint);
+  const response = await responsePromise;
   expect(response.ok()).toBe(true);
   expect(new URL(response.url()).pathname).toBe(endpoint);
 });
@@ -3142,7 +3149,7 @@ test("field-related errors map to correct FormItems", async ({
   const fieldDriver = await createFormItemDriver("testField");
 
   await formDriver.submitForm();
-await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
+  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "warning",
   );
@@ -3243,9 +3250,9 @@ test("create form works with submitUrl", async ({
   const fieldDriver = await createTextBoxDriver(inputElement);
 
   await fieldDriver.field.fill("John");
+  const responsePromise = formDriver.waitForSubmitResponse();
   await formDriver.submitForm("click");
-
-  const response = await formDriver.getSubmitResponse();
+  const response = await responsePromise;
   expect(await response.json()).toEqual({
     name: "John",
     id: 11,
@@ -3283,9 +3290,11 @@ test("regression: data url through modal context", async ({
   await expect(inputDriver.field).toHaveValue("Smith");
 
   await inputDriver.field.fill("EDITED-Smith");
+
+  const responsePromise = formDriver.waitForSubmitResponse();
   await formDriver.submitForm("click");
 
-  const response = await formDriver.getSubmitResponse();
+  const response = await responsePromise;
   expect(await response.json()).toEqual({
     name: "EDITED-Smith",
     id: 10,
@@ -3894,10 +3903,7 @@ test.describe("Form persistence — localStorage temporary save", () => {
     await expect(nameInput.field).toHaveValue("Bob");
   });
 
-  test("persist clears localStorage on successful submit", async ({
-    page,
-    initTestBed,
-  }) => {
+  test("persist clears localStorage on successful submit", async ({ page, initTestBed }) => {
     await page.addInitScript(() => {
       localStorage.setItem("test-form-submit", JSON.stringify({ name: "Carol" }));
     });
@@ -3936,10 +3942,7 @@ test.describe("Form persistence — localStorage temporary save", () => {
     expect(stored).toBeNull();
   });
 
-  test("keepOnCancel=true keeps localStorage on cancel", async ({
-    page,
-    initTestBed,
-  }) => {
+  test("keepOnCancel=true keeps localStorage on cancel", async ({ page, initTestBed }) => {
     await page.addInitScript(() => {
       localStorage.setItem("test-form-keep", JSON.stringify({ name: "Eve" }));
     });

@@ -1471,8 +1471,8 @@ test.describe("Behaviors and Parts", () => {
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
-      <Select 
-        testId="test" 
+      <Select
+        testId="test"
         variant="CustomVariant"
         animation="fadeIn"
         clearable="true"
@@ -1661,7 +1661,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     createDropdownMenuDriver,
     createSelectDriver,
   }) => {
-    const { testStateDriver } = await initTestBed(`
+    await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="outerDialog.open()">Open Dialog</Button>
         <ModalDialog id="outerDialog" title="Outer Dialog">
@@ -1687,13 +1687,12 @@ test.describe("Nested DropdownMenu and Select", () => {
       </Fragment>
     `);
 
-    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
-
     await page.getByTestId("openBtn").click();
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
     await expect(dropdownDriver.component).toBeVisible();
 
     await dropdownDriver.open();
@@ -1711,7 +1710,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").nth(1).click();
+    await page.getByRole("button", { name: "Confirm action" }).click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -2545,7 +2544,7 @@ test.describe.skip(
           <Option value="opt2" label="second"/>
           <Option value="opt3" label="third"/>
         </FormItem>
-      </Form>  
+      </Form>
     `);
       await page.getByRole("button", { name: "Save" }).click();
 
@@ -2562,7 +2561,7 @@ test.describe.skip(
           <Option value="opt2" label="second"/>
           <Option value="opt3" label="third"/>
         </FormItem>
-      </Form>  
+      </Form>
     `);
       await page.getByRole("button", { name: "Save" }).click();
 
