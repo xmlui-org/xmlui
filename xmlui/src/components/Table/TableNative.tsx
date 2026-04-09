@@ -1632,7 +1632,7 @@ export const Table = memo(forwardRef(
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes, safeColumns]);
+    }, [recalculateStarSizes, safeColumns, columnsWithSelectColumn]);
 
     useIsomorphicLayoutEffect(() => {
       registerComponentApi(selectionApi);

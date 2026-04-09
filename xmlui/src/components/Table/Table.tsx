@@ -547,7 +547,7 @@ export const TableMd = createMetadata({
     [`userSelect-row-${COMP}`]: "none",
     [`backgroundColor-evenRow-${COMP}`]: `$backgroundColor-row-${COMP}`,
     [`backgroundColor-oddRow-${COMP}`]: `$color-surface-100`,
-    [`backgroundColor-pinnedCell-${COMP}`]: "$color-surface-50",
+    [`backgroundColor-pinnedCell-${COMP}`]: "transparent",
   },
 });
 
