@@ -263,6 +263,15 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         // Reset page-level scroll so anchor navigation from this test doesn't
         // bleed into the next test's initial-state assertions.
         window.scrollTo(0, 0);
+        // Restore window.matchMedia if it was patched by a test (e.g.
+        // emulateTouchDevice in ScrollViewer tests). Without this, the patch
+        // persists into subsequent tests in the same worker and causes
+        // isTouchDevice=true, which forces normalizedScrollStyle='normal',
+        // hiding OverlayScrollbars fade overlays and making fade tests flaky.
+        if ((window as any).__originalMatchMedia) {
+          window.matchMedia = (window as any).__originalMatchMedia;
+          delete (window as any).__originalMatchMedia;
+        }
       });
       // Move mouse to a neutral position so :hover CSS from the previous
       // test doesn't bleed into the next one.

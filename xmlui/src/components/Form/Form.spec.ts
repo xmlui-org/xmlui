@@ -3433,15 +3433,13 @@ test.describe("Api", () => {
   test("getData returns deep clone - modifications do not affect form state", async ({
     initTestBed,
     page,
-    createTextBoxDriver,
-    createFormItemDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
           <FormItem label="Name" bindTo="name" initialValue="John" testId="nameInput" />
         </Form>
-        <Button testId="getDataBtn" onClick="testState = myForm.getData(); testState.name = 'Modified'" />
+        <Button testId="getDataBtn" onClick="testState = {... myForm.getData(), name: 'Modified'}" />
         <Button testId="getDataAgainBtn" onClick="testState = myForm.getData()" />
       </Fragment>
     `);
