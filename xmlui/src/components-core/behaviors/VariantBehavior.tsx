@@ -171,7 +171,7 @@ function VariantWrapper({
   }
 
   // Generate the CSS class using useStyles hook
-  const customVariantClassName = useStyles(variantSpec, { layer: "themes" });
+  const customVariantClassName = useStyles(variantSpec, { layer: "dynamic" });
 
   // Check if the child is ItemWithLabel (a wrapper component from labelBehavior)
   // If so, apply the className to the actual component inside ItemWithLabel instead

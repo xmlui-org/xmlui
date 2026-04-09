@@ -1052,7 +1052,7 @@ test.describe("Behaviors and Parts", () => {
     
     const link = page.getByTestId("test");
     const icon = link.locator("[data-part-id='icon']");
-    
+
     await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
     await expect(icon).toBeVisible();
   });
@@ -1068,6 +1068,7 @@ test.describe("Behaviors and Parts", () => {
     });
     
     const link = page.getByTestId("test");
+
     await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
     await expect(link).toHaveCSS("font-size", "20px");
   });
