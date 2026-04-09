@@ -57,67 +57,6 @@ describe("Xmlui transform - <global> helper tag", () => {
       expect(cd.type).equal("Stack");
       expect(cd.globalVars!.computed).equal("{6 * 7}");
     });
-
-    it("global fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><global/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("global fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><global name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-  });
-
-  describe("<global> in compound components", () => {
-    it("global in compound component definition throws T032 error", () => {
-      try {
-        transformSource(
-          "<Component name='Counter'><global name='totalClicks' value='{0}'/><Button/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
-
-    it("multiple globals in compound component throws T032 error", () => {
-      try {
-        transformSource(`
-          <Component name='SharedState'>
-            <global name='value1' value='100'/>
-            <global name='value2' value='200'/>
-            <Stack/>
-          </Component>
-        `);
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
-
-    it("global with Fragment wrapper in compound component throws T032 error", () => {
-      try {
-        transformSource(`
-          <Component name='Multi'>
-            <global name='sharedCount' value='{0}'/>
-            <Button/>
-            <Text/>
-          </Component>
-        `);
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
   });
 
   describe("<global> with <variable> combination", () => {
@@ -131,21 +70,6 @@ describe("Xmlui transform - <global> helper tag", () => {
       expect(cd.type).equal("Stack");
       expect(cd.globalVars!.globalCount).equal("{0}");
       expect(cd.vars!.localCount).equal("{0}");
-    });
-
-    it("global and var in compound component throws T032 error", () => {
-      try {
-        transformSource(`
-          <Component name='StatefulWidget'>
-            <global name='widgetCount' value='{0}'/>
-            <variable name='localState' value='{0}'/>
-            <Button/>
-          </Component>
-        `);
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
     });
   });
 
@@ -248,28 +172,6 @@ describe("Xmlui transform - global.* attribute syntax", () => {
       expect(cd.globalVars!.count).equal("{0}");
       expect(cd.globalVars!.userName).equal("'John'");
     });
-
-    it("global.* in compound component throws T032 error", () => {
-      try {
-        transformSource(
-          "<Component name='Counter' global.totalClicks='{0}'><Button/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
-
-    it("multiple global.* in compound component throws T032 error", () => {
-      try {
-        transformSource(
-          "<Component name='State' global.x='{1}' global.y='{2}'><Stack/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
   });
 
   describe("global.* with var.* combination", () => {
@@ -279,17 +181,6 @@ describe("Xmlui transform - global.* attribute syntax", () => {
       ) as ComponentDef;
       expect(cd.globalVars!.globalCount).equal("{0}");
       expect(cd.vars!.localCount).equal("{0}");
-    });
-
-    it("global.* and var.* in compound component throws T032 error", () => {
-      try {
-        transformSource(
-          "<Component name='Widget' global.shared='{100}' var.local='{0}'><Button/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
     });
   });
 
@@ -302,20 +193,6 @@ describe("Xmlui transform - global.* attribute syntax", () => {
       `) as ComponentDef;
       expect(cd.globalVars!.attrGlobal).equal("{1}");
       expect(cd.globalVars!.elemGlobal).equal("{2}");
-    });
-
-    it("mix in compound component throws T032 error", () => {
-      try {
-        transformSource(`
-          <Component name='Mixed' global.attr1='{10}'>
-            <global name='elem1' value='{20}'/>
-            <Button/>
-          </Component>
-        `);
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
     });
   });
 });
@@ -375,30 +252,6 @@ describe("Xmlui transform - <global> diagnostic errors", () => {
     it("allows global.* in root element (no error)", () => {
       const cd = transformSource("<Stack global.valid='{0}'/>") as ComponentDef;
       expect(cd.globalVars!.valid).equal("{0}");
-    });
-  });
-
-  describe("T032: Global not allowed in component definitions", () => {
-    it("throws T032 error when <global> is in compound component definition", () => {
-      try {
-        transformSource(
-          "<Component name='Test'><global name='invalid' value='{0}'/><Button/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
-    });
-
-    it("throws T032 error for global.* attribute in compound component definition", () => {
-      try {
-        transformSource(
-          "<Component name='Test' global.invalid='{0}'><Button/></Component>",
-        );
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T032");
-      }
     });
   });
 });

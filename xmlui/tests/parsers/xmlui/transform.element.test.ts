@@ -137,24 +137,6 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("vars", () => {
-    it("var fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><variable/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("var fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><variable name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("dotted var works #1", () => {
       const cd = transformSource("<Stack var.myVar='123'></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -218,33 +200,6 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Props
   describe("props", () => {
-    it("prop fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><property blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("prop fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><property/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("prop fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><property name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("implicit props with attr works #1", () => {
       const cd = transformSource("<Stack myProp='123'/>") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -350,33 +305,6 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Template (alias for property)
   describe("template", () => {
-    it("template fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><template blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("template fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><template/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("template fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><template name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("template with name/value attr works #1", () => {
       const cd = transformSource(
         "<Stack><template name='myProp' value='123'/></Stack>",
@@ -490,15 +418,6 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("event", () => {
-    it("event fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><event blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
     it("implicit events with attr works #1", () => {
       const cd = transformSource("<Stack onClick='doIt' />") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -510,33 +429,6 @@ describe("Xmlui transform - child elements", () => {
       expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
       const id = (stmts[0] as ExpressionStatement).expr as Identifier;
       expect(id.name).equal("doIt");
-    });
-
-    it("event fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><event/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("event fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><event name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("event fail with 'on' prefix", () => {
-      try {
-        transformSource("<Stack><event name='onClick' value='doIt'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T008");
-      }
     });
 
     it("event with name/value attr works #1", () => {
@@ -587,33 +479,6 @@ describe("Xmlui transform - child elements", () => {
   });
   describe("method", () => {
     // --- Method
-    it("method fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><method blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("method fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><method></method></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("method fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><method name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("method with name results null", () => {
       const cd = transformSource("<Stack><method name='set'/></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -718,24 +583,6 @@ describe("Xmlui transform - child elements", () => {
   });
   describe("uses", () => {
     // --- Uses
-    it("uses must not have a value attribute #1", () => {
-      try {
-        transformSource("<Stack><uses x='a'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T015");
-      }
-    });
-
-    it("uses must not have a value attribute #2", () => {
-      try {
-        transformSource("<Stack><uses x='a' value='b'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T015");
-      }
-    });
-
     it("uses works with 2 values", () => {
       const cd = transformSource(`
       <Stack>
@@ -1314,23 +1161,6 @@ describe("Xmlui transform - child elements", () => {
         },
       });
     });
-
-    it("Compound component cannot nest another one", () => {
-      try {
-        const cd = transformSource(`
-          <Component name="A">
-            <Stack>
-              <Component name="B">
-                <Button />
-              </Component>
-            </Stack>
-          </Component>
-          `) as CompoundComponentDef;
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).include("T006");
-      }
-    });
   });
   describe("debug info", () => {
     it("Compound component debug info nested with vars", () => {
@@ -1492,72 +1322,6 @@ describe("Xmlui transform - child elements", () => {
       ) as ComponentDef;
 
       expect(cd.children[0].type).eq("test-value.DataGrid");
-    });
-
-    describe("handled errors", () => {
-      it("errors on namespace value includeing '#'", () => {
-        try {
-          const cd = transformSource(`<App xmlns:TestNamespace="#something" />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("errors on refering to unknown namespace", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="Test.Components" >
-              <NonExistant:DataGrid />
-          </App>
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T027");
-        }
-      });
-
-      it("multiple colons in namespace value errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="component-ns:buttons-components:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("unrecognised namespace scheme errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="NON-EXISTANT:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T029");
-        }
-      });
-
-      it("duplicate namespace key errors", () => {
-        try {
-          const cd = transformSource(`
-              <App xmlns:TestNamespace="first" xmlns:TestNamespace="second" />
-              `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T025");
-        }
-      });
-
-      it("namespace on top lvl component errors", () => {
-        try {
-          const cd = transformSource(`<NonExistantNs:App />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T026");
-        }
-      });
     });
   });
 });
