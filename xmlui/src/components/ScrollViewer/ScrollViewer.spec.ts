@@ -745,6 +745,9 @@ test.describe("Header and Footer Templates", () => {
 async function emulateTouchDevice(page: Page) {
   await page.addInitScript(() => {
     const original = window.matchMedia.bind(window);
+    // Save original so the test fixture can restore it after the test ends.
+    // The fixture cleanup checks for __originalMatchMedia and restores it.
+    (window as any).__originalMatchMedia = original;
     window.matchMedia = (query: string) => {
       if (query === "(pointer: coarse)") {
         return {

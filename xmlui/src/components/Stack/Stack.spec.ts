@@ -90,10 +90,7 @@ test.describe("Basic Functionality", () => {
       el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
     });
 
-    // Wait for fade to update
-    await page.waitForTimeout(100);
-
-    // Top fade overlay should exist
+    // Top fade overlay should exist (toBeVisible auto-retries until timeout)
     const topFade = page.locator("[class*='fadeTop']");
     await expect(topFade).toBeVisible();
   });
