@@ -260,6 +260,9 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       await _sharedPage.evaluate(() => {
         localStorage.clear();
         sessionStorage.clear();
+        // Reset page-level scroll so anchor navigation from this test doesn't
+        // bleed into the next test's initial-state assertions.
+        window.scrollTo(0, 0);
       });
       // Move mouse to a neutral position so :hover CSS from the previous
       // test doesn't bleed into the next one.
@@ -418,6 +421,10 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           await page.evaluate(({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
             // Reset URL so React Router starts fresh at the app root.
             history.replaceState(null, "", "/");
+            // Reset page-level scroll: anchor navigation from the previous test
+            // (e.g. clicking a #hash link) scrolls the page and that scroll
+            // position persists across reinits unless we reset it here.
+            window.scrollTo(0, 0);
             (window as any).TEST_ENV = app;
             (window as any).TEST_RUNTIME = app.runtime;
             (window as any).TEST_EXTENSION_IDS = extensionIds;

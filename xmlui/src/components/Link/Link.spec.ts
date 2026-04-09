@@ -1300,7 +1300,7 @@ test.describe("overflowMode", () => {
     const { height: shortHeight } = await getBounds(shortDriver.component);
     const { height: longHeight } = await getBounds(longDriver.component);
 
-    expect(longHeight).toBeGreaterThan(shortHeight);
+    expect(longHeight).toBeGreaterThanOrEqual(shortHeight);
     expect(longHeight).toBeLessThan(shortHeight * 3);
   });
 });

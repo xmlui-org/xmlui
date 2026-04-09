@@ -22,16 +22,6 @@ renderTestBed();
   // so they don't leak into the next test.
   toast.remove();
 
-  // Remove dynamically-injected <style data-style-hash> tags.  The old
-  // StyleRegistry's setTimeout-based cleanup can race with the new tree's
-  // useInsertionEffect — the old timer may remove a <style> tag that the
-  // new tree just injected (same hash, same querySelector match).  By
-  // stripping all dynamic style tags before the new mount, we guarantee
-  // the fresh registry re-injects everything cleanly.
-  document.head
-    .querySelectorAll("style[data-style-hash]")
-    .forEach((el) => el.remove());
-
   renderKey++;
   flushSync(() => {
     root.render(<TestBed key={renderKey} />);
