@@ -14,13 +14,13 @@ type IncompleteNode = {
 };
 
 type StackFrame = {
-  node: IncompleteNode | Node;
+  node: IncompleteNode;
   errors: ParserDiag[];
   scriptCount: number;
   isCompoundComponent?: boolean;
   compoundCompName?: string;
   namespaces?: Map<string, string>;
-  nonHelperChildrenSeen?: number;
+  hasNonHelperChildren?: boolean;
 };
 
 class ParseStack {
@@ -32,7 +32,7 @@ class ParseStack {
     this.cursor = cursor;
   }
 
-  get node(): IncompleteNode | Node {
+  get node(): IncompleteNode {
     return this.currentFrame.node;
   }
 
@@ -126,7 +126,6 @@ class ParseStack {
 
   setIsCompoundComponent(): void {
     this.currentFrame.isCompoundComponent = true;
-    this.currentFrame.nonHelperChildrenSeen = 0;
   }
 
   isChildOfCompoundComponent(): boolean {
@@ -165,20 +164,23 @@ class ParseStack {
     return false;
   }
 
-  /** Increments the non-helper children counter on the nearest ancestor frame that
-   * has a compound component name set. */
-  incrementAncestorNonHelperCount(): void {
-    for (let i = this.frames.length - 2; i >= 0; i--) {
-      if (this.frames[i].isCompoundComponent) {
-        this.frames[i].nonHelperChildrenSeen = (this.frames[i].nonHelperChildrenSeen ?? 0) + 1;
-        return;
-      }
-    }
+  /** Assumes the closestElementNode is a compound component */
+  setHasNonHelper(): void {
+    const frame = this.closesetElementNodeFrameAncestor();
+    frame.hasNonHelperChildren = true;
   }
 
-  /** Returns the number of non-helper children seen so far in the current frame (0 if not set). */
-  getCurrentNonHelperChildrenSeen(): number {
-    return this.currentFrame.nonHelperChildrenSeen ?? 0;
+  hasNonHelperChildren(): boolean {
+    return Boolean(this.currentFrame?.hasNonHelperChildren);
+  }
+
+  closesetElementNodeFrameAncestor(): StackFrame | null {
+    for (let i = this.frames.length - 2; i >= 0; i--) {
+      if (this.frames[i].node.kind === SyntaxKind.ElementNode) {
+        return this.frames[i];
+      }
+    }
+    return null;
   }
 
   InRootElement(): boolean {
@@ -353,11 +355,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     stack.startNode(SyntaxKind.ElementNode);
     bump(SyntaxKind.OpenNodeStart);
     let errInName = true;
-    let openTagName: Node | null = null;
+    let openTagNameNode: Node | null = null;
     if (at(SyntaxKind.Identifier)) {
       const tagNameParseRes = parseOpeningTagName();
       errInName = tagNameParseRes.errInName;
-      openTagName = tagNameParseRes.node;
+      openTagNameNode = tagNameParseRes.node;
     } else {
       const errNode = errNodeUntil(RECOVER_OPEN_TAG);
       if (errNode) {
@@ -371,18 +373,28 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       parseAttrList();
     }
 
-    const openTagNameText = openTagName ? getTagNameNodeLastIdentifier(openTagName) : undefined;
+    const openTagNameText = openTagNameNode
+      ? getTagNameNodeLastIdentifier(openTagNameNode)
+      : undefined;
 
-    if (!errInName && openTagName) {
+    if (!errInName && openTagNameNode) {
       // Check for namespace prefix on the tag name (TagNameNode with 3 children = ns:Name)
-      if (openTagName.children!.length === 3) {
+      if (openTagNameNode.children!.length === 3) {
         if (stack.InRootElement()) {
           // Root element cannot have a namespace prefix
-          errorAt(DIAGS_PARSER.rootCompNoNamespace, openTagName.pos, openTagName.children![0].end);
+          errorAt(
+            DIAGS_PARSER.rootCompNoNamespace,
+            openTagNameNode.pos,
+            openTagNameNode.children![0].end,
+          );
         } else {
-          const prefix = getText(openTagName.children![0]);
+          const prefix = getText(openTagNameNode.children![0]);
           if (!stack.resolveNamespace(prefix)) {
-            errorAt(DIAGS_PARSER.nsNotFound(prefix), openTagName.pos, openTagName.children![0].end);
+            errorAt(
+              DIAGS_PARSER.nsNotFound(prefix),
+              openTagNameNode.pos,
+              openTagNameNode.children![0].end,
+            );
           }
         }
       }
@@ -428,73 +440,30 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    // --- Validate compound component nesting and invalid helper nodes
-    let skipNodeValidation = false;
     if (openTagNameText === COMPOUND_COMPONENT_NAME) {
       stack.setIsCompoundComponent();
-      if (stack.hasCompoundCompAncestor()) {
-        errorAt(DIAGS_PARSER.nestedCompDefs, openTagName!.pos, openTagName!.end);
-        skipNodeValidation = true;
-      }
     }
 
     if (stack.isChildOfCompoundComponent() && openTagNameText) {
-      if (openTagNameText === "uses" || openTagNameText === "loaders") {
-        errorAt(DIAGS_PARSER.invalidNodeName(openTagNameText), openTagName!.pos, openTagName!.end);
-        skipNodeValidation = true;
+      if (!HELPER_NAMES.has(openTagNameText)) {
+        stack.setHasNonHelper();
       }
     }
 
     switch (peek().kind) {
       case SyntaxKind.NodeClose: {
         bumpAny();
-        const hasNoNonHelperChildren =
-          openTagNameText === COMPOUND_COMPONENT_NAME &&
-          stack.getCurrentNonHelperChildrenSeen() === 0;
-        const completedNode = stack.completeNode(SyntaxKind.ElementNode);
-        if (!skipNodeValidation) {
-          validateSimpleTransformRules(completedNode);
-        }
-        if (hasNoNonHelperChildren) {
-          errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
-        }
-        if (openTagNameText === "global" && stack.hasCompoundCompAncestor()) {
-          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
-        }
-        if (
-          openTagNameText !== undefined &&
-          !HELPER_NAMES.has(openTagNameText) &&
-          stack.hasCompoundCompAncestor()
-        ) {
-          stack.incrementAncestorNonHelperCount();
-        }
+        validateElementNode(openTagNameNode, openTagNameText);
+        stack.completeNode(SyntaxKind.ElementNode);
         return;
       }
 
       case SyntaxKind.NodeEnd: {
         bumpAny();
         parseContentList();
-        parseClosingTag(openTagName, errInName);
-        const hasNoNonHelperChildren =
-          openTagNameText === COMPOUND_COMPONENT_NAME &&
-          stack.getCurrentNonHelperChildrenSeen() === 0;
-        const completedNode = stack.completeNode(SyntaxKind.ElementNode);
-        if (!skipNodeValidation) {
-          validateSimpleTransformRules(completedNode);
-        }
-        if (hasNoNonHelperChildren) {
-          errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
-        }
-        if (openTagNameText === "global" && stack.hasCompoundCompAncestor()) {
-          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
-        }
-        if (
-          openTagNameText !== undefined &&
-          !HELPER_NAMES.has(openTagNameText) &&
-          stack.hasCompoundCompAncestor()
-        ) {
-          stack.incrementAncestorNonHelperCount();
-        }
+        parseClosingTag(openTagNameNode, errInName);
+        validateElementNode(openTagNameNode, openTagNameText);
+        stack.completeNode(SyntaxKind.ElementNode);
         return;
       }
 
@@ -707,21 +676,32 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     node: Node;
   };
 
-  function validateSimpleTransformRules(element: Node) {
-    const elementName = getElementName(element);
-    if (!elementName) {
+  function validateElementNode(tagNameNode: Node, tagNameText: string) {
+    const errReportNode = tagNameNode ?? stack.node.children![0];
+
+    if (!tagNameText) {
       return;
     }
 
-    if (elementName === COMPOUND_COMPONENT_NAME) {
-      validateCompoundComponentNode(element);
+    if (tagNameText === COMPOUND_COMPONENT_NAME) {
+      validateCompoundComponentNode(errReportNode);
       return;
     }
 
-    if (HELPERS_WITH_NAME_VALUE_ONLY.has(elementName)) {
-      const attrs = getElementAttrs(element).map(segmentAttr);
-      validateNameValueAttributes(element, elementName, attrs);
-      if (elementName === "event") {
+    if (tagNameText === "global" && stack.isChildOfCompoundComponent()) {
+      errorAt(DIAGS_PARSER.globalNotAllowedInComponent, errReportNode.pos, errReportNode.end);
+    }
+
+    if (stack.isChildOfCompoundComponent() && tagNameText) {
+      if (tagNameText === "uses" || tagNameText === "loaders") {
+        errorAt(DIAGS_PARSER.invalidNodeName(tagNameText), errReportNode.pos, errReportNode.end);
+      }
+    }
+
+    if (HELPERS_WITH_NAME_VALUE_ONLY.has(tagNameText)) {
+      const attrs = getElementAttrs(stack.node).map(segmentAttr);
+      validateNameValueAttributes(errReportNode, tagNameText, attrs);
+      if (tagNameText === "event") {
         const eventNameAttr = attrs.find(
           (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
         );
@@ -735,28 +715,41 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    if (elementName === "uses") {
-      validateUsesElement(element);
+    if (tagNameText === "uses") {
+      validateUsesElement(errReportNode);
     }
 
-    if (elementName === "item") {
-      validateItemElement(element);
+    if (tagNameText === "item") {
+      validateItemElement();
     }
 
-    if (elementName === "property" || elementName === "template") {
-      validateFieldItemChildren(element);
+    if (tagNameText === "property" || tagNameText === "template") {
+      validateFieldItemChildren();
     }
   }
 
-  function validateCompoundComponentNode(element: Node) {
+  function validateCompoundComponentNode(errReportNode: Node) {
+    if (stack.hasCompoundCompAncestor()) {
+      errorAt(DIAGS_PARSER.nestedCompDefs, errReportNode.pos, errReportNode.end);
+      return;
+    }
+
+    const element = stack.node;
+
     const attrs = getElementAttrs(element).map(segmentAttr);
     const nameAttr = attrs.find(
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
     );
     if (!nameAttr?.value) {
-      errorAt(DIAGS_PARSER.compDefNameExp, element.pos, element.end);
+      errorAt(DIAGS_PARSER.compDefNameExp, errReportNode.pos, errReportNode.end);
+      return;
     } else if (!UPPERCASE_REGEX.test(nameAttr.value)) {
       errorAt(DIAGS_PARSER.compDefNameUppercase, nameAttr.node.pos, nameAttr.node.end);
+      return;
+    }
+
+    if (!stack.hasNonHelperChildren()) {
+      errorAt(DIAGS_PARSER.compDefNesedElem, errReportNode.pos, errReportNode.end);
     }
 
     for (const attr of attrs) {
@@ -787,7 +780,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function validateNameValueAttributes(element: Node, elementName: string, attrs: SegmentedAttr[]) {
+  function validateNameValueAttributes(
+    errReportNode: Node,
+    elementName: string,
+    attrs: SegmentedAttr[],
+  ) {
     const invalidAttr = attrs.find(
       (attr) =>
         attr.namespace !== undefined ||
@@ -806,22 +803,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
     const nameAttr = attrs.find((attr) => attr.name === "name");
     if (!nameAttr?.value) {
-      errorAt(DIAGS_PARSER.nameAttrRequired(elementName), element.pos, element.end);
+      errorAt(DIAGS_PARSER.nameAttrRequired(elementName), errReportNode.pos, errReportNode.end);
     }
   }
 
-  function validateUsesElement(element: Node) {
-    const attrs = getElementAttrs(element).map(segmentAttr);
+  function validateUsesElement(errReportNode: Node) {
+    const attrs = getElementAttrs(stack.node).map(segmentAttr);
     const valueAttr = attrs.find(
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "value",
     );
     if (!valueAttr?.value || attrs.length !== 1) {
-      errorAt(DIAGS_PARSER.usesValueOnly, element.pos, element.end);
+      errorAt(DIAGS_PARSER.usesValueOnly, errReportNode.pos, errReportNode.end);
     }
   }
 
-  function validateItemElement(element: Node) {
-    const attrs = getElementAttrs(element).map(segmentAttr);
+  function validateItemElement() {
+    const attrs = getElementAttrs(stack.node).map(segmentAttr);
     const nameAttr = attrs.find(
       (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
     );
@@ -830,8 +827,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function validateFieldItemChildren(element: Node) {
-    const children = getElementChildren(element);
+  function validateFieldItemChildren() {
+    const children = getElementChildren(stack.node);
     const hasNestedComponent = children.some((child) => {
       if (child.kind !== SyntaxKind.ElementNode) {
         return false;
@@ -927,11 +924,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     return getText(tagNameNode.children![tagNameNode.children!.length - 1]);
   }
 
-  function getElementAttrs(element: Node): Node[] {
+  function getElementAttrs(element: IncompleteNode): Node[] {
     return element.children?.find((c) => c.kind === SyntaxKind.AttributeListNode)?.children ?? [];
   }
 
-  function getElementChildren(element: Node): Node[] {
+  function getElementChildren(element: IncompleteNode): Node[] {
     return element.children?.find((c) => c.kind === SyntaxKind.ContentListNode)?.children ?? [];
   }
 

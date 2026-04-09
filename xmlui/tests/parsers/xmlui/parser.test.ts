@@ -594,7 +594,8 @@ describe("Xmlui parser - expected parser errors", () => {
 
   it("compound child in compound component", () => {
     const { errors } = parseSource("<Component name='MyComp'><Component /></Component>");
-    expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
+    const errCodes = errors.map((d) => d.code);
+    expect(errCodes).toContain(ErrCodesParser.nestedCompDefs);
   });
 
   it("invalid attribute in compound component", () => {
