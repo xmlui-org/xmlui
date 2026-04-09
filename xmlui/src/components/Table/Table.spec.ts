@@ -76,7 +76,10 @@ test.describe("Basic Functionality", () => {
     await expect.poll(testStateDriver.testState).toEqual("Apple");
   });
 
-  test("double-click fires handler without interfering with row selection", async ({ initTestBed, page }) => {
+  test("double-click fires handler without interfering with row selection", async ({
+    initTestBed,
+    page,
+  }) => {
     // Regression test: Verify that double-click doesn't trigger onClick twice
     // The fix checks event.detail >= 2 to skip onClick on the second click
     const { testStateDriver } = await initTestBed(`
@@ -102,7 +105,7 @@ test.describe("Basic Functionality", () => {
     const state = await testStateDriver.testState();
     expect(state).toMatchObject({
       action: "doubleClick",
-      item: "Apple"
+      item: "Apple",
     });
 
     // After double-click, the row should be selected (from the first click)
@@ -304,13 +307,13 @@ test.describe("Basic Functionality", () => {
           </Column>
         </Table>
       `);
-      const input = page.getByTestId('input0').getByRole('textbox');
+      const input = page.getByTestId("input0").getByRole("textbox");
       await input.click();
       await expect(input).toBeFocused();
 
       // Verify that no checkbox is checked
       const checkboxes = page.locator("input[type='checkbox']");
-      for (let i = 1; i < await checkboxes.count(); i++) {
+      for (let i = 1; i < (await checkboxes.count()); i++) {
         await expect(checkboxes.nth(i)).not.toBeChecked();
       }
     });
@@ -323,17 +326,20 @@ test.describe("Basic Functionality", () => {
           </Column>
         </Table>
       `);
-      const button = page.getByTestId('button0');
+      const button = page.getByTestId("button0");
       await button.click();
 
       // Verify that no checkbox is checked
       const checkboxes = page.locator("input[type='checkbox']");
-      for (let i = 1; i < await checkboxes.count(); i++) {
+      for (let i = 1; i < (await checkboxes.count()); i++) {
         await expect(checkboxes.nth(i)).not.toBeChecked();
       }
     });
 
-    test("row is not selected if dropdown trigger is clicked in row", async ({ initTestBed, page }) => {
+    test("row is not selected if dropdown trigger is clicked in row", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
           <Column bindTo="name" />
@@ -344,18 +350,21 @@ test.describe("Basic Functionality", () => {
           </Column>
         </Table>
       `);
-      const dropdownTrigger = page.getByTestId('dropdown0');
+      const dropdownTrigger = page.getByTestId("dropdown0");
       await dropdownTrigger.click();
-      await expect(page.getByText('Test Item')).toBeVisible();
+      await expect(page.getByText("Test Item")).toBeVisible();
 
       // Verify that no checkbox is checked
       const checkboxes = page.locator("input[type='checkbox']");
-      for (let i = 1; i < await checkboxes.count(); i++) {
+      for (let i = 1; i < (await checkboxes.count()); i++) {
         await expect(checkboxes.nth(i)).not.toBeChecked();
       }
     });
 
-    test("checkbox column maintains width with horizontal scrolling (issue #2790)", async ({ initTestBed, page }) => {
+    test("checkbox column maintains width with horizontal scrolling (issue #2790)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{[{foo: "bar"}]}' rowsSelectable="true" testId="table">
           <Column width="2000px" bindTo="foo" />
@@ -411,7 +420,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("hideSelectionCheckboxesHeader property", () => {
-    test("hides header checkbox when true, row checkboxes remain", async ({ initTestBed, page }) => {
+    test("hides header checkbox when true, row checkboxes remain", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true" testId="table">
           <Column bindTo="name"/>
@@ -425,7 +437,10 @@ test.describe("Basic Functionality", () => {
       await expect(rowCheckboxes).toHaveCount(4);
     });
 
-    test("shows header checkbox by default (hideSelectionCheckboxesHeader false)", async ({ initTestBed, page }) => {
+    test("shows header checkbox by default (hideSelectionCheckboxesHeader false)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" testId="table">
           <Column bindTo="name"/>
@@ -435,7 +450,10 @@ test.describe("Basic Functionality", () => {
       await expect(headerCheckbox).toHaveCount(1);
     });
 
-    test("hideSelectionCheckboxesHeader has no effect when enableMultiRowSelection is false", async ({ initTestBed, page }) => {
+    test("hideSelectionCheckboxesHeader has no effect when enableMultiRowSelection is false", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="false" hideSelectionCheckboxesHeader="true" testId="table">
           <Column bindTo="name"/>
@@ -448,7 +466,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("alwaysShowSelectionCheckboxes property", () => {
-    test("checkboxes are always visible when alwaysShowSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+    test("checkboxes are always visible when alwaysShowSelectionCheckboxes is true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
@@ -464,7 +485,10 @@ test.describe("Basic Functionality", () => {
       }
     });
 
-    test("checkboxes are hidden on non-hovered rows by default (alwaysShowSelectionCheckboxes false)", async ({ initTestBed, page }) => {
+    test("checkboxes are hidden on non-hovered rows by default (alwaysShowSelectionCheckboxes false)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" alwaysShowSelectionCheckboxes="false" testId="table">
           <Column bindTo="name"/>
@@ -475,7 +499,10 @@ test.describe("Basic Functionality", () => {
       await expect(checkboxes).toHaveCount(5); // header + 4 data rows
     });
 
-    test("alwaysShowSelectionCheckboxes has no effect when hideSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+    test("alwaysShowSelectionCheckboxes has no effect when hideSelectionCheckboxes is true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true" alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
@@ -486,7 +513,10 @@ test.describe("Basic Functionality", () => {
       await expect(checkboxes).toHaveCount(0);
     });
 
-    test("alwaysShowSelectionCheckboxes has no effect when row selection is disabled", async ({ initTestBed, page }) => {
+    test("alwaysShowSelectionCheckboxes has no effect when row selection is disabled", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSelectionCheckboxes="true" testId="table">
           <Column bindTo="name"/>
@@ -512,7 +542,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("checkboxTolerance property", () => {
-    test("allows checkbox interaction within compact tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows checkbox interaction within compact tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -549,10 +582,13 @@ test.describe("Basic Functionality", () => {
       await expect(firstRowCheckbox).toBeChecked();
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("selection changed");
     });
 
-    test("allows header checkbox interaction within compact tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows header checkbox interaction within compact tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -597,10 +633,13 @@ test.describe("Basic Functionality", () => {
       }
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('header selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("header selection changed");
     });
 
-    test("allows checkbox interaction within none tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows checkbox interaction within none tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -633,10 +672,13 @@ test.describe("Basic Functionality", () => {
       await expect(firstRowCheckbox).toBeChecked();
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('none selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("none selection changed");
     });
 
-    test("allows header checkbox interaction within none tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows header checkbox interaction within none tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -677,10 +719,13 @@ test.describe("Basic Functionality", () => {
       }
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('header none selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("header none selection changed");
     });
 
-    test("allows checkbox interaction within comfortable tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows checkbox interaction within comfortable tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -717,10 +762,13 @@ test.describe("Basic Functionality", () => {
       await expect(firstRowCheckbox).toBeChecked();
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('comfortable selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("comfortable selection changed");
     });
 
-    test("allows header checkbox interaction within comfortable tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows header checkbox interaction within comfortable tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -765,10 +813,13 @@ test.describe("Basic Functionality", () => {
       }
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('header comfortable selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("header comfortable selection changed");
     });
 
-    test("allows checkbox interaction within spacious tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows checkbox interaction within spacious tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -805,10 +856,13 @@ test.describe("Basic Functionality", () => {
       await expect(firstRowCheckbox).toBeChecked();
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('spacious selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("spacious selection changed");
     });
 
-    test("allows header checkbox interaction within spacious tolerance boundary", async ({ initTestBed, page }) => {
+    test("allows header checkbox interaction within spacious tolerance boundary", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}'
                rowsSelectable="true"
@@ -853,7 +907,7 @@ test.describe("Basic Functionality", () => {
       }
 
       // Verify selection event was fired
-      await expect.poll(testStateDriver.testState).toEqual('header spacious selection changed');
+      await expect.poll(testStateDriver.testState).toEqual("header spacious selection changed");
     });
   });
 
@@ -913,7 +967,10 @@ test.describe("Basic Functionality", () => {
         await expect(carrotCheckbox).not.toBeChecked();
       });
 
-      test("disabled predicate receives the row item as parameter", async ({ initTestBed, page }) => {
+      test("disabled predicate receives the row item as parameter", async ({
+        initTestBed,
+        page,
+      }) => {
         await initTestBed(`
           <Table
             data='{${JSON.stringify(sampleData)}}'
@@ -1116,7 +1173,10 @@ test.describe("Basic Functionality", () => {
         await expect(checkboxes).toHaveCount(3);
       });
 
-      test("row can be disabled which prevents interaction (has pointer-events: none)", async ({ initTestBed, page }) => {
+      test("row can be disabled which prevents interaction (has pointer-events: none)", async ({
+        initTestBed,
+        page,
+      }) => {
         await initTestBed(`
           <Table
             data='{${JSON.stringify(sampleData)}}'
@@ -1145,7 +1205,10 @@ test.describe("Basic Functionality", () => {
         await expect(carrotCheckbox).not.toBeChecked();
       });
 
-      test("row can be unselectable but not disabled (no disabled styling)", async ({ initTestBed, page }) => {
+      test("row can be unselectable but not disabled (no disabled styling)", async ({
+        initTestBed,
+        page,
+      }) => {
         await initTestBed(`
           <Table
             data='{${JSON.stringify(sampleData)}}'
@@ -1210,7 +1273,10 @@ test.describe("Basic Functionality", () => {
       await expect(page.getByText("No items found")).toBeVisible();
     });
 
-    test("hides no data view when noDataTemplate is empty string", async ({ initTestBed, page }) => {
+    test("hides no data view when noDataTemplate is empty string", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{[]}' noDataTemplate="" testId="table">
           <Column bindTo="name"/>
@@ -1261,7 +1327,10 @@ test.describe("Basic Functionality", () => {
     await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).not.toBeVisible();
   });
 
-  test("order indicator stays visible when table is sorted by column", async ({ initTestBed, page }) => {
+  test("order indicator stays visible when table is sorted by column", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table">
         <Column bindTo="name" header="Name" canSort="true"/>
@@ -1278,7 +1347,10 @@ test.describe("Basic Functionality", () => {
   });
 
   test.describe("alwaysShowSortingIndicator property", () => {
-    test("shows all sorting indicators when alwaysShowSortingIndicator is true", async ({ initTestBed, page }) => {
+    test("shows all sorting indicators when alwaysShowSortingIndicator is true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
           <Column bindTo="name" header="Name" canSort="true"/>
@@ -1295,7 +1367,10 @@ test.describe("Basic Functionality", () => {
       await expect(quantityHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
     });
 
-    test("hides sorting indicators by default when alwaysShowSortingIndicator is false", async ({ initTestBed, page }) => {
+    test("hides sorting indicators by default when alwaysShowSortingIndicator is false", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="false" testId="table">
           <Column bindTo="name" header="Name" canSort="true"/>
@@ -1309,7 +1384,10 @@ test.describe("Basic Functionality", () => {
       }
     });
 
-    test("sorting indicators remain visible after sorting when alwaysShowSortingIndicator is true", async ({ initTestBed, page }) => {
+    test("sorting indicators remain visible after sorting when alwaysShowSortingIndicator is true", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
           <Column bindTo="name" header="Name" canSort="true"/>
@@ -1331,7 +1409,10 @@ test.describe("Basic Functionality", () => {
       await expect(categoryHeader.locator("[data-part-id='orderIndicator']")).toBeVisible();
     });
 
-    test("non-sortable columns do not show indicators even with alwaysShowSortingIndicator", async ({ initTestBed, page }) => {
+    test("non-sortable columns do not show indicators even with alwaysShowSortingIndicator", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' alwaysShowSortingIndicator="true" testId="table">
           <Column bindTo="name" header="Name" canSort="true"/>
@@ -1436,7 +1517,10 @@ test.describe("Basic Functionality", () => {
       expect(result.category).toEqual("Fruit");
     });
 
-    test("provides $rowIndex context variable with correct index", async ({ initTestBed, page }) => {
+    test("provides $rowIndex context variable with correct index", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $rowIndex">
           <Column bindTo="name"/>
@@ -1450,7 +1534,10 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual(2);
     });
 
-    test("provides $itemIndex context variable with correct index", async ({ initTestBed, page }) => {
+    test("provides $itemIndex context variable with correct index", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = $itemIndex">
           <Column bindTo="name"/>
@@ -1482,7 +1569,10 @@ test.describe("Basic Functionality", () => {
       expect(result.itemIndex).toEqual(1);
     });
 
-    test("context variables match the correct row when clicking different rows", async ({ initTestBed, page }) => {
+    test("context variables match the correct row when clicking different rows", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' testId="table" onContextMenu="() => testState = { name: $item.name, index: $rowIndex }">
           <Column bindTo="name"/>
@@ -1519,20 +1609,17 @@ test.describe("Basic Functionality", () => {
 // =============================================================================
 
 test.describe("Features Needing Investigation", () => {
-  test("loading property shows loading state",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("loading property shows loading state", async ({ initTestBed, page }) => {
+    await initTestBed(`
         <Table loading="true" testId="table">
           <Column bindTo="name"/>
         </Table>
       `);
-      await expect(page.getByRole("status").and(page.getByLabel("Loading"))).toBeVisible();
-    }
-  );
+    await expect(page.getByRole("status").and(page.getByLabel("Loading"))).toBeVisible();
+  });
 
-  test("row selection works with checkboxes",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("row selection works with checkboxes", async ({ initTestBed, page }) => {
+    await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
@@ -1543,18 +1630,16 @@ test.describe("Features Needing Investigation", () => {
         </Table>
       `);
 
-      const checkboxes = page.locator("input[type='checkbox']");
-      await checkboxes.nth(1).check({ force: true }); // First data row
-      await checkboxes.nth(2).check({ force: true }); // Second data row
+    const checkboxes = page.locator("input[type='checkbox']");
+    await checkboxes.nth(1).check({ force: true }); // First data row
+    await checkboxes.nth(2).check({ force: true }); // Second data row
 
-      await expect(checkboxes.nth(1)).toBeChecked();
-      await expect(checkboxes.nth(2)).toBeChecked();
-    }
-  );
+    await expect(checkboxes.nth(1)).toBeChecked();
+    await expect(checkboxes.nth(2)).toBeChecked();
+  });
 
-  test("sorting works correctly with descending order",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("sorting works correctly with descending order", async ({ initTestBed, page }) => {
+    await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
           sortBy="name"
@@ -1565,16 +1650,14 @@ test.describe("Features Needing Investigation", () => {
         </Table>
       `);
 
-      const cells = page.locator("td");
-      // Should be sorted reverse alphabetically: Spinach, Carrot, Banana, Apple
-      await expect(cells.nth(0)).toHaveText("Spinach");
-      await expect(cells.nth(1)).toHaveText("Carrot");
-    }
-  );
+    const cells = page.locator("td");
+    // Should be sorted reverse alphabetically: Spinach, Carrot, Banana, Apple
+    await expect(cells.nth(0)).toHaveText("Spinach");
+    await expect(cells.nth(1)).toHaveText("Carrot");
+  });
 
-    test("sorting works correctly with ascending order",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("sorting works correctly with ascending order", async ({ initTestBed, page }) => {
+    await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
           sortBy="quantity"
@@ -1585,14 +1668,13 @@ test.describe("Features Needing Investigation", () => {
         </Table>
       `);
 
-      const cells = page.locator("td");
-      // Should be sorted in ascending order: 2, 3, 5, 10
-      await expect(cells.nth(0)).toHaveText("2");
-      await expect(cells.nth(1)).toHaveText("3");
-      await expect(cells.nth(2)).toHaveText("5");
-      await expect(cells.nth(3)).toHaveText("10");
-    }
-  );
+    const cells = page.locator("td");
+    // Should be sorted in ascending order: 2, 3, 5, 10
+    await expect(cells.nth(0)).toHaveText("2");
+    await expect(cells.nth(1)).toHaveText("3");
+    await expect(cells.nth(2)).toHaveText("5");
+    await expect(cells.nth(3)).toHaveText("10");
+  });
 });
 
 // =============================================================================
@@ -1622,7 +1704,10 @@ test.describe("Pagination Features", () => {
   ];
 
   test.describe("Auto-inference of isPaginated", () => {
-    test("auto-enables pagination when pageSize is set and data length exceeds pageSize", async ({ initTestBed, page }) => {
+    test("auto-enables pagination when pageSize is set and data length exceeds pageSize", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(largeDataSet)}}'
@@ -1642,7 +1727,10 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(5);
     });
 
-    test("does not auto-enable pagination when data length is less than or equal to pageSize", async ({ initTestBed, page }) => {
+    test("does not auto-enable pagination when data length is less than or equal to pageSize", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(smallDataSet)}}'
@@ -1662,7 +1750,10 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(2);
     });
 
-    test("respects explicit isPaginated=false even when pageSize is set", async ({ initTestBed, page }) => {
+    test("respects explicit isPaginated=false even when pageSize is set", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(largeDataSet)}}'
@@ -1683,7 +1774,10 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(12);
     });
 
-    test("respects explicit isPaginated=true even when data length is less than pageSize", async ({ initTestBed, page }) => {
+    test("respects explicit isPaginated=true even when data length is less than pageSize", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(smallDataSet)}}'
@@ -1705,7 +1799,10 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(2);
     });
 
-    test("auto-enables pagination when pageSize equals data length (edge case)", async ({ initTestBed, page }) => {
+    test("auto-enables pagination when pageSize equals data length (edge case)", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(smallDataSet)}}'
@@ -1740,7 +1837,10 @@ test.describe("Pagination Features", () => {
       await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
     });
 
-    test("shows pagination controls when there are multiple pages", async ({ initTestBed, page }) => {
+    test("shows pagination controls when there are multiple pages", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(largeDataSet)}}'
@@ -1774,7 +1874,10 @@ test.describe("Pagination Features", () => {
       await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
     });
 
-    test("hides pagination controls when pageSize is larger than data", async ({ initTestBed, page }) => {
+    test("hides pagination controls when pageSize is larger than data", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(smallDataSet)}}'
@@ -1793,7 +1896,10 @@ test.describe("Pagination Features", () => {
   });
 
   test.describe("alwaysShowPagination property", () => {
-    test("explicitly shows pagination controls when alwaysShowPagination=true even with one page", async ({ initTestBed, page }) => {
+    test("explicitly shows pagination controls when alwaysShowPagination=true even with one page", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(smallDataSet)}}'
@@ -1811,7 +1917,10 @@ test.describe("Pagination Features", () => {
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
     });
 
-    test("explicitly hides pagination controls when alwaysShowPagination=false even with multiple pages", async ({ initTestBed, page }) => {
+    test("explicitly hides pagination controls when alwaysShowPagination=false even with multiple pages", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(largeDataSet)}}'
@@ -1833,7 +1942,10 @@ test.describe("Pagination Features", () => {
       await expect(visibleRows).toHaveCount(5);
     });
 
-    test("uses implicit hiding when alwaysShowPagination is omitted", async ({ initTestBed, page }) => {
+    test("uses implicit hiding when alwaysShowPagination is omitted", async ({
+      initTestBed,
+      page,
+    }) => {
       // Test with one page - should hide
       await initTestBed(`
         <Table
@@ -1865,7 +1977,10 @@ test.describe("Pagination Features", () => {
       await expect(page.locator("button[aria-label*='Next page']")).toBeVisible();
     });
 
-    test("alwaysShowPagination overrides implicit hiding behavior", async ({ initTestBed, page }) => {
+    test("alwaysShowPagination overrides implicit hiding behavior", async ({
+      initTestBed,
+      page,
+    }) => {
       // With one page, normally controls would be hidden, but alwaysShowPagination=true should show them
       await initTestBed(`
         <Table
@@ -1910,7 +2025,10 @@ test.describe("Pagination Features", () => {
       await expect(page.locator("button[aria-label*='Next page']")).toHaveCount(0);
     });
 
-    test("pagination controls location respects visibility rules", async ({ initTestBed, page }) => {
+    test("pagination controls location respects visibility rules", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table
           data='{${JSON.stringify(largeDataSet)}}'
@@ -2044,17 +2162,20 @@ test.describe("Pagination Features", () => {
     });
 
     test("userSelect properties fallback to theme variables", async ({ initTestBed, page }) => {
-      await initTestBed(`
+      await initTestBed(
+        `
         <Table data='{${JSON.stringify(sampleData)}}' testId="table">
           <Column bindTo="name" header="Name"/>
         </Table>
-      `, {
-        testThemeVars: {
-          "userSelect-cell-Table": "none",
-          "userSelect-row-Table": "text",
-          "userSelect-heading-Table": "all",
+      `,
+        {
+          testThemeVars: {
+            "userSelect-cell-Table": "none",
+            "userSelect-row-Table": "text",
+            "userSelect-heading-Table": "all",
+          },
         },
-      });
+      );
 
       const firstCell = page.locator("tbody td").first().locator("div").first();
       await expect(firstCell).toHaveCSS("user-select", "none");
@@ -2067,18 +2188,21 @@ test.describe("Pagination Features", () => {
     });
 
     test("property values override theme variables", async ({ initTestBed, page }) => {
-      await initTestBed(`
+      await initTestBed(
+        `
         <Table
           data='{${JSON.stringify(sampleData)}}'
           userSelectCell="text"
           testId="table">
           <Column bindTo="name" header="Name"/>
         </Table>
-      `, {
-        testThemeVars: {
-          "userSelect-cell-Table": "none",
+      `,
+        {
+          testThemeVars: {
+            "userSelect-cell-Table": "none",
+          },
         },
-      });
+      );
 
       // Property value "text" should override theme variable "none"
       const firstCell = page.locator("tbody td").first().locator("div").first();
@@ -2106,10 +2230,7 @@ test.describe("Accessibility", () => {
     await expect(page.locator("tr")).toHaveCount(5); // 1 header + 4 data rows
   });
 
-  test("column headers are focusable and have proper structure", async ({
-    initTestBed,
-    page
-  }) => {
+  test("column headers are focusable and have proper structure", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' testId="table">
         <Column bindTo="name" header="Name" canSort="true"/>
@@ -2122,7 +2243,10 @@ test.describe("Accessibility", () => {
     await expect(headers.nth(1)).toContainText("Quantity");
   });
 
-  test("selection checkboxes have proper accessibility when enabled", async ({ initTestBed, page }) => {
+  test("selection checkboxes have proper accessibility when enabled", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
         <Column bindTo="name"/>
@@ -2188,9 +2312,9 @@ test.describe("Edge Cases", () => {
       {
         user: {
           profile: {
-            name: "John Doe"
-          }
-        }
+            name: "John Doe",
+          },
+        },
       },
     ];
 
@@ -2239,9 +2363,11 @@ test.describe("Edge Cases", () => {
     await expect(headers.first()).toContainText("Name");
   });
 
-  test("row checkboxes work when data array contains items with 'id' property",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("row checkboxes work when data array contains items with 'id' property", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
         <Table testId="table" rowsSelectable="true" data="{[
           { id: 1, name: 'Item 1' },
           { id: 2, name: 'Item 2' }
@@ -2254,16 +2380,14 @@ test.describe("Edge Cases", () => {
           </Column>
         </Table>
       `);
-      const checkboxes = page.locator("input[type='checkbox']");
-      await checkboxes.nth(1).check({ force: true }); // First data row
-      await expect(checkboxes.nth(1)).toBeChecked();
-      await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
-    }
-  );
+    const checkboxes = page.locator("input[type='checkbox']");
+    await checkboxes.nth(1).check({ force: true }); // First data row
+    await expect(checkboxes.nth(1)).toBeChecked();
+    await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
+  });
 
-  test("row checkboxes work when 'idKey' property is specified",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("row checkboxes work when 'idKey' property is specified", async ({ initTestBed, page }) => {
+    await initTestBed(`
         <Table testId="table" rowsSelectable="true"
           idKey="account_id"
           data="{[
@@ -2278,16 +2402,17 @@ test.describe("Edge Cases", () => {
           </Column>
         </Table>
       `);
-      const checkboxes = page.locator("input[type='checkbox']");
-      await checkboxes.nth(1).check({ force: true }); // First data row
-      await expect(checkboxes.nth(1)).toBeChecked();
-      await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
-    }
-  );
+    const checkboxes = page.locator("input[type='checkbox']");
+    await checkboxes.nth(1).check({ force: true }); // First data row
+    await expect(checkboxes.nth(1)).toBeChecked();
+    await expect(checkboxes.nth(2)).not.toBeChecked(); // Second data row
+  });
 
-  test("resizing a column with explicit width keeps header and data cells aligned",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("resizing a column with explicit width keeps header and data cells aligned", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
         <Table
           data="{[1,2,3]}"
           width="800px"
@@ -2305,40 +2430,39 @@ test.describe("Edge Cases", () => {
         </Table>
       `);
 
-      const firstHeader = page.locator("thead th").first();
-      const firstCell = page.locator("tbody tr").first().locator("td").first();
+    const firstHeader = page.locator("thead th").first();
+    const firstCell = page.locator("tbody tr").first().locator("td").first();
 
-      const headerBoxBefore = await firstHeader.boundingBox();
-      const cellBoxBefore = await firstCell.boundingBox();
+    const headerBoxBefore = await firstHeader.boundingBox();
+    const cellBoxBefore = await firstCell.boundingBox();
 
-      expect(headerBoxBefore).not.toBeNull();
-      expect(cellBoxBefore).not.toBeNull();
+    expect(headerBoxBefore).not.toBeNull();
+    expect(cellBoxBefore).not.toBeNull();
 
-      expect(Math.abs(headerBoxBefore!.width - cellBoxBefore!.width)).toBeLessThan(4);
+    expect(Math.abs(headerBoxBefore!.width - cellBoxBefore!.width)).toBeLessThan(4);
 
-      const resizer = firstHeader.locator('div[class*="resizer"]');
-      const resizerBox = await resizer.boundingBox();
-      expect(resizerBox).not.toBeNull();
+    const resizer = firstHeader.locator('div[class*="resizer"]');
+    const resizerBox = await resizer.boundingBox();
+    expect(resizerBox).not.toBeNull();
 
-      const startX = resizerBox!.x + resizerBox!.width / 2;
-      const startY = resizerBox!.y + resizerBox!.height / 2;
+    const startX = resizerBox!.x + resizerBox!.width / 2;
+    const startY = resizerBox!.y + resizerBox!.height / 2;
 
-      await page.mouse.move(startX, startY);
-      await page.mouse.down();
-      await page.mouse.move(startX + 120, startY);
-      await page.mouse.up();
+    await page.mouse.move(startX, startY);
+    await page.mouse.down();
+    await page.mouse.move(startX + 120, startY);
+    await page.mouse.up();
 
-      const headerBoxAfter = await firstHeader.boundingBox();
-      const cellBoxAfter = await firstCell.boundingBox();
+    const headerBoxAfter = await firstHeader.boundingBox();
+    const cellBoxAfter = await firstCell.boundingBox();
 
-      expect(headerBoxAfter).not.toBeNull();
-      expect(cellBoxAfter).not.toBeNull();
+    expect(headerBoxAfter).not.toBeNull();
+    expect(cellBoxAfter).not.toBeNull();
 
-      expect(headerBoxAfter!.width).toBeGreaterThan(headerBoxBefore!.width + 20);
+    expect(headerBoxAfter!.width).toBeGreaterThan(headerBoxBefore!.width + 20);
 
-      expect(Math.abs(headerBoxAfter!.width - cellBoxAfter!.width)).toBeLessThan(4);
-    }
-  );
+    expect(Math.abs(headerBoxAfter!.width - cellBoxAfter!.width)).toBeLessThan(4);
+  });
 });
 
 // =============================================================================
@@ -2347,36 +2471,40 @@ test.describe("Edge Cases", () => {
 
 // TODO: Need more theme variable tests!
 test.describe("Theme Variables and Styling", () => {
-  test("applies heading background color theme variable",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("applies heading background color theme variable", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
         <Table data='{${JSON.stringify(sampleData)}}' testId="table">
           <Column bindTo="name" header="Name"/>
         </Table>
-      `, {
+      `,
+      {
         testThemeVars: { "backgroundColor-heading-Table": "rgb(255, 0, 0)" },
-      });
+      },
+    );
 
-      const header = page.locator("th").first();
-      await expect(header).toHaveCSS("background-color", "rgb(255, 0, 0)");
-    }
-  );
+    const header = page.locator("th").first();
+    await expect(header).toHaveCSS("background-color", "rgb(255, 0, 0)");
+  });
 
-  test("applies fontSize-checkbox-Table theme variable to checkbox wrapper",
-    async ({ initTestBed, page }) => {
-      await initTestBed(`
+  test("applies fontSize-checkbox-Table theme variable to checkbox wrapper", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
         <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
           <Column bindTo="name" header="Name"/>
         </Table>
-      `, {
+      `,
+      {
         testThemeVars: { "fontSize-checkbox-Table": "24px" },
-      });
+      },
+    );
 
-      const checkboxWrapper = page.locator('[aria-label="Select all rows"]').first();
-      await expect(checkboxWrapper).toHaveCSS("font-size", "24px");
-    }
-  );
-
+    const checkboxWrapper = page.locator('[aria-label="Select all rows"]').first();
+    await expect(checkboxWrapper).toHaveCSS("font-size", "24px");
+  });
 });
 
 // =============================================================================
@@ -2418,7 +2546,10 @@ test.describe("Cell Vertical Alignment", () => {
     await expect(dataCell).toHaveClass(/alignTop/);
   });
 
-  test("applies bottom alignment when cellVerticalAlign='bottom'", async ({ initTestBed, page }) => {
+  test("applies bottom alignment when cellVerticalAlign='bottom'", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="bottom" testId="table">
         <Column bindTo="name" header="Name"/>
@@ -2435,7 +2566,10 @@ test.describe("Cell Vertical Alignment", () => {
     await expect(dataCell).toHaveClass(/alignBottom/);
   });
 
-  test("applies center alignment when cellVerticalAlign='center'", async ({ initTestBed, page }) => {
+  test("applies center alignment when cellVerticalAlign='center'", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' cellVerticalAlign="center" testId="table">
         <Column bindTo="name" header="Name"/>
@@ -2562,7 +2696,10 @@ test.describe("Column Alignment", () => {
       await expect(firstCell).toHaveCSS("text-align", "start");
     });
 
-    test("works with other layout properties like backgroundColor", async ({ initTestBed, page }) => {
+    test("works with other layout properties like backgroundColor", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Table data='{${JSON.stringify(sampleData)}}' testId="table">
           <Column bindTo="name" header="Name"/>
@@ -2706,8 +2843,8 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       // Press the platform-appropriate key: Cmd+A on macOS, Ctrl+A elsewhere
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
 
       await expect.poll(testStateDriver.testState).toEqual({
@@ -2738,8 +2875,8 @@ test.describe("Keyboard Shortcuts", () => {
       await firstRow.click();
 
       // Press the platform-appropriate key
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
 
       const result = await testStateDriver.testState();
@@ -2772,7 +2909,10 @@ test.describe("Keyboard Shortcuts", () => {
       await expect.poll(testStateDriver.testState).not.toEqual("selectAll triggered");
     });
 
-    test("automatically selects all items before calling event handler", async ({ initTestBed, page }) => {
+    test("automatically selects all items before calling event handler", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -2793,8 +2933,8 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       // Press the platform-appropriate key
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
       await page.waitForTimeout(100);
 
@@ -2805,7 +2945,7 @@ test.describe("Keyboard Shortcuts", () => {
       expect(result.selectedIds).toHaveLength(sampleData.length);
 
       // Verify all sample data IDs are in the selected IDs
-      sampleData.forEach(item => {
+      sampleData.forEach((item) => {
         expect(result.selectedIds).toContain(String(item.id));
       });
     });
@@ -2877,8 +3017,8 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
 
       await expect.poll(testStateDriver.testState).toEqual({
@@ -2906,8 +3046,8 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
 
       const result = await testStateDriver.testState();
@@ -2929,8 +3069,8 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
-      const isMac = process.platform === 'darwin';
-      const cutKey = isMac ? 'Meta+X' : 'Control+X';
+      const isMac = process.platform === "darwin";
+      const cutKey = isMac ? "Meta+X" : "Control+X";
       await page.keyboard.press(cutKey);
 
       await expect.poll(testStateDriver.testState).toEqual({
@@ -2957,8 +3097,8 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === 'darwin';
-      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      const isMac = process.platform === "darwin";
+      const pasteKey = isMac ? "Meta+V" : "Control+V";
       await page.keyboard.press(pasteKey);
 
       const result = await testStateDriver.testState();
@@ -2990,8 +3130,8 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === 'darwin';
-      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      const isMac = process.platform === "darwin";
+      const pasteKey = isMac ? "Meta+V" : "Control+V";
       await page.keyboard.press(pasteKey);
 
       // App-level handler must NOT count this as unhandled, because Table
@@ -3052,7 +3192,10 @@ test.describe("Keyboard Shortcuts", () => {
   });
 
   test.describe("context data structure", () => {
-    test("provides complete context with selection, focusedRow, and focusedCell", async ({ initTestBed, page }) => {
+    test("provides complete context with selection, focusedRow, and focusedCell", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3074,8 +3217,8 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
 
       const result = await testStateDriver.testState();
@@ -3110,8 +3253,8 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
 
       const result = await testStateDriver.testState();
@@ -3124,7 +3267,10 @@ test.describe("Keyboard Shortcuts", () => {
   });
 
   test.describe("integration with row selection", () => {
-    test("keyboard shortcuts work alongside arrow key navigation", async ({ initTestBed, page }) => {
+    test("keyboard shortcuts work alongside arrow key navigation", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3146,17 +3292,20 @@ test.describe("Keyboard Shortcuts", () => {
       await page.waitForTimeout(50);
 
       // Use keyboard shortcut
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
 
       const result = await testStateDriver.testState();
       expect(result.action).toBe("copy");
       // focusedName should either be a string or undefined
-      expect(['string', 'undefined']).toContain(typeof result.focusedName);
+      expect(["string", "undefined"]).toContain(typeof result.focusedName);
     });
 
-    test("Space key for selection still works after keyboard shortcuts", async ({ initTestBed, page }) => {
+    test("Space key for selection still works after keyboard shortcuts", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3170,8 +3319,8 @@ test.describe("Keyboard Shortcuts", () => {
       `);
 
       // First use a keyboard shortcut (this might not do anything if no onSelectAll handler)
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
       await page.waitForTimeout(50);
 
@@ -3187,7 +3336,10 @@ test.describe("Keyboard Shortcuts", () => {
   });
 
   test.describe("event prevention", () => {
-    test("prevents default browser behavior for handled shortcuts", async ({ initTestBed, page }) => {
+    test("prevents default browser behavior for handled shortcuts", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3201,8 +3353,8 @@ test.describe("Keyboard Shortcuts", () => {
       `);
 
       // CmdOrCtrl+A should be handled by our handler and prevented
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
 
       await expect.poll(testStateDriver.testState).toEqual("handled");
@@ -3210,7 +3362,10 @@ test.describe("Keyboard Shortcuts", () => {
   });
 
   test.describe("rowsSelectable guard", () => {
-    test("does not trigger onSelectAll when rowsSelectable is false", async ({ initTestBed, page }) => {
+    test("does not trigger onSelectAll when rowsSelectable is false", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3227,8 +3382,8 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       // Press the platform-appropriate key
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
       await page.waitForTimeout(100);
 
@@ -3237,7 +3392,10 @@ test.describe("Keyboard Shortcuts", () => {
       expect(state).toBeNull();
     });
 
-    test("does not trigger onDelete when rowsSelectable is false", async ({ initTestBed, page }) => {
+    test("does not trigger onDelete when rowsSelectable is false", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3277,8 +3435,8 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === 'darwin';
-      const copyKey = isMac ? 'Meta+C' : 'Control+C';
+      const isMac = process.platform === "darwin";
+      const copyKey = isMac ? "Meta+C" : "Control+C";
       await page.keyboard.press(copyKey);
       await page.waitForTimeout(100);
 
@@ -3303,8 +3461,8 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === 'darwin';
-      const cutKey = isMac ? 'Meta+X' : 'Control+X';
+      const isMac = process.platform === "darwin";
+      const cutKey = isMac ? "Meta+X" : "Control+X";
       await page.keyboard.press(cutKey);
       await page.waitForTimeout(100);
 
@@ -3329,8 +3487,8 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === 'darwin';
-      const pasteKey = isMac ? 'Meta+V' : 'Control+V';
+      const isMac = process.platform === "darwin";
+      const pasteKey = isMac ? "Meta+V" : "Control+V";
       await page.keyboard.press(pasteKey);
       await page.waitForTimeout(100);
 
@@ -3338,7 +3496,10 @@ test.describe("Keyboard Shortcuts", () => {
       const state = await testStateDriver.testState();
       expect(state).toEqual({ triggered: true });
     });
-    test("keyboard actions work when rowsSelectable is explicitly true", async ({ initTestBed, page }) => {
+    test("keyboard actions work when rowsSelectable is explicitly true", async ({
+      initTestBed,
+      page,
+    }) => {
       const { testStateDriver } = await initTestBed(`
         <Table
           data='{${JSON.stringify(sampleData)}}'
@@ -3354,8 +3515,8 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === 'darwin';
-      const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
+      const isMac = process.platform === "darwin";
+      const selectAllKey = isMac ? "Meta+A" : "Control+A";
       await page.keyboard.press(selectAllKey);
       await page.waitForTimeout(100);
 
@@ -3370,7 +3531,10 @@ test.describe("Keyboard Shortcuts", () => {
 // =============================================================================
 
 test.describe("Virtualization", () => {
-  test("only renders visible rows when height is constrained with large dataset", async ({ initTestBed, page }) => {
+  test("only renders visible rows when height is constrained with large dataset", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <Table
@@ -3493,7 +3657,10 @@ test.describe("Virtualization", () => {
     await expect(page.locator("td").filter({ hasText: "Item #600" }).first()).toBeVisible();
   });
 
-  test("maintains consistent total scroll height with virtualization", async ({ initTestBed, page }) => {
+  test("maintains consistent total scroll height with virtualization", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <App scrollWholePage="false">
         <Table
@@ -3608,7 +3775,7 @@ test.describe("Virtualization", () => {
 
     // Should be able to see items near the end of page 1 (around item 50)
     const visibleCells = await page.locator("td").allTextContents();
-    const hasItemsNear50 = visibleCells.some(text => {
+    const hasItemsNear50 = visibleCells.some((text) => {
       const num = parseInt(text);
       return num >= 45 && num <= 50;
     });
@@ -3719,10 +3886,7 @@ test.describe("syncWithVar property", () => {
     await expect(table.locator("input[type='checkbox']").nth(3)).not.toBeChecked();
   });
 
-  test("deselecting a row clears selectedIds in the variable", async ({
-    initTestBed,
-    page,
-  }) => {
+  test("deselecting a row clears selectedIds in the variable", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Fragment var.syncState="{{}}">
         <Table
@@ -3839,7 +4003,7 @@ test.describe("syncWithVar property", () => {
 
     // syncWithVar variable says id=2 should be selected — not initiallySelected's id=1
     await expect(table.locator("input[type='checkbox']").nth(1)).not.toBeChecked(); // id=1
-    await expect(table.locator("input[type='checkbox']").nth(2)).toBeChecked();    // id=2
+    await expect(table.locator("input[type='checkbox']").nth(2)).toBeChecked(); // id=2
   });
 
   test("invalid variable name does not crash the table and it still renders", async ({
@@ -4126,7 +4290,10 @@ test.describe("striped property", () => {
     }
   });
 
-  test("even rows (0-based index 0, 2) get evenRow class when striped is true", async ({ initTestBed, page }) => {
+  test("even rows (0-based index 0, 2) get evenRow class when striped is true", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
@@ -4140,7 +4307,10 @@ test.describe("striped property", () => {
     await expect(rows.nth(2)).toHaveClass(/evenRow/);
   });
 
-  test("odd rows (0-based index 1, 3) get oddRow class when striped is true", async ({ initTestBed, page }) => {
+  test("odd rows (0-based index 1, 3) get oddRow class when striped is true", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
@@ -4154,7 +4324,10 @@ test.describe("striped property", () => {
     await expect(rows.nth(3)).toHaveClass(/oddRow/);
   });
 
-  test("even rows do not get oddRow class; odd rows do not get evenRow class", async ({ initTestBed, page }) => {
+  test("even rows do not get oddRow class; odd rows do not get evenRow class", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
@@ -4170,45 +4343,75 @@ test.describe("striped property", () => {
     await expect(rows.nth(3)).not.toHaveClass(/evenRow/);
   });
 
-  test("backgroundColor-evenRow-Table theme var applies to even rows", async ({ initTestBed, page }) => {
-    await initTestBed(`
+  test("backgroundColor-evenRow-Table theme var applies to even rows", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
       </Table>
-    `, {
-      testThemeVars: { "backgroundColor-evenRow-Table": "rgb(200, 230, 255)" },
-    });
+    `,
+      {
+        testThemeVars: { "backgroundColor-evenRow-Table": "rgb(200, 230, 255)" },
+      },
+    );
 
     // Even rows (index 0, 2) should use the theme color
-    await expect(page.locator("tbody tr").nth(0)).toHaveCSS("background-color", "rgb(200, 230, 255)");
-    await expect(page.locator("tbody tr").nth(2)).toHaveCSS("background-color", "rgb(200, 230, 255)");
+    await expect(page.locator("tbody tr").nth(0)).toHaveCSS(
+      "background-color",
+      "rgb(200, 230, 255)",
+    );
+    await expect(page.locator("tbody tr").nth(2)).toHaveCSS(
+      "background-color",
+      "rgb(200, 230, 255)",
+    );
   });
 
-  test("backgroundColor-oddRow-Table theme var applies to odd rows", async ({ initTestBed, page }) => {
-    await initTestBed(`
+  test("backgroundColor-oddRow-Table theme var applies to odd rows", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
       </Table>
-    `, {
-      testThemeVars: { "backgroundColor-oddRow-Table": "rgb(255, 240, 200)" },
-    });
+    `,
+      {
+        testThemeVars: { "backgroundColor-oddRow-Table": "rgb(255, 240, 200)" },
+      },
+    );
 
     // Odd rows (index 1, 3) should use the theme color
-    await expect(page.locator("tbody tr").nth(1)).toHaveCSS("background-color", "rgb(255, 240, 200)");
-    await expect(page.locator("tbody tr").nth(3)).toHaveCSS("background-color", "rgb(255, 240, 200)");
+    await expect(page.locator("tbody tr").nth(1)).toHaveCSS(
+      "background-color",
+      "rgb(255, 240, 200)",
+    );
+    await expect(page.locator("tbody tr").nth(3)).toHaveCSS(
+      "background-color",
+      "rgb(255, 240, 200)",
+    );
   });
 
-  test("distinct even and odd colors produce alternating row backgrounds", async ({ initTestBed, page }) => {
-    await initTestBed(`
+  test("distinct even and odd colors produce alternating row backgrounds", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
       <Table data='{${JSON.stringify(sampleData)}}' striped="true" testId="table">
         <Column bindTo="name" header="Name"/>
       </Table>
-    `, {
-      testThemeVars: {
-        "backgroundColor-evenRow-Table": "rgb(220, 240, 220)",
-        "backgroundColor-oddRow-Table": "rgb(240, 220, 220)",
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-evenRow-Table": "rgb(220, 240, 220)",
+          "backgroundColor-oddRow-Table": "rgb(240, 220, 220)",
+        },
       },
-    });
+    );
 
     const rows = page.locator("tbody tr");
     await expect(rows.nth(0)).toHaveCSS("background-color", "rgb(220, 240, 220)");
@@ -4275,7 +4478,10 @@ test.describe("toggleSelectionOnClick property", () => {
     await expect(checkboxes.nth(3)).toBeChecked();
   });
 
-  test("without toggleSelectionOnClick plain click replaces selection", async ({ initTestBed, page }) => {
+  test("without toggleSelectionOnClick plain click replaces selection", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Table data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" testId="table">
         <Column bindTo="name"/>
@@ -4318,7 +4524,10 @@ test.describe("refreshOn Property", () => {
     await expect.poll(testStateDriver.testState).toEqual(2);
   });
 
-  test("does not update event handler closures when refreshOn is unchanged", async ({ initTestBed, page }) => {
+  test("does not update event handler closures when refreshOn is unchanged", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <VStack var.parentValue="1" var.refreshWatch="1">
         <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{refreshWatch}">
@@ -4341,7 +4550,10 @@ test.describe("refreshOn Property", () => {
     await expect.poll(testStateDriver.testState).toEqual("1");
   });
 
-  test("updates event handler closures if refreshOn is not provided", async ({ initTestBed, page }) => {
+  test("updates event handler closures if refreshOn is not provided", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <VStack var.parentValue="1">
         <Table data="{[{id: 1, name: 'Row A' }]}">
@@ -4362,5 +4574,52 @@ test.describe("refreshOn Property", () => {
     await btn.click();
     await txt.click();
     await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+});
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Regression", () => {
+  test("table inside HStack > VStack does not shrink continuously on initial render", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Regression: when star-sized columns' widths sum to less than clientWidth (due to
+    // Math.floor rounding and the -1 offset), the parent flex container shrank on each
+    // render, triggering the ResizeObserver again and causing an infinite shrink loop.
+    await initTestBed(`
+      <HStack>
+        <VStack>
+          <Table testId="table" data='{[
+            { id: 0, name: "Apples",  quantity: 5,   unit: "pieces" },
+            { id: 1, name: "Bananas", quantity: 6,   unit: "pieces" },
+            { id: 2, name: "Carrots", quantity: 100, unit: "grams"  }
+          ]}'>
+            <Column bindTo="name"/>
+            <Column bindTo="quantity"/>
+            <Column bindTo="unit"/>
+          </Table>
+        </VStack>
+      </HStack>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Measure the table wrapper width after initial render has settled
+    const initialBox = await table.boundingBox();
+    expect(initialBox).not.toBeNull();
+    const initialWidth = initialBox!.width;
+    expect(initialWidth).toBeGreaterThan(0);
+
+    // Wait long enough for any layout-feedback loop to have run several iterations
+    await page.waitForTimeout(500);
+
+    // The width must not have shrunk
+    const finalBox = await table.boundingBox();
+    expect(finalBox).not.toBeNull();
+    expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
   });
 });
