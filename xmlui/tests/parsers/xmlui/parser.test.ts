@@ -1,7 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  ErrCodesParser,
-} from "../../../src/parsers/xmlui-parser/diagnostics";
+import { ErrCodesParser } from "../../../src/parsers/xmlui-parser/diagnostics";
 import { findTokenAtOffset } from "../../../src/parsers/xmlui-parser/utils";
 import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
@@ -705,10 +703,118 @@ describe("Xmlui parser - expected parser errors", () => {
     const { errors } = parseSource("<App xmlns:ns='bad-scheme:foo'/>");
     expect(errors[0].code).toBe(ErrCodesParser.nsSchemeIncorrect);
   });
+
+  it("empty source triggers singleRootElem", () => {
+    const { errors } = parseSource("");
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+  });
+
+  it("compound component with only comment child triggers compDefNesedElem", () => {
+    const { errors } = parseSource("<Component name='MyComp'><!-- comment--></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+  });
+
+  it("variable helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><variable/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("variable helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><variable name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("property helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><property name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("template helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><template blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("template helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><template/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("template helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><template name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("event helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><event blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("event helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><event/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("event helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><event name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("method helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><method blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("method helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><method></method></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("method helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><method name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("uses helper rejects non-value attributes alongside value", () => {
+    const { errors } = parseSource("<Stack><uses x='a' value='b'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.usesValueOnly);
+  });
+
+  it("global helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><global/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("global helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><global name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("global element in compound component triggers globalNotAllowedInComponent", () => {
+    const { errors } = parseSource(
+      "<Component name='Counter'><global name='x' value='{0}'/><Button/></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.globalNotAllowedInComponent);
+  });
+
+  it("global.* attribute in compound component triggers globalNotAllowedInComponent", () => {
+    const { errors } = parseSource(
+      "<Component name='Counter' global.x='{0}'><Button/></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.globalNotAllowedInComponent);
+  });
 });
 
 describe("Xmlui parser - child nodes", () => {
   describe("remove StringLiterals from ContentListNode-s", () => {
+    it("loaders allowed as children of CompoundComponent's child nodes", () => {
+      const { errors } = parseSource(`<Component name='A'>
+        <Stack>
+          <loaders />
+        </Stack>
+      </Component>`);
+      expect(errors).toHaveLength(0);
+    });
+
     it("TextNode parsed for quoted content", () => {
       const { node, getText } = parseSource(`<Stack>" hello "</Stack>`);
       const rootElem = node.children![0];
