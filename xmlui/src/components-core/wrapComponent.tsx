@@ -574,9 +574,12 @@ export function wrapComponent<TMd extends ComponentMetadata>(
 
   // Behavior-consumed props that must never be forwarded to native React components.
   // These are XMLUI framework props handled by auto-attached behaviors (formBindingBehavior,
-  // validationBehavior, etc.). Forwarding them causes React DOM warnings.
+  // validationBehavior, etc.) or ComponentAdapter. Forwarding them causes React DOM warnings.
   specialProps.add("bindTo");
   specialProps.add("onValidate");
+  // bubbleEvents is consumed by ComponentAdapter's useMouseEventHandlers and must
+  // never reach native components (it is not a valid HTML attribute).
+  specialProps.add("bubbleEvents");
 
   return createComponentRenderer(type, metadata, (context) => {
     const {

@@ -6,7 +6,7 @@ import { createChildLayoutContext } from "../../abstractions/layout-context-util
 import { MemoizedItem } from "../../components/container-helpers";
 import { useTableContext } from "./TableContext";
 import type { OurColumnMetadata } from "./TableContext";
-import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
 type Props = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];
@@ -22,6 +22,7 @@ export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
 export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
+  const stableColumnMetadata = useShallowCompareMemoize(columnMetadata);
 
   const cellLayoutContext = useMemo(
     () => createChildLayoutContext(layoutContext, { type: "TableCell" }),
@@ -30,16 +31,23 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
 
   // Use a ref so that cellRenderer stays stable and doesn't re-register columns on
   // every render. createChildLayoutContext always creates new object references, so
-  // including cellLayoutContext in useCallback deps would cause an infinite loop:
-  // new context → new cellRenderer → registerColumn → state update → re-render → repeat.
+  // including cellLayoutContext in useCallback deps would cause an infinite loop
   const cellLayoutContextRef = useRef(cellLayoutContext);
   cellLayoutContextRef.current = cellLayoutContext;
 
+  const renderChildRef = useRef(renderChild);
+  renderChildRef.current = renderChild;
+
+  const nodeChildrenRef = useRef(nodeChildren);
+  nodeChildrenRef.current = nodeChildren;
+
   const cellRenderer = useCallback(
     (row: any, rowIndex: number, colIndex: number, value: any) => {
+      const childrenToRender = nodeChildrenRef.current;
+      if (!childrenToRender) return null;
       return (
         <MemoizedItem
-          node={nodeChildren!}
+          node={childrenToRender}
           contextVars={{
             $item: row,
             $rowIndex: rowIndex,
@@ -48,27 +56,28 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
             $itemIndex: rowIndex,
             $cell: value,
           }}
-          renderChild={renderChild}
+          renderChild={renderChildRef.current}
           layoutContext={cellLayoutContextRef.current}
         />
       );
     },
-    [nodeChildren, renderChild],
+    [],
   );
 
+  const hasChildren = !!nodeChildren;
   const safeCellRenderer = useMemo(() => {
-    return nodeChildren ? cellRenderer : undefined;
-  }, [cellRenderer, nodeChildren]);
+    return hasChildren ? cellRenderer : undefined;
+  }, [cellRenderer, hasChildren]);
 
   useIsomorphicLayoutEffect(() => {
     registerColumn(
       {
-        ...columnMetadata,
+        ...stableColumnMetadata,
         cellRenderer: safeCellRenderer,
       },
       id,
     );
-  }, [columnMetadata, id, registerColumn, safeCellRenderer]);
+  }, [stableColumnMetadata, id, registerColumn, safeCellRenderer]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {

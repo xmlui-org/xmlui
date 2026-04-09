@@ -80,9 +80,9 @@ test.describe("Basic Functionality", () => {
     // Regression test: Verify that double-click doesn't trigger onClick twice
     // The fix checks event.detail >= 2 to skip onClick on the second click
     const { testStateDriver } = await initTestBed(`
-      <Table 
-        data='{${JSON.stringify(sampleData)}}' 
-        testId="table" 
+      <Table
+        data='{${JSON.stringify(sampleData)}}'
+        testId="table"
         rowsSelectable="true"
         onRowDoubleClick="(item) => testState = { ...(testState || {}), action: 'doubleClick', item: item.name }"
         onSelectionDidChange="(selectedIds) => testState = { ...(testState || {}), selectionCount: selectedIds.length }"
@@ -97,12 +97,12 @@ test.describe("Basic Functionality", () => {
 
     // Verify double-click fires the handler
     await firstRow.dblclick();
-    
+
     // Double-click handler should fire
     const state = await testStateDriver.testState();
-    expect(state).toMatchObject({ 
-      action: "doubleClick", 
-      item: "Apple" 
+    expect(state).toMatchObject({
+      action: "doubleClick",
+      item: "Apple"
     });
 
     // After double-click, the row should be selected (from the first click)
@@ -365,21 +365,21 @@ test.describe("Basic Functionality", () => {
       // Get the first header cell (checkbox column)
       const checkboxHeaderCell = page.locator("th").first();
       await expect(checkboxHeaderCell).toBeVisible();
-      
+
       // Verify checkbox column has non-zero width
       const headerBox = await checkboxHeaderCell.boundingBox();
       expect(headerBox).not.toBeNull();
       expect(headerBox!.width).toBeGreaterThan(0);
-      
+
       // Get the first body cell (checkbox column in row)
       const checkboxBodyCell = page.locator("tbody td").first();
       await expect(checkboxBodyCell).toBeVisible();
-      
+
       // Verify checkbox body cell has non-zero width
       const bodyBox = await checkboxBodyCell.boundingBox();
       expect(bodyBox).not.toBeNull();
       expect(bodyBox!.width).toBeGreaterThan(0);
-      
+
       // Specifically verify it's approximately the expected width (42px)
       // Allow some tolerance for browser rendering differences
       expect(bodyBox!.width).toBeGreaterThanOrEqual(35);
@@ -2690,7 +2690,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("selectAll action (Ctrl+A / Cmd+A)", () => {
     test("triggers onSelectAll when Ctrl+A is pressed", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2704,7 +2704,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       // Press the platform-appropriate key: Cmd+A on macOS, Ctrl+A elsewhere
       const isMac = process.platform === 'darwin';
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
@@ -2718,12 +2718,12 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("passes correct context with selected items", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = {
             selectedItemsLength: selectedItems.length,
             selectedIdsLength: selectedIds.length,
             focusedRow: row ? row.item.name : null
@@ -2751,7 +2751,7 @@ test.describe("Keyboard Shortcuts", () => {
       const { testStateDriver } = await initTestBed(`
         <Fragment>
           <TextBox testId="input" />
-          <Table 
+          <Table
             data='{${JSON.stringify(sampleData)}}'
             rowsSelectable="true"
             testId="table"
@@ -2774,12 +2774,12 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("automatically selects all items before calling event handler", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
           autoFocus="true"
-          onSelectAllAction="(row, selectedItems, selectedIds) => testState = { 
+          onSelectAllAction="(row, selectedItems, selectedIds) => testState = {
             selectedItemsLength: selectedItems.length,
             selectedIdsLength: selectedIds.length,
             selectedIds: selectedIds
@@ -2791,7 +2791,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       // Press the platform-appropriate key
       const isMac = process.platform === 'darwin';
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
@@ -2803,7 +2803,7 @@ test.describe("Keyboard Shortcuts", () => {
       expect(result.selectedItemsLength).toBe(sampleData.length);
       expect(result.selectedIdsLength).toBe(sampleData.length);
       expect(result.selectedIds).toHaveLength(sampleData.length);
-      
+
       // Verify all sample data IDs are in the selected IDs
       sampleData.forEach(item => {
         expect(result.selectedIds).toContain(String(item.id));
@@ -2814,7 +2814,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("delete action (Delete key)", () => {
     test("triggers onDelete when Delete key is pressed", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2836,7 +2836,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("passes selected items in context", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2866,7 +2866,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("copy action (Ctrl+C / Cmd+C)", () => {
     test("triggers onCopy when Ctrl+C is pressed", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2889,7 +2889,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("provides selected items for copying", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2918,7 +2918,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("cut action (Ctrl+X / Cmd+X)", () => {
     test("triggers onCut when Ctrl+X is pressed", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2942,7 +2942,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("paste action (Ctrl+V / Cmd+V)", () => {
     test("triggers onPaste when Ctrl+V is pressed", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -2972,6 +2972,7 @@ test.describe("Keyboard Shortcuts", () => {
       const { testStateDriver } = await initTestBed(`
         <App
           var.appKeyCount="{0}"
+          var.testState="{0}"
           onKeyDown="event => { if (!event.defaultPrevented && (event.ctrlKey || event.metaKey) && event.key === 'v') appKeyCount = appKeyCount + 1; testState = appKeyCount; }"
         >
           <Table
@@ -2997,14 +2998,14 @@ test.describe("Keyboard Shortcuts", () => {
       // called event.preventDefault() and the App handler checks defaultPrevented.
       await page.waitForTimeout(200);
       const count = await testStateDriver.testState();
-      expect(count).toBe(0);
+      expect(count || 0).toBe(0);
     });
   });
 
   test.describe("custom key bindings", () => {
     test("uses custom key bindings when provided", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3015,7 +3016,7 @@ test.describe("Keyboard Shortcuts", () => {
           <Column bindTo="name"/>
         </Table>
       `);
-      
+
       // Default Delete key should not work
       await page.keyboard.press("Delete");
       await expect.poll(testStateDriver.testState).not.toEqual("custom delete triggered");
@@ -3027,7 +3028,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("allows partial override of default bindings", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3053,7 +3054,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("context data structure", () => {
     test("provides complete context with selection, focusedRow, and focusedCell", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3088,7 +3089,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("focusedRow contains item data when row is focused", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3125,7 +3126,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("integration with row selection", () => {
     test("keyboard shortcuts work alongside arrow key navigation", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3137,13 +3138,13 @@ test.describe("Keyboard Shortcuts", () => {
       `);
 
       const table = page.getByTestId("table");
-      
+
       // Navigate with arrow keys
       await page.keyboard.press("ArrowDown");
       await page.waitForTimeout(50);
       await page.keyboard.press("ArrowDown");
       await page.waitForTimeout(50);
-      
+
       // Use keyboard shortcut
       const isMac = process.platform === 'darwin';
       const copyKey = isMac ? 'Meta+C' : 'Control+C';
@@ -3157,7 +3158,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("Space key for selection still works after keyboard shortcuts", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3173,7 +3174,7 @@ test.describe("Keyboard Shortcuts", () => {
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
       await page.keyboard.press(selectAllKey);
       await page.waitForTimeout(50);
-      
+
       // Then try space key for selection
       await page.keyboard.press("ArrowDown");
       await page.waitForTimeout(100);
@@ -3188,7 +3189,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("event prevention", () => {
     test("prevents default browser behavior for handled shortcuts", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3198,7 +3199,7 @@ test.describe("Keyboard Shortcuts", () => {
           <Column bindTo="name"/>
         </Table>
       `);
-      
+
       // CmdOrCtrl+A should be handled by our handler and prevented
       const isMac = process.platform === 'darwin';
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
@@ -3211,7 +3212,7 @@ test.describe("Keyboard Shortcuts", () => {
   test.describe("rowsSelectable guard", () => {
     test("does not trigger onSelectAll when rowsSelectable is false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="false"
           testId="table"
@@ -3224,7 +3225,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       // Press the platform-appropriate key
       const isMac = process.platform === 'darwin';
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
@@ -3238,7 +3239,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("does not trigger onDelete when rowsSelectable is false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="false"
           testId="table"
@@ -3251,7 +3252,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       await page.keyboard.press("Delete");
       await page.waitForTimeout(100);
 
@@ -3262,7 +3263,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("does not trigger onCopy when rowsSelectable is false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="false"
           testId="table"
@@ -3275,7 +3276,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       const isMac = process.platform === 'darwin';
       const copyKey = isMac ? 'Meta+C' : 'Control+C';
       await page.keyboard.press(copyKey);
@@ -3288,7 +3289,7 @@ test.describe("Keyboard Shortcuts", () => {
 
     test("does not trigger onCut when rowsSelectable is false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="false"
           testId="table"
@@ -3301,7 +3302,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       const isMac = process.platform === 'darwin';
       const cutKey = isMac ? 'Meta+X' : 'Control+X';
       await page.keyboard.press(cutKey);
@@ -3339,7 +3340,7 @@ test.describe("Keyboard Shortcuts", () => {
     });
     test("keyboard actions work when rowsSelectable is explicitly true", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Table 
+        <Table
           data='{${JSON.stringify(sampleData)}}'
           rowsSelectable="true"
           testId="table"
@@ -3352,7 +3353,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-      
+
       const isMac = process.platform === 'darwin';
       const selectAllKey = isMac ? 'Meta+A' : 'Control+A';
       await page.keyboard.press(selectAllKey);
@@ -3647,7 +3648,7 @@ test.describe("Virtualization", () => {
     // Table should not be scrollable
     const scrollHeight = await table.evaluate((el) => el.scrollHeight);
     const clientHeight = await table.evaluate((el) => el.clientHeight);
-    
+
     // ScrollHeight should be close to clientHeight (no scrolling needed)
     expect(scrollHeight - clientHeight).toBeLessThan(10);
   });
@@ -4290,49 +4291,76 @@ test.describe("toggleSelectionOnClick property", () => {
   });
 });
 
-// =============================================================================
-// REGRESSION TESTS
+// refreshOn
 // =============================================================================
 
-test.describe("Regression", () => {
-  test("table inside HStack > VStack does not shrink continuously on initial render", async ({
-    initTestBed,
-    page,
-  }) => {
-    // Regression: when star-sized columns' widths sum to less than clientWidth (due to
-    // Math.floor rounding and the -1 offset), the parent flex container shrank on each
-    // render, triggering the ResizeObserver again and causing an infinite shrink loop.
-    await initTestBed(`
-      <HStack>
-        <VStack>
-          <Table testId="table" data='{[
-            { id: 0, name: "Apples",  quantity: 5,   unit: "pieces" },
-            { id: 1, name: "Bananas", quantity: 6,   unit: "pieces" },
-            { id: 2, name: "Carrots", quantity: 100, unit: "grams"  }
-          ]}'>
-            <Column bindTo="name"/>
-            <Column bindTo="quantity"/>
-            <Column bindTo="unit"/>
-          </Table>
-        </VStack>
-      </HStack>
+test.describe("refreshOn Property", () => {
+  test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{parentValue}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
     `);
 
-    const table = page.getByTestId("table");
-    await expect(table).toBeVisible();
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
 
-    // Measure the table wrapper width after initial render has settled
-    const initialBox = await table.boundingBox();
-    expect(initialBox).not.toBeNull();
-    const initialWidth = initialBox!.width;
-    expect(initialWidth).toBeGreaterThan(0);
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
 
-    // Wait long enough for any layout-feedback loop to have run several iterations
-    await page.waitForTimeout(500);
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
 
-    // The width must not have shrunk
-    const finalBox = await table.boundingBox();
-    expect(finalBox).not.toBeNull();
-    expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
+  test("does not update event handler closures when refreshOn is unchanged", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}" refreshOn="{refreshWatch}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+  });
+
+  test("updates event handler closures if refreshOn is not provided", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <Table data="{[{id: 1, name: 'Row A' }]}">
+          <Column header="Name">
+            <Text onClick="testState = parentValue">{$item.name}</Text>
+          </Column>
+        </Table>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Row A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
   });
 });

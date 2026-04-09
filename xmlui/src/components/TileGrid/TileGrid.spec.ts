@@ -847,3 +847,162 @@ test.describe("toggleSelectionOnClick property", () => {
     await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
   });
 });
+
+// =============================================================================
+// STEP 10: onContextMenu event
+// =============================================================================
+
+test.describe("onContextMenu event", () => {
+  const sampleData = [
+    { id: 1, name: "Apple", category: "Fruit" },
+    { id: 2, name: "Banana", category: "Fruit" },
+  ];
+
+  test("fires onContextMenu event on right-click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = 'context-menu-fired'"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const firstTile = page.getByRole("gridcell").first();
+    await expect(firstTile).toBeVisible();
+    await firstTile.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
+  test("provides $item context variable with tile data", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = $item"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const secondTile = page.getByRole("gridcell").nth(1);
+    await secondTile.click({ button: "right" });
+
+    const result = await testStateDriver.testState();
+    expect(result.id).toEqual(2);
+    expect(result.name).toEqual("Banana");
+    expect(result.category).toEqual("Fruit");
+  });
+
+  test("provides $itemIndex context variable with tile index", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = $itemIndex"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const secondTile = page.getByRole("gridcell").nth(1);
+    await secondTile.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+});
+
+
+// =============================================================================
+// refreshOn
+// =============================================================================
+
+test.describe("refreshOn Property", () => {
+  test("updates event handler closures when refreshOn changes", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+          refreshOn="{parentValue}"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+
+  test("does not update event handler closures when refreshOn is unchanged", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1" var.refreshWatch="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+          refreshOn="{refreshWatch}"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+  });
+
+  test("updates event handler closures if refreshOn is not provided (historic behavior)", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <VStack var.parentValue="1">
+        <TileGrid
+          data="{[{id: 1, name: 'Tile A' }]}"
+          itemWidth="100px"
+          itemHeight="100px"
+        >
+          <Text onClick="testState = parentValue">{$item.name}</Text>
+        </TileGrid>
+        <Button onClick="parentValue = 2" id="btn" label="Change" />
+      </VStack>
+    `);
+
+    const txt = page.getByText("Tile A");
+    const btn = page.getByTestId("btn");
+
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual("1");
+
+    await btn.click();
+    await txt.click();
+    await expect.poll(testStateDriver.testState).toEqual(2);
+  });
+});

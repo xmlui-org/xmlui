@@ -107,6 +107,7 @@ export type TileGridProps = {
   hideSelectionCheckboxes?: boolean;
   idKey?: string;
   itemUserSelect?: string;
+  renderVersion?: number;
   itemRenderer?: (item: any, index: number, count: number, selected: boolean) => ReactNode;
   onSelectionDidChange?: AsyncFunction;
   onItemDoubleClick?: AsyncFunction;
@@ -115,6 +116,7 @@ export type TileGridProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   onSelectAllAction?: AsyncFunction;
+  onContextMenuItem?: (item: any, index: number, event: React.MouseEvent) => void;
   updateState?: (state: Record<string, unknown>) => void;
   registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
@@ -172,6 +174,7 @@ export const TileGridNative = memo(
       onPasteAction,
       onDeleteAction,
       onSelectAllAction,
+      onContextMenuItem,
       itemRenderer,
       registerComponentApi,
       style,
@@ -348,6 +351,13 @@ export const TileGridNative = memo(
           return;
         }
 
+        // Modifier-only keys match no tile-grid action. Stop propagation to prevent
+        // bubbling to Main.xmlui → runCodeAsync → cloneDeep(state) → ~160ms per key-repeat.
+        if (event.key === "Control" || event.key === "Meta" || event.key === "Shift" || event.key === "Alt") {
+          event.stopPropagation();
+          return;
+        }
+
         // --- Space: toggle selection of the focused tile without moving focus
         if (event.key === " " && focusedTileIndex >= 0) {
           event.preventDefault();
@@ -472,6 +482,11 @@ export const TileGridNative = memo(
                       onDoubleClick={
                         onItemDoubleClick
                           ? () => onItemDoubleClick(item)
+                          : undefined
+                      }
+                      onContextMenu={
+                        onContextMenuItem
+                          ? (event) => { onContextMenuItem(item, globalIndex, event); }
                           : undefined
                       }
                     >

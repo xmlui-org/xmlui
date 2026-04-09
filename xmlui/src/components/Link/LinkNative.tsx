@@ -182,9 +182,9 @@ export const LinkNative = forwardRef(function LinkNative(
     <Node
       {...anchorProps}
       ref={forwardedRef as any}
-      // This line is needed to make download work with Link
+      // reloadDocument is a react-router-dom <Link>-only prop; omit it for plain divs.
       // Ref: https://v2.remix.run/docs/components/link#reloaddocument
-      reloadDocument={anchorProps.download !== undefined}
+      {...(to ? { reloadDocument: anchorProps.download !== undefined } : {})}
       to={smartTo}
       target={target}
       onClick={onClick}

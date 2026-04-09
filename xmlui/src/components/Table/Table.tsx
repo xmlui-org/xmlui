@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo, useId } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -15,6 +15,7 @@ import {
   dContextMenu,
   dInternal,
 } from "../metadata-helpers";
+import { useEvent } from "../../components-core/utils/misc";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -301,6 +302,12 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
+    refreshOn: d(
+      `An expression whose value change forces all table rows and cells to re-render. ` +
+        `Use this to ensure that closure variables bound in row or cell templates are updated when ` +
+        `global state changes (e.g. \`{selectMode}\`). Without this, virtualized rows might retain ` +
+        `stale references to global variables for performance reasons.`,
+    ),
     headerUserSelect: {
       description: `This property controls whether users can select text within table headers.`,
       valueType: "string",
@@ -572,38 +579,84 @@ const TableWithColumns = memo(
     ) => {
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
       const data = extractValue(node.props.items) || extractValue(node.props.data);
+
+      const refreshOn = extractValue(node.props.refreshOn);
+      const renderVersionRef = useRef(0);
+      const prevRefreshOnRef = useRef(refreshOn);
+
+      const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+      if (shouldForceRefresh) {
+        prevRefreshOnRef.current = refreshOn;
+        renderVersionRef.current++;
+      }
+
       const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
       const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
       const columnIdsRef = useRef([]);
       const [tableKey, setTableKey] = useState(0);
+
+      // Keep lookupAction stable across renders so the sync adapter closure always calls the latest version.
+      const lookupActionRef = useRef(lookupAction);
+      lookupActionRef.current = lookupAction;
+
+      // Stable delegates to prevent React.memo busts on TableNative.
+      const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
+      const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
+      const stableWillSort = useEvent((...args: any[]) => lookupEventHandler("willSort")?.(...args));
+      const stableRowDoubleClick = useEvent((...args: any[]) => lookupEventHandler("rowDoubleClick")?.(...args));
+      const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
+      const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
+      const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
+      const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
+      const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
+      const stableLookupEventHandler = useEvent((...args: Parameters<typeof lookupEventHandler>) => lookupEventHandler(...args));
+
+      const rowDisabledPredicate = node.props.rowDisabledPredicate;
+      const stableRowDisabledPredicate = useEvent((item: any) => lookupSyncCallback(rowDisabledPredicate)?.(item));
+      const rowUnselectablePredicate = node.props.rowUnselectablePredicate;
+      const stableRowUnselectablePredicate = useEvent((item: any) => lookupSyncCallback(rowUnselectablePredicate)?.(item));
+
       const tableContextValue = useMemo(() => {
         return {
           registerColumn: (column: OurColumnMetadata, id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                const existing = draft.findIndex((colId) => colId === id);
-                if (existing < 0) {
-                  draft.push(id);
+            setColumnIds((prev) => {
+              if (prev.includes(id)) return prev;
+              return [...prev, id];
+            });
+            setColumnByIds((prev) => {
+              const prevCol = prev[id];
+              // Even if it's the exact same object by reference, or same content, we only
+              // want to bail out if we don't need to change state.
+              if (prevCol === column) return prev;
+              if (prevCol) {
+                const prevKeys = Object.keys(prevCol);
+                const nextKeys = Object.keys(column);
+                if (prevKeys.length === nextKeys.length) {
+                  let isSame = true;
+                  for (let i = 0; i < prevKeys.length; i++) {
+                    const key = prevKeys[i];
+                    if ((prevCol as any)[key] !== (column as any)[key]) {
+                      isSame = false;
+                      break;
+                    }
+                  }
+                  if (isSame) return prev;
                 }
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                draft[id] = column;
-              }),
-            );
+              }
+              return { ...prev, [id]: column };
+            });
           },
           unRegisterColumn: (id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                return draft.filter((colId) => colId !== id);
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                delete draft[id];
-              }),
-            );
+            setColumnIds((prev) => {
+              if (!prev.includes(id)) return prev;
+              return prev.filter((colId) => colId !== id);
+            });
+            setColumnByIds((prev) => {
+              if (!(id in prev)) return prev;
+              const next = { ...prev };
+              delete next[id];
+              return next;
+            });
           },
         };
       }, []);
@@ -624,10 +677,13 @@ const TableWithColumns = memo(
         };
       }, []);
 
-      const columns = useMemo(
-        () => columnIds.map((colId) => columnsByIds[colId]),
-        [columnIds, columnsByIds],
-      );
+      const columns = useMemo(() => {
+        const result = new Array(columnIds.length);
+        for (let i = 0; i < columnIds.length; i++) {
+          result[i] = columnsByIds[columnIds[i]];
+        }
+        return result;
+      }, [columnIds, columnsByIds]);
 
       const selectionContext = useSelectionContext();
 
@@ -644,12 +700,18 @@ const TableWithColumns = memo(
       const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
       const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
 
-      // Keep lookupAction current without breaking the stable adapter reference.
-      const lookupActionRef = useRef(lookupAction);
-      lookupActionRef.current = lookupAction;
+      const pendingOwnWriteRef = useRef(false);
+      // Version counter for own-write detection.
+      // Each write embeds a monotonically-increasing __v number in the stored object.
+      // We compare this primitive on read-back — reliable even when XMLUI does not
+      // preserve inner array references across state evaluations.
+      const pendingOwnWriteVersionRef = useRef<number>(0);
+      const ownWriteCountRef = useRef<number>(0);
+      const pendingOwnWrite = pendingOwnWriteRef.current;
+      pendingOwnWriteRef.current = false; // consume immediately
 
       // Holder for the stable adapter object.
-      const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+      const syncAdapterHolderRef = useRef<{ value: any; update: any; _raw?: any; selectedIds?: any } | null>(null);
 
       let syncAdapter: any;
       if (syncVarName !== undefined) {
@@ -658,6 +720,9 @@ const TableWithColumns = memo(
           syncAdapterHolderRef.current = null;
         } else {
           const currentSyncVarValue = extractValue(`{${syncVarName}}`);
+          if (shouldForceRefresh && syncAdapterHolderRef.current) {
+             syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
+          }
           if (currentSyncVarValue != null) {
             if (!syncAdapterHolderRef.current) {
               // Create the stable adapter object once.  The update function always
@@ -665,19 +730,42 @@ const TableWithColumns = memo(
               syncAdapterHolderRef.current = {
                 value: currentSyncVarValue,
                 update: ({ selectedIds }: { selectedIds: string[] }) => {
-                  // Embed the actual value as a JSON literal so the expression is
-                  // self-contained.  We use ephemeral:true to prevent caching — the
-                  // handler string is different on every invocation.
-                  const valueJson = JSON.stringify(selectedIds);
-                  const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
-                  const handler = lookupActionRef.current?.(expr, { ephemeral: true });
-                  handler?.();
+                  pendingOwnWriteRef.current = true;
+                  const thisVersion = ++ownWriteCountRef.current;
+                  pendingOwnWriteVersionRef.current = thisVersion;
+                  const windowKey = `__tgSync_${syncVarName}`;
+                  (window as any)[windowKey] = { selectedIds, __v: thisVersion };
+                  const handler = lookupActionRef.current?.(
+                    `{${syncVarName} = window.${windowKey}}`,
+                    { ephemeral: true },
+                  );
+                  startTransition(() => {
+                    handler?.();
+                  });
                 },
               };
-            } else {
-              // Update the value in-place so useRowSelection sees the latest
-              // selectedIds while the object identity stays the same.
-              syncAdapterHolderRef.current.value = currentSyncVarValue;
+            } else if (currentSyncVarValue !== syncAdapterHolderRef.current.value) {
+              // Stable across concurrent React re-render passes: treat as own write if
+              // the inner selectedIds array is the exact same reference we wrote.
+              // XMLUI evaluates `{selectedIds: window.__tgSync_x}` and preserves the
+              // window array reference, so this O(1) check is sufficient.
+              const isOwnWrite = pendingOwnWrite ||
+                (pendingOwnWriteVersionRef.current > 0 &&
+                  currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
+
+              if (isOwnWrite) {
+                // Update value in-place — object identity is preserved, so
+                // Table (memo'd) does not re-render for this change.
+                syncAdapterHolderRef.current.value = currentSyncVarValue;
+              } else {
+                // Genuine external change — reset version sentinel so stale
+                // __v values from prior writes cannot cause false positives.
+                pendingOwnWriteVersionRef.current = 0;
+                syncAdapterHolderRef.current = {
+                  value: currentSyncVarValue,
+                  update: syncAdapterHolderRef.current.update,
+                };
+              }
             }
           } else {
             syncAdapterHolderRef.current = null;
@@ -695,6 +783,10 @@ const TableWithColumns = memo(
         () => createChildLayoutContext(layoutContext, { type: "Table" }),
         [layoutContext],
       );
+
+      const noDataRenderer = node.props.noDataTemplate
+        ? () => renderChild(node.props.noDataTemplate, tableChildLayoutContext)
+        : undefined;
 
       const tableContent = (
         <>
@@ -717,33 +809,28 @@ const TableWithColumns = memo(
             pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
             rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
             registerComponentApi={registerComponentApi}
-            noDataRenderer={
-              node.props.noDataTemplate &&
-              (() => {
-                return renderChild(node.props.noDataTemplate, tableChildLayoutContext);
-              })
-            }
+            noDataRenderer={noDataRenderer}
             hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
             loading={extractValue.asOptionalBoolean(node.props.loading)}
             isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
             headerHeight={extractValue.asSize(node.props.headerHeight)}
-            rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-            rowUnselectablePredicate={lookupSyncCallback(node.props.rowUnselectablePredicate)}
+            rowDisabledPredicate={stableRowDisabledPredicate}
+            rowUnselectablePredicate={stableRowUnselectablePredicate}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-            lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
-            sortingDidChange={lookupEventHandler("sortingDidChange")}
-            onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-            willSort={lookupEventHandler("willSort")}
-            rowDoubleClick={lookupEventHandler("rowDoubleClick")}
-            onSelectAllAction={lookupEventHandler("selectAllAction")}
-            onCutAction={lookupEventHandler("cutAction")}
-            onCopyAction={lookupEventHandler("copyAction")}
-            onPasteAction={lookupEventHandler("pasteAction")}
-            onDeleteAction={lookupEventHandler("deleteAction")}
+            lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
+            sortingDidChange={stableSortingDidChange}
+            onSelectionDidChange={stableSelectionDidChange}
+            willSort={stableWillSort}
+            rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+            onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
+            onCutAction={node.events?.cutAction ? stableCutAction : undefined}
+            onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}
+            onPasteAction={node.events?.pasteAction ? stablePasteAction : undefined}
+            onDeleteAction={node.events?.deleteAction ? stableDeleteAction : undefined}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
@@ -784,6 +871,7 @@ const TableWithColumns = memo(
             hideSelectionCheckboxes={extractValue.asOptionalBoolean(
               node.props.hideSelectionCheckboxes,
             )}
+            renderVersion={renderVersionRef.current}
             hideSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
               node.props.hideSelectionCheckboxesHeader,
             )}
