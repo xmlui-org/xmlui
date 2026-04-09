@@ -1420,6 +1420,7 @@ export const Table = forwardRef(
     }, []);
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
+    const lastMeasuredWidthRef = useRef<number | null>(null);
     const columnSizeTouched = useCallback((id: string) => {
       touchedSizesRef.current[id] = true;
     }, []);
@@ -1428,8 +1429,12 @@ export const Table = forwardRef(
       if (!tableRef.current) {
         return;
       }
-      let availableWidth = tableRef.current.clientWidth - 1;
-      // -1 to prevent horizontal scroll in scaled browsers (when you zoom in)
+      const measuredWidth = tableRef.current.clientWidth;
+      if (measuredWidth === lastMeasuredWidthRef.current) {
+        return;
+      }
+      lastMeasuredWidthRef.current = measuredWidth;
+      let availableWidth = measuredWidth;
       const widths: Record<string, number> = {};
       const columnsWithoutSize: Array<Column<RowWithOrder>> = [];
       const numberOfUnitsById: Record<string, number> = {};
@@ -1483,10 +1488,22 @@ export const Table = forwardRef(
         }
       }
 
-      // Allocate remaining space to unconstrained columns
+      // Allocate remaining space to unconstrained columns, distributing any remainder
+      // from Math.floor to the last column so the total exactly equals the available width.
+      // This prevents the column sum from undershooting clientWidth, which would cause the
+      // parent flex container to shrink and trigger an infinite resize loop.
       const finalTotalUnits = [...unitsMap.values()].reduce((s, v) => s + v, 0);
-      for (const [id, units] of unitsMap.entries()) {
-        widths[id] = Math.floor(remaining * (units / (finalTotalUnits || 1)));
+      const unitsEntries = [...unitsMap.entries()];
+      let allocatedToUnconstrained = 0;
+      for (let i = 0; i < unitsEntries.length; i++) {
+        const [id, units] = unitsEntries[i];
+        if (i < unitsEntries.length - 1) {
+          widths[id] = Math.floor(remaining * (units / (finalTotalUnits || 1)));
+          allocatedToUnconstrained += widths[id];
+        } else {
+          // Last unconstrained column absorbs the remainder so sum = remaining exactly
+          widths[id] = remaining - allocatedToUnconstrained;
+        }
       }
       for (const [id, w] of constrainedWidths.entries()) {
         widths[id] = w;
@@ -1504,6 +1521,8 @@ export const Table = forwardRef(
     useResizeObserver(tableRef, recalculateStarSizes);
 
     useIsomorphicLayoutEffect(() => {
+      // Reset cached width so columns are recalculated when the column set changes
+      lastMeasuredWidthRef.current = null;
       queueMicrotask(() => {
         recalculateStarSizes();
       });

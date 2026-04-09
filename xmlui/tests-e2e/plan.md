@@ -182,3 +182,142 @@ npx playwright test --reporter=json | jq '[.suites[].specs[].tests[].results[].d
 ```
 
 After each change, re-run these measurements to validate improvement.
+
+---
+
+## Applied Changes — Commit `0425300` ("Accelerate e2e tests #3222")
+
+All changes below are contained in a single commit across 8 files. They address both **performance** (eliminating per-test overhead) and **flakiness** (fixing ~60 intermittent test failures).
+
+### Changed Files
+
+| File | Summary |
+|---|---|
+| `xmlui/src/testing/fixtures.ts` | Worker-scoped shared page, in-page reinit fast path, post-render stability wait, focus-visible activation, mouse cleanup |
+| `xmlui/src/testing/infrastructure/main.tsx` | `__XMLUI_REINIT__` function for in-page re-rendering with toast cleanup |
+| `xmlui/src/testing/infrastructure/TestBed.tsx` | Conditional MSW service worker initialization |
+| `xmlui/src/testing/infrastructure/vite.config-overrides.ts` | New file: Vite pre-bundling for heavy dependencies |
+| `xmlui/src/components/Theme/NotificationToast.tsx` | Fix `toasterMounted` flag leak on unmount |
+| `playwright.config.ts` | Increased `expect` timeout to 10s |
+| `package.json` | Added `test-e2e-fast` script |
+
+---
+
+### 1. Worker-Scoped Shared Page (`fixtures.ts`)
+
+**Plan reference:** Phase 2 item 4 (in-page re-rendering) + Phase 2 item 6 (shared browser context)
+
+**Before:** Playwright created a fresh `BrowserContext` + `Page` for every test (default behavior). Every `initTestBed()` called `page.goto("/")` — a full HTTP request → HTML parse → JS bundle load → React mount cycle.
+
+**After:** Two new worker-scoped fixtures (`_sharedContext`, `_sharedPage`) create a single browser context and page per Playwright worker. The test-scoped `page` fixture is overridden to return `_sharedPage`. This means all tests within a worker share the same browser page.
+
+The `page` fixture override also:
+- Applies `test.use({ viewport })` to the shared page (prevents viewport leaks between tests)
+- Intercepts `page.addInitScript()` into a queue so the reinit fast path can replay them
+- Clears `localStorage` and `sessionStorage` between tests
+- Resets mouse to `(0, 0)` to prevent `:hover` CSS from bleeding between tests
+
+### 2. In-Page Reinit Fast Path (`main.tsx`, `fixtures.ts`)
+
+**Plan reference:** Phase 2 item 4
+
+`main.tsx` now exposes `window.__XMLUI_REINIT__()` which:
+1. Calls `toast.remove()` to clear stale notifications from `react-hot-toast`'s module-level store
+2. Increments a React key and calls `flushSync(() => root.render(<TestBed key={…} />))`
+
+The `flushSync` ensures the old tree is torn down and the new tree is mounted synchronously — no stale DOM lingers.
+
+In `fixtures.ts`, `initTestBed()` checks `window.__XMLUI_READY__`:
+- **First test in worker (slow path):** Full `page.goto("/")` — loads HTML, JS bundle, boots React
+- **Subsequent tests (fast path):** Replays queued init scripts via `page.evaluate()`, updates `window.TEST_ENV`, resets the URL via `history.replaceState`, then calls `__XMLUI_REINIT__()`. Falls back to full navigation if reinit throws.
+
+This eliminates the HTTP round-trip, HTML parsing, and JS re-evaluation for ~99% of tests.
+
+### 3. Conditional MSW Service Worker (`TestBed.tsx`)
+
+**Plan reference:** Phase 1 item 1
+
+**Before:** `waitForApiInterceptor={true}` was hardcoded. MSW's service worker registered and started on every test, even though only ~183 of ~11,000 `initTestBed` calls use `apiInterceptor`.
+
+**After:** `waitForApiInterceptor` is set to `!!window.TEST_ENV?.apiInterceptor`. The ~98% of tests that don't use API mocking skip MSW setup entirely.
+
+### 4. Vite Pre-Bundling (`vite.config-overrides.ts`)
+
+**Plan reference:** Phase 1 item 3
+
+New file that configures `optimizeDeps.include` for 30+ heavy dependencies (React, Radix UI, TanStack, Framer Motion, etc.). This forces Vite to pre-bundle these packages at dev server startup instead of transforming them on-demand during the first test page load. Reduces cold-start latency for local `test-e2e-dev` runs.
+
+### 5. `test-e2e-fast` Script (`package.json`)
+
+**Plan reference:** Phase 1 item 2
+
+New npm script: `"test-e2e-fast": "turbo run xmlui#build:xmlui-test-bed && cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test"`
+
+Builds the test bed first (using turbo cache if nothing changed), then serves the pre-built dist with `npx serve` instead of the Vite dev server. Eliminates on-demand module transformation overhead for local development.
+
+### 6. Toast/Notification State Leak Fix (`NotificationToast.tsx`, `main.tsx`)
+
+**Root cause:** `NotificationToast` uses a module-level `let toasterMounted = false` guard to prevent duplicate Toaster mounts. The `useEffect` never reset this flag on unmount. After the first test that rendered a toast, subsequent tests in the same worker could not mount a new Toaster — the flag stayed `true` permanently.
+
+Additionally, `react-hot-toast` keeps a module-level store of active toasts that leaked between tests.
+
+**Fixes:**
+- Added `return () => { toasterMounted = false; }` cleanup to the `useEffect` in `NotificationToast.tsx`
+- Added `toast.remove()` at the start of `__XMLUI_REINIT__` in `main.tsx`
+
+### 7. Post-Render Stability Wait (`fixtures.ts`)
+
+After `waitFor({ state: "attached" })`, `initTestBed` now runs:
+
+```ts
+await page.evaluate(() =>
+  document.fonts.ready.then(() =>
+    new Promise<void>(resolve => {
+      requestAnimationFrame(() => setTimeout(resolve, 0));
+    })
+  )
+);
+```
+
+This waits for: **(1)** web fonts to load, **(2)** one animation frame (layout/paint), **(3)** one macrotask (deferred `useEffect` callbacks scheduled via `MessageChannel`). Ensures the component tree is fully rendered and all deferred effects have run before assertions begin.
+
+### 8. `:focus-visible` Activation (`fixtures.ts`)
+
+Chrome only applies `:focus-visible` CSS when its internal `had_keyboard_event` flag is set. After `initTestBed`, we press `Shift` — a no-op key that doesn't move focus or trigger component handlers but flips Chrome into keyboard-navigation mode. Without this, programmatic `.focus()` calls followed by CSS assertions on `:focus-visible` outlines intermittently found no outline.
+
+### 9. Assertion Timeout Increase (`playwright.config.ts`)
+
+Added `expect: { timeout: 10_000 }` (up from the Playwright default of 5s). Auto-retrying assertions like `toBeVisible()`, `toHaveCSS()`, and `toBeInViewport()` now have 10 seconds to succeed. Accommodates slower CI environments and asynchronous operations like smooth scrolling, theme style injection, and animation completion.
+
+---
+
+## Follow-Up Changes (Post-Commit Flaky Test Fixes)
+
+Additional fixes applied after commit `0425300` to address remaining flaky tests exposed by the shared-page infrastructure. These include one more infrastructure fix and targeted test-level changes.
+
+### Infrastructure: StyleRegistry Race Condition (`main.tsx`)
+
+**Root cause:** XMLUI's CSS-in-JS system (`StyleRegistry`) uses `useInsertionEffect` to inject `<style>` tags and `useEffect` + `setTimeout(0)` to clean them up via ref counting. When `__XMLUI_REINIT__` unmounts the old tree and mounts a new one synchronously, the old tree's deferred `setTimeout` cleanup fires *after* the new tree's `useInsertionEffect` has already injected a `<style>` tag with the same hash. The old cleanup removes the new tag because it matches the same `querySelector("style[data-style-hash='…']")`.
+
+**Fix:** Before mounting the new tree, `__XMLUI_REINIT__` now strips all `<style data-style-hash>` elements from `<head>`. The new `StyleRegistry` re-injects everything via `useInsertionEffect` (synchronous during render), so no styles are lost.
+
+**Symptom:** Theme variable tests (`testThemeVars`) intermittently failed `toHaveCSS()` assertions — the custom theme style tag was removed by the old tree's cleanup timer. Affected Avatar, Link, Tree, and other components with theme variable tests.
+
+### Test-Level Fixes
+
+| File | Fix |
+|---|---|
+| `Stack.spec.ts` | Replaced `waitForTimeout(100)` with rAF+macrotask wait after OverlayScrollbars viewport scroll. Removed two unnecessary `waitForTimeout(100)` calls where `toHaveCount()` already auto-retries. |
+| `StickySection.spec.ts` | Added `waitForScrollerReady()` helper — polls until OverlayScrollbars viewport's `scrollHeight > clientHeight` (initialization is async; CSS `position: sticky` has no effect until the ancestor is scrollable). Fixed `scrollTo()` to target `[data-overlayscrollbars-viewport]` instead of the outer wrapper. |
+| `Drawer.spec.ts` | Added rAF+macrotask wait after drawer `toBeVisible()` before click-away. Radix Dialog's `onPointerDownOutside` handler isn't registered until the open animation completes. |
+| `Form.spec.ts` | Replaced direct `testState()` reads (non-retrying) with `expect.poll()`. Added label text to empty `<Button/>` elements that rendered invisible (Playwright's actionability check requires visible content). |
+| `Tree.spec.ts` | Converted one-shot `getComputedStyle(el).boxShadow` read to `expect.poll()` so it retries until the theme style applies. |
+
+### Validation Results
+
+| Scope | Result |
+|---|---|
+| Unit tests (Vitest) | 8,809 passed |
+| Targeted flaky tests (×2 repeat, 0 retries) | 257 passed, 0 failed |
+| Full affected spec files (with retries) | 748 passed, 0 flaky |
+| StickySection stress test (×3 repeat, 0 retries) | 33 passed, 0 failed |

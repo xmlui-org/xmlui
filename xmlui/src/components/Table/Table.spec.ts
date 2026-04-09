@@ -4289,3 +4289,50 @@ test.describe("toggleSelectionOnClick property", () => {
     await expect(checkboxes.nth(2)).toBeChecked();
   });
 });
+
+// =============================================================================
+// REGRESSION TESTS
+// =============================================================================
+
+test.describe("Regression", () => {
+  test("table inside HStack > VStack does not shrink continuously on initial render", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Regression: when star-sized columns' widths sum to less than clientWidth (due to
+    // Math.floor rounding and the -1 offset), the parent flex container shrank on each
+    // render, triggering the ResizeObserver again and causing an infinite shrink loop.
+    await initTestBed(`
+      <HStack>
+        <VStack>
+          <Table testId="table" data='{[
+            { id: 0, name: "Apples",  quantity: 5,   unit: "pieces" },
+            { id: 1, name: "Bananas", quantity: 6,   unit: "pieces" },
+            { id: 2, name: "Carrots", quantity: 100, unit: "grams"  }
+          ]}'>
+            <Column bindTo="name"/>
+            <Column bindTo="quantity"/>
+            <Column bindTo="unit"/>
+          </Table>
+        </VStack>
+      </HStack>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    // Measure the table wrapper width after initial render has settled
+    const initialBox = await table.boundingBox();
+    expect(initialBox).not.toBeNull();
+    const initialWidth = initialBox!.width;
+    expect(initialWidth).toBeGreaterThan(0);
+
+    // Wait long enough for any layout-feedback loop to have run several iterations
+    await page.waitForTimeout(500);
+
+    // The width must not have shrunk
+    const finalBox = await table.boundingBox();
+    expect(finalBox).not.toBeNull();
+    expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
+  });
+});
