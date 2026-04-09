@@ -150,7 +150,7 @@ export class ButtonDriver extends ComponentDriver {
 
   // NOTE: Accounts for icons being passed as children as well
   getIcons() {
-    return this.locator.locator('[data-icon-name]');
+    return this.locator.locator("[data-icon-name]");
   }
 }
 
@@ -582,7 +582,7 @@ export class FormDriver extends ComponentDriver {
     return requestPromise;
   }
 
-  getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+  waitForSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes(endpoint) && response.status() === responseStatus,
       { timeout },

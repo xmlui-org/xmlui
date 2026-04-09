@@ -122,8 +122,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             idField="nodeId"
             nameField="title"
@@ -152,8 +152,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             idField="id"
             nameField="displayName"
@@ -182,8 +182,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             idField="pk"
             nameField="label"
@@ -212,8 +212,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             idField="key"
             nameField="text"
@@ -242,8 +242,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatDataWithIcons)}}'>
             <property name="itemTemplate">
@@ -270,8 +270,8 @@ test.describe("Basic Functionality", () => {
   test("handles custom iconField mapping", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             idField="nodeId"
             nameField="title"
@@ -305,8 +305,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             iconField="icon"
             iconExpandedField="iconExpanded"
             iconCollapsedField="iconCollapsed"
@@ -338,8 +338,8 @@ test.describe("Basic Functionality", () => {
   test("handles missing icon fields gracefully", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             iconField="nonExistentIcon"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -369,8 +369,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -404,8 +404,8 @@ test.describe("Basic Functionality", () => {
 
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             selectableField="isSelectable"
             data='{${JSON.stringify(customSelectableData)}}'>
@@ -441,8 +441,8 @@ test.describe("Basic Functionality", () => {
 
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             selectableField="canSelect"
             data='{${JSON.stringify(partialSelectableData)}}'>
@@ -487,8 +487,8 @@ test.describe("Basic Functionality", () => {
 
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="id"
             nameField="title"
@@ -525,8 +525,8 @@ test.describe("Basic Functionality", () => {
 
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             selectableField="canClick"
             data='{${JSON.stringify(selectableBehaviorData)}}'>
@@ -569,8 +569,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="nodeId"
             nameField="title"
@@ -599,8 +599,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="id"
             nameField="displayName"
@@ -629,8 +629,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="pk"
             nameField="label"
@@ -659,8 +659,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="key"
             nameField="text"
@@ -689,8 +689,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             data='{${JSON.stringify(hierarchyDataWithIcons)}}'>
             <property name="itemTemplate">
@@ -720,8 +720,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="nodeId"
             nameField="title"
@@ -755,8 +755,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             iconField="icon"
             iconExpandedField="iconExpanded"
             iconCollapsedField="iconCollapsed"
@@ -791,8 +791,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             iconField="nonExistentIcon"
             data='{${JSON.stringify(hierarchyTreeData)}}'>
@@ -825,8 +825,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -864,8 +864,8 @@ test.describe("Basic Functionality", () => {
 
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(dataWithExtraProps)}}'>
             <property name="itemTemplate">
@@ -885,8 +885,8 @@ test.describe("Basic Functionality", () => {
   test("passes icon properties correctly via $item", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatDataWithIcons)}}'>
             <property name="itemTemplate">
@@ -911,8 +911,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -937,8 +937,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             idField="nodeId"
             nameField="title"
@@ -972,8 +972,8 @@ test.describe("Basic Functionality", () => {
   }) => {
     await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -1007,7 +1007,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{2}"
@@ -1062,7 +1062,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{3}"
@@ -1118,7 +1118,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{2}"
@@ -1163,7 +1163,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{2}"
@@ -1222,7 +1222,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{2}"
@@ -1282,7 +1282,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{null}"
@@ -1338,7 +1338,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="999"
@@ -1400,7 +1400,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -1480,7 +1480,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -1518,8 +1518,7 @@ test.describe("Basic Functionality", () => {
       // Verify the focus outline uses all custom theme variables
       // Note: In the current implementation, focus uses inset box-shadow rather than outline
       // but the theme variables should still be available for potential outline styling
-      const boxShadowValue = await focusedItem.evaluate((el) => getComputedStyle(el).boxShadow);
-      expect(boxShadowValue).toContain("0, 255, 0"); // Check for green color components
+      await expect(focusedItem).toHaveCSS("box-shadow", /0, 255, 0/);
     });
 
     test("combined selection and focus states work together", async ({
@@ -1537,7 +1536,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{3}"
@@ -1629,7 +1628,7 @@ test.describe("Basic Functionality", () => {
       await initTestBed(
         `
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="flat"
             defaultExpanded="all"
             selectedValue="{2}"
@@ -1696,8 +1695,8 @@ test.describe("Basic Functionality", () => {
     test("handles defaultExpanded none", async ({ initTestBed, createTreeDriver }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -1723,8 +1722,8 @@ test.describe("Basic Functionality", () => {
     test("handles defaultExpanded all", async ({ initTestBed, createTreeDriver }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -1748,8 +1747,8 @@ test.describe("Basic Functionality", () => {
     test("handles defaultExpanded first-level", async ({ initTestBed, createTreeDriver }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="first-level"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -1778,8 +1777,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             idField="pk"
             nameField="label"
             parentIdField="parent_id"
@@ -1819,8 +1818,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded='{["doc-root", "proj-web", "media-images"]}'
             data='{${JSON.stringify(multiBranchTreeData)}}'>
             <property name="itemTemplate">
@@ -1873,8 +1872,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded='{["doc-root", "proj-root", "doc-reports", "proj-web"]}'
             data='{${JSON.stringify(multiBranchTreeData)}}'>
             <property name="itemTemplate">
@@ -1926,8 +1925,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded='{["proj-web", "media-images"]}'
             data='{${JSON.stringify(multiBranchTreeData)}}'>
             <property name="itemTemplate">
@@ -1977,8 +1976,8 @@ test.describe("Basic Functionality", () => {
     test("handles expandedValues property", async ({ initTestBed, createTreeDriver }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree 
-            testId="tree" 
+          <Tree
+            testId="tree"
             dataFormat="flat"
             data='{${JSON.stringify(flatTreeData)}}'
             defaultExpanded="{[1]}"
@@ -1998,7 +1997,7 @@ test.describe("Basic Functionality", () => {
       await expect(tree.getByTestId("1")).toBeVisible();
       await expect(tree.getByTestId("2")).toBeVisible(); // Child of 1
       await expect(tree.getByTestId("3")).toBeVisible(); // Child of 1
-      
+
       // Node 4 is child of 2, not included in defaultExpanded so shouldn't be visible
       await expect(tree.getByTestId("4")).not.toBeVisible();
     });
@@ -2007,10 +2006,10 @@ test.describe("Basic Functionality", () => {
       "supports expansion toggle by chevron click",
       SKIP_REASON.TO_BE_IMPLEMENTED("Redundant with existing expand icon tests"),
       async ({ initTestBed, createTreeDriver, page }) => {
-      await initTestBed(`
+        await initTestBed(`
         <VStack height="400px">
-          <Tree 
-            testId="tree" 
+          <Tree
+            testId="tree"
             dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'
@@ -2024,27 +2023,28 @@ test.describe("Basic Functionality", () => {
         </VStack>
       `);
 
-      const tree = await createTreeDriver("tree");
+        const tree = await createTreeDriver("tree");
 
-      // Initially, only root node should be visible
-      await expect(tree.getByTestId("1")).toBeVisible();
-      await expect(tree.getByTestId("2")).not.toBeVisible();
+        // Initially, only root node should be visible
+        await expect(tree.getByTestId("1")).toBeVisible();
+        await expect(tree.getByTestId("2")).not.toBeVisible();
 
-      // Click the chevron/arrow icon to expand node 1
-      const expandIcon = page.locator("[data-tree-expand-icon]").first();
-      await expandIcon.click();
+        // Click the chevron/arrow icon to expand node 1
+        const expandIcon = page.locator("[data-tree-expand-icon]").first();
+        await expandIcon.click();
 
-      // Children should now be visible
-      await expect(tree.getByTestId("2")).toBeVisible();
-      await expect(tree.getByTestId("3")).toBeVisible();
+        // Children should now be visible
+        await expect(tree.getByTestId("2")).toBeVisible();
+        await expect(tree.getByTestId("3")).toBeVisible();
 
-      // Click chevron again to collapse
-      await expandIcon.click();
+        // Click chevron again to collapse
+        await expandIcon.click();
 
-      // Children should be hidden again
-      await expect(tree.getByTestId("2")).not.toBeVisible();
-      await expect(tree.getByTestId("3")).not.toBeVisible();
-    });
+        // Children should be hidden again
+        await expect(tree.getByTestId("2")).not.toBeVisible();
+        await expect(tree.getByTestId("3")).not.toBeVisible();
+      },
+    );
 
     test("supports expansion toggle by item click when enabled", async ({
       initTestBed,
@@ -2052,8 +2052,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree 
-            testId="tree" 
+          <Tree
+            testId="tree"
             dataFormat="flat"
             defaultExpanded="none"
             itemClickExpands="true"
@@ -2092,8 +2092,8 @@ test.describe("Basic Functionality", () => {
     test("handles autoExpandToSelection", async ({ initTestBed, createTreeDriver }) => {
       await initTestBed(`
         <VStack height="400px">
-          <Tree 
-            testId="tree" 
+          <Tree
+            testId="tree"
             dataFormat="flat"
             defaultExpanded="none"
             selectedValue="{4}"
@@ -2135,8 +2135,8 @@ test.describe("Events", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             data='{${JSON.stringify(flatTreeData)}}'
             onSelectionDidChange="event => testState = event">
             <property name="itemTemplate">
@@ -2168,8 +2168,8 @@ test.describe("Events", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="flat" 
+          <Tree testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(flatTreeData)}}'
             onSelectionDidChange="event => testState = event">
@@ -2201,7 +2201,7 @@ test.describe("Events", () => {
     test("fires after successful node expansion", async ({ initTestBed, createTreeDriver }) => {
       const { testStateDriver } = await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
+          <Tree testId="tree"
             dataFormat="hierarchy"
             itemClickExpands="true"
             data='{${JSON.stringify(hierarchyTreeData)}}'
@@ -2232,8 +2232,8 @@ test.describe("Events", () => {
     test("fires after successful node collapse", async ({ initTestBed, createTreeDriver }) => {
       const { testStateDriver } = await initTestBed(`
         <VStack height="400px">
-          <Tree testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree testId="tree"
+            dataFormat="hierarchy"
             itemClickExpands="true"
             defaultExpanded="all"
             data='{${JSON.stringify(hierarchyTreeData)}}'
@@ -2277,8 +2277,8 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
-              dataFormat="flat" 
+            <Tree testId="tree"
+              dataFormat="flat"
               data='{${JSON.stringify(flatTreeData)}}'
               onSelectionDidChange="event => testState = event">
               <property name="itemTemplate">
@@ -2313,8 +2313,8 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
-              dataFormat="flat" 
+            <Tree testId="tree"
+              dataFormat="flat"
               data='{${JSON.stringify(flatTreeData)}}'
               onSelectionDidChange="event => testState = event">
               <property name="itemTemplate">
@@ -2349,8 +2349,8 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
-              dataFormat="flat" 
+            <Tree testId="tree"
+              dataFormat="flat"
               defaultExpanded="all"
               data='{${JSON.stringify(flatTreeData)}}'
               onSelectionDidChange="event => testState = event">
@@ -2388,7 +2388,7 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
+            <Tree testId="tree"
               dataFormat="hierarchy"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidExpand="node => testState = node">
@@ -2422,7 +2422,7 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
+            <Tree testId="tree"
               dataFormat="hierarchy"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidExpand="node => testState = node">
@@ -2454,7 +2454,7 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px" var.selectionFired="false">
-            <Tree testId="tree" 
+            <Tree testId="tree"
               dataFormat="hierarchy"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidExpand="node => testState = node"
@@ -2493,8 +2493,8 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
-              dataFormat="hierarchy" 
+            <Tree testId="tree"
+              dataFormat="hierarchy"
               defaultExpanded="all"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidCollapse="node => testState = node">
@@ -2529,8 +2529,8 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px">
-            <Tree testId="tree" 
-              dataFormat="hierarchy" 
+            <Tree testId="tree"
+              dataFormat="hierarchy"
               defaultExpanded="all"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidCollapse="node => testState = node">
@@ -2569,7 +2569,7 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px" var.eventCount="0" var.lastEvent="">
-            <Tree testId="tree" 
+            <Tree testId="tree"
               dataFormat="hierarchy"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onSelectionDidChange="event => { eventCount++; lastEvent = 'selection:' + event.newNode?.id; testState = { count: eventCount, last: lastEvent }; }"
@@ -2610,7 +2610,7 @@ test.describe("Events", () => {
       }) => {
         const { testStateDriver } = await initTestBed(`
           <VStack height="400px" var.expandCount="0">
-            <Tree testId="tree" 
+            <Tree testId="tree"
               dataFormat="hierarchy"
               data='{${JSON.stringify(hierarchyTreeData)}}'
               onNodeDidExpand="node => { expandCount++; testState = expandCount; }">
@@ -3007,8 +3007,8 @@ test.describe("Accessibility", () => {
   test("has proper ARIA attributes", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
+        <Tree testId="tree"
+          dataFormat="flat"
           defaultExpanded="all"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3061,8 +3061,8 @@ test.describe("Accessibility", () => {
   test("supports keyboard navigation", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
+        <Tree testId="tree"
+          dataFormat="flat"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
             <HStack testId="{$item.id}:keyboard" verticalAlignment="center">
@@ -3114,8 +3114,8 @@ test.describe("Accessibility", () => {
   test("supports itemClickExpands behavior", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
+        <Tree testId="tree"
+          dataFormat="flat"
           itemClickExpands="true"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3156,8 +3156,8 @@ test.describe("Accessibility", () => {
   test("works with screen readers", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="400px">
-        <Tree testId="tree" 
-          dataFormat="flat" 
+        <Tree testId="tree"
+          dataFormat="flat"
           defaultExpanded="all"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3243,7 +3243,7 @@ test.describe("Theme Variables", () => {
     await initTestBed(
       `
       <VStack height="400px">
-        <Tree testId="tree" 
+        <Tree testId="tree"
           dataFormat="flat"
           defaultExpanded="all"
           data='{${JSON.stringify(flatTreeData)}}'>
@@ -3289,7 +3289,7 @@ test.describe("Theme Variables", () => {
     await initTestBed(
       `
       <VStack height="400px">
-        <Tree testId="tree" 
+        <Tree testId="tree"
           dataFormat="flat"
           defaultExpanded="all"
           data='{${JSON.stringify(flatTreeData)}}'>
@@ -3343,9 +3343,9 @@ test.describe("Edge Cases", () => {
   test("handles null/undefined data gracefully", async ({ initTestBed, createTreeDriver }) => {
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data="{null}" 
+        <Tree
+          testId="tree"
+          data="{null}"
           dataFormat="flat"
         />
       </VStack>
@@ -3364,9 +3364,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(malformedData)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(malformedData)}}'
           dataFormat="flat"
         />
       </VStack>
@@ -3386,9 +3386,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(circularData)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(circularData)}}'
           dataFormat="flat"
         />
       </VStack>
@@ -3406,9 +3406,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-      <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(duplicateIdData)}}' 
+      <Tree
+          testId="tree"
+          data='{${JSON.stringify(duplicateIdData)}}'
           dataFormat="flat"
         />
       </VStack>
@@ -3425,9 +3425,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(orphanedData)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(orphanedData)}}'
           dataFormat="flat"
         />
       </VStack>
@@ -3445,9 +3445,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(deepData)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(deepData)}}'
           dataFormat="flat"
           selectedValue="{100}"
         />
@@ -3465,9 +3465,9 @@ test.describe("Edge Cases", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(orphanedData)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(orphanedData)}}'
           dataFormat="invalid-format"
         />
       </VStack>
@@ -3492,9 +3492,9 @@ test.describe("Events", () => {
       <App var.message="Not clicked">
         <Text testId="output" value="{message}" />
         <VStack height="200px">
-          <Tree 
-            testId="tree" 
-            data='{${JSON.stringify(data)}}' 
+          <Tree
+            testId="tree"
+            data='{${JSON.stringify(data)}}'
             dataFormat="flat"
             onContextMenu="message = 'Context menu triggered'"
           />
@@ -3523,9 +3523,9 @@ test.describe("Events", () => {
     const { testStateDriver } = await initTestBed(`
       <App>
         <VStack height="200px">
-          <Tree 
-            testId="tree" 
-            data='{${JSON.stringify(data)}}' 
+          <Tree
+            testId="tree"
+            data='{${JSON.stringify(data)}}'
             dataFormat="flat"
             defaultExpanded="all"
             onContextMenu="testState = $item.id"
@@ -3541,10 +3541,10 @@ test.describe("Events", () => {
     `);
 
     const item1 = page.getByTestId("1");
-    
+
     // Right-click on the label area of item 1
     await item1.click({ button: "right" });
-    
+
     // Verify $item context was passed correctly
     await expect.poll(testStateDriver.testState).toEqual(1);
   });
@@ -3562,9 +3562,9 @@ test.describe("Events", () => {
     const { testStateDriver } = await initTestBed(`
       <App>
         <VStack height="200px">
-          <Tree 
-            testId="tree" 
-            data='{${JSON.stringify(data)}}' 
+          <Tree
+            testId="tree"
+            data='{${JSON.stringify(data)}}'
             dataFormat="flat"
             defaultExpanded="all"
             onContextMenu="testState = $item.id"
@@ -3582,7 +3582,7 @@ test.describe("Events", () => {
     // Right-click on the arrow/gutter area of item 1
     const expandIcon = page.locator("[data-tree-expand-icon]").first();
     await expandIcon.click({ button: "right" });
-    
+
     // Verify $item context was passed correctly even when clicking the arrow area
     await expect.poll(testStateDriver.testState).toEqual(1);
   });
@@ -3602,9 +3602,9 @@ test.describe("Events", () => {
     await initTestBed(
       `
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(data)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(data)}}'
           dataFormat="flat"
         >
           <property name="itemTemplate">
@@ -3654,9 +3654,9 @@ test.describe("Events", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          data='{${JSON.stringify(data)}}' 
+        <Tree
+          testId="tree"
+          data='{${JSON.stringify(data)}}'
           dataFormat="flat"
         >
           <property name="itemTemplate">
@@ -3706,9 +3706,9 @@ test.describe("Events", () => {
       `
       <App var.contextMenuVisible="false">
         <VStack height="200px">
-          <Tree 
-            testId="tree" 
-            data='{${JSON.stringify(data)}}' 
+          <Tree
+            testId="tree"
+            data='{${JSON.stringify(data)}}'
             dataFormat="flat"
             onContextMenu="contextMenuVisible = true"
           >
@@ -3747,9 +3747,9 @@ test.describe("Scroll Styling", () => {
   test("renders with scrollStyle='normal'", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="normal"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3766,9 +3766,9 @@ test.describe("Scroll Styling", () => {
   test("renders with scrollStyle='overlay'", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="overlay"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3785,9 +3785,9 @@ test.describe("Scroll Styling", () => {
   test("renders with scrollStyle='whenMouseOver'", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="whenMouseOver"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3804,9 +3804,9 @@ test.describe("Scroll Styling", () => {
   test("renders with scrollStyle='whenScrolling'", async ({ initTestBed, page }) => {
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="whenScrolling"
           data='{${JSON.stringify(flatTreeData)}}'>
           <property name="itemTemplate">
@@ -3829,9 +3829,9 @@ test.describe("Scroll Styling", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="overlay"
           showScrollerFade="true"
           data='{${JSON.stringify(tallData)}}'>
@@ -3859,9 +3859,9 @@ test.describe("Scroll Styling", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="overlay"
           showScrollerFade="true"
           data='{${JSON.stringify(tallData)}}'>
@@ -3889,9 +3889,9 @@ test.describe("Scroll Styling", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="overlay"
           showScrollerFade="true"
           data='{${JSON.stringify(tallData)}}'>
@@ -3908,7 +3908,7 @@ test.describe("Scroll Styling", () => {
     // Scroll down
     const tree = page.getByTestId("tree");
     await tree.evaluate((el) => {
-      el.querySelector('[data-overlayscrollbars-viewport]')?.scrollTo(0, 50);
+      el.querySelector("[data-overlayscrollbars-viewport]")?.scrollTo(0, 50);
     });
 
     // Wait for fade to update
@@ -3927,9 +3927,9 @@ test.describe("Scroll Styling", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="whenMouseOver"
           showScrollerFade="true"
           data='{${JSON.stringify(tallData)}}'>
@@ -3956,9 +3956,9 @@ test.describe("Scroll Styling", () => {
 
     await initTestBed(`
       <VStack height="200px">
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           scrollStyle="whenScrolling"
           showScrollerFade="true"
           data='{${JSON.stringify(tallData)}}'>
@@ -3983,10 +3983,7 @@ test.describe("Scroll Styling", () => {
 // =============================================================================
 
 test.describe("API - getVisibleItems", () => {
-  test("returns empty array when tree is empty", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("returns empty array when tree is empty", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
@@ -4022,10 +4019,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(smallData)}}'>
             <property name="itemTemplate">
@@ -4063,10 +4060,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="200px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             itemHeight="32"
             data='{${JSON.stringify(tallData)}}'>
             <property name="itemTemplate">
@@ -4088,12 +4085,12 @@ test.describe("API - getVisibleItems", () => {
 
     const visibleItems = await testStateDriver.testState();
     expect(Array.isArray(visibleItems)).toBe(true);
-    
+
     // With 200px viewport and 32px items, we should see roughly 6-8 items
     // (accounting for partial items and buffering)
     expect(visibleItems.length).toBeGreaterThan(0);
     expect(visibleItems.length).toBeLessThan(15); // Should be significantly less than 100
-    
+
     // First visible item should be near the top
     expect(visibleItems[0].id).toBeLessThanOrEqual(5);
   });
@@ -4113,10 +4110,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="200px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             itemHeight="32"
             data='{${JSON.stringify(tallData)}}'>
             <property name="itemTemplate">
@@ -4165,10 +4162,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="none"
             itemClickExpands="true"
             data='{${JSON.stringify(hierarchyTreeData)}}'>
@@ -4213,10 +4210,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4278,10 +4275,10 @@ test.describe("API - getVisibleItems", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(dataWithMetadata)}}'>
             <property name="itemTemplate">
@@ -4299,7 +4296,7 @@ test.describe("API - getVisibleItems", () => {
     await getVisibleButton.click();
 
     const visibleItems = await testStateDriver.testState();
-    
+
     // Verify each item has expected structure
     expect(visibleItems.length).toBe(3);
     visibleItems.forEach((item: any) => {
@@ -4337,10 +4334,10 @@ test.describe("API - replaceNode", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4361,7 +4358,7 @@ test.describe("API - replaceNode", () => {
     await replaceButton.click();
 
     await expect.poll(testStateDriver.testState).toBe("replaced");
-    
+
     // Verify the node name changed but ID stayed the same
     const item2 = page.getByTestId("2");
     await expect(item2).toBeVisible();
@@ -4382,10 +4379,10 @@ test.describe("API - replaceNode", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4406,16 +4403,16 @@ test.describe("API - replaceNode", () => {
     await replaceButton.click();
 
     await expect.poll(testStateDriver.testState).toBe("replaced");
-    
+
     // Verify old ID no longer exists
     const oldItem = page.getByTestId("folder1");
     await expect(oldItem).not.toBeVisible();
-    
+
     // Verify new ID exists with new name
     const newItem = page.getByTestId("renamedFolder");
     await expect(newItem).toBeVisible();
     await expect(newItem).toContainText("Renamed Folder");
-    
+
     // Verify children are still visible (expansion state was preserved)
     // The children still have their original IDs, only their parentId changed
     await expect(page.getByTestId("folder1/file1")).toBeVisible();
@@ -4441,10 +4438,10 @@ test.describe("API - replaceNode", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4465,7 +4462,7 @@ test.describe("API - replaceNode", () => {
     await replaceButton.click();
 
     await expect.poll(testStateDriver.testState).toBe("replaced");
-    
+
     // Verify the node name changed but ID stayed the same
     const item2 = page.getByTestId("2");
     await expect(item2).toBeVisible();
@@ -4491,10 +4488,10 @@ test.describe("API - replaceNode", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4515,16 +4512,16 @@ test.describe("API - replaceNode", () => {
     await replaceButton.click();
 
     await expect.poll(testStateDriver.testState).toBe("replaced");
-    
+
     // Verify old ID no longer exists
     const oldItem = page.getByTestId("folder1");
     await expect(oldItem).not.toBeVisible();
-    
+
     // Verify new ID exists with new name
     const newItem = page.getByTestId("renamedFolder");
     await expect(newItem).toBeVisible();
     await expect(newItem).toContainText("Renamed Folder");
-    
+
     // Verify children are still visible (hierarchy format doesn't use parent references)
     await expect(page.getByTestId("folder1/file1")).toBeVisible();
     await expect(page.getByTestId("folder1/file2")).toBeVisible();
@@ -4549,10 +4546,10 @@ test.describe("API - replaceNode", () => {
     await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="hierarchy" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="hierarchy"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4573,11 +4570,11 @@ test.describe("API - replaceNode", () => {
 
     // Wait for update
     await page.waitForTimeout(100);
-    
+
     // Verify root name changed
     const root = page.getByTestId("1");
     await expect(root).toContainText("Modified Root");
-    
+
     // Verify children still exist
     await expect(page.getByTestId("2")).toBeVisible();
     await expect(page.getByTestId("3")).toBeVisible();
@@ -4598,10 +4595,10 @@ test.describe("API - replaceNode", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="all"
             data='{${JSON.stringify(testData)}}'>
             <property name="itemTemplate">
@@ -4612,9 +4609,9 @@ test.describe("API - replaceNode", () => {
           </Tree>
         </VStack>
         <Button testId="replace-btn" label="Replace" onClick="
-          treeApi.replaceNode('/root/folder1', { 
-            id: '/root/renamedFolder', 
-            name: 'Renamed Folder' 
+          treeApi.replaceNode('/root/folder1', {
+            id: '/root/renamedFolder',
+            name: 'Renamed Folder'
           });
           testState = 'replaced';
         " />
@@ -4625,17 +4622,17 @@ test.describe("API - replaceNode", () => {
     await replaceButton.click();
 
     await expect.poll(testStateDriver.testState).toBe("replaced");
-    
+
     // Verify the renamed folder exists with correct name
     await expect(page.getByTestId("/root/renamedFolder")).toBeVisible();
     await expect(page.getByTestId("/root/renamedFolder")).toContainText("Renamed Folder");
-    
+
     // Verify old ID doesn't exist
     await expect(page.getByTestId("/root/folder1")).not.toBeVisible();
-    
+
     // Verify child is still visible (expansion state preserved, parentId updated)
     await expect(page.getByTestId("/root/folder1/file1")).toBeVisible();
-    
+
     // Verify other folder was not affected and is still visible
     await expect(page.getByTestId("/root/folder2")).toBeVisible();
   });
@@ -4646,17 +4643,14 @@ test.describe("API - replaceNode", () => {
 // =============================================================================
 
 test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
-  test("records timestamp when node expands", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("records timestamp when node expands", async ({ initTestBed, createButtonDriver, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <Fragment>
+      <Fragment var.expandedTimestamp="{null}" var.control="{Date.now()}" >
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4667,28 +4661,31 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
           </Tree>
         </VStack>
         <Button testId="expand-btn" onClick="treeApi.expandNode(1);" />
-        <Button testId="get-timestamp-btn" onClick="testState = treeApi.getExpandedTimestamp(1);" />
+        <Button testId="get-timestamp-btn" onClick="expandedTimestamp = treeApi.getExpandedTimestamp(1);" />
+
+        <Stack>
+            <Text testId="controlTime">{ control }</Text>
+            <Text testId="timestamp">{expandedTimestamp}</Text>
+        </Stack>
       </Fragment>
     `);
 
     const expandButton = await createButtonDriver("expand-btn");
     const getTimestampButton = await createButtonDriver("get-timestamp-btn");
-    
-    // Get timestamp before action
-    const timestampBefore = Date.now();
-    
+
     // Expand node
     await expandButton.click();
-    
+
     // Get timestamp
     await getTimestampButton.click();
-    const timestamp = await testStateDriver.testState();
-    
-    // Verify timestamp was recorded
-    expect(timestamp).toBeDefined();
-    expect(typeof timestamp).toBe("number");
-    expect(timestamp).toBeGreaterThanOrEqual(timestampBefore);
-    expect(timestamp).toBeLessThanOrEqual(Date.now());
+
+    const controlTimestamp = page.getByTestId("controlTime").filter({ hasText: /[0-9]/ });
+    const timestampLoc = page.getByTestId("timestamp").filter({ hasText: /[0-9]/ });
+
+    const control = Number(await controlTimestamp.textContent());
+    const timestamp = Number(await timestampLoc.textContent());
+
+    expect(timestamp).toBeGreaterThan(control);
   });
 
   test("returns undefined for never-expanded nodes", async ({
@@ -4698,10 +4695,10 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4717,22 +4714,19 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
 
     const checkButton = await createButtonDriver("check-btn");
     await checkButton.click();
-    
+
     const timestamp = await testStateDriver.testState();
     expect(timestamp).toBeUndefined();
   });
 
-  test("updates timestamp on re-expansion", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("updates timestamp on re-expansion", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4751,22 +4745,22 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
     const expandButton = await createButtonDriver("expand-btn");
     const collapseButton = await createButtonDriver("collapse-btn");
     const getTimestampButton = await createButtonDriver("get-timestamp-btn");
-    
+
     // First expansion
     await expandButton.click();
     await getTimestampButton.click();
     const firstTimestamp = await testStateDriver.testState();
     expect(firstTimestamp).toBeDefined();
-    
+
     // Collapse and wait a bit
     await collapseButton.click();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Second expansion
     await expandButton.click();
     await getTimestampButton.click();
     const secondTimestamp = await testStateDriver.testState();
-    
+
     // Verify timestamp updated
     expect(secondTimestamp).toBeDefined();
     expect(secondTimestamp).toBeGreaterThan(firstTimestamp as number);
@@ -4779,10 +4773,10 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4801,18 +4795,18 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
     const expand1Button = await createButtonDriver("expand-1-btn");
     const expand3Button = await createButtonDriver("expand-3-btn");
     const getTimestampsButton = await createButtonDriver("get-timestamps-btn");
-    
+
     // Expand node 1
     await expand1Button.click();
-    await new Promise(resolve => setTimeout(resolve, 10));
-    
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
     // Expand node 3
     await expand3Button.click();
-    
+
     // Get both timestamps
     await getTimestampsButton.click();
     const timestamps = await testStateDriver.testState();
-    
+
     expect(timestamps.t1).toBeDefined();
     expect(timestamps.t3).toBeDefined();
     expect(timestamps.t1).toBeLessThan(timestamps.t3);
@@ -4824,17 +4818,14 @@ test.describe("Auto-Load Feature - Step 1: Expanded Timestamp Tracking", () => {
 // =============================================================================
 
 test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
-  test("setAutoLoadAfter stores value correctly", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("setAutoLoadAfter stores value correctly", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4851,27 +4842,24 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
 
     const setButton = await createButtonDriver("set-btn");
     const checkButton = await createButtonDriver("check-btn");
-    
+
     // Set autoLoadAfter value
     await setButton.click();
-    
+
     // Verify it was set (we'll check this works correctly later)
     await checkButton.click();
     const result = await testStateDriver.testState();
     expect(result.success).toBe(true);
   });
 
-  test("null clears autoLoadAfter", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("null clears autoLoadAfter", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4890,30 +4878,27 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const setButton = await createButtonDriver("set-btn");
     const clearButton = await createButtonDriver("clear-btn");
     const checkButton = await createButtonDriver("check-btn");
-    
+
     // Set value
     await setButton.click();
-    
+
     // Clear with null
     await clearButton.click();
-    
+
     // Verify operation completed
     await checkButton.click();
     const result = await testStateDriver.testState();
     expect(result.success).toBe(true);
   });
 
-  test("undefined clears autoLoadAfter", async ({
-    initTestBed,
-    createButtonDriver,
-  }) => {
+  test("undefined clears autoLoadAfter", async ({ initTestBed, createButtonDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4932,13 +4917,13 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const setButton = await createButtonDriver("set-btn");
     const clearButton = await createButtonDriver("clear-btn");
     const checkButton = await createButtonDriver("check-btn");
-    
+
     // Set value
     await setButton.click();
-    
+
     // Clear with undefined
     await clearButton.click();
-    
+
     // Verify operation completed
     await checkButton.click();
     const result = await testStateDriver.testState();
@@ -4952,10 +4937,10 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -4976,16 +4961,16 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const expandButton = await createButtonDriver("expand-btn");
     const collapseButton = await createButtonDriver("collapse-btn");
     const checkButton = await createButtonDriver("check-btn");
-    
+
     // Set autoLoadAfter
     await setButton.click();
-    
+
     // Expand and collapse multiple times
     await expandButton.click();
     await collapseButton.click();
     await expandButton.click();
     await collapseButton.click();
-    
+
     // Verify autoLoadAfter persists (will be tested in Step 4 implementation)
     await checkButton.click();
     const result = await testStateDriver.testState();
@@ -4999,10 +4984,10 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded="none"
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -5023,12 +5008,12 @@ test.describe("Auto-Load Feature - Step 2: autoLoadAfter State Field", () => {
     const set2Button = await createButtonDriver("set-2-btn");
     const set3Button = await createButtonDriver("set-3-btn");
     const checkButton = await createButtonDriver("check-btn");
-    
+
     // Set different values for different nodes
     await set1Button.click();
     await set2Button.click();
     await set3Button.click();
-    
+
     // Verify all values were set
     await checkButton.click();
     const result = await testStateDriver.testState();
@@ -5044,10 +5029,10 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded='{[1, 2]}'
             autoLoadAfter="5000"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -5065,12 +5050,12 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
 
     const get1Button = await createButtonDriver("get-1-btn");
     const get2Button = await createButtonDriver("get-2-btn");
-    
+
     // Check node 1 - should use component default
     await get1Button.click();
     let result = await testStateDriver.testState();
     expect(result.value).toBe(5000);
-    
+
     // Check node 2 - should also use component default
     await get2Button.click();
     result = await testStateDriver.testState();
@@ -5084,10 +5069,10 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded='{[1, 2]}'
             autoLoadAfter="5000"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -5105,10 +5090,10 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
 
     const setButton = await createButtonDriver("set-btn");
     const getButton = await createButtonDriver("get-btn");
-    
+
     // Override default with per-node value
     await setButton.click();
-    
+
     // Verify override was successful - should return 3000, not 5000
     await getButton.click();
     const result = await testStateDriver.testState();
@@ -5122,10 +5107,10 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded='{[1, 2, 3]}'
             autoLoadAfter="7000"
             data='{${JSON.stringify(flatTreeData)}}'>
@@ -5147,20 +5132,20 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     const get1Button = await createButtonDriver("get-1-btn");
     const get2Button = await createButtonDriver("get-2-btn");
     const get3Button = await createButtonDriver("get-3-btn");
-    
+
     // Set explicit value only for node 2
     await setNode2Button.click();
-    
+
     // Node 1 should use default (7000)
     await get1Button.click();
     let result = await testStateDriver.testState();
     expect(result.node1).toBe(7000);
-    
+
     // Node 2 has explicit value (4000)
     await get2Button.click();
     result = await testStateDriver.testState();
     expect(result.node2).toBe(4000);
-    
+
     // Node 3 should use default (7000)
     await get3Button.click();
     result = await testStateDriver.testState();
@@ -5174,10 +5159,10 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             defaultExpanded='{[1, 2]}'
             data='{${JSON.stringify(flatTreeData)}}'>
             <property name="itemTemplate">
@@ -5192,7 +5177,7 @@ test.describe("Auto-Load Feature - Step 3: autoLoadAfter Component Property", ()
     `);
 
     const get1Button = await createButtonDriver("get-1-btn");
-    
+
     // autoLoadAfter not specified, should default to undefined (disabled)
     await get1Button.click();
     const result = await testStateDriver.testState();
@@ -5207,17 +5192,15 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     createButtonDriver,
   }) => {
     let loadCount = 0;
-    const dynamicTreeData = [
-      { id: 1, name: "Parent Node", parentId: null, loaded: false },
-    ];
+    const dynamicTreeData = [{ id: 1, name: "Parent Node", parentId: null, loaded: false }];
 
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             loadedField="loaded"
             autoLoadAfter="100"
             onLoadChildren="arg => {
@@ -5248,25 +5231,27 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     // Expand node 1 - should trigger initial load
     await expandButton.click();
     await tree.component.waitFor({ state: "visible" });
-    
+
     // Verify first child loaded
     await expect(tree.getByTestId("child-1")).toBeVisible();
-    
+
     // Collapse node 1
     await collapseButton.click();
-    
+
     // Wait for threshold (100ms + buffer)
     await delayButton.click();
-    
+
     // Expand again - should trigger autoload
     await expandButton.click();
-    
+
     // Verify new child loaded (loadCount should be 2)
-    await expect.poll(async () => {
-      const state = await testStateDriver.testState();
-      return state.loadCount;
-    }).toBe(2);
-    
+    await expect
+      .poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      })
+      .toBe(2);
+
     await expect(tree.getByTestId("child-2")).toBeVisible();
   });
 
@@ -5275,17 +5260,15 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     createTreeDriver,
     createButtonDriver,
   }) => {
-    const dynamicTreeData = [
-      { id: 1, name: "Dynamic Parent", parentId: null, loaded: false },
-    ];
+    const dynamicTreeData = [{ id: 1, name: "Dynamic Parent", parentId: null, loaded: false }];
 
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             loadedField="loaded"
             autoLoadAfter="100"
             onLoadChildren="arg => {
@@ -5317,18 +5300,20 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     await expandButton.click();
     await tree.component.waitFor({ state: "visible" });
     await expect(tree.getByTestId("dynamic-child-1")).toBeVisible();
-    
+
     // Collapse, wait beyond threshold, and re-expand
     await collapseButton.click();
     await delayButton.click();
     await expandButton.click();
-    
+
     // Verify dynamic node reloaded (loadCount = 2)
-    await expect.poll(async () => {
-      const state = await testStateDriver.testState();
-      return state.loadCount;
-    }).toBe(2);
-    
+    await expect
+      .poll(async () => {
+        const state = await testStateDriver.testState();
+        return state.loadCount;
+      })
+      .toBe(2);
+
     await expect(tree.getByTestId("dynamic-child-2")).toBeVisible();
   });
 
@@ -5337,17 +5322,15 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     createTreeDriver,
     createButtonDriver,
   }) => {
-    const dynamicTreeData = [
-      { id: 1, name: "Parent Node", parentId: null, loaded: false },
-    ];
+    const dynamicTreeData = [{ id: 1, name: "Parent Node", parentId: null, loaded: false }];
 
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <VStack height="400px">
-          <Tree 
-            id="treeApi" 
-            testId="tree" 
-            dataFormat="flat" 
+          <Tree
+            id="treeApi"
+            testId="tree"
+            dataFormat="flat"
             loadedField="loaded"
             autoLoadAfter="100"
             onLoadChildren="arg => {
@@ -5379,20 +5362,20 @@ test.describe("Auto-Load Feature - Step 4: Autoload Mechanism", () => {
     // First load
     await expandButton.click();
     await expect(tree.getByTestId("child-v1")).toBeVisible();
-    
+
     // Collapse and wait
     await collapseButton.click();
     await delayButton.click();
-    
+
     // Second load (autoload)
     await expandButton.click();
     await expect(tree.getByTestId("child-v2")).toBeVisible();
     await expect(tree.getByTestId("child-v1")).not.toBeVisible(); // Old child removed
-    
+
     // Collapse and wait again
     await collapseButton.click();
     await delayButton.click();
-    
+
     // Third load (another autoload)
     await expandButton.click();
     await expect(tree.getByTestId("child-v3")).toBeVisible();
@@ -5409,17 +5392,15 @@ test.describe("Regression: Issue #2786 - collapseNode() with autoLoadAfter=0", (
     initTestBed,
     createButtonDriver,
   }) => {
-      const dynamicTreeData = [
-        { id: 1, name: "Parent Node", parentId: null, loaded: false },
-      ];
+    const dynamicTreeData = [{ id: 1, name: "Parent Node", parentId: null, loaded: false }];
 
-      const { testStateDriver } = await initTestBed(`
+    const { testStateDriver } = await initTestBed(`
         <Fragment>
           <VStack height="400px">
-            <Tree 
-              id="treeApi" 
-              testId="tree" 
-              dataFormat="flat" 
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
               loadedField="loaded"
               autoLoadAfter="0"
               onLoadChildren="arg => {
@@ -5442,54 +5423,54 @@ test.describe("Regression: Issue #2786 - collapseNode() with autoLoadAfter=0", (
         </Fragment>
       `);
 
-      const expandButton = await createButtonDriver("expand-btn");
-      const collapseButton = await createButtonDriver("collapse-btn");
-      const checkStateButton = await createButtonDriver("check-state-btn");
+    const expandButton = await createButtonDriver("expand-btn");
+    const collapseButton = await createButtonDriver("collapse-btn");
+    const checkStateButton = await createButtonDriver("check-state-btn");
 
-      // Expand node 1 - should trigger initial load
-      await expandButton.click();
-      
-      // Verify node is loaded
-      await checkStateButton.click();
-      let state = await testStateDriver.testState();
-      expect(state.loadingState).toBe("loaded");
-      expect(state.loadCount).toBe(1);
+    // Expand node 1 - should trigger initial load
+    await expandButton.click();
 
-      // Collapse node 1 using collapseNode() API
-      // With autoLoadAfter="0", this should mark the node as unloaded
-      await collapseButton.click();
-      
-      // Check loading state after collapse - should be 'unloaded'
-      await checkStateButton.click();
-      state = await testStateDriver.testState();
-      expect(state.loadingState).toBe("unloaded");
+    // Verify node is loaded
+    await checkStateButton.click();
+    let state = await testStateDriver.testState();
+    expect(state.loadingState).toBe("loaded");
+    expect(state.loadCount).toBe(1);
 
-      // Re-expand should trigger reload since node was marked unloaded
-      await expandButton.click();
-      
-      // Verify reload happened (loadCount should be 2)
-      await expect.poll(async () => {
+    // Collapse node 1 using collapseNode() API
+    // With autoLoadAfter="0", this should mark the node as unloaded
+    await collapseButton.click();
+
+    // Check loading state after collapse - should be 'unloaded'
+    await checkStateButton.click();
+    state = await testStateDriver.testState();
+    expect(state.loadingState).toBe("unloaded");
+
+    // Re-expand should trigger reload since node was marked unloaded
+    await expandButton.click();
+
+    // Verify reload happened (loadCount should be 2)
+    await expect
+      .poll(async () => {
         const state = await testStateDriver.testState();
         return state.loadCount;
-      }).toBe(2);
-    });
+      })
+      .toBe(2);
+  });
 
   test("manual collapse (clicking) marks node as unloaded when autoLoadAfter is 0", async ({
     initTestBed,
     createTreeDriver,
     createButtonDriver,
   }) => {
-      const dynamicTreeData = [
-        { id: 1, name: "Parent Node", parentId: null, loaded: false },
-      ];
+    const dynamicTreeData = [{ id: 1, name: "Parent Node", parentId: null, loaded: false }];
 
-      const { testStateDriver } = await initTestBed(`
+    const { testStateDriver } = await initTestBed(`
         <Fragment>
           <VStack height="400px">
-            <Tree 
-              id="treeApi" 
-              testId="tree" 
-              dataFormat="flat" 
+            <Tree
+              id="treeApi"
+              testId="tree"
+              dataFormat="flat"
               loadedField="loaded"
               autoLoadAfter="0"
               itemClickExpands
@@ -5511,35 +5492,37 @@ test.describe("Regression: Issue #2786 - collapseNode() with autoLoadAfter=0", (
         </Fragment>
       `);
 
-      const tree = await createTreeDriver("tree");
-      const checkStateButton = await createButtonDriver("check-state-btn");
+    const tree = await createTreeDriver("tree");
+    const checkStateButton = await createButtonDriver("check-state-btn");
 
-      // Expand node 1 by clicking - should trigger initial load
-      await tree.getByTestId("1").click();
-      
-      // Verify node is loaded
-      await checkStateButton.click();
-      let state = await testStateDriver.testState();
-      expect(state.loadingState).toBe("loaded");
-      expect(state.loadCount).toBe(1);
+    // Expand node 1 by clicking - should trigger initial load
+    await tree.getByTestId("1").click();
 
-      // Collapse by clicking again
-      await tree.getByTestId("1").click();
-      
-      // Check loading state after manual collapse - should be 'unloaded'
-      await checkStateButton.click();
-      state = await testStateDriver.testState();
-      expect(state.loadingState).toBe("unloaded");
+    // Verify node is loaded
+    await checkStateButton.click();
+    let state = await testStateDriver.testState();
+    expect(state.loadingState).toBe("loaded");
+    expect(state.loadCount).toBe(1);
 
-      // Re-expand should trigger reload since node was marked unloaded
-      await tree.getByTestId("1").click();
-      
-      // Verify reload happened (loadCount should be 2)
-      await expect.poll(async () => {
+    // Collapse by clicking again
+    await tree.getByTestId("1").click();
+
+    // Check loading state after manual collapse - should be 'unloaded'
+    await checkStateButton.click();
+    state = await testStateDriver.testState();
+    expect(state.loadingState).toBe("unloaded");
+
+    // Re-expand should trigger reload since node was marked unloaded
+    await tree.getByTestId("1").click();
+
+    // Verify reload happened (loadCount should be 2)
+    await expect
+      .poll(async () => {
         const state = await testStateDriver.testState();
         return state.loadCount;
-      }).toBe(2);
-    });
+      })
+      .toBe(2);
+  });
 });
 
 // =============================================================================
@@ -5551,15 +5534,13 @@ test.describe("Dynamic Node Loaded State", () => {
     initTestBed,
     createTreeDriver,
   }) => {
-    const dynamicTreeData = [
-      { id: 1, name: "Dynamic Node Without Loaded", parentId: null },
-    ];
+    const dynamicTreeData = [{ id: 1, name: "Dynamic Node Without Loaded", parentId: null }];
 
     await initTestBed(`
       <Fragment>
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           dynamic="true"
           itemClickExpands
           onLoadChildren="arg => {
@@ -5576,10 +5557,10 @@ test.describe("Dynamic Node Loaded State", () => {
     `);
 
     const tree = await createTreeDriver("tree");
-    
+
     // Click to expand the dynamic node
     await tree.getByTestId("1").click();
-    
+
     // Verify children loaded
     await expect(tree.getByTestId("child-1")).toBeVisible();
   });
@@ -5594,9 +5575,9 @@ test.describe("Dynamic Node Loaded State", () => {
 
     await initTestBed(`
       <Fragment>
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           dynamic="true"
           loadedField="loaded"
           itemClickExpands
@@ -5614,10 +5595,10 @@ test.describe("Dynamic Node Loaded State", () => {
     `);
 
     const tree = await createTreeDriver("tree");
-    
+
     // Click to expand the dynamic node
     await tree.getByTestId("1").click();
-    
+
     // Verify children loaded
     await expect(tree.getByTestId("child-1")).toBeVisible();
   });
@@ -5632,9 +5613,9 @@ test.describe("Dynamic Node Loaded State", () => {
 
     await initTestBed(`
       <Fragment>
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           dynamic="true"
           loadedField="loaded"
           itemClickExpands
@@ -5649,10 +5630,10 @@ test.describe("Dynamic Node Loaded State", () => {
     `);
 
     const tree = await createTreeDriver("tree");
-    
+
     // Click the node - should not expand (no children, loaded: true)
     await tree.getByTestId("1").click();
-    
+
     // Tree should still only show the one node
     await expect(tree.getByTestId("1")).toBeVisible();
   });
@@ -5661,15 +5642,13 @@ test.describe("Dynamic Node Loaded State", () => {
     initTestBed,
     createTreeDriver,
   }) => {
-    const staticTreeData = [
-      { id: 1, name: "Static Node Without Loaded", parentId: null },
-    ];
+    const staticTreeData = [{ id: 1, name: "Static Node Without Loaded", parentId: null }];
 
     await initTestBed(`
       <Fragment>
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           dynamic="false"
           itemClickExpands
           data='{${JSON.stringify(staticTreeData)}}'>
@@ -5683,10 +5662,10 @@ test.describe("Dynamic Node Loaded State", () => {
     `);
 
     const tree = await createTreeDriver("tree");
-    
+
     // Click the node - should not expand (static node with no children)
     await tree.getByTestId("1").click();
-    
+
     // Tree should still only show the one node
     await expect(tree.getByTestId("1")).toBeVisible();
   });
@@ -5701,9 +5680,9 @@ test.describe("Dynamic Node Loaded State", () => {
 
     await initTestBed(`
       <Fragment>
-        <Tree 
-          testId="tree" 
-          dataFormat="flat" 
+        <Tree
+          testId="tree"
+          dataFormat="flat"
           dynamic="false"
           loadedField="loaded"
           itemClickExpands
@@ -5721,12 +5700,11 @@ test.describe("Dynamic Node Loaded State", () => {
     `);
 
     const tree = await createTreeDriver("tree");
-    
+
     // Click to expand - loaded: false means it should trigger loading
     await tree.getByTestId("1").click();
-    
+
     // Verify children loaded
     await expect(tree.getByTestId("child-1")).toBeVisible();
   });
 });
-
