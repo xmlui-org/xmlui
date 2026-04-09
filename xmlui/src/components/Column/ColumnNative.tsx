@@ -6,7 +6,7 @@ import { createChildLayoutContext } from "../../abstractions/layout-context-util
 import { MemoizedItem } from "../../components/container-helpers";
 import { useTableContext } from "./TableContext";
 import type { OurColumnMetadata } from "./TableContext";
-import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
 type Props = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];
@@ -22,6 +22,9 @@ export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
 export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
+  // Stabilize columnMetadata so the effect below only fires when actual primitive values change,
+  // not on every render due to new object identity from XMLUI reactive cycle.
+  const stableColumnMetadata = useShallowCompareMemoize(columnMetadata);
 
   const cellLayoutContext = useMemo(
     () => createChildLayoutContext(layoutContext, { type: "TableCell" }),
@@ -63,13 +66,12 @@ export const Column = memo(function Column({ nodeChildren, renderChild, layoutCo
   useIsomorphicLayoutEffect(() => {
     registerColumn(
       {
-        ...columnMetadata,
+        ...stableColumnMetadata,
         cellRenderer: safeCellRenderer,
       },
       id,
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(columnMetadata), id, registerColumn, safeCellRenderer]);
+  }, [stableColumnMetadata, id, registerColumn, safeCellRenderer]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {

@@ -216,11 +216,27 @@ export default function useRowSelection({
   // --- Track the source of the last update to prevent echoing
   const lastUpdateSourceRef = useRef<"table" | "appstate" | null>(null);
 
-  // Helper: set sync direction and schedule reset back to idle
+  // --- Captures an external update that was blocked while the guard was active.
+  // Filtering is done at capture time (in the effect) so the rAF only needs to apply it.
+  const pendingMissedAppStateRef = useRef<{ raw: string[]; toSelect: string[] } | null>(null);
+
+  // Cancel any pending rAF on unmount (writing to refs on an unmounted component is benign,
+  // but this avoids the unnecessary work and keeps cleanup explicit).
+  useEffect(() => () => cancelAnimationFrame(syncResetTimerRef.current), []);
+
+  // Helper: reset sync state to idle and apply any missed external update
   const scheduleSyncReset = () => {
     cancelAnimationFrame(syncResetTimerRef.current);
     syncResetTimerRef.current = requestAnimationFrame(() => {
       syncStateRef.current = "idle";
+      const missed = pendingMissedAppStateRef.current;
+      pendingMissedAppStateRef.current = null;
+      if (missed !== null) {
+        lastAppStateSelectionRef.current = missed.raw;
+        lastTableSelectionRef.current = missed.toSelect;
+        lastUpdateSourceRef.current = "appstate";
+        setSelectedRowIds(missed.toSelect);
+      }
       syncResetTimerRef.current = requestAnimationFrame(() => {
         lastUpdateSourceRef.current = null;
       });
@@ -229,13 +245,7 @@ export default function useRowSelection({
 
   // --- Sync from AppState to table selection (when AppState changes externally)
   useEffect(() => {
-    // Skip if not selectable, no sync, no selection, or we're currently updating to AppState
-    if (
-      !rowsSelectable ||
-      !syncWithAppState ||
-      !appStateSelection ||
-      syncStateRef.current === "updating_to_appstate"
-    ) {
+    if (!rowsSelectable || !syncWithAppState || !appStateSelection) {
       return;
     }
 
@@ -245,25 +255,33 @@ export default function useRowSelection({
       JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
     const wasNotOurUpdate = lastUpdateSourceRef.current !== "table";
 
-    if (isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
-      // Set state machine to indicate we're updating from AppState
-      syncStateRef.current = "updating_from_appstate";
-
-      const validIds = appStateSelection.filter((id: string) =>
-        items.some((item) => item[idKey] === id),
-      );
-
-      const idsToSelect = enableMultiRowSelection ? validIds : validIds.slice(0, 1);
-
-      // Track what we're setting to prevent loop
-      lastAppStateSelectionRef.current = [...appStateSelection];
-      lastTableSelectionRef.current = [...idsToSelect];
-      lastUpdateSourceRef.current = "appstate";
-
-      setSelectedRowIds(idsToSelect);
-      setInitialSelectionApplied(true);
-      scheduleSyncReset();
+    // Nothing to apply — bail out early before touching the guard
+    if (!isDifferentFromLastKnown || !wasNotOurUpdate || items.length === 0) {
+      return;
     }
+
+    const validIds = appStateSelection.filter((id: string) =>
+      items.some((item) => item[idKey] === id),
+    );
+    const idsToSelect = enableMultiRowSelection ? validIds : validIds.slice(0, 1);
+
+    if (syncStateRef.current === "updating_to_appstate") {
+      // Guard is active: save the missed update so scheduleSyncReset can apply it after unlocking
+      pendingMissedAppStateRef.current = { raw: [...appStateSelection], toSelect: idsToSelect };
+      return;
+    }
+
+    // Set state machine to indicate we're updating from AppState
+    syncStateRef.current = "updating_from_appstate";
+
+    // Track what we're setting to prevent loop
+    lastAppStateSelectionRef.current = [...appStateSelection];
+    lastTableSelectionRef.current = [...idsToSelect];
+    lastUpdateSourceRef.current = "appstate";
+
+    setSelectedRowIds(idsToSelect);
+    setInitialSelectionApplied(true);
+    scheduleSyncReset();
   }, [
     appStateSelection,
     items,

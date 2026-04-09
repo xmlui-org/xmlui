@@ -1,4 +1,5 @@
 import { memo, useMemo, useRef, startTransition } from "react";
+import { useEvent } from "../../components-core/utils/misc";
 import type { MouseEvent } from "react";
 import styles from "./TileGrid.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -350,6 +351,14 @@ const TileGridWithSync = memo(
       [hasContextMenu],
     );
 
+    const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
+    const stableItemDoubleClick = useEvent((...args: any[]) => lookupEventHandler("itemDoubleClick")?.(...args));
+    const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
+    const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
+    const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
+    const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
+    const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
+
     const stableItemRenderer = useMemo(
       () =>
         itemTemplate
@@ -391,13 +400,13 @@ const TileGridWithSync = memo(
         hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
         idKey={idKey}
         itemUserSelect={extractValue.asOptionalString(node.props.itemUserSelect)}
-        onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-        onItemDoubleClick={lookupEventHandler("itemDoubleClick")}
-        onCutAction={lookupEventHandler("cutAction")}
-        onCopyAction={lookupEventHandler("copyAction")}
-        onPasteAction={lookupEventHandler("pasteAction")}
-        onDeleteAction={lookupEventHandler("deleteAction")}
-        onSelectAllAction={lookupEventHandler("selectAllAction")}
+        onSelectionDidChange={stableSelectionDidChange}
+        onItemDoubleClick={node.events?.itemDoubleClick ? stableItemDoubleClick : undefined}
+        onCutAction={node.events?.cutAction ? stableCutAction : undefined}
+        onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}
+        onPasteAction={node.events?.pasteAction ? stablePasteAction : undefined}
+        onDeleteAction={node.events?.deleteAction ? stableDeleteAction : undefined}
+        onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
         onContextMenuItem={onContextMenuItem}
         itemRenderer={stableItemRenderer}
       />

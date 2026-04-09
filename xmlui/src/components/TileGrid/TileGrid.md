@@ -708,6 +708,30 @@ Fired when a tile is double-clicked. The handler receives the tile's data item.
 
 %-EVENT-END
 
+%-EVENT-START contextMenu
+
+Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.
+
+```xmlui copy /onContextMenu="testState = $item.name"/
+<App var.testState="">
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples'},
+      {id: 2, name: 'Bananas'},
+      {id: 3, name: 'Carrots'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    onContextMenu="testState = $item.name"
+  >
+    <Text>{$item.name}</Text>
+  </TileGrid>
+  <Text>Right-clicked: {testState}</Text>
+</App>
+```
+
+%-EVENT-END
+
 %-EVENT-START selectAllAction
 
 Fired when the user presses Ctrl/Cmd+A while the grid is focused and `itemsSelectable` is `true`.

@@ -307,7 +307,7 @@ const isWithinCheckboxBoundary = (
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
 //View the index.css file for more needed styles such as border-collapse: separate
-const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => {
+const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false): CSSProperties => {
   const isPinned = column.getIsPinned();
   // const isLastLeftPinnedColumn = isPinned === "left" && column.getIsLastColumn("left");
   // const isFirstRightPinnedColumn = isPinned === "right" && column.getIsFirstColumn("right");
@@ -320,9 +320,12 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
     //   : undefined,
     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
-    opacity: isPinned ? 0.95 : undefined,
     position: isPinned ? "sticky" : "relative",
-    backgroundColor: isPinned ? "inherit" : undefined,
+    backgroundColor: isPinned
+      ? isHeader
+        ? "var(--xmlui-backgroundColor-heading-Table)"
+        : undefined
+      : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
 };
@@ -600,75 +603,6 @@ export const Table = memo(forwardRef(
     }: TableProps,
     forwardedRef,
   ) => {
-    const propsRef = useRef<any>({});
-    const currentProps = {
-      data,
-      columns,
-      isPaginated,
-      loading,
-      headerHeight,
-      rowsSelectable,
-      enableMultiRowSelection,
-      toggleSelectionOnClick,
-      initiallySelected,
-      syncWithAppState,
-      pageSizeOptions,
-      pageSize,
-      currentPageIndex,
-      rowDisabledPredicate,
-      rowUnselectablePredicate,
-      sortBy,
-      sortingDirection,
-      iconSortAsc,
-      iconSortDesc,
-      iconNoSort,
-      sortingDidChange,
-      willSort,
-      lookupEventHandler,
-      style,
-      className,
-      classes,
-      noDataRenderer,
-      autoFocus,
-      hideHeader,
-      hideNoDataView,
-      hideSelectionCheckboxes,
-      renderVersion,
-      hideSelectionCheckboxesHeader,
-      alwaysShowSelectionCheckboxes,
-      alwaysShowPagination,
-      alwaysShowSelectionCheckboxesHeader,
-      alwaysShowSortingIndicator,
-      registerComponentApi,
-      onSelectionDidChange,
-      noBottomBorder,
-      paginationControlsLocation,
-      cellVerticalAlign,
-      buttonRowPosition,
-      pageSizeSelectorPosition,
-      pageInfoPosition,
-      showCurrentPage,
-      showPageInfo,
-      showPageSizeSelector,
-      checkboxTolerance,
-      rowHeight,
-      rowDoubleClick,
-      headerUserSelect,
-      cellUserSelect,
-      userSelectCell,
-      userSelectRow,
-      userSelectHeading,
-      keyBindings,
-      onSelectAllAction,
-      onCutAction,
-      onCopyAction,
-      onPasteAction,
-      onDeleteAction,
-      alwaysShowHeader,
-      striped,
-    };
-    propsRef.current = { ...currentProps };
-
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
       cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;

@@ -547,6 +547,7 @@ export const TableMd = createMetadata({
     [`userSelect-row-${COMP}`]: "none",
     [`backgroundColor-evenRow-${COMP}`]: `$backgroundColor-row-${COMP}`,
     [`backgroundColor-oddRow-${COMP}`]: `$color-surface-100`,
+    [`backgroundColor-pinnedCell-${COMP}`]: "$color-surface-50",
   },
 });
 
@@ -594,8 +595,9 @@ const TableWithColumns = memo(
       const columnIdsRef = useRef([]);
       const [tableKey, setTableKey] = useState(0);
 
-      const propsRef = useRef<any>({});
-      propsRef.current = { ...node.props };
+      // Keep lookupAction stable across renders so the sync adapter closure always calls the latest version.
+      const lookupActionRef = useRef(lookupAction);
+      lookupActionRef.current = lookupAction;
 
       // Stable delegates to prevent React.memo busts on TableNative.
       const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
@@ -733,7 +735,7 @@ const TableWithColumns = memo(
                   pendingOwnWriteVersionRef.current = thisVersion;
                   const windowKey = `__tgSync_${syncVarName}`;
                   (window as any)[windowKey] = { selectedIds, __v: thisVersion };
-                  const handler = lookupAction?.(
+                  const handler = lookupActionRef.current?.(
                     `{${syncVarName} = window.${windowKey}}`,
                     { ephemeral: true },
                   );

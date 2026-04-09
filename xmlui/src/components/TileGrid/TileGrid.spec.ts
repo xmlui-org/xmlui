@@ -847,3 +847,79 @@ test.describe("toggleSelectionOnClick property", () => {
     await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
   });
 });
+
+// =============================================================================
+// STEP 10: onContextMenu event
+// =============================================================================
+
+test.describe("onContextMenu event", () => {
+  const sampleData = [
+    { id: 1, name: "Apple", category: "Fruit" },
+    { id: 2, name: "Banana", category: "Fruit" },
+  ];
+
+  test("fires onContextMenu event on right-click", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = 'context-menu-fired'"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const firstTile = page.getByRole("gridcell").first();
+    await expect(firstTile).toBeVisible();
+    await firstTile.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual("context-menu-fired");
+  });
+
+  test("provides $item context variable with tile data", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = $item"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const secondTile = page.getByRole("gridcell").nth(1);
+    await secondTile.click({ button: "right" });
+
+    const result = await testStateDriver.testState();
+    expect(result.id).toEqual(2);
+    expect(result.name).toEqual("Banana");
+    expect(result.category).toEqual("Fruit");
+  });
+
+  test("provides $itemIndex context variable with tile index", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <TileGrid
+        data='{${JSON.stringify(sampleData)}}'
+        itemWidth="120px"
+        itemHeight="80px"
+        onContextMenu="testState = $itemIndex"
+      >
+        <VStack>
+          <Text>{$item.name}</Text>
+        </VStack>
+      </TileGrid>
+    `);
+
+    const secondTile = page.getByRole("gridcell").nth(1);
+    await secondTile.click({ button: "right" });
+
+    await expect.poll(testStateDriver.testState).toEqual(1);
+  });
+});
+
