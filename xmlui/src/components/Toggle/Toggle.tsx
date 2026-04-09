@@ -6,6 +6,7 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useState,
 } from "react";
 import classnames from "classnames";
 
@@ -111,8 +112,22 @@ export const Toggle = forwardRef(function Toggle(
     return false;
   };
 
+  const initialCycleRef = React.useRef(true);
+  const [suppressTransition, setSuppressTransition] = useState(() => transformToLegitValue(initialValue));
+
   useEffect(() => {
-    updateState({ value: transformToLegitValue(initialValue) }, { initial: true });
+    const legitInitial = transformToLegitValue(initialValue);
+    updateState({ value: legitInitial }, { initial: true });
+    if (initialCycleRef.current) {
+      initialCycleRef.current = false;
+      if (legitInitial) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setSuppressTransition(false);
+          });
+        });
+      }
+    }
   }, [initialValue, updateState]);
 
   const updateValue = useCallback(
@@ -208,6 +223,7 @@ export const Toggle = forwardRef(function Toggle(
               [styles.warning]: validationStatus === "warning",
               [styles.valid]: validationStatus === "valid",
               [styles.forceHover]: forceHover,
+              [styles.noTransition]: suppressTransition,
             },
           )}
         />
@@ -236,6 +252,7 @@ export const Toggle = forwardRef(function Toggle(
     indeterminate,
     autoFocus,
     forceHover,
+    suppressTransition,
   ]);
 
   return inputRenderer ? (

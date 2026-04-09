@@ -32,7 +32,6 @@ export default ({ mode = "lib" }) => {
           VITE_MOCK_ENABLED: true,
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
           VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
-          VITE_USED_COMPONENTS_Tree: "false",
           VITE_USED_COMPONENTS_TableEditor: "false",
           // VITE_USED_COMPONENTS_Charts: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
@@ -98,6 +97,7 @@ export default ({ mode = "lib" }) => {
       lib = {
         entry: {
           xmlui: path.resolve("src", "index.ts"),
+          "compiled-runtime": path.resolve("src", "index-compiled-runtime.ts"),
           "xmlui-parser": path.resolve("src", "parsers", "xmlui-parser", "index.ts"),
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),

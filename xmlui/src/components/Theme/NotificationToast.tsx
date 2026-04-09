@@ -64,6 +64,9 @@ export const NotificationToast = ({
       toasterMounted = true;
       setShouldRender(true);
     }
+    return () => {
+      toasterMounted = false;
+    };
   }, []);
 
   if (!shouldRender) return null;

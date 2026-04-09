@@ -1550,6 +1550,84 @@ describe("Playground pattern parsing", () => {
     expect(result.app.copy).toBe(true);
     expect(result.app.content).toBe("<Button>Click me</Button>\n");
   });
+
+  it("Handles four-backtick nested code fences in observePlaygroundPattern", () => {
+    // --- Act
+    const source = "```xmlui-pg\n````bash\necho hello\n````\n```";
+
+    const result = observePlaygroundPattern(source);
+
+    // --- Assert
+    expect(result).not.toBeNull();
+    expect(result[0]).toBe(0);
+    expect(result[2]).toBe("```xmlui-pg\n````bash\necho hello\n````\n```");
+  });
+
+  it("Parses four-backtick nested code fences in content", () => {
+    // --- Act
+    const content = "```xmlui-pg\n<Markdown>\n````bash\nnpm start\n````\n</Markdown>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe("<Markdown>\n```bash\nnpm start\n```\n</Markdown>\n");
+  });
+
+  it("Parses four-backtick nested code fences in explicit app segment", () => {
+    // --- Act
+    const content = "```xmlui-pg\n---app display\n<Markdown>\n````js\nconst x = 1;\n````\n</Markdown>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe("<Markdown>\n```js\nconst x = 1;\n```\n</Markdown>\n");
+  });
+
+  it("Handles multiple four-backtick nested code fences", () => {
+    // --- Act
+    const content =
+      "```xmlui-pg\n<App>\n````bash\nfirst\n````\ntext\n````js\nsecond\n````\n</App>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe(
+      "<App>\n```bash\nfirst\n```\ntext\n```js\nsecond\n```\n</App>\n",
+    );
+  });
+
+  it("Does not convert five backticks to three", () => {
+    // --- Act
+    const content = "```xmlui-pg\n`````bash\ncode\n`````\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    // Five backticks should remain as five backticks
+    expect(result.app.content).toBe("`````bash\ncode\n`````\n");
+  });
+
+  it("Display code block uses four-backtick fence when content has nested fences", () => {
+    // --- Act
+    const content =
+      "```xmlui-pg display\n---app display\n<Markdown>\n````bash\nnpm start\n````\n</Markdown>\n```";
+
+    const result = convertPlaygroundPatternToMarkdown(content);
+
+    // --- Assert
+    // The display markdown (base64-encoded in data-pg-markdown) should use ```` delimiters
+    const mdMatch = result.match(/data-pg-markdown="([^"]+)"/);
+    expect(mdMatch).not.toBeNull();
+    const displayMarkdown = base64ToString(mdMatch[1]);
+    // Should start with ```` instead of ```
+    expect(displayMarkdown).toContain("````xmlui");
+    // The content inside should have triple backticks (unescaped)
+    expect(displayMarkdown).toContain("```bash");
+  });
 });
 
 function base64ToString(base64: string) {

@@ -280,9 +280,28 @@ test("debounceWaitInMs resets timer on each change within the window", async ({
     </VStack>
   `);
 
+  // Helper: yield to the browser's message queue so React's passive effects
+  // (useEffect, which is scheduled via MessageChannel internally) have time to
+  // run before we advance the fake clock.  setTimeout and requestAnimationFrame
+  // are both faked by page.clock.install(), but MessageChannel is NOT faked, so
+  // this is the correct synchronisation primitive here.
+  const flushEffects = () =>
+    page.evaluate(
+      () =>
+        new Promise<void>(resolve => {
+          const { port1, port2 } = new MessageChannel();
+          port2.onmessage = () => resolve();
+          port1.postMessage(null);
+        }),
+    );
+
   // First change
   await page.getByTestId("button").click();
   await expect(page.getByTestId("text")).toHaveText("1|0");
+
+  // Flush React effects so the first debounce timer is registered before we
+  // advance the clock (prevents it from being registered at a shifted time).
+  await flushEffects();
 
   // Advance 200ms — still within debounce window
   await page.clock.fastForward(200);
@@ -291,6 +310,12 @@ test("debounceWaitInMs resets timer on each change within the window", async ({
   // Second change — resets the debounce timer
   await page.getByTestId("button").click();
   await expect(page.getByTestId("text")).toHaveText("2|0");
+
+  // Critical flush: ensures the useEffect from click #2 has called the debounce
+  // function (resetting the T=300 timer to T=500) before fastForward processes
+  // the original T=300 expiry.  Without this, under load the effect can run
+  // DURING fastForward, after the T=300 timer has already fired.
+  await flushEffects();
 
   // Advance another 200ms — 400ms since first change but only 200ms since last change
   await page.clock.fastForward(200);

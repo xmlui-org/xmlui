@@ -4,46 +4,39 @@ Stage a change locally while the user is editing and commit it to the data store
 
 Saving on every keystroke fires requests too aggressively and can cause the cursor to jump if the UI re-renders from a server response. Instead, track which row is being edited (`editingTaskId`) and keep the in-progress text in a local buffer (`editBuffer`). On focus-gain, copy the current value into the buffer. On focus-loss, write the buffer to state in a single operation and clear the editing flag.
 
-```xmlui-pg copy display name="Buffered task editing" height="500px"
+```xmlui-pg copy display name="Buffered task editing" height="580px"
 ---app display
 <App
   var.editingTaskId=""
   var.editBuffer=""
->
-
-  <AppState id="appState" initialValue="{{
-    tasks: [
+  var.tasks = "{[
       { id: 1, description: 'Review pull requests'},
-      { id: 2, description: 'Update documentation'}
-    ]
-  }}" />
+      { id: 2, description: 'Update documentation'},
+      { id: 3, description: 'Push changes'},
+    ]}">
 
   <H1>Todo list</H1>
-  <Table data="{appState.value.tasks}" width="100%">
-
-    <Column header="Description">
-      <TextBox
-        readOnly="{editingTaskId !== $item.id}"
-        initialValue="{$item.description}"
-        onGotFocus="() => {
-          editingTaskId = $item.id;
-          editBuffer = $item.description;
-        }"
-        onDidChange="(val) => { editBuffer = val; }"
-        onLostFocus="() => {
-          if (editBuffer.trim().length === 0) {
-            editingTaskId = null;
-            return;
-          }
-          const updated = appState.value.tasks.map((task) =>
-            task.id === $item.id ? { ...task, description: editBuffer } : task
-          );
-          appState.update({ ...appState.value, tasks: updated });
-          apiLog.setValue(apiLog.value + 'PUT ' + JSON.stringify(updated) + '\n');
-          editingTaskId = null;
-        }" />
-    </Column>
-  </Table>
+  <List data="{tasks}" borderCollapse="false">
+  <TextBox
+    readOnly="{editingTaskId !== $item.id}"
+    initialValue="{$item.description}"
+    onGotFocus="() => {
+      editingTaskId = $item.id;
+      editBuffer = $item.description;
+    }"
+    onDidChange="(val) => { editBuffer = val; }"
+    onLostFocus="() => {
+      editingTaskId = null;
+      if (editBuffer.trim().length === 0) {
+        return;
+      }
+      const updated = tasks.map((task) =>
+        task.id === $item.id ? { ...task, description: editBuffer } : task
+      );
+      tasks = updated;
+      apiLog.setValue(apiLog.value + 'PUT ' + JSON.stringify(updated) + '\n');
+    }" />
+  </List>
 
   <Card>
       <HStack gap="$space-2">
@@ -69,7 +62,7 @@ Saving on every keystroke fires requests too aggressively and can cause the curs
 
 **Validate before committing**: Check `editBuffer.trim().length === 0` (or any other rule) before calling the update. If invalid, simply reset the editing flag without saving, leaving the original value intact.
 
-**`AppState` + immutable update keeps the list reactive**: Use `appState.update({ ...appState.value, tasks: updated })` with a mapped array rather than mutating the array in place. XMLUI detects the reference change and re-renders the `Table`.
+**Immutable update keeps the list reactive**: Build a new array with `.map()` — `tasks.map(task => task.id === $item.id ? { ...task, description: editBuffer } : task)` — then assign it back to `tasks`. XMLUI detects the reference change and re-renders the `List`. Mutating the existing array in place (e.g. `tasks[i].description = editBuffer`) does not trigger a re-render.
 
 ---
 

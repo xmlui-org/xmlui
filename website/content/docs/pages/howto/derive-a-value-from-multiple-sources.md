@@ -11,9 +11,25 @@ XMLUI expressions are reactive: every `{expression}` in markup re-runs whenever 
     <Text variant="h5">Order Calculator</Text>
 
     <HStack gap="$space-4">
-      <NumberBox label="Quantity" value="{quantity}" onDidChange="(v) => quantity = v" minValue="1" />
-      <NumberBox label="Unit price ($)" value="{unitPrice}" onDidChange="(v) => unitPrice = v" minValue="0" />
-      <NumberBox label="Tax rate (%)" value="{taxRate * 100}" onDidChange="(v) => taxRate = v / 100" minValue="0" maxValue="100" />
+      <NumberBox 
+        label="Quantity" 
+        value="{quantity}" 
+        onDidChange="(v) => quantity = v" 
+        minValue="1" 
+      />
+      <NumberBox 
+        label="Unit price ($)" 
+        value="{unitPrice}" 
+        onDidChange="(v) => unitPrice = v" 
+        minValue="0" 
+      />
+      <NumberBox 
+        label="Tax rate (%)" 
+        value="{taxRate * 100}" 
+        onDidChange="(v) => taxRate = v / 100"
+        minValue="0" 
+        maxValue="100" 
+      />
     </HStack>
 
     <Card padding="$space-3">
@@ -31,7 +47,9 @@ XMLUI expressions are reactive: every `{expression}` in markup re-runs whenever 
         <HStack>
           <Text variant="strong">Total</Text>
           <SpaceFiller />
-          <Text variant="strong">${(quantity * unitPrice * (1 + taxRate)).toFixed(2)}</Text>
+          <Text variant="strong">
+            ${(quantity * unitPrice * (1 + taxRate)).toFixed(2)}
+          </Text>
         </HStack>
       </VStack>
     </Card>

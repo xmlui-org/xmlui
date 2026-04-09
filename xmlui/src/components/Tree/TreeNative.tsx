@@ -886,6 +886,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
           onNodeExpanded({ ...node, isExpanded: true });
         }
 
+        // Check if we need to auto-reload (Step 4: Auto-load feature)
+        // Only apply autoLoadAfter to dynamic nodes
+        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
+        const collapsedTime = collapsedTimestamps.get(node.key);
+
         // Step 3: Check if this node is dynamic (loads children asynchronously)
         const isDynamic = (() => {
           // Check if there's an explicit value set via setDynamic
@@ -905,14 +910,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
             return true;
           }
 
+          // If node was previously loaded and has autoLoadAfter configured, treat as dynamic
+          // (allows auto-reload to work even after the loaded field is set to true)
+          if (currentLoadingState === "loaded") {
+            return autoLoadAfter !== undefined && autoLoadAfter !== null;
+          }
+
           // Fall back to component-level default
           return dynamic ?? false;
         })();
-
-        // Check if we need to auto-reload (Step 4: Auto-load feature)
-        // Only apply autoLoadAfter to dynamic nodes
-        const currentLoadingState = nodeStates.get(node.key) || "unloaded";
-        const collapsedTime = collapsedTimestamps.get(node.key);
         const explicitAutoLoadAfter = autoLoadAfterMap.get(node.key);
 
         // Step 4: Read per-node autoLoadAfter from data field

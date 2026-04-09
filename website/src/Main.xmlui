@@ -476,7 +476,6 @@
                     </NavGroup>
 
                     <NavGroup label="Tables & Data Display">
-                    <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Pin columns in a wide table"
@@ -517,7 +516,6 @@
                             label="Auto-size column widths with star"
                             to="/docs/howto/auto-size-column-widths-with-star"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Modify a value reported in a Column"
@@ -528,11 +526,6 @@
                             label="Make a table responsive"
                             to="/docs/howto/make-a-table-responsive"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Sync selections between table and list views"
-                            to="/docs/howto/sync-selections-between-table-and-list-views"
-                        />
                     </NavGroup>
 
                     <NavGroup label="Lists, Trees & Iteration">
@@ -541,7 +534,6 @@
                             label="Build a grouped list with headers"
                             to="/docs/howto/group-items-in-list-by-a-property"
                         />
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Lazy-load tree children on expand"
@@ -572,7 +564,6 @@
                             label="Display an empty-state illustration"
                             to="/docs/howto/display-an-empty-state-illustration"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Paginate a list"
@@ -581,28 +572,20 @@
                     </NavGroup>
 
                     <NavGroup label="Navigation & Routing">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Add breadcrumb navigation"
                             to="/docs/howto/add-breadcrumb-navigation"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Protect a page with an auth guard"
                             to="/docs/howto/implement-an-authentication-gate"
                         />
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Deep-link to a tab or section"
                             to="/docs/howto/deep-link-to-a-tab-or-section"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build nested page routes"
-                            to="/docs/howto/build-nested-page-routes"
                         />
                         <NavLink
                             icon="article"
@@ -619,12 +602,6 @@
                             label="Highlight the active nav link"
                             to="/docs/howto/highlight-the-active-nav-link"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Collapse the nav panel on mobile"
-                            to="/docs/howto/collapse-the-nav-panel-on-mobile"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Make NavPanel width responsive"
@@ -711,7 +688,6 @@
                     </NavGroup>
 
                     <NavGroup label="Modals, Drawers & Overlays">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Open a confirmation before delete"
@@ -727,19 +703,11 @@
                             label="Show a slide-in settings drawer"
                             to="/docs/howto/show-a-slide-in-settings-drawer"
                         />
-                        -->
                         <NavLink
                             icon="article"
-                            label="Return data from a closed dialog"
+                            label="Keep a ModalDialog reopenable with onClose"
                             to="/docs/howto/use-modal-dialog-onclose"
                         />
-                        <!-- Temporarily hidden
-                        <NavLink
-                            icon="article"
-                            label="Open a context menu on right-click"
-                            to="/docs/howto/open-a-context-menu-on-right-click"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Pass data to a Modal Dialog"
@@ -859,13 +827,6 @@
                             label="Throttle rapid value updates"
                             to="/docs/howto/throttle-rapid-value-updates"
                         />
-                        <!-- Temporarily hidden
-                        <NavLink
-                            icon="article"
-                            label="React to button click not keystrokes"
-                            to="/docs/howto/react-to-button-click-not-keystrokes"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Buffer a reactive edit"
@@ -883,13 +844,7 @@
                         />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Menus & Toolbars">
-                        <NavLink
-                            icon="article"
-                            label="Build a toolbar with overflow menu"
-                            to="/docs/howto/build-a-toolbar-with-overflow-menu"
-                        />
                         <NavLink
                             icon="article"
                             label="Add a dropdown menu to a button"
@@ -905,15 +860,18 @@
                             label="Create a multi-level submenu"
                             to="/docs/howto/create-a-multi-level-submenu"
                         />
+                        <NavLink
+                            icon="article"
+                            label="Open a context menu on right-click"
+                            to="/docs/howto/open-a-context-menu-on-right-click"
+                        />
                     </NavGroup>
-                    -->
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Media & Rich Content">
                         <NavLink
                             icon="article"
-                            label="Render a Markdown file as a page"
-                            to="/docs/howto/render-a-markdown-file-as-a-page"
+                            label="Render Markdown content as a page"
+                            to="/docs/howto/render-markdown-content-as-a-page"
                         />
                         <NavLink
                             icon="article"
@@ -930,21 +888,9 @@
                             label="Generate a QR code from user input"
                             to="/docs/howto/generate-a-qr-code-from-user-input"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Display a PDF document inline"
-                            to="/docs/howto/display-a-pdf-document-inline"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add entrance animations to content"
-                            to="/docs/howto/add-entrance-animations-to-content"
-                        />
                     </NavGroup>
-                    -->
 
                     <NavGroup label="Miscellaneous Patterns">
-                        <!-- Temporarily hidden
                         <NavLink
                             icon="article"
                             label="Show toast notifications from code"
@@ -965,29 +911,11 @@
                             label="Build a batch-processing queue"
                             to="/docs/howto/build-a-batch-processing-queue"
                         />
-                        -->
                         <NavLink
                             icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
                         />
-                        <!-- Temporarily hidden
-                        <NavLink
-                            icon="article"
-                            label="Generate a table of contents"
-                            to="/docs/howto/generate-a-table-of-contents"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use local storage for user prefs"
-                            to="/docs/howto/use-local-storage-for-user-prefs"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Redirect users after login"
-                            to="/docs/howto/redirect-users-after-login"
-                        />
-                        -->
                         <NavLink
                             icon="article"
                             label="Debug a component"
@@ -995,7 +923,6 @@
                         />
                     </NavGroup>
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Advanced Theming">
                         <NavLink
                             icon="article"
@@ -1006,11 +933,6 @@
                             icon="article"
                             label="Style per-level Heading sizes"
                             to="/docs/howto/style-per-level-heading-sizes"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Theme TableOfContents by depth"
-                            to="/docs/howto/theme-tableofcontents-by-depth"
                         />
                         <NavLink
                             icon="article"
@@ -1036,11 +958,6 @@
                             icon="article"
                             label="Theme ExpandableItem transitions"
                             to="/docs/howto/theme-expandableitem-transitions"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Style NavPanel for horizontal mode"
-                            to="/docs/howto/style-navpanel-for-horizontal-mode"
                         />
                         <NavLink
                             icon="article"
@@ -1083,9 +1000,7 @@
                             to="/docs/howto/style-card-and-noresult-placeholders"
                         />
                     </NavGroup>
-                    -->
 
-                    <!-- Temporarily hidden
                     <NavGroup label="Complex Property Patterns">
                         <NavLink
                             icon="article"
@@ -1099,16 +1014,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Disable specific dates in DatePicker"
-                            to="/docs/howto/disable-specific-dates-in-datepicker"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Handle Form willSubmit return values"
-                            to="/docs/howto/handle-form-willsubmit-return-values"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Use regex validation in FormItem"
                             to="/docs/howto/use-regex-validation-in-formitem"
                         />
@@ -1119,166 +1024,15 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Switch Tabs to accordion view"
-                            to="/docs/howto/switch-tabs-to-accordion-view"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Sync TileGrid selection across grids"
                             to="/docs/howto/sync-tilegrid-selection-across-grids"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Configure Tooltip with string syntax"
-                            to="/docs/howto/configure-tooltip-with-string-syntax"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Control debounce vs throttle priority"
-                            to="/docs/howto/control-debounce-vs-throttle-priority"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Dock children in a Stack panel"
-                            to="/docs/howto/dock-children-in-a-stack-panel"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Communicate with IFrame content"
-                            to="/docs/howto/communicate-with-iframe-content"
                         />
                         <NavLink
                             icon="article"
                             label="Handle ContentSeparator orientation"
                             to="/docs/howto/handle-contentseparator-orientation"
                         />
-                        <NavLink
-                            icon="article"
-                            label="Load remote markup with IncludeMarkup"
-                            to="/docs/howto/load-remote-markup-with-includemarkup"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Stack StickySection elements"
-                            to="/docs/howto/stack-stickysection-elements"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Auto-scroll NavPanel to active item"
-                            to="/docs/howto/auto-scroll-navpanel-to-active-item"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Handle Checkbox value coercion"
-                            to="/docs/howto/handle-checkbox-value-coercion"
-                        />
                     </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Charts & Data Visualization">
-                        <NavLink
-                            icon="article"
-                            label="Build a stacked bar chart"
-                            to="/docs/howto/build-a-stacked-bar-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Format chart axis ticks"
-                            to="/docs/howto/format-chart-axis-ticks"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add custom tooltips to a chart"
-                            to="/docs/howto/add-custom-tooltips-to-a-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Create an area chart with stacking"
-                            to="/docs/howto/create-an-area-chart-with-stacking"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Position labels on a pie chart"
-                            to="/docs/howto/position-labels-on-a-pie-chart"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Overlay a radar chart comparison"
-                            to="/docs/howto/overlay-a-radar-chart-comparison"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Use ECharts for advanced charting"
-                            to="/docs/howto/use-echarts-for-advanced-charting"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Create a gauge dashboard widget"
-                            to="/docs/howto/create-a-gauge-dashboard-widget"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="PDF Viewer">
-                        <NavLink
-                            icon="article"
-                            label="Embed and navigate a PDF"
-                            to="/docs/howto/embed-and-navigate-a-pdf"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Add annotations to a PDF"
-                            to="/docs/howto/add-annotations-to-a-pdf"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Capture and apply PDF signatures"
-                            to="/docs/howto/capture-and-apply-pdf-signatures"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Export a modified PDF"
-                            to="/docs/howto/export-a-modified-pdf"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Rich Text & Masonry">
-                        <NavLink
-                            icon="article"
-                            label="Configure a TiptapEditor toolbar"
-                            to="/docs/howto/configure-a-tiptapeditor-toolbar"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build a responsive masonry layout"
-                            to="/docs/howto/build-a-responsive-masonry-layout"
-                        />
-                    </NavGroup>
-                    -->
-
-                    <!-- Temporarily hidden
-                    <NavGroup label="Animation & Carousel">
-                        <NavLink
-                            icon="article"
-                            label="Chain animations on scroll into view"
-                            to="/docs/howto/chain-animations-on-scroll-into-view"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Build an auto-playing carousel"
-                            to="/docs/howto/build-an-auto-playing-carousel"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Customize carousel controls & indicators"
-                            to="/docs/howto/customize-carousel-controls-and-indicators"
-                        />
-                    </NavGroup>
-                    -->
                 </NavGroup>
                 <NavGroup
                     label="Reference"
@@ -1744,13 +1498,6 @@
                 />
             </Page>
             <Page
-                url="/docs/howto/react-to-button-click-not-keystrokes"
-            >
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/react-to-button-click-not-keystrokes.md']}"
-                />
-            </Page>
-            <Page
                 url="/docs/howto/buffer-a-reactive-edit"
             >
                 <DocumentPageNoTOC
@@ -1940,13 +1687,6 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/make-a-table-responsive.md']}"
-                />
-            </Page>
-            <Page
-                url="/docs/howto/sync-selections-between-table-and-list-views"
-            >
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/sync-selections-between-table-and-list-views.md']}"
                 />
             </Page>
             <Page
@@ -2173,11 +1913,6 @@
                     content="{appGlobals.docsContent['pages/howto/deep-link-to-a-tab-or-section.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/build-nested-page-routes">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-nested-page-routes.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/switch-between-hash-and-history-routing">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/switch-between-hash-and-history-routing.md']}"
@@ -2191,11 +1926,6 @@
             <Page url="/docs/howto/highlight-the-active-nav-link">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/highlight-the-active-nav-link.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/collapse-the-nav-panel-on-mobile">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/collapse-the-nav-panel-on-mobile.md']}"
                 />
             </Page>
 
@@ -2350,11 +2080,6 @@
             </Page>
 
             <!-- New how-to articles: Menus & Toolbars -->
-            <Page url="/docs/howto/build-a-toolbar-with-overflow-menu">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-a-toolbar-with-overflow-menu.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/add-a-dropdown-menu-to-a-button">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/add-a-dropdown-menu-to-a-button.md']}"
@@ -2372,9 +2097,9 @@
             </Page>
 
             <!-- New how-to articles: Media & Rich Content -->
-            <Page url="/docs/howto/render-a-markdown-file-as-a-page">
+            <Page url="/docs/howto/render-markdown-content-as-a-page">
                 <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/render-a-markdown-file-as-a-page.md']}"
+                    content="{appGlobals.docsContent['pages/howto/render-markdown-content-as-a-page.md']}"
                 />
             </Page>
             <Page url="/docs/howto/embed-an-external-site-in-an-iframe">
@@ -2390,16 +2115,6 @@
             <Page url="/docs/howto/generate-a-qr-code-from-user-input">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/generate-a-qr-code-from-user-input.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/display-a-pdf-document-inline">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/display-a-pdf-document-inline.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/add-entrance-animations-to-content">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/add-entrance-animations-to-content.md']}"
                 />
             </Page>
 
@@ -2424,21 +2139,6 @@
                     content="{appGlobals.docsContent['pages/howto/build-a-batch-processing-queue.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/generate-a-table-of-contents">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/generate-a-table-of-contents.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/use-local-storage-for-user-prefs">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/use-local-storage-for-user-prefs.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/redirect-users-after-login">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/redirect-users-after-login.md']}"
-                />
-            </Page>
 
             <!-- New how-to articles: Advanced Theming -->
             <Page url="/docs/howto/theme-button-variant-color-combos">
@@ -2449,11 +2149,6 @@
             <Page url="/docs/howto/style-per-level-heading-sizes">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/style-per-level-heading-sizes.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/theme-tableofcontents-by-depth">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/theme-tableofcontents-by-depth.md']}"
                 />
             </Page>
             <Page url="/docs/howto/customize-select-and-autocomplete-menus">
@@ -2479,11 +2174,6 @@
             <Page url="/docs/howto/theme-expandableitem-transitions">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/theme-expandableitem-transitions.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/style-navpanel-for-horizontal-mode">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/style-navpanel-for-horizontal-mode.md']}"
                 />
             </Page>
             <Page url="/docs/howto/theme-multi-level-navgroup-nesting">
@@ -2538,16 +2228,6 @@
                     content="{appGlobals.docsContent['pages/howto/parse-uploaded-files-as-csv-or-json.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/disable-specific-dates-in-datepicker">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/disable-specific-dates-in-datepicker.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/handle-form-willsubmit-return-values">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/handle-form-willsubmit-return-values.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/use-regex-validation-in-formitem">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/use-regex-validation-in-formitem.md']}"
@@ -2558,59 +2238,14 @@
                     content="{appGlobals.docsContent['pages/howto/use-negative-maxprimarysize-in-splitter.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/switch-tabs-to-accordion-view">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/switch-tabs-to-accordion-view.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/sync-tilegrid-selection-across-grids">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/sync-tilegrid-selection-across-grids.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/configure-tooltip-with-string-syntax">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/configure-tooltip-with-string-syntax.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/control-debounce-vs-throttle-priority">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/control-debounce-vs-throttle-priority.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/dock-children-in-a-stack-panel">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/dock-children-in-a-stack-panel.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/communicate-with-iframe-content">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/communicate-with-iframe-content.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/handle-contentseparator-orientation">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/handle-contentseparator-orientation.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/load-remote-markup-with-includemarkup">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/load-remote-markup-with-includemarkup.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/stack-stickysection-elements">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/stack-stickysection-elements.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/auto-scroll-navpanel-to-active-item">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/auto-scroll-navpanel-to-active-item.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/handle-checkbox-value-coercion">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/handle-checkbox-value-coercion.md']}"
                 />
             </Page>
 

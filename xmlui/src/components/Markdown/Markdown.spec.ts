@@ -561,3 +561,104 @@ test.describe("Binding expression code-fence exclusion regression", () => {
     expect(text).toContain("Outside: 42");
   });
 });
+
+// =============================================================================
+// xmlui-pg: nested code fences with four backticks
+// =============================================================================
+
+test.describe("xmlui-pg nested code fences (four-backtick delimiter)", () => {
+  test("renders a basic xmlui-pg playground", async ({ initTestBed, page }) => {
+    const SOURCE = "```xmlui-pg\n<Button>Hello</Button>\n```";
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The NestedApp renders the Button component from the playground source
+    await expect(page.getByRole("button", { name: "Hello" })).toBeVisible();
+  });
+
+  test("four-backtick fence inside xmlui-pg does not close the outer fence", async ({
+    initTestBed,
+    page,
+  }) => {
+    // The ````bash...```` block must be treated as nested content, not as the closing ```.
+    // After unescaping, <Markdown> receives a bash code block and renders it.
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "npm start",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The nested app renders Markdown which renders "npm start" inside a code element
+    await expect(page.locator("code").filter({ hasText: "npm start" })).toBeVisible();
+  });
+
+  test("display segment with nested four-backtick fence emits a visible code block", async ({
+    initTestBed,
+    page,
+  }) => {
+    // display mode causes the segment source to appear as a <pre> code block above the playground
+    const SOURCE = [
+      "```xmlui-pg",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // A <pre> display code block must be rendered (the emitted wrapper uses ```` when content has ```)
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The source code shown in the display block must include "echo hello"
+    await expect(page.locator("pre").first()).toContainText("echo hello");
+  });
+
+  test("multiple four-backtick nested fences are all parsed into app content", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "first command",
+      "````",
+      "",
+      "````js",
+      "second command",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // Both unescaped code blocks must appear in the rendered Markdown output
+    await expect(page.locator("code").filter({ hasText: "first command" })).toBeVisible();
+    await expect(page.locator("code").filter({ hasText: "second command" })).toBeVisible();
+  });
+
+  test("four-backtick fence inside explicit ---app segment renders correctly", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg display",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The display code block is rendered as <pre>;
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The nested app renders the Markdown which shows "echo hello" in a code element
+    await expect(page.locator("code").filter({ hasText: "echo hello" }).first()).toBeVisible();
+  });
+});

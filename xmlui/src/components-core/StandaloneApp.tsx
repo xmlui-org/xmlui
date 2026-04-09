@@ -62,7 +62,6 @@ import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storag
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
-const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
 const GLOBALS_FILE = "Globals.xs";
 const GLOBALS_XS_BUILT_RESOURCE = "/src/Globals.xs";
 const CONFIG_FILE = "config.json";

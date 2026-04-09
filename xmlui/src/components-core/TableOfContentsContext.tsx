@@ -23,7 +23,7 @@ type HeadingItem = {
   text: string;
 
   // --- Reference to the anchor element.
-  anchor: HTMLAnchorElement | null;
+  anchor: HTMLElement | null;
 };
 
 type ActiveAnchorChangedCallback = (id: string) => void;

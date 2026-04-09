@@ -40,7 +40,19 @@ function bottomMarkup() {
   return topMarkup().replace(/stickTo="top"/g, 'stickTo="bottom"');
 }
 
-// Scroll the ScrollViewer's inner div to a given position.
+// Wait until the ScrollViewer's layout CSS is applied and content overflows so
+// that position:sticky actually works.  Must be called before the first scrollTo()
+// because the overflow CSS may not be applied yet immediately after initTestBed.
+async function waitForScrollerReady(page: any) {
+  const scroller = page.getByTestId("scroller");
+  await expect.poll(() =>
+    scroller.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight)
+  ).toBe(true);
+}
+
+// Scroll the ScrollViewer to a given position.
+// In "normal" scrollStyle (the default), the element with data-testid="scroller"
+// is itself the scrollable div — there is no OverlayScrollbars wrapper.
 async function scrollTo(page: any, scrollTop: number) {
   await page.getByTestId("scroller").evaluate(
     (el: HTMLElement, top: number) => { el.scrollTop = top; },
@@ -137,6 +149,7 @@ test.describe("stickTo='top' behavior", () => {
     await expect(page.getByTestId("section-1")).toBeVisible();
 
     // Scroll 200 px — well inside section 1's content, sections 2/3 not yet reached
+    await waitForScrollerReady(page);
     await scrollTo(page, 200);
 
     // Section 1 should be stuck at the top of the scroller
@@ -153,6 +166,7 @@ test.describe("stickTo='top' behavior", () => {
     // Scroll ~600 px — past section 1 (≈530 px) and into section 2's content.
     // Both sections are geometrically at the scroller top (both are sticky top:0);
     // section 2 wins visually because it has a higher z-index.
+    await waitForScrollerReady(page);
     await scrollTo(page, 600);
 
     await expect.poll(() => isAtScrollerTop(page, "section-2")).toBe(true);
@@ -171,6 +185,7 @@ test.describe("stickTo='top' behavior", () => {
     await expect(page.getByTestId("section-1")).toBeVisible();
 
     // Scroll all the way to the bottom
+    await waitForScrollerReady(page);
     await scrollTo(page, 99999);
 
     // Section 3 (the last one) is the most recently scrolled past
@@ -204,6 +219,7 @@ test.describe("stickTo='bottom' behavior", () => {
   }) => {
     await initTestBed(bottomMarkup());
     await expect(page.getByTestId("section-1")).toBeVisible();
+    await waitForScrollerReady(page);
 
     // At scrollTop=0, sections 2 and 3 are below the 400 px viewport.
     // Both are geometrically at the scroller's bottom (both sticky bottom:0);
@@ -224,6 +240,7 @@ test.describe("stickTo='bottom' behavior", () => {
     await expect(page.getByTestId("section-1")).toBeVisible();
 
     // Scroll ~600 px — we are inside section 2's content; section 3 is the next one ahead
+    await waitForScrollerReady(page);
     await scrollTo(page, 600);
 
     await expect.poll(() => isAtScrollerBottom(page, "section-3")).toBe(true);
@@ -238,6 +255,7 @@ test.describe("stickTo='bottom' behavior", () => {
     await expect(page.getByTestId("section-1")).toBeVisible();
 
     // Scroll to the very end — all sections are above or in view; none are below
+    await waitForScrollerReady(page);
     await scrollTo(page, 99999);
 
     await expect.poll(() => isAtScrollerBottom(page, "section-1")).toBe(false);
@@ -319,6 +337,7 @@ test.describe("Other Edge Cases", () => {
     await expect(page.getByTestId("section-1")).toBeVisible();
 
     for (const scrollPos of [100, 250, 380]) {
+      await waitForScrollerReady(page);
       await scrollTo(page, scrollPos);
       await expect.poll(() => isAtScrollerTop(page, "section-1")).toBe(true);
     }
@@ -349,6 +368,7 @@ test.describe("Other Edge Cases", () => {
     //   - top-sec (natural position 0) has been scrolled past → sticks at top
     //   - bottom-sec (natural position ~530 px) is still below the 400 px
     //     visible area (viewport bottom = 50+400 = 450 < 530) → sticks at bottom
+    await waitForScrollerReady(page);
     await scrollTo(page, 50);
 
     await expect.poll(() => isAtScrollerTop(page, "top-sec")).toBe(true);
