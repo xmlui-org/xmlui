@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.12.16
+
+### Patch Changes
+
+- 3d64a86: Fix portal rendering issues in Drawer and NestedApp
+- 07bc66e: All Tree rendering in standalone mode
+- d72d007: Fix Table rendering regression
+- 312d3fd: Do not animate Switch and Checkbox during the initial rendering
+- 329fc83: feat: allow loading external theme files in standalone mode defined in config.defaultTheme
+- 03f095c: refactor: remove redundant check for already registered icons in IconProvider
+- 672c9d9: APCall deferred execution fixed
+- cda9057: Improve Table and TileGrid performance
+- c137a85: feat: add sticky button row and max height to ModalDialog and Form components
+
 ## 0.12.15
 
 ### Patch Changes
