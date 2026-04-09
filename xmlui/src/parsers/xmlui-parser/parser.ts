@@ -17,6 +17,7 @@ type StackFrame = {
   node: IncompleteNode | Node;
   errors: ParserDiag[];
   scriptCount: number;
+  isCompoundComponent?: boolean;
   compoundCompName?: string;
   namespaces?: Map<string, string>;
   nonHelperChildrenSeen?: number;
@@ -106,28 +107,39 @@ class ParseStack {
     this.currentFrame.errors.push(error);
   }
 
-  /** Sets the compound component name on the current frame and initialises the non-helper
-   * children counter to 0. Called when an element with name "Component" is encountered. */
-  setCurrentCompoundCompName(name: string): void {
-    this.currentFrame.compoundCompName = name;
-    this.currentFrame.nonHelperChildrenSeen = 0;
-  }
-
   /** Walks all ancestor frames (excluding the current frame) looking for a compound component
    * name. Returns the name of the nearest ancestor compound component, or undefined. */
-  getAncestorCompoundCompName(): string | undefined {
+  hasCompoundCompAncestor(): boolean {
     for (let i = this.frames.length - 2; i >= 0; i--) {
-      if (this.frames[i].compoundCompName !== undefined) {
-        return this.frames[i].compoundCompName;
+      if (this.frames[i].isCompoundComponent) {
+        return true;
       }
     }
-    return undefined;
+    return false;
   }
 
   /** Initialises the namespace map on the current frame. Called once per ElementNode after
    * attribute parsing. */
   initCurrentNamespaces(): void {
     this.currentFrame.namespaces = new Map();
+  }
+
+  setIsCompoundComponent(): void {
+    this.currentFrame.isCompoundComponent = true;
+    this.currentFrame.nonHelperChildrenSeen = 0;
+  }
+
+  isChildOfCompoundComponent(): boolean {
+    for (let i = this.frames.length - 2; i >= 0; --i) {
+      const frame = this.frames[i];
+      if (frame.node.kind === SyntaxKind.ElementNode) {
+        if (frame.isCompoundComponent) {
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
   }
 
   // todo: this seems wrong, why are we storing the keys as the map values
@@ -157,7 +169,7 @@ class ParseStack {
    * has a compound component name set. */
   incrementAncestorNonHelperCount(): void {
     for (let i = this.frames.length - 2; i >= 0; i--) {
-      if (this.frames[i].compoundCompName !== undefined) {
+      if (this.frames[i].isCompoundComponent) {
         this.frames[i].nonHelperChildrenSeen = (this.frames[i].nonHelperChildrenSeen ?? 0) + 1;
         return;
       }
@@ -169,15 +181,15 @@ class ParseStack {
     return this.currentFrame.nonHelperChildrenSeen ?? 0;
   }
 
-  /** Returns the number of ElementNode frames currently on the stack. */
-  getElementNodeFrameCount(): number {
+  InRootElement(): boolean {
     let count = 0;
     for (const frame of this.frames) {
       if (frame.node.kind === SyntaxKind.ElementNode) {
         count++;
+        if (count > 1) break;
       }
     }
-    return count;
+    return count === 1;
   }
 
   private get currentFrame(): StackFrame {
@@ -361,11 +373,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
     const openTagNameText = openTagName ? getTagNameNodeLastIdentifier(openTagName) : undefined;
 
-    // --- Phase 4c: namespace validation and xmlns collection
     if (!errInName && openTagName) {
       // Check for namespace prefix on the tag name (TagNameNode with 3 children = ns:Name)
       if (openTagName.children!.length === 3) {
-        if (stack.getElementNodeFrameCount() === 1) {
+        if (stack.InRootElement()) {
           // Root element cannot have a namespace prefix
           errorAt(DIAGS_PARSER.rootCompNoNamespace, openTagName.pos, openTagName.children![0].end);
         } else {
@@ -417,25 +428,17 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    // --- Phase 4a: compound component name tracking
-    if (openTagNameText === COMPOUND_COMPONENT_NAME) {
-      const attrListNode = stack.node.children!.find(
-        (c) => c.kind === SyntaxKind.AttributeListNode,
-      );
-      const attrs = attrListNode ? (attrListNode.children ?? []).map(segmentAttr) : [];
-      const nameAttr = attrs.find((a) => !a.namespace && !a.startSegment && a.name === "name");
-      stack.setCurrentCompoundCompName(nameAttr?.value ?? "");
-    }
-
     // --- Validate compound component nesting and invalid helper nodes
     let skipNodeValidation = false;
-    if (
-      openTagNameText === COMPOUND_COMPONENT_NAME &&
-      stack.getAncestorCompoundCompName() !== undefined
-    ) {
-      errorAt(DIAGS_PARSER.nestedCompDefs, openTagName!.pos, openTagName!.end);
-      skipNodeValidation = true;
-    } else if (stack.getAncestorCompoundCompName() !== undefined && openTagNameText) {
+    if (openTagNameText === COMPOUND_COMPONENT_NAME) {
+      stack.setIsCompoundComponent();
+      if (stack.hasCompoundCompAncestor()) {
+        errorAt(DIAGS_PARSER.nestedCompDefs, openTagName!.pos, openTagName!.end);
+        skipNodeValidation = true;
+      }
+    }
+
+    if (stack.isChildOfCompoundComponent() && openTagNameText) {
       if (openTagNameText === "uses" || openTagNameText === "loaders") {
         errorAt(DIAGS_PARSER.invalidNodeName(openTagNameText), openTagName!.pos, openTagName!.end);
         skipNodeValidation = true;
@@ -455,13 +458,13 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         if (hasNoNonHelperChildren) {
           errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
         }
-        if (openTagNameText === "global" && stack.getAncestorCompoundCompName() !== undefined) {
+        if (openTagNameText === "global" && stack.hasCompoundCompAncestor()) {
           errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
         }
         if (
           openTagNameText !== undefined &&
           !HELPER_NAMES.has(openTagNameText) &&
-          stack.getAncestorCompoundCompName() !== undefined
+          stack.hasCompoundCompAncestor()
         ) {
           stack.incrementAncestorNonHelperCount();
         }
@@ -482,13 +485,13 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         if (hasNoNonHelperChildren) {
           errorAt(DIAGS_PARSER.compDefNesedElem, completedNode.pos, completedNode.end);
         }
-        if (openTagNameText === "global" && stack.getAncestorCompoundCompName() !== undefined) {
+        if (openTagNameText === "global" && stack.hasCompoundCompAncestor()) {
           errorAt(DIAGS_PARSER.globalNotAllowedInComponent, completedNode.pos, completedNode.end);
         }
         if (
           openTagNameText !== undefined &&
           !HELPER_NAMES.has(openTagNameText) &&
-          stack.getAncestorCompoundCompName() !== undefined
+          stack.hasCompoundCompAncestor()
         ) {
           stack.incrementAncestorNonHelperCount();
         }
