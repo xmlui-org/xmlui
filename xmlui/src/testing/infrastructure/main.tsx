@@ -2,15 +2,24 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import toast from "react-hot-toast";
 import TestBed from "./TestBed";
+import { StyleRegistry } from "../../components-core/theming/StyleRegistry";
 
 const rootEl = document.getElementById("root") as HTMLElement;
 const root = createRoot(rootEl);
 
 let renderKey = 0;
 
+// A single StyleRegistry instance shared across all TestBed renders.
+// When TestBed is remounted with a new key, the new tree's StyleProvider
+// (inside AppRoot) inherits this registry via the outer StyleProvider wrapper
+// in TestBed. Both old and new trees therefore decrement/increment the SAME
+// ref-counts, preventing the race where the old tree's deferred cleanup
+// setTimeout removes style tags just injected by the new tree.
+const stableStyleRegistry = new StyleRegistry();
+
 function renderTestBed() {
   renderKey++;
-  root.render(<TestBed key={renderKey} />);
+  root.render(<TestBed key={renderKey} styleRegistry={stableStyleRegistry} />);
 }
 
 renderTestBed();
@@ -22,20 +31,11 @@ renderTestBed();
   // so they don't leak into the next test.
   toast.remove();
 
-  // Remove dynamically-injected <style data-style-hash> tags.  The old
-  // StyleRegistry's setTimeout-based cleanup can race with the new tree's
-  // useInsertionEffect — the old timer may remove a <style> tag that the
-  // new tree just injected (same hash, same querySelector match).  By
-  // stripping all dynamic style tags before the new mount, we guarantee
-  // the fresh registry re-injects everything cleanly.
-  document.head
-    .querySelectorAll("style[data-style-hash]")
-    .forEach((el) => el.remove());
-
   renderKey++;
   flushSync(() => {
-    root.render(<TestBed key={renderKey} />);
+    root.render(<TestBed key={renderKey} styleRegistry={stableStyleRegistry} />);
   });
 };
 
 (window as any).__XMLUI_READY__ = true;
+
