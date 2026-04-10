@@ -1,10 +1,13 @@
-import { memo, useRef, startTransition } from "react";
+import { memo, useMemo, useRef, startTransition } from "react";
 
 import styles from "./List.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { RendererContext, LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
 import {
@@ -12,7 +15,6 @@ import {
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
 import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListNative";
-import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
 
 const COMP = "List";
 
@@ -133,6 +135,13 @@ export const ListMd = createMetadata({
         `The named variable must reference an object; the list will read from and write to its ` +
         `'selectedIds' property. When provided, this takes precedence over ` +
         `\`initiallySelected\`.`,
+    ),
+    refreshOn: d(
+      `Bind this property to a global variable (or expression) whose change should force all ` +
+        `visible list items to re-render and pick up the latest reactive state. When not set, ` +
+        `items re-render on every XMLUI reactive cycle (safe but less optimal). When set, items ` +
+        `only re-render when the bound value changes, which eliminates spurious re-renders from ` +
+        `unrelated global-variable updates (e.g. focus events).`,
     ),
     rowUnselectablePredicate: {
       description:
@@ -345,6 +354,44 @@ export const ListMd = createMetadata({
 
 const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
 
+// List-specific memoized item. Uses a custom comparator so that:
+//   - renderVersion change   → always re-render (external XMLUI reactive cycle / refreshOn fired)
+//   - node change            → re-render (item template changed)
+//   - contextVars value change → re-render (e.g. $isSelected toggled for this row)
+//   - renderChild / layoutContext stable refs → skip comparison
+// Kept separate from the shared MemoizedItem to avoid affecting other consumers.
+type ListMemoizedItemProps = {
+  node: ComponentDef | Array<ComponentDef>;
+  renderChild: RenderChildFn;
+  layoutContext?: LayoutContext;
+  contextVars?: Record<string, any>;
+  renderVersion: number;
+};
+
+const ListMemoizedItem = memo(
+  ({ node, renderChild, layoutContext, contextVars }: ListMemoizedItemProps) => (
+    <MemoizedItem
+      node={node}
+      renderChild={renderChild}
+      layoutContext={layoutContext}
+      contextVars={contextVars}
+    />
+  ),
+  (prev, next) => {
+    if (prev.renderVersion !== next.renderVersion) return false;
+    if (prev.node !== next.node) return false;
+    // renderChild and layoutContext are stable refs — no need to compare
+    const prevVars = prev.contextVars ?? EMPTY_OBJECT;
+    const nextVars = next.contextVars ?? EMPTY_OBJECT;
+    const keys = Object.keys(nextVars);
+    if (keys.length !== Object.keys(prevVars).length) return false;
+    for (const k of keys) {
+      if (prevVars[k] !== nextVars[k]) return false;
+    }
+    return true;
+  },
+);
+
 const ListWithSelection = memo(function ListWithSelection({
   extractValue,
   node,
@@ -371,6 +418,30 @@ const ListWithSelection = memo(function ListWithSelection({
   const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
 
   const selectionContext = useSelectionContext();
+
+  // --- Stable renderChild / layoutContext refs (L6) ---
+  // renderChild is recreated by the XMLUI runtime on every reactive cycle.
+  // Storing it in a ref and passing a stable wrapper to MemoizedItem prevents all
+  // visible items from re-rendering on every click/focus event.
+  const renderChildRef = useRef(renderChild);
+  renderChildRef.current = renderChild;
+  const layoutContextRef = useRef(layoutContext);
+  layoutContextRef.current = layoutContext;
+  const stableRenderChildFnRef = useRef<RenderChildFn>(
+    (node: any, ctx: any) => renderChildRef.current(node, ctx),
+  );
+
+  // --- renderVersion counter (L7) ---
+  // Increments only when refreshOn changes (or on every cycle if refreshOn is not set).
+  // Passed to ListMemoizedItem so items re-render exactly when needed.
+  const refreshOn = extractValue(node.props.refreshOn);
+  const prevRefreshOnRef = useRef<unknown>(refreshOn);
+  const renderVersionRef = useRef(0);
+  const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+  if (shouldForceRefresh) {
+    prevRefreshOnRef.current = refreshOn;
+    renderVersionRef.current++;
+  }
 
   // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
   //
@@ -449,6 +520,75 @@ const ListWithSelection = memo(function ListWithSelection({
   }
   syncAdapter = syncAdapterHolderRef.current;
 
+  // --- Stable memoized renderers (L5) ---
+  // Declared before JSX so useMemo is called unconditionally at the top level of the component.
+  // Each renderer uses stableRenderChildFnRef.current and layoutContextRef.current (stable refs),
+  // so the renderer function reference only changes when the template / key changes — not on
+  // every XMLUI reactive cycle.
+
+  // itemRenderer: receives renderVersion so ListMemoizedItem can decide per-row whether to
+  // re-render based on the refreshOn logic.
+  const stableItemRenderer = useMemo(
+    () =>
+      itemTemplate
+        ? (item: any, key: any, rowIndex: number, count: number, isSelected: boolean) => (
+            <ListMemoizedItem
+              node={itemTemplate as any}
+              key={key}
+              renderChild={stableRenderChildFnRef.current}
+              layoutContext={layoutContextRef.current}
+              renderVersion={renderVersionRef.current}
+              contextVars={{
+                $item: item,
+                $itemIndex: rowIndex,
+                $isFirst: rowIndex === 0,
+                $isLast: rowIndex === count - 1,
+                $isSelected: isSelected,
+              }}
+            />
+          )
+        : undefined,
+    // idKey is included because it is captured by itemTemplate renders via $item[idKey].
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [itemTemplate, idKey],
+  );
+
+  const stableSectionRenderer = useMemo(
+    () =>
+      node.props.groupBy
+        ? (item: any, key: any) =>
+            (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+              <MemoizedSection
+                node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
+                renderChild={stableRenderChildFnRef.current}
+                key={key}
+                item={item}
+              />
+            ) : null
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node.props.groupBy, node.props.groupHeaderTemplate, hideEmptyGroups],
+  );
+
+  const stableSectionFooterRenderer = useMemo(
+    () =>
+      node.props.groupFooterTemplate
+        ? (item: any, key: any) =>
+            (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+              <MemoizedItem
+                node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
+                renderChild={stableRenderChildFnRef.current}
+                key={key}
+                contextVars={{
+                  $group: item,
+                }}
+              />
+            ) : null
+        : undefined,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node.props.groupFooterTemplate, hideEmptyGroups],
+  );
+
   const listContent = (
     <ListNative
       registerComponentApi={registerComponentApi}
@@ -489,54 +629,9 @@ const ListWithSelection = memo(function ListWithSelection({
       onDeleteAction={lookupEventHandler("deleteAction")}
       rowDoubleClick={lookupEventHandler("rowDoubleClick")}
       keyBindings={extractValue(node.props.keyBindings)}
-      itemRenderer={
-        itemTemplate &&
-        ((item, key, rowIndex, count, isSelected) => {
-          return (
-            <MemoizedItem
-              node={itemTemplate as any}
-              key={key}
-              renderChild={renderChild}
-              layoutContext={layoutContext}
-              contextVars={{
-                $item: item,
-                $itemIndex: rowIndex,
-                $isFirst: rowIndex === 0,
-                $isLast: rowIndex === count - 1,
-                $isSelected: isSelected,
-              }}
-            />
-          );
-        })
-      }
-      sectionRenderer={
-        node.props.groupBy
-          ? (item, key) =>
-              (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
-                <MemoizedSection
-                  node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
-                  renderChild={renderChild}
-                  key={key}
-                  item={item}
-                />
-              ) : null
-          : undefined
-      }
-      sectionFooterRenderer={
-        node.props.groupFooterTemplate
-          ? (item, key) =>
-              (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
-                <MemoizedItem
-                  node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
-                  renderChild={renderChild}
-                  key={key}
-                  contextVars={{
-                    $group: item,
-                  }}
-                />
-              ) : null
-          : undefined
-      }
+      itemRenderer={stableItemRenderer}
+      sectionRenderer={stableSectionRenderer}
+      sectionFooterRenderer={stableSectionFooterRenderer}
     />
   );
 
