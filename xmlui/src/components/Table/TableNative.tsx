@@ -1648,8 +1648,13 @@ export const Table = memo(forwardRef(
 
                       const headerCell = target.closest("th");
 
-                      // Only handle clicks for the select column header
-                      if (headerCell && rowsSelectable && enableMultiRowSelection) {
+                      // Only handle clicks for the select column header when the header checkbox is visible
+                      if (
+                        headerCell &&
+                        rowsSelectable &&
+                        enableMultiRowSelection &&
+                        !hideSelectionCheckboxesHeader
+                      ) {
                         const headerId = headerCell.getAttribute("data-column-id");
 
                         if (headerId === "select") {
