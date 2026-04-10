@@ -1637,7 +1637,7 @@ export const Table = memo(forwardRef(
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes, safeColumns, rowsSelectable, hideSelectionCheckboxes]);
+    }, [recalculateStarSizes, safeColumns, columnsWithCustomCell, rowsSelectable, hideSelectionCheckboxes]);
 
     useIsomorphicLayoutEffect(() => {
       registerComponentApi(selectionApi);
