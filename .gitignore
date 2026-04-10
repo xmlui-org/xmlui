@@ -47,6 +47,8 @@ xmlui-optimized-output
 # AI local config
 .claude
 .gemini
+.cursor
+.agents
 .mcp.json
 .qwen
 CLAUDE.md
