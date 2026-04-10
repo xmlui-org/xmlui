@@ -43,6 +43,7 @@ export const ComponentWrapper = memo(
     const { descriptor } = componentRegistry.lookupComponentRenderer(node.type) || {};
     const stableLayoutContext = useRef(layoutContext);
 
+
     // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
       // --- If we have a DataSource child, we transform it to a loader on the node
