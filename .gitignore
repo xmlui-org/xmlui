@@ -44,6 +44,8 @@ xmlui-optimized-output
 .xmlui-ssg-ssr/
 .xmlui-ssg-entry.tsx
 
+myworkdriveclient/
+
 # AI local config
 .claude
 .gemini
