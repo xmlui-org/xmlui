@@ -28,13 +28,11 @@ import { toFlatTree, flatToNative, hierarchyToNative } from "../../components-co
 interface RowContext {
   nodes: FlatTreeNode[];
   toggleNode: (node: FlatTreeNode) => void;
-  selectedId: string | number | undefined;
   itemRenderer: (item: any) => ReactNode;
   itemClickExpands: boolean;
   onItemClick?: (item: FlatTreeNode) => void;
   onSelection: (node: FlatTreeNode) => void;
   lookupEventHandler?: any;
-  focusedIndex: number;
   onKeyDown: (e: React.KeyboardEvent) => void;
   treeContainerRef: React.RefObject<HTMLDivElement>;
   iconCollapsed: string;
@@ -48,19 +46,19 @@ interface RowContext {
 interface TreeRowProps {
   index: number;
   data: RowContext;
+  isSelected: boolean;
+  isFocused: boolean;
 }
 
-const TreeRow = memo(({ index, data }: TreeRowProps) => {
+const TreeRow = memo(({ index, data, isSelected, isFocused }: TreeRowProps) => {
   const {
     nodes,
     toggleNode,
-    selectedId,
     itemRenderer,
     itemClickExpands,
     onItemClick,
     onSelection,
     lookupEventHandler,
-    focusedIndex,
     treeContainerRef,
     iconCollapsed,
     iconExpanded,
@@ -70,10 +68,6 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     spinnerDelay,
   } = data;
   const treeItem = nodes[index];
-  const isFocused = focusedIndex === index && focusedIndex >= 0;
-
-  // Use string comparison to handle type mismatches between selectedId and treeItem.key
-  const isSelected = String(selectedId) === String(treeItem.key);
 
   // Track whether the spinner delay has expired for this loading node
   const nodeWithState = treeItem as FlatTreeNodeWithState;
@@ -267,6 +261,24 @@ const TreeRow = memo(({ index, data }: TreeRowProps) => {
     </div>
   );
 });
+
+/**
+ * T3: Memoized wrapper for TreeRow with a custom comparator.
+ * `data` (RowContext) is stable across selection/focus changes — only `isSelected`
+ * and `isFocused` change per-click, so only the affected rows re-render.
+ */
+const TreeMemoizedRow = memo(
+  ({ index, data, isSelected, isFocused }: TreeRowProps) => (
+    <TreeRow index={index} data={data} isSelected={isSelected} isFocused={isFocused} />
+  ),
+  (prev, next) => {
+    if (prev.data !== next.data) return false;
+    if (prev.index !== next.index) return false;
+    if (prev.isSelected !== next.isSelected) return false;
+    if (prev.isFocused !== next.isFocused) return false;
+    return true;
+  },
+);
 
 const emptyTreeData: UnPackedTreeData = {
   treeData: [],
@@ -1422,13 +1434,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
     return {
       nodes: flatTreeData,
       toggleNode,
-      selectedId: effectiveSelectedId,
       itemRenderer,
       itemClickExpands,
       onItemClick,
       onSelection: (node: FlatTreeNode) => setSelectedNodeById(node.key),
       lookupEventHandler,
-      focusedIndex,
       onKeyDown: handleKeyDown,
       treeContainerRef,
       iconCollapsed,
@@ -1441,13 +1451,11 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
   }, [
     flatTreeData,
     toggleNode,
-    effectiveSelectedId,
     itemRenderer,
     itemClickExpands,
     onItemClick,
     setSelectedNodeById,
     lookupEventHandler,
-    focusedIndex,
     handleKeyDown,
     iconCollapsed,
     iconExpanded,
@@ -2557,13 +2565,15 @@ export const TreeComponent = memo((props: TreeComponentProps) => {
         {flatTreeData.map((node, index) => {
           const isFirstItem = index === 0;
           const shouldMeasure = isFirstItem && fixedItemSize;
+          const isSelected = String(effectiveSelectedId) === String(node.key);
+          const isFocused = focusedIndex === index && focusedIndex >= 0;
 
           return shouldMeasure ? (
             <div key={node.key} ref={firstItemRef}>
-              <TreeRow index={index} data={itemData} />
+              <TreeMemoizedRow index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
             </div>
           ) : (
-            <TreeRow key={node.key} index={index} data={itemData} />
+            <TreeMemoizedRow key={node.key} index={index} data={itemData} isSelected={isSelected} isFocused={isFocused} />
           );
         })}
       </Virtualizer>

@@ -256,7 +256,13 @@ const TileGridWithSync = memo(
     // pendingOwnWriteRef: set to true just before syncAdapter.update calls handler().
     // Consumed at the top of each render to detect own-write XMLUI cycles and suppress
     // the resulting TileGridNative re-render (in-place syncAdapter update instead of new object).
+    // pendingOwnWriteVersionRef + __v: monotonically-increasing version embedded in the window
+    // object so own-write detection survives concurrent React re-renders (startTransition may
+    // cause multiple render attempts; a boolean flag would be consumed on the first and missed
+    // on the second, incorrectly treating the repeat as an external change).
     const pendingOwnWriteRef = useRef(false);
+    const pendingOwnWriteVersionRef = useRef<number>(0);
+    const ownWriteCountRef = useRef<number>(0);
     const pendingOwnWrite = pendingOwnWriteRef.current;
     pendingOwnWriteRef.current = false;
 
@@ -279,19 +285,27 @@ const TileGridWithSync = memo(
               value: currentValue,
               update: ({ selectedIds }: { selectedIds: string[] }) => {
                 const windowKey = `__tgSync_${syncVarName}`;
-                (window as any)[windowKey] = selectedIds;
+                pendingOwnWriteRef.current = true;
+                const thisVersion = ++ownWriteCountRef.current;
+                pendingOwnWriteVersionRef.current = thisVersion;
+                (window as any)[windowKey] = { selectedIds, __v: thisVersion };
                 const handler = lookupActionRef.current?.(
-                  `{${syncVarName} = {selectedIds: window.${windowKey}}}`,
+                  `{${syncVarName} = {selectedIds: window.${windowKey}.selectedIds, __v: window.${windowKey}.__v}}`,
                   { ephemeral: true },
                 );
-                pendingOwnWriteRef.current = true;
                 startTransition(() => { handler?.(); });
               },
             };
           } else if (currentValue !== syncAdapterHolderRef.current.value) {
-            if (pendingOwnWrite) {
+            const isOwnWrite = pendingOwnWrite ||
+              (pendingOwnWriteVersionRef.current > 0 &&
+                currentValue?.__v === pendingOwnWriteVersionRef.current);
+            if (isOwnWrite) {
               // Own-write cycle: update value in-place so TileGridNative.memo() is not triggered.
               syncAdapterHolderRef.current.value = currentValue;
+              if (currentValue?.__v === pendingOwnWriteVersionRef.current) {
+                pendingOwnWriteVersionRef.current = 0; // version consumed
+              }
             } else {
               // External change (select-all etc.): new object so TileGridNative.memo() detects it.
               syncAdapterHolderRef.current = {
