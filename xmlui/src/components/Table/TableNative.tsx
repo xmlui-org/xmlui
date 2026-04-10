@@ -864,13 +864,10 @@ export const Table = memo(forwardRef(
       });
     }, [getThemeVar, safeColumns]);
 
-    // --- Prepare column renderers according to columns defined in the table supporting optional row selection
-    const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
-      if (hideSelectionCheckboxes) {
-        return columnsWithCustomCell;
-      }
+    // --- Prepare selection column separately to keep it stable from hover state
+    const selectColumn: ColumnDef<any> = useMemo(() => {
       // --- Extend the columns with a selection checkbox (indeterminate)
-      const selectColumn = {
+      return {
         id: "select",
         size: SELECT_COLUMN_WIDTH,
         enableResizing: false,
@@ -933,11 +930,8 @@ export const Table = memo(forwardRef(
           );
         },
       };
-      return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
     }, [
       idKey,
-      rowsSelectable,
-      columnsWithCustomCell,
       enableMultiRowSelection,
       alwaysShowSelectionCheckboxesHeader,
       checkAllRows,
@@ -946,10 +940,17 @@ export const Table = memo(forwardRef(
       rowUnselectablePredicate,
       hoveredRowId,
       headerCheckboxHovered,
-      hideSelectionCheckboxes,
       hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes,
     ]);
+
+    // --- Prepare column renderers according to columns defined in the table supporting optional row selection
+    const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
+      if (hideSelectionCheckboxes) {
+        return columnsWithCustomCell;
+      }
+      return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
+    }, [rowsSelectable, columnsWithCustomCell, hideSelectionCheckboxes, selectColumn]);
 
     // --- Set up page information (using the first page size option)
     const [pagination, setPagination] = useState<PaginationState>({
@@ -1636,7 +1637,7 @@ export const Table = memo(forwardRef(
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes, safeColumns, columnsWithSelectColumn]);
+    }, [recalculateStarSizes, safeColumns, rowsSelectable, hideSelectionCheckboxes]);
 
     useIsomorphicLayoutEffect(() => {
       registerComponentApi(selectionApi);
