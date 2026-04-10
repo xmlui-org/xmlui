@@ -575,6 +575,10 @@ Use this while data is being fetched to prevent a layout flash.
 </App>
 ```
 
+### `refreshOn` [#refreshon]
+
+An optional value that, when changed, forces all visible tiles to re-render so their XMLUI event-handler closures pick up the latest reactive state. Bind to any global variable whose change should invalidate tile closures (e.g. `"{selectMode}"`). If not provided, tiles re-render on every XMLUI reactive cycle.
+
 ### `stretchItems` [#stretchitems]
 
 > [!DEF]  default: **false**
@@ -658,7 +662,80 @@ Selecting a tile in either grid immediately reflects in the other:
 Change the selection in one of the grids and check how it is synced.
 ```
 
+### `toggleSelectionOnClick` [#toggleselectiononclick]
+
+> [!DEF]  default: **false**
+
+When `true`, a plain click toggles the tile's selection state instead of replacing the current selection. Ctrl+Click and Shift+Click behavior is unchanged. Only has an effect when `itemsSelectable` is `true`.
+
+When `true`, a plain click toggles the tile's selection state (adds it if not selected, removes it if already selected) instead of replacing the current selection.
+This property only has an effect when `itemsSelectable` is `true`. Ctrl+Click and Shift+Click behavior is unchanged.
+
+The default value is `false`.
+
+```xmlui copy /toggleSelectionOnClick="true"/
+<App>
+  <TileGrid
+    data="{[...]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    toggleSelectionOnClick="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
+```xmlui-pg name="Example: toggleSelectionOnClick"
+<App>
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples', category: 'fruits'},
+      {id: 2, name: 'Bananas', category: 'fruits'},
+      {id: 3, name: 'Carrots', category: 'vegetables'},
+      {id: 4, name: 'Spinach', category: 'vegetables'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    itemsSelectable="true"
+    toggleSelectionOnClick="true"
+  >
+    <VStack padding="8px" horizontalAlignment="center" verticalAlignment="center">
+      <Text fontWeight="bold">{$item.name}</Text>
+      <Text color="gray">{$item.category}</Text>
+    </VStack>
+  </TileGrid>
+</App>
+```
+
 ## Events [#events]
+
+### `contextMenu` [#contextmenu]
+
+Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.
+
+Fired when a tile is right-clicked. Receives the tile data item as `$item` and its zero-based index as `$itemIndex`.
+
+```xmlui copy /onContextMenu="testState = $item.name"/
+<App var.testState="">
+  <TileGrid
+    data="{[
+      {id: 1, name: 'Apples'},
+      {id: 2, name: 'Bananas'},
+      {id: 3, name: 'Carrots'}
+    ]}"
+    itemWidth="120px"
+    itemHeight="80px"
+    onContextMenu="testState = $item.name"
+  >
+    <Text>{$item.name}</Text>
+  </TileGrid>
+  <Text>Right-clicked: {testState}</Text>
+</App>
+```
 
 ### `copyAction` [#copyaction]
 
