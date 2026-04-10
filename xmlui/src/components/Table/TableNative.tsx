@@ -1721,6 +1721,12 @@ export const Table = memo(forwardRef(
                     })}
                     onClick={(event) => {
                       const target = event.target as HTMLElement;
+                      
+                      // Allow native checkbox clicks to be handled by Toggle's onChange
+                      if (target.tagName.toLowerCase() === "input" && target.getAttribute("type") === "checkbox") {
+                        return;
+                      }
+
                       const headerCell = target.closest("th");
 
                       // Only handle clicks for the select column header
