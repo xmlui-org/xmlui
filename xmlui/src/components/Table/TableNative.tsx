@@ -250,60 +250,42 @@ const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
 
-/**
- * Maps checkbox tolerance values to pixel values
- * @param tolerance - The tolerance level
- * @returns The number of pixels for the tolerance
- */
-const getCheckboxTolerancePixels = (tolerance: CheckboxTolerance): number => {
-  switch (tolerance) {
-    case "none":
-      return 0;
-    case "compact":
-      return 8;
-    case "comfortable":
-      return 12;
-    case "spacious":
-      return 16;
-    default:
-      return 8; // fallback to compact
-  }
+type SelectionToggleProps = {
+  checkboxTolerance: CheckboxTolerance;
+  ariaLabel: string;
+  value: boolean;
+  indeterminate: boolean;
+  onDidChange: () => void;
+  alwaysVisibleClassName?: string;
 };
 
-/**
- * Helper function to check if a point is within the checkbox boundary
- * @param pointX - X coordinate of the point to check
- * @param pointY - Y coordinate of the point to check
- * @param checkboxRect - Bounding rectangle of the checkbox
- * @param tolerancePixels - Number of pixels to extend the boundary
- * @returns true if the point is within the checkbox or within tolerancePixels of its boundary
- */
-const isWithinCheckboxBoundary = (
-  pointX: number,
-  pointY: number,
-  checkboxRect: DOMRect,
-  tolerancePixels: number,
-): boolean => {
-  // Calculate distance from point to checkbox boundaries
-  const distanceToLeft = Math.abs(pointX - checkboxRect.left);
-  const distanceToRight = Math.abs(pointX - checkboxRect.right);
-  const distanceToTop = Math.abs(pointY - checkboxRect.top);
-  const distanceToBottom = Math.abs(pointY - checkboxRect.bottom);
-
-  // Check if point is within the checkbox bounds or within boundary pixels of any edge
-  const withinHorizontalBounds = pointX >= checkboxRect.left && pointX <= checkboxRect.right;
-  const withinVerticalBounds = pointY >= checkboxRect.top && pointY <= checkboxRect.bottom;
-  const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
-
-  const nearHorizontalBoundary =
-    withinVerticalBounds &&
-    (distanceToLeft <= tolerancePixels || distanceToRight <= tolerancePixels);
-  const nearVerticalBoundary =
-    withinHorizontalBounds &&
-    (distanceToTop <= tolerancePixels || distanceToBottom <= tolerancePixels);
-
-  return withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
-};
+function SelectionToggle({
+  checkboxTolerance,
+  ariaLabel,
+  value,
+  indeterminate,
+  onDidChange,
+  alwaysVisibleClassName,
+}: SelectionToggleProps) {
+  const wrapperClassName = classnames(styles.checkBoxWrapper, alwaysVisibleClassName, {
+    [styles.toleranceCompact]: checkboxTolerance === "compact",
+    [styles.toleranceComfortable]: checkboxTolerance === "comfortable",
+    [styles.toleranceSpacious]: checkboxTolerance === "spacious",
+  });
+  return (
+    <div className={wrapperClassName}>
+      <Toggle
+        {...{
+          "aria-label": ariaLabel,
+          className: styles.selectionToggle,
+          value,
+          indeterminate,
+          onDidChange,
+        }}
+      />
+    </div>
+  );
+}
 
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
@@ -660,15 +642,6 @@ export const Table = memo(forwardRef(
     // --- Keep track of visible table rows
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
-    // --- Track which row should show forced hover for checkbox
-    const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-
-    // --- Track if the header checkbox should show forced hover
-    const [headerCheckboxHovered, setHeaderCheckboxHovered] = useState<boolean>(false);
-
-    // --- Calculate tolerance pixels from the prop
-    const tolerancePixels = getCheckboxTolerancePixels(checkboxTolerance);
-
     // --- Get the operations to manage selected rows in a table
     const {
       toggleRow,
@@ -877,27 +850,24 @@ export const Table = memo(forwardRef(
         },
         header: ({ table }: HeaderContext<any, unknown>) =>
           enableMultiRowSelection && !hideSelectionCheckboxesHeader ? (
-            <Toggle
-              {...{
-                "aria-label": "Select all rows",
-                className: classnames(styles.checkBoxWrapper, {
-                  [styles.showInHeader]: alwaysShowSelectionCheckboxesHeader,
-                  [styles.forceHoverWrapper]: headerCheckboxHovered,
-                }),
-                value: table.getIsAllRowsSelected(),
-                indeterminate: table.getIsSomeRowsSelected(),
-                forceHover: headerCheckboxHovered,
-                onDidChange: () => {
-                  const allSelected = table
-                    .getRowModel()
-                    .rows.every(
-                      (row) =>
-                        rowDisabledPredicate(row.original) ||
-                        rowUnselectablePredicate(row.original) ||
-                        row.getIsSelected(),
-                    );
-                  checkAllRows(!allSelected);
-                },
+            <SelectionToggle
+              checkboxTolerance={checkboxTolerance}
+              ariaLabel="Select all rows"
+              alwaysVisibleClassName={
+                alwaysShowSelectionCheckboxesHeader ? styles.showInHeader : undefined
+              }
+              value={table.getIsAllRowsSelected()}
+              indeterminate={table.getIsSomeRowsSelected()}
+              onDidChange={() => {
+                const allSelected = table
+                  .getRowModel()
+                  .rows.every(
+                    (row) =>
+                      rowDisabledPredicate(row.original) ||
+                      rowUnselectablePredicate(row.original) ||
+                      row.getIsSelected(),
+                  );
+                checkAllRows(!allSelected);
               }}
             />
           ) : null,
@@ -905,24 +875,21 @@ export const Table = memo(forwardRef(
           return (
             <>
               {row.getCanSelect() && (
-                <Toggle
-                  {...{
-                    "aria-label": `Select ${row.original[idKey]}`,
-                    className: classnames(styles.checkBoxWrapper, {
-                      [styles.forceHoverWrapper]: hoveredRowId === row.id,
-                      [styles.showInRow]: alwaysShowSelectionCheckboxes,
-                    }),
-                    value: row.getIsSelected(),
-                    indeterminate: row.getIsSomeSelected(),
-                    forceHover: hoveredRowId === row.id,
-                    onDidChange: () => {
-                      // In single selection mode, allow deselection by checking if already selected
-                      if (!enableMultiRowSelection && row.getIsSelected()) {
-                        checkAllRows(false); // Deselect all (which is just this one row)
-                      } else {
-                        toggleRow(row.original, { metaKey: true });
-                      }
-                    },
+                <SelectionToggle
+                  checkboxTolerance={checkboxTolerance}
+                  ariaLabel={`Select ${row.original[idKey]}`}
+                  alwaysVisibleClassName={
+                    alwaysShowSelectionCheckboxes ? styles.showInRow : undefined
+                  }
+                  value={row.getIsSelected()}
+                  indeterminate={row.getIsSomeSelected()}
+                  onDidChange={() => {
+                    // In single selection mode, allow deselection by checking if already selected
+                    if (!enableMultiRowSelection && row.getIsSelected()) {
+                      checkAllRows(false); // Deselect all (which is just this one row)
+                    } else {
+                      toggleRow(row.original, { metaKey: true });
+                    }
                   }}
                 />
               )}
@@ -936,10 +903,9 @@ export const Table = memo(forwardRef(
       alwaysShowSelectionCheckboxesHeader,
       checkAllRows,
       toggleRow,
+      checkboxTolerance,
       rowDisabledPredicate,
       rowUnselectablePredicate,
-      hoveredRowId,
-      headerCheckboxHovered,
       hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes,
     ]);
@@ -1274,8 +1240,6 @@ export const Table = memo(forwardRef(
       toggleRow,
       checkAllRows,
       enableMultiRowSelection,
-      tolerancePixels,
-      setHoveredRowId,
       lookupEventHandler,
       rowDoubleClick,
       striped,
@@ -1420,29 +1384,19 @@ export const Table = memo(forwardRef(
                 // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
                 wrapperRef.current?.focus();
 
-                // Check if click is within checkbox boundary
-                const currentRow = event.currentTarget as HTMLElement;
-                const checkbox = currentRow.querySelector(
-                  'input[type="checkbox"]',
-                ) as HTMLInputElement;
+                const isSelectColumn =
+                  target.closest("td")?.getAttribute("data-column-id") === "select";
 
-                if (checkbox) {
-                  const checkboxRect = checkbox.getBoundingClientRect();
-                  const clickX = event.clientX;
-                  const clickY = event.clientY;
-
+                if (isSelectColumn) {
                   const rs = rowStateRef.current;
-                  if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, rs.tolerancePixels)) {
-                    // Toggle the checkbox when clicking within the boundary
-                    // In single selection mode, allow deselection by checking if already selected
-                    if (!rs.enableMultiRowSelection && row.getIsSelected()) {
-                      rs.checkAllRows(false); // Deselect all (which is just this one row)
-                    } else {
-                      rs.toggleRow(row.original, { metaKey: true });
-                    }
-                    return;
+                  if (!rs.enableMultiRowSelection && row.getIsSelected()) {
+                    rs.checkAllRows(false); // Deselect all (which is just this one row)
+                  } else {
+                    rs.toggleRow(row.original, { metaKey: true });
                   }
+                  return;
                 }
+
                 rowStateRef.current.toggleRow(row.original, event);
               }}
               onDoubleClick={(event) => {
@@ -1458,41 +1412,6 @@ export const Table = memo(forwardRef(
                     console.error("Error in rowDoubleClick handler:", e);
                   }
                 }
-              }}
-              onMouseMove={(event) => {
-                // Change cursor and hover state when within checkbox boundary
-                const currentRow = event.currentTarget as HTMLElement;
-                const checkbox = currentRow.querySelector(
-                  'input[type="checkbox"]',
-                ) as HTMLInputElement;
-
-                if (checkbox) {
-                  const checkboxRect = checkbox.getBoundingClientRect();
-                  const mouseX = event.clientX;
-                  const mouseY = event.clientY;
-
-                  const shouldShowHover = isWithinCheckboxBoundary(
-                    mouseX,
-                    mouseY,
-                    checkboxRect,
-                    rowStateRef.current.tolerancePixels,
-                  );
-
-                  // Update hover state and cursor based on proximity to checkbox
-                  if (shouldShowHover) {
-                    rowStateRef.current.setHoveredRowId(row.id);
-                    currentRow.style.cursor = "pointer";
-                  } else {
-                    rowStateRef.current.setHoveredRowId(null);
-                    currentRow.style.cursor = "";
-                  }
-                }
-              }}
-              onMouseLeave={(event) => {
-                // Reset cursor and hover state when leaving the row
-                const currentRow = event.currentTarget as HTMLElement;
-                currentRow.style.cursor = "";
-                rowStateRef.current.setHoveredRowId(null);
               }}
               onContextMenu={
                 rowStateRef.current.lookupEventHandler
@@ -1721,103 +1640,34 @@ export const Table = memo(forwardRef(
                     })}
                     onClick={(event) => {
                       const target = event.target as HTMLElement;
+
+                      // Allow native checkbox clicks to be handled by Toggle's onChange
+                      if (target.tagName.toLowerCase() === "input" && target.getAttribute("type") === "checkbox") {
+                        return;
+                      }
+
                       const headerCell = target.closest("th");
 
-                      // Only handle clicks for the select column header
-                      if (headerCell && rowsSelectable && enableMultiRowSelection) {
-                        const header = headerGroup.headers.find((h) => {
-                          const headerElement = headerCell;
-                          return (
-                            headerElement?.getAttribute("data-column-id") === h.id ||
-                            h.id === "select"
-                          );
-                        });
+                      // Only handle clicks for the select column header when the header checkbox is visible
+                      if (
+                        headerCell &&
+                        rowsSelectable &&
+                        enableMultiRowSelection &&
+                        !hideSelectionCheckboxesHeader
+                      ) {
+                        const headerId = headerCell.getAttribute("data-column-id");
 
-                        if (header && header.id === "select") {
-                          const clickX = event.clientX;
-                          const clickY = event.clientY;
-                          const checkbox = headerCell.querySelector(
-                            'input[type="checkbox"]',
-                          ) as HTMLInputElement;
-
-                          if (checkbox) {
-                            const checkboxRect = checkbox.getBoundingClientRect();
-
-                            if (
-                              isWithinCheckboxBoundary(
-                                clickX,
-                                clickY,
-                                checkboxRect,
-                                tolerancePixels,
-                              )
-                            ) {
-                              // Prevent the default click and manually trigger the checkbox
-                              event.preventDefault();
-                              event.stopPropagation();
-
-                              const allSelected = table
-                                .getRowModel()
-                                .rows.every(
-                                  (row) =>
-                                    rowDisabledPredicate(row.original) ||
-                                    rowUnselectablePredicate(row.original) ||
-                                    row.getIsSelected(),
-                                );
-                              checkAllRows(!allSelected);
-                            }
-                          }
-                        }
-                      }
-                    }}
-                    onMouseMove={(event) => {
-                      if (rowsSelectable && enableMultiRowSelection) {
-                        const target = event.target as HTMLElement;
-                        const headerCell = target.closest("th");
-
-                        if (headerCell) {
-                          const header = headerGroup.headers.find((h) => {
-                            const headerElement = headerCell;
-                            return (
-                              headerElement?.getAttribute("data-column-id") === h.id ||
-                              h.id === "select"
+                        if (headerId === "select") {
+                          const allSelected = table
+                            .getRowModel()
+                            .rows.every(
+                              (row) =>
+                                rowDisabledPredicate(row.original) ||
+                                rowUnselectablePredicate(row.original) ||
+                                row.getIsSelected(),
                             );
-                          });
-
-                          if (header && header.id === "select") {
-                            const mouseX = event.clientX;
-                            const mouseY = event.clientY;
-                            const checkbox = headerCell.querySelector(
-                              'input[type="checkbox"]',
-                            ) as HTMLInputElement;
-
-                            if (checkbox) {
-                              const checkboxRect = checkbox.getBoundingClientRect();
-                              const shouldShowHover = isWithinCheckboxBoundary(
-                                mouseX,
-                                mouseY,
-                                checkboxRect,
-                                tolerancePixels,
-                              );
-
-                              if (shouldShowHover && !headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(true);
-                                event.currentTarget.style.cursor = "pointer";
-                              } else if (!shouldShowHover && headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(false);
-                                event.currentTarget.style.cursor = "";
-                              }
-                            }
-                          } else if (headerCheckboxHovered) {
-                            setHeaderCheckboxHovered(false);
-                            event.currentTarget.style.cursor = "";
-                          }
+                          checkAllRows(!allSelected);
                         }
-                      }
-                    }}
-                    onMouseLeave={(event) => {
-                      if (headerCheckboxHovered) {
-                        setHeaderCheckboxHovered(false);
-                        event.currentTarget.style.cursor = "";
                       }
                     }}
                   >

@@ -42,7 +42,6 @@ type ToggleProps = {
   autoFocus?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
-  forceHover?: boolean;
   tabIndex?: number;
   "aria-label"?: string;
 };
@@ -80,7 +79,6 @@ export const Toggle = forwardRef(function Toggle(
     autoFocus,
     registerComponentApi,
     inputRenderer,
-    forceHover = false,
     tabIndex,
     "aria-label": ariaLabel,
     ...rest
@@ -222,7 +220,6 @@ export const Toggle = forwardRef(function Toggle(
               [styles.error]: validationStatus === "error",
               [styles.warning]: validationStatus === "warning",
               [styles.valid]: validationStatus === "valid",
-              [styles.forceHover]: forceHover,
               [styles.noTransition]: suppressTransition,
             },
           )}
@@ -251,7 +248,6 @@ export const Toggle = forwardRef(function Toggle(
     variant,
     indeterminate,
     autoFocus,
-    forceHover,
     suppressTransition,
   ]);
 
