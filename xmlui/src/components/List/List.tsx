@@ -1,4 +1,4 @@
-import { memo, useRef } from "react";
+import { memo, useRef, startTransition } from "react";
 
 import styles from "./List.module.scss";
 
@@ -372,11 +372,27 @@ const ListWithSelection = memo(function ListWithSelection({
 
   const selectionContext = useSelectionContext();
 
-  // Build a syncWithVar-compatible adapter for global-variable sync.
+  // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
+  //
+  // KEY POINTS (ported from Table.tsx):
+  // 1. Data is passed through a window variable; expression string stays constant O(1).
+  // 2. startTransition defers the XMLUI tree re-render so it does not block the main thread.
+  // 3. pendingOwnWriteRef + __v version tracking reliably suppress own-write re-renders.
+  // 4. External changes (e.g. select-all from outside) create a new adapter object so
+  //    ListNative detects the prop change and useRowSelection picks up the new selection.
   const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
   const lookupActionRef = useRef(lookupAction);
   lookupActionRef.current = lookupAction;
   const syncAdapterHolderRef = useRef<{ value: any; update: any } | null>(null);
+
+  const pendingOwnWriteRef = useRef(false);
+  // Each write embeds a monotonically-increasing __v number in the stored object.
+  // We compare this primitive on read-back — reliable even when XMLUI does not
+  // preserve inner array references across state evaluations.
+  const pendingOwnWriteVersionRef = useRef<number>(0);
+  const ownWriteCountRef = useRef<number>(0);
+  const pendingOwnWrite = pendingOwnWriteRef.current;
+  pendingOwnWriteRef.current = false; // consume immediately
 
   let syncAdapter: any;
   if (syncVarName !== undefined) {
@@ -387,17 +403,42 @@ const ListWithSelection = memo(function ListWithSelection({
       const currentSyncVarValue = extractValue(`{${syncVarName}}`);
       if (currentSyncVarValue != null) {
         if (!syncAdapterHolderRef.current) {
+          // Create the stable adapter object once.
           syncAdapterHolderRef.current = {
             value: currentSyncVarValue,
             update: ({ selectedIds }: { selectedIds: string[] }) => {
-              const valueJson = JSON.stringify(selectedIds);
-              const expr = `{${syncVarName} = {selectedIds: ${valueJson}}}`;
-              const handler = lookupActionRef.current?.(expr, { ephemeral: true });
-              handler?.();
+              pendingOwnWriteRef.current = true;
+              const thisVersion = ++ownWriteCountRef.current;
+              pendingOwnWriteVersionRef.current = thisVersion;
+              const windowKey = `__listSync_${syncVarName}`;
+              (window as any)[windowKey] = { selectedIds, __v: thisVersion };
+              const handler = lookupActionRef.current?.(
+                `{${syncVarName} = window.${windowKey}}`,
+                { ephemeral: true },
+              );
+              startTransition(() => {
+                handler?.();
+              });
             },
           };
-        } else {
-          syncAdapterHolderRef.current.value = currentSyncVarValue;
+        } else if (currentSyncVarValue !== syncAdapterHolderRef.current.value) {
+          // Detect whether this value change is from our own write or external.
+          const isOwnWrite = pendingOwnWrite ||
+            (pendingOwnWriteVersionRef.current > 0 &&
+              currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
+
+          if (isOwnWrite) {
+            // Own-write: update value in-place so ListNative.memo() is not triggered.
+            syncAdapterHolderRef.current.value = currentSyncVarValue;
+          } else {
+            // External change: reset version sentinel and create new object so
+            // ListNative detects the prop change and useRowSelection picks it up.
+            pendingOwnWriteVersionRef.current = 0;
+            syncAdapterHolderRef.current = {
+              value: currentSyncVarValue,
+              update: syncAdapterHolderRef.current.update,
+            };
+          }
         }
       } else {
         syncAdapterHolderRef.current = null;
