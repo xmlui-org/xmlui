@@ -28,6 +28,7 @@ import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Table.module.scss";
+import toggleStyles from "../Toggle/Toggle.module.scss";
 
 import "./react-table-config.d.ts";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -331,6 +332,22 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false):
       : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
+};
+
+const applyForcedCheckboxHoverStyles = (
+  checkbox: HTMLInputElement,
+  shouldShowHover: boolean,
+) => {
+  const wrapper = checkbox.closest(`.${styles.checkBoxWrapper}`);
+
+  if (shouldShowHover) {
+    wrapper?.classList.add(styles.forceHoverWrapper);
+    if (toggleStyles.forceHover) checkbox.classList.add(toggleStyles.forceHover);
+    return;
+  }
+
+  wrapper?.classList.remove(styles.forceHoverWrapper);
+  if (toggleStyles.forceHover) checkbox.classList.remove(toggleStyles.forceHover);
 };
 
 /**
@@ -660,12 +677,6 @@ export const Table = memo(forwardRef(
     // --- Keep track of visible table rows
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
-    // --- Track which row should show forced hover for checkbox
-    const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-
-    // --- Track if the header checkbox should show forced hover
-    const [headerCheckboxHovered, setHeaderCheckboxHovered] = useState<boolean>(false);
-
     // --- Calculate tolerance pixels from the prop
     const tolerancePixels = getCheckboxTolerancePixels(checkboxTolerance);
 
@@ -882,11 +893,9 @@ export const Table = memo(forwardRef(
                 "aria-label": "Select all rows",
                 className: classnames(styles.checkBoxWrapper, {
                   [styles.showInHeader]: alwaysShowSelectionCheckboxesHeader,
-                  [styles.forceHoverWrapper]: headerCheckboxHovered,
                 }),
                 value: table.getIsAllRowsSelected(),
                 indeterminate: table.getIsSomeRowsSelected(),
-                forceHover: headerCheckboxHovered,
                 onDidChange: () => {
                   const allSelected = table
                     .getRowModel()
@@ -909,12 +918,10 @@ export const Table = memo(forwardRef(
                   {...{
                     "aria-label": `Select ${row.original[idKey]}`,
                     className: classnames(styles.checkBoxWrapper, {
-                      [styles.forceHoverWrapper]: hoveredRowId === row.id,
                       [styles.showInRow]: alwaysShowSelectionCheckboxes,
                     }),
                     value: row.getIsSelected(),
                     indeterminate: row.getIsSomeSelected(),
-                    forceHover: hoveredRowId === row.id,
                     onDidChange: () => {
                       // In single selection mode, allow deselection by checking if already selected
                       if (!enableMultiRowSelection && row.getIsSelected()) {
@@ -938,8 +945,6 @@ export const Table = memo(forwardRef(
       toggleRow,
       rowDisabledPredicate,
       rowUnselectablePredicate,
-      hoveredRowId,
-      headerCheckboxHovered,
       hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes,
     ]);
@@ -1275,7 +1280,6 @@ export const Table = memo(forwardRef(
       checkAllRows,
       enableMultiRowSelection,
       tolerancePixels,
-      setHoveredRowId,
       lookupEventHandler,
       rowDoubleClick,
       striped,
@@ -1480,10 +1484,10 @@ export const Table = memo(forwardRef(
 
                   // Update hover state and cursor based on proximity to checkbox
                   if (shouldShowHover) {
-                    rowStateRef.current.setHoveredRowId(row.id);
+                    applyForcedCheckboxHoverStyles(checkbox, true);
                     currentRow.style.cursor = "pointer";
                   } else {
-                    rowStateRef.current.setHoveredRowId(null);
+                    applyForcedCheckboxHoverStyles(checkbox, false);
                     currentRow.style.cursor = "";
                   }
                 }
@@ -1492,7 +1496,12 @@ export const Table = memo(forwardRef(
                 // Reset cursor and hover state when leaving the row
                 const currentRow = event.currentTarget as HTMLElement;
                 currentRow.style.cursor = "";
-                rowStateRef.current.setHoveredRowId(null);
+                const checkbox = currentRow.querySelector(
+                  'input[type="checkbox"]',
+                ) as HTMLInputElement;
+                if (checkbox) {
+                  applyForcedCheckboxHoverStyles(checkbox, false);
+                }
               }}
               onContextMenu={
                 rowStateRef.current.lookupEventHandler
@@ -1799,26 +1808,30 @@ export const Table = memo(forwardRef(
                                 tolerancePixels,
                               );
 
-                              if (shouldShowHover && !headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(true);
+                              if (shouldShowHover) {
+                                applyForcedCheckboxHoverStyles(checkbox, true);
                                 event.currentTarget.style.cursor = "pointer";
-                              } else if (!shouldShowHover && headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(false);
+                              } else {
+                                applyForcedCheckboxHoverStyles(checkbox, false);
                                 event.currentTarget.style.cursor = "";
                               }
                             }
-                          } else if (headerCheckboxHovered) {
-                            setHeaderCheckboxHovered(false);
+                          } else {
+                            const checkbox = event.currentTarget.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                            if (checkbox) {
+                              applyForcedCheckboxHoverStyles(checkbox, false);
+                            }
                             event.currentTarget.style.cursor = "";
                           }
                         }
                       }
                     }}
                     onMouseLeave={(event) => {
-                      if (headerCheckboxHovered) {
-                        setHeaderCheckboxHovered(false);
-                        event.currentTarget.style.cursor = "";
+                      const checkbox = event.currentTarget.querySelector('input[type="checkbox"]') as HTMLInputElement;
+                      if (checkbox) {
+                        applyForcedCheckboxHoverStyles(checkbox, false);
                       }
+                      event.currentTarget.style.cursor = "";
                     }}
                   >
                     {headerGroup.headers.map((header, headerIndex) => {
