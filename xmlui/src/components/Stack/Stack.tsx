@@ -505,7 +505,7 @@ export const stackComponentRenderer = wrapComponent(
         extractValue.asSize(node.props?.itemWidth) ??
         extractValue.asOptionalString(
           node.props?.itemWidth,
-          orientation === "vertical" ? "100%" : "fit-content",
+          orientation === "vertical" ? "100%" : (props.wrapContent ? "100%" : "fit-content"),
         );
       return renderStack({
         node,
@@ -571,7 +571,7 @@ export const hStackComponentRenderer = wrapComponent(
     customRender(props, { node, extractValue, renderChild, layoutContext }) {
       const itemWidth =
         extractValue.asSize(node.props?.itemWidth) ??
-        extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+        extractValue.asOptionalString(node.props?.itemWidth, props.wrapContent ? "100%" : "fit-content");
       return renderStack({
         node,
         extractValue,
@@ -636,7 +636,7 @@ export const chStackComponentRenderer = wrapComponent(
     customRender(props, { node, extractValue, renderChild, layoutContext }) {
       const itemWidth =
         extractValue.asSize(node.props?.itemWidth) ??
-        extractValue.asOptionalString(node.props?.itemWidth, "fit-content");
+        extractValue.asOptionalString(node.props?.itemWidth, props.wrapContent ? "100%" : "fit-content");
       return renderStack({
         node,
         extractValue,
