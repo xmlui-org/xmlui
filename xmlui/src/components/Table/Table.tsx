@@ -528,8 +528,6 @@ export const TableMd = createMetadata({
     [`textTransform-heading-${COMP}`]: "uppercase",
     [`fontSize-row-${COMP}`]: "$fontSize-sm",
     [`fontSize-checkbox-${COMP}`]: "$fontSize",
-    // [`backgroundColor-${COMP}`]: "transparent",
-    // [`backgroundColor-row-${COMP}`]: "inherit",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
     [`backgroundColor-pagination-${COMP}`]: `$backgroundColor-${COMP}`,
     [`textColor-pagination-${COMP}`]: "$color-secondary",
@@ -547,7 +545,10 @@ export const TableMd = createMetadata({
     [`userSelect-row-${COMP}`]: "none",
     [`backgroundColor-evenRow-${COMP}`]: `$backgroundColor-row-${COMP}`,
     [`backgroundColor-oddRow-${COMP}`]: `$color-surface-100`,
-    [`backgroundColor-pinnedCell-${COMP}`]: "transparent",
+    [`backgroundColor-pinnedCell-${COMP}`]: "$color-surface-50",
+    [`backgroundColor-pinnedCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
+    [`backgroundColor-selectionCell-${COMP}`]: "$backgroundColor-pinnedCell-Table",
+    [`backgroundColor-selectionCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
   },
 });
 

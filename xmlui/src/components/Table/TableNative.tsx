@@ -56,6 +56,7 @@ import {
   matchesKeyEvent,
   type ParsedKeyBinding,
 } from "../../parsers/keybinding-parser/keybinding-parser";
+import { toCssVar } from "../../components-core/theming/layout-resolver";
 
 // =====================================================================================================================
 // Helper types
@@ -323,8 +324,10 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false):
     position: isPinned ? "sticky" : "relative",
     backgroundColor: isPinned
       ? isHeader
-        ? "var(--xmlui-backgroundColor-heading-Table)"
-        : "var(--xmlui-backgroundColor-pinnedCell-Table)"
+        ? toCssVar("$backgroundColor-heading-Table")
+        : column.id === "select"
+          ? `var(--checkbox-cell-bg, ${toCssVar("$backgroundColor-selectionCell-Table")})`
+          : `var(--pinned-cell-bg, ${toCssVar("$backgroundColor-pinnedCell-Table")})`
       : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
@@ -1325,6 +1328,7 @@ export const Table = memo(forwardRef(
                   <td
                     className={classnames(styles.cell, alignmentClass, columnClassName)}
                     key={`${cell.id}-${i}`}
+                    data-column-id={cell.column.id}
                     style={{
                       width: size,
                       "--column-width": `${size}px`,

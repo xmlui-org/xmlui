@@ -583,6 +583,44 @@ The default value is `false`.
 </App>
 ```
 
+### `hideSelectionCheckboxesHeader` [#hideselectioncheckboxesheader]
+
+> [!DEF]  default: **false**
+
+If true, the selection checkbox in the table header is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via API and keyboard.
+
+Hides the selection checkbox in the table header so it is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via the component API and keyboard shortcuts.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxesHeader="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxesHeader"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
 ### `iconNoSort` [#iconnosort]
 
 Allows setting an alternate icon displayed in the Table column header when sorting is enabled, but the column remains unsorted. You can change the default icon for all Table instances with the "icon.nosort:Table" declaration in the app configuration file.
@@ -1154,6 +1192,10 @@ This property determines the location of the pagination controls. It can be set 
 
 Available values: `top`, `bottom` **(default)**, `both`
 
+### `refreshOn` [#refreshon]
+
+An expression whose value change forces all table rows and cells to re-render. Use this to ensure that closure variables bound in row or cell templates are updated when global state changes (e.g. `{selectMode}`). Without this, virtualized rows might retain stale references to global variables for performance reasons.
+
 ### `rowDisabledPredicate` [#rowdisabledpredicate]
 
 This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
@@ -1593,6 +1635,44 @@ The following example demonstrates how two independent `MyTable` components shar
 </Component>
 ---desc
 Change the selection in one of the tables and check how it is synced.
+```
+
+### `toggleSelectionOnClick` [#toggleselectiononclick]
+
+> [!DEF]  default: **false**
+
+When `true`, a plain click toggles the row's selection state instead of replacing the current selection. Ctrl+Click and Shift+Click behavior is unchanged. Only has an effect when `rowsSelectable` is `true`.
+
+When `true`, a plain click toggles the row's selection state (adds it if not selected, removes it if already selected) instead of replacing the current selection with just that row.
+This property only has an effect when `rowsSelectable` is `true`. Ctrl+Click and Shift+Click behavior is unchanged.
+
+The default value is `false`.
+
+```xmlui copy /toggleSelectionOnClick="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" toggleSelectionOnClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: toggleSelectionOnClick"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    toggleSelectionOnClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 ### `userSelectCell` [#userselectcell]
@@ -2142,10 +2222,14 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-oddRow-Table | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-pagination-Table | $backgroundColor-Table | $backgroundColor-Table |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-pinnedCell-Table | $color-surface-50 | $color-surface-50 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-pinnedCell-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-50 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selectionCell-Table | $backgroundColor-pinnedCell-Table | $backgroundColor-pinnedCell-Table |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selectionCell-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-cell-Table | 1px solid $borderColor | 1px solid $borderColor |
 | [border](/docs/styles-and-themes/common-units/#border)-Table | 0px solid transparent | 0px solid transparent |

@@ -84,6 +84,19 @@ Available values:
 <Text>{authStatus.value.authenticated ? 'Logged in' : 'Not logged in'}</Text>
 ```
 
+### `dataType` [#datatype]
+
+Type of data to fetch. When set to `"text"`, the response is returned as a raw string without JSON parsing. When set to `"csv"`, the response is parsed as CSV.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `json` | Parse response as JSON (default) |
+| `text` | Return response as raw text |
+| `csv` | Parse response as CSV |
+| `sql` | Execute SQL query |
+
 ### `errorNotificationMessage` [#errornotificationmessage]
 
 This property customizes the message displayed in a toast when the API invocation results in an error. Use the `$error` context object to get the error code (`$error.statusCode`) optional message (`$error.message`), or details coming from the response body (`$error.details`). For example, you can use the following code snippet to display the status code and the details:

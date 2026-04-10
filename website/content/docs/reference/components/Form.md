@@ -231,6 +231,12 @@ This property defines the label of the Save button.
 
 This property defines the label of the Save button to display while async field validation is still in-flight. During async validation, the Submit button is disabled to prevent submission before validation completes.
 
+### `stickyButtonRow` [#stickybuttonrow]
+
+> [!DEF]  default: **false**
+
+When set to true, the button row sticks to the bottom of the scrollable content area. Useful when the form is displayed inside a scrollable container such as a ModalDialog.
+
 ### `storageKey` [#storagekey]
 
 The key used to save the form's temporary data in localStorage when `persist` is enabled. If omitted, the form's `id` attribute is used. If the form has no `id`, the key defaults to `"form-data"`.
@@ -436,6 +442,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-buttonRow-Form | transparent | transparent |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Form | transparent | transparent |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-danger-100 | $color-danger-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-primary-100 | $color-primary-100 |
@@ -448,6 +455,7 @@ The component has some parts that can be styled through layout properties and th
 | [gap](/docs/styles-and-themes/common-units/#size)-buttonRow-Form | $space-4 | $space-4 |
 | [gap](/docs/styles-and-themes/common-units/#size)-Form | $space-4 | $space-4 |
 | [marginTop](/docs/styles-and-themes/common-units/#size-values)-buttonRow-Form | $space-4 | $space-4 |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-buttonRow-Form | 0 | 0 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-error | $color-error | $color-error |
 | [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-info | $color-info | $color-info |
 | [textColor](/docs/styles-and-themes/common-units/#color)-ValidationDisplay-valid | $color-valid | $color-valid |
