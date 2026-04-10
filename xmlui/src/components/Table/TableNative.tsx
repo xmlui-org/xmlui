@@ -864,9 +864,9 @@ export const Table = memo(forwardRef(
       });
     }, [getThemeVar, safeColumns]);
 
-    // --- Prepare selection column separately to keep it stable from hover state
+    // --- Prepare the selection column separately so hover-driven updates stay isolated to it
     const selectColumn: ColumnDef<any> = useMemo(() => {
-      // --- Extend the columns with a selection checkbox (indeterminate)
+      // --- Extend the columns with a selection checkbox (indeterminate) without affecting the main column sizing pipeline
       return {
         id: "select",
         size: SELECT_COLUMN_WIDTH,
