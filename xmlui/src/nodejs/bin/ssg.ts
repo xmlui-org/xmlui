@@ -738,11 +738,11 @@ export const ssg = async ({
         outDir: ssrBuildPath,
         emptyOutDir: true,
         minify: false,
-        rollupOptions: {
-          ...viteConfig.build?.rollupOptions,
+        rolldownOptions: {
+          ...viteConfig.build?.rolldownOptions,
           input: undefined,
           output: {
-            ...viteConfig.build?.rollupOptions?.output,
+            ...viteConfig.build?.rolldownOptions?.output,
             entryFileNames: "render.mjs",
             inlineDynamicImports: true,
           },

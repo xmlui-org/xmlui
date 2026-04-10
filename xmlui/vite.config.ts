@@ -154,14 +154,6 @@ export default ({ mode = "lib" }) => {
       },
     },
     define,
-    esbuild: {
-      target: "es2020",
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        target: "es2020",
-      },
-    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -174,8 +166,8 @@ export default ({ mode = "lib" }) => {
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,
-      rollupOptions: {
-        treeshake: mode === "metadata" ? "smallest" : undefined,
+      rolldownOptions: {
+        treeshake: mode === "metadata" ? true : undefined,
         external:
           mode === "standalone" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds

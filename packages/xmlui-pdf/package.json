@@ -23,7 +23,7 @@
     "react-pdf": "^10.3.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.1.0",
+    "@vitejs/plugin-react": "^6.0.0",
     "vitest": "^4.0.16",
     "xmlui": "*"
   },

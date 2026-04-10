@@ -32,14 +32,6 @@ export const buildLib = async ({
     resolve: {
       extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui", ".xmlui.xs", ".xs"],
     },
-    esbuild: {
-      target: "es2020",
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        target: "es2020",
-      },
-    },
     define: {
       "process.env": {
         NODE_ENV: env.NODE_ENV,
@@ -63,8 +55,8 @@ export const buildLib = async ({
               name: env.npm_package_name,
               fileName: (format) => (format === "es" ? esFileName : umdFileName),
             },
-      rollupOptions: {
-        treeshake: mode === "metadata" ? "smallest" : undefined,
+      rolldownOptions: {
+        treeshake: mode === "metadata" ? true : undefined,
         external: mode === "metadata" ? [] : ["react", "react-dom", "xmlui", "react/jsx-runtime"],
         output: {
           footer: (chunk) => {

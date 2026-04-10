@@ -40,7 +40,5 @@
     "build-blog": "turbo run build:blog",
     "generate-docs": "turbo run generate-docs"
   },
-  "optionalDependencies": {
-    "@esbuild/darwin-arm64": "0.27.3"
-  }
+  "optionalDependencies": {}
 }

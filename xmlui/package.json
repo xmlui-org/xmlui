@@ -9,7 +9,7 @@
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:xmlui-test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles --withMock",
     "build:for-node": "tsdown",
-    "build:xmlui": "node --max-old-space-size=8192 node_modules/.bin/vite build --mode lib",
+    "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
     "build:xmlui-metadata": "vite build --mode metadata",
     "build:inspector-parser": "vite build --mode inspector-parser",
@@ -48,7 +48,7 @@
     "@remix-run/react": "2.17.4",
     "@tanstack/react-query": "^4.36.1",
     "@tanstack/react-table": "8.17.3",
-    "@vitejs/plugin-react": "5.1.0",
+    "@vitejs/plugin-react": "^6.0.0",
     "adm-zip": "0.5.10",
     "chroma-js": "^3.1.2",
     "classnames": "2.5.1",
@@ -91,10 +91,9 @@
     "unist-util-visit": "^5.0.0",
     "use-context-selector": "1.4.1",
     "virtua": "^0.48.2",
-    "vite": "7.1.12",
+    "vite": "^8.0.0",
     "vite-plugin-dts": "4.5.4",
     "vite-plugin-lib-inject-css": "2.2.2",
-    "vite-plugin-svgr": "4.5.0",
     "vscode-languageserver": "^9.0.1",
     "yargs": "17.7.2"
   },
@@ -128,16 +127,8 @@
     "terser": "^5.44.0",
     "tsdown": "^0.21.4",
     "typescript": "5.7.3",
-    "vitest": "^4.0.16"
-  },
-  "optionalDependencies": {
-    "@esbuild/linux-x64": "0.25.2",
-    "@rolldown/binding-darwin-arm64": "1.0.0-beta.45",
-    "@rolldown/binding-darwin-x64": "1.0.0-beta.45",
-    "@rolldown/binding-linux-x64-gnu": "1.0.0-beta.45",
-    "@rolldown/binding-win32-x64-msvc": "1.0.0-beta.45",
-    "@rollup/rollup-linux-x64-gnu": "4.20.0",
-    "@rollup/rollup-win32-x64-msvc": "4.20.0"
+    "vite-plugin-svgr": "5.2.0",
+    "vitest": "^4.1.0"
   },
   "files": [
     "dist",
