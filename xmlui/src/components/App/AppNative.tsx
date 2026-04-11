@@ -587,6 +587,11 @@ export function App({
       })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}
+      // Stable hook for embedding code: when fitContent is on, parent pages
+      // (e.g. iframe hosts auto-resizing the embed) can find this element via
+      // [data-xmlui-app-fit-content] without depending on hashed CSS module
+      // class names.
+      data-xmlui-app-fit-content={fitContent ? "true" : undefined}
       {...rest}
     >
       {config.useVerticalFullHeaderStructure ? (
