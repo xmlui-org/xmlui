@@ -86,14 +86,14 @@ export function getLayoutPath(context: LayoutContext | undefined): string[] {
 
 /**
  * Returns a copy of `context` with direct-child-only properties removed.
- * `ignoreLayoutProps` and `wrapChild` are meant for immediate children of a
- * layout container and must not leak through component boundaries when the
- * context is used as a fallback for transparent wrapper components.
+ * `ignoreLayoutProps`, `wrapChild`, and `extraClassName` are meant for immediate
+ * children of a layout container and must not leak through component boundaries
+ * when the context is used as a fallback for transparent wrapper components.
  */
 export function stripDirectChildProps(
   context: LayoutContext | undefined,
 ): LayoutContext | undefined {
   if (!context) return undefined;
-  const { ignoreLayoutProps, wrapChild, ...rest } = context;
+  const { ignoreLayoutProps, wrapChild, extraClassName, ...rest } = context;
   return rest;
 }
