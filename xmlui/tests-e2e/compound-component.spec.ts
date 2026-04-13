@@ -813,3 +813,50 @@ test("updateState works", async ({ page, initTestBed }) => {
   await page.getByRole("textbox").fill("Hello from MyComp!");
   await expect(page.getByTestId("helo")).toHaveText("Hello from MyComp!");
 });
+
+test("layout props are forwarded to a single root child", async ({ page, initTestBed }) => {
+  await initTestBed(`<InfoCard width="200px" />`, {
+    components: [
+      `
+      <Component name="InfoCard">
+        <Stack testId="inner" />
+      </Component>
+      `,
+    ],
+  });
+  await expect(page.getByTestId("inner")).toHaveCSS("width", "200px");
+});
+
+test("warns when layout props cannot be forwarded to multiple root children", async ({
+  page,
+  initTestBed,
+}) => {
+  const consoleWarnings: string[] = [];
+  const warningFound = new Promise<void>((resolve) => {
+    page.on("console", (msg) => {
+      if (msg.type() === "warning" && msg.text().includes("MultiRoot")) {
+        consoleWarnings.push(msg.text());
+        resolve();
+      }
+    });
+  });
+
+  await initTestBed(`<MultiRoot width="200px" />`, {
+    components: [
+      `
+      <Component name="MultiRoot">
+        <Text>First</Text>
+        <Text>Second</Text>
+      </Component>
+      `,
+    ],
+  });
+
+  await Promise.race([warningFound, page.waitForTimeout(2000)]);
+
+  expect(
+    consoleWarnings.some(
+      (w) => w.includes("MultiRoot") && w.includes("multiple root children"),
+    ),
+  ).toBe(true);
+});

@@ -474,7 +474,10 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
   const layoutClassName = useStyles(combinedStyleObject);
 
-  const className = [themeClassName, layoutClassName].filter(Boolean).join(" ");
+  // --- Include any extraClassName propagated from a parent compound component so that
+  // --- layout props set on the compound's usage site are applied to its single root child.
+  const extraClassName = layoutContextRef?.current?.extraClassName as string | undefined;
+  const className = [themeClassName, layoutClassName, extraClassName].filter(Boolean).join(" ");
 
   // Memoize `classes` so components wrapped in React.memo (e.g. Markdown)
   // don't re-render when `className` is unchanged.
