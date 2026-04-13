@@ -1519,6 +1519,10 @@ It contains the following boolean attributes:
 | `isFetchingPrevPage` | _TBD_                                |
 | `isFetchingNextPage` | _TBD_                                |
 
+### `refreshOn` [#refreshon]
+
+Bind this property to a global variable (or expression) whose change should force all visible list items to re-render and pick up the latest reactive state. When not set, items re-render on every XMLUI reactive cycle (safe but less optimal). When set, items only re-render when the bound value changes, which eliminates spurious re-renders from unrelated global-variable updates (e.g. focus events).
+
 ### `rowsSelectable` [#rowsselectable]
 
 Indicates whether the rows are selectable (`true`) or not (`false`).

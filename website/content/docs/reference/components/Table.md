@@ -2243,6 +2243,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-cell-Table | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |

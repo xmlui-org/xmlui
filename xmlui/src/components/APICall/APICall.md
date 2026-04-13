@@ -141,3 +141,54 @@ For a short overview on client side caching, see the [DataSource component](/doc
 This property takes either a string or a list of strings representing URL endpoints to indicate which data should be updated in the cache.
 
 %-PROP-END
+
+%-EVENT-START mockExecute
+
+When this event is defined, it **replaces the real HTTP request** entirely. The handler's return value becomes the result of the API call — `onSuccess` still fires with it, `lastResult` is updated, and query invalidation still runs as normal. No network request is made.
+
+This is the `APICall` counterpart to [`DataSource`'s `mockData`](/docs/reference/components/DataSource) property: use it during development and testing to simulate backend mutations without a real server.
+
+**Context variables available in the handler:**
+
+| Variable | Description |
+|---|---|
+| `$requestBody` | Resolved request body (`body` / `rawBody`) |
+| `$queryParams` | Resolved query parameters |
+| `$requestHeaders` | Resolved request headers |
+| `$pathParams` | Path parameters (empty object for client-side mocks) |
+| `$cookies` | Request cookies (empty object for client-side mocks) |
+| `$param` | First argument passed to `execute()` |
+| `$params` | Array of all arguments passed to `execute()` |
+
+```xmlui-pg name="Example: mockExecute — building a mock CRUD list"
+---app copy display
+<App var.users="{[
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' }
+]}">
+  <DataSource id="userList" url="/api/users" mockData="{users}" />
+  <Button>
+    <event name="click">
+      <APICall
+        url="/api/users"
+        method="post"
+        invalidates="/api/users"
+        onMockExecute="() => {
+          const newUser = { id: users.length + 1, name: 'New User' };
+          users = [...users, newUser];
+          return newUser;
+        }"
+      />
+    </event>
+    Add user
+  </Button>
+  <List data="{userList}">
+    <HStack>
+      <Text value="{$item.id}." width="24px"/>
+      <Text value="{$item.name}" />
+    </HStack>
+  </List>
+</App>
+```
+
+%-EVENT-END

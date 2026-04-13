@@ -17,6 +17,7 @@ interface Props {
   onSuccess?: (...args: any[]) => Promise<any>;
   onStatusUpdate?: (statusData: any, progress: number) => void | Promise<void>;
   onTimeout?: () => void | Promise<void>;
+  hasMockExecute?: boolean;
 }
 
 interface DeferredState {
@@ -198,7 +199,7 @@ function evaluateCondition(
   }
 }
 
-export function APICallNative({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout }: Props) {
+export function APICallNative({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout, hasMockExecute }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -578,6 +579,7 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
             onProgress: node.events?.progress,
             onBeforeRequest: node.events?.beforeRequest,
             onSuccess: onSuccess ?? node.events?.success,
+            onMockExecute: node.events?.mockExecute,
             onResponseHeaders: (h) => { capturedResponseHeaders = h; lastResponseHeadersRef.current = h; },
           },
           {

@@ -3323,3 +3323,313 @@ test.describe("Deferred Mode - Step 12: Integration & Polish", () => {
     expect(finalResult.pollCount).toEqual(pollCountBeforeWait);
   });
 });
+
+// =============================================================================
+// mockExecute EVENT TESTS
+// =============================================================================
+
+test.describe("mockExecute event", () => {
+  test("replaces real API call with mock handler return value", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          body="{{ name: 'New User' }}"
+          onSuccess="result => testState = result.id"
+          onMockExecute="() => ({ id: 99, name: 'Mocked' })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual(99);
+  });
+
+  test("does not make a real HTTP request when mockExecute is defined", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    // No apiInterceptor — a real request would result in a network error
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          onSuccess="() => testState = 'success'"
+          onError="() => testState = 'error'"
+          onMockExecute="() => ({ id: 1 })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("success");
+  });
+
+  test("exposes $queryParams in mock handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/search"
+          method="get"
+          queryParams="{{ term: 'hello' }}"
+          onSuccess="result => testState = result.term"
+          onMockExecute="() => ({ term: $queryParams.term })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("hello");
+  });
+
+  test("exposes $requestBody in mock handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          body="{{ name: 'Alice', age: 30 }}"
+          onSuccess="result => testState = result"
+          onMockExecute="() => ({ name: $requestBody.name, age: $requestBody.age })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual({ name: "Alice", age: 30 });
+  });
+
+  test("exposes $requestHeaders in mock handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/data"
+          method="get"
+          headers="{{ 'x-custom-header': 'myvalue' }}"
+          onSuccess="result => testState = result.found"
+          onMockExecute="() => ({ found: $requestHeaders['x-custom-header'] })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("myvalue");
+  });
+
+  test("exposes $param from execute() call in mock handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/items"
+          method="post"
+          onSuccess="result => testState = result.received"
+          onMockExecute="() => ({ received: $param })"
+        />
+        <Button testId="trigger" onClick="api.execute('hello')" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("hello");
+  });
+
+  test("exposes $params array from execute() call in mock handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/items"
+          method="post"
+          onSuccess="result => testState = result"
+          onMockExecute="() => ({ first: $params[0], second: $params[1] })"
+        />
+        <Button testId="trigger" onClick="api.execute('a', 'b')" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual({ first: "a", second: "b" });
+  });
+
+  test("fires onSuccess after mockExecute with the mock return value", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          onSuccess="result => testState = result.name"
+          onMockExecute="() => ({ id: 1, name: 'MockedUser' })"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("MockedUser");
+  });
+
+  test("fires onError when mockExecute throws", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          onError="() => testState = 'mock-error'"
+          onMockExecute="() => { throw 'simulated error'; }"
+        />
+        <Button testId="trigger" onClick="api.execute()" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual("mock-error");
+  });
+
+  test("updates inProgress and lastResult state correctly", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <APICall
+          id="api"
+          url="/api/users"
+          method="post"
+          onMockExecute="() => ({ id: 42 })"
+        />
+        <Button testId="trigger" onClick="let r = api.execute(); testState = api.lastResult" />
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual({ id: 42 });
+  });
+
+  test("works when defined inline inside an event handler", async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment>
+        <Button testId="trigger">
+          <event name="click">
+            <APICall
+              url="/api/users"
+              method="post"
+              body="{{ name: 'New User' }}"
+              onSuccess="result => testState = result.id"
+              onMockExecute="() => ({ id: 7, name: 'Inlined' })"
+            />
+          </event>
+          Add user
+        </Button>
+      </Fragment>
+    `);
+
+    const button = await createButtonDriver("trigger");
+    await button.click();
+
+    await expect.poll(testStateDriver.testState, { timeout: 2000 }).toEqual(7);
+  });
+
+  test("mock data list example: adds item via mockExecute", async ({
+    initTestBed,
+    createButtonDriver,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App var.mockData="{[
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+        { id: 3, name: 'Charlie' }
+      ]}">
+        <DataSource id="myData" url="/api/users" mockData="{mockData}" />
+        <List testId="list" data="{myData}">
+          <H3>{$item.name}</H3>
+        </List>
+        <Button testId="addBtn">
+          <event name="click">
+            <APICall url="/api/users" method="post" body="{{ name: 'New User' }}"
+              invalidates="/api/users"
+              onMockExecute="() => {
+                const newUser = { id: mockData.length + 1, name: 'New User' };
+                mockData = [...mockData, newUser];
+                return newUser;
+              }" />
+          </event>
+          Add user
+        </Button>
+      </App>
+    `);
+
+    // Initial 3 items
+    await expect(page.getByRole("heading")).toHaveCount(3);
+
+    const button = await createButtonDriver("addBtn");
+    await button.click();
+
+    // Should now show 4 items
+    await expect.poll(() => page.getByRole("heading").count(), { timeout: 3000 }).toBe(4);
+    await expect(page.getByRole("heading").last()).toHaveText("New User");
+  });
+});
