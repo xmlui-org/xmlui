@@ -534,11 +534,31 @@ It contains the following boolean attributes:
 > For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
 > or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
+`groupBy` accepts either a **string** (the name of the item field to group by) or a **function** that receives each list item and returns the grouping key.
+
+**String usage** — group by a field name directly:
+
 ```xmlui copy {3}
 <App>
   <List
     data='{[...]}'
     groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+**Function usage** — compute the grouping key from each item:
+
+```xmlui copy {3}
+<App>
+  <List
+    data='{[...]}'
+    groupBy="{(item) => item.name[0]}">
     <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$group.key}" />
@@ -607,6 +627,29 @@ It contains the following boolean attributes:
         <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: groupBy (function)" height="400px"
+<App>
+  <List
+    data='{[
+  { id: 0, name: "Apples" },
+  { id: 1, name: "Avocado" },
+  { id: 2, name: "Bananas" },
+  { id: 3, name: "Carrots" },
+  { id: 4, name: "Cheese" },
+  { id: 5, name: "Cherries" },
+  { id: 6, name: "Milk" },
+]}'
+    groupBy="{(item) => item.name[0]}">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <Text value="{$item.name}" />
   </List>
 </App>
 ```
