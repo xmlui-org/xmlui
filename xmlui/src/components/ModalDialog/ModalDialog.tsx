@@ -154,6 +154,8 @@ export const modalViewComponentRenderer = wrapComponent(
                     $param: openParams?.[0], 
                     $params: openParams 
                   }}
+                  vars={(node as any)._savedVarDefs}
+                  functions={(node as any)._savedFunctionDefs}
                 />
               );
             }}
