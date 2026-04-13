@@ -807,7 +807,7 @@ const Form = forwardRef(function (
         {...rest}
         noValidate={true}
         style={style}
-        className={classnames(styles.formWrapper, classes?.[COMPONENT_PART_KEY], className)}
+        className={classnames(styles.formWrapper, { [styles.stickyForm]: stickyButtonRow }, classes?.[COMPONENT_PART_KEY], className)}
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
