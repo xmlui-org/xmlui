@@ -2,4 +2,4 @@
 "xmlui": patch
 ---
 
-Fix sumbmitting invalid select values in a form
+Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode

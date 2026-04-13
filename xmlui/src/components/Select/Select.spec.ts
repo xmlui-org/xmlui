@@ -3078,3 +3078,38 @@ test.describe("Custom Height", () => {
     expect(triggerBox.height).toBeLessThan(100);
   });
 });
+
+// =============================================================================
+// SCROLL BEHAVIOR
+// =============================================================================
+
+test.describe("Scroll Behavior", () => {
+  test("opening dropdown does not block page scroll in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Select testId="mySelect">
+          <Option label="John Smith" value="john" />
+          <Option label="Jane Clint" value="jane" />
+          <Option label="Herbert Frank" value="herbert" />
+        </Select>
+        <Stack height="1600px" backgroundColor="teal"/>
+      </App>
+    `);
+    const driver = await createSelectDriver("mySelect");
+
+    // Open the dropdown
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "John Smith" })).toBeVisible();
+
+    // Attempt to scroll the page
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    await page.evaluate(() => window.scrollBy(0, 200));
+    const scrollAfter = await page.evaluate(() => window.scrollY);
+
+    expect(scrollAfter).toBeGreaterThan(scrollBefore);
+  });
+});

@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
@@ -98,6 +98,60 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
 
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
     const [open, setOpen] = useState(false);
+
+    // Radix Select's Content hardcodes RemoveScroll which locks page scroll whenever
+    // the dropdown is open. When the Select is not modal, counteract this by:
+    // 1. Decrementing the data-scroll-locked attribute on body (removes overflow:hidden CSS)
+    // 2. Adding capture-phase wheel/touchmove handlers to prevent RemoveScroll from
+    //    calling preventDefault on scroll events outside the dropdown
+    useEffect(() => {
+      if (!open || modal) return;
+
+      const body = document.body;
+      const LOCK_ATTR = "data-scroll-locked";
+
+      // Decrement the lock counter that RemoveScroll set
+      let didDecrement = false;
+      const decrement = () => {
+        const count = parseInt(body.getAttribute(LOCK_ATTR) || "0", 10);
+        if (count > 0 && !didDecrement) {
+          didDecrement = true;
+          if (count <= 1) {
+            body.removeAttribute(LOCK_ATTR);
+          } else {
+            body.setAttribute(LOCK_ATTR, String(count - 1));
+          }
+        }
+      };
+
+      // RemoveScroll applies the lock in a layout effect. Use rAF to run after paint.
+      const raf = requestAnimationFrame(decrement);
+
+      // Intercept wheel/touchmove events in capture phase for events outside the
+      // dropdown content. This prevents RemoveScroll's bubble-phase handler from
+      // calling preventDefault(), allowing the page to scroll normally.
+      const handler = (e: Event) => {
+        const viewport = body.querySelector("[data-radix-select-viewport]");
+        if (!viewport || !viewport.contains(e.target as Node)) {
+          e.stopPropagation();
+        }
+      };
+      document.addEventListener("wheel", handler, true);
+      document.addEventListener("touchmove", handler, true);
+
+      return () => {
+        cancelAnimationFrame(raf);
+
+        // Restore the lock counter so RemoveScroll's own cleanup stays balanced
+        if (didDecrement) {
+          const count = parseInt(body.getAttribute(LOCK_ATTR) || "0", 10);
+          body.setAttribute(LOCK_ATTR, String(count + 1));
+        }
+
+        document.removeEventListener("wheel", handler, true);
+        document.removeEventListener("touchmove", handler, true);
+      };
+    }, [open, modal]);
 
     // Convert value to string for Radix UI compatibility.
     // Always produce a string (defaulting to "") so Radix stays in controlled mode.
