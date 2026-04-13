@@ -11,6 +11,11 @@ type MemoizedItemProps = {
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
   contextVars?: Record<string, any>;
+  /** Optional variable definitions to include on the Container wrapper so they can
+   *  be resolved in the new context (e.g. with $param available). */
+  vars?: Record<string, any>;
+  /** Optional function definitions to include on the Container wrapper. */
+  functions?: Record<string, any>;
 };
 
 export const MemoizedItem = memo(
@@ -19,6 +24,8 @@ export const MemoizedItem = memo(
     renderChild,
     layoutContext,
     contextVars = EMPTY_OBJECT,
+    vars,
+    functions,
   }: MemoizedItemProps) => {
     const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
     const nodeWithContextVars = useMemo(
@@ -26,9 +33,11 @@ export const MemoizedItem = memo(
         ({
           type: "Container",
           contextVars: shallowMemoedContextVars,
+          ...(vars ? { vars } : undefined),
+          ...(functions ? { functions } : undefined),
           children: Array.isArray(node) ? node : [node],
         }) as ContainerWrapperDef,
-      [node, shallowMemoedContextVars],
+      [node, shallowMemoedContextVars, vars, functions],
     );
 
     return <>{renderChild(nodeWithContextVars, layoutContext)}</>;
