@@ -97,13 +97,15 @@ enum RowType {
   ITEM = "ITEM",
 }
 
+type GroupByValue = string | ((item: any) => any);
+
 type ListData = {
   groupsInitiallyExpanded?: boolean;
   defaultGroups?: Array<string>;
   expanded?: Record<any, boolean>;
   items: any[];
   limit?: number;
-  groupBy?: string;
+  groupBy?: GroupByValue;
   orderBy?: OrderBy;
   availableGroups?: string[];
 };
@@ -154,7 +156,9 @@ export function useListData({
     if (groupBy === undefined) {
       return EMPTY_OBJECT;
     }
-    return groupByFunc(cappedItems, (item) => item[groupBy]);
+    const iteratee =
+      typeof groupBy === "function" ? groupBy : (item: any) => item[groupBy];
+    return groupByFunc(cappedItems, iteratee);
   }, [cappedItems, groupBy]);
 
   const sections: string[] = useMemo(() => {

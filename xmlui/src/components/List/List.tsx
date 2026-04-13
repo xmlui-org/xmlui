@@ -7,6 +7,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import type { RendererContext, LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
 import { createMetadata, d, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
@@ -58,8 +59,9 @@ export const ListMd = createMetadata({
       defaultValue: false,
     },
     groupBy: d(
-      "This property sets which data item property is used to group the list items. If not set, " +
-        "no grouping is done.",
+      "This property sets which data item property is used to group the list items. " +
+        "Accepts a field name string or a function that receives an item and returns the group key. " +
+        "If not set, no grouping is done.",
     ),
     orderBy: d(
       `This optioanl property enables the ordering of list items by specifying an attribute in the data.`,
@@ -589,6 +591,11 @@ const ListWithSelection = memo(function ListWithSelection({
     [node.props.groupFooterTemplate, hideEmptyGroups],
   );
 
+  const groupByExtracted = extractValue(node.props.groupBy);
+  const groupByResolved = isArrowExpressionObject(groupByExtracted)
+    ? lookupSyncCallback(node.props.groupBy)
+    : groupByExtracted;
+
   const listContent = (
     <ListNative
       registerComponentApi={registerComponentApi}
@@ -596,7 +603,7 @@ const ListWithSelection = memo(function ListWithSelection({
       loading={extractValue.asOptionalBoolean(node.props.loading)}
       items={extractValue(node.props.items) || extractValue(node.props.data)}
       limit={extractValue(node.props.limit)}
-      groupBy={extractValue(node.props.groupBy)}
+      groupBy={groupByResolved as any}
       orderBy={extractValue(node.props.orderBy)}
       availableGroups={extractValue(node.props.availableGroups)}
       scrollAnchor={node.props.scrollAnchor as any}

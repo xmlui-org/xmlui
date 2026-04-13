@@ -2196,3 +2196,104 @@ test.describe("Row Selection", () => {
     });
   });
 });
+
+test.describe("groupBy with function", () => {
+  test("groups items using a function", async ({ initTestBed, createListDriver }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.category}"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Group: fruit");
+    await expect(driver.component).toContainText("Group: vegetable");
+    await expect(driver.component).toContainText("Apple");
+    await expect(driver.component).toContainText("Banana");
+    await expect(driver.component).toContainText("Carrot");
+  });
+
+  test("groups items using a computed value from function", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.name[0]}"
+        data="{[
+          {id: 1, name: 'Apple'},
+          {id: 2, name: 'Avocado'},
+          {id: 3, name: 'Banana'},
+          {id: 4, name: 'Cherry'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Letter: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Letter: A");
+    await expect(driver.component).toContainText("Letter: B");
+    await expect(driver.component).toContainText("Letter: C");
+    await expect(driver.component).toContainText("Apple");
+    await expect(driver.component).toContainText("Avocado");
+    await expect(driver.component).toContainText("Banana");
+    await expect(driver.component).toContainText("Cherry");
+  });
+
+  test("string groupBy still works as before", async ({ initTestBed, createListDriver }) => {
+    await initTestBed(`
+      <List
+        groupBy="category"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Group: fruit");
+    await expect(driver.component).toContainText("Group: vegetable");
+  });
+
+  test("function groupBy works with defaultGroups ordering", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.category}"
+        defaultGroups="{['vegetable', 'fruit']}"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text testId="groupHeader">Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    const headers = page.getByTestId("groupHeader");
+    await expect(headers).toHaveCount(2);
+    await expect(headers.nth(0)).toContainText("Group: vegetable");
+    await expect(headers.nth(1)).toContainText("Group: fruit");
+  });
+});

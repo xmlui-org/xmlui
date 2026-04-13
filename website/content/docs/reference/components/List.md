@@ -535,17 +535,37 @@ When set to `true`, the list will measure the height of the first item and use t
 
 ### `groupBy` [#groupby]
 
-This property sets which data item property is used to group the list items. If not set, no grouping is done.
+This property sets which data item property is used to group the list items. Accepts a field name string or a function that receives an item and returns the group key. If not set, no grouping is done.
 
 >[!INFO]
 > For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
 > or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
+
+`groupBy` accepts either a **string** (the name of the item field to group by) or a **function** that receives each list item and returns the grouping key.
+
+**String usage** — group by a field name directly:
 
 ```xmlui copy {3}
 <App>
   <List
     data='{[...]}'
     groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+**Function usage** — compute the grouping key from each item:
+
+```xmlui copy {3}
+<App>
+  <List
+    data='{[...]}'
+    groupBy="{(item) => item.name[0]}">
     <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$group.key}" />
@@ -614,6 +634,29 @@ This property sets which data item property is used to group the list items. If 
         <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: groupBy (function)" height="400px"
+<App>
+  <List
+    data='{[
+  { id: 0, name: "Apples" },
+  { id: 1, name: "Avocado" },
+  { id: 2, name: "Bananas" },
+  { id: 3, name: "Carrots" },
+  { id: 4, name: "Cheese" },
+  { id: 5, name: "Cherries" },
+  { id: 6, name: "Milk" },
+]}'
+    groupBy="{(item) => item.name[0]}">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <Text value="{$item.name}" />
   </List>
 </App>
 ```
