@@ -969,7 +969,19 @@ function postProcessSearch(
 }
 
 /**
- * Groups search results by category and sorts the groups by their summed Fuse.js scores
+ * Priority order for search result categories. Lower number = higher priority.
+ * Categories not listed here fall back to a default priority of 99.
+ */
+const CATEGORY_PRIORITY: Partial<Record<string, number>> = {
+  docs: 0,
+  "get-started": 1,
+  blog: 2,
+  news: 3,
+};
+
+/**
+ * Groups search results by category and sorts the groups first by explicit category
+ * priority (docs before blog), then by their summed Fuse.js scores as a tiebreaker
  * (lower sum = better overall match quality), keeping items within each group in their
  * original score-sorted order.
  */
@@ -988,9 +1000,12 @@ function groupAndSortByCategory(results: SearchResult[]): SearchResult[] {
     groupScores.set(cat, sum);
   }
 
-  const sortedCategories = [...groups.keys()].sort(
-    (a, b) => (groupScores.get(a) ?? 0) - (groupScores.get(b) ?? 0),
-  );
+  const sortedCategories = [...groups.keys()].sort((a, b) => {
+    const priorityA = CATEGORY_PRIORITY[a] ?? 99;
+    const priorityB = CATEGORY_PRIORITY[b] ?? 99;
+    if (priorityA !== priorityB) return priorityA - priorityB;
+    return (groupScores.get(a) ?? 0) - (groupScores.get(b) ?? 0);
+  });
 
   return sortedCategories.flatMap((cat) => groups.get(cat)!);
 }
