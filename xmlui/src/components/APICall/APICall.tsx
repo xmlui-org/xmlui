@@ -26,6 +26,7 @@ export interface ApiActionComponent extends ComponentDef {
     progress: string;
     error: string;
     beforeRequest: string;
+    mockExecute: string;
   };
 }
 
@@ -281,6 +282,16 @@ export const APICallMd = createMetadata({
       signature: "() => void",
       parameters: {},
     },
+    mockExecute: {
+      description:
+        "When defined, this event handler replaces the actual API request. " +
+        "The handler receives the resolved request properties as context variables: " +
+        "`$pathParams`, `$queryParams`, `$requestBody`, `$cookies`, `$requestHeaders`. " +
+        "When triggered via the `execute()` method, `$param` and `$params` are also available. " +
+        "The return value of the handler becomes the result of the API call.",
+      signature: "() => any",
+      parameters: {},
+    },
     progress: dInternal(),
   },
   contextVars: {
@@ -291,6 +302,21 @@ export const APICallMd = createMetadata({
       description:
         "Array of all parameters passed to `execute()` method (access with " +
         "`$params[0]`, `$params[1]`, etc.)",
+    },
+    $pathParams: {
+      description: "Path parameters extracted from the request URL (available in `mockExecute`)",
+    },
+    $queryParams: {
+      description: "Resolved query parameters (available in `mockExecute`)",
+    },
+    $requestBody: {
+      description: "Resolved request body (available in `mockExecute`)",
+    },
+    $cookies: {
+      description: "Request cookies (available in `mockExecute`)",
+    },
+    $requestHeaders: {
+      description: "Resolved request headers (available in `mockExecute`)",
     },
     $result: {
       description: "Response data (available in `completedNotificationMessage`)",
@@ -387,6 +413,7 @@ export const apiCallRenderer = createComponentRenderer(
         onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
+        hasMockExecute={!!node.events?.mockExecute}
       />
     );
   },

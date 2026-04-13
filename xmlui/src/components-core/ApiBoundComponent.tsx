@@ -50,7 +50,7 @@ export function ApiBoundComponent({
       };
 
       // --- Prepare event handlers
-      const { success, error, progress, beforeRequest } = actionComponent.events || {};
+      const { success, error, progress, beforeRequest, mockExecute } = actionComponent.events || {};
       switch (type) {
         case "FileUpload": {
           const {
@@ -148,6 +148,7 @@ export function ApiBoundComponent({
               onProgress: ${prepareEvent(progress)},
               onBeforeRequest: ${prepareEvent(beforeRequest)},
               onSuccess: ${prepareEvent(success)},
+              onMockExecute: ${prepareEvent(mockExecute)},
               updates: ${JSON.stringify(updates)},
               optimisticValue: ${JSON.stringify(optimisticValue)},
               payloadType: ${JSON.stringify(payloadType)},

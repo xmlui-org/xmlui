@@ -280,6 +280,7 @@ type APICall = {
   onSuccess?: string | ((...args: any[]) => Promise<any>);
   onProgress?: string;
   onError?: string;
+  onMockExecute?: string;
   onResponseHeaders?: (headers: Record<string, string>) => void;
 } & ApiOperationDef;
 
@@ -306,6 +307,7 @@ export async function callApi(
     uid: actionUid,
     onProgress,
     omitTransactionId,
+    onMockExecute,
     onResponseHeaders,
 
     //operation
@@ -386,46 +388,74 @@ export async function callApi(
   }
 
   try {
-    const operation: ApiOperationDef = {
-      headers,
-      url,
-      queryParams,
-      rawBody,
-      method,
-      body,
-      payloadType,
-      credentials,
-    };
-    const _onProgress = lookupAction(onProgress, uid, {
-      eventName: "progress",
-    });
+    let result;
 
-    // Trace API call start — capture traceId before await so api:complete
-    // uses the same context (getCurrentTrace() may change after await)
-    const apiTraceId = getCurrentTrace();
-    traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
-      transactionId: clientTxId,
-      body: resolvedBody,
-    });
+    if (onMockExecute) {
+      // Mock execution: resolve request properties and call the mock handler
+      const resolvedMockQueryParams = extractParam(stateContext, queryParams, appContext) || {};
+      const resolvedMockBody = rawBody
+        ? extractParam(stateContext, rawBody, appContext)
+        : body
+          ? extractParam(stateContext, body, appContext)
+          : undefined;
+      const resolvedMockHeaders = extractParam(stateContext, headers, appContext) || {};
 
-    const result = await new RestApiProxy(appContext, apiInstance).execute({
-      operation,
-      params: stateContext,
-      transactionId: clientTxId,
-      omitTransactionId,
-      resolveBindingExpressions,
-      onProgress: _onProgress,
-      onResponseHeaders,
-    });
+      const mockFn = lookupAction(onMockExecute, uid, {
+        eventName: "mockExecute",
+        context: {
+          ...getCurrentState(),
+          $pathParams: {},
+          $queryParams: resolvedMockQueryParams,
+          $requestBody: resolvedMockBody,
+          $cookies: {},
+          $requestHeaders: resolvedMockHeaders,
+          $param: stateContext["$param"],
+          $params: stateContext["$params"],
+        },
+      });
+      result = await mockFn?.();
+    } else {
+      const operation: ApiOperationDef = {
+        headers,
+        url,
+        queryParams,
+        rawBody,
+        method,
+        body,
+        payloadType,
+        credentials,
+      };
+      const _onProgress = lookupAction(onProgress, uid, {
+        eventName: "progress",
+      });
 
-    // Trace API call completion — reuse traceId from start
-    traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
-      transactionId: clientTxId,
-      body: resolvedBody,
-      result,
-      status: getLastApiStatus(clientTxId),
-      _traceId: apiTraceId,
-    });
+      // Trace API call start — capture traceId before await so api:complete
+      // uses the same context (getCurrentTrace() may change after await)
+      const apiTraceId = getCurrentTrace();
+      traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
+        transactionId: clientTxId,
+        body: resolvedBody,
+      });
+
+      result = await new RestApiProxy(appContext, apiInstance).execute({
+        operation,
+        params: stateContext,
+        transactionId: clientTxId,
+        omitTransactionId,
+        resolveBindingExpressions,
+        onProgress: _onProgress,
+        onResponseHeaders,
+      });
+
+      // Trace API call completion — reuse traceId from start
+      traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
+        transactionId: clientTxId,
+        body: resolvedBody,
+        result,
+        status: getLastApiStatus(clientTxId),
+        _traceId: apiTraceId,
+      });
+    }
 
     const onSuccessFn = typeof onSuccess === "function"
       ? onSuccess
