@@ -122,7 +122,12 @@ export function FormBindingWrapper({
   // Handle value changes
   const onStateChange = useCallback(
     ({ value }: any, options?: any) => {
-      childUpdateState?.({ value }, options);
+      // formOnly:true means only update the form subject, not the wrapped component's
+      // own state container. This avoids Radix Select transitioning to uncontrolled
+      // mode when the form value is cleared to undefined.
+      if (!options?.formOnly) {
+        childUpdateState?.({ value }, options);
+      }
       if (!isInsideForm) return;
       // We already handled the initial value in the useEffect with fieldInitialized
       if (!options?.initial) {

@@ -2528,13 +2528,135 @@ test.describe("Grouping Functionality", () => {
   });
 });
 
+// =============================================================================
+// INVALID INITIAL VALUE IN FORM (regression tests)
+// =============================================================================
+
+test.describe("Invalid initial value in Form", () => {
+  test("invalid initialValue is cleared on form submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="{123}">
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("invalid initialValue is cleared on form submit - searchable Select", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="{123}" searchable>
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("valid initialValue is preserved on form submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="first">
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("First");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe("first");
+  });
+
+  test("invalid Form data value is cleared on submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form data="{{ sel: 'no-such-option' }}" onSubmit="data => testState = data.sel">
+          <Select testId="mySelect" bindTo="sel">
+            <Option label="Alpha" value="alpha" />
+            <Option label="Beta" value="beta" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("invalid multiSelect values are filtered on form submit", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form data="{{ sel: ['opt1', 'invalid', 'opt3'] }}" onSubmit="data => testState = data.sel">
+          <Select testId="mySelect" bindTo="sel" multiSelect searchable>
+            <Option label="Opt 1" value="opt1" />
+            <Option label="Opt 2" value="opt2" />
+            <Option label="Opt 3" value="opt3" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual(["opt1", "opt3"]);
+  });
+
+  test("invalid value outside a Form is not cleared - standalone Select", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" initialValue="{42}">
+          <Option value="{0}" label="Zero"/>
+          <Option value="{1}" label="One"/>
+          <Option value="{2}" label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 42");
+  });
+});
+
 // Regression tests for the value synchronization issue with Select
-// NOTE: These tests are currently skipped due to known issues.
-test.describe.skip(
+test.describe(
   "Form Value Synchronization",
-  SKIP_REASON.UNSURE(
-    "We have not decided how to tackle this data vs UI inconsistency yet. A number of proposals are being evaluated.",
-  ),
   () => {
     test("invalid single value in Form - SimpleSelect", async ({ page, initTestBed }) => {
       const { testStateDriver } = await initTestBed(`
@@ -2546,11 +2668,11 @@ test.describe.skip(
         </FormItem>
       </Form>
     `);
-      await page.getByRole("button", { name: "Save" }).click();
-
       const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
       await expect(selectTrigger).toContainText("");
-      await expect.poll(testStateDriver.testState).toBe("invalid");
+
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState).toBe(undefined);
     });
 
     test("invalid single value in Form - Select", async ({ page, initTestBed }) => {
@@ -2563,11 +2685,11 @@ test.describe.skip(
         </FormItem>
       </Form>
     `);
-      await page.getByRole("button", { name: "Save" }).click();
-
       const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
       await expect(selectTrigger).toContainText("");
-      await expect.poll(testStateDriver.testState).toBe("invalid");
+
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState).toBe(undefined);
     });
 
     test("changing options does not update value - SimpleSelect", async ({ page, initTestBed }) => {
