@@ -8,6 +8,7 @@
         <HStack
             when="{$props.useDefault}"
             wrapContent="true"
+            itemWidth="fit-content"
             verticalAlignment="center"
             gap="$space-2"
         >
@@ -35,6 +36,7 @@
         <HStack
             when="{!$props.useDefault}"
             wrapContent="true"
+            itemWidth="fit-content"
             verticalAlignment="center"
             gap="$space-2"
         >
