@@ -28,7 +28,7 @@ import { SimpleSelect } from "./SimpleSelect";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
-import { useFormContextPart } from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -428,6 +428,44 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       updateState({ value: initialValue }, { initial: true });
     }
   }, [initialValue, updateState]);
+
+  // When inside a form, clear the value if it does not match any loaded option.
+  // This aligns with native <select> semantics: an invalid value becomes no selection.
+  // The check runs once — after both options are non-empty AND the value is set — so
+  // option-list changes or delayed form initialization cannot cause spurious clears.
+  const isInsideForm = useIsInsideForm();
+  const hasValidatedInitialValueRef = useRef(false);
+  useEffect(() => {
+    if (!isInsideForm) return;
+    if (hasValidatedInitialValueRef.current) return;
+    if (options.length === 0) return;
+    // Wait until the form has actually provided a concrete value (not just "not yet set")
+    if (value === undefined || value === null) return;
+
+    hasValidatedInitialValueRef.current = true;
+
+    if (!multiSelect) {
+      if (value !== "") {
+        const isValid = options.some((opt) => `${opt.value}` === `${value}`);
+        if (!isValid) {
+          // Use formOnly:true so the form field is cleared without updating the
+          // component's own display state. Updating to undefined would cause
+          // SimpleSelect (Radix) to transition to uncontrolled mode and fire
+          // onValueChange("") which would immediately overwrite the cleared value.
+          updateState({ value: undefined }, { formOnly: true });
+        }
+      }
+    } else {
+      if (Array.isArray(value) && value.length > 0) {
+        const validValues = value.filter((v) =>
+          options.some((opt) => String(opt.value) === String(v)),
+        );
+        if (validValues.length !== value.length) {
+          updateState({ value: validValues });
+        }
+      }
+    }
+  }, [isInsideForm, options, value, multiSelect, updateState]);
 
   // Observe the size of the reference element
   useEffect(() => {

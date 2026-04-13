@@ -99,9 +99,12 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
     const [open, setOpen] = useState(false);
 
-    // Convert value to string for Radix UI compatibility
+    // Convert value to string for Radix UI compatibility.
+    // Always produce a string (defaulting to "") so Radix stays in controlled mode.
+    // Passing undefined would trigger a controlled→uncontrolled transition that
+    // causes Radix to fire onValueChange("") unexpectedly.
     const stringValue = useMemo(() => {
-      return value != undefined ? String(value) : undefined;
+      return value != null && value !== "" ? String(value) : "";
     }, [value]);
 
     // Handle value changes with proper type conversion
