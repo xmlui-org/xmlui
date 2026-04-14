@@ -312,6 +312,35 @@ $scrollPaddingBlockPage: createThemeVar("scroll-padding-block-Pages");
       }
     }
 
+    // fitContent: app sizes itself to its content's natural height rather
+    // than filling its container's viewport. Intended for iframe embedding
+    // or use as a block within a larger page. Takes precedence over
+    // scrollWholePage's viewport pinning and all per-layout rules; the host
+    // page becomes the sole scroll container. Nothing inside the app should
+    // create a height-bounded scroll container.
+    //
+    // !important is used deliberately: this is an escape-hatch mode that
+    // must override the layout-specific cascade (e.g. .horizontal.sticky's
+    // min-height: 100%). Trying to out-specificity every layout combination
+    // would be brittle.
+    &.fitContent {
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: visible !important;
+
+      .mainContentRow,
+      .mainContentArea,
+      .pagesContainer,
+      .pageContentContainer,
+      .pageContentContainer > :global(.xmlui-page-root) {
+        height: auto !important;
+        min-height: 0 !important;
+        max-height: none !important;
+        overflow: visible !important;
+      }
+    }
+
     &:not(.scrollWholePage) {
       overflow: clip; // clip (not hidden) — prevents this element from acting as a scroll container,
       // so focus-driven scrollIntoView cannot scroll appContainer. overflow:hidden creates a scroll
