@@ -152,6 +152,7 @@ export const formBindingBehavior: Behavior = {
         labelBreak={labelBreak}
         enabled={enabled}
         requireLabelMode={requireLabelMode}
+        className={className}
         layoutContext={layoutContext}
       >
         {node as ReactElement}
