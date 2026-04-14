@@ -14,9 +14,21 @@ import { ThemedStack as Stack } from "../Stack/Stack";
 import { Dialog } from "./Dialog";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
-const ConfirmationModalContext = React.createContext({
-  confirm: (_title?: string, _message?: string, _actionLabel?: string, _cancelLabel?: string) =>
-    Promise.resolve(false),
+type ConfirmOptions = {
+  title?: string;
+  message?: string;
+  actionLabel?: string;
+  cancelLabel?: string;
+  width?: string;
+};
+
+type ConfirmFn = {
+  (options: ConfirmOptions): Promise<boolean>;
+  (title?: string, message?: string, actionLabel?: string, cancelLabel?: string, width?: string): Promise<boolean>;
+};
+
+const ConfirmationModalContext = React.createContext<{ confirm: ConfirmFn }>({
+  confirm: () => Promise.resolve(false),
 });
 
 export const useConfirm = () => useContext(ConfirmationModalContext);
@@ -46,6 +58,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
   const [message, setMessage] = useState<string | undefined>();
   const [cancelLabel, setCancelLabel] = useState<string>("Cancel");
   const [buttons, setButtons] = useState<Array<ConfirmButtonParams>>([]);
+  const [width, setWidth] = useState<string | undefined>();
   // Refs and other
   const resolver = useRef<((confirmationResult: boolean) => void) | null>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
@@ -64,11 +77,30 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const handleShow = useCallback(
     (
-      title = "Confirm Operation",
-      message = "Are you sure you want to perform this operation?",
-      actionLabel = "Yes",
-      cancelLabel = "Cancel",
+      titleOrOptions: string | ConfirmOptions = "Confirm Operation",
+      messageArg = "Are you sure you want to perform this operation?",
+      actionLabelArg = "Yes",
+      cancelLabelArg = "Cancel",
+      widthArg?: string,
     ) => {
+      let title: string;
+      let message: string;
+      let actionLabel: string;
+      let cancelLabel: string;
+      let resolvedWidth: string | undefined;
+      if (typeof titleOrOptions === "object" && titleOrOptions !== null) {
+        title = titleOrOptions.title ?? "Confirm Operation";
+        message = titleOrOptions.message ?? "Are you sure you want to perform this operation?";
+        actionLabel = titleOrOptions.actionLabel ?? "Yes";
+        cancelLabel = titleOrOptions.cancelLabel ?? "Cancel";
+        resolvedWidth = titleOrOptions.width;
+      } else {
+        title = titleOrOptions;
+        message = messageArg;
+        actionLabel = actionLabelArg;
+        cancelLabel = cancelLabelArg;
+        resolvedWidth = widthArg;
+      }
       // Trace confirmation modal show
       if (isTracingActive()) {
         const w = window as any;
@@ -91,6 +123,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       setButtons([{ label: actionLabel, value: true }]);
       setMessage(message);
       setCancelLabel(cancelLabel);
+      setWidth(resolvedWidth);
       setShowConfirmationModal(true);
       return new Promise<boolean>(function (resolve) {
         resolver.current = resolve;
@@ -149,7 +182,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const contextValue = useMemo(() => {
     return {
-      confirm: handleShow,
+      confirm: handleShow as ConfirmFn,
     };
   }, [handleShow]);
 
@@ -163,6 +196,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
           description={message}
           isOpen={true}
           onClose={handleCancel}
+          width={width}
           buttons={
             <Stack
               orientation="horizontal"
