@@ -20,6 +20,10 @@ $backgroundColor-buttonRow-Form: createThemeVar("backgroundColor-buttonRow-Form"
     flex-direction: column;
     gap: $gap-Form;
     background-color: $backgroundColor-Form;
+
+    &.stickyForm {
+      min-height: 100%;
+    }
   }
 
   .buttonRow {
@@ -34,6 +38,7 @@ $backgroundColor-buttonRow-Form: createThemeVar("backgroundColor-buttonRow-Form"
   .stickyButtonRow {
     position: sticky;
     bottom: 0;
+    margin-top: auto;
     padding-top: $paddingTop-buttonRow-Form;
     background-color: $backgroundColor-buttonRow-Form;
   }

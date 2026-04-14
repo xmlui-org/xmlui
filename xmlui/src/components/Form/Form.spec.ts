@@ -1,6 +1,7 @@
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 import { labelPositionValues } from "../abstractions";
 import { expect, test } from "../../testing/fixtures";
+import { getBounds } from "../../testing/component-test-helpers";
 
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
@@ -4119,5 +4120,283 @@ test.describe("dataAfterSubmit property", () => {
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect(nameInput.field).toHaveValue("");
+  });
+});
+
+// =============================================================================
+// STICKY BUTTON ROW TESTS
+// =============================================================================
+
+test.describe("stickyButtonRow property", () => {
+  test("button row does not have sticky positioning by default", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).not.toHaveCSS("position", "sticky");
+  });
+
+  test("button row has sticky positioning when set to true", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" stickyButtonRow="true" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).toHaveCSS("position", "sticky");
+    await expect(buttonRow).toHaveCSS("bottom", "0px");
+  });
+
+  test("button row does not have sticky positioning when set to false", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" stickyButtonRow="false" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).not.toHaveCSS("position", "sticky");
+  });
+
+  test("form wrapper fills the scroll container height when stickyButtonRow is true", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const formBounds = await getBounds(driver.component);
+    // Form should fill the full height of the scroll container
+    expect(formBounds.height).toBeCloseTo(containerBounds.height, 0);
+  });
+
+  test("button row is anchored to the bottom of the scroll container with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+    // Button row bottom edge should align with container bottom within 2px
+    expect(Math.abs(buttonRowBounds.bottom - containerBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row without stickyButtonRow is not anchored to the container bottom with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+    // Without stickyButtonRow, the button row sits right below the field, not at the container bottom
+    expect(buttonRowBounds.bottom).toBeLessThan(containerBounds.bottom - 10);
+  });
+
+  test("button row stays visible at the bottom of the scroll container after scrolling to top", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="200px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Field 1" bindTo="f1" />
+          <FormItem label="Field 2" bindTo="f2" />
+          <FormItem label="Field 3" bindTo="f3" />
+          <FormItem label="Field 4" bindTo="f4" />
+          <FormItem label="Field 5" bindTo="f5" />
+        </Form>
+      </VStack>
+    `);
+    const container = page.getByTestId("container");
+
+    // Wait until the container is actually scrollable
+    await expect.poll(() =>
+      container.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to the bottom
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+
+    // Scroll back to the top
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(container);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row must be visible within the container's viewport
+    expect(buttonRowBounds.top).toBeGreaterThanOrEqual(containerBounds.top);
+    // Button row bottom edge must align with container bottom (sticky: bottom 0)
+    expect(Math.abs(buttonRowBounds.bottom - containerBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row disappears when scrolled to top without stickyButtonRow", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="200px" overflowY="auto">
+        <Form testId="form">
+          <FormItem label="Field 1" bindTo="f1" />
+          <FormItem label="Field 2" bindTo="f2" />
+          <FormItem label="Field 3" bindTo="f3" />
+          <FormItem label="Field 4" bindTo="f4" />
+          <FormItem label="Field 5" bindTo="f5" />
+        </Form>
+      </VStack>
+    `);
+    const container = page.getByTestId("container");
+
+    await expect.poll(() =>
+      container.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to top — button row should be out of view (not sticky)
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(container);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Without sticky, the button row's natural position is below the container viewport
+    expect(buttonRowBounds.top).toBeGreaterThan(containerBounds.bottom);
+  });
+
+  // ModalDialog is the primary use-case for stickyButtonRow (see component docs).
+  // The modal's innerContent div (overflow-y: auto) is the scroll container.
+
+  test("button row is anchored to the bottom of a ModalDialog with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice">
+        <Form testId="form" stickyButtonRow="true" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+
+    // The form's direct parent is the modal's innerContent scroll container
+    const modalScrollBody = driver.component.locator("..");
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row bottom edge must align with the modal scroll body's bottom edge
+    expect(Math.abs(buttonRowBounds.bottom - scrollBodyBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row stays visible at bottom of ModalDialog after scrolling to top", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    // Constrain modal height via inline style so the form overflows and the body scrolls
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice" maxHeight="300px">
+        <Form testId="form" stickyButtonRow="true" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Created Date" bindTo="createdDate" />
+          <TextBox label="Pay To" bindTo="payTo" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+          <NumberBox label="Po Number" bindTo="poNumber" />
+          <DateInput label="Due Date" bindTo="dueDate" />
+          <TextBox label="Ship Via" bindTo="shipVia" />
+          <TextBox label="Shipping Point" bindTo="shippingPoint" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+
+    // The form's direct parent is the modal's innerContent scroll container
+    const modalScrollBody = driver.component.locator("..");
+
+    // Wait until the modal body is actually scrollable
+    await expect.poll(() =>
+      modalScrollBody.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to the bottom then back to the top
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row must be visible within the modal scroll body
+    expect(buttonRowBounds.top).toBeGreaterThanOrEqual(scrollBodyBounds.top);
+    // Button row bottom edge must be at the bottom of the modal scroll body (sticky)
+    expect(Math.abs(buttonRowBounds.bottom - scrollBodyBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row disappears after scrolling to top in ModalDialog without stickyButtonRow", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice" maxHeight="300px">
+        <Form testId="form" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Created Date" bindTo="createdDate" />
+          <TextBox label="Pay To" bindTo="payTo" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+          <NumberBox label="Po Number" bindTo="poNumber" />
+          <DateInput label="Due Date" bindTo="dueDate" />
+          <TextBox label="Ship Via" bindTo="shipVia" />
+          <TextBox label="Shipping Point" bindTo="shippingPoint" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+    const modalScrollBody = driver.component.locator("..");
+
+    await expect.poll(() =>
+      modalScrollBody.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to top — button row scrolls out of view
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Without sticky, the button row's natural position is below the visible area
+    expect(buttonRowBounds.top).toBeGreaterThan(scrollBodyBounds.bottom);
   });
 });
