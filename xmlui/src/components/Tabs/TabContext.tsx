@@ -11,15 +11,17 @@ interface ITabContext{
   unRegister: (innerId: string) => void;
   activeTabId: string;
   getTabItems: () => TabItem[];
+  keepMounted: boolean;
 }
 export const TabContext = createContext<ITabContext>({
   register: (tabItem) => {},
   unRegister: (innerId: string) => {},
   activeTabId: "",
   getTabItems: () => [],
+  keepMounted: false,
 });
 
-export function useTabContextValue() {
+export function useTabContextValue(keepMounted: boolean = false) {
   const [tabItems, setTabItems] = useState<TabItem[]>(EMPTY_ARRAY);
   const tabItemsRef = useRef<TabItem[]>(EMPTY_ARRAY);
   tabItemsRef.current = tabItems;
@@ -58,8 +60,9 @@ export function useTabContextValue() {
       activeTabId,
       setActiveTabId,
       getTabItems,
+      keepMounted,
     };
-  }, [register, unRegister, activeTabId, getTabItems]);
+  }, [register, unRegister, activeTabId, getTabItems, keepMounted]);
 
   return {
     tabItems,

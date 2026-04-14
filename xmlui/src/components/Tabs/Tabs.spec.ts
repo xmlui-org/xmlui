@@ -1593,3 +1593,177 @@ test.describe("regression tests", () => {
     expect(colorDifference).toBeGreaterThan(30);
   });
 });
+
+// =============================================================================
+// KEEP MOUNTED TESTS
+// =============================================================================
+
+test.describe("keepMounted", () => {
+  test("inactive tab content is not in DOM by default outside of Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByTestId("content1")).toBeVisible();
+    await expect(page.getByTestId("content2")).toHaveCount(0);
+  });
+
+  test("keepMounted=true renders all tab panels in DOM", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs keepMounted="{true}">
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+        <TabItem label="Tab 3">
+          <Text testId="content3">Content 3</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    // Active tab visible
+    await expect(page.getByTestId("content1")).toBeVisible();
+    // Inactive tabs in DOM but hidden
+    await expect(page.getByTestId("content2")).toHaveCount(1);
+    await expect(page.getByTestId("content2")).not.toBeVisible();
+    await expect(page.getByTestId("content3")).toHaveCount(1);
+    await expect(page.getByTestId("content3")).not.toBeVisible();
+  });
+
+  test("keepMounted=true shows correct content after switching tabs", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs keepMounted="{true}">
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    // Switch to Tab 2
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByTestId("content2")).toBeVisible();
+    await expect(page.getByTestId("content1")).not.toBeVisible();
+    // Content1 still in DOM
+    await expect(page.getByTestId("content1")).toHaveCount(1);
+  });
+
+  test("keepMounted=false does not render inactive tabs even inside Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Tabs keepMounted="{false}">
+          <TabItem label="Tab 1">
+            <Text testId="content1">Content 1</Text>
+          </TabItem>
+          <TabItem label="Tab 2">
+            <Text testId="content2">Content 2</Text>
+          </TabItem>
+        </Tabs>
+      </Form>
+    `);
+
+    await expect(page.getByTestId("content1")).toBeVisible();
+    await expect(page.getByTestId("content2")).toHaveCount(0);
+  });
+
+  test("defaults to keepMounted=true inside Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Tabs>
+          <TabItem label="Tab 1">
+            <Text testId="content1">Content 1</Text>
+          </TabItem>
+          <TabItem label="Tab 2">
+            <Text testId="content2">Content 2</Text>
+          </TabItem>
+        </Tabs>
+      </Form>
+    `);
+
+    // Active tab visible
+    await expect(page.getByTestId("content1")).toBeVisible();
+    // Inactive tab in DOM but hidden (because inside Form)
+    await expect(page.getByTestId("content2")).toHaveCount(1);
+    await expect(page.getByTestId("content2")).not.toBeVisible();
+  });
+
+  test("form fields in hidden tabs preserve values on submit", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form
+        data="{{ firstname: 'John', lastname: 'Doe', phone: '123-456-7890', email: 'john@example.com' }}"
+        onSubmit="data => testState = JSON.stringify(data)"
+      >
+        <Tabs>
+          <TabItem label="Personal">
+            <TextBox bindTo="firstname" label="First Name" />
+            <TextBox bindTo="lastname" label="Last Name" />
+          </TabItem>
+          <TabItem label="Contact">
+            <TextBox bindTo="phone" label="Phone" />
+            <TextBox bindTo="email" label="Email" />
+          </TabItem>
+        </Tabs>
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    // Submit without visiting the Contact tab
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.firstname).toBe("John");
+    expect(result.lastname).toBe("Doe");
+    expect(result.phone).toBe("123-456-7890");
+    expect(result.email).toBe("john@example.com");
+  });
+});
+
+// =============================================================================
+// GAP PROP AND THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("gap prop and paddingTop-TabItem theme variable", () => {
+  test("gap prop sets padding-top on tab content panel", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs gap="40px">
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `);
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "40px");
+  });
+
+  test("gap prop overrides theme variable", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs gap="0px">
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `, {
+      testThemeVars: { "paddingTop-TabItem": "24px" },
+    });
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "0px");
+  });
+
+  test("paddingTop-TabItem theme variable applies without gap prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `, {
+      testThemeVars: { "paddingTop-TabItem": "32px" },
+    });
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "32px");
+  });
+});

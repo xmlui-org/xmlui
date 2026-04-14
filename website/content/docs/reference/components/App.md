@@ -35,6 +35,12 @@ This property sets the app's default tone ("light" or "dark").
 
 Available values: `light`, `dark`
 
+### `fitContent` [#fitcontent]
+
+> [!DEF]  default: **false**
+
+When `true`, the app sizes itself to its content's natural height rather than filling its container's viewport. Intended for embedding an app inside an iframe or as a block within a larger page: the host page becomes the sole scroll container. This overrides `scrollWholePage`'s viewport pinning.
+
 ### `layout` [#layout]
 
 This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
