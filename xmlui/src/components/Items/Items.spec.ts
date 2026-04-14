@@ -452,3 +452,47 @@ test.describe("Other Edge Cases", () => {
     await expect(textElements).toHaveCount(1);
   });
 });
+
+// =============================================================================
+// REACTIVITY: PARENT FUNCTION DEPS IN CHILD CONTAINERS
+// =============================================================================
+
+test.describe("Function dependency tracking across containers", () => {
+  test("script function calls in Items children re-evaluate when parent variable changes", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <script>
+          var selected = "";
+          function isSelected(alias) {
+            return selected === alias;
+          }
+        </script>
+
+        <Items data="{[{alias: 'a'}, {alias: 'b'}]}">
+          <Button
+            testId="btn-{$item.alias}"
+            label="{isSelected($item.alias) ? 'YES' : 'NO'}"
+            onClick="selected = $item.alias"
+          />
+        </Items>
+      </App>
+    `);
+
+    // Initially neither is selected
+    await expect(page.getByTestId("btn-a")).toContainText("NO");
+    await expect(page.getByTestId("btn-b")).toContainText("NO");
+
+    // Click first button - its label should change via function re-evaluation
+    await page.getByTestId("btn-a").click();
+    await expect(page.getByTestId("btn-a")).toContainText("YES");
+    await expect(page.getByTestId("btn-b")).toContainText("NO");
+
+    // Click second button - selection should move
+    await page.getByTestId("btn-b").click();
+    await expect(page.getByTestId("btn-a")).toContainText("NO");
+    await expect(page.getByTestId("btn-b")).toContainText("YES");
+  });
+});
