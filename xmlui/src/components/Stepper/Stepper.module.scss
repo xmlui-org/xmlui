@@ -1,0 +1,175 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- Theme variables ---
+$size-indicator-Stepper: createThemeVar("size-indicator-Stepper");
+$borderWidth-indicator-Stepper: createThemeVar("borderWidth-indicator-Stepper");
+$color-indicator-active-Stepper: createThemeVar("color-indicator-active-Stepper");
+$color-indicator-completed-Stepper: createThemeVar("color-indicator-completed-Stepper");
+$color-indicator-incomplete-Stepper: createThemeVar("color-indicator-incomplete-Stepper");
+$color-separator-Stepper: createThemeVar("color-separator-Stepper");
+$color-separator-completed-Stepper: createThemeVar("color-separator-completed-Stepper");
+$thickness-separator-Stepper: createThemeVar("thickness-separator-Stepper");
+$fontSize-label-Stepper: createThemeVar("fontSize-label-Stepper");
+$fontSize-description-Stepper: createThemeVar("fontSize-description-Stepper");
+$color-label-active-Stepper: createThemeVar("color-label-active-Stepper");
+$color-label-completed-Stepper: createThemeVar("color-label-completed-Stepper");
+$color-label-incomplete-Stepper: createThemeVar("color-label-incomplete-Stepper");
+$gap-Stepper: createThemeVar("gap-Stepper");
+$color-indicator-text-Stepper: createThemeVar("color-indicator-text-Stepper");
+$color-indicator-text-active-Stepper: createThemeVar("color-indicator-text-active-Stepper");
+
+@layer components {
+  // --- Root container ---
+  .root {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    &.vertical {
+      flex-direction: row;
+    }
+  }
+
+  // --- Step indicator strip ---
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
+    .vertical & {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  // --- Individual step wrapper (indicator + body) ---
+  .stepWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+
+    &.iconRight {
+      flex-direction: row-reverse;
+    }
+
+    .vertical & {
+      flex-direction: row;
+    }
+  }
+
+  // --- Step indicator circle ---
+  .indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $size-indicator-Stepper;
+    height: $size-indicator-Stepper;
+    min-width: $size-indicator-Stepper;
+    min-height: $size-indicator-Stepper;
+    border-radius: 50%;
+    border: $borderWidth-indicator-Stepper solid $color-indicator-incomplete-Stepper;
+    background-color: transparent;
+    color: $color-indicator-text-Stepper;
+    font-weight: 600;
+    font-size: $fontSize-label-Stepper;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+    padding: 0;
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+
+    &[data-state="active"] {
+      border-color: $color-indicator-active-Stepper;
+      background-color: $color-indicator-active-Stepper;
+      color: $color-indicator-text-active-Stepper;
+    }
+
+    &[data-state="completed"] {
+      border-color: $color-indicator-completed-Stepper;
+      background-color: $color-indicator-completed-Stepper;
+      color: $color-indicator-text-active-Stepper;
+    }
+  }
+
+  // --- Separator line between indicators ---
+  .separator {
+    flex: 1 1 auto;
+    height: $thickness-separator-Stepper;
+    min-width: 24px;
+    background-color: $color-separator-Stepper;
+    transition: background-color 0.2s;
+
+    &[data-state="completed"] {
+      background-color: $color-separator-completed-Stepper;
+    }
+
+    .vertical & {
+      width: $thickness-separator-Stepper;
+      height: 24px;
+      min-width: unset;
+      min-height: 24px;
+      flex: 0 0 auto;
+      margin-left: calc($size-indicator-Stepper / 2 - $thickness-separator-Stepper / 2);
+    }
+  }
+
+  // --- Step body (label + description) ---
+  .stepBody {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .stepLabel {
+    font-size: $fontSize-label-Stepper;
+    font-weight: 500;
+    color: $color-label-incomplete-Stepper;
+
+    &[data-state="active"] {
+      color: $color-label-active-Stepper;
+    }
+
+    &[data-state="completed"] {
+      color: $color-label-completed-Stepper;
+    }
+  }
+
+  .stepDescription {
+    font-size: $fontSize-description-Stepper;
+    color: $color-label-incomplete-Stepper;
+
+    &[data-state="active"] {
+      color: $color-label-active-Stepper;
+    }
+
+    &[data-state="completed"] {
+      color: $color-label-completed-Stepper;
+    }
+  }
+
+  // --- Content panel ---
+  .content {
+    margin-top: $gap-Stepper;
+
+    .vertical & {
+      margin-top: 0;
+      margin-left: $gap-Stepper;
+      flex: 1;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

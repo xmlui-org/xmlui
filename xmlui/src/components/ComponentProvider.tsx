@@ -140,6 +140,8 @@ import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
 import { createPropHolderComponent } from "../components-core/renderers";
+import { stepperComponentRenderer } from "./Stepper/Stepper";
+import { stepComponentRenderer } from "./Stepper/Step";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
 import { navPanelCollapseButtonComponentRenderer } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { toneSwitchComponentRenderer } from "./ToneSwitch/ToneSwitch";
@@ -513,6 +515,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerCoreComponent(accordionItemComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_Step !== "false") {
+      this.registerCoreComponent(stepComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
@@ -592,6 +597,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(ratingInputComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
+      this.registerCoreComponent(stepperComponentRenderer);
     }
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
