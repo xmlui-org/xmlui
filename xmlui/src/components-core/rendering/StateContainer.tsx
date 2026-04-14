@@ -39,7 +39,7 @@ import type {
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
-import { FnDepsProvider } from "../FnDepsContext";
+import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
 // ============================================================================
@@ -210,6 +210,7 @@ export const StateContainer = memo(
 
     //first: collection function (arrowExpressions) dependencies
     //    -> do it until there's no function dep, only var deps
+    const parentFnDeps = useFnDeps();
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
@@ -219,8 +220,13 @@ export const StateContainer = memo(
           fnDeps[key] = collectVariableDependencies(value, referenceTrackedApi);
         }
       });
-      return collectFnVarDeps(fnDeps);
-    }, [referenceTrackedApi, varDefinitions]);
+      const localFnDeps = collectFnVarDeps(fnDeps);
+      // Merge parent function deps so child containers inherit dependency tracking
+      // for functions defined in ancestor containers
+      if (Object.keys(parentFnDeps).length === 0) return localFnDeps;
+      if (Object.keys(localFnDeps).length === 0) return parentFnDeps;
+      return { ...parentFnDeps, ...localFnDeps };
+    }, [parentFnDeps, referenceTrackedApi, varDefinitions]);
 
     /**
      * Variable Resolution Strategy
