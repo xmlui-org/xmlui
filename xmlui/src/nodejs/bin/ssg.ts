@@ -762,8 +762,13 @@ export const ssg = async ({
       throw new Error("failed to load renderPath from temporary SSG entry module");
     }
 
-    const searchIndex: SearchItemData[] = Array.from({ length: pathsToRender.length });
+    const navGroupSummaryUrls = routeStore.navGroupUrls();
+    const searchIndex: SearchItemData[] = [];
     let nextRouteIndex = 0;
+    const renderedEntries: { routeIndex: number; entry: SearchItemData | null }[] = Array.from(
+      { length: pathsToRender.length },
+      (_, i) => ({ routeIndex: i, entry: null }),
+    );
     const workerCount = Math.min(SSG_WRITE_CONCURRENCY, pathsToRender.length);
 
     const workers = Array.from({ length: workerCount }, async () => {
@@ -781,7 +786,10 @@ export const ssg = async ({
         const outputFile = getOutputHtmlPath(outPath, route);
         const dir = path.dirname(outputFile);
 
-        searchIndex[routeIndex] = extractSearchEntry(route, rendered.markup);
+        // Exclude NavGroup summary pages from search index
+        if (!navGroupSummaryUrls.has(route)) {
+          renderedEntries[routeIndex]!.entry = extractSearchEntry(route, rendered.markup);
+        }
 
         await mkdir(dir, { recursive: true });
         await writeFile(outputFile, finalHtml, "utf-8");
@@ -790,6 +798,10 @@ export const ssg = async ({
     });
 
     await Promise.all(workers);
+
+    for (const { entry } of renderedEntries) {
+      if (entry) searchIndex.push(entry);
+    }
 
     const searchIndexFile = path.join(outPath, SEARCH_INDEX_FILE_NAME);
     await writeFile(searchIndexFile, JSON.stringify(searchIndex), "utf-8");

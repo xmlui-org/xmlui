@@ -14,6 +14,7 @@ import {
   useSearchContextUpdater,
   useSearchContextLoadedExternalIndex,
 } from "./SearchContext";
+import { extractNavGroupUrls } from "./AppNavigation";
 
 const HIDDEN_STYLE: CSSProperties = {
   position: "absolute",
@@ -29,10 +30,11 @@ const EXCLUDED_URL_PATTERNS = [/^\/404$/, /^\/not-found$/];
 
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
+  NavPanel?: ComponentDef;
   renderChild: RenderChildFn;
 }
 
-export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
+export function SearchIndexCollector({ Pages, NavPanel, renderChild }: SearchIndexCollectorProps) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
   const loadedExternalIndex = useSearchContextLoadedExternalIndex();
@@ -49,6 +51,9 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     };
   }, [setIndexing]);
 
+  // Collect NavGroup summary page URLs to exclude from search indexing
+  const navGroupUrls = useMemo(() => extractNavGroupUrls(NavPanel), [NavPanel]);
+
   // 1. Memoize the list of pages to be indexed
   const pagesToIndex = useMemo(() => {
     return (
@@ -59,10 +64,11 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
           !child.props.url.includes("*") &&
           !child.props.url.includes(":") &&
           !EXCLUDED_URL_PATTERNS.some((pattern) => pattern.test(child.props.url)) &&
-          child.props?.searchIndexable !== false, // explicit opt-out
+          child.props?.searchIndexable !== false && // explicit opt-out
+          !navGroupUrls.has(child.props.url), // exclude NavGroup summary pages
       ) || []
     );
-  }, [Pages?.children]);
+  }, [Pages?.children, navGroupUrls]);
 
   const [, startTransitionParent] = useTransition(); // Transition for parent updates
 

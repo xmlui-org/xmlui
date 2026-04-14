@@ -200,6 +200,31 @@ function labelExistsInHierarchy(searchLabel: string, hierarchy: NavHierarchyNode
   });
 }
 
+// --- NavGroup URL Extraction ---
+
+/**
+ * Recursively collects all `to` URLs from NavGroup components in a navigation tree.
+ * These URLs point to summary/overview pages that should be excluded from search indexing.
+ */
+export function extractNavGroupUrls(node: ComponentDef | undefined): Set<string> {
+  const urls = new Set<string>();
+  if (!node) return urls;
+  collectNavGroupUrls(node.children, urls);
+  return urls;
+}
+
+function collectNavGroupUrls(children: ComponentDef[] | undefined, urls: Set<string>): void {
+  if (!children) return;
+  for (const child of children) {
+    if (child.type === "NavGroup" && typeof child.props?.to === "string" && child.props.to) {
+      urls.add(child.props.to);
+    }
+    if (child.children) {
+      collectNavGroupUrls(child.children, urls);
+    }
+  }
+}
+
 // --- Navigation Extraction Functions ---
 
 /**
