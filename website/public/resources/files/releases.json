@@ -1,5 +1,261 @@
 [
   {
+    "tag_name": "xmlui@0.12.17",
+    "published_at": "2026-04-14T10:23:37Z",
+    "changes": [
+      {
+        "description": "Add `mockExecute` event to APICall component",
+        "commit_sha": "4dc14d0"
+      },
+      {
+        "description": "Improve List and Tree performance",
+        "commit_sha": "00457e4"
+      },
+      {
+        "description": "Fix `$param` being undefined in `<variable>` declarations that are direct children of `ModalDialog`",
+        "commit_sha": "d474652"
+      },
+      {
+        "description": "Fix RadioGroup keyboard navigation: arrow keys now correctly select the next/previous option instead of only moving focus without updating the value.",
+        "commit_sha": "f00a826"
+      },
+      {
+        "description": "extened the number of parsing errors which can be displayed before reaching the point where only a single error can be reported without line numbers.",
+        "commit_sha": "55258df"
+      },
+      {
+        "description": "Add new theme variables to Table",
+        "commit_sha": "983bfe3"
+      },
+      {
+        "description": "Fix the itemLabelWidth behavior in Form",
+        "commit_sha": "41e4f0a"
+      },
+      {
+        "description": "Extended List `groupBy` property to accept a function in addition to a string. When a function is provided (e.g., `groupBy=\"{(item) => item.name[0]}\"`), it receives each list item and returns the value used for grouping.",
+        "commit_sha": "b296689"
+      },
+      {
+        "description": "Fix HStack default item widths with input controls",
+        "commit_sha": "80ff0fd"
+      },
+      {
+        "description": "Allow page scrolling while Select's dropdown is open",
+        "commit_sha": "2ac4c4a"
+      },
+      {
+        "description": "Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode",
+        "commit_sha": "e27fef3"
+      },
+      {
+        "description": "Add gap property to Tabs",
+        "commit_sha": "611cc69"
+      },
+      {
+        "description": "Support object and array destructuring in reactive `var` declarations. `var {a, b} = expr` and `var [a, b] = expr` are now valid in code-behind scripts and markup script blocks. Destructured declarations are expanded into temporary variables to preserve reactive semantics.",
+        "commit_sha": "b45106d"
+      },
+      {
+        "description": "Add \"before\" and \"after\" values to labelPosition",
+        "commit_sha": "9a1d99b"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.17.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.17/xmlui-0.12.17.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.16",
+    "published_at": "2026-04-09T11:34:45Z",
+    "changes": [
+      {
+        "description": "Fix portal rendering issues in Drawer and NestedApp",
+        "commit_sha": "3d64a86"
+      },
+      {
+        "description": "All Tree rendering in standalone mode",
+        "commit_sha": "07bc66e"
+      },
+      {
+        "description": "Fix Table rendering regression",
+        "commit_sha": "d72d007"
+      },
+      {
+        "description": "Do not animate Switch and Checkbox during the initial rendering",
+        "commit_sha": "312d3fd"
+      },
+      {
+        "description": "feat: allow loading external theme files in standalone mode defined in config.defaultTheme",
+        "commit_sha": "329fc83"
+      },
+      {
+        "description": "refactor: remove redundant check for already registered icons in IconProvider",
+        "commit_sha": "03f095c"
+      },
+      {
+        "description": "APCall deferred execution fixed",
+        "commit_sha": "672c9d9"
+      },
+      {
+        "description": "Improve Table and TileGrid performance",
+        "commit_sha": "cda9057"
+      },
+      {
+        "description": "feat: add sticky button row and max height to ModalDialog and Form components",
+        "commit_sha": "c137a85"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.16.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.16/xmlui-0.12.16.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.15",
+    "published_at": "2026-04-01T14:15:14Z",
+    "changes": [
+      {
+        "description": "Fix Stack to respect itemWidth when wrapContent is false",
+        "commit_sha": "90f5002"
+      },
+      {
+        "description": "Extend Form with savePendingLabel, and submitFeedbackDelay",
+        "commit_sha": "2623e28"
+      },
+      {
+        "description": "feat: implement select-all, delete-all functionality in DateInput component",
+        "commit_sha": "db67849"
+      },
+      {
+        "description": "Fix Select `dropdownHeight` prop leaking to the trigger element in SimpleSelect mode, causing the trigger to render at the dropdown's height instead of its normal size.",
+        "commit_sha": "28a77d7"
+      },
+      {
+        "description": "fix: restore Bookmark hash navigation in shadow DOM and vertical-full-header layout",
+        "commit_sha": "0dd6e23"
+      },
+      {
+        "description": "refactor: improve Select component formatting and styling consistency, adding e2e tests",
+        "commit_sha": "460a693"
+      },
+      {
+        "description": "fix: simplify inlinePickerMenu styling and add consistent padding",
+        "commit_sha": "7675d1c"
+      },
+      {
+        "description": "feat: add hover preview for DatePicker range selection",
+        "commit_sha": "9df5f4b"
+      },
+      {
+        "description": "fix: quoted content in markup no longer has special meaning. `<Stack>\"hi\"</Stack>`no longer produces the unquoted string _hi_, but rather the quoted string as-is _\"hi\"_. This can technically break existing code which relied on quoting text that incluced the less-than (&lt;) character. This feature was very hidden, we don't expect users to have markup like that. In case you are affected, use the _&lt;_ entity instead, or wrap the content in a CDATA.",
+        "commit_sha": "f74d48f"
+      },
+      {
+        "description": "Hide the experimental pub/sub behavior",
+        "commit_sha": "5fa348e"
+      },
+      {
+        "description": "feat: gracefully handle html when fetching files for standalone",
+        "commit_sha": "370b985"
+      },
+      {
+        "description": "fix: preserve `PageMetaTitle` and other Helmet-managed head output during static site generation so generated HTML includes the correct page title and head tags at build time.",
+        "commit_sha": "4ee71c6"
+      },
+      {
+        "description": "Form's willSubmit will receive the data with noSubmit flag too for validation. The submit event will not.",
+        "commit_sha": "2623e28"
+      },
+      {
+        "description": "Add FormSegment component",
+        "commit_sha": "2623e28"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.15.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.15/xmlui-0.12.15.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.14",
+    "published_at": "2026-03-30T05:31:39Z",
+    "changes": [
+      {
+        "description": "Fix DataSource name when no id is declared",
+        "commit_sha": "60086b1"
+      },
+      {
+        "description": "Allow setting the toast notification position",
+        "commit_sha": "e72aee2"
+      },
+      {
+        "description": "fix: ItemWithLabel falls back to Form's itemLabelPosition from context",
+        "commit_sha": "c7933d4"
+      },
+      {
+        "description": "Add striped property to Table",
+        "commit_sha": "5d2d8ac"
+      },
+      {
+        "description": "Fix CLI bin path in published package: the `clean-package` replacement now correctly points to `dist/nodejs/bin/index.mjs` (the actual ESM output from tsdown) instead of the incorrect `dist/nodejs/bin/index.js`. This mismatch prevented `npm` from creating the `xmlui` symlink in `.bin` during install.",
+        "commit_sha": "f90a550"
+      },
+      {
+        "description": "Fix: Variable initializers in user-defined components can now access routing context variables",
+        "commit_sha": "f09e2fe"
+      },
+      {
+        "description": "Use `Globals.xs` instead of `Main.xmlui.xs` for global variable and function declarations. `Main.xmlui.xs` declarations are now local to the Main component, consistent with how all other code-behind files work.",
+        "commit_sha": "46e4b62"
+      },
+      {
+        "description": "fix: only deep-coppy theme vars when <Theme> needs them. This reduces the number of CSS vars present on a site.",
+        "commit_sha": "9adc767"
+      },
+      {
+        "description": "fix: select - label position, minWidth",
+        "commit_sha": "40d58ac"
+      },
+      {
+        "description": "Allow user-defined components to use arbitrary theme variables",
+        "commit_sha": "084b7dd"
+      },
+      {
+        "description": "Extend headings and Markdown with anchorTemplate",
+        "commit_sha": "90152c6"
+      },
+      {
+        "description": "Column width, minWidth, and maxWidth now accept and resolve theme variables, em/rem values",
+        "commit_sha": "e554b84"
+      },
+      {
+        "description": "NavPanel can be synched with the selected content",
+        "commit_sha": "b7f7152"
+      },
+      {
+        "description": "Auto-generate metadata for user-defined (compound) components by statically analyzing their definition tree. This enables proper theme variable optimization — compound component theme vars are now collected into the global `componentThemeVars` set, so `ThemeProvider` resolves hierarchical variables for them correctly.",
+        "commit_sha": "084b7dd"
+      },
+      {
+        "description": "fix: change NestedApp header background color to surface color",
+        "commit_sha": "9471ef6"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.14.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.14/xmlui-0.12.14.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.13",
     "published_at": "2026-03-25T17:28:50Z",
     "changes": [
@@ -248,194 +504,6 @@
       {
         "name": "xmlui-0.12.9.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.9/xmlui-0.12.9.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.7",
-    "published_at": "2026-03-12T07:34:36Z",
-    "changes": [
-      {
-        "description": "Implement responsive layout properties",
-        "commit_sha": "3139ddc"
-      },
-      {
-        "description": "improve: enhance wrapComponent functionality with metadata merging",
-        "commit_sha": "92db16f"
-      },
-      {
-        "description": "Add `mockData` property to `DataSource` for development and testing",
-        "commit_sha": "2693f67"
-      },
-      {
-        "description": "Add headerUserSelect and cellUserSelect properties to Table",
-        "commit_sha": "420bae7"
-      },
-      {
-        "description": "Gather a search index into a json file at SSG time, which the client fetches.",
-        "commit_sha": "a72eb6d"
-      },
-      {
-        "description": "Fix Table rows occasionally rendering as blank despite valid data by passing `itemSize={rowHeight}` to the virtua Virtualizer component",
-        "commit_sha": "1b8c544"
-      },
-      {
-        "description": "Add applyLayoutProperties configuration option",
-        "commit_sha": "be9a99b"
-      },
-      {
-        "description": "Fix ContextMenu and ModalDialog theming regressions",
-        "commit_sha": "12c1131"
-      },
-      {
-        "description": "Theme variables optimization ready for review",
-        "commit_sha": "12c1131"
-      },
-      {
-        "description": "Add dock property to Stack",
-        "commit_sha": "90fd13f"
-      },
-      {
-        "description": "Remove HoverCard and PositionedContainer",
-        "commit_sha": "5b4ec41"
-      },
-      {
-        "description": "Fix Select regression",
-        "commit_sha": "9791592"
-      },
-      {
-        "description": "feat: integrate wrapComponent into core components where possible",
-        "commit_sha": "f1aa401"
-      },
-      {
-        "description": "Fix theme variable optimization regressions",
-        "commit_sha": "985a7be"
-      },
-      {
-        "description": "Fix portal styling issues with ModalDialog and Search",
-        "commit_sha": "12c1131"
-      },
-      {
-        "description": "Global variables regression fixes",
-        "commit_sha": "3286eb2"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.7.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.7/xmlui-0.12.7.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.6",
-    "published_at": "2026-03-05T14:14:47Z",
-    "changes": [
-      {
-        "description": "fix: Links in tables can't be right-clicked",
-        "commit_sha": "4a27cd3"
-      },
-      {
-        "description": "Allow sync between Table instance with syncWithVar",
-        "commit_sha": "77cde39"
-      },
-      {
-        "description": "Made pattern validation such as email, phone and url more lenient: now they accept empty values.",
-        "commit_sha": "ffc1b30"
-      },
-      {
-        "description": "Updated search functionality on website and reworked search data transformation. Also added categories for search results.",
-        "commit_sha": "66da3b5"
-      },
-      {
-        "description": "Add responsive `when-xs`, `when-sm`, `when-md`, `when-lg`, `when-xl`, `when-xxl` attributes",
-        "commit_sha": "8478033"
-      },
-      {
-        "description": "Fixed a bug where pressing enter after entering an input in the Search field on the website did not navigate to the first result.",
-        "commit_sha": "75c96b7"
-      },
-      {
-        "description": "fix: ensure header and data cells remain aligned during column resizing in Table component",
-        "commit_sha": "ee088cc"
-      },
-      {
-        "description": "Add responsive \"when\" (-xs, -sm, -md, ect.) attributes",
-        "commit_sha": "8478033"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.6.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.6/xmlui-0.12.6.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.5",
-    "published_at": "2026-03-03T09:09:48Z",
-    "changes": [
-      {
-        "description": "Add the 'ssg' subcommand to xmlui",
-        "commit_sha": "88ce91b"
-      },
-      {
-        "description": "Add long text related properties to Link",
-        "commit_sha": "a8dd927"
-      },
-      {
-        "description": "Remove the EmojiSelector component",
-        "commit_sha": "fd643cb"
-      },
-      {
-        "description": "Fix `Actions.navigate` with relative paths (e.g. `'.'`) and query params now correctly stays on the current page instead of redirecting to the `Pages` fallback. The relative pathname is resolved to an absolute path before being passed to the router, because the wrapped navigate introduced in 12.4 for `willNavigate`/`didNavigate` events runs in a higher-level React context that lacked the nested route matches needed for correct relative-path resolution.",
-        "commit_sha": "fd643cb"
-      },
-      {
-        "description": "refactor: prevent auto-focus in Sheet component",
-        "commit_sha": "ee167b7"
-      },
-      {
-        "description": "refactor: update Link component to support noIndicator prop and improve footer layout on the website",
-        "commit_sha": "7a4a44f"
-      },
-      {
-        "description": "Add StickySection component",
-        "commit_sha": "c32edd9"
-      },
-      {
-        "description": "Fix willNavigate and didNavigate regression",
-        "commit_sha": "fd643cb"
-      },
-      {
-        "description": "APICall now does not invalidate queries while navigating away",
-        "commit_sha": "4aeced8"
-      },
-      {
-        "description": "Remove deprecated \\_meta.json files and related code. Navigation now uses navSections/ JSON files exclusively.",
-        "commit_sha": "8d9f103"
-      },
-      {
-        "description": "refactor: update layout and styling for navigation, introduce new theme vars for Drawer close button",
-        "commit_sha": "521d5b1"
-      },
-      {
-        "description": "Fix new operator parsing (priority) issue",
-        "commit_sha": "c14a331"
-      },
-      {
-        "description": "ExpandableItem whitespace can be fully controlled via theme",
-        "commit_sha": "bc0f26b"
-      },
-      {
-        "description": "Add Drawer component",
-        "commit_sha": "7c6c270"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.5.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.5/xmlui-0.12.5.js"
       }
     ]
   }
