@@ -392,6 +392,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Use a custom FormItem control"
+                            to="/docs/howto/use-a-custom-formitem"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Copy billing data to shipping"
                             to="/docs/howto/copy-billing-to-shipping"
                         />
@@ -1551,6 +1556,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/do-custom-form-validation.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/use-a-custom-formitem"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/use-a-custom-formitem.md']}"
                 />
             </Page>
             <Page
