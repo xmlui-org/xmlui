@@ -77,6 +77,7 @@ export const CheckboxMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  compactInlineLabel: true,
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
     [`borderColor-${COMP}`]: `$borderColor-Input-default`,

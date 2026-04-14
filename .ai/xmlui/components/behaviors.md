@@ -44,11 +44,34 @@ props: {
 If `label` is absent from metadata, the label behavior wraps the component automatically — useful for TextBox, Select, etc. that delegate labeling to the behavior.
 
 **Extra label-related props** the behavior reads:
-- `labelPosition` — `"start"` | `"end"` | `"top"` | `"bottom"`
+- `labelPosition` — `"start"` | `"end"` | `"top"` | `"bottom"` | `"before"` | `"after"`
 - `labelWidth` — pixel/percent width of the label column
 - `labelBreak` — threshold at which label wraps to top
 - `required` — shows asterisk indicator
 - `shrinkToLabel` — makes container only as wide as the label
+
+**`"before"` and `"after"` positions**
+
+These two values place the label inline with the input, respecting the current writing direction (`direction` prop):
+
+| Value | LTR | RTL |
+|---|---|---|
+| `"before"` | Label to the left of the input | Label to the right of the input |
+| `"after"` | Label to the right of the input | Label to the left of the input |
+
+Their exact behavior depends on whether the component opts in to **compact inline label** mode via `compactInlineLabel: true` in its metadata:
+
+- **Compact mode** (Checkbox, Switch): The container shrinks to `fit-content` width — the label sits snugly next to the control without stretching to fill the row. If `labelWidth` is not set explicitly it defaults to `fit-content`.
+- **Normal mode** (all other components, e.g. TextBox): `"before"` maps to `"start"` and `"after"` maps to `"end"` — the label column occupies its natural share of the full-width row, identical to the existing start/end layout.
+
+**Opting in to compact mode (component authors):**
+
+```typescript
+export const CheckboxMd = createMetadata({
+  compactInlineLabel: true,
+  // ...
+});
+```
 
 ## Animation Behavior
 

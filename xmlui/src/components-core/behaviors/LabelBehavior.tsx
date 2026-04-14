@@ -122,6 +122,7 @@ export const labelBehavior: Behavior = {
         isInputTemplateUsed={!!componentNode.props?.inputTemplate}
         direction={direction}
         layoutContext={layoutContext}
+        compactInlineLabel={!!(metadata as any)?.compactInlineLabel}
       >
         {node}
       </ItemWithLabel>

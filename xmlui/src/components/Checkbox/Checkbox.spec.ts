@@ -472,6 +472,70 @@ test.describe("Label", () => {
     await expect(page.getByLabel("test")).toBeVisible();
     await expect(page.getByText("test")).toBeVisible();
   });
+
+  test("labelPosition=before positions label before input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="before" />`);
+
+    const { left: checkboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight, width: labelWidth } = await getBounds(page.getByText("test"));
+
+    // Label should be positioned before (left of) the checkbox
+    expect(labelRight).toBeLessThan(checkboxLeft);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=after positions label after input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="after" />`);
+
+    const { right: checkboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
+
+    // Label should be positioned after (right of) the checkbox
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=before uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Checkbox label="test" labelPosition="before" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=after uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Checkbox label="test" labelPosition="after" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=before respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="rtl" label="test" labelPosition="before" />`);
+
+    // In RTL, "before" means the label is to the right of the checkbox
+    const { right: checkboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
+
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
+  });
+
+  test("labelPosition=after respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="rtl" label="test" labelPosition="after" />`);
+
+    // In RTL, "after" means the label is to the left of the checkbox
+    const { left: checkboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight } = await getBounds(page.getByText("test"));
+
+    expect(labelRight).toBeLessThan(checkboxLeft);
+  });
 });
 
 // =============================================================================

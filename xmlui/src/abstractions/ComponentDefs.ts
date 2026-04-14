@@ -367,6 +367,12 @@ export type ComponentMetadata<
   // List of behaviors to exclude from this component
   excludeBehaviors?: string[];
 
+  // When true, the label behavior will use compact (fit-content) layout for
+  // "before" and "after" labelPosition values. Intended for toggle-style
+  // components (Checkbox, Switch) where the control is small and the label
+  // should sit snugly next to it.
+  compactInlineLabel?: boolean;
+
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
 
