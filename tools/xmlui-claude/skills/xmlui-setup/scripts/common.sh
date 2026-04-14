@@ -3,7 +3,6 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 log() {
   printf "[xmlui-claude] %s\n" "$*"
@@ -21,25 +20,6 @@ fail() {
 require_cmd() {
   local cmd="$1"
   command -v "${cmd}" >/dev/null 2>&1 || fail "Missing required command: ${cmd}"
-}
-
-prompt_yes_no() {
-  local message="$1"
-  local default_answer="${2:-y}"
-  local answer
-
-  if [[ "${default_answer}" == "y" ]]; then
-    read -r -p "${message} [Y/n]: " answer || true
-    answer="${answer:-Y}"
-  else
-    read -r -p "${message} [y/N]: " answer || true
-    answer="${answer:-N}"
-  fi
-
-  case "${answer}" in
-    y|Y|yes|YES) return 0 ;;
-    *) return 1 ;;
-  esac
 }
 
 detect_platform() {

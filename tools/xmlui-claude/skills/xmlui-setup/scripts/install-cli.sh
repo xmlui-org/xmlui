@@ -10,10 +10,10 @@ select_download_url() {
   detect_platform
 
   case "${PLATFORM_OS}_${PLATFORM_ARCH}" in
-    darwin_arm64) echo "https://github.com/xmlui-org/xmlui-cli/releases/download/latest/xmlui-macos-arm64.tar.gz" ;;
-    darwin_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/download/latest/xmlui-macos-intel.tar.gz" ;;
-    linux_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/download/latest/xmlui-linux-x64.tar.gz" ;;
-    win_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/download/latest/xmlui-win-x64.zip" ;;
+    darwin_arm64) echo "https://github.com/xmlui-org/xmlui-cli/releases/latest/download/xmlui-macos-arm64.tar.gz" ;;
+    darwin_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/latest/download/xmlui-macos-intel.tar.gz" ;;
+    linux_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/latest/download/xmlui-linux-x64.tar.gz" ;;
+    win_x64) echo "https://github.com/xmlui-org/xmlui-cli/releases/latest/download/xmlui-win-x64.zip" ;;
     *) fail "No URL mapping for ${PLATFORM_OS}/${PLATFORM_ARCH}" ;;
   esac
 }
