@@ -1,5 +1,24 @@
 # xmlui
 
+## 0.12.17
+
+### Patch Changes
+
+- 4dc14d0: Add `mockExecute` event to APICall component
+- 00457e4: Improve List and Tree performance
+- d474652: Fix `$param` being undefined in `<variable>` declarations that are direct children of `ModalDialog`
+- f00a826: Fix RadioGroup keyboard navigation: arrow keys now correctly select the next/previous option instead of only moving focus without updating the value.
+- 55258df: extened the number of parsing errors which can be displayed before reaching the point where only a single error can be reported without line numbers.
+- 983bfe3: Add new theme variables to Table
+- 41e4f0a: Fix the itemLabelWidth behavior in Form
+- b296689: Extended List `groupBy` property to accept a function in addition to a string. When a function is provided (e.g., `groupBy="{(item) => item.name[0]}"`), it receives each list item and returns the value used for grouping.
+- 80ff0fd: Fix HStack default item widths with input controls
+- 2ac4c4a: Allow page scrolling while Select's dropdown is open
+- e27fef3: Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode
+- 611cc69: Add gap property to Tabs
+- b45106d: Support object and array destructuring in reactive `var` declarations. `var {a, b} = expr` and `var [a, b] = expr` are now valid in code-behind scripts and markup script blocks. Destructured declarations are expanded into temporary variables to preserve reactive semantics.
+- 9a1d99b: Add "before" and "after" values to labelPosition
+
 ## 0.12.16
 
 ### Patch Changes
