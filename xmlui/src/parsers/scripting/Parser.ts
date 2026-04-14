@@ -152,6 +152,9 @@ export class Parser {
   // --- Track if we've seen any non-import statements (for import position validation)
   private _hasNonImportStatement = false;
 
+  // --- Counter for generating unique temporary variable names during destructuring expansion
+  private _destrCounter = 0;
+
   /**
    * Initializes the parser with the specified source code
    * @param source Source code to parse
@@ -537,7 +540,41 @@ export class Parser {
     while (true) {
       const declStart = this._lexer.peek();
       let declarationProps: any = {};
-      if (declStart.type === TokenType.Identifier) {
+      if (declStart.type === TokenType.LBrace) {
+        // --- Object destructure
+        endToken = this._lexer.ahead(1);
+        const oDestr = this.parseObjectDestructure();
+        if (oDestr === null) return null;
+        endToken = oDestr.length > 0 ? oDestr[oDestr.length - 1].endToken : endToken;
+
+        // --- Mandatory initialization
+        this.expectToken(TokenType.Assignment);
+        const expr = this.getExpression(false);
+        if (expr === null) return null;
+        endToken = expr.endToken;
+
+        // --- Expand destructure into temp + individual reactive declarations
+        this.expandObjectDestructureToReactiveVars(
+          oDestr, expr, decls, declStart, endToken,
+        );
+      } else if (declStart.type === TokenType.LSquare) {
+        // --- Array destructure
+        endToken = this._lexer.ahead(1);
+        const aDestr = this.parseArrayDestructure();
+        if (aDestr === null) return null;
+        endToken = aDestr.length > 0 ? aDestr[aDestr.length - 1].endToken : endToken;
+
+        // --- Mandatory initialization
+        this.expectToken(TokenType.Assignment);
+        const expr = this.getExpression(false);
+        if (expr === null) return null;
+        endToken = expr.endToken;
+
+        // --- Expand destructure into temp + individual reactive declarations
+        this.expandArrayDestructureToReactiveVars(
+          aDestr, expr, decls, declStart, endToken,
+        );
+      } else if (declStart.type === TokenType.Identifier) {
         if (declStart.text.startsWith("$")) {
           this.reportError("W031");
           return null;
@@ -551,26 +588,26 @@ export class Parser {
             endToken,
           },
         };
+
+        // --- Mandatory initialization
+        this.expectToken(TokenType.Assignment);
+        const expr = this.getExpression(false);
+        if (expr === null) return null;
+        declarationProps.expr = expr;
+        endToken = expr.endToken;
+        // --- New declaration reached
+        decls.push(
+          this.createExpressionNode<ReactiveVarDeclaration>(
+            T_REACTIVE_VAR_DECLARATION,
+            declarationProps,
+            declStart,
+            endToken,
+          ),
+        );
       } else {
         this.reportError("W003");
         return null;
       }
-
-      // --- Mandatory initialization
-      this.expectToken(TokenType.Assignment);
-      const expr = this.getExpression(false);
-      if (expr === null) return null;
-      declarationProps.expr = expr;
-      endToken = expr.endToken;
-      // --- New declaration reached
-      decls.push(
-        this.createExpressionNode<ReactiveVarDeclaration>(
-          T_REACTIVE_VAR_DECLARATION,
-          declarationProps,
-          declStart,
-          endToken,
-        ),
-      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -586,6 +623,149 @@ export class Parser {
       startToken,
       endToken,
     );
+  }
+
+  /**
+   * Expands an object destructuring pattern into reactive var declarations.
+   * `var {a, b: bAlias} = expr` becomes:
+   *   var __destr_N = expr; var a = __destr_N.a; var bAlias = __destr_N.b;
+   */
+  private expandObjectDestructureToReactiveVars(
+    oDestr: ObjectDestructure[],
+    sourceExpr: Expression,
+    decls: ReactiveVarDeclaration[],
+    startToken: Token | undefined,
+    endToken: Token | undefined,
+  ): void {
+    const tempName = `__destr_${++this._destrCounter}`;
+    const tempId = this.createExpressionNode<Identifier>(
+      T_IDENTIFIER, { name: tempName }, startToken, endToken,
+    );
+
+    // --- Temp variable holds the source expression
+    decls.push(
+      this.createExpressionNode<ReactiveVarDeclaration>(
+        T_REACTIVE_VAR_DECLARATION,
+        { id: tempId, expr: sourceExpr },
+        startToken,
+        endToken,
+      ),
+    );
+
+    // --- For each destructured property, create a declaration
+    for (const prop of oDestr) {
+      const memberExpr = this.createExpressionNode<MemberAccessExpression>(
+        T_MEMBER_ACCESS_EXPRESSION,
+        {
+          obj: this.createExpressionNode<Identifier>(
+            T_IDENTIFIER, { name: tempName }, startToken, endToken,
+          ),
+          member: prop.id,
+        },
+        startToken,
+        endToken,
+      );
+
+      if (prop.oDestr) {
+        // --- Nested object destructure
+        this.expandObjectDestructureToReactiveVars(
+          prop.oDestr, memberExpr, decls, startToken, endToken,
+        );
+      } else if (prop.aDestr) {
+        // --- Nested array destructure
+        this.expandArrayDestructureToReactiveVars(
+          prop.aDestr, memberExpr, decls, startToken, endToken,
+        );
+      } else {
+        // --- Simple property: use alias if present, otherwise property name
+        const varName = prop.alias || prop.id;
+        const varId = this.createExpressionNode<Identifier>(
+          T_IDENTIFIER, { name: varName }, startToken, endToken,
+        );
+        decls.push(
+          this.createExpressionNode<ReactiveVarDeclaration>(
+            T_REACTIVE_VAR_DECLARATION,
+            { id: varId, expr: memberExpr },
+            startToken,
+            endToken,
+          ),
+        );
+      }
+    }
+  }
+
+  /**
+   * Expands an array destructuring pattern into reactive var declarations.
+   * `var [a, , c] = expr` becomes:
+   *   var __destr_N = expr; var a = __destr_N[0]; var c = __destr_N[2];
+   */
+  private expandArrayDestructureToReactiveVars(
+    aDestr: ArrayDestructure[],
+    sourceExpr: Expression,
+    decls: ReactiveVarDeclaration[],
+    startToken: Token | undefined,
+    endToken: Token | undefined,
+  ): void {
+    const tempName = `__destr_${++this._destrCounter}`;
+    const tempId = this.createExpressionNode<Identifier>(
+      T_IDENTIFIER, { name: tempName }, startToken, endToken,
+    );
+
+    // --- Temp variable holds the source expression
+    decls.push(
+      this.createExpressionNode<ReactiveVarDeclaration>(
+        T_REACTIVE_VAR_DECLARATION,
+        { id: tempId, expr: sourceExpr },
+        startToken,
+        endToken,
+      ),
+    );
+
+    // --- For each array element, create a declaration
+    for (let i = 0; i < aDestr.length; i++) {
+      const elem = aDestr[i];
+
+      // --- Skip holes (elements without id or nested patterns)
+      if (!elem.id && !elem.oDestr && !elem.aDestr) continue;
+
+      const indexExpr = this.createExpressionNode<CalculatedMemberAccessExpression>(
+        T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+        {
+          obj: this.createExpressionNode<Identifier>(
+            T_IDENTIFIER, { name: tempName }, startToken, endToken,
+          ),
+          member: this.createExpressionNode<Literal>(
+            T_LITERAL, { value: i }, startToken, endToken,
+          ),
+        },
+        startToken,
+        endToken,
+      );
+
+      if (elem.oDestr) {
+        // --- Nested object destructure
+        this.expandObjectDestructureToReactiveVars(
+          elem.oDestr, indexExpr, decls, startToken, endToken,
+        );
+      } else if (elem.aDestr) {
+        // --- Nested array destructure
+        this.expandArrayDestructureToReactiveVars(
+          elem.aDestr, indexExpr, decls, startToken, endToken,
+        );
+      } else {
+        const varId = this.createExpressionNode<Identifier>(
+          T_IDENTIFIER, { name: elem.id! }, startToken, endToken,
+        );
+        decls.push(
+          this.createExpressionNode<ReactiveVarDeclaration>(
+            T_REACTIVE_VAR_DECLARATION,
+            { id: varId, expr: indexExpr },
+            startToken,
+            endToken,
+          ),
+        );
+      }
+    }
   }
 
   /**
