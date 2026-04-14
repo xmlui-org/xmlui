@@ -40,6 +40,7 @@ type ItemWithLabelProps = {
   cloneStyle?: boolean;
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
+  compactInlineLabel?: boolean;
 };
 export const defaultProps: Pick<
   ItemWithLabelProps,
@@ -53,6 +54,7 @@ export const defaultProps: Pick<
   | "requireLabelMode"
   | "isInputTemplateUsed"
   | "direction"
+  | "compactInlineLabel"
 > = {
   labelBreak: true,
   enabled: true,
@@ -64,6 +66,7 @@ export const defaultProps: Pick<
   requireLabelMode: "markRequired",
   isInputTemplateUsed: false,
   direction: "ltr",
+  compactInlineLabel: false,
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -92,6 +95,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     testId,
     cloneStyle = defaultProps.cloneStyle,
     requireLabelMode = defaultProps.requireLabelMode,
+    compactInlineLabel = defaultProps.compactInlineLabel,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
@@ -132,7 +136,17 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   }, [inputElement]);
 
   const labelWrapperHeight =
-    resolvedLabelPosition === "start" || resolvedLabelPosition === "end" ? inputHeight : "auto";
+    resolvedLabelPosition === "start" || resolvedLabelPosition === "end" ||
+    resolvedLabelPosition === "before" || resolvedLabelPosition === "after"
+      ? inputHeight
+      : "auto";
+
+  const resolvedLabelWidth =
+    labelWidth !== undefined
+      ? (numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth)
+      : (compactInlineLabel && (resolvedLabelPosition === "before" || resolvedLabelPosition === "after"))
+        ? "fit-content"
+        : undefined;
 
   // Check if the child is a RadioGroup component
   const isRadioGroup = React.isValidElement(children) && children.type === RadioGroup;
@@ -162,8 +176,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
           className={classnames(styles.container, {
             [styles.top]: resolvedLabelPosition === "top",
             [styles.bottom]: resolvedLabelPosition === "bottom",
-            [styles.start]: resolvedLabelPosition === "start",
-            [styles.end]: resolvedLabelPosition === "end",
+            [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
+            [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
+            [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
+            [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
             [styles.shrinkToLabel]: shrinkToLabel,
           })}
           dir={rest?.direction}
@@ -190,8 +206,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   }
                   style={{
                     ...labelStyle,
-                    width:
-                      labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+                    width: resolvedLabelWidth,
                     flexShrink: labelWidth !== undefined ? 0 : undefined,
                   }}
                   className={classnames(styles.inputLabel, {
@@ -248,8 +263,10 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
         className={classnames(styles.container, {
           [styles.top]: resolvedLabelPosition === "top",
           [styles.bottom]: resolvedLabelPosition === "bottom",
-          [styles.start]: resolvedLabelPosition === "start",
-          [styles.end]: resolvedLabelPosition === "end",
+          [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
+          [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
+          [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
+          [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
         dir={rest?.direction}
@@ -267,8 +284,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
                 style={{
                   ...labelStyle,
-                  width:
-                    labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+                  width: resolvedLabelWidth,
                   flexShrink: labelWidth !== undefined ? 0 : undefined,
                 }}
                 className={classnames(styles.inputLabel, {

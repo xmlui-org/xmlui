@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -423,6 +424,70 @@ test.describe("Label", () => {
     await initTestBed(`<Switch label="Test label" labelPosition="invalid" />`);
     const switchElement = page.getByRole("switch");
     await expect(switchElement).toBeVisible();
+  });
+
+  test("labelPosition=before positions label before input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="ltr" label="Enable feature" labelPosition="before" />`);
+
+    const { left: switchLeft } = await getBounds(page.getByLabel("Enable feature"));
+    const { right: labelRight } = await getBounds(page.getByText("Enable feature"));
+
+    // Label should be positioned before (left of) the switch
+    expect(labelRight).toBeLessThan(switchLeft);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=after positions label after input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="ltr" label="Enable feature" labelPosition="after" />`);
+
+    const { right: switchRight } = await getBounds(page.getByLabel("Enable feature"));
+    const { left: labelLeft } = await getBounds(page.getByText("Enable feature"));
+
+    // Label should be positioned after (right of) the switch
+    expect(labelLeft).toBeGreaterThan(switchRight);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=before uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Switch label="Enable feature" labelPosition="before" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("Enable feature"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=after uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Switch label="Enable feature" labelPosition="after" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("Enable feature"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=before respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="rtl" label="Enable feature" labelPosition="before" />`);
+
+    // In RTL, "before" means the label is to the right of the switch
+    const { right: switchRight } = await getBounds(page.getByLabel("Enable feature"));
+    const { left: labelLeft } = await getBounds(page.getByText("Enable feature"));
+
+    expect(labelLeft).toBeGreaterThan(switchRight);
+  });
+
+  test("labelPosition=after respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="rtl" label="Enable feature" labelPosition="after" />`);
+
+    // In RTL, "after" means the label is to the left of the switch
+    const { left: switchLeft } = await getBounds(page.getByLabel("Enable feature"));
+    const { right: labelRight } = await getBounds(page.getByText("Enable feature"));
+
+    expect(labelRight).toBeLessThan(switchLeft);
   });
 });
 

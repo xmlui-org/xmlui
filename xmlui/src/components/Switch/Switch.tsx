@@ -22,6 +22,7 @@ const COMP = "Switch";
 
 export const SwitchMd = createMetadata({
   status: "stable",
+  compactInlineLabel: true,
   description: "`Switch` enables users to toggle between two states: on and off.",
   parts: {
     label: {

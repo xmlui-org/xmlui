@@ -264,6 +264,38 @@ test.describe("Label", () => {
     await expect(driver.label).toBeVisible();
     await expect(driver.input).toBeVisible();
   });
+
+  test("labelPosition=before maps to start layout (label left of input, LTR)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="before" />`);
+    const driver = await createTextBoxDriver("test");
+    const { left: inputLeft } = await getBounds(driver.input);
+    const { right: labelRight } = await getBounds(driver.label);
+    expect(labelRight).toBeLessThan(inputLeft);
+  });
+
+  test("labelPosition=after maps to end layout (label right of input, LTR)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="after" />`);
+    const driver = await createTextBoxDriver("test");
+    const { right: inputRight } = await getBounds(driver.input);
+    const { left: labelLeft } = await getBounds(driver.label);
+    expect(labelLeft).toBeGreaterThan(inputRight);
+  });
+
+  test("labelPosition=before respects RTL direction (label right of input)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="rtl" label="test" labelPosition="before" />`);
+    const driver = await createTextBoxDriver("test");
+    const { right: inputRight } = await getBounds(driver.input);
+    const { left: labelLeft } = await getBounds(driver.label);
+    expect(labelLeft).toBeGreaterThan(inputRight);
+  });
+
+  test("labelPosition=after respects RTL direction (label left of input)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="rtl" label="test" labelPosition="after" />`);
+    const driver = await createTextBoxDriver("test");
+    const { left: inputLeft } = await getBounds(driver.input);
+    const { right: labelRight } = await getBounds(driver.label);
+    expect(labelRight).toBeLessThan(inputLeft);
+  });
 });
 
 // =============================================================================

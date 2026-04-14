@@ -274,7 +274,7 @@ export const requireLabelModeMd: PropertyValueDescription[] = [
 ];
 
 // --- Available label positions
-export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
+export const labelPositionValues = ["top", "start", "end", "bottom", "before", "after"] as const;
 export const labelPositionNames = [...labelPositionValues];
 export type LabelPosition = (typeof labelPositionValues)[number];
 export const labelPositionMd: PropertyValueDescription[] = [
@@ -290,6 +290,16 @@ export const labelPositionMd: PropertyValueDescription[] = [
   },
   { value: "top", description: "The top of the input" },
   { value: "bottom", description: "The bottom of the input" },
+  {
+    value: "before",
+    description:
+      "The label is placed directly before the input with fit-content width. Similar to 'start' but the label does not stretch.",
+  },
+  {
+    value: "after",
+    description:
+      "The label is placed directly after the input with fit-content width. Similar to 'end' but the label does not stretch.",
+  },
 ];
 
 // --- Available trigger positions
