@@ -23,6 +23,7 @@ import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { useIsInsideForm } from "../Form/FormContext";
 
 type Props = {
   id?: string;
@@ -44,6 +45,8 @@ type Props = {
   distributeEvenly?: boolean;
   onDidChange?: (index: number, id: string, label: string) => void;
   onContextMenu?: any;
+  keepMounted?: boolean;
+  gap?: string;
 };
 
 export const defaultProps = {
@@ -52,6 +55,7 @@ export const defaultProps = {
   tabAlignment: "start" as "start" | "end" | "center" | "stretch",
   accordionView: false,
   distributeEvenly: false,
+  keepMounted: undefined as boolean | undefined,
 };
 
 export const Tabs = forwardRef(function Tabs(
@@ -70,11 +74,15 @@ export const Tabs = forwardRef(function Tabs(
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
     onContextMenu,
+    keepMounted = defaultProps.keepMounted,
+    gap,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const { tabItems, tabContextValue } = useTabContextValue();
+  const isInsideForm = useIsInsideForm();
+  const resolvedKeepMounted = keepMounted ?? isInsideForm;
+  const { tabItems, tabContextValue } = useTabContextValue(resolvedKeepMounted);
   const _id = useId();
   const tabsId = id || _id;
 
@@ -154,7 +162,7 @@ export const Tabs = forwardRef(function Tabs(
           id={tabsId}
           ref={forwardedRef}
           className={classnames(styles.tabs, styles.accordionView, classes?.[COMPONENT_PART_KEY], className)}
-          style={style}
+          style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
         >
           <RTabsRoot
             value={`${currentTab}`}
@@ -256,7 +264,7 @@ export const Tabs = forwardRef(function Tabs(
           }
         }}
         orientation={orientation}
-        style={style}
+        style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
       >
         <RTabsList
           className={classnames(styles.tabsList, {

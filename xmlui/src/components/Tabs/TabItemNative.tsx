@@ -14,7 +14,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerId = useId();
-  const { register, unRegister, activeTabId, getTabItems } = useTabContext();
+  const { register, unRegister, activeTabId, getTabItems, keepMounted } = useTabContext();
 
   useEffect(() => {
     register({
@@ -37,7 +37,9 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
     }
   }, [activeTabId, innerId, activated]);
 
-  if (activeTabId !== innerId) return null;
+  const isActive = activeTabId === innerId;
+
+  if (!isActive && !keepMounted) return null;
 
   // Find the index of this tab for ordering
   const tabItems = getTabItems();
@@ -49,9 +51,14 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
       {...rest}
       key={innerId}
       value={innerId}
+      forceMount={keepMounted ? true : undefined}
       className={classnames(styles.tabsContent, classes?.[COMPONENT_PART_KEY], className)}
       ref={forwardedRef}
-      style={{ ...style, order: contentOrder }}
+      style={{
+        ...style,
+        order: contentOrder,
+        ...(keepMounted && !isActive ? { display: "none" } : {}),
+      }}
     >
       {children}
     </Content>

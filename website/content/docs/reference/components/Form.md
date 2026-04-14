@@ -140,6 +140,8 @@ Available values:
 | `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
+| `before` | The label is placed directly before the input with fit-content width. Similar to 'start' but the label does not stretch. |
+| `after` | The label is placed directly after the input with fit-content width. Similar to 'end' but the label does not stretch. |
 
 ### `itemLabelWidth` [#itemlabelwidth]
 

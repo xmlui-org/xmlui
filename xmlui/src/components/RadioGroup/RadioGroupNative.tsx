@@ -160,6 +160,46 @@ export const RadioGroup = forwardRef(function RadioGroup(
     [updateValue, readOnly],
   );
 
+  // --- Handle arrow-key navigation to update the selected value
+  // Radix's built-in mechanism (click-on-focus via isArrowKeyPressedRef) is unreliable
+  // because keyup can fire before the deferred focus, preventing the click.
+  // We handle arrow keys directly on the group root (via event bubbling) so that the
+  // value always follows focus.
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (readOnly || !enabled) return;
+
+      const isVerticalKey = e.key === "ArrowDown" || e.key === "ArrowUp";
+      const isHorizontalKey = e.key === "ArrowRight" || e.key === "ArrowLeft";
+
+      if (!isVerticalKey && !isHorizontalKey) return;
+      if (orientation === "horizontal" && isVerticalKey) return;
+      if (orientation === "vertical" && isHorizontalKey) return;
+
+      const isNext = e.key === "ArrowDown" || e.key === "ArrowRight";
+
+      const radios = Array.from(
+        radioGroupRef.current?.querySelectorAll('[role="radio"]:not(:disabled)') ?? [],
+      ) as HTMLElement[];
+
+      if (radios.length === 0) return;
+
+      const focused = e.target as HTMLElement;
+      const currentIndex = radios.indexOf(focused);
+      if (currentIndex === -1) return;
+
+      const nextIndex = isNext
+        ? (currentIndex + 1) % radios.length
+        : (currentIndex - 1 + radios.length) % radios.length;
+
+      const nextValue = radios[nextIndex].getAttribute("value");
+      if (nextValue != null) {
+        onInputChange(nextValue);
+      }
+    },
+    [readOnly, enabled, orientation, onInputChange],
+  );
+
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(
     (ev: React.FocusEvent<HTMLDivElement, Element>) => {
@@ -202,6 +242,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
           id={id}
           onBlur={handleOnBlur}
           onFocus={handleOnFocus}
+          onKeyDown={handleKeyDown}
           onValueChange={onInputChange}
           value={value}
           disabled={!enabled}

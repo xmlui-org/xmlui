@@ -689,6 +689,73 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // ITEM LABEL WIDTH INHERITANCE FOR LABEL BEHAVIOR (NO BINDTO)
+  // =============================================================================
+
+  test.describe("itemLabelWidth inheritance without bindTo", () => {
+    test("applies form itemLabelWidth to components with label but no bindTo", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          itemLabelWidth="200px"
+          itemLabelPosition="start"
+          hideButtonRow="true"
+          data="{{ name: 'John' }}"
+        >
+          <TextBox bindTo="name" label="Bound Label" />
+          <TextBox label="Unbound Label" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "200px");
+      await expect(labels.nth(1)).toHaveCSS("width", "200px");
+    });
+
+    test("component-level labelWidth overrides form itemLabelWidth for unbound component", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form itemLabelWidth="200px" itemLabelPosition="start" hideButtonRow="true">
+          <TextBox label="Default Width" />
+          <TextBox label="Custom Width" labelWidth="100px" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "200px");
+      await expect(labels.nth(1)).toHaveCSS("width", "100px");
+    });
+
+    test("form itemLabelPosition propagates to components without bindTo", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          itemLabelPosition="start"
+          itemLabelWidth="150px"
+          hideButtonRow="true"
+          data="{{ name: 'Jane' }}"
+        >
+          <TextBox bindTo="name" label="Bound" />
+          <TextBox label="Unbound" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "150px");
+      await expect(labels.nth(1)).toHaveCSS("width", "150px");
+    });
+  });
+
+  // =============================================================================
   // ITEM LABEL BREAK TESTS
   // =============================================================================
 

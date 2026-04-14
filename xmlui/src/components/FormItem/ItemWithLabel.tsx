@@ -78,7 +78,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     style = {},
     className,
     label,
-    labelBreak = defaultProps.labelBreak,
+    labelBreak,
     labelWidth,
     enabled = defaultProps.enabled,
     required = defaultProps.required,
@@ -107,6 +107,16 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     (value) => value?.itemLabelPosition as LabelPosition | undefined,
   );
   const resolvedLabelPosition = labelPosition ?? formItemLabelPosition ?? "top";
+
+  const formItemLabelWidth = useFormContextPart<string | undefined>(
+    (value) => value?.itemLabelWidth,
+  );
+  const resolvedLabelWidthProp = labelWidth ?? formItemLabelWidth;
+
+  const formItemLabelBreak = useFormContextPart<boolean | undefined>(
+    (value) => value?.itemLabelBreak,
+  );
+  const resolvedLabelBreak = labelBreak ?? formItemLabelBreak ?? defaultProps.labelBreak!;
 
   // When rendered inside a horizontal Stack, validation messages must not push sibling
   // inputs out of alignment, and required markers should reserve consistent space so
@@ -142,8 +152,8 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       : "auto";
 
   const resolvedLabelWidth =
-    labelWidth !== undefined
-      ? (numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth)
+    resolvedLabelWidthProp !== undefined
+      ? (numberRegex.test(resolvedLabelWidthProp) ? `${resolvedLabelWidthProp}px` : resolvedLabelWidthProp)
       : (compactInlineLabel && (resolvedLabelPosition === "before" || resolvedLabelPosition === "after"))
         ? "fit-content"
         : undefined;
@@ -207,12 +217,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   style={{
                     ...labelStyle,
                     width: resolvedLabelWidth,
-                    flexShrink: labelWidth !== undefined ? 0 : undefined,
+                    flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                   }}
                   className={classnames(styles.inputLabel, {
                     [styles.required]: required,
                     [styles.disabled]: !enabled,
-                    [styles.labelBreak]: labelBreak,
+                    [styles.labelBreak]: resolvedLabelBreak,
                   })}
                 >
                   {label}
@@ -285,12 +295,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 style={{
                   ...labelStyle,
                   width: resolvedLabelWidth,
-                  flexShrink: labelWidth !== undefined ? 0 : undefined,
+                  flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                 }}
                 className={classnames(styles.inputLabel, {
                   [styles.required]: required,
                   [styles.disabled]: !enabled,
-                  [styles.labelBreak]: labelBreak,
+                  [styles.labelBreak]: resolvedLabelBreak,
                 })}
               >
                 {label}

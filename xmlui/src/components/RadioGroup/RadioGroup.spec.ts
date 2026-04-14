@@ -906,3 +906,214 @@ test.describe("gap property", () => {
     expect(box1.x - (box0.x + box0.width)).toBeGreaterThanOrEqual(45);
   });
 });
+
+// =============================================================================
+// KEYBOARD NAVIGATION TESTS
+// =============================================================================
+
+test.describe("Keyboard Navigation", () => {
+  test("ArrowDown selects the next option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should select option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
+  });
+
+  test("ArrowUp selects the previous option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the second option
+    await options.nth(1).click();
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowUp should select option 1
+    await options.nth(1).focus();
+    await expect(options.nth(1)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(1)).not.toBeChecked();
+  });
+
+  test("ArrowDown wraps from last to first option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the last option
+    await options.nth(2).click();
+    await expect(options.nth(2)).toBeChecked();
+
+    // ArrowDown should wrap to option 1
+    await options.nth(2).focus();
+    await expect(options.nth(2)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(2)).not.toBeChecked();
+  });
+
+  test("ArrowUp wraps from first to last option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowUp should wrap to option 3
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(options.nth(2)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
+  });
+
+  test("sequential ArrowDown visits all options in order", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select option 1
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown → option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowDown → option 3
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
+
+    // ArrowDown → wraps to option 1
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+  });
+
+  test("ArrowDown works when Options are inside a VStack", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <VStack>
+          <Option label="First Option" value="1" />
+          <Option label="Second Option" value="2" />
+          <Option label="Third Option" value="3" />
+        </VStack>
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+    await expect(options).toHaveCount(3);
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should select option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowDown should select option 3
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
+  });
+
+  test("keyboard navigation fires onDidChange", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <RadioGroup initialValue="1" onDidChange="(value) => testState = value">
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // ArrowDown from option 1 to option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+    await expect.poll(testStateDriver.testState).toBe("2");
+  });
+
+  test("keyboard navigation does not change value when readOnly", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <RadioGroup readOnly="true" initialValue="1">
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should NOT change value
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+  });
+
+  test("keyboard navigation skips disabled options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" enabled="{false}" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should skip disabled option 2 and select option 3
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
+  });
+});
