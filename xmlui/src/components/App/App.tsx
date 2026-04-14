@@ -61,6 +61,15 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.scrollWholePage,
     },
+    fitContent: {
+      description:
+        `When \`true\`, the app sizes itself to its content's natural height rather than ` +
+        `filling its container's viewport. Intended for embedding an app inside an iframe ` +
+        `or as a block within a larger page: the host page becomes the sole scroll container. ` +
+        `This overrides \`scrollWholePage\`'s viewport pinning.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.fitContent,
+    },
     noScrollbarGutters: {
       description:
         "This boolean property specifies whether the scrollbar gutters should be hidden.",
@@ -249,6 +258,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
     ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
     : true;
   const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
+  const fitContent = extractValue.asOptionalBoolean(node.props.fitContent, false);
 
   // When scrollWholePage is false, pageContentContainer is a vertical flex container
   // Pass layout context so children can properly resolve star sizing
@@ -257,6 +267,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
   return (
     <AppComponent
       scrollWholePage={scrollWholePage}
+      fitContent={fitContent}
       noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
       classes={classes}
       layout={extractValue(node.props.layout)}

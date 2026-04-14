@@ -88,6 +88,7 @@ type Props = {
   loggedInUser?: any;
   scrollWholePage: boolean;
   noScrollbarGutters?: boolean;
+  fitContent?: boolean;
   onReady?: () => void;
   onMessageReceived?: (data: any, event: MessageEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
@@ -116,6 +117,7 @@ export const defaultProps: Pick<
   Props,
   | "scrollWholePage"
   | "noScrollbarGutters"
+  | "fitContent"
   | "defaultTone"
   | "defaultTheme"
   | "autoDetectTone"
@@ -131,6 +133,7 @@ export const defaultProps: Pick<
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
+  fitContent: false,
   defaultTone: undefined,
   defaultTheme: undefined,
   autoDetectTone: false,
@@ -183,6 +186,7 @@ export function App({
   loggedInUser,
   scrollWholePage = defaultProps.scrollWholePage,
   noScrollbarGutters = defaultProps.noScrollbarGutters,
+  fitContent = defaultProps.fitContent,
   onReady = defaultProps.onReady,
   onMessageReceived = defaultProps.onMessageReceived,
   onKeyDown = defaultProps.onKeyDown,
@@ -485,7 +489,8 @@ export function App({
     classes?.[COMPONENT_PART_KEY],
     styles.appContainer,
     {
-      [styles.scrollWholePage]: scrollWholePage,
+      [styles.scrollWholePage]: scrollWholePage && !fitContent,
+      [styles.fitContent]: fitContent,
       [styles.noScrollbarGutters]: noScrollbarGutters,
       [styles.noFooter]: !footerSticky,
       "media-large": mediaSize.largeScreen,
@@ -582,6 +587,11 @@ export function App({
       })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}
+      // Stable hook for embedding code: when fitContent is on, parent pages
+      // (e.g. iframe hosts auto-resizing the embed) can find this element via
+      // [data-xmlui-app-fit-content] without depending on hashed CSS module
+      // class names.
+      data-xmlui-app-fit-content={fitContent ? "true" : undefined}
       {...rest}
     >
       {config.useVerticalFullHeaderStructure ? (
