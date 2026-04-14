@@ -20,6 +20,13 @@
       "author": "xmlui.org",
       "description": "A complete business application for invoice management with a local server and database.",
       "zipArchive": "https://github.com/xmlui-org/xmlui-invoice/releases/latest/download/xmlui-invoice.zip"
+    },
+    {
+      "uid": "xmlui-hello-world-trace",
+      "displayName": "XMLUI Hello World with Tracing",
+      "author": "xmlui.org",
+      "description": "A minimal XMLUI starter app with the Inspector and XS tracing already wired up.",
+      "zipArchive": "https://github.com/xmlui-org/xmlui-hello-world-trace/releases/latest/download/xmlui-hello-world-trace.zip"
     }
   ]
 }
