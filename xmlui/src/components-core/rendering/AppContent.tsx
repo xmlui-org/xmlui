@@ -525,6 +525,11 @@ export function AppContent({
   // This ensures DataLoader can capture the trace when useQuery triggers fetches
   if (xsVerbose && typeof window !== "undefined") {
     const w = window as any;
+    // Initialize _xsLogs early so DataSource startup fetches are traced.
+    // Without this, pushXsLog() noops because _xsLogs doesn't exist yet.
+    if (!Array.isArray(w._xsLogs)) {
+      w._xsLogs = [];
+    }
     if (!w._xsStartupTrace) {
       w._xsStartupTrace = `startup-${Date.now().toString(36)}`;
     }
