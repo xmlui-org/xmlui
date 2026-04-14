@@ -300,7 +300,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       registerComponentApi={registerComponentApi}
     >
       {renderChild(restChildren, contentLayoutContext)}
-      <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+      <SearchIndexCollector Pages={Pages} NavPanel={NavPanel} renderChild={renderChild} />
     </AppComponent>
   );
 }

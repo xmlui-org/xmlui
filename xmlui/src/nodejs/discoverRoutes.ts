@@ -57,9 +57,10 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
         const content = await readFile(filePath, "utf-8");
         const result = xmlUiMarkupToComponent(content, filePath);
         if (result.errors.length === 0 && result?.component && "component" in result.component) {
-          const compDef = result.component.component;
-          const maybePageComp = getPagesComponent(compDef);
+          const innerCompDef = result.component.component;
+          const maybePageComp = getPagesComponent(innerCompDef);
           if (maybePageComp) {
+            compDef = innerCompDef;
             pagesComp = maybePageComp;
             break;
           }
@@ -71,8 +72,12 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
   }
 
   if (!pagesComp) {
-    return new RouteStore(["/"]);
+    return new RouteStore(["/"], new Set());
   }
+
+  // Extract NavGroup summary page URLs from the NavPanel
+  const navPanelComp = getNavPanelComponent(compDef ?? undefined);
+  const navGroupSummaryUrls = extractNavGroupUrlsFromTree(navPanelComp ?? undefined);
 
   const extractedRoutes = extractUrls(pagesComp).map(normalizeRoute);
 
@@ -99,7 +104,7 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
   discovered.add("/");
   const discoveredArray = [...discovered];
 
-  return new RouteStore(discoveredArray);
+  return new RouteStore(discoveredArray, navGroupSummaryUrls);
 }
 
 function getPagesComponent(comp: ComponentDef | undefined): ComponentDef | null {
@@ -149,6 +154,37 @@ function dynRouteToGlobPattern(route: string, contentDir: string): string {
   return path.join(contentDir, ...globSegments);
 }
 
+function getNavPanelComponent(comp: ComponentDef | undefined): ComponentDef | null {
+  if (!comp) return null;
+  if (comp.type === "NavPanel") return comp;
+  if (Array.isArray(comp.children)) {
+    for (const child of comp.children) {
+      const result = getNavPanelComponent(child);
+      if (result) return result;
+    }
+  }
+  return null;
+}
+
+function extractNavGroupUrlsFromTree(comp: ComponentDef | undefined): Set<string> {
+  const urls = new Set<string>();
+  if (!comp) return urls;
+  collectNavGroupUrls(comp.children as ComponentDef[] | undefined, urls);
+  return urls;
+}
+
+function collectNavGroupUrls(children: ComponentDef[] | undefined, urls: Set<string>): void {
+  if (!children) return;
+  for (const child of children) {
+    if (child.type === "NavGroup" && typeof child.props?.to === "string" && child.props.to) {
+      urls.add(child.props.to);
+    }
+    if (child.children) {
+      collectNavGroupUrls(child.children as ComponentDef[], urls);
+    }
+  }
+}
+
 function extractUrls(componentDef: ComponentDef): string[] {
   const pagesComp = getPagesComponent(componentDef);
   const urls: string[] = [];
@@ -166,7 +202,10 @@ function extractUrls(componentDef: ComponentDef): string[] {
 }
 
 export class RouteStore {
-  constructor(private readonly routes: string[]) {}
+  constructor(
+    private readonly routes: string[],
+    private readonly _navGroupUrls: Set<string> = new Set(),
+  ) {}
 
   /** @returns only static routes (those that do not have `":paramname"` or `"*"` in them).*/
   staticRoutes() {
@@ -176,5 +215,10 @@ export class RouteStore {
   /** @returns both static and dynamic routes (those that have `":paramname"` or `"*"` in them).*/
   allRoutes() {
     return this.routes;
+  }
+
+  /** @returns URLs that are NavGroup summary pages (should be excluded from search indexing). */
+  navGroupUrls(): Set<string> {
+    return this._navGroupUrls;
   }
 }
