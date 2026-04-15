@@ -424,6 +424,109 @@ test("component handles disabledDates correctly", async ({ page, initTestBed }) 
   await expect(testDayCell).toBeDisabled();
 });
 
+test("disabled day has lower opacity than enabled day", async ({ page, initTestBed }) => {
+  const today = new Date();
+  const disabledDay = 15;
+  const enabledDay = 16;
+  const testMonthName = format(today, "LLLL");
+  const disabledDateStr = format(new Date(today.getFullYear(), today.getMonth(), disabledDay), "MM/dd/yyyy");
+  const monthStr = String(today.getMonth() + 1).padStart(2, "0");
+
+  await initTestBed(
+    `<DatePicker testId="datePicker" inline disabledDates="{['${disabledDateStr}']}" />`,
+  );
+
+  const grid = page.getByRole("grid", { name: testMonthName });
+  const disabledCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(disabledDay).padStart(2, "0")}"]`);
+  const enabledCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(enabledDay).padStart(2, "0")}"]`);
+
+  const disabledOpacity = await disabledCell.evaluate((el) => window.getComputedStyle(el).opacity);
+  const enabledOpacity = await enabledCell.evaluate((el) => window.getComputedStyle(el).opacity);
+
+  expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity));
+
+  const opacityDifference = parseFloat(enabledOpacity) - parseFloat(disabledOpacity);
+  expect(opacityDifference).toBeGreaterThanOrEqual(0.2);
+});
+
+test("disabled day button has correct cursor style", async ({ page, initTestBed }) => {
+  const today = new Date();
+  const disabledDay = 15;
+  const testMonthName = format(today, "LLLL");
+  const disabledDateStr = format(new Date(today.getFullYear(), today.getMonth(), disabledDay), "MM/dd/yyyy");
+
+  await initTestBed(
+    `<DatePicker testId="datePicker" inline disabledDates="{['${disabledDateStr}']}" />`,
+  );
+
+  const grid = page.getByRole("grid", { name: testMonthName });
+  const disabledButton = grid.getByText(disabledDay.toString(), { exact: true });
+
+  const cursor = await disabledButton.evaluate((el) => window.getComputedStyle(el).cursor);
+  expect(cursor).not.toBe("pointer");
+});
+
+test("disabled day should not show hover effect", async ({ page, initTestBed }) => {
+  const today = new Date();
+  const disabledDay = 15;
+  const testMonthName = format(today, "LLLL");
+  const disabledDateStr = format(new Date(today.getFullYear(), today.getMonth(), disabledDay), "MM/dd/yyyy");
+
+  await initTestBed(
+    `<DatePicker testId="datePicker" inline disabledDates="{['${disabledDateStr}']}" />`,
+  );
+
+  const grid = page.getByRole("grid", { name: testMonthName });
+  const disabledButton = grid.getByText(disabledDay.toString(), { exact: true });
+
+  const bgBefore = await disabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+  await disabledButton.hover();
+  const bgAfter = await disabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+
+  expect(bgAfter, "Disabled day should not change background on hover").toBe(bgBefore);
+});
+
+test("clicking a disabled date does not select it", async ({ page, initTestBed }) => {
+  const today = new Date();
+  const disabledDay = 15;
+  const disabledDateStr = format(new Date(today.getFullYear(), today.getMonth(), disabledDay), "MM/dd/yyyy");
+  const testMonthName = format(today, "LLLL");
+
+  await initTestBed(
+    `<Fragment>
+      <DatePicker id="dp" testId="datePicker" inline disabledDates="{['${disabledDateStr}']}" />
+      <Text testId="value">{dp.value}</Text>
+    </Fragment>`,
+  );
+
+  const grid = page.getByRole("grid", { name: testMonthName });
+  const disabledButton = grid.getByText(disabledDay.toString(), { exact: true });
+
+  await disabledButton.click({ force: true });
+  await expect(page.getByTestId("value")).toHaveText("");
+});
+
+test("disabled date range has visual distinction", async ({ page, initTestBed }) => {
+  const today = new Date();
+  const testMonthName = format(today, "LLLL");
+  const monthStr = String(today.getMonth() + 1).padStart(2, "0");
+  const rangeStartStr = format(new Date(today.getFullYear(), today.getMonth(), 10), "MM/dd/yyyy");
+  const rangeEndStr = format(new Date(today.getFullYear(), today.getMonth(), 20), "MM/dd/yyyy");
+
+  await initTestBed(
+    `<DatePicker testId="datePicker" inline disabledDates="{({from: '${rangeStartStr}', to: '${rangeEndStr}'})}" />`,
+  );
+
+  const grid = page.getByRole("grid", { name: testMonthName });
+  const disabledDayInRange = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-15"]`);
+  const enabledDayCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-08"]`);
+
+  const disabledOpacity = await disabledDayInRange.evaluate((el) => window.getComputedStyle(el).opacity);
+  const enabledOpacity = await enabledDayCell.evaluate((el) => window.getComputedStyle(el).opacity);
+
+  expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity));
+});
+
 // =============================================================================
 // INTEGRATION TESTS
 // =============================================================================

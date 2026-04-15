@@ -12,7 +12,7 @@ $themeVars: (
 $componentName: "DatePicker";
 $themeVars: t.composePaddingVars($themeVars, $componentName);
 
-// Variables for default variant
+// --- Variables for default variant
 $borderRadius-DatePicker: createThemeVar("Input:borderRadius-#{$componentName}");
 $borderColor-DatePicker: createThemeVar("Input:borderColor-#{$componentName}");
 $borderWidth-DatePicker: createThemeVar("Input:borderWidth-#{$componentName}");
@@ -32,7 +32,7 @@ $textColor-placeholder-DatePicker: createThemeVar("Input:textColor-placeholder-#
 $fontSize-placeholder-DatePicker: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
 $color-adornment-DatePicker: createThemeVar("Input:color-adornment-#{$componentName}");
 
-// Variables for error variant
+// --- Variables for error variant
 $borderRadius-DatePicker--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
 $borderColor-DatePicker--error: createThemeVar("Input:borderColor-#{$componentName}--error");
 $borderWidth-DatePicker--error: createThemeVar("Input:borderWidth-#{$componentName}--error");
@@ -52,7 +52,7 @@ $textColor-placeholder-DatePicker--error: createThemeVar("Input:textColor-placeh
 $fontSize-placeholder-DatePicker--error: createThemeVar("Input:fontSize-placeholder-#{$componentName}--error");
 $color-adornment-DatePicker--error: createThemeVar("Input:color-adornment-#{$componentName}--error");
 
-// Variables for warning variant
+// --- Variables for warning variant
 $borderRadius-DatePicker--warning: createThemeVar("Input:borderRadius-#{$componentName}--warning");
 $borderColor-DatePicker--warning: createThemeVar("Input:borderColor-#{$componentName}--warning");
 $borderWidth-DatePicker--warning: createThemeVar("Input:borderWidth-#{$componentName}--warning");
@@ -72,7 +72,7 @@ $textColor-placeholder-DatePicker--warning: createThemeVar("Input:textColor-plac
 $fontSize-placeholder-DatePicker--warning: createThemeVar("Input:fontSize-placeholder-#{$componentName}--warning");
 $color-adornment-DatePicker--warning: createThemeVar("Input:color-adornment-#{$componentName}--warning");
 
-// Variables for success variant
+// --- Variables for success variant
 $borderRadius-DatePicker--success: createThemeVar("Input:borderRadius-#{$componentName}--success");
 $borderColor-DatePicker--success: createThemeVar("Input:borderColor-#{$componentName}--success");
 $borderWidth-DatePicker--success: createThemeVar("Input:borderWidth-#{$componentName}--success");
@@ -92,7 +92,7 @@ $textColor-placeholder-DatePicker--success: createThemeVar("Input:textColor-plac
 $fontSize-placeholder-DatePicker--success: createThemeVar("Input:fontSize-placeholder-#{$componentName}--success");
 $color-adornment-DatePicker--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
 
-// Variables for @layer section
+// --- Variables for @layer section
 $fontSize-DatePicker: createThemeVar("Input:fontSize-DatePicker");
 $backgroundColor-DatePicker--disabled: createThemeVar("Input:backgroundColor-DatePicker--disabled");
 $textColor-DatePicker--disabled: createThemeVar("Input:textColor-DatePicker--disabled");
@@ -101,7 +101,7 @@ $boxShadow-menu-DatePicker: createThemeVar("Input:boxShadow-menu-DatePicker");
 $backgroundColor-menu-DatePicker: createThemeVar("Input:backgroundColor-menu-DatePicker");
 $borderRadius-menu-DatePicker: createThemeVar("Input:borderRadius-menu-DatePicker");
 
-// --- CSS properties of a particular Select variant
+// --- Variant mixin
 @mixin variant($variantName) {
   $suffix: if($variantName != "", "--#{$variantName}", "");
   border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
@@ -114,8 +114,7 @@ $borderRadius-menu-DatePicker: createThemeVar("Input:borderRadius-menu-DatePicke
 
   &:hover {
     border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
-    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover"
-    );
+    background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover");
     box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
     color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
   }
@@ -137,11 +136,11 @@ $borderRadius-menu-DatePicker: createThemeVar("Input:borderRadius-menu-DatePicke
   }
 }
 
+// --- Calendar-specific variables
 $rdp-accent-color: createThemeVar("Input:backgroundColor-item-DatePicker--active");
-$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover"
-  );
+$backgroundColor-item-DatePicker--hover: createThemeVar("Input:backgroundColor-item-DatePicker--hover");
 $rdp-selected-color: createThemeVar("Input:textColor-value-DatePicker");
-$rdp-cell-size: t.$space-10; // 2.5em
+$rdp-cell-size: t.$space-10;
 $rdp-caption-font-size: t.$fontSize-lg;
 $rdp-outline: t.$space-0_5 solid t.useVar($rdp-accent-color);
 $rdp-outline-selected: t.$space-0_5 solid t.useVar($rdp-accent-color);
@@ -149,6 +148,9 @@ $minHeight: createThemeVar("Input:minHeight-#{$componentName}");
 $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selectedItem-DatePicker");
 
 @layer components {
+
+  // ===== INPUT TRIGGER =====
+
   .datePicker {
     display: flex;
     align-items: center;
@@ -192,6 +194,13 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     }
   }
 
+  .datePickerValue {
+    display: flex;
+    flex: 1;
+  }
+
+  // ===== MENU CONTAINERS =====
+
   .inlinePickerMenu {
     padding: t.$space-4;
     overflow-y: auto;
@@ -213,85 +222,63 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     border: 1px solid $rdp-accent-color;
   }
 
-  /* Variables declaration */
+  // ===== CALENDAR ROOT & CSS CUSTOM PROPERTIES =====
+
   /* prettier-ignore */
   .root {
     --rdp-day-height: #{t.$space-11};
-    /* The height of the day cells. (2.75em) */
     --rdp-day-width: #{t.$space-11};
-    /* The width of the day cells. (2.75em) */
 
     --rdp-day_button-border-radius: 100%;
-    /* The border radius of the day cells. */
     --rdp-day_button-border: #{t.$space-0_5} solid transparent;
-    /* The border of the day cells. */
     --rdp-day_button-height: #{t.$space-10};
-    /* The height of the day cells. (2.5em) */
     --rdp-day_button-width: #{t.$space-10};
-    /* The width of the day cells. (2.5em) */
 
     --rdp-disabled-opacity: 0.5;
-    /* The opacity of the disabled days. */
     --rdp-outside-opacity: 0.75;
-    /* The opacity of the days outside the current month. */
 
     --rdp-dropdown-gap: #{t.$space-2};
-    /* The gap between the dropdowns used in the month captons. */
-
     --rdp-months-gap: #{t.$space-8};
-    /* The gap between the months in the multi-month view. */
 
     --rdp-nav_button-disabled-opacity: 0.5;
-    /* The opacity of the disabled navigation buttons. */
     --rdp-nav_button-height: #{t.$space-9};
-    /* The height of the navigation buttons. (2.25em) */
     --rdp-nav_button-width: #{t.$space-9};
-    /* The width of the navigation buttons. (2.25em) */
     --rdp-nav-height: #{t.$space-11};
-    /* The height of the navigation bar. (2.75em) */
 
     --rdp-range_middle-color: inherit;
-    /* The color of the range text. */
 
-    --rdp-range_start-color: white;
-    /* The color of the range text. */
+    --rdp-range_start-color: #{$rdp-selected-color};
     --rdp-range_start-background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, #{$backgroundColor-item-DatePicker--hover} 50%);
-    /* Used for the background of the start of the selected range. */
     --rdp-range_start-date-background-color: #{$rdp-accent-color};
-    /* The background color of the date when at the start of the selected range. */
 
     --rdp-range_end-background: linear-gradient(var(--rdp-gradient-direction), var(--rdp-range_middle-background-color) 50%, transparent 50%);
-    /* Used for the background of the end of the selected range. */
-    --rdp-range_end-color: white;
-    /* The color of the range text. */
+    --rdp-range_end-color: #{$rdp-selected-color};
     --rdp-range_end-date-background-color: #{$rdp-accent-color};
-    /* The background color of the date when at the end of the selected range. */
 
     --rdp-week_number-border-radius: 100%;
-    /* The border radius of the week number. */
     --rdp-week_number-border: #{t.$space-0_5} solid transparent;
-    /* The border of the week number. */
-
     --rdp-week_number-height: var(--rdp-day-height);
-    /* The height of the week number cells. */
     --rdp-week_number-opacity: 0.75;
-    /* The opacity of the week number. */
     --rdp-week_number-width: var(--rdp-day-width);
-    /* The width of the week number cells. */
     --rdp-weeknumber-text-align: center;
-    /* The text alignment of the weekday cells. */
 
     --rdp-weekday-opacity: 0.75;
-    /* The opacity of the weekday. */
     --rdp-weekday-padding: #{t.$space-2} 0;
-    /* The padding of the weekday. */
     --rdp-weekday-text-align: center;
-    /* The text alignment of the weekday cells. */
 
     --rdp-gradient-direction: 90deg;
 
     --rdp-animation_duration: 0.3s;
     --rdp-animation_timing: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .root {
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .root * {
+    box-sizing: border-box;
   }
 
   .root[dir="rtl"] {
@@ -302,65 +289,38 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     --rdp-outside-opacity: unset;
   }
 
-  /* Root of the component. */
-  .root {
+  // ===== CALENDAR LAYOUT =====
+
+  .months {
     position: relative;
-    /* Required to position the navigation toolbar. */
-    box-sizing: border-box;
-  }
-
-  .root * {
-    box-sizing: border-box;
-  }
-
-  .day {
-    width: var(--rdp-day-width);
-    height: var(--rdp-day-height);
-    text-align: center;
-    transition: background-color 0.2s ease-in-out;
-  }
-
-  .day_button {
-    background: none;
-    padding: 0;
-    margin: 0;
-    cursor: pointer;
-    font: inherit;
-    color: inherit;
-    justify-content: center;
-    align-items: center;
     display: flex;
-
-    width: var(--rdp-day_button-width);
-    height: var(--rdp-day_button-height);
-    border: var(--rdp-day_button-border);
-    border-radius: var(--rdp-day_button-border-radius);
-    transition: background-color 0.2s ease-in-out;
-
-    &:hover {
-      background-color: $backgroundColor-item-DatePicker--hover;
-    }
+    flex-wrap: wrap;
+    gap: var(--rdp-months-gap);
+    max-width: fit-content;
   }
 
-  .day_button:disabled {
-    cursor: revert;
+  .month_grid {
+    border-collapse: collapse;
   }
 
-  .caption_label {
-    z-index: 1;
+  .month_caption {
+    display: flex;
+    align-content: center;
+    padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
+    height: var(--rdp-nav-height);
+    font-weight: t.$fontWeight-bold;
+    font-size: t.$fontSize-lg;
+  }
 
-    position: relative;
-    display: inline-flex;
+  // ===== NAVIGATION =====
+
+  .nav {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    display: flex;
     align-items: center;
-    padding-left: t.$space-2;
-    padding-right: t.$space-2;
-
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .dropdown:focus-visible~.caption_label {
-    outline: t.$outlineWidth--focus auto t.$outlineColor--focus;
+    height: var(--rdp-nav-height);
   }
 
   .button_next,
@@ -374,12 +334,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     color: inherit;
     -moz-appearance: none;
     -webkit-appearance: none;
+    appearance: none;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    appearance: none;
-
     width: var(--rdp-nav_button-width);
     height: var(--rdp-nav_button-height);
 
@@ -393,7 +352,6 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   .button_previous:disabled,
   .button_previous[aria-disabled="true"] {
     cursor: revert;
-
     opacity: var(--rdp-nav_button-disabled-opacity);
   }
 
@@ -407,6 +365,53 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     transform-origin: 50%;
   }
 
+  // --- Navigation layout variants
+  .root[data-nav-layout="around"] .month,
+  .root[data-nav-layout="after"] .month {
+    position: relative;
+  }
+
+  .root[data-nav-layout="around"] .month_caption {
+    justify-content: center;
+    margin-inline-start: var(--rdp-nav_button-width);
+    margin-inline-end: var(--rdp-nav_button-width);
+    position: relative;
+  }
+
+  .root[data-nav-layout="around"] .button_previous {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    height: var(--rdp-nav-height);
+    display: inline-flex;
+  }
+
+  .root[data-nav-layout="around"] .button_next {
+    position: absolute;
+    inset-inline-end: 0;
+    top: 0;
+    height: var(--rdp-nav-height);
+    display: inline-flex;
+    justify-content: center;
+  }
+
+  // ===== DROPDOWNS =====
+
+  .caption_label {
+    z-index: 1;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding-left: t.$space-2;
+    padding-right: t.$space-2;
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .dropdown:focus-visible~.caption_label {
+    outline: t.$outlineWidth--focus auto t.$outlineColor--focus;
+  }
+
   .dropdowns {
     position: relative;
     display: inline-flex;
@@ -415,8 +420,6 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   .dropdown {
-
-    /* Reset */
     z-index: 2;
     opacity: 0;
     appearance: none;
@@ -448,66 +451,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     opacity: var(--rdp-disabled-opacity);
   }
 
-  .month_caption {
-    display: flex;
-    align-content: center;
-    padding: t.$space-3 t.$space-3 t.$space-3 t.$space-1;
-    height: var(--rdp-nav-height);
-    font-weight: t.$fontWeight-bold;
-    font-size: t.$fontSize-lg;
-  }
-
-  .root[data-nav-layout="around"] .month,
-  .root[data-nav-layout="after"] .month {
-    position: relative;
-  }
-
-  .root[data-nav-layout="around"] .month_caption {
-    justify-content: center;
-    margin-inline-start: var(--rdp-nav_button-width);
-    margin-inline-end: var(--rdp-nav_button-width);
-    position: relative;
-  }
-
-  .root[data-nav-layout="around"] .button_previous {
-    position: absolute;
-    inset-inline-start: 0;
-    top: 0;
-    height: var(--rdp-nav-height);
-    display: inline-flex;
-  }
-
-  .root[data-nav-layout="around"] .button_next {
-    position: absolute;
-    inset-inline-end: 0;
-    top: 0;
-    height: var(--rdp-nav-height);
-    display: inline-flex;
-    justify-content: center;
-  }
-
-  .months {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--rdp-months-gap);
-    max-width: fit-content;
-  }
-
-  .month_grid {
-    border-collapse: collapse;
-  }
-
-  .nav {
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-end: 0;
-
-    display: flex;
-    align-items: center;
-
-    height: var(--rdp-nav-height);
-  }
+  // ===== WEEKDAY & WEEK NUMBER HEADERS =====
 
   .weekday {
     opacity: var(--rdp-weekday-opacity);
@@ -530,22 +474,53 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     text-align: var(--rdp-weeknumber-text-align);
   }
 
-  /* DAY MODIFIERS */
+  // ===== DAY CELLS =====
+
+  .day {
+    width: var(--rdp-day-width);
+    height: var(--rdp-day-height);
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .day_button {
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: var(--rdp-day_button-width);
+    height: var(--rdp-day_button-height);
+    border: var(--rdp-day_button-border);
+    border-radius: var(--rdp-day_button-border-radius);
+    transition: background-color 0.2s ease-in-out;
+
+    &:not(:disabled):hover {
+      background-color: $backgroundColor-item-DatePicker--hover;
+    }
+
+    &:disabled {
+      cursor: revert;
+    }
+  }
+
+  // ===== DAY MODIFIERS =====
+
   .today:not(.outside) {
     color: t.$color-primary-500;
   }
 
-  .selected {
+  .day.selected {
     font-weight: t.$fontWeight-bold;
     background-color: $backgroundColor-item-DatePicker--hover !important;
-  }
 
-  .selected .day_button {
-    border: t.$space-0_5 solid $borderColor-selectedItem-DatePicker;
-  }
-  
-  .day.selected {
-    background-color: $backgroundColor-item-DatePicker--hover !important;
+    .day_button {
+      border: t.$space-0_5 solid $borderColor-selectedItem-DatePicker;
+    }
   }
 
   .outside {
@@ -561,51 +536,53 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     color: var(--rdp-range_start-color);
   }
 
+  // ===== RANGE SELECTION =====
+
   .range_start {
     background-color: $backgroundColor-item-DatePicker--hover;
-  }
 
-  .range_start .day_button {
-    background-color: var(--rdp-range_start-date-background-color);
-    color: var(--rdp-range_start-color);
+    .day_button {
+      background-color: var(--rdp-range_start-date-background-color);
+      color: var(--rdp-range_start-color);
+    }
   }
 
   .range_middle {
     background-color: $backgroundColor-item-DatePicker--hover;
-  }
 
-  .range_middle .day_button {
-    border-color: transparent;
-    border: unset;
-    border-radius: unset;
-    color: var(--rdp-range_middle-color);
-    background-color: $backgroundColor-item-DatePicker--hover;
+    .day_button {
+      border-color: transparent;
+      border: unset;
+      border-radius: unset;
+      color: var(--rdp-range_middle-color);
+      background-color: $backgroundColor-item-DatePicker--hover;
+    }
   }
 
   .range_end {
     background-color: $backgroundColor-item-DatePicker--hover;
-  }
 
-  .range_end .day_button {
-    color: var(--rdp-range_start-color);
-    background-color: var(--rdp-range_end-date-background-color);
+    .day_button {
+      color: var(--rdp-range_start-color);
+      background-color: var(--rdp-range_end-date-background-color);
+    }
   }
 
   .range_start.range_end {
     background: revert;
   }
 
-  /* Range preview on hover - when first date is selected and hovering over another date */
+  // --- Range preview on hover (first date selected, hovering over another date)
   .hovered:not(.range_start):not(.range_end) {
     background-color: $backgroundColor-item-DatePicker--hover;
+
+    .day_button {
+      background-color: $backgroundColor-item-DatePicker--hover;
+      border-color: transparent;
+    }
   }
 
-  .hovered:not(.range_start):not(.range_end) .day_button {
-    background-color: $backgroundColor-item-DatePicker--hover;
-    border-color: transparent;
-  }
-
-  /* Single selected date in range mode - when only from date is selected */
+  // --- Single selected date in range mode (only from date selected)
   .singleSelected {
     background-color: $backgroundColor-item-DatePicker--hover !important;
   }
@@ -614,49 +591,26 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     cursor: pointer;
   }
 
-  .datePickerValue {
-    display: flex;
-    flex: 1;
-  }
+  // ===== ANIMATIONS =====
 
   @keyframes rdp-slide_in_left {
-    0% {
-      transform: translateX(-100%);
-    }
-
-    100% {
-      transform: translateX(0);
-    }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
   }
 
   @keyframes rdp-slide_in_right {
-    0% {
-      transform: translateX(100%);
-    }
-
-    100% {
-      transform: translateX(0);
-    }
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(0); }
   }
 
   @keyframes rdp-slide_out_left {
-    0% {
-      transform: translateX(0);
-    }
-
-    100% {
-      transform: translateX(-100%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
   }
 
   @keyframes rdp-slide_out_right {
-    0% {
-      transform: translateX(0);
-    }
-
-    100% {
-      transform: translateX(100%);
-    }
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
   }
 
   .weeks_before_enter {
@@ -692,23 +646,13 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   }
 
   @keyframes rdp-fade_in {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 
   @keyframes rdp-fade_out {
-    from {
-      opacity: 1;
-    }
-
-    to {
-      opacity: 0;
-    }
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   .caption_after_enter {
