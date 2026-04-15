@@ -1,4 +1,4 @@
-import Icon from "./svg/fi-grid.svg?react";
+import Icon from "./svg/l-kanban.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const BoardIcon = (props: IconBaseProps) => <Icon {...props}/>
+export const BoardIcon = (props: IconBaseProps) => <Icon {...props}/>;

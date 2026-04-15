@@ -16,7 +16,6 @@ import { FiHardDriveIcon } from "./Icon/FiHardDriveIcon";
 import { FiHelpCircleIcon } from "./Icon/FiHelpCircleIcon";
 import { FiKeyIcon } from "./Icon/FiKeyIcon";
 import { FiLockIcon } from "./Icon/FiLockIcon";
-import { FiRefreshCcwIcon } from "./Icon/FiRefreshCcwIcon";
 import { FiSlashIcon } from "./Icon/FiSlashIcon";
 import { FiStarIcon } from "./Icon/FiStarIcon";
 import { FiUploadIcon } from "./Icon/FiUploadIcon";

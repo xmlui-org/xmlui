@@ -1,4 +1,4 @@
-import Icon from "./svg/hi-outline-paint-brush.svg?react";
+import Icon from "./svg/l-paintbrush.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
 export const HiOutlinePaintBrushIcon = (props: IconBaseProps) => <Icon {...props}/>;

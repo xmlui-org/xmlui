@@ -1,4 +1,4 @@
-import Icon from "./svg/tfi-reload.svg?react";
+import Icon from "./svg/l-rotate-cw.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const TfiReloadIcon = (props: IconBaseProps) => <Icon fill="currentColor" {...props}/>;
+export const TfiReloadIcon = (props: IconBaseProps) => <Icon {...props}/>;

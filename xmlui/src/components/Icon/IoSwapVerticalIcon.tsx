@@ -1,4 +1,4 @@
-import Icon from "./svg/io-swap-vertical.svg?react";
+import Icon from "./svg/l-arrow-up-down.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const IoSwapVerticalIcon = (props: IconBaseProps) => <Icon stroke="currentColor" {...props}/>;
+export const IoSwapVerticalIcon = (props: IconBaseProps) => <Icon {...props}/>;

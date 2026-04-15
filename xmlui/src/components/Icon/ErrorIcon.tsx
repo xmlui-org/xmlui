@@ -1,4 +1,4 @@
-import Icon from "./svg/bi-error-circle.svg?react";
+import Icon from "./svg/l-circle-x.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const ErrorIcon = (props: IconBaseProps) => <Icon fill="currentColor" stroke="currentColor" strokeWidth={0} {...props}/>;
+export const ErrorIcon = (props: IconBaseProps) => <Icon {...props}/>;

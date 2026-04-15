@@ -1,4 +1,4 @@
-import Icon from "./svg/md-outline-palette.svg?react";
+import Icon from "./svg/l-palette.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const MdOutlinePaletteIcon = (props: IconBaseProps) => <Icon fill="currentColor" {...props} />;
+export const MdOutlinePaletteIcon = (props: IconBaseProps) => <Icon {...props}/>;

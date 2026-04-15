@@ -1,4 +1,4 @@
-import Icon from "./svg/rx-lightning-bolt.svg?react";
+import Icon from "./svg/l-zap.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
 export const RxLightningBoltIcon = (props: IconBaseProps) => <Icon {...props}/>;

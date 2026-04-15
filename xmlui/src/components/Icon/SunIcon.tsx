@@ -1,6 +1,4 @@
-import Icon from "./svg/sun.svg?react";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/l-sun.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const SunIcon = (props: IconBaseProps) => (
-    <Icon {...props} />
-);
+export const SunIcon = (props: IconBaseProps) => <Icon {...props}/>;

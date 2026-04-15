@@ -1,4 +1,4 @@
-import Icon from "./svg/gr-next.svg?react";
+import Icon from "./svg/l-chevron-right.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const GrNextIcon = (props: IconBaseProps) => <Icon stroke="currentColor" {...props}/>;
+export const GrNextIcon = (props: IconBaseProps) => <Icon {...props}/>;

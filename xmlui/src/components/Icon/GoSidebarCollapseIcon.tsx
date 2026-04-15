@@ -1,4 +1,4 @@
-import Icon from "./svg/go-sidebar-collapse.svg?react";
+import Icon from "./svg/l-panel-left-close.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const GoSidebarCollapseIcon = (props: IconBaseProps) => <Icon fill="currentColor" {...props}/>;
+export const GoSidebarCollapseIcon = (props: IconBaseProps) => <Icon {...props}/>;

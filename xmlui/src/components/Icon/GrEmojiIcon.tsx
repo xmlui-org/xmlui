@@ -1,4 +1,4 @@
-import Icon from "./svg/gr-emoji.svg?react";
+import Icon from "./svg/l-smile.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const GrEmojiIcon = (props: IconBaseProps) => <Icon fill="currentColor" {...props}/>;
+export const GrEmojiIcon = (props: IconBaseProps) => <Icon {...props}/>;

@@ -1,4 +1,4 @@
-import Icon from "./svg/ai-outline-plus-circle.svg?react";
+import Icon from "./svg/l-circle-plus.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const AiOutlinePlusCircleIcon = (props: IconBaseProps) => <Icon fill="currentColor" {...props}/>;
+export const AiOutlinePlusCircleIcon = (props: IconBaseProps) => <Icon {...props}/>;

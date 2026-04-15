@@ -1,4 +1,4 @@
-import Share from "./svg/share.svg?react";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/l-share-2.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const ShareIcon = (props: IconBaseProps) => <Share {...props}/>
+export const ShareIcon = (props: IconBaseProps) => <Icon {...props}/>;
