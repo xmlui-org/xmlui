@@ -17,6 +17,7 @@
     "test:e2e": "playwright test -c ..",
     "test:e2e-summary": "node scripts/e2e-test-summary.js",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
+    "pack:local": "clean-package && npm pack && clean-package restore",
     "prepublishOnly": "clean-package",
     "postpublish": "clean-package restore",
     "generate-docs-summaries": "node scripts/generate-docs/generate-summary-files.mjs",
