@@ -1,5 +1,11 @@
 # xmlui
 
+## 0.12.19
+
+### Patch Changes
+
+- 74e7c88: Fix the build issue using multiple vite entry points
+
 ## 0.12.18
 
 ### Patch Changes
