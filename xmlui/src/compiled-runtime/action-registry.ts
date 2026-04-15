@@ -15,7 +15,10 @@ export interface ActionContext {
     dismiss: (id?: string) => void;
     custom: (msg: string, opts?: unknown) => void;
   };
-  confirm: (title: string, message?: string, actionLabel?: string, cancelLabel?: string) => Promise<boolean>;
+  confirm: {
+    (options: { title?: string; message?: string; actionLabel?: string; cancelLabel?: string; width?: string }): Promise<boolean>;
+    (title?: string, message?: string, actionLabel?: string, cancelLabel?: string, width?: string): Promise<boolean>;
+  };
   queryClient: unknown;
 }
 

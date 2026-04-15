@@ -15,6 +15,7 @@ export type Props = {
   // like complex layouts, images, etc.
   children?: React.ReactNode;
   portalTo?: HTMLElement;
+  width?: string;
 };
 
 /**
@@ -30,9 +31,10 @@ export const Dialog = ({
   isOpen,
   onClose,
   buttons,
+  width,
 }: Props) => {
   return (
-    <ModalDialog onClose={onClose} isInitiallyOpen={isOpen} title={title}>
+    <ModalDialog onClose={onClose} isInitiallyOpen={isOpen} title={title} style={width ? { width } : undefined}>
       <div className={styles.dialogContent}>
         <div id="dialogDesc">
           <Text>{description}</Text>

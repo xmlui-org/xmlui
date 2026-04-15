@@ -583,14 +583,46 @@ This property gets the base name used for the router.
 ### `confirm`
 
 ```ts
-function confirm: (title: string, message?: string, actionLabel?: string): boolean
+// Positional arguments form
+function confirm(
+  title?: string,
+  message?: string,
+  actionLabel?: string,
+  cancelLabel?: string,
+  width?: string,
+): Promise<boolean>;
+
+// Options object form
+function confirm(options: {
+  title?: string;
+  message?: string;
+  actionLabel?: string;
+  cancelLabel?: string;
+  width?: string;
+}): Promise<boolean>;
 ```
 
-Instructs the browser to display a dialog with a confirmation message, and to wait until the user either confirms or cancels the dialog. It returns a boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
+Displays a confirmation dialog and returns a `Promise` that resolves to `true` when the user confirms, or `false` when the user cancels.
 
-- `title`: The title of the dialog
-- `message`: The message to display
-- `actionLabel`: The label of the action button
+The function can be called with positional arguments or with a single options object:
+
+```ts
+// Positional arguments
+const ok = await confirm("Delete item", "Are you sure?", "Delete", "Cancel");
+
+// Options object
+const ok = await confirm({ 
+  title: "Delete item",
+  message: "Are you sure?", 
+  width: "400px" });
+```
+
+**Parameters:**
+- `title`: The title displayed in the dialog header (default: `"Confirm Operation"`)
+- `message`: The body message (default: `"Are you sure you want to perform this operation?"`)
+- `actionLabel`: Label for the confirm button (default: `"Yes"`)
+- `cancelLabel`: Label for the cancel button (default: `"Cancel"`)
+- `width`: Optional CSS width for the dialog (e.g. `"400px"`, `"50vw"`)
 
 ### `signError`
 

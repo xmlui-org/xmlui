@@ -10,6 +10,8 @@
 
 Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
 
+**Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
+
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |

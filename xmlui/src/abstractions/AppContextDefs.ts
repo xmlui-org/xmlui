@@ -16,6 +16,15 @@ import type { PubSubService } from "../components-core/pubsub/PubSubService";
 
 // This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
+// Options object accepted by the `confirm` function.
+export type ConfirmOptions = {
+  title?: string;
+  message?: string;
+  actionLabel?: string;
+  cancelLabel?: string;
+  width?: string;
+};
+
 export type AppContextObject = {
   // Accept other methods
   [x: string]: unknown;
@@ -176,15 +185,23 @@ export type AppContextObject = {
   // ==============================================================================================
   // Notifications and Dialogs
 
+  // Options object form for the `confirm` function.
   // Instructs the browser to display a dialog with an optional message, and to
   // wait until the user either confirms or cancels the dialog. It returns a
   // boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
-  confirm: (
-    title?: string,
-    message?: string,
-    actionLabel?: string,
-    cancelLabel?: string,
-  ) => Promise<boolean>;
+  // Can be called with positional arguments or with a single options object:
+  //   confirm(title?, message?, actionLabel?, cancelLabel?, width?)
+  //   confirm({ title?, message?, actionLabel?, cancelLabel?, width? })
+  confirm: {
+    (options: ConfirmOptions): Promise<boolean>;
+    (
+      title?: string,
+      message?: string,
+      actionLabel?: string,
+      cancelLabel?: string,
+      width?: string,
+    ): Promise<boolean>;
+  };
 
   // This method displays the specified `error` (error message) on the UI.
   signError(error: Error | string): void;
