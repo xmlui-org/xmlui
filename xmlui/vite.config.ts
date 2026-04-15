@@ -162,7 +162,7 @@ export default ({ mode = "lib" }) => {
       },
     },
     build: {
-      minify: "terser",
+      minify: true,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,
