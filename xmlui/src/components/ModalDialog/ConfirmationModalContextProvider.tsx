@@ -24,7 +24,13 @@ type ConfirmOptions = {
 
 type ConfirmFn = {
   (options: ConfirmOptions): Promise<boolean>;
-  (title?: string, message?: string, actionLabel?: string, cancelLabel?: string, width?: string): Promise<boolean>;
+  (
+    title?: string,
+    message?: string,
+    actionLabel?: string,
+    cancelLabel?: string,
+    width?: string,
+  ): Promise<boolean>;
 };
 
 const ConfirmationModalContext = React.createContext<{ confirm: ConfirmFn }>({
@@ -88,18 +94,18 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       let actionLabel: string;
       let cancelLabel: string;
       let resolvedWidth: string | undefined;
-      if (typeof titleOrOptions === "object" && titleOrOptions !== null) {
-        title = titleOrOptions.title ?? "Confirm Operation";
-        message = titleOrOptions.message ?? "Are you sure you want to perform this operation?";
-        actionLabel = titleOrOptions.actionLabel ?? "Yes";
-        cancelLabel = titleOrOptions.cancelLabel ?? "Cancel";
-        resolvedWidth = titleOrOptions.width;
-      } else {
+      if (typeof titleOrOptions === "string") {
         title = titleOrOptions;
         message = messageArg;
         actionLabel = actionLabelArg;
         cancelLabel = cancelLabelArg;
         resolvedWidth = widthArg;
+      } else {
+        title = titleOrOptions.title ?? "Confirm Operation";
+        message = titleOrOptions.message ?? "Are you sure you want to perform this operation?";
+        actionLabel = titleOrOptions.actionLabel ?? "Yes";
+        cancelLabel = titleOrOptions.cancelLabel ?? "Cancel";
+        resolvedWidth = titleOrOptions.width;
       }
       // Trace confirmation modal show
       if (isTracingActive()) {
@@ -132,30 +138,33 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
     [],
   );
 
-  const handleOk = useCallback((value: any, buttonLabel?: string) => {
-    // Trace confirmation
-    if (isTracingActive()) {
-      const w = window as any;
-      // Restore trace context from when modal was shown
-      if (w._xsPendingConfirmTrace) {
-        w._xsCurrentTrace = w._xsPendingConfirmTrace;
+  const handleOk = useCallback(
+    (value: any, buttonLabel?: string) => {
+      // Trace confirmation
+      if (isTracingActive()) {
+        const w = window as any;
+        // Restore trace context from when modal was shown
+        if (w._xsPendingConfirmTrace) {
+          w._xsCurrentTrace = w._xsPendingConfirmTrace;
+        }
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: w._xsCurrentTrace,
+          kind: "modal:confirm",
+          modalType: "confirmation",
+          ariaName: title,
+          value,
+          buttonLabel,
+        });
       }
-      pushXsLog({
-        ts: Date.now(),
-        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: w._xsCurrentTrace,
-        kind: "modal:confirm",
-        modalType: "confirmation",
-        ariaName: title,
-        value,
-        buttonLabel,
-      });
-    }
-    if (resolver.current) {
-      resolver.current(value);
-    }
-    setShowConfirmationModal(false);
-  }, []);
+      if (resolver.current) {
+        resolver.current(value);
+      }
+      setShowConfirmationModal(false);
+    },
+    [title],
+  );
 
   const handleCancel = useCallback(() => {
     // Trace cancellation
@@ -178,7 +187,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       resolver.current(false);
     }
     setShowConfirmationModal(false);
-  }, []);
+  }, [title]);
 
   const contextValue = useMemo(() => {
     return {
