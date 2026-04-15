@@ -1,5 +1,14 @@
 # xmlui-vscode
 
+## 0.12.18
+
+### Patch Changes
+
+- Updated dependencies [f502d2b]
+- Updated dependencies [1039048]
+- Updated dependencies [8689e17]
+  - xmlui@0.12.18
+
 ## 0.12.17
 
 ### Patch Changes
