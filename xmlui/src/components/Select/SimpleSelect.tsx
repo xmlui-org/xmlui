@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
@@ -50,6 +50,7 @@ interface SimpleSelectProps {
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   children?: ReactNode;
   options: Option[];
+  scrollIndicators?: boolean;
   validationIcon?: string | null;
   validationStatus: ValidationStatus;
   invalidMessages: string[];
@@ -87,6 +88,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       valueRenderer,
       options,
       children,
+      scrollIndicators = true,
       validationIcon,
       validationStatus,
       invalidMessages,
@@ -98,6 +100,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
 
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
     const [open, setOpen] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     // Radix Select's Content hardcodes RemoveScroll which locks page scroll whenever
     // the dropdown is open. When the Select is not modal, counteract this by:
@@ -152,6 +155,28 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         document.removeEventListener("touchmove", handler, true);
       };
     }, [open, modal]);
+
+    // When the dropdown opens, pin Content to its initial clientHeight so that
+    // scroll buttons mounting/unmounting cannot change the outer container size.
+    // The Radix Viewport has flex:1 so it absorbs the scroll button heights instead.
+    useEffect(() => {
+      if (!open) return;
+      const el = contentRef.current;
+      if (!el) return;
+
+      let rafId = requestAnimationFrame(() => {
+        rafId = requestAnimationFrame(() => {
+          el.style.height = `${el.clientHeight}px`;
+        });
+      });
+
+      return () => {
+        cancelAnimationFrame(rafId);
+        if (contentRef.current) {
+          contentRef.current.style.height = "auto";
+        }
+      };
+    }, [open]);
 
     // Convert value to string for Radix UI compatibility.
     // Always produce a string (defaulting to "") so Radix stays in controlled mode.
@@ -283,15 +308,18 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         </Trigger>
         <Portal container={root}>
           <Content
+            ref={contentRef}
             collisionPadding={0}
             className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
             style={{ height: "auto", maxHeight: height, minWidth: panelWidth }}
           >
-            <ScrollUpButton className={styles.selectScrollUpButton}>
-              <ThemedIcon name="chevronup" />
-            </ScrollUpButton>
+            {scrollIndicators && (
+              <ScrollUpButton className={styles.selectScrollUpButton}>
+                <ThemedIcon name="chevronup" />
+              </ScrollUpButton>
+            )}
             <Part partId="listWrapper">
               <Viewport className={styles.selectViewport}>
                 {groupBy && groupedOptions ? (
@@ -337,9 +365,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 )}
               </Viewport>
             </Part>
-            <ScrollDownButton className={styles.selectScrollDownButton}>
-              <ThemedIcon name="chevrondown" />
-            </ScrollDownButton>
+            {scrollIndicators && (
+              <ScrollDownButton className={styles.selectScrollDownButton}>
+                <ThemedIcon name="chevrondown" />
+              </ScrollDownButton>
+            )}
           </Content>
         </Portal>
       </Root>

@@ -451,7 +451,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     position: relative;
     width: 100%;
     max-height: 280px;
-    overflow: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background-color: $backgroundColor-menu-Select;
     border-radius: $borderRadius-menu-Select;
     box-shadow: $boxShadow-menu-Select;
@@ -487,8 +489,8 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   }
 
   .selectViewport {
-    height: fit-content;
     width: 100%;
+    min-height: 0;
   }
 
   .selectScrollUpButton {
@@ -498,6 +500,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     justify-content: center;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    flex-shrink: 0;
   }
 
   .selectScrollDownButton {
@@ -507,6 +510,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     justify-content: center;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    flex-shrink: 0;
   }
 
   .selectEmpty {
