@@ -71,6 +71,7 @@ interface SelectProps {
   contentClassName?: string;
   classes?: Record<string, string>;
   dropdownHeight?: CSSProperties["height"];
+  scrollIndicators?: boolean;
 
   // Validation
   validationStatus?: ValidationStatus;
@@ -264,6 +265,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     contentClassName,
     classes,
     dropdownHeight,
+    scrollIndicators,
 
     // Validation
     validationStatus = defaultProps.validationStatus,
@@ -767,6 +769,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             clearable={clearable}
             onClear={clearValue}
             valueRenderer={valueRenderer}
+            scrollIndicators={scrollIndicators}
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}
             finalValidationIconSuccess={finalValidationIconSuccess}

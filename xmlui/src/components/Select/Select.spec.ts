@@ -3113,3 +3113,185 @@ test.describe("Scroll Behavior", () => {
     expect(scrollAfter).toBeGreaterThan(scrollBefore);
   });
 });
+
+// =============================================================================
+// DROPDOWN HEIGHT STABILITY
+// =============================================================================
+
+test.describe("Dropdown Height Stability", () => {
+  // Build a markup with enough options to overflow a small dropdownHeight,
+  // triggering scroll indicators.
+  const MARKUP = `
+    <Select testId="sel" dropdownHeight="120px">
+      <Option value="a" label="Alpha" />
+      <Option value="b" label="Beta" />
+      <Option value="c" label="Gamma" />
+      <Option value="d" label="Delta" />
+      <Option value="e" label="Epsilon" />
+      <Option value="f" label="Zeta" />
+      <Option value="g" label="Eta" />
+      <Option value="h" label="Theta" />
+    </Select>
+  `;
+
+  test("dropdown height stays stable when scroll indicators appear", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(MARKUP);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // Wait for the dropdown to open and stabilize
+    const dropdown = page.locator("[data-radix-popper-content-wrapper]");
+    await expect(dropdown).toBeVisible();
+
+    // Measure height after initial open (only down arrow visible)
+    const heightBefore = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Scroll inside the viewport to trigger the up-arrow to appear
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    });
+
+    // Wait a frame for any re-render
+    await page.waitForTimeout(100);
+
+    const heightAfter = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Gross dropdown height must not change when scroll indicators mount/unmount
+    expect(Math.abs(heightAfter - heightBefore)).toBeLessThanOrEqual(2);
+  });
+
+  test("dropdown does not exceed dropdownHeight when scroll indicators are shown", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(MARKUP);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    const dropdown = page.locator("[data-radix-popper-content-wrapper]");
+    await expect(dropdown).toBeVisible();
+
+    // Scroll to trigger both arrows
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    const dropdownHeight = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Dropdown should be at most dropdownHeight (120px) plus border (2px tolerance)
+    expect(dropdownHeight).toBeLessThanOrEqual(124);
+  });
+});
+
+// =============================================================================
+// SCROLL INDICATORS PROPERTY
+// =============================================================================
+
+test.describe("scrollIndicators property", () => {
+  const OPTIONS = `
+    <Option value="a" label="Alpha" />
+    <Option value="b" label="Beta" />
+    <Option value="c" label="Gamma" />
+    <Option value="d" label="Delta" />
+    <Option value="e" label="Epsilon" />
+    <Option value="f" label="Zeta" />
+    <Option value="g" label="Eta" />
+    <Option value="h" label="Theta" />
+  `;
+
+  test("scroll indicator arrows are visible by default when list overflows", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    // Scroll partway to make both up and down arrows appear
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    const upVisible = await page.evaluate(() => {
+      const btns = document.querySelectorAll("[data-radix-popper-content-wrapper] button, [data-radix-popper-content-wrapper] [role='button'], [data-radix-popper-content-wrapper] > div > *");
+      // Find elements rendered by ScrollUpButton / ScrollDownButton via their position
+      const content = document.querySelector("[data-radix-popper-content-wrapper] > *:first-child") as HTMLElement | null;
+      if (!content) return false;
+      const children = Array.from(content.children) as HTMLElement[];
+      // Up button is the first child with non-zero height when scrolled
+      return children.some(c => c.offsetHeight > 0 && c !== content.querySelector("[data-radix-select-viewport]"));
+    });
+
+    expect(upVisible).toBe(true);
+  });
+
+  test("scroll indicator arrows are hidden when scrollIndicators is false", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px" scrollIndicators="false">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    // With scrollIndicators=false, neither scroll button class should be present
+    const upButtonCount = await page.locator("[class*='selectScrollUpButton']").count();
+    const downButtonCount = await page.locator("[class*='selectScrollDownButton']").count();
+
+    expect(upButtonCount).toBe(0);
+    expect(downButtonCount).toBe(0);
+  });
+
+  test("scrollIndicators=false does not remove options from the list", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px" scrollIndicators="false">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    // All 8 options should still exist in the DOM even though there are no scroll arrows
+    const optionCount = await page.getByRole("option").count();
+    expect(optionCount).toBe(8);
+
+    // The viewport should still be scrollable
+    const isScrollable = await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      return viewport ? viewport.scrollHeight > viewport.clientHeight : false;
+    });
+    expect(isScrollable).toBe(true);
+  });
+});

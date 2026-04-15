@@ -87,6 +87,12 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
     ),
+    scrollIndicators: {
+      description:
+        "This property controls whether scroll indicator arrows are displayed at the top and bottom of the dropdown list when the content overflows.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
     emptyListTemplate: dComponent(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
@@ -245,6 +251,7 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
     "validationStatus",
     "emptyListTemplate",
     "dropdownHeight",
+    "scrollIndicators",
     "required",
     "modal",
     "groupBy",
@@ -302,6 +309,7 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
+        scrollIndicators={extractValue.asOptionalBoolean(node.props.scrollIndicators)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
         groupBy={extractValue(node.props.groupBy)}
