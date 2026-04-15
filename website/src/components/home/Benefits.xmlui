@@ -1,17 +1,21 @@
 <Component name="Benefits">
-    <FlowLayout maxWidth="{mediaSize.sizeIndex > 2 ? '600px' : '400px'}" columnGap="$space-8" rowGap="$space-8" width="100%">
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Simple.">
+    <FlowLayout
+        maxWidth-md="$maxWidth-md-Benefit"
+        maxWidth="$maxWidth-Benefit"
+        columnGap="$space-8"
+        rowGap="$space-8"
+    >
+        <Benefit width="100%" width-md="50%" title="Simple.">
             No CSS or React expertise required.
         </Benefit>
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Semantic.">
+        <Benefit width="100%" width-md="50%" title="Semantic.">
             Humans and AIs can reason together.
         </Benefit>
-            <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Connected.">
+        <Benefit width="100%" width-md="50%" title="Connected.">
             Use APIs with little or no scripting.
         </Benefit>
-        <Benefit width="{mediaSize.sizeIndex > 2 ? '50%' : '100%'}" title="Deployable">
+        <Benefit width="100%" width-md="50%" title="Deployable.">
             Drop files onto a static webserver.
         </Benefit>
     </FlowLayout>
 </Component>
-

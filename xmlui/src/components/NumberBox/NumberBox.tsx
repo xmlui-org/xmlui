@@ -1,7 +1,9 @@
 import styles from "./NumberBox.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import {
   createMetadata,
   d,
@@ -22,6 +24,7 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { defaultProps, NumberBox } from "./NumberBoxNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "NumberBox";
 
@@ -107,6 +110,7 @@ export const NumberBoxMd = createMetadata({
         "The minimum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no minimum value check is done.",
+      valueType: "number",
       defaultValue: defaultProps.min,
     },
     maxValue: {
@@ -114,6 +118,7 @@ export const NumberBoxMd = createMetadata({
         "The maximum value the input field allows. Can be a float or an integer if " +
         "[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer." +
         "If not set, no maximum value check is done.",
+      valueType: "number",
       defaultValue: defaultProps.max,
     },
     verboseValidationFeedback: {
@@ -155,57 +160,28 @@ export const NumberBoxMd = createMetadata({
   },
 });
 
-export const numberBoxComponentRenderer = createComponentRenderer(
-  COMP,
-  NumberBoxMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    className,
-    registerComponentApi,
-  }) => {
-    let extractedInitialValue;
-    try {
-      extractedInitialValue = extractValue.asOptionalNumber(node.props.initialValue);
-    } catch {}
-    return (
-      <NumberBox
-        className={className}
-        value={state?.value}
-        initialValue={extractedInitialValue}
-        step={extractValue(node.props.step)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        hasSpinBox={extractValue.asOptionalBoolean(node.props.hasSpinBox)}
-        integersOnly={extractValue.asOptionalBoolean(node.props.integersOnly)}
-        zeroOrPositive={extractValue.asOptionalBoolean(node.props.zeroOrPositive)}
-        min={extractValue.asOptionalNumber(node.props.minValue)}
-        max={extractValue.asOptionalNumber(node.props.maxValue)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
-        gap={extractValue.asOptionalString(node.props.gap)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        spinnerUpIcon={extractValue.asOptionalString(node.props.spinnerUpIcon)}
-        spinnerDownIcon={extractValue.asOptionalString(node.props.spinnerDownIcon)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        maxLength={extractValue(node.props.maxLength)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        direction={extractValue(node.props.direction)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-      />
-    );
+type ThemedNumberBoxProps = React.ComponentProps<typeof NumberBox> & { className?: string };
+
+export const ThemedNumberBox = React.forwardRef<HTMLDivElement, ThemedNumberBoxProps>(
+  function ThemedNumberBox({ className, classes, ...props }: ThemedNumberBoxProps, ref) {
+    const themeClass = useComponentThemeClass(NumberBoxMd);
+    const themedClasses: Record<string, string> = {
+      ...(classes ?? {}),
+      [COMPONENT_PART_KEY]: [themeClass, classes?.[COMPONENT_PART_KEY]].filter(Boolean).join(" "),
+    };
+    return <NumberBox {...props} className={className} classes={themedClasses} ref={ref} />;
   },
 );
+
+export const numberBoxComponentRenderer = wrapComponent(COMP, ThemedNumberBox, NumberBoxMd, {
+  exposeRegisterApi: true,
+  rename: {
+    minValue: "min",
+    maxValue: "max",
+  },
+  events: {
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
+  },
+  deriveAriaLabel: (props) => props.label || props.placeholder,
+});

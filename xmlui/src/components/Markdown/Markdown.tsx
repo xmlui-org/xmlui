@@ -1,10 +1,11 @@
 import styles from "./Markdown.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown, defaultProps } from "./MarkdownNative";
-import type React from "react";
+import React from "react";
 import { forwardRef, useMemo } from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { parseBindingExpression } from "./parse-binding-expr";
 import type { CodeHighlighter } from "../CodeBlock/highlight-code";
@@ -14,8 +15,9 @@ import {
   observePlaygroundPattern,
   observeTreeDisplay,
 } from "./utils";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dComponent } from "../metadata-helpers";
 import type { BreakMode, OverflowMode } from "../abstractions";
+import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Markdown";
 
@@ -26,6 +28,7 @@ export const MarkdownMd = createMetadata({
     "[Text](/working-with-text) for simple, styled text content, and `Markdown` " +
     "when you need [rich formatting](/working-with-markdown).",
   themeVars: parseScssVar(styles.themeVars),
+  themeVarContributorComponents: ["CodeBlock", "Text", "NestedApp"],
   props: {
     content: d(
       "This property sets the markdown content to display. Alternatively, you can nest " +
@@ -61,6 +64,11 @@ export const MarkdownMd = createMetadata({
         "next to headings.",
       valueType: "boolean",
     },
+    anchorTemplate: dComponent(
+      "An optional template to customize the anchor link rendered next to each heading. " +
+      "Requires `showHeadingAnchors` to be `true`. " +
+      "The template receives `$anchorId` and `$anchorHref` as context variables.",
+    ),
     grayscale: {
       description:
         "This boolean property specifies whether images should be displayed in " +
@@ -217,49 +225,82 @@ export const MarkdownMd = createMetadata({
   },
 });
 
-export const markdownComponentRenderer = createComponentRenderer(
-  COMP,
-  MarkdownMd,
-  ({ node, extractValue, renderChild, className }) => {
-    let renderedChildren = "";
+type ThemedMarkdownProps = React.ComponentPropsWithoutRef<typeof Markdown>;
 
-    // 1. Static content prop fallback
-    if (!renderedChildren) {
-      renderedChildren = extractValue.asString(node.props.content);
-    }
-
-    // 2. "data" property fallback
-    if (!renderedChildren && typeof (node.props as any).data === "string") {
-      renderedChildren = extractValue.asString((node.props as any).data);
-    }
-
-    // 3. Children fallback
-    if (!renderedChildren) {
-      (node.children ?? []).forEach((child) => {
-        const renderedChild = renderChild(child);
-        if (typeof renderedChild === "string") {
-          renderedChildren += renderedChild;
-        }
-      });
-    }
-
+export const ThemedMarkdown = React.forwardRef<React.ElementRef<typeof Markdown>, ThemedMarkdownProps>(
+  function ThemedMarkdown({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(MarkdownMd);
     return (
-      <TransformedMarkdown
-        className={className}
-        removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
-        removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
-        codeHighlighter={extractValue(node.props.codeHighlighter)}
-        extractValue={extractValue}
-        showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
-        grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
-        truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
-        openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
-        overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
-        breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
-      >
-        {renderedChildren}
-      </TransformedMarkdown>
+      <Markdown
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
+  },
+);
+
+export const markdownComponentRenderer = wrapComponent(
+  COMP,
+  Markdown,
+  MarkdownMd,
+  {
+    exclude: [
+      "content", "removeIndents", "removeBr", "codeHighlighter",
+      "showHeadingAnchors", "grayscale", "truncateLinks", "openLinkInNewTab",
+      "overflowMode", "breakMode", "anchorTemplate",
+    ],
+    customRender(_props, { node, extractValue, renderChild, classes }) {
+      let renderedChildren = "";
+
+      // 1. Static content prop fallback
+      if (!renderedChildren) {
+        renderedChildren = extractValue.asString(node.props.content);
+      }
+
+      // 2. "data" property fallback
+      if (!renderedChildren && typeof (node.props as any).data === "string") {
+        renderedChildren = extractValue.asString((node.props as any).data);
+      }
+
+      // 3. Children fallback
+      if (!renderedChildren) {
+        (node.children ?? []).forEach((child) => {
+          const renderedChild = renderChild(child);
+          if (typeof renderedChild === "string") {
+            renderedChildren += renderedChild;
+          }
+        });
+      }
+
+      return (
+        <TransformedMarkdown
+          classes={classes}
+          removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, true)}
+          removeBr={extractValue.asOptionalBoolean(node.props.removeBr, false)}
+          codeHighlighter={extractValue(node.props.codeHighlighter)}
+          extractValue={extractValue}
+          showHeadingAnchors={extractValue.asOptionalBoolean(node.props.showHeadingAnchors)}
+          grayscale={extractValue.asOptionalBoolean(node.props.grayscale)}
+          truncateLinks={extractValue.asOptionalBoolean(node.props.truncateLinks)}
+          openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
+          overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
+          breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+          anchorRenderer={node.props.anchorTemplate
+            ? (anchorId: string, anchorHref: string) => (
+                <MemoizedItem
+                  node={(node.props as any).anchorTemplate}
+                  contextVars={{ $anchorId: anchorId, $anchorHref: anchorHref }}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+          }
+        >
+          {renderedChildren}
+        </TransformedMarkdown>
+      );
+    },
   },
 );
 
@@ -268,6 +309,7 @@ type TransformedMarkdownProps = {
   removeIndents?: boolean;
   removeBr?: boolean;
   className?: string;
+  classes?: Record<string, string>;
   extractValue: ValueExtractor;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
@@ -276,6 +318,7 @@ type TransformedMarkdownProps = {
   openLinkInNewTab?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
 };
 
 const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>(
@@ -285,6 +328,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       removeIndents,
       removeBr,
       className,
+      classes,
       extractValue,
       codeHighlighter,
       showHeadingAnchors,
@@ -293,6 +337,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       openLinkInNewTab,
       overflowMode,
       breakMode,
+      anchorRenderer,
     }: TransformedMarkdownProps,
     ref,
   ) => {
@@ -335,12 +380,14 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
         removeBr={removeBr}
         codeHighlighter={codeHighlighter}
         className={className}
+        classes={classes}
         showHeadingAnchors={showHeadingAnchors}
         grayscale={grayscale}
         truncateLinks={truncateLinks}
         openLinkInNewTab={openLinkInNewTab}
         overflowMode={overflowMode}
         breakMode={breakMode}
+        anchorRenderer={anchorRenderer}
       >
         {markdownContent}
       </Markdown>

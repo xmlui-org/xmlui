@@ -8,6 +8,8 @@
 
 Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
 
+**Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
+
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |
@@ -198,6 +200,42 @@ By default, the value of this property is `true`.
 ]}' 
     rowsSelectable="true" 
     enableMultiRowSelection="false">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START toggleSelectionOnClick
+
+When `true`, a plain click toggles the row's selection state (adds it if not selected, removes it if already selected) instead of replacing the current selection with just that row.
+This property only has an effect when `rowsSelectable` is `true`. Ctrl+Click and Shift+Click behavior is unchanged.
+
+The default value is `false`.
+
+```xmlui copy /toggleSelectionOnClick="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" toggleSelectionOnClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: toggleSelectionOnClick"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    toggleSelectionOnClick="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -727,6 +765,42 @@ The default value is `false`.
     rowsSelectable="true"
     enableMultiRowSelection="true"
     hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START hideSelectionCheckboxesHeader
+
+Hides the selection checkbox in the table header so it is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via the component API and keyboard shortcuts.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxesHeader="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxesHeader"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxesHeader="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -1305,6 +1379,79 @@ You can use these accelerator key names:
 
 %-PROP-END
 
+%-PROP-START striped
+
+```xmlui copy /striped="true"/
+<App>
+  <Table data='{[...]}' striped="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: striped"
+<App>
+  <Table data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' striped="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+%-PROP-END
+
 %-EVENT-START sortingDidChange
 
 Note the [`canSort`](/docs/reference/components/Column#cansort-default-true) properties on the `Column` components which enable custom ordering.
@@ -1715,6 +1862,42 @@ This event is triggered when a table row is double-clicked. The handler receives
     <Column bindTo="name"/>
   </Table>
 </App>
+```
+
+%-PROP-END
+
+%-PROP-START syncWithVar
+
+The following example demonstrates how two independent `MyTable` components share selection state through a global variable. Selecting a row in either table immediately reflects in the other, and `selState` always holds the current selection:
+
+>[!INFO]
+> `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
+
+```xmlui-pg
+---app copy display /global.selState/ filename="Main.xmlui"
+<App global.selState="{{}}">
+  <MyTable />
+  <Text>Selection: {JSON.stringify(selState)}</Text>
+  <MyTable />
+</App>
+---comp copy display /syncWithVar="selState"/ filename="MyTable.xmlui"
+<Component name="MyTable">
+  <Table
+    syncWithVar="selState"
+    rowsSelectable="true"
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+      { id: 1, name: "Bananas", quantity: 6 },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</Component>
+---desc
+Change the selection in one of the tables and check how it is synced.
 ```
 
 %-PROP-END

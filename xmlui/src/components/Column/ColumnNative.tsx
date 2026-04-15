@@ -1,15 +1,17 @@
-import { useCallback, useId, useMemo } from "react";
+import { memo, useCallback, useId, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { MemoizedItem } from "../../components/container-helpers";
 import { useTableContext } from "./TableContext";
 import type { OurColumnMetadata } from "./TableContext";
-import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useIsomorphicLayoutEffect, useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
 type Props = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];
   renderChild: RenderChildFn;
+  layoutContext?: LayoutContext;
 };
 
 export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
@@ -17,9 +19,24 @@ export const defaultProps: Pick<Props, "canSort" | "canResize"> = {
   canResize: true,
 };
 
-export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) {
+export const Column = memo(function Column({ nodeChildren, renderChild, layoutContext, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
+  // Stabilize columnMetadata so the effect below only fires when actual primitive values change,
+  // not on every render due to new object identity from XMLUI reactive cycle.
+  const stableColumnMetadata = useShallowCompareMemoize(columnMetadata);
+
+  const cellLayoutContext = useMemo(
+    () => createChildLayoutContext(layoutContext, { type: "TableCell" }),
+    [layoutContext],
+  );
+
+  // Use a ref so that cellRenderer stays stable and doesn't re-register columns on
+  // every render. createChildLayoutContext always creates new object references, so
+  // including cellLayoutContext in useCallback deps would cause an infinite loop:
+  // new context → new cellRenderer → registerColumn → state update → re-render → repeat.
+  const cellLayoutContextRef = useRef(cellLayoutContext);
+  cellLayoutContextRef.current = cellLayoutContext;
 
   const cellRenderer = useCallback(
     (row: any, rowIndex: number, colIndex: number, value: any) => {
@@ -35,6 +52,7 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
             $cell: value,
           }}
           renderChild={renderChild}
+          layoutContext={cellLayoutContextRef.current}
         />
       );
     },
@@ -48,12 +66,12 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
   useIsomorphicLayoutEffect(() => {
     registerColumn(
       {
-        ...columnMetadata,
+        ...stableColumnMetadata,
         cellRenderer: safeCellRenderer,
       },
       id,
     );
-  }, [columnMetadata, id, registerColumn, safeCellRenderer]);
+  }, [stableColumnMetadata, id, registerColumn, safeCellRenderer]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {
@@ -61,4 +79,4 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
     };
   }, [id, unRegisterColumn]);
   return null;
-}
+});

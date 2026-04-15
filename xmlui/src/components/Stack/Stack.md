@@ -6,12 +6,46 @@
 - **Flexible spacing**: Configurable gaps between elements with theme-aware sizing
 - **Content wrapping**: Automatic wrapping when space constraints require it
 - **Order control**: Reverse child element order with the reverse property
+- **Dock layout**: Anchor children to edges or fill remaining space using the `dock` prop
 - **Foundation for variants**: Powers HStack, VStack, CHStack, and CVStack specialized components
 
 For common scenarios, consider the specialized variants: [HStack](/docs/reference/components/HStack) (horizontal), [VStack](/docs/reference/components/VStack) (vertical), [CHStack](/docs/reference/components/CHStack) (centered horizontal), and [CVStack](/docs/reference/components/CVStack) (centered vertical).
 
-%-DESC-END
+## Dock Layout
 
+Setting the `dock` prop on any direct child of a `Stack` switches the parent into **DockPanel layout mode**. Children are anchored to the edges of the parent in declaration order, with the remainder of the space filled by the `stretch` child.
+
+| `dock` value | Behavior |
+|---|---|
+| `"top"` | Anchored to the top edge, full width, respects its own `height` |
+| `"bottom"` | Anchored to the bottom edge, full width, respects its own `height` |
+| `"left"` | Anchored to the left of the middle row, respects its own `width` |
+| `"right"` | Anchored to the right of the middle row, respects its own `width` |
+| `"stretch"` | Fills all remaining space in the middle row; its `width` and `height` are ignored |
+
+Children without a `dock` prop participate as undocked items in the middle row alongside any `stretch` child.
+
+> [!NOTE]
+> The parent `Stack` must have a defined `height` for `dock="bottom"` children to anchor to the bottom edge. Without a bounded height the outer flex column has no fixed size and bottom items follow immediately after top items.
+
+```xmlui-pg copy display name="Example: dock layout"
+<App>
+  <Stack height="300px" width="400px" gap="0">
+    <Stack dock="top" height="50px" backgroundColor="coral">
+      <Text>Top</Text>
+    </Stack>
+    <Stack dock="bottom" height="50px" backgroundColor="cornflowerblue">
+      <Text>Bottom</Text>
+    </Stack>
+    <Stack dock="left" width="30%" backgroundColor="lightgreen">
+      <Text>Left</Text>
+    </Stack>
+    <Stack dock="stretch" backgroundColor="lightyellow">
+      <Text>Stretch</Text>
+    </Stack>
+  </Stack>
+</App>
+```
 %-PROP-START gap
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font size of the element (See size values).

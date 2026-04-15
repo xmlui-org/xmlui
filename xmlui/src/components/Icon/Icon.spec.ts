@@ -31,77 +31,25 @@ test.describe("name Property", () => {
     await expect(icon).toBeVisible();
   });
 
-  test("handles non-existent icon name gracefully", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="non-existent-icon"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render when icon name doesn't exist
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles empty string name", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name=""/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with empty string name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles null name value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="{null}"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with null name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles undefined name value", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="{undefined}"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with undefined name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles special characters in name", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="test-icon_with$pecial@chars"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with non-existent special character name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles unicode characters in name", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="测试图标"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with non-existent unicode name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles emoji in name", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="🏠"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with non-existent emoji name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles component-specific icon name syntax", async ({ initTestBed, page }) => {
-    await initTestBed(`<Icon name="component:specific-icon"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with non-existent component-specific name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
-  });
-
-  test("handles very long icon name", async ({ initTestBed, page }) => {
+  test("handles invalid/missing icon names gracefully (no render)", async ({ initTestBed, page }) => {
     const longName = "a".repeat(1000);
-    await initTestBed(`<Icon name="${longName}"/>`);
-    const icon = page.getByTestId("test-id-component");
-    // Component doesn't render with non-existent long name
-    const exists = await icon.count();
-    expect(exists).toBe(0);
+    await initTestBed(`
+      <Fragment>
+        <Icon testId="v1" name="non-existent-icon"/>
+        <Icon testId="v2" name=""/>
+        <Icon testId="v3" name="{null}"/>
+        <Icon testId="v4" name="{undefined}"/>
+        <Icon testId="v5" name="test-icon_with$pecial@chars"/>
+        <Icon testId="v6" name="测试图标"/>
+        <Icon testId="v7" name="🏠"/>
+        <Icon testId="v8" name="component:specific-icon"/>
+        <Icon testId="v9" name="${longName}"/>
+      </Fragment>
+    `);
+    // Component doesn't render when icon name doesn't exist
+    for (let i = 1; i <= 9; i++) {
+      expect(await page.getByTestId(`v${i}`).count()).toBe(0);
+    }
   });
 });
 
@@ -110,89 +58,35 @@ test.describe("name Property", () => {
 // =============================================================================
 
 test.describe("size Property", () => {
-  test("renders with predefined size 'xs'", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="xs"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    // Check computed width/height using CSS
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("12px"); // 0.75em calculated
+  test("renders with predefined sizes (xs, sm, md, lg)", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Icon testId="xs" name="home" size="xs"/>
+        <Icon testId="sm" name="home" size="sm"/>
+        <Icon testId="md" name="home" size="md"/>
+        <Icon testId="lg" name="home" size="lg"/>
+      </Fragment>
+    `);
+    for (const [id, expectedWidth] of [["xs", "12px"], ["sm", "16px"], ["md", "24px"], ["lg", "32px"]] as [string, string][]) {
+      const icon = (await createIconDriver(id)).svgIcon;
+      await expect(icon).toBeVisible();
+      expect(await icon.evaluate((el) => window.getComputedStyle(el).width)).toBe(expectedWidth);
+    }
   });
 
-  test("renders with predefined size 'sm'", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="sm"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("16px"); // 1em calculated
-  });
-
-  test("renders with predefined size 'md'", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="md"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("24px"); // 1.5rem calculated
-  });
-
-  test("renders with predefined size 'lg'", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="lg"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("32px"); // 2em calculated
-  });
-
-  test("renders with custom pixel size", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="48px"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("48px");
-  });
-
-  test("renders with custom em size", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="3em"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("48px"); // 3em calculated at 16px base
-  });
-
-  test("renders with custom rem size", async ({ initTestBed, createIconDriver }) => {
-    await initTestBed(`<Icon testId="icon" name="home" size="2rem"/>`);
-    const iconDrv = await createIconDriver("icon");
-    const icon = iconDrv.svgIcon;
-    await expect(icon).toBeVisible();
-    const computedStyle = await icon.evaluate((el) => {
-      const style = window.getComputedStyle(el);
-      return { width: style.width, height: style.height };
-    });
-    expect(computedStyle.width).toBe("32px"); // 2rem calculated
+  test("renders with custom pixel, em, and rem sizes", async ({ initTestBed, createIconDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Icon testId="px" name="home" size="48px"/>
+        <Icon testId="em" name="home" size="3em"/>
+        <Icon testId="rem" name="home" size="2rem"/>
+      </Fragment>
+    `);
+    for (const [id, expectedWidth] of [["px", "48px"], ["em", "48px"], ["rem", "32px"]] as [string, string][]) {
+      const icon = (await createIconDriver(id)).svgIcon;
+      await expect(icon).toBeVisible();
+      expect(await icon.evaluate((el) => window.getComputedStyle(el).width)).toBe(expectedWidth);
+    }
   });
 
   test("handles invalid size gracefully", async ({ initTestBed, createIconDriver }) => {

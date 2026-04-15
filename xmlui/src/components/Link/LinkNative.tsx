@@ -11,10 +11,11 @@ import classnames from "classnames";
 
 import styles from "./Link.module.scss";
 import { capitalizeFirstLetter } from "../../components-core/utils/misc";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { BreakMode, LinkTarget, OverflowMode } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import type { To } from "react-router-dom";
 import { Part } from "../Part/Part";
 import { PART_ICON } from "../../components-core/parts";
@@ -25,15 +26,17 @@ import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 
 type Props = {
   to: string | { pathname: string; queryParams?: Record<string, any> };
-  children: ReactNode;
+  children?: ReactNode;
+  label?: string;
   icon?: string;
   active?: boolean;
-  disabled?: boolean;
+  enabled?: boolean;
   horizontalAlignment?: string;
   verticalAlignment?: string;
   onClick?: () => void;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   noIndicator?: boolean;
   maxLines?: number;
   preserveLinebreaks?: boolean;
@@ -47,9 +50,9 @@ type Props = {
   >
 >;
 
-export const defaultProps: Pick<Props, "active" | "disabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
+export const defaultProps: Pick<Props, "active" | "enabled" | "noIndicator" | "preserveLinebreaks" | "ellipses"> = {
   active: false,
-  disabled: false,
+  enabled: true,
   noIndicator: false,
   preserveLinebreaks: false,
   ellipses: true,
@@ -62,15 +65,17 @@ export const LinkNative = forwardRef(function LinkNative(
   const {
     to,
     children,
+    label,
     icon,
     active = defaultProps.active,
     onClick,
     target,
-    disabled = defaultProps.disabled,
+    enabled = defaultProps.enabled,
     horizontalAlignment,
     verticalAlignment,
     style,
     className,
+    classes,
     noIndicator = defaultProps.noIndicator,
     maxLines = 0,
     preserveLinebreaks = defaultProps.preserveLinebreaks,
@@ -80,7 +85,8 @@ export const LinkNative = forwardRef(function LinkNative(
     ...anchorProps
   } = specifyTypes(props);
 
-  const iconLink = !!icon && !children;
+  const content = label ?? children;
+  const iconLink = !!icon && !content;
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
   }, [to]) as To;
@@ -176,20 +182,21 @@ export const LinkNative = forwardRef(function LinkNative(
     <Node
       {...anchorProps}
       ref={forwardedRef as any}
-      // This line is needed to make download work with Link
+      // reloadDocument is a react-router-dom <Link>-only prop; omit it for plain divs.
       // Ref: https://v2.remix.run/docs/components/link#reloaddocument
-      reloadDocument={anchorProps.download !== undefined}
+      {...(to ? { reloadDocument: anchorProps.download !== undefined } : {})}
       to={smartTo}
       target={target}
       onClick={onClick}
       className={classnames(
-        className,
         styles.container,
+        classes?.[COMPONENT_PART_KEY],
+        className,
         {
           [styles.noIndicator]: noIndicator,
           [styles.iconLink]: iconLink,
           [styles.active]: active,
-          [styles.disabled]: disabled,
+          [styles.disabled]: !enabled,
           // When any overflow/text feature is active the container must be
           // allowed to shrink (min-width:0) and must clip its flex children.
           [styles.textOverflowContainer]: hasOverflowFeature,
@@ -202,16 +209,16 @@ export const LinkNative = forwardRef(function LinkNative(
       {icon && (
         <Part partId={PART_ICON}>
           <div className={styles.iconWrapper}>
-            <Icon name={icon} />
+            <ThemedIcon name={icon} />
           </div>
         </Part>
       )}
       {hasOverflowFeature ? (
         <span className={classnames(styles.textSpan, textSpanClasses)} style={textSpanStyle}>
-          {children}
+          {content}
         </span>
       ) : (
-        children
+        content
       )}
     </Node>
   );

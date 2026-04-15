@@ -16,11 +16,12 @@ import {
   createComponentRenderer,
   createUserDefinedComponentRenderer,
 } from "./components-core/renderers";
+import { wrapComponent, wrapCompound } from "./components-core/wrapComponent";
 import type { TreeNode } from "./components-core/abstractions/treeAbstractions";
-import { Icon } from "./components/Icon/IconNative";
+import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
-import { Stack } from "./components/Stack/StackNative";
-import { Button } from "./components/Button/ButtonNative";
+import { ThemedStack as Stack } from "./components/Stack/Stack";
+import { ThemedButton as Button } from "./components/Button/Button";
 import { Splitter } from "./components/Splitter/SplitterNative";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
@@ -28,6 +29,7 @@ import { getColor } from "./components-core/utils/css-utils";
 import { useColors } from "./components-core/utils/hooks";
 import type {
   ComponentRendererDef,
+  CompoundComponentRendererInfo,
   RegisterComponentApiFn,
   RendererContext,
 } from "./abstractions/RendererDefs";
@@ -36,26 +38,40 @@ import StandaloneExtensionManager from "./components-core/StandaloneExtensionMan
 import type { ThemeDefinition, ThemeTone } from "./abstractions/ThemingDefs";
 import { useDevTools } from "./components-core/InspectorContext";
 import { useLogger } from "./logging/LoggerContext";
-import { TabItemComponent } from "./components/Tabs/TabItemNative";
-import { Tabs } from "./components/Tabs/TabsNative";
+import { ThemedTabItem as TabItemComponent } from "./components/Tabs/TabItem";
+import { ThemedTabs as Tabs } from "./components/Tabs/Tabs";
 import { errReportComponent, xmlUiMarkupToComponent } from "./components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "./components-core/interception/ApiInterceptorProvider";
-import { Spinner } from "./components/Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "./components/Spinner/Spinner";
 import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
-import { Text } from "./components/Text/TextNative";
-import { TextBox } from "./components/TextBox/TextBoxNative";
+import { ThemedText as Text } from "./components/Text/Text";
+import { ThemedTextBox as TextBox } from "./components/TextBox/TextBox";
 import { NestedApp } from "./components/NestedApp/NestedAppNative";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
-import { LinkNative } from "./components/Link/LinkNative";
-import { Breakout } from "./components/Breakout/BreakoutNative";
+import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
+import { ThemedHeading as Heading } from "./components/Heading/Heading";
+import { ThemedImage as Image } from "./components/Image/Image";
+import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
+import { ThemedTableOfContents as TableOfContents } from "./components/TableOfContents/TableOfContents";
+import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
+import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
+import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
 import { Theme } from "./components/Theme/ThemeNative";
-import { useSearchContextContent } from "./components/App/SearchContext";
+import { OptionContext, useOption } from "./components/Select/OptionContext";
+
+import {
+  type SearchItemData,
+  useSearchContextContent,
+  SEARCH_DEFAULT_CATEGORY,
+  SEARCH_CATEGORIES,
+} from "./components/App/SearchContext";
 import { useAppLayoutContext } from "./components/App/AppLayoutContext";
+import { useComponentThemeClass } from "./components-core/theming/utils";
 import { StyleProvider } from "./components-core/theming/StyleContext";
 import { StyleRegistry } from "./components-core/theming/StyleRegistry";
 import { useEvent } from "./components-core/utils/misc";
@@ -102,15 +118,22 @@ import {
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
 import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
 import { Tooltip } from "./components/Tooltip/TooltipNative";
-import { DropdownMenu, MenuItem } from "./components/DropdownMenu/DropdownMenuNative";
+import {
+  ThemedDropdownMenu as DropdownMenu,
+  ThemedMenuItem as MenuItem,
+} from "./components/DropdownMenu/DropdownMenu";
 import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
 import { MemoizedItem } from "./components/container-helpers";
+import { HiddenOption } from "./components/Select/HiddenOption";
+import OptionTypeProvider from "./components/Option/OptionTypeProvider";
+import type { Option } from "./components/abstractions";
 
 export type {
   ThemeDefinition,
   ComponentDef,
   ComponentRendererDef,
   CompoundComponentDef,
+  CompoundComponentRendererInfo,
   PropertyValueDescription,
   ComponentLike,
   StandaloneAppDescription,
@@ -123,6 +146,7 @@ export type {
   ComponentMetadata,
   ThemeTone,
   XmlUiNode,
+  SearchItemData,
 };
 export {
   StandaloneApp,
@@ -196,12 +220,20 @@ export {
   NestedApp,
   VisuallyHidden,
   LinkNative,
+  Heading,
+  Image,
+  Markdown,
+  TableOfContents,
+  FlowLayout,
+  FlowItemWrapper,
+  COMPONENT_PART_KEY,
+  useAppContext,
   ToneChangerButton,
   NavPanelCollapseButton,
   Logo,
-  Breakout,
   useSearchContextContent,
   useAppLayoutContext,
+  useComponentThemeClass,
   StyleProvider,
   StyleRegistry,
   useEvent,
@@ -213,4 +245,13 @@ export {
   MenuItem,
   ContentSeparator,
   MemoizedItem,
+  SEARCH_DEFAULT_CATEGORY,
+  SEARCH_CATEGORIES,
+  wrapComponent,
+  wrapCompound,
+  HiddenOption,
+  OptionTypeProvider,
+  Option,
+  OptionContext,
+  useOption,
 };

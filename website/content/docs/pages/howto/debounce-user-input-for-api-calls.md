@@ -2,19 +2,32 @@
 
 Use `debounce` to delay function execution until user input pauses, reducing unnecessary API calls. The following example implements search within a product catalog (sample products are Laptop, Mouse, Keyboard, etc.).
 
-```xmlui-pg copy display name="Search with debounced API calls" height="400px"
----comp display /debounce/
-<Component 
-  name="DebouncedSearch" 
+```xmlui-pg copy display name="Search with debounced API calls" height="440px"
+---app display /debounce/
+<App 
   var.searchTerm="" 
   var.results="{[]}"
+  var.invoked="{0}"
+  var.changed="{0}"
   var.inProgress="{false}">
+
+  <!--
+  products: [
+    { id: 1, name: 'Laptop', price: 999, category: 'Electronics' },
+    { id: 2, name: 'Mouse', price: 29, category: 'Electronics' },
+    { id: 3, name: 'Keyboard', price: 79, category: 'Electronics' },
+    { id: 4, name: 'Monitor', price: 299, category: 'Electronics' },
+    { id: 5, name: 'Desk Chair', price: 199, category: 'Furniture' },
+    { id: 6, name: 'Desk Lamp', price: 49, category: 'Furniture' }
+  ]
+  -->
   <VStack>
     <TextBox
       label="Search products:"
       placeholder="Type to search..."
       onDidChange="e => {
         searchTerm = e;
+        changed++;
         inProgress = true;
         // Only call API after 500ms of no typing
         debounce(500, (term) => {
@@ -25,10 +38,12 @@ Use `debounce` to delay function execution until user input pauses, reducing unn
           });
           results = response.status === 'ok' ? response.results : [];
           inProgress = false;
+          invoked++;
         }, e);
       }"
     />
 
+    <Text>Changed/Invoked: {changed} / {invoked}</Text>
     <Card when="{searchTerm.length > 0}">
       <VStack>
         <Text when="{inProgress}" variant="em">
@@ -48,10 +63,6 @@ Use `debounce` to delay function execution until user input pauses, reducing unn
       </VStack>
     </Card>
   </VStack>
-</Component>
----app display
-<App>
-  <DebouncedSearch />
 </App>
 ---api
 {

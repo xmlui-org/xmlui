@@ -2,9 +2,10 @@ import {
   componentsSection,
   extensionsSection,
   docsContent,
-  plainTextDocsContent,
-  plainTextBlogContent,
+  staticSearchData,
   prefetchedContent,
+  posts,
+  allPosts,
   shikiHighlighter,
   highlight,
   getLocalIcons,
@@ -13,11 +14,21 @@ import type { StandaloneAppDescription } from "xmlui";
 import XmluiLandingTheme from "./themes/landing-theme";
 import XmluiWebSiteTheme from "./themes/website-theme";
 import EarthtoneTheme from "./themes/earthtone";
+import XmluiGreenTheme from "./themes/xmlui-green-on-default";
+import XmluiOrangeTheme from "./themes/xmlui-orange-on-default";
+import XmluiGrayTheme from "./themes/xmlui-gray-on-default";
 
 const App: StandaloneAppDescription = {
-  name: "XMLUI Website",
+  name: "XMLUI",
   defaultTheme: "xmlui-website-theme",
-  themes: [XmluiLandingTheme, XmluiWebSiteTheme, EarthtoneTheme],
+  themes: [
+    XmluiLandingTheme,
+    XmluiWebSiteTheme,
+    EarthtoneTheme,
+    XmluiGreenTheme,
+    XmluiOrangeTheme,
+    XmluiGrayTheme,
+  ],
   icons: getLocalIcons(),
   resources: {
     logo: "/resources/logo.svg",
@@ -33,9 +44,10 @@ const App: StandaloneAppDescription = {
       extensions: extensionsSection,
     },
     docsContent,
-    plainTextDocsContent,
-    plainTextBlogContent,
+    staticSearchData,
     prefetchedContent,
+    posts,
+    allPosts,
     codeHighlighter: {
       availableLangs: shikiHighlighter.getLoadedLanguages(),
       highlight,

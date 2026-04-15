@@ -20,9 +20,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -55,6 +55,12 @@ This property indicates whether the input accepts user actions (`true`) or not (
 </App>
 ```
 
+### `gap` [#gap]
+
+> [!DEF]  default: **"$gap-normal"**
+
+This property sets the gap between the radio options in the group. Accepts any valid CSS size value or a theme token (e.g. `$gap-normal`).
+
 ### `initialValue` [#initialvalue]
 
 > [!DEF]  default: **""**
@@ -74,6 +80,19 @@ This property defines the initial value of the selected option within the group.
   </RadioGroup>
 </App>
 ```
+
+### `orientation` [#orientation]
+
+> [!DEF]  default: **"vertical"**
+
+This property sets the layout direction of the radio options within the group. Use `horizontal` to arrange them in a row, or `vertical` (default) to stack them.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `horizontal` | The component will fill the available space horizontally |
+| `vertical` | The component will fill the available space vertically **(default)** |
 
 ### `readOnly` [#readonly]
 
@@ -215,19 +234,19 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroup | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $backgroundColor--disabled | $backgroundColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-RadioGroupOption | $color-primary-500 | $color-primary-500 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default | $color-surface-500 | $color-surface-500 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--active | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default | $color-surface-500 | $color-surface-500 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default--active | $color-primary-500 | $color-primary-500 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default--active | $color-primary-500 | $color-primary-500 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default--hover | $color-surface-700 | $color-surface-700 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default--hover | $color-surface-700 | $color-surface-700 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | $borderColor-Input--error | $borderColor-Input--error |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--success | $borderColor-Input--success | $borderColor-Input--success |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--warning | $borderColor-Input--warning | $borderColor-Input--warning |
@@ -238,12 +257,13 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption | $fontSize-sm | $fontSize-sm |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-RadioGroupOption | $fontWeight-bold | $fontWeight-bold |
+| [gap](/docs/styles-and-themes/common-units/#size)-RadioGroup | $gap-normal | $gap-normal |
 | [gap](/docs/styles-and-themes/common-units/#size)-RadioGroupOption | 0.25em | 0.25em |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-RadioGroupOption--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-RadioGroupOption--focus | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--default | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-RadioGroupOption--error | *none* | *none* |

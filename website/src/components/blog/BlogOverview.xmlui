@@ -2,14 +2,13 @@
     <script>
         var layout = getThemeVar("layout") || "basic";
         var showTags = getThemeVar("tags") !== "false";
-        var sortedPosts = (posts || [])
+        var sortedPosts = (appGlobals.posts || [])
             .filter((p) => !p.draft)
             .toSorted((a, b) => Date.parse(b.date) - Date.parse(a.date));
         var allTags = distinct(sortedPosts.flatMap((p) => p.tags || [])).toSorted();
         var latestPost = sortedPosts.length
             ? sortedPosts.reduce((latest, p) => Date.parse(p.date) > Date.parse(latest.date) ? p : latest)
             : null;
-        var gridCols = mediaSize.sizeIndex > 3 ? 3 : mediaSize.sizeIndex > 2 ? 2 : 1;
         var postsByTag = allTags.map((tag) => ({
             tag,
             posts: sortedPosts.filter((p) => p.tags && p.tags.includes(tag)),
@@ -41,7 +40,6 @@
                 sortedPosts="{sortedPosts}"
                 showTags="{showTags}"
                 postsByTag="{postsByTag}"
-                gridCols="{gridCols}"
             />
         </VStack>
     </CHStack>

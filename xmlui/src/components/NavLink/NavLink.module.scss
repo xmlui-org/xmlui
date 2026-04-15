@@ -98,6 +98,7 @@ $transition: color 0.1s, background-color 0.1s;
       cursor: pointer;
       display: flex;
       align-items: center;
+      text-align: start;
       font-size: $fontSize-NavLink;
       font-weight: $fontWeight-NavLink;
       font-family: $fontFamily-NavLink;

@@ -21,9 +21,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -163,6 +163,12 @@ This method returns the current value of the ColorPicker.
 
 **Signature**: `get value(): string`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`input`**: The color picker input element.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]
@@ -170,36 +176,36 @@ This method returns the current value of the ColorPicker.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ColorPicker | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--default--focus | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--error--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--success--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--warning | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--warning--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ColorPicker--warning--hover | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ColorPicker--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ColorPicker | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ColorPicker--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ColorPicker--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ColorPicker--warning | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ColorPicker--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ColorPicker | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ColorPicker--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ColorPicker--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-ColorPicker--warning | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ColorPicker--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ColorPicker | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ColorPicker--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ColorPicker--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-ColorPicker--warning | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--default | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--default--focus | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--error--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--success--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-ColorPicker--success--hover | *none* | *none* |

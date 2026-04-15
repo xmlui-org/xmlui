@@ -15,8 +15,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -202,7 +202,7 @@ This component does not expose any methods.
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-Badge-pill | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Badge | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Badge-pill | *none* | *none* |
-| [textAlign](/docs/styles-and-themes/common-units/#text-align)-Badge | *none* | *none* |
+| [textAlign](/docs/styles-and-themes/common-units/#text-align)-Badge | center | center |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-Badge-pill | *none* | *none* |
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-Badge | *none* | *none* |
 | [textAlignLast](/docs/styles-and-themes/common-units/#text-align)-Badge-pill | *none* | *none* |

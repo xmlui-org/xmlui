@@ -9,7 +9,8 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     // --- App layout
     "width-navPanel-App": "280px",
     "maxWidth-content-App": "1000px",
-    "maxWidth-content-NoToc": "700px",
+    "maxWidth-content-DocumentPageNoTOC": "700px",
+    "height-AppHeader": "44px",
 
     layout: "basic",
     tableOfContents: "false",
@@ -18,17 +19,19 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "maxWidth-content-HomePage": "800px",
     "maxWidth-content-BlogOverview": "800px",
     "maxWidth-content-BlogPage": "800px",
-    "maxWidth-content-GetStartedPage": "800px",
+    "maxWidth-md-content-GetStartedPage": "800px",
+    "maxWidth-content-GetStartedPage": "100%",
 
     "paddingVertical-NavPanel": "0",
     "marginBottom-logo-NavPanel": "0",
+    "paddingHorizontal-NavPanel": "$space-4",
+    "paddingHorizontal-md-NavPanel": "0",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
-    "backgroundColor": "$color-surface-0",
-    "fontSize": "15px",
-    "fontFamily-monospace":
-      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    backgroundColor: "$color-surface-0",
+    fontSize: "15px",
+    "fontFamily-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
     "font-feature-settings": "'cv03', 'ss03'",
     "fontSize-code": "13px",
     "textColor-Text": "$color-surface-600",
@@ -37,6 +40,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "iconAlignment-NavLink": "baseline",
     "fontSize-NavLink": "14px",
     "fontWeight-NavLink": "500",
+    "backgroundColor-NavLink--active": "$color-surface-100",
     "textColor-NavLink": "$color-surface-500",
     "textColor-NavLink--active": "$color-surface-900",
     "textColor-NavLink--hover": "$color-surface-700",
@@ -57,8 +61,7 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "borderLeft-TableOfContentsItem": "2px solid $color-surface-100",
     "fontWeight-TableOfContentsItem--active": "$fontWeight-normal",
     "textColor-TableOfContentsItem--active": "$color-surface-900",
-    "borderLeft-TableOfContentsItem--active":
-      "2px solid $color-surface-900",
+    "borderLeft-TableOfContentsItem--active": "2px solid $color-surface-900",
 
     // --- Content layout
     "textColor-Heading": "$color-surface-900",
@@ -78,10 +81,10 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "fontSize-H4": "$fontSize-lg",
     "marginBottom-H4-markdown": "$space-1",
     "fontWeight-PrevNextLink": "500",
-    "textColor-PrevNextLink": "$color-surface-900",
-    "padding-PrevNextLink": "4px",
-    "fontSize-PrevNextText": "13px",
-    "textColor-PrevNextText": "$color-surface-500",
+    "textColor-prevNextLink-DocumentLinks": "$color-surface-900",
+    "padding-prevNextLink-DocumentLinks": "4px",
+    "fontSize-prevNextText-DocumentLinks": "13px",
+    "textColor-prevNextText-DocumentLinks": "$color-surface-500",
     "backgroundColor-Card--hover": "$color-surface-50",
     "backgroundColor-CodeBlock": "$color-surface-100",
     "textColor-Link": "$color-surface-600",
@@ -92,12 +95,30 @@ export const XmluiWebSiteTheme: ThemeDefinition = {
     "border-ScrollToTop": "1px solid $color-surface-200",
     "color-ScrollToTop": "$color-surface-900",
 
-    // --- Drawer close button
+    // --- Drawer
+    "maxWidth-Drawer": "100%",
     "top-CloseButton": "$space-3",
     "right-CloseButton": "$space-3",
 
     // --- Search
+    "textColor-SearchToggleButton": "$color-surface-500",
+    "textColor-SearchToggleButton--hover": "$color-surface-700",
     "backgroundColor-SearchItem--hover": "$color-surface-50",
+
+    // --- Headlines
+    "paddingTop-Headlines": "$space-14",
+    "paddingTop-md-Headlines": "$space-20",
+    "fontSize-heading-Headlines": "36px",
+    "fontSize-md-heading-Headlines": "42px",
+    "lineHeight-heading-Headlines": "1.2",
+    "fontSize-sub-Headlines": "24px",
+    "lineHeight-sub-Headlines": "1.3",
+
+    // --- Benefit
+    "marginTop-Benefit": "6px",
+    "size-icon-Benefit": "24px",
+    "maxWidth-md-Benefit": "600px",
+    "maxWidth-Benefit": "400px",
   },
   resources: {},
 };

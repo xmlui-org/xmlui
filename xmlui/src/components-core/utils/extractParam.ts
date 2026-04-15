@@ -2,7 +2,8 @@ import React, { type CSSProperties } from "react";
 import { isPlainObject } from "lodash-es";
 
 import type { ContainerState } from "../rendering/ContainerWrapper";
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { evalBinding } from "../script-runner/eval-tree-sync";
@@ -176,6 +177,91 @@ export function shouldKeep(
 }
 
 /**
+ * Resolves the effective "when" value for a component, applying Tailwind-style
+ * min-width (mobile-first) responsive overrides.
+ *
+ * If no responsiveWhen entries are defined, delegates to the plain shouldKeep (base `when`).
+ * Otherwise, treats responsiveWhen as the exclusive source of truth:
+ * - For the current sizeIndex, walks from the current breakpoint down to "xs"
+ * - Returns the first defined responsive value found
+ * - If no responsive rule matches, returns false (hidden by default)
+ * - If sizeIndex is undefined, falls back to base `when`
+ *
+ * @param when Base visibility condition
+ * @param responsiveWhen Per-breakpoint visibility overrides (Tailwind mobile-first)
+ * @param componentState Current component state
+ * @param appContext Application context with mediaSize information
+ * @returns The effective visibility (true=show, false=hide)
+ */
+export function resolveResponsiveWhen(
+  when: string | boolean | undefined,
+  responsiveWhen: Partial<Record<MediaBreakpointType, string | boolean>> | undefined,
+  componentState: ContainerState,
+  appContext?: AppContextObject,
+): boolean {
+  // If no responsive rules are defined, use base `when` (backward compatibility)
+  if (!responsiveWhen || Object.keys(responsiveWhen).length === 0) {
+    return shouldKeep(when, componentState, appContext);
+  }
+
+  const sizeIndex = appContext?.mediaSize?.sizeIndex;
+
+  if (sizeIndex === undefined) {
+    // --- SSR mode: `document` is not available, so the viewport breakpoint is unknown.
+    if (typeof document === "undefined") {
+      // Point 1: Render the component if it would be visible at *any* breakpoint.
+      // This ensures SSR output includes the component for crawlers and initial HTML.
+      const isVisibleAtAnyBreakpoint = MediaBreakpointKeys.some((bp) => {
+        if (responsiveWhen[bp] === undefined) return false;
+        return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+      });
+      if (isVisibleAtAnyBreakpoint) {
+        // TODO (Point 2): Generate a responsive CSS class (e.g. via a media-query stylesheet)
+        // and attach its class name to the component so the browser can apply the correct
+        // visibility on first paint before React hydration runs.
+        return true;
+      }
+      return false;
+    }
+
+    // Client-side but sizeIndex not yet computed (media queries still resolving on first
+    // render). Suppress rendering to avoid a flash where multiple mutually-exclusive
+    // responsive components briefly appear together before the breakpoint is known.
+    return false;
+  }
+
+  // Walk from current breakpoint down to xs (Tailwind mobile-first)
+  for (let i = sizeIndex; i >= 0; i--) {
+    const bp = MediaBreakpointKeys[i];
+    if (responsiveWhen[bp] !== undefined) {
+      return asOptionalBoolean(extractParam(componentState, responsiveWhen[bp], appContext, true)) ?? true;
+    }
+  }
+
+  // No responsive rule matched for the current viewport (all rules are above it).
+  // If an explicit base `when` is set, honour it.
+  if (when !== undefined) {
+    return shouldKeep(when, componentState, appContext);
+  }
+
+  // No base `when` and no rule covers the current viewport — infer the implied base
+  // from the *lowest* defined responsive rule (mirrors buildWhenStyleObject logic):
+  //   lowest rule is truthy  → visibility is opt-in, so implied base is false (hidden)
+  //   lowest rule is falsy   → visibility is opt-out, so implied base is true  (visible)
+  // Walk ascending (xs → xxl) to find the first defined rule.
+  for (const bp of MediaBreakpointKeys) {
+    if (responsiveWhen![bp] !== undefined) {
+      const lowestValue =
+        asOptionalBoolean(extractParam(componentState, responsiveWhen![bp], appContext, true)) ?? true;
+      return !lowestValue;
+    }
+  }
+
+  // Responsive rules map was non-empty but nothing found — should not happen.
+  return true;
+}
+
+/**
  * Resolves props that can either be regular properties or URL resources.
  * It also removes layoutCss props from regular properties.
  * @param props Component (rest) props
@@ -238,9 +324,18 @@ export function removeStylesFromProps(
     delete nodeProps["class"];
   }
 
-  const filterKeys = layoutOptionKeys;
   return Object.fromEntries(
-    Object.entries(nodeProps).filter(([key]) => !filterKeys.includes(key)),
+    Object.entries(nodeProps).filter(([key]) => {
+      if (layoutOptionKeys.includes(key)) return false;
+      // Filter responsive variants like fontSize-md, backgroundColor-lg, etc.
+      const dashIdx = key.lastIndexOf("-");
+      if (dashIdx > 0) {
+        const base = key.slice(0, dashIdx);
+        const suffix = key.slice(dashIdx + 1) as any;
+        if (layoutOptionKeys.includes(base) && MediaBreakpointKeys.includes(suffix)) return false;
+      }
+      return true;
+    }),
   );
 }
 

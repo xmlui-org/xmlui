@@ -173,7 +173,7 @@ function transformStops(stops) {
 }
 ```
 
-> [!INFO] The code-behind file for the application root, `Main.xmlui.xs`, is special. All variables and functions declared here are [global variables](/docs/guides/markup#global-variables).
+> [!INFO] The `Globals.xs` file is special. All variables and functions declared there are [global variables](/docs/guides/markup#global-variables) visible to all components. `Main.xmlui.xs` declarations are local to the Main component, just like any other code-behind file.
 
 ## index.html vs code-behind
 

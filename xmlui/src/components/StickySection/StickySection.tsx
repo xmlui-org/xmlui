@@ -1,6 +1,6 @@
 import styles from "./StickySection.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { StickySection, defaultProps } from "./StickySectionNative";
 import { createMetadata } from "../metadata-helpers";
@@ -33,18 +33,6 @@ export const StickySectionMd = createMetadata({
   },
 });
 
-export const stickySectionComponentRenderer = createComponentRenderer(
-  COMP,
-  StickySectionMd,
-  ({ node, renderChild, extractValue, className }) => {
-    return (
-      <StickySection
-        uid={node.uid}
-        stickTo={extractValue.asOptionalString(node.props?.stickTo)}
-        className={className}
-      >
-        {renderChild(node.children)}
-      </StickySection>
-    );
-  },
-);
+export const stickySectionComponentRenderer = wrapComponent(COMP, StickySection, StickySectionMd, {
+  passUid: true,
+});

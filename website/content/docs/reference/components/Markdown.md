@@ -133,12 +133,16 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
+
+### `anchorTemplate` [#anchortemplate]
+
+An optional template to customize the anchor link rendered next to each heading. Requires `showHeadingAnchors` to be `true`. The template receives `$anchorId` and `$anchorHref` as context variables.
 
 ### `breakMode` [#breakmode]
 

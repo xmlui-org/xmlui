@@ -1,7 +1,7 @@
-import { createUserDefinedComponentRenderer, dClick, dGotFocus, dLostFocus } from "xmlui";
+import { createUserDefinedComponentRenderer, dClick, dGotFocus, dLostFocus, PropertyValueDescription } from "xmlui";
 import { createMetadata } from "xmlui";
+import type { ComponentMetadata, CompoundComponentRendererInfo } from "xmlui";
 import componentSource from "./FancyButton.xmlui";
-import { PropertyValueDescription } from "xmlui/src/abstractions/ComponentDefs";
 
 export const alignmentOptionMd: PropertyValueDescription[] = [
   { value: "center", description: "Place the content in the middle" },
@@ -62,7 +62,7 @@ const fancyButtonVariantMd = [
   { value: "outlinedPill", description: "Outlined pill variant with fully rounded edges" },
 ];
 
-export const FancyButtonMd = createMetadata({
+export const FancyButtonMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "`FancyButton` is an enhanced interactive component for triggering actions with " +
@@ -72,20 +72,20 @@ export const FancyButtonMd = createMetadata({
     autoFocus: {
       description: "Indicates if the button should receive focus when the page loads.",
       isRequired: false,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: false,
     },
     variant: {
       description: "The button variant determines the visual style and corner treatment.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       availableValues: fancyButtonVariantMd,
       defaultValue: "rounded",
     },
     size: {
       description: "Sets the size of the button.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       availableValues: sizeMd,
       defaultValue: "md",
     },
@@ -95,7 +95,7 @@ export const FancyButtonMd = createMetadata({
         `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
         `small icon button. When the ${COMP} has nested children, it will display them and ` +
         `ignore the value of the \`label\` prop.`,
-      type: "string",
+      valueType: "string",
     },
     type: {
       description:
@@ -109,7 +109,7 @@ export const FancyButtonMd = createMetadata({
       description:
         `The value of this property indicates whether the button accepts actions (\`true\`) ` +
         `or does not react to them (\`false\`).`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: true,
     },
     icon: {
@@ -117,12 +117,12 @@ export const FancyButtonMd = createMetadata({
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
         `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
         `displays only that icon.`,
-      type: "string",
+      valueType: "string",
     },
     iconPosition: {
       description: `This optional string determines the location of the icon in the ${COMP}.`,
       availableValues: iconPositionMd,
-      type: "string",
+      valueType: "string",
       defaultValue: "start",
     },
     contentPosition: {
@@ -130,12 +130,12 @@ export const FancyButtonMd = createMetadata({
         `This optional value determines how the label and icon (or nested children) should be placed` +
         `inside the ${COMP} component.`,
       availableValues: alignmentOptionMd,
-      type: "string",
+      valueType: "string",
       defaultValue: "center",
     },
     contextualLabel: {
       description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
-      type: "string",
+      valueType: "string",
     },
   },
   events: {
@@ -218,7 +218,7 @@ export const FancyButtonMd = createMetadata({
   },
 });
 
-export const fancyButtonRenderer = createUserDefinedComponentRenderer(
+export const fancyButtonRenderer: CompoundComponentRendererInfo = createUserDefinedComponentRenderer(
   FancyButtonMd,
   componentSource,
 );

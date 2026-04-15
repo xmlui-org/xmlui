@@ -1,3 +1,3 @@
-import playground from "xmlui-playground";
+import playground from "./src/extension";
 
 export default [playground];

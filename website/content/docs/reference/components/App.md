@@ -14,7 +14,7 @@ This component supports the following behaviors:
 | Behavior | Properties |
 | --- | --- |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Publish/Subscribe | `subscribeToTopic` |
+| Display When | `displayWhen` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
@@ -34,6 +34,12 @@ This property sets the app's default theme.
 This property sets the app's default tone ("light" or "dark").
 
 Available values: `light`, `dark`
+
+### `fitContent` [#fitcontent]
+
+> [!DEF]  default: **false**
+
+When `true`, the app sizes itself to its content's natural height rather than filling its container's viewport. Intended for embedding an app inside an iframe or as a block within a larger page: the host page becomes the sole scroll container. This overrides `scrollWholePage`'s viewport pinning.
 
 ### `layout` [#layout]
 
@@ -550,6 +556,9 @@ This component does not expose any methods.
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App | $maxWidth-content | $maxWidth-content |
 | [maxWidth-content](/docs/styles-and-themes/common-units/#size-values)-App--withToc | *none* | *none* |
+| [maxWidth](/docs/styles-and-themes/common-units/#size-values)-drawer-App | 100% | 100% |
+| right-closeButton-App | $space-2 | $space-2 |
+| top-closeButton-App | $space-2 | $space-2 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-App | $space-64 | $space-64 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-navPanel-collapsed-App | 48px | 48px |
 

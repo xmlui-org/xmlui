@@ -150,7 +150,7 @@ export class ButtonDriver extends ComponentDriver {
 
   // NOTE: Accounts for icons being passed as children as well
   getIcons() {
-    return this.locator.locator('[data-icon-name]');
+    return this.locator.locator("[data-icon-name]");
   }
 }
 
@@ -530,24 +530,6 @@ type MockExternalApiOptions = {
   body?: Record<string, any>;
 };
 
-export class BackdropDriver extends ComponentDriver {
-  getBackdrop() {
-    return this.component.locator("> *").first();
-  }
-
-  getOverlay() {
-    return this.component.locator("> *").nth(1);
-  }
-
-  getDefaultBackgroundColor() {
-    return "rgba(0, 0, 0, 0)"; // Default backdrop color
-  }
-
-  getDefaultOpacity() {
-    return "0.1"; // Default backdrop opacity
-  }
-}
-
 export class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
     const { status = 200, headers = {}, body = {} } = apiOptions;
@@ -600,7 +582,7 @@ export class FormDriver extends ComponentDriver {
     return requestPromise;
   }
 
-  getSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
+  waitForSubmitResponse(endpoint = "/entities", responseStatus = 200, timeout = 5000) {
     const responsePromise = this.page.waitForResponse(
       (response) => response.url().includes(endpoint) && response.status() === responseStatus,
       { timeout },
@@ -1045,7 +1027,7 @@ export class FormItemDriver extends ComponentDriver {
   }
 
   get textBox() {
-    return this.input.getByRole("textbox");
+    return this.input.getByRole("textbox").or(this.input.getByRole("spinbutton"));
   }
 
   get checkbox() {

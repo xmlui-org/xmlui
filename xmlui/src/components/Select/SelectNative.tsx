@@ -11,6 +11,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
@@ -18,7 +19,8 @@ import { noop } from "../../components-core/constants";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
-import Icon from "../Icon/IconNative";
+import { createLogEntry, pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { ThemedIcon } from "../Icon/Icon";
 import { SelectContext, useSelect } from "./SelectContext";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { HiddenOption } from "./HiddenOption";
@@ -26,7 +28,7 @@ import { SimpleSelect } from "./SimpleSelect";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
-import { useFormContextPart } from "../Form/FormContext";
+import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -66,7 +68,10 @@ interface SelectProps {
   // Styling
   style?: CSSProperties;
   className?: string;
+  contentClassName?: string;
+  classes?: Record<string, string>;
   dropdownHeight?: CSSProperties["height"];
+  scrollIndicators?: boolean;
 
   // Validation
   validationStatus?: ValidationStatus;
@@ -138,7 +143,7 @@ const SelectTriggerValue = ({
               ) : (
                 <span key={option.value} className={styles.badge}>
                   {option.label}
-                  <Icon
+                  <ThemedIcon
                     name="close"
                     size="sm"
                     onClick={(event) => {
@@ -216,7 +221,7 @@ const SelectTriggerActions = ({
               clearValue();
             }}
           >
-            <Icon name="close" />
+            <ThemedIcon name="close" />
           </span>
         </Part>
       )}
@@ -235,7 +240,7 @@ const SelectTriggerActions = ({
           className={classnames(styles.action, { [styles.disabled]: !enabled || readOnly })}
           aria-disabled={!enabled || readOnly}
         >
-          <Icon name="chevrondown" />
+          <ThemedIcon name="chevrondown" />
         </span>
       )}
     </div>
@@ -257,7 +262,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     // Styling
     style,
     className,
+    contentClassName,
+    classes,
     dropdownHeight,
+    scrollIndicators,
 
     // Validation
     validationStatus = defaultProps.validationStatus,
@@ -300,6 +308,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   forwardedRef,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const ariaLabelRef = useRef("");
+  if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+    ariaLabelRef.current = (rest as any)["aria-label"] || "";
+  }
   const [open, setOpen] = useState(false);
   const [panelWidth, setPanelWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
@@ -308,12 +320,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   let validationIcon = null;
@@ -415,6 +431,44 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     }
   }, [initialValue, updateState]);
 
+  // When inside a form, clear the value if it does not match any loaded option.
+  // This aligns with native <select> semantics: an invalid value becomes no selection.
+  // The check runs once — after both options are non-empty AND the value is set — so
+  // option-list changes or delayed form initialization cannot cause spurious clears.
+  const isInsideForm = useIsInsideForm();
+  const hasValidatedInitialValueRef = useRef(false);
+  useEffect(() => {
+    if (!isInsideForm) return;
+    if (hasValidatedInitialValueRef.current) return;
+    if (options.length === 0) return;
+    // Wait until the form has actually provided a concrete value (not just "not yet set")
+    if (value === undefined || value === null) return;
+
+    hasValidatedInitialValueRef.current = true;
+
+    if (!multiSelect) {
+      if (value !== "") {
+        const isValid = options.some((opt) => `${opt.value}` === `${value}`);
+        if (!isValid) {
+          // Use formOnly:true so the form field is cleared without updating the
+          // component's own display state. Updating to undefined would cause
+          // SimpleSelect (Radix) to transition to uncontrolled mode and fire
+          // onValueChange("") which would immediately overwrite the cleared value.
+          updateState({ value: undefined }, { formOnly: true });
+        }
+      }
+    } else {
+      if (Array.isArray(value) && value.length > 0) {
+        const validValues = value.filter((v) =>
+          options.some((opt) => String(opt.value) === String(v)),
+        );
+        if (validValues.length !== value.length) {
+          updateState({ value: validValues });
+        }
+      }
+    }
+  }, [isInsideForm, options, value, multiSelect, updateState]);
+
   // Observe the size of the reference element
   useEffect(() => {
     const current = referenceElement;
@@ -450,11 +504,39 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
+      // Emit interaction + native trace events for option selection.
+      // The interaction event is needed because Radix Select handles selection
+      // internally without firing a DOM click that AppContent can capture.
+      // Gated on _xsLogs existence (proxy for xsVerbose) to avoid work when tracing is off.
+      if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
+        const selectedOption = options.find((o) => String(o.value) === String(selectedValue));
+        const optionLabel = selectedOption?.label || String(selectedValue);
+        pushXsLog({
+          ts: Date.now(),
+          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+          traceId: (window as any)._xsCurrentTrace,
+          kind: "interaction",
+          interaction: "click",
+          componentType: "Select",
+          componentLabel: optionLabel,
+          ariaRole: "option",
+          selectAriaLabel: ariaLabelRef.current,
+          ariaName: optionLabel,
+        });
+        pushXsLog(
+          createLogEntry("native:selection:change", {
+            component: "Select",
+            ariaName: ariaLabelRef.current || undefined,
+            displayLabel: optionLabel,
+            value: newSelectedValue,
+          }),
+        );
+      }
       if (!multiSelect) {
         setOpen(false);
       }
     },
-    [multiSelect, currentValue, updateState, onDidChange],
+    [multiSelect, currentValue, updateState, onDidChange, options],
   );
 
   // Clear selected value
@@ -603,7 +685,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
     () =>
       emptyListTemplate ?? (
         <div className={styles.selectEmpty}>
-          <Icon name="noresult" />
+          <ThemedIcon name="noresult" />
           <span>List is empty</span>
         </div>
       ),
@@ -662,12 +744,14 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         {useSimpleSelect ? (
           // SimpleSelect mode (Radix UI Select)
           <SimpleSelect
+            ref={forwardedRef}
             value={currentValue as SingleValueType}
             onValueChange={(val) => toggleOption(val)}
             id={id}
             options={options}
             style={style}
-            className={className}
+            className={classnames(className, classes?.[COMPONENT_PART_KEY])}
+            contentClassName={contentClassName}
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
@@ -685,6 +769,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             clearable={clearable}
             onClear={clearValue}
             valueRenderer={valueRenderer}
+            scrollIndicators={scrollIndicators}
             validationStatus={validationStatus}
             invalidMessages={invalidMessages}
             finalValidationIconSuccess={finalValidationIconSuccess}
@@ -716,10 +801,16 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
                   onBlur={onBlur}
                   disabled={!enabled}
                   aria-expanded={open}
-                  className={classnames(className, styles.selectTrigger, styles[validationStatus], {
-                    [styles.disabled]: !enabled,
-                    [styles.multi]: multiSelect,
-                  })}
+                  className={classnames(
+                    styles.selectTrigger,
+                    classes?.[COMPONENT_PART_KEY],
+                    className,
+                    styles[validationStatus],
+                    {
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multiSelect,
+                    },
+                  )}
                   role="combobox"
                   onClick={(event) => {
                     if (!enabled || readOnly) return;
@@ -780,14 +871,18 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: panelWidth, height: dropdownHeight }}
-                  className={classnames(styles.selectContent, styles[validationStatus])}
+                  style={{ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" }}
+                  className={classnames(
+                    contentClassName,
+                    styles.selectContent,
+                    styles[validationStatus],
+                  )}
                   onKeyDown={handleKeyDown}
                 >
                   <div className={styles.command}>
                     {searchable ? (
                       <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
+                        <ThemedIcon name="search" />
                         <input
                           role="searchbox"
                           className={classnames(styles.commandInput)}
@@ -921,6 +1016,8 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
     <div
       ref={optionRef}
       role="option"
+      aria-label={label || value}
+      data-component-type="Option"
       aria-disabled={!enabled}
       aria-selected={selected}
       className={classnames(styles.multiSelectOption, {
@@ -945,7 +1042,7 @@ function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?
         ) : (
           <>
             {children || label}
-            {selected && <Icon name="checkmark" />}
+            {selected && <ThemedIcon name="checkmark" />}
           </>
         )}
       </div>

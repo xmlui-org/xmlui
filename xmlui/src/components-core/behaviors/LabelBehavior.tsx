@@ -94,7 +94,7 @@ export const labelBehavior: Behavior = {
     return true;
   },
   attach: (context, node, metadata) => {
-    const { extractValue, node: componentNode } = context;
+    const { extractValue, node: componentNode, layoutContext } = context;
 
     const label = extractValue.asOptionalString(componentNode.props.label);
     const labelPosition = extractValue(componentNode.props.labelPosition);
@@ -121,6 +121,8 @@ export const labelBehavior: Behavior = {
         labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
         isInputTemplateUsed={!!componentNode.props?.inputTemplate}
         direction={direction}
+        layoutContext={layoutContext}
+        compactInlineLabel={!!(metadata as any)?.compactInlineLabel}
       >
         {node}
       </ItemWithLabel>

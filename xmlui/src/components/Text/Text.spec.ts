@@ -41,64 +41,76 @@ test.describe("Basic Functionality", () => {
     await expect(driver.component).toHaveText(EXPECTED);
   });
 
-  Object.entries(TextVariantElement).forEach(([variant, htmlElement]) => {
-    test(`variant=${variant} renders correct HTML element: ${htmlElement}`, async ({
-      initTestBed,
-      createTextDriver,
-    }) => {
-      await initTestBed(`<Text variant="${variant}" />`);
-      const driver = await createTextDriver();
-
-      const tagName = await driver.getComponentTagName();
-      expect(tagName).toEqual(htmlElement);
-    });
+  test("variants render correct HTML elements", async ({ initTestBed, createTextDriver }) => {
+    const variants = Object.entries(TextVariantElement);
+    const markup = variants.map(([variant, _], i) => `<Text testId="v${i}" variant="${variant}" />`).join("\n");
+    await initTestBed(`<Fragment>${markup}</Fragment>`);
+    for (let i = 0; i < variants.length; i++) {
+      const [, htmlElement] = variants[i];
+      const driver = await createTextDriver(`v${i}`);
+      expect(await driver.getComponentTagName()).toEqual(htmlElement);
+    }
   });
 
-  Array.from(new Set(Object.values(TextVariantElement)))
-    .filter((variant) => !["h6", "span"].includes(variant))
-    .forEach((htmlElement) => {
-      test(`HtmlTag component '${htmlElement}' renders correctly`, async ({
-        initTestBed,
-        createTextDriver,
-      }) => {
-        await initTestBed(`<${htmlElement} />`);
-        const driver = await createTextDriver();
-
-        await expect(driver.component).toBeAttached();
-      });
-    });
-
-  [
-    { label: "undefined", value: "'{undefined}'", toExpected: "" },
-    { label: "undefined with string", value: "'abc{undefined}def'", toExpected: "abcdef" },
-    { label: "null", value: "'{null}'", toExpected: "" },
-    { label: "null with string", value: "'abc{null}def'", toExpected: "abcdef" },
-    { label: "empty string", value: "''", toExpected: "" },
-    { label: "string", value: "'test'", toExpected: "test" },
-    { label: "integer", value: "'{1}'", toExpected: "1" },
-    { label: "float", value: "'{1.2}'", toExpected: "1.2" },
-    { label: "boolean", value: "'{true}'", toExpected: "true" },
-    { label: "empty object", value: "'{{}}'", toExpected: {}.toString() },
-    { label: "object", value: "\"{{ a: 1, b: 'hi' }}\"", toExpected: { a: 1, b: "hi" }.toString() },
-    { label: "empty array", value: "'{[]}'", toExpected: "" },
-    { label: "array", value: "'{[1, 2, 3]}'", toExpected: [1, 2, 3].toString() },
-  ].forEach(({ label, value, toExpected }) => {
-    test(`handles ${label} value prop correctly`, async ({ initTestBed, createTextDriver }) => {
-      await initTestBed(`<Text value=${value} />`);
-      const driver = await createTextDriver();
-
-      await expect(driver.component).toHaveText(toExpected);
-    });
+  test("HtmlTag components render correctly", async ({ initTestBed, createTextDriver }) => {
+    const htmlElements = Array.from(new Set(Object.values(TextVariantElement)))
+      .filter((variant) => !["h6", "span"].includes(variant));
+    const markup = htmlElements.map((el, i) => `<${el} testId="v${i}" />`).join("\n");
+    await initTestBed(`<Fragment>${markup}</Fragment>`);
+    for (let i = 0; i < htmlElements.length; i++) {
+      const driver = await createTextDriver(`v${i}`);
+      await expect(driver.component).toBeAttached();
+    }
   });
 
-  test("removes leading whitespace", async ({ page, initTestBed }) => {
-    await initTestBed(`<Text testId="text">   {123}</Text>`);
-    await expect(page.getByTestId("text")).toHaveText("123");
+  test("handles various value prop types correctly", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="v0" value="{undefined}" />
+        <Text testId="v1" value="abc{undefined}def" />
+        <Text testId="v2" value="{null}" />
+        <Text testId="v3" value="abc{null}def" />
+        <Text testId="v4" value="" />
+        <Text testId="v5" value="test" />
+        <Text testId="v6" value="{1}" />
+        <Text testId="v7" value="{1.2}" />
+        <Text testId="v8" value="{true}" />
+        <Text testId="v9" value="{{}}" />
+        <Text testId="v10" value="{{ a: 1, b: 'hi' }}" />
+        <Text testId="v11" value="{[]}" />
+        <Text testId="v12" value="{[1, 2, 3]}" />
+      </Fragment>
+    `);
+    const expected = [
+      "",                            // undefined
+      "abcdef",                      // undefined with string
+      "",                            // null
+      "abcdef",                      // null with string
+      "",                            // empty string
+      "test",                        // string
+      "1",                           // integer
+      "1.2",                         // float
+      "true",                        // boolean
+      {}.toString(),                 // empty object
+      { a: 1, b: "hi" }.toString(), // object
+      "",                            // empty array
+      [1, 2, 3].toString(),          // array
+    ];
+    for (let i = 0; i < expected.length; i++) {
+      const driver = await createTextDriver(`v${i}`);
+      await expect(driver.component).toHaveText(expected[i]);
+    }
   });
 
-  test("removes trailing whitespace", async ({ page, initTestBed }) => {
-    await initTestBed(`<Text testId="text">{123}  </Text>`);
-    await expect(page.getByTestId("text")).toHaveText("123");
+  test("removes leading and trailing whitespace", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="leading">   {123}</Text>
+        <Text testId="trailing">{123}  </Text>
+      </Fragment>
+    `);
+    await expect(page.getByTestId("leading")).toHaveText("123");
+    await expect(page.getByTestId("trailing")).toHaveText("123");
   });
 
   test("preserves whitespace when using value prop", async ({ initTestBed, createTextDriver }) => {
@@ -950,18 +962,25 @@ test.describe("Break Mode", () => {
 // =============================================================================
 
 test.describe("Edge Cases", () => {
-  [
-    { label: "empty object", value: "'{{}}'", toExpected: {}.toString() },
-    { label: "object", value: "\"{{ a: 1, b: 'hi' }}\"", toExpected: { a: 1, b: "hi" }.toString() },
-    { label: "empty array", value: "'{[]}'", toExpected: "" },
-    { label: "array", value: "'{[1, 2, 3]}'", toExpected: [1, 2, 3].toString() },
-  ].forEach(({ label, value, toExpected }) => {
-    test(`handles ${label} value prop gracefully`, async ({ initTestBed, createTextDriver }) => {
-      await initTestBed(`<Text value=${value} />`);
-      const driver = await createTextDriver();
-
-      await expect(driver.component).toHaveText(toExpected);
-    });
+  test("handles object and array value props gracefully", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="v0" value="{{}}" />
+        <Text testId="v1" value="{{ a: 1, b: 'hi' }}" />
+        <Text testId="v2" value="{[]}" />
+        <Text testId="v3" value="{[1, 2, 3]}" />
+      </Fragment>
+    `);
+    const expected = [
+      {}.toString(),
+      { a: 1, b: "hi" }.toString(),
+      "",
+      [1, 2, 3].toString(),
+    ];
+    for (let i = 0; i < expected.length; i++) {
+      const driver = await createTextDriver(`v${i}`);
+      await expect(driver.component).toHaveText(expected[i]);
+    }
   });
 
   test("handles extremely long text content", async ({ initTestBed, createTextDriver }) => {

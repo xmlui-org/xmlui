@@ -42,33 +42,13 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/Backdrop",
-          "label": "Backdrop",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Badge",
           "label": "Badge",
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/BarChart",
-          "label": "BarChart",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Blog",
-          "label": "Blog",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/Bookmark",
           "label": "Bookmark",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Breakout",
-          "label": "Breakout",
           "icon": "component"
         },
         {
@@ -89,11 +69,6 @@
         {
           "to": "/docs/reference/components/Card",
           "label": "Card",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Carousel",
-          "label": "Carousel",
           "icon": "component"
         },
         {
@@ -139,11 +114,6 @@
         {
           "to": "/docs/reference/components/DatePicker",
           "label": "DatePicker",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/DonutChart",
-          "label": "DonutChart",
           "icon": "component"
         },
         {
@@ -194,6 +164,11 @@
         {
           "to": "/docs/reference/components/FormSection",
           "label": "FormSection",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/FormSegment",
+          "label": "FormSegment",
           "icon": "component"
         },
         {
@@ -269,21 +244,6 @@
         {
           "to": "/docs/reference/components/Items",
           "label": "Items",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/LabelList",
-          "label": "LabelList",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/Legend",
-          "label": "Legend",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/LineChart",
-          "label": "LineChart",
           "icon": "component"
         },
         {
@@ -387,11 +347,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/PieChart",
-          "label": "PieChart",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/ProgressBar",
           "label": "ProgressBar",
           "icon": "component"
@@ -409,11 +364,6 @@
         {
           "to": "/docs/reference/components/RadioGroup",
           "label": "RadioGroup",
-          "icon": "component"
-        },
-        {
-          "to": "/docs/reference/components/RealTimeAdapter",
-          "label": "RealTimeAdapter",
           "icon": "component"
         },
         {
@@ -524,6 +474,11 @@
         {
           "to": "/docs/reference/components/Theme",
           "label": "Theme",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/TileGrid",
+          "label": "TileGrid",
           "icon": "component"
         },
         {

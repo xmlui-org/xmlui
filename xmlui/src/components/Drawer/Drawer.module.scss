@@ -12,14 +12,21 @@ $backgroundColor-Drawer: createThemeVar("backgroundColor-#{$component}");
 $backgroundColor-backdrop-Drawer: createThemeVar("backgroundColor-backdrop-#{$component}");
 $borderRadius-Drawer: createThemeVar("borderRadius-#{$component}");
 $boxShadow-Drawer: createThemeVar("boxShadow-#{$component}");
-$padding-Drawer: createThemeVar("padding-#{$component}");
+$themeVars: t.composePaddingVars($themeVars, $component);
+$paddingTop-Drawer:    createThemeVar("paddingTop-#{$component}");
+$paddingRight-Drawer:  createThemeVar("paddingRight-#{$component}");
+$paddingBottom-Drawer: createThemeVar("paddingBottom-#{$component}");
+$paddingLeft-Drawer:   createThemeVar("paddingLeft-#{$component}");
 $width-Drawer: createThemeVar("width-#{$component}");
 $maxWidth-Drawer: createThemeVar("maxWidth-#{$component}");
 $height-Drawer: createThemeVar("height-#{$component}");
 $maxHeight-Drawer: createThemeVar("maxHeight-#{$component}");
 $zIndex-Drawer: createThemeVar("zIndex-#{$component}");
+$gap-Drawer: createThemeVar("gap-#{$component}");
 $animationDuration-Drawer: createThemeVar("animationDuration-#{$component}");
 $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
+$top-closeButton-Drawer: createThemeVar("top-closeButton-#{$component}");
+$right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
 
 // Slide animations
 @keyframes slideInFromLeft {
@@ -85,9 +92,8 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   background-color: $backgroundColor-Drawer;
   border-radius: $borderRadius-Drawer;
   box-shadow: $boxShadow-Drawer;
-  padding: $padding-Drawer;
   z-index: calc($zIndex-Drawer + 1);
-  overflow: auto;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   pointer-events: auto;
@@ -142,11 +148,50 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   }
 }
 
-// Close button (×) in top-right corner
+// Portal target for content that child components (e.g. Select dropdowns)
+// render via useTheme().root.  It must stack above the drawer panel so
+// portalled overlays are not hidden behind the slide-in panel.
+.childPortal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: calc($zIndex-Drawer + 2);
+}
+
+// Visually hidden but accessible to screen readers
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+// Sticky header: outer padding (top + horizontal), no bottom — gap handles spacing
+.header {
+  flex-shrink: 0;
+  padding: $paddingTop-Drawer $paddingRight-Drawer 0 $paddingLeft-Drawer;
+}
+
+.headerContent {
+  width: 100%;
+}
+
+// Scrollable body: outer padding (bottom + horizontal), gap-driven top margin
+.body {
+  flex: 1;
+  overflow: auto;
+  padding: 0 $paddingRight-Drawer $paddingBottom-Drawer $paddingLeft-Drawer;
+  margin-top: $gap-Drawer;
+}
+
+// Close button (×) - floats at top-right
 .closeButton {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: $top-closeButton-Drawer;
+  right: $right-closeButton-Drawer;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -158,7 +203,7 @@ $animationEasing-Drawer: createThemeVar("animationEasing-#{$component}");
   cursor: pointer;
   opacity: 0.6;
   transition: opacity 150ms ease;
-  z-index: 1;
+  z-index: 10;
 
   &:hover {
     opacity: 1;

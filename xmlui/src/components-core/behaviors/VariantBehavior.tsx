@@ -1,6 +1,6 @@
 import { type ReactElement, cloneElement } from "react";
 import { buttonVariantValues } from "../../components/abstractions";
-import { badgeVariantValues } from "../../components/Badge/BadgeNative";
+import { badgeVariantValues } from "../../components/Badge/BadgeReact";
 import { ItemWithLabel } from "../../components/FormItem/ItemWithLabel";
 import { THEME_VAR_PREFIX } from "../theming/layout-resolver";
 import { parseLayoutProperty, toCssPropertyName } from "../theming/parse-layout-props";
@@ -171,22 +171,22 @@ function VariantWrapper({
   }
 
   // Generate the CSS class using useStyles hook
-  const customVariantClassName = useStyles(variantSpec);
+  const customVariantClassName = useStyles(variantSpec, { layer: "dynamic" });
 
   // Check if the child is ItemWithLabel (a wrapper component from labelBehavior)
   // If so, apply the className to the actual component inside ItemWithLabel instead
   const isItemWithLabel = children.type === ItemWithLabel;
-  
+
   if (isItemWithLabel && children.props?.children) {
     // Apply className to the actual component inside ItemWithLabel
     const innerChild = children.props.children as ReactElement;
     const innerClassName = innerChild.props?.className || "";
     const newInnerClassName = `${innerClassName} ${customVariantClassName || ""}`.trim();
-    
+
     const wrappedChildren = cloneElement(innerChild, {
       className: newInnerClassName,
     });
-    
+
     return cloneElement(children, {
       children: wrappedChildren,
     });
@@ -200,4 +200,3 @@ function VariantWrapper({
     className: newClassName,
   });
 }
-

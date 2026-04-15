@@ -35,8 +35,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -83,6 +83,19 @@ Available values:
 />
 <Text>{authStatus.value.authenticated ? 'Logged in' : 'Not logged in'}</Text>
 ```
+
+### `dataType` [#datatype]
+
+Type of data to fetch. When set to `"text"`, the response is returned as a raw string without JSON parsing. When set to `"csv"`, the response is parsed as CSV.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `json` | Parse response as JSON (default) |
+| `text` | Return response as raw text |
+| `csv` | Parse response as CSV |
+| `sql` | Execute SQL query |
 
 ### `errorNotificationMessage` [#errornotificationmessage]
 
@@ -140,9 +153,19 @@ Set the HTTP method.
 
 Available values: `get` **(default)**, `post`, `put`, `delete`, `patch`, `head`, `options`, `trace`, `connect`
 
+### `mockData` [#mockdata]
+
+Provide data directly instead of fetching from a URL. When set, the component resolves immediately with this value — no network request is made. Intended for development and testing. Supports reactive expressions: when the bound value changes, the DataSource re-resolves with the updated data.
+
 ### `nextPageSelector` [#nextpageselector]
 
 When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
+
+### `omitTransactionId` [#omittransactionid]
+
+> [!DEF]  default: **"false"**
+
+When set to `true`, the `x-ue-client-tx-id` request header will not be added to outgoing requests. Use this when the target API does not allow custom request headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).
 
 ### `pollIntervalInSeconds` [#pollintervalinseconds]
 
@@ -273,9 +296,7 @@ Set an optional function to perform a final transformation of the response data.
 
 ### `url` [#url]
 
-> [!DEF]  This property is required.
-
-Set the URL.
+Set the URL. Required unless `mockData` is provided, in which case the component returns the mock data directly without making a network request.
 
 ## Events [#events]
 
@@ -321,6 +342,12 @@ This property indicates if the data has been loaded.
 This method requests the re-fetch of the data.
 
 **Signature**: `refetch(): void`
+
+### `responseHeaders` [#responseheaders]
+
+This property retrieves the HTTP response headers from the last successful fetch. Returns an object whose keys are header names and values are header values, or `undefined` if no fetch has completed yet.
+
+**Signature**: `get responseHeaders(): Record<string, string> | undefined`
 
 ### `value` [#value]
 

@@ -11,22 +11,23 @@
 **Context variables available during execution:**
 
 - `$attempts`: Number of status polls made in deferred mode
+- `$cookies`: Request cookies (available in `mockExecute`)
 - `$elapsed`: Time elapsed since polling started in milliseconds
 - `$error`: Error details (available in `errorNotificationMessage`)
 - `$param`: The first parameter passed to `execute()` method
 - `$params`: Array of all parameters passed to `execute()` method (access with `$params[0]`, `$params[1]`, etc.)
+- `$pathParams`: Path parameters extracted from the request URL (available in `mockExecute`)
 - `$polling`: Boolean indicating if polling is currently active in deferred mode
 - `$progress`: Current progress 0-100 when in deferred mode (extracted via progressExtractor expression)
+- `$queryParams`: Resolved query parameters (available in `mockExecute`)
+- `$requestBody`: Resolved request body (available in `mockExecute`)
+- `$requestHeaders`: Resolved request headers (available in `mockExecute`)
 - `$result`: Response data (available in `completedNotificationMessage`)
 - `$statusData`: Latest status response data when in deferred mode (available in event handlers and notifications)
 
 ## Behaviors [#behaviors]
 
-This component supports the following behaviors:
-
-| Behavior | Properties |
-| --- | --- |
-| Publish/Subscribe | `subscribeToTopic` |
+No behaviors are applicable to this component.
 
 ## Properties [#properties]
 
@@ -37,6 +38,10 @@ This optional property sets the request body. Use to pass an object that will be
 ### `cancelBody` [#cancelbody]
 
 Optional body to send with the cancel request. Can use $result context from initial response.
+
+### `cancelButtonLabel` [#cancelbuttonlabel]
+
+This optional string property enables the customization of the cancel button in the confirmation dialog that is displayed before the `APICall` is executed.
 
 ### `cancelMethod` [#cancelmethod]
 
@@ -292,6 +297,59 @@ This event fires when a request results in an error.
 
 - `error`: The error object containing details about what went wrong with the API request.
 
+### `mockExecute` [#mockexecute]
+
+When defined, this event handler replaces the actual API request. The handler receives the resolved request properties as context variables: `$pathParams`, `$queryParams`, `$requestBody`, `$cookies`, `$requestHeaders`. When triggered via the `execute()` method, `$param` and `$params` are also available. The return value of the handler becomes the result of the API call.
+
+**Signature**: `() => any`
+
+When this event is defined, it **replaces the real HTTP request** entirely. The handler's return value becomes the result of the API call — `onSuccess` still fires with it, `lastResult` is updated, and query invalidation still runs as normal. No network request is made.
+
+This is the `APICall` counterpart to [`DataSource`'s `mockData`](/docs/reference/components/DataSource) property: use it during development and testing to simulate backend mutations without a real server.
+
+**Context variables available in the handler:**
+
+| Variable | Description |
+|---|---|
+| `$requestBody` | Resolved request body (`body` / `rawBody`) |
+| `$queryParams` | Resolved query parameters |
+| `$requestHeaders` | Resolved request headers |
+| `$pathParams` | Path parameters (empty object for client-side mocks) |
+| `$cookies` | Request cookies (empty object for client-side mocks) |
+| `$param` | First argument passed to `execute()` |
+| `$params` | Array of all arguments passed to `execute()` |
+
+```xmlui-pg name="Example: mockExecute — building a mock CRUD list"
+---app copy display
+<App var.users="{[
+  { id: 1, name: 'Alice' },
+  { id: 2, name: 'Bob' }
+]}">
+  <DataSource id="userList" url="/api/users" mockData="{users}" />
+  <Button>
+    <event name="click">
+      <APICall
+        url="/api/users"
+        method="post"
+        invalidates="/api/users"
+        onMockExecute="() => {
+          const newUser = { id: users.length + 1, name: 'New User' };
+          users = [...users, newUser];
+          return newUser;
+        }"
+      />
+    </event>
+    Add user
+  </Button>
+  <List data="{userList}">
+    <HStack>
+      <Text value="{$item.id}." width="24px"/>
+      <Text value="{$item.name}" />
+    </HStack>
+  </List>
+</App>
+```
+
 ### `pollingComplete` [#pollingcomplete]
 
 Fires when polling stops in deferred mode (success, failure, timeout, or manual stop).
@@ -371,6 +429,12 @@ Check if polling is currently active in deferred mode.
 The error from the most recent failed API call execution.
 
 **Signature**: `lastError: any`
+
+### `lastResponseHeaders` [#lastresponseheaders]
+
+This property retrieves the HTTP response headers from the last successful API call execution, or `undefined` if no successful call has completed yet.
+
+**Signature**: `get lastResponseHeaders(): Record<string, string> | undefined`
 
 ### `lastResult` [#lastresult]
 

@@ -20,28 +20,42 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   // --- value
 
   // correct types: string, undefined, null, number, boolean -> everything will be coerced to strings
-  [
-    { label: "undefined", value: "'{undefined}'", toExpect: "" },
-    { label: "null", value: "'{null}'", toExpect: "" },
-    { label: "empty string", value: "''", toExpect: "" },
-    { label: "string", value: "'test'", toExpect: "test" },
-    { label: "integer", value: "'{1}'", toExpect: "1" },
-    { label: "float", value: "'{1.2}'", toExpect: "1.2" },
-    { label: "boolean", value: "'{true}'", toExpect: "true" },
-    { label: "empty object", value: "'{{}}'", toExpect: {}.toString() },
-    { label: "object", value: "\"{{ a: 1, b: 'hi' }}\"", toExpect: { a: 1, b: "hi" }.toString() },
-    { label: "empty array", value: "'{[]}'", toExpect: "" },
-    { label: "array", value: "'{[1, 2, 3]}'", toExpect: [1, 2, 3].toString() },
-  ].forEach(({ label, value, toExpect }) => {
-    test(`setting value to ${label} sets value of field`, async ({
-      initTestBed,
-      createHeadingDriver,
-    }) => {
-      await initTestBed(`<Heading value=${value} />`);
-      const driver = await createHeadingDriver();
-
-      await expect(driver.component).toHaveText(toExpect);
-    });
+  test("setting value to various types sets value of field", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Heading testId="v0" value="{undefined}" />
+        <Heading testId="v1" value="{null}" />
+        <Heading testId="v2" value="" />
+        <Heading testId="v3" value="test" />
+        <Heading testId="v4" value="{1}" />
+        <Heading testId="v5" value="{1.2}" />
+        <Heading testId="v6" value="{true}" />
+        <Heading testId="v7" value="{{}}" />
+        <Heading testId="v8" value="{{ a: 1, b: 'hi' }}" />
+        <Heading testId="v9" value="{[]}" />
+        <Heading testId="v10" value="{[1, 2, 3]}" />
+      </Fragment>
+    `);
+    const expected = [
+      "",                            // undefined
+      "",                            // null
+      "",                            // empty string
+      "test",                        // string
+      "1",                           // integer
+      "1.2",                         // float
+      "true",                        // boolean
+      {}.toString(),                 // empty object → "[object Object]"
+      { a: 1, b: "hi" }.toString(), // object → "[object Object]"
+      "",                            // empty array
+      [1, 2, 3].toString(),          // array → "1,2,3"
+    ];
+    for (let i = 0; i < expected.length; i++) {
+      const driver = await createHeadingDriver(`v${i}`);
+      await expect(driver.component).toHaveText(expected[i]);
+    }
   });
 
   test("setting value prop has no whitespace collapsing", async ({
@@ -98,28 +112,18 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
     return headingSizes;
   }
-  // NOTE: we don't explicitly test h6, since all other headings have tested for its size
-  headingLevels
-    .filter((l) => l !== "h6")
-    .forEach((level, idx) => {
-      test(`compare ${level} size to other levels`, async ({
-        initTestBed,
-        createHeadingDriver,
-      }) => {
-        const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
-
-        for (let i = idx + 1; i < headingSizes.length; i++) {
-          /* console.log(
-            `${level} width: ${headingSizes[idx].width} and height: ${headingSizes[idx].height}`,
-          );
-          console.log(
-            `compared to h${i + 1} width: ${headingSizes[i].width} and height: ${headingSizes[i].height}`,
-          ); */
-          expect(headingSizes[idx].width).toBeGreaterThanOrEqual(headingSizes[i].width);
-          expect(headingSizes[idx].height).toBeGreaterThanOrEqual(headingSizes[i].height);
-        }
-      });
-    });
+  test("heading sizes decrease from h1 to h6", async ({
+    initTestBed,
+    createHeadingDriver,
+  }) => {
+    const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
+    for (let i = 0; i < headingSizes.length - 1; i++) {
+      for (let j = i + 1; j < headingSizes.length; j++) {
+        expect(headingSizes[i].width).toBeGreaterThanOrEqual(headingSizes[j].width);
+        expect(headingSizes[i].height).toBeGreaterThanOrEqual(headingSizes[j].height);
+      }
+    }
+  });
 
   [
     { label: "H1 is the same as Heading level='h1'", specializedComp: "H1", level: "h1" },

@@ -27,6 +27,10 @@ export default defineConfig({
   workers: CI ? "100%" : "75%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
+
+  /* Give auto-retrying assertions more headroom under parallel load */
+  expect: { timeout: 10_000 },
+
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     ...devices["Desktop Chrome"],

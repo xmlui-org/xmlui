@@ -2,21 +2,70 @@
 
 `ChangeListener` is an invisible component that watches for changes in values and triggers actions in response. It's essential for creating reactive behavior when you need to respond to data changes, state updates, or component property modifications outside of normal event handlers.
 
+`ChangeListener` watches for changes in values and fires a handler in response. It supports two timing strategies:
+
+- **Throttling**: Use `throttleWaitInMs` when you want **periodic updates** during rapid changes — fires immediately, then at most once per interval. Good for progress tracking or scroll events.
+- **Debouncing**: Use `debounceWaitInMs` when you want to **wait for silence** — fires only after the value stops changing for the specified duration. Ideal for search-as-you-type or auto-save.
+
+| Aspect | Throttle | Debounce |
+|--------|----------|----------|
+| Fires on first change? | Yes | No — waits for silence |
+| Fires during rapid changes? | Yes, at most once per interval | No — timer resets each time |
+| Fires after last change? | Only if interval expires | Yes, always |
+| Best for | Continuous monitoring at a set rate | Waiting for user to finish |
+
+> **Rule of precedence:** When both `debounceWaitInMs` and `throttleWaitInMs` are set, debounce takes precedence.
+
 **Key features:**
 - **Value monitoring**: Watches any expression, variable, or component property for changes
-- **Throttling support**: Prevents excessive triggering with `throttleWaitInMs` for rapid changes
-- **Previous/new values**: Access both old and new values in the change handler
+- **Previous/new values**: Access both old and new values in change handlers
 - **Reactive patterns**: Coordinates between components or triggers side effects
 
 ## Behaviors [#behaviors]
 
-This component supports the following behaviors:
-
-| Behavior | Properties |
-| --- | --- |
-| Publish/Subscribe | `subscribeToTopic` |
+No behaviors are applicable to this component.
 
 ## Properties [#properties]
+
+### `debounceWaitInMs` [#debouncewaitinms]
+
+> [!DEF]  default: **0**
+
+This property sets a debounce wait time (in milliseconds) to apply when executing the `didChange` event handler. The `didChange` event will only fire after the listened value has been stable for the specified duration. This is useful for search-as-you-type scenarios where you want to wait until the user stops typing before firing the event. When both `debounceWaitInMs` and `throttleWaitInMs` are set, debounce takes precedence.
+
+Use `debounceWaitInMs` when you want the handler to fire **only after the value has stopped changing** for a given period. Every new change resets the timer, so the handler runs once — after the last change — when things go quiet.
+
+**Good use cases for debounce:**
+- Search-as-you-type: wait until the user stops typing before sending a query
+- Auto-saving a form: only persist when the user pauses, not on every keystroke
+- Any situation where only the final settled value matters, not the intermediate ones
+
+The following sample lets you compare different debounce wait times for a search input. Type in the text box and observe that the "Searching for" text only updates after you stop typing for the chosen duration.
+
+```xmlui-pg copy display name="Example: debounceWaitInMs"
+<App var.searchFor="(empty)">
+  <RadioGroup
+    id="debounceTime"
+    initialValue="400"
+    label="Choose debounce wait time"
+    orientation="horizontal"
+  >
+    <Option value="0">0ms</Option>
+    <Option value="400">400ms</Option>
+    <Option value="800">800ms</Option>
+  </RadioGroup>
+  <TextBox id="searchBox" label="Search" />
+  <H3>
+    Searching for: {searchFor}
+  </H3>
+
+  <ChangeListener
+    listenTo="{searchBox.value}"
+    debounceWaitInMs="{debounceTime.value}"
+    onDidChange="(change) => searchFor = change.newValue"
+  />
+</App>
+```
 
 ### `listenTo` [#listento]
 
@@ -38,9 +87,16 @@ The following sample demonstrates using this property. Every time the user click
 
 > [!DEF]  default: **0**
 
-This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
+This property sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 
-The following example works like the previous one (in the `listen` prop's description). However, the user can reset or set the throttling time to 3 seconds. You can observe that while the throttling time is 3 seconds, the counter increments on every click, but `isEven` only refreshes once within 3 seconds.
+Use `throttleWaitInMs` when you want to **limit how frequently** the handler fires while a value is changing continuously. Throttle guarantees the handler runs at most once per interval — it fires immediately on the first change and then again at most once per `throttleWaitInMs` milliseconds for as long as changes keep coming.
+
+**Good use cases for throttle:**
+- Progress bars or live counters where you want regular updates at a controlled rate
+- Reacting to window resize events or scroll position changes
+- Any situation where intermediate values are still meaningful, but too many updates hurt performance
+
+The following example works like the `listenTo` sample, but the user can switch between no throttling and a 3-second throttle. While throttling is active the counter increments on every click, but `isEven` only refreshes at most once per 3 seconds.
 
 ```xmlui-pg copy display name="Example: throttleWaitInMs"
 <App var.counter="{0}" var.isEven="{false}" var.throttle="{0}">
@@ -78,10 +134,12 @@ The event argument is an object with `prevValue` and `newValue` properties that 
   <Button label="Increment counter" onClick="{counter++}" />
   <ChangeListener
     listenTo="{counter}"
-    onDidChange="(change) => changeLog.setValue('prev: ' + change.prevValue + ' new: ' + change.newValue)"
+    onDidChange="(change) => 
+      changeLog.setValue('prev: ' + change.prevValue + ' new: ' + change.newValue)"
   />
   <TextArea id="changeLog" />
 </App>
+```
 
 ## Exposed Methods [#exposed-methods]
 

@@ -5,7 +5,6 @@ import { ErrorWithSeverity, LOGGER_LEVELS, logger } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable, createTable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
-import { getAllIconNames } from "../../dist/metadata/icons.js";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
 import { configManager, pathResolver } from "./configuration-management.mjs";
@@ -26,7 +25,7 @@ import {
   ERROR_CONTEXTS,
   COMPONENT_NAV_ERRORS,
   EXTENSIONS_NAVIGATION,
-  ICONS_NAVIGATION,
+  DOCS_COMPONENTS_PATH,
 } from "./constants.mjs";
 import { handleNonFatalError, withErrorHandling } from "./error-handling.mjs";
 
@@ -38,15 +37,11 @@ const [components] = partitionMetadata(collectedComponentMetadata, filterByProps
 
 await cleanupLegacyGeneratedDocsFolders();
 await generateComponents(components);
-generateIconNames();
 
 // --- Extensions
 const extensionsConfig = await configManager.loadExtensionsConfig();
 const packagesMetadata = await dynamicallyLoadExtensionPackages(extensionsConfig);
 await generateExtensionPackages(packagesMetadata, extensionsConfig);
-
-// --- Context Variables Summary
-await generateContextVariablesSummary();
 
 /**
  * Generates JSON structure for components and writes to components.json
@@ -137,53 +132,6 @@ async function writeExtensionsJson(extensionsJson) {
   }
 }
 
-/**
- * Finds and displays the content between GENERATED CONTENT delimiters in Main.xmlui
- */
-async function findAndDisplayGeneratedContent() {
-  try {
-    const mainXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.MAIN_XMLUI);
-
-    if (!existsSync(mainXmluiPath)) {
-      throw new Error(COMPONENT_NAV_ERRORS.MAIN_XMLUI_NOT_FOUND(mainXmluiPath));
-    }
-
-    const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
-
-    // Define the delimiter patterns using regex
-    const startDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.START_REGEX;
-    const endDelimiterRegex = COMPONENT_NAVIGATION.DELIMITERS.END_REGEX;
-
-    const startMatch = fileContent.match(startDelimiterRegex);
-    const endMatch = fileContent.match(endDelimiterRegex);
-
-    if (!startMatch) {
-      throw new Error(COMPONENT_NAV_ERRORS.START_DELIMITER_NOT_FOUND);
-    }
-
-    if (!endMatch) {
-      throw new Error(COMPONENT_NAV_ERRORS.END_DELIMITER_NOT_FOUND);
-    }
-
-    const startIndex = startMatch.index;
-    const endIndex = endMatch.index;
-
-    if (startIndex >= endIndex) {
-      throw new Error(COMPONENT_NAV_ERRORS.INVALID_DELIMITER_ORDER);
-    }
-
-    // Extract content between delimiters (excluding the delimiters themselves)
-    const generatedContentStart = startIndex + startMatch[0].length;
-    const generatedContent = fileContent.substring(generatedContentStart, endIndex);
-
-    // Calculate indentation depth
-    const indentationDepth = calculateIndentationDepth(generatedContent);
-
-    return { indentationDepth };
-  } catch (error) {
-    return { indentationDepth: 0 };
-  }
-}
 
 /**
  * Generates a comprehensive components overview file with a table of all components
@@ -214,7 +162,7 @@ async function generateComponentsOverview(overviewFile, summaryTitle, components
       const description = originalMetadata?.description || TEXT_CONSTANTS.NO_DESCRIPTION_AVAILABLE;
 
       // Format the table row with correct relative path
-      return `| [${componentName}](/docs/reference/components/${componentName}) | ${description} |`;
+      return `| [${componentName}](/${DOCS_COMPONENTS_PATH}/${componentName}) | ${description} |`;
     });
 
     // Combine header and rows
@@ -252,7 +200,6 @@ async function generateExtensionPackages(metadata, extensionsConfig) {
       {
         sourceFolder: metadata[packageName].sourceFolder,
         outFolder: packageFolder,
-        examplesFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.COMPONENT_SAMPLES),
       },
       { excludeComponentStatuses: extensionsConfig?.excludeComponentStatuses },
     );
@@ -363,18 +310,11 @@ async function generateComponents(metadata) {
       ),
       // --- CHANGE: Now documents are generated in the a new folder, outside of pages
       outFolder: outputFolder,
-      // outFolder: join(FOLDERS.docsRoot, FOLDER_NAMES.PAGES, FOLDER_NAMES.COMPONENTS),
-      examplesFolder: pathResolver.resolvePath(
-        PATH_CONSTANTS.DOCS_COMPONENT_SAMPLES,
-        PATH_CONSTANTS.WORKSPACE,
-      ),
     },
     { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
 
   if (componentsConfig?.cleanFolder) {
-    // --- CHANGE: Now documents are generated in the a new folder, outside of pages
-    // await cleanFolder(join(FOLDERS.pages, FOLDER_NAMES.COMPONENTS));
     await cleanFolder(outputFolder);
   }
 
@@ -395,77 +335,6 @@ async function generateComponents(metadata) {
   await metadataGenerator.generatePermalinksForHeaders();
 
   await metadataGenerator.createMetadataJsonForLanding(URL_REFERENCES.DOCS, "components");
-}
-
-async function generateIconNames() {
-  try {
-    // Get all icon names from the built icons.js file
-    const iconNames = getAllIconNames();
-
-    // Sort the icon names alphabetically
-    const sortedIconNames = iconNames.sort();
-
-    // Generate the var tag with the array of icon names
-    // Use single quotes for strings inside the array to avoid conflicts with the attribute's double quotes
-    const iconNamesArray = JSON.stringify(sortedIconNames, null, 2)
-      .replace(/"/g, "'") // Replace double quotes with single quotes
-      .replace(/^/gm, "  ") // Indent each line by 2 spaces
-      .trim();
-
-    const varTag = `<variable name="names" value="{${iconNamesArray}}" />`;
-
-    // Read the Icons.xmlui file to find indentation
-    const iconsXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.ICONS_XMLUI);
-
-    if (!existsSync(iconsXmluiPath)) {
-      logger.warn(`Icons.xmlui file not found at ${iconsXmluiPath}`);
-      return;
-    }
-
-    const fileContent = await readFile(iconsXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
-
-    // Find the content between delimiters to get indentation
-    const startDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.START_REGEX;
-    const endDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.END_REGEX;
-
-    const startMatch = fileContent.match(startDelimiterRegex);
-    const endMatch = fileContent.match(endDelimiterRegex);
-
-    if (!startMatch || !endMatch) {
-      logger.warn("Icon names delimiters not found in Icons.xmlui");
-      return;
-    }
-
-    const startIndex = startMatch.index;
-    const endIndex = endMatch.index;
-    const generatedContentStart = startIndex + startMatch[0].length;
-    const generatedContent = fileContent.substring(generatedContentStart, endIndex);
-
-    // Calculate indentation depth
-    const indentationDepth = calculateIndentationDepth(generatedContent);
-
-    // Replace the generated content
-    await replaceGeneratedContentInIconsXmlui(varTag, indentationDepth);
-
-    logger.info(`Generated ${sortedIconNames.length} icon names in Icons.xmlui`);
-  } catch (error) {
-    logger.error(`Failed to generate icon names: ${error.message}`);
-  }
-}
-
-// NOTE: Unused - we are not generating Html component docs
-async function generateHtmlTagComponents(metadata) {
-  const componentsConfig = await configManager.loadComponentsConfig();
-  const outputPaths = pathResolver.getOutputPaths();
-  const metadataGenerator = new DocsGenerator(
-    metadata,
-    {
-      sourceFolder: pathResolver.resolvePath("xmlui/src/components", "project"),
-      outFolder: outputPaths.pages + "/components",
-      examplesFolder: pathResolver.resolvePath("docs/component-samples", "project"),
-    },
-    { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
-  );
 }
 
 async function cleanFolder(folderToClean) {
@@ -623,322 +492,4 @@ function insertKeyAt(key, value, obj, pos) {
     ac[a] = obj[a];
     return ac;
   }, {});
-}
-
-/**
- * Calculates the indentation depth of content by finding the minimum leading whitespace
- * @param {string} content - The content to analyze
- * @returns {number} The number of whitespace characters representing the indentation depth
- */
-function calculateIndentationDepth(content) {
-  if (!content || content.trim().length === 0) {
-    return 0;
-  }
-
-  const lines = content.split("\n");
-  let minIndentation = Infinity;
-
-  for (const line of lines) {
-    // Skip empty lines
-    if (line.trim().length === 0) {
-      continue;
-    }
-
-    // Count leading whitespace characters
-    const leadingWhitespace = line.match(/^(\s*)/)[1];
-    const indentationCount = leadingWhitespace.length;
-
-    // Track minimum indentation
-    if (indentationCount < minIndentation) {
-      minIndentation = indentationCount;
-    }
-  }
-
-  // Return 0 if no lines had content or all lines were empty
-  return minIndentation === Infinity ? 0 : minIndentation;
-}
-
-/**
- * Replaces the content between GENERATED CONTENT delimiters in Icons.xmlui with icon names
- * @param {string} content - The content to insert
- * @param {number} indentationDepth - Number of spaces to indent each line
- */
-async function replaceGeneratedContentInIconsXmlui(content, indentationDepth) {
-  try {
-    const iconsXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.ICONS_XMLUI);
-
-    if (!existsSync(iconsXmluiPath)) {
-      throw new Error(`Icons.xmlui file not found at ${iconsXmluiPath}`);
-    }
-
-    // Read the Icons.xmlui file
-    const fileContent = await readFile(iconsXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
-
-    // Define the delimiter patterns using regex
-    const startDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.START_REGEX;
-    const endDelimiterRegex = ICONS_NAVIGATION.DELIMITERS.END_REGEX;
-
-    const startMatch = fileContent.match(startDelimiterRegex);
-    const endMatch = fileContent.match(endDelimiterRegex);
-
-    if (!startMatch || !endMatch) {
-      throw new Error("Icon names delimiters not found in Icons.xmlui");
-    }
-
-    const startIndex = startMatch.index;
-    const endIndex = endMatch.index;
-
-    // Create indented content
-    const indentString = " ".repeat(indentationDepth);
-    const indentedContent = indentString + content;
-
-    // Build the new content with proper formatting
-    const newGeneratedContent =
-      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
-      indentedContent +
-      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
-      indentString;
-
-    // Replace the content between delimiters
-    const beforeDelimiter = fileContent.substring(0, startIndex + startMatch[0].length);
-    const afterDelimiter = fileContent.substring(endIndex);
-    const newFileContent = beforeDelimiter + newGeneratedContent + afterDelimiter;
-
-    // Write the updated content back to the file
-    await writeFile(iconsXmluiPath, newFileContent, TEXT_CONSTANTS.UTF8_ENCODING);
-  } catch (error) {
-    throw new Error(`Failed to replace icon names content: ${error.message}`);
-  }
-}
-
-/**
- * Replaces the content between GENERATED CONTENT delimiters in Main.xmlui with NavLink content
- * @param {string} navLinksContent - The NavLink content to insert
- * @param {number} indentationDepth - Number of spaces to indent each line
- */
-async function replaceGeneratedContentInMainXmlui(
-  navLinksContent,
-  indentationDepth,
-  NavConfigObj = COMPONENT_NAVIGATION,
-) {
-  try {
-    const mainXmluiPath = join(FOLDERS.docsRoot, FILE_PATHS.MAIN_XMLUI);
-
-    if (!existsSync(mainXmluiPath)) {
-      throw new Error(COMPONENT_NAV_ERRORS.MAIN_XMLUI_NOT_FOUND(mainXmluiPath));
-    }
-
-    // Read the Main.xmlui file
-    const fileContent = await readFile(mainXmluiPath, TEXT_CONSTANTS.UTF8_ENCODING);
-
-    // Define the delimiter patterns using regex
-    const startDelimiterRegex = NavConfigObj.DELIMITERS.START_REGEX;
-    const endDelimiterRegex = NavConfigObj.DELIMITERS.END_REGEX;
-
-    const startMatch = fileContent.match(startDelimiterRegex);
-    const endMatch = fileContent.match(endDelimiterRegex);
-
-    if (!startMatch || !endMatch) {
-      throw new Error(COMPONENT_NAV_ERRORS.DELIMITERS_NOT_FOUND);
-    }
-
-    const startIndex = startMatch.index;
-    const endIndex = endMatch.index;
-
-    // Create indented content from the in-memory NavLinks content
-    const indentString = " ".repeat(indentationDepth);
-    const indentedLines = navLinksContent
-      .split(TEXT_CONSTANTS.NEWLINE_SEPARATOR)
-      .filter((line) => line.trim().length > 0) // Remove empty lines
-      .map((line) => indentString + line);
-
-    // Build the new content with proper formatting
-    const newGeneratedContent =
-      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
-      indentedLines.join(TEXT_CONSTANTS.NEWLINE_SEPARATOR) +
-      TEXT_CONSTANTS.NEWLINE_SEPARATOR +
-      indentString;
-
-    // Replace the content between delimiters
-    const beforeDelimiter = fileContent.substring(0, startIndex + startMatch[0].length);
-    const afterDelimiter = fileContent.substring(endIndex);
-    const newFileContent = beforeDelimiter + newGeneratedContent + afterDelimiter;
-
-    // Write the updated content back to the file
-    await writeFile(mainXmluiPath, newFileContent, TEXT_CONSTANTS.UTF8_ENCODING);
-  } catch (error) {
-    throw new Error(COMPONENT_NAV_ERRORS.CONTENT_REPLACEMENT_FAILED);
-  }
-}
-
-/**
- * Generates a comprehensive context variables summary page
- */
-async function generateContextVariablesSummary() {
-  logger.info("Generating context variables summary...");
-
-  // Collect all context variables from all components
-  const contextVarsByName = new Map();
-
-  // Iterate through all components
-  for (const [componentName, componentData] of Object.entries(collectedComponentMetadata)) {
-    // Skip if component has no context variables
-    if (!componentData.contextVars || Object.keys(componentData.contextVars).length === 0) {
-      continue;
-    }
-
-    // Process each context variable in this component
-    for (const [varName, varData] of Object.entries(componentData.contextVars)) {
-      // Skip internal context variables
-      if (varData.isInternal) {
-        continue;
-      }
-
-      // Initialize the context variable entry if it doesn't exist
-      if (!contextVarsByName.has(varName)) {
-        contextVarsByName.set(varName, {
-          name: varName,
-          occurrences: [],
-        });
-      }
-
-      // Add this component as an occurrence
-      const varEntry = contextVarsByName.get(varName);
-      varEntry.occurrences.push({
-        componentName,
-        description: varData.description || "No description provided",
-      });
-    }
-  }
-
-  // Sort context variables by name
-  const sortedContextVars = Array.from(contextVarsByName.values()).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  );
-
-  // Generate the markdown content
-  let markdown = generateContextVarsMarkdown(sortedContextVars);
-
-  // Write to file
-  const outputPath = join(FOLDERS.docsRoot, "content", "pages", "context-variables2.md");
-  await writeFile(outputPath, markdown, "utf8");
-
-  logger.info(`Context variables summary generated: ${outputPath}`);
-  logger.info(`Total unique context variables: ${sortedContextVars.length}`);
-}
-
-/**
- * Generates the markdown content for the context variables summary
- * @param {Array} contextVars Array of context variable objects
- * @returns {string} Markdown content
- */
-function generateContextVarsMarkdown(contextVars) {
-  let markdown = "";
-
-  // Add header
-  markdown += "# Context Variables Summary\n\n";
-  markdown +=
-    "This page provides a comprehensive overview of all context variables exposed by XMLUI components. ";
-  markdown +=
-    "Context variables are values that components make available to their children, accessible using the `$variableName` syntax.\n\n";
-
-  // Add table of contents
-  markdown += "## Available Context Variables\n\n";
-  markdown += "Jump to:\n\n";
-  for (const contextVar of contextVars) {
-    const anchor = contextVar.name
-      .toLowerCase()
-      .replace(/\$/g, "")
-      .replace(/[^a-z0-9-]/g, "-");
-    markdown += `- [\`${contextVar.name}\`](#${anchor})\n`;
-  }
-  markdown += "\n---\n\n";
-
-  // Generate section for each context variable
-  for (const contextVar of contextVars) {
-    markdown += generateContextVarSection(contextVar);
-  }
-
-  return markdown;
-}
-
-/**
- * Generates a section for a single context variable
- * @param {object} contextVar Context variable object with name and occurrences
- * @returns {string} Markdown section
- */
-function generateContextVarSection(contextVar) {
-  let section = "";
-  const anchor = contextVar.name
-    .toLowerCase()
-    .replace(/\$/g, "")
-    .replace(/[^a-z0-9-]/g, "-");
-
-  // Add context variable name as heading
-  section += `## \`${contextVar.name}\` [#${anchor}]\n\n`;
-
-  // Generate summary description
-  const summary = generateSummaryDescription(contextVar);
-  section += `${summary}\n\n`;
-
-  // Add "Used by" info
-  if (contextVar.occurrences.length === 1) {
-    section += `**Used by:** 1 component\n\n`;
-  } else {
-    section += `**Used by:** ${contextVar.occurrences.length} components\n\n`;
-  }
-
-  // Sort occurrences by component name
-  const sortedOccurrences = contextVar.occurrences.sort((a, b) =>
-    a.componentName.localeCompare(b.componentName),
-  );
-
-  // Create table of components that expose this context variable
-  const tableRows = sortedOccurrences.map((occurrence) => {
-    const componentLink = `[${occurrence.componentName}](/docs/reference/components/${occurrence.componentName})`;
-    return [componentLink, occurrence.description];
-  });
-
-  const table = createTable({
-    headers: ["Component", "Description"],
-    rows: tableRows,
-  });
-
-  section += table;
-  section += "\n";
-
-  return section;
-}
-
-/**
- * Generates a summary description based on the occurrences
- * @param {object} contextVar Context variable object
- * @returns {string} Summary description
- */
-function generateSummaryDescription(contextVar) {
-  // If all components have the same description, use it
-  const descriptions = contextVar.occurrences.map((occ) => occ.description);
-  const uniqueDescriptions = [...new Set(descriptions)];
-
-  if (uniqueDescriptions.length === 1) {
-    return uniqueDescriptions[0];
-  }
-
-  // If descriptions vary, generate a generic summary
-  const varNameWithoutDollar = contextVar.name.replace(/^\$/, "");
-
-  // Try to infer what the variable represents based on its name
-  if (varNameWithoutDollar.toLowerCase().includes("item")) {
-    return `Provides access to the current item being rendered in a list or iteration context.`;
-  } else if (varNameWithoutDollar.toLowerCase().includes("index")) {
-    return `Provides the index of the current item in an iteration or list context.`;
-  } else if (varNameWithoutDollar.toLowerCase().includes("value")) {
-    return `Provides access to the current value in the component's context.`;
-  } else if (varNameWithoutDollar.toLowerCase().includes("state")) {
-    return `Provides access to the current state of the component.`;
-  } else if (varNameWithoutDollar.toLowerCase().includes("data")) {
-    return `Provides access to data exposed by the component.`;
-  } else {
-    return `Context variable exposed by the following components. See individual component descriptions for details.`;
-  }
 }

@@ -1,6 +1,8 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { Logo, defaultProps } from "./LogoNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Logo";
 
@@ -25,16 +27,22 @@ export const LogoMd = createMetadata({
   },
 });
 
-export const logoComponentRenderer = createComponentRenderer(
-  COMP,
-  LogoMd,
-  ({ node, className, extractValue }) => {
+type ThemedLogoProps = React.ComponentPropsWithoutRef<typeof Logo>;
+
+export const ThemedLogo = React.forwardRef<React.ElementRef<typeof Logo>, ThemedLogoProps>(
+  function ThemedLogo({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(LogoMd);
     return (
       <Logo
-        className={className}
-        inline={extractValue.asOptionalBoolean(node.props.inline)}
-        alt={extractValue(node.props.alt)}
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
   },
 );
+
+export const logoComponentRenderer = wrapComponent(COMP, Logo, LogoMd, {
+  booleans: ["inline"],
+  strings: ["alt"],
+});

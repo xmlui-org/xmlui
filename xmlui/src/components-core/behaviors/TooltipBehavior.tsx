@@ -1,4 +1,4 @@
-import { parseTooltipOptions, Tooltip } from "../../components/Tooltip/TooltipNative";
+import { parseTooltipOptions, ThemedTooltip as Tooltip } from "../../components/Tooltip/Tooltip";
 import type { Behavior } from "./Behavior";
 
 /**

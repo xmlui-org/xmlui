@@ -24,6 +24,7 @@ type ValidationWrapperProps = {
   customValidationsDebounce?: number;
   validationMode?: ValidationMode;
   verboseValidationFeedback?: boolean;
+  validationDisplayDelay?: number;
   itemIndex?: number;
   formItemType?: string;
   componentType?: string;
@@ -64,6 +65,7 @@ export function ValidationWrapper({
   customValidationsDebounce = 0,
   validationMode,
   verboseValidationFeedback,
+  validationDisplayDelay = 0,
   itemIndex,
   formItemType,
   componentType,
@@ -76,16 +78,13 @@ export function ValidationWrapper({
   const { parentFormItemId } = useContext(FormItemContext);
 
   const formItemId = useMemo(() => {
-    if (isFormItem) {
-      return resolveFormItemId({
-        bindTo,
-        defaultId,
-        parentFormItemId,
-        itemIndex,
-      });
-    }
-    return bindTo || defaultId;
-  }, [bindTo, defaultId, isFormItem, itemIndex, parentFormItemId]);
+    return resolveFormItemId({
+      bindTo,
+      defaultId,
+      parentFormItemId,
+      itemIndex,
+    });
+  }, [bindTo, defaultId, itemIndex, parentFormItemId]);
 
   const contextVerboseValidationFeedback = useFormContextPart(
     (value) => value?.verboseValidationFeedback,
@@ -116,6 +115,7 @@ export function ValidationWrapper({
     validationResult,
     validationMode,
     effectiveVerboseValidationFeedback,
+    validationDisplayDelay,
   );
 
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });

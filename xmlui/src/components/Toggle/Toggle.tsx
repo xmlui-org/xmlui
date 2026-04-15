@@ -6,6 +6,7 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
+  useState,
 } from "react";
 import classnames from "classnames";
 
@@ -16,8 +17,9 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { PART_INPUT } from "../../components-core/parts";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 type ToggleProps = {
   id?: string;
@@ -34,12 +36,14 @@ type ToggleProps = {
   onBlur?: () => void;
   variant?: "checkbox" | "switch";
   indeterminate?: boolean;
+  classes?: Record<string, string>;
   className?: string;
   required?: boolean;
   autoFocus?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
-  forceHover?: boolean;
+  tabIndex?: number;
+  "aria-label"?: string;
 };
 
 export const defaultProps: Pick<
@@ -69,18 +73,20 @@ export const Toggle = forwardRef(function Toggle(
     onBlur = noop,
     variant = "checkbox",
     indeterminate = defaultProps.indeterminate,
+    classes,
     className,
     required,
     autoFocus,
     registerComponentApi,
     inputRenderer,
-    forceHover = false,
+    tabIndex,
+    "aria-label": ariaLabel,
     ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
 ) {
   const innerRef = React.useRef<HTMLInputElement | null>(null);
-  const ref = innerRef ? composeRefs(forwardedRef, innerRef) : forwardedRef;
+  const composedRef = useComposedRefs(forwardedRef, innerRef);
 
   const transformToLegitValue = (inp: any): boolean => {
     if (typeof inp === "undefined" || inp === null) {
@@ -104,8 +110,22 @@ export const Toggle = forwardRef(function Toggle(
     return false;
   };
 
+  const initialCycleRef = React.useRef(true);
+  const [suppressTransition, setSuppressTransition] = useState(() => transformToLegitValue(initialValue));
+
   useEffect(() => {
-    updateState({ value: transformToLegitValue(initialValue) }, { initial: true });
+    const legitInitial = transformToLegitValue(initialValue);
+    updateState({ value: legitInitial }, { initial: true });
+    if (initialCycleRef.current) {
+      initialCycleRef.current = false;
+      if (legitInitial) {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            setSuppressTransition(false);
+          });
+        });
+      }
+    }
   }, [initialValue, updateState]);
 
   const updateValue = useCallback(
@@ -169,12 +189,15 @@ export const Toggle = forwardRef(function Toggle(
       <Part partId={PART_INPUT}>
         <input
           {...rest}
+          data-component-type="Toggle"
           id={id}
-          ref={ref}
+          ref={composedRef}
           type="checkbox"
           role={variant}
           checked={legitValue}
           disabled={!enabled}
+          tabIndex={tabIndex}
+          aria-label={ariaLabel}
           required={required}
           readOnly={readOnly}
           aria-readonly={readOnly}
@@ -187,24 +210,33 @@ export const Toggle = forwardRef(function Toggle(
           onBlur={handleOnBlur}
           autoFocus={autoFocus}
           style={style}
-          className={classnames(className, styles.resetAppearance, {
-            [styles.checkbox]: variant === "checkbox",
-            [styles.switch]: variant === "switch",
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-            [styles.forceHover]: forceHover,
-          })}
+          className={classnames(
+            !inputRenderer ? classes?.[COMPONENT_PART_KEY] : undefined,
+            className,
+            styles.resetAppearance,
+            {
+              [styles.checkbox]: variant === "checkbox",
+              [styles.switch]: variant === "switch",
+              [styles.error]: validationStatus === "error",
+              [styles.warning]: validationStatus === "warning",
+              [styles.valid]: validationStatus === "valid",
+              [styles.noTransition]: suppressTransition,
+            },
+          )}
         />
       </Part>
     );
   }, [
     rest,
+    classes,
     className,
-    ref,
+    inputRenderer,
+    composedRef,
     style,
     id,
     enabled,
+    tabIndex,
+    ariaLabel,
     handleOnBlur,
     handleOnFocus,
     onInputChange,
@@ -216,11 +248,11 @@ export const Toggle = forwardRef(function Toggle(
     variant,
     indeterminate,
     autoFocus,
-    forceHover,
+    suppressTransition,
   ]);
 
   return inputRenderer ? (
-    <label className={styles.label}>
+    <label className={classnames(styles.label, classes?.[COMPONENT_PART_KEY])}>
       <div className={styles.inputContainer}>{input}</div>
       {inputRenderer({
         $checked: transformToLegitValue(value),

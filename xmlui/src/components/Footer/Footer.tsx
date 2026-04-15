@@ -1,10 +1,11 @@
 import styles from "./Footer.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Footer } from "./FooterNative";
 import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "Footer";
 
@@ -45,22 +46,16 @@ export const FooterMd = createMetadata({
   },
 });
 
-export const footerRenderer = createComponentRenderer(
-  COMP,
-  FooterMd,
-  ({ node, renderChild, className, layoutContext, extractValue }) => {
+export const footerRenderer = wrapComponent(COMP, Footer, FooterMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, layoutContext }) => {
     const sticky = extractValue.asOptionalBoolean(node.props.sticky, true);
-    
+    const mergedClasses = layoutContext?.themeClassName
+      ? { ...classes, [COMPONENT_PART_KEY]: classnames(layoutContext.themeClassName, classes?.[COMPONENT_PART_KEY]) }
+      : classes;
     return (
-      <Footer 
-        className={classnames(layoutContext?.themeClassName, className)}
-        sticky={sticky}
-      >
-        {renderChild(node.children, {
-          type: "Stack",
-          orientation: "horizontal",
-        })}
+      <Footer classes={mergedClasses} sticky={sticky}>
+        {renderChild(node.children, { type: "Stack", orientation: "horizontal" })}
       </Footer>
     );
   },
-);
+});

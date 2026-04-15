@@ -93,8 +93,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -253,6 +253,8 @@ The component has some parts that can be styled through layout properties and th
 | [lineHeight](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | *none* | *none* |
 | [marginBottom](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | 0 | 0 |
 | [marginBottom](/docs/styles-and-themes/common-units/#size-values)-title-ModalDialog | 0 | 0 |
+| [maxHeight](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 100% | 100% |
+| [maxHeight](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 100% | 100% |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 450px | 450px |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | 450px | 450px |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-ModalDialog | *none* | *none* |

@@ -1,0 +1,227 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "TableSelect";
+
+$borderColor:           createThemeVar("borderColor-#{$component}");
+$borderColorHover:      createThemeVar("borderColor-#{$component}--hover");
+$outlineColor:          createThemeVar("outlineColor-#{$component}--focus");
+$outlineWidth:          createThemeVar("outlineWidth-#{$component}--focus");
+$outlineStyle:          createThemeVar("outlineStyle-#{$component}--focus");
+$outlineOffset:         createThemeVar("outlineOffset-#{$component}--focus");
+$backgroundColor:       createThemeVar("Input:backgroundColor-#{$component}");
+$textColor:             createThemeVar("textColor-#{$component}");
+$textColorPlaceholder:  createThemeVar("textColor-placeholder-#{$component}");
+$borderRadius:          createThemeVar("borderRadius-#{$component}");
+$paddingHorizontal:     createThemeVar("paddingHorizontal-#{$component}");
+$paddingVertical:       createThemeVar("paddingVertical-#{$component}");
+$minHeight:             createThemeVar("minHeight-#{$component}");
+
+$dropdownBackground:    createThemeVar("backgroundColor-#{$component}-dropdown");
+$dropdownBorderColor:   createThemeVar("borderColor-#{$component}-dropdown");
+$dropdownBoxShadow:     createThemeVar("boxShadow-#{$component}-dropdown");
+
+$searchBorderColor:     createThemeVar("borderColor-#{$component}-search");
+$searchBackground:      createThemeVar("backgroundColor-#{$component}-search");
+
+$headerBackground:      createThemeVar("backgroundColor-#{$component}-header");
+$headerTextColor:       createThemeVar("textColor-#{$component}-header");
+
+$rowHoverBackground:    createThemeVar("backgroundColor-#{$component}-row--hover");
+$rowSelectedBackground: createThemeVar("backgroundColor-#{$component}-row--selected");
+$rowSelectedTextColor:  createThemeVar("textColor-#{$component}-row--selected");
+$rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
+
+.wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: $minHeight;
+  padding: $paddingVertical $paddingHorizontal;
+  background-color: $backgroundColor;
+  border: 1px solid $borderColor;
+  border-radius: $borderRadius;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  color: $textColor;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  color-scheme: inherit;
+  transition: border-color 0.15s ease;
+
+  &:hover {
+    border-color: $borderColorHover;
+  }
+
+  &:focus {
+    outline-color: $outlineColor;
+    outline-width: $outlineWidth;
+    outline-style: $outlineStyle;
+    outline-offset: $outlineOffset;
+    border-color: $borderColorHover;
+  }
+
+  &.open {
+    border-color: $borderColorHover;
+  }
+}
+
+.triggerText {
+  flex: 1;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &.placeholder {
+    color: $textColorPlaceholder;
+  }
+}
+
+.chevron {
+  flex-shrink: 0;
+  margin-left: 8px;
+  width: 16px;
+  height: 16px;
+  color: inherit;
+  transition: transform 0.15s ease;
+
+  &.rotated {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown {
+  /* position + top/left/width come from inline style (portal) */
+  z-index: 9999;
+  background-color: $dropdownBackground;
+  border: 1px solid $dropdownBorderColor;
+  border-radius: $borderRadius;
+  box-shadow: $dropdownBoxShadow;
+  overflow: hidden;
+}
+
+.searchWrapper {
+  padding: 8px;
+  border-bottom: 1px solid $searchBorderColor;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: $textColorPlaceholder;
+  width: 14px;
+  height: 14px;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  color: $textColor;
+
+  &::placeholder {
+    color: $textColorPlaceholder;
+  }
+}
+
+.tableWrapper {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tableHead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: $headerBackground;
+
+  th {
+    padding: 8px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: $headerTextColor;
+    border-bottom: 1px solid $rowBorderColor;
+    white-space: nowrap;
+  }
+}
+
+.tableBody {
+  tr {
+    border-bottom: 1px solid $rowBorderColor;
+    cursor: pointer;
+    transition: background-color 0.1s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: $rowHoverBackground;
+    }
+
+    &.selected {
+      background-color: $rowSelectedBackground;
+
+      td {
+        color: $rowSelectedTextColor;
+      }
+    }
+
+    &.highlighted {
+      background-color: $rowHoverBackground;
+      outline: none;
+    }
+  }
+
+  td {
+    padding: 10px 12px;
+    color: $textColor;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+  }
+}
+
+.emptyRow {
+  td {
+    padding: 16px 12px;
+    text-align: center;
+    color: $textColorPlaceholder;
+    cursor: default !important;
+
+    &:hover {
+      background-color: transparent !important;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

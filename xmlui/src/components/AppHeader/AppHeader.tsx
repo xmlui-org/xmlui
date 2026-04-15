@@ -7,6 +7,7 @@ import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
 import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "AppHeader";
 
@@ -62,7 +63,7 @@ export const AppHeaderMd = createMetadata({
 export const appHeaderComponentRenderer = createComponentRenderer(
   COMP,
   AppHeaderMd,
-  ({ node, renderChild, className, layoutContext, extractValue }) => {
+  ({ node, renderChild, classes, layoutContext, extractValue }) => {
     // --- Convert the plain (text) logo template into component definition
     const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
     const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
@@ -84,7 +85,8 @@ export const appHeaderComponentRenderer = createComponentRenderer(
           type: "Stack",
           orientation: "horizontal",
         })}
-        className={classnames(layoutContext?.themeClassName, className)}
+        classes={classes}
+        className={layoutContext?.themeClassName}
         renderChild={renderChild}
       >
         {renderChild(node.children, {

@@ -20,9 +20,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -228,15 +228,19 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Switch--success | $borderColor-Switch--success | $borderColor-Switch--success |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Switch--warning | $borderColor-Switch--warning | $borderColor-Switch--warning |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Switch--warning | $borderColor-Switch--warning | $borderColor-Switch--warning |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $color-surface-200 | $color-surface-200 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $color-surface-200 | $color-surface-200 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $borderColor-Input-default | $borderColor-Input-default |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch | $borderColor-Input-default | $borderColor-Input-default |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--error | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Switch--warning | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Switch | 1px | 1px |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-Switch | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Switch--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Switch | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Switch--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Switch | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Switch--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Switch | $outlineWidth--focus | $outlineWidth--focus |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Switch--focus | *none* | *none* |

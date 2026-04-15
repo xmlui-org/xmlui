@@ -26,6 +26,7 @@ $backgroundColor-list-Tabs: createThemeVar("backgroundColor-list-Tabs");
 $borderRadius-list-Tabs: createThemeVar("borderRadius-list-Tabs");
 $border-list-Tabs: createThemeVar("border-list-Tabs");
 $gap-list-Tabs: createThemeVar("gap-list-Tabs");
+$paddingTop-TabItem: createThemeVar("paddingTop-TabItem");
 
 @layer components {
   .tabs {
@@ -163,6 +164,7 @@ $gap-list-Tabs: createThemeVar("gap-list-Tabs");
   .tabsContent {
     flex-grow: 1;
     outline: none;
+    padding-top: var(--paddingTop-TabItem, #{$paddingTop-TabItem});
   }
 
   // Accordion view styles

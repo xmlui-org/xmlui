@@ -1,6 +1,6 @@
 import styles from "./ContextMenu.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
 import { ContextMenu } from "./ContextMenuNative";
@@ -18,7 +18,8 @@ export const ContextMenuMd = createMetadata({
     "trigger button and is typically used with `onContextMenu` events to create right-click " +
     "menus or custom context-aware action menus. The menu automatically positions itself " +
     "within the viewport and closes when clicking outside or when a menu item is selected. ",
-  parts: {
+    themeVarContributorComponents: ["MenuItem", "MenuSeparator", "SubMenuItem" ],
+    parts: {
     content: {
       description: "The content area of the ContextMenu where menu items are displayed.",
     },
@@ -62,30 +63,29 @@ export const ContextMenuMd = createMetadata({
   },
 });
 
-export const contextMenuComponentRenderer = createComponentRenderer(
-  CMCOMP,
-  ContextMenuMd,
-  ({ node, extractValue, renderChild, registerComponentApi, className, state, updateState }) => {
+export const contextMenuComponentRenderer = wrapComponent(CMCOMP, ContextMenu, ContextMenuMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, { node, extractValue, renderChild, registerComponentApi, updateState, state, classes }) => {
     // Filter separators dynamically: accounts for adjacent/leading/trailing separators
     // and `when` conditions on menu items so hidden items don't leave orphaned separators.
     const filteredChildren = filterSeparators(node.children, extractValue);
-    
+
     // Wrap filtered children with $context variable
     const nodeWithContextVars: ContainerWrapperDef = {
       type: "Container",
       contextVars: { $context: state.$context },
       children: filteredChildren,
     };
-    
+
     return (
       <ContextMenu
         registerComponentApi={registerComponentApi}
         updateState={updateState}
-        className={className}
+        classes={classes}
         menuWidth={extractValue(node.props.menuWidth)}
       >
         {renderChild(nodeWithContextVars)}
       </ContextMenu>
     );
   },
-);
+});

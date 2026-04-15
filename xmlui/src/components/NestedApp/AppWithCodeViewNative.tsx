@@ -2,15 +2,15 @@ import { type ReactNode, useCallback, useState } from "react";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import styles from "./NestedApp.module.scss";
 import { Tooltip } from "./Tooltip";
 import { createQueryString, withoutTrailingSlash } from "./utils";
 import { useAppContext } from "../../components-core/AppContext";
 import classnames from "classnames";
 import Logo from "./logo.svg?react";
-import { useTheme } from "../../components-core/theming/ThemeContext";
-import Icon from "../Icon/IconNative";
+import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import { ThemedIcon } from "../Icon/Icon";
 
 type AppWithCodeViewNativeProps = {
   // Markdown content to display in the left column
@@ -68,19 +68,21 @@ export function AppWithCodeViewNative({
   const [showCode, setShowCode] = useState(initiallyShowCode);
   const appContext = useAppContext();
   const [refreshVersion, setRefreshVersion] = useState(0);
-  const { activeTheme: currentTheme, activeThemeTone, activeThemeId } = useTheme();
+  const { activeThemeTone, activeThemeId } = useTheme();
+  const { themes: allThemes } = useThemes();
 
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
   const openPlayground = useCallback(async () => {
+    const themeForExport = allThemes.find((t) => t.id === activeThemeId);
     const data = {
       standalone: {
         app,
         components,
         config: {
           name: title,
-          themes: [currentTheme],
+          themes: themeForExport ? [themeForExport] : [],
           defaultTheme: activeTheme,
         },
         api: api,
@@ -97,7 +99,7 @@ export function AppWithCodeViewNative({
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
     window.open(`${safePopOutUrl}/#${appQueryString}`, "_blank");
-  }, [app, components, title, activeTheme, api, activeTone, safePopOutUrl]);
+  }, [allThemes, app, components, title, activeTheme, api, activeThemeId, activeTone, activeThemeTone, safePopOutUrl]);
 
   if (withFrame) {
     return (
@@ -144,7 +146,7 @@ export function AppWithCodeViewNative({
                           void openPlayground();
                         }}
                       >
-                        <Icon name="hyperlink" size="sm" />
+                        <ThemedIcon name="hyperlink" size="sm" />
                       </button>
                     }
                     label="View and edit in new full-width window"
@@ -160,7 +162,7 @@ export function AppWithCodeViewNative({
                           setRefreshVersion(refreshVersion + 1);
                         }}
                       >
-                        <Icon name="refresh" size="sm" />
+                        <ThemedIcon name="refresh" size="sm" />
                       </button>
                     }
                     label="Reset the app"

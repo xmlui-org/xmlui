@@ -4,6 +4,7 @@ import {
   forwardRef,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -29,13 +30,17 @@ import { useTheme, useThemes } from "../../components-core/theming/ThemeContext"
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
 import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderNative";
+import { AppHeaderMd } from "../AppHeader/AppHeader";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
 import { AppLayoutContext } from "../App/AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
 import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { writeLocalStorage } from "../../components-core/appContext/local-storage-functions";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // --- Slot Components ---
 
@@ -78,10 +83,12 @@ type Props = {
   navPanelInDrawer?: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
   noScrollbarGutters?: boolean;
+  fitContent?: boolean;
   onReady?: () => void;
   onMessageReceived?: (data: any, event: MessageEvent) => void;
   onKeyDown?: (event: KeyboardEvent) => void;
@@ -98,6 +105,9 @@ type Props = {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone?: boolean;
+  persistTheme?: boolean;
+  toneStorageKey?: string;
+  themeStorageKey?: string;
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
@@ -107,9 +117,13 @@ export const defaultProps: Pick<
   Props,
   | "scrollWholePage"
   | "noScrollbarGutters"
+  | "fitContent"
   | "defaultTone"
   | "defaultTheme"
   | "autoDetectTone"
+  | "persistTheme"
+  | "toneStorageKey"
+  | "themeStorageKey"
   | "onReady"
   | "onMessageReceived"
   | "onKeyDown"
@@ -119,9 +133,13 @@ export const defaultProps: Pick<
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
+  fitContent: false,
   defaultTone: undefined,
   defaultTheme: undefined,
   autoDetectTone: false,
+  persistTheme: false,
+  toneStorageKey: "appTone",
+  themeStorageKey: "appTheme",
   onReady: noop,
   onMessageReceived: noop,
   onKeyDown: noop,
@@ -168,6 +186,7 @@ export function App({
   loggedInUser,
   scrollWholePage = defaultProps.scrollWholePage,
   noScrollbarGutters = defaultProps.noScrollbarGutters,
+  fitContent = defaultProps.fitContent,
   onReady = defaultProps.onReady,
   onMessageReceived = defaultProps.onMessageReceived,
   onKeyDown = defaultProps.onKeyDown,
@@ -185,16 +204,20 @@ export function App({
   defaultTone,
   defaultTheme,
   autoDetectTone = defaultProps.autoDetectTone,
+  persistTheme = defaultProps.persistTheme,
+  toneStorageKey = defaultProps.toneStorageKey,
+  themeStorageKey = defaultProps.themeStorageKey,
   renderChild,
   name,
   className,
+  classes,
   applyDefaultContentPadding,
   registerComponentApi,
   footerSticky = true,
   ...rest
 }: Props) {
   const { getThemeVar } = useTheme();
-  const { setActiveThemeTone, setActiveThemeId, themes } = useThemes();
+  const { setActiveThemeTone, setActiveThemeId, activeThemeTone, activeThemeId, themes } = useThemes();
   const mounted = useRef(false);
 
   // Validate and sanitize layout input with explicit validation
@@ -238,9 +261,24 @@ export function App({
     defaultTone,
     defaultTheme,
     autoDetectTone,
+    persistTheme,
+    toneStorageKey,
+    themeStorageKey,
     setActiveThemeTone,
     setActiveThemeId,
   });
+
+  // Persist tone and theme ID to localStorage whenever they change (when persistTheme is true).
+  // Use writeLocalStorage so that storageTimestamp is updated and ChangeListener consumers are notified.
+  useEffect(() => {
+    if (!persistTheme) return;
+    writeLocalStorage(toneStorageKey, activeThemeTone);
+  }, [persistTheme, toneStorageKey, activeThemeTone]);
+
+  useEffect(() => {
+    if (!persistTheme) return;
+    writeLocalStorage(themeStorageKey, activeThemeId);
+  }, [persistTheme, themeStorageKey, activeThemeId]);
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -448,9 +486,11 @@ export function App({
 
   const wrapperBaseClasses = [
     className,
+    classes?.[COMPONENT_PART_KEY],
     styles.appContainer,
     {
-      [styles.scrollWholePage]: scrollWholePage,
+      [styles.scrollWholePage]: scrollWholePage && !fitContent,
+      [styles.fitContent]: fitContent,
       [styles.noScrollbarGutters]: noScrollbarGutters,
       [styles.noFooter]: !footerSticky,
       "media-large": mediaSize.largeScreen,
@@ -479,6 +519,10 @@ export function App({
     throw new Error("layout type not supported: " + safeLayout);
   }
 
+  // Compute the AppHeader theme class so the auto-generated header (which bypasses
+  // the component registry) still gets its CSS variables (e.g. --xmlui-height-AppHeader).
+  const appHeaderThemeClass = useComponentThemeClass(AppHeaderMd);
+
   // Helper functions for rendering slots
   const renderHeaderSlot = () => (
     <Part partId="header">
@@ -490,7 +534,7 @@ export function App({
         )}
       >
         {config.showCondensedHeader && !hasRegisteredHeader && hasRegisteredNavPanel && (
-          <AppContextAwareAppHeader renderChild={renderChild} />
+          <AppContextAwareAppHeader renderChild={renderChild} className={appHeaderThemeClass} />
         )}
         {header}
         {config.navPanelInHeader && navPanelVisible && (
@@ -543,6 +587,11 @@ export function App({
       })}
       style={styleWithHelpers}
       ref={shouldContainerScroll ? pageScrollRef : undefined}
+      // Stable hook for embedding code: when fitContent is on, parent pages
+      // (e.g. iframe hosts auto-resizing the embed) can find this element via
+      // [data-xmlui-app-fit-content] without depending on hashed CSS module
+      // class names.
+      data-xmlui-app-fit-content={fitContent ? "true" : undefined}
       {...rest}
     >
       {config.useVerticalFullHeaderStructure ? (
@@ -645,40 +694,89 @@ function useThemeInitialization({
   defaultTone,
   defaultTheme,
   autoDetectTone,
+  persistTheme,
+  toneStorageKey,
+  themeStorageKey,
   setActiveThemeTone,
   setActiveThemeId,
 }: {
   defaultTone?: string;
   defaultTheme?: string;
   autoDetectTone: boolean;
+  persistTheme: boolean;
+  toneStorageKey: string;
+  themeStorageKey: string;
   setActiveThemeTone: (tone: "dark" | "light") => void;
   setActiveThemeId: (id: string) => void;
 }) {
   const mounted = useRef(false);
 
-  // Initial theme and tone setup - runs once on mount
-  useEffect(() => {
+  // Initial theme and tone setup - runs once on mount.
+  // useLayoutEffect fires synchronously before the browser paints, preventing
+  // a flash where the default tone/theme is visible before the stored values load.
+  // NOTE: the stored tone/theme are pre-applied at the ThemeProvider level
+  // (via AppWrapper's resolveStoredTheme helper), so this effect is mainly a
+  // safety net for edge cases where that synchronous read is unavailable.
+  useLayoutEffect(() => {
     if (mounted.current) return;
     mounted.current = true;
 
-    // Set tone: explicit defaultTone, or auto-detect from system
-    if (defaultTone === "dark" || defaultTone === "light") {
-      setActiveThemeTone(defaultTone as any);
-    } else if (autoDetectTone) {
-      const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const detectedTone = systemPrefersDark ? "dark" : "light";
-      setActiveThemeTone(detectedTone);
+    // Resolve tone: persisted value wins, then explicit defaultTone, then auto-detect
+    let resolvedTone: "dark" | "light" | undefined;
+
+    if (persistTheme) {
+      try {
+        const stored = localStorage.getItem(toneStorageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (parsed === "dark" || parsed === "light") {
+            resolvedTone = parsed;
+          }
+        }
+      } catch {
+        // Corrupt value — fall through to other strategies
+      }
     }
 
-    // Set theme ID if provided
-    if (defaultTheme) {
-      setActiveThemeId(defaultTheme);
+    if (!resolvedTone) {
+      if (defaultTone === "dark" || defaultTone === "light") {
+        resolvedTone = defaultTone;
+      } else if (autoDetectTone) {
+        const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        resolvedTone = systemPrefersDark ? "dark" : "light";
+      }
+    }
+
+    if (resolvedTone) {
+      setActiveThemeTone(resolvedTone);
+    }
+
+    // Resolve theme ID: persisted value wins, then explicit defaultTheme
+    let resolvedTheme: string | undefined;
+    if (persistTheme) {
+      try {
+        const stored = localStorage.getItem(themeStorageKey);
+        if (stored !== null) {
+          const parsed = JSON.parse(stored);
+          if (typeof parsed === "string" && parsed.length > 0) {
+            resolvedTheme = parsed;
+          }
+        }
+      } catch {
+        // Corrupt value — fall through to defaultTheme
+      }
+    }
+    if (!resolvedTheme && defaultTheme) {
+      resolvedTheme = defaultTheme;
+    }
+    if (resolvedTheme) {
+      setActiveThemeId(resolvedTheme);
     }
 
     return () => {
       mounted.current = false;
     };
-  }, [defaultTone, defaultTheme, autoDetectTone, setActiveThemeTone, setActiveThemeId]);
+  }, [defaultTone, defaultTheme, autoDetectTone, persistTheme, toneStorageKey, themeStorageKey, setActiveThemeTone, setActiveThemeId]);
 
   // Listen for system theme changes when autoDetectTone is enabled
   useEffect(() => {

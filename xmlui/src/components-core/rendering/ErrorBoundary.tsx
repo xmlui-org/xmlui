@@ -3,6 +3,7 @@ import React, { type ErrorInfo, type ReactNode } from "react";
 import styles from "./ErrorBoundary.module.scss";
 
 import type { ComponentLike } from "../../abstractions/ComponentDefs";
+import { pushXsLog } from "../inspector/inspectorUtils";
 
 // --- The properties of the ErrorBoundary component
 interface Props {
@@ -54,25 +55,17 @@ export class ErrorBoundary extends React.Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo, this.props.location);
 
-    // Trace the error if xsVerbose tracing is enabled
-    // Note: ErrorBoundary is a class component without access to appContext,
-    // so we check _xsLogs existence as a proxy for xsVerbose being enabled
-    if (typeof window !== "undefined") {
-      const w = window as any;
-      // _xsLogs is only initialized when xsVerbose=true in AppContent
-      if (Array.isArray(w._xsLogs)) {
-        w._xsLogs.push({
-          ts: Date.now(),
-          perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-          traceId: w._xsCurrentTrace,
-          kind: "error:boundary",
-          error: error.message,
-          stack: error.stack,
-          componentStack: errorInfo.componentStack,
-          location: this.props.location,
-        });
-      }
-    }
+    // Trace the error — pushXsLog is a noop when xsVerbose is off
+    pushXsLog({
+      ts: Date.now(),
+      perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+      traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+      kind: "error:boundary",
+      error: { message: error.message },
+      stack: error.stack,
+      componentStack: errorInfo.componentStack,
+      location: this.props.location,
+    });
   }
 
   /**

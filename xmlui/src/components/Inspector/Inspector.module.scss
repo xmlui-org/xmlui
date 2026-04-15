@@ -1,0 +1,80 @@
+@use "../../components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Inspector";
+$color-icon-Inspector: createThemeVar("color-icon-#{$component}");
+
+@layer components {
+  .iconButton {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: $color-icon-Inspector;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    color: currentColor;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .dialog {
+    background: var(--backgroundColor-primary, #fff);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-width: 98vw;
+    max-height: 98vh;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--borderColor, #e5e7eb);
+  }
+
+  .title {
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .closeButton {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: currentColor;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  .iframe {
+    flex: 1;
+    border: none;
+    width: 100%;
+    height: 100%;
+  }
+
+  :export {
+    themeVars: t.json-stringify($themeVars);
+  }
+}

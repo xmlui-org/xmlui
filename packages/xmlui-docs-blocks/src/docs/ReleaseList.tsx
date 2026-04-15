@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./ReleaseList.xmlui";
 
-export const ReleaseListMd = createMetadata({
+export const ReleaseListMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "Release list. Items: tag_name or version, published_at, changes[{ description, commit_sha }], optional assets[{ name, browser_download_url }].",

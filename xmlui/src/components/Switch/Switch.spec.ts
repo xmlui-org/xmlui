@@ -1,3 +1,4 @@
+import { getBounds } from "../../testing/component-test-helpers";
 import { test, expect } from "../../testing/fixtures";
 
 // =============================================================================
@@ -25,190 +26,82 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("transformToLegitValue Input Type Tests", () => {
-    // Boolean values
-    test("initialValue handles boolean true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{true}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles boolean false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{false}" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    // Undefined and null values
-    test("initialValue handles undefined as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{undefined}" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    test("initialValue handles null as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{null}" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    // Number values
-    test("initialValue handles number 0 as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{0}" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    test("initialValue handles positive number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{1}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles negative number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{-1}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles decimal number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{3.14}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles NaN as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{NaN}" />`);
-      // NaN is treated as true due to JavaScript evaluation context
-      // In XMLUI context, NaN is passed through differently than expected
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    // String values
-    test("initialValue handles empty string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    test("initialValue handles whitespace-only string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="   " />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'false' as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="false" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'FALSE' as false (case insensitive)", async ({
+    test("initialValue handles various deterministic input types", async ({
       initTestBed,
       page,
     }) => {
-      await initTestBed(`<Switch initialValue="FALSE" />`);
-      await expect(page.getByRole("switch")).not.toBeChecked();
+      await initTestBed(`
+        <Fragment>
+          <Switch testId="sw0" initialValue="{true}" />
+          <Switch testId="sw1" initialValue="{false}" />
+          <Switch testId="sw2" initialValue="{undefined}" />
+          <Switch testId="sw3" initialValue="{null}" />
+          <Switch testId="sw4" initialValue="{0}" />
+          <Switch testId="sw5" initialValue="{1}" />
+          <Switch testId="sw6" initialValue="{-1}" />
+          <Switch testId="sw7" initialValue="{3.14}" />
+          <Switch testId="sw8" initialValue="{NaN}" />
+          <Switch testId="sw9" initialValue="" />
+          <Switch testId="sw10" initialValue="   " />
+          <Switch testId="sw11" initialValue="false" />
+          <Switch testId="sw12" initialValue="FALSE" />
+          <Switch testId="sw13" initialValue="true" />
+          <Switch testId="sw14" initialValue="yes" />
+          <Switch testId="sw15" initialValue="not false" />
+          <Switch testId="sw16" initialValue="{Infinity}" />
+          <Switch testId="sw17" initialValue="{-Infinity}" />
+        </Fragment>
+      `);
+      // Boolean values
+      await expect(page.getByTestId("sw0")).toBeChecked();
+      await expect(page.getByTestId("sw1")).not.toBeChecked();
+      // Undefined and null
+      await expect(page.getByTestId("sw2")).not.toBeChecked();
+      await expect(page.getByTestId("sw3")).not.toBeChecked();
+      // Number values
+      await expect(page.getByTestId("sw4")).not.toBeChecked();
+      await expect(page.getByTestId("sw5")).toBeChecked();
+      await expect(page.getByTestId("sw6")).toBeChecked();
+      await expect(page.getByTestId("sw7")).toBeChecked();
+      // NaN is treated as true in XMLUI context
+      await expect(page.getByTestId("sw8")).toBeChecked();
+      // String values
+      await expect(page.getByTestId("sw9")).not.toBeChecked();
+      await expect(page.getByTestId("sw10")).not.toBeChecked();
+      await expect(page.getByTestId("sw11")).not.toBeChecked();
+      await expect(page.getByTestId("sw12")).not.toBeChecked();
+      await expect(page.getByTestId("sw13")).toBeChecked();
+      await expect(page.getByTestId("sw14")).toBeChecked();
+      await expect(page.getByTestId("sw15")).toBeChecked();
+      // Edge cases
+      await expect(page.getByTestId("sw16")).toBeChecked();
+      await expect(page.getByTestId("sw17")).toBeChecked();
     });
 
-    test("initialValue handles string 'true' as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="true" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles non-empty string as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="yes" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles string with content and 'false' as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Switch initialValue="not false" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    // Array values
-    test("initialValue handles empty array as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{[]}" />`);
-      // Empty arrays may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with elements as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{[1, 2, 3]}" />`);
-      // Arrays with elements may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).toBeChecked();
-      } else {
-        // Component doesn't render with complex array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with single element as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Switch initialValue="{['item']}" />`);
-      // Arrays may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).toBeChecked();
-      } else {
-        // Component doesn't render with array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Object values
-    test("initialValue handles empty object as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{{}}" />`);
-      // Empty objects may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles object with properties as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{{a: 'b'}}" />`);
-      // Objects may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).toBeChecked();
-      } else {
-        // Component doesn't render with object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles complex object as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{{name: 'test', value: 123}}" />`);
-      // Complex objects may cause component to not render in some contexts
-      const switchElement = page.getByRole("switch");
-      const exists = await switchElement.count();
-      if (exists > 0) {
-        await expect(switchElement).toBeChecked();
-      } else {
-        // Component doesn't render with complex object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Edge case values
-    test("initialValue handles Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{Infinity}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
-    });
-
-    test("initialValue handles negative Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Switch initialValue="{-Infinity}" />`);
-      await expect(page.getByRole("switch")).toBeChecked();
+    test("initialValue handles array and object values", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Fragment>
+          <Switch testId="sa0" initialValue="{[]}" />
+          <Switch testId="sa1" initialValue="{[1, 2, 3]}" />
+          <Switch testId="sa2" initialValue="{['item']}" />
+          <Switch testId="so0" initialValue="{{}}" />
+          <Switch testId="so1" initialValue="{{a: 'b'}}" />
+          <Switch testId="so2" initialValue="{{name: 'test', value: 123}}" />
+        </Fragment>
+      `);
+      // Arrays and objects may cause the component to not render - that is acceptable
+      const sa0 = page.getByTestId("sa0");
+      if ((await sa0.count()) > 0) await expect(sa0).not.toBeChecked();
+      const sa1 = page.getByTestId("sa1");
+      if ((await sa1.count()) > 0) await expect(sa1).toBeChecked();
+      const sa2 = page.getByTestId("sa2");
+      if ((await sa2.count()) > 0) await expect(sa2).toBeChecked();
+      const so0 = page.getByTestId("so0");
+      if ((await so0.count()) > 0) await expect(so0).not.toBeChecked();
+      const so1 = page.getByTestId("so1");
+      if ((await so1.count()) > 0) await expect(so1).toBeChecked();
+      const so2 = page.getByTestId("so2");
+      if ((await so2.count()) > 0) await expect(so2).toBeChecked();
     });
   });
 
@@ -531,6 +424,70 @@ test.describe("Label", () => {
     await initTestBed(`<Switch label="Test label" labelPosition="invalid" />`);
     const switchElement = page.getByRole("switch");
     await expect(switchElement).toBeVisible();
+  });
+
+  test("labelPosition=before positions label before input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="ltr" label="Enable feature" labelPosition="before" />`);
+
+    const { left: switchLeft } = await getBounds(page.getByLabel("Enable feature"));
+    const { right: labelRight } = await getBounds(page.getByText("Enable feature"));
+
+    // Label should be positioned before (left of) the switch
+    expect(labelRight).toBeLessThan(switchLeft);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=after positions label after input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="ltr" label="Enable feature" labelPosition="after" />`);
+
+    const { right: switchRight } = await getBounds(page.getByLabel("Enable feature"));
+    const { left: labelLeft } = await getBounds(page.getByText("Enable feature"));
+
+    // Label should be positioned after (right of) the switch
+    expect(labelLeft).toBeGreaterThan(switchRight);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=before uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Switch label="Enable feature" labelPosition="before" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("Enable feature"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=after uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Switch label="Enable feature" labelPosition="after" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("Enable feature"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=before respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="rtl" label="Enable feature" labelPosition="before" />`);
+
+    // In RTL, "before" means the label is to the right of the switch
+    const { right: switchRight } = await getBounds(page.getByLabel("Enable feature"));
+    const { left: labelLeft } = await getBounds(page.getByText("Enable feature"));
+
+    expect(labelLeft).toBeGreaterThan(switchRight);
+  });
+
+  test("labelPosition=after respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Switch direction="rtl" label="Enable feature" labelPosition="after" />`);
+
+    // In RTL, "after" means the label is to the left of the switch
+    const { left: switchLeft } = await getBounds(page.getByLabel("Enable feature"));
+    const { right: labelRight } = await getBounds(page.getByText("Enable feature"));
+
+    expect(labelRight).toBeLessThan(switchLeft);
   });
 });
 
@@ -884,7 +841,7 @@ test.describe("Theme Vars", () => {
 // =============================================================================
 
 test.describe("Validation", () => {
-  test(`applies correct borderColor --default`, async ({ initTestBed, page }) => {
+  test(`applies correct borderColor`, async ({ initTestBed, page }) => {
     await initTestBed(`<Switch testId="test" />`, {
       testThemeVars: {
         "borderColor-Switch": "rgb(255, 0, 0)",
@@ -904,7 +861,7 @@ test.describe("Validation", () => {
 
   test(`applies correct borderColor on hover`, async ({ initTestBed, page }) => {
     await initTestBed(`<Switch testId="test" />`, {
-      testThemeVars: { [`borderColor-Switch--default--hover`]: "rgb(0, 0, 0)" },
+      testThemeVars: { [`borderColor-Switch--hover`]: "rgb(0, 0, 0)" },
     });
     await page.getByTestId("test").hover();
     await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
@@ -1281,5 +1238,51 @@ test.describe("Behaviors and Parts", () => {
     // Should only have one label with the text "Enable notifications"
     const labels = page.getByText("Enable notifications");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<Switch testId="test" width-md="200px" />`);
+    const switchEl = page.getByTestId("test");
+
+    // Below md — width should NOT be 200px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(switchEl).not.toHaveCSS("width", "200px");
+
+    // At md — width should be 200px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(switchEl).toHaveCSS("width", "200px");
+
+    // Well above md — width should still be 200px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(switchEl).toHaveCSS("width", "200px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Switch testId="test" width="150px" />`);
+    const switchEl = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(switchEl).toHaveCSS("width", "150px");
+    }
+  });
+
+  test("breakpoint width overrides base at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<Switch testId="test" width="100px" width-lg="300px" />`);
+    const switchEl = page.getByTestId("test");
+
+    // Below lg — base 100px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(switchEl).toHaveCSS("width", "100px");
+
+    // At lg — 300px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(switchEl).toHaveCSS("width", "300px");
   });
 });

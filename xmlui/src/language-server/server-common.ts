@@ -5,6 +5,7 @@ import type {
   InitializeResult,
   HoverParams,
   DocumentFormattingParams,
+  FoldingRangeParams,
 } from "vscode-languageserver";
 import {
   TextDocumentSyncKind,
@@ -28,6 +29,7 @@ import { Project } from "./base/project.js";
 import { handleDefinition } from "./services/definition.js";
 import { ProjectDocumentManager } from "./base/project-document-manager";
 import { fileURLToPath } from "url";
+import { handleFoldingRanges } from "./services/folding";
 
 const metaByComp = collectedComponentMetadata as ComponentMetadataCollection;
 const metadataProvider = new MetadataProvider(metaByComp);
@@ -69,6 +71,7 @@ export function start(connection: Connection) {
         hoverProvider: true,
         documentFormattingProvider: true,
         definitionProvider: true,
+        foldingRangeProvider: true,
       },
     };
     if (hasWorkspaceFolderCapability) {
@@ -110,6 +113,10 @@ export function start(connection: Connection) {
 
   connection.onCompletion(({ position, textDocument }: TextDocumentPositionParams) => {
     return handleCompletion(project, textDocument.uri, position);
+  });
+
+  connection.onFoldingRanges(({ textDocument }: FoldingRangeParams) => {
+    return handleFoldingRanges(project, textDocument.uri);
   });
 
   connection.onCompletionResolve((completionItem: XmluiCompletionItem) => {

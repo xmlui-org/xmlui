@@ -5,63 +5,82 @@ Define a `PostalAddress` component shared for billing and shipping. Use the Java
 ```xmlui-pg
 ---comp display
 <Component name="PostalAddress">
-    <FormItem
+    <TextBox
       label="Address"
-      type="text"
       bindTo="{$props.type}.address"
       width="100%"
       placeholder="Street address" />
 
-    <FormItem
+    <TextBox
       label="City"
-      type="text"
       bindTo="{$props.type}.city"
       width="100%"
       placeholder="City" />
 
-    <FormItem
+    <TextBox
       label="State/Province"
-      type="text"
       bindTo="{$props.type}.state"
       width="100%"
       placeholder="State/Province" />
 
-    <FormItem
+    <TextBox
       label="Postal code"
-      type="text"
       bindTo="{$props.type}.postal_code"
       width="100%"
       placeholder="Postal code" />
 
-    <FormItem
+    <TextBox
       label="Country"
-      type="text"
       bindTo="{$props.type}.country"
       width="100%"
       placeholder="Country" />
   </Component>
----app display {12}
+---app display {15-18}
   <App>
     <Form
       id="addresses"
       data="{{
-        billing: { address: '123 W. 57th', city: 'New York', state: 'NY', country: 'USA', postal_code: '10019' },
+        billing: { 
+          address: '123 W. 57th', city: 'New York', state: 'NY', 
+          country: 'USA', postal_code: '10019' 
+        },
         shipping: {}
       }}"
       onSubmit="(toSave) => toast(JSON.stringify(toSave))"
     >
       <Button
         label="Copy Billing to Shipping"
-        onClick="() => addresses.update({ shipping: { ...$data.billing } })" />
+        onClick="
+          addresses.update({ shipping: { ...$data.billing } });
+          toast.success('Billing copied to Shipping')
+        " />
       <Tabs>
-        <TabItem label="billing">
+        <TabItem label="Billing" paddingVertical="$padding-normal">
           <PostalAddress type="billing" />
         </TabItem>
-        <TabItem label="shipping">
+        <TabItem label="Shipping" paddingVertical="$padding-normal">
           <PostalAddress type="shipping" />
         </TabItem>
       </Tabs>
     </Form>
   </App>
 ```
+
+## Key points
+
+**Extract shared field groups into a custom component**: `PostalAddress` is defined once and reused for both billing and shipping by passing `type` as a prop. The `bindTo` expressions use `{$props.type}.fieldName` so the same component writes to different parts of the form data depending on where it is placed.
+
+**`Form.update()` merges data into the current form state**: Calling `addresses.update({ shipping: { ...$data.billing } })` patches only the `shipping` key, leaving all other form fields untouched.
+
+**The spread operator copies a nested object in one step**: `{ ...$data.billing }` creates a shallow copy of the billing object. Every property is duplicated into the shipping section without listing field names individually.
+
+**`$data` always reflects the live form values**: Inside event handlers, `$data` contains the current value of every form field, including unsaved changes. Reading `$data.billing` after the user has edited the billing section returns the latest input, not the initial data.
+
+---
+
+## See also
+
+- [Form component](/docs/reference/components/Form) — `update()` method, `$data` context variable
+- [Prefill a form from an API response](/docs/howto/prefill-a-form-from-an-api-response) — loading initial form data from a server
+- [Transform form data before submission](/docs/howto/transform-form-data-before-submission) — reshaping data in `onWillSubmit`
 

@@ -9,12 +9,26 @@ import React, {
 } from "react";
 
 import type { ButtonVariant, ButtonThemeColor } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
-import { Stack } from "../Stack/StackNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedStack as Stack } from "../Stack/Stack";
 import { Dialog } from "./Dialog";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
-const ConfirmationModalContext = React.createContext({
-  confirm: (title: string, message?: string, actionLabel?: string) => Promise.resolve(false),
+type ConfirmOptions = {
+  title?: string;
+  message?: string;
+  actionLabel?: string;
+  cancelLabel?: string;
+  width?: string;
+};
+
+type ConfirmFn = {
+  (options: ConfirmOptions): Promise<boolean>;
+  (title?: string, message?: string, actionLabel?: string, cancelLabel?: string, width?: string): Promise<boolean>;
+};
+
+const ConfirmationModalContext = React.createContext<{ confirm: ConfirmFn }>({
+  confirm: () => Promise.resolve(false),
 });
 
 export const useConfirm = () => useContext(ConfirmationModalContext);
@@ -30,12 +44,6 @@ type ConfirmButtonParams = {
   value: any;
 };
 
-type ConfirmParams = {
-  message?: string;
-  title: string;
-  buttons: Array<ConfirmButtonParams>;
-};
-
 // Check if verbose tracing is active by looking for window._xsLogs directly.
 // We can't use useAppContext() here because ConfirmationModalContextProvider
 // is mounted above AppContext in the component tree.
@@ -44,12 +52,13 @@ function isTracingActive(): boolean {
 }
 
 export const ConfirmationModalContextProvider = ({ children }: Props) => {
-
   // State
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [title, setTitle] = useState<string>("Are you sure?");
   const [message, setMessage] = useState<string | undefined>();
+  const [cancelLabel, setCancelLabel] = useState<string>("Cancel");
   const [buttons, setButtons] = useState<Array<ConfirmButtonParams>>([]);
+  const [width, setWidth] = useState<string | undefined>();
   // Refs and other
   const resolver = useRef<((confirmationResult: boolean) => void) | null>(null);
   const buttonsRef = useRef<HTMLDivElement>(null);
@@ -67,39 +76,54 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
   }, [showConfirmationModal]);
 
   const handleShow = useCallback(
-    (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
+    (
+      titleOrOptions: string | ConfirmOptions = "Confirm Operation",
+      messageArg = "Are you sure you want to perform this operation?",
+      actionLabelArg = "Yes",
+      cancelLabelArg = "Cancel",
+      widthArg?: string,
+    ) => {
+      let title: string;
+      let message: string;
+      let actionLabel: string;
+      let cancelLabel: string;
+      let resolvedWidth: string | undefined;
+      if (typeof titleOrOptions === "object" && titleOrOptions !== null) {
+        title = titleOrOptions.title ?? "Confirm Operation";
+        message = titleOrOptions.message ?? "Are you sure you want to perform this operation?";
+        actionLabel = titleOrOptions.actionLabel ?? "Yes";
+        cancelLabel = titleOrOptions.cancelLabel ?? "Cancel";
+        resolvedWidth = titleOrOptions.width;
+      } else {
+        title = titleOrOptions;
+        message = messageArg;
+        actionLabel = actionLabelArg;
+        cancelLabel = cancelLabelArg;
+        resolvedWidth = widthArg;
+      }
       // Trace confirmation modal show
       if (isTracingActive()) {
         const w = window as any;
         w._xsPendingConfirmTrace = w._xsCurrentTrace || w._xsLastInteraction?.id;
-        const modalTitle = typeof title === "string" ? title : title.title;
-        const modalButtons = typeof title === "string"
-          ? [{ label: actionLabel || "Ok", value: true }]
-          : title.buttons.map(b => ({ label: b.label, value: b.value }));
-        w._xsLogs.push({
+        pushXsLog({
           ts: Date.now(),
           perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
           traceId: w._xsCurrentTrace,
           kind: "modal:show",
           modalType: "confirmation",
-          title: modalTitle,
-          buttons: modalButtons,
+          ariaName: title,
+          title,
+          buttons: [
+            { label: actionLabel, value: true },
+            { label: cancelLabel, value: false },
+          ],
         });
       }
-      if (typeof title === "string") {
-        setTitle(title);
-        setButtons([
-          {
-            label: actionLabel || "Ok",
-            value: true,
-          },
-        ]);
-        setMessage(message);
-      } else {
-        setTitle(title.title);
-        setButtons(title.buttons);
-        setMessage(title.message);
-      }
+      setTitle(title);
+      setButtons([{ label: actionLabel, value: true }]);
+      setMessage(message);
+      setCancelLabel(cancelLabel);
+      setWidth(resolvedWidth);
       setShowConfirmationModal(true);
       return new Promise<boolean>(function (resolve) {
         resolver.current = resolve;
@@ -116,12 +140,13 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       if (w._xsPendingConfirmTrace) {
         w._xsCurrentTrace = w._xsPendingConfirmTrace;
       }
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
         traceId: w._xsCurrentTrace,
         kind: "modal:confirm",
         modalType: "confirmation",
+        ariaName: title,
         value,
         buttonLabel,
       });
@@ -140,12 +165,13 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       if (w._xsPendingConfirmTrace) {
         w._xsCurrentTrace = w._xsPendingConfirmTrace;
       }
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
         traceId: w._xsCurrentTrace,
         kind: "modal:cancel",
         modalType: "confirmation",
+        ariaName: title,
       });
     }
     if (resolver.current) {
@@ -156,7 +182,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
 
   const contextValue = useMemo(() => {
     return {
-      confirm: handleShow,
+      confirm: handleShow as ConfirmFn,
     };
   }, [handleShow]);
 
@@ -170,6 +196,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
           description={message}
           isOpen={true}
           onClose={handleCancel}
+          width={width}
           buttons={
             <Stack
               orientation="horizontal"
@@ -178,7 +205,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
               ref={buttonsRef}
             >
               <Button variant="ghost" themeColor="secondary" size="sm" onClick={handleCancel}>
-                Cancel
+                {cancelLabel}
               </Button>
               {buttons.length > 1 ? <div style={{ flex: 1 }} /> : undefined}
               {buttons.map(

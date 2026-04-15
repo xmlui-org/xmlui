@@ -61,6 +61,15 @@ export const AppMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.scrollWholePage,
     },
+    fitContent: {
+      description:
+        `When \`true\`, the app sizes itself to its content's natural height rather than ` +
+        `filling its container's viewport. Intended for embedding an app inside an iframe ` +
+        `or as a block within a larger page: the host page becomes the sole scroll container. ` +
+        `This overrides \`scrollWholePage\`'s viewport pinning.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.fitContent,
+    },
     noScrollbarGutters: {
       description:
         "This boolean property specifies whether the scrollbar gutters should be hidden.",
@@ -79,13 +88,38 @@ export const AppMd = createMetadata({
       defaultValue: defaultProps.defaultTheme,
     },
     autoDetectTone: {
-      description: 
+      description:
         'This boolean property enables automatic detection of the system theme preference. ' +
         'When set to true and no defaultTone is specified, the app will automatically use ' +
         '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
         'also respond to changes in the system theme preference.',
       valueType: "boolean",
       defaultValue: defaultProps.autoDetectTone,
+    },
+    persistTheme: {
+      description:
+        'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
+        'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
+        'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
+      valueType: "boolean",
+      defaultValue: defaultProps.persistTheme,
+      isInternal: true,
+    },
+    themeStorageKey: {
+      description:
+        'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
+        'Change this if you need to namespace the key per-app or per-user.',
+      valueType: "string",
+      defaultValue: defaultProps.themeStorageKey,
+      isInternal: true,
+    },
+    toneStorageKey: {
+      description:
+        'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
+        'Change this if you need to namespace the key per-app or per-user.',
+      valueType: "string",
+      defaultValue: defaultProps.toneStorageKey,
+      isInternal: true,
     },
   },
   events: {
@@ -133,7 +167,7 @@ export const AppMd = createMetadata({
       },
     },
     didNavigate: {
-      description: 
+      description:
         `This event fires after the app has completed any navigation (including Link clicks, browser back/forward, ` +
         `and programmatic navigation).`,
       signature: "(to: string | number, queryParams?: Record<string, any>) => Promise<void>",
@@ -145,6 +179,7 @@ export const AppMd = createMetadata({
   },
   themeVars: { ...parseScssVar(styles.themeVars), ...parseScssVar(drawerStyles.themeVars) },
   limitThemeVarsToComponent: true,
+  themeVarContributorComponents: ["Footer", "Pages"],
   themeVarDescriptions: {
     "maxWidth-content-App":
       "This theme variable defines the maximum width of the main content. If the main " +
@@ -158,7 +193,9 @@ export const AppMd = createMetadata({
       "with one of the vertical layouts.",
   },
   defaultThemeVars: {
-    "maxWidth-Drawer": "100%",
+    [`maxWidth-drawer-${COMP}`]: "100%",
+    [`top-closeButton-${COMP}`]: "$space-2",
+    [`right-closeButton-${COMP}`]: "$space-2",
     [`width-navPanel-${COMP}`]: "$space-64",
     [`width-navPanel-collapsed-${COMP}`]: "48px",
     [`borderRight-navPanelWrapper-${COMP}`]: "1px solid $borderColor",
@@ -168,7 +205,7 @@ export const AppMd = createMetadata({
     [`boxShadow-header-${COMP}`]: "none",
     [`boxShadow-navPanel-${COMP}`]: "none",
     [`scroll-padding-block-Pages`]: "$space-4",
-    [`backgroundColor-content-App`]: "$backgroundColor",
+    [`backgroundColor-content-${COMP}`]: "$backgroundColor",
     light: {
       // --- No light-specific theme vars
     },
@@ -179,24 +216,24 @@ export const AppMd = createMetadata({
 });
 
 
-function AppNode({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) {
+function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) {
   // --- Use ref to track if we've already processed the navigation to avoid duplicates in strict mode
   const processedNavRef = useRef(false);
 
   // --- Extract app components
   const extracted = extractAppComponents(node.children);
   const { AppHeader, Footer, Pages, restChildren } = extracted;
-  
+
   // --- Enhance NavPanel with page navigation inline
   const { NavPanel: originalNavPanel } = extracted;
-  
+
   let NavPanel = originalNavPanel;
-  
+
   if (Pages && !processedNavRef.current) {
     processedNavRef.current = true;
-    
+
     const extraNavs = extractNavPanelFromPages(Pages, originalNavPanel, extractValue);
-    
+
     if (extraNavs?.length) {
       if (originalNavPanel) {
         NavPanel = {
@@ -213,12 +250,16 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
     }
   }
 
-  const applyDefaultContentPadding = !Pages;
-  const footerSticky = Footer?.props?.sticky !== undefined 
+  // Determine if default content padding should be applied
+  // Only apply if Pages is not present AND padding/paddingTop is not explicitly set
+  const hasExplicitPadding = node.props.padding !== undefined
+  const applyDefaultContentPadding = !Pages && !hasExplicitPadding;
+  const footerSticky = Footer?.props?.sticky !== undefined
     ? extractValue.asOptionalBoolean(Footer.props.sticky, true)
     : true;
   const scrollWholePage = extractValue.asOptionalBoolean(node.props.scrollWholePage, true);
-  
+  const fitContent = extractValue.asOptionalBoolean(node.props.fitContent, false);
+
   // When scrollWholePage is false, pageContentContainer is a vertical flex container
   // Pass layout context so children can properly resolve star sizing
   const contentLayoutContext = !scrollWholePage ? { type: "Stack" as const, orientation: "vertical" as const } : undefined;
@@ -226,8 +267,9 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
   return (
     <AppComponent
       scrollWholePage={scrollWholePage}
+      fitContent={fitContent}
       noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
-      className={className}
+      classes={classes}
       layout={extractValue(node.props.layout)}
       loggedInUser={extractValue(node.props.loggedInUser)}
       onReady={lookupEventHandler("ready")}
@@ -243,6 +285,10 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       defaultTone={extractValue(node.props.defaultTone)}
       defaultTheme={extractValue(node.props.defaultTheme)}
       autoDetectTone={extractValue.asOptionalBoolean(node.props.autoDetectTone, false)}
+      persistTheme={extractValue.asOptionalBoolean(node.props.persistTheme, false)}
+      themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
+      toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
+
       applyDefaultContentPadding={applyDefaultContentPadding}
       header={renderChild(AppHeader)}
       footer={renderChild(Footer)}
@@ -254,7 +300,7 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
       registerComponentApi={registerComponentApi}
     >
       {renderChild(restChildren, contentLayoutContext)}
-      <SearchIndexCollector Pages={Pages} renderChild={renderChild} />
+      <SearchIndexCollector Pages={Pages} NavPanel={NavPanel} renderChild={renderChild} />
     </AppComponent>
   );
 }
@@ -262,13 +308,13 @@ function AppNode({ node, extractValue, renderChild, className, lookupEventHandle
 export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, renderChild, classes, lookupEventHandler, registerComponentApi }) => {
     return (
       <AppNode
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        className={className}
+        classes={classes}
         lookupEventHandler={lookupEventHandler}
         registerComponentApi={registerComponentApi}
       />

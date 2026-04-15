@@ -1,6 +1,6 @@
 {
   "name": "xmlui-docs-blocks",
-  "version": "0.0.3",
+  "version": "0.0.6",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",
-    "js-yaml": "4.1.0",
+    "js-yaml": "4.1.1",
     "remark-parse": "11.0.0",
     "remark-stringify": "11.0.0",
     "shiki": "^3.3.0",

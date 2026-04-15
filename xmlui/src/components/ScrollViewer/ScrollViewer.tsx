@@ -1,8 +1,12 @@
+import React from "react";
 import styles from "./ScrollViewer.module.scss";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata } from "../../components/metadata-helpers";
 import { ScrollViewer, defaultProps } from "./ScrollViewerNative";
+import { Scroller } from "./Scroller";
+export { type ScrollStyle } from "./Scroller";
 
 const COMP = "ScrollViewer";
 const SCROLLER = "Scroller";
@@ -33,7 +37,8 @@ export const ScrollViewerMd = createMetadata({
         "`normal` uses the standard browser scrollbar. " +
         "`overlay` uses themed scrollbars that are always visible and can be customized via theme variables. " +
         "`whenMouseOver` shows overlay scrollbars that appear when the mouse hovers over the scroll area and hide after 200ms when the mouse leaves. " +
-        "`whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity.",
+        "`whenScrolling` shows overlay scrollbars only during active scrolling and hides them after 400ms of inactivity. " +
+        "On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.",
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -43,7 +48,8 @@ export const ScrollViewerMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
         "The fade indicators automatically appear/disappear based on the current scroll position. " +
         "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
-        "Only works with overlay scrollbar modes (not with `normal` mode).",
+        "Only works with overlay scrollbar modes (not with `normal` mode). " +
+        "On mobile/touch devices, this property has no effect.",
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -142,25 +148,45 @@ export const ScrollViewerMd = createMetadata({
   },
 });
 
-export const scrollViewerComponentRenderer = createComponentRenderer(
-  COMP,
-  ScrollViewerMd,
-  ({ node, extractValue, renderChild, className }) => {
-    const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
-    const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
-    const header = node.props.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
-    const footer = node.props.footerTemplate ? renderChild(node.props.footerTemplate) : undefined;
+type ThemedScrollerProps = React.ComponentPropsWithoutRef<typeof Scroller>;
 
+export const ThemedScroller = React.forwardRef<React.ElementRef<typeof Scroller>, ThemedScrollerProps>(
+  function ThemedScroller({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ScrollViewerMd);
     return (
-      <ScrollViewer 
-        className={className} 
-        scrollStyle={scrollStyle as any}
-        showScrollerFade={showScrollerFade}
-        header={header}
-        footer={footer}
-      >
-        {renderChild(node.children)}
-      </ScrollViewer>
+      <Scroller
+        {...props}
+        className={className}
+        containerClassName={themeClass}
+        ref={ref}
+      />
     );
-  }
+  },
+);
+
+export const scrollViewerComponentRenderer = wrapComponent(
+  COMP,
+  ScrollViewer,
+  ScrollViewerMd,
+  {
+    exclude: ["scrollStyle", "showScrollerFade", "headerTemplate", "footerTemplate"],
+    customRender(_props, { node, extractValue, renderChild, classes }) {
+      const scrollStyle = extractValue.asOptionalString(node.props.scrollStyle);
+      const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+      const header = node.props.headerTemplate ? renderChild(node.props.headerTemplate) : undefined;
+      const footer = node.props.footerTemplate ? renderChild(node.props.footerTemplate) : undefined;
+
+      return (
+        <ScrollViewer
+          classes={classes}
+          scrollStyle={scrollStyle as any}
+          showScrollerFade={showScrollerFade}
+          header={header}
+          footer={footer}
+        >
+          {renderChild(node.children)}
+        </ScrollViewer>
+      );
+    },
+  },
 );

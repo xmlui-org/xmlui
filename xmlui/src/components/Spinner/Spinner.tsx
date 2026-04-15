@@ -1,9 +1,12 @@
 import styles from "./Spinner.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Spinner, defaultProps } from "./SpinnerNative";
 import { createMetadata } from "../metadata-helpers";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Spinner";
 
@@ -24,6 +27,7 @@ export const SpinnerMd = createMetadata({
       defaultValue: defaultProps.fullScreen,
     },
   },
+  defaultAriaLabel: "Loading",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`size-${COMP}`]: "2.5em",
@@ -32,16 +36,17 @@ export const SpinnerMd = createMetadata({
   },
 });
 
-export const spinnerComponentRenderer = createComponentRenderer(
-  COMP,
-  SpinnerMd,
-  ({ node, className, extractValue }) => {
-    return (
-      <Spinner
-        className={className}
-        delay={extractValue.asOptionalNumber(node.props.delay)}
-        fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
-      />
-    );
+type ThemedSpinnerProps = Omit<React.ComponentProps<typeof Spinner>, "classes"> & { className?: string };
+export const ThemedSpinner = React.forwardRef<HTMLDivElement, ThemedSpinnerProps>(
+  function ThemedSpinner({ className, ...props }: ThemedSpinnerProps, ref) {
+    const themeClass = useComponentThemeClass(SpinnerMd);
+    const combinedClass = [themeClass, className].filter(Boolean).join(" ");
+    return <Spinner {...props} classes={{ [COMPONENT_PART_KEY]: combinedClass }} ref={ref} />;
   },
+);
+
+export const spinnerComponentRenderer = wrapComponent(
+  COMP,
+  ThemedSpinner,
+  SpinnerMd,
 );

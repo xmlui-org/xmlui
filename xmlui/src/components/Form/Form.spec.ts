@@ -1,6 +1,7 @@
 import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
 import { labelPositionValues } from "../abstractions";
 import { expect, test } from "../../testing/fixtures";
+import { getBounds } from "../../testing/component-test-helpers";
 
 // Test data constants
 const errorDisplayInterceptor: ApiInterceptorDefinition = {
@@ -688,6 +689,73 @@ test.describe("Basic Functionality", () => {
   });
 
   // =============================================================================
+  // ITEM LABEL WIDTH INHERITANCE FOR LABEL BEHAVIOR (NO BINDTO)
+  // =============================================================================
+
+  test.describe("itemLabelWidth inheritance without bindTo", () => {
+    test("applies form itemLabelWidth to components with label but no bindTo", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          itemLabelWidth="200px"
+          itemLabelPosition="start"
+          hideButtonRow="true"
+          data="{{ name: 'John' }}"
+        >
+          <TextBox bindTo="name" label="Bound Label" />
+          <TextBox label="Unbound Label" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "200px");
+      await expect(labels.nth(1)).toHaveCSS("width", "200px");
+    });
+
+    test("component-level labelWidth overrides form itemLabelWidth for unbound component", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form itemLabelWidth="200px" itemLabelPosition="start" hideButtonRow="true">
+          <TextBox label="Default Width" />
+          <TextBox label="Custom Width" labelWidth="100px" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "200px");
+      await expect(labels.nth(1)).toHaveCSS("width", "100px");
+    });
+
+    test("form itemLabelPosition propagates to components without bindTo", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <Form
+          itemLabelPosition="start"
+          itemLabelWidth="150px"
+          hideButtonRow="true"
+          data="{{ name: 'Jane' }}"
+        >
+          <TextBox bindTo="name" label="Bound" />
+          <TextBox label="Unbound" />
+        </Form>
+      `);
+
+      const labels = page.locator("[data-part-id='label']");
+      await expect(labels).toHaveCount(2);
+      await expect(labels.nth(0)).toHaveCSS("width", "150px");
+      await expect(labels.nth(1)).toHaveCSS("width", "150px");
+    });
+  });
+
+  // =============================================================================
   // ITEM LABEL BREAK TESTS
   // =============================================================================
 
@@ -818,13 +886,13 @@ test.describe("Basic Functionality", () => {
       const driver1 = await createFormItemDriver("formItem1");
       const driver2 = await createFormItemDriver("formItem2");
       const driver3 = await createFormItemDriver("formItem3");
-      
+
       await expect(driver1.label).toContainText("*");
       await expect(driver1.label).not.toContainText("(Optional)");
-      
+
       await expect(driver2.label).not.toContainText("*");
       await expect(driver2.label).toContainText("(Optional)");
-      
+
       await expect(driver3.label).toContainText("*");
       await expect(driver3.label).not.toContainText("(Optional)");
     });
@@ -841,11 +909,11 @@ test.describe("Basic Functionality", () => {
       `);
       const driver1 = await createFormItemDriver("formItem1");
       const driver2 = await createFormItemDriver("formItem2");
-      
+
       // formItem1 uses Form's itemRequireLabelMode="markRequired", so no indicator for optional field
       await expect(driver1.label).not.toContainText("*");
       await expect(driver1.label).not.toContainText("(Optional)");
-      
+
       // formItem2 overrides with requireLabelMode="markOptional", so shows optional tag
       await expect(driver2.label).not.toContainText("*");
       await expect(driver2.label).toContainText("(Optional)");
@@ -988,7 +1056,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit allows submission when returning null", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'John' }}"
           onWillSubmit="data => null"
           onSubmit="data => testState = data">
@@ -1006,7 +1074,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Jane' }}"
           onWillSubmit="data => undefined"
           onSubmit="data => testState = data">
@@ -1024,7 +1092,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Bob' }}"
           onWillSubmit='data => ""'
           onSubmit="data => testState = data">
@@ -1039,7 +1107,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit allows submission when returning true", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Alice' }}"
           onWillSubmit="data => true"
           onSubmit="data => testState = data">
@@ -1057,7 +1125,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Charlie' }}"
           onWillSubmit="data => 42"
           onSubmit="data => testState = data">
@@ -1072,7 +1140,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit cancels submission when returning false", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Test' }}"
           onWillSubmit="data => false"
           onSubmit="data => testState = 'submitted'">
@@ -1092,7 +1160,7 @@ test.describe("Basic Functionality", () => {
       page,
     }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Original', email: 'old@test.com' }}"
           onWillSubmit="data => ({ name: 'Modified', email: 'new@test.com', extra: 'added' })"
           onSubmit="data => testState = data">
@@ -1112,7 +1180,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit can add fields to submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'User' }}"
           onWillSubmit="data => ({ name: data.name, timestamp: 1234567890, source: 'web' })"
           onSubmit="data => testState = data">
@@ -1131,7 +1199,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit can remove fields from submission data", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'User', password: 'secret', email: 'user@test.com' }}"
           onWillSubmit="data => ({ name: data.name, email: data.email })"
           onSubmit="data => testState = data">
@@ -1151,7 +1219,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit does not submit array when returned", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ name: 'Test' }}"
           onWillSubmit="data => ['array', 'value']"
           onSubmit="data => testState = data">
@@ -1167,7 +1235,7 @@ test.describe("Basic Functionality", () => {
 
     test("onWillSubmit with complex object transformation", async ({ initTestBed, page }) => {
       const { testStateDriver } = await initTestBed(`
-        <Form 
+        <Form
           data="{{ firstName: 'John', lastName: 'Doe', age: 30 }}"
           onWillSubmit="data => ({ fullName: data.firstName + ' ' + data.lastName, age: data.age })"
           onSubmit="data => testState = data">
@@ -1182,6 +1250,57 @@ test.describe("Basic Functionality", () => {
       await expect.poll(testStateDriver.testState).toEqual({
         fullName: "John Doe",
         age: 30,
+      });
+    });
+
+    test("onWillSubmit first arg excludes noSubmit fields, second arg includes them", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Fragment>
+          <Form
+            data="{{ username: 'alice', password: 'secret', confirmPassword: 'secret' }}"
+            onWillSubmit="(data, allData) => { testState = { data, allData }; return false; }"
+            onSubmit="data => testState = { submitData: data }">
+            <FormItem label="Username" bindTo="username" />
+            <FormItem label="Password" bindTo="password" />
+            <FormItem label="Confirm Password" bindTo="confirmPassword" noSubmit="true" />
+          </Form>
+        </Fragment>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // first arg (data) excludes noSubmit fields
+      // second arg (allData) includes noSubmit fields
+      await expect.poll(testStateDriver.testState).toEqual({
+        data: { username: "alice", password: "secret" },
+        allData: { username: "alice", password: "secret", confirmPassword: "secret" },
+      });
+    });
+
+    test("onSubmit does not receive noSubmit fields when onWillSubmit passes through", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: 'bob', password: 'pass', confirmPassword: 'pass' }}"
+          onWillSubmit="(data, allData) => undefined"
+          onSubmit="data => testState = data">
+          <FormItem label="Username" bindTo="username" />
+          <FormItem label="Password" bindTo="password" />
+          <FormItem label="Confirm Password" bindTo="confirmPassword" noSubmit="true" />
+        </Form>
+      `);
+
+      await page.getByRole("button", { name: "Save" }).click();
+
+      // onSubmit should NOT receive confirmPassword
+      await expect.poll(testStateDriver.testState).toEqual({
+        username: "bob",
+        password: "pass",
       });
     });
 
@@ -1235,8 +1354,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <App>
-          <Form 
-            testId="outerForm" 
+          <Form
+            testId="outerForm"
             data="{{ host: 'example.com' }}"
             onSubmit="data => testState = { outer: 'submitted' }">
             <FormItem label="host" bindTo="host" />
@@ -1282,8 +1401,8 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <App>
-          <Form 
-            testId="outerForm" 
+          <Form
+            testId="outerForm"
             data="{{ host: 'example.com' }}"
             onSubmit="data => testState = { outer: 'submitted', host: data.host }">
             <FormItem label="host" bindTo="host" />
@@ -1615,28 +1734,28 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             onValidate="value => {
               return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 too short', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             onValidate="value => {
               return { isValid: value && value.includes('@'), invalidMessage: 'Field 2 needs @', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field3"
-            label="Field 3" 
-            bindTo="field3" 
+            label="Field 3"
+            bindTo="field3"
             type="text"
             required="true"
             requiredInvalidMessage="Field 3 is required"
@@ -1668,18 +1787,18 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Must contain test', severity: 'error' })"
@@ -1715,10 +1834,10 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field" 
-            bindTo="field1" 
+            label="Field"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             customValidationsDebounce="300"
@@ -1732,7 +1851,7 @@ test.describe("Basic Functionality", () => {
 
       // Type short value
       await input1.field.fill("ab");
-      
+
       // After debounce, validation message should appear
       await expect(field1Driver.component).toContainText("Too short", { timeout: 1000 });
     });
@@ -1745,18 +1864,18 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form onSaved="testState = 'formSaved'">
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             required="true"
             onValidate="value => ({ isValid: value && value.length >= 3, invalidMessage: 'Too short', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             required="true"
           />
@@ -1781,6 +1900,78 @@ test.describe("Basic Functionality", () => {
       expect(state).not.toEqual("formSaved");
     });
 
+    test("form blocks submission while async onValidate is still in-flight", async ({
+      initTestBed,
+      page,
+    }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: '' }}"
+          onSubmit="data => testState = 'submitted'">
+          <FormItem
+            label="Username"
+            bindTo="username"
+            onValidate="value => {
+              delay(3000);
+              return null;
+            }"
+          />
+        </Form>
+      `);
+
+      // Fill the field to trigger async validation (delay 3000ms)
+      await page.getByRole("textbox").fill("alice");
+      // Brief pause to ensure the partial validation state is reflected in React state
+      await page.waitForTimeout(100);
+
+      // While async validation is in-flight, the Save button should be disabled
+      // and show the pending label "Validating..."
+      const saveButton = page.getByRole("button", { name: "Validating..." });
+      await expect(saveButton).toBeVisible();
+      await expect(saveButton).toBeDisabled();
+
+      // Once async validation settles, the button re-enables and reverts to "Save"
+      await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 7000 });
+
+      // User can now click Save and the form submits
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState, { timeout: 3000 }).toEqual("submitted");
+    });
+
+    test("form does not submit after async validation fails", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <Form
+          data="{{ username: '' }}"
+          onSubmit="data => testState = 'submitted'">
+          <FormItem
+            label="Username"
+            bindTo="username"
+            onValidate="value => {
+              delay(500);
+              return 'Username is already taken';
+            }"
+          />
+        </Form>
+      `);
+
+      // Fill the field to trigger async validation (delay 500ms, returns error)
+      await page.getByRole("textbox").fill("alice");
+      await page.waitForTimeout(100);
+
+      // While async validation is in-flight, Save button shows "Validating..." and is disabled
+      await expect(page.getByRole("button", { name: "Validating..." })).toBeDisabled();
+
+      // Once validation settles and returns an error, the Save button re-enables
+      // but the form will show a validation error
+      await expect(page.getByRole("button", { name: "Save" })).toBeEnabled({ timeout: 3000 });
+
+      // Clicking Save with a validation error must not submit the form
+      await page.getByRole("button", { name: "Save" }).click();
+      await page.waitForTimeout(500);
+      const state = await testStateDriver.testState();
+      expect(state).not.toEqual("submitted");
+    });
+
     test("onValidate validation messages appear in correct timing order", async ({
       initTestBed,
       createFormItemDriver,
@@ -1788,10 +1979,10 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
-            bindTo="field1" 
+            label="Field 1"
+            bindTo="field1"
             type="text"
             validationMode="onChanged"
             onValidate="value => {
@@ -1802,10 +1993,10 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.length >= 3, invalidMessage: 'Field 1 error', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
-            bindTo="field2" 
+            label="Field 2"
+            bindTo="field2"
             type="text"
             validationMode="onChanged"
             onValidate="value => {
@@ -1826,17 +2017,21 @@ test.describe("Basic Functionality", () => {
 
       // Type in first field
       await input1.field.fill("ab");
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.sequence && state.sequence.includes("field1");
-      }).toBe(true);
+      await expect
+        .poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.sequence && state.sequence.includes("field1");
+        })
+        .toBe(true);
 
       // Type in second field
       await input2.field.fill("test");
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.sequence && state.sequence.includes("field2");
-      }).toBe(true);
+      await expect
+        .poll(async () => {
+          const state = await testStateDriver.testState();
+          return state?.sequence && state.sequence.includes("field2");
+        })
+        .toBe(true);
 
       // Both validations should have run
       const state = await testStateDriver.testState();
@@ -1855,9 +2050,9 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             required="true"
             requiredInvalidMessage="Field 1 required"
@@ -1866,9 +2061,9 @@ test.describe("Basic Functionality", () => {
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 1 needs test', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             required="true"
             requiredInvalidMessage="Field 2 required"
@@ -1915,9 +2110,9 @@ test.describe("Basic Functionality", () => {
       const { testStateDriver } = await initTestBed(`
         <Form
           data="{{ field1: 'valid1', field2: 'valid2', field3: 'valid3' }}">
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -1928,9 +2123,9 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field1', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -1941,9 +2136,9 @@ test.describe("Basic Functionality", () => {
               return { isValid: value && value.startsWith('valid'), invalidMessage: 'Invalid field2', severity: 'error' }
             }"
           />
-          <FormItem 
+          <FormItem
             testId="field3"
-            label="Field 3" 
+            label="Field 3"
             bindTo="field3"
             customValidationsDebounce="100"
             onValidate="value => {
@@ -1963,10 +2158,15 @@ test.describe("Basic Functionality", () => {
       await formDriver.submitForm();
 
       // Wait for all validations to complete and form to save
-      await expect.poll(async () => {
-        const state = await testStateDriver.testState();
-        return state?.field1Done && state?.field2Done && state?.field3Done;
-      }, { timeout: 2000 }).toBe(true);
+      await expect
+        .poll(
+          async () => {
+            const state = await testStateDriver.testState();
+            return state?.field1Done && state?.field2Done && state?.field3Done;
+          },
+          { timeout: 2000 },
+        )
+        .toBe(true);
     });
 
     test("changing field value re-triggers onValidate in real-time", async ({
@@ -1976,9 +2176,9 @@ test.describe("Basic Functionality", () => {
     }) => {
       const { testStateDriver } = await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             validationMode="onChanged"
             onValidate="value => {
@@ -2018,16 +2218,16 @@ test.describe("Basic Functionality", () => {
     }) => {
       await initTestBed(`
         <Form>
-          <FormItem 
+          <FormItem
             testId="field1"
-            label="Field 1" 
+            label="Field 1"
             bindTo="field1"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.length >= 5, invalidMessage: 'Field 1: minimum 5 chars', severity: 'error' })"
           />
-          <FormItem 
+          <FormItem
             testId="field2"
-            label="Field 2" 
+            label="Field 2"
             bindTo="field2"
             validationMode="onChanged"
             onValidate="value => ({ isValid: value && value.includes('test'), invalidMessage: 'Field 2: must contain test', severity: 'error' })"
@@ -2086,9 +2286,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver("form");
+      const responsePromise = driver.waitForSubmitResponse("/custom-endpoint");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/custom-endpoint");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
 
@@ -2111,9 +2311,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver();
+      const responsePromise = driver.waitForSubmitResponse("/entities/1");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/entities/1");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
 
@@ -2136,9 +2336,9 @@ test.describe("Basic Functionality", () => {
       );
 
       const driver = await createFormDriver();
+      const responsePromise = driver.waitForSubmitResponse("/custom");
       await driver.submitForm();
-
-      const response = await driver.getSubmitResponse("/custom");
+      const response = await responsePromise;
       expect(response.ok()).toEqual(true);
     });
   });
@@ -2477,9 +2677,9 @@ test("mock service responds", async ({ initTestBed, createFormDriver }) => {
     },
   );
   const driver = await createFormDriver();
+  const responsePromise = driver.waitForSubmitResponse("/test");
   await driver.submitForm();
-
-  const request = await driver.getSubmitResponse("/test");
+  const request = await responsePromise;
   expect(request.ok()).toEqual(true);
 });
 
@@ -2817,8 +3017,9 @@ test("form submits to correct url", async ({ initTestBed, createFormDriver }) =>
   );
   const driver = await createFormDriver();
 
+  const responsePromise = driver.waitForSubmitResponse(endpoint);
   await driver.submitForm();
-  const response = await driver.getSubmitResponse(endpoint);
+  const response = await responsePromise;
   expect(response.ok()).toBe(true);
   expect(new URL(response.url()).pathname).toBe(endpoint);
 });
@@ -3016,7 +3217,7 @@ test("field-related errors map to correct FormItems", async ({
   const fieldDriver = await createFormItemDriver("testField");
 
   await formDriver.submitForm();
-await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
+  await expect(fieldDriver.validationStatusIndicator).toHaveAttribute(
     fieldDriver.validationStatusTag,
     "warning",
   );
@@ -3117,9 +3318,9 @@ test("create form works with submitUrl", async ({
   const fieldDriver = await createTextBoxDriver(inputElement);
 
   await fieldDriver.field.fill("John");
+  const responsePromise = formDriver.waitForSubmitResponse();
   await formDriver.submitForm("click");
-
-  const response = await formDriver.getSubmitResponse();
+  const response = await responsePromise;
   expect(await response.json()).toEqual({
     name: "John",
     id: 11,
@@ -3157,9 +3358,11 @@ test("regression: data url through modal context", async ({
   await expect(inputDriver.field).toHaveValue("Smith");
 
   await inputDriver.field.fill("EDITED-Smith");
+
+  const responsePromise = formDriver.waitForSubmitResponse();
   await formDriver.submitForm("click");
 
-  const response = await formDriver.getSubmitResponse();
+  const response = await responsePromise;
   expect(await response.json()).toEqual({
     name: "EDITED-Smith",
     id: 10,
@@ -3307,15 +3510,13 @@ test.describe("Api", () => {
   test("getData returns deep clone - modifications do not affect form state", async ({
     initTestBed,
     page,
-    createTextBoxDriver,
-    createFormItemDriver,
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
         <Form id="myForm">
           <FormItem label="Name" bindTo="name" initialValue="John" testId="nameInput" />
         </Form>
-        <Button testId="getDataBtn" onClick="testState = myForm.getData(); testState.name = 'Modified'" />
+        <Button testId="getDataBtn" onClick="testState = {... myForm.getData(), name: 'Modified'}" />
         <Button testId="getDataAgainBtn" onClick="testState = myForm.getData()" />
       </Fragment>
     `);
@@ -3716,5 +3917,553 @@ test.describe("Api", () => {
 
     expect(data.firstName).toEqual("Lucy");
     expect(data.lastName).toEqual("Rose");
+  });
+});
+
+// =============================================================================
+// FORM PERSISTENCE (persist / storageKey / doNotPersistFields / keepOnCancel)
+// =============================================================================
+
+test.describe("Form persistence — localStorage temporary save", () => {
+  test("persist saves form data to localStorage as user types", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+
+    // Wait for the autosave to fire
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form"));
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.name).toBe("Alice");
+  });
+
+  test("persist restores saved form data on reload", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-reload", JSON.stringify({ name: "Bob" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-reload">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await expect(nameInput.field).toHaveValue("Bob");
+  });
+
+  test("persist clears localStorage on successful submit", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-submit", JSON.stringify({ name: "Carol" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-submit"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Save" }).click();
+
+    // After submit, localStorage entry should be gone
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-submit"));
+    expect(stored).toBeNull();
+  });
+
+  test("keepOnCancel=false (default) clears localStorage on cancel", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-cancel-default", JSON.stringify({ name: "Dave" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-cancel-default">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-cancel-default"));
+    expect(stored).toBeNull();
+  });
+
+  test("keepOnCancel=true keeps localStorage on cancel", async ({ page, initTestBed }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-keep", JSON.stringify({ name: "Eve" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-keep" keepOnCancel="true">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-keep"));
+    expect(stored).not.toBeNull();
+  });
+
+  test("keepOnCancel=false explicitly clears localStorage on cancel", async ({
+    page,
+    initTestBed,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem("test-form-cancel", JSON.stringify({ name: "Dave" }));
+    });
+
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-cancel" keepOnCancel="false">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-cancel"));
+    expect(stored).toBeNull();
+  });
+
+  test("doNotPersistFields excludes specified fields from localStorage save", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" persist="true" storageKey="test-form-exclude"
+            doNotPersistFields="{['secret']}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+        <FormItem label="Secret" bindTo="secret" testId="secretField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    const secretItem = await createFormItemDriver("secretField");
+    const secretInput = await createTextBoxDriver(secretItem.input);
+    await nameInput.field.fill("Frank");
+    await secretInput.field.fill("password123");
+
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-exclude"));
+    expect(stored).not.toBeNull();
+    const parsed = JSON.parse(stored!);
+    expect(parsed.name).toBe("Frank");
+    expect(parsed.secret).toBeUndefined();
+  });
+
+  test("when persist is not set, no localStorage entry is created", async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form testId="form" storageKey="test-form-no-persist">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Grace");
+
+    await page.waitForTimeout(100);
+
+    const stored = await page.evaluate(() => localStorage.getItem("test-form-no-persist"));
+    expect(stored).toBeNull();
+  });
+});
+
+// =============================================================================
+// dataAfterSubmit PROPERTY
+// =============================================================================
+
+test.describe("dataAfterSubmit property", () => {
+  test('"keep" (default) preserves submitted data in the form', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("Alice");
+  });
+
+  test('"reset" restores the form to its initial data after submit', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="reset"
+            data="{ {name: 'Initial'} }"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Changed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("Initial");
+  });
+
+  test('"clear" empties the form after submit', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="clear"
+            data="{ {name: 'Initial'} }"
+            onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Changed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("");
+  });
+
+  test('"clear" empties form even when no data prop is set', async ({
+    page,
+    initTestBed,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form dataAfterSubmit="clear" onSubmit="() => {}">
+        <FormItem label="Name" bindTo="name" testId="nameField" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameField");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Typed");
+    await page.getByRole("button", { name: "Save" }).click();
+
+    await expect(nameInput.field).toHaveValue("");
+  });
+});
+
+// =============================================================================
+// STICKY BUTTON ROW TESTS
+// =============================================================================
+
+test.describe("stickyButtonRow property", () => {
+  test("button row does not have sticky positioning by default", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).not.toHaveCSS("position", "sticky");
+  });
+
+  test("button row has sticky positioning when set to true", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" stickyButtonRow="true" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).toHaveCSS("position", "sticky");
+    await expect(buttonRow).toHaveCSS("bottom", "0px");
+  });
+
+  test("button row does not have sticky positioning when set to false", async ({
+    initTestBed,
+    createFormDriver,
+  }) => {
+    await initTestBed(`<Form testId="form" stickyButtonRow="false" />`);
+    const driver = await createFormDriver("form");
+    const buttonRow = driver.submitButton.locator("..");
+    await expect(buttonRow).not.toHaveCSS("position", "sticky");
+  });
+
+  test("form wrapper fills the scroll container height when stickyButtonRow is true", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const formBounds = await getBounds(driver.component);
+    // Form should fill the full height of the scroll container
+    expect(formBounds.height).toBeCloseTo(containerBounds.height, 0);
+  });
+
+  test("button row is anchored to the bottom of the scroll container with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+    // Button row bottom edge should align with container bottom within 2px
+    expect(Math.abs(buttonRowBounds.bottom - containerBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row without stickyButtonRow is not anchored to the container bottom with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="400px" overflowY="auto">
+        <Form testId="form">
+          <FormItem label="Name" bindTo="name" />
+        </Form>
+      </VStack>
+    `);
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(page.getByTestId("container"));
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+    // Without stickyButtonRow, the button row sits right below the field, not at the container bottom
+    expect(buttonRowBounds.bottom).toBeLessThan(containerBounds.bottom - 10);
+  });
+
+  test("button row stays visible at the bottom of the scroll container after scrolling to top", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="200px" overflowY="auto">
+        <Form testId="form" stickyButtonRow="true">
+          <FormItem label="Field 1" bindTo="f1" />
+          <FormItem label="Field 2" bindTo="f2" />
+          <FormItem label="Field 3" bindTo="f3" />
+          <FormItem label="Field 4" bindTo="f4" />
+          <FormItem label="Field 5" bindTo="f5" />
+        </Form>
+      </VStack>
+    `);
+    const container = page.getByTestId("container");
+
+    // Wait until the container is actually scrollable
+    await expect.poll(() =>
+      container.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to the bottom
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+
+    // Scroll back to the top
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(container);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row must be visible within the container's viewport
+    expect(buttonRowBounds.top).toBeGreaterThanOrEqual(containerBounds.top);
+    // Button row bottom edge must align with container bottom (sticky: bottom 0)
+    expect(Math.abs(buttonRowBounds.bottom - containerBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row disappears when scrolled to top without stickyButtonRow", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <VStack testId="container" height="200px" overflowY="auto">
+        <Form testId="form">
+          <FormItem label="Field 1" bindTo="f1" />
+          <FormItem label="Field 2" bindTo="f2" />
+          <FormItem label="Field 3" bindTo="f3" />
+          <FormItem label="Field 4" bindTo="f4" />
+          <FormItem label="Field 5" bindTo="f5" />
+        </Form>
+      </VStack>
+    `);
+    const container = page.getByTestId("container");
+
+    await expect.poll(() =>
+      container.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to top — button row should be out of view (not sticky)
+    await container.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const driver = await createFormDriver("form");
+    const containerBounds = await getBounds(container);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Without sticky, the button row's natural position is below the container viewport
+    expect(buttonRowBounds.top).toBeGreaterThan(containerBounds.bottom);
+  });
+
+  // ModalDialog is the primary use-case for stickyButtonRow (see component docs).
+  // The modal's innerContent div (overflow-y: auto) is the scroll container.
+
+  test("button row is anchored to the bottom of a ModalDialog with short content", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice">
+        <Form testId="form" stickyButtonRow="true" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+
+    // The form's direct parent is the modal's innerContent scroll container
+    const modalScrollBody = driver.component.locator("..");
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row bottom edge must align with the modal scroll body's bottom edge
+    expect(Math.abs(buttonRowBounds.bottom - scrollBodyBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row stays visible at bottom of ModalDialog after scrolling to top", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    // Constrain modal height via inline style so the form overflows and the body scrolls
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice" maxHeight="300px">
+        <Form testId="form" stickyButtonRow="true" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Created Date" bindTo="createdDate" />
+          <TextBox label="Pay To" bindTo="payTo" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+          <NumberBox label="Po Number" bindTo="poNumber" />
+          <DateInput label="Due Date" bindTo="dueDate" />
+          <TextBox label="Ship Via" bindTo="shipVia" />
+          <TextBox label="Shipping Point" bindTo="shippingPoint" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+
+    // The form's direct parent is the modal's innerContent scroll container
+    const modalScrollBody = driver.component.locator("..");
+
+    // Wait until the modal body is actually scrollable
+    await expect.poll(() =>
+      modalScrollBody.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to the bottom then back to the top
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Button row must be visible within the modal scroll body
+    expect(buttonRowBounds.top).toBeGreaterThanOrEqual(scrollBodyBounds.top);
+    // Button row bottom edge must be at the bottom of the modal scroll body (sticky)
+    expect(Math.abs(buttonRowBounds.bottom - scrollBodyBounds.bottom)).toBeLessThanOrEqual(2);
+  });
+
+  test("button row disappears after scrolling to top in ModalDialog without stickyButtonRow", async ({
+    initTestBed,
+    createFormDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <ModalDialog when="{true}" testId="modal" title="Update Invoice" maxHeight="300px">
+        <Form testId="form" saveLabel="Update Invoice">
+          <Select label="Credit Account" bindTo="creditAccount" />
+          <DateInput label="Created Date" bindTo="createdDate" />
+          <TextBox label="Pay To" bindTo="payTo" />
+          <DateInput label="Invoice Date" bindTo="invoiceDate" />
+          <NumberBox label="Po Number" bindTo="poNumber" />
+          <DateInput label="Due Date" bindTo="dueDate" />
+          <TextBox label="Ship Via" bindTo="shipVia" />
+          <TextBox label="Shipping Point" bindTo="shippingPoint" />
+        </Form>
+      </ModalDialog>
+    `);
+
+    await expect(page.getByTestId("modal")).toBeVisible();
+    const driver = await createFormDriver("form");
+    const modalScrollBody = driver.component.locator("..");
+
+    await expect.poll(() =>
+      modalScrollBody.evaluate((el: HTMLElement) => el.scrollHeight > el.clientHeight),
+    ).toBe(true);
+
+    // Scroll to top — button row scrolls out of view
+    await modalScrollBody.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+
+    const scrollBodyBounds = await getBounds(modalScrollBody);
+    const buttonRowBounds = await getBounds(driver.submitButton.locator(".."));
+
+    // Without sticky, the button row's natural position is below the visible area
+    expect(buttonRowBounds.top).toBeGreaterThan(scrollBodyBounds.bottom);
   });
 });

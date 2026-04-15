@@ -4,6 +4,7 @@
   "files.eol": "\n",
   "vitest.enable": true,
   "vitest.workspaceConfig": "./vitest.workspace.ts",
+  "vitest.exclude": ["packages/xmlui-devtools/**"],
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
@@ -57,6 +58,58 @@
     "/^npm run \\| grep -E \"lint\\|check\"$/": {
       "approve": true,
       "matchCommandLine": true
-    }
+    },
+    "npx changeset": true,
+    "paste": true,
+    "bc": true,
+    "cp": true,
+    "git restore": true,
+    "lsof": true,
+    "/^cat /Users/dotneteer/source/xmlui/xmlui/scripts/generate-docs/metadata/components/metadata\\.json \\| python3 -c \"import json,sys; d=json\\.load\\(sys\\.stdin\\); print\\(f'Total components: \\{len\\(d\\)\\}'\\); print\\('First 5:', \\[c\\['displayName'\\] for c in d\\[:5\\]\\]\\)\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "mkdir": true,
+    "npm run generate-docs-summaries": true,
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| head -30$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| grep -E \"ERR\\|error\\|Error\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| grep -E \"\\^\\\\\\[ERR\\\\\\]\\|\\^Error\\|\\^node:\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1; echo \"EXIT: \\$\\?\"; ls -lt /Users/dotneteer/source/xmlui/website/content/docs/reference/components/ \\| head -3$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node scripts/generate-docs/get-docs\\.mjs 2>&1 \\| grep -v \"\\^\\\\\\[WARN\\\\\\]\" \\| head -20; echo \"EXIT: \\$\\?\"; ls -lt /Users/dotneteer/source/xmlui/website/content/docs/reference/components/ \\| head -3$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^python3 << 'EOF'\nimport re\n\nwith open\\('/Users/dotneteer/source/xmlui/xmlui/src/components/HtmlTags/HtmlTags\\.tsx', 'r'\\) as f:\n    content = f\\.read\\(\\)\n\n# 1\\. Add COMPONENT_PART_KEY import after classnames import\ncontent = content\\.replace\\(\n    \"import classnames from 'classnames';\",\n    \"import classnames from 'classnames';\\\\nimport \\{ COMPONENT_PART_KEY \\} from \\\\\"\\.\\./\\.\\./components-core/responsive-layout\\\\\";\"\n\\)\n\n# 2\\. Replace className in destructuring patterns\ncontent = content\\.replace\\('extractResourceUrl, className \\}\\)', 'extractResourceUrl, classes \\}\\)'\\)\n\n# 3\\. Replace plain className=\\{className\\}\ncontent = content\\.replace\\('className=\\{className\\}', 'className=\\{classes\\?\\.\\[COMPONENT_PART_KEY\\]\\}'\\)\n\n# 4\\. Replace classnames\\(styles\\.xxx, className\\) patterns\ncontent = re\\.sub\\(r'className=\\\\\\{classnames\\\\\\(\\(\\[\\^,\\]\\+\\), className\\\\\\)\\\\\\}', r'className=\\{classnames\\(\\\\1, classes\\?\\.\\[COMPONENT_PART_KEY\\]\\)\\}', content\\)\n\n# 5\\. Replace classnames\\(className, styles\\.xxx\\) patterns  \ncontent = re\\.sub\\(r'className=\\\\\\{classnames\\\\\\(className, \\(\\[\\^\\)\\]\\+\\)\\\\\\)\\\\\\}', r'className=\\{classnames\\(classes\\?\\.\\[COMPONENT_PART_KEY\\], \\\\1\\)\\}', content\\)\n\nwith open\\('/Users/dotneteer/source/xmlui/xmlui/src/components/HtmlTags/HtmlTags\\.tsx', 'w'\\) as f:\n    f\\.write\\(content\\)\n\n# Verify no 'className' references remain related to className usage in renderers \nremaining = \\[l for l in content\\.split\\('\\\\n'\\) if 'className' in l and 'COMPONENT_PART_KEY' not in l\\]\nprint\\(f\"Lines with className not yet migrated: \\{len\\(remaining\\)\\}\"\\)\nfor l in remaining\\[:10\\]:\n    print\\(l\\)\nEOF$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "/^node -e \"const mod = require\\('\\./xmlui/src/components/FlowLayout/flow-layout-utils\\.ts'\\); console\\.log\\('Module loads OK'\\);\" 2>&1 \\|\\| echo \"Note: Direct require fails but this is expected - TypeScript needs compilation\"$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "npm run type-check:xmlui": true,
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && npm run 2>&1 \\| grep -E \"\\^\\\\s\\+\\(test\\|type\\|build\\|check\\)\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "git fetch": true,
+    "/^cd /Users/dotneteer/source/xmlui/xmlui && node scripts/generate-docs\\.mjs 2>&1 \\| grep -i \"list\\\\\\|error\\\\\\|warn\" \\| head -20$/": {
+      "approve": true,
+      "matchCommandLine": true
+    },
+    "awk": true,
+    "git stash": true
   }
 }

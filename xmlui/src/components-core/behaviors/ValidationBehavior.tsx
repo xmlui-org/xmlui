@@ -134,7 +134,8 @@ export const validationBehavior: Behavior = {
     const bindTo = extractValue.asOptionalString(componentNode.props?.bindTo);
     const itemIndex =
       (renderedNode.props as any)?.itemIndex ??
-      extractValue.asOptionalNumber(componentNode.props?.itemIndex);
+      extractValue.asOptionalNumber(componentNode.props?.itemIndex) ??
+      extractValue.asOptionalNumber("{$itemIndex}");
     const formItemType = extractValue.asOptionalString(componentNode.props?.type);
     const inline = extractValue.asOptionalBoolean(componentNode.props?.inline);
     const verboseValidationFeedback = extractValue.asOptionalBoolean(
@@ -178,6 +179,10 @@ export const validationBehavior: Behavior = {
     );
     const customValidationsDebounce = extractValue.asOptionalNumber(
       componentNode.props?.customValidationsDebounce,
+      0,
+    );
+    const validationDisplayDelay = extractValue.asOptionalNumber(
+      componentNode.props?.validationDisplayDelay,
       0,
     );
     const validationMode = extractValue.asOptionalString(componentNode.props?.validationMode);
@@ -225,6 +230,7 @@ export const validationBehavior: Behavior = {
         validations={validations}
         onValidate={onValidate}
         customValidationsDebounce={customValidationsDebounce}
+        validationDisplayDelay={validationDisplayDelay}
         validationMode={validationMode as any}
         verboseValidationFeedback={verboseValidationFeedback}
         itemIndex={itemIndex}

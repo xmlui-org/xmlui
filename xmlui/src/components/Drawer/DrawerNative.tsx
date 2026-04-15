@@ -15,8 +15,10 @@ import styles from "./Drawer.module.scss";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { ThemeContext } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
 import { Icon } from "../Icon/IconNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // =============================================================================
 // Types
@@ -35,6 +37,8 @@ export interface DrawerProps {
   closeButtonVisible?: boolean;
   /** Close the drawer when the user clicks outside of it */
   closeOnClickAway?: boolean;
+  /** Custom content rendered in the sticky header (next to the close button) */
+  headerTemplate?: ReactNode;
   /** Callback fired when the drawer opens */
   onOpen?: () => void;
   /** Callback fired when the drawer closes */
@@ -43,6 +47,7 @@ export interface DrawerProps {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   className?: string;
+  classes?: Record<string, string>;
   /** Inline styles applied directly to the drawer panel (overrides theme vars) */
   style?: CSSProperties;
 }
@@ -90,16 +95,19 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
     initiallyOpen = defaultProps.initiallyOpen,
     closeButtonVisible = defaultProps.closeButtonVisible,
     closeOnClickAway = defaultProps.closeOnClickAway,
+    headerTemplate,
     onOpen,
     onClose,
     registerComponentApi,
     children,
     className,
+    classes,
     style,
   },
   _ref,
 ) {
-  const { root } = useTheme();
+  const theme = useTheme();
+  const { root } = theme;
   const drawerRef = useRef<HTMLDivElement>(null);
 
   // --- Create a scoped portal container appended to root. It uses
@@ -107,17 +115,42 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
   // --- drawer's own position:absolute children, and overflow:hidden clips
   // --- the exit animation to the root's bounds (stops the flash).
   const [portalContainer, setPortalContainer] = useState<HTMLDivElement | null>(null);
+
+  // --- Create a secondary portal container for child portalled content
+  // --- (e.g. Select dropdowns, tooltips). This container sits as a sibling
+  // --- of the main portal container in `root` and has a z-index above the
+  // --- drawer panel so that overlays from components inside the drawer are
+  // --- not hidden behind it.
+  const [childPortalContainer, setChildPortalContainer] = useState<HTMLDivElement | null>(null);
+
   useEffect(() => {
     if (!root) return;
     const el = document.createElement('div');
     el.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;';
+    if (className || classes?.[COMPONENT_PART_KEY]) el.className = classnames(classes?.[COMPONENT_PART_KEY], className);
     (root as HTMLElement).appendChild(el);
     setPortalContainer(el);
+
+    const childEl = document.createElement('div');
+    childEl.className = styles.childPortal;
+    (root as HTMLElement).appendChild(childEl);
+    setChildPortalContainer(childEl);
+
     return () => {
       (root as HTMLElement).removeChild(el);
       setPortalContainer(null);
+      (root as HTMLElement).removeChild(childEl);
+      setChildPortalContainer(null);
     };
-  }, [root]);
+  }, [root, className]);
+
+  // Override the theme context's portal root for children inside the drawer
+  // so that portalled content (Select dropdowns, tooltips, etc.) renders into
+  // the child portal container which stacks above the drawer panel.
+  const childTheme = useMemo(() => ({
+    ...theme,
+    root: childPortalContainer ?? root,
+  }), [theme, childPortalContainer, root]);
 
   const { isOpen, doOpen, doClose } = useDrawerOpenState(initiallyOpen, onOpen, onClose);
 
@@ -170,7 +203,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
       <Dialog.Portal container={portalContainer}>
         {/* Backdrop */}
         {hasBackdrop && (
-          <Dialog.Overlay className={styles.backdrop} />
+          <Dialog.Overlay className={classnames(styles.backdrop, className)} />
         )}
 
         {/* Drawer panel */}
@@ -181,23 +214,35 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
             [styles.right]:  position === "right",
             [styles.top]:    position === "top",
             [styles.bottom]: position === "bottom",
-          }, className)}
+          }, classes?.[COMPONENT_PART_KEY], className)}
           style={style}
           aria-label="Drawer"
           onAnimationEnd={handlePanelAnimationEnd}
           onPointerDownOutside={(e) => { if (closeOnClickAway) doClose(); else e.preventDefault(); }}
           onEscapeKeyDown={() => doClose()}
         >
-          {/* Visually-hidden title so Dialog.Content has accessible label */}
-          <Dialog.Title className="sr-only">Drawer</Dialog.Title>
+          <Dialog.Title className={styles.srOnly}>Drawer</Dialog.Title>
+          {/* Close button - floats at top-right */}
           {closeButtonVisible && (
             <Dialog.Close asChild>
               <button className={styles.closeButton} aria-label="Close">
-                <Icon name="close" />
+                <Icon name="close" size="sm" />
               </button>
             </Dialog.Close>
           )}
-          {children}
+          {/* Header with template content - full width */}
+          {!!headerTemplate && (
+            <div className={styles.header}>
+              <div className={styles.headerContent}>
+                {headerTemplate}
+              </div>
+            </div>
+          )}
+          <ThemeContext.Provider value={childTheme}>
+            <div className={styles.body}>
+              {children}
+            </div>
+          </ThemeContext.Provider>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

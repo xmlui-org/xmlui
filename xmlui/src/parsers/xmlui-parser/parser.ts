@@ -10,7 +10,194 @@ import { DocumentCursor } from "../../language-server/base/text-document";
 
 type IncompleteNode = {
   children: Node[];
+  kind: SyntaxKind;
 };
+
+type StackFrame = {
+  node: IncompleteNode;
+  errors: ParserDiag[];
+  scriptCount: number;
+  isCompoundComponent?: boolean;
+  compoundCompName?: string;
+  namespaces?: Map<string, string>;
+  hasNonHelperChildren?: boolean;
+};
+
+class ParseStack {
+  private readonly frames: StackFrame[];
+  private readonly cursor: DocumentCursor;
+
+  constructor(cursor: DocumentCursor) {
+    this.frames = [];
+    this.cursor = cursor;
+  }
+
+  get node(): IncompleteNode {
+    return this.currentFrame.node;
+  }
+
+  allErrors(): ParserDiag[] {
+    return this.frames[0].errors;
+  }
+
+  /** start a new node. Any new tokens or nodes will be put into it's children list from that point. Each call to this should be paired with a `completeNode` */
+  startNode(kind: SyntaxKind): void {
+    this.frames.push({
+      node: {
+        kind,
+        children: [],
+      },
+      scriptCount: 0,
+      errors: [],
+    });
+  }
+
+  completeNode(kind: SyntaxKind): Node {
+    if (this.frames.length < 2) {
+      throw new Error("Cannot complete the root stack frame");
+    }
+
+    const completedFrame = this.frames.pop()!;
+    const completedNode = createNode(kind, completedFrame.node.children!);
+    const parentFrame = this.currentFrame;
+    parentFrame.node.children!.push(completedNode);
+    if (completedFrame.errors.length > 0) {
+      parentFrame.errors.push(...completedFrame.errors);
+    }
+    return completedNode;
+  }
+
+  abandonNode(): void {
+    if (this.frames.length < 2) {
+      throw new Error("Cannot abandon the root stack frame");
+    }
+
+    const abandonedFrame = this.frames.pop()!;
+    const parentFrame = this.currentFrame;
+    parentFrame.node.children!.push(...abandonedFrame.node.children!);
+    if (abandonedFrame.errors.length > 0) {
+      parentFrame.errors.push(...abandonedFrame.errors);
+    }
+  }
+
+  pushToken(node: Node): void {
+    this.node.children!.push(node);
+  }
+
+  /** Tracks script tags within the current frame. Emits multipleScriptTags if a second script
+   * is encountered. Should only be called from parseFile and parseContentList. */
+  incScriptTagCount(node: Node): void {
+    if (this.currentFrame.scriptCount === 1) {
+      const diag = DIAGS_PARSER.multipleScriptTags;
+      const { contextPos, contextEnd } = this.cursor.getSurroundingContext(node.pos, node.end, 1);
+      const err: ParserDiag = {
+        code: diag.code,
+        message: diag.message,
+        pos: node.pos,
+        end: node.end,
+        contextPos,
+        contextEnd,
+      };
+      this.pushError(err);
+    }
+    this.currentFrame.scriptCount++;
+  }
+
+  pushError(error: ParserDiag): void {
+    this.currentFrame.errors.push(error);
+  }
+
+  /** Walks all ancestor frames (excluding the current frame) looking for a compound component
+   * name. Returns the name of the nearest ancestor compound component, or undefined. */
+  hasCompoundCompAncestor(): boolean {
+    for (let i = this.frames.length - 2; i >= 0; i--) {
+      if (this.frames[i].isCompoundComponent) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Initialises the namespace map on the current frame. Called once per ElementNode after
+   * attribute parsing. */
+  initCurrentNamespaces(): void {
+    this.currentFrame.namespaces = new Map();
+  }
+
+  setIsCompoundComponent(): void {
+    this.currentFrame.isCompoundComponent = true;
+  }
+
+  isChildOfCompoundComponent(): boolean {
+    for (let i = this.frames.length - 2; i >= 0; --i) {
+      const frame = this.frames[i];
+      if (frame.node.kind === SyntaxKind.ElementNode) {
+        if (frame.isCompoundComponent) {
+          return true;
+        }
+        return false;
+      }
+    }
+    return false;
+  }
+
+  // todo: this seems wrong, why are we storing the keys as the map values
+  /** Adds a namespace prefix to the current frame's namespace map.
+   * Returns false if the key already exists (caller should emit duplXmlns). */
+  addCurrentNamespace(key: string): boolean {
+    const map = this.currentFrame.namespaces!;
+    if (map.has(key)) {
+      return false;
+    }
+    map.set(key, key);
+    return true;
+  }
+
+  /** Resolves a namespace prefix by walking ancestor frames from innermost outward.
+   * Returns true if the prefix is declared in any ancestor, false otherwise. */
+  resolveNamespace(prefix: string): boolean {
+    for (let i = this.frames.length - 1; i >= 0; i--) {
+      if (this.frames[i].namespaces?.has(prefix)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** Assumes the closestElementNode is a compound component */
+  setHasNonHelper(): void {
+    const frame = this.closesetElementNodeFrameAncestor();
+    frame.hasNonHelperChildren = true;
+  }
+
+  hasNonHelperChildren(): boolean {
+    return Boolean(this.currentFrame?.hasNonHelperChildren);
+  }
+
+  closesetElementNodeFrameAncestor(): StackFrame | null {
+    for (let i = this.frames.length - 2; i >= 0; i--) {
+      if (this.frames[i].node.kind === SyntaxKind.ElementNode) {
+        return this.frames[i];
+      }
+    }
+    return null;
+  }
+
+  InRootElement(): boolean {
+    let count = 0;
+    for (const frame of this.frames) {
+      if (frame.node.kind === SyntaxKind.ElementNode) {
+        count++;
+        if (count > 1) break;
+      }
+    }
+    return count === 1;
+  }
+
+  private get currentFrame(): StackFrame {
+    return this.frames[this.frames.length - 1]!;
+  }
+}
 
 export type GetText = (n: Node, ignoreTrivia?: boolean) => string;
 
@@ -28,7 +215,6 @@ const RECOVER_OPEN_TAG = [
 const RECOVER_ATTR = [SyntaxKind.Identifier, ...RECOVER_OPEN_TAG] as const;
 const RECOVER_CONTENT_LIST = [
   SyntaxKind.TextNode,
-  SyntaxKind.StringLiteral,
   SyntaxKind.CData,
   SyntaxKind.Script,
   SyntaxKind.OpenNodeStart,
@@ -41,6 +227,30 @@ const RECOVER_CLOSE_TAG = [
   SyntaxKind.CData,
   SyntaxKind.Script,
 ] as const;
+
+const COMPOUND_COMPONENT_NAME = "Component";
+const HELPERS_WITH_NAME_VALUE_ONLY = new Set([
+  "property",
+  "template",
+  "event",
+  "variable",
+  "method",
+  "global",
+]);
+const HELPER_NAMES = new Set([
+  "property",
+  "template",
+  "event",
+  "variable",
+  "global",
+  "loaders",
+  "uses",
+  "method",
+  "item",
+  "field",
+]);
+const ON_PREFIX_REGEX = /^on[A-Z]/;
+const UPPERCASE_REGEX = /^[A-Z]/;
 
 export function createXmlUiParser(source: string): {
   parse: () => ParseResult;
@@ -55,10 +265,8 @@ export function createXmlUiParser(source: string): {
 
 export function parseXmlUiMarkup(text: string): ParseResult {
   const cursor = new DocumentCursor(text);
-  const errors: ParserDiag[] = [];
-  const parents: (IncompleteNode | Node)[] = [];
+  const stack = new ParseStack(cursor);
   let peekedToken: Node | undefined;
-  let node: Node | IncompleteNode = { children: [] };
   let errFromScanner: { message: ScannerDiagnosticMessage; prefixLength: number } | undefined =
     undefined;
 
@@ -70,22 +278,27 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   };
   const scanner = createScanner(false, text, onScannerErr);
   const fileContentListNode = parseFile();
-  return { node: fileContentListNode, errors };
+  return { node: fileContentListNode, errors: stack.allErrors() };
 
   function getText(n: Node, ignoreTrivia: boolean = true) {
     return text.substring(ignoreTrivia ? n.pos : n.start, n.end);
   }
 
   function parseFile(): Node {
+    stack.startNode(SyntaxKind.ContentListNode);
     while (true) {
       const token = peekInContent();
       switch (token.kind) {
         case SyntaxKind.EndOfFileToken:
           bumpAny();
-          return createNode(SyntaxKind.ContentListNode, node.children);
+          const fileContentListNode = createNode(SyntaxKind.ContentListNode, stack.node.children!);
+          validateSingleRootElement(fileContentListNode);
+          return fileContentListNode;
         case SyntaxKind.CData:
-        case SyntaxKind.Script:
           bumpAny();
+          break;
+        case SyntaxKind.Script:
+          stack.incScriptTagCount(bumpAny());
           break;
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
@@ -108,15 +321,16 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function parseContentList() {
-    startNode();
+    stack.startNode(SyntaxKind.ContentListNode);
     loop: while (true) {
       const token = peekInContent();
       switch (token.kind) {
         case SyntaxKind.TextNode:
-        case SyntaxKind.StringLiteral:
         case SyntaxKind.CData:
-        case SyntaxKind.Script:
           bumpAny();
+          break;
+        case SyntaxKind.Script:
+          stack.incScriptTagCount(bumpAny());
           break;
         case SyntaxKind.OpenNodeStart:
           parseOpeningTag();
@@ -130,22 +344,22 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           break;
       }
     }
-    if (node.children && node.children.length > 0) {
-      completeNode(SyntaxKind.ContentListNode);
+    if (stack.node.children && stack.node.children.length > 0) {
+      stack.completeNode(SyntaxKind.ContentListNode);
     } else {
-      abandonNode();
+      stack.abandonNode();
     }
   }
 
   function parseOpeningTag() {
-    startNode();
+    stack.startNode(SyntaxKind.ElementNode);
     bump(SyntaxKind.OpenNodeStart);
     let errInName = true;
-    let openTagName: Node | null = null;
+    let openTagNameNode: Node | null = null;
     if (at(SyntaxKind.Identifier)) {
       const tagNameParseRes = parseOpeningTagName();
       errInName = tagNameParseRes.errInName;
-      openTagName = tagNameParseRes.node;
+      openTagNameNode = tagNameParseRes.node;
     } else {
       const errNode = errNodeUntil(RECOVER_OPEN_TAG);
       if (errNode) {
@@ -159,23 +373,102 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       parseAttrList();
     }
 
+    const openTagNameText = openTagNameNode
+      ? getTagNameNodeLastIdentifier(openTagNameNode)
+      : undefined;
+
+    if (!errInName && openTagNameNode) {
+      // Check for namespace prefix on the tag name (TagNameNode with 3 children = ns:Name)
+      if (openTagNameNode.children!.length === 3) {
+        if (stack.InRootElement()) {
+          // Root element cannot have a namespace prefix
+          errorAt(
+            DIAGS_PARSER.rootCompNoNamespace,
+            openTagNameNode.pos,
+            openTagNameNode.children![0].end,
+          );
+        } else {
+          const prefix = getText(openTagNameNode.children![0]);
+          if (!stack.resolveNamespace(prefix)) {
+            errorAt(
+              DIAGS_PARSER.nsNotFound(prefix),
+              openTagNameNode.pos,
+              openTagNameNode.children![0].end,
+            );
+          }
+        }
+      }
+
+      // Initialise the namespace map for this frame and collect xmlns declarations
+      stack.initCurrentNamespaces();
+      const attrListNode = stack.node.children!.find(
+        (c) => c.kind === SyntaxKind.AttributeListNode,
+      );
+      if (attrListNode) {
+        for (const attr of attrListNode.children ?? []) {
+          const segmented = segmentAttr(attr);
+          if (segmented.namespace === "xmlns") {
+            const key = segmented.unsegmentedName;
+            const rawValue = segmented.value ?? "";
+            const parts = rawValue.split(":");
+            if (parts.length > 2) {
+              errorAt(
+                DIAGS_PARSER.nsValueIncorrect(
+                  rawValue,
+                  "Namespace cannot contain multiple ':' (colon).",
+                ),
+                attr.pos,
+                attr.end,
+              );
+            } else if (parts.length === 2 && parts[0] !== "component-ns") {
+              errorAt(DIAGS_PARSER.nsSchemeIncorrect(rawValue, "component-ns"), attr.pos, attr.end);
+            } else {
+              const nsValue = parts.length === 2 ? parts[1] : rawValue;
+              if (nsValue.includes("#")) {
+                errorAt(
+                  DIAGS_PARSER.nsValueIncorrect(nsValue, "Namespace cannot contain character '#'."),
+                  attr.pos,
+                  attr.end,
+                );
+              }
+            }
+            if (!stack.addCurrentNamespace(key)) {
+              errorAt(DIAGS_PARSER.duplXmlns(key), attr.pos, attr.end);
+            }
+          }
+        }
+      }
+    }
+
+    if (openTagNameText === COMPOUND_COMPONENT_NAME) {
+      stack.setIsCompoundComponent();
+    }
+
+    if (stack.isChildOfCompoundComponent() && openTagNameText) {
+      if (!HELPER_NAMES.has(openTagNameText)) {
+        stack.setHasNonHelper();
+      }
+    }
+
     switch (peek().kind) {
       case SyntaxKind.NodeClose: {
         bumpAny();
-        completeNode(SyntaxKind.ElementNode);
+        validateElementNode(openTagNameNode, openTagNameText);
+        stack.completeNode(SyntaxKind.ElementNode);
         return;
       }
 
       case SyntaxKind.NodeEnd: {
         bumpAny();
         parseContentList();
-        parseClosingTag(openTagName, errInName);
-        completeNode(SyntaxKind.ElementNode);
+        parseClosingTag(openTagNameNode, errInName);
+        validateElementNode(openTagNameNode, openTagNameText);
+        stack.completeNode(SyntaxKind.ElementNode);
         return;
       }
 
       default: {
-        completeNode(SyntaxKind.ElementNode);
+        stack.completeNode(SyntaxKind.ElementNode);
         error(DIAGS_PARSER.expEndOrClose);
         return;
       }
@@ -183,10 +476,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function parseOpeningTagName(): { node: Node; errInName: boolean } {
-    startNode();
+    stack.startNode(SyntaxKind.TagNameNode);
     const identNode = bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
-      const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
+      const nameNodeWithColon = stack.completeNode(SyntaxKind.TagNameNode);
       const namespaceName = getText(identNode);
       errorAt(
         DIAGS_PARSER.expTagNameAfterNamespace(namespaceName),
@@ -196,12 +489,12 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       errNodeUntil([SyntaxKind.Identifier, ...RECOVER_OPEN_TAG]);
       return { node: nameNodeWithColon, errInName: true };
     } else {
-      return { node: completeNode(SyntaxKind.TagNameNode), errInName: false };
+      return { node: stack.completeNode(SyntaxKind.TagNameNode), errInName: false };
     }
   }
 
   function parseAttrList() {
-    startNode();
+    stack.startNode(SyntaxKind.AttributeListNode);
     const attrNames: { ns?: string; name: string }[] = [];
 
     loop: while (true) {
@@ -221,15 +514,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    if (node.children!.length === 0) {
-      abandonNode();
+    if (stack.node.children!.length === 0) {
+      stack.abandonNode();
     } else {
-      completeNode(SyntaxKind.AttributeListNode);
+      stack.completeNode(SyntaxKind.AttributeListNode);
     }
   }
 
   function parseAttr(attrNames: { ns?: string; name: string }[]) {
-    startNode();
+    stack.startNode(SyntaxKind.AttributeNode);
     if (at(SyntaxKind.Identifier)) {
       parseAttrName(attrNames);
     } else {
@@ -240,9 +533,9 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         } else {
           errorAt(DIAGS_PARSER.expAttrName, errNode.pos, errNode.end);
         }
-        completeNode(SyntaxKind.AttributeNode);
+        stack.completeNode(SyntaxKind.AttributeNode);
       } else {
-        abandonNode();
+        stack.abandonNode();
         error(DIAGS_PARSER.expAttrName);
       }
       return;
@@ -259,14 +552,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    completeNode(SyntaxKind.AttributeNode);
+    stack.completeNode(SyntaxKind.AttributeNode);
   }
 
   function parseAttrName(attrNames: { ns?: string; name: string }[]) {
     let nameIdent = peek();
     let nsIdent = undefined;
 
-    startNode();
+    stack.startNode(SyntaxKind.AttributeKeyNode);
     bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon)) {
       if (at(SyntaxKind.Identifier)) {
@@ -288,7 +581,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
     checkAttrName(attrNames, { nsIdent, nameIdent });
-    completeNode(SyntaxKind.AttributeKeyNode);
+    stack.completeNode(SyntaxKind.AttributeKeyNode);
   }
 
   function parseClosingTag(openTagName: Node | null, skipNameMatching: boolean) {
@@ -329,10 +622,10 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   function parseClosingTagName(): Node {
-    startNode();
+    stack.startNode(SyntaxKind.TagNameNode);
     const identNode = bump(SyntaxKind.Identifier);
     if (eat(SyntaxKind.Colon) && !eat(SyntaxKind.Identifier)) {
-      const nameNodeWithColon = completeNode(SyntaxKind.TagNameNode);
+      const nameNodeWithColon = stack.completeNode(SyntaxKind.TagNameNode);
       errorAt(
         DIAGS_PARSER.expTagNameAfterNamespace(getText(identNode)),
         nameNodeWithColon.pos,
@@ -341,7 +634,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       errNodeUntil(RECOVER_OPEN_TAG);
       return nameNodeWithColon;
     } else {
-      return completeNode(SyntaxKind.TagNameNode);
+      return stack.completeNode(SyntaxKind.TagNameNode);
     }
   }
 
@@ -374,12 +667,277 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+  type SegmentedAttr = {
+    namespace?: string;
+    startSegment?: string;
+    name?: string;
+    value?: string;
+    unsegmentedName: string;
+    node: Node;
+  };
+
+  function validateElementNode(tagNameNode: Node, tagNameText: string) {
+    const errReportNode = tagNameNode ?? stack.node.children![0];
+
+    if (!tagNameText) {
+      return;
+    }
+
+    if (tagNameText === COMPOUND_COMPONENT_NAME) {
+      validateCompoundComponentNode(errReportNode);
+      return;
+    }
+
+    if (tagNameText === "global" && stack.isChildOfCompoundComponent()) {
+      errorAt(DIAGS_PARSER.globalNotAllowedInComponent, errReportNode.pos, errReportNode.end);
+    }
+
+    if (stack.isChildOfCompoundComponent() && tagNameText) {
+      if (tagNameText === "uses" || tagNameText === "loaders") {
+        errorAt(DIAGS_PARSER.invalidNodeName(tagNameText), errReportNode.pos, errReportNode.end);
+      }
+    }
+
+    if (HELPERS_WITH_NAME_VALUE_ONLY.has(tagNameText)) {
+      const attrs = getElementAttrs(stack.node).map(segmentAttr);
+      validateNameValueAttributes(errReportNode, tagNameText, attrs);
+      if (tagNameText === "event") {
+        const eventNameAttr = attrs.find(
+          (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
+        );
+        if (eventNameAttr?.value && ON_PREFIX_REGEX.test(eventNameAttr.value)) {
+          errorAt(
+            DIAGS_PARSER.eventNoOnPrefix(eventNameAttr.value),
+            eventNameAttr.node.pos,
+            eventNameAttr.node.end,
+          );
+        }
+      }
+    }
+
+    if (tagNameText === "uses") {
+      validateUsesElement(errReportNode);
+    }
+
+    if (tagNameText === "item") {
+      validateItemElement();
+    }
+
+    if (tagNameText === "property" || tagNameText === "template") {
+      validateFieldItemChildren();
+    }
+  }
+
+  function validateCompoundComponentNode(errReportNode: Node) {
+    if (stack.hasCompoundCompAncestor()) {
+      errorAt(DIAGS_PARSER.nestedCompDefs, errReportNode.pos, errReportNode.end);
+      return;
+    }
+
+    const element = stack.node;
+
+    const attrs = getElementAttrs(element).map(segmentAttr);
+    const nameAttr = attrs.find(
+      (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
+    );
+    if (!nameAttr?.value) {
+      errorAt(DIAGS_PARSER.compDefNameExp, errReportNode.pos, errReportNode.end);
+      return;
+    } else if (!UPPERCASE_REGEX.test(nameAttr.value)) {
+      errorAt(DIAGS_PARSER.compDefNameUppercase, nameAttr.node.pos, nameAttr.node.end);
+      return;
+    }
+
+    if (!stack.hasNonHelperChildren()) {
+      errorAt(DIAGS_PARSER.compDefNesedElem, errReportNode.pos, errReportNode.end);
+    }
+
+    for (const attr of attrs) {
+      if (attr.namespace === "xmlns") {
+        continue;
+      }
+
+      if (attr.startSegment) {
+        if (attr.startSegment === "global") {
+          errorAt(DIAGS_PARSER.globalNotAllowedInComponent, attr.node.pos, attr.node.end);
+        } else if (attr.startSegment !== "method" && attr.startSegment !== "var") {
+          errorAt(
+            DIAGS_PARSER.invalidReusableCompAttr(attr.unsegmentedName),
+            attr.node.pos,
+            attr.node.end,
+          );
+        }
+        continue;
+      }
+
+      if (attr.name !== "name" && attr.name !== "codeBehind") {
+        errorAt(
+          DIAGS_PARSER.invalidReusableCompAttr(attr.name ?? attr.unsegmentedName),
+          attr.node.pos,
+          attr.node.end,
+        );
+      }
+    }
+  }
+
+  function validateNameValueAttributes(
+    errReportNode: Node,
+    elementName: string,
+    attrs: SegmentedAttr[],
+  ) {
+    const invalidAttr = attrs.find(
+      (attr) =>
+        attr.namespace !== undefined ||
+        attr.startSegment !== undefined ||
+        (attr.name !== "name" && attr.name !== "value"),
+    );
+
+    if (invalidAttr) {
+      errorAt(
+        DIAGS_PARSER.onlyNameValueAttrs(elementName),
+        invalidAttr.node.pos,
+        invalidAttr.node.end,
+      );
+      return;
+    }
+
+    const nameAttr = attrs.find((attr) => attr.name === "name");
+    if (!nameAttr?.value) {
+      errorAt(DIAGS_PARSER.nameAttrRequired(elementName), errReportNode.pos, errReportNode.end);
+    }
+  }
+
+  function validateUsesElement(errReportNode: Node) {
+    const attrs = getElementAttrs(stack.node).map(segmentAttr);
+    const valueAttr = attrs.find(
+      (attr) => !attr.namespace && !attr.startSegment && attr.name === "value",
+    );
+    if (!valueAttr?.value || attrs.length !== 1) {
+      errorAt(DIAGS_PARSER.usesValueOnly, errReportNode.pos, errReportNode.end);
+    }
+  }
+
+  function validateItemElement() {
+    const attrs = getElementAttrs(stack.node).map(segmentAttr);
+    const nameAttr = attrs.find(
+      (attr) => !attr.namespace && !attr.startSegment && attr.name === "name",
+    );
+    if (nameAttr) {
+      errorAt(DIAGS_PARSER.cantHaveNameAttr("item"), nameAttr.node.pos, nameAttr.node.end);
+    }
+  }
+
+  function validateFieldItemChildren() {
+    const children = getElementChildren(stack.node);
+    const hasNestedComponent = children.some((child) => {
+      if (child.kind !== SyntaxKind.ElementNode) {
+        return false;
+      }
+      const childName = getElementName(child);
+      return childName ? UPPERCASE_REGEX.test(childName) : false;
+    });
+
+    if (hasNestedComponent) {
+      return;
+    }
+
+    let nestedElementType: "field" | "item" | undefined;
+
+    for (const child of children) {
+      if (child.kind !== SyntaxKind.ElementNode) {
+        continue;
+      }
+
+      const childName = getElementName(child);
+      if (!childName) {
+        continue;
+      }
+
+      if (childName !== "field" && childName !== "item") {
+        errorAt(DIAGS_PARSER.onlyFieldOrItemChild, child.pos, child.end);
+        continue;
+      }
+
+      if (!nestedElementType) {
+        nestedElementType = childName;
+      } else if (nestedElementType !== childName) {
+        errorAt(DIAGS_PARSER.cannotMixFieldItem, child.pos, child.end);
+      }
+    }
+  }
+
+  function validateSingleRootElement(fileContentListNode: Node) {
+    const children = fileContentListNode.children ?? [];
+    // --- Check that the nodes contains exactly only a single component root element before the EoF token
+    if (children[0].kind !== SyntaxKind.ElementNode) {
+      errorAt(DIAGS_PARSER.singleRootElem, children[0].pos, children[0].end);
+    }
+    if (children.length > 2) {
+      errorAt(DIAGS_PARSER.singleRootElem, children[1].pos, children[1].end);
+    }
+  }
+
+  function segmentAttr(attr: Node): SegmentedAttr {
+    const keyNode = attr.children?.[0];
+    const keyChildren = keyNode?.children ?? [];
+    const hasNamespace = keyChildren.length === 3;
+    const namespace = hasNamespace ? getText(keyChildren[0]) : undefined;
+    const unsegmentedName =
+      keyChildren.length > 0 ? getText(keyChildren[keyChildren.length - 1]) : "";
+
+    const segments = unsegmentedName.split(".");
+    let startSegment: string | undefined;
+    let name: string | undefined;
+    if (segments.length === 2) {
+      startSegment = segments[0];
+      name = segments[1];
+    } else {
+      name = unsegmentedName;
+    }
+
+    const valueNode = attr.children?.[2];
+    let value: string | undefined;
+    if (valueNode && valueNode.kind === SyntaxKind.StringLiteral) {
+      const valueText = getText(valueNode);
+      value = valueText.length >= 2 ? valueText.substring(1, valueText.length - 1) : "";
+    }
+
+    return {
+      namespace,
+      startSegment,
+      name,
+      value,
+      unsegmentedName,
+      node: attr,
+    };
+  }
+
+  function getElementName(element: Node): string | undefined {
+    const tagNameNode = element.children?.find((c) => c.kind === SyntaxKind.TagNameNode);
+    if (!tagNameNode || !tagNameNode.children || tagNameNode.children.length === 0) {
+      return undefined;
+    }
+    return getText(tagNameNode.children[tagNameNode.children.length - 1]);
+  }
+
+  function getTagNameNodeLastIdentifier(tagNameNode: Node): string {
+    return getText(tagNameNode.children![tagNameNode.children!.length - 1]);
+  }
+
+  function getElementAttrs(element: IncompleteNode): Node[] {
+    return element.children?.find((c) => c.kind === SyntaxKind.AttributeListNode)?.children ?? [];
+  }
+
+  function getElementChildren(element: IncompleteNode): Node[] {
+    return element.children?.find((c) => c.kind === SyntaxKind.ContentListNode)?.children ?? [];
+  }
+
   function error({ code, message }: ParserDiagPositionless) {
     const { pos, end } = peek();
 
     const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, end, 1);
 
-    errors.push({
+    stack.pushError({
       code,
       message,
       pos,
@@ -392,7 +950,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function errorAt({ code, message }: ParserDiagPositionless, pos: number, end: number) {
     const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, end, 1);
 
-    errors.push({
+    stack.pushError({
       code,
       message,
       pos,
@@ -408,13 +966,13 @@ export function parseXmlUiMarkup(text: string): ParseResult {
    * @returns the error node with the consumed tokens, or null if there were no tokens consumed
    */
   function errNodeUntil(tokens: readonly SyntaxKind[]): Node | null {
-    startNode();
+    stack.startNode(SyntaxKind.ErrorNode);
     advance(tokens);
-    if (node.children!.length === 0) {
-      abandonNode();
+    if (stack.node.children!.length === 0) {
+      stack.abandonNode();
       return null;
     } else {
-      return completeNode(SyntaxKind.ErrorNode);
+      return stack.completeNode(SyntaxKind.ErrorNode);
     }
   }
 
@@ -480,22 +1038,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    let parseAsStringLiteral = false;
-    if (token.kind === SyntaxKind.StringLiteral) {
-      const beforeLookahead = token.end;
-      const nextToken = collectToken(true);
-      parseAsStringLiteral =
-        nextToken.kind === SyntaxKind.CData ||
-        nextToken.kind === SyntaxKind.CloseNodeStart ||
-        nextToken.kind === SyntaxKind.Script ||
-        nextToken.kind === SyntaxKind.OpenNodeStart;
-      scanner.resetTokenState(beforeLookahead);
-    }
-
     let pos: number;
-    if (parseAsStringLiteral) {
-      pos = token.pos;
-    } else if (leadingComments.length > 0) {
+    if (leadingComments.length > 0) {
       pos = leadingComments[leadingComments.length - 1].end;
     } else if (firstNonCommentTriviaIdx !== -1) {
       pos = trivia![firstNonCommentTriviaIdx].pos;
@@ -512,9 +1056,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     if (secondCommentGroupStartIdx !== -1) {
       end = trivia![secondCommentGroupStartIdx].pos;
       scanner.resetTokenState(end);
-    } else if (parseAsStringLiteral) {
-      kind = SyntaxKind.StringLiteral;
-      end = token.end;
     } else {
       while (true) {
         const nextChar = scanner.peekChar();
@@ -544,33 +1085,14 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function bumpAny(): Node {
     if (peekedToken) {
-      node.children!.push(peekedToken);
+      stack.pushToken(peekedToken);
       const bumpedToken = peekedToken;
       peekedToken = undefined;
       return bumpedToken;
     }
     const token = collectToken(false);
-    node.children!.push(token);
+    stack.pushToken(token);
     return token;
-  }
-
-  /** start a new node. Any new tokens or nodes will be put into it's children list from that point. Each call to this should be paired with a [completeNode] */
-  function startNode() {
-    parents.push(node);
-    node = {
-      children: [],
-    };
-  }
-
-  function completeNode(type: SyntaxKind): Node {
-    const completedNode = createNode(type, node.children!);
-    const parentNode = parents[parents.length - 1]!;
-
-    parentNode.children!.push(completedNode);
-
-    node = parentNode;
-    parents.pop();
-    return completedNode;
   }
 
   function collectToken(inContent: boolean): Node {
@@ -604,11 +1126,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         const token = new Node(kind, pos, badPrefixEnd, triviaBefore);
 
         scanner.resetTokenState(badPrefixEnd);
-        startNode();
-        node.children!.push(token);
+        stack.startNode(SyntaxKind.ErrorNode);
+        stack.pushToken(token);
 
         const { contextPos, contextEnd } = cursor.getSurroundingContext(pos, badPrefixEnd, 0);
-        errors.push({
+        stack.pushError({
           code: err.code,
           message: err.message,
           pos,
@@ -616,7 +1138,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           contextPos,
           contextEnd,
         });
-        completeNode(SyntaxKind.ErrorNode);
+        stack.completeNode(SyntaxKind.ErrorNode);
 
         errFromScanner = undefined;
         return collectToken(inContent);
@@ -638,13 +1160,6 @@ export function parseXmlUiMarkup(text: string): ParseResult {
           );
       }
     }
-  }
-
-  function abandonNode() {
-    const parentNode = parents[parents.length - 1];
-    parentNode!.children!.push(...node.children!);
-    node = parentNode;
-    parents.pop();
   }
 }
 

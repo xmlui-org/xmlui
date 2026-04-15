@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { MessageListenerNative } from "./MessageListenerNative";
 
@@ -24,16 +24,4 @@ export const MessageListenerMd = createMetadata({
   },
 });
 
-export const messageListenerComponentRenderer = createComponentRenderer(
-  COMP,
-  MessageListenerMd,
-  ({ node, renderChild, lookupEventHandler }) => {
-    const onMessageReceived = lookupEventHandler("messageReceived");
-
-    return (
-      <MessageListenerNative onMessageReceived={onMessageReceived}>
-        {renderChild(node.children)}
-      </MessageListenerNative>
-    );
-  },
-);
+export const messageListenerComponentRenderer = wrapComponent(COMP, MessageListenerNative, MessageListenerMd, {});

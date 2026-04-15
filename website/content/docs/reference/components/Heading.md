@@ -7,7 +7,7 @@
 - **Text overflow control**: Automatic ellipses and line limiting for long headings
 - **Anchor generation**: Optional hover anchors for deep linking to specific sections
 
-For the shorthand versions see: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
+For the shorthand versions see: [H1](/docs/reference/components/H1), [H2](/docs/reference/components/H2), [H3](/docs/reference/components/H3), [H4](/docs/reference/components/H4), [H5](/docs/reference/components/H5), [H6](/docs/reference/components/H6).
 
 ```xmlui-pg copy display name="Example: Headings with levels"
 <App>
@@ -34,12 +34,16 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
+
+### `anchorTemplate` [#anchortemplate]
+
+An optional template to customize the anchor link rendered next to the heading when `showAnchor` is enabled. The template receives `$anchorId` (the computed anchor ID) and `$anchorHref` (the anchor href string, e.g. `#my-heading`) as context variables.
 
 ### `ellipses` [#ellipses]
 

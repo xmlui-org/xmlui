@@ -5,89 +5,46 @@ import { test, expect } from "../../testing/fixtures";
 // =============================================================================
 
 test.describe("Basic Functionality", () => {
-  test("renders items vertically and centers them", async ({ initTestBed, page }) => {
+  test("renders items vertically centered, supports empty, ignores orientation prop", async ({ initTestBed, page }) => {
     await initTestBed(`
-      <CVStack testId="cvstack" width="200px" height="200px" backgroundColor="lightgray">
-        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
-        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
-        <Stack testId="item3" height="32px" width="32px" backgroundColor="green" />
-      </CVStack>
+      <Fragment>
+        <CVStack testId="cvs-main" width="200px" height="200px" backgroundColor="lightgray">
+          <Stack testId="cvs-i1" height="32px" width="32px" backgroundColor="red" />
+          <Stack testId="cvs-i2" height="32px" width="32px" backgroundColor="blue" />
+          <Stack testId="cvs-i3" height="32px" width="32px" backgroundColor="green" />
+        </CVStack>
+        <CVStack testId="cvs-empty"></CVStack>
+        <CVStack testId="cvs-orient" orientation="horizontal" width="200px" height="100px" backgroundColor="lightgray">
+          <Stack testId="cvs-oi1" height="32px" width="32px" backgroundColor="red" />
+          <Stack testId="cvs-oi2" height="32px" width="32px" backgroundColor="blue" />
+        </CVStack>
+      </Fragment>
     `);
 
-    const cvstack = page.getByTestId("cvstack");
-    const item1 = page.getByTestId("item1");
-    const item2 = page.getByTestId("item2");
-    const item3 = page.getByTestId("item3");
+    // Verify vertical layout and centering
+    const cvstackBox = await page.getByTestId("cvs-main").boundingBox();
+    const i1Box = await page.getByTestId("cvs-i1").boundingBox();
+    const i2Box = await page.getByTestId("cvs-i2").boundingBox();
+    const i3Box = await page.getByTestId("cvs-i3").boundingBox();
+    expect(i2Box!.y).toBeGreaterThan(i1Box!.y + i1Box!.height - 1);
+    expect(i3Box!.y).toBeGreaterThan(i2Box!.y + i2Box!.height - 1);
+    const cvsCenterX = cvstackBox!.x + cvstackBox!.width / 2;
+    expect(Math.abs(i1Box!.x + i1Box!.width / 2 - cvsCenterX)).toBeLessThan(1);
+    expect(Math.abs(i2Box!.x + i2Box!.width / 2 - cvsCenterX)).toBeLessThan(1);
+    expect(Math.abs(i3Box!.x + i3Box!.width / 2 - cvsCenterX)).toBeLessThan(1);
+    const cvsCenterY = cvstackBox!.y + cvstackBox!.height / 2;
+    const contentCenterY = i1Box!.y + (i3Box!.y + i3Box!.height - i1Box!.y) / 2;
+    expect(Math.abs(contentCenterY - cvsCenterY)).toBeLessThan(1);
 
-    await expect(cvstack).toBeVisible();
-    await expect(item1).toBeVisible();
-    await expect(item2).toBeVisible();
-    await expect(item3).toBeVisible();
+    // Verify empty renders
+    await expect(page.getByTestId("cvs-empty")).toBeAttached();
+    await expect(page.getByTestId("cvs-empty")).toBeEmpty();
 
-    // Get bounding boxes to verify vertical layout and centering
-    const cvstackBox = await cvstack.boundingBox();
-    const item1Box = await item1.boundingBox();
-    const item2Box = await item2.boundingBox();
-    const item3Box = await item3.boundingBox();
-
-    // Verify items are stacked vertically (item2 should be below item1, item3 below item2)
-    expect(item2Box!.y).toBeGreaterThan(item1Box!.y + item1Box!.height - 1); // -1 for floating point tolerance
-    expect(item3Box!.y).toBeGreaterThan(item2Box!.y + item2Box!.height - 1); // -1 for floating point tolerance
-
-    // Verify items are horizontally centered within the container
-    const cvstackCenterX = cvstackBox!.x + cvstackBox!.width / 2;
-    const item1CenterX = item1Box!.x + item1Box!.width / 2;
-    const item2CenterX = item2Box!.x + item2Box!.width / 2;
-    const item3CenterX = item3Box!.x + item3Box!.width / 2;
-
-    expect(Math.abs(item1CenterX - cvstackCenterX)).toBeLessThan(1);
-    expect(Math.abs(item2CenterX - cvstackCenterX)).toBeLessThan(1);
-    expect(Math.abs(item3CenterX - cvstackCenterX)).toBeLessThan(1);
-
-    // Verify the entire content is vertically centered within the container
-    const allItemsTopY = item1Box!.y;
-    const allItemsBottomY = item3Box!.y + item3Box!.height;
-    const allItemsHeight = allItemsBottomY - allItemsTopY;
-    const cvstackCenterY = cvstackBox!.y + cvstackBox!.height / 2;
-    const contentCenterY = allItemsTopY + allItemsHeight / 2;
-
-    expect(Math.abs(contentCenterY - cvstackCenterY)).toBeLessThan(1);
-  });
-
-  test("renders empty CVStack", async ({ initTestBed, page }) => {
-    await initTestBed(`<CVStack testId="cvstack"></CVStack>`);
-    
-    const cvstack = page.getByTestId("cvstack");
-    await expect(cvstack).toBeAttached();
-    await expect(cvstack).toBeEmpty();
-  });
-
-  test("ignores orientation property", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <CVStack testId="cvstack" orientation="horizontal" width="200px" height="100px" backgroundColor="lightgray">
-        <Stack testId="item1" height="32px" width="32px" backgroundColor="red" />
-        <Stack testId="item2" height="32px" width="32px" backgroundColor="blue" />
-      </CVStack>
-    `);
-
-    const cvstack = page.getByTestId("cvstack");
-    const item1 = page.getByTestId("item1");
-    const item2 = page.getByTestId("item2");
-
-    await expect(item1).toBeVisible();
-    await expect(item2).toBeVisible();
-
-    // Get bounding boxes to verify still renders vertically and centered despite orientation="horizontal"
-    const cvstackBox = await cvstack.boundingBox();
-    const item1Box = await item1.boundingBox();
-    const item2Box = await item2.boundingBox();
-
-    // Verify items are still stacked vertically (orientation prop should be ignored)
-    expect(item2Box!.y).toBeGreaterThan(item1Box!.y + item1Box!.height - 1);
-
-    // Verify items are still horizontally centered
-    const cvstackCenterX = cvstackBox!.x + cvstackBox!.width / 2;
-    const item1CenterX = item1Box!.x + item1Box!.width / 2;
-    expect(Math.abs(item1CenterX - cvstackCenterX)).toBeLessThan(1);
+    // Verify orientation is ignored (still renders vertically and centered)
+    const orientBox = await page.getByTestId("cvs-orient").boundingBox();
+    const oi1Box = await page.getByTestId("cvs-oi1").boundingBox();
+    const oi2Box = await page.getByTestId("cvs-oi2").boundingBox();
+    expect(oi2Box!.y).toBeGreaterThan(oi1Box!.y + oi1Box!.height - 1);
+    expect(Math.abs(oi1Box!.x + oi1Box!.width / 2 - (orientBox!.x + orientBox!.width / 2))).toBeLessThan(1);
   });
 });

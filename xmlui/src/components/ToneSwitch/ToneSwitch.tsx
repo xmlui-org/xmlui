@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ToneSwitch.module.scss";
@@ -41,17 +41,4 @@ export const ToneSwitchMd = createMetadata({
   },
 });
 
-/**
- * Define the renderer for the ToneSwitch component
- */
-export const toneSwitchComponentRenderer = createComponentRenderer(
-  COMP, 
-  ToneSwitchMd, 
-  ({ node, extractValue, className }) => {
-    return <ToneSwitch
-      className={className}
-      iconLight={extractValue(node.props.iconLight)}
-      iconDark={extractValue(node.props.iconDark)}
-    />;
-  }
-);
+export const toneSwitchComponentRenderer = wrapComponent(COMP, ToneSwitch, ToneSwitchMd, {});

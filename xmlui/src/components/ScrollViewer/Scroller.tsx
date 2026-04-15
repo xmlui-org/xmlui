@@ -4,6 +4,7 @@ import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
 import styles from "./ScrollViewer.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useIsTouchDevice } from "../../components-core/utils/hooks";
 
 export type ScrollStyle = "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
 
@@ -15,6 +16,7 @@ export const defaultProps = {
 type Props = {
   children: ReactNode;
   className?: string;
+  containerClassName?: string;
   style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
@@ -33,6 +35,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   {
     children,
     className,
+    containerClassName,
     style,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
@@ -50,10 +53,15 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   const autoHideDelayMouseOver = parseInt(getThemeVar("autoHideDelay-whenMouseOver-Scroller") || "200", 10);
   const autoHideDelayScrolling = parseInt(getThemeVar("autoHideDelay-whenScrolling-Scroller") || "400", 10);
 
+  // On touch/mobile devices, always use native scrollbars for better UX
+  const isTouchDevice = useIsTouchDevice();
+
   // Normalize scrollStyle to a valid value, defaulting to "normal" for unrecognized values
-  const normalizedScrollStyle = (["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
-    ? scrollStyle
-    : "normal") as ScrollStyle;
+  const normalizedScrollStyle = (isTouchDevice
+    ? "normal"
+    : ["normal", "overlay", "whenMouseOver", "whenScrolling"].includes(scrollStyle as string)
+      ? scrollStyle
+      : "normal") as ScrollStyle;
 
   // Update fade indicators based on scroll position
   const updateFadeIndicators = React.useCallback(() => {
@@ -141,7 +149,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // Normal mode: use standard div with default browser scrollbar
   if (normalizedScrollStyle === "normal") {
     return (
-      <div ref={ref} className={className} style={style} {...rest}>
+      <div ref={ref} className={`${containerClassName ? `${containerClassName} ` : ""}${className || ""}`} style={style} {...rest}>
         {children}
       </div>
     );
@@ -150,7 +158,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // Overlay mode: overlay scrollbar using theme variables (always visible)
   if (normalizedScrollStyle === "overlay") {
     return (
-      <div className={styles.fadeContainer}>
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
         <OverlayScrollbarsComponent
           ref={(instance) => {
             if (instance) {
@@ -190,7 +198,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
   // WhenMouseOver mode: scrollbar appears on hover
   if (normalizedScrollStyle === "whenMouseOver") {
     return (
-      <div className={styles.fadeContainer}>
+      <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
         <OverlayScrollbarsComponent
           ref={(instance) => {
             if (instance) {
@@ -230,7 +238,7 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
 
   // WhenScrolling mode: scrollbar appears during scroll and fades after 400ms
   return (
-    <div className={styles.fadeContainer}>
+    <div className={`${styles.fadeContainer}${containerClassName ? ` ${containerClassName}` : ""}`}>
       <OverlayScrollbarsComponent
         ref={(instance) => {
           if (instance) {

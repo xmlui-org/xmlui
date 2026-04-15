@@ -1,5 +1,6 @@
-import { createComponentRenderer } from "../../components-core/renderers";
-import { ColorPicker, defaultProps } from "./ColorPickerNative";
+import { ColorPicker, defaultProps } from "./ColorPickerReact";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -14,6 +15,7 @@ import {
 } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ColorPicker.module.scss";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "ColorPicker";
 
@@ -52,42 +54,40 @@ export const ColorPickerMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  parts: {
+    input: { description: "The color picker input element." },
+  },
   defaultThemeVars: {
     [`width-${COMP}`]: "3em",
     [`height-${COMP}`]: "1.5em",
   },
 });
 
-export const colorPickerComponentRenderer = createComponentRenderer(
-  "ColorPicker",
-  ColorPickerMd,
-  ({
-    node,
-    extractValue,
-    className,
-    state,
-    lookupEventHandler,
-    registerComponentApi,
-    updateState,
-  }) => {
-    const readOnly = extractValue.asOptionalBoolean(node.props?.readOnly, false);
-    const enabled = extractValue.asOptionalBoolean(node.props?.enabled, true);
+type ThemedColorPickerProps = React.ComponentPropsWithoutRef<typeof ColorPicker>;
+
+export const ThemedColorPicker = React.forwardRef<React.ElementRef<typeof ColorPicker>, ThemedColorPickerProps>(
+  function ThemedColorPicker({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ColorPickerMd);
     return (
       <ColorPicker
-        validationStatus={extractValue(node.props.validationStatus)}
-        value={state.value}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        className={className}
-        required={extractValue.asOptionalBoolean(node.props?.required)}
-        enabled={enabled && !readOnly}
-        readOnly={readOnly}
-        autoFocus={extractValue.asOptionalBoolean(node.props?.autoFocus)}
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
+  },
+);
+
+export const colorPickerComponentRenderer = wrapComponent(
+  "ColorPicker",
+  ColorPicker,
+  ColorPickerMd,
+  {
+    exposeRegisterApi: true,
+    events: {
+      gotFocus: "onFocus",
+      lostFocus: "onBlur",
+      didChange: "onDidChange",
+    },
   },
 );

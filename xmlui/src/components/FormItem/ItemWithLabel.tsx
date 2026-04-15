@@ -6,12 +6,13 @@ import { Slot } from "@radix-ui/react-slot";
 import styles from "./FormItem.module.scss";
 
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
-import { Spinner } from "../Spinner/SpinnerNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
 import { PART_LABELED_ITEM, PART_LABEL } from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
-import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useFormContextPart } from "../Form/FormContext";
 
 // Component part names
 
@@ -39,6 +40,7 @@ type ItemWithLabelProps = {
   cloneStyle?: boolean;
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
+  compactInlineLabel?: boolean;
 };
 export const defaultProps: Pick<
   ItemWithLabelProps,
@@ -52,6 +54,7 @@ export const defaultProps: Pick<
   | "requireLabelMode"
   | "isInputTemplateUsed"
   | "direction"
+  | "compactInlineLabel"
 > = {
   labelBreak: true,
   enabled: true,
@@ -63,6 +66,7 @@ export const defaultProps: Pick<
   requireLabelMode: "markRequired",
   isInputTemplateUsed: false,
   direction: "ltr",
+  compactInlineLabel: false,
 };
 
 const numberRegex = /^[0-9]+$/;
@@ -70,11 +74,11 @@ const numberRegex = /^[0-9]+$/;
 export const ItemWithLabel = forwardRef(function ItemWithLabel(
   {
     id,
-    labelPosition = "top",
+    labelPosition,
     style = {},
     className,
     label,
-    labelBreak = defaultProps.labelBreak,
+    labelBreak,
     labelWidth,
     enabled = defaultProps.enabled,
     required = defaultProps.required,
@@ -91,12 +95,34 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     testId,
     cloneStyle = defaultProps.cloneStyle,
     requireLabelMode = defaultProps.requireLabelMode,
+    compactInlineLabel = defaultProps.compactInlineLabel,
     ...rest
   }: ItemWithLabelProps,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const generatedId = useId();
   const inputId = id || generatedId;
+
+  const formItemLabelPosition = useFormContextPart<LabelPosition | undefined>(
+    (value) => value?.itemLabelPosition as LabelPosition | undefined,
+  );
+  const resolvedLabelPosition = labelPosition ?? formItemLabelPosition ?? "top";
+
+  const formItemLabelWidth = useFormContextPart<string | undefined>(
+    (value) => value?.itemLabelWidth,
+  );
+  const resolvedLabelWidthProp = labelWidth ?? formItemLabelWidth;
+
+  const formItemLabelBreak = useFormContextPart<boolean | undefined>(
+    (value) => value?.itemLabelBreak,
+  );
+  const resolvedLabelBreak = labelBreak ?? formItemLabelBreak ?? defaultProps.labelBreak!;
+
+  // When rendered inside a horizontal Stack, validation messages must not push sibling
+  // inputs out of alignment, and required markers should reserve consistent space so
+  // all labels in the same row have the same height.
+  const isInHorizontalStack = layoutContext?.orientation === "horizontal";
+
   const [inputElement, setInputElement] = useState<HTMLElement | null>(null);
   const [inputHeight, setInputHeight] = useState<number | undefined>(undefined);
 
@@ -120,7 +146,17 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   }, [inputElement]);
 
   const labelWrapperHeight =
-    labelPosition === "start" || labelPosition === "end" ? inputHeight : "auto";
+    resolvedLabelPosition === "start" || resolvedLabelPosition === "end" ||
+    resolvedLabelPosition === "before" || resolvedLabelPosition === "after"
+      ? inputHeight
+      : "auto";
+
+  const resolvedLabelWidth =
+    resolvedLabelWidthProp !== undefined
+      ? (numberRegex.test(resolvedLabelWidthProp) ? `${resolvedLabelWidthProp}px` : resolvedLabelWidthProp)
+      : (compactInlineLabel && (resolvedLabelPosition === "before" || resolvedLabelPosition === "after"))
+        ? "fit-content"
+        : undefined;
 
   // Check if the child is a RadioGroup component
   const isRadioGroup = React.isValidElement(children) && children.type === RadioGroup;
@@ -148,10 +184,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       >
         <div
           className={classnames(styles.container, {
-            [styles.top]: labelPosition === "top",
-            [styles.bottom]: labelPosition === "bottom",
-            [styles.start]: labelPosition === "start",
-            [styles.end]: labelPosition === "end",
+            [styles.top]: resolvedLabelPosition === "top",
+            [styles.bottom]: resolvedLabelPosition === "bottom",
+            [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
+            [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
+            [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
+            [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
             [styles.shrinkToLabel]: shrinkToLabel,
           })}
           dir={rest?.direction}
@@ -178,19 +216,23 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                   }
                   style={{
                     ...labelStyle,
-                    width:
-                      labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
-                    flexShrink: labelWidth !== undefined ? 0 : undefined,
+                    width: resolvedLabelWidth,
+                    flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                   }}
                   className={classnames(styles.inputLabel, {
                     [styles.required]: required,
                     [styles.disabled]: !enabled,
-                    [styles.labelBreak]: labelBreak,
+                    [styles.labelBreak]: resolvedLabelBreak,
                   })}
                 >
                   {label}
-                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
-                    required && <span className={styles.requiredMark}>*</span>}
+                  {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && (
+                    required
+                      ? <span className={styles.requiredMark}>*</span>
+                      : isInHorizontalStack
+                        ? <span className={styles.requiredMark} style={{ visibility: "hidden" }}>*</span>
+                        : null
+                  )}
                   {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                     !required && <span className={styles.optionalTag}> (Optional)</span>}
                   {validationInProgress && (
@@ -207,7 +249,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               </Part>
             </div>
           )}
-          <div className={styles.wrapper}>
+          <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
             <Part partId={PART_LABELED_ITEM}>
               {cloneElement(children as ReactElement, {
                 id: !isInputTemplateUsed ? inputId : undefined,
@@ -216,7 +258,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
               })}
             </Part>
             {validationResult && (
-              <div className={styles.validationResultWrapper}>{validationResult}</div>
+              <div className={classnames(styles.validationResultWrapper, { [styles.validationMessageAbsolute]: isInHorizontalStack })}>{validationResult}</div>
             )}
           </div>
         </div>
@@ -229,10 +271,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
-          [styles.top]: labelPosition === "top",
-          [styles.bottom]: labelPosition === "bottom",
-          [styles.start]: labelPosition === "start",
-          [styles.end]: labelPosition === "end",
+          [styles.top]: resolvedLabelPosition === "top",
+          [styles.bottom]: resolvedLabelPosition === "bottom",
+          [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
+          [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
+          [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
+          [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
         dir={rest?.direction}
@@ -250,19 +294,23 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
                 onClick={onLabelClick || (() => document.getElementById(inputId)?.focus())}
                 style={{
                   ...labelStyle,
-                  width:
-                    labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
-                  flexShrink: labelWidth !== undefined ? 0 : undefined,
+                  width: resolvedLabelWidth,
+                  flexShrink: resolvedLabelWidthProp !== undefined ? 0 : undefined,
                 }}
                 className={classnames(styles.inputLabel, {
                   [styles.required]: required,
                   [styles.disabled]: !enabled,
-                  [styles.labelBreak]: labelBreak,
+                  [styles.labelBreak]: resolvedLabelBreak,
                 })}
               >
                 {label}
-                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") &&
-                  required && <span className={styles.requiredMark}>*</span>}
+                {(requireLabelMode === "markRequired" || requireLabelMode === "markBoth") && (
+                  required
+                    ? <span className={styles.requiredMark}>*</span>
+                    : isInHorizontalStack
+                      ? <span className={styles.requiredMark} style={{ visibility: "hidden" }}>*</span>
+                      : null
+                )}
                 {(requireLabelMode === "markOptional" || requireLabelMode === "markBoth") &&
                   !required && <span className={styles.optionalTag}> (Optional)</span>}
                 {validationInProgress && (
@@ -274,7 +322,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             </Part>
           </div>
         )}
-        <div className={styles.wrapper}>
+        <div className={classnames(styles.wrapper, { [styles.validationAnchor]: isInHorizontalStack })}>
           <Part partId={PART_LABELED_ITEM}>
             {cloneElement(children as ReactElement, {
               id: !isInputTemplateUsed ? inputId : undefined,
@@ -283,7 +331,7 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
             })}
           </Part>
           {validationResult && (
-            <div className={styles.validationResultWrapper}>{validationResult}</div>
+            <div className={classnames(styles.validationResultWrapper, { [styles.validationMessageAbsolute]: isInHorizontalStack })}>{validationResult}</div>
           )}
         </div>
       </div>

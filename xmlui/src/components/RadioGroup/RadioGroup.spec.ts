@@ -373,7 +373,7 @@ test("correct borderColor applied on validationStatus 'default'", async ({ initT
     </RadioGroup>`,
     {
       testThemeVars: {
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -394,7 +394,7 @@ test("correct borderColor applied on validationStatus 'error'", async ({ initTes
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--error": "rgb(255, 32, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -415,7 +415,7 @@ test("correct borderColor applied on validationStatus 'warning'", async ({ initT
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--warning": "rgb(255, 180, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -436,7 +436,7 @@ test("correct borderColor applied on validationStatus 'valid'", async ({ initTes
     {
       testThemeVars: {
         "borderColor-RadioGroupOption--success": "rgb(0, 180, 0)",
-        "borderColor-RadioGroupOption--default": "rgb(80, 80, 80)",
+        "borderColor-RadioGroupOption": "rgb(80, 80, 80)",
         "borderColor-checked-RadioGroupOption": "rgb(80, 80, 80)",
       },
     },
@@ -763,5 +763,357 @@ test.describe("Behaviors and Parts", () => {
     // Should only have one label with the text "Choose option"
     const labels = page.getByText("Choose option");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// ORIENTATION TESTS
+// =============================================================================
+
+test.describe("orientation property", () => {
+  test("defaults to vertical layout", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    await expect(group).toBeVisible();
+
+    // Vertical means options are stacked — each item's top should be below the previous one
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    expect(box1.y).toBeGreaterThan(box0.y);
+    expect(box2.y).toBeGreaterThan(box1.y);
+  });
+
+  test("vertical orientation stacks options in a column", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="vertical">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    expect(box1.y).toBeGreaterThan(box0.y);
+    expect(box2.y).toBeGreaterThan(box1.y);
+  });
+
+  test("horizontal orientation places options side by side", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="horizontal">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const group = page.getByRole("radiogroup");
+    const items = group.locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    const box2 = await items.nth(2).boundingBox();
+    // All items share the same vertical position and are arranged left to right
+    expect(box0.y).toBeCloseTo(box1.y, -1);
+    expect(box1.y).toBeCloseTo(box2.y, -1);
+    expect(box1.x).toBeGreaterThan(box0.x);
+    expect(box2.x).toBeGreaterThan(box1.x);
+  });
+
+  test("horizontal orientation still allows selecting options and fires didChange", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <RadioGroup orientation="horizontal" onDidChange="(value) => testState = value">
+        <Option value="a" label="Alpha" />
+        <Option value="b" label="Beta" />
+      </RadioGroup>
+    `);
+
+    await page.getByRole("radiogroup").getByRole("radio").nth(1).click();
+    await expect.poll(testStateDriver.testState).toBe("b");
+  });
+});
+
+// =============================================================================
+// GAP PROPERTY TESTS
+// =============================================================================
+
+test.describe("gap property", () => {
+  test("gap prop increases spacing between options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup gap="40px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // The vertical distance between consecutive options should reflect the large gap
+    expect(box1.y - (box0.y + box0.height)).toBeGreaterThanOrEqual(35);
+  });
+
+  test("gap prop with zero removes spacing between options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup gap="0px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // With zero gap the next item starts immediately after the previous one
+    expect(box1.y - (box0.y + box0.height)).toBeLessThan(2);
+  });
+
+  test("gap is applied in horizontal orientation too", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup orientation="horizontal" gap="50px">
+        <Option value="1" label="Option 1" />
+        <Option value="2" label="Option 2" />
+        <Option value="3" label="Option 3" />
+      </RadioGroup>
+    `);
+
+    const items = page.getByRole("radiogroup").locator("[data-radio-item]");
+    await expect(items).toHaveCount(3);
+    const box0 = await items.nth(0).boundingBox();
+    const box1 = await items.nth(1).boundingBox();
+    // The horizontal distance between the end of item 0 and start of item 1 should be ≥ 45px
+    expect(box1.x - (box0.x + box0.width)).toBeGreaterThanOrEqual(45);
+  });
+});
+
+// =============================================================================
+// KEYBOARD NAVIGATION TESTS
+// =============================================================================
+
+test.describe("Keyboard Navigation", () => {
+  test("ArrowDown selects the next option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should select option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
+  });
+
+  test("ArrowUp selects the previous option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the second option
+    await options.nth(1).click();
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowUp should select option 1
+    await options.nth(1).focus();
+    await expect(options.nth(1)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(1)).not.toBeChecked();
+  });
+
+  test("ArrowDown wraps from last to first option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the last option
+    await options.nth(2).click();
+    await expect(options.nth(2)).toBeChecked();
+
+    // ArrowDown should wrap to option 1
+    await options.nth(2).focus();
+    await expect(options.nth(2)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+    await expect(options.nth(2)).not.toBeChecked();
+  });
+
+  test("ArrowUp wraps from first to last option", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowUp should wrap to option 3
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowUp");
+    await expect(options.nth(2)).toBeChecked();
+    await expect(options.nth(0)).not.toBeChecked();
+  });
+
+  test("sequential ArrowDown visits all options in order", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select option 1
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown → option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowDown → option 3
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
+
+    // ArrowDown → wraps to option 1
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+  });
+
+  test("ArrowDown works when Options are inside a VStack", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <VStack>
+          <Option label="First Option" value="1" />
+          <Option label="Second Option" value="2" />
+          <Option label="Third Option" value="3" />
+        </VStack>
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+    await expect(options).toHaveCount(3);
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should select option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+
+    // ArrowDown should select option 3
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
+  });
+
+  test("keyboard navigation fires onDidChange", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <RadioGroup initialValue="1" onDidChange="(value) => testState = value">
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // ArrowDown from option 1 to option 2
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(1)).toBeChecked();
+    await expect.poll(testStateDriver.testState).toBe("2");
+  });
+
+  test("keyboard navigation does not change value when readOnly", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <RadioGroup readOnly="true" initialValue="1">
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should NOT change value
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(0)).toBeChecked();
+  });
+
+  test("keyboard navigation skips disabled options", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <RadioGroup>
+        <Option label="First Option" value="1" />
+        <Option label="Second Option" value="2" enabled="{false}" />
+        <Option label="Third Option" value="3" />
+      </RadioGroup>
+    `);
+    const options = page.getByRole("radiogroup").getByRole("radio");
+
+    // Select the first option
+    await options.nth(0).click();
+    await expect(options.nth(0)).toBeChecked();
+
+    // ArrowDown should skip disabled option 2 and select option 3
+    await options.nth(0).focus();
+    await expect(options.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowDown");
+    await expect(options.nth(2)).toBeChecked();
   });
 });

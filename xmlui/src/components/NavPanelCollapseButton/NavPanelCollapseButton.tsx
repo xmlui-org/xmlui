@@ -1,6 +1,6 @@
-import { createComponentRenderer } from "../../components-core/renderers";
-import { Button } from "../Button/ButtonNative";
-import { Icon } from "../Icon/IconNative";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata } from "../metadata-helpers";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 
@@ -50,27 +50,16 @@ export function NavPanelCollapseButton({
   return (
     <Button
       variant="ghost"
-      icon={<Icon name={collapsed ? iconCollapsed : icon} />}
+      icon={<ThemedIcon name={collapsed ? iconCollapsed : icon} />}
       aria-label={collapsed ? ariaLabelCollapsed : ariaLabel}
       onClick={toggle}
     />
   );
 }
 
-export const navPanelCollapseButtonComponentRenderer = createComponentRenderer(
+export const navPanelCollapseButtonComponentRenderer = wrapComponent(
   COMP,
+  NavPanelCollapseButton,
   NavPanelCollapseButtonMd,
-  ({ node, extractValue }) => {
-    return (
-      <NavPanelCollapseButton
-        icon={extractValue.asOptionalString(node.props.icon)}
-        iconCollapsed={extractValue.asOptionalString(node.props.iconCollapsed)}
-        aria-label={extractValue.asOptionalString(node.props["aria-label"], "Collapse sidebar")}
-        aria-labelCollapsed={extractValue.asOptionalString(
-          node.props["aria-labelCollapsed"],
-          "Expand sidebar",
-        )}
-      />
-    );
-  },
+  {},
 );

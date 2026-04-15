@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./DocumentPage.xmlui";
 
-export const DocumentPageMd = createMetadata({
+export const DocumentPageMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Document page with breadcrumbs, markdown content, TOC and prev/next links.",
   props: {

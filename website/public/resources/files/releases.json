@@ -1,501 +1,509 @@
 [
   {
-    "tag_name": "xmlui@0.12.4",
-    "published_at": "2026-02-25T12:11:06Z",
+    "tag_name": "xmlui@0.12.17",
+    "published_at": "2026-04-14T10:23:37Z",
     "changes": [
       {
-        "description": "Add experimental IncludeMarkup component",
-        "commit_sha": "0aaa878"
+        "description": "Add `mockExecute` event to APICall component",
+        "commit_sha": "4dc14d0"
       },
       {
-        "description": "Inline styles on components with the bindTo property applied will not style the label. Also fixed NumberBox adornment location when writing mode is right-to-left.",
-        "commit_sha": "7cf02a7"
+        "description": "Improve List and Tree performance",
+        "commit_sha": "00457e4"
       },
       {
-        "description": "Use the new website project as the target of component document generation",
-        "commit_sha": "48b7e46"
+        "description": "Fix `$param` being undefined in `<variable>` declarations that are direct children of `ModalDialog`",
+        "commit_sha": "d474652"
+      },
+      {
+        "description": "Fix RadioGroup keyboard navigation: arrow keys now correctly select the next/previous option instead of only moving focus without updating the value.",
+        "commit_sha": "f00a826"
+      },
+      {
+        "description": "extened the number of parsing errors which can be displayed before reaching the point where only a single error can be reported without line numbers.",
+        "commit_sha": "55258df"
+      },
+      {
+        "description": "Add new theme variables to Table",
+        "commit_sha": "983bfe3"
+      },
+      {
+        "description": "Fix the itemLabelWidth behavior in Form",
+        "commit_sha": "41e4f0a"
+      },
+      {
+        "description": "Extended List `groupBy` property to accept a function in addition to a string. When a function is provided (e.g., `groupBy=\"{(item) => item.name[0]}\"`), it receives each list item and returns the value used for grouping.",
+        "commit_sha": "b296689"
+      },
+      {
+        "description": "Fix HStack default item widths with input controls",
+        "commit_sha": "80ff0fd"
+      },
+      {
+        "description": "Allow page scrolling while Select's dropdown is open",
+        "commit_sha": "2ac4c4a"
+      },
+      {
+        "description": "Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode",
+        "commit_sha": "e27fef3"
+      },
+      {
+        "description": "Add gap property to Tabs",
+        "commit_sha": "611cc69"
+      },
+      {
+        "description": "Support object and array destructuring in reactive `var` declarations. `var {a, b} = expr` and `var [a, b] = expr` are now valid in code-behind scripts and markup script blocks. Destructured declarations are expanded into temporary variables to preserve reactive semantics.",
+        "commit_sha": "b45106d"
+      },
+      {
+        "description": "Add \"before\" and \"after\" values to labelPosition",
+        "commit_sha": "9a1d99b"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.12.4.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.4/xmlui-0.12.4.js"
+        "name": "xmlui-0.12.17.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.17/xmlui-0.12.17.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.12.2",
-    "published_at": "2026-02-18T11:52:16Z",
+    "tag_name": "xmlui@0.12.16",
+    "published_at": "2026-04-09T11:34:45Z",
     "changes": [
       {
-        "description": "Fix bookmark navigation in nested apps (xmlui-pg playground examples)",
-        "commit_sha": "1ffaf6d"
+        "description": "Fix portal rendering issues in Drawer and NestedApp",
+        "commit_sha": "3d64a86"
       },
       {
-        "description": "Add itemWidth property to Stack and FlowLayout",
-        "commit_sha": "51a7021"
+        "description": "All Tree rendering in standalone mode",
+        "commit_sha": "07bc66e"
       },
       {
-        "description": "Change component document generation to the new link format",
-        "commit_sha": "c00f264"
+        "description": "Fix Table rendering regression",
+        "commit_sha": "d72d007"
       },
       {
-        "description": "Remove global variables from compnent files",
-        "commit_sha": "354669a"
+        "description": "Do not animate Switch and Checkbox during the initial rendering",
+        "commit_sha": "312d3fd"
       },
       {
-        "description": "Fix virtualization issues with List and Table",
-        "commit_sha": "23db092"
+        "description": "feat: allow loading external theme files in standalone mode defined in config.defaultTheme",
+        "commit_sha": "329fc83"
       },
       {
-        "description": "Fix shrinking Table selection checkbox",
-        "commit_sha": "63ef618"
+        "description": "refactor: remove redundant check for already registered icons in IconProvider",
+        "commit_sha": "03f095c"
       },
       {
-        "description": "feat: improve NavPanel by using NavSection placeholder components for dynamic nav element generation",
-        "commit_sha": "3cf2443"
+        "description": "APCall deferred execution fixed",
+        "commit_sha": "672c9d9"
       },
       {
-        "description": "Fix initialPrimarySize issue with Splitter",
-        "commit_sha": "3c9936d"
+        "description": "Improve Table and TileGrid performance",
+        "commit_sha": "cda9057"
       },
       {
-        "description": "fix: handle active heading state in TableOfContents and update indicator visibility",
-        "commit_sha": "71a1220"
-      },
-      {
-        "description": "Fix <script> + code-behind function declaration regression",
-        "commit_sha": "8c51a09"
-      },
-      {
-        "description": "fix: enhance footer behavior in App component",
-        "commit_sha": "a1d6fde"
-      },
-      {
-        "description": "fix: toc - smoothScrolling",
-        "commit_sha": "a00651d"
-      },
-      {
-        "description": "APICall allows access to error response details",
-        "commit_sha": "47d70ec"
-      },
-      {
-        "description": "Actions.upload now allows field name",
-        "commit_sha": "c9bea96"
-      },
-      {
-        "description": "Fix Bookmark scrolling issue with xmlui-pg",
-        "commit_sha": "1ffaf6d"
-      },
-      {
-        "description": "Additional component metadata: \"excludeBehaviors\", \"deprecationMessage\"",
-        "commit_sha": "c853a36"
-      },
-      {
-        "description": "Remove multiple adjacent separators from DropdownMenu and ContextMenu",
-        "commit_sha": "01e2f2a"
-      },
-      {
-        "description": "fix: scroll behavior handling in TableOfContents and AppContent components",
-        "commit_sha": "a00651d"
+        "description": "feat: add sticky button row and max height to ModalDialog and Form components",
+        "commit_sha": "c137a85"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.12.2.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.2/xmlui-0.12.2.js"
+        "name": "xmlui-0.12.16.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.16/xmlui-0.12.16.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.12.1",
-    "published_at": "2026-02-11T18:05:22Z",
+    "tag_name": "xmlui@0.12.15",
+    "published_at": "2026-04-01T14:15:14Z",
     "changes": [
       {
-        "description": "Ensure vite dev server restarts when a module changes",
-        "commit_sha": "ef9bc10"
+        "description": "Fix Stack to respect itemWidth when wrapContent is false",
+        "commit_sha": "90f5002"
       },
       {
-        "description": "Fix Tree collapseNode to mark the node unloaded",
-        "commit_sha": "4e33e2b"
+        "description": "Extend Form with savePendingLabel, and submitFeedbackDelay",
+        "commit_sha": "2623e28"
       },
       {
-        "description": "Allow Tree.replaceNode to change the node ID",
-        "commit_sha": "5978efa"
+        "description": "feat: implement select-all, delete-all functionality in DateInput component",
+        "commit_sha": "db67849"
       },
       {
-        "description": "Improve inspector trace logging with additional event data",
-        "commit_sha": "916d0db"
+        "description": "Fix Select `dropdownHeight` prop leaking to the trigger element in SimpleSelect mode, causing the trigger to render at the dropdown's height instead of its normal size.",
+        "commit_sha": "28a77d7"
       },
       {
-        "description": "Global variable handling redesigned",
-        "commit_sha": "0050784"
+        "description": "fix: restore Bookmark hash navigation in shadow DOM and vertical-full-header layout",
+        "commit_sha": "0dd6e23"
       },
       {
-        "description": "Fix return from try..catch",
-        "commit_sha": "c9c4ee2"
+        "description": "refactor: improve Select component formatting and styling consistency, adding e2e tests",
+        "commit_sha": "460a693"
       },
       {
-        "description": "Conservative refactoring of containers and state management",
-        "commit_sha": "9b6268e"
+        "description": "fix: simplify inlinePickerMenu styling and add consistent padding",
+        "commit_sha": "7675d1c"
       },
       {
-        "description": "Removed react-icons as a dependency.",
-        "commit_sha": "e506bd3"
+        "description": "feat: add hover preview for DatePicker range selection",
+        "commit_sha": "9df5f4b"
+      },
+      {
+        "description": "fix: quoted content in markup no longer has special meaning. `<Stack>\"hi\"</Stack>`no longer produces the unquoted string _hi_, but rather the quoted string as-is _\"hi\"_. This can technically break existing code which relied on quoting text that incluced the less-than (&lt;) character. This feature was very hidden, we don't expect users to have markup like that. In case you are affected, use the _&lt;_ entity instead, or wrap the content in a CDATA.",
+        "commit_sha": "f74d48f"
+      },
+      {
+        "description": "Hide the experimental pub/sub behavior",
+        "commit_sha": "5fa348e"
+      },
+      {
+        "description": "feat: gracefully handle html when fetching files for standalone",
+        "commit_sha": "370b985"
+      },
+      {
+        "description": "fix: preserve `PageMetaTitle` and other Helmet-managed head output during static site generation so generated HTML includes the correct page title and head tags at build time.",
+        "commit_sha": "4ee71c6"
+      },
+      {
+        "description": "Form's willSubmit will receive the data with noSubmit flag too for validation. The submit event will not.",
+        "commit_sha": "2623e28"
+      },
+      {
+        "description": "Add FormSegment component",
+        "commit_sha": "2623e28"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.12.1.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.1/xmlui-0.12.1.js"
+        "name": "xmlui-0.12.15.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.15/xmlui-0.12.15.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.12.0",
-    "published_at": "2026-02-06T13:46:20Z",
+    "tag_name": "xmlui@0.12.14",
+    "published_at": "2026-03-30T05:31:39Z",
     "changes": [
       {
-        "description": "Add inspector logging infrastructure for debugging XMLUI applications",
-        "commit_sha": "19e04b3"
+        "description": "Fix DataSource name when no id is declared",
+        "commit_sha": "60086b1"
       },
       {
-        "description": "- when using `parseAs`, remember the filename(s) and report them in the input box",
-        "commit_sha": "d8d3613"
+        "description": "Allow setting the toast notification position",
+        "commit_sha": "e72aee2"
       },
       {
-        "description": "improve TableOfContents component",
-        "commit_sha": "a79e4f6"
+        "description": "fix: ItemWithLabel falls back to Form's itemLabelPosition from context",
+        "commit_sha": "c7933d4"
       },
       {
-        "description": "Fix Fragment visibility regression",
-        "commit_sha": "e4dab71"
+        "description": "Add striped property to Table",
+        "commit_sha": "5d2d8ac"
       },
       {
-        "description": "Add module import to standalone apps",
-        "commit_sha": "547e261"
+        "description": "Fix CLI bin path in published package: the `clean-package` replacement now correctly points to `dist/nodejs/bin/index.mjs` (the actual ESM output from tsdown) instead of the incorrect `dist/nodejs/bin/index.js`. This mismatch prevented `npm` from creating the `xmlui` symlink in `.bin` during install.",
+        "commit_sha": "f90a550"
       },
       {
-        "description": "Fix <script> layout issue in App",
-        "commit_sha": "a49f1a9"
+        "description": "Fix: Variable initializers in user-defined components can now access routing context variables",
+        "commit_sha": "f09e2fe"
       },
       {
-        "description": "Extend Tree API with replaceNode and replaceChildren",
-        "commit_sha": "b9a0e56"
+        "description": "Use `Globals.xs` instead of `Main.xmlui.xs` for global variable and function declarations. `Main.xmlui.xs` declarations are now local to the Main component, consistent with how all other code-behind files work.",
+        "commit_sha": "46e4b62"
       },
       {
-        "description": "Experimenting with publish/subscribe behavior",
-        "commit_sha": "3dce31d"
+        "description": "fix: only deep-coppy theme vars when <Theme> needs them. This reduces the number of CSS vars present on a site.",
+        "commit_sha": "9adc767"
       },
       {
-        "description": "Minor Splitter improvements",
-        "commit_sha": "e8d6844"
+        "description": "fix: select - label position, minWidth",
+        "commit_sha": "40d58ac"
       },
       {
-        "description": "Add global variables to xmlui (Globals.xs)",
-        "commit_sha": "74ac666"
+        "description": "Allow user-defined components to use arbitrary theme variables",
+        "commit_sha": "084b7dd"
       },
       {
-        "description": "Fix breaking component links (404) in docs",
-        "commit_sha": "79cd8c9"
+        "description": "Extend headings and Markdown with anchorTemplate",
+        "commit_sha": "90152c6"
       },
       {
-        "description": "feat: implement navpanelFooter and NavPanelCollapseButton (experimental)",
-        "commit_sha": "7ea3e83"
+        "description": "Column width, minWidth, and maxWidth now accept and resolve theme variables, em/rem values",
+        "commit_sha": "e554b84"
       },
       {
-        "description": "Fix Windows-specific module resolution issues",
-        "commit_sha": "f13b74f"
+        "description": "NavPanel can be synched with the selected content",
+        "commit_sha": "b7f7152"
+      },
+      {
+        "description": "Auto-generate metadata for user-defined (compound) components by statically analyzing their definition tree. This enables proper theme variable optimization — compound component theme vars are now collected into the global `componentThemeVars` set, so `ThemeProvider` resolves hierarchical variables for them correctly.",
+        "commit_sha": "084b7dd"
+      },
+      {
+        "description": "fix: change NestedApp header background color to surface color",
+        "commit_sha": "9471ef6"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.12.0.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.0/xmlui-0.12.0.js"
+        "name": "xmlui-0.12.14.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.14/xmlui-0.12.14.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.11.34",
-    "published_at": "2026-02-02T15:18:46Z",
+    "tag_name": "xmlui@0.12.13",
+    "published_at": "2026-03-25T17:28:50Z",
     "changes": [
       {
-        "description": "Fix ContextMenu regressions",
-        "commit_sha": "f4ff5cd"
+        "description": "feat: add cancelButtonLabel prop to APICall for confirm dialog",
+        "commit_sha": "d19a909"
       },
       {
-        "description": "Add icon to SubMenuItem",
-        "commit_sha": "6b1df19"
+        "description": "feat: xmlui-search - spotlight mode, filter by categories, suggested keywords",
+        "commit_sha": "61308b2"
       },
       {
-        "description": "Updated FileUploadDropZone so the default styling is more user friendly.",
-        "commit_sha": "be41834"
+        "description": "Fix reactive expressions in component properties not updating when they call functions that depend on changed variables",
+        "commit_sha": "c4fc0be"
       },
       {
-        "description": "Fix onContextMenu issues with Tree",
-        "commit_sha": "19eb716"
+        "description": "Add pathname global",
+        "commit_sha": "4127490"
       },
       {
-        "description": "Fixed issue with markdown links to properly download resource files.",
-        "commit_sha": "a1baf19"
+        "description": "fix: responsive table glitch",
+        "commit_sha": "f6921ed"
       },
       {
-        "description": "Experiment with module imports",
-        "commit_sha": "b9d774f"
+        "description": "Markdown in fenced code block should not replace \"@{}\"",
+        "commit_sha": "ed962d1"
       },
       {
-        "description": "Tweaked ExpandableItem styles so the summary button appears interactable.",
-        "commit_sha": "a94ec67"
+        "description": "Fixed a bug where setting the regex property to a valid regular expression also tested the input if it was empty.",
+        "commit_sha": "333bce7"
+      },
+      {
+        "description": "Fix AppHeader theming",
+        "commit_sha": "4127490"
+      },
+      {
+        "description": "Fix responsive CSS generation",
+        "commit_sha": "b133970"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.11.34.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.34/xmlui-0.11.34.js"
+        "name": "xmlui-0.12.13.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.13/xmlui-0.12.13.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.11.33",
-    "published_at": "2026-01-29T11:00:52Z",
+    "tag_name": "xmlui@0.12.12",
+    "published_at": "2026-03-23T15:29:46Z",
     "changes": [
       {
-        "description": "Add selectAll, cut, copy, paste, and delete actions (with keybindings) to Table",
-        "commit_sha": "8be5f66"
+        "description": "Fix tab-out issue with PasswordInput",
+        "commit_sha": "44546ae"
       },
       {
-        "description": "fix: labelBehavior - double label issue",
-        "commit_sha": "7107dd7"
+        "description": "expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project",
+        "commit_sha": "0a4c214"
+      },
+      {
+        "description": "Ignore scrollStyle and showScrollerFade on mobile devices",
+        "commit_sha": "6dda27c"
+      },
+      {
+        "description": "Wire Inspector icon color through theme system so it responds to theme changes",
+        "commit_sha": "d65101f"
+      },
+      {
+        "description": "Experiment with persisting unsubmitted Form data",
+        "commit_sha": "82f5ad4"
+      },
+      {
+        "description": "Move Blog component from xmlui core to xmlui-docs-blocks extension package",
+        "commit_sha": "fffde0d"
+      },
+      {
+        "description": "Fix DataSource reactivity through variables",
+        "commit_sha": "c9871a9"
+      },
+      {
+        "description": "Improve component property name linting with responsive properties and behavior properties",
+        "commit_sha": "7e0dab5"
+      },
+      {
+        "description": "Fix Select regression in Form (versus FormItem type=\"select\")",
+        "commit_sha": "894a635"
+      },
+      {
+        "description": "Move Carousel to xmlui-website-blocks extension",
+        "commit_sha": "77254bc"
+      },
+      {
+        "description": "Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).",
+        "commit_sha": "679b397"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.11.33.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.33/xmlui-0.11.33.js"
+        "name": "xmlui-0.12.12.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.12/xmlui-0.12.12.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.11.32",
-    "published_at": "2026-01-28T12:54:00Z",
+    "tag_name": "xmlui@0.12.11",
+    "published_at": "2026-03-19T14:32:36Z",
     "changes": [
       {
-        "description": "fix: window.\\_\\_PUBLIC_PATH prefix applying twice to icon resources, making them not resolve to anything.",
-        "commit_sha": "cda5e22"
+        "description": "Fix FormItem theme variable regression",
+        "commit_sha": "3daa045"
       },
       {
-        "description": "Extend Table with userSelect properties",
-        "commit_sha": "e98efdf"
+        "description": "Charts moved from xmlui core to the xmlui-recharts extension",
+        "commit_sha": "93a19dd"
       },
       {
-        "description": "Review the async loading of Tree items",
-        "commit_sha": "7d66fac"
+        "description": "Fix FormItem type=\"checkbox\" regression",
+        "commit_sha": "8a3180d"
       },
       {
-        "description": "feat: Open up possibility for custom components to receive input behaviors via an API/context",
-        "commit_sha": "9bea8d0"
+        "description": "fix: JSDOM preventing running xmlui commands when bundled into executable file",
+        "commit_sha": "1b695f0"
       },
       {
-        "description": "Add scrollStyle and showScrollerFade to Tree",
-        "commit_sha": "6ad3926"
-      },
-      {
-        "description": "Removed timeout properties from onValidate.",
-        "commit_sha": "f4842b1"
-      },
-      {
-        "description": "improve: Provide accessible text label for RadioGroup",
-        "commit_sha": "1055794"
-      },
-      {
-        "description": "Allow the \"new\" keyword in object literals as property name",
-        "commit_sha": "a8117ba"
+        "description": "List can handle row selection (similarly to Table)",
+        "commit_sha": "c903b50"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.11.32.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.32/xmlui-0.11.32.js"
+        "name": "xmlui-0.12.11.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.11/xmlui-0.12.11.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.11.31",
-    "published_at": "2026-01-26T15:36:46Z",
+    "tag_name": "xmlui@0.12.10",
+    "published_at": "2026-03-18T14:19:35Z",
     "changes": [
       {
-        "description": "Migrate Table to virtua (from @tanstack/react-virtual)",
-        "commit_sha": "796793b"
+        "description": "fix error callback running on previous failed ApiCall after component mounts, as if the current call failed.",
+        "commit_sha": "166139f"
       },
       {
-        "description": "Experiment with deferred APICall",
-        "commit_sha": "307611c"
+        "description": "Add bootstrap-like column widths",
+        "commit_sha": "bb6dfd8"
       },
       {
-        "description": "Parse async/await in scripts but raise error when executing",
-        "commit_sha": "c05a6dd"
+        "description": "Remove RealTimeAdapter component",
+        "commit_sha": "83c84c6"
       },
       {
-        "description": "Allow Column to use layout properties",
-        "commit_sha": "00f087d"
+        "description": "Move Backdrop and Breakout to the xmlui-website-blocks extension",
+        "commit_sha": "d456b4b"
       },
       {
-        "description": "Parse new operator but raise error when executing",
-        "commit_sha": "10c1fa5"
-      },
-      {
-        "description": "Experimental generation of context variables",
-        "commit_sha": "78716f4"
-      },
-      {
-        "description": "Fix <li> issue with Markdown in Firefox",
-        "commit_sha": "33c99cd"
-      },
-      {
-        "description": "Fix the inconsistent URL encoding between url and queryParams",
-        "commit_sha": "e11595e"
+        "description": "Add experimental local storage persistence",
+        "commit_sha": "bd49e49"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.11.31.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.31/xmlui-0.11.31.js"
+        "name": "xmlui-0.12.10.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.10/xmlui-0.12.10.js"
       }
     ]
   },
   {
-    "tag_name": "xmlui@0.11.30",
-    "published_at": "2026-01-22T12:45:26Z",
+    "tag_name": "xmlui@0.12.9",
+    "published_at": "2026-03-17T14:29:27Z",
     "changes": [
       {
-        "description": "Add ScrollViewer component",
-        "commit_sha": "4e0379f"
+        "description": "Retry patch release",
+        "commit_sha": "39b3847"
       },
       {
-        "description": "Document and improve ContextMenu",
-        "commit_sha": "498abc1"
+        "description": "Add TileGrid component — a responsive, virtualized tile grid",
+        "commit_sha": "f889233"
       },
       {
-        "description": "- Columns with bindTo are now sortable by default",
-        "commit_sha": "62d88a4"
+        "description": "Fix Markdown xmlui-pg regression",
+        "commit_sha": "6ccb0e6"
       },
       {
-        "description": "Add QRCode component",
-        "commit_sha": "ded963e"
+        "description": "Fix issues with mobile NavPanel",
+        "commit_sha": "20be4248f1393b2f7b5bc6edd4f644bc75f6e785"
       },
       {
-        "description": "Add scrollStyle property to Stack, FlowLayout, and NavPanel",
-        "commit_sha": "4e0379f"
+        "description": "Add \"spacing\" to applyLayoutProperties",
+        "commit_sha": "70a091c7ee783f02306f9f9be3aa73fa01864647"
       },
       {
-        "description": "Add ContextMenu component",
-        "commit_sha": "84acbea"
+        "description": "fix: Improve styling flexibility and theme handling across components",
+        "commit_sha": "551775b681541510ba3718292e93416b243f17b3"
       },
       {
-        "description": "Added completed state theme variable for ProgressBar called \"color-indicator-ProgressBar--complete\".",
-        "commit_sha": "6decfd7"
+        "description": "Implement scroll-snap related layout properties",
+        "commit_sha": "7e5c62f7d05da66d3ffa7a8bcad20b8f07d47f89"
       },
       {
-        "description": "Added validation timeout handling for input fields. New properties include customValidationsTimeout and customValidationsTimeoutMessage.",
-        "commit_sha": "0f9326f"
+        "description": "Fix responsive width properties (e.g. width-md) not working on FlowLayout/HStack-wrap children",
+        "commit_sha": "41552d1734cbc798a57778e0b5fd2698905495c5"
       },
       {
-        "description": "upgrade @remix-run/react to 2.17.4, migrate imports to react-router-dom",
-        "commit_sha": "7a4974d"
+        "description": "Add debounceWaitInMs property to ChangeListener",
+        "commit_sha": "7d85f4a220ace63cbd2560781ca2607a9d563e71"
       },
       {
-        "description": "Add contextMenu event to several components",
-        "commit_sha": "2fb95aa"
+        "description": "Initialize global variables of App before children are initialized",
+        "commit_sha": "fe26c40464d4c809e854b534d837cde1e6f94630"
       },
       {
-        "description": "Add scroll fading effect",
-        "commit_sha": "05c9fd7"
+        "description": "DataSource and APICall now return repsonse headers",
+        "commit_sha": "a9e8c428ab88e1acf4172d7504d055253dc9ac31"
       },
       {
-        "description": "Review markdown rendering and theming",
-        "commit_sha": "bc7addd"
+        "description": "Make transaction IDs optional to avoid CORS preflight failures with third-party APIs.",
+        "commit_sha": "8660487d501945e26c944ffd950cea9ab29362b6"
+      },
+      {
+        "description": "Fix NavGroup trigger alignment",
+        "commit_sha": "3211bce655d8c0b437399f1d40a1aa3ab4b3ef98"
+      },
+      {
+        "description": "fix: playground - theme handing",
+        "commit_sha": "2a5d32f4ca5c34dcec873464f0a14ec6612b9f7f"
+      },
+      {
+        "description": "fix: wrapComponent - prevent layout props from being forwarded to native components unless explicitly declared in metadata",
+        "commit_sha": "36e79df7d172d8cd0d57d8e0201764d50ee11c62"
+      },
+      {
+        "description": "Upgrade react-router-dom from 6.26.2 to 6.30.3 to address -https://github.com/advisories/GHSA-9jcx-v3wj-wh4m (XSS via Open Redirects in @remix-run/router). axios was already upgraded to 1.13.5 to address https://github.com/advisories/GHSA-43fc-jf86-j433 (DoS via __proto__ key in mergeConfig).",
+        "commit_sha": "c6aea4fd0a2f370094a6d3e1ac1717c91711eea3"
+      },
+      {
+        "description": "Fix dependency regression with global variables",
+        "commit_sha": "2f368e4e00c4bbb9a83a8f167a47bf61f60b5fb5"
+      },
+      {
+        "description": "Add \"strict\" setting so lintSeverity",
+        "commit_sha": "9031871ae7ec25af0a8c75117fedecc13367c786"
       }
     ],
     "assets": [
       {
-        "name": "xmlui-0.11.30.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.30/xmlui-0.11.30.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.11.29",
-    "published_at": "2026-01-19T15:48:52Z",
-    "changes": [
-      {
-        "description": "Add experimental MessageListener component",
-        "commit_sha": "eead0f5"
-      },
-      {
-        "description": "Fix scroll issues with List virtualization",
-        "commit_sha": "5c9cd56"
-      },
-      {
-        "description": "Added itemRequiredIndicator property to Form to control required/optional indicators for FormItems on the form level.",
-        "commit_sha": "6021e4d"
-      },
-      {
-        "description": "make goto-definition reach components across the whole opened workspace",
-        "commit_sha": "1906b59"
-      },
-      {
-        "description": "Change the indicator in TableOfContents",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add iconAlignment to NavLink and NavGroup",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add new Theme variables to NavLink and NavGroup",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Experiment with documentation theme",
-        "commit_sha": "486588f"
-      },
-      {
-        "description": "Add overflowMode and breakMode to Markdown",
-        "commit_sha": "45441eb"
-      },
-      {
-        "description": "Renamed requiredIndicator to requireLabelMode and itemRequiredIndicator to itemRequireLabelMode.",
-        "commit_sha": "a43b636"
-      },
-      {
-        "description": "In the Search box, hitting Enter opens the first match when none selected.",
-        "commit_sha": "ee7ad5a"
-      },
-      {
-        "description": "Added requiredIndicator property to FormItem to customize required/optional indicators next to labels. Options are: \"required\", \"optional\", \"both\". Default is \"required\".",
-        "commit_sha": "6c232bf"
-      },
-      {
-        "description": "Fix alignment issues with Text",
-        "commit_sha": "beff0fc"
-      },
-      {
-        "description": "Fix Column sortable regression",
-        "commit_sha": "23c44d5"
-      },
-      {
-        "description": "Fix List visibility issue in Markdown",
-        "commit_sha": "99039d4"
-      },
-      {
-        "description": "Removed language-server-web-worker export from package.json",
-        "commit_sha": "626bede"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.11.29.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.11.29/xmlui-0.11.29.js"
+        "name": "xmlui-0.12.9.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.9/xmlui-0.12.9.js"
       }
     ]
   }

@@ -3,12 +3,15 @@
 Agent-oriented reference for the XMLUI monorepo. Read this first for any task.
 For deeper detail, refer to:
 
-- **`xmlui/conventions/`** — component checklists and refactoring templates.
-- **`xmlui/dev-docs/`** — full developer docs (architecture, testing conventions, component patterns, build system).
+- **`xmlui/dev-docs/`** — architecture & subsystem reference (rendering, containers, theming, forms, etc.)
+- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/components/overview.md` (component authoring), `.ai/xmlui/components/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing/e2e.md` (E2E conventions).
 
 ---
 
 ## What is XMLUI
+
+> **User perspective**: `.ai/xmlui/overview.md` describes XMLUI from the application developer's point of view — markup syntax, reactive binding, routing, forms, global functions. Read this to understand *what the components you build are for*.
+
 
 XMLUI is a **declarative, reactive frontend framework** for building web applications using XML markup. Users write `.xmlui` files instead of JavaScript/JSX. The framework is fully reactive — expressions in markup re-evaluate automatically when their dependencies change, similar to a spreadsheet. There is no manual state wiring.
 
@@ -64,8 +67,8 @@ xmlui-repo-root/
 │   │   ├── parsers/          # Expression / XML parsers
 │   │   └── testing/          # Test fixtures and infrastructure
 │   ├── tests/                # Unit tests (Vitest), mirrors src/ structure
-│   ├── dev-docs/             # Developer documentation
-│   └── conventions/          # AI-facing conventions and checklists
+│   └── dev-docs/             # Architecture & subsystem reference docs
+├── guidelines/      # Contribution conventions and patterns (xmlui/, packages/, tools/, …)
 ├── packages/        # Extension packages (xmlui-animations, xmlui-pdf, xmlui-spreadsheet, etc.)
 ├── docs/            # Documentation website (built-mode XMLUI app)
 ├── blog/            # Blog site

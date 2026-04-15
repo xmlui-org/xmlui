@@ -1,10 +1,12 @@
 import styles from "./ExpandableItem.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
 import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
 import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "ExpandableItem";
 
@@ -125,18 +127,33 @@ export const ExpandableItemMd = createMetadata({
   },
 });
 
-export const expandableItemComponentRenderer = createComponentRenderer(
-  COMP,
-  ExpandableItemMd,
-  ({ node, renderChild, lookupEventHandler, registerComponentApi, extractValue, className }) => {
-    // Handle summary as either a string or a component definition
+type ThemedExpandableItemProps = React.ComponentPropsWithoutRef<typeof ExpandableItem>;
+
+export const ThemedExpandableItem = React.forwardRef<React.ElementRef<typeof ExpandableItem>, ThemedExpandableItemProps>(
+  function ThemedExpandableItem({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ExpandableItemMd);
+    return (
+      <ExpandableItem
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const expandableItemComponentRenderer = wrapComponent(COMP, ExpandableItem, ExpandableItemMd, {
+  exposeRegisterApi: true,
+  exclude: ["summary"],
+  customRender: (_props, { node, renderChild, lookupEventHandler, registerComponentApi, extractValue, classes }) => {
+    // summary can be a ComponentDef (render via renderChild) or a plain value (extract as string)
     const summaryProp = node.props?.summary;
     const summaryContent = summaryProp
       ? typeof summaryProp === 'object' && summaryProp.type
         ? renderChild(summaryProp)
         : extractValue(summaryProp)
       : undefined;
-    
+
     return (
       <ExpandableItem
         summary={summaryContent}
@@ -171,11 +188,11 @@ export const expandableItemComponentRenderer = createComponentRenderer(
           defaultExpandableItemProps.fullWidthSummary,
         )}
         onExpandedChange={lookupEventHandler("expandedChange")}
-        className={className}
+        classes={classes}
         registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}
       </ExpandableItem>
     );
   },
-);
+});

@@ -1,8 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useCallback, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import styles from "./Select.module.scss";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import type { SingleValueType } from "./SelectNative";
@@ -30,6 +30,7 @@ interface SimpleSelectProps {
   id: string;
   style: CSSProperties;
   className?: string;
+  contentClassName?: string;
   onFocus: () => void;
   onBlur: () => void;
   enabled: boolean;
@@ -49,6 +50,7 @@ interface SimpleSelectProps {
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   children?: ReactNode;
   options: Option[];
+  scrollIndicators?: boolean;
   validationIcon?: string | null;
   validationStatus: ValidationStatus;
   invalidMessages: string[];
@@ -76,6 +78,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       readOnly,
       emptyListNode,
       className,
+      contentClassName,
       modal,
       groupBy,
       groupHeaderRenderer,
@@ -85,6 +88,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       valueRenderer,
       options,
       children,
+      scrollIndicators = true,
       validationIcon,
       validationStatus,
       invalidMessages,
@@ -96,10 +100,90 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
 
     const composedRef = forwardRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
     const [open, setOpen] = useState(false);
+    const contentRef = useRef<HTMLDivElement>(null);
 
-    // Convert value to string for Radix UI compatibility
+    // Radix Select's Content hardcodes RemoveScroll which locks page scroll whenever
+    // the dropdown is open. When the Select is not modal, counteract this by:
+    // 1. Decrementing the data-scroll-locked attribute on body (removes overflow:hidden CSS)
+    // 2. Adding capture-phase wheel/touchmove handlers to prevent RemoveScroll from
+    //    calling preventDefault on scroll events outside the dropdown
+    useEffect(() => {
+      if (!open || modal) return;
+
+      const body = document.body;
+      const LOCK_ATTR = "data-scroll-locked";
+
+      // Decrement the lock counter that RemoveScroll set
+      let didDecrement = false;
+      const decrement = () => {
+        const count = parseInt(body.getAttribute(LOCK_ATTR) || "0", 10);
+        if (count > 0 && !didDecrement) {
+          didDecrement = true;
+          if (count <= 1) {
+            body.removeAttribute(LOCK_ATTR);
+          } else {
+            body.setAttribute(LOCK_ATTR, String(count - 1));
+          }
+        }
+      };
+
+      // RemoveScroll applies the lock in a layout effect. Use rAF to run after paint.
+      const raf = requestAnimationFrame(decrement);
+
+      // Intercept wheel/touchmove events in capture phase for events outside the
+      // dropdown content. This prevents RemoveScroll's bubble-phase handler from
+      // calling preventDefault(), allowing the page to scroll normally.
+      const handler = (e: Event) => {
+        const viewport = body.querySelector("[data-radix-select-viewport]");
+        if (!viewport || !viewport.contains(e.target as Node)) {
+          e.stopPropagation();
+        }
+      };
+      document.addEventListener("wheel", handler, true);
+      document.addEventListener("touchmove", handler, true);
+
+      return () => {
+        cancelAnimationFrame(raf);
+
+        // Restore the lock counter so RemoveScroll's own cleanup stays balanced
+        if (didDecrement) {
+          const count = parseInt(body.getAttribute(LOCK_ATTR) || "0", 10);
+          body.setAttribute(LOCK_ATTR, String(count + 1));
+        }
+
+        document.removeEventListener("wheel", handler, true);
+        document.removeEventListener("touchmove", handler, true);
+      };
+    }, [open, modal]);
+
+    // When the dropdown opens, pin Content to its initial clientHeight so that
+    // scroll buttons mounting/unmounting cannot change the outer container size.
+    // The Radix Viewport has flex:1 so it absorbs the scroll button heights instead.
+    useEffect(() => {
+      if (!open) return;
+      const el = contentRef.current;
+      if (!el) return;
+
+      let rafId = requestAnimationFrame(() => {
+        rafId = requestAnimationFrame(() => {
+          el.style.height = `${el.clientHeight}px`;
+        });
+      });
+
+      return () => {
+        cancelAnimationFrame(rafId);
+        if (contentRef.current) {
+          contentRef.current.style.height = "auto";
+        }
+      };
+    }, [open]);
+
+    // Convert value to string for Radix UI compatibility.
+    // Always produce a string (defaulting to "") so Radix stays in controlled mode.
+    // Passing undefined would trigger a controlled→uncontrolled transition that
+    // causes Radix to fire onValueChange("") unexpectedly.
     const stringValue = useMemo(() => {
-      return value != undefined ? String(value) : undefined;
+      return value != null && value !== "" ? String(value) : "";
     }, [value]);
 
     // Handle value changes with proper type conversion
@@ -214,25 +298,28 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 }}
                 tabIndex={-1}
               >
-                <Icon name="close" />
+                <ThemedIcon name="close" />
               </button>
             </Part>
           )}
           <span className={styles.action}>
-            <Icon name="chevrondown" />
+            <ThemedIcon name="chevrondown" />
           </span>
         </Trigger>
         <Portal container={root}>
           <Content
+            ref={contentRef}
             collisionPadding={0}
-            className={styles.selectDropdownContent}
+            className={classnames(contentClassName, styles.selectDropdownContent)}
             position="popper"
             align="start"
-            style={{ maxHeight: height, minWidth: panelWidth }}
+            style={{ height: "auto", maxHeight: height, minWidth: panelWidth }}
           >
-            <ScrollUpButton className={styles.selectScrollUpButton}>
-              <Icon name="chevronup" />
-            </ScrollUpButton>
+            {scrollIndicators && (
+              <ScrollUpButton className={styles.selectScrollUpButton}>
+                <ThemedIcon name="chevronup" />
+              </ScrollUpButton>
+            )}
             <Part partId="listWrapper">
               <Viewport className={styles.selectViewport}>
                 {groupBy && groupedOptions ? (
@@ -250,7 +337,9 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                               )
                             ) : (
                               <Label className={styles.groupHeader}>
-                                {groupHeaderRenderer ? groupHeaderRenderer({ $group: groupName }) : groupName}
+                                {groupHeaderRenderer
+                                  ? groupHeaderRenderer({ $group: groupName })
+                                  : groupName}
                               </Label>
                             )}
                             {groupOptions.map((option) => (
@@ -276,9 +365,11 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                 )}
               </Viewport>
             </Part>
-            <ScrollDownButton className={styles.selectScrollDownButton}>
-              <Icon name="chevrondown" />
-            </ScrollDownButton>
+            {scrollIndicators && (
+              <ScrollDownButton className={styles.selectScrollDownButton}>
+                <ThemedIcon name="chevrondown" />
+              </ScrollDownButton>
+            )}
           </Content>
         </Portal>
       </Root>

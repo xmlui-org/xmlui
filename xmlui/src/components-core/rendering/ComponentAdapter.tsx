@@ -13,14 +13,16 @@ import type {
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
-import { extractParam, shouldKeep } from "../utils/extractParam";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
+import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import { useTheme } from "../theming/ThemeContext";
-import { useComponentStyle } from "../theming/StyleContext";
+import { useStyles } from "../theming/StyleContext";
+import type { StyleObjectType } from "../theming/StyleRegistry";
 import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 import { mergeProps } from "../utils/mergeProps";
 import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
+import { useFnDeps } from "../FnDepsContext";
 import { EMPTY_OBJECT } from "../constants";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { ApiBoundComponent } from "../ApiBoundComponent";
@@ -32,8 +34,23 @@ import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
+import { stripDirectChildProps } from "../../abstractions/layout-context-utils";
 import InvalidComponent from "./InvalidComponent";
-import { resolveLayoutProps } from "../theming/layout-resolver";
+import {
+  resolveLayoutProps,
+  DIMS_ONLY_PROPS,
+  SPACING_ONLY_PROPS,
+} from "../theming/layout-resolver";
+import { useComponentThemeClass } from "../theming/utils";
+import {
+  buildResponsiveStyleObjects,
+  buildCompositeStyleObject,
+  buildWhenStyleObject,
+  isVisibleAtAnyBreakpoint,
+  COMPONENT_PART_KEY,
+} from "../theming/responsive-layout";
+import { parseLayoutProperty } from "../theming/parse-layout-props";
+import { is } from "immer/dist/internal.js";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -118,7 +135,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const resolvedLabel = useMemo(() => {
     const props = safeNode.props || {};
     const rawLabel =
-      props.label ?? props.title ?? props.name ?? props.text ?? props.value ?? props.placeholder;
+      props.label ??
+      props.title ??
+      props.name ??
+      props.text ??
+      props.value ??
+      props.placeholder ??
+      props["aria-label"];
     if (rawLabel === undefined) return undefined;
     // Use extractParam to evaluate expressions like "{mediaSize.largeScreen ? 'Delete' : ''}"
     return extractParam(state, rawLabel, appContext, true);
@@ -192,10 +215,13 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+  // --- Get the function dependencies from the parent container
+  const fnDeps = useFnDeps();
+
   // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Obtain a function that can execute a script synchronously
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
@@ -215,17 +241,22 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   );
 
   // --- Obtain the component renderer and descriptor from the component registry
-  // --- Memoizes the renderChild function
+  // --- Memoizes the renderChild function.
+  // --- When a component calls renderChild without an explicit layoutContext (undefined),
+  // --- we fall back to the component's own incoming context so that "transparent"
+  // --- wrapper components propagate the parent layout context automatically.
+  // --- Direct-child-only properties (ignoreLayoutProps, wrapChild) are stripped
+  // --- from the fallback so they don't leak through component boundaries.
   const memoedRenderChild: RenderChildFn = useCallback(
     (children, layoutContext, pRenderContext) => {
       return renderChild(
         children,
-        layoutContext,
+        layoutContext ?? stripDirectChildProps(layoutContextRef.current),
         pRenderContext || parentRenderContext,
         uidInfoRef,
       );
     },
-    [renderChild, parentRenderContext, uidInfoRef],
+    [renderChild, parentRenderContext, uidInfoRef, layoutContextRef],
   );
 
   // --- Collect the API-bound properties and events of the component to determine
@@ -277,10 +308,16 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     [lookupAction, safeNode.events, uid],
   );
 
+  // EXPERIMENTAL: extract bubbleEvents prop to allow selective propagation bypass
+  const bubbleEvents = safeNode.props.bubbleEvents
+    ? (valueExtractor(safeNode.props.bubbleEvents) as string[] | undefined)
+    : undefined;
+
   // --- Set up the mouse event handlers for the component
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
     descriptor?.nonVisual || isApiBound || isCompoundComponent,
+    bubbleEvents, // EXPERIMENTAL
   );
 
   // --- Use the current theme to obtain resources and collect theme variables
@@ -321,6 +358,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         mediaSize: appContext.mediaSize,
       },
       themeDisableInlineStyle ?? appContext.appGlobals?.disableInlineStyle,
+      appContext.appGlobals?.applyLayoutProperties,
     );
 
     // --- Old layout property resolution
@@ -332,6 +370,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     layoutContextRef,
     appContext.mediaSize,
     appContext.appGlobals?.disableInlineStyle,
+    appContext.appGlobals?.applyLayoutProperties,
     themeDisableInlineStyle,
     safeNode.props,
     valueExtractor,
@@ -343,12 +382,117 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
 
-  const className = useComponentStyle(stableLayoutCss);
+  const themeClassName = useComponentThemeClass(descriptor);
+
+  // --- Collect extended layout props: keys with part and/or breakpoint suffixes
+  // --- (e.g. "fontSize-label", "padding-md", "color-input-lg")
+  const extendedLayoutProps = useMemo(() => {
+    if (!safeNode.props) return EMPTY_OBJECT as Record<string, any>;
+    const applyMode = appContext.appGlobals?.applyLayoutProperties ?? "all";
+    // Mirror the applyLayoutProperties check that resolveLayoutProps applies to the base props
+    if (applyMode === "none") return EMPTY_OBJECT as Record<string, any>;
+    const extended: Record<string, any> = {};
+    const ignoreProps = (layoutContextRef?.current?.ignoreLayoutProps as string[]) || [];
+    for (const key of Object.keys(safeNode.props)) {
+      const parsed = parseLayoutProperty(key);
+      if (typeof parsed === "string") continue; // invalid key
+      if (parsed.component) continue; // component-scoped, not a layout prop
+      // Only collect keys that have a part, breakpoint, or state suffix — base keys are already
+      // handled by the existing layoutOptionKeys pass above
+      if (
+        parsed.part ||
+        (parsed.screenSizes && parsed.screenSizes.length > 0) ||
+        (parsed.states && parsed.states.length > 0)
+      ) {
+        // Skip responsive variants of ignored layout props — the parent container
+        // (e.g. FlowItemWrapper) handles them via its own width resolution.
+        if (ignoreProps.includes(parsed.property)) continue;
+        // In "dims" / "spacing" mode, restrict to the allowed property set
+        if (applyMode === "dims" && !DIMS_ONLY_PROPS.has(parsed.property)) continue;
+        if (applyMode === "spacing" && !SPACING_ONLY_PROPS.has(parsed.property)) continue;
+        extended[key] = valueExtractor(safeNode.props[key], true);
+      }
+    }
+    return extended;
+  }, [safeNode.props, valueExtractor, appContext.appGlobals?.applyLayoutProperties]);
+
+  // --- Build composite responsive style object covering root + all parts
+  const responsiveStyleObject = useMemo(
+    () => buildCompositeStyleObject(buildResponsiveStyleObjects(extendedLayoutProps)),
+    [extendedLayoutProps],
+  );
+
+  // --- Build responsive display rules from when / when-* attributes (SSR only)
+  // In normal (client-side) mode the component is either rendered or not based on the
+  // runtime `currentWhenValue`, so CSS display rules add no value.
+  // In SSR mode (`document` is undefined) we need media-query display rules so the
+  // browser shows/hides the pre-rendered HTML correctly before JS hydration.
+  const isSSR = typeof document === "undefined";
+  const whenStyleObject = useMemo(
+    () => (isSSR ? buildWhenStyleObject(safeNode.when, safeNode.responsiveWhen) : {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isSSR, safeNode.when, safeNode.responsiveWhen],
+  );
+
+  // --- Merge layout responsive styles and when-display styles into one object
+  const mergedStyleObject = useMemo(() => {
+    const hasLayout = responsiveStyleObject && Object.keys(responsiveStyleObject).length > 0;
+    const hasWhen = whenStyleObject && Object.keys(whenStyleObject).length > 0;
+    if (!hasLayout && !hasWhen) return responsiveStyleObject; // stable empty ref
+    if (!hasWhen) return responsiveStyleObject;
+    if (!hasLayout) return whenStyleObject as StyleObjectType;
+    // Deep-merge: both may have @media keys that need combining
+    const merged = { ...responsiveStyleObject } as Record<string, any>;
+    for (const [key, val] of Object.entries(whenStyleObject)) {
+      if (key.startsWith("@media") && merged[key]) {
+        merged[key] = { ...(merged[key] as object), ...(val as object) };
+      } else {
+        merged[key] = val;
+      }
+    }
+    return merged as StyleObjectType;
+  }, [responsiveStyleObject, whenStyleObject]);
+
+  const stableResponsiveStyleObject = useShallowCompareMemoize(mergedStyleObject);
+
+  // --- Merge base layout CSS and responsive/when CSS into a single useStyles call so that
+  // --- base rules and @media rules always live in the same <style> element in the correct
+  // --- source order (base first, then @media). Without this, a second component instance
+  // --- with new base styles (new hash) would inject its base <style> *after* the already-
+  // --- injected responsive <style> shared with an earlier instance, causing the base
+  // --- font-size to override the @media breakpoint override (source-order cascade bug).
+  const combinedStyleObject = useMemo((): StyleObjectType => {
+    const hasBase = stableLayoutCss && Object.keys(stableLayoutCss).length > 0;
+    const hasResponsive =
+      stableResponsiveStyleObject && Object.keys(stableResponsiveStyleObject).length > 0;
+    if (!hasBase && !hasResponsive) return EMPTY_OBJECT as StyleObjectType;
+    if (!hasBase) return stableResponsiveStyleObject;
+    if (!hasResponsive) return { "&": stableLayoutCss } as StyleObjectType;
+    return { "&": stableLayoutCss, ...stableResponsiveStyleObject } as StyleObjectType;
+  }, [stableLayoutCss, stableResponsiveStyleObject]);
+
+  // --- Always call useStyles (Rules of Hooks) — returns undefined when object is empty
+  const layoutClassName = useStyles(combinedStyleObject);
+
+  // --- Include any extraClassName propagated from a parent compound component so that
+  // --- layout props set on the compound's usage site are applied to its single root child.
+  const extraClassName = layoutContextRef?.current?.extraClassName as string | undefined;
+  const className = [themeClassName, layoutClassName, extraClassName].filter(Boolean).join(" ");
+
+  // Memoize `classes` so components wrapped in React.memo (e.g. Markdown)
+  // don't re-render when `className` is unchanged.
+  // MUST be before any conditional return to obey the Rules of Hooks.
+  const memoedClasses = useMemo(() => ({ [COMPONENT_PART_KEY]: className }), [className]);
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
-  // --- Evaluate the current "when" condition
-  const currentWhenValue = shouldKeep(safeNode.when, state, appContext);
+  // --- Evaluate the current "when" condition (respects responsive when-* breakpoint rules)
+  const currentWhenValue = resolveResponsiveWhen(
+    safeNode.when,
+    safeNode.responsiveWhen,
+    state,
+    appContext,
+  );
 
   // --- Handle init and cleanup events based on "when" condition transitions
   useEffect(() => {
@@ -395,27 +539,36 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
   const logInteraction = useCallback(
     (interaction: string, detail?: Record<string, any>) => {
       if (!xsVerbose) return;
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-        w._xsLogs.push({
-          ts: Date.now(),
-          traceId: getCurrentTrace(),
-          kind: "interaction",
-          componentType: safeNode.type,
-          componentLabel: resolvedLabel,
-          uid: safeNode.uid,
-          interaction,
-          detail,
-        });
-      }
+      pushXsLog({
+        ts: Date.now(),
+        traceId: getCurrentTrace(),
+        kind: "interaction",
+        componentType: safeNode.type,
+        componentLabel: resolvedLabel,
+        uid: safeNode.uid,
+        interaction,
+        detail,
+      });
     },
     [xsVerbose, safeNode.type, resolvedLabel, safeNode.uid],
   );
 
-  // --- If when is false, don't render the component
+  // --- Decide whether to skip rendering entirely
+  // SSR mode (no `document`): render the component if it is visible at ANY breakpoint
+  // and rely on CSS display rules (from buildWhenStyleObject) to hide/show per viewport.
+  // Normal mode (client-side): trust the runtime `currentWhenValue` which reflects the
+  // actual viewport — don't render at all when the component should be hidden.
   if (!currentWhenValue) {
-    return null;
+    const isSSR = typeof document === "undefined";
+    if (isSSR) {
+      const staticVisibility = isVisibleAtAnyBreakpoint(safeNode.when, safeNode.responsiveWhen);
+      if (staticVisibility !== true) {
+        return null;
+      }
+      // SSR + visible at some breakpoint → fall through and render with CSS classes
+    } else {
+      return null;
+    }
   }
 
   const rendererContext: RendererContext<any> = {
@@ -433,6 +586,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     renderChild: memoedRenderChild,
     registerComponentApi: memoedRegisterComponentApi,
     className,
+    classes: memoedClasses,
     layoutContext: layoutContextRef?.current,
     uid,
     logInteraction,

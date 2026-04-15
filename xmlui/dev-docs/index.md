@@ -23,8 +23,8 @@ This article helps you understand the implementation details of xmlui so that yo
 - ...
 
 **Conventions to use with AI**
-- [Creating XMLUI Components](./conv-create-components.md)
-- [Testing XMLUI Components]()
+- [Creating XMLUI Components](../../.ai/xmlui/components/overview.md)
+- [Testing XMLUI Components](../../.ai/xmlui/testing/e2e.md)
 
 Topics to elaborate on:
 

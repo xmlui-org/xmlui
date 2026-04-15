@@ -359,11 +359,6 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
 
     Object.entries(icons).forEach(([iconName, svgData]) => {
       const iconKey = iconName.toLowerCase();
-      
-      // Skip if already registered
-      if (pool.has(iconKey)) {
-        return;
-      }
 
       // Decode data URI if needed
       let decodedSvgData = svgData;
@@ -468,6 +463,7 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
     if (attachedResources.current[resourceUrl]) {
       return;
     }
+    attachedResources.current[resourceUrl] = true;
     const icon = await (await fetch(resourceUrl)).text();
 
     const div = document.createElement("div");
@@ -489,12 +485,9 @@ export function IconProvider({ children, icons }: { children: ReactNode, icons: 
     const d = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
     d.innerHTML = div.children[0].innerHTML;
     d.id = resourceUrl;
-    d.setAttributeNS(null, "viewBox", attrs["viewBox"]);
+    d.setAttributeNS(null, "viewBox", attrs["viewBox"] ?? "0 0 24 24");
 
-    if (!attachedResources.current[resourceUrl]) {
-      spriteRootRef.current!.appendChild(d);
-      attachedResources.current[resourceUrl] = true;
-    }
+    spriteRootRef.current!.appendChild(d);
     const customIcon = {
       name: resourceUrl,
       attributes: attrs,

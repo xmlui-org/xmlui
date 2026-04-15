@@ -26,8 +26,11 @@ export function flattenNode(
   const isDynamic = nodeDynamicValue !== undefined ? nodeDynamicValue : (componentDynamic ?? false);
   // For dynamic nodes, if loaded is not explicitly true, treat as unloaded
   const isUnloaded = isDynamic ? node.loaded !== true : node.loaded === false;
-  const hasChildren = hasActualChildren || isDynamic || isUnloaded;
-  
+  // A node that is currently reloading (loading state = "loading") must keep hasChildren=true
+  // so the expand-icon slot is rendered and the spinner can appear
+  const isReloading = nodeStates?.get(key) === "loading";
+  const hasChildren = hasActualChildren || isDynamic || isUnloaded || isReloading;
+
   // Get loading state for this node
   const loadingState = nodeStates?.get(key) || (isDynamic || isUnloaded ? 'unloaded' : 'loaded');
   

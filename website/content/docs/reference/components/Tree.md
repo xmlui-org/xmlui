@@ -378,8 +378,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -654,6 +654,10 @@ The `loadedField` property specifies which field in node data indicates whether 
 
 The property name in source data for display text.
 
+### `overflow` [#overflow]
+
+Overrides the overflow style of the tree scroll container. When set (e.g. "visible"), the tree renders at its natural content height without internal scrolling, allowing an outer container to handle scrolling instead.
+
 ### `parentIdField` [#parentidfield]
 
 > [!DEF]  default: **"parentId"**
@@ -664,7 +668,7 @@ The property name in source data for parent relationships (used in flat format).
 
 > [!DEF]  default: **"normal"**
 
-This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity. On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.
 
 Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
 
@@ -682,7 +686,7 @@ The selected item ID in source data format.
 
 > [!DEF]  default: **false**
 
-When enabled, displays gradient fade indicators at the top and bottom edges of the tree when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
+When enabled, displays gradient fade indicators at the top and bottom edges of the tree when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.
 
 ### `spinnerDelay` [#spinnerdelay]
 

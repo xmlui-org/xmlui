@@ -1,11 +1,13 @@
 import styles from "./Tabs.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 import { MemoizedItem } from "../container-helpers";
 import { Tabs, defaultProps } from "./TabsNative";
 import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "Tabs";
 
@@ -54,6 +56,21 @@ export const TabsMd = createMetadata({
     headerTemplate: {
       ...dComponent(`This property declares the template for the clickable tab area.`),
     },
+    keepMounted: {
+      description:
+        `When enabled, all tab panels remain mounted in the DOM even when not active — ` +
+        `inactive panels are hidden with \`display: none\`. This ensures that form fields ` +
+        `inside non-visible tabs stay registered with an enclosing Form. ` +
+        `Defaults to \`true\` when the Tabs component is inside a Form, \`false\` otherwise.`,
+      valueType: "boolean",
+    },
+    gap: {
+      description:
+        `Sets the gap (padding) between the tab header strip and the active tab panel content. ` +
+        `Accepts any valid CSS length (e.g. \`"8px"\`, \`"1rem"\`). ` +
+        `When set, this overrides the \`paddingTop-TabItem\` theme variable.`,
+      valueType: "string",
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -92,40 +109,64 @@ export const TabsMd = createMetadata({
     [`textColor-trigger-${COMP}--active`]: "$color-primary-900",
     [`textColor-trigger-${COMP}--hover`]: "$color-primary-900",
     [`gap-list-${COMP}`]: "0px",
+    [`paddingTop-TabItem`]: "$gap-normal",
   },
 });
 
-export const tabsComponentRenderer = createComponentRenderer(
-  COMP,
-  TabsMd,
-  ({ extractValue, node, renderChild, className, registerComponentApi, lookupEventHandler }) => {
+type ThemedTabsProps = React.ComponentPropsWithoutRef<typeof Tabs>;
+
+export const ThemedTabs = React.forwardRef<React.ElementRef<typeof Tabs>, ThemedTabsProps>(
+  function ThemedTabs({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TabsMd);
     return (
       <Tabs
-        id={node?.uid}
-        className={className}
-        headerRenderer={
-          node?.props?.headerTemplate
-            ? (item) => (
-                <MemoizedItem
-                  node={node.props.headerTemplate! as any}
-                  contextVars={{
-                    $header: item,
-                  }}
-                  renderChild={renderChild}
-                />
-              )
-            : undefined
-        }
-        activeTab={extractValue(node.props?.activeTab)}
-        orientation={extractValue(node.props?.orientation)}
-        tabAlignment={extractValue(node.props?.tabAlignment)}
-        accordionView={extractValue(node.props?.accordionView)}
-        onDidChange={lookupEventHandler("didChange")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children)}
-      </Tabs>
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
+  },
+);
+
+export const tabsComponentRenderer = wrapComponent(
+  COMP,
+  Tabs,
+  TabsMd,
+  {
+    exposeRegisterApi: true,
+    exclude: ["activeTab", "orientation", "tabAlignment", "accordionView", "headerTemplate", "keepMounted", "gap"],
+    events: [],
+    customRender(_props, { extractValue, node, renderChild, classes, registerComponentApi, lookupEventHandler }) {
+      return (
+        <Tabs
+          id={node?.uid}
+          classes={classes}
+          headerRenderer={
+            node?.props?.headerTemplate
+              ? (item) => (
+                  <MemoizedItem
+                    node={node.props.headerTemplate! as any}
+                    contextVars={{
+                      $header: item,
+                    }}
+                    renderChild={renderChild}
+                  />
+                )
+              : undefined
+          }
+          activeTab={extractValue(node.props?.activeTab)}
+          orientation={extractValue(node.props?.orientation)}
+          tabAlignment={extractValue(node.props?.tabAlignment)}
+          accordionView={extractValue(node.props?.accordionView)}
+          keepMounted={extractValue.asOptionalBoolean(node.props?.keepMounted)}
+          gap={extractValue.asOptionalString(node.props?.gap)}
+          onDidChange={lookupEventHandler("didChange")}
+          onContextMenu={lookupEventHandler("contextMenu")}
+          registerComponentApi={registerComponentApi}
+        >
+          {renderChild(node.children)}
+        </Tabs>
+      );
+    },
   },
 );

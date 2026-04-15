@@ -22,6 +22,12 @@ export const defaultProps: Pick<Props, "position" | "visible" | "threshold" | "i
   behavior: "smooth",
 };
 
+// Returns true only for large containers that are likely the main page scroll area,
+// not small overlays like search result dropdowns.
+function isMainScrollContainer(element: HTMLElement): boolean {
+  return element.offsetHeight > window.innerHeight * 0.5;
+}
+
 export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
   function ScrollToTop(
     {
@@ -38,95 +44,81 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
   ) {
     const [isVisible, setIsVisible] = useState(false);
 
-    // Validate position and fall back to "end" if invalid
     const validPosition = ["start", "center", "end"].includes(position || "") ? position : "end";
-    
-    // Validate behavior and fall back to "smooth" if invalid
     const validBehavior = ["smooth", "instant", "auto"].includes(behavior || "") ? behavior : "smooth";
 
-    // Check scroll position to determine visibility
     useEffect(() => {
       if (!visible) {
         setIsVisible(false);
         return;
       }
 
-      const handleScroll = () => {
-        // Check multiple possible scroll containers using the same logic as scroll-to-top
+      const getPageScrollTop = () => {
         const windowScrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const bodyScrollTop = document.body.scrollTop;
-        
         let maxScrollTop = Math.max(windowScrollTop, bodyScrollTop);
-        
-        // Check all elements that might be scrolled (same as in handleClick)
-        const allElements = document.querySelectorAll('*');
-        allElements.forEach((element) => {
-          if (element instanceof HTMLElement && element.scrollTop > 0) {
+
+        document.querySelectorAll("*").forEach((element) => {
+          if (
+            element instanceof HTMLElement &&
+            element.scrollTop > 0 &&
+            isMainScrollContainer(element)
+          ) {
             maxScrollTop = Math.max(maxScrollTop, element.scrollTop);
           }
         });
-        
-        // Also check common XMLUI containers
-        const xmluiContainers = document.querySelectorAll(
-          '.xmlui-app, .xmlui-page, .xmlui-container, [data-xmlui], main, .main, #root, .app'
-        );
-        xmluiContainers.forEach((element) => {
-          if (element instanceof HTMLElement) {
-            maxScrollTop = Math.max(maxScrollTop, element.scrollTop);
-          }
-        });
-        
-        // If threshold is 0, show the button regardless of scroll position
+
+        return maxScrollTop;
+      };
+
+      const handleScroll = (event?: Event) => {
+        // Ignore scroll events from small elements (e.g. search result dropdowns)
+        if (
+          event &&
+          event.target instanceof HTMLElement &&
+          !isMainScrollContainer(event.target)
+        ) {
+          return;
+        }
+
+        const scrollTop = getPageScrollTop();
         if (threshold === 0) {
           setIsVisible(true);
         } else {
-          setIsVisible(maxScrollTop > (threshold || 0));
+          setIsVisible(scrollTop > (threshold || 0));
         }
       };
 
       window.addEventListener("scroll", handleScroll);
-      document.addEventListener("scroll", handleScroll, true); // Capture phase for all scroll events
-      
-      // Also listen to scroll events on common container elements
-      const xmluiContainers = document.querySelectorAll(
-        '.xmlui-app, .xmlui-page, .xmlui-container, [data-xmlui], main, .main, #root, .app'
-      );
-      xmluiContainers.forEach((element) => {
-        element.addEventListener("scroll", handleScroll);
-      });
-      
-      handleScroll(); // Check initial position
+      // Capture phase catches scroll events on div containers (not just window)
+      document.addEventListener("scroll", handleScroll, true);
+
+      handleScroll();
 
       return () => {
         window.removeEventListener("scroll", handleScroll);
         document.removeEventListener("scroll", handleScroll, true);
-        xmluiContainers.forEach((element) => {
-          element.removeEventListener("scroll", handleScroll);
-        });
       };
     }, [visible, threshold]);
 
-    // Scroll to top functionality
     const handleClick = useCallback(() => {
-      // Force scroll to top using multiple methods
-      // This will work regardless of which container is scrolled
-      
-      // Convert behavior prop to ScrollBehavior type
-      const scrollBehavior: ScrollBehavior = validBehavior === "instant" ? "instant" : validBehavior === "auto" ? "auto" : "smooth";
-      
-      // Method 1: Standard window scroll
+      const scrollBehavior: ScrollBehavior =
+        validBehavior === "instant" ? "instant" : validBehavior === "auto" ? "auto" : "smooth";
+
       window.scrollTo({ top: 0, behavior: scrollBehavior });
-      
-      // Method 2: Direct property setting (for instant behavior)
+
       if (validBehavior === "instant") {
         document.documentElement.scrollTop = 0;
         document.body.scrollTop = 0;
       }
-      
-      // Method 3: Find and scroll any scrolled containers
-      const allElements = document.querySelectorAll('*');
-      allElements.forEach((element) => {
-        if (element instanceof HTMLElement && element.scrollTop > 0) {
+
+      // Only reset main scroll containers, not small overlays like dropdowns
+      document.querySelectorAll("*").forEach((element) => {
+        if (
+          element instanceof HTMLElement &&
+          element.scrollTop > 0 &&
+          isMainScrollContainer(element)
+        ) {
           if (validBehavior === "instant") {
             element.scrollTop = 0;
           } else {
@@ -134,21 +126,7 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
           }
         }
       });
-      
-      // Method 4: Scroll specific XMLUI containers (common patterns)
-      const xmluiContainers = document.querySelectorAll(
-        '.xmlui-app, .xmlui-page, .xmlui-container, [data-xmlui], main, .main, #root, .app'
-      );
-      xmluiContainers.forEach((element) => {
-        if (element instanceof HTMLElement) {
-          if (validBehavior === "instant") {
-            element.scrollTop = 0;
-          } else {
-            element.scrollTo({ top: 0, behavior: scrollBehavior });
-          }
-        }
-      });
-      
+
       onClick?.();
     }, [validBehavior, onClick]);
 

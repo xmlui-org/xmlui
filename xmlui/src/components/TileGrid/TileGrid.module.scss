@@ -1,0 +1,118 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "TileGrid";
+$backgroundColor-item-TileGrid: createThemeVar("backgroundColor-item-#{$component}");
+$backgroundColor-item-TileGrid--hover: createThemeVar(
+  "backgroundColor-item-#{$component}--hover"
+);
+$backgroundColor-item-TileGrid--selected: createThemeVar(
+  "backgroundColor-item-#{$component}--selected"
+);
+$backgroundColor-item-TileGrid--selected--hover: createThemeVar(
+  "backgroundColor-item-#{$component}--selected--hover"
+);
+$borderRadius-item-TileGrid: createThemeVar("borderRadius-item-#{$component}");
+$offsetVertical-checkbox-TileGrid: createThemeVar("offsetVertical-checkbox-#{$component}");
+$offsetHorizontal-checkbox-TileGrid: createThemeVar("offsetHorizontal-checkbox-#{$component}");
+$fontSize-checkbox-TileGrid: createThemeVar("fontSize-checkbox-#{$component}");
+$userSelect-item-TileGrid: createThemeVar("userSelect-item-#{$component}");
+$outlineColor-item-TileGrid--focus: createThemeVar("outlineColor-item-#{$component}--focus");
+$outlineWidth-item-TileGrid--focus: createThemeVar("outlineWidth-item-#{$component}--focus");
+$outlineStyle-item-TileGrid--focus: createThemeVar("outlineStyle-item-#{$component}--focus");
+$outlineOffset-item-TileGrid--focus: createThemeVar("outlineOffset-item-#{$component}--focus");
+
+@layer components {
+  .tileGridWrapper {
+    overflow: auto;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    outline: none;
+  }
+
+  .tileRow {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+  }
+
+  .tileWrapper {
+    position: relative;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    background-color: $backgroundColor-item-TileGrid;
+    border-radius: $borderRadius-item-TileGrid;
+    overflow: hidden;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $backgroundColor-item-TileGrid--hover;
+    }
+
+    &.selected {
+      background-color: $backgroundColor-item-TileGrid--selected;
+
+      &:hover {
+        background-color: $backgroundColor-item-TileGrid--selected--hover;
+      }
+    }
+
+    &.focused {
+      outline-width: $outlineWidth-item-TileGrid--focus;
+      outline-color: $outlineColor-item-TileGrid--focus;
+      outline-style: $outlineStyle-item-TileGrid--focus;
+      outline-offset: $outlineOffset-item-TileGrid--focus;
+    }
+  }
+
+  .tileContent {
+    width: 100%;
+    height: 100%;
+    user-select: $userSelect-item-TileGrid;
+  }
+
+  .selectedIndicator {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .checkboxOverlay {
+    position: absolute;
+    z-index: 1;
+    pointer-events: auto;
+    font-size: $fontSize-checkbox-TileGrid;
+
+    &.topStart {
+      top: $offsetVertical-checkbox-TileGrid;
+      inset-inline-start: $offsetHorizontal-checkbox-TileGrid;
+    }
+
+    &.topEnd {
+      top: $offsetVertical-checkbox-TileGrid;
+      inset-inline-end: $offsetHorizontal-checkbox-TileGrid;
+    }
+
+    &.bottomStart {
+      bottom: $offsetVertical-checkbox-TileGrid;
+      inset-inline-start: $offsetHorizontal-checkbox-TileGrid;
+    }
+
+    &.bottomEnd {
+      bottom: $offsetVertical-checkbox-TileGrid;
+      inset-inline-end: $offsetHorizontal-checkbox-TileGrid;
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

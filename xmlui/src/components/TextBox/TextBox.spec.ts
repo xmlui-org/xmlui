@@ -210,48 +210,35 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Label", () => {
-  test("labelPosition=start positions label before input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="start" />`);
+  test("labelPosition places label correctly in all positions", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextBox testId="lp-start" direction="ltr" label="test" labelPosition="start" />
+        <TextBox testId="lp-end" direction="ltr" label="test" labelPosition="end" />
+        <TextBox testId="lp-top" label="test" labelPosition="top" />
+        <TextBox testId="lp-bottom" label="test" labelPosition="bottom" />
+      </Fragment>
+    `);
 
-    const driver = await createTextBoxDriver("test");
+    const startDriver = await createTextBoxDriver("lp-start");
+    const { left: startInputLeft } = await getBounds(startDriver.input);
+    const { right: startLabelRight } = await getBounds(startDriver.label);
+    expect(startLabelRight).toBeLessThan(startInputLeft);
 
-    const { left: textboxLeft } = await getBounds(driver.input);
-    const { right: labelRight } = await getBounds(driver.label);
+    const endDriver = await createTextBoxDriver("lp-end");
+    const { right: endInputRight } = await getBounds(endDriver.input);
+    const { left: endLabelLeft } = await getBounds(endDriver.label);
+    expect(endLabelLeft).toBeGreaterThan(endInputRight);
 
-    expect(labelRight).toBeLessThan(textboxLeft);
-  });
+    const topDriver = await createTextBoxDriver("lp-top");
+    const { top: topInputTop } = await getBounds(topDriver.input);
+    const { bottom: topLabelBottom } = await getBounds(topDriver.label);
+    expect(topLabelBottom).toBeLessThan(topInputTop);
 
-  test("labelPosition=end positions label after input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="end" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { right: textboxRight } = await getBounds(driver.input);
-    const { left: labelLeft } = await getBounds(driver.label);
-
-    expect(labelLeft).toBeGreaterThan(textboxRight);
-  });
-
-  test("labelPosition=top positions label above input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" label="test" labelPosition="top" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { top: textboxTop } = await getBounds(driver.input);
-    const { bottom: labelBottom } = await getBounds(driver.label);
-
-    expect(labelBottom).toBeLessThan(textboxTop);
-  });
-
-  test("labelPosition=bottom positions label below input", async ({ initTestBed, createTextBoxDriver }) => {
-    await initTestBed(`<TextBox testId="test" label="test" labelPosition="bottom" />`);
-
-    const driver = await createTextBoxDriver("test");
-
-    const { bottom: textboxBottom } = await getBounds(driver.input);
-    const { top: labelTop } = await getBounds(driver.label);
-
-    expect(labelTop).toBeGreaterThan(textboxBottom);
+    const bottomDriver = await createTextBoxDriver("lp-bottom");
+    const { bottom: bottomInputBottom } = await getBounds(bottomDriver.input);
+    const { top: bottomLabelTop } = await getBounds(bottomDriver.label);
+    expect(bottomLabelTop).toBeGreaterThan(bottomInputBottom);
   });
 
   test("labelBreak enables label line breaks", async ({ initTestBed, createTextBoxDriver }) => {
@@ -276,6 +263,38 @@ test.describe("Label", () => {
     const driver = await createTextBoxDriver("test");
     await expect(driver.label).toBeVisible();
     await expect(driver.input).toBeVisible();
+  });
+
+  test("labelPosition=before maps to start layout (label left of input, LTR)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="before" />`);
+    const driver = await createTextBoxDriver("test");
+    const { left: inputLeft } = await getBounds(driver.input);
+    const { right: labelRight } = await getBounds(driver.label);
+    expect(labelRight).toBeLessThan(inputLeft);
+  });
+
+  test("labelPosition=after maps to end layout (label right of input, LTR)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="ltr" label="test" labelPosition="after" />`);
+    const driver = await createTextBoxDriver("test");
+    const { right: inputRight } = await getBounds(driver.input);
+    const { left: labelLeft } = await getBounds(driver.label);
+    expect(labelLeft).toBeGreaterThan(inputRight);
+  });
+
+  test("labelPosition=before respects RTL direction (label right of input)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="rtl" label="test" labelPosition="before" />`);
+    const driver = await createTextBoxDriver("test");
+    const { right: inputRight } = await getBounds(driver.input);
+    const { left: labelLeft } = await getBounds(driver.label);
+    expect(labelLeft).toBeGreaterThan(inputRight);
+  });
+
+  test("labelPosition=after respects RTL direction (label left of input)", async ({ initTestBed, createTextBoxDriver }) => {
+    await initTestBed(`<TextBox testId="test" direction="rtl" label="test" labelPosition="after" />`);
+    const driver = await createTextBoxDriver("test");
+    const { left: inputLeft } = await getBounds(driver.input);
+    const { right: labelRight } = await getBounds(driver.label);
+    expect(labelRight).toBeLessThan(inputLeft);
   });
 });
 
@@ -586,6 +605,51 @@ test.describe("Password Input", () => {
     await icon.click();
     await expect(icon).toBeVisible();
   });
+
+  test("Tab moves focus from showPasswordToggle input directly to next input", async ({
+    initTestBed,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <PasswordInput testId="pwd-toggle" showPasswordToggle="true" />
+        <PasswordInput testId="pwd-plain" />
+        <TextBox testId="textbox" />
+      </App>
+    `);
+    const pwdToggle = await createTextBoxDriver("pwd-toggle");
+    const pwdPlain = await createTextBoxDriver("pwd-plain");
+
+    await pwdToggle.input.focus();
+    await expect(pwdToggle.input).toBeFocused();
+
+    // Tab once — must leave the first PasswordInput entirely (skip the toggle button)
+    await page.keyboard.press("Tab");
+    await expect(pwdPlain.input).toBeFocused();
+  });
+
+  test("Tab moves focus from plain PasswordInput to TextBox", async ({
+    initTestBed,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <PasswordInput testId="pwd-toggle" showPasswordToggle="true" />
+        <PasswordInput testId="pwd-plain" />
+        <TextBox testId="textbox" />
+      </App>
+    `);
+    const pwdPlain = await createTextBoxDriver("pwd-plain");
+    const textbox = await createTextBoxDriver("textbox");
+
+    await pwdPlain.input.focus();
+    await expect(pwdPlain.input).toBeFocused();
+
+    await page.keyboard.press("Tab");
+    await expect(textbox.input).toBeFocused();
+  });
 });
 
 // =============================================================================
@@ -673,7 +737,7 @@ test.describe("Validation", () => {
   test("handles invalid validationStatus gracefully", async ({ initTestBed, createTextBoxDriver }) => {
     await initTestBed(`<TextBox testId="input" validationStatus="invalid" />`, {
       testThemeVars: {
-        "borderColor-TextBox--default": "rgb(0, 0, 0)",
+        "borderColor-TextBox": "rgb(0, 0, 0)",
         "borderColor-TextBox--error": "rgb(255, 0, 0)",
         "borderColor-TextBox--warning": "rgb(255, 165, 0)",
         "borderColor-TextBox--success": "rgb(0, 255, 0)",
@@ -687,7 +751,7 @@ test.describe("Validation", () => {
   });
 
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },
@@ -1325,5 +1389,68 @@ test.describe("Validation Feedback", () => {
     // Should only have one label with the text "Username"
     const labels = page.getByText("Username");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width-md="400px" />`);
+    const textBox = page.getByTestId("test");
+
+    // Below md — width should NOT be 400px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(textBox).not.toHaveCSS("width", "400px");
+
+    // At md — width should be 400px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(textBox).toHaveCSS("width", "400px");
+
+    // Well above md — width should still be 400px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(textBox).toHaveCSS("width", "400px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width="250px" />`);
+    const textBox = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(textBox).toHaveCSS("width", "250px");
+    }
+  });
+
+  test("breakpoint width overrides base at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width="150px" width-lg="500px" />`);
+    const textBox = page.getByTestId("test");
+
+    // Below lg — base 150px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(textBox).toHaveCSS("width", "150px");
+
+    // At lg — 500px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(textBox).toHaveCSS("width", "500px");
+  });
+
+  test("multiple breakpoints stack correctly (mobile-first)", async ({ page, initTestBed }) => {
+    await initTestBed(`<TextBox testId="test" width-sm="200px" width-md="350px" />`);
+    const textBox = page.getByTestId("test");
+
+    // xs — no rule applies
+    await page.setViewportSize({ width: 400, height: 600 });
+    await expect(textBox).not.toHaveCSS("width", "200px");
+
+    // sm — 200px
+    await page.setViewportSize({ width: 600, height: 600 });
+    await expect(textBox).toHaveCSS("width", "200px");
+
+    // md — 350px overrides
+    await page.setViewportSize({ width: 800, height: 600 });
+    await expect(textBox).toHaveCSS("width", "350px");
   });
 });

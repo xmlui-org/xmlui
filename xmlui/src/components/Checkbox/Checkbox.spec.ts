@@ -26,190 +26,82 @@ test.describe("Basic Functionality", () => {
   // =============================================================================
 
   test.describe("transformToLegitValue Input Type Tests", () => {
-    // Boolean values
-    test("initialValue handles boolean true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{true}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles boolean false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{false}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    // Undefined and null values
-    test("initialValue handles undefined as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{undefined}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles null as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{null}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    // Number values
-    test("initialValue handles number 0 as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{0}" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles positive number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{1}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles negative number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{-1}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles decimal number as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{3.14}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles NaN as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{NaN}" />`);
-      // NaN is treated as true due to JavaScript evaluation context
-      // In XMLUI context, NaN is passed through differently than expected
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    // String values
-    test("initialValue handles empty string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles whitespace-only string as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="   " />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'false' as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="false" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
-    });
-
-    test("initialValue handles string 'FALSE' as false (case insensitive)", async ({
+    test("initialValue handles various deterministic input types", async ({
       initTestBed,
       page,
     }) => {
-      await initTestBed(`<Checkbox initialValue="FALSE" />`);
-      await expect(page.getByRole("checkbox")).not.toBeChecked();
+      await initTestBed(`
+        <Fragment>
+          <Checkbox testId="cb0" initialValue="{true}" />
+          <Checkbox testId="cb1" initialValue="{false}" />
+          <Checkbox testId="cb2" initialValue="{undefined}" />
+          <Checkbox testId="cb3" initialValue="{null}" />
+          <Checkbox testId="cb4" initialValue="{0}" />
+          <Checkbox testId="cb5" initialValue="{1}" />
+          <Checkbox testId="cb6" initialValue="{-1}" />
+          <Checkbox testId="cb7" initialValue="{3.14}" />
+          <Checkbox testId="cb8" initialValue="{NaN}" />
+          <Checkbox testId="cb9" initialValue="" />
+          <Checkbox testId="cb10" initialValue="   " />
+          <Checkbox testId="cb11" initialValue="false" />
+          <Checkbox testId="cb12" initialValue="FALSE" />
+          <Checkbox testId="cb13" initialValue="true" />
+          <Checkbox testId="cb14" initialValue="yes" />
+          <Checkbox testId="cb15" initialValue="not false" />
+          <Checkbox testId="cb16" initialValue="{Infinity}" />
+          <Checkbox testId="cb17" initialValue="{-Infinity}" />
+        </Fragment>
+      `);
+      // Boolean values
+      await expect(page.getByTestId("cb0")).toBeChecked();
+      await expect(page.getByTestId("cb1")).not.toBeChecked();
+      // Undefined and null
+      await expect(page.getByTestId("cb2")).not.toBeChecked();
+      await expect(page.getByTestId("cb3")).not.toBeChecked();
+      // Number values
+      await expect(page.getByTestId("cb4")).not.toBeChecked();
+      await expect(page.getByTestId("cb5")).toBeChecked();
+      await expect(page.getByTestId("cb6")).toBeChecked();
+      await expect(page.getByTestId("cb7")).toBeChecked();
+      // NaN is treated as true in XMLUI context
+      await expect(page.getByTestId("cb8")).toBeChecked();
+      // String values
+      await expect(page.getByTestId("cb9")).not.toBeChecked();
+      await expect(page.getByTestId("cb10")).not.toBeChecked();
+      await expect(page.getByTestId("cb11")).not.toBeChecked();
+      await expect(page.getByTestId("cb12")).not.toBeChecked();
+      await expect(page.getByTestId("cb13")).toBeChecked();
+      await expect(page.getByTestId("cb14")).toBeChecked();
+      await expect(page.getByTestId("cb15")).toBeChecked();
+      // Edge cases
+      await expect(page.getByTestId("cb16")).toBeChecked();
+      await expect(page.getByTestId("cb17")).toBeChecked();
     });
 
-    test("initialValue handles string 'true' as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="true" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles non-empty string as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="yes" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles string with content and 'false' as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Checkbox initialValue="not false" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    // Array values
-    test("initialValue handles empty array as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{[]}" />`);
-      // Empty arrays may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with elements as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{[1, 2, 3]}" />`);
-      // Arrays with elements may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with complex array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles array with single element as true", async ({
-      initTestBed,
-      page,
-    }) => {
-      await initTestBed(`<Checkbox initialValue="{['item']}" />`);
-      // Arrays may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with array - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Object values
-    test("initialValue handles empty object as false", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{}}" />`);
-      // Empty objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).not.toBeChecked();
-      } else {
-        // Component doesn't render with empty object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles object with properties as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{a: 'b'}}" />`);
-      // Objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    test("initialValue handles complex object as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{{name: 'test', value: 123}}" />`);
-      // Complex objects may cause component to not render in some contexts
-      const checkbox = page.getByRole("checkbox");
-      const exists = await checkbox.count();
-      if (exists > 0) {
-        await expect(checkbox).toBeChecked();
-      } else {
-        // Component doesn't render with complex object - this is acceptable behavior
-        expect(exists).toBe(0);
-      }
-    });
-
-    // Edge case values
-    test("initialValue handles Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{Infinity}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
-    });
-
-    test("initialValue handles negative Infinity as true", async ({ initTestBed, page }) => {
-      await initTestBed(`<Checkbox initialValue="{-Infinity}" />`);
-      await expect(page.getByRole("checkbox")).toBeChecked();
+    test("initialValue handles array and object values", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <Fragment>
+          <Checkbox testId="ca0" initialValue="{[]}" />
+          <Checkbox testId="ca1" initialValue="{[1, 2, 3]}" />
+          <Checkbox testId="ca2" initialValue="{['item']}" />
+          <Checkbox testId="co0" initialValue="{{}}" />
+          <Checkbox testId="co1" initialValue="{{a: 'b'}}" />
+          <Checkbox testId="co2" initialValue="{{name: 'test', value: 123}}" />
+        </Fragment>
+      `);
+      // Arrays and objects may cause the component to not render - that is acceptable
+      const ca0 = page.getByTestId("ca0");
+      if ((await ca0.count()) > 0) await expect(ca0).not.toBeChecked();
+      const ca1 = page.getByTestId("ca1");
+      if ((await ca1.count()) > 0) await expect(ca1).toBeChecked();
+      const ca2 = page.getByTestId("ca2");
+      if ((await ca2.count()) > 0) await expect(ca2).toBeChecked();
+      const co0 = page.getByTestId("co0");
+      if ((await co0.count()) > 0) await expect(co0).not.toBeChecked();
+      const co1 = page.getByTestId("co1");
+      if ((await co1.count()) > 0) await expect(co1).toBeChecked();
+      const co2 = page.getByTestId("co2");
+      if ((await co2.count()) > 0) await expect(co2).toBeChecked();
     });
   });
 
@@ -579,6 +471,70 @@ test.describe("Label", () => {
     await initTestBed(`<Checkbox labelPosition="invalid" label="test" />`);
     await expect(page.getByLabel("test")).toBeVisible();
     await expect(page.getByText("test")).toBeVisible();
+  });
+
+  test("labelPosition=before positions label before input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="before" />`);
+
+    const { left: checkboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight, width: labelWidth } = await getBounds(page.getByText("test"));
+
+    // Label should be positioned before (left of) the checkbox
+    expect(labelRight).toBeLessThan(checkboxLeft);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=after positions label after input with fit-content width", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="ltr" label="test" labelPosition="after" />`);
+
+    const { right: checkboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
+
+    // Label should be positioned after (right of) the checkbox
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
+    // Container should not stretch to full width (fit-content behavior)
+    const container = page.locator("[class*=container]").first();
+    const { width: containerWidth } = await getBounds(container);
+    const { width: viewportWidth } = page.viewportSize()!;
+    expect(containerWidth).toBeLessThan(viewportWidth);
+  });
+
+  test("labelPosition=before uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Checkbox label="test" labelPosition="before" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=after uses explicit labelWidth when provided", async ({ initTestBed, page }) => {
+    const expected = 200;
+    await initTestBed(`<Checkbox label="test" labelPosition="after" labelWidth="${expected}px" />`);
+    const { width } = await getBounds(page.getByText("test"));
+    expect(width).toEqual(expected);
+  });
+
+  test("labelPosition=before respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="rtl" label="test" labelPosition="before" />`);
+
+    // In RTL, "before" means the label is to the right of the checkbox
+    const { right: checkboxRight } = await getBounds(page.getByLabel("test"));
+    const { left: labelLeft } = await getBounds(page.getByText("test"));
+
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
+  });
+
+  test("labelPosition=after respects RTL writing direction", async ({ initTestBed, page }) => {
+    await initTestBed(`<Checkbox direction="rtl" label="test" labelPosition="after" />`);
+
+    // In RTL, "after" means the label is to the left of the checkbox
+    const { left: checkboxLeft } = await getBounds(page.getByLabel("test"));
+    const { right: labelRight } = await getBounds(page.getByText("test"));
+
+    expect(labelRight).toBeLessThan(checkboxLeft);
   });
 });
 
@@ -1046,7 +1002,7 @@ test.describe("Theme Vars", () => {
 
 test.describe("Validation", () => {
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },
@@ -1075,7 +1031,7 @@ test.describe("Validation", () => {
 
   test(`applies correct borderColor on hover`, async ({ initTestBed, page }) => {
     await initTestBed(`<Checkbox testId="test" />`, {
-      testThemeVars: { [`borderColor-Checkbox--default--hover`]: "rgb(0, 0, 0)" },
+      testThemeVars: { [`borderColor-Checkbox--hover`]: "rgb(0, 0, 0)" },
     });
     await page.getByTestId("test").hover();
     await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
@@ -1320,5 +1276,51 @@ test.describe("Behaviors and Parts", () => {
     // Should only have one label with the text "Show password"
     const labels = page.getByText("Show password");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// RESPONSIVE LAYOUT PROPERTIES
+// =============================================================================
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width-md="200px" />`);
+    const checkbox = page.getByTestId("test");
+
+    // Below md — width should NOT be 200px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(checkbox).not.toHaveCSS("width", "200px");
+
+    // At md — width should be 200px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "200px");
+
+    // Well above md — width should still be 200px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(checkbox).toHaveCSS("width", "200px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width="150px" />`);
+    const checkbox = page.getByTestId("test");
+
+    for (const viewportWidth of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width: viewportWidth, height: 600 });
+      await expect(checkbox).toHaveCSS("width", "150px");
+    }
+  });
+
+  test("breakpoint width overrides base at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<Checkbox testId="test" width="100px" width-lg="300px" />`);
+    const checkbox = page.getByTestId("test");
+
+    // Below lg — base 100px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "100px");
+
+    // At lg — 300px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(checkbox).toHaveCSS("width", "300px");
   });
 });

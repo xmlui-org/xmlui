@@ -5,6 +5,8 @@ import React, {
   type ReactNode,
   useRef,
   useMemo,
+  useEffect,
+  useCallback,
 } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -12,9 +14,9 @@ import rehypeRaw from "rehype-raw";
 
 import styles from "./Markdown.module.scss";
 
-import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
-import { LinkNative } from "../Link/LinkNative";
+import { ThemedHeading as Heading } from "../Heading/Heading";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
 import { Toggle } from "../Toggle/Toggle";
 import {
   type CodeHighlighter,
@@ -23,16 +25,99 @@ import {
 } from "../CodeBlock/highlight-code";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useAppContext } from "../../components-core/AppContext";
-import { CodeBlock, markdownCodeBlockParser } from "../CodeBlock/CodeBlockNative";
+import { ThemedCodeBlock as CodeBlock } from "../CodeBlock/CodeBlock";
+import { markdownCodeBlockParser } from "../CodeBlock/CodeBlockReact";
 import classnames from "classnames";
-import Icon from "../Icon/IconNative";
-import { TreeDisplay } from "../TreeDisplay/TreeDisplayNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedTreeDisplay as TreeDisplay } from "../TreeDisplay/TreeDisplay";
 import { visit } from "unist-util-visit";
 import type { Node, Parent } from "unist";
-import { ExpandableItem } from "../ExpandableItem/ExpandableItemNative";
+import { ThemedExpandableItem as ExpandableItem } from "../ExpandableItem/ExpandableItem";
 import NestedAppAndCodeViewNative from "../NestedApp/AppWithCodeViewNative";
 import { CodeText } from "./CodeText";
 import { decodeFromBase64 } from "../../components-core/utils/base64-utils";
+
+// ---------------------------------------------------------------------------
+// Module-level helpers — defined outside any component so their references
+// are stable for the entire session (no new allocation on each render).
+// Neither of these closes over any component state.
+// ---------------------------------------------------------------------------
+
+function getImageKey(node: any): string {
+  return `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
+}
+
+/** Rehype plugin that unwraps a samp playground element from its surrounding <p> tag. */
+const preventPlaygroundParagraphWrap = () => {
+  return function transformer(tree: Node) {
+    visit(tree, "element", (node: any, index: number | undefined, parent: any) => {
+      if (node.tagName !== "p" || !node.children || !Array.isArray(node.children)) {
+        return;
+      }
+      const nonEmptySiblings = node.children.filter((child: any) => {
+        return !(child.type === "text" && /^\s*$/.test(child.value));
+      });
+      if (
+        nonEmptySiblings.length === 1 &&
+        nonEmptySiblings[0].type === "element" &&
+        nonEmptySiblings[0].tagName === "samp" &&
+        nonEmptySiblings[0].properties?.["data-pg-content"]
+      ) {
+        const sampElement = nonEmptySiblings[0];
+        if (parent && parent.children && Array.isArray(parent.children) && typeof index === "number") {
+          parent.children.splice(index, 1, sampElement);
+        }
+        return index;
+      }
+    });
+  };
+};
+
+/** Stable rehype plugin array — same reference across all Markdown renders. */
+const stableRehypePlugins = [rehypeRaw, preventPlaygroundParagraphWrap];
+
+/**
+ * Stable component for rendering xmlui-pg playground elements inside Markdown.
+ * Defined at module level so its identity never changes across renders.
+ */
+function PlaygroundSampRenderer(props: any) {
+  const _renderCount = useRef(0);
+  _renderCount.current++;
+
+  const markdownContentBase64 = props?.["data-pg-markdown"];
+  const markdownContent = markdownContentBase64
+    ? decodeFromBase64(markdownContentBase64)
+    : "";
+  const dataContentBase64 = props?.["data-pg-content"];
+  const jsonContent = decodeFromBase64(dataContentBase64);
+  const appProps = JSON.parse(jsonContent);
+  const content = (
+    <NestedAppAndCodeViewNative
+      markdown={markdownContent}
+      app={appProps.app}
+      config={appProps.config}
+      components={appProps.components}
+      api={appProps.api}
+      activeTheme={appProps.activeTheme}
+      activeTone={appProps.activeTone}
+      title={appProps.name}
+      height={appProps.height}
+      allowPlaygroundPopup={!appProps.noPopup}
+      withFrame={appProps.noFrame ? false : true}
+      noHeader={appProps.noHeader ?? false}
+      splitView={appProps.splitView ?? false}
+      initiallyShowCode={appProps.initiallyShowCode ?? false}
+      popOutUrl={appProps.popOutUrl}
+      immediate={appProps.immediate}
+      withSplashScreen={appProps.withSplashScreen}
+    />
+  );
+  if (appProps.noFrame === true) {
+    return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
+  }
+  return content;
+}
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { BreakMode, OverflowMode } from "../abstractions";
 
 // Default props for the Markdown component
@@ -49,6 +134,7 @@ type MarkdownProps = {
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   codeHighlighter?: CodeHighlighter;
   showHeadingAnchors?: boolean;
   grayscale?: boolean;
@@ -56,6 +142,7 @@ type MarkdownProps = {
   openLinkInNewTab?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
+  anchorRenderer?: (anchorId: string, anchorHref: string) => ReactNode;
 };
 
 function PreTagComponent({ id, children, codeHighlighter }) {
@@ -66,10 +153,10 @@ function PreTagComponent({ id, children, codeHighlighter }) {
   let _codeHighlighter = null;
   if (codeHighlighter) {
     _codeHighlighter = codeHighlighter;
-  } else {
-    _codeHighlighter = isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)
-      ? appContext?.appGlobals?.codeHighlighter
-      : null;
+  } else if (isCodeHighlighter(appContext?.appGlobals?.codeHighlighter)) {
+    _codeHighlighter = appContext.appGlobals.codeHighlighter;
+  } else if (typeof window !== "undefined" && isCodeHighlighter((window as any).__xmluiCodeHighlighter)) {
+    _codeHighlighter = (window as any).__xmluiCodeHighlighter;
   }
 
   const defaultCodefence = (
@@ -102,6 +189,7 @@ export const Markdown = memo(
       children,
       style,
       className,
+      classes,
       codeHighlighter,
       showHeadingAnchors,
       grayscale,
@@ -109,6 +197,7 @@ export const Markdown = memo(
       openLinkInNewTab,
       overflowMode = defaultProps.overflowMode,
       breakMode = defaultProps.breakMode,
+      anchorRenderer,
       ...rest
     }: MarkdownProps,
     ref,
@@ -174,62 +263,27 @@ export const Markdown = memo(
     }
     children = removeIndents ? removeTextIndents(children) : children;
 
-    const getImageKey = (node: any) =>
-      `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
-
-    const markdownImgParser = () => {
+    // markdownImgParser only reads imageInfo.current (a stable ref) — safe with empty deps.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const markdownImgParser = useCallback(() => {
       imageInfo.current.clear();
       return function transformer(tree: Node) {
         visit(tree, "image", visitor);
+        function visitor(node: any, _: number, parent: Parent | undefined) {
+          imageInfo.current.set(
+            getImageKey(node),
+            parent.type === "paragraph" && parent.children.length > 1,
+          );
+        }
       };
+    }, []);
 
-      function visitor(node: any, _: number, parent: Parent | undefined) {
-        imageInfo.current.set(
-          getImageKey(node),
-          parent.type === "paragraph" && parent.children.length > 1,
-        );
-      }
-    };
-
-    // Prevent xmlui-pg playground elements (samp tags with data-pg-content) from being wrapped in <p> tags
-    const preventPlaygroundParagraphWrap = () => {
-      return function transformer(tree: Node) {
-        visit(tree, "element", (node: any, index: number | undefined, parent: any) => {
-          // We're looking for <p> tags that contain only a <samp> element with data-pg-content
-          if (node.tagName !== "p" || !node.children || !Array.isArray(node.children)) {
-            return;
-          }
-
-          // Filter out whitespace-only text nodes
-          const nonEmptySiblings = node.children.filter((child: any) => {
-            return !(child.type === "text" && /^\s*$/.test(child.value));
-          });
-
-          // Check if this paragraph contains only a samp element with data-pg-content
-          if (
-            nonEmptySiblings.length === 1 &&
-            nonEmptySiblings[0].type === "element" &&
-            nonEmptySiblings[0].tagName === "samp" &&
-            nonEmptySiblings[0].properties?.["data-pg-content"]
-          ) {
-            const sampElement = nonEmptySiblings[0];
-
-            // Replace the paragraph with the samp element by modifying the parent's children
-            if (
-              parent &&
-              parent.children &&
-              Array.isArray(parent.children) &&
-              typeof index === "number"
-            ) {
-              parent.children.splice(index, 1, sampElement);
-            }
-
-            // Return the sampElement to continue visiting from there
-            return index;
-          }
-        });
-      };
-    };
+    // Stable remark plugins array — only changes when markdownImgParser changes (never, with [] deps above).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const remarkPlugins = useMemo(
+      () => [remarkGfm, markdownCodeBlockParser, markdownImgParser],
+      [markdownImgParser],
+    );
 
     return (
       <div
@@ -241,13 +295,14 @@ export const Markdown = memo(
           { [styles.truncateLinks]: truncateLinks },
           overflowClasses,
           breakClasses,
+          classes?.[COMPONENT_PART_KEY],
           className,
         )}
         style={style}
       >
         <ReactMarkdown
-          remarkPlugins={[remarkGfm, markdownCodeBlockParser, markdownImgParser]}
-          rehypePlugins={[rehypeRaw, preventPlaygroundParagraphWrap]}
+          remarkPlugins={remarkPlugins}
+          rehypePlugins={stableRehypePlugins}
           components={{
             details({ children, node, ...props }) {
               return (
@@ -301,27 +356,27 @@ export const Markdown = memo(
             },
             h1({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h1" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h1" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h2({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h2" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h2" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h3({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h3" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h3" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h4({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h4" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h4" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h5({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h5" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h5" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             h6({ children }) {
               const { label, uid } = removeGeneratedAnchorSuffix(children);
-              return <Heading level="h6" uid={uid} showAnchor={showHeadingAnchors}>{label}</Heading>;
+              return <Heading className={className} level="h6" uid={uid} showAnchor={showHeadingAnchors} anchorRenderer={anchorRenderer}>{label}</Heading>;
             },
             p({ id, children, node }) {
               // Check if this paragraph contains a samp element (xmlui-pg playground)
@@ -331,14 +386,14 @@ export const Markdown = memo(
               }
 
               return (
-                <Text variant="paragraph" className={styles.markdown} uid={id}>
+                <Text variant="paragraph" className={classnames(styles.markdown, className)} uid={id}>
                   {children}
                 </Text>
               );
             },
             code({ id, children }) {
               return (
-                <Text uid={id} variant="code">
+                <Text uid={id} className={className} variant="code">
                   {children}
                 </Text>
               );
@@ -352,21 +407,21 @@ export const Markdown = memo(
             },
             strong({ id, children }) {
               return (
-                <Text uid={id} variant="strong">
+                <Text uid={id} className={className} variant="strong">
                   {children}
                 </Text>
               );
             },
             em({ id, children }) {
               return (
-                <Text uid={id} variant="em">
+                <Text uid={id} className={className} variant="em">
                   {children}
                 </Text>
               );
             },
             del({ id, children }) {
               return (
-                <Text uid={id} variant="deleted">
+                <Text uid={id} className={className} variant="deleted">
                   {children}
                 </Text>
               );
@@ -450,7 +505,7 @@ export const Markdown = memo(
               }
 
               return (
-                <LinkNative to={href} target={target} {...(props as any)}>
+                <LinkNative className={className} to={href} target={target} {...(props as any)}>
                   {label}
                 </LinkNative>
               );
@@ -463,6 +518,7 @@ export const Markdown = memo(
                   variant="checkbox"
                   readOnly={disabled}
                   value={checked}
+                  className={className}
                   /* label={value}
                 labelPosition={"right"} */
                 />
@@ -505,40 +561,7 @@ export const Markdown = memo(
             tfoot({ children }) {
               return <tfoot className={styles.htmlTfoot}>{children}</tfoot>;
             },
-            samp({ ...props }) {
-              const markdownContentBase64 = props?.["data-pg-markdown"];
-              const markdownContent = markdownContentBase64
-                ? decodeFromBase64(markdownContentBase64)
-                : "";
-              const dataContentBase64 = props?.["data-pg-content"];
-              const jsonContent = decodeFromBase64(dataContentBase64);
-              const appProps = JSON.parse(jsonContent);
-              const content = (
-                <NestedAppAndCodeViewNative
-                  markdown={markdownContent}
-                  app={appProps.app}
-                  config={appProps.config}
-                  components={appProps.components}
-                  api={appProps.api}
-                  activeTheme={appProps.activeTheme}
-                  activeTone={appProps.activeTone}
-                  title={appProps.name}
-                  height={appProps.height}
-                  allowPlaygroundPopup={!appProps.noPopup}
-                  withFrame={appProps.noFrame ? false : true}
-                  noHeader={appProps.noHeader ?? false}
-                  splitView={appProps.splitView ?? false}
-                  initiallyShowCode={appProps.initiallyShowCode ?? false}
-                  popOutUrl={appProps.popOutUrl}
-                  immediate={appProps.immediate}
-                  withSplashScreen={appProps.withSplashScreen}
-                />
-              );
-              if (appProps.noFrame === true) {
-                return <div style={{ height: appProps.height ?? "fit-content" }}>{content}</div>;
-              }
-              return content;
-            },
+            samp: PlaygroundSampRenderer,
             section({ children, ...props }) {
               const treeContentBase64 = props?.["data-tree-content"];
               if (treeContentBase64 !== undefined) {
@@ -695,14 +718,14 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
     }
 
     const iconMap: Record<string, React.ReactNode> = {
-      info: <Icon name="admonition_info" />,
-      warning: <Icon name="admonition_warning" />,
-      danger: <Icon name="admonition_danger" />,
-      note: <Icon name="admonition_note" />,
-      tip: <Icon name="admonition_tip" />,
+      info: <ThemedIcon name="admonition_info" />,
+      warning: <ThemedIcon name="admonition_warning" />,
+      danger: <ThemedIcon name="admonition_danger" />,
+      note: <ThemedIcon name="admonition_note" />,
+      tip: <ThemedIcon name="admonition_tip" />,
       card: null,
-      feat: <Icon name="star" />,
-      def: <Icon name="definition" />,
+      feat: <ThemedIcon name="star" />,
+      def: <ThemedIcon name="definition" />,
     };
 
     // Render adornment blockquote with the updated structure
@@ -723,7 +746,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
         <div className={styles.admonitionContainer}>
           {iconMap[type] !== null && (
             <div className={`${styles.admonitionIcon} ${styles[type] || ""}`}>
-              {iconMap[type] || <Icon name="admonition_info" />}
+              {iconMap[type] || <ThemedIcon name="admonition_info" />}
             </div>
           )}
           <div className={styles.admonitionContent}>{processedChildren}</div>

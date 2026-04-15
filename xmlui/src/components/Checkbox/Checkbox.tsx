@@ -1,7 +1,9 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import {
   createMetadata,
   dAutoFocus,
@@ -19,11 +21,9 @@ import {
   dValidationStatus,
 } from "../../components/metadata-helpers";
 import { defaultProps as toggleDefaultProps, Toggle } from "../Toggle/Toggle";
-import { MemoizedItem } from "../container-helpers";
 
 export const defaultProps = {
   ...toggleDefaultProps,
-  labelPosition: "end",
 };
 
 const COMP = "Checkbox";
@@ -77,8 +77,14 @@ export const CheckboxMd = createMetadata({
     },
   },
   themeVars: parseScssVar(styles.themeVars),
+  compactInlineLabel: true,
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
+    [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
+    [`outlineColor-${COMP}`]: `$outlineColor--focus`,
+    [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,
+    [`outlineStyle-${COMP}`]: `$outlineStyle--focus`,
     [`borderColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`backgroundColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`borderColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,
@@ -92,54 +98,41 @@ export const CheckboxMd = createMetadata({
   },
 });
 
-export const checkboxComponentRenderer = createComponentRenderer(
-  COMP,
-  CheckboxMd,
-  ({
-    node,
-    extractValue,
-    className,
-    updateState,
-    lookupEventHandler,
-    state,
-    registerComponentApi,
-    renderChild,
-    layoutContext,
-  }) => {
-    const inputTemplate = node.props.inputTemplate;
+type ThemedToggleProps = React.ComponentPropsWithoutRef<typeof Toggle>;
+export const ThemedToggle = React.forwardRef<HTMLInputElement, ThemedToggleProps>(
+  function ThemedToggle({ className, ...props }: ThemedToggleProps, ref) {
+    const themeClass = useComponentThemeClass(CheckboxMd);
     return (
       <Toggle
-        inputRenderer={
-          inputTemplate
-            ? (contextVars) => (
-                <MemoizedItem
-                  contextVars={contextVars}
-                  node={inputTemplate}
-                  renderChild={renderChild}
-                  layoutContext={layoutContext}
-                />
-              )
-            : undefined
-        }
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        className={className}
-        initialValue={extractValue.asOptionalBoolean(
-          node.props.initialValue,
-          defaultProps.initialValue,
-        )}
-        value={state?.value}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        onClick={lookupEventHandler("click")}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        indeterminate={extractValue.asOptionalBoolean(node.props.indeterminate)}
-        registerComponentApi={registerComponentApi}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
+  },
+);
+
+export const checkboxComponentRenderer = wrapComponent(
+  COMP,
+  Toggle,
+  CheckboxMd,
+  {
+    booleans: ["indeterminate"],
+    events: { click: "onClick", gotFocus: "onFocus", lostFocus: "onBlur", didChange: "onDidChange" },
+    renderers: {
+      inputTemplate: {
+        reactProp: "inputRenderer",
+        contextVars: (contextVars: Record<string, any>) => contextVars,
+      },
+    },
+    exposeRegisterApi: true,
+    customRender: (props, { node, extractValue }) => {
+      // initialValue needs explicit boolean coercion (e.g. "" → false, "false" → false)
+      props.initialValue = extractValue.asOptionalBoolean(
+        node.props?.initialValue,
+        defaultProps.initialValue,
+      );
+      return <Toggle {...props} />;
+    },
   },
 );

@@ -96,28 +96,29 @@ export function useIsWindowFocused() {
  * @param query Media query to run
  */
 export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState<boolean>(false);
-  useEffect(() => {
-    if (!window) {
-      setMatches(false);
-      return;
-    }
+  const getMatch = () => (typeof window !== "undefined" ? window.matchMedia(query).matches : false);
+  const [matches, setMatches] = useState(getMatch);
 
-    const matchMedia = window.matchMedia(query);
-    // Triggered at the first client-side load and if query changes
-    handleChange();
+  useIsomorphicLayoutEffect(() => {
+    if (typeof window === "undefined") return;
 
-    matchMedia.addEventListener("change", handleChange);
-    return () => {
-      matchMedia.removeEventListener("change", handleChange);
-    };
+    const mql = window.matchMedia(query);
+    setMatches(mql.matches); // sync on mount/query change before paint
+    const onChange = () => setMatches(mql.matches);
+    mql.addEventListener("change", onChange);
 
-    function handleChange() {
-      setMatches(matchMedia.matches);
-    }
+    return () => mql.removeEventListener("change", onChange);
   }, [query]);
 
   return matches;
+}
+
+/**
+ * Returns true when the primary pointing device is coarse (touch), i.e. a mobile / tablet.
+ * Other components can use this to fall back to native scrollbar UX on touch devices.
+ */
+export function useIsTouchDevice() {
+  return useMediaQuery("(pointer: coarse)");
 }
 
 /**

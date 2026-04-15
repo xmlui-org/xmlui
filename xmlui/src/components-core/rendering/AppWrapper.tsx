@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { BrowserRouter, HashRouter, MemoryRouter, useInRouterContext } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Helmet, HelmetProvider } from "react-helmet-async";
@@ -23,6 +24,77 @@ import type { ProjectCompilation } from "../../abstractions/scripting/Compilatio
 import { ComponentViewer } from "../ComponentViewer";
 
 export type TrackContainerHeight = "auto" | "fixed";
+
+/**
+ * Recursively walks a component-like tree to find the first node of the given type.
+ */
+function findNodeOfType(node: ComponentLike, type: string): Record<string, any> | undefined {
+  if (!node) return undefined;
+  const n = node as any;
+  if (n.type === type) return n;
+  const children: ComponentLike[] = n.children || [];
+  for (const child of children) {
+    const found = findNodeOfType(child, type);
+    if (found) return found;
+  }
+  return undefined;
+}
+
+/**
+ * Synchronously resolves the initial defaultTheme and defaultTone to use for ThemeProvider,
+ * taking into account the App component's persistTheme / storage-key props. This ensures
+ * ThemeProvider's useState initializer gets the correct value on the very first render,
+ * preventing a flash-of-wrong-theme.
+ */
+function resolveStoredTheme(
+  node: ComponentLike,
+  defaultTheme: string | undefined,
+  defaultTone: ThemeTone | undefined,
+): { defaultTheme: string | undefined; defaultTone: ThemeTone | undefined } {
+  if (typeof localStorage === "undefined") return { defaultTheme, defaultTone };
+
+  const appNode = findNodeOfType(node, "App");
+  if (!appNode) return { defaultTheme, defaultTone };
+
+  const rawPersist = appNode.props?.persistTheme;
+  const isPersist = rawPersist === true || rawPersist === "true" || rawPersist === 1;
+  if (!isPersist) return { defaultTheme, defaultTone };
+
+  const themeKey: string =
+    typeof appNode.props?.themeStorageKey === "string" && appNode.props.themeStorageKey
+      ? appNode.props.themeStorageKey
+      : "appTheme";
+  const toneKey: string =
+    typeof appNode.props?.toneStorageKey === "string" && appNode.props.toneStorageKey
+      ? appNode.props.toneStorageKey
+      : "appTone";
+
+  let resolvedTheme = defaultTheme;
+  let resolvedTone = defaultTone;
+
+  try {
+    const stored = localStorage.getItem(themeKey);
+    if (stored !== null) {
+      const parsed = JSON.parse(stored);
+      if (typeof parsed === "string" && parsed.length > 0) resolvedTheme = parsed;
+    }
+  } catch {
+    /* ignore */
+  }
+
+  try {
+    const stored = localStorage.getItem(toneKey);
+    if (stored !== null) {
+      const parsed = JSON.parse(stored);
+      if (parsed === "dark" || parsed === "light") resolvedTone = parsed as ThemeTone;
+    }
+  } catch {
+    /* ignore */
+  }
+
+  return { defaultTheme: resolvedTheme, defaultTone: resolvedTone };
+}
+
 export type AppWrapperProps = {
   // --- The root node of the application definition; the internal
   // --- representation of the entire app to run
@@ -99,6 +171,9 @@ export type AppWrapperProps = {
   onInit?: () => void;
 
   icons?: Record<string, string>;
+
+  // --- Optional react-helmet-async SSR context used by SSG to collect head output.
+  helmetContext?: Record<string, unknown>;
 };
 
 /**
@@ -125,6 +200,7 @@ export const AppWrapper = ({
   projectCompilation,
   onInit,
   icons,
+  helmetContext,
 }: AppWrapperProps) => {
   if (previewMode) {
     // --- Prevent leaking the meta items to the parent document,
@@ -136,12 +212,24 @@ export const AppWrapper = ({
   const siteName = globalProps?.name || "XMLUI app";
   const useHashBasedRouting = globalProps?.useHashBasedRouting ?? true;
 
+  // --- Resolve theme/tone synchronously from localStorage if persistTheme is set on the
+  // --- App component. This ensures ThemeProvider's useState initializer gets the correct
+  // --- value on the very first render, eliminating a flash-of-wrong-theme/tone.
+  const { defaultTheme: resolvedDefaultTheme, defaultTone: resolvedDefaultTone } = useMemo(
+    () => resolveStoredTheme(node, defaultTheme, defaultTone),
+    // We intentionally only depend on node identity — the storage keys and flags are
+    // read directly from the node's props during the memo. Updating when the node
+    // reference changes (async standalone load) is sufficient.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [node],
+  );
+
   // --- The children of the AppWrapper component are the components that
   // --- provide the app functionality and services. These components are
   // --- wrapped in other components that provide the necessary environment
   // --- for the app to run.
   const dynamicChildren = (
-    <HelmetProvider>
+    <HelmetProvider context={helmetContext}>
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
       <LoggerProvider>
         <LoggerInitializer />
@@ -149,8 +237,8 @@ export const AppWrapper = ({
           <ThemeProvider
             resourceMap={resourceMap}
             themes={contributes.themes}
-            defaultTheme={defaultTheme}
-            defaultTone={defaultTone}
+            defaultTheme={resolvedDefaultTheme}
+            defaultTone={resolvedDefaultTone}
             resources={resources}
           >
             <InspectorProvider
@@ -218,7 +306,11 @@ export const AppWrapper = ({
 
         {/* Otherwise create our own router */}
         {shouldCreateRouter && (
-          <Router basename={Router === HashRouter ? undefined : baseName} {...routerProps}>
+          <Router
+            basename={Router === HashRouter ? undefined : baseName}
+            future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+            {...routerProps}
+          >
             {dynamicChildren}
           </Router>
         )}

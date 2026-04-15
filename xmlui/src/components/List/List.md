@@ -534,11 +534,31 @@ It contains the following boolean attributes:
 > For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
 > or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
+`groupBy` accepts either a **string** (the name of the item field to group by) or a **function** that receives each list item and returns the grouping key.
+
+**String usage** — group by a field name directly:
+
 ```xmlui copy {3}
 <App>
   <List
     data='{[...]}'
     groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+**Function usage** — compute the grouping key from each item:
+
+```xmlui copy {3}
+<App>
+  <List
+    data='{[...]}'
+    groupBy="{(item) => item.name[0]}">
     <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$group.key}" />
@@ -607,6 +627,29 @@ It contains the following boolean attributes:
         <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: groupBy (function)" height="400px"
+<App>
+  <List
+    data='{[
+  { id: 0, name: "Apples" },
+  { id: 1, name: "Avocado" },
+  { id: 2, name: "Bananas" },
+  { id: 3, name: "Carrots" },
+  { id: 4, name: "Cheese" },
+  { id: 5, name: "Cherries" },
+  { id: 6, name: "Milk" },
+]}'
+    groupBy="{(item) => item.name[0]}">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <Text value="{$item.name}" />
   </List>
 </App>
 ```
@@ -1015,14 +1058,24 @@ Note how the `List` on the right has different borders:
 ```xmlui /borderCollapse/
 <App>
   <HStack>
-    <List data="{[...]}" groupBy="category" borderCollapse="false" width="$space-48">
+    <List 
+      data="{[...]}"
+      groupBy="category" 
+      borderCollapse="false" 
+      width="$space-64"
+    >
       <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
         </Stack>
       </property>
     </List>
-    <List data="{[...]}" groupBy="category" borderCollapse="true" width="$space-48">
+    <List 
+      data="{[...]}" 
+      groupBy="category" 
+      borderCollapse="true" 
+      width="$space-64"
+    >
       <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
@@ -1086,7 +1139,7 @@ Note how the `List` on the right has different borders:
     key: 0,
   },
 ]}'
-  groupBy="category" borderCollapse="false" width="$space-48">
+  groupBy="category" borderCollapse="false" width="$space-64">
     <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
@@ -1143,7 +1196,7 @@ Note how the `List` on the right has different borders:
     key: 0,
   },
 ]}'
-      groupBy="category" borderCollapse="true" width="$space-48">
+      groupBy="category" borderCollapse="true" width="$space-64">
       <property name="groupHeaderTemplate">
         <Stack>
           <Text variant="subtitle" value="{$group.key}" />
@@ -1468,10 +1521,504 @@ Note how the `meats` category is not displayed in the right `List`:
 
 %-PROP-END
 
+%-PROP-START enableMultiRowSelection
+
+```xmlui copy /enableMultiRowSelection="false"/
+<App>
+  <List data='{[...]}' rowsSelectable="true" enableMultiRowSelection="false">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: enableMultiRowSelection"
+<App>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}' rowsSelectable="true" enableMultiRowSelection="false">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START hideSelectionCheckboxes
+
+The default value is `false`. When set to `true`, the selection checkboxes are hidden while
+selection via click, keyboard, and the programmatic API still work as expected.
+
+```xmlui copy /hideSelectionCheckboxes="true"/
+<App>
+  <List 
+    data='{[...]}' 
+    rowsSelectable="true" 
+    enableMultiRowSelection="true" 
+    hideSelectionCheckboxes="true"
+  >
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxes"
+<App>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxes="true">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START selectionCheckboxPosition
+
+When `"overlay"` is active, use
+[`selectionCheckboxAnchor`](#selectionCheckboxAnchor),
+[`selectionCheckboxOffsetX`](#selectionCheckboxOffsetX), and
+[`selectionCheckboxOffsetY`](#selectionCheckboxOffsetY) to fine-tune the position.
+
+```xmlui copy /selectionCheckboxPosition="overlay"/
+<App>
+  <List data='{[...]}' rowsSelectable="true" selectionCheckboxPosition="overlay">
+    <Card paddingLeft="40px">{$item.name}</Card>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: selectionCheckboxPosition overlay"
+<App>
+  <List
+    enableMultiRowSelection="true"
+    data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    selectionCheckboxPosition="overlay"
+  >
+    <Card paddingLeft="40px">
+      {$item.name} — {$item.category}
+    </Card>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START selectionCheckboxAnchor
+
+Use `"center-left"` or `"center-right"` to vertically center the checkbox regardless of
+row height — ideal for card-style layouts.
+
+```xmlui copy /selectionCheckboxAnchor="bottom-left"/
+<App>
+  <List data='{[...]}' 
+    rowsSelectable="true"
+    selectionCheckboxPosition="overlay"
+    selectionCheckboxAnchor="bottom-left">
+    <Card paddingLeft="40px">{$item.name}</Card>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: selectionCheckboxAnchor"
+<App>
+    <List
+      enableMultiRowSelection="true"
+      data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+      rowsSelectable="true"
+      selectionCheckboxPosition="overlay"
+      selectionCheckboxAnchor="bottom-left"
+    >
+      <Card paddingLeft="36px" minHeight="50px">
+        {$item.name}
+      </Card>
+    </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START selectionCheckboxSize
+
+Sets the width and height of the checkbox element. Accepts any CSS length value such as
+`"16px"` or `"20px"`. When not set the browser default size is used. Applies in both
+`"before"` and `"overlay"` modes.
+
+```xmlui copy /selectionCheckboxSize="20px"/
+<App>
+  <List data='{[...]}' rowsSelectable="true" selectionCheckboxSize="20px">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: selectionCheckboxSize"
+<App>
+  <List
+    enableMultiRowSelection="true"
+    data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    selectionCheckboxSize="20px"
+  >
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START initiallySelected
+
+The following example pre-selects the first and third items (IDs `0` and `2`) when the list renders:
+
+```xmlui copy /initiallySelected="{[0, 2]}"/
+<App>
+  <List data='{[...]}' rowsSelectable="true" initiallySelected="{[0, 2]}">
+    <Text>{$isSelected ? '✓ ' : ''}{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: initiallySelected"
+<App>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}' rowsSelectable="true" initiallySelected="{[0, 2]}">
+    <Text>{$isSelected ? "✓ " : ""}{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START keyBindings
+
+This property uses the following default key bindings:
+
+```json
+{ 
+  "selectAll": "CmdOrCtrl+A", 
+  "cut": "CmdOrCtrl+X", 
+  "copy": "CmdOrCtrl+C", 
+  "paste": "CmdOrCtrl+V", 
+  "delete": "Delete"
+}
+```
+
+You can use these accelerator key names:
+- `CmdOrCtrl`: Command on macOS, Ctrl on Windows/Linux
+- `Alt`: Alt/Option
+- `Shift`: Shift
+- `Super`: Command on macOS, Windows key on Windows/Linux
+- `Ctrl`: Control key
+- `Cmd`: Command key (macOS only)
+
+%-PROP-END
+
+%-PROP-START rowsSelectable
+
+The default value is `false`. When enabled, clicking a row selects it and highlights it.
+The current selection state is exposed to the item template via the `$isSelected` context variable.
+
+```xmlui copy /rowsSelectable="true"/ /$isSelected/
+<App>
+  <List data='{[...]}' rowsSelectable="true">
+    <Text color="{$isSelected ? '$color-primary' : 'inherit'}">{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: rowsSelectable"
+<App>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}' rowsSelectable="true">
+    <Text color="{$isSelected ? '$color-primary' : 'inherit'}">{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START rowUnselectablePredicate
+
+Rows matching this predicate cannot be selected and are excluded from select-all operations.
+The selection checkbox is automatically displayed as disabled for these rows, providing visual feedback to users.
+
+```xmlui copy {4}
+<App>
+  <List data='{[...]}'
+    rowsSelectable="true"
+    rowUnselectablePredicate="{(item) => item.category === 'vegetables'}">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: rowUnselectablePredicate"
+<App>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    rowUnselectablePredicate="{(item) => item.category === 'vegetables'}">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-PROP-END
+
+%-PROP-START syncWithVar
+
+The following example demonstrates two independent `MyList` components sharing selection state
+through a global variable. Selecting a row in either list immediately reflects in the other:
+
+>[!INFO]
+> `syncWithVar` works with both global and local variables. When using local variables, ensure all Lists in the sync have that variable in their scope.
+
+```xmlui-pg
+---app copy display /global.selState/ filename="Main.xmlui"
+<App global.selState="{{}}">
+  <MyList />
+  <Text>Selection: {JSON.stringify(selState)}</Text>
+  <MyList />
+</App>
+---comp copy display /syncWithVar="selState"/ filename="MyList.xmlui"
+<Component name="MyList">
+  <List
+    syncWithVar="selState"
+    data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+  >
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</Component>
+---desc
+Change the selection in one of the lists and check how it is synced.
+```
+
+%-PROP-END
+
+%-EVENT-START selectionDidChange
+
+The handler receives an array of the selected items. If multi-row selection is disabled,
+the array will contain zero or one item.
+
+```xmlui copy {4}
+<App var.selection="">
+  <Text>Selected: {selection}</Text>
+  <List data='{[...]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(items) => selection = items.map(i => i.name).join(', ')">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: selectionDidChange"
+<App var.selection="">
+  <Text>Selected: {selection || "(none)"}</Text>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(items) => selection = items.map(i => i.name).join(', ')">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START rowDoubleClick
+
+This event is triggered when a list row is double-clicked. The handler receives the row's data
+item as its only argument.
+
+```xmlui copy {3}
+<App var.lastClicked="">
+  <Text>Double-clicked: {lastClicked}</Text>
+  <List data='{[...]}' onRowDoubleClick="(item) => lastClicked = item.name">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: rowDoubleClick"
+<App var.lastClicked="">
+  <Text>Double-clicked: {lastClicked || "(none)"}</Text>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}' onRowDoubleClick="(item) => lastClicked = item.name">
+    <Card>{$item.name} — {$item.category}</Card>
+  </List>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START selectAllAction
+
+```xmlui copy {4}
+<App var.log="">
+  <Text>{log}</Text>
+  <List 
+    data='{[...]}' 
+    rowsSelectable="true" 
+    enableMultiRowSelection="true"
+    onSelectAllAction="(row, items, ids) => 
+      log = 'Selected all: ' + ids.join(', ')
+    ">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: selectAllAction"
+<App var.log="">
+  <Text>{log || "Press Ctrl+A / Cmd+A after clicking a row"}</Text>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectAllAction="(row, items, ids) => log = 'Selected ' + ids.length + ' items: ' + ids.join(', ')">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START cutAction
+
+See also [`copyAction`](#copyaction), [`pasteAction`](#pasteaction), and [`deleteAction`](#deleteaction) for the other keyboard-triggered events.
+
+%-EVENT-END
+
+%-EVENT-START copyAction
+
+```xmlui copy {4}
+<App var.log="">
+  <Text>{log}</Text>
+  <List data='{[...]}' rowsSelectable="true"
+    onCopyAction="(row, items, ids) => log = 'Copied: ' + ids.join(', ')">
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: copyAction"
+<App var.log="">
+  <Text>{log || "Select a row then press Ctrl+C / Cmd+C"}</Text>
+  <List data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onCopyAction="(row, items, ids) => log = 'Copied IDs: ' + ids.join(', ')">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START pasteAction
+
+See [`copyAction`](#copyaction) for a similar example.
+
+%-EVENT-END
+
+%-EVENT-START deleteAction
+
+See [`copyAction`](#copyaction) for a similar example.
+
+%-EVENT-END
+
 %-STYLE-START
 
-`List` is a layout container; its purpose is to render nested child components.
-`List` has no theme variables to change its visual appearance.
+`List` supports the following theme variables for customizing selection colors and the
+appearance of selection checkboxes.
+
+**Selection colors:**
+
+| Theme variable | Default |
+| :--- | :--- |
+| `backgroundColor-List` | `$backgroundColor` |
+| `backgroundColor-selected-List` | `$color-primary-100` |
+| `backgroundColor-selected-List--hover` | `$color-primary-100` |
+| `backgroundColor-row-List--hover` | `$color-primary-50` |
+
+**Selection checkbox appearance** — each variable falls back to the equivalent `Checkbox`
+component theme variable when not explicitly set, so the checkboxes automatically
+follow your form input styling:
+
+| Theme variable | Fallback |
+| :--- | :--- |
+| `borderRadius-selectionCheckbox-List` | `borderRadius-Checkbox` |
+| `borderColor-selectionCheckbox-List` | `borderColor-Checkbox` |
+| `backgroundColor-selectionCheckbox-List` | `backgroundColor-Checkbox` |
+| `borderColor-checked-selectionCheckbox-List` | `borderColor-checked-Checkbox` |
+| `backgroundColor-checked-selectionCheckbox-List` | `backgroundColor-checked-Checkbox` |
+| `backgroundColor-indicator-selectionCheckbox-List` | `backgroundColor-indicator-Checkbox` |
+| `outlineWidth-selectionCheckbox-List--focus` | `outlineWidth-Checkbox--focus` |
+| `outlineColor-selectionCheckbox-List--focus` | `outlineColor-Checkbox--focus` |
+| `outlineStyle-selectionCheckbox-List--focus` | `outlineStyle-Checkbox--focus` |
+| `outlineOffset-selectionCheckbox-List--focus` | `outlineOffset-Checkbox--focus` |
 
 %-STYLE-END
 
@@ -1480,7 +2027,7 @@ Note how the `meats` category is not displayed in the right `List`:
 The following example demonstrates `scrollToBottom` and all the other scroll methods:
 
 ```xmlui-pg copy display name="Example: data API Call" height="400px"
-<App layout="condensed-sticky">
+<App layout="condensed-sticky" scrollWholePage="false">
   <AppHeader>
     <HStack>
       <Button onClick="myList.scrollToBottom()">Scroll to Bottom</Button>
@@ -1491,6 +2038,7 @@ The following example demonstrates `scrollToBottom` and all the other scroll met
   </AppHeader>
   <List 
     id="myList" 
+    height="*"
     data="{
       Array.from({ length: 100 })
       .map((_, i) => ({id: 'item-' + i, value: 'Item #' + i}))
@@ -1521,5 +2069,76 @@ See the [`scrollToBottom`](#scrolltobottom) example.
 %-API-START scrollToId
 
 See the [`scrollToBottom`](#scrolltobottom) example.
+
+%-API-END
+
+%-API-START clearSelection
+
+The following example demonstrates `clearSelection` and the other selection API methods:
+
+```xmlui copy /clearSelection()/ /selectId([0, 2])/ /selectAll()/
+<App>
+  <HStack>
+    <Button label="Select all" onClick="list.selectAll()" />
+    <Button label="Select 0, 2" onClick="list.selectId([0, 2])" />
+    <Button label="Clear" onClick="list.clearSelection()" />
+  </HStack>
+  <List 
+    id="list" 
+    data='{[...]}' 
+    rowsSelectable="true" 
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(items) => selection = items.map(i => i.id).join(', ')"
+  >
+    <Text>{$item.name}</Text>
+  </List>
+</App>
+```
+
+```xmlui-pg name="Example: clearSelection"
+<App var.selection="">
+  <Text>Selected IDs: {selection || "(none)"}</Text>
+  <HStack>
+    <Button label="Select all" onClick="list.selectAll()" />
+    <Button label="Select 0, 2" onClick="list.selectId([0, 2])" />
+    <Button label="Clear" onClick="list.clearSelection()" />
+  </HStack>
+  <List id="list" data='{[
+  { id: 0, name: "Apples", category: "fruits" },
+  { id: 1, name: "Bananas", category: "fruits" },
+  { id: 2, name: "Carrots", category: "vegetables" },
+  { id: 3, name: "Spinach", category: "vegetables" }
+]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(items) => selection = items.map(i => i.id).join(', ')">
+    <Text>{$item.name} — {$item.category}</Text>
+  </List>
+</App>
+```
+
+%-API-END
+
+%-API-START getSelectedIds
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+%-API-END
+
+%-API-START getSelectedItems
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+%-API-END
+
+%-API-START selectAll
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+%-API-END
+
+%-API-START selectId
+
+(See the [example](#clearselection) at the `clearSelection` method)
 
 %-API-END

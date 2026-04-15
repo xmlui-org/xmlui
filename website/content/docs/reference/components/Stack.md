@@ -2,16 +2,6 @@
 
 `Stack` is the fundamental layout container that organizes child elements in configurable horizontal or vertical arrangements. As the most versatile building block in XMLUI's layout system, it provides comprehensive alignment, spacing, and flow control options that serve as the foundation for all specialized stack variants.
 
-**Key features:**
-- **Dynamic orientation**: Switch between horizontal and vertical layouts programmatically
-- **Comprehensive alignment**: Precise control over both horizontal and vertical child positioning
-- **Flexible spacing**: Configurable gaps between elements with theme-aware sizing
-- **Content wrapping**: Automatic wrapping when space constraints require it
-- **Order control**: Reverse child element order with the reverse property
-- **Foundation for variants**: Powers HStack, VStack, CHStack, and CVStack specialized components
-
-For common scenarios, consider the specialized variants: [HStack](/docs/reference/components/HStack) (horizontal), [VStack](/docs/reference/components/VStack) (vertical), [CHStack](/docs/reference/components/CHStack) (centered horizontal), and [CVStack](/docs/reference/components/CVStack) (centered vertical).
-
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -20,12 +10,18 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
+
+### `dock` [#dock]
+
+When set on a child of a Stack, activates DockPanel layout in the parent Stack. `top` — child occupies the top of the remaining area, full width, respects its own `height`. `bottom` — child occupies the bottom, full width, respects its own `height`. `left` — child occupies the left of the middle row, respects its own `width`. `right` — child occupies the right of the middle row, respects its own `width`. `stretch` — child fills all remaining middle-row space; its `width` and `height` are ignored. Children without a `dock` prop participate as undocked items in the middle row. The parent Stack must have a defined height for `bottom`-docked children to anchor correctly.
+
+Available values: `top`, `bottom`, `left`, `right`, `stretch`
 
 ### `gap` [#gap]
 
@@ -114,7 +110,7 @@ Default is **false**, which indicates a left-to-right layout.
 
 > [!DEF]  default: **"normal"**
 
-This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity. On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.
 
 Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
 
@@ -122,7 +118,7 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 > [!DEF]  default: **true**
 
-When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode).
+When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. The fade indicators automatically appear/disappear based on the current scroll position. Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. Only works with overlay scrollbar modes (not with 'normal' mode). On mobile/touch devices, this property has no effect.
 
 ### `verticalAlignment` [#verticalalignment]
 

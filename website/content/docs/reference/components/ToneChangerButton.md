@@ -1,5 +1,8 @@
 # ToneChangerButton [#tonechangerbutton]
 
+>[!WARNING]
+> The `ToneChangerButton` component is deprecated and will be removed in a future release. Please use the `ToneSwitch` component instead.
+
 `ToneChangerButton` enables the user to switch between light and dark modes.
 
 ```xmlui-pg {4} copy display name="Example: using ToneChangerButton"
@@ -23,8 +26,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 

@@ -15,9 +15,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -196,13 +196,13 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-track-Slider--disabled | $color-surface-300 | $color-surface-600 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default | transparent | transparent |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default--focus | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider | transparent | transparent |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider | transparent | transparent |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--success--hover | *none* | *none* |
@@ -211,32 +211,32 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Slider--warning--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-thumb-Slider | $color-surface-50 | $color-surface-950 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--default | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider | $borderRadius | $borderRadius |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Slider--warning | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--default | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider | solid | solid |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider | solid | solid |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Slider--warning | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-thumb-Slider | solid | solid |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--default | 0 | 0 |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--default | 0 | 0 |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider | 0 | 0 |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider | 0 | 0 |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Slider--warning | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-thumb-Slider | 2px | 2px |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-thumb-Slider | 2px | 2px |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default | none | none |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default--focus | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider | none | none |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider | none | none |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Slider--success--hover | *none* | *none* |

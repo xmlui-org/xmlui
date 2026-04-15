@@ -8,9 +8,9 @@ $themeVars: ();
 }
 
 $borderRadius-FileUploadDropZone: createThemeVar("borderRadius-FileUploadDropZone");
-$borderColor-FileUploadDropZone: createThemeVar("borderColor-FileUploadDropZone--default");
-$borderWidth-FileUploadDropZone: createThemeVar("borderWidth-FileUploadDropZone--default");
-$borderStyle-FileUploadDropZone: createThemeVar("borderStyle-FileUploadDropZone--default");
+$borderColor-FileUploadDropZone: createThemeVar("borderColor-FileUploadDropZone");
+$borderWidth-FileUploadDropZone: createThemeVar("borderWidth-FileUploadDropZone");
+$borderStyle-FileUploadDropZone: createThemeVar("borderStyle-FileUploadDropZone");
 
 $backgroundColor-FileUploadDropZone: createThemeVar("backgroundColor-FileUploadDropZone");
 $textColor-FileUploadDropZone: createThemeVar("textColor-FileUploadDropZone");

@@ -43,6 +43,7 @@ export const ComponentWrapper = memo(
     const { descriptor } = componentRegistry.lookupComponentRenderer(node.type) || {};
     const stableLayoutContext = useRef(layoutContext);
 
+
     // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
       // --- If we have a DataSource child, we transform it to a loader on the node
@@ -168,6 +169,37 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
         when: child.when,
         debug: child.debug,
       });
+    } else if (node.scriptCollected && child?.type === "Fragment" && child.children?.some((c) => c?.type === "DataSource")) {
+      // When a <script> tag and a <DataSource> are siblings, the parser wraps the non-helper
+      // siblings in a synthetic Fragment (see transform.ts wrapWithFragment). The parent node
+      // will have `scriptCollected` set in exactly this case. We must NOT apply this to
+      // user-authored <Fragment> components that legitimately contain <DataSource> children —
+      // those are handled correctly when the Fragment itself is rendered.
+      didResolve = true;
+      if (!loaders) {
+        loaders = [];
+      }
+      const remainingFragmentChildren: ComponentDef[] = [];
+      child.children.forEach((fragmentChild) => {
+        if (fragmentChild?.type === "DataSource") {
+          loaders!.push({
+            uid: fragmentChild.uid!,
+            type: "DataLoader",
+            props: fragmentChild.props,
+            events: fragmentChild.events,
+            when: fragmentChild.when,
+            debug: fragmentChild.debug,
+          });
+        } else {
+          remainingFragmentChildren.push(fragmentChild);
+        }
+      });
+      if (remainingFragmentChildren.length > 0) {
+        if (!children) {
+          children = [];
+        }
+        children.push({ ...child, children: remainingFragmentChildren });
+      }
     } else {
       if (!children) {
         children = [];

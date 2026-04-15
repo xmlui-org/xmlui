@@ -62,7 +62,7 @@ $fontSize-CodeBlock: createThemeVar("fontSize-CodeBlock");
     position: relative;
     display: flex;
     //align-items: center;
-    min-height: 48px;
+    min-height: 8px;
     height: 100%;
     overflow: auto;
     font-size: t.$fontSize-code;

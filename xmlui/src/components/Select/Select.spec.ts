@@ -357,12 +357,12 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select an option and verify
       await page.getByRole("option", { name: "opt2" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
@@ -386,12 +386,12 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select an option and verify
       await page.getByRole("option", { name: "opt2" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected value: opt2");
@@ -415,17 +415,17 @@ test.describe("Basic Functionality", () => {
     `);
       const driver = await createSelectDriver("mySelect");
       await driver.toggleOptionsVisibility();
-      
+
       // Options should display their values
       await expect(page.getByRole("option", { name: "opt1" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt2" })).toBeVisible();
       await expect(page.getByRole("option", { name: "opt3" })).toBeVisible();
-      
+
       // Select multiple options and verify
       await page.getByRole("option", { name: "opt1" }).click();
       await page.getByRole("option", { name: "opt3" }).click();
       await expect(page.getByTestId("text")).toHaveText("Selected values: opt1,opt3");
-      
+
       // Selected values should appear as badges with their value text
       await driver.toggleOptionsVisibility();
       await expect(page.getByText("opt1").first()).toBeVisible();
@@ -642,7 +642,7 @@ test.describe("searchable select", () => {
     await expect(page.getByText("Please select an item")).toBeVisible();
   });
 
-  test("inProgressNotificationMessage shown when inProgress is true", async ({
+  test("inProgressNotificationMessage respects inProgress", async ({
     initTestBed,
     page,
     createSelectDriver,
@@ -654,16 +654,10 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    let driver = await createSelectDriver();
     await driver.click();
     await expect(page.getByText("in-progress-msg")).toBeVisible();
-  });
 
-  test("inProgressNotificationMessage not shown when inProgress is false", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable inProgress="false" inProgressNotificationMessage="in-progress-msg">
         <Option value="opt1" label="first"/>
@@ -671,7 +665,7 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="third"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
     await expect(page.getByText("in-progress-msg")).not.toBeVisible();
   });
@@ -696,7 +690,7 @@ test.describe("searchable select", () => {
     },
   );
 
-  test("dropdownHeight applies custom height with searchable", async ({
+  test("dropdownHeight/search behavior in searchable mode", async ({
     initTestBed,
     page,
     createSelectDriver,
@@ -713,19 +707,11 @@ test.describe("searchable select", () => {
         <Option value="opt8" label="Honeydew"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    let driver = await createSelectDriver();
     await driver.click();
-    
-    // Verify dropdown opens and shows options
     await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Honeydew" })).toBeAttached();
-  });
 
-  test("dropdown defaults to height with searchable when not specified", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable>
         <Option value="opt1" label="Apple"/>
@@ -733,19 +719,11 @@ test.describe("searchable select", () => {
         <Option value="opt3" label="Cherry"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
-    
-    // Verify dropdown opens and shows options
     await expect(page.getByRole("option", { name: "Apple" })).toBeVisible();
     await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
-  });
 
-  test("search works with dropdownHeight", async ({
-    initTestBed,
-    page,
-    createSelectDriver,
-  }) => {
     await initTestBed(`
       <Select searchable dropdownHeight="120px">
         <Option value="opt1" label="Apple"/>
@@ -755,13 +733,9 @@ test.describe("searchable select", () => {
         <Option value="opt5" label="Elderberry"/>
       </Select>
     `);
-    const driver = await createSelectDriver();
+    driver = await createSelectDriver();
     await driver.click();
-    
-    // Search for a specific option
     await driver.searchFor("Cherry");
-    
-    // Only Cherry should be visible after search
     await expect(page.getByRole("option", { name: "Cherry" })).toBeVisible();
     const options = await page.getByRole("option").all();
     expect(options).toHaveLength(1);
@@ -959,7 +933,7 @@ test.describe("multiSelect", () => {
 
     await expect(page.getByTestId("custom-value")).toBeVisible();
     await expect(page.getByTestId("custom-value")).toHaveText("opt1=first");
-    
+
     const driver = await createSelectDriver();
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("second");
@@ -1087,38 +1061,28 @@ test.describe("Api", () => {
 // =============================================================================
 
 test.describe("Visual State", () => {
-  test("input has correct width in px", async ({ page, initTestBed }) => {
+  test("input width variants", async ({ page, initTestBed }) => {
     await initTestBed(`<Select width="200px" testId="test"/>`, {});
+    let input = page.getByTestId("test");
+    let bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test");
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input with label has correct width in px", async ({ page, initTestBed }) => {
     await initTestBed(`<Select width="200px" label="test" testId="test"/>`, {});
+    input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input has correct width in %", async ({ page, initTestBed }) => {
     await page.setViewportSize({ width: 400, height: 300 });
     await initTestBed(`<Select width="50%" testId="test"/>`, {});
+    input = page.getByTestId("test");
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
 
-    const input = page.getByTestId("test");
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
-  });
-
-  test("input with label has correct width in %", async ({ page, initTestBed }) => {
     await page.setViewportSize({ width: 400, height: 300 });
     await initTestBed(`<Select width="50%" label="test" testId="test"/>`, {});
-
-    const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
-    const { width } = await input.boundingBox();
-    expect(width).toBe(200);
+    input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
+    bounds = await input.boundingBox();
+    expect(bounds.width).toBe(200);
   });
 
   test("dropdown height is consistent across Select variants with same number of options", async ({
@@ -1159,22 +1123,22 @@ test.describe("Visual State", () => {
     const simpleDropdown = page.locator("[data-state='open'][role='listbox']").first();
     const { height: simpleHeight } = await simpleDropdown.boundingBox();
     // close
-    await page.getByText('Option 1').click();
+    await page.getByText("Option 1").click();
 
     const searchableSelect = page.getByTestId("searchableSelect");
     await searchableSelect.click();
 
     // Get the dropdown content height for searchable Select
-    const searchableDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const searchableDropdown = page.getByRole("dialog").locator("[role='listbox']");
     const { height: searchableHeight } = await searchableDropdown.boundingBox();
     // close
-    await page.getByRole('listbox').getByText('Option 1').click();
+    await page.getByRole("listbox").getByText("Option 1").click();
 
     const multiSelect = page.getByTestId("multiSelect");
     await multiSelect.click();
 
     // Get the dropdown content height for multiSelect
-    const multiDropdown = page.getByRole('dialog').locator("[role='listbox']");
+    const multiDropdown = page.getByRole("dialog").locator("[role='listbox']");
     const { height: multiHeight } = await multiDropdown.boundingBox();
 
     // All dropdowns should have approximately the same height
@@ -1206,9 +1170,7 @@ test.describe("Z-Index and Modal Layering", () => {
           <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
             <FormItem bindTo="firstName" required="true" />
             <FormItem bindTo="lastName" required="true" />
-            <FormItem
-              label="Field to Update"
-              type="select"
+            <Select
               width="200px"
               bindTo="fieldToUpdate"
               required
@@ -1218,7 +1180,7 @@ test.describe("Z-Index and Modal Layering", () => {
               <Option value="rate">Price</Option>
               <Option value="description">Item Description</Option>
               <Option value="account_id">Account</Option>
-            </FormItem>
+            </Select>
           </Form>
         </ModalDialog>
       </Fragment>
@@ -1235,8 +1197,8 @@ test.describe("Z-Index and Modal Layering", () => {
     await expect(page.getByRole("dialog", { name: "Example Dialog" })).toBeVisible();
 
     // Open the select in the modal
-    const modalSelectDriver = await createSelectDriver("modal-select");
-    await modalSelectDriver.click();
+    const priceButton = page.getByText("Price").nth(0);
+    await priceButton.click();
 
     // Check that all options are visible
     await expect(page.getByRole("option", { name: "Price" })).toBeVisible();
@@ -1250,112 +1212,109 @@ test.describe("Z-Index and Modal Layering", () => {
 // =============================================================================
 
 test.describe("Theme Variables", () => {
-  [
-    { value: "--default", prop: "" },
+  const variants = [
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },
-  ].forEach((variant) => {
-    test(`applies correct borderRadius ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderRadius-Select${variant.value}`]: "12px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-radius", "12px");
-    });
+  ];
 
-    test(`applies correct borderColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderColor-Select${variant.value}`]: "rgb(255, 0, 0)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(255, 0, 0)");
-    });
-
-    test(`applies correct borderWidth ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderWidth-Select${variant.value}`]: "1px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-width", "1px");
-    });
-
-    test(`applies correct borderStyle ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderStyle-Select${variant.value}`]: "dashed" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("border-style", "dashed");
-    });
-
-    test(`applies correct fontSize ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`fontSize-Select${variant.value}`]: "14px" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("font-size", "14px");
-    });
-
-    test(`applies correct backgroundColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`backgroundColor-Select${variant.value}`]: "rgb(240, 240, 240)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(240, 240, 240)");
-    });
-
-    test(`applies correct boxShadow ${variant.value}`, async ({ initTestBed, page }) => {
+  const runPerVariant = async (
+    initTestBed: any,
+    page: any,
+    themeVarPrefix: string,
+    cssProp: string,
+    expected: string,
+    hover = false,
+  ) => {
+    for (const variant of variants) {
       await initTestBed(`<Select testId="test" ${variant.prop} />`, {
         testThemeVars: {
-          [`boxShadow-Select${variant.value}`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
+          [`${themeVarPrefix}-Select${variant.value}${hover ? "--hover" : ""}`]: expected,
         },
       });
-      await expect(page.getByTestId("test")).toHaveCSS(
-        "box-shadow",
-        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
-      );
-    });
+      if (hover) {
+        await page.getByTestId("test").hover();
+      }
+      await expect(page.getByTestId("test")).toHaveCSS(cssProp, expected);
+    }
+  };
 
-    test(`applies correct textColor ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`textColor-Select${variant.value}`]: "rgb(0, 0, 0)" },
-      });
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
-    });
+  test("applies correct borderRadius across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderRadius", "border-radius", "12px");
+  });
 
-    test(`applies correct borderColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`borderColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("border-color", "rgb(0, 0, 0)");
-    });
+  test("applies correct borderColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderColor", "border-color", "rgb(255, 0, 0)");
+  });
 
-    test(`applies correct backgroundColor on hover ${variant.value}`, async ({
+  test("applies correct borderWidth across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderWidth", "border-width", "1px");
+  });
+
+  test("applies correct borderStyle across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderStyle", "border-style", "dashed");
+  });
+
+  test("applies correct fontSize across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "fontSize", "font-size", "14px");
+  });
+
+  test("applies correct backgroundColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
       initTestBed,
       page,
-    }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`backgroundColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("background-color", "rgb(0, 0, 0)");
-    });
+      "backgroundColor",
+      "background-color",
+      "rgb(240, 240, 240)",
+    );
+  });
 
-    test(`applies correct boxShadow on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: {
-          [`boxShadow-Select${variant.value}--hover`]: "0 2px 8px rgba(0, 0, 0, 0.1)",
-        },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS(
-        "box-shadow",
-        "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
-      );
-    });
+  test("applies correct boxShadow across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "boxShadow",
+      "box-shadow",
+      "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+    );
+  });
 
-    test(`applies correct textColor on hover ${variant.value}`, async ({ initTestBed, page }) => {
-      await initTestBed(`<Select testId="test" ${variant.prop} />`, {
-        testThemeVars: { [`textColor-Select${variant.value}--hover`]: "rgb(0, 0, 0)" },
-      });
-      await page.getByTestId("test").hover();
-      await expect(page.getByTestId("test")).toHaveCSS("color", "rgb(0, 0, 0)");
-    });
+  test("applies correct textColor across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "textColor", "color", "rgb(0, 0, 0)");
+  });
+
+  test("applies correct borderColor on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "borderColor", "border-color", "rgb(0, 0, 0)", true);
+  });
+
+  test("applies correct backgroundColor on hover across variants", async ({
+    initTestBed,
+    page,
+  }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "backgroundColor",
+      "background-color",
+      "rgb(0, 0, 0)",
+      true,
+    );
+  });
+
+  test("applies correct boxShadow on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(
+      initTestBed,
+      page,
+      "boxShadow",
+      "box-shadow",
+      "rgba(0, 0, 0, 0.1) 0px 2px 8px 0px",
+      true,
+    );
+  });
+
+  test("applies correct textColor on hover across variants", async ({ initTestBed, page }) => {
+    await runPerVariant(initTestBed, page, "textColor", "color", "rgb(0, 0, 0)", true);
   });
 });
 
@@ -1512,8 +1471,8 @@ test.describe("Behaviors and Parts", () => {
   test.fixme("all behaviors combined with parts", async ({ page, initTestBed }) => {
     await initTestBed(
       `
-      <Select 
-        testId="test" 
+      <Select
+        testId="test"
         variant="CustomVariant"
         animation="fadeIn"
         clearable="true"
@@ -1547,7 +1506,10 @@ test.describe("Behaviors and Parts", () => {
     await expect(tooltip).toHaveText("Tooltip text");
   });
 
-  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markRequired" bindTo="country">
@@ -1555,13 +1517,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markRequired' hides indicator for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markRequired" bindTo="country">
@@ -1569,13 +1534,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
@@ -1583,13 +1551,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("requireLabelMode='markOptional' hides indicator for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markOptional' hides indicator for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markOptional" bindTo="country">
@@ -1597,13 +1568,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows asterisk for required fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="true" requireLabelMode="markBoth" bindTo="country">
@@ -1611,13 +1585,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("*");
     await expect(label).not.toContainText("(Optional)");
   });
 
-  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({ page, initTestBed }) => {
+  test("requireLabelMode='markBoth' shows optional tag for optional fields", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form>
         <Select testId="test" label="Country" required="false" requireLabelMode="markBoth" bindTo="country">
@@ -1625,13 +1602,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).not.toContainText("*");
     await expect(label).toContainText("(Optional)");
   });
 
-  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({ page, initTestBed }) => {
+  test("input requireLabelMode overrides Form itemRequireLabelMode", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="required">
         <Select testId="test" label="Country" required="false" requireLabelMode="markOptional" bindTo="country">
@@ -1639,13 +1619,16 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const label = page.getByText("Country");
     await expect(label).toContainText("(Optional)");
     await expect(label).not.toContainText("*");
   });
 
-  test("input inherits Form itemRequireLabelMode when not specified", async ({ page, initTestBed }) => {
+  test("input inherits Form itemRequireLabelMode when not specified", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
       <Form itemRequireLabelMode="markBoth">
         <Select testId="test1" label="Required Field" required="true" bindTo="field1">
@@ -1656,10 +1639,10 @@ test.describe("Behaviors and Parts", () => {
         </Select>
       </Form>
     `);
-    
+
     const requiredLabel = page.getByText("Required Field");
     const optionalLabel = page.getByText("Optional Field");
-    
+
     await expect(requiredLabel).toContainText("*");
     await expect(requiredLabel).not.toContainText("(Optional)");
     await expect(optionalLabel).toContainText("(Optional)");
@@ -1678,7 +1661,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     createDropdownMenuDriver,
     createSelectDriver,
   }) => {
-    const { testStateDriver } = await initTestBed(`
+    await initTestBed(`
       <Fragment>
         <Button testId="openBtn" onClick="outerDialog.open()">Open Dialog</Button>
         <ModalDialog id="outerDialog" title="Outer Dialog">
@@ -1704,13 +1687,12 @@ test.describe("Nested DropdownMenu and Select", () => {
       </Fragment>
     `);
 
-    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
-
     await page.getByTestId("openBtn").click();
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
+    const dropdownDriver = await createDropdownMenuDriver("nested-dropdown");
     await expect(dropdownDriver.component).toBeVisible();
 
     await dropdownDriver.open();
@@ -1728,7 +1710,7 @@ test.describe("Nested DropdownMenu and Select", () => {
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
-    await page.getByText("Confirm action").nth(1).click();
+    await page.getByRole("button", { name: "Confirm action" }).click();
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
@@ -1786,14 +1768,14 @@ test.describe("Nested DropdownMenu and Select", () => {
 
     const selectDriver = await createSelectDriver("testSelect");
 
-    await page.getByTestId("openBtn").click({delay: 100});
+    await page.getByTestId("openBtn").click({ delay: 100 });
 
     const outerDialog = page.getByRole("dialog", { name: "Outer Dialog" });
     await expect(outerDialog).toBeVisible();
 
     await expect(selectDriver.component).toBeVisible();
 
-    await selectDriver.click({delay: 100});
+    await selectDriver.click({ delay: 100 });
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Option 2")).toBeVisible();
 
@@ -1810,22 +1792,22 @@ test.describe("Nested DropdownMenu and Select", () => {
     const confirmDialog = page.getByRole("dialog", { name: "Confirm action" });
     await expect(confirmDialog).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100}); // Click outside all dialogs
+    await page.mouse.click(10, 10, { delay: 100 }); // Click outside all dialogs
     await expect(confirmDialog).not.toBeVisible();
     await expect(page.getByText("Item 1")).toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Item 1")).not.toBeVisible();
     await expect(page.getByText("Option 1")).toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Option 1")).not.toBeVisible();
     await expect(page.getByText("Outer Dialog")).toBeVisible();
 
-    await page.mouse.click(10, 10, {delay: 100});
+    await page.mouse.click(10, 10, { delay: 100 });
     await expect(page.getByText("Outer Dialog")).not.toBeVisible();
   });
 });
@@ -2546,13 +2528,135 @@ test.describe("Grouping Functionality", () => {
   });
 });
 
+// =============================================================================
+// INVALID INITIAL VALUE IN FORM (regression tests)
+// =============================================================================
+
+test.describe("Invalid initial value in Form", () => {
+  test("invalid initialValue is cleared on form submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="{123}">
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("invalid initialValue is cleared on form submit - searchable Select", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="{123}" searchable>
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("valid initialValue is preserved on form submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form onSubmit="data => testState = data.test">
+          <Select bindTo="test" initialValue="first">
+            <Option label="First" value="first" />
+            <Option label="Second" value="second" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("First");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe("first");
+  });
+
+  test("invalid Form data value is cleared on submit - SimpleSelect", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form data="{{ sel: 'no-such-option' }}" onSubmit="data => testState = data.sel">
+          <Select testId="mySelect" bindTo="sel">
+            <Option label="Alpha" value="alpha" />
+            <Option label="Beta" value="beta" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
+    await expect(selectTrigger).toContainText("");
+
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toBe(undefined);
+  });
+
+  test("invalid multiSelect values are filtered on form submit", async ({
+    page,
+    initTestBed,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <Form data="{{ sel: ['opt1', 'invalid', 'opt3'] }}" onSubmit="data => testState = data.sel">
+          <Select testId="mySelect" bindTo="sel" multiSelect searchable>
+            <Option label="Opt 1" value="opt1" />
+            <Option label="Opt 2" value="opt2" />
+            <Option label="Opt 3" value="opt3" />
+          </Select>
+        </Form>
+      </App>
+    `);
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect.poll(testStateDriver.testState).toEqual(["opt1", "opt3"]);
+  });
+
+  test("invalid value outside a Form is not cleared - standalone Select", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select id="mySelect" initialValue="{42}">
+          <Option value="{0}" label="Zero"/>
+          <Option value="{1}" label="One"/>
+          <Option value="{2}" label="Two"/>
+        </Select>
+        <Text testId="text">Selected value: {mySelect.value}</Text>
+      </Fragment>
+    `);
+    await expect(page.getByTestId("text")).toHaveText("Selected value: 42");
+  });
+});
+
 // Regression tests for the value synchronization issue with Select
-// NOTE: These tests are currently skipped due to known issues.
-test.describe.skip(
+test.describe(
   "Form Value Synchronization",
-  SKIP_REASON.UNSURE(
-    "We have not decided how to tackle this data vs UI inconsistency yet. A number of proposals are being evaluated.",
-  ),
   () => {
     test("invalid single value in Form - SimpleSelect", async ({ page, initTestBed }) => {
       const { testStateDriver } = await initTestBed(`
@@ -2562,13 +2666,13 @@ test.describe.skip(
           <Option value="opt2" label="second"/>
           <Option value="opt3" label="third"/>
         </FormItem>
-      </Form>  
+      </Form>
     `);
-      await page.getByRole("button", { name: "Save" }).click();
-
       const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
       await expect(selectTrigger).toContainText("");
-      await expect.poll(testStateDriver.testState).toBe("invalid");
+
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState).toBe(undefined);
     });
 
     test("invalid single value in Form - Select", async ({ page, initTestBed }) => {
@@ -2579,13 +2683,13 @@ test.describe.skip(
           <Option value="opt2" label="second"/>
           <Option value="opt3" label="third"/>
         </FormItem>
-      </Form>  
+      </Form>
     `);
-      await page.getByRole("button", { name: "Save" }).click();
-
       const selectTrigger = page.getByTestId("mySelect").locator('button[role="combobox"]');
       await expect(selectTrigger).toContainText("");
-      await expect.poll(testStateDriver.testState).toBe("invalid");
+
+      await page.getByRole("button", { name: "Save" }).click();
+      await expect.poll(testStateDriver.testState).toBe(undefined);
     });
 
     test("changing options does not update value - SimpleSelect", async ({ page, initTestBed }) => {
@@ -2687,7 +2791,10 @@ test.describe.skip(
 // =============================================================================
 
 test.describe("Validation Feedback", () => {
-  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({ initTestBed, page }) => {
+  test("shows helper text and no icon when verboseValidationFeedback is true (default)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{true}">
         <Select testId="input" bindTo="input" required="{true}">
@@ -2696,19 +2803,22 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation by submitting empty required field
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text
     await expect(page.getByText("This field is required")).toBeVisible();
-    
+
     // Check absence of concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).not.toBeVisible();
   });
 
-  test("shows icon and no helper text when verboseValidationFeedback is false", async ({ initTestBed, page }) => {
+  test("shows icon and no helper text when verboseValidationFeedback is false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <Select testId="input" bindTo="input" required="{true}">
@@ -2717,17 +2827,17 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     // Trigger validation
     await page.getByTestId("submit").click();
-    
+
     // Check for helper text (should be hidden)
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Check for concise feedback icon
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
-    
+
     // Check that it shows error icon
     await expect(conciseFeedback.locator("[data-icon-name='error']")).toBeVisible();
   });
@@ -2741,18 +2851,22 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     // Helper text hidden
     await expect(page.getByText("This field is required")).not.toBeVisible();
-    
+
     // Concise feedback visible
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
   });
 
-  test("shows valid icon in concise mode when valid", async ({ initTestBed, page, createSelectDriver }) => {
+  test("shows valid icon in concise mode when valid", async ({
+    initTestBed,
+    page,
+    createSelectDriver,
+  }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <Select testId="input" bindTo="input" required="{true}" validationMode="onChanged">
@@ -2761,16 +2875,16 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     const driver = await createSelectDriver("input");
-    
+
     // First make it invalid
     await page.getByTestId("submit").click();
-    
+
     // Now make it valid
     await page.getByTestId("input").click();
     await driver.selectLabel("Option 1");
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();
     await expect(conciseFeedback.locator("[data-icon-name='checkmark']")).toBeVisible();
@@ -2785,20 +2899,23 @@ test.describe("Validation Feedback", () => {
         <Button testId="submit" type="submit">Submit</Button>
       </Form>
     `);
-    
+
     await page.getByTestId("submit").click();
-    
+
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     // Hover over the icon
     await conciseFeedback.hover();
-    
+
     // Check tooltip content
     const tooltip = page.locator("[data-tooltip-container]");
     await expect(tooltip).toBeVisible();
     await expect(tooltip).toContainText("This field is required");
   });
 
-  test("does not duplicate label when inside Form with label prop", async ({ initTestBed, page }) => {
+  test("does not duplicate label when inside Form with label prop", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Form>
         <Select
@@ -2811,9 +2928,370 @@ test.describe("Validation Feedback", () => {
         </Select>
       </Form>
     `);
-    
+
     // Should only have one label with the text "Choose option"
     const labels = page.getByText("Choose option");
     await expect(labels).toHaveCount(1);
+  });
+});
+
+// =============================================================================
+// CUSTOM HEIGHT TESTS
+// =============================================================================
+
+test.describe("Custom Height", () => {
+  test("custom height does not constrain dropdown options in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" initialValue="customer">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("custom height does not constrain dropdown options in searchable select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" searchable="{true}" initialValue="customer">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("custom height does not constrain dropdown options in multi-select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" height="32px" multiSelect="{true}">
+        <Option label="Customer" value="customer" />
+        <Option label="Vendor" value="vendor" />
+        <Option label="Partner" value="partner" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // All options should be visible in the dropdown
+    await expect(page.getByRole("option", { name: "Customer" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Vendor" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Partner" })).toBeVisible();
+  });
+
+  test("selecting options works correctly with custom height", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select testId="sel" id="mySelect" height="32px">
+          <Option label="Customer" value="customer" />
+          <Option label="Vendor" value="vendor" />
+        </Select>
+        <Text testId="text">{mySelect.value}</Text>
+      </Fragment>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await driver.selectLabel("Vendor");
+
+    await expect(page.getByTestId("text")).toHaveText("vendor");
+  });
+
+  test("dropdownHeight does not leak to trigger element in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" initialValue="bakerloo" dropdownHeight="300px">
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
+
+  test("dropdownHeight does not leak to trigger element in searchable select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" initialValue="bakerloo" dropdownHeight="300px" searchable>
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
+
+  test("dropdownHeight does not leak to trigger element in multi-select", async ({
+    initTestBed,
+    createSelectDriver,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="300px" multiSelect>
+        <Option value="bakerloo" label="Bakerloo" />
+        <Option value="central" label="Central" />
+        <Option value="circle" label="Circle" />
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    const triggerBox = await driver.component.boundingBox();
+
+    // The trigger should be normal height (well under 300px), not inflated by dropdownHeight
+    expect(triggerBox.height).toBeLessThan(100);
+  });
+});
+
+// =============================================================================
+// SCROLL BEHAVIOR
+// =============================================================================
+
+test.describe("Scroll Behavior", () => {
+  test("opening dropdown does not block page scroll in simple select", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App>
+        <Select testId="mySelect">
+          <Option label="John Smith" value="john" />
+          <Option label="Jane Clint" value="jane" />
+          <Option label="Herbert Frank" value="herbert" />
+        </Select>
+        <Stack height="1600px" backgroundColor="teal"/>
+      </App>
+    `);
+    const driver = await createSelectDriver("mySelect");
+
+    // Open the dropdown
+    await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "John Smith" })).toBeVisible();
+
+    // Attempt to scroll the page
+    const scrollBefore = await page.evaluate(() => window.scrollY);
+    await page.evaluate(() => window.scrollBy(0, 200));
+    const scrollAfter = await page.evaluate(() => window.scrollY);
+
+    expect(scrollAfter).toBeGreaterThan(scrollBefore);
+  });
+});
+
+// =============================================================================
+// DROPDOWN HEIGHT STABILITY
+// =============================================================================
+
+test.describe("Dropdown Height Stability", () => {
+  // Build a markup with enough options to overflow a small dropdownHeight,
+  // triggering scroll indicators.
+  const MARKUP = `
+    <Select testId="sel" dropdownHeight="120px">
+      <Option value="a" label="Alpha" />
+      <Option value="b" label="Beta" />
+      <Option value="c" label="Gamma" />
+      <Option value="d" label="Delta" />
+      <Option value="e" label="Epsilon" />
+      <Option value="f" label="Zeta" />
+      <Option value="g" label="Eta" />
+      <Option value="h" label="Theta" />
+    </Select>
+  `;
+
+  test("dropdown height stays stable when scroll indicators appear", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(MARKUP);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    // Wait for the dropdown to open and stabilize
+    const dropdown = page.locator("[data-radix-popper-content-wrapper]");
+    await expect(dropdown).toBeVisible();
+
+    // Measure height after initial open (only down arrow visible)
+    const heightBefore = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Scroll inside the viewport to trigger the up-arrow to appear
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    });
+
+    // Wait a frame for any re-render
+    await page.waitForTimeout(100);
+
+    const heightAfter = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Gross dropdown height must not change when scroll indicators mount/unmount
+    expect(Math.abs(heightAfter - heightBefore)).toBeLessThanOrEqual(2);
+  });
+
+  test("dropdown does not exceed dropdownHeight when scroll indicators are shown", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(MARKUP);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+
+    const dropdown = page.locator("[data-radix-popper-content-wrapper]");
+    await expect(dropdown).toBeVisible();
+
+    // Scroll to trigger both arrows
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    const dropdownHeight = await dropdown.evaluate((el) => (el as HTMLElement).offsetHeight);
+
+    // Dropdown should be at most dropdownHeight (120px) plus border (2px tolerance)
+    expect(dropdownHeight).toBeLessThanOrEqual(124);
+  });
+});
+
+// =============================================================================
+// SCROLL INDICATORS PROPERTY
+// =============================================================================
+
+test.describe("scrollIndicators property", () => {
+  const OPTIONS = `
+    <Option value="a" label="Alpha" />
+    <Option value="b" label="Beta" />
+    <Option value="c" label="Gamma" />
+    <Option value="d" label="Delta" />
+    <Option value="e" label="Epsilon" />
+    <Option value="f" label="Zeta" />
+    <Option value="g" label="Eta" />
+    <Option value="h" label="Theta" />
+  `;
+
+  test("scroll indicator arrows are visible by default when list overflows", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    // Scroll partway to make both up and down arrows appear
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    const upVisible = await page.evaluate(() => {
+      const btns = document.querySelectorAll("[data-radix-popper-content-wrapper] button, [data-radix-popper-content-wrapper] [role='button'], [data-radix-popper-content-wrapper] > div > *");
+      // Find elements rendered by ScrollUpButton / ScrollDownButton via their position
+      const content = document.querySelector("[data-radix-popper-content-wrapper] > *:first-child") as HTMLElement | null;
+      if (!content) return false;
+      const children = Array.from(content.children) as HTMLElement[];
+      // Up button is the first child with non-zero height when scrolled
+      return children.some(c => c.offsetHeight > 0 && c !== content.querySelector("[data-radix-select-viewport]"));
+    });
+
+    expect(upVisible).toBe(true);
+  });
+
+  test("scroll indicator arrows are hidden when scrollIndicators is false", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px" scrollIndicators="false">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      if (viewport) viewport.scrollTop = Math.floor(viewport.scrollHeight / 2);
+    });
+    await page.waitForTimeout(100);
+
+    // With scrollIndicators=false, neither scroll button class should be present
+    const upButtonCount = await page.locator("[class*='selectScrollUpButton']").count();
+    const downButtonCount = await page.locator("[class*='selectScrollDownButton']").count();
+
+    expect(upButtonCount).toBe(0);
+    expect(downButtonCount).toBe(0);
+  });
+
+  test("scrollIndicators=false does not remove options from the list", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" dropdownHeight="120px" scrollIndicators="false">
+        ${OPTIONS}
+      </Select>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.toggleOptionsVisibility();
+    await expect(page.locator("[data-radix-popper-content-wrapper]")).toBeVisible();
+
+    // All 8 options should still exist in the DOM even though there are no scroll arrows
+    const optionCount = await page.getByRole("option").count();
+    expect(optionCount).toBe(8);
+
+    // The viewport should still be scrollable
+    const isScrollable = await page.evaluate(() => {
+      const viewport = document.querySelector("[data-radix-select-viewport]") as HTMLElement;
+      return viewport ? viewport.scrollHeight > viewport.clientHeight : false;
+    });
+    expect(isScrollable).toBe(true);
   });
 });

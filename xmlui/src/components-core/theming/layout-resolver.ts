@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { LayoutContext } from "../../abstractions/RendererDefs";
+import { isInsideLayout } from "../../abstractions/layout-context-utils";
 import { EMPTY_OBJECT } from "../constants";
 import { isEmpty } from "lodash-es";
 
@@ -18,24 +19,73 @@ const defaultCompResult: ResolvedLayout = {
   issues: new Set(),
 };
 
+export type ApplyLayoutProperties = "none" | "dims" | "spacing" | "all";
+
+/** Properties allowed in "dims" mode (dimensions only). */
+export const DIMS_ONLY_PROPS = new Set([
+  "width", "minWidth", "maxWidth",
+  "height", "minHeight", "maxHeight",
+]);
+
+/** Properties allowed in "spacing" mode (dims + gap, padding, margin and their variants). */
+export const SPACING_ONLY_PROPS = new Set([
+  ...DIMS_ONLY_PROPS,
+  "gap",
+  "padding", "paddingHorizontal", "paddingVertical",
+  "paddingTop", "paddingBottom", "paddingLeft", "paddingRight",
+  "margin", "marginHorizontal", "marginVertical",
+  "marginTop", "marginBottom", "marginLeft", "marginRight",
+]);
+
 export function resolveLayoutProps(
   layoutProps: LayoutProps = EMPTY_OBJECT,
   layoutContext?: LayoutContext,
   disableInlineStyle?: boolean,
+  applyLayoutProperties?: ApplyLayoutProperties,
 ): ResolvedLayout {
+  const mode = applyLayoutProperties ?? "all";
+
+  // --- "none" mode: no layout properties at all
+  if (mode === "none") {
+    return defaultCompResult;
+  }
+
   const result: ResolvedLayout = {
     cssProps: {},
     issues: new Set(),
   };
 
+  // --- "dims" mode: only allow dimension properties
+  const dimsOnly = mode === "dims";
+  // --- "spacing" mode: allow dimensions + padding + margin + gap
+  const spacingOnly = mode === "spacing";
+
   // Get the list of layout properties to ignore from layout context
   const ignoreLayoutProps = (layoutContext?.ignoreLayoutProps as string[]) || [];
   const shouldIgnore = (prop: string) => ignoreLayoutProps.includes(prop);
 
+  // --- Inside a TableCell, reset min-width to 0 so nested flex containers
+  // --- (HStack, Link, etc.) can shrink below their content width, allowing
+  // --- text-overflow: ellipsis to work on descendant Text components. (#2936)
+  // --- The Text component's own overflow CSS handles clipping; we do NOT set
+  // --- overflow: hidden here because that would clip flow-mode text reflow.
+  const insideTableCell = isInsideLayout(layoutContext, "TableCell");
+  if (insideTableCell && !layoutProps.minWidth) {
+    result.cssProps.minWidth = 0;
+  }
+
   // --- Adjust flex
   if (!!getOrientation(layoutContext)) {
-    // --- In a container, we always use "flex-shrink: 0"
-    result.cssProps.flexShrink = 0;
+    // --- In a container, we normally use "flex-shrink: 0" to prevent items
+    // --- from collapsing. Inside a TableCell however, items must be allowed
+    // --- to shrink so that text truncation / ellipsis works. (#2936)
+    // --- We set flexShrink: 1 explicitly (not just omit 0) so the inline style
+    // --- overrides any SCSS class that sets flex-shrink: 0 (e.g. overflowFlow).
+    if (insideTableCell) {
+      result.cssProps.flexShrink = 1;
+    } else {
+      result.cssProps.flexShrink = 0;
+    }
   }
 
   // --- Dimensions: widht and height is not considered to be inline styles
@@ -83,6 +133,15 @@ export function resolveLayoutProps(
   collectCss("minHeight", false);
   collectCss("maxHeight", false);
 
+  // --- In "dims" mode, skip everything beyond dimensions
+  if (dimsOnly) {
+    // --- If we didn't set any props, return a referentially stable result
+    if (isEmpty(result.cssProps) && isEmpty(result.issues)) {
+      return defaultCompResult;
+    }
+    return result;
+  }
+
   // --- Positions
   collectCss("top", disableInlineStyle);
   collectCss("right", disableInlineStyle);
@@ -125,6 +184,15 @@ export function resolveLayoutProps(
   }
   collectCss("marginTop", disableInlineStyle);
   collectCss("marginBottom", disableInlineStyle);
+
+  // --- In "spacing" mode, skip everything beyond dimensions + padding + margin
+  if (spacingOnly) {
+    // --- If we didn't set any props, return a referentially stable result
+    if (isEmpty(result.cssProps) && isEmpty(result.issues)) {
+      return defaultCompResult;
+    }
+    return result;
+  }
 
   // --- Borders
   collectCss("border", disableInlineStyle);
@@ -195,6 +263,21 @@ export function resolveLayoutProps(
   collectCss("cursor", disableInlineStyle);
   collectCss("whiteSpace", disableInlineStyle);
   collectCss("transform", disableInlineStyle);
+
+  // --- Scroll snap
+  collectCss("scrollSnapType", disableInlineStyle);
+  collectCss("scrollSnapAlign", disableInlineStyle);
+  collectCss("scrollSnapStop", disableInlineStyle);
+  collectCss("scrollPadding", disableInlineStyle);
+  collectCss("scrollPaddingTop", disableInlineStyle);
+  collectCss("scrollPaddingRight", disableInlineStyle);
+  collectCss("scrollPaddingBottom", disableInlineStyle);
+  collectCss("scrollPaddingLeft", disableInlineStyle);
+  collectCss("scrollMargin", disableInlineStyle);
+  collectCss("scrollMarginTop", disableInlineStyle);
+  collectCss("scrollMarginRight", disableInlineStyle);
+  collectCss("scrollMarginBottom", disableInlineStyle);
+  collectCss("scrollMarginLeft", disableInlineStyle);
 
   // --- Outline
   collectCss("outline", disableInlineStyle);
@@ -422,6 +505,21 @@ export type LayoutProps = {
   opacity?: string | number;
   transform?: string;
 
+  // --- Scroll snap
+  scrollSnapType?: string;
+  scrollSnapAlign?: string;
+  scrollSnapStop?: string;
+  scrollPadding?: string | number;
+  scrollPaddingTop?: string | number;
+  scrollPaddingRight?: string | number;
+  scrollPaddingBottom?: string | number;
+  scrollPaddingLeft?: string | number;
+  scrollMargin?: string | number;
+  scrollMarginTop?: string | number;
+  scrollMarginRight?: string | number;
+  scrollMarginBottom?: string | number;
+  scrollMarginLeft?: string | number;
+
   // --- Typography
   color?: string;
   fontFamily?: string;
@@ -533,6 +631,21 @@ const layoutPatterns: Record<keyof LayoutProps, RegExp[]> = {
   overflowY: [],
   zIndex: [],
   opacity: [],
+
+  // --- Scroll snap
+  scrollSnapType: [],
+  scrollSnapAlign: [],
+  scrollSnapStop: [],
+  scrollPadding: [],
+  scrollPaddingTop: [],
+  scrollPaddingRight: [],
+  scrollPaddingBottom: [],
+  scrollPaddingLeft: [],
+  scrollMargin: [],
+  scrollMarginTop: [],
+  scrollMarginRight: [],
+  scrollMarginBottom: [],
+  scrollMarginLeft: [],
 
   // --- Typography
   color: [],

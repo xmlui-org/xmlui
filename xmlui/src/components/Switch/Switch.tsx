@@ -1,6 +1,6 @@
 import styles from "../Toggle/Toggle.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -22,6 +22,7 @@ const COMP = "Switch";
 
 export const SwitchMd = createMetadata({
   status: "stable",
+  compactInlineLabel: true,
   description: "`Switch` enables users to toggle between two states: on and off.",
   parts: {
     label: {
@@ -67,6 +68,12 @@ export const SwitchMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   limitThemeVarsToComponent: true,
   defaultThemeVars: {
+    [`borderColor-${COMP}`]: `$borderColor-Input-default`,
+    [`borderWidth-${COMP}`]: "1px",
+    [`outlineWidth-${COMP}`]: `$outlineWidth--focus`,
+    [`outlineColor-${COMP}`]: `$outlineColor--focus`,
+    [`outlineOffset-${COMP}`]: `$outlineOffset--focus`,
+    [`outlineStyle-${COMP}`]: `$outlineStyle--focus`,
     [`borderColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`backgroundColor-checked-${COMP}--error`]: `$borderColor-${COMP}--error`,
     [`borderColor-checked-${COMP}--warning`]: `$borderColor-${COMP}--warning`,
@@ -74,8 +81,6 @@ export const SwitchMd = createMetadata({
     [`borderColor-checked-${COMP}--success`]: `$borderColor-${COMP}--success`,
     [`backgroundColor-checked-${COMP}--success`]: `$borderColor-${COMP}--success`,
     [`backgroundColor-${COMP}`]: "$color-surface-0",
-    [`borderColor-${COMP}`]: "$color-surface-200",
-    [`borderWidth-${COMP}`]: "1px",
     [`backgroundColor-indicator-${COMP}`]: "$color-surface-400",
     [`backgroundColor-${COMP}-indicator--disabled`]: "$backgroundColor-primary",
     [`backgroundColor-indicator-checked-${COMP}`]: "$backgroundColor-primary",
@@ -89,39 +94,45 @@ export const SwitchMd = createMetadata({
   },
 });
 
-export const switchComponentRenderer = createComponentRenderer(
+export const switchComponentRenderer = wrapComponent(
   COMP,
+  Toggle,
   SwitchMd,
-  ({
-    node,
-    extractValue,
-    className,
-    updateState,
-    state,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    return (
-      <Toggle
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        className={className}
-        initialValue={extractValue.asOptionalBoolean(
-          node.props.initialValue,
-          defaultProps.initialValue,
-        )}
-        value={state?.value}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        onClick={lookupEventHandler("click")}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        variant="switch"
-        registerComponentApi={registerComponentApi}
-      />
-    );
+  {
+    exposeRegisterApi: true,
+    stateful: true,
+    events: [],
+    customRender(_props, {
+      node,
+      extractValue,
+      classes,
+      updateState,
+      state,
+      lookupEventHandler,
+      registerComponentApi,
+    }) {
+      return (
+        <Toggle
+          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+          classes={classes}
+          initialValue={extractValue.asOptionalBoolean(
+            node.props.initialValue,
+            defaultProps.initialValue,
+          )}
+          value={state?.value}
+          readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+          validationStatus={extractValue(node.props.validationStatus)}
+          updateState={updateState}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+          onClick={lookupEventHandler("click")}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          required={extractValue.asOptionalBoolean(node.props.required)}
+          variant="switch"
+          registerComponentApi={registerComponentApi}
+        />
+      );
+    },
   },
 );

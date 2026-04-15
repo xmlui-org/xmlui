@@ -1,0 +1,49 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Gauge";
+
+$backgroundColor-Gauge: createThemeVar("Input:backgroundColor-#{$componentName}");
+$textColor-Gauge: createThemeVar("Input:textColor-#{$componentName}");
+$primaryColor-Gauge: createThemeVar("Input:primaryColor-#{$componentName}");
+
+@layer components {
+  .gaugeContainer {
+    display: inline-block;
+    max-width: 100%;
+
+    :global(smart-gauge) {
+      max-width: 100%;
+      width: 100% !important;
+      --smart-background: #{$backgroundColor-Gauge};
+      --smart-background-color: #{$textColor-Gauge};
+      --smart-primary: #{$primaryColor-Gauge};
+      --smart-surface: #{$backgroundColor-Gauge};
+      --smart-surface-color: #{$textColor-Gauge};
+
+      :global(.smart-digital-display) {
+        color: #{$textColor-Gauge} !important;
+      }
+
+      :global(.smart-needle),
+      :global(.smart-needle-central-circle) {
+        fill: #{$textColor-Gauge} !important;
+      }
+      :global(.smart-track) {
+        fill: #{$backgroundColor-Gauge} !important;
+      }
+      :global(.smart-value-path) {
+        fill: #{$primaryColor-Gauge} !important;
+      }
+    }
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

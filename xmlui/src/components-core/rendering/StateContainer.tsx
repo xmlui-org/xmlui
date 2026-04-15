@@ -39,6 +39,8 @@ import type {
 } from "./ContainerWrapper";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import { extractScopedState, CodeBehindParseError } from "./ContainerUtils";
+import { FnDepsProvider, useFnDeps } from "../FnDepsContext";
+import { isArrowExpressionObject } from "../../abstractions/InternalMarkers";
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -180,6 +182,7 @@ export const StateContainer = memo(
       stateFromOutside,
       componentStateWithApis,
       node.contextVars,
+      routingParams,
     );
 
     // ========================================================================
@@ -207,15 +210,23 @@ export const StateContainer = memo(
 
     //first: collection function (arrowExpressions) dependencies
     //    -> do it until there's no function dep, only var deps
+    const parentFnDeps = useFnDeps();
     const functionDeps = useMemo(() => {
       const fnDeps: Record<string, Array<string>> = {};
       Object.entries(varDefinitions).forEach(([key, value]) => {
         if (isParsedValue(value) && value.tree.type === T_ARROW_EXPRESSION) {
           fnDeps[key] = collectVariableDependencies(value.tree, referenceTrackedApi);
+        } else if (isArrowExpressionObject(value) && value.type === T_ARROW_EXPRESSION) {
+          fnDeps[key] = collectVariableDependencies(value, referenceTrackedApi);
         }
       });
-      return collectFnVarDeps(fnDeps);
-    }, [referenceTrackedApi, varDefinitions]);
+      const localFnDeps = collectFnVarDeps(fnDeps);
+      // Merge parent function deps so child containers inherit dependency tracking
+      // for functions defined in ancestor containers
+      if (Object.keys(parentFnDeps).length === 0) return localFnDeps;
+      if (Object.keys(localFnDeps).length === 0) return parentFnDeps;
+      return { ...parentFnDeps, ...localFnDeps };
+    }, [parentFnDeps, referenceTrackedApi, varDefinitions]);
 
     /**
      * Variable Resolution Strategy
@@ -312,6 +323,46 @@ export const StateContainer = memo(
     );
 
     // ========================================================================
+    // LAYER 7: RESOLVE LIVE-REFERENCE SENTINELS
+    // ========================================================================
+
+    // When an event handler sets `myVar = someComponentApi` (e.g. `myData = ds`),
+    // the event handler stores a sentinel `{ __liveApiRef__: "ds" }` as the variable
+    // value so the binding stays live instead of capturing a stale snapshot.
+    //
+    // For **implicit containers** (those without an explicit `uses` boundary), the
+    // loader state (e.g. DataSource's value/loaded) is dispatched to the *parent*
+    // reducer via parentDispatch, not to this container's own useReducer. This means
+    // `componentStateWithApis` does not contain the loader's string key ("ds"), so the
+    // sentinel can't be resolved there. However, `combinedState` — which spreads in
+    // `stateFromOutside` (the parent's combinedState) — *does* contain the loader's
+    // data. We therefore resolve sentinels here, at the fully-combined state level,
+    // where every layer is visible.
+    const resolvedCombinedState = useMemo(() => {
+      let modified = false;
+      let result = combinedState;
+      for (const key of Object.keys(combinedState)) {
+        const val = (combinedState as any)[key];
+        if (
+          val !== null &&
+          val !== undefined &&
+          typeof val === "object" &&
+          typeof val.__liveApiRef__ === "string"
+        ) {
+          const apiKey: string = val.__liveApiRef__;
+          if (apiKey in combinedState) {
+            if (!modified) {
+              result = { ...combinedState };
+              modified = true;
+            }
+            (result as any)[key] = (combinedState as any)[apiKey];
+          }
+        }
+      }
+      return result;
+    }, [combinedState]);
+
+    // ========================================================================
     // COMPONENT API REGISTRATION
     // ========================================================================
 
@@ -367,6 +418,9 @@ export const StateContainer = memo(
           // Global variable (not shadowed by local)
           if (isRoot) {
             // Root container should handle global var updates itself
+            // Use stableCurrentGlobalVars as localVars so the reducer can see
+            // the original structure of the global variable (e.g., the full array)
+            // when applying path-based updates like push operations.
             dispatch({
               type: ContainerActionKind.STATE_PART_CHANGED,
               payload: {
@@ -374,7 +428,7 @@ export const StateContainer = memo(
                 value: newValue,
                 target,
                 actionType: action,
-                localVars: resolvedLocalVars,
+                localVars: stableCurrentGlobalVars,
               },
             });
           } else {
@@ -400,7 +454,7 @@ export const StateContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, parentStatePartChanged],
+      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, node.globalVars, appContext, parentStatePartChanged],
     );
 
     // ========================================================================
@@ -409,28 +463,30 @@ export const StateContainer = memo(
 
     return (
       <ErrorBoundary node={node} location={"container"}>
-        <Container
-          resolvedKey={resolvedKey}
-          node={node}
-          componentState={combinedState}
-          globalVars={stableCurrentGlobalVars}
-          dispatch={dispatch}
-          parentDispatch={parentDispatch}
-          setVersion={setVersion}
-          version={version}
-          statePartChanged={statePartChanged}
-          registerComponentApi={registerComponentApi}
-          parentRegisterComponentApi={parentRegisterComponentApi}
-          layoutContextRef={layoutContextRef}
-          parentRenderContext={parentRenderContext}
-          memoedVarsRef={memoedVars}
-          isImplicit={isImplicit}
-          ref={ref}
-          uidInfoRef={uidInfoRef}
-          {...rest}
-        >
-          {children}
-        </Container>
+        <FnDepsProvider value={functionDeps}>
+          <Container
+            resolvedKey={resolvedKey}
+            node={node}
+            componentState={resolvedCombinedState}
+            globalVars={stableCurrentGlobalVars}
+            dispatch={dispatch}
+            parentDispatch={parentDispatch}
+            setVersion={setVersion}
+            version={version}
+            statePartChanged={statePartChanged}
+            registerComponentApi={registerComponentApi}
+            parentRegisterComponentApi={parentRegisterComponentApi}
+            layoutContextRef={layoutContextRef}
+            parentRenderContext={parentRenderContext}
+            memoedVarsRef={memoedVars}
+            isImplicit={isImplicit}
+            ref={ref}
+            uidInfoRef={uidInfoRef}
+            {...rest}
+          >
+            {children}
+          </Container>
+        </FnDepsProvider>
       </ErrorBoundary>
     );
   }),

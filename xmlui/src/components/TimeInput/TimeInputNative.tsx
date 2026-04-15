@@ -1,6 +1,7 @@
 import { type CSSProperties } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./TimeInput.module.scss";
 import { PartialInput } from "../Input/PartialInput";
 import { InputDivider } from "../Input/InputDivider";
@@ -9,7 +10,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 // Import utilities and types from merged utils file
 import {
@@ -46,6 +47,7 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onDidChange?: (newValue: string | null) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -68,6 +70,7 @@ type Props = {
   readOnly?: boolean;
   autoFocus?: boolean;
   emptyCharacter?: string;
+  ariaLabel?: string;
 };
 
 export const defaultProps = {
@@ -92,6 +95,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     updateState,
     style,
     className,
+    classes,
     onDidChange,
     onFocus,
     onBlur,
@@ -114,6 +118,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
     emptyCharacter = defaultProps.emptyCharacter,
+    ariaLabel,
     ...rest
   },
   ref,
@@ -601,7 +606,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   // Custom clear icon
   const clearIconElement = useMemo(() => {
     if (clearIcon === null || clearIcon === "null") return null;
-    if (clearIcon) return <Icon name={clearIcon} />;
+    if (clearIcon) return <ThemedIcon name={clearIcon} />;
     // Default clear icon
     return (
       <svg
@@ -647,12 +652,14 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
           [styles.disabled]: !enabled,
           [styles.readOnly]: readOnly,
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={{ ...style, gap }}
       onFocusCapture={handleComponentFocus}
       onBlur={handleComponentBlur}
       data-validation-status={validationStatus}
+      aria-label={ariaLabel}
       {...rest}
     >
       {startAdornment}
@@ -677,6 +684,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             isInvalid={isHourCurrentlyInvalid}
             is24Hour={!is12HourFormat}
             emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} hour` : "hour"}
           />
 
           <InputDivider separator=":" />
@@ -699,6 +707,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
             value={minute}
             isInvalid={isMinuteCurrentlyInvalid}
             emptyCharacter={processedEmptyCharacter}
+            ariaLabel={ariaLabel ? `${ariaLabel} minute` : "minute"}
           />
 
           {/* Second input (if needed) */}
@@ -722,6 +731,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
                 value={second}
                 isInvalid={isSecondCurrentlyInvalid}
                 emptyCharacter={processedEmptyCharacter}
+                ariaLabel={ariaLabel ? `${ariaLabel} second` : "second"}
               />
             </>
           )}
@@ -738,6 +748,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
               onAmPmSet={handleAmPmSet}
               onKeyDown={handleArrowKeys}
               value={amPm}
+              ariaLabel={ariaLabel ? `${ariaLabel} AM/PM` : "AM/PM"}
             />
           )}
         </div>

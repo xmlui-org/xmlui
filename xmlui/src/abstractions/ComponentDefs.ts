@@ -1,6 +1,7 @@
 import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
 import type { DefaultThemeVars } from "./ThemingDefs";
+import type { MediaBreakpointType } from "./AppContextDefs";
 
 /**
  * This interface represents the core properties of a component definition
@@ -56,6 +57,18 @@ export interface ComponentDefCore {
    * component hierarchy is omitted from the rendered tree.
    */
   when?: string | boolean;
+
+  /**
+   * Per-breakpoint visibility conditions (Tailwind mobile-first style).
+   * Keys are breakpoint names ("xs" | "sm" | "md" | "lg" | "xl" | "xxl").
+   * When any responsiveWhen entries are defined, they become the exclusive source of truth
+   * for visiblity, overriding the base `when` value. For a given screen size, the resolution
+   * walks from the current breakpoint down to "xs", returning the first defined responsive
+   * value. If no responsive rule matches, the component is hidden (false). If no responsiveWhen
+   * entries are defined at all, the base `when` property is used (backward compatibility).
+   * Example: `<Button when-md="true" />` shows only at md and above, hidden at xs/sm.
+   */
+  responsiveWhen?: Partial<Record<MediaBreakpointType, string | boolean>>;
 
   /**
    * Some components work with data obtained asynchronously. Fetching this data requires
@@ -208,6 +221,10 @@ export type ComponentPropertyMetadata = {
   // information to validate the property value.
   readonly valueType?: PropertyValueType;
 
+  // When true, wrapComponent resolves this prop via extractResourceUrl instead of
+  // extractValue, enabling XMLUI resource path resolution (e.g. relative paths).
+  readonly isResourceUrl?: boolean;
+
   // This field defines the available values of the property. The rendering engine
   // uses this information to validate the property value.
   readonly availableValues?: readonly PropertyValueDescription[];
@@ -326,6 +343,9 @@ export type ComponentMetadata<
   // including the component name
   limitThemeVarsToComponent?: boolean;
 
+  // Component names (type) that contribute theme variables to this component.
+  themeVarContributorComponents?: string[];
+
   // Indicates that the component allows arbitrary props (not just the named ones)
   allowArbitraryProps?: boolean;
 
@@ -347,8 +367,19 @@ export type ComponentMetadata<
   // List of behaviors to exclude from this component
   excludeBehaviors?: string[];
 
+  // When true, the label behavior will use compact (fit-content) layout for
+  // "before" and "after" labelPosition values. Intended for toggle-style
+  // components (Checkbox, Switch) where the control is small and the label
+  // should sit snugly next to it.
+  compactInlineLabel?: boolean;
+
   // Optional message to display if the component is deprecated
   deprecationMessage?: string;
+
+  // Default aria-label for screen readers when the app author doesn't provide one.
+  // Wrapper authors set this to a human-readable string describing the component's
+  // purpose (e.g., "Loading" for Spinner, "Toggle color mode" for ToneChangerButton).
+  defaultAriaLabel?: string;
 };
 
 export interface ParentRenderContext {

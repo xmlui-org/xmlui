@@ -4,6 +4,8 @@ import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 // @ts-ignore
 import js from "@shikijs/langs/javascript";
 // @ts-ignore
+import ts from "@shikijs/langs/typescript";
+// @ts-ignore
 import scss from "@shikijs/langs/scss";
 // @ts-ignore
 import css from "@shikijs/langs/css";
@@ -16,7 +18,7 @@ import { xmluiGrammar, xmluiThemeLight, xmluiThemeDark } from "xmlui/syntax/text
 
 export const shikiHighlighter = createHighlighterCoreSync({
   // @ts-ignore
-  langs: [js, json, html, xmluiGrammar, css, scss],
+  langs: [js, ts, json, html, xmluiGrammar, css, scss],
   // @ts-ignore
   themes: [xmluiThemeLight, xmluiThemeDark],
   engine: createJavaScriptRegexEngine(),

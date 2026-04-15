@@ -1,5 +1,8 @@
 # FormSection [#formsection]
 
+>[!WARNING]
+> The `FormSection` component is deprecated and will be removed in a future release.
+
 `FormSection` groups elements within a `Form`. Child components are placed in a [FlowLayout](/components/FlowLayout).
 
 ## Behaviors [#behaviors]
@@ -10,8 +13,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 

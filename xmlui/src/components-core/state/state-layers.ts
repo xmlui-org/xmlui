@@ -121,11 +121,56 @@ export function mergeComponentApis(
   }
 
   // Merge component APIs into state
+  // When xsVerbose is enabled, wrap API methods to emit method:call trace events.
+  // A WeakMap cache ensures we only create one wrapper per original function,
+  // avoiding new function identities on every merge (which would trigger re-renders).
+  const xsVerbose = typeof window !== "undefined" && (window as any).__xsVerbose;
+  if (xsVerbose) {
+    const w = window as any;
+    if (!w.__xsMethodWrapCache) w.__xsMethodWrapCache = new WeakMap();
+  }
   for (const componentApiKey of Object.getOwnPropertySymbols(componentApis)) {
     const value = componentApis[componentApiKey];
     if (componentApiKey.description) {
       const key = componentApiKey.description;
-      ret[key] = { ...(ret[key] || {}), ...value };
+      if (xsVerbose && value && typeof value === "object") {
+        const cache = (window as any).__xsMethodWrapCache;
+        const traced: Record<string, any> = {};
+        for (const [name, fn] of Object.entries(value)) {
+          if (typeof fn === "function") {
+            let wrapped = cache.get(fn);
+            if (!wrapped) {
+              const methodName = name;
+              const componentKey = key;
+              wrapped = (...args: any[]) => {
+                const w = window as any;
+                const { pushTrace, popTrace, pushXsLog, createLogEntry } = w.__xsTraceHelpers || {};
+                const traceId = pushTrace?.();
+                try {
+                  const result = fn(...args);
+                  pushXsLog?.(
+                    createLogEntry?.("method:call", {
+                      component: componentKey,
+                      componentLabel: componentKey,
+                      displayLabel: `${componentKey}.${methodName}(${args.map((a: any) => { try { return JSON.stringify(a); } catch { return "[Object]"; } }).join(", ")})`,
+                    }),
+                  );
+                  return result;
+                } finally {
+                  popTrace?.(traceId);
+                }
+              };
+              cache.set(fn, wrapped);
+            }
+            traced[name] = wrapped;
+          } else {
+            traced[name] = fn;
+          }
+        }
+        ret[key] = { ...(ret[key] || {}), ...traced };
+      } else {
+        ret[key] = { ...(ret[key] || {}), ...value };
+      }
     }
     ret[componentApiKey] = { ...ret[componentApiKey], ...value };
   }
@@ -274,6 +319,7 @@ export function useMergedState(
         }
       }
     });
+
     return ret;
   }, [localVars, componentState]);
   return useShallowCompareMemoize(merged);

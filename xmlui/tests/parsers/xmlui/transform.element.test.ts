@@ -32,16 +32,56 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.children![0].props! as any).value).equal("hithere");
   });
 
-  it("string literal as child #1", () => {
-    const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNode");
-    expect((cd.children![0].props! as any).value).equal("hi ");
-  });
+  describe("remove StringLiterals from ContentListNode-s", () => {
+    it("string literal as child #1", () => {
+      const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal("'hi ' ");
+    });
 
-  it("string literal as child #2", () => {
-    const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNode");
-    expect((cd.children![0].props! as any).value).equal("hi ");
+    it("string literal as child #2", () => {
+      const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal(" 'hi '");
+    });
+
+    it("string literal as child #3", () => {
+      const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal(' "123 ""abc" ');
+    });
+
+    it("CData as child", () => {
+      const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("hi");
+    });
+
+    it("string literal then text as child", () => {
+      const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNode");
+      expect((cd.children![0].props! as any).value).equal("'hi ' there");
+    });
+
+    it("string literal then CData as child", () => {
+      const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("'hi ' there");
+    });
+
+    it("string literal #2 then CData as child", () => {
+      const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("'hi' there");
+    });
+
+    it("string literal, text, CData as child", () => {
+      const cd = transformSource(
+        "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
+      ) as ComponentDef;
+      expect(cd.children![0].type).equal("TextNodeCData");
+      expect((cd.children![0].props! as any).value).equal("hi there 'all' people");
+    });
   });
 
   it("string literal as child #3", () => {
@@ -60,26 +100,6 @@ describe("Xmlui transform - child elements", () => {
     const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("'hi ' there");
-  });
-
-  it("string literal then CData as child", () => {
-    const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hi there");
-  });
-
-  it("string literal #2 then CData as child", () => {
-    const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hithere");
-  });
-
-  it("string literal, text, CData as child", () => {
-    const cd = transformSource(
-      "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
-    ) as ComponentDef;
-    expect(cd.children![0].type).equal("TextNodeCData");
-    expect((cd.children![0].props! as any).value).equal("hi thereallpeople");
   });
 
   it("text and element as child #1", () => {
@@ -117,24 +137,6 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("vars", () => {
-    it("var fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><variable/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("var fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><variable name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("dotted var works #1", () => {
       const cd = transformSource("<Stack var.myVar='123'></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -198,33 +200,6 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Props
   describe("props", () => {
-    it("prop fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><property blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("prop fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><property/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("prop fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><property name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("implicit props with attr works #1", () => {
       const cd = transformSource("<Stack myProp='123'/>") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -330,33 +305,6 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Template (alias for property)
   describe("template", () => {
-    it("template fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><template blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("template fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><template/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("template fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><template name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
     it("template with name/value attr works #1", () => {
       const cd = transformSource(
         "<Stack><template name='myProp' value='123'/></Stack>",
@@ -470,15 +418,6 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("event", () => {
-    it("event fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><event blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
     it("implicit events with attr works #1", () => {
       const cd = transformSource("<Stack onClick='doIt' />") as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -490,33 +429,6 @@ describe("Xmlui transform - child elements", () => {
       expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
       const id = (stmts[0] as ExpressionStatement).expr as Identifier;
       expect(id.name).equal("doIt");
-    });
-
-    it("event fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><event/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("event fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><event name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("event fail with 'on' prefix", () => {
-      try {
-        transformSource("<Stack><event name='onClick' value='doIt'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T008");
-      }
     });
 
     it("event with name/value attr works #1", () => {
@@ -567,115 +479,110 @@ describe("Xmlui transform - child elements", () => {
   });
   describe("method", () => {
     // --- Method
-    it("method fails with invalid attribute", () => {
-      try {
-        transformSource("<Stack><method blabla='123'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T011");
-      }
-    });
-
-    it("method fails with missing name attribute", () => {
-      try {
-        transformSource("<Stack><method></method></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("method fails with empty name attribute", () => {
-      try {
-        transformSource("<Stack><method name=''/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T012");
-      }
-    });
-
-    it("method with name/value attr works #1", () => {
-      const cd = transformSource("<Stack><method name='set' value='do'/></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name/value attr works #2", () => {
-      const cd = transformSource(`
-      <Stack>
-        <method name="set" value='do'/>
-        <method name="other" value='get'/>
-      </Stack>
-    `) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-      expect((cd.api! as any).other).equal("get");
-    });
-
-    it("method dotted attr works #1", () => {
-      const cd = transformSource("<Stack method.myApi='getCount()'></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).myApi).equal("getCount()");
-    });
-
-    it("method with name and text works #1", () => {
-      const cd = transformSource("<Stack><method name='set'>do</method></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name and text works #1", () => {
-      const cd = transformSource("<Stack><method name='set'>do</method></Stack>") as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-    });
-
-    it("method with name and text works #2", () => {
-      const cd = transformSource(`
-      <Stack>
-        <method name='set'>do</method>
-        <method name='other'>get</method>
-      </Stack>
-    `) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).set).equal("do");
-      expect((cd.api! as any).other).equal("get");
-    });
-
     it("method with name results null", () => {
       const cd = transformSource("<Stack><method name='set'/></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
       expect((cd.api! as any).set).equal(null);
     });
 
-    it("method becomes array #1", () => {
-      const cd = transformSource(
-        "<Stack><method name='myApi' value='123'/><method name='myApi' value='234'/></Stack>",
-      ) as ComponentDef;
-      expect(cd.type).equal("Stack");
-      expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
+    describe("method pre-parsing", () => {
+      it("inline method attr is pre-parsed", () => {
+        const cd = transformSource("<Stack method.myApi='doIt' />") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myApi;
+        expect(method.__PARSED).toBe(true);
+        const stmts = method.statements as Statement[];
+        expect(stmts.length).equal(1);
+        expect(stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+        expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
+        const id = (stmts[0] as ExpressionStatement).expr as Identifier;
+        expect(id.name).equal("doIt");
+      });
+
+      it("method with value attr is pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myMethod' value='doIt'/></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myMethod;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+        const stmts = method.statements as Statement[];
+        expect(stmts.length).equal(1);
+        expect(stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+        expect((stmts[0] as ExpressionStatement).expr.type).equal(T_IDENTIFIER);
+      });
+
+      it("method with text content is pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myMethod'>doIt</method></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).myMethod;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+      });
+
+      it("multiple methods are all pre-parsed", () => {
+        const cd = transformSource(`
+        <Stack>
+          <method name="set">doIt</method>
+          <method name="get">getIt</method>
+        </Stack>
+      `) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        expect((cd.api! as any).set.__PARSED).toBe(true);
+        expect((cd.api! as any).get.__PARSED).toBe(true);
+        expect((cd.api! as any).set.source).equal("doIt");
+        expect((cd.api! as any).get.source).equal("getIt");
+      });
+
+      it("null method stays null", () => {
+        const cd = transformSource("<Stack><method name='myMethod'/></Stack>") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        expect((cd.api! as any).myMethod).equal(null);
+      });
+
+      it("source is preserved in pre-parsed method", () => {
+        const cd = transformSource("<Stack method.counter='count + 1' />") as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const method = (cd.api! as any).counter;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("count + 1");
+      });
+
+      it("parseId is a number in pre-parsed method", () => {
+        const cd = transformSource("<Stack method.myApi='doIt' />") as ComponentDef;
+        const method = (cd.api! as any).myApi;
+        expect(typeof method.parseId).equal("number");
+      });
+
+      it("compound component method attr is pre-parsed", () => {
+        const cd = transformSource(
+          "<Component name='MyComp' method.myApi='doIt'><Stack/></Component>",
+        ) as CompoundComponentDef;
+        expect(cd.name).equal("MyComp");
+        const method = (cd.api! as any).myApi;
+        expect(method.__PARSED).toBe(true);
+        expect(method.source).equal("doIt");
+      });
+
+      it("method array entries are pre-parsed", () => {
+        const cd = transformSource(
+          "<Stack><method name='myApi' value='doIt'/><method name='myApi' value='getIt'/></Stack>",
+        ) as ComponentDef;
+        expect(cd.type).equal("Stack");
+        const methods = (cd.api! as any).myApi;
+        expect(Array.isArray(methods)).toBe(true);
+        expect(methods[0].__PARSED).toBe(true);
+        expect(methods[0].source).equal("doIt");
+        expect(methods[1].__PARSED).toBe(true);
+        expect(methods[1].source).equal("getIt");
+      });
     });
   });
   describe("uses", () => {
     // --- Uses
-    it("uses must not have a value attribute #1", () => {
-      try {
-        transformSource("<Stack><uses x='a'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T015");
-      }
-    });
-
-    it("uses must not have a value attribute #2", () => {
-      try {
-        transformSource("<Stack><uses x='a' value='b'/></Stack>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).includes("T015");
-      }
-    });
-
     it("uses works with 2 values", () => {
       const cd = transformSource(`
       <Stack>
@@ -1107,7 +1014,7 @@ describe("Xmlui transform - child elements", () => {
           },
         },
         api: {
-          hello: "console.log('hello')",
+          hello: { __PARSED: true },
         },
       });
     });
@@ -1119,7 +1026,7 @@ describe("Xmlui transform - child elements", () => {
       expect(cd).toMatchObject({
         name: "MyComp",
         api: {
-          getIt: "getIt()",
+          getIt: { __PARSED: true },
         },
         component: {
           type: "Stack",
@@ -1134,8 +1041,8 @@ describe("Xmlui transform - child elements", () => {
       expect(cd).toMatchObject({
         name: "MyComp",
         api: {
-          getIt: "getIt()",
-          other: "other()",
+          getIt: { __PARSED: true },
+          other: { __PARSED: true },
         },
         component: {
           type: "Stack",
@@ -1153,8 +1060,8 @@ describe("Xmlui transform - child elements", () => {
           type: "Stack",
         },
         api: {
-          getIt: "getIt()",
-          other: "other()",
+          getIt: { __PARSED: true },
+          other: { __PARSED: true },
         },
       });
     });
@@ -1253,23 +1160,6 @@ describe("Xmlui transform - child elements", () => {
           fileId: 0,
         },
       });
-    });
-
-    it("Compound component cannot nest another one", () => {
-      try {
-        const cd = transformSource(`
-          <Component name="A">
-            <Stack>
-              <Component name="B">
-                <Button />
-              </Component>
-            </Stack>
-          </Component>
-          `) as CompoundComponentDef;
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).include("T006");
-      }
     });
   });
   describe("debug info", () => {
@@ -1432,72 +1322,6 @@ describe("Xmlui transform - child elements", () => {
       ) as ComponentDef;
 
       expect(cd.children[0].type).eq("test-value.DataGrid");
-    });
-
-    describe("handled errors", () => {
-      it("errors on namespace value includeing '#'", () => {
-        try {
-          const cd = transformSource(`<App xmlns:TestNamespace="#something" />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("errors on refering to unknown namespace", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="Test.Components" >
-              <NonExistant:DataGrid />
-          </App>
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T027");
-        }
-      });
-
-      it("multiple colons in namespace value errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="component-ns:buttons-components:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T028");
-        }
-      });
-
-      it("unrecognised namespace scheme errors", () => {
-        try {
-          const cd = transformSource(`
-          <App xmlns:TestNamespace="NON-EXISTANT:Test.Components" />
-          `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T029");
-        }
-      });
-
-      it("duplicate namespace key errors", () => {
-        try {
-          const cd = transformSource(`
-              <App xmlns:TestNamespace="first" xmlns:TestNamespace="second" />
-              `) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T025");
-        }
-      });
-
-      it("namespace on top lvl component errors", () => {
-        try {
-          const cd = transformSource(`<NonExistantNs:App />`) as ComponentDef;
-          assert.fail("Exception expected");
-        } catch (err) {
-          expect(err.toString()).include("T026");
-        }
-      });
     });
   });
 });

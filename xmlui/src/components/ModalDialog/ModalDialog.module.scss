@@ -20,11 +20,12 @@ $fontFamily-ModalDialog: createThemeVar("Dialog:fontFamily-#{$component}");
 $textColor-ModalDialog: createThemeVar("Dialog:textColor-#{$component}");
 $minWidth-ModalDialog: createThemeVar("Dialog:minWidth-#{$component}");
 $maxWidth-ModalDialog: createThemeVar("Dialog:maxWidth-#{$component}");
+$maxHeight-ModalDialog: createThemeVar("Dialog:maxHeight-#{$component}");
 $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$component}");
 
 @layer components {
   .overlay {
-    position: absolute;
+    position: fixed;
     display: grid;
     place-items: center;
     overflow-y: auto;
@@ -74,7 +75,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
     box-shadow: t.$boxShadow-spread;
     transform: translate(0);
     width: 90vw;
-    max-height: 100%;
+    max-height: $maxHeight-ModalDialog;
     max-width: $maxWidth-ModalDialog;
     min-width: $minWidth-ModalDialog;
     isolation: isolate;
@@ -104,6 +105,7 @@ $marginBottom-title-ModalDialog: createThemeVar("Dialog:marginBottom-title-#{$co
     min-height: 0;
     gap: var(--stack-gap-default);
     flex: 1;
+    overflow-y: auto;
   }
 
   @keyframes overlayShow {

@@ -1,12 +1,14 @@
-import React, { forwardRef, type ReactNode, useEffect } from "react";
+import React, { forwardRef, type ReactNode, useCallback, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./NavPanel.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
 
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import { Logo } from "../Logo/LogoNative";
+import { ThemedLogo as Logo } from "../Logo/Logo";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
@@ -260,6 +262,9 @@ export const defaultProps = {
   inDrawer: false,
   scrollStyle: "normal" as ScrollStyle,
   showScrollerFade: true,
+  syncWithContent: false,
+  syncScrollBehavior: "smooth" as ScrollBehavior,
+  syncScrollPosition: "center" as ScrollLogicalPosition,
 };
 
 interface INavPanelContext {
@@ -277,6 +282,7 @@ function DrawerNavPanel({
   footerContent,
   children,
   className,
+  classes,
   style,
   scrollStyle = defaultProps.scrollStyle,
   showScrollerFade = defaultProps.showScrollerFade,
@@ -284,6 +290,7 @@ function DrawerNavPanel({
 }: {
   children: ReactNode;
   className?: string;
+  classes?: Record<string, string>;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   footerContent?: ReactNode;
@@ -295,7 +302,7 @@ function DrawerNavPanel({
     <NavPanelContext.Provider value={contextValue}>
       <div
         {...rest}
-        className={classnames(styles.wrapper, className, { [styles.hasFooter]: hasFooter })}
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.hasFooter]: hasFooter })}
         style={style}
       >
         <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
@@ -322,6 +329,7 @@ function DrawerNavPanel({
 type Props = {
   children: ReactNode;
   className?: string;
+  classes?: Record<string, string>;
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   footerContent?: ReactNode;
@@ -330,6 +338,9 @@ type Props = {
   showScrollerFade?: boolean;
   navLinks?: NavHierarchyNode[];
   scrollStyle?: ScrollStyle;
+  syncWithContent?: boolean;
+  syncScrollBehavior?: ScrollBehavior;
+  syncScrollPosition?: ScrollLogicalPosition;
 };
 
 export const NavPanel = forwardRef(function NavPanel(
@@ -339,17 +350,97 @@ export const NavPanel = forwardRef(function NavPanel(
     logoContent,
     footerContent,
     className,
+    classes,
     inDrawer = defaultProps.inDrawer,
     renderChild,
     navLinks,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
+    syncWithContent = defaultProps.syncWithContent,
+    syncScrollBehavior = defaultProps.syncScrollBehavior,
+    syncScrollPosition = defaultProps.syncScrollPosition,
     ...rest
   }: Props,
   forwardedRef: React.ForwardedRef<any>,
 ) {
   const appLayoutContext = useAppLayoutContext();
   const linkInfoContext = useLinkInfoContext();
+  const localRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  // True when the current navigation was initiated by a click inside the NavPanel.
+  // In that case the user already sees the clicked link, so we skip scrolling.
+  const clickedInsideRef = useRef(false);
+
+  const mergedRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      localRef.current = node;
+      if (typeof forwardedRef === "function") {
+        forwardedRef(node);
+      } else if (forwardedRef) {
+        (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [forwardedRef],
+  );
+
+  // Scroll the active NavLink into view when the route changes
+  useEffect(() => {
+    if (!syncWithContent || !localRef.current) return;
+
+    // If the navigation was triggered by clicking inside the NavPanel the user
+    // already sees the link — skip scrolling to avoid it jumping under the cursor.
+    if (clickedInsideRef.current) {
+      clickedInsideRef.current = false;
+      return;
+    }
+
+    const panel = localRef.current;
+    let scrolled = false;
+
+    // Scrolls the leaf active link if it is not inside a collapsed NavGroup.
+    // Returns true if scrolling was performed.
+    //
+    // Nav hierarchy: a NavGroup header also renders a NavLink with `to` that gets
+    // `xmlui-navlink-active` on a prefix match. That header link has `aria-expanded`
+    // on it (passed from ExpandableNavGroup). Leaf NavLinks never have `aria-expanded`.
+    // We skip header links so we always scroll to the deepest/leaf active link.
+    const findAndScrollToActiveLink = (): boolean => {
+      const candidates = Array.from(panel.querySelectorAll(".xmlui-navlink-active"));
+      // Find the leaf link: exclude NavGroup-header links (they have aria-expanded)
+      const leafLink = candidates.find((el) => el.getAttribute("aria-expanded") === null);
+      if (!leafLink) return false;
+      // If the link is inside a still-collapsed NavGroup content (aria-hidden="true"),
+      // the expansion animation hasn't finished yet — defer until transitionend.
+      let el: Element | null = leafLink.parentElement;
+      while (el && el !== panel) {
+        if (el.getAttribute("aria-hidden") === "true") return false;
+        el = el.parentElement;
+      }
+      leafLink.scrollIntoView({ block: syncScrollPosition, behavior: syncScrollBehavior });
+      return true;
+    };
+
+    // Try immediately — works when the active link is in an already-expanded group
+    if (findAndScrollToActiveLink()) {
+      scrolled = true;
+      return;
+    }
+
+    // Otherwise wait for the NavGroup CSS grid expansion (grid-template-rows, 0.3s)
+    // to complete before scrolling to the leaf link.
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (scrolled || e.propertyName !== "grid-template-rows") return;
+      if (findAndScrollToActiveLink()) {
+        scrolled = true;
+        panel.removeEventListener("transitionend", handleTransitionEnd);
+      }
+    };
+
+    panel.addEventListener("transitionend", handleTransitionEnd);
+    return () => {
+      panel.removeEventListener("transitionend", handleTransitionEnd);
+    };
+  }, [syncWithContent, syncScrollBehavior, syncScrollPosition, location.pathname]);
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const showLogo =
     appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
@@ -377,6 +468,7 @@ export const NavPanel = forwardRef(function NavPanel(
         logoContent={safeLogoContent}
         footerContent={hasFooter ? footerContent : undefined}
         className={className}
+        classes={classes}
         scrollStyle={scrollStyle}
         showScrollerFade={showScrollerFade}
       >
@@ -388,13 +480,15 @@ export const NavPanel = forwardRef(function NavPanel(
   const wrapperEl = (
     <div
       {...rest}
-      ref={forwardedRef}
-      className={classnames(styles.wrapper, className, {
+      ref={mergedRef}
+      onMouseDown={() => { clickedInsideRef.current = true; }}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
         [styles.horizontal]: horizontal,
         [styles.vertical]: vertical,
         [styles.condensed]: isCondensed,
         [styles.hasFooter]: hasFooter,
         [styles.collapsed]: collapsed,
+        [styles.overlayScroll]: scrollStyle !== "normal",
       })}
       style={style}
     >

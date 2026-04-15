@@ -67,6 +67,20 @@ export function safeStringify(value: any): string {
 }
 
 /**
+ * Safely deep-clone a value, replacing circular references, functions,
+ * and DOM nodes with placeholder strings. Use when storing values in
+ * _xsLogs that will later be JSON.stringify'd during trace capture.
+ */
+export function safeClone<T>(value: T): T {
+  if (value == null || typeof value !== "object") return value;
+  try {
+    return JSON.parse(safeStringify(value));
+  } catch {
+    return "[uncloneable]" as any;
+  }
+}
+
+/**
  * Simple stringify for diff display (no circular reference handling needed).
  */
 export function simpleStringify(value: any): string {
@@ -187,25 +201,30 @@ export interface XsLogEntry {
 export function pushXsLog(entry: XsLogEntry, xsLogMax: number = 200): void {
   if (typeof window === "undefined") return;
   const w = window as any;
-  w._xsLogs = Array.isArray(w._xsLogs) ? w._xsLogs : [];
-  w._xsLogs.push(entry);
+  // _xsLogs is only initialized by AppContent when xsVerbose=true.
+  // If it doesn't exist, tracing is off — noop.
+  if (!Array.isArray(w._xsLogs)) return;
+  // Safe-clone the entry to prevent circular references from live objects
+  // (e.g., React Query cache) from poisoning _xsLogs and breaking JSON export.
+  w._xsLogs.push(safeClone(entry));
   if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
     splicePreservingInteractions(w._xsLogs, xsLogMax);
   }
 }
 
 /**
- * Trim _xsLogs to the max size while preserving interaction, navigate, and API
- * events. These are rare but critical for Playwright test generation and
- * semantic trace comparison, and must not be evicted by high-frequency
- * events (state:changes, handler:start/complete, component:vars:*).
+ * Trim _xsLogs to the max size while preserving events critical for Playwright
+ * test generation and semantic trace comparison. High-frequency events
+ * (state:changes, component:vars:*) are evictable; everything needed to
+ * reconstruct user journeys (interactions, navigation, APIs, handlers,
+ * modals, toasts) is preserved.
  */
 export function splicePreservingInteractions(logs: any[], maxSize: number): void {
-  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error"]);
+  const preserved = new Set(["interaction", "navigate", "api:start", "api:complete", "api:error", "handler:start", "handler:complete", "modal:show", "modal:confirm", "modal:cancel", "toast", "submenu:open", "selection:change", "focus:change", "method:call", "value:change"]);
   const keep: any[] = [];
   const evictable: any[] = [];
   for (const entry of logs) {
-    if (preserved.has(entry.kind)) {
+    if (preserved.has(entry.kind) || entry.kind?.startsWith("native:")) {
       keep.push(entry);
     } else {
       evictable.push(entry);
@@ -283,10 +302,18 @@ export function popTrace(): void {
 
 /**
  * Get the current trace ID.
+ * After startup is complete, never return the startup trace — events that
+ * fire without an active interaction trace should get no traceId rather
+ * than being incorrectly attributed to startup.
  */
 export function getCurrentTrace(): string | undefined {
   if (typeof window !== "undefined") {
-    return (window as any)._xsCurrentTrace;
+    const w = window as any;
+    const current = w._xsCurrentTrace;
+    if (current && w._xsStartupComplete && current === w._xsStartupTrace) {
+      return undefined;
+    }
+    return current;
   }
   return traceStack[traceStack.length - 1];
 }

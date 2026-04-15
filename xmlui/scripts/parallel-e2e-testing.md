@@ -266,5 +266,5 @@ Potential enhancements:
 
 - [Playwright Configuration](../../playwright.config.ts)
 - [Distribution Script](./distribute-tests.cjs)
-- [E2E Testing Conventions](../dev-docs/conv-e2e-testing.md)
+- [E2E Testing Conventions](../../.ai/xmlui/testing/e2e.md)
 - [GitHub Actions - Matrix Strategy](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs)

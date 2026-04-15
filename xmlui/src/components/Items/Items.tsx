@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
 import { Items, defaultProps } from "./ItemsNative";
@@ -36,14 +36,14 @@ export const ItemsMd = createMetadata({
   opaque: true,
 });
 
-export const itemsComponentRenderer = createComponentRenderer(COMP, ItemsMd, (rendererContext) => {
-  const { node, renderChild, extractValue, layoutContext } = rendererContext;
-  return (
-    <Items
-      items={extractValue(node.props.items) || extractValue(node.props.data)}
-      reverse={extractValue(node.props.reverse)}
-      renderItem={(contextVars, key) => {
-        return (
+export const itemsComponentRenderer = wrapComponent(COMP, Items, ItemsMd, {
+  customRender: (_props, context) => {
+    const { node, renderChild, extractValue, layoutContext } = context;
+    return (
+      <Items
+        items={extractValue(node.props.items) || extractValue(node.props.data)}
+        reverse={extractValue(node.props.reverse)}
+        renderItem={(contextVars, key) => (
           <MemoizedItem
             key={key}
             contextVars={contextVars}
@@ -51,8 +51,8 @@ export const itemsComponentRenderer = createComponentRenderer(COMP, ItemsMd, (re
             renderChild={renderChild}
             layoutContext={layoutContext}
           />
-        );
-      }}
-    />
-  );
+        )}
+      />
+    );
+  },
 });

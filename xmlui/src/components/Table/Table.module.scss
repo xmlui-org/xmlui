@@ -17,6 +17,8 @@ $backgroundColor-row-Table: createThemeVar("backgroundColor-row-#{$component}");
 $backgroundColor-row-Table--hover: createThemeVar("backgroundColor-row-#{$component}--hover");
 $backgroundColor-selected-Table: createThemeVar("backgroundColor-selected-#{$component}");
 $backgroundColor-selected-Table--hover: createThemeVar("backgroundColor-selected-#{$component}--hover");
+$backgroundColor-evenRow-Table: createThemeVar("backgroundColor-evenRow-#{$component}");
+$backgroundColor-oddRow-Table: createThemeVar("backgroundColor-oddRow-#{$component}");
 $backgroundColor-heading-Table: createThemeVar("backgroundColor-heading-#{$component}");
 $backgroundColor-heading-Table--hover: createThemeVar("backgroundColor-heading-#{$component}--hover");
 $backgroundColor-heading-Table--active: createThemeVar("backgroundColor-heading-#{$component}--active");
@@ -30,6 +32,9 @@ $backgroundColor-pagination-Table: createThemeVar("backgroundColor-pagination-#{
 $textColor-heading-Table: createThemeVar("textColor-heading-#{$component}");
 $fontWeight-row-Table: createThemeVar("fontWeight-row-#{$component}");
 $fontSize-row-Table: createThemeVar("fontSize-row-#{$component}");
+$fontSize-checkbox-Table: createThemeVar("fontSize-checkbox-#{$component}");
+$backgroundColor-selectionCell-Table: createThemeVar("backgroundColor-selectionCell-#{$component}");
+$backgroundColor-selectionCell-Table--hover: createThemeVar("backgroundColor-selectionCell-#{$component}--hover");
 $fontWeight-heading-Table: createThemeVar("fontWeight-heading-#{$component}");
 $fontSize-heading-Table: createThemeVar("fontSize-heading-#{$component}");
 $textTransform-heading-Table: createThemeVar("textTransform-heading-#{$component}");
@@ -43,10 +48,14 @@ $outlineOffset-heading-Table--focus: createThemeVar('outlineOffset-heading-#{$co
 $borderBottom-cell-Table: createThemeVar("borderBottom-cell-Table");
 $borderBottom-last-row-Table: createThemeVar("borderBottom-last-row-Table");
 $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
+$backgroundColor-pinnedCell-Table: createThemeVar("backgroundColor-pinnedCell-#{$component}");
+$backgroundColor-pinnedCell-Table--hover: createThemeVar("backgroundColor-pinnedCell-#{$component}--hover");
+$borderColor-Checkbox--hover: createThemeVar("Input:borderColor-Checkbox--hover");
 
 @layer components {
   .wrapper {
     width: 100%;
+    max-height: 100%;
     outline: none;
     overflow: auto;
     isolation: isolate;
@@ -127,6 +136,10 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     background-color: $backgroundColor-heading-Table;
   }
 
+  .pinnedCell {
+    background-color: $backgroundColor-pinnedCell-Table;
+  }
+
   .columnCell,
   .cell {
     display: flex;
@@ -135,6 +148,7 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    border-bottom: $borderBottom-cell-Table;
 
     &.alignTop {
       align-items: flex-start;
@@ -146,6 +160,11 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
     &.alignBottom {
       align-items: flex-end;
+    }
+
+    // Allow the ::before pseudo-element on .checkBoxWrapper to extend beyond cell bounds
+    &[data-column-id="select"] {
+      overflow: visible;
     }
   }
 
@@ -164,11 +183,11 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
     .headerRow {
       display: flex;
       flex-direction: row;
-      border-bottom: $borderBottom-cell-Table;
+      width: 100%;
       //background-color: inherit;
 
       .checkBoxWrapper {
-        font-size: t.$fontSize;
+        font-size: $fontSize-checkbox-Table;
         visibility: hidden;
 
         &.showInHeader,
@@ -234,9 +253,23 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       font-size: $fontSize-row-Table;
       font-weight: $fontWeight-row-Table;
       background-color: $backgroundColor-row-Table;
+      --pinned-cell-bg: #{$backgroundColor-row-Table};
+      --checkbox-cell-bg: #{$backgroundColor-selectionCell-Table};
+
+      &.evenRow {
+        background-color: $backgroundColor-evenRow-Table;
+        --pinned-cell-bg: #{$backgroundColor-evenRow-Table};
+      }
+
+      &.oddRow {
+        background-color: $backgroundColor-oddRow-Table;
+        --pinned-cell-bg: #{$backgroundColor-oddRow-Table};
+      }
 
       &.selected {
         background-color: $backgroundColor-selected-Table;
+        --pinned-cell-bg: #{$backgroundColor-selected-Table};
+        --checkbox-cell-bg: #{$backgroundColor-selected-Table};
 
         .cell {
           background-color: $backgroundColor-selected-Table;
@@ -246,6 +279,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
       &:hover {
         background-color: $backgroundColor-row-Table--hover;
+        --pinned-cell-bg: #{$backgroundColor-pinnedCell-Table--hover};
+        --checkbox-cell-bg: #{$backgroundColor-selectionCell-Table--hover};
 
         .cell {
           background-color: $backgroundColor-row-Table--hover;
@@ -254,6 +289,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
       &.selected.focused {
         background-color: $backgroundColor-selected-Table;
+        --pinned-cell-bg: #{$backgroundColor-selected-Table};
+        --checkbox-cell-bg: #{$backgroundColor-selected-Table};
 
         .cell {
           background-color: $backgroundColor-selected-Table;
@@ -262,6 +299,8 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
       &.selected:hover {
         background-color: $backgroundColor-selected-Table--hover;
+        --pinned-cell-bg: #{$backgroundColor-selected-Table--hover};
+        --checkbox-cell-bg: #{$backgroundColor-selected-Table--hover};
 
         .cell {
           background-color: $backgroundColor-selected-Table--hover;
@@ -274,11 +313,15 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
       }
 
       &:last-child{
-        border-bottom: $borderBottom-last-row-Table;
+        .cell {
+          border-bottom: $borderBottom-last-row-Table;
+        }
       }
 
       &.noBottomBorder:last-child {
-        border-bottom: none;
+        .cell {
+          border-bottom: none;
+        }
       }
     }
   }
@@ -368,15 +411,49 @@ $borderColor-cell-Table: createThemeVar("borderColor-cell-Table");
 
   .checkBoxWrapper {
     opacity: 0.5;
+    position: relative; // For pseudo-element absolute positioning
+    cursor: pointer;
 
     &:hover {
       opacity: 1;
+
+      .selectionToggle {
+        border-color: $borderColor-Checkbox--hover;
+      }
     }
 
-    // Force hover state for extended interaction zone
-    &.forceHoverWrapper {
-      opacity: 1;
+    // Extended interaction zones via CSS
+    &.toleranceCompact {
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        z-index: 1;
+      }
     }
+
+    &.toleranceComfortable {
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -12px;
+        z-index: 1;
+      }
+    }
+
+    &.toleranceSpacious {
+      &::before {
+        content: '';
+        position: absolute;
+        inset: -16px;
+        z-index: 1;
+      }
+    }
+  }
+
+  .selectionToggle {
+    position: relative;
+    z-index: 2;
   }
 
   .resizer {

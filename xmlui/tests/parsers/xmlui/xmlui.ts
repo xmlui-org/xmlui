@@ -19,7 +19,7 @@ export function transformSource(
   }
   if (errors.length > 0) {
     // return {errors}
-    throw new Error(errors[0].message);
+    throw new Error(`${errors[0].code}: ${errors[0].message}`);
   }
   return nodeToComponentDef(node, getText, fileId ?? 0);
 }

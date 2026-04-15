@@ -797,6 +797,20 @@ $space-72: createVar(space-72);
 $space-80: createVar(space-80);
 $space-96: createVar(space-96);
 
+// CSS variables describing bbotstrap column sizes
+$col-1: createVar(col-1);
+$col-2: createVar(col-2);
+$col-3: createVar(col-3);
+$col-4: createVar(col-4);
+$col-5: createVar(col-5);
+$col-6: createVar(col-6);
+$col-7: createVar(col-7);
+$col-8: createVar(col-8);
+$col-9: createVar(col-9);
+$col-10: createVar(col-10);
+$col-11: createVar(col-11);
+$col-12: createVar(col-12);
+
 // ---------------------------------------------------------------------------------------------------------------------
 // Generic style variables
 
@@ -897,9 +911,13 @@ $textColor-InputLabel-required: createVar(textColor-InputLabel-required);
 
 // ---------------------------------------------------------------------------------------------------------------------
 // formItem style variables
-$textColor-FormItemLabel: createVar(textColor-FormItemLabel);
-$fontSize-FormItemLabel: createVar(fontSize-FormItemLabel);
-$fontWeight-FormItemLabel: createVar(fontWeight-FormItemLabel);
+$textColor-label-formItem: createVar(textColor-label-formItem);
+$textColor-label-formItem--required: createVar(textColor-label-formItem--required);
+$fontSize-label-formItem: createVar(fontSize-label-formItem);
+$fontSize-label-formItem--required: createVar(fontSize-label-formItem--required);
+$fontWeight-label-formItem: createVar(fontWeight-label-formItem);
+$fontWeight-label-formItem--required: createVar(fontWeight-label-formItem--required);
+
 
 //----------------------------------------------------------------------------------------------------------------------
 // Tab style variables

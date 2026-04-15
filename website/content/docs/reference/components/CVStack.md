@@ -1,8 +1,8 @@
 # CVStack [#cvstack]
 
-This component is inherited from [Stack](/components/Stack)
+This component is inherited from [Stack](/docs/reference/components/Stack)
 
-See also: [CHStack](/components/CHStack), [HStack](/components/HStack), [VStack](/components/VStack)
+See also: [CHStack](/docs/reference/components/CHStack), [HStack](/docs/reference/components/HStack), [VStack](/docs/reference/components/VStack)
 
 `CVStack` is a specialized, shorthand version for the regular `Stack` component with a vertical orientation centered on its contents.
 

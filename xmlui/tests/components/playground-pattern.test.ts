@@ -1387,6 +1387,247 @@ describe("Playground pattern parsing", () => {
       height: "300px",
     });
   });
+
+  it("Copy flag inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.display).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by app section from root, section display not inherited", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app display
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.display).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by section, section's own copy wins", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app copy
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Copy flag inherited by comp section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg copy
+---app
+<Button>Click me</Button>
+---comp
+<Component name="MyComponent" />
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.components).toBeDefined();
+    expect(result.components?.length).toBe(1);
+    expect(result.components?.[0].copy).toBe(true);
+    expect(result.components?.[0].display).toBeUndefined();
+    expect(result.components?.[0].content).toBe('<Component name="MyComponent" />\n');
+  });
+
+  it("No copy inherited when root has no copy flag", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.copy).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display flag inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display and copy flags both inherited by app section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Display flag inherited by comp section from root", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg display copy
+---app
+<Button>Click me</Button>
+---comp
+<Component name="MyComponent" />
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.components).toBeDefined();
+    expect(result.components?.length).toBe(1);
+    expect(result.components?.[0].display).toBe(true);
+    expect(result.components?.[0].copy).toBe(true);
+    expect(result.components?.[0].content).toBe('<Component name="MyComponent" />\n');
+  });
+
+  it("No display inherited when root has no display flag", () => {
+    // --- Act
+    const content = `\`\`\`xmlui-pg
+---app
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBeUndefined();
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Section's explicit display overrides inherited display", () => {
+    // --- Act - root has no display, but section declares it
+    const content = `\`\`\`xmlui-pg copy
+---app display
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.display).toBe(true);
+    expect(result.app.copy).toBe(true);
+    expect(result.app.content).toBe("<Button>Click me</Button>\n");
+  });
+
+  it("Handles four-backtick nested code fences in observePlaygroundPattern", () => {
+    // --- Act
+    const source = "```xmlui-pg\n````bash\necho hello\n````\n```";
+
+    const result = observePlaygroundPattern(source);
+
+    // --- Assert
+    expect(result).not.toBeNull();
+    expect(result[0]).toBe(0);
+    expect(result[2]).toBe("```xmlui-pg\n````bash\necho hello\n````\n```");
+  });
+
+  it("Parses four-backtick nested code fences in content", () => {
+    // --- Act
+    const content = "```xmlui-pg\n<Markdown>\n````bash\nnpm start\n````\n</Markdown>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe("<Markdown>\n```bash\nnpm start\n```\n</Markdown>\n");
+  });
+
+  it("Parses four-backtick nested code fences in explicit app segment", () => {
+    // --- Act
+    const content = "```xmlui-pg\n---app display\n<Markdown>\n````js\nconst x = 1;\n````\n</Markdown>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe("<Markdown>\n```js\nconst x = 1;\n```\n</Markdown>\n");
+  });
+
+  it("Handles multiple four-backtick nested code fences", () => {
+    // --- Act
+    const content =
+      "```xmlui-pg\n<App>\n````bash\nfirst\n````\ntext\n````js\nsecond\n````\n</App>\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    expect(result.app.content).toBe(
+      "<App>\n```bash\nfirst\n```\ntext\n```js\nsecond\n```\n</App>\n",
+    );
+  });
+
+  it("Does not convert five backticks to three", () => {
+    // --- Act
+    const content = "```xmlui-pg\n`````bash\ncode\n`````\n```";
+
+    const result = parsePlaygroundPattern(content);
+
+    // --- Assert
+    expect(result.app).toBeDefined();
+    // Five backticks should remain as five backticks
+    expect(result.app.content).toBe("`````bash\ncode\n`````\n");
+  });
+
+  it("Display code block uses four-backtick fence when content has nested fences", () => {
+    // --- Act
+    const content =
+      "```xmlui-pg display\n---app display\n<Markdown>\n````bash\nnpm start\n````\n</Markdown>\n```";
+
+    const result = convertPlaygroundPatternToMarkdown(content);
+
+    // --- Assert
+    // The display markdown (base64-encoded in data-pg-markdown) should use ```` delimiters
+    const mdMatch = result.match(/data-pg-markdown="([^"]+)"/);
+    expect(mdMatch).not.toBeNull();
+    const displayMarkdown = base64ToString(mdMatch[1]);
+    // Should start with ```` instead of ```
+    expect(displayMarkdown).toContain("````xmlui");
+    // The content inside should have triple backticks (unescaped)
+    expect(displayMarkdown).toContain("```bash");
+  });
 });
 
 function base64ToString(base64: string) {

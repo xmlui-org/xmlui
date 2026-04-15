@@ -1,6 +1,8 @@
 import { Slider } from "./SliderNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -120,11 +122,11 @@ export const SliderMd = createMetadata({
     [`boxShadow-thumb-${COMP}--hover`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
     [`backgroundColor-thumb-${COMP}--active`]: "$color-primary-400",
     [`boxShadow-thumb-${COMP}--active`]: "0 0 0 6px rgb(from $color-primary r g b / 0.4)",
-    [`borderRadius-${COMP}--default`]: "$borderRadius",
-    [`borderColor-${COMP}--default`]: "transparent",
-    [`borderWidth-${COMP}--default`]: "0",
-    [`borderStyle-${COMP}--default`]: "solid",
-    [`boxShadow-${COMP}--default`]: "none",
+    [`borderRadius-${COMP}`]: "$borderRadius",
+    [`borderColor-${COMP}`]: "transparent",
+    [`borderWidth-${COMP}`]: "0",
+    [`borderStyle-${COMP}`]: "solid",
+    [`boxShadow-${COMP}`]: "none",
 
     light: {
       [`backgroundColor-track-${COMP}--disabled`]: "$color-surface-300",
@@ -141,43 +143,48 @@ export const SliderMd = createMetadata({
   },
 });
 
-export const sliderComponentRenderer = createComponentRenderer(
-  COMP,
-  SliderMd,
-  ({
-    node,
-    extractValue,
-    lookupEventHandler,
-    lookupSyncCallback,
-    className,
-    updateState,
-    state,
-    registerComponentApi,
-  }) => {
+type ThemedSliderProps = React.ComponentPropsWithoutRef<typeof Slider>;
+
+export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, ThemedSliderProps>(
+  function ThemedSlider({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(SliderMd);
     return (
       <Slider
-        validationStatus={extractValue(node.props.validationStatus)}
-        minStepsBetweenThumbs={extractValue(node.props?.minStepsBetweenThumbs)}
-        value={state.value}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        className={className}
-        step={extractValue(node.props?.step)}
-        min={extractValue(node.props?.minValue)}
-        max={extractValue(node.props?.maxValue)}
-        enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        rangeStyle={extractValue(node.props?.rangeStyle)}
-        thumbStyle={extractValue(node.props?.thumbStyle)}
-        showValues={extractValue.asOptionalBoolean(node.props?.showValues)}
-        valueFormat={lookupSyncCallback(node.props?.valueFormat)}
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
   },
 );
+
+export const sliderComponentRenderer = wrapComponent(COMP, Slider, SliderMd, {
+  // minValue, maxValue, minStepsBetweenThumbs are number-typed in metadata — asOptionalNumber throws
+  // for non-numeric strings (e.g. "invalid"). Exclude them so customRender handles via raw extractValue.
+  exclude: ["minValue", "maxValue", "minStepsBetweenThumbs"],
+  customRender: (_props, { node, extractValue, lookupEventHandler, lookupSyncCallback, classes, updateState, state, registerComponentApi }) => (
+    <Slider
+      validationStatus={extractValue(node.props.validationStatus)}
+      minStepsBetweenThumbs={extractValue(node.props?.minStepsBetweenThumbs)}
+      value={state.value}
+      initialValue={extractValue(node.props.initialValue)}
+      updateState={updateState}
+      onDidChange={lookupEventHandler("didChange")}
+      onFocus={lookupEventHandler("gotFocus")}
+      onBlur={lookupEventHandler("lostFocus")}
+      registerComponentApi={registerComponentApi}
+      classes={classes}
+      step={extractValue(node.props?.step)}
+      min={extractValue(node.props?.minValue)}
+      max={extractValue(node.props?.maxValue)}
+      enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
+      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+      required={extractValue.asOptionalBoolean(node.props.required)}
+      rangeStyle={extractValue(node.props?.rangeStyle)}
+      thumbStyle={extractValue(node.props?.thumbStyle)}
+      showValues={extractValue.asOptionalBoolean(node.props?.showValues)}
+      valueFormat={lookupSyncCallback(node.props?.valueFormat)}
+    />
+  ),
+});

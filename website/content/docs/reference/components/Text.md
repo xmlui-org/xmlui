@@ -38,8 +38,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -604,7 +604,7 @@ When using custom variants, you can style them using theme variables with the na
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-code | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-keyboard | rgb(from $color-surface-100 r g b / 0.4) | rgb(from $color-surface-100 r g b / 0.4) |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-marked | rgb(from $color-primary-200 r g b / 0.4) | rgb(from $color-primary-400 r g b / 0.4) |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Text-marked | rgb(from $color-primary-300 r g b / 0.4) | rgb(from $color-primary-400 r g b / 0.4) |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-100 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-300 |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Text | $borderRadius | $borderRadius |
@@ -690,7 +690,7 @@ When using custom variants, you can style them using theme variables with the na
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-code--hover | initial | initial |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-900 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Text-marked | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Text-marked | $color-secondary-800 | $color-secondary-800 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-placeholder--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Text-secondary | $textColor-secondary | $textColor-secondary |

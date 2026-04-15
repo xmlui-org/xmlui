@@ -1,6 +1,6 @@
 import styles from "./FileUploadDropZone.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneNative";
 import { createMetadata, d } from "../metadata-helpers";
@@ -78,34 +78,25 @@ export const FileUploadDropZoneMd = createMetadata({
   },
 });
 
-export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
+export const fileUploadDropZoneComponentRenderer = wrapComponent(
   COMP,
+  FileUploadDropZone,
   FileUploadDropZoneMd,
-  ({
-    node,
-    extractValue,
-    updateState,
-    renderChild,
-    lookupEventHandler,
-    registerComponentApi,
-    className,
-  }) => {
-    return (
+  {
+    events: { upload: "onUpload" },
+    strings: ["acceptedFileTypes"],
+    numbers: ["maxFiles"],
+    exclude: ["enabled"],
+    passUid: true,
+    exposeRegisterApi: true,
+    customRender: (props, { node, extractValue, renderChild, updateState }) => (
       <FileUploadDropZone
-        onUpload={lookupEventHandler("upload")!}
-        uid={extractValue(node.uid)}
-        registerComponentApi={registerComponentApi}
-        className={className}
-        allowPaste={extractValue(node.props.allowPaste)}
-        text={extractValue(node.props.text)}
-        icon={extractValue(node.props.icon)}
+        {...(props as any)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         updateState={updateState}
-        acceptedFileTypes={extractValue.asOptionalString(node.props.acceptedFileTypes)}
-        maxFiles={extractValue.asOptionalNumber(node.props.maxFiles)}
       >
         {renderChild(node.children, { type: "Stack" })}
       </FileUploadDropZone>
-    );
+    ),
   },
 );

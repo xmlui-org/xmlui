@@ -12,9 +12,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -343,78 +343,78 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--default | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--focus | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--focus | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning--hover | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--focus | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning--hover | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TextArea--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TextArea | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TextArea--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TextArea--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TextArea--warning | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TextArea--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TextArea | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TextArea--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TextArea--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TextArea--warning | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--warning | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--default | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--default--focus | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--error--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--success--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--success--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--warning--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TextArea--warning--hover | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-TextArea--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-TextArea | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-TextArea--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-TextArea--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-TextArea--warning | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextArea--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextArea | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextArea--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextArea--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextArea--warning | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-TextArea--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TextArea--warning--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TextArea--default--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TextArea--error--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TextArea--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TextArea--success--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TextArea--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-TextArea--default--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TextArea--error--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-TextArea--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TextArea--success--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TextArea--warning--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--default--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--error--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--success--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TextArea--warning--focus | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-TextArea | *none* | *none* |
@@ -424,17 +424,17 @@ The component has some parts that can be styled through layout properties and th
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-TextArea | *none* | *none* |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-TextArea | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-TextArea | $space-2 | $space-2 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-TextArea--default | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-TextArea | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-TextArea--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-TextArea--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-TextArea--warning | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--default | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--focus | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--default--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--disabled | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--error--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--focus | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TextArea--success--hover | *none* | *none* |

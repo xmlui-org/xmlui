@@ -6,6 +6,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { usePrevious } from "../../components-core/utils/hooks";
 import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 /**
  * An interval of selected items
@@ -28,6 +29,7 @@ type ToggleOptions = {
   metaKey?: boolean;
   ctrlKey?: boolean;
   singleItem?: boolean;
+  source?: "pointer" | "keyboard";
 };
 
 type SelectionApi = {
@@ -160,6 +162,7 @@ export default function useRowSelection({
   visibleItems = items,
   rowsSelectable,
   enableMultiRowSelection,
+  toggleSelectionOnClick,
   rowDisabledPredicate,
   rowUnselectablePredicate,
   onSelectionDidChange,
@@ -170,6 +173,7 @@ export default function useRowSelection({
   visibleItems: Item[];
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
+  toggleSelectionOnClick?: boolean;
   rowDisabledPredicate?: (item: any) => boolean;
   rowUnselectablePredicate?: (item: any) => boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
@@ -200,12 +204,10 @@ export default function useRowSelection({
   // The approach uses React's useEffect pattern which is appropriate for React-to-React communication.
   // The new AppState didUpdate event is more useful for non-React integrations.
   const appStateSelection = syncWithAppState?.value?.selectedIds;
-  const prevAppStateSelection = usePrevious(appStateSelection);
 
-  // --- State machine for sync direction control
-  const [syncState, setSyncState] = useState<
-    "idle" | "updating_to_appstate" | "updating_from_appstate"
-  >("idle");
+  // --- State machine for sync direction control (ref to avoid extra renders)
+  const syncStateRef = useRef<"idle" | "updating_to_appstate" | "updating_from_appstate">("idle");
+  const syncResetTimerRef = useRef<number>(0);
 
   // --- Use refs to track the last known selections to prevent update loops
   const lastAppStateSelectionRef = useRef<any[]>();
@@ -214,59 +216,86 @@ export default function useRowSelection({
   // --- Track the source of the last update to prevent echoing
   const lastUpdateSourceRef = useRef<"table" | "appstate" | null>(null);
 
+  // --- Captures an external update that was blocked while the guard was active.
+  // Filtering is done at capture time (in the effect) so the rAF only needs to apply it.
+  const pendingMissedAppStateRef = useRef<{ raw: string[]; toSelect: string[] } | null>(null);
+
+  // Cancel any pending rAF on unmount (writing to refs on an unmounted component is benign,
+  // but this avoids the unnecessary work and keeps cleanup explicit).
+  useEffect(() => () => cancelAnimationFrame(syncResetTimerRef.current), []);
+
+  // Helper: reset sync state to idle and apply any missed external update
+  const scheduleSyncReset = () => {
+    cancelAnimationFrame(syncResetTimerRef.current);
+    syncResetTimerRef.current = requestAnimationFrame(() => {
+      syncStateRef.current = "idle";
+      const missed = pendingMissedAppStateRef.current;
+      pendingMissedAppStateRef.current = null;
+      if (missed !== null) {
+        lastAppStateSelectionRef.current = missed.raw;
+        lastTableSelectionRef.current = missed.toSelect;
+        lastUpdateSourceRef.current = "appstate";
+        setSelectedRowIds(missed.toSelect);
+      }
+      syncResetTimerRef.current = requestAnimationFrame(() => {
+        lastUpdateSourceRef.current = null;
+      });
+    });
+  };
+
   // --- Sync from AppState to table selection (when AppState changes externally)
   useEffect(() => {
-    // Skip if not selectable, no sync, no selection, or we're currently updating to AppState
-    if (
-      !rowsSelectable ||
-      !syncWithAppState ||
-      !appStateSelection ||
-      syncState === "updating_to_appstate"
-    ) {
+    if (!rowsSelectable || !syncWithAppState || !appStateSelection) {
       return;
     }
 
-    // Only update if AppState selection actually changed and this wasn't caused by our own table update
-    const appStateChanged = appStateSelection !== prevAppStateSelection;
+    // Deep comparison handles late data loading and multi-source updates correctly.
     const isDifferentFromLastKnown =
       JSON.stringify([...(appStateSelection || [])].sort()) !==
       JSON.stringify([...(lastAppStateSelectionRef.current || [])].sort());
     const wasNotOurUpdate = lastUpdateSourceRef.current !== "table";
 
-    if (appStateChanged && isDifferentFromLastKnown && wasNotOurUpdate && items.length > 0) {
-      // Set state machine to indicate we're updating from AppState
-      setSyncState("updating_from_appstate");
-
-      const validIds = appStateSelection.filter((id: string) =>
-        items.some((item) => item[idKey] === id),
-      );
-
-      const idsToSelect = enableMultiRowSelection ? validIds : validIds.slice(0, 1);
-
-      // Track what we're setting to prevent loop
-      lastAppStateSelectionRef.current = [...appStateSelection];
-      lastTableSelectionRef.current = [...idsToSelect];
-      lastUpdateSourceRef.current = "appstate";
-
-      setSelectedRowIds(idsToSelect);
-      setInitialSelectionApplied(true);
+    // Nothing to apply — bail out early before touching the guard
+    if (!isDifferentFromLastKnown || !wasNotOurUpdate || items.length === 0) {
+      return;
     }
+
+    const validIds = appStateSelection.filter((id: string) =>
+      items.some((item) => item[idKey] === id),
+    );
+    const idsToSelect = enableMultiRowSelection ? validIds : validIds.slice(0, 1);
+
+    if (syncStateRef.current === "updating_to_appstate") {
+      // Guard is active: save the missed update so scheduleSyncReset can apply it after unlocking
+      pendingMissedAppStateRef.current = { raw: [...appStateSelection], toSelect: idsToSelect };
+      return;
+    }
+
+    // Set state machine to indicate we're updating from AppState
+    syncStateRef.current = "updating_from_appstate";
+
+    // Track what we're setting to prevent loop
+    lastAppStateSelectionRef.current = [...appStateSelection];
+    lastTableSelectionRef.current = [...idsToSelect];
+    lastUpdateSourceRef.current = "appstate";
+
+    setSelectedRowIds(idsToSelect);
+    setInitialSelectionApplied(true);
+    scheduleSyncReset();
   }, [
     appStateSelection,
-    prevAppStateSelection,
     items,
     rowsSelectable,
     syncWithAppState,
     idKey,
     enableMultiRowSelection,
     setSelectedRowIds,
-    syncState,
   ]);
 
   // --- Sync from table selection to AppState (when user interacts with table)
   useEffect(() => {
     // Skip if not selectable, no sync, or currently updating from AppState
-    if (!rowsSelectable || !syncWithAppState || syncState === "updating_from_appstate") {
+    if (!rowsSelectable || !syncWithAppState || syncStateRef.current === "updating_from_appstate") {
       return;
     }
 
@@ -284,7 +313,7 @@ export default function useRowSelection({
 
     if (tableChanged && isDifferentFromAppState && wasNotAppStateUpdate) {
       // Set state machine to indicate we're updating to AppState
-      setSyncState("updating_to_appstate");
+      syncStateRef.current = "updating_to_appstate";
 
       // Track what we're updating to prevent loop
       lastTableSelectionRef.current = [...currentSelectionIds];
@@ -292,32 +321,10 @@ export default function useRowSelection({
       lastUpdateSourceRef.current = "table";
 
       syncWithAppState.update?.({ selectedIds: currentSelectionIds });
+
+      scheduleSyncReset();
     }
-  }, [selectedItems, syncWithAppState, appStateSelection, idKey, rowsSelectable, syncState]);
-
-  // --- Reset sync state machine to idle when updates are complete
-  useEffect(() => {
-    if (syncState !== "idle") {
-      // Reset to idle state in the next tick to allow the current update to complete
-      const resetTimer = requestAnimationFrame(() => {
-        setSyncState("idle");
-      });
-
-      return () => cancelAnimationFrame(resetTimer);
-    }
-  }, [syncState, appStateSelection, selectedItems]);
-
-  // --- Clear update source when sync state becomes idle
-  useEffect(() => {
-    if (syncState === "idle") {
-      // Use a separate frame to clear the source after the sync state is reset
-      const clearTimer = requestAnimationFrame(() => {
-        lastUpdateSourceRef.current = null;
-      });
-
-      return () => cancelAnimationFrame(clearTimer);
-    }
-  }, [syncState]);
+  }, [selectedItems, syncWithAppState, appStateSelection, idKey, rowsSelectable]);
 
   // --- Set initial selection when component mounts and items are available
   // Use a separate effect that runs after the refresh to ensure timing is correct
@@ -402,9 +409,21 @@ export default function useRowSelection({
       }
 
       const targetId = walkableList[targetIndex];
+      const targetItem = visibleItems[targetIndex];
+
+      // --- If the target item is unselectable, ignore the interaction
+      if (
+        targetItem &&
+        (rowDisabledPredicate?.(targetItem) || rowUnselectablePredicate?.(targetItem))
+      ) {
+        return;
+      }
+
       const { shiftKey, metaKey, ctrlKey } = options;
 
-      const singleItem = !enableMultiRowSelection || (!shiftKey && !metaKey && !ctrlKey);
+      const singleItem =
+        !enableMultiRowSelection ||
+        (!(toggleSelectionOnClick && options.source !== "keyboard") && !shiftKey && !metaKey && !ctrlKey);
 
       // --- This variable will hold the newest selection interval
       let newSelectionInterval: SelectionInterval;
@@ -451,7 +470,12 @@ export default function useRowSelection({
           }
 
           const sl = walkableList.slice(normalizedFromIdx, normalizedToIdx + 1);
-          newSelectedRowsIdsInOrder = union(newSelectedRowsIdsInOrder, sl);
+          // --- Exclude unselectable items from the range
+          const selectableSl = sl.filter((id) => {
+            const item = visibleItems.find((i) => i[idKey] === id);
+            return !item || (!rowDisabledPredicate?.(item) && !rowUnselectablePredicate?.(item));
+          });
+          newSelectedRowsIdsInOrder = union(newSelectedRowsIdsInOrder, selectableSl);
           newSelectionInterval = {
             from: from,
             to: to,
@@ -463,8 +487,8 @@ export default function useRowSelection({
             to: targetId,
           };
 
-          if (metaKey || ctrlKey) {
-            // --- If META key (Mac) or CTRL (Windows) is pressed, toggle the selection of the targeted item
+          if (metaKey || ctrlKey || toggleSelectionOnClick) {
+            // --- If META key (Mac) or CTRL (Windows) is pressed, or toggleSelectionOnClick is enabled, toggle the selection of the targeted item
             if (newSelectedRowsIdsInOrder.includes(targetId)) {
               newSelectedRowsIdsInOrder = newSelectedRowsIdsInOrder.filter(
                 (item) => item !== targetId,
@@ -501,40 +525,68 @@ export default function useRowSelection({
     if (!rowsSelectable) {
       return;
     }
+    const keyboardOptions: ToggleOptions = {
+      shiftKey: event.shiftKey,
+      metaKey: event.metaKey,
+      ctrlKey: event.ctrlKey,
+      source: "keyboard",
+    };
+
     if (event.key === "ArrowDown") {
       // --- Move/extend the selection to the item below the focused one
       event.preventDefault();
+      event.stopPropagation();
       let newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 1);
       if (focusedIndex !== visibleItems.length - 1) {
-        toggleRowIndex(newFocusIndex, event);
+        toggleRowIndex(newFocusIndex, keyboardOptions);
       }
     }
     if (event.key === "PageDown") {
       // --- Move/extend the selection to the item 8 items below the focused one
       event.preventDefault();
+      event.stopPropagation();
       const newFocusIndex = Math.min(visibleItems.length - 1, focusedIndex + 8);
-      toggleRowIndex(newFocusIndex, event);
+      toggleRowIndex(newFocusIndex, keyboardOptions);
     }
     if (event.key === "ArrowUp") {
       // --- Move/extend the selection to the item above the focused one
       event.preventDefault();
+      event.stopPropagation();
       let newFocusIndex = Math.max(0, focusedIndex - 1);
       if (focusedIndex >= 0) {
-        toggleRowIndex(newFocusIndex, event);
+        toggleRowIndex(newFocusIndex, keyboardOptions);
       }
     }
     if (event.key === "PageUp") {
       // --- Move/extend the selection to the item 8 items above the focused one
       event.preventDefault();
+      event.stopPropagation();
       const newFocusIndex = Math.max(0, focusedIndex - 8);
-      toggleRowIndex(newFocusIndex, event);
+      toggleRowIndex(newFocusIndex, keyboardOptions);
     }
   });
 
+  // Keep a ref to the callback so the effect below only fires when selectedItems
+  // changes — not when the parent re-renders and passes a new function reference.
+  const onSelectionDidChangeRef = useRef(onSelectionDidChange);
+  onSelectionDidChangeRef.current = onSelectionDidChange;
+
   useEffect(() => {
-    // console.log("selection DID CHANGE?");
-    void onSelectionDidChange?.(selectedItems);
-  }, [selectedItems, onSelectionDidChange]);
+    void onSelectionDidChangeRef.current?.(selectedItems);
+    if (selectedItems.length > 0) {
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "selection:change",
+        component: "Table",
+        ariaName: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
+        displayLabel: `${selectedItems.length} item${selectedItems.length !== 1 ? "s" : ""}`,
+        selectedIds: selectedItems.map((item: any) => item.id ?? item.key),
+        selectedCount: selectedItems.length,
+      });
+    }
+  }, [selectedItems]);
 
   /**
    * This operation checks or clears all rows

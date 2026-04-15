@@ -26,7 +26,6 @@ import { FooterMd } from "./Footer/Footer";
 import { FormMd } from "./Form/Form";
 import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
-import { HoverCardMd } from "./HoverCard/HoverCard";
 import { IconMd } from "./Icon/Icon";
 import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
@@ -44,11 +43,9 @@ import { NoResultMd } from "./NoResult/NoResult";
 import { NumberBoxMd } from "./NumberBox/NumberBox";
 import { PageMetaTitleMd } from "./PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "./Pages/Pages";
-import { PositionedContainerMd } from "./PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "./ProgressBar/ProgressBar";
 import { QueueMd } from "./Queue/Queue";
 import { RadioGroupMd } from "./RadioGroup/RadioGroup";
-import { RealTimeAdapterMd } from "./RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "./Redirect/Redirect";
 import { SelectMd } from "./Select/Select";
 import { SelectionStoreMd } from "./SelectionStore/SelectionStore";
@@ -60,7 +57,6 @@ import { SwitchMd } from "./Switch/Switch";
 import { TableMd } from "./Table/Table";
 import { ColumnMd } from "./Column/Column";
 import { TableOfContentsMd } from "./TableOfContents/TableOfContents";
-import { BlogMd } from "./Blog/Blog";
 import { TabsMd } from "./Tabs/Tabs";
 import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
@@ -71,14 +67,11 @@ import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
-import { BreakoutMd } from "./Breakout/Breakout";
-import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
-import { BackdropMd } from "./Backdrop/Backdrop";
 import { BrMd } from "./Br/Br";
 import {
   HtmlAddressMd,
@@ -196,12 +189,6 @@ import {
   XmlUiThemeDefinition,
   XmlUiWebThemeDefinition,
 } from "../components-core/theming/themes/xmlui";
-import { BarChartMd } from "./Charts/BarChart/BarChart";
-import { DonutChartMd } from "./Charts/DonutChart/DonutChart";
-import { LabelListMd } from "./Charts/LabelList/LabelList";
-import { LegendMd } from "./Charts/Legend/Legend";
-import { LineChartMd } from "./Charts/LineChart/LineChart";
-import { PieChartMd } from "./Charts/PieChart/PieChart";
 import { ExpandableItemMd } from "./ExpandableItem/ExpandableItem";
 import { SlotMd } from "./Slot/Slot";
 import { TooltipMd } from "./Tooltip/Tooltip";
@@ -210,15 +197,14 @@ import { TimerMd } from "./Timer/Timer";
 import { DateInputMd } from "./DateInput/DateInput";
 import { PaginationMd } from "./Pagination/Pagination";
 import { ResponsiveBarMd } from "./ResponsiveBar/ResponsiveBar";
-import { ScrollViewer } from "./ScrollViewer/ScrollViewerNative";
 import { ScrollViewerMd } from "./ScrollViewer/ScrollViewer";
 import { ContextMenuMd } from "./ContextMenu/ContextMenu";
-import QRCode from "react-qr-code";
 import { QRCodeMd } from "./QRCode/QRCode";
 import { IncludeMarkupMd } from "./IncludeMarkup/IncludeMarkup";
-import { StickySection } from "./StickySection/StickySectionNative";
 import { StickySectionMd } from "./StickySection/StickySection";
 import { DrawerMd } from "./Drawer/Drawer";
+import { TileGridMd } from "./TileGrid/TileGrid";
+import { FormSegmentMd } from "./FormSegment/FormSegment";
 
 export const collectedComponentMetadata = {
   // --- HTML tags
@@ -329,14 +315,10 @@ export const collectedComponentMetadata = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
-  Backdrop: BackdropMd,
   Badge: BadgeMd,
-  Blog: BlogMd,
   Bookmark: BookmarkMd,
-  Breakout: BreakoutMd,
   Button: ButtonMd,
   Card: CardMd,
-  Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   CODE: HtmlCodeMd,
@@ -361,6 +343,7 @@ export const collectedComponentMetadata = {
   Form: FormMd,
   FormItem: FormItemMd,
   FormSection: FormSectionMd,
+  FormSegment: FormSegmentMd,
   Heading: HeadingMd,
   H1: H1Md,
   H2: H2Md,
@@ -368,7 +351,6 @@ export const collectedComponentMetadata = {
   H4: H4Md,
   H5: H5Md,
   H6: H6Md,
-  HoverCard: HoverCardMd,
   Icon: IconMd,
   IFrame: IFrameMd,
   Image: ImageMd,
@@ -391,12 +373,10 @@ export const collectedComponentMetadata = {
   Page: PageMd,
   Pages: PagesMd,
   Pagination: PaginationMd,
-  PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   QRCode: QRCodeMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
-  RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   ResponsiveBar: ResponsiveBarMd,
   ScrollViewer: ScrollViewerMd,
@@ -425,6 +405,7 @@ export const collectedComponentMetadata = {
   Text: TextMd,
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
+  TileGrid: TileGridMd,
   PasswordInput: PasswordMd,
   Theme: ThemeMd,
   TimeInput: TimeInputMd,
@@ -433,12 +414,6 @@ export const collectedComponentMetadata = {
   NavPanelCollapseButton: NavPanelCollapseButtonMd,
   ToneSwitch: ToneSwitchMd,
   Tree: TreeMd,
-  BarChart: BarChartMd,
-  DonutChart: DonutChartMd,
-  LabelList: LabelListMd,
-  Legend: LegendMd,
-  LineChart: LineChartMd,
-  PieChart: PieChartMd,
 };
 
 export const collectedThemes: Record<string, ThemeDefinition> = {

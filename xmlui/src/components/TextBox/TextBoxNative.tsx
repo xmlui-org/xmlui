@@ -9,10 +9,15 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import { Adornment } from "../Input/InputAdornment";
 import type { ValidationStatus } from "../abstractions";
-import { PART_START_ADORNMENT, PART_INPUT, PART_END_ADORNMENT, PART_CONCISE_VALIDATION_FEEDBACK } from "../../components-core/parts";
+import { PART_START_ADORNMENT,
+  PART_INPUT,
+  PART_END_ADORNMENT,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+} from "../../components-core/parts";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -30,6 +35,7 @@ type Props = {
   updateState?: UpdateStateFn;
   initialValue?: string;
   style?: CSSProperties;
+  classes?: Record<string, string>;
   className?: string;
   maxLength?: number;
   enabled?: boolean;
@@ -109,6 +115,7 @@ export const TextBox = forwardRef(function TextBox(
     updateState = defaultProps.updateState,
     initialValue = defaultProps.initialValue,
     style,
+    classes,
     className,
     maxLength,
     enabled = defaultProps.enabled,
@@ -152,12 +159,16 @@ export const TextBox = forwardRef(function TextBox(
     setShowPassword((prev) => !prev);
   }, []);
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "error";
 
   useEffect(() => {
@@ -213,6 +224,17 @@ export const TextBox = forwardRef(function TextBox(
     inputRef.current?.focus();
   }, []);
 
+  // Relay focus from the outer div to the inner input without triggering browser scroll.
+  // The outer div (tabIndex=-1) acts as a focus relay target; we don't want an additional
+  // scroll side-effect here since the host already handles scroll if desired.
+  // Only relay when focus arrives from outside — if a child (e.g. the password toggle button)
+  // receives focus we must not steal it back, otherwise Tab navigation becomes trapped.
+  const relayFocus = useCallback((e: React.FocusEvent<HTMLDivElement>) => {
+    if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, []);
+
   const setValue = useEvent((newValue) => {
     updateValue(newValue);
   });
@@ -224,11 +246,19 @@ export const TextBox = forwardRef(function TextBox(
     });
   }, [focus, registerComponentApi, setValue]);
 
+  const searchAriaAttributes =
+    type === "search"
+      ? {
+          "aria-controls": rest["aria-controls"],
+          "aria-autocomplete": rest["aria-autocomplete"],
+          "aria-activedescendant": rest["aria-activedescendant"],
+        }
+      : {};
   return (
     <div
       {...rest}
       ref={ref}
-      className={classnames(className, styles.inputRoot, {
+      className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
         [styles.disabled]: !enabled,
         [styles.readOnly]: readOnly,
         [styles.error]: validationStatus === "error",
@@ -236,7 +266,7 @@ export const TextBox = forwardRef(function TextBox(
         [styles.valid]: validationStatus === "valid",
       })}
       tabIndex={-1}
-      onFocus={focus}
+      onFocus={relayFocus}
       style={{ ...style, gap }}
     >
       <Part partId={PART_START_ADORNMENT}>
@@ -247,6 +277,7 @@ export const TextBox = forwardRef(function TextBox(
           id={id}
           ref={inputRef}
           type={actualType}
+          aria-label={(rest as any)["aria-label"]}
           className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
@@ -262,6 +293,8 @@ export const TextBox = forwardRef(function TextBox(
           autoFocus={autoFocus}
           tabIndex={enabled ? tabIndex : -1}
           required={required}
+          autoComplete="off"
+          {...searchAriaAttributes}
         />
       </Part>
       {!readOnly && enabled && type == "search" && localValue?.length > 0 && (
@@ -289,6 +322,7 @@ export const TextBox = forwardRef(function TextBox(
             iconName={showPassword ? passwordVisibleIcon : passwordHiddenIcon}
             className={classnames(styles.adornment, styles.passwordToggle)}
             onClick={togglePasswordVisibility}
+            tabIndex={-1}
           />
         </Part>
       ) : (

@@ -3,10 +3,9 @@
         <VStack width="*">
             <Breadcrumbs />
             <Markdown
-                when="{$props.content || $props.url}"
                 content="{$props.content}"
                 data="{$props.url}" />
-            <Slot when="{!$props.content && !$props.url}" />
+            <Slot />
             <DocumentLinks />
         </VStack>
         <TableOfContents
@@ -14,8 +13,8 @@
             showScrollerFade="true"
             width="$space-64"
             omitH1
-            when="{mediaSize.sizeIndex > 3 && !$props.hideToc}"
+            when-lg
             maxHeadingLevel="{$props.maxHeadingLevel ? $props.maxHeadingLevel : 3}" />
-        <VStack width="$space-64" when="{mediaSize.sizeIndex > 3 && $props.hideToc}" />
     </HStack>
 </Component>
+    

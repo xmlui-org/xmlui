@@ -7,7 +7,14 @@ import { useAppContext } from "../../components-core/AppContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import type { PageMd } from "../Pages/Pages";
 import { IndexerContext } from "./IndexerContext";
-import { useSearchContextSetIndexing, useSearchContextUpdater } from "./SearchContext";
+import {
+  SEARCH_CATEGORIES,
+  SEARCH_DEFAULT_CATEGORY,
+  useSearchContextSetIndexing,
+  useSearchContextUpdater,
+  useSearchContextLoadedExternalIndex,
+} from "./SearchContext";
+import { extractNavGroupUrls } from "./AppNavigation";
 
 const HIDDEN_STYLE: CSSProperties = {
   position: "absolute",
@@ -19,14 +26,18 @@ const indexerContextValue = {
   indexing: true,
 };
 
+const EXCLUDED_URL_PATTERNS = [/^\/404$/, /^\/not-found$/];
+
 interface SearchIndexCollectorProps {
   Pages?: ComponentDef;
+  NavPanel?: ComponentDef;
   renderChild: RenderChildFn;
 }
 
-export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollectorProps) {
+export function SearchIndexCollector({ Pages, NavPanel, renderChild }: SearchIndexCollectorProps) {
   const appContext = useAppContext();
   const setIndexing = useSearchContextSetIndexing();
+  const loadedExternalIndex = useSearchContextLoadedExternalIndex();
   const { root } = useTheme();
 
   const [indexState, setIndexState] = useState<{ index: number; done: boolean }>({
@@ -40,6 +51,9 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     };
   }, [setIndexing]);
 
+  // Collect NavGroup summary page URLs to exclude from search indexing
+  const navGroupUrls = useMemo(() => extractNavGroupUrls(NavPanel), [NavPanel]);
+
   // 1. Memoize the list of pages to be indexed
   const pagesToIndex = useMemo(() => {
     return (
@@ -48,10 +62,13 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
           child.type === "Page" && // Ensure 'Page' matches your actual component type name
           child.props?.url && // Ensure URL exists
           !child.props.url.includes("*") &&
-          !child.props.url.includes(":"),
+          !child.props.url.includes(":") &&
+          !EXCLUDED_URL_PATTERNS.some((pattern) => pattern.test(child.props.url)) &&
+          child.props?.searchIndexable !== false && // explicit opt-out
+          !navGroupUrls.has(child.props.url), // exclude NavGroup summary pages
       ) || []
     );
-  }, [Pages?.children]);
+  }, [Pages?.children, navGroupUrls]);
 
   const [, startTransitionParent] = useTransition(); // Transition for parent updates
 
@@ -67,7 +84,7 @@ export function SearchIndexCollector({ Pages, renderChild }: SearchIndexCollecto
     });
   }, [pagesToIndex.length]); // Recreate if the total number of pages changes
 
-  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done) {
+  if (!appContext.appGlobals?.searchIndexEnabled || indexState.done || loadedExternalIndex) {
     return null;
   }
 
@@ -141,10 +158,15 @@ function PageIndexer({ Page, renderChild, onIndexed }: PageIndexerProps) {
         titleElement?.remove();
         const textContent = (clone.textContent || "").trim().replace(/\s+/g, " ");
 
+        const categoryBasedOnUrl =
+          pageUrl.split("/").find((segment: string) => segment.length > 0) || "";
         searchContextUpdater({
           title,
           content: textContent,
           path: pageUrl,
+          category: SEARCH_CATEGORIES.includes(categoryBasedOnUrl)
+            ? categoryBasedOnUrl
+            : SEARCH_DEFAULT_CATEGORY,
         });
 
         onIndexed();

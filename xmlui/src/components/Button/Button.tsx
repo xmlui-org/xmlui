@@ -8,7 +8,7 @@ import {
   buttonTypesMd,
   iconPositionMd,
 } from "../abstractions";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -18,9 +18,11 @@ import {
   dLostFocus,
   dOrientation,
 } from "../../components/metadata-helpers";
-import { Icon } from "../Icon/IconNative";
-import { Button, defaultProps } from "./ButtonNative";
+import { Button, defaultProps } from "./ButtonReact";
 import { hasRenderableChildren } from "../../components-core/rendering/nodeUtils";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import React from "react";
+import { ThemedIcon } from "../Icon/Icon";
 
 const COMP = "Button";
 
@@ -186,36 +188,38 @@ export const ButtonMd = createMetadata({
   },
 });
 
-export const buttonComponentRenderer = createComponentRenderer(
+type ThemedButtonProps = React.ComponentProps<typeof Button> & { className?: string };
+export const ThemedButton = React.forwardRef<HTMLButtonElement, ThemedButtonProps>(
+  function ThemedButton({ className, ...props }: ThemedButtonProps, ref) {
+    const themeClass = useComponentThemeClass(ButtonMd);
+    return <Button {...props} className={`${themeClass}${className ? ` ${className}` : ""}`} ref={ref} />;
+  },
+);
+
+export const buttonComponentRenderer = wrapComponent(
   "Button",
+  Button,
   ButtonMd,
-  ({ node, extractValue, renderChild, lookupEventHandler, className }) => {
-    const iconName = extractValue.asString(node.props.icon);
-    const label = extractValue.asDisplayText(node.props.label);
-    const renderedChildren = hasRenderableChildren(node.children)
-      ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
-      : label;
-    return (
-      <Button
-        type={extractValue.asOptionalString(node.props.type)}
-        variant={extractValue.asOptionalString(node.props.variant)}
-        themeColor={extractValue.asOptionalString(node.props.themeColor)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        size={extractValue.asOptionalString(node.props.size)}
-        icon={iconName && <Icon name={iconName} aria-hidden />}
-        iconPosition={extractValue.asOptionalString(node.props.iconPosition)}
-        orientation={extractValue.asOptionalString(node.props.orientation)}
-        contentPosition={extractValue.asOptionalString(node.props.contentPosition)}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
-        onClick={lookupEventHandler("click")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        className={className}
-        contextualLabel={extractValue.asOptionalString(node.props.contextualLabel)}
-      >
-        {renderedChildren}
-      </Button>
-    );
+  {
+    booleans: ["autoFocus"],
+    strings: ["variant", "themeColor", "size", "iconPosition", "orientation", "contentPosition", "contextualLabel"],
+    events: { click: "onClick", contextMenu: "onContextMenu", gotFocus: "onFocus", lostFocus: "onBlur" },
+    exclude: ["icon", "label", "enabled"],
+    customRender: (props, { node, extractValue, renderChild }) => {
+      const iconName = extractValue.asString(node.props.icon);
+      const label = extractValue.asDisplayText(node.props.label);
+      const renderedChildren = hasRenderableChildren(node.children)
+        ? renderChild(node.children, { type: "Stack", orientation: "horizontal" })
+        : label;
+      return (
+        <Button
+          {...props}
+          icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
+          disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+        >
+          {renderedChildren}
+        </Button>
+      );
+    },
   },
 );

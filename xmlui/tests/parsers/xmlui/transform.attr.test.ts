@@ -28,7 +28,7 @@ describe("Xmlui transform - attributes", () => {
       transformSource("<Component name='MyStack' invaAttr='a'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T021")).equal(true);
+      expect(err.toString().includes("U027")).equal(true);
     }
   });
 
@@ -37,7 +37,7 @@ describe("Xmlui transform - attributes", () => {
       transformSource("<Component invaAttr='a' name='MyStack'><Stack /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("T021")).equal(true);
+      expect(err.toString().includes("U027")).equal(true);
     }
   });
 
@@ -63,6 +63,40 @@ describe("Xmlui transform - attributes", () => {
     expect(cd.type).equal("Stack");
     expect(cd.props ?? {}).not.toHaveProperty("when");
     expect(cd.when).equal("isOpen");
+  });
+
+  it("when-md responds attribute is parsed correctly", () => {
+    const cd = transformSource("<Stack when-md='true' />") as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.props ?? {}).not.toHaveProperty("when-md");
+    expect(cd.responsiveWhen?.md).equal("true");
+    expect(cd.responsiveWhen?.xs).equal(undefined);
+  });
+
+  it("multiple when-* attributes are parsed correctly", () => {
+    const cd = transformSource('<Stack when-xs="true" when-lg="{isVisible}" />') as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.props ?? {}).not.toHaveProperty("when-xs");
+    expect(cd.props ?? {}).not.toHaveProperty("when-lg");
+    expect(cd.responsiveWhen?.xs).equal("true");
+    expect(cd.responsiveWhen?.lg).equal("{isVisible}");
+    expect(cd.responsiveWhen?.md).equal(undefined);
+  });
+
+  it("invalid when-* suffix lands in props", () => {
+    const cd = transformSource("<Stack when-zz='false' />") as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.responsiveWhen).equal(undefined);
+    expect(cd.props?.["when-zz"]).equal("false");
+  });
+
+  it("when-* and when coexist", () => {
+    const cd = transformSource('<Stack when="true" when-md="false" />') as ComponentDef<typeof StackMd>;
+    expect(cd.type).equal("Stack");
+    expect(cd.when).equal("true");
+    expect(cd.responsiveWhen?.md).equal("false");
+    expect(cd.props ?? {}).not.toHaveProperty("when");
+    expect(cd.props ?? {}).not.toHaveProperty("when-md");
   });
 
   it("uses works with 1 value", () => {

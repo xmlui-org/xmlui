@@ -47,9 +47,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -268,7 +268,7 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Checkbox--default | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Checkbox | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Checkbox--disabled | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Checkbox--disabled | $color-surface-200 | $color-surface-200 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Checkbox--error | *none* | *none* |
@@ -283,10 +283,11 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox--warning | $borderColor-Checkbox--warning | $borderColor-Checkbox--warning |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox--warning | $borderColor-Checkbox--warning | $borderColor-Checkbox--warning |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-Checkbox | $backgroundColor-primary | $backgroundColor-primary |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox | $borderColor-Input-default | $borderColor-Input-default |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox | $borderColor-Input-default | $borderColor-Input-default |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--error | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--warning | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox | $color-primary-500 | $color-primary-500 |
@@ -297,23 +298,27 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox--success | $borderColor-Checkbox--success | $borderColor-Checkbox--success |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox--warning | $borderColor-Checkbox--warning | $borderColor-Checkbox--warning |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-checked-Checkbox--warning | $borderColor-Checkbox--warning | $borderColor-Checkbox--warning |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Checkbox--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Checkbox | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Checkbox--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Checkbox--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Checkbox--warning | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox--default--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox--error--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox--success--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Checkbox--warning--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox--default--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox | $outlineOffset--focus | $outlineOffset--focus |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox--error--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox--success--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Checkbox--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox--default--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox | $outlineStyle--focus | $outlineStyle--focus |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox--error--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox--success--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Checkbox--warning--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox--default--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox | $outlineWidth--focus | $outlineWidth--focus |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox--error--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox--success--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Checkbox--warning--focus | *none* | *none* |

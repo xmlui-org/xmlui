@@ -363,93 +363,66 @@ test.describe("Basic Functionality", () => {
   });
 
   // Edge cases for showPageSizeSelector property
-  test("handles null showPageSizeSelector property", async ({ initTestBed, page }) => {
+  test("handles various showPageSizeSelector coercion values", async ({ initTestBed, page }) => {
+    // null - falls back to true
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{null}"/>`,
     );
-
-    // Should fall back to default behavior (true) when null
     await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.getByLabel("Items per page")).toBeVisible();
-  });
 
-  test("handles undefined showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // undefined - falls back to true
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{undefined}"/>`,
     );
-
-    // Should fall back to default behavior (true) when undefined
     await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.getByLabel("Items per page")).toBeVisible();
-  });
 
-  test("handles string 'false' for showPageSizeSelector property", async ({
-    initTestBed,
-    page,
-  }) => {
+    // string 'false' - treated as false
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="false"/>`,
     );
-
-    // Should treat string 'false' as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
     await expect(page.getByLabel("Items per page")).toHaveCount(0);
-  });
 
-  test("handles string 'true' for showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // string 'true' - treated as true
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="true"/>`,
     );
-
-    // Should treat string 'true' as true
     await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.getByLabel("Items per page")).toBeVisible();
-  });
 
-  test("handles numeric 0 for showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // numeric 0 - treated as false
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{0}"/>`,
     );
-
-    // Should treat 0 as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
     await expect(page.getByLabel("Items per page")).toHaveCount(0);
-  });
 
-  test("handles numeric 1 for showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // numeric 1 - treated as true
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{1}"/>`,
     );
-
-    // Should treat 1 as true
     await expect(page.getByText("Items per page")).toBeVisible();
     await expect(page.getByLabel("Items per page")).toBeVisible();
-  });
 
-  test("handles object for showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // object - truthy if renders
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector="{{a: 'b'}}" />`,
     );
-
-    // Objects may cause component to not render properly in some contexts
     const pageSizeText = page.getByText("Items per page");
     const exists = await pageSizeText.count();
     if (exists > 0) {
-      // Should treat object as truthy (true) when it renders
       await expect(pageSizeText).toBeVisible();
       await expect(page.getByLabel("Items per page")).toBeVisible();
     } else {
-      // Component may not render page size selector with invalid object input
       await expect(pageSizeText).not.toBeVisible();
     }
-  });
 
-  test("handles empty string for showPageSizeSelector property", async ({ initTestBed, page }) => {
+    // empty string - treated as false
     await initTestBed(
       `<Pagination itemCount="50" pageSize="10" pageSizeOptions="{[5, 10, 20]}" showPageSizeSelector=""/>`,
     );
-
-    // Should treat empty string as false
     await expect(page.getByText("Items per page")).not.toBeVisible();
     await expect(page.getByLabel("Items per page")).toHaveCount(0);
   });

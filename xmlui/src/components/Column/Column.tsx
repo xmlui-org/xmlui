@@ -1,12 +1,15 @@
 import type React from "react";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { createMetadata } from "../metadata-helpers";
-import { Column, defaultProps } from "./ColumnNative";
+import { Column, defaultProps } from "./ColumnReact";
 
 const COMP = "Column";
 
 export const ColumnMd = createMetadata({
   status: "stable",
+  nonVisual: true,
   description:
     "`Column` defines the structure and behavior of individual table columns " +
     "within a [`Table`](/docs/reference/components/Table) component. Each Column controls data " +
@@ -90,45 +93,46 @@ export const ColumnMd = createMetadata({
   },
 });
 
-export const columnComponentRenderer = createComponentRenderer(
-  COMP,
-  ColumnMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, className, appContext } = rendererContext;
+export const columnComponentRenderer = wrapComponent(COMP, Column, ColumnMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes, appContext, layoutContext }) => {
     // Allow config.json to override the default canSort value via appGlobals.columnCanSortDefault
     const canSortDefault = appContext?.appGlobals?.columnCanSortDefault ?? defaultProps.canSort;
-    
+
     // Convert horizontalAlignment and verticalAlignment to CSS properties for table cells
     // since columns are not flex containers
     const horizontalAlignment = extractValue.asOptionalString(node.props.horizontalAlignment);
     const verticalAlignment = extractValue.asOptionalString(node.props.verticalAlignment);
-    
+
+    const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
+
     const style: React.CSSProperties = {};
+    if (backgroundColor) {
+      style.backgroundColor = backgroundColor;
+    }
     if (horizontalAlignment) {
       // Use flexbox to align block-level content
       style.display = 'flex';
-      style.justifyContent = 
+      style.justifyContent =
         horizontalAlignment === 'start' ? 'flex-start' :
         horizontalAlignment === 'center' ? 'center' :
         horizontalAlignment === 'end' ? 'flex-end' :
         horizontalAlignment;
-      style.textAlign = horizontalAlignment as any; // Also set textAlign for text content
+      style.textAlign = horizontalAlignment as React.CSSProperties["textAlign"]; // Also set textAlign for text content
     }
     if (verticalAlignment) {
       if (!style.display) {
         style.display = 'flex';
       }
-      style.alignItems = 
+      style.alignItems =
         verticalAlignment === 'start' ? 'flex-start' :
         verticalAlignment === 'center' ? 'center' :
         verticalAlignment === 'end' ? 'flex-end' :
         verticalAlignment;
-      style.verticalAlign = verticalAlignment as any; // Also set verticalAlign for fallback
+      style.verticalAlign = verticalAlignment as React.CSSProperties["verticalAlign"]; // Also set verticalAlign for fallback
     }
-    
+
     return (
       <Column
-        className={className}
         style={Object.keys(style).length > 0 ? style : undefined}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}
@@ -140,8 +144,9 @@ export const columnComponentRenderer = createComponentRenderer(
         maxWidth={extractValue(node.props.maxWidth)}
         nodeChildren={node.children}
         renderChild={renderChild}
+        layoutContext={layoutContext as LayoutContext}
         id={node.uid}
       />
     );
   },
-);
+});

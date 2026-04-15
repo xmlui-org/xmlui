@@ -17,7 +17,7 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, ValidationStatus } from "../abstractions";
 import styles from "../../components/AutoComplete/AutoComplete.module.scss";
-import Icon from "../../components/Icon/IconNative";
+import { ThemedIcon } from "../../components/Icon/Icon";
 import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
 import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
@@ -25,6 +25,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
@@ -43,6 +44,7 @@ type AutoCompleteProps = {
   emptyListTemplate?: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: (ev: React.FocusEvent<HTMLInputElement>) => void;
@@ -62,6 +64,7 @@ type AutoCompleteProps = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  contentClassName?: string;
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -103,6 +106,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     emptyListTemplate,
     style,
     className,
+    classes,
     children,
     readOnly = defaultProps.readOnly,
     autoFocus = defaultProps.autoFocus,
@@ -117,6 +121,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    contentClassName,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -422,7 +427,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
     () =>
       emptyListTemplate ?? (
         <div className={styles.autoCompleteEmpty}>
-          <Icon name="noresult" />
+          <ThemedIcon name="noresult" />
           <span>List is empty</span>
         </div>
       ),
@@ -502,6 +507,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                 ref={forwardedRef}
                 style={style}
                 className={classnames(
+                  classes?.[COMPONENT_PART_KEY],
                   className,
                   styles.badgeListWrapper,
                   styles[validationStatus],
@@ -528,14 +534,14 @@ export const AutoComplete = forwardRef(function AutoComplete(
                       <span key={index} className={styles.badge}>
                         {v?.label}
                         {!readOnly && (
-                          <Icon
-                            name="close"
-                            size="sm"
+                          <span
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleOption(v.value);
                             }}
-                          />
+                          >
+                            <ThemedIcon name="close" size="sm" />
+                          </span>
                         )}
                       </span>
                     ))}
@@ -614,7 +620,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                           clearValue();
                         }}
                       >
-                        <Icon name="close" />
+                        <ThemedIcon name="close" />
                       </span>
                     )}
                     <span
@@ -627,7 +633,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
                         inputRef.current?.focus();
                       }}
                     >
-                      <Icon name="chevrondown" />
+                      <ThemedIcon name="chevrondown" />
                     </span>
                   </div>
                 </div>
@@ -637,7 +643,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
           <Portal container={root}>
             <PopoverContent
               style={{ width, height: dropdownHeight }}
-              className={styles.popoverContent}
+              className={classnames(contentClassName, styles.popoverContent)}
               align="start"
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
@@ -797,14 +803,14 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
       {children ? (
         <>
           <div className={styles.autoCompleteOptionContent}>{children}</div>
-          {selected && <Icon name="checkmark" />}
+          {selected && <ThemedIcon name="checkmark" />}
         </>
       ) : optionRenderer ? (
         optionRenderer({ label, value, enabled }, selectedValue as any, false)
       ) : (
         <>
           <div className={styles.autoCompleteOptionContent}>{label}</div>
-          {selected && <Icon name="checkmark" />}
+          {selected && <ThemedIcon name="checkmark" />}
         </>
       )}
     </div>

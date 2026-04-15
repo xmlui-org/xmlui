@@ -1,11 +1,18 @@
+import React from "react";
+import classnames from "classnames";
 import styles from "./FlowLayout.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
+import { collectResponsiveWidthProps } from "./flow-layout-utils";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+
+export { FlowItemBreak, FlowItemWrapper } from "./FlowLayoutNative";
 import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";
@@ -57,7 +64,8 @@ export const FlowLayoutMd = createMetadata({
         `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -67,7 +75,8 @@ export const FlowLayoutMd = createMetadata({
         "When enabled, displays gradient fade indicators at the top and bottom of the scroll container to visually indicate that more content is available in those directions. " +
         "The fade indicators automatically appear/disappear based on the current scroll position. " +
         "Top fade shows when scrolled down from the top, bottom fade shows when not at the bottom. " +
-        "Only works with overlay scrollbar modes (not with 'normal' mode).",
+        "Only works with overlay scrollbar modes (not with 'normal' mode). " +
+        "On mobile/touch devices, this property has no effect.",
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -90,10 +99,29 @@ export const FlowLayoutMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const flowLayoutComponentRenderer = createComponentRenderer(
-  COMP,
-  FlowLayoutMd,
-  ({ node, renderChild, className, extractValue, registerComponentApi, lookupEventHandler }) => {
+type ThemedFlowLayoutProps = React.ComponentPropsWithoutRef<typeof FlowLayout> & {
+  classes?: Record<string, string>;
+};
+
+export const ThemedFlowLayout = React.forwardRef<React.ElementRef<typeof FlowLayout>, ThemedFlowLayoutProps>(
+  function ThemedFlowLayout({ className, classes, ...props }, ref) {
+    const themeClass = useComponentThemeClass(FlowLayoutMd);
+    const mergedClasses = {
+      ...classes,
+      [COMPONENT_PART_KEY]: classnames(themeClass, classes?.[COMPONENT_PART_KEY], className),
+    };
+    return (
+      <FlowLayout
+        {...props}
+        classes={mergedClasses}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const flowLayoutComponentRenderer = wrapComponent(COMP, FlowLayout, FlowLayoutMd, {
+  customRender: (_props, { node, renderChild, classes, extractValue, registerComponentApi, lookupEventHandler }) => {
     if (!isComponentDefChildren(node.children)) {
       throw new NotAComponentDefError();
     }
@@ -106,7 +134,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       extractValue.asSize(node.props?.rowGap) ||
       extractValue.asSize(node.props?.gap) ||
       extractValue.asSize("$space-4");
-    const itemWidth = extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
+    const itemWidth = extractValue.asSize(node.props?.itemWidth) ??
+      extractValue.asOptionalString(node.props?.itemWidth, defaultProps.itemWidth);
     const verticalAlignment = extractValue.asOptionalString(node.props?.verticalAlignment, "start");
     const scrollStyle = extractValue.asOptionalString(
       node.props.scrollStyle,
@@ -115,8 +144,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
     const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
 
     return (
-      <FlowLayout
-        className={className}
+      <ThemedFlowLayout
+        classes={classes}
         columnGap={columnGap}
         rowGap={rowGap}
         itemWidth={itemWidth}
@@ -143,11 +172,13 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             const width = extractValue((node.props as any)?.width);
             const minWidth = extractValue((node.props as any)?.minWidth);
             const maxWidth = extractValue((node.props as any)?.maxWidth);
+            const responsiveWidthProps = collectResponsiveWidthProps(node.props, extractValue);
             return (
               <FlowItemWrapper
                 width={width}
                 minWidth={minWidth}
                 maxWidth={maxWidth}
+                responsiveWidthProps={responsiveWidthProps}
                 forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
@@ -155,7 +186,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             );
           },
         })}
-      </FlowLayout>
+      </ThemedFlowLayout>
     );
   },
-);
+});

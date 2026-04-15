@@ -1,7 +1,7 @@
 import { describe, expect, assert, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
-import { TransformDiag } from "../../../src/parsers/xmlui-parser";
+import type { TransformDiag } from "../../../src/parsers/xmlui-parser";
 
 describe("Xmlui transform - regression", () => {
   it("prop with multiple component #1", () => {
@@ -95,7 +95,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n");
+    expect((cd.api as any).myMethod).toMatchObject({ __PARSED: true });
   });
 
   it("Var removes whitespaces", () => {

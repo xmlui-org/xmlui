@@ -7,8 +7,6 @@ export const FOLDERS = {
   script: import.meta.dirname ?? fileURLToPath(new URL(".", import.meta.url)),
   xmluiDist: join(dirname(fileURLToPath(import.meta.url)), "../../", "dist"),
   projectRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../"),
-  docsRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs"),
-  pages: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs", "pages"),
-  docsMeta: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs", "meta"),
+  docsRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../", "website", "content", "docs"),
   navSections: join(dirname(fileURLToPath(import.meta.url)), "../../../", "website", "navSections"),
 };

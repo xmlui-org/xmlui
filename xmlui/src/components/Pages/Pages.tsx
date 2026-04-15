@@ -1,6 +1,6 @@
 import styles from "./Pages.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { createMetadata, d, dInternal } from "../metadata-helpers";
 import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
@@ -22,6 +22,13 @@ export const PageMd = createMetadata({
     url: d(
       `The URL of the route associated with the content. If not set, the page is not available.`,
     ),
+    // NOTE: This is experimental
+    searchIndexable: {
+      description: "Whether the content of this page should be indexed for search. Defaults to true.",
+      type: "boolean",
+      defaultValue: true,
+      isInternal: true,
+    },
     navLabel: dInternal(
       "The label of the page that is displayed in the navigation panel. If provided, the " +
         "a new entry will be added to the navigation panel.",
@@ -29,10 +36,8 @@ export const PageMd = createMetadata({
   },
 });
 
-export const pageRenderer = createComponentRenderer(
-  PAGE,
-  PageMd,
-  ({ node, extractValue, renderChild, className }) => {
+export const pageRenderer = wrapComponent(PAGE, RouteWrapper, PageMd, {
+  customRender: (_props, { node, extractValue, renderChild, classes }) => {
     const paddings = extractPaddings(extractValue, node.props);
     return (
       <TableOfContentsProvider>
@@ -41,13 +46,13 @@ export const pageRenderer = createComponentRenderer(
           uid={node.uid}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
-          className={className}
+          classes={classes}
           {...paddings}
         />
       </TableOfContentsProvider>
     );
   },
-);
+});
 
 const COMP = "Pages";
 
@@ -75,18 +80,14 @@ export const PagesMd = createMetadata({
   },
 });
 
-export const pagesRenderer = createComponentRenderer(
-  COMP,
-  PagesMd,
-  ({ node, extractValue, renderChild }) => {
-    return (
-      <Pages
-        fallbackPath={extractValue(node.props.fallbackPath)}
-        defaultScrollRestoration={extractValue.asOptionalBoolean(node.props.defaultScrollRestoration)}
-        node={node}
-        renderChild={renderChild}
-        extractValue={extractValue}
-      />
-    );
-  },
-);
+export const pagesRenderer = wrapComponent(COMP, Pages, PagesMd, {
+  customRender: (_props, { node, extractValue, renderChild }) => (
+    <Pages
+      fallbackPath={extractValue(node.props.fallbackPath)}
+      defaultScrollRestoration={extractValue.asOptionalBoolean(node.props.defaultScrollRestoration)}
+      node={node}
+      renderChild={renderChild}
+      extractValue={extractValue}
+    />
+  ),
+});

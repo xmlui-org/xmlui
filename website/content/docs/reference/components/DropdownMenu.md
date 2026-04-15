@@ -34,7 +34,7 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Publish/Subscribe | `subscribeToTopic` |
+| Display When | `displayWhen` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -202,10 +202,10 @@ This method command closes the dropdown.
 
 ```xmlui-pg copy {4} display name="Example: close" height="240px"
 <App>
-  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
-    <EmojiSelector
-      onSelect="(reaction) => { emojiDropdown.close(); }"
-      autoFocus="true"
+  <DropdownMenu id="dropdown" label="Dropdown">
+    <Button
+      onClick="(reaction) => { dropdown.close(); }"
+      label="Close"
     />
   </DropdownMenu>
 </App>
@@ -219,12 +219,12 @@ This method command opens the dropdown.
 
 ```xmlui-pg copy {2} display name="Example: open" height="300px"
 <App>
-  <Button onClick="emojiDropdown.open()">Open the Dropdown</Button>
-  <DropdownMenu id="emojiDropdown" label="Emoji Dropdown">
-    <EmojiSelector
-      onSelect="(reaction) => { emojiDropdown.close(); }"
-      autoFocus="true"
-    />
+  <Button onClick="dropdown.open()">Open the Dropdown</Button>
+  <DropdownMenu id="dropdown" label="Dropdown">
+    <Button
+      onClick="(reaction) => { dropdown.close(); }"
+      label="Close"
+    />  
   </DropdownMenu>
 </App>
 ```

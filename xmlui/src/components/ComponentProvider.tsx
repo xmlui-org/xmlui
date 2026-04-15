@@ -60,14 +60,13 @@ import {
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
 import { dynamicHeightListComponentRenderer } from "./List/List";
-import { positionedContainerComponentRenderer } from "./PositionedContainer/PositionedContainer";
+import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "./FormItem/FormItem";
 import { passwordInputComponentRenderer, textBoxComponentRenderer } from "./TextBox/TextBox";
-import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "./Form/Form";
+import { formSegmentComponentRenderer } from "./FormSegment/FormSegment";
 import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
-import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
 import { appRenderer } from "./App/App";
 import { navPanelRenderer } from "./NavPanel/NavPanel";
 import { pageRenderer, pagesRenderer } from "./Pages/Pages";
@@ -105,6 +104,7 @@ import { ComponentRegistryContext } from "./ComponentRegistryContext";
 import { columnComponentRenderer } from "./Column/Column";
 import type { ActionFunction, ActionRendererDef } from "../abstractions/ActionDefs";
 import { apiAction } from "../components-core/action/APICall";
+import { generateUdComponentMetadata } from "../components-core/ud-metadata";
 import { downloadAction } from "../components-core/action/FileDownloadAction";
 import { uploadAction } from "../components-core/action/FileUploadAction";
 import { navigateAction } from "../components-core/action/NavigateAction";
@@ -116,7 +116,7 @@ import { variantBehavior } from "../components-core/behaviors/VariantBehavior";
 import { bookmarkBehavior } from "../components-core/behaviors/BookmarkBehavior";
 import { formBindingBehavior } from "../components-core/behaviors/FormBindingBehavior";
 import { validationBehavior } from "../components-core/behaviors/ValidationBehavior";
-import { pubSubBehavior } from "../components-core/behaviors/PubSubBehavior";
+import { displayWhenBehavior } from "../components-core/behaviors/DisplayWhenBehavior";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -134,16 +134,12 @@ import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
 import { appStateComponentRenderer } from "./AppState/AppState";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
-import { blogComponentRenderer } from "./Blog/Blog";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
-import { carouselComponentRenderer } from "./Carousel/Carousel";
-import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
 import { createPropHolderComponent } from "../components-core/renderers";
-import { breakoutComponentRenderer } from "./Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "./ToneChangerButton/ToneChangerButton";
 import { navPanelCollapseButtonComponentRenderer } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { toneSwitchComponentRenderer } from "./ToneSwitch/ToneSwitch";
@@ -151,7 +147,6 @@ import { apiCallRenderer } from "./APICall/APICall";
 import { optionComponentRenderer } from "./Option/Option";
 import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
 import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
-import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import { scrollViewerComponentRenderer } from "./ScrollViewer/ScrollViewer";
 import { qrCodeComponentRenderer } from "./QRCode/QRCode";
 import { includeMarkupComponentRenderer } from "./IncludeMarkup/IncludeMarkup";
@@ -261,17 +256,10 @@ import {
 } from "./HtmlTags/HtmlTags";
 import { colorPickerComponentRenderer } from "./ColorPicker/ColorPicker";
 import { inspectButtonComponentRenderer } from "./InspectButton/InspectButton";
+import { inspectorComponentRenderer } from "./Inspector/Inspector";
 import { nestedAppComponentRenderer } from "./NestedApp/NestedApp";
 import { appWithCodeViewComponentRenderer } from "./NestedApp/AppWithCodeView";
 import { codeBlockComponentRenderer } from "./CodeBlock/CodeBlock";
-import { areaChartComponentRenderer } from "./Charts/AreaChart/AreaChart";
-import { barChartComponentRenderer } from "./Charts/BarChart/BarChart";
-import { donutChartComponentRenderer } from "./Charts/DonutChart/DonutChart";
-import { labelListComponentRenderer } from "./Charts/LabelList/LabelList";
-import { legendComponentRenderer } from "./Charts/Legend/Legend";
-import { lineChartComponentRenderer } from "./Charts/LineChart/LineChart";
-import { pieChartComponentRenderer } from "./Charts/PieChart/PieChart";
-import { radarChartComponentRenderer } from "./Charts/RadarChart/RadarChart";
 
 import { paginationComponentRenderer } from "./Pagination/Pagination";
 import { tooltipComponentRenderer } from "./Tooltip/Tooltip";
@@ -421,6 +409,7 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Form !== "false") {
       this.registerCoreComponent(formComponentRenderer);
       this.registerCoreComponent(formItemComponentRenderer);
+      this.registerCoreComponent(formSegmentComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);
@@ -464,6 +453,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerCoreComponent(dynamicHeightListComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TileGrid !== "false") {
+      this.registerCoreComponent(tileGridComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_App !== "false") {
@@ -521,9 +513,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerCoreComponent(accordionItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
-      this.registerCoreComponent(carouselItemComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
@@ -551,17 +540,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(paginationComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_Charts !== "false") {
-      this.registerCoreComponent(areaChartComponentRenderer);
-      this.registerCoreComponent(barChartComponentRenderer);
-      this.registerCoreComponent(donutChartComponentRenderer);
-      this.registerCoreComponent(labelListComponentRenderer);
-      this.registerCoreComponent(legendComponentRenderer);
-      this.registerCoreComponent(lineChartComponentRenderer);
-      this.registerCoreComponent(pieChartComponentRenderer);
-      this.registerCoreComponent(radarChartComponentRenderer);
-    }
-
     if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
       this.registerCoreComponent(dateInputComponentRenderer);
@@ -579,13 +557,10 @@ export class ComponentRegistry {
       this.registerCoreComponent(queueComponentRenderer);
       this.registerCoreComponent(qrCodeComponentRenderer);
       this.registerCoreComponent(includeMarkupComponentRenderer);
-      this.registerCoreComponent(positionedContainerComponentRenderer);
       this.registerCoreComponent(changeListenerComponentRenderer);
-      this.registerCoreComponent(realTimeAdapterComponentRenderer);
       this.registerCoreComponent(textBoxComponentRenderer);
       this.registerCoreComponent(passwordInputComponentRenderer);
       this.registerCoreComponent(numberBoxComponentRenderer);
-      this.registerCoreComponent(hoverCardComponentRenderer);
       this.registerCoreComponent(radioGroupRenderer);
       this.registerCoreComponent(radioItemComponentRenderer);
       this.registerCoreComponent(fileInputRenderer);
@@ -597,6 +572,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(navPanelCollapseButtonComponentRenderer);
       this.registerCoreComponent(toneSwitchComponentRenderer);
       this.registerCoreComponent(inspectButtonComponentRenderer);
+      this.registerCoreComponent(inspectorComponentRenderer);
       this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(menuItemRenderer);
@@ -607,25 +583,20 @@ export class ComponentRegistry {
       this.registerCoreComponent(tabsComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
-      this.registerCoreComponent(blogComponentRenderer);
       this.registerCoreComponent(codeBlockComponentRenderer);
       // --- Nested app and related components
       this.registerCoreComponent(nestedAppComponentRenderer);
       this.registerCoreComponent(appWithCodeViewComponentRenderer);
       // --- New Bootstrap-inspired components
-      this.registerCoreComponent(carouselComponentRenderer);
       this.registerCoreComponent(accordionComponentRenderer);
       this.registerCoreComponent(sliderComponentRenderer);
       this.registerCoreComponent(ratingInputComponentRenderer);
-      this.registerCoreComponent(backdropComponentRenderer);
       this.registerCoreComponent(toastComponentRenderer);
     }
-    this.registerCoreComponent(breakoutComponentRenderer);
     this.registerCoreComponent(themeComponentRenderer);
     this.registerCoreComponent(appStateComponentRenderer);
     this.registerCoreComponent(apiCallRenderer);
     this.registerCoreComponent(drawerComponentRenderer);
-
 
     if (process.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
       this.registerCoreComponent(htmlATagRenderer);
@@ -848,9 +819,12 @@ export class ComponentRegistry {
     this.registerBehavior(tooltipBehavior);
     this.registerBehavior(variantBehavior);
     this.registerBehavior(bookmarkBehavior);
-    this.registerBehavior(pubSubBehavior);
     this.registerBehavior(formBindingBehavior);
     this.registerBehavior(validationBehavior);
+    // displayWhen is registered last so it is the outermost wrapper.
+    // Everything — including labels, form binding, and validation — is kept
+    // mounted inside the hidden div, preserving form field registration.
+    this.registerBehavior(displayWhenBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {
@@ -1033,6 +1007,11 @@ export class ComponentRegistry {
     { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
     namespace: string,
   ) {
+    const autoMetadata = generateUdComponentMetadata(compoundComponentDef);
+    const mergedMetadata = metadata
+      ? { ...autoMetadata, ...metadata }
+      : autoMetadata;
+
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
@@ -1046,7 +1025,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-      metadata,
+      metadata: mergedMetadata,
     };
 
     this.registerComponentRenderer(component, namespace);

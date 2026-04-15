@@ -1,6 +1,7 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createMetadata, d } from "../metadata-helpers";
+import { paddingSubject } from "../../components-core/theming/themes/base-utils";
+import { createMetadata, dComponent } from "../metadata-helpers";
 import { DrawerNative, defaultProps } from "./DrawerNative";
 
 import styles from "./Drawer.module.scss";
@@ -49,6 +50,9 @@ export const DrawerMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.closeOnClickAway,
     },
+    headerTemplate: dComponent(
+      "A custom template rendered in the sticky header area, next to the close button.",
+    ),
   },
 
   events: {
@@ -82,7 +86,8 @@ export const DrawerMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`boxShadow-${COMP}`]:
       "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05)",
-    [`padding-${COMP}`]: "$space-4",
+    ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-4" }),
+    [`gap-${COMP}`]: "$space-4",
     [`width-${COMP}`]: "320px",
     [`maxWidth-${COMP}`]: "80%",
     [`height-${COMP}`]: "320px",
@@ -90,6 +95,8 @@ export const DrawerMd = createMetadata({
     [`zIndex-${COMP}`]: "200",
     [`animationDuration-${COMP}`]: "250ms",
     [`animationEasing-${COMP}`]: "cubic-bezier(0.4, 0, 0.2, 1)",
+    [`top-closeButton-${COMP}`]: "$space-2",
+    [`right-closeButton-${COMP}`]: "$space-3",
   },
 });
 
@@ -97,35 +104,19 @@ export const DrawerMd = createMetadata({
 // Renderer
 // =============================================================================
 
-export const drawerComponentRenderer = createComponentRenderer(
-  COMP,
-  DrawerMd,
-  ({  
-    node,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    registerComponentApi,
-    className,
-  }) => {
+export const drawerComponentRenderer = wrapComponent(COMP, DrawerNative, DrawerMd, {
+  exposeRegisterApi: true,
+  customRender: (props, { node, extractValue, renderChild }) => {
     // Read layout properties that should override the corresponding theme variables
     const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
 
     return (
       <DrawerNative
-        position={extractValue.asOptionalString(node.props.position, defaultProps.position) as any}
-        hasBackdrop={extractValue.asOptionalBoolean(node.props.hasBackdrop, defaultProps.hasBackdrop)}
-        initiallyOpen={extractValue.asOptionalBoolean(node.props.initiallyOpen, defaultProps.initiallyOpen)}
-        closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible, defaultProps.closeButtonVisible)}
-        closeOnClickAway={extractValue.asOptionalBoolean(node.props.closeOnClickAway, defaultProps.closeOnClickAway)}
-        onOpen={lookupEventHandler("open")}
-        onClose={lookupEventHandler("close")}
-        registerComponentApi={registerComponentApi}
-        className={className}
+        {...props}
         style={backgroundColor ? { backgroundColor } : undefined}
       >
         {renderChild(node.children)}
       </DrawerNative>
     );
   },
-);
+});

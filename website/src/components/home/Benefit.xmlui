@@ -1,13 +1,21 @@
 <Component name="Benefit">
   <HStack gap="$space-3">
-    <Icon name="valid" marginTop="6px" height="24px" width="24px" />
+    <Icon
+      name="valid"
+      marginTop="$marginTop-Benefit"
+      height="$size-icon-Benefit"
+      width="$size-icon-Benefit"
+    />
     <VStack width="*">
       <Text fontSize="$fontSize-lg">
         {$props.children}
-        <Text variant="strong" fontSize="$fontSize-lg">{$props.title}</Text>
-        <Slot>{$props.benefit}</Slot>
+        <Text variant="strong" fontSize="$fontSize-lg">
+          {$props.title}
+        </Text>
+        <Slot>
+          {$props.benefit}
+        </Slot>
       </Text>
     </VStack>
   </HStack>
 </Component>
-

@@ -201,6 +201,48 @@ test("removes multiple adjacent separators", async ({ initTestBed, page, createC
   await expect(separators).toHaveCount(1);
 });
 
+test("hides leading separators before items with $context-dependent when conditions", async ({
+  initTestBed,
+  page,
+  createContextMenuDriver,
+}) => {
+  // Regression test: multiple MenuSeparators appearing before the first visible item
+  // when items before them are hidden by `when` conditions (the typical real-world
+  // case is compound components whose items conditionally show based on $context).
+  // The leading separators that end up at the top of the rendered menu must not appear.
+  await initTestBed(`
+    <App var.itemType="''">
+      <Card testId="target" title="Target"
+            onContextMenu="ev => { itemType = 'file'; menu.openAt(ev); }">
+        <Text value="Right click me" />
+      </Card>
+      <ContextMenu id="menu">
+        <MenuItem when="{itemType === 'folder'}">Folder-only Item</MenuItem>
+        <MenuSeparator />
+        <MenuSeparator />
+        <MenuItem when="{itemType === 'file'}">File Item 1</MenuItem>
+        <MenuSeparator />
+        <MenuItem when="{itemType === 'file'}">File Item 2</MenuItem>
+      </ContextMenu>
+    </App>
+  `);
+  const driver = await createContextMenuDriver("menu");
+
+  await page.getByTestId("target").click({ button: "right" });
+
+  // The folder-only item must not be visible
+  await expect(page.getByRole("menuitem", { name: "Folder-only Item" })).not.toBeVisible();
+  // The file items must be visible
+  await expect(page.getByRole("menuitem", { name: "File Item 1" })).toBeVisible();
+  await expect(page.getByRole("menuitem", { name: "File Item 2" })).toBeVisible();
+
+  // The two leading separators (before any visible item, because the folder-only item
+  // is hidden) must be suppressed — only one separator between the two file items
+  // should remain.
+  const separators = driver.getMenuSeparators();
+  await expect(separators).toHaveCount(1);
+});
+
 test("supports submenus", async ({ initTestBed, page, createContextMenuDriver }) => {
   await initTestBed(`
     <Card testId="target" title="Target" onContextMenu="ev => menu.openAt(ev)">
@@ -541,11 +583,15 @@ test.describe("Positioning", () => {
 
 test("adjusts position when menu would overflow viewport", async ({ initTestBed, page }) => {
   await initTestBed(`
-    <Card 
+    <Card
       testId="target"
-      title="Bottom Right Corner" 
-      onContextMenu="ev => menu.openAt(ev)" 
-      style="position: fixed; bottom: 0; right: 0; width: 200px; height: 100px;"
+      title="Bottom Right Corner"
+      onContextMenu="ev => menu.openAt(ev)"
+      width="200px"
+      height="100px"
+      position="absolute"
+      bottom="0"
+      right="0"
     >
       <Text value="Right click me" />
     </Card>

@@ -1,12 +1,9 @@
 import styles from "./Carousel.module.scss";
 
-import { createComponentRenderer, parseScssVar, createMetadata, d } from "xmlui";
-
-const dDidChange = (componentName: string) => d(`This event is fired when the displayed content of the ${componentName} changes.`);
-const orientationOptionMd = ["horizontal", "vertical"];
+import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
 import { CarouselComponent, defaultProps } from "./CarouselNative";
 
-const COMP = "CarouselNew";
+const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
   status: "stable",
@@ -19,7 +16,7 @@ export const CarouselMd = createMetadata({
         "This property indicates the orientation of the carousel. The `horizontal` " +
         "value indicates that the carousel moves horizontally, and the `vertical` " +
         "value indicates that the carousel moves vertically.",
-      availableValues: orientationOptionMd,
+      availableValues: ["horizontal", "vertical"],
       valueType: "string",
       defaultValue: defaultProps.orientation,
     },
@@ -73,7 +70,13 @@ export const CarouselMd = createMetadata({
     },
   },
   events: {
-    displayDidChange: dDidChange(COMP),
+    displayDidChange: {
+      description: `This event fires when the active slide of the ${COMP} changes.`,
+      signature: "displayDidChange(activeSlide: number): void",
+      parameters: {
+        activeSlide: "The index of the currently active slide.",
+      },
+    },
   },
   apis: {
     canScrollPrev: {
@@ -124,34 +127,11 @@ export const CarouselMd = createMetadata({
     [`height-${COMP}`]: "100%",
     [`width-${COMP}`]: "100%",
   },
-} as const);
+});
 
-export const carouselComponentRenderer = createComponentRenderer(
-  COMP,
-  CarouselMd,
-  ({ node, renderChild, className, extractValue, lookupEventHandler, registerComponentApi }) => {
-    const props = (node.props as typeof CarouselMd.props)!;
-    return (
-      <CarouselComponent
-        className={className}
-        stopAutoplayOnInteraction={extractValue.asOptionalBoolean(
-          props.stopAutoplayOnInteraction,
-        )}
-        autoplayInterval={extractValue.asOptionalNumber(props.autoplayInterval)}
-        transitionDuration={extractValue.asOptionalNumber(props.transitionDuration)}
-        indicators={extractValue.asOptionalBoolean(props.indicators)}
-        controls={extractValue.asOptionalBoolean(props.controls)}
-        orientation={extractValue(props.orientation)}
-        onDisplayDidChange={lookupEventHandler("displayDidChange")}
-        autoplay={extractValue.asOptionalBoolean(props.autoplay)}
-        registerComponentApi={registerComponentApi}
-        loop={extractValue.asOptionalBoolean(props.loop)}
-        startIndex={extractValue.asOptionalNumber(props.startIndex)}
-        prevIcon={extractValue(props.prevIcon)}
-        nextIcon={extractValue(props.nextIcon)}
-      >
-        {renderChild(node.children)}
-      </CarouselComponent>
-    );
-  },
-);
+export const carouselComponentRenderer = wrapComponent(COMP, CarouselComponent, CarouselMd, {
+  booleans: ["indicators", "controls", "autoplay", "loop", "stopAutoplayOnInteraction"],
+  numbers: ["startIndex", "transitionDuration", "autoplayInterval"],
+  events: { displayDidChange: "onDisplayDidChange" },
+  exposeRegisterApi: true,
+});

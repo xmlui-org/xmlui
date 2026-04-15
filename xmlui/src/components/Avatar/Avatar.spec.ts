@@ -14,39 +14,25 @@ test.describe("smoke tests", () => {
   });
 });
 
-test("empty name shows no initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name=""/>`);
-  await expect((await createAvatarDriver()).component).toBeEmpty();
-});
-
-test("name with symbols renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="B 'Alan"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("B'");
-});
-
-test("numeric name renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="123"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("1");
-});
-
-test("unicode name renders initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="孔丘"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("孔");
-});
-
-test("single name renders one initial", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("T");
-});
-
-test("three words render three initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim John Smith"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("TJS");
-});
-
-test("many words limited to three initials", async ({ initTestBed, createAvatarDriver }) => {
-  await initTestBed(`<Avatar name="Tim John Smith Jones"/>`);
-  await expect((await createAvatarDriver()).component).toContainText("TJS");
+test("name initials rendering for various name patterns", async ({ initTestBed, createAvatarDriver }) => {
+  await initTestBed(`
+    <Fragment>
+      <Avatar testId="v0" name="" />
+      <Avatar testId="v1" name="B 'Alan" />
+      <Avatar testId="v2" name="123" />
+      <Avatar testId="v3" name="孔丘" />
+      <Avatar testId="v4" name="Tim" />
+      <Avatar testId="v5" name="Tim John Smith" />
+      <Avatar testId="v6" name="Tim John Smith Jones" />
+    </Fragment>
+  `);
+  await expect((await createAvatarDriver("v0")).component).toBeEmpty();
+  await expect((await createAvatarDriver("v1")).component).toContainText("B'");
+  await expect((await createAvatarDriver("v2")).component).toContainText("1");
+  await expect((await createAvatarDriver("v3")).component).toContainText("孔");
+  await expect((await createAvatarDriver("v4")).component).toContainText("T");
+  await expect((await createAvatarDriver("v5")).component).toContainText("TJS");
+  await expect((await createAvatarDriver("v6")).component).toContainText("TJS");
 });
 
 test("test state initializes correctly", async ({ initTestBed }) => {
@@ -2029,5 +2015,113 @@ test.describe("Theme Vars", () => {
     await expect(component).toHaveCSS("border-left-color", EXPECTED_COLOR);
     await expect(component).toHaveCSS("border-left-width", EXPECTED_WIDTH);
     await expect(component).toHaveCSS("border-left-style", EXPECTED_STYLE);
+  });
+});
+
+test.describe("Responsive Layout Properties", () => {
+  test("width-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" width-md="120px" />`);
+    const avatar = page.getByTestId("test");
+
+    // Below md — width should NOT be 120px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(avatar).not.toHaveCSS("width", "120px");
+
+    // At md — width should be 120px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(avatar).toHaveCSS("width", "120px");
+
+    // Well above md — width should still be 120px
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await expect(avatar).toHaveCSS("width", "120px");
+  });
+
+  test("height-md applies at md viewport and above", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" height-md="120px" />`);
+    const avatar = page.getByTestId("test");
+
+    // Below md — height should NOT be 120px
+    await page.setViewportSize({ width: 767, height: 600 });
+    await expect(avatar).not.toHaveCSS("height", "120px");
+
+    // At md — height should be 120px
+    await page.setViewportSize({ width: 768, height: 600 });
+    await expect(avatar).toHaveCSS("height", "120px");
+  });
+
+  test("width-md and height-md together apply at md viewport", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" width-md="120px" height-md="120px" />`);
+    const avatar = page.getByTestId("test");
+
+    // xs — neither dimension is overridden
+    await page.setViewportSize({ width: 480, height: 600 });
+    await expect(avatar).not.toHaveCSS("width", "120px");
+    await expect(avatar).not.toHaveCSS("height", "120px");
+
+    // md — both dimensions apply
+    await page.setViewportSize({ width: 900, height: 600 });
+    await expect(avatar).toHaveCSS("width", "120px");
+    await expect(avatar).toHaveCSS("height", "120px");
+  });
+
+  test("base width applies at all viewport sizes", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" width="80px" />`);
+    const avatar = page.getByTestId("test");
+
+    for (const width of [375, 576, 768, 1024, 1280]) {
+      await page.setViewportSize({ width, height: 600 });
+      await expect(avatar).toHaveCSS("width", "80px");
+    }
+  });
+
+  test("breakpoint-specific width overrides base width at that breakpoint", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" width="50px" width-lg="200px" />`);
+    const avatar = page.getByTestId("test");
+
+    // Below lg — base 50px
+    await page.setViewportSize({ width: 991, height: 600 });
+    await expect(avatar).toHaveCSS("width", "50px");
+
+    // At lg — 200px
+    await page.setViewportSize({ width: 992, height: 600 });
+    await expect(avatar).toHaveCSS("width", "200px");
+  });
+
+  test("multiple breakpoint widths stack correctly (mobile-first cascade)", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" width-sm="60px" width-md="120px" width-xl="200px" />`);
+    const avatar = page.getByTestId("test");
+
+    // xs: no rule applies
+    await page.setViewportSize({ width: 400, height: 600 });
+    await expect(avatar).not.toHaveCSS("width", "60px");
+
+    // sm: 60px rule
+    await page.setViewportSize({ width: 600, height: 600 });
+    await expect(avatar).toHaveCSS("width", "60px");
+
+    // md: 120px overrides
+    await page.setViewportSize({ width: 800, height: 600 });
+    await expect(avatar).toHaveCSS("width", "120px");
+
+    // lg: md rule still applies (no lg rule defined)
+    await page.setViewportSize({ width: 1100, height: 600 });
+    await expect(avatar).toHaveCSS("width", "120px");
+
+    // xl: 200px overrides
+    await page.setViewportSize({ width: 1300, height: 600 });
+    await expect(avatar).toHaveCSS("width", "200px");
+  });
+
+  test("opacity-sm applies from sm breakpoint upward", async ({ page, initTestBed }) => {
+    await initTestBed(`<Avatar testId="test" name="AB" opacity-sm="0.5" />`);
+    const avatar = page.getByTestId("test");
+
+    // xs — no opacity override
+    await page.setViewportSize({ width: 400, height: 600 });
+    await expect(avatar).not.toHaveCSS("opacity", "0.5");
+
+    // sm — opacity applies
+    await page.setViewportSize({ width: 600, height: 600 });
+    await expect(avatar).toHaveCSS("opacity", "0.5");
   });
 });

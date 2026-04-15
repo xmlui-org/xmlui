@@ -21,6 +21,9 @@ import { useEvent } from "../../components-core/utils/misc";
 import { TabContext, useTabContextValue } from "./TabContext";
 import classnames from "classnames";
 import { noop } from "../../components-core/constants";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
+import { useIsInsideForm } from "../Form/FormContext";
 
 type Props = {
   id?: string;
@@ -38,9 +41,12 @@ type Props = {
   children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
   className?: string;
+  classes?: Record<string, string>;
   distributeEvenly?: boolean;
   onDidChange?: (index: number, id: string, label: string) => void;
   onContextMenu?: any;
+  keepMounted?: boolean;
+  gap?: string;
 };
 
 export const defaultProps = {
@@ -49,6 +55,7 @@ export const defaultProps = {
   tabAlignment: "start" as "start" | "end" | "center" | "stretch",
   accordionView: false,
   distributeEvenly: false,
+  keepMounted: undefined as boolean | undefined,
 };
 
 export const Tabs = forwardRef(function Tabs(
@@ -63,14 +70,19 @@ export const Tabs = forwardRef(function Tabs(
     id,
     registerComponentApi,
     className,
+    classes,
     distributeEvenly = defaultProps.distributeEvenly,
     onDidChange = noop,
     onContextMenu,
+    keepMounted = defaultProps.keepMounted,
+    gap,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const { tabItems, tabContextValue } = useTabContextValue();
+  const isInsideForm = useIsInsideForm();
+  const resolvedKeepMounted = keepMounted ?? isInsideForm;
+  const { tabItems, tabContextValue } = useTabContextValue(resolvedKeepMounted);
   const _id = useId();
   const tabsId = id || _id;
 
@@ -149,8 +161,8 @@ export const Tabs = forwardRef(function Tabs(
           {...rest}
           id={tabsId}
           ref={forwardedRef}
-          className={classnames(className, styles.tabs, styles.accordionView)}
-          style={style}
+          className={classnames(styles.tabs, styles.accordionView, classes?.[COMPONENT_PART_KEY], className)}
+          style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
         >
           <RTabsRoot
             value={`${currentTab}`}
@@ -161,6 +173,18 @@ export const Tabs = forwardRef(function Tabs(
                 tabContextValue.setActiveTabId(tab);
                 setActiveIndex(newIndex);
                 onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+                pushXsLog({
+                  ts: Date.now(),
+                  perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+                  traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+                  kind: "focus:change",
+                  component: "Tabs",
+                  ariaName: tabItem?.label,
+                  displayLabel: tabItem?.label,
+                  tabIndex: newIndex,
+                  tabId: tabItem.id || tabItem.innerId,
+                  tabLabel: tabItem?.label,
+                });
               }
             }}
             orientation="vertical"
@@ -214,7 +238,7 @@ export const Tabs = forwardRef(function Tabs(
         {...rest}
         id={tabsId}
         ref={forwardedRef}
-        className={classnames(className, styles.tabs)}
+        className={classnames(styles.tabs, classes?.[COMPONENT_PART_KEY], className)}
         value={`${currentTab}`}
         onContextMenu={onContextMenu}
         onValueChange={(tab) => {
@@ -224,10 +248,23 @@ export const Tabs = forwardRef(function Tabs(
             tabContextValue.setActiveTabId(tab);
             setActiveIndex(newIndex);
             onDidChange?.(newIndex, tabItem.id || tabItem.innerId, tabItem?.label);
+            pushXsLog({
+              ts: Date.now(),
+              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+              traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+              kind: "focus:change",
+              component: "Tabs",
+              ariaName: tabItem?.label,
+              componentLabel: tabItem?.label,
+              displayLabel: tabItem?.label,
+              tabIndex: newIndex,
+              tabId: tabItem.id || tabItem.innerId,
+              tabLabel: tabItem?.label,
+            });
           }
         }}
         orientation={orientation}
-        style={style}
+        style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
       >
         <RTabsList
           className={classnames(styles.tabsList, {

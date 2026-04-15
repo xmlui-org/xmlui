@@ -28,6 +28,7 @@ import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -43,6 +44,9 @@ import {
   prefixLines,
   xsConsoleLog,
   pushXsLog,
+  createLogEntry,
+  pushTrace,
+  popTrace,
   splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
 
@@ -95,13 +99,21 @@ export function AppContent({
   // Note: Startup trace initialization happens during render (near xsVerbose definition)
   // to ensure it's set before children mount and trigger useQuery fetches
   const [loggedInUser, setLoggedInUser] = useState(null);
-  
+
+  // Bumped to Date.now() on every localStorage mutation — allows markup to react
+  // to storage changes via ChangeListener listenTo="{storageTimestamp}"
+  const [storageTimestamp, setStorageTimestamp] = useState<number>(0);
+  useEffect(() => {
+    setStorageChangeListener(() => setStorageTimestamp(Date.now()));
+    return () => setStorageChangeListener(null);
+  }, []);
+
   // --- Navigation event handlers state
   const [navigationHandlers, setNavigationHandlersState] = useState<{
     onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined;
     onDidNavigate?: (to: string | number, queryParams?: Record<string, any>) => void;
   }>({});
-  
+
   const setNavigationHandlers = useCallback(
     (
       onWillNavigate?: (to: string | number, queryParams?: Record<string, any>) => false | void | null | undefined,
@@ -111,12 +123,12 @@ export function AppContent({
     },
     [],
   );
-  
+
   const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
   const navigateRouter = useNavigate();
   const { confirm } = useConfirm();
-  
+
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
@@ -128,13 +140,13 @@ export function AppContent({
   const navigate = useCallback(
     async (to: any, options?: any) => {
       const { onWillNavigate } = navigationHandlers;
-      
+
       // Extract queryParams if exists in options (for NavigateAction compatibility)
       const queryParams = options?.queryParams;
-      
+
       // Remove queryParams from options before passing to navigateRouter
       const { queryParams: _, ...navigateOptions } = options || {};
-      
+
       // Call willNavigate handler if defined (only for programmatic navigation)
       if (onWillNavigate) {
         const result = await onWillNavigate(to, queryParams);
@@ -143,15 +155,15 @@ export function AppContent({
           return;
         }
       }
-      
+
       // Perform the actual navigation
       navigateRouter(to, navigateOptions);
-      
+
       // didNavigate will be fired by the useEffect that watches location changes
     },
     [navigateRouter, navigationHandlers],
   );
-  
+
   // Fire didNavigate after any location change (works for all navigation types)
   useEffect(() => {
     // Skip firing didNavigate on initial render
@@ -159,13 +171,13 @@ export function AppContent({
       isInitialRenderRef.current = false;
       return;
     }
-    
+
     const currentPath = location.pathname + location.search + location.hash;
     const previousPath = previousLocationRef.current;
-    
+
     if (currentPath !== previousPath) {
       previousLocationRef.current = currentPath;
-      
+
       const { onDidNavigate } = navigationHandlers;
       if (onDidNavigate) {
         void onDidNavigate(currentPath, undefined);
@@ -303,6 +315,9 @@ export function AppContent({
   let vpSize;
   let vpSizeIndex;
   const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
+
+  const prevVpRef = useRef<{ size: string; index: number }>({ size: "lg", index: 3 });
+
   if (isViewportXlDesktop) {
     vpSize = "xxl";
     vpSizeIndex = 5;
@@ -321,7 +336,12 @@ export function AppContent({
   } else if (isViewportPhone) {
     vpSize = "xs";
     vpSizeIndex = 0;
+  } else {
+    vpSize = prevVpRef.current.size;
+    vpSizeIndex = prevVpRef.current.index;
   }
+
+  prevVpRef.current = { size: vpSize, index: vpSizeIndex };
 
   // --- Collect information about the current environment
   const isInIFrame = useIsInIFrame();
@@ -361,10 +381,11 @@ export function AppContent({
         if (!rootNode) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
           const id = safeDecodeHash(hash);
-          const el = document.getElementById(id);
+          // ShadowRoot doesn't have getElementById; use querySelector instead
+          const el = (rootNode as ShadowRoot).querySelector(`#${CSS.escape(id)}`);
           if (el) {
             // For nested apps, only scroll within the shadow DOM (don't cross into host document)
-            scrollAncestorsToView(el, scrollBehavior, true);
+            scrollAncestorsToView(el as HTMLElement, scrollBehavior, true);
           }
         }
       });
@@ -392,14 +413,18 @@ export function AppContent({
 
       requestAnimationFrame(() => {
         if (!rootNode) return;
-        // --- Hash from URL may be encoded (e.g. %20 for space); decode for getElementById
+        // --- Hash from URL may be encoded (e.g. %20 for space); decode for element lookup
         const id = safeDecodeHash(lastHash.current);
-        const el = document.getElementById(id);
+        // ShadowRoot doesn't have getElementById; use querySelector instead
+        const el =
+          typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot
+            ? (rootNode as ShadowRoot).querySelector(`#${CSS.escape(id)}`)
+            : document.getElementById(id);
         if (!el) return;
         if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-          scrollAncestorsToView(el, scrollBehavior);
+          scrollAncestorsToView(el as HTMLElement, scrollBehavior);
         } else {
-          el.scrollIntoView({ behavior: scrollBehavior, block: "start" });
+          (el as HTMLElement).scrollIntoView({ behavior: scrollBehavior, block: "start" });
         }
       });
     }
@@ -416,13 +441,17 @@ export function AppContent({
         tableOfContentsContext.scrollToAnchor(bookmarkId, smoothScrolling);
       } else {
         // Fallback if TableOfContentsContext is not available
-        const el = document.getElementById(bookmarkId);
+        const rootNode = root?.getRootNode();
+        // ShadowRoot doesn't have getElementById; use querySelector instead
+        const el =
+          typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot
+            ? (rootNode as ShadowRoot).querySelector(`#${CSS.escape(bookmarkId)}`)
+            : document.getElementById(bookmarkId);
         if (el) {
-          const rootNode = root?.getRootNode();
           if (typeof ShadowRoot !== "undefined" && rootNode instanceof ShadowRoot) {
-            scrollAncestorsToView(el, smoothScrolling ? "smooth" : "auto");
+            scrollAncestorsToView(el as HTMLElement, smoothScrolling ? "smooth" : "auto");
           } else {
-            el.scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
+            (el as HTMLElement).scrollIntoView({ behavior: smoothScrolling ? "smooth" : "auto", block: "start" });
           }
         }
       }
@@ -501,6 +530,11 @@ export function AppContent({
     }
     if (!w._xsCurrentTrace) {
       w._xsCurrentTrace = w._xsStartupTrace;
+    }
+    // Expose tracing flag and helpers for state-layers method:call instrumentation
+    w.__xsVerbose = true;
+    if (!w.__xsTraceHelpers) {
+      w.__xsTraceHelpers = { pushTrace, popTrace, pushXsLog, createLogEntry };
     }
   }
 
@@ -655,7 +689,8 @@ export function AppContent({
 
       const inspectEl = withInspectId || closestInspect;
       const testIdEl = withTestId || closestTestId;
-      const nearest = inspectEl || testIdEl || target;
+      const componentTypeEl = target?.closest?.("[data-component-type]") as HTMLElement | null;
+      const nearest = inspectEl || testIdEl || componentTypeEl || target;
 
       const inspectId = inspectEl?.getAttribute?.("data-inspectid") || undefined;
       const testId = testIdEl?.getAttribute?.("data-testid") || undefined;
@@ -717,6 +752,12 @@ export function AppContent({
             const parentRole = el.getAttribute?.("role");
             if (parentRole) {
               ariaRole = parentRole;
+              ariaTarget = el;
+              break;
+            }
+            // Check for aria-label without role (e.g. div with aria-label)
+            // — the label identifies the element even without a semantic role
+            if (el.getAttribute?.("aria-label")) {
               ariaTarget = el;
               break;
             }
@@ -867,7 +908,7 @@ export function AppContent({
       w._xsLastInteraction = { id: interactionId, ts: Date.now() };
       w._xsCurrentTrace = interactionId;
       lastEventTraceId = interactionId;
-      w._xsLogs.push({
+      pushXsLog({
         ts: Date.now(),
         perfTs,
         eventTs: logEventTs,
@@ -882,10 +923,7 @@ export function AppContent({
         ariaName: detail.ariaName,
         detail,
         text: safeStringify(detail),
-      });
-      if (Number.isFinite(xsLogMax) && xsLogMax > 0 && w._xsLogs.length > xsLogMax) {
-        splicePreservingInteractions(w._xsLogs, xsLogMax);
-      }
+      }, xsLogMax);
     };
 
     const types = ["click", "dblclick", "contextmenu", "keydown"];
@@ -902,19 +940,14 @@ export function AppContent({
   // --- Wrap toast to log calls to _xsLogs for test trace capture
   const tracedToast = useMemo(() => {
     function logToast(type: string, message: unknown) {
-      if (typeof window !== "undefined") {
-        const w = window as any;
-        if (Array.isArray(w._xsLogs)) {
-          w._xsLogs.push({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: w._xsCurrentTrace,
-            kind: "toast",
-            toastType: type,
-            message: typeof message === "string" ? message : String(message),
-          });
-        }
-      }
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "toast",
+        toastType: type,
+        message: typeof message === "string" ? message : String(message),
+      });
     }
     const wrapper: any = (message: unknown, opts?: any) => {
       logToast("default", message);
@@ -970,6 +1003,10 @@ export function AppContent({
       // --- Math-related
       ...mathFunctions,
 
+      // --- Local storage utilities
+      ...localStorageFunctions,
+      storageTimestamp,
+
       // --- File Utilities
       formatFileSizeInBytes,
       getFileExtension,
@@ -977,6 +1014,7 @@ export function AppContent({
       // --- Navigation-related
       navigate,
       routerBaseName,
+      get pathname() { return globalThis?.location?.pathname; },
       setNavigationHandlers,
 
       // --- Notifications and dialogs
@@ -1043,6 +1081,7 @@ export function AppContent({
     root,
     AppState,
     pubSubService,
+    storageTimestamp,
   ]);
 
   return (
@@ -1060,20 +1099,17 @@ function signError(error: Error | string) {
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);
-  // Also log to _xsLogs when xsVerbose is active (same guard as ErrorBoundary).
-  if (typeof window !== "undefined") {
-    const w = window as any;
-    if (Array.isArray(w._xsLogs)) {
-      w._xsLogs.push({
-        ts: Date.now(),
-        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-        traceId: w._xsCurrentTrace,
-        kind: "error:runtime",
-        error: message,
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-    }
-  }
+  // Also log to _xsLogs — pushXsLog is a noop when xsVerbose is off
+  pushXsLog({
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+    kind: "error:runtime",
+    error: {
+      message,
+      stack: error instanceof Error ? error.stack : undefined,
+    },
+  });
 }
 
 /**

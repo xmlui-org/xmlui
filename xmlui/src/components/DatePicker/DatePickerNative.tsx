@@ -16,8 +16,9 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormContextPart } from "../Form/FormContext";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
@@ -70,6 +71,7 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -99,6 +101,7 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  contentClassName?: string;
 };
 
 export const enum WeekDays {
@@ -147,13 +150,13 @@ export const defaultProps: Pick<
 const Chevron = ({ ...props }) => {
   const { orientation = "left" } = props;
   if (orientation === "up") {
-    return <Icon name={"chevronup"} size={"sm"} />;
+    return <ThemedIcon name={"chevronup"} size={"sm"} />;
   } else if (orientation === "down") {
-    return <Icon name={"chevrondown"} size={"sm"} />;
+    return <ThemedIcon name={"chevrondown"} size={"sm"} />;
   } else if (orientation === "left") {
-    return <Icon name={"chevronleft"} size={"lg"} />;
+    return <ThemedIcon name={"chevronleft"} size={"lg"} />;
   } else if (orientation === "right") {
-    return <Icon name={"chevronright"} size={"lg"} />;
+    return <ThemedIcon name={"chevronright"} size={"lg"} />;
   }
 };
 
@@ -178,6 +181,7 @@ export const DatePicker = forwardRef(function DatePicker(
     disabledDates = defaultProps.disabledDates,
     style,
     className,
+    classes,
     registerComponentApi,
     inline = defaultProps.inline,
     startText,
@@ -195,6 +199,7 @@ export const DatePicker = forwardRef(function DatePicker(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    contentClassName,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -203,15 +208,20 @@ export const DatePicker = forwardRef(function DatePicker(
   const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [inlineMonth, setInlineMonth] = useState<Date | undefined>();
+  const [hoveredDate, setHoveredDate] = useState<Date | undefined>();
   const inputRef = useRef<HTMLInputElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
 
-  const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
+  const contextVerboseValidationFeedback = useFormContextPart(
+    (ctx) => ctx?.verboseValidationFeedback,
+  );
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
 
-  const finalVerboseValidationFeedback = verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
-  const finalValidationIconSuccess = validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
+  const finalVerboseValidationFeedback =
+    verboseValidationFeedback ?? contextVerboseValidationFeedback ?? true;
+  const finalValidationIconSuccess =
+    validationIconSuccess ?? contextValidationIconSuccess ?? "checkmark";
   const finalValidationIconError = validationIconError ?? contextValidationIconError ?? "close";
 
   const selected: any = useMemo(() => {
@@ -448,23 +458,56 @@ export const DatePicker = forwardRef(function DatePicker(
       if (mode === "single") {
         setOpen(false);
       }
+      setHoveredDate(undefined);
     },
     [onDidChange, updateState, mode, dateFormat, readOnly],
   );
+
+  const handleDayMouseEnter = useCallback(
+    (date: Date) => {
+      if (mode === "range") {
+        setHoveredDate(date);
+      }
+    },
+    [mode],
+  );
+
+  const handleDayMouseLeave = useCallback(() => {
+    setHoveredDate(undefined);
+  }, []);
+
+  const modifiers = useMemo(() => {
+    const mods: any = {};
+
+    if (mode === "range" && hoveredDate && selected?.from) {
+      // Show preview when hovering, even if a range is already selected
+      // This allows users to see what the new range would be
+      const start = selected.from < hoveredDate ? selected.from : hoveredDate;
+      const end = selected.from < hoveredDate ? hoveredDate : selected.from;
+      mods.hovered = { from: start, to: end };
+    }
+
+    // Add background to single selected date in range mode
+    if (mode === "range" && selected?.from && !selected?.to) {
+      mods.singleSelected = selected.from;
+    }
+
+    return mods;
+  }, [mode, hoveredDate, selected]);
 
   return inline ? (
     <div
       ref={ref}
       {...rest}
       style={style}
-      className={classnames(styles.inlinePickerMenu, className)}
+      className={classnames(styles.inlinePickerMenu, classes?.[COMPONENT_PART_KEY], className)}
       tabIndex={0}
     >
       <DayPicker
         id={id}
         required={undefined}
         captionLayout="dropdown"
-        fixedWeeks
+        fixedWeeks={mode !== "range"}
         startMonth={_startDate}
         endMonth={_endDate}
         month={inlineMonth}
@@ -472,13 +515,18 @@ export const DatePicker = forwardRef(function DatePicker(
         disabled={disabled}
         weekStartsOn={_weekStartsOn}
         showWeekNumber={showWeekNumber}
-        showOutsideDays
+        showOutsideDays={mode !== "range"}
         classNames={styles}
         mode={mode === "single" ? "single" : "range"}
         selected={selected}
         onSelect={handleSelect}
         autoFocus={autoFocus}
         numberOfMonths={mode === "range" ? 2 : 1}
+        pagedNavigation={mode === "range"}
+        modifiers={modifiers}
+        modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+        onDayMouseEnter={handleDayMouseEnter}
+        onDayMouseLeave={handleDayMouseLeave}
         components={{
           Chevron,
         }}
@@ -494,6 +542,7 @@ export const DatePicker = forwardRef(function DatePicker(
         style={style}
         aria-expanded={open}
         className={classnames(
+          classes?.[COMPONENT_PART_KEY],
           className,
           styles.datePicker,
           {
@@ -546,7 +595,7 @@ export const DatePicker = forwardRef(function DatePicker(
           role="menu"
           align={"start"}
           sideOffset={5}
-          className={styles.datePickerMenu}
+          className={classnames(contentClassName, styles.datePickerMenu)}
           onFocus={handleOnMenuFocus}
           onBlur={handleOnMenuBlur}
           onInteractOutside={handleOnMenuBlur}
@@ -554,7 +603,7 @@ export const DatePicker = forwardRef(function DatePicker(
           <DayPicker
             required={undefined}
             animate
-            fixedWeeks
+            fixedWeeks={mode !== "range"}
             autoFocus={autoFocus}
             classNames={styles}
             captionLayout="dropdown"
@@ -564,11 +613,16 @@ export const DatePicker = forwardRef(function DatePicker(
             disabled={disabled}
             weekStartsOn={_weekStartsOn}
             showWeekNumber={showWeekNumber}
-            showOutsideDays
+            showOutsideDays={mode !== "range"}
             mode={mode === "single" ? "single" : "range"}
             selected={selected}
             onSelect={handleSelect}
             numberOfMonths={mode === "range" ? 2 : 1}
+            pagedNavigation={mode === "range"}
+            modifiers={modifiers}
+            modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+            onDayMouseEnter={handleDayMouseEnter}
+            onDayMouseLeave={handleDayMouseLeave}
             components={{
               Chevron,
             }}

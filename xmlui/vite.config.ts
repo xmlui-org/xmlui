@@ -1,10 +1,11 @@
 // @ts-ignore
 import path from "path";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
+import type { PluginOption } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import ViteYaml from "@modyfi/vite-plugin-yaml";
-import { default as ViteXmlui } from "./bin/vite-xmlui-plugin";
+import { default as ViteXmlui } from "./src/nodejs/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
@@ -33,7 +34,6 @@ export default ({ mode = "lib" }) => {
           VITE_MOCK_ENABLED: true,
           VITE_MOCK_WORKER_LOCATION: "mockApi.js",
           VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
-          VITE_USED_COMPONENTS_Tree: "false",
           VITE_USED_COMPONENTS_TableEditor: "false",
           // VITE_USED_COMPONENTS_Charts: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
@@ -99,6 +99,7 @@ export default ({ mode = "lib" }) => {
       lib = {
         entry: {
           xmlui: path.resolve("src", "index.ts"),
+          "compiled-runtime": path.resolve("src", "index-compiled-runtime.ts"),
           "xmlui-parser": path.resolve("src", "parsers", "xmlui-parser", "index.ts"),
           "syntax-monaco": path.resolve("src", "syntax", "monaco", "index.ts"),
           "syntax-textmate": path.resolve("src", "syntax", "textMate", "index.ts"),
@@ -108,19 +109,21 @@ export default ({ mode = "lib" }) => {
       };
     }
   }
-  let plugins =
-    mode === "metadata"
-      ? [ViteXmlui({})]
-      : mode === "inspector-parser"
-        ? [dts({ rollupTypes: true })] // Minimal plugins for standalone parser
-        : [
-            react(),
-            svgr(),
-            ViteYaml(),
-            ViteXmlui({}),
-            cssInjectedByJsPlugin({
-              injectCode: (cssCode) => {
-                return `
+
+  let plugins: PluginOption[] = [];
+  if (mode === "metadata") {
+    plugins = [ViteXmlui()];
+  } else if (mode === "inspector-parser") {
+    plugins = [dts({ rollupTypes: true }) as Plugin];
+  } else {
+    plugins = [
+      react(),
+      svgr(),
+      ViteYaml(),
+      ViteXmlui({}),
+      cssInjectedByJsPlugin({
+        injectCode: (cssCode) => {
+          return `
       if (typeof window !== 'undefined') {
         window.__XMLUI_STYLES__ = window.__XMLUI_STYLES__ || '';
         window.__XMLUI_STYLES__ += ${cssCode};
@@ -129,10 +132,11 @@ export default ({ mode = "lib" }) => {
         window.dispatchEvent(new CustomEvent('xmlui-styles-loaded'));
       }
     `;
-              },
-            }),
-            dts({ rollupTypes: true }),
-          ];
+        },
+      }),
+      dts({ rollupTypes: true }),
+    ] as Plugin[];
+  }
 
   if (mode === "lib") {
     plugins.push(

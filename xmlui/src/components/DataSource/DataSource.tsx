@@ -25,9 +25,18 @@ export const DataSourceMd = createMetadata({
       valueType: "string",
     },
     url: {
-      description: `Set the URL.`,
-      isRequired: true,
+      description:
+        `Set the URL. Required unless \`mockData\` is provided, in which case ` +
+        `the component returns the mock data directly without making a network request.`,
       valueType: "string",
+    },
+    mockData: {
+      description:
+        "Provide data directly instead of fetching from a URL. When set, the component " +
+        "resolves immediately with this value — no network request is made. Intended for " +
+        "development and testing. Supports reactive expressions: when the bound value " +
+        "changes, the DataSource re-resolves with the updated data.",
+      valueType: "any",
     },
     body: {
       description: `Set the optional request body. The object you pass is serialized as a JSON string.`,
@@ -105,6 +114,18 @@ export const DataSourceMd = createMetadata({
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,
     },
+    dataType: {
+      description:
+        "Type of data to fetch. When set to `\"text\"`, the response is returned as a raw string " +
+        "without JSON parsing. When set to `\"csv\"`, the response is parsed as CSV.",
+      availableValues: [
+        { value: "json", description: "Parse response as JSON (default)" },
+        { value: "text", description: "Return response as raw text" },
+        { value: "csv", description: "Parse response as CSV" },
+        { value: "sql", description: "Execute SQL query" },
+      ],
+      valueType: "string",
+    },
     structuralSharing: {
       description:
         "This property allows structural sharing. When turned on, `DataSource` will keep " +
@@ -112,6 +133,14 @@ export const DataSourceMd = createMetadata({
         "changed, `DataSource` will keep the unchanged parts and only replace the changed " +
         "parts. If you do not need this behavior, set this property to `false`.",
       defaultValue: "true",
+    },
+    omitTransactionId: {
+      description:
+        "When set to `true`, the `x-ue-client-tx-id` request header will not be added " +
+        "to outgoing requests. Use this when the target API does not allow custom request " +
+        "headers (e.g. third-party APIs with strict CORS `Access-Control-Allow-Headers`).",
+      valueType: "boolean",
+      defaultValue: "false",
     },
   },
   events: {
@@ -154,6 +183,13 @@ export const DataSourceMd = createMetadata({
     refetch: {
       description: "This method requests the re-fetch of the data.",
       signature: "refetch(): void",
+    },
+    responseHeaders: {
+      description:
+        "This property retrieves the HTTP response headers from the last successful fetch. " +
+        "Returns an object whose keys are header names and values are header values, or `undefined` " +
+        "if no fetch has completed yet.",
+      signature: "get responseHeaders(): Record<string, string> | undefined",
     },
   },
 });

@@ -363,6 +363,147 @@ This function returns the type of the specified file.
 - If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
 - Otherwise, it returns undefined.
 
+## Local Storage Utilities
+
+### `clearLocalStorage`
+
+```ts
+function clearLocalStorage(prefix?: string): void;
+```
+
+Clears `localStorage` entries.
+
+- No argument: removes all entries (`localStorage.clear()`).
+- With `prefix`: removes only entries whose root key starts with the prefix.
+- Silently handles errors.
+
+**Examples:**
+
+```ts
+clearLocalStorage()           // wipes all localStorage for this app
+clearLocalStorage("myApp.v1") // removes all entries prefixed "myApp.v1"
+```
+
+### `deleteLocalStorage`
+
+```ts
+function deleteLocalStorage(key: string): void;
+```
+
+Removes a value from `localStorage`.
+
+- For a simple key: removes the entire entry.
+- For a dot-path key: reads the root entry, removes the sub-path, and writes the updated root back.
+- No-op if the key / sub-path doesn't exist.
+- Silently handles errors.
+
+**Examples:**
+
+```ts
+deleteLocalStorage("count")          // removes the "count" entry entirely
+deleteLocalStorage("prefs.theme")    // removes only prefs.theme from "prefs" entry
+```
+
+### `getAllLocalStorage`
+
+```ts
+function getAllLocalStorage(): Record<string, any>;
+```
+
+Returns all current `localStorage` entries as a plain object. Values are JSON-parsed where possible; non-JSON entries are returned as raw strings. Returns an empty object if `localStorage` is unavailable.
+
+**Example:**
+
+```xmlui
+<Button
+  label="Inspect storage"
+  onClick="toast(JSON.stringify(getAllLocalStorage()))"
+/>
+```
+
+---
+
+### `readLocalStorage`
+
+```ts
+function readLocalStorage(key: string, fallback?: any): any;
+```
+
+Reads a value from `localStorage` using dot-path key semantics. The `key` is a dot-separated path where the first segment is the localStorage entry and the rest is a property path inside the parsed JSON value.
+
+- If the entry exists and is valid JSON, returns the value (or sub-path if specified).
+- If the entry is missing, unparseable, or any error occurs, returns `fallback`.
+- Silently handles `QuotaExceededError` and `SecurityError`.
+
+**Examples:**
+
+```ts
+readLocalStorage("count")                    
+readLocalStorage("prefs.theme.tone")         
+readLocalStorage("missing", "default value") 
+```
+
+### `resetLocalStorage`
+
+```ts
+function resetLocalStorage(prefix?: string): void;
+```
+
+Alias for `clearLocalStorage`. Removes `localStorage` entries; recommended name for app-level "Reset settings" actions.
+
+- No argument: removes all entries.
+- With `prefix`: removes only entries whose root key starts with the prefix.
+
+**Example:**
+
+```xmlui
+<Button
+  label="Reset all settings"
+  onClick="resetLocalStorage(); location.reload()"
+/>
+```
+
+### `storageTimestamp`
+
+```ts
+get storageTimestamp: number;
+```
+
+A read-only value that is updated to `Date.now()` after every `localStorage` mutation performed via the XMLUI storage functions (`writeLocalStorage`, `deleteLocalStorage`, `clearLocalStorage`, `resetLocalStorage`) and the App `persistTheme` feature. Starts at `0` on page load (no mutations yet).
+
+Use it with `ChangeListener` to reactively respond to any storage change:
+
+```xmlui
+<App var.storageContent="">
+  <ChangeListener
+    listenTo="{storageTimestamp}"
+    onDidChange="storageContent = JSON.stringify(getAllLocalStorage(), null, 2)"
+  />
+  <Button label="Save" onClick="writeLocalStorage('prefs.theme', 'dark')" />
+  <Text>{storageContent}</Text>
+</App>
+```
+
+### `writeLocalStorage`
+
+```ts
+function writeLocalStorage(key: string, value: any): void;
+```
+
+Writes a value to `localStorage` using dot-path key semantics.
+
+- For a simple key (no dots): JSON-stringifies and stores the value. Removes the entry if `value` is `undefined`.
+- For a dot-path key: reads the root entry, sets the sub-path using lodash semantics, and writes the updated root back.
+- Silently handles errors (quota exceeded, security errors, etc.).
+
+**Examples:**
+
+```ts
+writeLocalStorage("count", 42)               // stores {"count": 42} as JSON
+writeLocalStorage("prefs.theme", "dark")     // merges into existing "prefs" entry
+writeLocalStorage("temp", undefined)         // removes the "temp" entry
+```
+
 ## Math Utilities
 
 ### `avg`
@@ -421,6 +562,14 @@ This function works with both the Table of Contents system and standalone bookma
 </App>
 ```
 
+### `pathname`
+
+```ts
+get pathname: string | undefined;
+```
+
+This property returns the current URL pathname (e.g. `"/about"`), or `undefined` in non-browser environments.
+
 ### `routerBaseName`
 
 ```ts
@@ -434,14 +583,46 @@ This property gets the base name used for the router.
 ### `confirm`
 
 ```ts
-function confirm: (title: string, message?: string, actionLabel?: string): boolean
+// Positional arguments form
+function confirm(
+  title?: string,
+  message?: string,
+  actionLabel?: string,
+  cancelLabel?: string,
+  width?: string,
+): Promise<boolean>;
+
+// Options object form
+function confirm(options: {
+  title?: string;
+  message?: string;
+  actionLabel?: string;
+  cancelLabel?: string;
+  width?: string;
+}): Promise<boolean>;
 ```
 
-Instructs the browser to display a dialog with a confirmation message, and to wait until the user either confirms or cancels the dialog. It returns a boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
+Displays a confirmation dialog and returns a `Promise` that resolves to `true` when the user confirms, or `false` when the user cancels.
 
-- `title`: The title of the dialog
-- `message`: The message to display
-- `actionLabel`: The label of the action button
+The function can be called with positional arguments or with a single options object:
+
+```ts
+// Positional arguments
+const ok = await confirm("Delete item", "Are you sure?", "Delete", "Cancel");
+
+// Options object
+const ok = await confirm({ 
+  title: "Delete item",
+  message: "Are you sure?", 
+  width: "400px" });
+```
+
+**Parameters:**
+- `title`: The title displayed in the dialog header (default: `"Confirm Operation"`)
+- `message`: The body message (default: `"Are you sure you want to perform this operation?"`)
+- `actionLabel`: Label for the confirm button (default: `"Yes"`)
+- `cancelLabel`: Label for the cancel button (default: `"Cancel"`)
+- `width`: Optional CSS width for the dialog (e.g. `"400px"`, `"50vw"`)
 
 ### `signError`
 

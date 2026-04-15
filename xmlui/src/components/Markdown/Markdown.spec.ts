@@ -245,147 +245,91 @@ test("removeIndents=false: 4space/1 tab indent maps to a code block", async ({
 // =============================================================================
 
 test.describe("File Download Attribute", () => {
-  test("adds download attribute to links with common file extensions", async ({
+  test("handles download attribute detection across file types and edge cases", async ({
     initTestBed,
     page,
   }) => {
-    const SOURCE = `
+    // common downloadable file extensions get download attribute
+    await initTestBed(`<Markdown><![CDATA[
 [PDF File](/resources/files/sample.pdf)
 [CSV File](/resources/files/sample-products.csv)
 [ZIP Archive](/downloads/package.zip)
 [JSON Data](/api/data.json)
 [Excel File](/reports/data.xlsx)
 [Text File](/docs/readme.txt)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "PDF File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "CSV File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ZIP Archive" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "JSON Data" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Excel File" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Text File" })).toHaveAttribute("download");
 
-    const pdfLink = page.getByRole("link", { name: "PDF File" });
-    const csvLink = page.getByRole("link", { name: "CSV File" });
-    const zipLink = page.getByRole("link", { name: "ZIP Archive" });
-    const jsonLink = page.getByRole("link", { name: "JSON Data" });
-    const excelLink = page.getByRole("link", { name: "Excel File" });
-    const txtLink = page.getByRole("link", { name: "Text File" });
-
-    await expect(pdfLink).toHaveAttribute("download");
-    await expect(csvLink).toHaveAttribute("download");
-    await expect(zipLink).toHaveAttribute("download");
-    await expect(jsonLink).toHaveAttribute("download");
-    await expect(excelLink).toHaveAttribute("download");
-    await expect(txtLink).toHaveAttribute("download");
-  });
-
-  test("does not add download attribute to web page links", async ({ initTestBed, page }) => {
-    const SOURCE = `
+    // web page extensions do not get download attribute
+    await initTestBed(`<Markdown><![CDATA[
 [HTML Page](/docs/index.html)
 [HTM Page](/docs/page.htm)
 [PHP Script](/api/endpoint.php)
 [ASP Page](/legacy/page.asp)
 [ASPX Page](/app/default.aspx)
 [JSP Page](/java/app.jsp)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "HTML Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "HTM Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PHP Script" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ASP Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "ASPX Page" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "JSP Page" })).not.toHaveAttribute("download");
 
-    const htmlLink = page.getByRole("link", { name: "HTML Page" });
-    const htmLink = page.getByRole("link", { name: "HTM Page" });
-    const phpLink = page.getByRole("link", { name: "PHP Script" });
-    const aspLink = page.getByRole("link", { name: "ASP Page" });
-    const aspxLink = page.getByRole("link", { name: "ASPX Page" });
-    const jspLink = page.getByRole("link", { name: "JSP Page" });
-
-    await expect(htmlLink).not.toHaveAttribute("download");
-    await expect(htmLink).not.toHaveAttribute("download");
-    await expect(phpLink).not.toHaveAttribute("download");
-    await expect(aspLink).not.toHaveAttribute("download");
-    await expect(aspxLink).not.toHaveAttribute("download");
-    await expect(jspLink).not.toHaveAttribute("download");
-  });
-
-  test("handles file links with query parameters correctly", async ({ initTestBed, page }) => {
-    const SOURCE = `
+    // file links with query parameters and hash fragments still get download attribute
+    await initTestBed(`<Markdown><![CDATA[
 [CSV with Query](/api/export.csv?format=standard&date=2024)
 [PDF with Hash](/docs/report.pdf#page=5)
 [File with Both](/data/file.json?v=1#section)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "CSV with Query" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PDF with Hash" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "File with Both" })).toHaveAttribute("download");
 
-    const csvLink = page.getByRole("link", { name: "CSV with Query" });
-    const pdfLink = page.getByRole("link", { name: "PDF with Hash" });
-    const jsonLink = page.getByRole("link", { name: "File with Both" });
-
-    await expect(csvLink).toHaveAttribute("download");
-    await expect(pdfLink).toHaveAttribute("download");
-    await expect(jsonLink).toHaveAttribute("download");
-  });
-
-  test("does not add download attribute to links without file extensions", async ({
-    initTestBed,
-    page,
-  }) => {
-    const SOURCE = `
+    // links without file extensions do not get download attribute
+    await initTestBed(`<Markdown><![CDATA[
 [No Extension](/docs/readme)
 [Directory](/resources/)
 [Root](/api)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "No Extension" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Directory" })).not.toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Root" })).not.toHaveAttribute("download");
 
-    const noExtLink = page.getByRole("link", { name: "No Extension" });
-    const dirLink = page.getByRole("link", { name: "Directory" });
-    const rootLink = page.getByRole("link", { name: "Root" });
-
-    await expect(noExtLink).not.toHaveAttribute("download");
-    await expect(dirLink).not.toHaveAttribute("download");
-    await expect(rootLink).not.toHaveAttribute("download");
-  });
-
-  test("handles various document and archive formats", async ({ initTestBed, page }) => {
-    const SOURCE = `
+    // various document and archive formats get download attribute
+    await initTestBed(`<Markdown><![CDATA[
 [Word Doc](/files/document.doc)
 [Word DocX](/files/document.docx)
 [PowerPoint](/slides/presentation.ppt)
 [PowerPoint X](/slides/presentation.pptx)
 [RAR Archive](/downloads/archive.rar)
 [7z Archive](/downloads/data.7z)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Word Doc", exact: true })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Word DocX" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PowerPoint", exact: true })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "PowerPoint X" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "RAR Archive" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "7z Archive" })).toHaveAttribute("download");
 
-    const docLink = page.getByRole("link", { name: "Word Doc", exact: true });
-    const docxLink = page.getByRole("link", { name: "Word DocX" });
-    const pptLink = page.getByRole("link", { name: "PowerPoint", exact: true });
-    const pptxLink = page.getByRole("link", { name: "PowerPoint X" });
-    const rarLink = page.getByRole("link", { name: "RAR Archive" });
-    const sevenZLink = page.getByRole("link", { name: "7z Archive" });
-
-    await expect(docLink).toHaveAttribute("download");
-    await expect(docxLink).toHaveAttribute("download");
-    await expect(pptLink).toHaveAttribute("download");
-    await expect(pptxLink).toHaveAttribute("download");
-    await expect(rarLink).toHaveAttribute("download");
-    await expect(sevenZLink).toHaveAttribute("download");
-  });
-
-  test("file extension detection is case-insensitive", async ({ initTestBed, page }) => {
-    const SOURCE = `
+    // file extension detection is case-insensitive
+    await initTestBed(`<Markdown><![CDATA[
 [Uppercase PDF](/files/DOCUMENT.PDF)
 [Mixed Case CSV](/data/Products.CsV)
 [Lowercase Zip](/archives/data.zip)
-    `;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    ]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Uppercase PDF" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Mixed Case CSV" })).toHaveAttribute("download");
+    await expect(page.getByRole("link", { name: "Lowercase Zip" })).toHaveAttribute("download");
 
-    const pdfLink = page.getByRole("link", { name: "Uppercase PDF" });
-    const csvLink = page.getByRole("link", { name: "Mixed Case CSV" });
-    const zipLink = page.getByRole("link", { name: "Lowercase Zip" });
-
-    await expect(pdfLink).toHaveAttribute("download");
-    await expect(csvLink).toHaveAttribute("download");
-    await expect(zipLink).toHaveAttribute("download");
-  });
-
-  test("preserves explicit download attribute from HTML", async ({ initTestBed, page }) => {
-    const SOURCE = `<a href="/resources/files/sample-products.csv" download>Click to Download</a>`;
-    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
-
-    const link = page.getByRole("link", { name: "Click to Download" });
-    await expect(link).toHaveAttribute("download");
+    // explicit download attribute from HTML is preserved
+    await initTestBed(`<Markdown><![CDATA[<a href="/resources/files/sample-products.csv" download>Click to Download</a>]]></Markdown>`);
+    await expect(page.getByRole("link", { name: "Click to Download" })).toHaveAttribute("download");
   });
 });
 
@@ -566,5 +510,155 @@ test.describe("Heading ID Generation Regression", () => {
     
     const brElements = page.locator("br");
     await expect(brElements).toHaveCount(0);
+  });
+});
+
+// =============================================================================
+// REGRESSION: binding expressions not replaced inside code fences
+// =============================================================================
+
+test.describe("Binding expression code-fence exclusion regression", () => {
+  test("does not replace @{} binding inside a triple-backtick code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // The expression inside the code fence must remain literal
+    await expect(driver.component).toHaveText("@{someValue}");
+  });
+
+  test("replaces @{} binding outside a code fence but not inside", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "Value: @{someValue}\n\n```\n@{someValue}\n```";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    // Outside the fence: replaced; inside: literal
+    const text = await driver.component.textContent();
+    expect(text).toContain("Value: 42");
+    expect(text).toContain("@{someValue}");
+  });
+
+  test("replaces @{} binding in text after a closing code fence", async ({
+    initTestBed,
+    createMarkdownDriver,
+  }) => {
+    const SOURCE = "```\n@{someValue}\n```\n\nOutside: @{someValue}";
+    await initTestBed(
+      `<App var.someValue="{42}"><Markdown><![CDATA[${SOURCE}]]></Markdown></App>`,
+    );
+    const driver = await createMarkdownDriver();
+    const text = await driver.component.textContent();
+    // Code fence content is literal; text after the fence is replaced
+    expect(text).toContain("@{someValue}");
+    expect(text).toContain("Outside: 42");
+  });
+});
+
+// =============================================================================
+// xmlui-pg: nested code fences with four backticks
+// =============================================================================
+
+test.describe("xmlui-pg nested code fences (four-backtick delimiter)", () => {
+  test("renders a basic xmlui-pg playground", async ({ initTestBed, page }) => {
+    const SOURCE = "```xmlui-pg\n<Button>Hello</Button>\n```";
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The NestedApp renders the Button component from the playground source
+    await expect(page.getByRole("button", { name: "Hello" })).toBeVisible();
+  });
+
+  test("four-backtick fence inside xmlui-pg does not close the outer fence", async ({
+    initTestBed,
+    page,
+  }) => {
+    // The ````bash...```` block must be treated as nested content, not as the closing ```.
+    // After unescaping, <Markdown> receives a bash code block and renders it.
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "npm start",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The nested app renders Markdown which renders "npm start" inside a code element
+    await expect(page.locator("code").filter({ hasText: "npm start" })).toBeVisible();
+  });
+
+  test("display segment with nested four-backtick fence emits a visible code block", async ({
+    initTestBed,
+    page,
+  }) => {
+    // display mode causes the segment source to appear as a <pre> code block above the playground
+    const SOURCE = [
+      "```xmlui-pg",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // A <pre> display code block must be rendered (the emitted wrapper uses ```` when content has ```)
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The source code shown in the display block must include "echo hello"
+    await expect(page.locator("pre").first()).toContainText("echo hello");
+  });
+
+  test("multiple four-backtick nested fences are all parsed into app content", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg",
+      "<Markdown>",
+      "````bash",
+      "first command",
+      "````",
+      "",
+      "````js",
+      "second command",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // Both unescaped code blocks must appear in the rendered Markdown output
+    await expect(page.locator("code").filter({ hasText: "first command" })).toBeVisible();
+    await expect(page.locator("code").filter({ hasText: "second command" })).toBeVisible();
+  });
+
+  test("four-backtick fence inside explicit ---app segment renders correctly", async ({
+    initTestBed,
+    page,
+  }) => {
+    const SOURCE = [
+      "```xmlui-pg display",
+      "---app display",
+      "<Markdown>",
+      "````bash",
+      "echo hello",
+      "````",
+      "</Markdown>",
+      "```",
+    ].join("\n");
+    await initTestBed(`<Markdown><![CDATA[${SOURCE}]]></Markdown>`);
+    // The display code block is rendered as <pre>;
+    // Two <pre> elements exist: display block + rendered bash block inside NestedApp — use .first()
+    await expect(page.locator("pre").first()).toBeVisible();
+    // The nested app renders the Markdown which shows "echo hello" in a code element
+    await expect(page.locator("code").filter({ hasText: "echo hello" }).first()).toBeVisible();
   });
 });

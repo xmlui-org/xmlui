@@ -24,6 +24,7 @@ vi.mock("../../../src/components-core/theming/ThemeContext", () => ({
 
 vi.mock("../../../src/components-core/theming/StyleContext", () => ({
   useComponentStyle: vi.fn(() => "test-class"),
+  useStyles: vi.fn(() => "test-styles-class"),
 }));
 
 vi.mock("../../../src/components-core/InspectorContext", () => ({
@@ -45,6 +46,7 @@ vi.mock("../../../src/components-core/utils/hooks", () => ({
 vi.mock("../../../src/components-core/utils/extractParam", () => ({
   extractParam: vi.fn((state, value) => value),
   shouldKeep: vi.fn((when) => when !== false),
+  resolveResponsiveWhen: vi.fn((when, _responsiveWhen) => when !== false),
 }));
 
 // Now import the component

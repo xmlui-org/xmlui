@@ -120,8 +120,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -162,6 +162,28 @@ When `true`, clicking outside the drawer panel closes it.
 > [!DEF]  default: **true**
 
 When `true`, a translucent overlay is shown behind the drawer while it is open.
+
+### `headerTemplate` [#headertemplate]
+
+A custom template rendered in the sticky header area, next to the close button.
+
+This property defines a custom template rendered in the sticky header area of the drawer, next to the close button. Use it to display a logo, title, or any custom content that stays fixed at the top while the drawer body scrolls.
+
+```xmlui-pg copy display {5-7} name="Example: headerTemplate" height="280px"
+<App>
+  <Button label="Open Drawer" onClick="drawer.open()" />
+  <Drawer id="drawer" position="left">
+    <property name="headerTemplate">
+      <H3>Navigation</H3>
+    </property>
+    <VStack gap="$space-2">
+      <Button label="Home" variant="ghost" />
+      <Button label="Settings" variant="ghost" />
+      <Button label="Help" variant="ghost" />
+    </VStack>
+  </Drawer>
+</App>
+```
 
 ### `initiallyOpen` [#initiallyopen]
 
@@ -255,9 +277,18 @@ Opens the `Drawer`. Invoke with `drawerId.open()`.
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Drawer | $backgroundColor-primary | $backgroundColor-primary |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Drawer | $borderRadius | $borderRadius |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Drawer | 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05) | 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05) |
+| [gap](/docs/styles-and-themes/common-units/#size)-Drawer | $space-4 | $space-4 |
 | [height](/docs/styles-and-themes/common-units/#size-values)-Drawer | 320px | 320px |
 | [maxHeight](/docs/styles-and-themes/common-units/#size-values)-Drawer | 50% | 50% |
 | [maxWidth](/docs/styles-and-themes/common-units/#size-values)-Drawer | 80% | 80% |
-| [padding](/docs/styles-and-themes/common-units/#size-values)-Drawer | $space-4 | $space-4 |
+| [padding](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingTop-Drawer $paddingRight-Drawer $paddingBottom-Drawer $paddingLeft-Drawer | $paddingTop-Drawer $paddingRight-Drawer $paddingBottom-Drawer $paddingLeft-Drawer |
+| [paddingBottom](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingVertical-Drawer | $paddingVertical-Drawer |
+| [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-Drawer | $space-4 | $space-4 |
+| [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingHorizontal-Drawer | $paddingHorizontal-Drawer |
+| [paddingRight](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingHorizontal-Drawer | $paddingHorizontal-Drawer |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-Drawer | $paddingVertical-Drawer | $paddingVertical-Drawer |
+| [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Drawer | $space-4 | $space-4 |
+| right-closeButton-Drawer | $space-3 | $space-3 |
+| top-closeButton-Drawer | $space-2 | $space-2 |
 | [width](/docs/styles-and-themes/common-units/#size-values)-Drawer | 320px | 320px |
 | zIndex-Drawer | 200 | 200 |

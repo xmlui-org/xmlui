@@ -12,7 +12,14 @@ export function isEmptyLike(value: string | number | empty): value is empty {
 }
 
 export function mapToRepresentation(value: string | number | empty) {
-  if (typeof value === "string") return value;
+  if (typeof value === "string") {
+    // Only return strings that look like valid numeric input (or partial input like "-", "1e", "0.")
+    if (value === "" || value === "-" || FLOAT_REGEXP.test(value) || INT_REGEXP.test(value) ||
+        /^-?\d*\.?\d*([eE][+-]?\d*)?$/.test(value)) {
+      return value;
+    }
+    return "";
+  }
   if (typeof value === "number") return value.toString();
   return "";
 }

@@ -10,6 +10,8 @@
 
 Use `Column` to define headers, data binding, sorting behavior, and custom cell content.
 
+**Row identity**: The Table uses the `id` field of each data item as a unique row identifier. This identifier is used for row selection, `selectId()`, `getSelectedIds()`, and `syncWithVar`. If your data uses a different field as the key, set the [`idKey`](#idkey) property to that field name.
+
 In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |
@@ -44,8 +46,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -92,6 +94,22 @@ If this property is set to `true`, the component gets the focus automatically wh
 Determines where to place the pagination button row in the layout. It works the same as the [Pagination component property](./Pagination#buttonrowposition).
 
 Available values: `start`, `center` **(default)**, `end`
+
+### `cellUserSelect` [#celluserselect]
+
+> [!DEF]  default: **"none"**
+
+This property controls whether users can select text within table cells.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user |
+| `none` | Text cannot be selected **(default)** |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
 
 ### `cellVerticalAlign` [#cellverticalalign]
 
@@ -434,6 +452,22 @@ It accepts common [size values](/docs/styles-and-themes/common-units#size-values
 </App>
 ```
 
+### `headerUserSelect` [#headeruserselect]
+
+> [!DEF]  default: **"text"**
+
+This property controls whether users can select text within table headers.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `auto` | Default text selection behavior |
+| `text` | Text can be selected by the user **(default)** |
+| `none` | Text cannot be selected |
+| `contain` | Selection is contained within this element |
+| `all` | The entire element content is selected as one unit |
+
 ### `hideHeader` [#hideheader]
 
 > [!DEF]  default: **false**
@@ -544,6 +578,44 @@ The default value is `false`.
     rowsSelectable="true"
     enableMultiRowSelection="true"
     hideSelectionCheckboxes="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+### `hideSelectionCheckboxesHeader` [#hideselectioncheckboxesheader]
+
+> [!DEF]  default: **false**
+
+If true, the selection checkbox in the table header is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via API and keyboard.
+
+Hides the selection checkbox in the table header so it is never displayed, not even on hover. Row checkboxes are unaffected. Selection logic still works via the component API and keyboard shortcuts.
+
+The default value is `false`.
+
+```xmlui copy /hideSelectionCheckboxesHeader="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="true" hideSelectionCheckboxesHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: hideSelectionCheckboxesHeader"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    hideSelectionCheckboxesHeader="true">
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
@@ -814,7 +886,7 @@ An array of IDs that should be initially selected when the table is rendered. Th
 
 > [!DEF]  default: **false**
 
-This property adds pagination controls to the `Table`.
+This property adds pagination controls to the `Table`. When enabled, the pagination bar is automatically hidden if all rows fit on a single page. You can omit this property and set only `pageSize` instead — pagination will then activate automatically when the data length exceeds the page size and hide itself when it does not.
 
 ```xmlui copy /isPaginated="true"/
 <App>
@@ -954,7 +1026,7 @@ Determines where to place the page information in the layout. It works the same 
 
 ### `pageSize` [#pagesize]
 
-This property defines the number of rows to display per page when pagination is enabled.
+This property defines the number of rows to display per page. When set without also setting `isPaginated`, pagination is activated automatically whenever the number of data rows exceeds this value and suppressed otherwise. This makes `pageSize` the minimal way to get auto-activating, auto-hiding pagination: no conditional expressions on `isPaginated` or the position props are needed.
 
 Options
 
@@ -1121,6 +1193,10 @@ Determines where to place the page size selector in the layout. It works the sam
 This property determines the location of the pagination controls. It can be set to `top`, `bottom`, or `both`.
 
 Available values: `top`, `bottom` **(default)**, `both`
+
+### `refreshOn` [#refreshon]
+
+An expression whose value change forces all table rows and cells to re-render. Use this to ensure that closure variables bound in row or cell templates are updated when global state changes (e.g. `{selectMode}`). Without this, virtualized rows might retain stale references to global variables for performance reasons.
 
 ### `rowDisabledPredicate` [#rowdisabledpredicate]
 
@@ -1448,15 +1524,164 @@ This property determines the sort order to be `ascending` or `descending`. This 
 </App>
 ```
 
+### `striped` [#striped]
+
+> [!DEF]  default: **false**
+
+When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.
+
+```xmlui copy /striped="true"/
+<App>
+  <Table data='{[...]}' striped="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: striped"
+<App>
+  <Table data='{[
+  {
+    id: 0,
+    name: "Apples",
+    quantity: 5,
+    unit: "pieces",
+    category: "fruits",
+    key: 5,
+  },
+  {
+    id: 1,
+    name: "Bananas",
+    quantity: 6,
+    unit: "pieces",
+    category: "fruits",
+    key: 4,
+  },
+  {
+    id: 2,
+    name: "Carrots",
+    quantity: 100,
+    unit: "grams",
+    category: "vegetables",
+    key: 3,
+  },
+  {
+    id: 3,
+    name: "Spinach",
+    quantity: 1,
+    unit: "bunch",
+    category: "vegetables",
+    key: 2,
+  },
+  {
+    id: 4,
+    name: "Milk",
+    quantity: 10,
+    unit: "liter",
+    category: "dairy",
+    key: 1,
+  },
+  {
+    id: 5,
+    name: "Cheese",
+    quantity: 200,
+    unit: "grams",
+    category: "dairy",
+    key: 0,
+  },
+]}' striped="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
 ### `syncWithAppState` [#syncwithappstate]
 
 An AppState instance to synchronize the table's selection state with. The table will read from and write to the 'selectedIds' property of the AppState object. When provided, this takes precedence over the initiallySelected property for initial selection. You can use the AppState's didUpdate event to receive notifications when the selection changes.
+
+### `syncWithVar` [#syncwithvar]
+
+The name of a global variable to synchronize the table's selection state with. The named variable must reference an object; the table will read from and write to its 'selectedIds' property. When provided, this takes precedence over both `initiallySelected` and `syncWithAppState`. Multiple tables sharing the same variable name will keep their selections in sync automatically. A runtime error is signalled if the value is not a valid JavaScript variable name.
+
+The following example demonstrates how two independent `MyTable` components share selection state through a global variable. Selecting a row in either table immediately reflects in the other, and `selState` always holds the current selection:
+
+>[!INFO]
+> `syncWithVar` works with both global and local variables. When using local variables, ensure all Tables in the sync have that variable in their scope.
+
+```xmlui-pg
+---app copy display /global.selState/ filename="Main.xmlui"
+<App global.selState="{{}}">
+  <MyTable />
+  <Text>Selection: {JSON.stringify(selState)}</Text>
+  <MyTable />
+</App>
+---comp copy display /syncWithVar="selState"/ filename="MyTable.xmlui"
+<Component name="MyTable">
+  <Table
+    syncWithVar="selState"
+    rowsSelectable="true"
+    data='{[
+      { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+      { id: 1, name: "Bananas", quantity: 6 },
+      { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    ]}'
+  >
+    <Column bindTo="name" />
+    <Column bindTo="quantity" />
+    <Column bindTo="unit" />
+  </Table>
+</Component>
+---desc
+Change the selection in one of the tables and check how it is synced.
+```
+
+### `toggleSelectionOnClick` [#toggleselectiononclick]
+
+> [!DEF]  default: **false**
+
+When `true`, a plain click toggles the row's selection state instead of replacing the current selection. Ctrl+Click and Shift+Click behavior is unchanged. Only has an effect when `rowsSelectable` is `true`.
+
+When `true`, a plain click toggles the row's selection state (adds it if not selected, removes it if already selected) instead of replacing the current selection with just that row.
+This property only has an effect when `rowsSelectable` is `true`. Ctrl+Click and Shift+Click behavior is unchanged.
+
+The default value is `false`.
+
+```xmlui copy /toggleSelectionOnClick="true"/
+<App>
+  <Table data='{[...]}' rowsSelectable="true" toggleSelectionOnClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+```xmlui-pg name="Example: toggleSelectionOnClick"
+<App>
+  <Table data='{[
+    { id: 0, name: "Apples", quantity: 5, unit: "pieces" },
+    { id: 1, name: "Bananas", quantity: 6, unit: "pieces" },
+    { id: 2, name: "Carrots", quantity: 100, unit: "grams" },
+    { id: 3, name: "Spinach", quantity: 1, unit: "bunch" }
+  ]}'
+    rowsSelectable="true"
+    toggleSelectionOnClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
 
 ### `userSelectCell` [#userselectcell]
 
 > [!DEF]  default: **"auto"**
 
-This property controls whether users can select text within table cells. Use `text` to allow text selection, `none` to prevent selection, or `auto` for default behavior.
+This property controls whether users can select text within table cells.
 
 Available values:
 
@@ -1993,14 +2218,20 @@ The component has some parts that can be styled through layout properties and th
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-evenRow-Table | $backgroundColor-row-Table | $backgroundColor-row-Table |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-300 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-oddRow-Table | $color-surface-100 | $color-surface-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-pagination-Table | $backgroundColor-Table | $backgroundColor-Table |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-pinnedCell-Table | $color-surface-50 | $color-surface-50 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-pinnedCell-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-50 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-100 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-selected-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selectionCell-Table | $backgroundColor-pinnedCell-Table | $backgroundColor-pinnedCell-Table |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-selectionCell-Table--hover | $backgroundColor-row-Table--hover | $backgroundColor-row-Table--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [border](/docs/styles-and-themes/common-units/#border)-cell-Table | 1px solid $borderColor | 1px solid $borderColor |
 | [border](/docs/styles-and-themes/common-units/#border)-Table | 0px solid transparent | 0px solid transparent |
@@ -2014,6 +2245,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-cell-Table | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-cell-Table | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Checkbox--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Table | *none* | *none* |
 | [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-cell-Table | *none* | *none* |
 | [borderEndEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Table | *none* | *none* |
@@ -2068,6 +2300,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-cell-Table | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Table | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-checkbox-Table | $fontSize | $fontSize |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-heading-Table | $fontSize-tiny | $fontSize-tiny |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-row-Table | $fontSize-sm | $fontSize-sm |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-heading-Table | $fontWeight-bold | $fontWeight-bold |

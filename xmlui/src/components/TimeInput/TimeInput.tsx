@@ -1,6 +1,6 @@
 import styles from "./TimeInput.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -162,51 +162,58 @@ export const TimeInputMd = createMetadata({
   },
 });
 
-export const timeInputComponentRenderer = createComponentRenderer(
+export const timeInputComponentRenderer = wrapComponent(
   COMP,
+  TimeInputNative,
   TimeInputMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    className,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    const extractedInitialValue = extractValue(node.props.initialValue);
-    const stateValue = state?.value;
+  {
+    exposeRegisterApi: true,
+    stateful: true,
+    events: [],
+    customRender(_props, {
+      node,
+      state,
+      updateState,
+      extractValue,
+      classes,
+      lookupEventHandler,
+      registerComponentApi,
+    }) {
+      const extractedInitialValue = extractValue(node.props.initialValue);
+      const stateValue = state?.value;
 
-    return (
-      <TimeInputNative
-        className={className}
-        initialValue={extractedInitialValue}
-        value={stateValue}
-        updateState={updateState}
-        registerComponentApi={registerComponentApi}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, defaultProps.autoFocus)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly, defaultProps.readOnly)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        hour24={extractValue.asOptionalBoolean(node.props.hour24, defaultProps.hour24)}
-        seconds={extractValue.asOptionalBoolean(node.props.seconds, defaultProps.seconds)}
-        minTime={extractValue(node.props.minTime)}
-        maxTime={extractValue(node.props.maxTime)}
-        clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
-        clearIcon={extractValue(node.props.clearIcon)}
-        clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
-        required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
-        startText={extractValue(node.props.startText)}
-        startIcon={extractValue(node.props.startIcon)}
-        endText={extractValue(node.props.endText)}
-        endIcon={extractValue(node.props.endIcon)}
-        gap={extractValue.asOptionalString(node.props.gap)}
-        emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        onInvalidChange={lookupEventHandler("invalidTime")}
-      />
-    );
+      return (
+        <TimeInputNative
+          classes={classes}
+          initialValue={extractedInitialValue}
+          value={stateValue}
+          updateState={updateState}
+          registerComponentApi={registerComponentApi}
+          enabled={extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, defaultProps.autoFocus)}
+          readOnly={extractValue.asOptionalBoolean(node.props.readOnly, defaultProps.readOnly)}
+          validationStatus={extractValue(node.props.validationStatus)}
+          hour24={extractValue.asOptionalBoolean(node.props.hour24, defaultProps.hour24)}
+          seconds={extractValue.asOptionalBoolean(node.props.seconds, defaultProps.seconds)}
+          minTime={extractValue(node.props.minTime)}
+          maxTime={extractValue(node.props.maxTime)}
+          clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
+          clearIcon={extractValue(node.props.clearIcon)}
+          clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
+          required={extractValue.asOptionalBoolean(node.props.required, defaultProps.required)}
+          startText={extractValue(node.props.startText)}
+          startIcon={extractValue(node.props.startIcon)}
+          endText={extractValue(node.props.endText)}
+          endIcon={extractValue(node.props.endIcon)}
+          gap={extractValue.asOptionalString(node.props.gap)}
+          emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter, defaultProps.emptyCharacter)}
+          ariaLabel={extractValue.asOptionalString(node.props["aria-label"])}
+          onDidChange={lookupEventHandler("didChange")}
+          onFocus={lookupEventHandler("gotFocus")}
+          onBlur={lookupEventHandler("lostFocus")}
+          onInvalidChange={lookupEventHandler("invalidTime")}
+        />
+      );
+    },
   },
 );

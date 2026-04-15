@@ -33,7 +33,37 @@ $boxShadow-Search: createThemeVar("boxShadow-#{$componentListPanel}");
 $componentListItem: "SearchItem";
 $borderRadius-SearchItem: createThemeVar("borderRadius-#{$componentListItem}");
 $backgroundColor-SearchItem--hover: createThemeVar("backgroundColor-#{$componentListItem}--hover");
+$backgroundColor-SearchItem--focus: createThemeVar("backgroundColor-#{$componentListItem}--focus");
 $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem}--focus");
+
+$componentListFooter: "SearchFooter";
+$backgroundColor-SearchFooter: createThemeVar("backgroundColor-#{$componentListFooter}");
+$borderColor-SearchFooter: createThemeVar("borderColor-#{$componentListFooter}");
+
+$componentButton: "SearchToggleButton";
+$textColor-SearchToggleButton: createThemeVar("textColor-#{$componentButton}");
+$textColor-SearchToggleButton--hover: createThemeVar("textColor-#{$componentButton}--hover");
+$backgroundColor-SearchToggleButton--hover: createThemeVar("backgroundColor-#{$componentButton}--hover");
+
+$textColor-SearchNoResults: createThemeVar("textColor-SearchNoResults");
+$backgroundColor-SearchNoResultsChip: createThemeVar("backgroundColor-SearchNoResultsChip");
+$textColor-SearchNoResultsChip: createThemeVar("textColor-SearchNoResultsChip");
+
+$backgroundColor-SearchCategoryBadge: createThemeVar("backgroundColor-SearchCategoryBadge");
+$textColor-SearchCategoryBadge: createThemeVar("textColor-SearchCategoryBadge");
+
+$backgroundColor-SearchFilterChip: createThemeVar("backgroundColor-SearchFilterChip");
+$backgroundColor-SearchFilterChip--active: createThemeVar("backgroundColor-SearchFilterChip--active");
+$textColor-SearchFilterChip: createThemeVar("textColor-SearchFilterChip");
+$textColor-SearchFilterChip--active: createThemeVar("textColor-SearchFilterChip--active");
+$borderRadius-SearchFilterChip: createThemeVar("borderRadius-SearchFilterChip");
+
+$backgroundColor-SearchSortButton--active: createThemeVar("backgroundColor-SearchSortButton--active");
+$textColor-SearchSortButton--active: createThemeVar("textColor-SearchSortButton--active");
+
+$textColor-SearchResultCount: createThemeVar("textColor-SearchResultCount");
+
+$textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 
 // Keyframe animations for collapsible search
 @keyframes expandSearch {
@@ -61,24 +91,74 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
 .listPanel {
   @include t.borderVars($themeVars, $componentListPanel);
   @include t.paddingVars($themeVars, $componentListPanel);
+  background-color: $backgroundColor-Search;
   overflow: hidden;
   width: 580px;
   margin-top: 4px;
   box-shadow: $boxShadow-Search;
+  position: relative;
+  z-index: 10000;
 
-  &.inDrawer {
+  @media (max-width: 600px) {
     width: var(--radix-popover-trigger-width);
-    z-index: 1;
   }
 }
 
 .list {
   background-color: $backgroundColor-Search;
   max-height: 360px;
+  overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;
   scrollbar-width: thin;
-  padding: 0.75rem;
+
+  // No padding-top: sticky headers use top: 0, which is anchored to the scroll
+  // viewport's top edge. If padding-top were set, items could scroll into that
+  // padding zone and appear above the stuck header. The visual top gap is
+  // instead provided by margin-top on the first list child, which is part of
+  // the normal scroll flow and doesn't affect sticky anchoring.
+  padding: 0 0.75rem 0.75rem;
+
+  & > :first-child:not(.categoryHeader) {
+    margin-top: 0.75rem;
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.drawerOverlayList {
+  flex: 1;
+  max-height: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+.drawerResultsWrapper {
+  width: 100%;
+  background-color: $backgroundColor-Search;
+  border-radius: $borderRadius-SearchItem;
+  box-shadow: t.$boxShadow-md;
+  position: absolute;
+  top: 42px;
+}
+
+.drawerBackButton {
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0.25rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    opacity: 1;
+    background: $backgroundColor-SearchItem--hover;
+  }
 }
 
 .input {
@@ -92,8 +172,9 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   border-color: $borderColor-SearchInput;
   @include t.paddingVars($themeVars, $componentInput);
 
-
   &.active {
+    background-color: $backgroundColor-SearchInput--active;
+
     [data-part-id="startAdornment"],
     [data-part-id="endAdornment"] {
       color: $textColor-adornment-SearchInput--active;
@@ -105,6 +186,10 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   }
 
   &.fullWidth {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
     width: 100%;
   }
 
@@ -128,25 +213,439 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
   }
 }
 
+.categoryHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: $backgroundColor-Search;
+  list-style: none;
+  padding-top: 1.25rem;
+  padding-bottom: 0.25rem;
+  padding-inline: 0.75rem;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+  margin-top: 0;
+  margin-bottom: 0.25rem;
+
+  /* &:not(:first-child) {
+    margin-top: 0.75rem;
+  } */
+
+  .categoryHeaderText {
+    font-size: 0.72em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--xmlui-color-secondary-800);
+  }
+}
+
 .noResults {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.noResultsPanel {
+  padding: 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .noResultsMessage {
+    color: $textColor-SearchNoResults;
+  }
+
+  .noResultsHint {
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+
+  .noResultsSuggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .noResultsSuggestionChip {
+    background: $backgroundColor-SearchNoResultsChip;
+    color: $textColor-SearchNoResultsChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 9999px;
+    padding: 0.15rem 0.75rem;
+    font-size: 0.8em;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.previewMetadata {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.1rem;
+  margin-bottom: 0.2rem;
+
+  .categoryBadge {
+    background: $backgroundColor-SearchCategoryBadge;
+    color: $textColor-SearchCategoryBadge;
+    font-size: 0.68em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+  }
+
+  .pathBreadcrumb {
+    font-size: 0.75em;
+    opacity: 0.6;
+
+    .pathSegment {
+      // intentionally unstyled — inherits from pathBreadcrumb
+    }
+
+    .pathSeparator {
+      opacity: 0.5;
+    }
+  }
+}
+
+.panelControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem 0;
+  flex-wrap: wrap;
+}
+
+.categoryFilterBar {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  flex: 1;
+
+  .categoryFilterChip {
+    background: $backgroundColor-SearchFilterChip;
+    color: $textColor-SearchFilterChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: $borderRadius-SearchFilterChip;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.78em;
+    cursor: pointer;
+
+    &.categoryFilterChipActive {
+      background: $backgroundColor-SearchFilterChip--active;
+      color: $textColor-SearchFilterChip--active;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  .sortLabel {
+    font-size: 0.78em;
+    opacity: 0.6;
+    white-space: nowrap;
+  }
+  flex-shrink: 0;
+
+  .sortButton {
+    background: transparent;
+    color: $textColor-SearchFilterChip;
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 4px;
+    padding: 0.15rem 0.55rem;
+    font-size: 0.78em;
+    cursor: pointer;
+
+    &.sortButtonActive {
+      background: $backgroundColor-SearchSortButton--active;
+      color: $textColor-SearchSortButton--active;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+.loadMoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1rem;
+  border-top: 1px solid var(--xmlui-borderColor);
+
+  .resultCount {
+    font-size: 0.78em;
+    color: $textColor-SearchResultCount;
+    opacity: 0.7;
+  }
+
+  .loadMoreButton {
+    background: transparent;
+    color: var(--xmlui-textColor-primary);
+    border: 1px solid var(--xmlui-borderColor);
+    border-radius: 4px;
+    padding: 0.2rem 0.75rem;
+    font-size: 0.8em;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
+$backgroundColor-SearchOverlay: createThemeVar("backgroundColor-SearchOverlay");
+$backgroundColor-SearchOverlayPanel: createThemeVar("backgroundColor-SearchOverlayPanel");
+$borderRadius-SearchOverlayPanel: createThemeVar("borderRadius-SearchOverlayPanel");
+$boxShadow-SearchOverlayPanel: createThemeVar("boxShadow-SearchOverlayPanel");
+$textColor-SearchOverlayTab: createThemeVar("textColor-SearchOverlayTab");
+$textColor-SearchOverlayTab--active: createThemeVar("textColor-SearchOverlayTab--active");
+$borderColor-SearchOverlayTab--active: createThemeVar("borderColor-SearchOverlayTab--active");
+
+.overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  background: #{rgb}(from t.useVar(t.$backgroundColor-primary) r g b / 90%);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+  pointer-events: auto;
+}
+
+.overlayBackdrop * {
+  pointer-events: auto;
+}
+
+.overlayPanel {
+  background: $backgroundColor-SearchOverlayPanel;
+  width: 680px;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 20vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: $boxShadow-SearchOverlayPanel;
+  position: fixed;
+  top: 20vh;
+  border-radius: t.$space-2_5;
+
+  @media (max-width: 600px) {
+    border-radius: t.$space-2_5;
+    display: flex;
+    top: auto;
+    position: relative;
+    flex-direction: column;
+    background: $backgroundColor-SearchOverlayPanel;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: min(680px, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    min-height: 0;
+    overflow: hidden;
+    box-shadow: $boxShadow-SearchOverlayPanel;
+  }
+
+}
+
+.overlayPanelWithResults {
+  @media (max-width: 600px) {
+    height: calc(100dvh - 3rem);
+    max-height: calc(100dvh - 3rem);
+  }
+}
+
+.overlayInputRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
+
+  .overlaySearchIcon {
+    flex-shrink: 0;
+    opacity: 0.5;
+  }
+
+  .overlayInput {
+    flex: 1;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    font-size: 1rem;
+    padding: 0 !important;
+  }
+
+  .overlayCloseButton {
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.5;
+    padding: 0.25rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+
+    &:hover {
+      opacity: 1;
+      background: $backgroundColor-SearchItem--hover;
+    }
+  }
+}
+
+.overlayControls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  overflow: auto;
+  justify-content: space-between;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+
+  @media (max-width: 600px) {
+    background: $backgroundColor-SearchOverlayPanel;
+  }
+}
+
+.drawerControls {
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--xmlui-borderColor);
+
+  .drawerCategoryRow {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding: 0 1rem;
+    border-bottom: 1px solid var(--xmlui-borderColor);
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  .drawerSortRow {
+    display: flex;
+    justify-content: flex-start;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.overlayTabs {
+  display: flex;
+  gap: 0;
+
+  .overlayTab {
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85em;
+    font-weight: 500;
+    color: $textColor-SearchOverlayTab;
+    cursor: pointer;
+    white-space: nowrap;
+
+    &:hover {
+      color: $textColor-SearchOverlayTab--active;
+    }
+
+    &.overlayTabActive {
+      color: $textColor-SearchOverlayTab--active;
+      border-bottom-color: $borderColor-SearchOverlayTab--active;
+    }
+  }
+}
+
+.overlayList {
+  max-height: 420px;
+}
+
+.overlayResultsList {
+  min-height: 0;
+
+  @media (max-width: 600px) {
+    flex: 1 1 auto;
+    height: 0;
+    max-height: none;
+    min-height: 0;
+    display: block;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+}
+
+// Drawer (mobile full-screen) overlay variants
+.overlayBackdropMobile {
+  padding: 1.5rem 1rem;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100vw;
+  max-width: 100vw;
+  min-height: 100dvh;
+}
+
+
+.didYouMeanBanner {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.75rem 0;
+
+  .didYouMeanText {
+    font-size: 0.85em;
+    color: $textColor-SearchDidYouMean;
+  }
+
+  .didYouMeanSuggestion {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 0.85em;
+    font-weight: 600;
+    color: var(--xmlui-color-primary-500);
+    cursor: pointer;
+    text-decoration: underline;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}
+
 .item {
   list-style: none;
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
   padding-inline: 0.75rem;
   border-radius: $borderRadius-SearchItem;
   border: 2px solid transparent;
   cursor: pointer;
-  
+
   // This style is used to denote keyboard focus
-  &.keyboardFocus {
-    background-color: $backgroundColor-SearchItem--hover;
-    
+  &.focus {
+    background-color: $backgroundColor-SearchItem--focus;
+
     // Ensures the underlying link is visible on programmatic hover
     & > a {
       color: var(--xmlui-textColor-primary);
@@ -159,21 +658,66 @@ $borderColor-SearchItem--focus: createThemeVar("borderColor-#{$componentListItem
     &:hover {
       color: inherit;
     }
+
     &:active {
       color: var(--xmlui-textColor-primary);
     }
   }
 
   & > a .snippet {
-    padding-top: 0.25rem;
-    padding-bottom: 0.25rem;
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
+  // Only apply to .item elements that are NOT also .categoryHeader
   &.header:has(+ .content):not(:first-child) {
     margin-top: 0.5rem;
   }
 }
 
-:export{
+.snippet {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.itemLink {
+  text-decoration: none;
+  width: 100%;
+  min-height: 36px;
+}
+
+.itemBody {
+  width: 100%;
+}
+
+.itemTitleRow {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+
+  [data-variant="subtitle"] {
+    font-weight: 600;
+  }
+}
+
+.itemSnippets {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchToggleButton {
+  color: $textColor-SearchToggleButton !important;
+
+  &:hover {
+    background: $backgroundColor-SearchToggleButton--hover !important;
+    color: $textColor-SearchToggleButton--hover !important;
+  }
+}
+
+:export {
   themeVars: t.json-stringify($themeVars)
 }

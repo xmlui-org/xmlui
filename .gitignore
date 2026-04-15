@@ -41,9 +41,21 @@ coverage
 dist
 dist-ssg
 xmlui-optimized-output
+.xmlui-ssg-ssr/
+.xmlui-ssg-entry.tsx
 
-# Claude Code local config
+myworkdriveclient/
+
+# AI local config
 .claude
+.gemini
+.cursor
+.agents
 .mcp.json
+.qwen
+CLAUDE.md
+GEMINI.md
+.github/copilot-instructions.md
+
 
 docs/scripts/component-metadata.json

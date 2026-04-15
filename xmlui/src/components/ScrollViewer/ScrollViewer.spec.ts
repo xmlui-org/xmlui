@@ -1,5 +1,6 @@
 import { test, expect } from "../../testing/fixtures";
 import { getBounds } from "../../testing/component-test-helpers";
+import type { Page } from "@playwright/test";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -730,4 +731,143 @@ test.describe("Header and Footer Templates", () => {
     await expect(page.getByTestId("viewer").locator('[class*="stickyHeader"]')).not.toBeAttached();
     await expect(page.getByTestId("viewer").locator('[class*="stickyFooter"]')).not.toBeAttached();
   });
+});
+
+// =============================================================================
+// MOBILE / TOUCH DEVICE BEHAVIOR TESTS
+// =============================================================================
+
+/**
+ * Injects a matchMedia mock into the page so that `(pointer: coarse)` returns true,
+ * simulating a touch/mobile device for `useIsTouchDevice()`.
+ * Must be called BEFORE initTestBed so the mock is in place when the app boots.
+ */
+async function emulateTouchDevice(page: Page) {
+  await page.addInitScript(() => {
+    const original = window.matchMedia.bind(window);
+    // Save original so the test fixture can restore it after the test ends.
+    // The fixture cleanup checks for __originalMatchMedia and restores it.
+    (window as any).__originalMatchMedia = original;
+    window.matchMedia = (query: string) => {
+      if (query === "(pointer: coarse)") {
+        return {
+          matches: true,
+          media: query,
+          addEventListener: () => {},
+          removeEventListener: () => {},
+          addListener: () => {},
+          removeListener: () => {},
+          dispatchEvent: () => false,
+          onchange: null,
+        } as unknown as MediaQueryList;
+      }
+      return original(query);
+    };
+  });
+}
+
+test.describe("Mobile/Touch Device Behavior", () => {
+  test("desktop: overlay scrollStyle uses OverlayScrollbars", async ({ initTestBed, page }) => {
+    // Without touch emulation, pointer is "fine" → overlay mode should be active
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
+          <Stack height="600px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    // OverlayScrollbarsComponent marks its viewport with this attribute
+    await expect(page.locator("[data-overlayscrollbars-viewport]")).toBeAttached();
+  });
+
+  test("mobile: overlay scrollStyle falls back to native scrollbar", async ({ initTestBed, page }) => {
+    await emulateTouchDevice(page);
+
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
+          <Stack height="600px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    // OverlayScrollbars must NOT be present — native scrollbar is used instead
+    await expect(page.locator("[data-overlayscrollbars-viewport]")).not.toBeAttached();
+  });
+
+  test("mobile: whenMouseOver scrollStyle falls back to native scrollbar", async ({ initTestBed, page }) => {
+    await emulateTouchDevice(page);
+
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="whenMouseOver">
+          <Stack height="600px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.locator("[data-overlayscrollbars-viewport]")).not.toBeAttached();
+  });
+
+  test("mobile: whenScrolling scrollStyle falls back to native scrollbar", async ({ initTestBed, page }) => {
+    await emulateTouchDevice(page);
+
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="whenScrolling">
+          <Stack height="600px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.locator("[data-overlayscrollbars-viewport]")).not.toBeAttached();
+  });
+
+  test("mobile: normal scrollStyle is unaffected", async ({ initTestBed, page }) => {
+    await emulateTouchDevice(page);
+
+    await initTestBed(`
+      <Stack height="300px">
+        <ScrollViewer testId="viewer" scrollStyle="normal">
+          <Stack height="600px"><Text>Content</Text></Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.locator("[data-overlayscrollbars-viewport]")).not.toBeAttached();
+  });
+
+  test("mobile: content remains scrollable with native scrollbar", async ({ initTestBed, page }) => {
+    await emulateTouchDevice(page);
+
+    await initTestBed(`
+      <Stack height="200px">
+        <ScrollViewer testId="viewer" scrollStyle="overlay">
+          <Stack height="600px">
+            <Text testId="top">Top</Text>
+            <Text testId="bottom" style="margin-top:550px">Bottom</Text>
+          </Stack>
+        </ScrollViewer>
+      </Stack>
+    `);
+
+    await expect(page.getByTestId("viewer")).toBeVisible();
+    await expect(page.getByTestId("top")).toBeVisible();
+
+    // Content is still scrollable via the native scroll mechanism
+    await page.getByTestId("viewer").evaluate((el) => {
+      el.scrollTop = 500;
+    });
+    await page.waitForFunction(() => {
+      const el = document.querySelector("[data-testid='viewer']") as HTMLElement;
+      return el != null && el.scrollTop > 0;
+    });
+  });
+
 });

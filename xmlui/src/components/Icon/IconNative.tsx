@@ -65,6 +65,7 @@ export const Icon = forwardRef(function Icon(
     onClick,
     onKeyDown: handleKeyDown,
     tabIndex: onClick ? (tabIndex ?? 0) : tabIndex,
+    role: onClick ? "button" : undefined,
   };
   // ---
   const customIconUrl = useCustomIconUrl(name);

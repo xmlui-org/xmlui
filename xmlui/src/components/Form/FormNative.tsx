@@ -36,11 +36,11 @@ import {
   triedToSubmit,
   UNBOUND_FIELD_SUFFIX,
 } from "../../components/Form/formActions";
-import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
-import { Text } from "../../components/Text/TextNative";
-import { Stack } from "../../components/Stack/StackNative";
+import { ThemedModalDialog as ModalDialog } from "../../components/ModalDialog/ModalDialog";
+import { ThemedText as Text } from "../../components/Text/Text";
+import { ThemedStack as Stack } from "../../components/Stack/Stack";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
 import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
 import { type FormAction, formReset } from "../Form/formActions";
@@ -51,9 +51,15 @@ import { cloneDeep, get, set } from "lodash-es";
 import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
 import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { Part } from "../Part/Part";
 import { MemoizedItem } from "../container-helpers";
 import type { RequireLabelMode } from "../abstractions";
+import {
+  deleteLocalStorage,
+  readLocalStorage,
+  writeLocalStorage,
+} from "../../components-core/appContext/local-storage-functions";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -106,8 +112,9 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.FIELD_VALIDATED: {
-      // it means no validation happened, ignore it
-      if (action.payload.validationResult.validations.length === 0) {
+      // If there are no validation errors AND no async validation is pending, clear the entry.
+      // When partial is true we must keep the entry so callers can detect in-flight validation.
+      if (action.payload.validationResult.validations.length === 0 && !action.payload.validationResult.partial) {
         delete state.validationResults[uid];
         break;
       }
@@ -236,7 +243,7 @@ type OnSubmit = (
   params: Record<string, any> | undefined,
   options: { passAsDefaultBody: boolean },
 ) => Promise<void>;
-type OnWillSubmit = (params: Record<string, any> | undefined) => Promise<boolean | void | null | undefined | string | Record<string, any>>;
+type OnWillSubmit = (data: Record<string, any> | undefined, allData: Record<string, any> | undefined) => Promise<boolean | void | null | undefined | string | Record<string, any>>;
 type OnSuccess = (result: any) => Promise<void>;
 type OnCancel = () => void;
 type OnReset = () => void;
@@ -248,10 +255,13 @@ type Props = {
   children: ReactNode;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   enabled?: boolean;
   cancelLabel?: string;
   saveLabel?: string;
   saveInProgressLabel?: string;
+  savePendingLabel?: string;
+  submitFeedbackDelay?: number;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
   onWillSubmit?: OnWillSubmit;
@@ -268,10 +278,18 @@ type Props = {
   keepModalOpenOnSubmit?: boolean;
   hideButtonRowUntilDirty?: boolean;
   hideButtonRow?: boolean;
+  stickyButtonRow?: boolean;
   enableSubmit?: boolean;
   verboseValidationFeedback?: boolean;
   validationIconSuccess?: string;
   validationIconError?: string;
+  persist?: boolean;
+  storageKey?: string;
+  doNotPersistFields?: string[];
+  keepOnCancel?: boolean;
+  onPersistClear?: () => void;
+  dataAfterSubmit?: "keep" | "reset" | "clear";
+  onClearAfterSubmit?: () => void;
 };
 
 export const defaultProps: Pick<
@@ -279,30 +297,40 @@ export const defaultProps: Pick<
   | "cancelLabel"
   | "saveLabel"
   | "saveInProgressLabel"
+  | "savePendingLabel"
+  | "submitFeedbackDelay"
   | "itemLabelPosition"
   | "itemLabelBreak"
   | "keepModalOpenOnSubmit"
   | "swapCancelAndSave"
   | "hideButtonRowUntilDirty"
   | "hideButtonRow"
+  | "stickyButtonRow"
   | "enableSubmit"
   | "itemRequireLabelMode"
   | "validationIconSuccess"
   | "validationIconError"
+  | "keepOnCancel"
+  | "dataAfterSubmit"
 > = {
   cancelLabel: "Cancel",
   saveLabel: "Save",
   saveInProgressLabel: "Saving...",
+  savePendingLabel: "Validating...",
+  submitFeedbackDelay: 100,
   itemLabelPosition: "top",
   itemLabelBreak: true,
   keepModalOpenOnSubmit: false,
   swapCancelAndSave: false,
   hideButtonRowUntilDirty: false,
   hideButtonRow: false,
+  stickyButtonRow: false,
   enableSubmit: true,
   itemRequireLabelMode: "markRequired",
   validationIconSuccess: "checkmark",
   validationIconError: "error",
+  keepOnCancel: false,
+  dataAfterSubmit: "keep" as const,
 };
 
 // --- Remove the properties from formState.subject where the property name ends with UNBOUND_FIELD_SUFFIX
@@ -319,6 +347,20 @@ function cleanUpSubject(subject: any, noSubmitFields: Record<string, boolean>) {
   );
 }
 
+// --- Remove only the UNBOUND_FIELD_SUFFIX properties, keeping noSubmit fields.
+// --- Used for willSubmit which should receive all form data including noSubmit fields.
+function cleanUpSubjectForWillSubmit(subject: any) {
+  return Object.entries(subject || {}).reduce(
+    (acc, [key, value]) => {
+      if (!key.endsWith(UNBOUND_FIELD_SUFFIX)) {
+        acc[key] = value;
+      }
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
+}
+
 const Form = forwardRef(function (
   {
     formState,
@@ -327,10 +369,13 @@ const Form = forwardRef(function (
     children,
     style,
     className,
+    classes,
     enabled = true,
     cancelLabel = defaultProps.cancelLabel,
     saveLabel = defaultProps.saveLabel,
     saveInProgressLabel = defaultProps.saveInProgressLabel,
+    savePendingLabel = defaultProps.savePendingLabel,
+    submitFeedbackDelay = defaultProps.submitFeedbackDelay,
     swapCancelAndSave,
     onWillSubmit,
     onSubmit,
@@ -347,10 +392,18 @@ const Form = forwardRef(function (
     keepModalOpenOnSubmit = defaultProps.keepModalOpenOnSubmit,
     hideButtonRowUntilDirty = defaultProps.hideButtonRowUntilDirty,
     hideButtonRow = defaultProps.hideButtonRow,
+    stickyButtonRow = defaultProps.stickyButtonRow,
     enableSubmit = defaultProps.enableSubmit,
     verboseValidationFeedback,
     validationIconSuccess = defaultProps.validationIconSuccess,
     validationIconError = defaultProps.validationIconError,
+    persist,
+    storageKey,
+    doNotPersistFields,
+    keepOnCancel = defaultProps.keepOnCancel,
+    onPersistClear,
+    dataAfterSubmit = defaultProps.dataAfterSubmit,
+    onClearAfterSubmit,
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -358,6 +411,37 @@ const Form = forwardRef(function (
   const formRef = useRef<HTMLFormElement>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
+
+  // Check if any field has async validation in-flight (partial=true).
+  // The Save button is disabled while this is true.
+  const isValidating = useMemo(() => {
+    return Object.values(formState.validationResults).some((r) => r.partial);
+  }, [formState.validationResults]);
+
+  // Delay showing feedback labels by submitFeedbackDelay so that fast operations
+  // don't cause a visible label flash on the Save button.
+  const [showValidatingLabel, setShowValidatingLabel] = useState(false);
+  useEffect(() => {
+    if (!isValidating) {
+      setShowValidatingLabel(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowValidatingLabel(true), submitFeedbackDelay);
+    return () => clearTimeout(timer);
+  }, [isValidating, submitFeedbackDelay]);
+
+  const [showInProgressLabel, setShowInProgressLabel] = useState(false);
+  useEffect(() => {
+    if (!formState.submitInProgress) {
+      setShowInProgressLabel(false);
+      return;
+    }
+    const timer = setTimeout(() => setShowInProgressLabel(true), submitFeedbackDelay);
+    return () => clearTimeout(timer);
+  }, [formState.submitInProgress, submitFeedbackDelay]);
+
+  // Resolve the effective storage key for persistence
+  const persistKey = persist ? (storageKey || id || "form-data") : undefined;
 
   const isEnabled = enabled && !formState.submitInProgress;
   const isDirty = useMemo(() => {
@@ -402,6 +486,10 @@ const Form = forwardRef(function (
   ]);
 
   const doCancel = useEvent(() => {
+    if (persistKey && !keepOnCancel) {
+      deleteLocalStorage(persistKey);
+      onPersistClear?.();
+    }
     onCancel?.();
     void requestModalFormClose();
   });
@@ -409,6 +497,12 @@ const Form = forwardRef(function (
   const doValidate = useEvent(() => {
     // Trigger validation display on all fields
     dispatch(triedToSubmit());
+
+    // If any field still has async validation in-flight (partial=true), block submission.
+    // The partial flag means sync checks passed but the async onValidate hasn't resolved yet.
+    const hasPendingAsyncValidation = Object.values(formState.validationResults).some(
+      (result) => result.partial,
+    );
 
     // Get validation results grouped by severity
     const { error, warning } = groupInvalidValidationResultsBySeverity(
@@ -420,7 +514,7 @@ const Form = forwardRef(function (
 
     // Return validation result
     return {
-      isValid: error.length === 0,
+      isValid: !hasPendingAsyncValidation && error.length === 0,
       data: cleanedData,
       errors: error,
       warnings: warning,
@@ -448,6 +542,35 @@ const Form = forwardRef(function (
     const validationResult = doValidate();
 
     if (!validationResult.isValid) {
+      // Emit validation:error trace event when xsVerbose is enabled
+      if (typeof window !== "undefined" && (window as any).__xsVerbose) {
+        const { pushXsLog, createLogEntry, pushTrace, popTrace } = (window as any).__xsTraceHelpers || {};
+        if (pushXsLog && createLogEntry) {
+          // Don't push a new trace — inherit the current trace context
+          // (the Save click's traceId) so validation:error lands in the same step
+          const errorFields: string[] = [];
+          const errorMessages: string[] = [];
+          for (const [field, result] of Object.entries(validationResult.validationResults)) {
+            const vr = result as any;
+            if (!vr.isValid) {
+              errorFields.push(field);
+              const msgs = (vr.validations || [])
+                .filter((v: any) => !v.isValid)
+                .map((v: any) => v.invalidMessage || "invalid");
+              errorMessages.push(...msgs);
+            }
+          }
+          const formAriaLabel = rest["aria-label"] || id;
+          pushXsLog(createLogEntry("validation:error", {
+            component: "Form",
+            componentLabel: formAriaLabel || undefined,
+            ariaName: formAriaLabel || undefined,
+            displayLabel: `${formAriaLabel || "Form"}: ${errorFields.length} error${errorFields.length > 1 ? "s" : ""}: ${errorFields.join(", ")}`,
+            errorFields,
+            errorMessages,
+          }));
+        }
+      }
       return;
     }
     if (validationResult.warnings.length > 0 && !confirmSubmitModalVisible) {
@@ -458,7 +581,10 @@ const Form = forwardRef(function (
     dispatch(formSubmitting());
     try {
       const filteredSubject = validationResult.data;
-      const willSubmitResult = await onWillSubmit?.(filteredSubject);
+      // Pass cleaned data as first arg and full data (including noSubmit fields) as second arg.
+      // This lets willSubmit do cross-field validation while knowing exactly what onSubmit will receive.
+      const fullSubject = cleanUpSubjectForWillSubmit(formState.subject);
+      const willSubmitResult = await onWillSubmit?.(filteredSubject, fullSubject);
 
       // Handle different return values from willSubmit
       if (willSubmitResult === false) {
@@ -485,16 +611,28 @@ const Form = forwardRef(function (
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
+      // Clear any persisted form data after successful submit
+      if (persistKey) {
+        deleteLocalStorage(persistKey);
+        onPersistClear?.();
+      }
       await onSuccess?.(result);
 
       if (!keepModalOpenOnSubmit) {
         void requestModalFormClose();
       }
-      // we only reset the form automatically if the initial value is empty ()
-      if (initialValue === EMPTY_OBJECT) {
+      if (dataAfterSubmit === "reset") {
         flushSync(() => {
           doReset();
         });
+      } else if (dataAfterSubmit === "clear") {
+        flushSync(() => {
+          onClearAfterSubmit?.();
+          doReset();
+        });
+      } else {
+        // "keep" (default): fire the reset event (backward compat) without resetting form state
+        onReset?.();
       }
       if (prevFocused && typeof (prevFocused as HTMLElement).focus === "function") {
         (prevFocused as HTMLElement).focus();
@@ -577,12 +715,30 @@ const Form = forwardRef(function (
   const submitButton = useMemo(
     () => (
       <Part partId={PART_SUBMIT_BUTTON} key={PART_SUBMIT_BUTTON}>
-        <Button key="submit" type={"submit"} disabled={!isEnabled || !enableSubmit}>
-          {formState.submitInProgress ? saveInProgressLabel : saveLabel}
+        <Button
+          key="submit"
+          type={"submit"}
+          disabled={!isEnabled || !enableSubmit || isValidating}
+        >
+          {showValidatingLabel
+            ? savePendingLabel
+            : showInProgressLabel
+              ? saveInProgressLabel
+              : saveLabel}
         </Button>
       </Part>
     ),
-    [isEnabled, enableSubmit, formState.submitInProgress, saveInProgressLabel, saveLabel],
+    [
+      isEnabled,
+      enableSubmit,
+      isValidating,
+      showValidatingLabel,
+      savePendingLabel,
+      showInProgressLabel,
+      formState.submitInProgress,
+      saveInProgressLabel,
+      saveLabel,
+    ],
   );
 
   const getData = useCallback(() => {
@@ -593,6 +749,37 @@ const Form = forwardRef(function (
     return isDirty;
   }, [isDirty]);
 
+  // Load persisted form data on mount when persist is enabled
+  useEffect(() => {
+    if (!persistKey) return;
+    const saved = readLocalStorage(persistKey);
+    if (saved && typeof saved === "object") {
+      Object.entries(saved).forEach(([key, value]) => {
+        dispatch({
+          type: FormActionKind.FIELD_VALUE_CHANGED,
+          payload: { uid: key, value },
+        });
+      });
+    }
+    // Run only on mount (persistKey should not change)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [persistKey]);
+
+  // Autosave form data to localStorage whenever subject changes and persist is enabled
+  useEffect(() => {
+    if (!persistKey) return;
+    if (Object.keys(formState.subject).length === 0) return;
+    const dataToSave = Object.entries(formState.subject).reduce(
+      (acc, [key, value]) => {
+        if (!key.endsWith(UNBOUND_FIELD_SUFFIX) && !(doNotPersistFields?.includes(key))) {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, any>,
+    );
+    writeLocalStorage(persistKey, dataToSave);
+  }, [persistKey, formState.subject, doNotPersistFields]);
 
   useEffect(() => {
     registerComponentApi?.({
@@ -607,7 +794,7 @@ const Form = forwardRef(function (
   let safeButtonRow = (
     <>
       {buttonRow || (
-        <div className={styles.buttonRow}>
+        <div className={classnames(styles.buttonRow, { [styles.stickyButtonRow]: stickyButtonRow })}>
           {swapCancelAndSave && [submitButton, cancelButton]}
           {!swapCancelAndSave && [cancelButton, submitButton]}
         </div>
@@ -620,7 +807,7 @@ const Form = forwardRef(function (
         {...rest}
         noValidate={true}
         style={style}
-        className={classnames(styles.formWrapper, className)}
+        className={classnames(styles.formWrapper, { [styles.stickyForm]: stickyButtonRow }, classes?.[COMPONENT_PART_KEY], className)}
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
@@ -674,7 +861,7 @@ export const FormWithContextVar = forwardRef(function (
     renderChild,
     extractValue,
     style,
-    className,
+    classes,
     lookupEventHandler,
     registerComponentApi,
     appContext,
@@ -683,7 +870,7 @@ export const FormWithContextVar = forwardRef(function (
     renderChild: RenderChildFn;
     extractValue: ValueExtractor;
     style?: CSSProperties;
-    className?: string;
+    classes?: Record<string, string>;
     lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
     registerComponentApi: RegisterComponentApiFn;
     appContext?: any;
@@ -691,6 +878,16 @@ export const FormWithContextVar = forwardRef(function (
   ref: ForwardedRef<HTMLDivElement>,
 ) {
   const [formState, dispatch] = useReducer(formReducer, initialState);
+  // Track which resetVersion was triggered by a "clear" submit so that
+  // effectiveInitialValue stays EMPTY_OBJECT for that cycle (and won't flip
+  // back, which would cause FormItem re-initialization to restore old data).
+  const [clearedAtResetVersion, setClearedAtResetVersion] = useState<number | null>(null);
+
+  // Build a stable callback that captures the *current* resetVersion so that
+  // when called inside flushSync it sets the correct target version.
+  const handleClearAfterSubmit = useCallback(() => {
+    setClearedAtResetVersion((formState.resetVersion ?? 0) + 1);
+  }, [formState.resetVersion]);
 
   const $data = useMemo(() => {
     const updateData = (change: any) => {
@@ -711,19 +908,51 @@ export const FormWithContextVar = forwardRef(function (
     return { ...cleanUpSubject(formState.subject, formState.noSubmitFields), update: updateData };
   }, [formState.subject, formState.noSubmitFields]);
 
+  // $validationIssues: { [fieldName]: SingleValidationResult[] } — only invalid entries.
+  const $validationIssues = useMemo(() => {
+    const result: Record<string, Array<SingleValidationResult>> = {};
+    Object.entries(formState.validationResults).forEach(([field, validationResult]) => {
+      const invalidResults = validationResult.validations.filter((v) => !v.isValid);
+      if (invalidResults.length > 0) {
+        result[field] = invalidResults;
+      }
+    });
+    return result;
+  }, [formState.validationResults]);
+
+  // $hasValidationIssue(fieldName?): When called without an argument, return true if ANY field has validation issues.
+  // When called with a fieldName, return true if that specific field has issues.
+  const $hasValidationIssue = useCallback(
+    (fieldName?: string) => {
+      if (fieldName === undefined) {
+        return Object.keys($validationIssues).length > 0;
+      }
+      return ($validationIssues[fieldName]?.length ?? 0) > 0;
+    },
+    [$validationIssues],
+  );
+
   const nodeWithItem = useMemo(() => {
     return {
       type: "Fragment",
       vars: {
         $data: $data,
+        $validationIssues: $validationIssues,
+        $hasValidationIssue: $hasValidationIssue,
       },
       children: node.children,
     };
-  }, [$data, node.children]);
+  }, [$data, $validationIssues, $hasValidationIssue, node.children]);
 
-  const initialValue = extractValue(node.props.data);
+  const rawInitialValue = extractValue(node.props.data);
+  // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.
+  // Once the user triggers another reset the versions differ and raw data is restored.
+  const effectiveInitialValue =
+    clearedAtResetVersion !== null && clearedAtResetVersion === formState.resetVersion
+      ? EMPTY_OBJECT
+      : rawInitialValue;
   const submitMethod =
-    extractValue.asOptionalString(node.props.submitMethod) || (initialValue ? "put" : "post");
+    extractValue.asOptionalString(node.props.submitMethod) || (rawInitialValue ? "put" : "post");
   const inProgressNotificationMessage =
     extractValue.asOptionalString(node.props.inProgressNotificationMessage) || "";
   const completedNotificationMessage =
@@ -736,7 +965,7 @@ export const FormWithContextVar = forwardRef(function (
     extractValue.asOptionalString(node.props._data_url);
 
   const itemLabelWidth = extractValue.asOptionalString(node.props.itemLabelWidth);
-  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle);
+  const { cssProps: itemLabelWidthCssProps } = resolveLayoutProps({ width: itemLabelWidth }, undefined, appContext?.appGlobals?.disableInlineStyle, appContext?.appGlobals?.applyLayoutProperties);
 
   return (
     <Slot ref={ref} style={style}>
@@ -748,6 +977,7 @@ export const FormWithContextVar = forwardRef(function (
         itemRequireLabelMode={extractValue.asOptionalString(node.props.itemRequireLabelMode)}
         hideButtonRowUntilDirty={extractValue.asOptionalBoolean(node.props.hideButtonRowUntilDirty)}
         hideButtonRow={extractValue.asOptionalBoolean(node.props.hideButtonRow)}
+        stickyButtonRow={extractValue.asOptionalBoolean(node.props.stickyButtonRow)}
         enableSubmit={extractValue.asOptionalBoolean(node.props.enableSubmit)}
         verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
@@ -755,10 +985,12 @@ export const FormWithContextVar = forwardRef(function (
         formState={formState}
         dispatch={dispatch}
         id={node.uid}
-        className={className}
+        classes={classes}
         cancelLabel={extractValue(node.props.cancelLabel)}
         saveLabel={extractValue(node.props.saveLabel)}
         saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
+        savePendingLabel={extractValue(node.props.savePendingLabel)}
+        submitFeedbackDelay={extractValue.asOptionalNumber(node.props.submitFeedbackDelay)}
         swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
         onWillSubmit={lookupEventHandler("willSubmit", {
           context: {
@@ -788,7 +1020,7 @@ export const FormWithContextVar = forwardRef(function (
             $data,
           },
         })}
-        initialValue={initialValue}
+        initialValue={effectiveInitialValue}
         buttonRow={
           node.props.buttonRowTemplate ? (
             <MemoizedItem
@@ -801,6 +1033,12 @@ export const FormWithContextVar = forwardRef(function (
           ) : undefined
         }
         registerComponentApi={registerComponentApi}
+        persist={!!extractValue.asOptionalString(node.props.persist) || extractValue.asOptionalBoolean(node.props.persist)}
+        storageKey={extractValue.asOptionalString(node.props.storageKey)}
+        doNotPersistFields={extractValue(node.props.doNotPersistFields) as string[] | undefined}
+        keepOnCancel={extractValue.asOptionalBoolean(node.props.keepOnCancel)}
+        dataAfterSubmit={extractValue.asOptionalString(node.props.dataAfterSubmit) as "keep" | "reset" | "clear" | undefined}
+        onClearAfterSubmit={handleClearAfterSubmit}
         enabled={
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
           !extractValue.asOptionalBoolean((node.props as any).loading, false)

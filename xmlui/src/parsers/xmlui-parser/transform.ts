@@ -1,21 +1,14 @@
-import type {
-  ComponentDef,
-  ComponentMetadata,
-  CompoundComponentDef,
-} from "../../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { CollectedDeclarations } from "../../components-core/script-runner/ScriptingSourceTree";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
 import { Node } from "./syntax-node";
 import { SyntaxKind } from "./syntax-kind";
 import { Parser } from "../scripting/Parser";
 import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
-import {
-  DIAGS_TRANSFORM,
-  TransformDiag,
-  type TransformDiagPositionless,
-} from "./diagnostics";
+import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -34,6 +27,7 @@ export const CORE_NAMESPACE_VALUE = "#xmlui-core-ns";
  * since they are not present in the original source text */
 interface TransformNode extends Node {
   text?: string;
+  originalKind?: SyntaxKind;
 }
 
 const HelperNode = {
@@ -61,7 +55,7 @@ export function nodeToComponentDef(
     return node.text ?? originalGetText(node);
   };
 
-  const element = getTopLvlElement(node, getText);
+  const element = node.children![0];
   const preppedElement = prepNode(element);
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
@@ -101,10 +95,6 @@ export function nodeToComponentDef(
   ): ComponentDef | CompoundComponentDef | null {
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
-    if (name === COMPOUND_COMP_ID) {
-      reportError(DIAGS_TRANSFORM.nestedCompDefs);
-    }
-
     let component: ComponentDef = {
       type: name,
       debug: {
@@ -123,26 +113,21 @@ export function nodeToComponentDef(
   }
 
   function collectCompoundComponent(node: Node) {
-    const attrs = getAttributes(node).map(segmentAttr);
-    // --- Validate component name
-    const compoundName = attrs.find((attr) => attr.name === "name");
-    if (!compoundName) {
-      reportError(DIAGS_TRANSFORM.compDefNameExp);
-    }
-
-    if (!UCRegex.test(compoundName.value)) {
-      reportError(DIAGS_TRANSFORM.compDefNameUppercase);
-    }
+    const attrNodes = getAttributes(node);
+    const attrs = attrNodes.map(segmentAttr);
+    const compoundName = attrs.find((attr) => attr.name === "name")!;
 
     const codeBehind = attrs.find((attr) => attr.name === "codeBehind");
 
     // --- Get "method" attributes
     let api: Record<string, any> | undefined;
-    const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
+    const apiAttrs = attrNodes
+      .map((attrNode) => ({ attrNode, segmented: segmentAttr(attrNode) }))
+      .filter(({ segmented }) => segmented.startSegment === "method");
     if (apiAttrs.length > 0) {
       api = {};
-      apiAttrs.forEach((attr) => {
-        api![attr.name] = attr.value;
+      apiAttrs.forEach(({ attrNode, segmented }) => {
+        api![segmented.name] = parseEvent(segmented.value, attrNode.children?.[2]);
       });
     }
 
@@ -159,7 +144,7 @@ export function nodeToComponentDef(
     // --- Report error for global attributes (not allowed in component definitions)
     const globalsAttrs = attrs.filter((attr) => attr.startSegment === "global");
     if (globalsAttrs.length > 0) {
-      reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent);
+      // Parser already emits globalNotAllowedInComponent for these.
     }
 
     const children = getChildNodes(node);
@@ -169,9 +154,7 @@ export function nodeToComponentDef(
       (child) =>
         child.kind === SyntaxKind.ElementNode && !(getComponentName(child, getText) in HelperNode),
     );
-    if (nestedComponents.length === 0) {
-      nestedComponents.push(createTextNodeElement(""));
-    }
+    // If nestedComponents is empty the parser will have already emitted compDefNesedElem.
 
     const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
@@ -181,8 +164,7 @@ export function nodeToComponentDef(
         if (childName === HelperNode.variable) {
           nestedVars.push(child);
         } else if (childName === HelperNode.global) {
-          // Report error for global elements (not allowed in component definitions)
-          reportError(DIAGS_TRANSFORM.globalNotAllowedInComponent, child.start, child.end);
+          // Parser already emits globalNotAllowedInComponent for global elements in component defs.
         } else if (childName in HelperNode) {
           nonVarHelperNodes.push(child);
         }
@@ -205,7 +187,11 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element, false)! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(
+      usesStack,
+      element,
+      false,
+    )! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -271,9 +257,6 @@ export function nodeToComponentDef(
     // --- Process child nodes
     childNodes.forEach((child: Node) => {
       if (child.kind === SyntaxKind.Script) {
-        if (hasScriptNode) {
-          reportError(DIAGS_TRANSFORM.multipleScriptTags, child.pos, child.end);
-        }
         processScriptTag(comp, child, getText);
         hasScriptNode = true;
         return;
@@ -342,11 +325,6 @@ export function nodeToComponentDef(
               comp.events ??= {};
               comp.events[name] = parseEvent(value, nodeScriptContent);
             },
-            (name) => {
-              if (onPrefixRegex.test(name)) {
-                reportError(DIAGS_TRANSFORM.eventNoOnPrefix(name));
-              }
-            },
           );
           return;
 
@@ -374,7 +352,6 @@ export function nodeToComponentDef(
             usesStack,
             comp,
             child,
-
             (name) => (isComponent(comp) ? comp.globalVars?.[name] : undefined),
             (name, value) => {
               if (!isComponent(comp)) return;
@@ -399,15 +376,18 @@ export function nodeToComponentDef(
             child,
 
             (name) => (isComponent(comp) ? comp.api?.[name] : undefined),
-            (name, value) => {
+            (name, value, nodeScriptContent) => {
+              const parsedValue = Array.isArray(value)
+                ? value.map((item) => parseEvent(item, nodeScriptContent))
+                : parseEvent(value, nodeScriptContent);
               comp.api ??= {};
-              comp.api[name] = value;
+              comp.api[name] = parsedValue;
             },
           );
           return;
 
         default:
-          reportError(DIAGS_TRANSFORM.invalidNodeName(childName));
+          // Parser already emits invalidNodeName for unrecognised helper node names.
           return;
       }
     });
@@ -431,11 +411,6 @@ export function nodeToComponentDef(
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && startSegment !== "method" && startSegment !== "var" && startSegment !== "global") {
-        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(nsKey));
-        return;
-      }
-
       if (name === "name" && !startSegment) {
         // --- We already processed name
         return;
@@ -446,10 +421,6 @@ export function nodeToComponentDef(
         return;
       }
 
-      // --- Compound components do not have any other attributable props
-      if (!startSegment && name) {
-        reportError(DIAGS_TRANSFORM.invalidReusableCompAttr(name));
-      }
       return;
     }
 
@@ -468,6 +439,16 @@ export function nodeToComponentDef(
         comp.uses = splitUsesValue(value);
         return;
       default:
+        // --- Handle responsive when-* attributes (when-xs, when-sm, etc.)
+        if (name.startsWith("when-")) {
+          const bp = name.slice(5); // Extract breakpoint name: "xs", "sm", "md", "lg", "xl", "xxl"
+          if ((MediaBreakpointKeys as readonly string[]).includes(bp)) {
+            comp.responsiveWhen ??= {};
+            (comp.responsiveWhen as any)[bp] = value;
+            return;
+          }
+        }
+
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
@@ -480,7 +461,7 @@ export function nodeToComponentDef(
           comp.globalVars[name] = value;
         } else if (startSegment === "method") {
           comp.api ??= {};
-          comp.api[name] = value;
+          comp.api[name] = parseEvent(value, attrValueStringNode);
         } else if (startSegment === "event") {
           comp.events ??= {};
           comp.events[name] = parseEvent(value, attrValueStringNode);
@@ -511,29 +492,20 @@ export function nodeToComponentDef(
 
       if (child.kind !== SyntaxKind.ElementNode) return;
       const childName = getComponentName(child, getText);
-      // --- The only element names we accept are "field" or "item"
-      if (childName !== "field" && childName !== "item") {
-        reportError(DIAGS_TRANSFORM.onlyFieldOrItemChild);
-        return;
-      }
+      // --- Parse phase validates non-field/non-item children and mixed lists.
+      if (childName !== "field" && childName !== "item") return;
 
       if (childName === "field") {
         if (!nestedElementType) {
           // --- First nested element is "field", so we have an object
           nestedElementType = childName;
           result = {};
-        } else if (nestedElementType !== childName) {
-          reportError(DIAGS_TRANSFORM.cannotMixFieldItem);
-          return;
         }
       } else if (childName === "item") {
         if (!nestedElementType) {
           // --- First nested element is "item", so we have an array
           nestedElementType = childName;
           result = [];
-        } else if (nestedElementType !== childName) {
-          reportError(DIAGS_TRANSFORM.cannotMixFieldItem);
-          return;
         }
       }
 
@@ -557,9 +529,10 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     element: Node,
     allowName = true,
+    extraAllowedAttrs: string[] = [],
   ): { name?: string; value: any; valueContentNode?: Node } | null {
     const elementName = getComponentName(element, getText);
-    // --- Accept only "name", "value"
+    // --- Accept only "name", "value" (and any explicitly allowed extras)
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
       (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
@@ -570,24 +543,17 @@ export function nodeToComponentDef(
     const attrNodes = getAttributes(element);
     const attrsSegmented = attrNodes.map(segmentAttr);
 
-    const attrProps = attrsSegmented.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
-    if (attrsSegmented.length > attrProps.length) {
-      reportError(DIAGS_TRANSFORM.onlyNameValueAttrs(elementName));
-      return null;
-    }
+    const allAllowedAttrs =
+      extraAllowedAttrs.length > 0 ? [...propAttrs, ...extraAllowedAttrs] : propAttrs;
+    const attrProps = attrsSegmented.filter((attr) => allAllowedAttrs.indexOf(attr.name) >= 0);
+    if (attrsSegmented.length > attrProps.length) return null;
 
     // --- Validate the "name" usage
     const nameAttr = attrProps.find((attr) => attr.name === "name");
     if (allowName) {
-      if (!nameAttr?.value) {
-        reportError(DIAGS_TRANSFORM.nameAttrRequired(elementName));
-        return null;
-      }
+      if (!nameAttr?.value) return null;
     } else {
-      if (nameAttr) {
-        reportError(DIAGS_TRANSFORM.cantHaveNameAttr(elementName));
-        return null;
-      }
+      if (nameAttr) return null;
     }
     const name = nameAttr?.value;
 
@@ -637,10 +603,7 @@ export function nodeToComponentDef(
     comp: ComponentDef | CompoundComponentDef,
     loaders: Node,
   ): void {
-    if (!isComponent(comp)) {
-      reportError(DIAGS_TRANSFORM.invalidNodeName("loaders"));
-      return;
-    }
+    if (!isComponent(comp)) return;
 
     const children = getChildNodes(loaders);
     //todo: this check seems not necesarry
@@ -702,11 +665,12 @@ export function nodeToComponentDef(
     getter: (name: string) => any,
     setter: (name: string, value: string, valueNode?: Node) => void,
     nameValidator?: (name: string) => void,
+    extraAllowedAttrs: string[] = [],
   ): void {
     // --- Compound component do not have a uses
 
     // --- Get the value
-    const valueInfo = collectValue(usesStack, child);
+    const valueInfo = collectValue(usesStack, child, true, extraAllowedAttrs);
     if (!valueInfo) {
       return;
     }
@@ -730,17 +694,11 @@ export function nodeToComponentDef(
 
   function collectUsesElements(comp: ComponentDef | CompoundComponentDef, usesNode: Node): void {
     // --- Compound component do not have a uses
-    if (!isComponent(comp)) {
-      reportError(DIAGS_TRANSFORM.invalidNodeName("uses"));
-      return;
-    }
+    if (!isComponent(comp)) return;
 
     const attributes = getAttributes(usesNode).map(segmentAttr);
     const valueAttr = attributes.find((attr) => attr.name === "value");
-    if (!valueAttr?.value || attributes.length !== 1) {
-      reportError(DIAGS_TRANSFORM.usesValueOnly);
-      return;
-    }
+    if (!valueAttr?.value || attributes.length !== 1) return;
 
     // --- Extract the value
     const usesValues = splitUsesValue(valueAttr.value);
@@ -831,17 +789,15 @@ export function nodeToComponentDef(
 
       let textValue = getText(child);
 
-      if (child.kind === SyntaxKind.StringLiteral) {
-        textValue = textValue.slice(1, -1);
-      } else if (child.kind === SyntaxKind.CData) {
+      if (child.kind === SyntaxKind.CData) {
         shouldUseCData = true;
       }
 
       if (shouldUseTextNodeElement) {
         if (shouldUseCData) {
-          newChild = createTextNodeCDataElement(textValue);
+          newChild = createTextNodeCDataElement(textValue, child.kind);
         } else {
-          newChild = createTextNodeElement(textValue);
+          newChild = createTextNodeElement(textValue, child.kind);
         }
       } else {
         newChild = {
@@ -849,6 +805,7 @@ export function nodeToComponentDef(
           text: textValue,
           pos: child.pos,
           end: child.end,
+          originalKind: child.kind,
         } as TransformNode;
       }
       childNodes[i] = newChild;
@@ -880,10 +837,7 @@ export function nodeToComponentDef(
 
   function collapseWhitespace(childNodes: TransformNode[]) {
     for (let i = 0; i < childNodes.length; ++i) {
-      if (
-        childNodes[i].kind === SyntaxKind.StringLiteral ||
-        childNodes[i].kind === SyntaxKind.TextNode
-      ) {
+      if (childNodes[i].kind === SyntaxKind.TextNode) {
         //the union is the same as \s , but took \u00a0 (non breaking space) out
         //source https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Cheatsheet
         const allSubsequentWsExceptNonBreakingSpace =
@@ -906,7 +860,7 @@ export function nodeToComponentDef(
 
   function parseEscapeCharactersInContent(childNodes: TransformNode[]) {
     for (let node of childNodes) {
-      if (node.kind === SyntaxKind.StringLiteral || node.kind === SyntaxKind.TextNode) {
+      if (node.kind === SyntaxKind.TextNode) {
         const escapedText = tryEscapeEntities(getText(node));
         if (escapedText !== null) {
           node.text = escapedText;
@@ -1023,23 +977,7 @@ export function nodeToComponentDef(
       const node = childNodes[i - 1];
       const nextNode = childNodes[i];
 
-      if (node.kind === SyntaxKind.StringLiteral && nextNode.kind === SyntaxKind.CData) {
-        childNodes[i - 1] = {
-          pos: node.pos,
-          end: nextNode.end,
-          kind: SyntaxKind.CData,
-          text: getText(node).slice(1, -1) + getText(nextNode),
-        } as TransformNode;
-        childNodes.pop();
-      } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.StringLiteral) {
-        childNodes[i - 1] = {
-          pos: node.pos,
-          end: nextNode.end,
-          kind: SyntaxKind.CData,
-          text: getText(node) + getText(nextNode).slice(1, -1),
-        } as TransformNode;
-        childNodes.pop();
-      } else if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.TextNode) {
+      if (node.kind === SyntaxKind.CData && nextNode.kind === SyntaxKind.TextNode) {
         childNodes[i - 1] = {
           pos: node.pos,
           end: nextNode.end,
@@ -1105,13 +1043,25 @@ export function nodeToComponentDef(
         if (nodeContainingValue) {
           let diagPos: number;
           let diagEnd: number;
-          if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
+          const transformNode = nodeContainingValue as TransformNode;
+          if (transformNode.originalKind !== undefined) {
+            if (transformNode.originalKind === SyntaxKind.CData) {
+              const afterCDataPos = transformNode.pos + CDATA_PREFIX_LEN;
+              diagPos = afterCDataPos + errMsg.position;
+              diagEnd = afterCDataPos + errMsg.end;
+            } else {
+              const afterContentPos = transformNode.pos;
+              diagPos = afterContentPos + errMsg.position;
+              diagEnd = afterContentPos + errMsg.end;
+            }
+          } else if (nodeContainingValue.kind === SyntaxKind.StringLiteral) {
             const afterQuotePos = nodeContainingValue.pos + 1;
             diagPos = afterQuotePos + errMsg.position;
             diagEnd = afterQuotePos + errMsg.end;
           } else if (nodeContainingValue.kind === SyntaxKind.TextNode) {
-            diagPos = nodeContainingValue.pos + errMsg.position;
-            diagEnd = nodeContainingValue.pos + errMsg.end;
+            const afterContentPos = nodeContainingValue.pos;
+            diagPos = afterContentPos + errMsg.position;
+            diagEnd = afterContentPos + errMsg.end;
           }
           reportError(diag, diagPos, diagEnd);
         } else {
@@ -1149,7 +1099,7 @@ export function nodeToComponentDef(
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
       comp.scriptCollected = collectCodeBehindFromSource("Main", scriptContent);
-      
+
       // --- Merge pre-resolved imports if provided
       if (preResolvedImports) {
         comp.scriptCollected.functions = {
@@ -1161,7 +1111,7 @@ export function nodeToComponentDef(
           ...comp.scriptCollected.vars,
         };
       }
-      
+
       if (comp.scriptCollected.hasInvalidStatements) {
         comp.scriptError = new Error(
           `Only reactive variable and function definitions are allowed in a code-behind module.`,
@@ -1190,9 +1140,10 @@ export function nodeToComponentDef(
   }
 }
 
-function createTextNodeCDataElement(textValue: string): Node {
+function createTextNodeCDataElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1217,12 +1168,13 @@ function createTextNodeCDataElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
-function createTextNodeElement(textValue: string): Node {
+function createTextNodeElement(textValue: string, originalKind?: SyntaxKind): Node {
   return {
     kind: SyntaxKind.ElementNode,
+    originalKind,
     children: [
       { kind: SyntaxKind.OpenNodeStart },
       {
@@ -1247,7 +1199,7 @@ function createTextNodeElement(textValue: string): Node {
       },
       { kind: SyntaxKind.NodeClose },
     ],
-  } as Node;
+  } as unknown as Node;
 }
 
 function reportError(
@@ -1317,7 +1269,7 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
     if (child.type === "Fragment" && child.scriptCollected) {
       // Check if the script references context variables (like $item, $itemIndex, etc.)
       const hasContextVarReferences = child.script?.includes("$");
-      
+
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level
       if (!hasContextVarReferences) {
@@ -1392,23 +1344,22 @@ function addToNamespaces(
 ) {
   let nsCommaSeparated = value.split(":");
   if (nsCommaSeparated.length > 2) {
-    return reportError(
-      DIAGS_TRANSFORM.nsValueIncorrect(value, "Namespace cannot contain multiple ':' (colon)."),
-    );
+    // Parser already emits nsValueIncorrect for this.
+    return;
   }
 
   let nsValue = value;
   if (nsCommaSeparated.length === 2) {
     if (nsCommaSeparated[0] != COMPONENT_NAMESPACE_SCHEME) {
-      return reportError(DIAGS_TRANSFORM.nsSchemeIncorrect(value, COMPONENT_NAMESPACE_SCHEME));
+      // Parser already emits nsSchemeIncorrect for this.
+      return;
     }
     nsValue = nsCommaSeparated[1];
   }
 
   if (nsValue.includes("#")) {
-    return reportError(
-      DIAGS_TRANSFORM.nsValueIncorrect(nsValue, "Namespace cannot contain character '#'."),
-    );
+    // Parser already emits nsValueIncorrect for this.
+    return;
   }
 
   switch (nsValue) {
@@ -1425,23 +1376,10 @@ function addToNamespaces(
 
   const compNamespaces = namespaceStack[namespaceStack.length - 1];
   if (compNamespaces.has(nsKey)) {
-    return reportError(DIAGS_TRANSFORM.duplXmlns(nsKey));
+    // Parser already emits duplXmlns for this — skip silently.
+    return;
   }
   compNamespaces.set(nsKey, nsValue);
-}
-
-function getTopLvlElement(node: Node, getText: GetText): Node {
-  // --- Check that the nodes contains exactly only a single component root element before the EoF token
-  if (node.children!.length !== 2) {
-    reportError(DIAGS_TRANSFORM.singleRootElem);
-  }
-
-  // --- Ensure it's a component
-  const element = node.children![0];
-  if (element.kind !== SyntaxKind.ElementNode) {
-    reportError(DIAGS_TRANSFORM.singleRootElem);
-  }
-  return element;
 }
 
 function getComponentName(node: Node, getText: GetText) {
@@ -1465,7 +1403,8 @@ function getNamespaceResolvedComponentName(
   const namespace = getText(nameTokens[0]);
 
   if (namespaceStack.length === 0) {
-    reportError(DIAGS_TRANSFORM.rootCompNoNamespace);
+    // Parser already emits rootCompNoNamespace for this.
+    return namespace + "." + name;
   }
 
   let resolvedNamespace = undefined;
@@ -1476,7 +1415,8 @@ function getNamespaceResolvedComponentName(
     }
   }
   if (resolvedNamespace === undefined) {
-    reportError(DIAGS_TRANSFORM.nsNotFound(namespace));
+    // Parser already emits nsNotFound for this.
+    return namespace + "." + name;
   }
 
   return resolvedNamespace + "." + name;

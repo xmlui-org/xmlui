@@ -218,7 +218,13 @@ class FormItemValidator {
       return undefined;
     }
     switch (pattern.toLowerCase()) {
-      case "email":
+      case "email": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         return {
           isValid: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
             this.value,
@@ -226,14 +232,28 @@ class FormItemValidator {
           invalidMessage: patternInvalidMessage || "Not a valid email address",
           severity: patternInvalidSeverity,
         };
-      case "phone":
+      }
+      case "phone": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         return {
           // Phone must contain at least one digit and only allowed characters
           isValid: /^[a-zA-Z0-9#*)(+.\-_&']+$/.test(this.value) && /[0-9]/.test(this.value),
           invalidMessage: patternInvalidMessage || "Not a valid phone number",
           severity: patternInvalidSeverity,
         };
-      case "url":
+      }
+      case "url": {
+        if (this.value === undefined || this.value === null || this.value === "") {
+          return {
+            isValid: true,
+            severity: "valid",
+          };
+        }
         let url;
         try {
           url = new URL(this.value);
@@ -245,11 +265,11 @@ class FormItemValidator {
             severity: patternInvalidSeverity,
           };
         }
-
         return {
           isValid: true,
           severity: "valid",
         };
+      }
       default: {
         console.warn("Unknown pattern provided");
         return {
@@ -264,6 +284,12 @@ class FormItemValidator {
     const { regex, regexInvalidMessage, regexInvalidSeverity = "error" } = this.validations;
     if (regex === undefined) {
       return undefined;
+    }
+    if (this.value === undefined || this.value === null || this.value === "") {
+      return {
+        isValid: true,
+        severity: "valid",
+      };
     }
     return {
       isValid: isRegexValid(this.value, regex),
@@ -301,8 +327,18 @@ class FormItemValidator {
       throw error;
     });
 
-    if (validationFnResult === undefined) {
+    if (validationFnResult === undefined || validationFnResult === null) {
       return undefined;
+    }
+
+    if (typeof validationFnResult === "string") {
+      return [
+        {
+          isValid: false,
+          invalidMessage: validationFnResult,
+          severity: "error",
+        },
+      ];
     }
 
     if (typeof validationFnResult === "boolean") {
@@ -386,6 +422,7 @@ export function useValidationDisplay(
   validationResult: ValidationResult | undefined,
   validationMode: ValidationMode = defaultValidationMode,
   verboseValidationFeedback: boolean = true,
+  validationDisplayDelay: number = 0,
 ): {
   isHelperTextShown: boolean;
   validationStatus: ValidationSeverity;
@@ -462,6 +499,29 @@ export function useValidationDisplay(
     }
   }
   isHelperTextShown = isHelperTextShown || forceShowValidationResult;
+
+  // Eagerly show validation results when async validation takes longer than validationDisplayDelay.
+  // "Punish-late" mode normally hides results until blur — but a slow async check (e.g. a network
+  // call) should reveal the outcome once it settles, even if the field is still focused.
+  const isPartial = validationResult?.partial ?? false;
+  const [asyncTookLong, setAsyncTookLong] = useState(false);
+  // Reset the flag whenever the value changes (a new validation cycle begins).
+  useEffect(() => {
+    setAsyncTookLong(false);
+  }, [value]);
+  // Start a timer when async validation is in-flight for a dirty field.
+  // If it fires before validation resolves, record that it took long.
+  useEffect(() => {
+    if (!isPartial || !isDirty || validationDisplayDelay <= 0) {
+      return;
+    }
+    const timer = setTimeout(() => setAsyncTookLong(true), validationDisplayDelay);
+    return () => clearTimeout(timer);
+  }, [isPartial, isDirty, validationDisplayDelay]);
+  // Override: once a slow async validation settles, show the result immediately.
+  if (asyncTookLong && !isPartial) {
+    isHelperTextShown = true;
+  }
 
   const [prevStableShown, setPrevStableShown] = useState(isHelperTextShown);
   if (prevStableShown !== isHelperTextShown && !validationInProgress) {

@@ -1,6 +1,8 @@
 import React, { forwardRef, type ReactNode, type CSSProperties } from "react";
+import classnames from "classnames";
 import { Scroller, type ScrollStyle } from "./Scroller";
 import styles from "./ScrollViewer.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 export const defaultProps = {
   scrollStyle: "normal" as ScrollStyle,
@@ -12,6 +14,7 @@ type Props = {
   header?: ReactNode;
   footer?: ReactNode;
   className?: string;
+  classes?: Record<string, string>;
   style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
@@ -27,6 +30,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
     header,
     footer,
     className,
+    classes,
     style,
     scrollStyle = defaultProps.scrollStyle,
     showScrollerFade = defaultProps.showScrollerFade,
@@ -48,12 +52,12 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
     //
     // Also strip data-testid / data-component-type from rest so they are not duplicated
     // as HTML attributes on the inner Scroller via prop spreading.
-    const { "data-testid": _testId, "data-component-type": _compType, ...scrollerRest } = rest;
+    const { "data-testid": _testId, "data-component-type": _compType, ...scrollerRest } = rest as Record<string, any>;
     const scrollerStyle: CSSProperties = {
       overflow: "auto",
     };
     return (
-      <div ref={ref} className={`${styles.headerFooterWrapper} ${className || ""}`} style={style}>
+      <div ref={ref} className={classnames(styles.headerFooterWrapper, classes?.[COMPONENT_PART_KEY], className)} style={style}>
         {header && <div className={styles.stickyHeader}>{header}</div>}
         <Scroller
           className={styles.scrollerFlex}
@@ -79,7 +83,7 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
   return (
     <Scroller
       ref={ref}
-      className={className}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
       style={containerStyle}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}

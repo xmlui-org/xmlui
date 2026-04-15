@@ -10,7 +10,9 @@ $themeVars: ();
 $gap-Form: createThemeVar("gap-Form");
 $gap-buttonRow-Form: createThemeVar("gap-buttonRow-Form");
 $marginTop-buttonRow-Form: createThemeVar("marginTop-buttonRow-Form");
+$paddingTop-buttonRow-Form: createThemeVar("paddingTop-buttonRow-Form");
 $backgroundColor-Form: createThemeVar("backgroundColor-Form");
+$backgroundColor-buttonRow-Form: createThemeVar("backgroundColor-buttonRow-Form");
 
 @layer components {
   .formWrapper {
@@ -18,6 +20,10 @@ $backgroundColor-Form: createThemeVar("backgroundColor-Form");
     flex-direction: column;
     gap: $gap-Form;
     background-color: $backgroundColor-Form;
+
+    &.stickyForm {
+      min-height: 100%;
+    }
   }
 
   .buttonRow {
@@ -27,6 +33,14 @@ $backgroundColor-Form: createThemeVar("backgroundColor-Form");
     justify-content: flex-end;
     gap: $gap-buttonRow-Form;
     margin-top: $marginTop-buttonRow-Form;
+  }
+
+  .stickyButtonRow {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    padding-top: $paddingTop-buttonRow-Form;
+    background-color: $backgroundColor-buttonRow-Form;
   }
 }
 

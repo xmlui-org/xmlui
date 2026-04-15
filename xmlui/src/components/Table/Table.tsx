@@ -1,13 +1,21 @@
-import { forwardRef, useMemo, useRef, useState, memo, useId } from "react";
+import { forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
 
 import "./react-table-config.d.ts";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { createMetadata, d, dAutoFocus, dComponent, dContextMenu, dInternal } from "../metadata-helpers";
+import {
+  createMetadata,
+  d,
+  dAutoFocus,
+  dComponent,
+  dContextMenu,
+  dInternal,
+} from "../metadata-helpers";
+import { useEvent } from "../../components-core/utils/misc";
 import type { OurColumnMetadata } from "../Column/TableContext";
 import { TableContext } from "../Column/TableContext";
 import {
@@ -20,8 +28,9 @@ import {
   CheckboxToleranceValues,
   defaultProps,
 } from "./TableNative";
-import type { RendererContext } from "../../abstractions/RendererDefs";
-import { PositionValues } from "../Pagination/PaginationNative";
+import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
+import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
+import { PositionValues } from "../Pagination/Pagination";
 import type { PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
 const COMP = "Table";
@@ -66,7 +75,11 @@ export const TableMd = createMetadata({
       defaultValue: defaultProps.idKey,
     },
     isPaginated: {
-      description: `This property adds pagination controls to the \`${COMP}\`.`,
+      description:
+        `This property adds pagination controls to the \`${COMP}\`. ` +
+        `When enabled, the pagination bar is automatically hidden if all rows fit on a single page. ` +
+        `You can omit this property and set only \`pageSize\` instead — pagination will then ` +
+        `activate automatically when the data length exceeds the page size and hide itself when it does not.`,
       valueType: "boolean",
       defaultValue: defaultProps.isPaginated,
     },
@@ -86,8 +99,20 @@ export const TableMd = createMetadata({
         `this takes precedence over the initiallySelected property for initial selection. ` +
         `You can use the AppState's didUpdate event to receive notifications when the selection changes.`,
     ),
+    syncWithVar: d(
+      `The name of a global variable to synchronize the table's selection state with. ` +
+        `The named variable must reference an object; the table will read from and write to its ` +
+        `'selectedIds' property. When provided, this takes precedence over both ` +
+        `\`initiallySelected\` and \`syncWithAppState\`. Multiple tables sharing the same variable ` +
+        `name will keep their selections in sync automatically. ` +
+        `A runtime error is signalled if the value is not a valid JavaScript variable name.`,
+    ),
     pageSize: d(
-      `This property defines the number of rows to display per page when pagination is enabled.`,
+      `This property defines the number of rows to display per page. ` +
+        `When set without also setting \`isPaginated\`, pagination is activated automatically ` +
+        `whenever the number of data rows exceeds this value and suppressed otherwise. ` +
+        `This makes \`pageSize\` the minimal way to get auto-activating, auto-hiding pagination: ` +
+        `no conditional expressions on \`isPaginated\` or the position props are needed.`,
     ),
     pageSizeOptions: {
       description:
@@ -141,7 +166,8 @@ export const TableMd = createMetadata({
         `a Boolean-like value.`,
     ),
     rowUnselectablePredicate: {
-      description: `This property defines a predicate function with a return value that determines if the ` +
+      description:
+        `This property defines a predicate function with a return value that determines if the ` +
         `row should be unselectable. The function retrieves the item to display and should return ` +
         `a Boolean-like value. This property only has an effect when the \`rowsSelectable\` property is set to \`true\`.`,
     },
@@ -170,6 +196,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: false,
     },
+    hideSelectionCheckboxesHeader: {
+      description:
+        "If true, the selection checkbox in the table header is never displayed, not even on hover. " +
+        "Row checkboxes are unaffected. Selection logic still works via API and keyboard.",
+      valueType: "boolean",
+      defaultValue: defaultProps.hideSelectionCheckboxesHeader,
+    },
     iconNoSort: d(
       `Allows setting an alternate icon displayed in the ${COMP} column header when sorting is ` +
         `enabled, but the column remains unsorted. You can change the default icon for all ${COMP} ` +
@@ -192,6 +225,14 @@ export const TableMd = createMetadata({
         `to \`false\` limits selection to a single row.`,
       valueType: "boolean",
       defaultValue: defaultProps.enableMultiRowSelection,
+    },
+    toggleSelectionOnClick: {
+      description:
+        "When `true`, a plain click toggles the row's selection state instead of replacing the " +
+        "current selection. Ctrl+Click and Shift+Click behavior is unchanged. " +
+        "Only has an effect when `rowsSelectable` is `true`.",
+      valueType: "boolean",
+      defaultValue: defaultProps.toggleSelectionOnClick,
     },
     alwaysShowSelectionCheckboxesHeader: {
       description:
@@ -261,10 +302,26 @@ export const TableMd = createMetadata({
       availableValues: CheckboxToleranceValues,
       defaultValue: defaultProps.checkboxTolerance,
     },
+    refreshOn: d(
+      `An expression whose value change forces all table rows and cells to re-render. ` +
+        `Use this to ensure that closure variables bound in row or cell templates are updated when ` +
+        `global state changes (e.g. \`{selectMode}\`). Without this, virtualized rows might retain ` +
+        `stale references to global variables for performance reasons.`,
+    ),
+    headerUserSelect: {
+      description: `This property controls whether users can select text within table headers.`,
+      valueType: "string",
+      availableValues: userSelectValues,
+      defaultValue: "text",
+    },
+    cellUserSelect: {
+      description: `This property controls whether users can select text within table cells.`,
+      valueType: "string",
+      availableValues: userSelectValues,
+      defaultValue: "none",
+    },
     userSelectCell: {
-      description:
-        `This property controls whether users can select text within table cells. ` +
-        `Use \`text\` to allow text selection, \`none\` to prevent selection, or \`auto\` for default behavior.`,
+      description: `This property controls whether users can select text within table cells.`,
       valueType: "string",
       availableValues: userSelectValues,
       defaultValue: defaultProps.userSelectCell,
@@ -301,6 +358,13 @@ export const TableMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.alwaysShowHeader,
     },
+    striped: {
+      description:
+        "When set to `true`, the table rows alternate between the `backgroundColor-evenRow-Table` " +
+        "and `backgroundColor-oddRow-Table` theme variables, creating a striped appearance.",
+      valueType: "boolean",
+      defaultValue: defaultProps.striped,
+    },
   },
   events: {
     contextMenu: dContextMenu(COMP),
@@ -312,7 +376,8 @@ export const TableMd = createMetadata({
       signature: "sortingDidChange(columnName: string, sortDirection: 'asc' | 'desc' | null): void",
       parameters: {
         columnName: "The name of the column being sorted.",
-        sortDirection: "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.",
+        sortDirection:
+          "The sort direction: 'asc' for ascending, 'desc' for descending, or null for unsorted.",
       },
     },
     willSort: {
@@ -348,11 +413,14 @@ export const TableMd = createMetadata({
         `(default: Ctrl+A/Cmd+A) and \`rowsSelectable\` is set to \`true\`. The component ` +
         `automatically selects all rows before invoking this handler. The handler receives ` +
         `three parameters: the currently focused row (if any), all selected items, and all selected IDs.`,
-      signature: "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "selectAll(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused. Contains item data, row index, row ID, and selection state.",
-        selectedItems: "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
-        selectedIds: "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.",
+        selectedItems:
+          "Array of all selected row items. When selectAll is triggered, this contains all table rows.",
+        selectedIds:
+          "Array of all selected row IDs (as strings). When selectAll is triggered, this contains all row IDs.",
       },
     },
     cutAction: {
@@ -362,7 +430,8 @@ export const TableMd = createMetadata({
         `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
         `does not automatically modify data; the handler must implement the cut logic (e.g., ` +
         `copying data to clipboard and removing from the data source).`,
-      signature: "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "cut(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -375,7 +444,8 @@ export const TableMd = createMetadata({
         `(default: Ctrl+C/Cmd+C) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
         `three parameters: the focused row, selected items, and selected IDs. The handler should ` +
         `implement the copy logic (e.g., using the Clipboard API to copy selected data).`,
-      signature: "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "copy(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -388,7 +458,8 @@ export const TableMd = createMetadata({
         `(default: Ctrl+V/Cmd+V) and \`rowsSelectable\` is set to \`true\`. The handler receives ` +
         `three parameters: the focused row, selected items, and selected IDs. The handler must ` +
         `implement the paste logic (e.g., reading from clipboard and inserting data into the table).`,
-      signature: "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "paste(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -402,7 +473,8 @@ export const TableMd = createMetadata({
         `three parameters: the focused row, selected items, and selected IDs. Note: The component ` +
         `does not automatically remove data; the handler must implement the delete logic (e.g., ` +
         `removing selected items from the data source).`,
-      signature: "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
+      signature:
+        "delete(row: TableRowContext | null, selectedItems: any[], selectedIds: string[]): void | Promise<void>",
       parameters: {
         row: "The currently focused row context, or null if no row is focused.",
         selectedItems: "Array of selected row items.",
@@ -455,8 +527,7 @@ export const TableMd = createMetadata({
     [`fontWeight-heading-${COMP}`]: "$fontWeight-bold",
     [`textTransform-heading-${COMP}`]: "uppercase",
     [`fontSize-row-${COMP}`]: "$fontSize-sm",
-    // [`backgroundColor-${COMP}`]: "transparent",
-    // [`backgroundColor-row-${COMP}`]: "inherit",
+    [`fontSize-checkbox-${COMP}`]: "$fontSize",
     [`backgroundColor-selected-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
     [`backgroundColor-pagination-${COMP}`]: `$backgroundColor-${COMP}`,
     [`textColor-pagination-${COMP}`]: "$color-secondary",
@@ -472,6 +543,12 @@ export const TableMd = createMetadata({
     [`userSelect-heading-${COMP}`]: "text",
     [`userSelect-cell-${COMP}`]: "none",
     [`userSelect-row-${COMP}`]: "none",
+    [`backgroundColor-evenRow-${COMP}`]: `$backgroundColor-row-${COMP}`,
+    [`backgroundColor-oddRow-${COMP}`]: `$color-surface-100`,
+    [`backgroundColor-pinnedCell-${COMP}`]: "$color-surface-50",
+    [`backgroundColor-pinnedCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
+    [`backgroundColor-selectionCell-${COMP}`]: "$backgroundColor-pinnedCell-Table",
+    [`backgroundColor-selectionCell-${COMP}--hover`]: `$backgroundColor-row-${COMP}--hover`,
   },
 });
 
@@ -483,55 +560,104 @@ const TableWithColumns = memo(
         node,
         renderChild,
         lookupEventHandler,
+        lookupAction,
         lookupSyncCallback,
-        className,
+        classes,
         registerComponentApi,
+        layoutContext,
       }: Pick<
         RendererContext,
         | "extractValue"
         | "node"
         | "renderChild"
         | "lookupEventHandler"
-        | "className"
+        | "lookupAction"
+        | "classes"
         | "registerComponentApi"
         | "lookupSyncCallback"
-      >,
+      > & { layoutContext?: LayoutContext },
       ref,
     ) => {
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
       const data = extractValue(node.props.items) || extractValue(node.props.data);
+
+      const refreshOn = extractValue(node.props.refreshOn);
+      const renderVersionRef = useRef(0);
+      const prevRefreshOnRef = useRef(refreshOn);
+
+      const shouldForceRefresh = node.props.refreshOn === undefined || prevRefreshOnRef.current !== refreshOn;
+      if (shouldForceRefresh) {
+        prevRefreshOnRef.current = refreshOn;
+        renderVersionRef.current++;
+      }
+
       const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
       const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
       const columnIdsRef = useRef([]);
       const [tableKey, setTableKey] = useState(0);
+
+      // Keep lookupAction stable across renders so the sync adapter closure always calls the latest version.
+      const lookupActionRef = useRef(lookupAction);
+      lookupActionRef.current = lookupAction;
+
+      // Stable delegates to prevent React.memo busts on TableNative.
+      const stableSortingDidChange = useEvent((...args: any[]) => lookupEventHandler("sortingDidChange")?.(...args));
+      const stableSelectionDidChange = useEvent((...args: any[]) => lookupEventHandler("selectionDidChange")?.(...args));
+      const stableWillSort = useEvent((...args: any[]) => lookupEventHandler("willSort")?.(...args));
+      const stableRowDoubleClick = useEvent((...args: any[]) => lookupEventHandler("rowDoubleClick")?.(...args));
+      const stableSelectAllAction = useEvent((...args: any[]) => lookupEventHandler("selectAllAction")?.(...args));
+      const stableCutAction = useEvent((...args: any[]) => lookupEventHandler("cutAction")?.(...args));
+      const stableCopyAction = useEvent((...args: any[]) => lookupEventHandler("copyAction")?.(...args));
+      const stablePasteAction = useEvent((...args: any[]) => lookupEventHandler("pasteAction")?.(...args));
+      const stableDeleteAction = useEvent((...args: any[]) => lookupEventHandler("deleteAction")?.(...args));
+      const stableLookupEventHandler = useEvent((...args: Parameters<typeof lookupEventHandler>) => lookupEventHandler(...args));
+
+      const rowDisabledPredicate = node.props.rowDisabledPredicate;
+      const stableRowDisabledPredicate = useEvent((item: any) => lookupSyncCallback(rowDisabledPredicate)?.(item));
+      const rowUnselectablePredicate = node.props.rowUnselectablePredicate;
+      const stableRowUnselectablePredicate = useEvent((item: any) => lookupSyncCallback(rowUnselectablePredicate)?.(item));
+
       const tableContextValue = useMemo(() => {
         return {
           registerColumn: (column: OurColumnMetadata, id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                const existing = draft.findIndex((colId) => colId === id);
-                if (existing < 0) {
-                  draft.push(id);
+            setColumnIds((prev) => {
+              if (prev.includes(id)) return prev;
+              return [...prev, id];
+            });
+            setColumnByIds((prev) => {
+              const prevCol = prev[id];
+              // Even if it's the exact same object by reference, or same content, we only
+              // want to bail out if we don't need to change state.
+              if (prevCol === column) return prev;
+              if (prevCol) {
+                const prevKeys = Object.keys(prevCol);
+                const nextKeys = Object.keys(column);
+                if (prevKeys.length === nextKeys.length) {
+                  let isSame = true;
+                  for (let i = 0; i < prevKeys.length; i++) {
+                    const key = prevKeys[i];
+                    if ((prevCol as any)[key] !== (column as any)[key]) {
+                      isSame = false;
+                      break;
+                    }
+                  }
+                  if (isSame) return prev;
                 }
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                draft[id] = column;
-              }),
-            );
+              }
+              return { ...prev, [id]: column };
+            });
           },
           unRegisterColumn: (id: string) => {
-            setColumnIds(
-              produce((draft) => {
-                return draft.filter((colId) => colId !== id);
-              }),
-            );
-            setColumnByIds(
-              produce((draft) => {
-                delete draft[id];
-              }),
-            );
+            setColumnIds((prev) => {
+              if (!prev.includes(id)) return prev;
+              return prev.filter((colId) => colId !== id);
+            });
+            setColumnByIds((prev) => {
+              if (!(id in prev)) return prev;
+              const next = { ...prev };
+              delete next[id];
+              return next;
+            });
           },
         };
       }, []);
@@ -552,12 +678,116 @@ const TableWithColumns = memo(
         };
       }, []);
 
-      const columns = useMemo(
-        () => columnIds.map((colId) => columnsByIds[colId]),
-        [columnIds, columnsByIds],
-      );
+      const columns = useMemo(() => {
+        const result = new Array(columnIds.length);
+        for (let i = 0; i < columnIds.length; i++) {
+          result[i] = columnsByIds[columnIds[i]];
+        }
+        return result;
+      }, [columnIds, columnsByIds]);
 
       const selectionContext = useSelectionContext();
+
+      // Build a syncWithAppState-compatible adapter for the syncWithVar global-variable sync.
+      //
+      // KEY POINTS:
+      // 1. extractValue({varName}) returns the PLAIN state value, not a reactive proxy.
+      //    Mutating it directly has no effect on XMLUI state.
+      // 2. Writes must go through lookupAction so the expression runs inside XMLUI's
+      //    reactive execution engine (buildProxy + statePartChanged chain).
+      // 3. The adapter object must stay STABLE (same reference) across renders so that
+      //    useRowSelection's effects do not fire on every render.  We achieve this with
+      //    a ref whose .value property is updated in-place each render.
+      const VALID_IDENTIFIER_RE = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/;
+      const syncVarName = extractValue.asOptionalString(node.props.syncWithVar);
+
+      const pendingOwnWriteRef = useRef(false);
+      // Version counter for own-write detection.
+      // Each write embeds a monotonically-increasing __v number in the stored object.
+      // We compare this primitive on read-back — reliable even when XMLUI does not
+      // preserve inner array references across state evaluations.
+      const pendingOwnWriteVersionRef = useRef<number>(0);
+      const ownWriteCountRef = useRef<number>(0);
+      const pendingOwnWrite = pendingOwnWriteRef.current;
+      pendingOwnWriteRef.current = false; // consume immediately
+
+      // Holder for the stable adapter object.
+      const syncAdapterHolderRef = useRef<{ value: any; update: any; _raw?: any; selectedIds?: any } | null>(null);
+
+      let syncAdapter: any;
+      if (syncVarName !== undefined) {
+        if (!VALID_IDENTIFIER_RE.test(syncVarName)) {
+          console.error(`[Table syncWithVar] Invalid variable name: "${syncVarName}"`);
+          syncAdapterHolderRef.current = null;
+        } else {
+          const currentSyncVarValue = extractValue(`{${syncVarName}}`);
+          if (shouldForceRefresh && syncAdapterHolderRef.current) {
+             syncAdapterHolderRef.current = { ...syncAdapterHolderRef.current };
+          }
+          if (currentSyncVarValue != null) {
+            if (!syncAdapterHolderRef.current) {
+              // Create the stable adapter object once.  The update function always
+              // uses the latest lookupAction via the ref.
+              syncAdapterHolderRef.current = {
+                value: currentSyncVarValue,
+                update: ({ selectedIds }: { selectedIds: string[] }) => {
+                  pendingOwnWriteRef.current = true;
+                  const thisVersion = ++ownWriteCountRef.current;
+                  pendingOwnWriteVersionRef.current = thisVersion;
+                  const windowKey = `__tgSync_${syncVarName}`;
+                  (window as any)[windowKey] = { selectedIds, __v: thisVersion };
+                  const handler = lookupActionRef.current?.(
+                    `{${syncVarName} = window.${windowKey}}`,
+                    { ephemeral: true },
+                  );
+                  startTransition(() => {
+                    handler?.();
+                  });
+                },
+              };
+            } else if (currentSyncVarValue !== syncAdapterHolderRef.current.value) {
+              // Stable across concurrent React re-render passes: treat as own write if
+              // the inner selectedIds array is the exact same reference we wrote.
+              // XMLUI evaluates `{selectedIds: window.__tgSync_x}` and preserves the
+              // window array reference, so this O(1) check is sufficient.
+              const isOwnWrite = pendingOwnWrite ||
+                (pendingOwnWriteVersionRef.current > 0 &&
+                  currentSyncVarValue?.__v === pendingOwnWriteVersionRef.current);
+
+              if (isOwnWrite) {
+                // Update value in-place — object identity is preserved, so
+                // Table (memo'd) does not re-render for this change.
+                syncAdapterHolderRef.current.value = currentSyncVarValue;
+              } else {
+                // Genuine external change — reset version sentinel so stale
+                // __v values from prior writes cannot cause false positives.
+                pendingOwnWriteVersionRef.current = 0;
+                syncAdapterHolderRef.current = {
+                  value: currentSyncVarValue,
+                  update: syncAdapterHolderRef.current.update,
+                };
+              }
+            }
+          } else {
+            syncAdapterHolderRef.current = null;
+          }
+        }
+      } else {
+        syncAdapterHolderRef.current = null;
+      }
+      syncAdapter = syncAdapterHolderRef.current;
+
+      // Memoize so the reference is stable across re-renders — ComponentWrapper
+      // is React.memo'd, so a new object would defeat memo and re-render Columns
+      // on every Table state update, causing an infinite registerColumn loop.
+      const tableChildLayoutContext = useMemo(
+        () => createChildLayoutContext(layoutContext, { type: "Table" }),
+        [layoutContext],
+      );
+
+      const noDataRenderer = node.props.noDataTemplate
+        ? () => renderChild(node.props.noDataTemplate, tableChildLayoutContext)
+        : undefined;
 
       const tableContent = (
         <>
@@ -566,13 +796,13 @@ const TableWithColumns = memo(
             This way the order of the columns is preserved.
         */}
           <TableContext.Provider value={tableContextValue} key={tableKey}>
-            {renderChild(node.children)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <TableContext.Provider value={columnRefresherContextValue}>
-            {renderChild(node.children)}
+            {renderChild(node.children, tableChildLayoutContext)}
           </TableContext.Provider>
           <Table
-            className={className}
+            classes={classes}
             ref={ref}
             data={data}
             columns={columns}
@@ -580,38 +810,36 @@ const TableWithColumns = memo(
             pageSize={extractValue.asOptionalNumber(node.props.pageSize)}
             rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
             registerComponentApi={registerComponentApi}
-            noDataRenderer={
-              node.props.noDataTemplate &&
-              (() => {
-                return renderChild(node.props.noDataTemplate);
-              })
-            }
+            noDataRenderer={noDataRenderer}
             hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
             loading={extractValue.asOptionalBoolean(node.props.loading)}
             isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
             headerHeight={extractValue.asSize(node.props.headerHeight)}
-            rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-            rowUnselectablePredicate={lookupSyncCallback(node.props.rowUnselectablePredicate)}
+            rowDisabledPredicate={stableRowDisabledPredicate}
+            rowUnselectablePredicate={stableRowUnselectablePredicate}
             sortBy={extractValue(node.props?.sortBy)}
             sortingDirection={extractValue(node.props?.sortDirection)}
             iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
             iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
             iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-            lookupEventHandler={node.events?.contextMenu ? lookupEventHandler : undefined}
-            sortingDidChange={lookupEventHandler("sortingDidChange")}
-            onSelectionDidChange={lookupEventHandler("selectionDidChange")}
-            willSort={lookupEventHandler("willSort")}
-            rowDoubleClick={lookupEventHandler("rowDoubleClick")}
-            onSelectAllAction={lookupEventHandler("selectAllAction")}
-            onCutAction={lookupEventHandler("cutAction")}
-            onCopyAction={lookupEventHandler("copyAction")}
-            onPasteAction={lookupEventHandler("pasteAction")}
-            onDeleteAction={lookupEventHandler("deleteAction")}
+            lookupEventHandler={!!node.events?.contextMenu ? stableLookupEventHandler : undefined}
+            sortingDidChange={stableSortingDidChange}
+            onSelectionDidChange={stableSelectionDidChange}
+            willSort={stableWillSort}
+            rowDoubleClick={node.events?.rowDoubleClick ? stableRowDoubleClick : undefined}
+            onSelectAllAction={node.events?.selectAllAction ? stableSelectAllAction : undefined}
+            onCutAction={node.events?.cutAction ? stableCutAction : undefined}
+            onCopyAction={node.events?.copyAction ? stableCopyAction : undefined}
+            onPasteAction={node.events?.pasteAction ? stablePasteAction : undefined}
+            onDeleteAction={node.events?.deleteAction ? stableDeleteAction : undefined}
             uid={node.uid}
             autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
             hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
             enableMultiRowSelection={extractValue.asOptionalBoolean(
               node.props.enableMultiRowSelection,
+            )}
+            toggleSelectionOnClick={extractValue.asOptionalBoolean(
+              node.props.toggleSelectionOnClick,
             )}
             alwaysShowSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
               node.props.alwaysShowSelectionCheckboxesHeader,
@@ -623,9 +851,7 @@ const TableWithColumns = memo(
             paginationControlsLocation={extractValue.asOptionalString(
               node.props.paginationControlsLocation,
             )}
-            alwaysShowPagination={extractValue.asOptionalBoolean(
-              node.props.alwaysShowPagination,
-            )}
+            alwaysShowPagination={extractValue.asOptionalBoolean(node.props.alwaysShowPagination)}
             cellVerticalAlign={extractValue.asOptionalString(node.props.cellVerticalAlign)}
             buttonRowPosition={extractValue.asOptionalString(node.props.buttonRowPosition)}
             pageSizeSelectorPosition={extractValue.asOptionalString(
@@ -637,14 +863,25 @@ const TableWithColumns = memo(
             showPageSizeSelector={extractValue.asOptionalBoolean(node.props.showPageSizeSelector)}
             checkboxTolerance={extractValue.asOptionalString(node.props.checkboxTolerance)}
             initiallySelected={extractValue(node.props.initiallySelected)}
-            syncWithAppState={extractValue(node.props.syncWithAppState)}
+            syncWithAppState={syncAdapter ?? extractValue(node.props.syncWithAppState)}
+            headerUserSelect={extractValue.asOptionalString(node.props.headerUserSelect)}
+            cellUserSelect={extractValue.asOptionalString(node.props.cellUserSelect)}
             userSelectCell={extractValue.asOptionalString(node.props.userSelectCell)}
             userSelectRow={extractValue.asOptionalString(node.props.userSelectRow)}
             userSelectHeading={extractValue.asOptionalString(node.props.userSelectHeading)}
-            hideSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.hideSelectionCheckboxes)}
-            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(node.props.alwaysShowSelectionCheckboxes)}
+            hideSelectionCheckboxes={extractValue.asOptionalBoolean(
+              node.props.hideSelectionCheckboxes,
+            )}
+            renderVersion={renderVersionRef.current}
+            hideSelectionCheckboxesHeader={extractValue.asOptionalBoolean(
+              node.props.hideSelectionCheckboxesHeader,
+            )}
+            alwaysShowSelectionCheckboxes={extractValue.asOptionalBoolean(
+              node.props.alwaysShowSelectionCheckboxes,
+            )}
             keyBindings={extractValue(node.props.keyBindings)}
             alwaysShowHeader={extractValue.asOptionalBoolean(node.props.alwaysShowHeader)}
+            striped={extractValue.asOptionalBoolean(node.props.striped)}
           />
         </>
       );
@@ -658,28 +895,18 @@ const TableWithColumns = memo(
 );
 TableWithColumns.displayName = "TableWithColumns";
 
-export const tableComponentRenderer = createComponentRenderer(
-  COMP,
-  TableMd,
-  ({
-    extractValue,
-    node,
-    renderChild,
-    lookupEventHandler,
-    lookupSyncCallback,
-    className,
-    registerComponentApi,
-  }) => {
-    return (
-      <TableWithColumns
-        node={node}
-        extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler as any}
-        lookupSyncCallback={lookupSyncCallback}
-        className={className}
-        renderChild={renderChild}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
+export const tableComponentRenderer = wrapComponent(COMP, Table, TableMd, {
+  customRender: (_props, { extractValue, node, renderChild, lookupEventHandler, lookupAction, lookupSyncCallback, classes, registerComponentApi, layoutContext }) => (
+    <TableWithColumns
+      node={node}
+      extractValue={extractValue}
+      lookupEventHandler={lookupEventHandler as any}
+      lookupAction={lookupAction}
+      lookupSyncCallback={lookupSyncCallback}
+      classes={classes}
+      renderChild={renderChild}
+      registerComponentApi={registerComponentApi}
+      layoutContext={layoutContext}
+    />
+  ),
+});

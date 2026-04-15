@@ -1,6 +1,6 @@
 import styles from "./DateInput.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -23,7 +23,7 @@ import {
   DateInputModeValues,
   defaultProps,
   WeekDays,
-} from "./DateInputNative";
+} from "./DateInputReact";
 
 const COMP = "DateInput";
 
@@ -45,6 +45,9 @@ export const DateInputMd = createMetadata({
     },
     clearButton: {
       description: "The button to clear the date input.",
+    },
+    conciseValidationFeedback: {
+      description: "The concise validation feedback indicator shown when verboseValidationFeedback is false.",
     },
   },
   props: {
@@ -226,56 +229,20 @@ export const DateInputMd = createMetadata({
   },
 });
 
-export const dateInputComponentRenderer = createComponentRenderer(
+export const dateInputComponentRenderer = wrapComponent(
   COMP,
+  DateInput,
   DateInputMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    className,
-    lookupEventHandler,
-    registerComponentApi,
-  }) => {
-    return (
-      <DateInput
-        id={node.uid}
-        className={className}
-        mode={extractValue(node.props?.mode)}
-        value={state?.value}
-        initialValue={extractValue(node.props.initialValue)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        invalidMessages={extractValue(node.props.invalidMessages)}
-        updateState={updateState}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        registerComponentApi={registerComponentApi}
-        dateFormat={extractValue(node.props.dateFormat)}
-        showWeekNumber={extractValue.asOptionalBoolean(node.props.showWeekNumber)}
-        weekStartsOn={extractValue.asOptionalNumber(node.props.weekStartsOn)}
-        minValue={extractValue.asOptionalString(node.props.minValue)}
-        maxValue={extractValue.asOptionalString(node.props.maxValue)}
-        disabledDates={extractValue(node.props.disabledDates)}
-        inline={extractValue.asOptionalBoolean(node.props.inline, defaultProps.inline)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        clearable={extractValue.asOptionalBoolean(node.props.clearable, defaultProps.clearable)}
-        clearIcon={extractValue.asOptionalString(node.props.clearIcon)}
-        clearToInitialValue={extractValue.asOptionalBoolean(node.props.clearToInitialValue, defaultProps.clearToInitialValue)}
-        gap={extractValue.asOptionalString(node.props.gap)}
-        emptyCharacter={extractValue.asOptionalString(node.props.emptyCharacter)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-      />
-    );
+  {
+    events: { didChange: "onDidChange", gotFocus: "onFocus", lostFocus: "onBlur" },
+    booleans: ["verboseValidationFeedback"],
+    strings: ["validationIconSuccess", "validationIconError"],
+    exclude: ["invalidMessages"],
+    exposeRegisterApi: true,
+    customRender: (props, { node, extractValue }) => {
+      props.id = node.uid;
+      props.invalidMessages = extractValue(node.props.invalidMessages);
+      return <DateInput {...props} />;
+    },
   },
 );

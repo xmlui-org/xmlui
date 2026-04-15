@@ -54,6 +54,11 @@ export interface RendererContext<TMd extends ComponentMetadata = ComponentMetada
 
   className?: string;
 
+  // Per-part class map. "-component" holds the class for the outermost DOM element
+  // (same as className). Other keys correspond to declared part names.
+  // Components opt-in to using this instead of className.
+  classes?: Record<string, string>;
+
   // Log a user interaction for inspector/debugging (no-op when xsVerbose is false)
   logInteraction: LogInteractionFn;
 }
@@ -119,7 +124,22 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
 // stack). This type provides information about that context and the operations that
 // render children in it.
 export type LayoutContext<T extends ComponentDef = ComponentDef> = {
-  type?: string; // The type of the layout context
+  // The type of the layout context (e.g., "Stack", "DockLayout", "FlowLayout", "Table")
+  type?: string;
+
+  // How many layout-providing ancestors this context has.
+  // 0 for the first layout context created from the application root;
+  // incremented by createChildLayoutContext each time a new layout boundary is established.
+  depth?: number;
+
+  // The enclosing layout context, forming an ancestry chain.
+  // Undefined when this is the root layout context.
+  parent?: LayoutContext<T>;
+
+  // Layout-specific properties used by resolveLayoutProps and components.
+  orientation?: string;
+  itemWidth?: string;
+  ignoreLayoutProps?: string[];
 
   // This function allows the React representation of a particular child node to be
   // wrapped in whatever React components to accommodate the current layout context.
@@ -131,7 +151,8 @@ export type LayoutContext<T extends ComponentDef = ComponentDef> = {
     metadata?: ComponentMetadata,
   ) => ReactNode;
 
-  // Arbitrary props extending the layout context
+  // Arbitrary props extending the layout context (for backward compatibility and
+  // component-specific extensions).
   [key: string]: any;
 };
 

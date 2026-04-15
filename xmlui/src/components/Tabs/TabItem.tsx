@@ -1,7 +1,9 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { TabItemComponent } from "./TabItemNative";
 import { createMetadata, d, dComponent, dLabel } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TabItem";
 
@@ -31,39 +33,59 @@ export const TabItemMd = createMetadata({
   },
 });
 
-export const tabItemComponentRenderer = createComponentRenderer(
-  COMP,
-  TabItemMd,
-  (rendererContext) => {
-    const { node, renderChild, extractValue, lookupEventHandler } = rendererContext;
+type ThemedTabItemProps = React.ComponentPropsWithoutRef<typeof TabItemComponent>;
+
+export const ThemedTabItem = React.forwardRef<React.ElementRef<typeof TabItemComponent>, ThemedTabItemProps>(
+  function ThemedTabItem({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TabItemMd);
     return (
       <TabItemComponent
-        id={extractValue(node.uid)}
-        label={extractValue(node.props.label)}
-        activated={lookupEventHandler("activated")}
-        headerRenderer={
-          node.props.headerTemplate
-            ? (item) => {
-                return (
-                  <MemoizedItem
-                    node={node.props.headerTemplate}
-                    contextVars={{
-                      $header: {
-                        id: item.id,
-                        index: item.index,
-                        label: item.label,
-                        isActive: item.isActive,
-                      },
-                    }}
-                    renderChild={renderChild}
-                  />
-                );
-              }
-            : undefined
-        }
-      >
-        {renderChild(node.children)}
-      </TabItemComponent>
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
+  },
+);
+
+export const tabItemComponentRenderer = wrapComponent(
+  COMP,
+  TabItemComponent,
+  TabItemMd,
+  {
+    exclude: ["label", "headerTemplate"],
+    events: [],
+    customRender(_props, { node, renderChild, extractValue, lookupEventHandler, classes }) {
+      return (
+        <TabItemComponent
+          classes={classes}
+          id={extractValue(node.uid)}
+          label={extractValue(node.props.label)}
+          activated={lookupEventHandler("activated")}
+          headerRenderer={
+            node.props.headerTemplate
+              ? (item) => {
+                  return (
+                    <MemoizedItem
+                      node={node.props.headerTemplate}
+                      contextVars={{
+                        $header: {
+                          id: item.id,
+                          index: item.index,
+                          label: item.label,
+                          isActive: item.isActive,
+                        },
+                      }}
+                      renderChild={renderChild}
+                    />
+                  );
+                }
+              : undefined
+          }
+        >
+          {renderChild(node.children)}
+        </TabItemComponent>
+      );
+    },
   },
 );

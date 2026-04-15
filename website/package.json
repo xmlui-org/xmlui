@@ -1,13 +1,13 @@
 {
   "name": "xmlui-website",
   "private": true,
-  "version": "0.0.13",
+  "version": "0.0.18",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
-    "gen:releases": "node scripts/get-releases.js --output 'public/resources/files/releases.json'",
-    "gen:download-latest-xmlui-release": "node scripts/download-latest-xmlui.js",
-    "gen:rss": "node scripts/generate-rss.js",
+    "gen:releases": "tsx scripts/get-releases.ts --output 'public/resources/files/releases.json'",
+    "gen:download-latest-xmlui-release": "tsx scripts/download-latest-xmlui.ts",
+    "gen:rss": "tsx scripts/generate-rss.ts",
     "gen:sitemap": "tsx scripts/generate-sitemap.mjs",
     "build": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui build --buildMode=INLINE_ALL --withMock ",
     "build-ssg": "npm run gen:releases && npm run gen:download-latest-xmlui-release && npm run gen:rss && npm run gen:sitemap && xmlui ssg && mv dist-ssg/ssg-staticwebapp.config.json dist-ssg/staticwebapp.config.json",
@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "xmlui": "*",
-    "xmlui-playground": "*",
     "xmlui-search": "*",
     "xmlui-hello-world": "*",
     "xmlui-website-blocks": "*",
-    "xmlui-docs-blocks": "*"
+    "xmlui-docs-blocks": "*",
+    "xmlui-recharts": "*"
   },
   "msw": {
     "workerDirectory": [
@@ -29,6 +29,7 @@
   "devDependencies": {
     "xmlui-website-blocks": "*",
     "xmlui-animations": "*",
+    "xmlui-recharts": "*",
     "@emotion/is-prop-valid": "^1.3.1",
     "@octokit/rest": "^22.0.0"
   }

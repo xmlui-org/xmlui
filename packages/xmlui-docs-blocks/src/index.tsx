@@ -19,13 +19,13 @@ import { overviewRenderer } from "./docs/Overview";
 import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
 import { pageNotFoundRenderer } from "./docs/PageNotFound";
 import { releaseListRenderer } from "./docs/ReleaseList";
+import { blogComponentRenderer } from "./blog/Blog";
 import {
   findNavItem,
   getNavGroup,
   getTopLevelChildren,
   getPageDescription,
   getRootLinks,
-  getCardWidth,
   getCardIcon,
 } from "./utils/overviewHelpers";
 import { XmlUiDocsThemeDefinition } from "./themes/xmlui-docs";
@@ -49,6 +49,7 @@ export default {
     twoColumnCodeRenderer,
     pageNotFoundRenderer,
     releaseListRenderer,
+    blogComponentRenderer,
   ],
   functions: {
     findNavItem,
@@ -56,7 +57,6 @@ export default {
     getTopLevelChildren,
     getPageDescription,
     getRootLinks,
-    getCardWidth,
     getCardIcon,
   },
 };

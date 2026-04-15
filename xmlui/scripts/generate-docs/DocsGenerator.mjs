@@ -4,8 +4,6 @@ import { unlink, readFile, writeFile, readdir, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS, processError } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
 import { getSectionBeforeAndAfter, strBufferToLines, toHeadingPath } from "./utils.mjs";
-import { buildPagesMap } from "./build-pages-map.mjs";
-import { buildDownloadsMap } from "./build-downloads-map.mjs";
 import { FOLDERS } from "./folders.mjs";
 import { 
   FILE_EXTENSIONS, 
@@ -19,9 +17,8 @@ logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
 export class DocsGenerator {
   metadata = [];
   folders = {
-    sourceFolder: FOLDERS.pages,
-    outFolder: FOLDERS.pages,
-    examplesFolder: FOLDERS.pages,
+    sourceFolder: null,
+    outFolder: null,
   };
 
   constructor(metadata, folders, { excludeComponentStatuses }) {
@@ -143,7 +140,7 @@ export class DocsGenerator {
   async generatePackageDescription(packageDescription, sectionHeading, fileName) {
     logger.info("Creating package description section in specified file");
     try {
-      const outFile = fileName || join(FOLDERS.pages, `${basename(this.folders.sourceFolder)}.md`);
+      const outFile = fileName || join(this.folders.outFolder, `${basename(this.folders.sourceFolder)}.md`);
 
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
@@ -173,30 +170,6 @@ export class DocsGenerator {
         throw new ErrorWithSeverity(`File ${file} does not exist.`, LOGGER_LEVELS.error);
       }
       await generatePermalinks(filePath);
-    }
-  }
-
-  async generateArticleAndDownloadsLinks() {
-    try {
-      const pagesMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.PAGES_MAP);
-      if (existsSync(pagesMapFile)) {
-        await unlink(pagesMapFile);
-        await writeFile(pagesMapFile, "");
-      }
-
-      logger.info("Generating link IDs for article headings");
-      buildPagesMap(FOLDERS.pages, pagesMapFile);
-
-      const downloadsMapFile = join(FOLDERS.docsMeta, OUTPUT_FILES.DOWNLOADS_MAP);
-      if (existsSync(downloadsMapFile)) {
-        await unlink(downloadsMapFile);
-        await writeFile(downloadsMapFile, "");
-      }
-
-      logger.info("Generating link IDs for downloadable files");
-      buildDownloadsMap(join(FOLDERS.docsRoot, "public", "resources", "files"), downloadsMapFile);
-    } catch (error) {
-      processError(error);
     }
   }
 }

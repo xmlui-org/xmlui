@@ -10,19 +10,19 @@ $themeVars: (
 }
 
 // Variables for @layer section
-$textColor-FormItemLabel: createThemeVar("textColor-FormItemLabel");
-$fontFamily-FormItemLabel: createThemeVar("fontFamily-FormItemLabel");
-$fontSize-FormItemLabel: createThemeVar("fontSize-FormItemLabel");
-$fontWeight-FormItemLabel: createThemeVar("fontWeight-FormItemLabel");
-$fontStyle-FormItemLabel: createThemeVar("fontStyle-FormItemLabel");
-$textTransform-FormItemLabel: createThemeVar("textTransform-FormItemLabel");
-$textColor-FormItemLabel-required: createThemeVar("textColor-FormItemLabel-required");
-$fontSize-FormItemLabel-required: createThemeVar("fontSize-FormItemLabel-required");
-$fontWeight-FormItemLabel-required: createThemeVar("fontWeight-FormItemLabel-required");
-$fontStyle-FormItemLabel-required: createThemeVar("fontStyle-FormItemLabel-required");
-$textTransform-FormItemLabel-required: createThemeVar("textTransform-FormItemLabel-required");
-$textColor-FormItemLabel-requiredMark: createThemeVar("textColor-FormItemLabel-requiredMark");
-$textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-optionalTag");
+$textColor-label-formItem: createThemeVar("textColor-label-formItem");
+$fontFamily-label-formItem: createThemeVar("fontFamily-label-formItem");
+$fontSize-label-formItem: createThemeVar("fontSize-label-formItem");
+$fontWeight-label-formItem: createThemeVar("fontWeight-label-formItem");
+$fontStyle-label-formItem: createThemeVar("fontStyle-label-formItem");
+$textTransform-label-formItem: createThemeVar("textTransform-label-formItem");
+$textColor-label-formItem--required: createThemeVar("textColor-label-formItem--required");
+$fontSize-label-formItem--required: createThemeVar("fontSize-label-formItem--required");
+$fontWeight-label-formItem--required: createThemeVar("fontWeight-label-formItem--required");
+$fontStyle-label-formItem--required: createThemeVar("fontStyle-label-formItem--required");
+$textTransform-label-formItem--required: createThemeVar("textTransform-label-formItem--required");
+$textColor-requiredMark-formItem: createThemeVar("textColor-requiredMark-formItem");
+$textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem");
 
 // TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
 
@@ -60,17 +60,35 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
       gap: 0.5em;
     }
 
+    &.before {
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: start;
+      gap: 0.5em;
+      width: fit-content;
+      align-self: flex-start;
+    }
+
+    &.after {
+      flex-direction: row-reverse;
+      justify-content: start;
+      align-items: flex-start;
+      gap: 0.5em;
+      width: fit-content;
+      align-self: flex-start;
+    }
+
     &.shrinkToLabel {
       width: fit-content;
     }
 
     .inputLabel {
-      color: $textColor-FormItemLabel;
-      font-family: $fontFamily-FormItemLabel;
-      font-size: $fontSize-FormItemLabel;
-      font-weight: $fontWeight-FormItemLabel;
-      font-style: $fontStyle-FormItemLabel;
-      text-transform: $textTransform-FormItemLabel;
+      color: $textColor-label-formItem;
+      font-family: $fontFamily-label-formItem;
+      font-size: $fontSize-label-formItem;
+      font-weight: $fontWeight-label-formItem;
+      font-style: $fontStyle-label-formItem;
+      text-transform: $textTransform-label-formItem;
       user-select: none;
       cursor: pointer;
       word-break: normal;
@@ -84,11 +102,11 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
       }
 
       &.required {
-        color: $textColor-FormItemLabel-required;
-        font-size: $fontSize-FormItemLabel-required;
-        font-weight: $fontWeight-FormItemLabel-required;
-        font-style: $fontStyle-FormItemLabel-required;
-        text-transform: $textTransform-FormItemLabel-required;
+        color: $textColor-label-formItem--required;
+        font-size: $fontSize-label-formItem--required;
+        font-weight: $fontWeight-label-formItem--required;
+        font-style: $fontStyle-label-formItem--required;
+        text-transform: $textTransform-label-formItem--required;
       }
 
       &.disabled {
@@ -98,12 +116,12 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
 
       .requiredMark {
         margin-left: 0.2em;
-        color: $textColor-FormItemLabel-requiredMark;
+        color: $textColor-requiredMark-formItem;
       }
 
       .optionalTag {
         margin-left: 0.2em;
-        color: $textColor-FormItemLabel-optionalTag;
+        color: $textColor-optionalTag-formItem;
       }
     }
   }
@@ -112,6 +130,7 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
    display: flex;
    align-items: center;
    flex-direction: column;
+   width: 100%;
   }
 
   .wrapper {
@@ -125,6 +144,21 @@ $textColor-FormItemLabel-optionalTag: createThemeVar("textColor-FormItemLabel-op
 
   .validationResultWrapper {
     width: 100%;
+  }
+
+  // When a FormItem is inside a horizontal Stack, the validation message must not
+  // push sibling inputs out of alignment. We anchor the wrapper and float the
+  // message absolutely below the input so it overlaps rather than reflows.
+  .validationAnchor {
+    position: relative;
+  }
+
+  .validationMessageAbsolute {
+    position: static;
+    top: auto;
+    left: auto;
+    white-space: normal;
+    z-index: auto;
   }
 
   .helperTextContainer {

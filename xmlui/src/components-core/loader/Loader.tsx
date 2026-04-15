@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useQuery, type QueryFunction } from "@tanstack/react-query";
 import { createDraft, finishDraft } from "immer";
 
@@ -129,10 +129,29 @@ export function Loader({
 
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
+  const prevIsFetching = usePrevious(isFetching);
+  const prevIsLoading = usePrevious(isLoading);
+
+  // Tracks whether at least one fetch has completed since this component mounted.
+  // Prevents stale cached errors (e.g. a 401 from a prior session still in the
+  // react-query cache) from being replayed as a fresh error on mount.
+  const hasFetchCompletedRef = useRef(false);
 
   useIsomorphicLayoutEffect(() => {
     loaderInProgressChanged(isFetching || isLoading);
-  }, [isLoading, isFetching, loaderInProgressChanged]);
+    if (prevIsFetching && !isFetching) {
+      hasFetchCompletedRef.current = true;
+    }
+  }, [isLoading, isFetching, loaderInProgressChanged, prevIsFetching]);
+
+  // When a genuinely new fetch starts (query key changed, no cached data), reset the loaded
+  // state so stale data from the previous query is not shown during the new fetch.
+  // This is distinct from a background refetch (isRefetching), where old data should remain visible.
+  useIsomorphicLayoutEffect(() => {
+    if (isLoading && !prevIsLoading) {
+      loaderLoaded(undefined);
+    }
+  }, [isLoading, prevIsLoading, loaderLoaded]);
 
   useIsomorphicLayoutEffect(() => {
     loaderIsRefetchingChanged(isRefetching);
@@ -156,7 +175,7 @@ export function Loader({
         // console.log("[Loader] onLoaded function exists:", !!onLoaded);
         onLoaded?.(data, isRefetching);
       }, 0);
-    } else if (status === "error" && error !== prevError) {
+    } else if (status === "error" && error !== prevError && hasFetchCompletedRef.current) {
       // console.log("[Loader] Calling loaderError with error:", error);
       loaderError(error);
     }

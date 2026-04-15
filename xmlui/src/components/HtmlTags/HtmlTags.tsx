@@ -16,12 +16,13 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { LinkNative } from "../Link/LinkNative";
-import { Heading } from "../Heading/HeadingNative";
-import { Text } from "../Text/TextNative";
+import { ThemedLinkNative as LinkNative } from "../Link/Link";
+import { ThemedHeading as Heading } from "../Heading/Heading";
+import { ThemedText as Text } from "../Text/Text";
 import { PropsTrasform } from "../../components-core/utils/extractParam";
 import { createMetadata, d } from "../metadata-helpers";
 import classnames from 'classnames';
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 export const HtmlAMd = createMetadata({
   status: "deprecated",
@@ -45,12 +46,12 @@ export const HtmlAMd = createMetadata({
 export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { disabled } = p.asOptionalBoolean("disabled");
     const { href, ...rest } = p.asRest();
     return (
-      <LinkNative to={href} disabled={disabled ?? false} className={className} {...rest}>
+      <LinkNative to={href} enabled={!(disabled ?? false)} className={classes?.[COMPONENT_PART_KEY]} {...rest}>
         {renderChild(node.children)}
       </LinkNative>
     );
@@ -66,11 +67,11 @@ export const HtmlAbbrMd = createMetadata({
 export const htmlAbbrTagRenderer = createComponentRenderer(
   "abbr",
   HtmlAbbrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="abbr">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="abbr">
         {renderChild(node.children)}
       </Text>
     );
@@ -86,11 +87,11 @@ export const HtmlAddressMd = createMetadata({
 export const htmlAddressTagRenderer = createComponentRenderer(
   "address",
   HtmlAddressMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <address className={className} {...props}>
+      <address className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </address>
     );
@@ -118,11 +119,11 @@ export const HtmlAreaMd = createMetadata({
 export const htmlAreaTagRenderer = createComponentRenderer(
   "area",
   HtmlAreaMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <area className={className} {...props}>
+      <area className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </area>
     );
@@ -138,11 +139,11 @@ export const HtmlArticleMd = createMetadata({
 export const htmlArticleTagRenderer = createComponentRenderer(
   "article",
   HtmlArticleMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <article className={className} {...props}>
+      <article className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </article>
     );
@@ -158,11 +159,11 @@ export const HtmlAsideMd = createMetadata({
 export const htmlAsideTagRenderer = createComponentRenderer(
   "aside",
   HtmlAsideMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <aside className={className} {...props}>
+      <aside className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </aside>
     );
@@ -189,7 +190,7 @@ export const HtmlAudioMd = createMetadata({
 export const htmlAudioTagRenderer = createComponentRenderer(
   "audio",
   HtmlAudioMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
       "autoPlay",
@@ -200,7 +201,7 @@ export const htmlAudioTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <audio
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         autoPlay={autoPlay ?? false}
         controls={controls ?? false}
         loop={loop ?? false}
@@ -222,11 +223,11 @@ export const HtmlBMd = createMetadata({
 export const htmlBTagRenderer = createComponentRenderer(
   "b",
   HtmlBMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <b className={className} {...props}>
+      <b className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </b>
     );
@@ -242,11 +243,11 @@ export const HtmlBdiMd = createMetadata({
 export const htmlBdiTagRenderer = createComponentRenderer(
   "bdi",
   HtmlBdiMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <bdi className={className} {...props}>
+      <bdi className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </bdi>
     );
@@ -265,11 +266,11 @@ export const HtmlBdoMd = createMetadata({
 export const htmlBdoTagRenderer = createComponentRenderer(
   "bdo",
   HtmlBdoMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <bdo className={className} {...props}>
+      <bdo className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </bdo>
     );
@@ -288,11 +289,11 @@ export const HtmlBlockquoteMd = createMetadata({
 export const htmlBlockquoteTagRenderer = createComponentRenderer(
   "blockquote",
   HtmlBlockquoteMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <blockquote className={className} {...props}>
+      <blockquote className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </blockquote>
     );
@@ -325,7 +326,7 @@ export const HtmlButtonMd = createMetadata({
 export const htmlButtonTagRenderer = createComponentRenderer(
   "button",
   HtmlButtonMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { autoFocus, disabled, formNoValidate } = p.asOptionalBoolean(
       "autoFocus",
@@ -335,7 +336,7 @@ export const htmlButtonTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <button
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         autoFocus={autoFocus ?? false}
         disabled={disabled ?? false}
         formNoValidate={formNoValidate ?? false}
@@ -360,12 +361,12 @@ export const HtmlCanvasMd = createMetadata({
 export const htmlCanvasTagRenderer = createComponentRenderer(
   "canvas",
   HtmlCanvasMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const sizeProps = p.asOptionalNumber("width", "height");
     const props = p.asRest();
     return (
-      <canvas className={className} {...sizeProps} {...props}>
+      <canvas className={classes?.[COMPONENT_PART_KEY]} {...sizeProps} {...props}>
         {renderChild(node.children)}
       </canvas>
     );
@@ -381,11 +382,11 @@ export const HtmlCaptionMd = createMetadata({
 export const htmlCaptionTagRenderer = createComponentRenderer(
   "caption",
   HtmlCaptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <caption className={className} {...props}>
+      <caption className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </caption>
     );
@@ -401,11 +402,11 @@ export const HtmlCiteMd = createMetadata({
 export const htmlCiteTagRenderer = createComponentRenderer(
   "cite",
   HtmlCiteMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="cite">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="cite">
         {renderChild(node.children)}
       </Text>
     );
@@ -421,11 +422,11 @@ export const HtmlCodeMd = createMetadata({
 export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="code">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="code">
         {renderChild(node.children)}
       </Text>
     );
@@ -444,12 +445,12 @@ export const HtmlColMd = createMetadata({
 export const htmlColTagRenderer = createComponentRenderer(
   "col",
   HtmlColMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { span } = p.asOptionalNumber("span");
     const props = p.asRest();
     return (
-      <col className={className} span={span} {...props}>
+      <col className={classes?.[COMPONENT_PART_KEY]} span={span} {...props}>
         {renderChild(node.children)}
       </col>
     );
@@ -468,12 +469,12 @@ export const HtmlColgroupMd = createMetadata({
 export const htmlColgroupTagRenderer = createComponentRenderer(
   "colgroup",
   HtmlColgroupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { span } = p.asOptionalNumber("span");
     const props = p.asRest();
     return (
-      <colgroup className={className} span={span} {...props}>
+      <colgroup className={classes?.[COMPONENT_PART_KEY]} span={span} {...props}>
         {renderChild(node.children)}
       </colgroup>
     );
@@ -492,11 +493,11 @@ export const HtmlDataMd = createMetadata({
 export const htmlDataTagRenderer = createComponentRenderer(
   "data",
   HtmlDataMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <data className={className} {...props}>
+      <data className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </data>
     );
@@ -512,11 +513,11 @@ export const HtmlDatalistMd = createMetadata({
 export const htmlDatalistTagRenderer = createComponentRenderer(
   "datalist",
   HtmlDatalistMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <datalist className={className} {...props}>
+      <datalist className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </datalist>
     );
@@ -532,11 +533,11 @@ export const HtmlDdMd = createMetadata({
 export const htmlDdTagRenderer = createComponentRenderer(
   "dd",
   HtmlDdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <dd className={className} {...props}>
+      <dd className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </dd>
     );
@@ -556,11 +557,11 @@ export const HtmlDelMd = createMetadata({
 export const htmlDelTagRenderer = createComponentRenderer(
   "del",
   HtmlDelMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="deleted">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="deleted">
         {renderChild(node.children)}
       </Text>
     );
@@ -584,12 +585,12 @@ export const HtmlDetailsMd = createMetadata({
 export const htmlDetailsTagRenderer = createComponentRenderer(
   "details",
   HtmlDetailsMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { open } = p.asOptionalBoolean("open");
     const props = p.asRest();
     return (
-      <details className={classnames(styles.htmlDetails, className)} open={open ?? false} {...props}>
+      <details className={classnames(styles.htmlDetails, classes?.[COMPONENT_PART_KEY])} open={open ?? false} {...props}>
         {renderChild(node.children)}
       </details>
     );
@@ -605,11 +606,11 @@ export const HtmlDfnMd = createMetadata({
 export const htmlDfnTagRenderer = createComponentRenderer(
   "dfn",
   HtmlDfnMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <dfn className={className} {...props}>
+      <dfn className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </dfn>
     );
@@ -628,12 +629,12 @@ export const HtmlDialogMd = createMetadata({
 export const htmlDialogTagRenderer = createComponentRenderer(
   "dialog",
   HtmlDialogMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { open } = p.asOptionalBoolean("open");
     const props = p.asRest();
     return (
-      <dialog className={className} open={open ?? false} {...props}>
+      <dialog className={classes?.[COMPONENT_PART_KEY]} open={open ?? false} {...props}>
         {renderChild(node.children)}
       </dialog>
     );
@@ -649,11 +650,11 @@ export const HtmlDivMd = createMetadata({
 export const htmlDivTagRenderer = createComponentRenderer(
   "div",
   HtmlDivMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <div className={className} {...props}>
+      <div className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </div>
     );
@@ -669,11 +670,11 @@ export const HtmlDlMd = createMetadata({
 export const htmlDlTagRenderer = createComponentRenderer(
   "dl",
   HtmlDlMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <dl className={className} {...props}>
+      <dl className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </dl>
     );
@@ -689,11 +690,11 @@ export const HtmlDtMd = createMetadata({
 export const htmlDtTagRenderer = createComponentRenderer(
   "dt",
   HtmlDtMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <dt className={className} {...props}>
+      <dt className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </dt>
     );
@@ -709,11 +710,11 @@ export const HtmlEMMd = createMetadata({
 export const htmlEMTagRenderer = createComponentRenderer(
   "em",
   HtmlEMMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="em">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="em">
         {renderChild(node.children)}
       </Text>
     );
@@ -735,12 +736,12 @@ export const HtmlEmbedMd = createMetadata({
 export const htmlEmbedTagRenderer = createComponentRenderer(
   "embed",
   HtmlEmbedMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const props = p.asRest();
     return (
-      <embed className={className} src={src} {...props}>
+      <embed className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
         {renderChild(node.children)}
       </embed>
     );
@@ -761,12 +762,12 @@ export const HtmlFieldsetMd = createMetadata({
 export const htmlFieldsetTagRenderer = createComponentRenderer(
   "fieldset",
   HtmlFieldsetMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { disabled } = p.asOptionalBoolean("disabled");
     const props = p.asRest();
     return (
-      <fieldset className={className} disabled={disabled ?? false} {...props}>
+      <fieldset className={classes?.[COMPONENT_PART_KEY]} disabled={disabled ?? false} {...props}>
         {renderChild(node.children)}
       </fieldset>
     );
@@ -782,11 +783,11 @@ export const HtmlFigcaptionMd = createMetadata({
 export const htmlFigcaptionTagRenderer = createComponentRenderer(
   "figcaption",
   HtmlFigcaptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <figcaption className={className} {...props}>
+      <figcaption className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </figcaption>
     );
@@ -802,11 +803,11 @@ export const HtmlFigureMd = createMetadata({
 export const htmlFigureTagRenderer = createComponentRenderer(
   "figure",
   HtmlFigureMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <figure className={className} {...props}>
+      <figure className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </figure>
     );
@@ -822,11 +823,11 @@ export const HtmlFooterMd = createMetadata({
 export const htmlFooterTagRenderer = createComponentRenderer(
   "footer",
   HtmlFooterMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <footer className={className} {...props}>
+      <footer className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </footer>
     );
@@ -854,12 +855,12 @@ export const HtmlFormMd = createMetadata({
 export const htmlFormTagRenderer = createComponentRenderer(
   "form",
   HtmlFormMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { noValidate } = p.asOptionalBoolean("noValidate");
     const props = p.asRest();
     return (
-      <form className={className} noValidate={noValidate ?? false} {...props}>
+      <form className={classes?.[COMPONENT_PART_KEY]} noValidate={noValidate ?? false} {...props}>
         {renderChild(node.children)}
       </form>
     );
@@ -880,11 +881,11 @@ export const HtmlH1Md = createMetadata({
 export const htmlH1TagRenderer = createComponentRenderer(
   "h1",
   HtmlH1Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h1">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h1">
         {renderChild(node.children)}
       </Heading>
     );
@@ -905,11 +906,11 @@ export const HtmlH2Md = createMetadata({
 export const htmlH2TagRenderer = createComponentRenderer(
   "h2",
   HtmlH2Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h2">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h2">
         {renderChild(node.children)}
       </Heading>
     );
@@ -930,11 +931,11 @@ export const HtmlH3Md = createMetadata({
 export const htmlH3TagRenderer = createComponentRenderer(
   "h3",
   HtmlH3Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h3">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h3">
         {renderChild(node.children)}
       </Heading>
     );
@@ -955,11 +956,11 @@ export const HtmlH4Md = createMetadata({
 export const htmlH4TagRenderer = createComponentRenderer(
   "h4",
   HtmlH4Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h4">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h4">
         {renderChild(node.children)}
       </Heading>
     );
@@ -980,11 +981,11 @@ export const HtmlH5Md = createMetadata({
 export const htmlH5TagRenderer = createComponentRenderer(
   "h5",
   HtmlH5Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h5">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h5">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1005,11 +1006,11 @@ export const HtmlH6Md = createMetadata({
 export const htmlH6TagRenderer = createComponentRenderer(
   "h6",
   HtmlH6Md,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Heading className={classnames(className, styles.htmlHeading)} {...props} level="h6">
+      <Heading className={classnames(classes?.[COMPONENT_PART_KEY], styles.htmlHeading)} {...props} level="h6">
         {renderChild(node.children)}
       </Heading>
     );
@@ -1025,11 +1026,11 @@ export const HtmlHeaderMd = createMetadata({
 export const htmlHeaderTagRenderer = createComponentRenderer(
   "header",
   HtmlHeaderMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <header className={className} {...props}>
+      <header className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </header>
     );
@@ -1045,11 +1046,11 @@ export const HtmlHrMd = createMetadata({
 export const htmlHrTagRenderer = createComponentRenderer(
   "hr",
   HtmlHrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <hr className={className} {...props}>
+      <hr className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </hr>
     );
@@ -1065,11 +1066,11 @@ export const HtmlIMd = createMetadata({
 export const htmlITagRenderer = createComponentRenderer(
   "i",
   HtmlIMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <i className={className} {...props}>
+      <i className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </i>
     );
@@ -1097,13 +1098,13 @@ export const HtmlIframeMd = createMetadata({
 export const htmlIframeTagRenderer = createComponentRenderer(
   "iframe",
   HtmlIframeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const { allowFullScreen } = p.asOptionalBoolean("allowFullScreen");
     const props = p.asRest();
     return (
-      <iframe className={className} src={src} allowFullScreen={allowFullScreen ?? false} {...props}>
+      <iframe className={classes?.[COMPONENT_PART_KEY]} src={src} allowFullScreen={allowFullScreen ?? false} {...props}>
         {renderChild(node.children)}
       </iframe>
     );
@@ -1129,12 +1130,12 @@ export const HtmlImgMd = createMetadata({
 export const htmlImgTagRenderer = createComponentRenderer(
   "img",
   HtmlImgMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const props = p.asRest() as Record<string, any>;
     return (
-      <img className={className} src={src} {...props}>
+      <img className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
         {renderChild(node.children)}
       </img>
     );
@@ -1173,7 +1174,7 @@ export const HtmlInputMd = createMetadata({
 export const htmlInputTagRenderer = createComponentRenderer(
   "input",
   HtmlInputMd,
-  ({ node, extractValue, extractResourceUrl, className }) => {
+  ({ node, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { autoFocus, checked, disabled, readOnly, required, multiple } = p.asOptionalBoolean(
       "autoFocus",
@@ -1187,7 +1188,7 @@ export const htmlInputTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <input
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         autoFocus={autoFocus ?? false}
         checked={checked ?? false}
         disabled={disabled ?? false}
@@ -1214,11 +1215,11 @@ export const HtmlInsMd = createMetadata({
 export const htmlInsTagRenderer = createComponentRenderer(
   "ins",
   HtmlInsMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="inserted">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="inserted">
         {renderChild(node.children)}
       </Text>
     );
@@ -1234,11 +1235,11 @@ export const HtmlKbdMd = createMetadata({
 export const htmlKbdTagRenderer = createComponentRenderer(
   "kbd",
   HtmlKbdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="keyboard">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="keyboard">
         {renderChild(node.children)}
       </Text>
     );
@@ -1257,11 +1258,11 @@ export const HtmlLabelMd = createMetadata({
 export const htmlLabelTagRenderer = createComponentRenderer(
   "label",
   HtmlLabelMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <label className={className} {...props}>
+      <label className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </label>
     );
@@ -1277,11 +1278,11 @@ export const HtmlLegendMd = createMetadata({
 export const htmlLegendTagRenderer = createComponentRenderer(
   "legend",
   HtmlLegendMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <legend className={className} {...props}>
+      <legend className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </legend>
     );
@@ -1304,12 +1305,12 @@ export const HtmlLiMd = createMetadata({
 export const htmlLiTagRenderer = createComponentRenderer(
   "li",
   HtmlLiMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { value } = p.asOptionalNumber("value");
     const props = p.asRest();
     return (
-      <li className={className} value={value} {...props}>
+      <li className={classes?.[COMPONENT_PART_KEY]} value={value} {...props}>
         {renderChild(node.children)}
       </li>
     );
@@ -1325,11 +1326,11 @@ export const HtmlMainMd = createMetadata({
 export const htmlMainTagRenderer = createComponentRenderer(
   "main",
   HtmlMainMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <main className={className} {...props}>
+      <main className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </main>
     );
@@ -1348,11 +1349,11 @@ export const HtmlMapMd = createMetadata({
 export const htmlMapTagRenderer = createComponentRenderer(
   "map",
   HtmlMapMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <map className={className} {...props}>
+      <map className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </map>
     );
@@ -1368,11 +1369,11 @@ export const HtmlMarkMd = createMetadata({
 export const htmlMarkTagRenderer = createComponentRenderer(
   "mark",
   HtmlMarkMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="marked">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="marked">
         {renderChild(node.children)}
       </Text>
     );
@@ -1391,11 +1392,11 @@ export const HtmlMenuMd = createMetadata({
 export const htmlMenuTagRenderer = createComponentRenderer(
   "menu",
   HtmlMenuMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <menu className={className} {...props}>
+      <menu className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </menu>
     );
@@ -1419,12 +1420,12 @@ export const HtmlMeterMd = createMetadata({
 export const htmlMeterTagRenderer = createComponentRenderer(
   "meter",
   HtmlMeterMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const numberProps = p.asOptionalNumber("value", "min", "max", "low", "high", "optimum");
     const props = p.asRest();
     return (
-      <meter className={className} {...numberProps} {...props}>
+      <meter className={classes?.[COMPONENT_PART_KEY]} {...numberProps} {...props}>
         {renderChild(node.children)}
       </meter>
     );
@@ -1440,11 +1441,11 @@ export const HtmlNavMd = createMetadata({
 export const htmlNavTagRenderer = createComponentRenderer(
   "nav",
   HtmlNavMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <nav className={className} {...props}>
+      <nav className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </nav>
     );
@@ -1468,11 +1469,11 @@ export const HtmlObjectMd = createMetadata({
 export const htmlObjectTagRenderer = createComponentRenderer(
   "object",
   HtmlObjectMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <object className={className} {...props}>
+      <object className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </object>
     );
@@ -1493,11 +1494,11 @@ export const HtmlOlMd = createMetadata({
 export const htmlOlTagRenderer = createComponentRenderer(
   "ol",
   HtmlOlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <ol className={classnames(styles.htmlOl, className)} {...props}>
+      <ol className={classnames(styles.htmlOl, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </ol>
     );
@@ -1517,12 +1518,12 @@ export const HtmlOptgroupMd = createMetadata({
 export const htmlOptgroupTagRenderer = createComponentRenderer(
   "optgroup",
   HtmlOptgroupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { disabled } = p.asOptionalBoolean("disabled");
     const props = p.asRest();
     return (
-      <optgroup className={className} disabled={disabled ?? false} {...props}>
+      <optgroup className={classes?.[COMPONENT_PART_KEY]} disabled={disabled ?? false} {...props}>
         {renderChild(node.children)}
       </optgroup>
     );
@@ -1544,13 +1545,13 @@ export const HtmlOptionMd = createMetadata({
 export const htmlOptionTagRenderer = createComponentRenderer(
   "option",
   HtmlOptionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { disabled, selected } = p.asOptionalBoolean("disabled", "selected");
     const props = p.asRest();
     return (
       <option
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         disabled={disabled ?? false}
         selected={selected ?? false}
         {...props}
@@ -1575,11 +1576,11 @@ export const HtmlOutputMd = createMetadata({
 export const htmlOutputTagRenderer = createComponentRenderer(
   "output",
   HtmlOutputMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <output className={className} {...props}>
+      <output className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </output>
     );
@@ -1595,11 +1596,11 @@ export const HtmlPMd = createMetadata({
 export const htmlPTagRenderer = createComponentRenderer(
   "p",
   HtmlPMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="paragraph">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="paragraph">
         {renderChild(node.children)}
       </Text>
     );
@@ -1619,11 +1620,11 @@ export const HtmlParamMd = createMetadata({
 export const htmlParamTagRenderer = createComponentRenderer(
   "param",
   HtmlParamMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <param className={className} {...props}>
+      <param className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </param>
     );
@@ -1639,11 +1640,11 @@ export const HtmlPictureMd = createMetadata({
 export const htmlPictureTagRenderer = createComponentRenderer(
   "picture",
   HtmlPictureMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <picture className={className} {...props}>
+      <picture className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </picture>
     );
@@ -1659,11 +1660,11 @@ export const HtmlPreMd = createMetadata({
 export const htmlPreTagRenderer = createComponentRenderer(
   "pre",
   HtmlPreMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="codefence">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="codefence">
         {renderChild(node.children)}
       </Text>
     );
@@ -1683,12 +1684,12 @@ export const HtmlProgressMd = createMetadata({
 export const htmlProgressTagRenderer = createComponentRenderer(
   "progress",
   HtmlProgressMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const numberProps = p.asOptionalNumber("max", "value");
     const props = p.asRest();
     return (
-      <progress className={className} {...numberProps} {...props}>
+      <progress className={classes?.[COMPONENT_PART_KEY]} {...numberProps} {...props}>
         {renderChild(node.children)}
       </progress>
     );
@@ -1707,11 +1708,11 @@ export const HtmlQMd = createMetadata({
 export const htmlQTagRenderer = createComponentRenderer(
   "q",
   HtmlQMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <q className={className} {...props}>
+      <q className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </q>
     );
@@ -1727,11 +1728,11 @@ export const HtmlRpMd = createMetadata({
 export const htmlRpTagRenderer = createComponentRenderer(
   "rp",
   HtmlRpMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <rp className={className} {...props}>
+      <rp className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </rp>
     );
@@ -1747,11 +1748,11 @@ export const HtmlRtMd = createMetadata({
 export const htmlRtTagRenderer = createComponentRenderer(
   "rt",
   HtmlRtMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <rt className={className} {...props}>
+      <rt className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </rt>
     );
@@ -1767,11 +1768,11 @@ export const HtmlRubyMd = createMetadata({
 export const htmlRubyTagRenderer = createComponentRenderer(
   "ruby",
   HtmlRubyMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <ruby className={className} {...props}>
+      <ruby className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </ruby>
     );
@@ -1787,11 +1788,11 @@ export const HtmlSMd = createMetadata({
 export const htmlSTagRenderer = createComponentRenderer(
   "s",
   HtmlSMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <s className={className} {...props}>
+      <s className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </s>
     );
@@ -1807,11 +1808,11 @@ export const HtmlSampMd = createMetadata({
 export const htmlSampTagRenderer = createComponentRenderer(
   "samp",
   HtmlSampMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="sample">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sample">
         {renderChild(node.children)}
       </Text>
     );
@@ -1827,11 +1828,11 @@ export const HtmlSectionMd = createMetadata({
 export const htmlSectionTagRenderer = createComponentRenderer(
   "section",
   HtmlSectionMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <section className={className} {...props}>
+      <section className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </section>
     );
@@ -1856,7 +1857,7 @@ export const HtmlSelectMd = createMetadata({
 export const htmlSelectTagRenderer = createComponentRenderer(
   "select",
   HtmlSelectMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { autoFocus, disabled, multiple, required } = p.asOptionalBoolean(
       "autoFocus",
@@ -1868,7 +1869,7 @@ export const htmlSelectTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <select
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         autoFocus={autoFocus ?? false}
         disabled={disabled ?? false}
         multiple={multiple ?? false}
@@ -1891,11 +1892,11 @@ export const HtmlSmallMd = createMetadata({
 export const htmlSmallTagRenderer = createComponentRenderer(
   "small",
   HtmlSmallMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="small">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="small">
         {renderChild(node.children)}
       </Text>
     );
@@ -1918,12 +1919,12 @@ export const HtmlSourceMd = createMetadata({
 export const htmlSourceTagRenderer = createComponentRenderer(
   "source",
   HtmlSourceMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const props = p.asRest();
     return (
-      <source className={className} src={src} {...props}>
+      <source className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
         {renderChild(node.children)}
       </source>
     );
@@ -1939,11 +1940,11 @@ export const HtmlSpanMd = createMetadata({
 export const htmlSpanTagRenderer = createComponentRenderer(
   "span",
   HtmlSpanMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <span className={className} {...props}>
+      <span className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </span>
     );
@@ -1959,11 +1960,11 @@ export const HtmlStrongMd = createMetadata({
 export const htmlStrongTagRenderer = createComponentRenderer(
   "strong",
   HtmlStrongMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="strong">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="strong">
         {renderChild(node.children)}
       </Text>
     );
@@ -1979,11 +1980,11 @@ export const HtmlSubMd = createMetadata({
 export const htmlSubTagRenderer = createComponentRenderer(
   "sub",
   HtmlSubMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="sub">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sub">
         {renderChild(node.children)}
       </Text>
     );
@@ -1999,11 +2000,11 @@ export const HtmlSummaryMd = createMetadata({
 export const htmlSummaryTagRenderer = createComponentRenderer(
   "summary",
   HtmlSummaryMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <summary className={className} {...props}>
+      <summary className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </summary>
     );
@@ -2019,11 +2020,11 @@ export const HtmlSupMd = createMetadata({
 export const htmlSupTagRenderer = createComponentRenderer(
   "sup",
   HtmlSupMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="sup">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="sup">
         {renderChild(node.children)}
       </Text>
     );
@@ -2056,11 +2057,11 @@ export const HtmlTableMd = createMetadata({
 export const htmlTableTagRenderer = createComponentRenderer(
   "table",
   HtmlTableMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <table className={classnames(styles.htmlTable, className)} {...props}>
+      <table className={classnames(styles.htmlTable, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </table>
     );
@@ -2077,11 +2078,11 @@ export const HtmlTbodyMd = createMetadata({
 export const htmlTbodyTagRenderer = createComponentRenderer(
   "tbody",
   HtmlTbodyMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <tbody className={classnames(styles.htmlTbody, className)} {...props}>
+      <tbody className={classnames(styles.htmlTbody, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </tbody>
     );
@@ -2113,11 +2114,11 @@ export const HtmlTdMd = createMetadata({
 export const htmlTdTagRenderer = createComponentRenderer(
   "td",
   HtmlTdMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <td className={classnames(styles.htmlTd, className)} {...props}>
+      <td className={classnames(styles.htmlTd, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </td>
     );
@@ -2133,11 +2134,11 @@ export const HtmlTemplateMd = createMetadata({
 export const htmlTemplateTagRenderer = createComponentRenderer(
   "template",
   HtmlTemplateMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <template className={className} {...props}>
+      <template className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </template>
     );
@@ -2169,7 +2170,7 @@ export const HtmlTextareaMd = createMetadata({
 export const htmlTextareaTagRenderer = createComponentRenderer(
   "textarea",
   HtmlTextareaMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { autoFocus, disabled, readOnly, required } = p.asOptionalBoolean(
       "autoFocus",
@@ -2181,7 +2182,7 @@ export const htmlTextareaTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <textarea
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         autoFocus={autoFocus ?? false}
         disabled={disabled ?? false}
         readOnly={readOnly ?? false}
@@ -2205,11 +2206,11 @@ export const HtmlTfootMd = createMetadata({
 export const htmlTfootTagRenderer = createComponentRenderer(
   "tfoot",
   HtmlTfootMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <tfoot className={classnames(styles.htmlTfoot, className)} {...props}>
+      <tfoot className={classnames(styles.htmlTfoot, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </tfoot>
     );
@@ -2242,11 +2243,11 @@ export const HtmlThMd = createMetadata({
 export const htmlThTagRenderer = createComponentRenderer(
   "th",
   HtmlThMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <th className={classnames(styles.htmlTh, className)} {...props}>
+      <th className={classnames(styles.htmlTh, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </th>
     );
@@ -2268,11 +2269,11 @@ export const HtmlTheadMd = createMetadata({
 export const htmlTheadTagRenderer = createComponentRenderer(
   "thead",
   HtmlTheadMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <thead className={classnames(styles.htmlThead, className)} {...props}>
+      <thead className={classnames(styles.htmlThead, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </thead>
     );
@@ -2291,11 +2292,11 @@ export const HtmlTimeMd = createMetadata({
 export const htmlTimeTagRenderer = createComponentRenderer(
   "time",
   HtmlTimeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <time className={className} {...props}>
+      <time className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </time>
     );
@@ -2317,11 +2318,11 @@ export const HtmlTrMd = createMetadata({
 export const htmlTrTagRenderer = createComponentRenderer(
   "tr",
   HtmlTrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <tr className={classnames(styles.htmlTr, className)} {...props}>
+      <tr className={classnames(styles.htmlTr, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </tr>
     );
@@ -2344,13 +2345,13 @@ export const HtmlTrackMd = createMetadata({
 export const htmlTrackTagRenderer = createComponentRenderer(
   "track",
   HtmlTrackMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const { default: defaultProp } = p.asOptionalBoolean("default");
     const props = p.asRest();
     return (
-      <track className={className} default={defaultProp ?? false} src={src} {...props}>
+      <track className={classes?.[COMPONENT_PART_KEY]} default={defaultProp ?? false} src={src} {...props}>
         {renderChild(node.children)}
       </track>
     );
@@ -2366,11 +2367,11 @@ export const HtmlUMd = createMetadata({
 export const htmlUTagRenderer = createComponentRenderer(
   "u",
   HtmlUMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <u className={className} {...props}>
+      <u className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </u>
     );
@@ -2391,11 +2392,11 @@ export const HtmlUlMd = createMetadata({
 export const htmlUlTagRenderer = createComponentRenderer(
   "ul",
   HtmlUlMd, // Use HtmlOlMd instead of HtmlListMd
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <ul className={classnames(styles.htmlUl, className)} {...props}>
+      <ul className={classnames(styles.htmlUl, classes?.[COMPONENT_PART_KEY])} {...props}>
         {renderChild(node.children)}
       </ul>
     );
@@ -2411,11 +2412,11 @@ export const HtmlVarMd = createMetadata({
 export const htmlVarTagRenderer = createComponentRenderer(
   "var",
   HtmlCodeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <Text className={className} {...props} variant="var">
+      <Text className={classes?.[COMPONENT_PART_KEY]} {...props} variant="var">
         {renderChild(node.children)}
       </Text>
     );
@@ -2449,7 +2450,7 @@ export const HtmlVideoMd = createMetadata({
 export const htmlVideoTagRenderer = createComponentRenderer(
   "video",
   HtmlVideoMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const { autoPlay, controls, loop, muted } = p.asOptionalBoolean(
@@ -2461,7 +2462,7 @@ export const htmlVideoTagRenderer = createComponentRenderer(
     const props = p.asRest();
     return (
       <video
-        className={className}
+        className={classes?.[COMPONENT_PART_KEY]}
         src={src}
         autoPlay={autoPlay ?? false}
         controls={controls ?? false}
@@ -2484,11 +2485,11 @@ export const HtmlWbrMd = createMetadata({
 export const htmlWbrTagRenderer = createComponentRenderer(
   "wbr",
   HtmlWbrMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, className }) => {
+  ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
     return (
-      <wbr className={className} {...props}>
+      <wbr className={classes?.[COMPONENT_PART_KEY]} {...props}>
         {renderChild(node.children)}
       </wbr>
     );

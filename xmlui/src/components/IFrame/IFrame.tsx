@@ -1,7 +1,7 @@
 import styles from "./IFrame.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
 import { IFrame } from "./IFrameNative";
 
@@ -82,22 +82,8 @@ export const IFrameMd = createMetadata({
   },
 });
 
-export const iframeComponentRenderer = createComponentRenderer(
-  COMP,
-  IFrameMd,
-  ({ node, extractValue, className, extractResourceUrl, lookupEventHandler, registerComponentApi }) => {
-    return (
-      <IFrame
-        src={extractResourceUrl(node.props.src)}
-        srcdoc={extractValue.asOptionalString(node.props.srcdoc)}
-        allow={extractValue.asOptionalString(node.props.allow)}
-        name={extractValue.asOptionalString(node.props.name)}
-        referrerPolicy={extractValue.asOptionalString(node.props.referrerPolicy) as any}
-        sandbox={extractValue.asOptionalString(node.props.sandbox)}
-        className={className}
-        onLoad={lookupEventHandler("load")}
-        registerComponentApi={registerComponentApi}
-      />
-    );
-  },
-);
+export const iframeComponentRenderer = wrapComponent(COMP, IFrame, IFrameMd, {
+  resourceUrls: ["src"],
+  strings: ["srcdoc", "allow", "name", "referrerPolicy", "sandbox"],
+  exposeRegisterApi: true,
+});

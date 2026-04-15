@@ -1,4 +1,5 @@
 import React, { forwardRef, isValidElement, useMemo } from "react";
+import type { LayoutContext } from "../abstractions/RendererDefs";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ComponentDef } from "../abstractions/ComponentDefs";
@@ -10,14 +11,18 @@ import { isArrowExpressionObject } from "../abstractions/InternalMarkers";
 import { useEvent } from "./utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
-import { EMPTY_ARRAY } from "./constants";
 import { mergeProps } from "./utils/mergeProps";
+import { layoutOptionKeys } from "./descriptorHelper";
+
+// Tracks component types that have already emitted the layout-forward warning
+// so the warning fires only once per type (development builds only).
+const warnedLayoutForwardTypes = new Set<string>();
 
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
   compound: ComponentDef;
   // The API of the compound component
-  api?: Record<string, string>;
+  api?: Record<string, any>;
   scriptCollected?: CollectedDeclarations;
 } & RendererContext;
 
@@ -43,6 +48,9 @@ export const CompoundComponent = forwardRef(
       lookupAction,
       contextVars, // Extract contextVars to prevent it from being passed to DOM elements
       globalVars,
+      // Strip XMLUI-internal props that must never be forwarded to inner DOM elements
+      logInteraction: _logInteraction,
+      classes: _classes,
       ...restProps
     }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,
@@ -69,11 +77,13 @@ export const CompoundComponent = forwardRef(
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
-      
+
       // Extract global variable keys from globalVars to set as 'uses'
       // This ensures the compound component only inherits globals, not parent's local vars
-      const globalKeys = globalVars ? Object.keys(globalVars).filter(k => !k.startsWith('__')) : undefined;
-      
+      const globalKeys = globalVars
+        ? Object.keys(globalVars).filter((k) => !k.startsWith("__"))
+        : undefined;
+
       return {
         type: "Container",
         api,
@@ -158,18 +168,40 @@ export const CompoundComponent = forwardRef(
       };
     }, [hasTemplateProps, node.children, node.props, renderChild]);
 
-    //we remove the wrapChild prop from layout context, because that wrapping already happened for the compound component instance
-    const safeLayoutContext = layoutContext
-      ? { ...layoutContext, wrapChild: undefined }
-      : layoutContext;
+    // Remove the wrapChild prop from layout context, because that wrapping already happened
+    // for the compound component instance. When the compound component has a layout className
+    // (e.g. width="200px"), pass it as extraClassName so ComponentAdapter of the single root
+    // child can include it in its own className — making layout props flow automatically.
+    const extraClassName = restProps.className;
+    const safeLayoutContext: LayoutContext | undefined = extraClassName
+      ? { ...(layoutContext ?? {}), wrapChild: undefined, extraClassName }
+      : layoutContext
+        ? { ...layoutContext, wrapChild: undefined }
+        : layoutContext;
     const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, memoedParentRenderContext);
+
+    // Development warning: layout props on the call site cannot be forwarded when the
+    // compound component's template produces multiple root children.
+    // The parser wraps multiple root children in a synthetic "Fragment" node,
+    // so compound.type === "Fragment" reliably indicates this case.
+    if (process.env.NODE_ENV !== "production" && extraClassName) {
+      if (compound.type === "Fragment") {
+        const usedLayoutProps = layoutOptionKeys.filter((key) => key in node.props);
+        if (usedLayoutProps.length > 0 && !warnedLayoutForwardTypes.has(node.type)) {
+          warnedLayoutForwardTypes.add(node.type);
+          console.warn(
+            `[XMLUI] Component '${node.type}' has layout props (${usedLayoutProps.join(", ")}) ` +
+              `but its template has multiple root children — layout props cannot be forwarded. ` +
+              `Wrap the template content in a single root element to enable layout forwarding.`,
+          );
+        }
+      }
+    }
+
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),
-        ...mergeProps(
-          ret.props,
-          restProps
-        ),
+        ...mergeProps(ret.props, restProps),
       } as any);
     }
     return React.isValidElement(ret) ? ret : <>{ret}</>;

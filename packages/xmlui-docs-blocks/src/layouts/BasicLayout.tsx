@@ -1,9 +1,9 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./BasicLayout.xmlui";
 
 const COMP = "BasicLayout";
 
-export const BasicLayoutMd = createMetadata({
+export const BasicLayoutMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "A generic list layout for blog or documentation posts.",
   props: {

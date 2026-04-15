@@ -15,24 +15,24 @@ $themeVars: t.composePaddingVars($themeVars, $componentName);
 $themeVars: t.composePaddingVars($themeVars, "item-#{$componentName}");
 
 // Variables for default variant
-$borderRadius-Select--default: createThemeVar("Input:borderRadius-#{$componentName}--default");
-$borderColor-Select--default: createThemeVar("Input:borderColor-#{$componentName}--default");
-$borderWidth-Select--default: createThemeVar("Input:borderWidth-#{$componentName}--default");
-$borderStyle-Select--default: createThemeVar("Input:borderStyle-#{$componentName}--default");
-$fontSize-Select--default: createThemeVar("Input:fontSize-#{$componentName}--default");
-$backgroundColor-Select--default: createThemeVar("Input:backgroundColor-#{$componentName}--default");
-$boxShadow-Select--default: createThemeVar("Input:boxShadow-#{$componentName}--default");
-$textColor-Select--default: createThemeVar("Input:textColor-#{$componentName}--default");
-$borderColor-Select--default--hover: createThemeVar("Input:borderColor-#{$componentName}--default--hover");
-$backgroundColor-Select--default--hover: createThemeVar("Input:backgroundColor-#{$componentName}--default--hover");
-$boxShadow-Select--default--hover: createThemeVar("Input:boxShadow-#{$componentName}--default--hover");
-$textColor-Select--default--hover: createThemeVar("Input:textColor-#{$componentName}--default--hover");
-$outlineWidth-Select--default--focus: createThemeVar("Input:outlineWidth-#{$componentName}--default--focus");
-$outlineColor-Select--default--focus: createThemeVar("Input:outlineColor-#{$componentName}--default--focus");
-$outlineStyle-Select--default--focus: createThemeVar("Input:outlineStyle-#{$componentName}--default--focus");
-$outlineOffset-Select--default--focus: createThemeVar("Input:outlineOffset-#{$componentName}--default--focus");
-$textColor-placeholder-Select--default: createThemeVar("Input:textColor-placeholder-#{$componentName}--default");
-$fontSize-placeholder-Select--default: createThemeVar("Input:fontSize-placeholder-#{$componentName}--default");
+$borderRadius-Select: createThemeVar("Input:borderRadius-#{$componentName}");
+$borderColor-Select: createThemeVar("Input:borderColor-#{$componentName}");
+$borderWidth-Select: createThemeVar("Input:borderWidth-#{$componentName}");
+$borderStyle-Select: createThemeVar("Input:borderStyle-#{$componentName}");
+$fontSize-Select: createThemeVar("Input:fontSize-#{$componentName}");
+$backgroundColor-Select: createThemeVar("Input:backgroundColor-#{$componentName}");
+$boxShadow-Select: createThemeVar("Input:boxShadow-#{$componentName}");
+$textColor-Select: createThemeVar("Input:textColor-#{$componentName}");
+$borderColor-Select--hover: createThemeVar("Input:borderColor-#{$componentName}--hover");
+$backgroundColor-Select--hover: createThemeVar("Input:backgroundColor-#{$componentName}--hover");
+$boxShadow-Select--hover: createThemeVar("Input:boxShadow-#{$componentName}--hover");
+$textColor-Select--hover: createThemeVar("Input:textColor-#{$componentName}--hover");
+$outlineWidth-Select--focus: createThemeVar("Input:outlineWidth-#{$componentName}--focus");
+$outlineColor-Select--focus: createThemeVar("Input:outlineColor-#{$componentName}--focus");
+$outlineStyle-Select--focus: createThemeVar("Input:outlineStyle-#{$componentName}--focus");
+$outlineOffset-Select--focus: createThemeVar("Input:outlineOffset-#{$componentName}--focus");
+$textColor-placeholder-Select: createThemeVar("Input:textColor-placeholder-#{$componentName}");
+$fontSize-placeholder-Select: createThemeVar("Input:fontSize-placeholder-#{$componentName}");
 
 // Variables for error variant
 $borderRadius-Select--error: createThemeVar("Input:borderRadius-#{$componentName}--error");
@@ -125,38 +125,40 @@ $textColor-item-Select--disabled: createThemeVar("textColor-item-#{$componentNam
 $opacity-text-item-Select--disabled: createThemeVar("opacity-text-item-#{$componentName}--disabled");
 $textColor-indicator-Select: createThemeVar("textColor-indicator-#{$componentName}");
 $minHeight-Select: createThemeVar("minHeight-#{$componentName}");
+$minWidth-Select: createThemeVar("minWidth-#{$componentName}");
 $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
-  border-radius: createThemeVar("Input:borderRadius-#{$componentName}--#{$variantName}");
-  border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}");
-  border-width: createThemeVar("Input:borderWidth-#{$componentName}--#{$variantName}");
-  border-style: createThemeVar("Input:borderStyle-#{$componentName}--#{$variantName}");
-  font-size: createThemeVar("Input:fontSize-#{$componentName}--#{$variantName}");
-  background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}");
-  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}");
-  color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}");
+  $suffix: if($variantName != "", "--#{$variantName}", "");
+  border-radius: createThemeVar("Input:borderRadius-#{$componentName}#{$suffix}");
+  border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}");
+  border-width: createThemeVar("Input:borderWidth-#{$componentName}#{$suffix}");
+  border-style: createThemeVar("Input:borderStyle-#{$componentName}#{$suffix}");
+  font-size: createThemeVar("Input:fontSize-#{$componentName}#{$suffix}");
+  background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}");
+  box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}");
+  color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}");
 
   &:not(:disabled) {
     &:hover {
-      border-color: createThemeVar("Input:borderColor-#{$componentName}--#{$variantName}--hover");
-      background-color: createThemeVar("Input:backgroundColor-#{$componentName}--#{$variantName}--hover");
-      box-shadow: createThemeVar("Input:boxShadow-#{$componentName}--#{$variantName}--hover");
-      color: createThemeVar("Input:textColor-#{$componentName}--#{$variantName}--hover");
+      border-color: createThemeVar("Input:borderColor-#{$componentName}#{$suffix}--hover");
+      background-color: createThemeVar("Input:backgroundColor-#{$componentName}#{$suffix}--hover");
+      box-shadow: createThemeVar("Input:boxShadow-#{$componentName}#{$suffix}--hover");
+      color: createThemeVar("Input:textColor-#{$componentName}#{$suffix}--hover");
     }
 
     &:focus-visible {
-      outline-width: createThemeVar('Input:outlineWidth-#{$componentName}--#{$variantName}--focus');
-      outline-color: createThemeVar('Input:outlineColor-#{$componentName}--#{$variantName}--focus');
-      outline-style: createThemeVar('Input:outlineStyle-#{$componentName}--#{$variantName}--focus');
-      outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}--#{$variantName}--focus');
+      outline-width: createThemeVar('Input:outlineWidth-#{$componentName}#{$suffix}--focus');
+      outline-color: createThemeVar('Input:outlineColor-#{$componentName}#{$suffix}--focus');
+      outline-style: createThemeVar('Input:outlineStyle-#{$componentName}#{$suffix}--focus');
+      outline-offset: createThemeVar('Input:outlineOffset-#{$componentName}#{$suffix}--focus');
     }
   }
 
   &::placeholder {
-    color: createThemeVar("Input:textColor-placeholder-#{$componentName}--#{$variantName}");
-    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}--#{$variantName}");
+    color: createThemeVar("Input:textColor-placeholder-#{$componentName}#{$suffix}");
+    font-size: createThemeVar("Input:fontSize-placeholder-#{$componentName}#{$suffix}");
   }
 }
 
@@ -177,9 +179,10 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     align-items: center;
     flex-wrap: wrap;
     min-height: $minHeight-Select;
+    min-width: $minWidth-Select;
     @include t.paddingVars($themeVars, $componentName);
 
-    @include variant("default");
+    @include variant("");
 
     &.error {
       @include variant("error");
@@ -314,7 +317,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     box-shadow: $boxShadow-menu-Select;
     border: $borderWidth-menu-Select solid $borderColor-menu-Select;
     // Apply default variant fontSize (dropdown is portaled so needs explicit fontSize)
-    font-size: $fontSize-Select--default;
+    font-size: $fontSize-Select;
     
     // Apply variant-specific fontSize for dropdown
     &.error {
@@ -448,7 +451,9 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     position: relative;
     width: 100%;
     max-height: 280px;
-    overflow: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
     background-color: $backgroundColor-menu-Select;
     border-radius: $borderRadius-menu-Select;
     box-shadow: $boxShadow-menu-Select;
@@ -484,8 +489,8 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
   }
 
   .selectViewport {
-    height: fit-content;
     width: 100%;
+    min-height: 0;
   }
 
   .selectScrollUpButton {
@@ -495,6 +500,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     justify-content: center;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    flex-shrink: 0;
   }
 
   .selectScrollDownButton {
@@ -504,6 +510,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     justify-content: center;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
+    flex-shrink: 0;
   }
 
   .selectEmpty {

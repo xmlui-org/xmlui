@@ -17,9 +17,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -396,6 +396,7 @@ You can query the component's value. If no value is set, it will retrieve `undef
 The component has some parts that can be styled through layout properties and theme variables separately:
 
 - **`clearButton`**: The button to clear the date input.
+- **`conciseValidationFeedback`**: The concise validation feedback indicator shown when verboseValidationFeedback is false.
 - **`day`**: The day input field.
 - **`month`**: The month input field.
 - **`year`**: The year input field.
@@ -407,13 +408,13 @@ The component has some parts that can be styled through layout properties and th
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--default | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput | $backgroundColor | $backgroundColor |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--focus | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--focus | *none* | *none* |
@@ -428,13 +429,13 @@ The component has some parts that can be styled through layout properties and th
 | [borderBottomStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderBottomWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--hover | *none* | *none* |
@@ -452,7 +453,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderLeftStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-button-DateInput | $borderRadius | $borderRadius |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput--warning | *none* | *none* |
@@ -464,7 +465,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput | *none* | *none* |
 | [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-DateInput | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput--warning | *none* | *none* |
@@ -477,34 +478,33 @@ The component has some parts that can be styled through layout properties and th
 | [borderVerticalStyle](/docs/styles-and-themes/common-units/#border-style)-DateInput | *none* | *none* |
 | [borderVerticalWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--warning | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--default | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--default--focus | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--error--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--success--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--success--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--warning--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-DateInput--warning--hover | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-DateInput--default | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-adornment-DateInput | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-DateInput--error | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-DateInput--success | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-DateInput--warning | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-divider-DateInput | $textColor-secondary | $textColor-secondary |
 | disabledColor-button-DateInput | $textColor-disabled | $textColor-disabled |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-DateInput--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-DateInput--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-DateInput--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-DateInput--warning | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-DateInput | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-DateInput--default | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-DateInput--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-DateInput--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-DateInput--warning | *none* | *none* |
@@ -514,22 +514,22 @@ The component has some parts that can be styled through layout properties and th
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-input-DateInput | 0.54em | 0.54em |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-DateInput--disabled | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-button-DateInput--focused | $color-accent-500 | $color-accent-500 |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-DateInput--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-DateInput--warning--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-button-DateInput--focused | 2px | 2px |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DateInput--default--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DateInput--error--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DateInput--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DateInput--success--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-DateInput--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-DateInput--default--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-DateInput--error--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-DateInput--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-DateInput--success--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-DateInput--warning--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-button-DateInput--focused | 2px | 2px |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--default--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--error--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--success--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-DateInput--warning--focus | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-button-DateInput | 4px 6px | 4px 6px |
@@ -543,13 +543,13 @@ The component has some parts that can be styled through layout properties and th
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-DateInput | $space-2 | $space-2 |
 | spacing-divider-DateInput | 1px 0 | 1px 0 |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-input-DateInput | center | center |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--default | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--focus | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--default--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--disabled | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--error--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--focus | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-DateInput--success--hover | *none* | *none* |

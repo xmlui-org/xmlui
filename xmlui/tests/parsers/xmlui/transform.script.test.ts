@@ -2,11 +2,19 @@ import { assert, describe, expect, it } from "vitest";
 import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import {
   type Expression,
+  type MemberAccessExpression,
+  type CalculatedMemberAccessExpression,
+  type Identifier,
+  type Literal,
   type ModuleErrors,
   T_ARROW_EXPRESSION,
   T_BINARY_EXPRESSION,
   T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_IDENTIFIER,
 } from "../../../src/components-core/script-runner/ScriptingSourceTree";
+import { PARSED_MARK_PROP } from "../../../src/abstractions/InternalMarkers";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - script", () => {
@@ -308,5 +316,144 @@ var b = 2;
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
     expect((textNode.props as any).value).equal("{uppercaseItem}");
+  });
+
+  // =========================================================================
+  // Var destructuring in XMLUI script blocks
+  // =========================================================================
+
+  it("Script collect - object destructuring", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var {name, age} = person;
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect("name" in collected.vars).equal(true);
+    expect("age" in collected.vars).equal(true);
+    expect(collected.vars.name[PARSED_MARK_PROP]).equal(true);
+    expect(collected.vars.age[PARSED_MARK_PROP]).equal(true);
+
+    // name's tree should be MemberAccessExpression
+    expect((collected.vars.name.tree as Expression).type).equal(T_MEMBER_ACCESS_EXPRESSION);
+    expect((collected.vars.age.tree as Expression).type).equal(T_MEMBER_ACCESS_EXPRESSION);
+  });
+
+  it("Script collect - array destructuring", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var [first, second] = items;
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect("first" in collected.vars).equal(true);
+    expect("second" in collected.vars).equal(true);
+    expect(collected.vars.first[PARSED_MARK_PROP]).equal(true);
+    expect(collected.vars.second[PARSED_MARK_PROP]).equal(true);
+
+    expect((collected.vars.first.tree as Expression).type).equal(T_CALCULATED_MEMBER_ACCESS_EXPRESSION);
+    expect((collected.vars.second.tree as Expression).type).equal(T_CALCULATED_MEMBER_ACCESS_EXPRESSION);
+  });
+
+  it("Script collect - object destructuring with alias", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var {x: xPos, y: yPos} = coords;
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect("xPos" in collected.vars).equal(true);
+    expect("yPos" in collected.vars).equal(true);
+    // Originals should not appear
+    expect("x" in collected.vars).equal(false);
+    expect("y" in collected.vars).equal(false);
+  });
+
+  it("Script collect - multiple destructuring with functions", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var {a, b} = source1;
+          function compute(x) { return x * 2; }
+          var [c, d] = source2;
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect(collected.hasInvalidStatements).equal(false);
+    expect("a" in collected.vars).equal(true);
+    expect("b" in collected.vars).equal(true);
+    expect("c" in collected.vars).equal(true);
+    expect("d" in collected.vars).equal(true);
+    expect("compute" in collected.functions).equal(true);
+  });
+
+  it("Script collect - destructuring mixed with simple vars", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var count = 0;
+          var {name, age} = person;
+          var label = "hello";
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect(collected.hasInvalidStatements).equal(false);
+    expect("count" in collected.vars).equal(true);
+    expect("name" in collected.vars).equal(true);
+    expect("age" in collected.vars).equal(true);
+    expect("label" in collected.vars).equal(true);
+
+    // Simple vars have direct expression trees
+    expect((collected.vars.count.tree as Expression).type).equal(T_LITERAL);
+    // Destructured vars have member access trees
+    expect((collected.vars.name.tree as Expression).type).equal(T_MEMBER_ACCESS_EXPRESSION);
+  });
+
+  it("Script collect - destructuring in Component", () => {
+    const cd = transformSource(`
+      <Component name="MyComp">
+        <script>
+          var {x, y} = getData();
+        </script>
+        <Stack/>
+      </Component>
+    `) as CompoundComponentDef;
+
+    const comp = cd.component as any;
+    expect(comp.script).toContain("var {x, y} = getData()");
+    const collected = comp.scriptCollected!;
+    expect("x" in collected.vars).equal(true);
+    expect("y" in collected.vars).equal(true);
+    expect(collected.vars.x[PARSED_MARK_PROP]).equal(true);
+    expect(collected.vars.y[PARSED_MARK_PROP]).equal(true);
+  });
+
+  it("Script collect - nested object destructuring", () => {
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          var {user: {name, email}} = response;
+        </script>
+      </Stack>
+    `) as ComponentDef;
+
+    const collected = cd.scriptCollected!;
+    expect("name" in collected.vars).equal(true);
+    expect("email" in collected.vars).equal(true);
+    // "user" is not a declared var — it's a nesting path
+    expect("user" in collected.vars).equal(false);
   });
 });

@@ -1,7 +1,10 @@
 import styles from "./Select.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import {
   dPlaceholder,
   dInitialValue,
@@ -84,6 +87,12 @@ export const SelectMd = createMetadata({
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
     ),
+    scrollIndicators: {
+      description:
+        "This property controls whether scroll indicator arrows are displayed at the top and bottom of the dropdown list when the content overflows.",
+      valueType: "boolean",
+      defaultValue: true,
+    },
     emptyListTemplate: dComponent(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
@@ -204,23 +213,71 @@ export const SelectMd = createMetadata({
     [`textColor-${COMP}--disabled`]: "$textColor--disabled",
     [`minHeight-${COMP}`]: "$space-7",
     [`minHeight-item-${COMP}`]: "$space-7",
+    [`minWidth-${COMP}`]: "$space-16",
   },
 });
 
-export const selectComponentRenderer = createComponentRenderer(
-  COMP,
-  SelectMd,
-  ({
-    node,
-    state,
-    updateState,
-    extractValue,
-    renderChild,
-    lookupEventHandler,
-    className,
-    registerComponentApi,
-    ...rest
-  }) => {
+type ThemedSelectProps = React.ComponentProps<typeof Select> & { className?: string };
+export const ThemedSelect = React.forwardRef<HTMLDivElement, ThemedSelectProps>(
+  function ThemedSelect({ className, ...props }: ThemedSelectProps, ref) {
+    const themeClass = useComponentThemeClass(SelectMd);
+    const combinedClassName = `${themeClass}${className ? ` ${className}` : ""}`;
+    return (
+      <Select
+        {...props}
+        className={combinedClassName}
+        contentClassName={combinedClassName}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
+  exposeRegisterApi: true,
+  stateful: true,
+  exclude: [
+    "multiSelect",
+    "searchable",
+    "clearable",
+    "value",
+    "initialValue",
+    "inProgress",
+    "inProgressNotificationMessage",
+    "readOnly",
+    "autoFocus",
+    "enabled",
+    "placeholder",
+    "validationStatus",
+    "emptyListTemplate",
+    "dropdownHeight",
+    "scrollIndicators",
+    "required",
+    "modal",
+    "groupBy",
+    "groupHeaderTemplate",
+    "ungroupedHeaderTemplate",
+    "valueTemplate",
+    "optionTemplate",
+    "optionLabelTemplate",
+    "verboseValidationFeedback",
+    "validationIconSuccess",
+    "validationIconError",
+  ],
+  events: [],
+  customRender(
+    _props,
+    {
+      node,
+      state,
+      updateState,
+      extractValue,
+      renderChild,
+      lookupEventHandler,
+      classes,
+      registerComponentApi,
+    },
+  ) {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
     const clearable = extractValue.asOptionalBoolean(node.props.clearable);
@@ -228,8 +285,10 @@ export const selectComponentRenderer = createComponentRenderer(
     const isControlled = node.props.value !== undefined;
     return (
       <Select
+        aria-label={_props["aria-label"]}
         multiSelect={multiSelect}
-        className={className}
+        classes={classes}
+        contentClassName={classes?.[COMPONENT_PART_KEY]}
         inProgress={extractValue.asOptionalBoolean(node.props.inProgress)}
         inProgressNotificationMessage={extractValue.asOptionalString(
           node.props.inProgressNotificationMessage,
@@ -250,10 +309,13 @@ export const selectComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
+        scrollIndicators={extractValue.asOptionalBoolean(node.props.scrollIndicators)}
         required={extractValue.asOptionalBoolean(node.props.required)}
         modal={extractValue.asOptionalBoolean(node.props.modal)}
         groupBy={extractValue(node.props.groupBy)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+        verboseValidationFeedback={extractValue.asOptionalBoolean(
+          node.props.verboseValidationFeedback,
+        )}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
         groupHeaderRenderer={
@@ -320,4 +382,4 @@ export const selectComponentRenderer = createComponentRenderer(
       </Select>
     );
   },
-);
+});

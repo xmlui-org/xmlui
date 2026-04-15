@@ -335,4 +335,61 @@ test.describe("Global variables", () => {
     await expect(page.getByTestId("incbGlobalText")).toHaveText("incbGlobal: 77");
     await expect(page.getByTestId("helloText")).toHaveText("Hello: 77");
   });
+
+  test("markup globals available in onInit", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App global.myDs="{'hello'}">
+        <Text testId="result" onInit="myDs = 'hey'">
+          Users: {myDs}
+        </Text>
+        <Button testId="btn" onClick="myDs = 'clicked'">
+          Say clicked
+        </Button>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    // onInit should have set myDs to 'hey'
+    await expect(page.getByTestId("result")).toHaveText("Users: hey");
+
+    // onClick should still work
+    await page.getByTestId("btn").click();
+    await expect(page.getByTestId("result")).toHaveText("Users: clicked");
+  });
+
+  test("markup globals with numeric value available in onInit", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App global.count="{0}">
+        <Text testId="result" onInit="count = 42">
+          Count: {count}
+        </Text>
+      </App>
+    `,
+      { noFragmentWrapper: true },
+    );
+
+    await expect(page.getByTestId("result")).toHaveText("Count: 42");
+  });
+
+  test("code-behind globals available in onInit", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App>
+        <Text testId="result" onInit="count = 99">
+          Count: {count}
+        </Text>
+      </App>
+    `,
+      {
+        mainXs: `
+      var count = 0;
+    `,
+      },
+    );
+
+    await expect(page.getByTestId("result")).toHaveText("Count: 99");
+  });
 });

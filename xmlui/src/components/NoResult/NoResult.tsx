@@ -1,6 +1,6 @@
 import styles from "./NoResult.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dLabel } from "../metadata-helpers";
 import { NoResult, defaultProps } from "./NoResultNative";
@@ -39,17 +39,13 @@ export const NoResultMd = createMetadata({
   },
 });
 
-export const noResultComponentRenderer = createComponentRenderer(
-  COMP,
-  NoResultMd,
-  ({ node, extractValue, className }) => {
-    return (
-      <NoResult
-        label={extractValue.asDisplayText(node.props.label || node.children || "No results found")}
-        icon={node.props.icon}
-        hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
-        className={className}
-      />
-    );
-  },
-);
+export const noResultComponentRenderer = wrapComponent(COMP, NoResult, NoResultMd, {
+  customRender: (_props, { node, extractValue, classes }) => (
+    <NoResult
+      label={extractValue.asDisplayText(node.props.label || node.children || "No results found")}
+      icon={node.props.icon}
+      hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
+      classes={classes}
+    />
+  ),
+});

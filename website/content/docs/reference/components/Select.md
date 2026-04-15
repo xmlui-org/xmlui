@@ -51,9 +51,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -505,11 +505,11 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-Select--hover | $backgroundColor-dropdown-item--hover | $backgroundColor-dropdown-item--hover |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $color-surface-raised | $color-surface-raised |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
@@ -528,12 +528,12 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-menu-Select | $borderColor | $borderColor |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $borderColor--disabled | $borderColor--disabled |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |
@@ -550,7 +550,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderLeftWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-Select | $borderRadius | $borderRadius |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select--warning | *none* | *none* |
@@ -562,7 +562,7 @@ The component has some parts that can be styled through layout properties and th
 | [borderStartEndRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderStartStartRadius](/docs/styles-and-themes/common-units/#border-rounding)-Select | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-Select--warning | *none* | *none* |
@@ -577,25 +577,25 @@ The component has some parts that can be styled through layout properties and th
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-Select | 1px | 1px |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-menu-Select | 1px | 1px |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-Select--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-Select | $boxShadow-md | $boxShadow-md |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--default | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--success--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-Select--warning--hover | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-Select--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-Select | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-Select--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-Select--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-Select--warning | *none* | *none* |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select--warning | *none* | *none* |
@@ -603,23 +603,20 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-item-Select | $space-7 | $space-7 |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-Select | $space-7 | $space-7 |
+| [minWidth](/docs/styles-and-themes/common-units/#size-values)-Select | $space-16 | $space-16 |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-text-item-Select--disabled | *none* | *none* |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--default--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--error--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--success--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--warning--focus | *none* | *none* |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Select--default--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Select--error--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Select--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Select--success--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-Select--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-Select--default--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Select--error--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Select--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Select--success--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-Select--warning--focus | *none* | *none* |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Select--default--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Select--error--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Select--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-Select--success--focus | *none* | *none* |
@@ -643,16 +640,15 @@ The component has some parts that can be styled through layout properties and th
 | [textColor](/docs/styles-and-themes/common-units/#color)-indicator-Select | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-300 | $color-surface-300 |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select--default | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-placeholder-Select--warning | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Select--default | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Select--default--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Select | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--disabled | $textColor--disabled | $textColor--disabled |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |

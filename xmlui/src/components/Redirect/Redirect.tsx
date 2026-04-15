@@ -1,7 +1,7 @@
 import type { To } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createUrlWithQueryParams } from "../component-utils";
 import { createMetadata } from "../metadata-helpers";
 
@@ -29,15 +29,11 @@ export const RedirectMd = createMetadata({
   },
 });
 
-export const redirectRenderer = createComponentRenderer(
-  COMP,
-  RedirectMd,
-  ({ node, extractValue }) => {
-    return (
-      <Navigate
-        to={createUrlWithQueryParams(extractValue(node.props.to)) as To}
-        replace={extractValue.asOptionalBoolean(node.props.replace)}
-      />
-    );
-  },
-);
+export const redirectRenderer = wrapComponent(COMP, Navigate, RedirectMd, {
+  customRender: (_props, { node, extractValue }) => (
+    <Navigate
+      to={createUrlWithQueryParams(extractValue(node.props.to)) as To}
+      replace={extractValue.asOptionalBoolean(node.props.replace)}
+    />
+  ),
+});

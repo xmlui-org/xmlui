@@ -11,7 +11,7 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     // --- App layout
     "width-navPanel-App": "280px",
     "maxWidth-content-App": "1000px",
-    "maxWidth-content-NoToc": "700px",
+    "maxWidth-content-DocumentPageNoTOC": "700px",
 
     // --- Colors & typography
     "color-surface": "rgb(111, 110, 119)",
@@ -62,10 +62,10 @@ export const XmlUiDocsThemeDefinition: ThemeDefinition = {
     "marginTop-H4-markdown": "$space-6",
     "marginBottom-H4-markdown": "$space-1",
     "fontWeight-PrevNextLink": "500",
-    "textColor-PrevNextLink": "$color-surface-900",
-    "padding-PrevNextLink": "4px",
-    "fontSize-PrevNextText": "13px",
-    "textColor-PrevNextText": "$color-surface-500",
+    "textColor-prevNextLink-DocumentLinks": "$color-surface-900",
+    "padding-prevNextLink-DocumentLinks": "4px",
+    "fontSize-prevNextText-DocumentLinks": "13px",
+    "textColor-prevNextText-DocumentLinks": "$color-surface-500",
     "backgroundColor-Card--hover": "$color-surface-50",
     "backgroundColor-CodeBlock": "$color-surface-100",
     "textColor-Link": "$color-surface-600",

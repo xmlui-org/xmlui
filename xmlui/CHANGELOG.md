@@ -1,5 +1,212 @@
 # xmlui
 
+## 0.12.17
+
+### Patch Changes
+
+- 4dc14d0: Add `mockExecute` event to APICall component
+- 00457e4: Improve List and Tree performance
+- d474652: Fix `$param` being undefined in `<variable>` declarations that are direct children of `ModalDialog`
+- f00a826: Fix RadioGroup keyboard navigation: arrow keys now correctly select the next/previous option instead of only moving focus without updating the value.
+- 55258df: extened the number of parsing errors which can be displayed before reaching the point where only a single error can be reported without line numbers.
+- 983bfe3: Add new theme variables to Table
+- 41e4f0a: Fix the itemLabelWidth behavior in Form
+- b296689: Extended List `groupBy` property to accept a function in addition to a string. When a function is provided (e.g., `groupBy="{(item) => item.name[0]}"`), it receives each list item and returns the value used for grouping.
+- 80ff0fd: Fix HStack default item widths with input controls
+- 2ac4c4a: Allow page scrolling while Select's dropdown is open
+- e27fef3: Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode
+- 611cc69: Add gap property to Tabs
+- b45106d: Support object and array destructuring in reactive `var` declarations. `var {a, b} = expr` and `var [a, b] = expr` are now valid in code-behind scripts and markup script blocks. Destructured declarations are expanded into temporary variables to preserve reactive semantics.
+- 9a1d99b: Add "before" and "after" values to labelPosition
+
+## 0.12.16
+
+### Patch Changes
+
+- 3d64a86: Fix portal rendering issues in Drawer and NestedApp
+- 07bc66e: All Tree rendering in standalone mode
+- d72d007: Fix Table rendering regression
+- 312d3fd: Do not animate Switch and Checkbox during the initial rendering
+- 329fc83: feat: allow loading external theme files in standalone mode defined in config.defaultTheme
+- 03f095c: refactor: remove redundant check for already registered icons in IconProvider
+- 672c9d9: APCall deferred execution fixed
+- cda9057: Improve Table and TileGrid performance
+- c137a85: feat: add sticky button row and max height to ModalDialog and Form components
+
+## 0.12.15
+
+### Patch Changes
+
+- 90f5002: Fix Stack to respect itemWidth when wrapContent is false
+- 2623e28: Extend Form with savePendingLabel, and submitFeedbackDelay
+- db67849: feat: implement select-all, delete-all functionality in DateInput component
+- 28a77d7: Fix Select `dropdownHeight` prop leaking to the trigger element in SimpleSelect mode, causing the trigger to render at the dropdown's height instead of its normal size.
+- 0dd6e23: fix: restore Bookmark hash navigation in shadow DOM and vertical-full-header layout
+- 460a693: refactor: improve Select component formatting and styling consistency, adding e2e tests
+- 7675d1c: fix: simplify inlinePickerMenu styling and add consistent padding
+- 9df5f4b: feat: add hover preview for DatePicker range selection
+- f74d48f: fix: quoted content in markup no longer has special meaning. `<Stack>"hi"</Stack>`no longer produces the unquoted string _hi_, but rather the quoted string as-is _"hi"_. This can technically break existing code which relied on quoting text that incluced the less-than (<) character. This feature was very hidden, we don't expect users to have markup like that. In case you are affected, use the _&lt;_ entity instead, or wrap the content in a CDATA.
+- 5fa348e: Hide the experimental pub/sub behavior
+- 370b985: feat: gracefully handle html when fetching files for standalone
+- 4ee71c6: fix: preserve `PageMetaTitle` and other Helmet-managed head output during static site generation so generated HTML includes the correct page title and head tags at build time.
+- 2623e28: Form's willSubmit will receive the data with noSubmit flag too for validation. The submit event will not.
+- 2623e28: Add FormSegment component
+
+## 0.12.14
+
+### Patch Changes
+
+- 60086b1: Fix DataSource name when no id is declared
+- e72aee2: Allow setting the toast notification position
+- c7933d4: fix: ItemWithLabel falls back to Form's itemLabelPosition from context
+- 5d2d8ac: Add striped property to Table
+- f90a550: Fix CLI bin path in published package: the `clean-package` replacement now correctly points to `dist/nodejs/bin/index.mjs` (the actual ESM output from tsdown) instead of the incorrect `dist/nodejs/bin/index.js`. This mismatch prevented `npm` from creating the `xmlui` symlink in `.bin` during install.
+- f09e2fe: Fix: Variable initializers in user-defined components can now access routing context variables
+- 46e4b62: Use `Globals.xs` instead of `Main.xmlui.xs` for global variable and function declarations. `Main.xmlui.xs` declarations are now local to the Main component, consistent with how all other code-behind files work.
+- 9adc767: fix: only deep-coppy theme vars when <Theme> needs them. This reduces the number of CSS vars present on a site.
+- 40d58ac: fix: select - label position, minWidth
+- 084b7dd: Allow user-defined components to use arbitrary theme variables
+- 90152c6: Extend headings and Markdown with anchorTemplate
+- e554b84: Column width, minWidth, and maxWidth now accept and resolve theme variables, em/rem values
+- b7f7152: NavPanel can be synched with the selected content
+- 084b7dd: Auto-generate metadata for user-defined (compound) components by statically analyzing their definition tree. This enables proper theme variable optimization — compound component theme vars are now collected into the global `componentThemeVars` set, so `ThemeProvider` resolves hierarchical variables for them correctly.
+- 9471ef6: fix: change NestedApp header background color to surface color
+
+## 0.12.13
+
+### Patch Changes
+
+- d19a909: feat: add cancelButtonLabel prop to APICall for confirm dialog
+- 61308b2: feat: xmlui-search - spotlight mode, filter by categories, suggested keywords
+- c4fc0be: Fix reactive expressions in component properties not updating when they call functions that depend on changed variables
+- 4127490: Add pathname global
+- f6921ed: fix: responsive table glitch
+- ed962d1: Markdown in fenced code block should not replace "@{}"
+- 333bce7: Fixed a bug where setting the regex property to a valid regular expression also tested the input if it was empty.
+- 4127490: Fix AppHeader theming
+- b133970: Fix responsive CSS generation
+
+## 0.12.12
+
+### Patch Changes
+
+- 44546ae: Fix tab-out issue with PasswordInput
+- 0a4c214: expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project
+- 6dda27c: Ignore scrollStyle and showScrollerFade on mobile devices
+- d65101f: Wire Inspector icon color through theme system so it responds to theme changes
+- 82f5ad4: Experiment with persisting unsubmitted Form data
+- fffde0d: Move Blog component from xmlui core to xmlui-docs-blocks extension package
+- c9871a9: Fix DataSource reactivity through variables
+- 7e0dab5: Improve component property name linting with responsive properties and behavior properties
+- 894a635: Fix Select regression in Form (versus FormItem type="select")
+- 77254bc: Move Carousel to xmlui-website-blocks extension
+- 679b397: Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).
+
+## 0.12.11
+
+### Patch Changes
+
+- 3daa045: Fix FormItem theme variable regression
+- 93a19dd: Charts moved from xmlui core to the xmlui-recharts extension
+- 8a3180d: Fix FormItem type="checkbox" regression
+- 1b695f0: fix: JSDOM preventing running xmlui commands when bundled into executable file
+- c903b50: List can handle row selection (similarly to Table)
+
+## 0.12.10
+
+### Patch Changes
+
+- 166139f: fix error callback running on previous failed ApiCall after component mounts, as if the current call failed.
+- bb6dfd8: Add bootstrap-like column widths
+- 83c84c6: Remove RealTimeAdapter component
+- d456b4b: Move Backdrop and Breakout to the xmlui-website-blocks extension
+- bd49e49: Add experimental local storage persistence
+
+## 0.12.9
+
+### Patch Changes
+
+- 39b3847: Retry patch release
+
+## 0.12.8
+
+### Patch Changes
+
+- f889233: Add `TileGrid` component — a responsive, virtualized tile grid
+- 6ccb0e6: Fix Markdown xmlui-pg regression
+- 20be424: Fix issues with mobile NavPanel
+- 70a091c: Add "spacing" to applyLayoutProperties
+- 551775b: fix: Improve styling flexibility and theme handling across components
+- 7e5c62f: Implement scroll-snap related layout properties
+- 41552d1: Fix responsive width properties (e.g. `width-md`) not working on FlowLayout/HStack-wrap children; eliminate layout flash by using CSS @media rules instead of JS-based sizeIndex detection
+- 7d85f4a: Add debounceWaitInMs property to ChangeListener
+- fe26c40: Initialize global variables of App before children are initialized
+- a9e8c42: DataSource and APICall now return repsonse headers
+- 8660487: Make transaction IDs optional to avoid CORS preflight failures with third-party APIs.
+- 3211bce: Fix NavGroup trigger alignment
+- 2a5d32f: fix: playground - theme handing
+- 36e79df: fix: wrapComponent - prevent layout props from being forwarded to native components unless explicitly declared in metadata
+- c6aea4f: Upgrade `react-router-dom` from 6.26.2 to 6.30.3 to address CVE-2025-68470 (XSS via Open Redirects in `@remix-run/router`). `axios` was already upgraded to 1.13.5 to address CVE-2026-25639 (DoS via `__proto__` key in `mergeConfig`).
+- 2f368e4: Fix dependency regression with global variables
+- 9031871: Add "strict" setting so lintSeverity
+
+## 0.12.7
+
+### Patch Changes
+
+- 3139ddc: Implement responsive layout properties
+- 92db16f: improve: enhance wrapComponent functionality with metadata merging
+- 2693f67: Add `mockData` property to `DataSource` for development and testing
+- 420bae7: Add headerUserSelect and cellUserSelect properties to Table
+- a72eb6d: Gather a search index into a json file at SSG time, which the client fetches.
+- 1b8c544: Fix Table rows occasionally rendering as blank despite valid data by passing `itemSize={rowHeight}` to the virtua Virtualizer component
+- be9a99b: Add applyLayoutProperties configuration option
+- 12c1131: Fix ContextMenu and ModalDialog theming regressions
+- 12c1131: Theme variables optimization ready for review
+- 90fd13f: Add dock property to Stack
+- 5b4ec41: Remove HoverCard and PositionedContainer
+- 9791592: Fix Select regression
+- f1aa401: feat: integrate wrapComponent into core components where possible
+- 985a7be: Fix theme variable optimization regressions
+- 12c1131: Fix portal styling issues with ModalDialog and Search
+- 3286eb2: Global variables regression fixes
+
+## 0.12.6
+
+### Patch Changes
+
+- 4a27cd3: fix: Links in tables can't be right-clicked
+- 77cde39: Allow sync between Table instance with syncWithVar
+- ffc1b30: Made pattern validation such as email, phone and url more lenient: now they accept empty values.
+- 66da3b5: Updated search functionality on website and reworked search data transformation. Also added categories for search results.
+- 8478033: Add responsive `when-xs`, `when-sm`, `when-md`, `when-lg`, `when-xl`, `when-xxl` attributes
+  that control component visibility per breakpoint, following Tailwind's mobile-first (min-width)
+  convention. When any responsive `when-*` attribute is defined it becomes the exclusive source of
+  truth — the base `when` is only consulted when no responsive attributes are present, preserving
+  full backward compatibility.
+- 75c96b7: Fixed a bug where pressing enter after entering an input in the Search field on the website did not navigate to the first result.
+- ee088cc: fix: ensure header and data cells remain aligned during column resizing in Table component
+- 8478033: Add responsive "when" (-xs, -sm, -md, ect.) attributes
+
+## 0.12.5
+
+### Patch Changes
+
+- 88ce91b: Add the 'ssg' subcommand to xmlui
+- a8dd927: Add long text related properties to Link
+- fd643cb: Remove the EmojiSelector component
+- fd643cb: Fix `Actions.navigate` with relative paths (e.g. `'.'`) and query params now correctly stays on the current page instead of redirecting to the `Pages` fallback. The relative pathname is resolved to an absolute path before being passed to the router, because the wrapped navigate introduced in 12.4 for `willNavigate`/`didNavigate` events runs in a higher-level React context that lacked the nested route matches needed for correct relative-path resolution.
+- ee167b7: refactor: prevent auto-focus in Sheet component
+- 7a4a44f: refactor: update Link component to support noIndicator prop and improve footer layout on the website
+- c32edd9: Add StickySection component
+- fd643cb: Fix willNavigate and didNavigate regression
+- 4aeced8: APICall now does not invalidate queries while navigating away
+- 8d9f103: Remove deprecated \_meta.json files and related code. Navigation now uses navSections/ JSON files exclusively.
+- 521d5b1: refactor: update layout and styling for navigation, introduce new theme vars for Drawer close button
+- c14a331: Fix new operator parsing (priority) issue
+- bc0f26b: ExpandableItem whitespace can be fully controlled via theme
+- 7c6c270: Add Drawer component
+
 ## 0.12.4
 
 ### Patch Changes

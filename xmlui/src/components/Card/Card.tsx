@@ -1,10 +1,12 @@
 import styles from "./Card.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 import { orientationOptionMd, alignmentOptionValues } from "../abstractions";
-import { Card, defaultProps } from "./CardNative";
+import { Card, defaultProps } from "./CardReact";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Card";
 
@@ -31,7 +33,7 @@ export const CardMd = createMetadata({
       description:
         `The url for an avarar image. If not specified, but [\`showAvatar\`](#showAvatar) is true, ${COMP} will show the ` +
         `first letters of the [\`title\`](#title).`,
-      type: "string",
+      valueType: "string",
     },
     showAvatar: {
       description: `Indicates whether the avatar should be displayed`,
@@ -85,6 +87,13 @@ export const CardMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    doubleClick: {
+      description: `This event is triggered when the ${COMP} is double-clicked.`,
+      signature: "doubleClick(event: MouseEvent): void",
+      parameters: {
+        event: "The mouse event object.",
+      },
+    },
     contextMenu: dContextMenu(COMP),
   },
   apis: {
@@ -134,31 +143,28 @@ export const CardMd = createMetadata({
   },
 });
 
-export const cardComponentRenderer = createComponentRenderer(
-  "Card",
-  CardMd,
-  ({ node, extractValue, renderChild, className, registerComponentApi, lookupEventHandler }) => {
+type ThemedCardProps = React.ComponentPropsWithoutRef<typeof Card>;
+
+export const ThemedCard = React.forwardRef<React.ElementRef<typeof Card>, ThemedCardProps>(
+  function ThemedCard({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(CardMd);
     return (
       <Card
-        className={className}
-        title={extractValue.asOptionalString(node.props.title)}
-        linkTo={extractValue.asOptionalString(node.props.linkTo)}
-        subtitle={extractValue.asOptionalString(node.props.subtitle)}
-        avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
-        showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
-        avatarSize={extractValue.asOptionalString(node.props.avatarSize)}
-        orientation={extractValue.asOptionalString(node.props.orientation)}
-        horizontalAlignment={extractValue.asOptionalString(node.props.horizontalAlignment)}
-        verticalAlignment={extractValue.asOptionalString(node.props.verticalAlignment)}
-        onClick={lookupEventHandler("click")}
-        onContextMenu={lookupEventHandler("contextMenu")}
-        registerComponentApi={registerComponentApi}
-      >
-        {renderChild(node.children, {
-          type: "Stack",
-          orientation: "vertical",
-        })}
-      </Card>
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
+  },
+);
+
+export const cardComponentRenderer = wrapComponent(
+  COMP,
+  ThemedCard,
+  CardMd,
+  {
+    exposeRegisterApi: true,
+    childrenLayoutContext: { type: "Stack", orientation: "vertical" },
+    deriveAriaLabel: (props) => props.title,
   },
 );

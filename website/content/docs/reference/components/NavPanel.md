@@ -18,8 +18,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -66,7 +66,7 @@ This property defines the logo template to display in the navigation panel with 
 
 > [!DEF]  default: **"normal"**
 
-This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity.
+This property determines the scrollbar style. Options: "normal" uses the browser's default scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar only while scrolling is active and fades out after 400ms of inactivity. On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.
 
 Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrolling`
 
@@ -74,7 +74,29 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 > [!DEF]  default: **true**
 
-When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.
+When enabled, displays gradient fade indicators at the top and bottom edges of the navigation panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue to users that additional content is available by scrolling. The indicators automatically appear and disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.
+
+### `syncScrollBehavior` [#syncscrollbehavior]
+
+> [!DEF]  default: **"smooth"**
+
+Controls the scroll animation when `syncWithContent` is enabled. Use `"smooth"` for an animated scroll or `"instant"` to jump immediately to the active item without animation.
+
+Available values: `smooth` **(default)**, `instant`
+
+### `syncScrollPosition` [#syncscrollposition]
+
+> [!DEF]  default: **"center"**
+
+Controls the vertical alignment of the active navigation item within the NavPanel when `syncWithContent` scrolls it into view. `"center"` places the item in the middle of the visible area; `"nearest"` scrolls the minimum amount needed; `"start"` aligns it to the top; `"end"` aligns it to the bottom.
+
+Available values: `center` **(default)**, `nearest`, `start`, `end`
+
+### `syncWithContent` [#syncwithcontent]
+
+> [!DEF]  default: **false**
+
+When enabled, any page navigation automatically scrolls the corresponding navigation item within the NavPanel into view, keeping the active link visible.
 
 ## Events [#events]
 

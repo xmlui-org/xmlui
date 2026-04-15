@@ -8,19 +8,20 @@ $themeVars: ();
 }
 
 $gap-RadioGroupOption: createThemeVar("gap-RadioGroupOption");
+$gap-RadioGroup: createThemeVar("gap-RadioGroup");
 
 // --- Borders
 
 $borderWidth-RadioGroupOption: createThemeVar("borderWidth-RadioGroupOption");
 $borderWidth-RadioGroupOption-validation: createThemeVar("borderWidth-RadioGroupOption-validation");
 
-$borderColor-RadioGroupOption--default: createThemeVar("Input:borderColor-RadioGroupOption--default");
+$borderColor-RadioGroupOption: createThemeVar("Input:borderColor-RadioGroupOption");
 $borderColor-checked-RadioGroupOption: createThemeVar("Input:borderColor-checked-RadioGroupOption");
-$borderColor-RadioGroupOption--default--hover: createThemeVar(
-  "Input:borderColor-RadioGroupOption--default--hover"
+$borderColor-RadioGroupOption--hover: createThemeVar(
+  "Input:borderColor-RadioGroupOption--hover"
 );
-$borderColor-RadioGroupOption--default--active: createThemeVar(
-  "Input:borderColor-RadioGroupOption--default--active"
+$borderColor-RadioGroupOption--active: createThemeVar(
+  "Input:borderColor-RadioGroupOption--active"
 );
 $borderColor-RadioGroupOption--disabled: createThemeVar(
   "Input:borderColor-RadioGroupOption--disabled"
@@ -32,8 +33,8 @@ $borderColor-RadioGroupOption--success: createThemeVar("Input:borderColor-RadioG
 
 // --- Backgrounds
 $backgroundColor-RadioGroup: createThemeVar("Input:backgroundColor-RadioGroup");
-$backgroundColor-RadioGroupOption--default: createThemeVar(
-  "Input:backgroundColor-RadioGroupOption--default"
+$backgroundColor-RadioGroupOption: createThemeVar(
+  "Input:backgroundColor-RadioGroupOption"
 );
 $backgroundColor-checked-RadioGroupOption: createThemeVar(
   "Input:backgroundColor-checked-RadioGroupOption"
@@ -51,7 +52,7 @@ $textColor-RadioGroupOption--disabled: createThemeVar("Input:textColor-RadioGrou
 $fontSize-RadioGroupOption: createThemeVar("Input:fontSize-RadioGroupOption");
 $fontWeight-RadioGroupOption: createThemeVar("Input:fontWeight-RadioGroupOption");
 
-$textColor-RadioGroupOption--default: createThemeVar("Input:textColor-RadioGroupOption--default");
+$textColor-RadioGroupOption: createThemeVar("Input:textColor-RadioGroupOption");
 $textColor-RadioGroupOption--error: createThemeVar("Input:textColor-RadioGroupOption--error");
 $textColor-RadioGroupOption--warning: createThemeVar("Input:textColor-RadioGroupOption--warning");
 $textColor-RadioGroupOption--success: createThemeVar("Input:textColor-RadioGroupOption--success");
@@ -66,8 +67,13 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
   .radioGroupContainer {
     display: flex;
     flex-direction: column;
-    gap: t.$space-2;
+    gap: $gap-RadioGroup;
     background-color: $backgroundColor-RadioGroup;
+
+    &.horizontal {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   }
 
   .radioOptionContainer {
@@ -81,15 +87,15 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
     width: 1.2em;
     height: 1.2em;
     border-radius: 100%;
-    background: $backgroundColor-RadioGroupOption--default;
+    background: $backgroundColor-RadioGroupOption;
     border-width: $borderWidth-RadioGroupOption;
     border-style: solid;
-    border-color: $borderColor-RadioGroupOption--default;
+    border-color: $borderColor-RadioGroupOption;
     padding: 0;
     cursor: pointer;
 
     &:hover {
-      border-color: $borderColor-RadioGroupOption--default--hover;
+      border-color: $borderColor-RadioGroupOption--hover;
     }
     &:focus-visible {
       outline-width: $outlineWidth-RadioGroupOption--focus;
@@ -162,7 +168,7 @@ $outlineOffset-RadioGroupOption--focus: createThemeVar("Input:outlineOffset-Radi
 
   .label {
     width: 100%;
-    color: $textColor-RadioGroupOption--default;
+    color: $textColor-RadioGroupOption;
     font-size: $fontSize-RadioGroupOption;
     font-weight: $fontWeight-RadioGroupOption;
     user-select: none;

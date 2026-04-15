@@ -2,14 +2,12 @@ import type { ReactNode } from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+
+import toast from "react-hot-toast";
 import yaml from "js-yaml";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
-import type {
-  ComponentDef,
-  CompoundComponentDef,
-} from "../abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import { AppRoot } from "./rendering/AppRoot";
 import { normalizePath } from "./utils/misc";
@@ -57,15 +55,49 @@ import type {
 import { evalBinding } from "./script-runner/eval-tree-sync";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import { MetadataProvider } from "../language-server/services/common/metadata-utils";
-import { extractParam } from "./utils/extractParam";
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
+import { SsgEnvProvider } from "./rendering/SsgEnvContext";
+import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
-const MAIN_XS_BUILT_RESOURCE = "/src/Main.xmlui.xs";
+const GLOBALS_FILE = "Globals.xs";
+const GLOBALS_XS_BUILT_RESOURCE = "/src/Globals.xs";
 const CONFIG_FILE = "config.json";
 
 const metadataProvider = new MetadataProvider(collectedComponentMetadata);
+
+// ---------------------------------------------------------------------------
+// Storage escape hatch — runs at module-init time, BEFORE React or the router
+// are instantiated. By the time BrowserRouter reads globalThis.location the
+// param has already been stripped; HashRouter and MemoryRouter are unaffected.
+// Uses globalThis instead of window so this module is safe to import in
+// Node.js / SSR environments where window is undefined.
+// ---------------------------------------------------------------------------
+
+/**
+ * Registers `globalThis.XMLUI_RESET_STORAGE` and `globalThis.XMLUI_GET_STORAGE`
+ * console helpers.
+ *
+ * Called once at module-init time when a browser environment is detected.
+ * Extracted into a function so the SSR guard is a single top-level check.
+ */
+function initStorageGlobals(): void {
+  // globalThis.XMLUI_RESET_STORAGE(key?) — callable from the browser console.
+  // Clears the matching localStorage entries and reloads the page.
+  (globalThis as any).XMLUI_RESET_STORAGE = (key?: string) => {
+    clearLocalStorage(key);
+    globalThis.location.reload();
+  };
+
+  // Diagnostic: globalThis.XMLUI_GET_STORAGE() — returns all current localStorage entries
+  // as a plain object (values JSON-parsed where possible).
+  (globalThis as any).XMLUI_GET_STORAGE = () => getAllLocalStorage();
+}
+
+if (typeof globalThis.window !== "undefined") {
+  initStorageGlobals();
+}
 
 type RuntimeProps = {
   default?: any;
@@ -95,6 +127,7 @@ type StandaloneAppProps = {
 
   // --- If true, the app waits for the API interceptor to be ready
   waitForApiInterceptor?: boolean;
+  helmetContext?: Record<string, unknown>;
   children?: ReactNode;
 };
 
@@ -117,6 +150,7 @@ function StandaloneApp({
   runtime,
   extensionManager,
   waitForApiInterceptor = false,
+  helmetContext,
   children,
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
@@ -161,8 +195,7 @@ function StandaloneApp({
     }
   }, [runtime]);
 
-  // Helper to filter out internal metadata (__tree_* keys) from globalVars
-  // Exposes only the actual variable values to the renderer
+  // Helper to filter out internal metadata (__tree_* keys) from globalVars.
   const filterGlobalVars = (vars: Record<string, any>): Record<string, any> => {
     const filtered: Record<string, any> = {};
     for (const [key, value] of Object.entries(vars)) {
@@ -173,7 +206,8 @@ function StandaloneApp({
     return filtered;
   };
 
-  const { apiInterceptor,
+  const {
+    apiInterceptor,
     name,
     appGlobals,
     defaultTheme,
@@ -215,11 +249,13 @@ function StandaloneApp({
     return null;
   }
 
-  // --- The app may use a mocked API already defined in `window.XMLUI_MOCK_API`
+  // --- The app may use a mocked API already defined in `globalThis.XMLUI_MOCK_API`
   // --- or within the standalone app's definition, in `apiInterceptor`.
   const mockedApi =
     // @ts-ignore
-    typeof window !== "undefined" && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
+    typeof globalThis.window !== "undefined" && (globalThis as any).XMLUI_MOCK_API
+      ? (globalThis as any).XMLUI_MOCK_API
+      : apiInterceptor;
 
   // --- Components can be decorated with test IDs used in end-to-end tests.
   // --- This flag checks the environment if the app runs in E2E test mode.
@@ -228,7 +264,7 @@ function StandaloneApp({
     decorateComponentsWithTestId ||
     appGlobals?.xsVerbose === true ||
     // @ts-ignore
-    (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
+    (typeof globalThis.window !== "undefined" ? (globalThis as any).XMLUI_MOCK_TEST_ID : false);
 
   // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
@@ -239,28 +275,33 @@ function StandaloneApp({
       useHashBasedRouting={useHashBasedRouting}
       waitForApiInterceptor={waitForApiInterceptor}
     >
-      <AppRoot
-        asIsland={asIsland}
-        projectCompilation={projectCompilation}
-        decorateComponentsWithTestId={shouldDecorateWithTestId}
-        node={entryPoint!}
-        standalone={true}
-        debugEnabled={debugEnabled}
-        // @ts-ignore
-        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
-        globalProps={globalProps}
-        globalVars={filterGlobalVars(globalVars)}
-        defaultTheme={defaultTheme}
-        defaultTone={defaultTone as ThemeTone}
-        resources={resources}
-        resourceMap={resourceMap}
-        sources={sources}
-        extensionManager={extensionManager}
-        contributes={contributes}
-        icons={icons}
-      >
-        {children}
-      </AppRoot>
+      <SsgEnvProvider>
+        <AppRoot
+          asIsland={asIsland}
+          projectCompilation={projectCompilation}
+          decorateComponentsWithTestId={shouldDecorateWithTestId}
+          node={entryPoint!}
+          standalone={true}
+          debugEnabled={debugEnabled}
+          // @ts-ignore
+          routerBaseName={
+            typeof globalThis.window !== "undefined" ? (globalThis as any).__PUBLIC_PATH || "" : ""
+          }
+          globalProps={globalProps}
+          globalVars={filterGlobalVars(globalVars)}
+          defaultTheme={defaultTheme}
+          defaultTone={defaultTone as ThemeTone}
+          resources={resources}
+          resourceMap={resourceMap}
+          sources={sources}
+          extensionManager={extensionManager}
+          contributes={contributes}
+          icons={icons}
+          helmetContext={helmetContext}
+        >
+          {children}
+        </AppRoot>
+      </SsgEnvProvider>
     </ApiInterceptorProvider>
   );
 }
@@ -285,6 +326,65 @@ type ParsedResponse = {
 };
 
 /**
+ * Validates that a response is not HTML (which would indicate the server
+ * returned index.html instead of the requested file, a common SPA behavior).
+ * Returns the response object if valid, or throws an error if it's HTML.
+ *
+ * Checks:
+ * 1. Content-Type header for "text/html"
+ * 2. If no Content-Type, checks if text starts with "<!DOCTYPE html>" or "<html"
+ *
+ * @param response The response to validate
+ * @returns The response object if valid
+ * @throws If the response is HTML or fetch failed
+ */
+async function validateResponseIsNotHtml(response: Response): Promise<Response> {
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${response.url}`);
+  }
+
+  const contentType = response.headers.get("content-type")?.toLowerCase();
+  if (contentType?.includes("text/html")) {
+    throw new Error(
+      `Failed to fetch ${response.url} - server returned HTML instead of expected content`,
+    );
+  }
+
+  if (!contentType) {
+    const clonedResponse = response.clone();
+    const reader = clonedResponse.body?.getReader();
+
+    if (reader) {
+      const decoder = new TextDecoder();
+      const maxProbeChars = 256;
+      let probeText = "";
+
+      try {
+        while (probeText.length < maxProbeChars) {
+          const { done, value } = await reader.read();
+          if (done) {
+            break;
+          }
+
+          probeText += decoder.decode(value, { stream: true }).toLowerCase();
+        }
+      } finally {
+        reader.releaseLock();
+      }
+
+      probeText = probeText.trimStart();
+      if (probeText.startsWith("<!doctype html") || probeText.startsWith("<html")) {
+        throw new Error(
+          `Failed to fetch ${response.url} - server returned HTML instead of expected content`,
+        );
+      }
+    }
+  }
+
+  return response;
+}
+
+/**
  * This function parses the response of a fetch retrieving the contents of a
  * component markup file.
  * @param response The response coming from the fetch
@@ -293,10 +393,8 @@ type ParsedResponse = {
  * displays the errors.
  */
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${response.url}`);
-  }
-  const code = await response.text();
+  const validatedResponse = await validateResponseIsNotHtml(response);
+  const code = await validatedResponse.text();
   const fileId = response.url;
 
   let codeBehind: CollectedDeclarations | undefined;
@@ -313,10 +411,8 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
         // --- Normalize the path for consistency across platforms (especially Windows)
         const normalizedPath = normalizePath(modulePath);
         const moduleResponse = await fetchWithoutCache(normalizedPath);
-        if (!moduleResponse.ok) {
-          throw new Error(`Failed to fetch module: ${normalizedPath}`);
-        }
-        return await moduleResponse.text();
+        const validatedResponse = await validateResponseIsNotHtml(moduleResponse);
+        return await validatedResponse.text();
       };
 
       // --- Collect code-behind with import support from inline scripts
@@ -364,10 +460,8 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
  * displays the errors.
  */
 async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
-  if (!response.ok) {
-    throw new Error(`Failed to fetch ${response.url}`);
-  }
-  const code = await response.text();
+  const validatedResponse = await validateResponseIsNotHtml(response);
+  const code = await validatedResponse.text();
 
   const parser = new Parser(code);
   try {
@@ -413,10 +507,8 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
       const normalizedPath = normalizePath(modulePath);
 
       const moduleResponse = await fetchWithoutCache(normalizedPath);
-      if (!moduleResponse.ok) {
-        throw new Error(`Failed to fetch module: ${normalizedPath}`);
-      }
-      return await moduleResponse.text();
+      const validatedResponse = await validateResponseIsNotHtml(moduleResponse);
+      return await validatedResponse.text();
     };
 
     // --- Collect code-behind with import support
@@ -499,6 +591,7 @@ function resolveRuntime(runtime: Record<string, any>): {
   let config: StandaloneAppDescription | undefined;
   let entryPoint: ComponentDef | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
+  let globalsXs: CollectedDeclarations | undefined;
   let apiInterceptor: any;
 
   // --- Process the runtime files
@@ -507,6 +600,11 @@ function resolveRuntime(runtime: Record<string, any>): {
       // --- We assume that the config file has a default export and this
       // --- export is the standalone app's configuration.
       config = value.default;
+    }
+
+    // --- Globals.xs holds app-wide global variable and function declarations.
+    if (key.endsWith("/Globals.xs") && !matchesFolder(key, "components")) {
+      globalsXs = value.default;
     }
 
     // --- We assume that the entry point is either named "Main" or "App".
@@ -598,7 +696,8 @@ function resolveRuntime(runtime: Record<string, any>): {
   // --- We have an entry point defined in the configuration file or in the main app file.
   const safeEntryPoint = config?.entryPoint || entryPoint;
 
-  // --- We may have a code-behind file. If so, we merge the variables and functions
+  // --- We may have a code-behind file for the entry point (Main.xmlui.xs).
+  // --- Its declarations are LOCAL to the Main component.
   let entryPointWithCodeBehind = {
     ...safeEntryPoint,
     vars: {
@@ -609,22 +708,13 @@ function resolveRuntime(runtime: Record<string, any>): {
     scriptError: entryPointCodeBehind?.moduleErrors,
   } as ComponentDef;
 
-  // --- Treat Main.xmlui.xs variables as globals (same as global.* prefix) so they are
-  // --- accessible to child (compound) components, not just main's local scope.
-  if (entryPointCodeBehind?.vars || entryPointCodeBehind?.functions) {
+  // --- Treat Globals.xs variables as globals (same as global.* prefix) so they are
+  // --- accessible to child (compound) components.
+  if (globalsXs?.vars || globalsXs?.functions) {
     entryPointWithCodeBehind = transformMainXsToGlobalTags(
       entryPointWithCodeBehind,
-      entryPointCodeBehind as any,
+      globalsXs as any,
     );
-    // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
-    // --- If kept in both, the expression string in globalVars always re-evaluates to
-    // --- the initial value, breaking reactivity after mutations like codeBehindCount++.
-    if (entryPointCodeBehind?.vars && entryPointWithCodeBehind.vars) {
-      const promotedKeys = Object.keys(entryPointCodeBehind.vars);
-      const remainingVars = { ...entryPointWithCodeBehind.vars };
-      promotedKeys.forEach((k) => delete remainingVars[k]);
-      entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
-    }
   }
 
   // --- Collect the component definition we pass to the rendering engine
@@ -714,13 +804,8 @@ async function loadThemeFile(url: string): Promise<ThemeDefinition> {
   // First try to load as JSON
   try {
     const response = await fetchWithoutCache(url);
-    if (!response.ok) {
-      // If the JSON file doesn't exist, try YAML immediately
-      throw new Error(`Failed to fetch ${url}`);
-    }
-
-    // Get the content as text first
-    const text = await response.text();
+    const validatedResponse = await validateResponseIsNotHtml(response);
+    const text = await validatedResponse.text();
 
     // Try to parse as JSON
     try {
@@ -741,8 +826,8 @@ async function loadThemeFile(url: string): Promise<ThemeDefinition> {
     const yamlUrl = url.replace(/\.json$/, ".yml");
     try {
       const response = await fetchWithoutCache(yamlUrl);
-      if (!response.ok) throw new Error(`Failed to fetch ${yamlUrl}`);
-      const text = await response.text();
+      const validatedResponse = await validateResponseIsNotHtml(response);
+      const text = await validatedResponse.text();
       return yaml.load(text) as ThemeDefinition;
     } catch (yamlError) {
       console.error(
@@ -810,6 +895,21 @@ function useStandalone(
   });
 
   const [projectCompilation, setProjectCompilation] = useState<ProjectCompilation>(null);
+  const [pendingLintToasts, setPendingLintToasts] = useState<string[]>([]);
+
+  // --- Show Strict-severity lint warnings after the Toaster (inside NotificationToast)
+  // --- has committed. Effects in children fire before parent effects, so by the time
+  // --- this fires, NotificationToast has already queued its setShouldRender(true).
+  // --- React then processes that state update, mounts the Toaster, and its useState
+  // --- initialises from react-hot-toast's module-level memoryState — which already
+  // --- contains the toasts fired here.
+  useEffect(() => {
+    if (pendingLintToasts.length === 0) return;
+    const timer = setTimeout(() => {
+      pendingLintToasts.forEach((msg) => toast.error(msg, { duration: 8000 }));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pendingLintToasts]);
 
   // --- This function extracts the global variables and functions from the combined
   // --- pre-built Globals.xs module.
@@ -952,11 +1052,31 @@ function useStandalone(
   };
 
   const [globalVars, setGlobalVars] = useState<Record<string, any>>(() => {
-    // Get the vars in Main.xmlui.xs module directly from runtime.
+    // Get the vars in Globals.xs module directly from runtime.
     // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
-    const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-    const mainXsData = (mainXs as any)?.default ?? mainXs;
-    return extractGlobals({ ...(mainXsData?.vars || {}), ...(mainXsData?.functions || {}) });
+    const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
+    const globalsXsData = (globalsXs as any)?.default ?? globalsXs;
+    const extracted = extractGlobals({
+      ...(globalsXsData?.vars || {}),
+      ...(globalsXsData?.functions || {}),
+    });
+
+    // Also include markup globals (global.* attributes) and entry-point functions
+    // from the app definition so they are available on the very first render.
+    // Without this, child components' onInit handlers fire before globals are in scope.
+    const resolvedRuntime = resolveRuntime(runtime);
+    const appDef = mergeAppDefWithRuntime(resolvedRuntime.standaloneApp, standaloneAppDef);
+    if (appDef?.entryPoint) {
+      const ep = appDef.entryPoint as ComponentDef;
+      if (ep.globalVars) {
+        Object.assign(extracted, ep.globalVars);
+      }
+      if (ep.functions) {
+        Object.assign(extracted, ep.functions);
+      }
+    }
+
+    return extracted;
   });
 
   useIsomorphicLayoutEffect(() => {
@@ -974,31 +1094,25 @@ function useStandalone(
           throw new Error("couldn't find the application metadata");
         }
 
-        // --- Transform Main.xmlui.xs variables into <global> tags for dependency support.
+        // --- Transform Globals.xs variables into <global> tags for dependency support.
         // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
-        const mainXs = runtime?.[MAIN_XS_BUILT_RESOURCE];
-        const mainXsData = (mainXs as any)?.default ?? mainXs;
-        if (mainXsData?.vars || mainXsData?.functions) {
+        const globalsXs = runtime?.[GLOBALS_XS_BUILT_RESOURCE];
+        const globalsXsData = (globalsXs as any)?.default ?? globalsXs;
+        if (globalsXsData?.vars || globalsXsData?.functions) {
           appDef.entryPoint = transformMainXsToGlobalTags(
             appDef.entryPoint as ComponentDef,
-            mainXsData,
+            globalsXsData,
           );
-          // --- Remove code-behind vars from `vars` — same reason as in resolveRuntime.
-          if (mainXsData?.vars && appDef.entryPoint) {
-            const promotedKeys = Object.keys(mainXsData.vars);
-            const ep = appDef.entryPoint as ComponentDef;
-            if (ep.vars) {
-              const remainingVars = { ...ep.vars };
-              promotedKeys.forEach((k) => delete remainingVars[k]);
-              appDef.entryPoint = { ...ep, vars: remainingVars };
-            }
-          }
         }
 
-        const lintErrorComponent = processAppLinting(appDef, metadataProvider);
+        const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(
+          appDef,
+          metadataProvider,
+        );
         if (lintErrorComponent) {
           appDef.entryPoint = lintErrorComponent;
         }
+        setPendingLintToasts(toastMessages);
 
         discoverCompilationDependencies({
           projectCompilation: resolvedRuntime.projectCompilation,
@@ -1017,7 +1131,7 @@ function useStandalone(
           Object.assign(parsedGlobals, entryPointDef.globalVars);
         }
 
-        // Collect functions from root element (from Main.xmlui.xs)
+        // Collect functions from root element (from Globals.xs)
         // Functions need to flow through globalVars to be available in compound components
         if (entryPointDef?.functions) {
           Object.assign(parsedGlobals, entryPointDef.functions);
@@ -1059,6 +1173,7 @@ function useStandalone(
         // --- with elements from the configuration file. Note that we do not
         // --- check whether the config file's content is semantically valid.
         const configResponse = await fetchWithoutCache(CONFIG_FILE);
+        await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
         const config: StandaloneJsonConfig = await configResponse.json();
 
         const themePromises: Promise<ThemeDefinition>[] = [];
@@ -1077,7 +1192,10 @@ function useStandalone(
           themes,
         };
 
-        const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+        const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(
+          newAppDef,
+          metadataProvider,
+        );
         if (lintErrorComponent) {
           newAppDef.entryPoint = lintErrorComponent;
         }
@@ -1087,56 +1205,43 @@ function useStandalone(
         });
         setProjectCompilation(resolvedRuntime.projectCompilation);
         setStandaloneApp(newAppDef);
+        setPendingLintToasts(toastMessages);
         return;
       }
 
       // --- Fetch the main file
       const entryPointPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(srcBase + "/" + MAIN_FILE);
-          if (resp.ok) {
-            resolve(parseComponentMarkupResponse(resp));
-          } else {
-            resolve({
-              component: errReportMessage(`Failed to load the main component (${MAIN_FILE})`),
-              file: MAIN_FILE,
-              hasError: true,
-            });
-          }
+          const resp = await fetchWithoutCache(MAIN_FILE);
+          resolve(parseComponentMarkupResponse(resp));
         } catch (e) {
-          resolve(null);
+          resolve({
+            component: errReportMessage(`Failed to load the main component (${MAIN_FILE})`),
+            file: MAIN_FILE,
+            hasError: true,
+          });
         }
       }) as any;
 
-      // --- Fetch the optional Main.xmlui.xs file containing global variables and functions
+      // --- Fetch the optional Globals.xs file containing global variables and functions
       const globalsPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+          const resp = await fetchWithoutCache(GLOBALS_FILE);
+          const parsedGlobals = await parseCodeBehindResponse(resp);
 
-          if (resp.ok) {
-            const parsedGlobals = await parseCodeBehindResponse(resp);
-
-            const mainXs = parsedGlobals?.codeBehind;
-            const extractedGlobals = extractGlobals({
-              ...(mainXs?.vars || {}),
-              ...(mainXs?.functions || {}),
-            });
-            // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
-            resolve({
-              ...parsedGlobals?.codeBehind,
-              src: parsedGlobals?.src,
-              __extractedGlobals: extractedGlobals,
-            });
-          } else {
-            resolve({
-              component: errReportMessage(
-                `Failed to load the code-behind (${MAIN_CODE_BEHIND_FILE})`,
-              ),
-              file: MAIN_CODE_BEHIND_FILE,
-              hasError: true,
-            });
-          }
+          const globalsXs = parsedGlobals?.codeBehind;
+          const extractedGlobals = extractGlobals({
+            ...globalsXs?.vars,
+            ...globalsXs?.functions,
+          });
+          // Return structure matching vite-xmlui-plugin: codeBehind spread with src and extractedGlobals
+          resolve({
+            ...parsedGlobals?.codeBehind,
+            src: parsedGlobals?.src,
+            __extractedGlobals: extractedGlobals,
+          });
         } catch (e) {
+          // Globals.xs is optional — resolve with null if not found
           resolve(null);
         }
       }) as any;
@@ -1145,14 +1250,18 @@ function useStandalone(
       let config: StandaloneJsonConfig = undefined;
       try {
         const configResponse = await fetchWithoutCache(CONFIG_FILE);
+        await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
         config = await configResponse.json();
       } catch (e) {}
 
       // --- Fetch the themes according to the configuration
       let themePromises: Promise<ThemeDefinition>[];
+      let defaultThemeIsUrl: boolean = false;
       if ((config?.themes ?? []).length === 0 && config?.defaultTheme) {
         // --- Special case, we have only a single "defaultTheme" in the configuration
-        const fetchDefaultTheme = loadThemeFile(`themes/${config?.defaultTheme}.json`);
+        const themeUrl = toThemeUrl(config.defaultTheme);
+        defaultThemeIsUrl = themeUrl === config.defaultTheme;
+        const fetchDefaultTheme = loadThemeFile(themeUrl);
         themePromises = [fetchDefaultTheme];
       } else {
         // --- In any other case, we fetch all themes defined in the configuration
@@ -1190,7 +1299,7 @@ function useStandalone(
 
       let loadedEntryPointCodeBehind = null;
       if (loadedEntryPoint.component.props?.codeBehind !== undefined) {
-        // --- We have a code-behind file for the main component
+        // --- We have an explicit code-behind file for the main component
         loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
           try {
             const resp = await fetchWithoutCache(
@@ -1205,9 +1314,27 @@ function useStandalone(
             resolve(null);
           }
         })) as any;
-        if (loadedEntryPointCodeBehind.hasError) {
+        if (loadedEntryPointCodeBehind?.hasError) {
           errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
         }
+      } else {
+        // --- Try to load the convention-based Main.xmlui.xs code-behind file.
+        // --- Its declarations are LOCAL to the Main component.
+        loadedEntryPointCodeBehind = await (async () => {
+          try {
+            const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+            const parsed = await parseCodeBehindResponse(resp);
+            if (parsed.hasError) {
+              errorComponents.push(parsed.component as ComponentDef);
+              return parsed;
+            }
+            // Attach src so compilation tracking picks it up
+            return { ...parsed.codeBehind, src: parsed.src };
+          } catch (e) {
+            // Main.xmlui.xs is optional — ignore fetch failures
+          }
+          return null;
+        })();
       }
 
       // --- Check if any of the components have markup errors
@@ -1262,39 +1389,35 @@ function useStandalone(
           loadedEntryPoint.codeBehind?.moduleErrors || loadedEntryPointCodeBehind?.moduleErrors,
       };
 
-      // --- Transform Main.xmlui.xs variables into <global> tags for dependency support (same as pre-built path)
+      // --- Transform Globals.xs variables into <global> tags for dependency support (same as pre-built path)
       if (
         loadedGlobals &&
         typeof loadedGlobals === "object" &&
         ((loadedGlobals as any).vars || (loadedGlobals as any).functions)
       ) {
-        // Pass loadedGlobals directly - it has the same structure as runtime[MAIN_XS_BUILT_RESOURCE]
+        // Pass loadedGlobals directly - it has the same structure as runtime[GLOBALS_XS_BUILT_RESOURCE]
         entryPointWithCodeBehind = transformMainXsToGlobalTags(
           entryPointWithCodeBehind,
           loadedGlobals as any,
         );
-        // --- Remove code-behind vars from `vars` so they only exist in `globalVars`.
-        // --- If kept in both, the local var shadows the global, so statePartChanged
-        // --- dispatches locally and the root's global state never updates — child
-        // --- components never see the mutation.
-        if ((loadedGlobals as any)?.vars && entryPointWithCodeBehind.vars) {
-          const promotedKeys = Object.keys((loadedGlobals as any).vars);
-          const remainingVars = { ...entryPointWithCodeBehind.vars };
-          promotedKeys.forEach((k) => delete remainingVars[k]);
-          entryPointWithCodeBehind = { ...entryPointWithCodeBehind, vars: remainingVars };
-        }
       }
 
-      const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
+      const defaultThemeProp = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
       // --- We test whether the default theme is not from a binding
       // --- expression and is not a built-in theme already loaded. If so,
       // --- we load it from the `themes` folder.
-      if (defaultTheme && typeof defaultTheme === "string" && !defaultTheme.includes("{")) {
+      if (
+        defaultThemeProp &&
+        typeof defaultThemeProp === "string" &&
+        !defaultThemeProp.includes("{")
+      ) {
         if (
-          !builtInThemes.find((theme) => theme.id === defaultTheme) &&
-          !themes.find((theme) => theme.id === defaultTheme)
+          !builtInThemes.find((theme) => theme.id === defaultThemeProp) &&
+          !themes.find((theme) => theme.id === defaultThemeProp)
         ) {
-          themes.push(await loadThemeFile(`themes/${defaultTheme}.json`));
+          defaultThemeIsUrl = defaultThemeProp === config.defaultTheme;
+          const themeUrl = toThemeUrl(defaultThemeProp);
+          themes.push(await loadThemeFile(themeUrl));
         }
       }
 
@@ -1427,15 +1550,27 @@ function useStandalone(
       }
       // --- Let's check for errors to display
 
+      let defaultTheme = config.defaultTheme;
+      if (defaultThemeIsUrl) {
+        const themeId = themes.at(-1)?.id;
+        if (typeof themeId === "string") {
+          defaultTheme = themeId;
+        }
+      }
+
       const newAppDef = {
         ...config,
+        defaultTheme,
         themes,
         sources,
         components: componentsWithCodeBehinds as any,
         entryPoint: entryPointWithCodeBehind,
       };
 
-      const lintErrorComponent = processAppLinting(newAppDef, metadataProvider);
+      const { errorComponent: lintErrorComponent, toastMessages } = processAppLinting(
+        newAppDef,
+        metadataProvider,
+      );
 
       const errorComponent: ComponentDef | null =
         errorComponents.length > 0
@@ -1461,6 +1596,7 @@ function useStandalone(
 
       setProjectCompilation(resolvedRuntime.projectCompilation);
       setStandaloneApp(newAppDef);
+      setPendingLintToasts(toastMessages);
 
       // --- Collect and merge globalVars from parsed components
       const parsedGlobals: Record<string, any> = {};
@@ -1615,19 +1751,13 @@ export function startApp(
     if (rootElement.innerHTML.trim().length > 0) {
       contentRoot = ReactDOM.hydrateRoot(
         rootElement,
-        <BrowserRouter>
-          <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-        </BrowserRouter>,
+        <StandaloneApp runtime={runtime} extensionManager={extensionManager} />,
       );
       return contentRoot;
     }
     contentRoot = ReactDOM.createRoot(rootElement);
   }
-  contentRoot.render(
-    <BrowserRouter>
-      <StandaloneApp runtime={runtime} extensionManager={extensionManager} />
-    </BrowserRouter>,
-  );
+  contentRoot.render(<StandaloneApp runtime={runtime} extensionManager={extensionManager} />);
   return contentRoot;
 }
 
@@ -1660,51 +1790,47 @@ export function startIslands(
 
 
 /**
- * Transform Main.xmlui.xs variables into globalVars property to leverage
+ * Transform Globals.xs variables into globalVars property to leverage
  * the existing dependency system that works correctly for globalVars
  */
 function transformMainXsToGlobalTags(
   entryPoint: ComponentDef,
-  mainXs: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string }
+  globalsXsDef: { vars?: Record<string, any>; functions?: Record<string, any>; src?: string },
 ): ComponentDef {
-  const globalVars: Record<string, string> = {};
+  const globalVars: Record<string, any> = {};
 
-  // Process vars from Main.xmlui.xs
-  if (mainXs.vars) {
-    Object.entries(mainXs.vars).forEach(([varName, varDef]) => {
-      // Use the source text directly from the parsed expression
-      let valueExpression = "";
-
-      if (typeof varDef === "object" && varDef?.source) {
-        // Use the source text preserved by the parser
-        valueExpression = varDef.source;
-      } else if (mainXs.src) {
-        // Fallback: extract from source code using regex when we have the full source
-        const srcMatch = mainXs.src.match(new RegExp(`var\\s+${varName}\\s*=\\s*(.+?)(?:;|$)`, 'm'));
-        if (srcMatch) {
-          valueExpression = srcMatch[1].trim();
+  // Process vars from Globals.xs
+  if (globalsXsDef.vars) {
+    Object.entries(globalsXsDef.vars).forEach(([varName, varDef]) => {
+      // If the var has a parsed expression tree with source text, convert it
+      // to a binding expression string so useGlobalVariables can evaluate it
+      // reactively. This preserves reactivity for dependent vars (e.g.,
+      // var dummy = 3*count) and correctly handles multi-line expressions
+      // (e.g., object literals spanning multiple lines).
+      if (
+        typeof varDef === "object" &&
+        varDef !== null &&
+        (varDef as any).__PARSED__ &&
+        (varDef as any).tree
+      ) {
+        const source = (varDef as any).tree.source;
+        if (typeof source === "string") {
+          // Wrap in {…} so extractParam recognizes it as a binding expression
+          globalVars[varName] = "{" + source + "}";
+          return;
         }
       }
 
-      if (!valueExpression) {
-        valueExpression = "0"; // Safe fallback
-      }
-
-      // Wrap in braces if not already wrapped
-      if (!valueExpression.startsWith("{")) {
-        valueExpression = `{${valueExpression}}`;
-      }
-
-      // Add to globalVars
-      globalVars[varName] = valueExpression;
+      // Fallback for vars without a parse tree (e.g., already-evaluated values)
+      globalVars[varName] = varDef;
     });
   }
 
-  // Process functions from Main.xmlui.xs
+  // Process functions from Globals.xs
   // Functions are parse trees that need to be evaluated to become callable
   const functions: Record<string, any> = {};
-  if (mainXs.functions) {
-    Object.entries(mainXs.functions).forEach(([funcName, funcDef]) => {
+  if (globalsXsDef.functions) {
+    Object.entries(globalsXsDef.functions).forEach(([funcName, funcDef]) => {
       // Functions come as objects with __PARSED__ mark and tree property
       if (
         typeof funcDef === "object" &&
@@ -1713,7 +1839,6 @@ function transformMainXsToGlobalTags(
         (funcDef as any).tree
       ) {
         try {
-          // Evaluate the function tree to get an actual callable function
           const evalContext: BindingTreeEvaluationContext = {
             mainThread: {
               childThreads: [],
@@ -1729,24 +1854,31 @@ function transformMainXsToGlobalTags(
           console.error(`Failed to evaluate function ${funcName}:`, error);
         }
       } else {
-        // Already evaluated or literal value
         functions[funcName] = funcDef;
       }
     });
   }
 
-  // Add the globalVars and functions to the entry point
+  // Merge globalVars: .xs vars come FIRST (for evaluation order — markup globals
+  // like global.catColors="{categoryColorMap}" can depend on .xs vars), and .xs
+  // vars take PRECEDENCE over markup globals with the same name.
   if (Object.keys(globalVars).length > 0 || Object.keys(functions).length > 0) {
+    const mergedGlobalVars: Record<string, any> = { ...globalVars };
+    if (entryPoint.globalVars) {
+      for (const [key, value] of Object.entries(entryPoint.globalVars)) {
+        if (!(key in globalVars)) {
+          mergedGlobalVars[key] = value;
+        }
+      }
+    }
+
     const transformedEntryPoint: ComponentDef = {
       ...entryPoint,
-      globalVars: {
-        ...entryPoint.globalVars,
-        ...globalVars
-      },
+      globalVars: mergedGlobalVars,
       functions: {
         ...entryPoint.functions,
-        ...functions
-      }
+        ...functions,
+      },
     };
 
     return transformedEntryPoint;
@@ -1762,7 +1894,7 @@ export default StandaloneApp;
 function processAppLinting(
   appDef: StandaloneAppDescription,
   metadataProvider: MetadataProvider,
-): null | ComponentDef {
+): { errorComponent: ComponentDef | null; toastMessages: string[] } {
   const lintSeverity = getLintSeverity(appDef.appGlobals?.lintSeverity);
 
   if (lintSeverity !== LintSeverity.Skip) {
@@ -1775,11 +1907,18 @@ function processAppLinting(
       if (lintSeverity === LintSeverity.Warning) {
         allComponentLints.forEach(printComponentLints);
       } else if (lintSeverity === LintSeverity.Error) {
-        return lintErrorsComponent(allComponentLints);
+        return { errorComponent: lintErrorsComponent(allComponentLints), toastMessages: [] };
+      } else if (lintSeverity === LintSeverity.Strict) {
+        allComponentLints.forEach(printComponentLints);
+        const toastMessages = allComponentLints.map(({ componentName, lints }) => {
+          const messages = lints.map(({ message }) => message).join("\n");
+          return `Lint issues in '${componentName}':\n${messages}`;
+        });
+        return { errorComponent: null, toastMessages };
       }
     }
-    return null;
   }
+  return { errorComponent: null, toastMessages: [] };
 }
 
 function discoverCompilationDependencies({
@@ -1837,4 +1976,16 @@ function discoverDirectComponentDependenciesHelp(
   }
 
   return deps;
+}
+
+function toThemeUrl(themeNameOrUrl: string): string {
+  const startsWithHttp = /^https?:\/\//;
+  if (startsWithHttp.test(themeNameOrUrl)) {
+    return themeNameOrUrl;
+  }
+  let res = "themes/" + themeNameOrUrl;
+  if (!themeNameOrUrl.endsWith(".json")) {
+    res += ".json";
+  }
+  return res;
 }

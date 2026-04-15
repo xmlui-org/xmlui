@@ -55,8 +55,8 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -125,6 +125,10 @@ The accordion view is particularly useful for mobile layouts or when you need to
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.
 
+### `gap` [#gap]
+
+Sets the gap (padding) between the tab header strip and the active tab panel content. Accepts any valid CSS length (e.g. `"8px"`, `"1rem"`). When set, this overrides the `paddingTop-TabItem` theme variable.
+
 ### `headerTemplate` [#headertemplate]
 
 This property declares the template for the clickable tab area.
@@ -177,6 +181,10 @@ Individual tab items have an optional identifier, which is passed to the header 
 ```
 
 > [!INFO] Individual `TabItem` children can customize their [header templates](./TabItem#headertemplate), too.
+
+### `keepMounted` [#keepmounted]
+
+When enabled, all tab panels remain mounted in the DOM even when not active — inactive panels are hidden with `display: none`. This ensures that form fields inside non-visible tabs stay registered with an enclosing Form. Defaults to `true` when the Tabs component is inside a Form, `false` otherwise.
 
 ### `orientation` [#orientation]
 
@@ -402,6 +410,7 @@ This method sets the active tab by index (0-based).
 | [paddingHorizontal](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
 | [paddingLeft](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
 | [paddingRight](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
+| [paddingTop](/docs/styles-and-themes/common-units/#size-values)-TabItem | $gap-normal | $gap-normal |
 | [paddingTop](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-trigger-Tabs | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-trigger-Tabs | $color-primary-600 | $color-primary-600 |

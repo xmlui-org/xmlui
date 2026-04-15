@@ -4,18 +4,21 @@ import type {
   ComponentMetadata,
 } from "../../abstractions/ComponentDefs";
 import type { StandaloneAppDescription } from "../../components-core/abstractions/standalone";
-import { layoutOptionKeys } from "../../components-core/descriptorHelper";
+import { layoutOptionKeys, behaviorPropKeys } from "../../components-core/descriptorHelper";
 import { viewportSizeMd } from "../../components/abstractions";
 import type {
   ComponentMetadataProvider,
   MetadataProvider,
 } from "../../language-server/services/common/metadata-utils";
 import { CORE_NAMESPACE_VALUE } from "./transform";
+import { MediaBreakpointKeys } from "../../abstractions/AppContextDefs";
+import { parseLayoutProperty } from "../../components-core/theming/parse-layout-props";
 
 export enum LintSeverity {
   Skip,
   Warning,
   Error,
+  Strict,
 }
 
 export enum LintDiagKind {
@@ -47,9 +50,12 @@ export function getLintSeverity(lintSeverityOption: string | undefined): LintSev
     case "skip":
       return LintSeverity.Skip;
       break;
+    case "strict":
+      return LintSeverity.Strict;
+      break;
     default:
       console.warn(
-        `Invalid lint severity option '${lintSeverityOption}'. Must be one of: 'warning', 'error', 'skip'. Defaulting to 'warning'.`,
+        `Invalid lint severity option '${lintSeverityOption}'. Must be one of: 'warning', 'error', 'skip', 'strict'. Defaulting to 'warning'.`,
       );
       return LintSeverity.Warning;
       break;
@@ -198,13 +204,44 @@ function lintHelp(
 
 const implicitPropNames = layoutOptionKeys;
 
+/**
+ * All property names (trigger props + declared props) from every registered behavior.
+ * These are implicitly valid on any component.
+ */
+const behaviorPropNames = new Set<string>(behaviorPropKeys);
+
+/**
+ * Checks if a property is a valid layout property variant.
+ * This includes responsive variants (e.g., "width-md"), state variants (e.g., "backgroundColor--hover"),
+ * and combinations (e.g., "width-md--hover").
+ * 
+ * Returns true if:
+ * - The property base (before separators) is in layoutOptionKeys
+ * - The property structure is valid (CSS property name, optional responsive breakpoint, optional state)
+ */
+function isValidLayoutPropertyVariant(propName: string): boolean {
+  // Parse the property to extract base property and other segments
+  const parsed = parseLayoutProperty(propName, false);
+  
+  // If parsing failed (returned an error string), it's not a valid property
+  if (typeof parsed === "string") {
+    return false;
+  }
+  
+  // Check if the base property is a known layout property
+  return layoutOptionKeys.includes(parsed.property);
+}
+
 function lintAttrs(
   component: ComponentDef,
   metadataForCurrentComponent: ComponentMetadataProvider,
   diags: LintDiagnostic[],
 ) {
   const invalidAttrNames = Object.keys(component.props ?? {}).filter(
-    (name) => !metadataForCurrentComponent.getAttr(name),
+    (name) =>
+      !metadataForCurrentComponent.getAttr(name) &&
+      !isValidLayoutPropertyVariant(name) &&
+      !behaviorPropNames.has(name),
   );
   const invalidEvents = Object.keys(component.events ?? {}).filter(
     (event) => !metadataForCurrentComponent.getEvent(event),

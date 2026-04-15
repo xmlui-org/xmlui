@@ -3,14 +3,15 @@ import classnames from "classnames";
 import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./Pagination.module.scss";
-import { Button } from "../Button/ButtonNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { ThemedButton as Button } from "../Button/Button";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
-import { Text } from "../Text/TextNative";
-import { Icon } from "../Icon/IconNative";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedIcon } from "../Icon/Icon";
 import type { OrientationOptions } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Part } from "../Part/Part";
-import { Select } from "../Select/SelectNative";
+import { ThemedSelect as Select } from "../Select/Select";
 import { convertOptionValue, OptionNative } from "../Option/OptionNative";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 
@@ -43,6 +44,7 @@ type Props = {
   updateState?: UpdateStateFn;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps: Required<
@@ -72,7 +74,7 @@ export const defaultProps: Required<
   pageInfoPosition: "end",
 };
 
-interface PaginationAPI extends ComponentApi {
+export interface PaginationAPI extends ComponentApi {
   moveFirst: () => void;
   moveLast: () => void;
   movePrev: () => void;
@@ -105,6 +107,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
     updateState,
     style,
     className,
+    classes,
     ...rest
   },
   ref,
@@ -199,6 +202,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             [styles.paginationVertical]: orientation === "vertical",
             [styles.paginationHorizontal]: orientation === "horizontal",
           },
+          classes?.[COMPONENT_PART_KEY],
           className,
         )}
         style={style}
@@ -221,7 +225,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               style={{ minHeight: "36px", padding: "8px" }}
               aria-label="Previous page"
             >
-              <Icon
+              <ThemedIcon
                 name="prev:Pagination"
                 fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
                 size="sm"
@@ -240,7 +244,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               style={{ minHeight: "36px", padding: "8px" }}
               aria-label="Next page"
             >
-              <Icon
+              <ThemedIcon
                 name="next:Pagination"
                 fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
                 size="sm"
@@ -302,7 +306,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             style={{ minHeight: "36px", padding: "8px" }}
             aria-label="First page"
           >
-            <Icon
+            <ThemedIcon
               name={`first:Pagination`}
               fallback={orientation === "vertical" ? "doublechevronup" : "doublechevronleft"}
               size="sm"
@@ -322,7 +326,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               style={{ minHeight: "36px", padding: "8px" }}
               aria-label="Previous page"
             >
-              <Icon
+              <ThemedIcon
                 name={`prev:Pagination`}
                 fallback={orientation === "vertical" ? "chevronup" : "chevronleft"}
                 size="sm"
@@ -372,7 +376,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               style={{ minHeight: "36px", padding: "8px" }}
               aria-label="Next page"
             >
-              <Icon
+              <ThemedIcon
                 name={`next:Pagination`}
                 fallback={orientation === "vertical" ? "chevrondown" : "chevronright"}
                 size="sm"
@@ -392,7 +396,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             style={{ minHeight: "36px", padding: "8px" }}
             aria-label="Last page"
           >
-            <Icon
+            <ThemedIcon
               name={`last:Pagination`}
               fallback={orientation === "vertical" ? "doublechevrondown" : "doublechevronright"}
               size="sm"
@@ -455,6 +459,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
           [styles.paginationVertical]: orientation === "vertical",
           [styles.paginationHorizontal]: orientation === "horizontal",
         },
+        classes?.[COMPONENT_PART_KEY],
         className,
       )}
       style={style}

@@ -52,13 +52,16 @@ export function observePlaygroundPattern(content: string): [number, number, stri
     if (endIndex !== -1) {
       // Check if the end pattern is not part of {pg-content} (escaped with backticks)
       const precedingChar = content[endIndex - 1];
-      if (precedingChar !== "\\") {
-        return [
-          startIndex,
-          endIndex + endPattern.length,
-          content.substring(startIndex, endIndex + endPattern.length),
-        ];
-      }
+      if (precedingChar === "\\") continue;
+      // Skip if part of a 4+ backtick sequence (used for nested code fences)
+      const followingChar =
+        endIndex + endPattern.length < content.length ? content[endIndex + endPattern.length] : "";
+      if (precedingChar === "`" || followingChar === "`") continue;
+      return [
+        startIndex,
+        endIndex + endPattern.length,
+        content.substring(startIndex, endIndex + endPattern.length),
+      ];
     }
   }
 
@@ -202,6 +205,21 @@ export function extractAppAttributes(appContent: string): { defaultTone?: string
   return result;
 }
 
+/**
+ * Replace exactly 4 consecutive backticks with 3, allowing nested code fences inside xmlui-pg blocks.
+ */
+function unescapeNestedCodeFences(content: string): string {
+  return content.replace(/(?<!`)````(?!`)/g, "```");
+}
+
+/**
+ * Return the minimum fence delimiter that safely wraps content.
+ * If content contains ```, returns ````; otherwise returns ```.
+ */
+function codeFenceFor(content: string): string {
+  return /(?<!`)```(?!`)/.test(content) ? "````" : "```";
+}
+
 export function parsePlaygroundPattern(content: string): PlaygroundPattern {
   const pattern: PlaygroundPattern = {};
   const match = observePlaygroundPattern(content);
@@ -224,26 +242,26 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
     const line = lines[i];
     if (line.startsWith("---app")) {
       const appSegment = parseSegmentProps(line);
-      pattern.app = { ...appSegment };
+      pattern.app = { copy: pattern.default?.copy, display: pattern.default?.display, ...appSegment };
       closeCurrentMode("app");
     } else if (line.startsWith("---comp")) {
       closeCurrentMode("comp");
       const compSegment = parseSegmentProps(line);
       pattern.components ??= [];
-      pattern.components.push(compSegment);
+      pattern.components.push({ copy: pattern.default?.copy, display: pattern.default?.display, ...compSegment });
     } else if (line.startsWith("---config")) {
       const configSegment = parseSegmentProps(line);
-      pattern.config ??= { ...configSegment };
+      pattern.config ??= { copy: pattern.default?.copy, display: pattern.default?.display, ...configSegment };
       closeCurrentMode("config");
     } else if (line.startsWith("---api")) {
       const apiSegment = parseSegmentProps(line);
-      pattern.api ??= { ...apiSegment };
+      pattern.api ??= { copy: pattern.default?.copy, display: pattern.default?.display, ...apiSegment };
       closeCurrentMode("api");
     } else if (line.startsWith("---desc")) {
       closeCurrentMode("desc");
       const descSegment = parseSegmentProps(line);
       pattern.descriptions ??= [];
-      pattern.descriptions.push(descSegment);
+      pattern.descriptions.push({ copy: pattern.default?.copy, display: pattern.default?.display, ...descSegment });
     } else {
       // Append the line to the current segment content
       segmentContent += line + "\n";
@@ -256,7 +274,7 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
   } else {
     pattern.app = {
       ...pattern.default,
-      content: segmentContent,
+      content: unescapeNestedCodeFences(segmentContent),
       order,
     };
   }
@@ -265,25 +283,26 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
 
   function closeCurrentMode(newMode: string) {
     foundSegment = true;
+    const resolved = unescapeNestedCodeFences(segmentContent);
     switch (currentMode) {
       case "app":
-        pattern.app.content = segmentContent;
+        pattern.app.content = resolved;
         pattern.app.order = order++;
         break;
       case "comp":
-        pattern.components[pattern.components.length - 1].content = segmentContent;
+        pattern.components[pattern.components.length - 1].content = resolved;
         pattern.components[pattern.components.length - 1].order = order++;
         break;
       case "config":
-        pattern.config.content = segmentContent;
+        pattern.config.content = resolved;
         pattern.config.order = order++;
         break;
       case "api":
-        pattern.api.content = segmentContent;
+        pattern.api.content = resolved;
         pattern.api.order = order++;
         break;
       case "desc":
-        pattern.descriptions[pattern.descriptions.length - 1].content = segmentContent;
+        pattern.descriptions[pattern.descriptions.length - 1].content = resolved;
         pattern.descriptions[pattern.descriptions.length - 1].order = order++;
         break;
     }
@@ -401,9 +420,10 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
     segmentAttrs = segmentAttrs.trim().replace(/\s+/g, " ");
 
     switch (type) {
-      case "app":
+      case "app": {
         if (segment.display) {
-          markdownContent += "```xmlui " + segmentAttrs + "\n" + segment.content + "```\n\n";
+          const fence = codeFenceFor(segment.content);
+          markdownContent += fence + "xmlui " + segmentAttrs + "\n" + segment.content + fence + "\n\n";
         }
         pgContent.app = segment.content;
         
@@ -416,23 +436,28 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
           pgContent.activeTheme = appAttrs.defaultTheme;
         }
         break;
-      case "config":
+      }
+      case "config": {
         if (segment.display) {
-          markdownContent += "```json " + segmentAttrs + "\n" + segment.content + "```\n\n";
+          const fence = codeFenceFor(segment.content);
+          markdownContent += fence + "json " + segmentAttrs + "\n" + segment.content + fence + "\n\n";
         }
         pgContent.config = segment.content;
         break;
+      }
       case "api":
         // --- Never display API segments
         pgContent.api = segment.content;
         break;
-      case "comp":
+      case "comp": {
         if (segment.display) {
-          markdownContent += "```xmlui " + segmentAttrs + "\n" + segment.content + "```\n\n";
+          const fence = codeFenceFor(segment.content);
+          markdownContent += fence + "xmlui " + segmentAttrs + "\n" + segment.content + fence + "\n\n";
         }
         pgContent.components ??= [];
         pgContent.components.push(segment.content);
         break;
+      }
       case "desc":
         markdownContent += segment.content + "\n";
         break;

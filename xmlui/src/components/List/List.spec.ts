@@ -1368,3 +1368,932 @@ test.describe("Virtualization", () => {
     await expect(list).toContainText("Item 1");
   });
 });
+
+// =============================================================================
+// ROW SELECTION TESTS
+// =============================================================================
+
+const sampleData = [
+  { id: 1, name: "Apple", quantity: 5, category: "Fruit" },
+  { id: 2, name: "Banana", quantity: 3, category: "Fruit" },
+  { id: 3, name: "Carrot", quantity: 10, category: "Vegetable" },
+  { id: 4, name: "Spinach", quantity: 2, category: "Vegetable" },
+];
+
+test.describe("Row Selection", () => {
+  test.describe("rowsSelectable property", () => {
+    test("clicking a row selects it when rowsSelectable is true", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items).toHaveCount(4);
+
+      // Click first item
+      await items.first().click();
+      await expect(items.first()).toHaveAttribute("data-selected", "true");
+    });
+
+    test("rows are not selectable by default", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}'>
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items).toHaveCount(4);
+
+      // Click first item — should NOT get selected
+      await items.first().click();
+      await expect(items.first()).not.toHaveAttribute("data-selected", "true");
+    });
+
+    test("rows are not selectable when rowsSelectable is false", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="false">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+      await expect(items.first()).not.toHaveAttribute("data-selected", "true");
+    });
+
+    test("selected row gets the selected CSS class", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+      await expect(items.first()).toHaveClass(/selected/);
+    });
+
+    test("clicking another row deselects the previously selected row in single-select mode", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="false">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      // Select first item
+      await items.nth(0).click();
+      await expect(items.nth(0)).toHaveAttribute("data-selected", "true");
+
+      // Select second item
+      await items.nth(1).click();
+      await expect(items.nth(1)).toHaveAttribute("data-selected", "true");
+      await expect(items.nth(0)).not.toHaveAttribute("data-selected", "true");
+    });
+  });
+
+  test.describe("enableMultiRowSelection property", () => {
+    test("allows selecting multiple rows with Ctrl/Meta+click", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      // Select first item
+      await items.nth(0).click();
+      await expect(items.nth(0)).toHaveAttribute("data-selected", "true");
+
+      // Ctrl+click second item
+      await items.nth(1).click({ modifiers: ["ControlOrMeta"] });
+      await expect(items.nth(0)).toHaveAttribute("data-selected", "true");
+      await expect(items.nth(1)).toHaveAttribute("data-selected", "true");
+    });
+
+    test("single-select mode replaces selection on click", async ({
+      initTestBed,
+      page,
+    }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="false">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      await items.nth(0).click();
+      await items.nth(2).click();
+
+      // Only second clicked should be selected
+      await expect(items.nth(0)).not.toHaveAttribute("data-selected", "true");
+      await expect(items.nth(2)).toHaveAttribute("data-selected", "true");
+    });
+  });
+
+  test.describe("selectionDidChange event", () => {
+    test("fires when a row is selected", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await expect.poll(testStateDriver.testState).toBe(1);
+    });
+
+    test("fires with updated count when selection changes", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.nth(0).click();
+      await expect.poll(testStateDriver.testState).toBe(1);
+
+      await items.nth(1).click({ modifiers: ["ControlOrMeta"] });
+      await expect.poll(testStateDriver.testState).toBe(2);
+    });
+
+    test("passes selected items to the handler", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onSelectionDidChange="items => testState = items.map(i => i.name).join(',')"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await expect.poll(testStateDriver.testState).toEqual("Apple");
+    });
+  });
+
+  test.describe("rowDoubleClick event", () => {
+    test("fires on double-click with the row item", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          onRowDoubleClick="(item) => testState = item.name"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().dblclick();
+
+      await expect.poll(testStateDriver.testState).toEqual("Apple");
+    });
+
+    test("double-click does not interfere with selection", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onRowDoubleClick="(item) => testState = item.name"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().dblclick();
+
+      await expect.poll(testStateDriver.testState).toEqual("Apple");
+      // After double-click, row should be selected (from the first click)
+      await expect(items.first()).toHaveClass(/selected/);
+    });
+  });
+
+  test.describe("rowUnselectablePredicate property", () => {
+    test("unselectable predicate excludes rows from selectAll", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="selectAllBtn" label="Select All" onClick="myList.selectAll()" />
+      `);
+
+      // selectAll should only select non-unselectable rows (Apple, Banana = 2)
+      await page.getByTestId("selectAllBtn").click();
+      await expect.poll(testStateDriver.testState).toBe(2);
+    });
+
+    test("selectable rows can still be selected", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      // Click on a fruit row (selectable)
+      await items.filter({ hasText: "Apple" }).click();
+      await expect.poll(testStateDriver.testState).toBe(1);
+    });
+
+    test("has no effect when rowsSelectable is false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="false"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+      await expect(items.first()).not.toHaveAttribute("data-selected", "true");
+    });
+
+    test("clicking an unselectable row does not select it", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      // Click on a Vegetable row — should NOT be selected
+      await items.filter({ hasText: "Carrot" }).click();
+      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute("data-selected", "true");
+      await expect.poll(testStateDriver.testState).toBe(0);
+    });
+
+    test("unselectable rows are skipped when using checkbox", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      // The 3rd item (index 2) is Carrot (Vegetable) — its checkbox should not select it
+      const vegetableCheckbox = items.filter({ hasText: "Carrot" }).locator("input[type='checkbox']");
+      await vegetableCheckbox.click({ force: true });
+      await expect(items.filter({ hasText: "Carrot" })).not.toHaveAttribute("data-selected", "true");
+      await expect.poll(testStateDriver.testState).toBe(0);
+    });
+
+    test("unselectable rows display disabled checkbox", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" enableMultiRowSelection="true"
+          rowUnselectablePredicate="{item => item.category === 'Vegetable'}">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      // Vegetables (Carrot, Spinach) should have disabled checkboxes
+      const vegetableCheckbox = items.filter({ hasText: "Carrot" }).locator("input[type='checkbox']");
+      await expect(vegetableCheckbox).toBeDisabled();
+
+      // Fruits (Apple, Banana) should have enabled checkboxes
+      const fruitCheckbox = items.filter({ hasText: "Apple" }).locator("input[type='checkbox']");
+      await expect(fruitCheckbox).toBeEnabled();
+    });
+  });
+
+  test.describe("hideSelectionCheckboxes property", () => {
+    test("shows checkboxes when rowsSelectable is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(4);
+    });
+
+    test("hides checkboxes when hideSelectionCheckboxes is true", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" hideSelectionCheckboxes="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(0);
+    });
+
+    test("no checkboxes when rowsSelectable is false", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}'>
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(0);
+    });
+
+    test("clicking a checkbox selects the row", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          onSelectionDidChange="items => testState = items.length">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstCheckbox = page.locator("input[type='checkbox']").first();
+      await firstCheckbox.check({ force: true });
+      await expect.poll(testStateDriver.testState).toBe(1);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items.first()).toHaveAttribute("data-selected", "true");
+    });
+
+    test("checkbox reflects selection state", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstCheckbox = page.locator("input[type='checkbox']").first();
+      await expect(firstCheckbox).not.toBeChecked();
+
+      // Select via row click
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+      await expect(firstCheckbox).toBeChecked();
+    });
+  });
+
+  test.describe("selectionCheckboxPosition property", () => {
+    test("defaults to before mode (checkbox before content)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      // In before mode the row has the hasCheckboxes class (flex layout)
+      const firstRow = page.locator("[data-list-item-type='ITEM']").first();
+      await expect(firstRow).toHaveClass(/hasCheckboxes/);
+      await expect(firstRow).not.toHaveClass(/hasOverlayCheckbox/);
+    });
+
+    test("overlay mode: row has hasOverlayCheckbox class, not hasCheckboxes", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" selectionCheckboxPosition="overlay">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstRow = page.locator("[data-list-item-type='ITEM']").first();
+      await expect(firstRow).toHaveClass(/hasOverlayCheckbox/);
+      await expect(firstRow).not.toHaveClass(/hasCheckboxes/);
+    });
+
+    test("overlay mode: checkbox is present inside row", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true" selectionCheckboxPosition="overlay">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const checkboxes = page.locator("input[type='checkbox']");
+      await expect(checkboxes).toHaveCount(4);
+    });
+
+    test("overlay mode: checkbox position reflects anchor top-left (default)", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          selectionCheckboxAnchor="top-left"
+          selectionCheckboxOffsetX="12px"
+          selectionCheckboxOffsetY="12px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      await expect(wrapper).toBeAttached();
+      // Verify the style contains top and left offsets
+      const style = await wrapper.getAttribute("style");
+      expect(style).toContain("top: 12px");
+      expect(style).toContain("left: 12px");
+    });
+
+    test("overlay mode: top-right anchor uses right/top offsets", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          selectionCheckboxAnchor="top-right"
+          selectionCheckboxOffsetX="10px"
+          selectionCheckboxOffsetY="10px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      await expect(wrapper).toBeAttached();
+      const style = await wrapper.getAttribute("style");
+      expect(style).toContain("top: 10px");
+      expect(style).toContain("right: 10px");
+    });
+
+    test("overlay mode: bottom-left anchor uses bottom/left offsets", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          selectionCheckboxAnchor="bottom-left"
+          selectionCheckboxOffsetX="6px"
+          selectionCheckboxOffsetY="6px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      await expect(wrapper).toBeAttached();
+      const style = await wrapper.getAttribute("style");
+      expect(style).toContain("bottom: 6px");
+      expect(style).toContain("left: 6px");
+    });
+
+    test("overlay mode: bottom-right anchor uses bottom/right offsets", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          selectionCheckboxAnchor="bottom-right"
+          selectionCheckboxOffsetX="4px"
+          selectionCheckboxOffsetY="4px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const wrapper = page.locator("[data-list-item-type='ITEM']").first().locator("[class*='checkboxOverlay']").first();
+      await expect(wrapper).toBeAttached();
+      const style = await wrapper.getAttribute("style");
+      expect(style).toContain("bottom: 4px");
+      expect(style).toContain("right: 4px");
+    });
+
+    test("overlay mode: selecting via checkbox still works", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          onSelectionDidChange="items => testState = items.length">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstCheckbox = page.locator("input[type='checkbox']").first();
+      await firstCheckbox.check({ force: true });
+      await expect.poll(testStateDriver.testState).toBe(1);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items.first()).toHaveAttribute("data-selected", "true");
+    });
+
+    test("selectionCheckboxSize applies width and height to checkbox input", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxSize="24px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstCheckbox = page.locator("input[type='checkbox']").first();
+      await expect(firstCheckbox).toHaveCSS("width", "24px");
+      await expect(firstCheckbox).toHaveCSS("height", "24px");
+    });
+
+    test("selectionCheckboxSize works in overlay mode", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List data='{${JSON.stringify(sampleData)}}' rowsSelectable="true"
+          selectionCheckboxPosition="overlay"
+          selectionCheckboxSize="20px">
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+      const firstCheckbox = page.locator("input[type='checkbox']").first();
+      await expect(firstCheckbox).toHaveCSS("width", "20px");
+      await expect(firstCheckbox).toHaveCSS("height", "20px");
+    });
+  });
+
+  test.describe("initiallySelected property", () => {
+    test("renders with pre-selected rows", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          initiallySelected="{[1, 3]}"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items).toHaveCount(4);
+
+      // Items with id 1 (Apple) and 3 (Carrot) should be selected
+      await expect(items.filter({ hasText: "Apple" })).toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Carrot" })).toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Banana" })).not.toHaveAttribute("data-selected", "true");
+      await expect(items.filter({ hasText: "Spinach" })).not.toHaveAttribute("data-selected", "true");
+    });
+  });
+
+  test.describe("$isSelected context variable", () => {
+    test("exposes selection state to item template", async ({ initTestBed, page }) => {
+      await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+        >
+          <Text testId="{'item-' + $item.id}">{$item.name} - {$isSelected ? 'YES' : 'NO'}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+
+      // Initially no items selected
+      await expect(page.getByTestId("item-1")).toContainText("Apple - NO");
+
+      // Click first item
+      await items.first().click();
+
+      // Now it should show YES
+      await expect(page.getByTestId("item-1")).toContainText("Apple - YES");
+    });
+  });
+
+  test.describe("selection APIs", () => {
+    test("selectAll API selects all rows", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="selectAllBtn" label="Select All" onClick="myList.selectAll()" />
+      `);
+
+      await page.getByTestId("selectAllBtn").click();
+      await expect.poll(testStateDriver.testState).toBe(4);
+
+      // Verify all items are selected
+      const items = page.locator("[data-list-item-type='ITEM']");
+      for (let i = 0; i < 4; i++) {
+        await expect(items.nth(i)).toHaveAttribute("data-selected", "true");
+      }
+    });
+
+    test("clearSelection API deselects all rows", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          onSelectionDidChange="items => testState = items.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="selectAllBtn" label="Select All" onClick="myList.selectAll()" />
+        <Button testId="clearBtn" label="Clear" onClick="myList.clearSelection()" />
+      `);
+
+      // Select all first
+      await page.getByTestId("selectAllBtn").click();
+      await expect.poll(testStateDriver.testState).toBe(4);
+
+      // Clear selection
+      await page.getByTestId("clearBtn").click();
+      await expect.poll(testStateDriver.testState).toBe(0);
+
+      // Verify no items are selected
+      const items = page.locator("[data-list-item-type='ITEM']");
+      for (let i = 0; i < 4; i++) {
+        await expect(items.nth(i)).not.toHaveAttribute("data-selected", "true");
+      }
+    });
+
+    test("getSelectedIds API returns selected IDs", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="getIdsBtn" label="Get IDs" onClick="testState = myList.getSelectedIds()" />
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.nth(0).click();
+      await items.nth(2).click({ modifiers: ["ControlOrMeta"] });
+
+      await page.getByTestId("getIdsBtn").click();
+
+      const result = await testStateDriver.testState();
+      expect(result).toHaveLength(2);
+      expect(result).toContain(1);
+      expect(result).toContain(3);
+    });
+
+    test("getSelectedItems API returns selected items", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="getItemsBtn" label="Get Items" onClick="testState = myList.getSelectedItems().map(i => i.name).join(',')" />
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.nth(0).click();
+      await items.nth(1).click({ modifiers: ["ControlOrMeta"] });
+
+      await page.getByTestId("getItemsBtn").click();
+
+      await expect.poll(testStateDriver.testState).toEqual("Apple,Banana");
+    });
+
+    test("selectId API selects a specific row", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          id="myList"
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onSelectionDidChange="items => testState = items.map(i => i.name).join(',')"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+        <Button testId="selectBtn" label="Select Banana" onClick="myList.selectId(2)" />
+      `);
+
+      await page.getByTestId("selectBtn").click();
+      await expect.poll(testStateDriver.testState).toEqual("Banana");
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await expect(items.filter({ hasText: "Banana" })).toHaveAttribute("data-selected", "true");
+    });
+  });
+
+  test.describe("keyboard actions", () => {
+    test("Ctrl+A selects all rows and fires selectAllAction", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          enableMultiRowSelection="true"
+          onSelectAllAction="(row, items, ids) => testState = ids.length"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      // Click a row first to focus the list
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      // Press Ctrl+A
+      await page.keyboard.press("ControlOrMeta+a");
+
+      await expect.poll(testStateDriver.testState).toBe(4);
+    });
+
+    test("copyAction fires on Ctrl+C", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onCopyAction="(row, items, ids) => testState = 'copied:' + ids.join(',')"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await page.keyboard.press("ControlOrMeta+c");
+
+      await expect.poll(testStateDriver.testState).toEqual("copied:1");
+    });
+
+    test("cutAction fires on Ctrl+X", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onCutAction="(row, items, ids) => testState = 'cut:' + ids.join(',')"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await page.keyboard.press("ControlOrMeta+x");
+
+      await expect.poll(testStateDriver.testState).toEqual("cut:1");
+    });
+
+    test("deleteAction fires on Delete key", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onDeleteAction="(row, items, ids) => testState = 'deleted:' + ids.join(',')"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await page.keyboard.press("Delete");
+
+      await expect.poll(testStateDriver.testState).toEqual("deleted:1");
+    });
+
+    test("pasteAction fires on Ctrl+V", async ({ initTestBed, page }) => {
+      const { testStateDriver } = await initTestBed(`
+        <List
+          data='{${JSON.stringify(sampleData)}}'
+          rowsSelectable="true"
+          onPasteAction="(row, items, ids) => testState = 'pasted'"
+        >
+          <Text>{$item.name}</Text>
+        </List>
+      `);
+
+      const items = page.locator("[data-list-item-type='ITEM']");
+      await items.first().click();
+
+      await page.keyboard.press("ControlOrMeta+v");
+
+      await expect.poll(testStateDriver.testState).toEqual("pasted");
+    });
+  });
+});
+
+test.describe("groupBy with function", () => {
+  test("groups items using a function", async ({ initTestBed, createListDriver }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.category}"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Group: fruit");
+    await expect(driver.component).toContainText("Group: vegetable");
+    await expect(driver.component).toContainText("Apple");
+    await expect(driver.component).toContainText("Banana");
+    await expect(driver.component).toContainText("Carrot");
+  });
+
+  test("groups items using a computed value from function", async ({
+    initTestBed,
+    createListDriver,
+  }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.name[0]}"
+        data="{[
+          {id: 1, name: 'Apple'},
+          {id: 2, name: 'Avocado'},
+          {id: 3, name: 'Banana'},
+          {id: 4, name: 'Cherry'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Letter: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Letter: A");
+    await expect(driver.component).toContainText("Letter: B");
+    await expect(driver.component).toContainText("Letter: C");
+    await expect(driver.component).toContainText("Apple");
+    await expect(driver.component).toContainText("Avocado");
+    await expect(driver.component).toContainText("Banana");
+    await expect(driver.component).toContainText("Cherry");
+  });
+
+  test("string groupBy still works as before", async ({ initTestBed, createListDriver }) => {
+    await initTestBed(`
+      <List
+        groupBy="category"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text>Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    await expect(driver.component).toContainText("Group: fruit");
+    await expect(driver.component).toContainText("Group: vegetable");
+  });
+
+  test("function groupBy works with defaultGroups ordering", async ({
+    initTestBed,
+    createListDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <List
+        groupBy="{(item) => item.category}"
+        defaultGroups="{['vegetable', 'fruit']}"
+        data="{[
+          {id: 1, name: 'Apple', category: 'fruit'},
+          {id: 2, name: 'Carrot', category: 'vegetable'},
+          {id: 3, name: 'Banana', category: 'fruit'}
+        ]}">
+        <property name="groupHeaderTemplate">
+          <Text testId="groupHeader">Group: {$group.key}</Text>
+        </property>
+        <Text>{$item.name}</Text>
+      </List>
+    `);
+    const driver = await createListDriver();
+    const headers = page.getByTestId("groupHeader");
+    await expect(headers).toHaveCount(2);
+    await expect(headers.nth(0)).toContainText("Group: vegetable");
+    await expect(headers.nth(1)).toContainText("Group: fruit");
+  });
+});

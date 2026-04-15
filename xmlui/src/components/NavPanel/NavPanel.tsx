@@ -1,13 +1,11 @@
 import styles from "./NavPanel.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { NavPanel, defaultProps, buildNavHierarchy } from "./NavPanelNative";
-import { useCallback, useMemo } from "react";
-import classnames from "classnames";
+import { useMemo } from "react";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import { useComponentRegistry } from "../ComponentRegistryContext";
 
 const COMP = "NavPanel";
 
@@ -220,7 +218,8 @@ export const NavPanelMd = createMetadata({
         `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
@@ -231,9 +230,34 @@ export const NavPanelMd = createMetadata({
         `panel when scrollable content extends beyond the visible area. The fade effect provides a visual cue ` +
         `to users that additional content is available by scrolling. The indicators automatically appear and ` +
         `disappear based on the scroll position. This property only works with "overlay", "whenMouseOver", and ` +
-        `"whenScrolling" scroll styles.`,
+        `"whenScrolling" scroll styles. On mobile/touch devices, this property has no effect.`,
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
+    },
+    syncWithContent: {
+      description:
+        `When enabled, any page navigation automatically scrolls the corresponding navigation ` +
+        `item within the NavPanel into view, keeping the active link visible.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.syncWithContent,
+    },
+    syncScrollBehavior: {
+      description:
+        `Controls the scroll animation when \`syncWithContent\` is enabled. Use \`"smooth"\` for an ` +
+        `animated scroll or \`"instant"\` to jump immediately to the active item without animation.`,
+      valueType: "string",
+      availableValues: ["smooth", "instant"],
+      defaultValue: defaultProps.syncScrollBehavior,
+    },
+    syncScrollPosition: {
+      description:
+        `Controls the vertical alignment of the active navigation item within the NavPanel when ` +
+        `\`syncWithContent\` scrolls it into view. \`"center"\` places the item in the middle of the ` +
+        `visible area; \`"nearest"\` scrolls the minimum amount needed; \`"start"\` aligns it to the ` +
+        `top; \`"end"\` aligns it to the bottom.`,
+      valueType: "string",
+      availableValues: ["center", "nearest", "start", "end"],
+      defaultValue: defaultProps.syncScrollPosition,
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -259,7 +283,7 @@ export const NavPanelMd = createMetadata({
 function NavPanelWithBuiltNavHierarchy({
   node,
   renderChild,
-  className,
+  classes,
   layoutContext,
   extractValue,
   appContext,
@@ -294,6 +318,15 @@ function NavPanelWithBuiltNavHierarchy({
     defaultProps.scrollStyle,
   );
   const showScrollerFade = extractValue.asOptionalBoolean(node.props.showScrollerFade);
+  const syncWithContent = extractValue.asOptionalBoolean(node.props.syncWithContent);
+  const syncScrollBehavior = extractValue.asOptionalString(
+    node.props.syncScrollBehavior,
+    defaultProps.syncScrollBehavior,
+  ) as ScrollBehavior | undefined;
+  const syncScrollPosition = extractValue.asOptionalString(
+    node.props.syncScrollPosition,
+    defaultProps.syncScrollPosition,
+  ) as ScrollLogicalPosition | undefined;
   const footerContent = node.props.footerTemplate
     ? renderChild(node.props.footerTemplate)
     : undefined;
@@ -302,31 +335,31 @@ function NavPanelWithBuiltNavHierarchy({
     <NavPanel
       logoContent={renderChild(node.props.logoTemplate)}
       footerContent={footerContent}
-      className={classnames(layoutContext?.themeClassName, className)}
+      className={layoutContext?.themeClassName}
+      classes={classes}
       inDrawer={layoutContext?.inDrawer}
       renderChild={renderChild}
       navLinks={navLinks}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
+      syncWithContent={syncWithContent}
+      syncScrollBehavior={syncScrollBehavior}
+      syncScrollPosition={syncScrollPosition}
     >
       {renderChild(expandedChildren)}
     </NavPanel>
   );
 }
 
-export const navPanelRenderer = createComponentRenderer(
-  COMP,
-  NavPanelMd,
-  ({ node, renderChild, className, layoutContext, extractValue, appContext }) => {
-    return (
-      <NavPanelWithBuiltNavHierarchy
-        node={node}
-        renderChild={renderChild}
-        className={className}
-        layoutContext={layoutContext}
-        extractValue={extractValue}
-        appContext={appContext}
-      />
-    );
-  },
-);
+export const navPanelRenderer = wrapComponent(COMP, NavPanel, NavPanelMd, {
+  customRender: (_props, context) => (
+    <NavPanelWithBuiltNavHierarchy
+      node={context.node as any}
+      renderChild={context.renderChild}
+      classes={context.classes}
+      layoutContext={context.layoutContext}
+      extractValue={context.extractValue}
+      appContext={context.appContext}
+    />
+  ),
+});

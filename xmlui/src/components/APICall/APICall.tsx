@@ -14,6 +14,7 @@ export interface ApiActionComponent extends ComponentDef {
     confirmTitle?: string;
     confirmMessage?: string;
     confirmButtonLabel?: string;
+    cancelButtonLabel?: string;
     optimisticValue: any;
     getOptimisticValue: string;
     inProgressNotificationMessage?: string;
@@ -25,6 +26,7 @@ export interface ApiActionComponent extends ComponentDef {
     progress: string;
     error: string;
     beforeRequest: string;
+    mockExecute: string;
   };
 }
 
@@ -108,6 +110,12 @@ export const APICallMd = createMetadata({
     confirmButtonLabel: {
       description:
         "This optional string property enables the customization of the submit button in the " +
+        `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
+      valueType: "string",
+    },
+    cancelButtonLabel: {
+      description:
+        "This optional string property enables the customization of the cancel button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
       valueType: "string",
     },
@@ -274,6 +282,16 @@ export const APICallMd = createMetadata({
       signature: "() => void",
       parameters: {},
     },
+    mockExecute: {
+      description:
+        "When defined, this event handler replaces the actual API request. " +
+        "The handler receives the resolved request properties as context variables: " +
+        "`$pathParams`, `$queryParams`, `$requestBody`, `$cookies`, `$requestHeaders`. " +
+        "When triggered via the `execute()` method, `$param` and `$params` are also available. " +
+        "The return value of the handler becomes the result of the API call.",
+      signature: "() => any",
+      parameters: {},
+    },
     progress: dInternal(),
   },
   contextVars: {
@@ -284,6 +302,21 @@ export const APICallMd = createMetadata({
       description:
         "Array of all parameters passed to `execute()` method (access with " +
         "`$params[0]`, `$params[1]`, etc.)",
+    },
+    $pathParams: {
+      description: "Path parameters extracted from the request URL (available in `mockExecute`)",
+    },
+    $queryParams: {
+      description: "Resolved query parameters (available in `mockExecute`)",
+    },
+    $requestBody: {
+      description: "Resolved request body (available in `mockExecute`)",
+    },
+    $cookies: {
+      description: "Request cookies (available in `mockExecute`)",
+    },
+    $requestHeaders: {
+      description: "Resolved request headers (available in `mockExecute`)",
     },
     $result: {
       description: "Response data (available in `completedNotificationMessage`)",
@@ -337,6 +370,12 @@ export const APICallMd = createMetadata({
       description: "The error from the most recent failed API call execution.",
       signature: "lastError: any",
     },
+    lastResponseHeaders: {
+      description:
+        "This property retrieves the HTTP response headers from the last successful " +
+        "API call execution, or `undefined` if no successful call has completed yet.",
+      signature: "get lastResponseHeaders(): Record<string, string> | undefined",
+    },
     stopPolling: {
       description: "Manually stop polling in deferred mode. The operation continues on the server.",
       signature: "stopPolling(): void",
@@ -374,6 +413,7 @@ export const apiCallRenderer = createComponentRenderer(
         onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
+        hasMockExecute={!!node.events?.mockExecute}
       />
     );
   },

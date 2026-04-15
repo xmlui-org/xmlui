@@ -28,14 +28,16 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { mergeProps } from "../../components-core/utils/mergeProps";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Icon } from "../Icon/IconNative";
-import { NavLink } from "../NavLink/NavLinkNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import type { NavGroupMd } from "./NavGroup";
 import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { getAppLayoutOrientation } from "../App/AppNative";
 import { useAppContext } from "../../components-core/AppContext";
 
@@ -43,6 +45,8 @@ type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
 type Props = {
   style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
   label: string;
   icon?: React.ReactNode;
   to?: string;
@@ -80,6 +84,8 @@ export const NavGroup = forwardRef(function NavGroup(
   {
     node,
     style,
+    className,
+    classes,
     label,
     icon,
     renderChild,
@@ -147,6 +153,8 @@ export const NavGroup = forwardRef(function NavGroup(
           {...rest}
           to={to}
           style={style}
+          className={className}
+          classes={classes}
           label={label}
           icon={icon}
           node={node}
@@ -180,6 +188,8 @@ export const NavGroup = forwardRef(function NavGroup(
 
 type ExpandableNavGroupProps = {
   style?: CSSProperties;
+  className?: string;
+  classes?: Record<string, string>;
   label: string;
   icon: ReactNode;
   node: NavGroupComponentDef;
@@ -195,6 +205,8 @@ type ExpandableNavGroupProps = {
 const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   {
     style = EMPTY_OBJECT,
+    className,
+    classes,
     label,
     icon,
     renderChild,
@@ -240,12 +252,27 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       e.preventDefault();
       e.stopPropagation();
     }
-    setExpanded((prev) => !prev);
+    setExpanded((prev) => {
+      const newExpanded = !prev;
+      pushXsLog({
+        ts: Date.now(),
+        perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+        traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+        kind: "focus:change",
+        component: "NavGroup",
+        ariaName: label,
+        componentLabel: label,
+        displayLabel: label,
+        label,
+        expanded: newExpanded,
+      });
+      return newExpanded;
+    });
   };
 
   return (
     <div
-      className={styles.groupWrapper}
+      className={classnames(styles.groupWrapper, classes?.[COMPONENT_PART_KEY], className)}
       style={expandIconAlignment === "end" ? { width: "100%" } : undefined}
     >
       <NavLink
@@ -267,7 +294,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
       >
         {label}
         {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-        <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
+        <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />
       </NavLink>
       <div
         aria-hidden={!expanded}
@@ -346,7 +373,20 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
       {...rest}
       open={expanded}
       onOpenChange={(open) => {
-        if (renderCount) setExpanded(open);
+        if (renderCount) {
+          setExpanded(open);
+          pushXsLog({
+            ts: Date.now(),
+            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+            traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
+            kind: "focus:change",
+            component: "NavGroup",
+            ariaName: label,
+            displayLabel: label,
+            label,
+            expanded: open,
+          });
+        }
       }}
     >
       <Trigger asChild disabled={disabled}>
@@ -367,9 +407,9 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
         >
           {label}
           {expandIconAlignment === "end" && <div style={{ flex: 1 }} />}
-          {level === 0 && <Icon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
+          {level === 0 && <ThemedIcon name={expanded ? iconVerticalExpanded : iconVerticalCollapsed} />}
           {level >= 1 && (
-            <Icon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
+            <ThemedIcon name={expanded ? iconHorizontalExpanded : iconHorizontalCollapsed} />
           )}
         </NavLink>
       </Trigger>

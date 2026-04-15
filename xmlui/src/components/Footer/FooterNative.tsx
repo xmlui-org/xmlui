@@ -6,6 +6,7 @@ import classnames from "classnames";
 import styles from "./Footer.module.scss";
 
 import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // =====================================================================================================================
 // React Footer component implementation
@@ -19,12 +20,14 @@ export const Footer = forwardRef(function Footer(
     children,
     style,
     className,
+    classes,
     sticky = defaultProps.sticky,
     ...rest
   }: {
     children: ReactNode;
     style?: React.CSSProperties;
     className?: string;
+    classes?: Record<string, string>;
     sticky?: boolean;
   },
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -41,7 +44,7 @@ export const Footer = forwardRef(function Footer(
       data-sticky={sticky}
     >
       <div
-        className={classnames(styles.wrapper, className, {
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, {
           [styles.full]: !canRestrictContentWidth,
         })}
       >

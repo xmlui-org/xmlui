@@ -2,7 +2,9 @@ import { heroSectionComponentRenderer } from "./HeroSection/HeroSection";
 import { scrollToTopComponentRenderer } from "./ScrollToTop/ScrollToTop";
 import { fancyButtonRenderer } from "./FancyButton/FancyButton";
 import { carouselComponentRenderer } from "./Carousel/Carousel";
-import { helloRenderer } from "./Hello/Hello";
+import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
+import { backdropComponentRenderer } from "./Backdrop/Backdrop";
+import { breakoutComponentRenderer } from "./Breakout/Breakout";
 
 export default {
   namespace: "XMLUIExtensions",
@@ -11,6 +13,8 @@ export default {
     scrollToTopComponentRenderer,
     fancyButtonRenderer,
     carouselComponentRenderer,
-    helloRenderer
+    carouselItemComponentRenderer,
+    backdropComponentRenderer,
+    breakoutComponentRenderer,
   ]
 };

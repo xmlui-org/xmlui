@@ -40,6 +40,118 @@
           ]
         },
         {
+          "label": "Xmlui Echart",
+          "to": "/docs/reference/extensions/xmlui-echart/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-echart/_overview"
+            },
+            {
+              "label": "EChart",
+              "to": "/docs/reference/extensions/xmlui-echart/EChart"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Gauge",
+          "to": "/docs/reference/extensions/xmlui-gauge/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-gauge/_overview"
+            },
+            {
+              "label": "Gauge",
+              "to": "/docs/reference/extensions/xmlui-gauge/Gauge"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Masonry",
+          "to": "/docs/reference/extensions/xmlui-masonry/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-masonry/_overview"
+            },
+            {
+              "label": "Masonry",
+              "to": "/docs/reference/extensions/xmlui-masonry/Masonry"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Pdf",
+          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-pdf/_overview"
+            },
+            {
+              "label": "Pdf",
+              "to": "/docs/reference/extensions/xmlui-pdf/Pdf"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Recharts",
+          "to": "/docs/reference/extensions/xmlui-recharts/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-recharts/_overview"
+            },
+            {
+              "label": "AreaChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/AreaChart"
+            },
+            {
+              "label": "BarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/BarChart"
+            },
+            {
+              "label": "DonutChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/DonutChart"
+            },
+            {
+              "label": "LabelList",
+              "to": "/docs/reference/extensions/xmlui-recharts/LabelList"
+            },
+            {
+              "label": "Legend",
+              "to": "/docs/reference/extensions/xmlui-recharts/Legend"
+            },
+            {
+              "label": "LineChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/LineChart"
+            },
+            {
+              "label": "PieChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/PieChart"
+            },
+            {
+              "label": "RadarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/RadarChart"
+            }
+          ]
+        },
+        {
+          "label": "Xmlui Tiptap Editor",
+          "to": "/docs/reference/extensions/xmlui-tiptap-editor/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-tiptap-editor/_overview"
+            },
+            {
+              "label": "TiptapEditor",
+              "to": "/docs/reference/extensions/xmlui-tiptap-editor/TiptapEditor"
+            }
+          ]
+        },
+        {
           "label": "Xmlui Website Blocks",
           "to": "/docs/reference/extensions/xmlui-website-blocks/_overview",
           "children": [
@@ -62,20 +174,6 @@
             {
               "label": "ScrollToTop",
               "to": "/docs/reference/extensions/xmlui-website-blocks/ScrollToTop"
-            }
-          ]
-        },
-        {
-          "label": "Xmlui Pdf",
-          "to": "/docs/reference/extensions/xmlui-pdf/_overview",
-          "children": [
-            {
-              "label": "Extension Overview",
-              "to": "/docs/reference/extensions/xmlui-pdf/_overview"
-            },
-            {
-              "label": "Pdf",
-              "to": "/docs/reference/extensions/xmlui-pdf/Pdf"
             }
           ]
         }

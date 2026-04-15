@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   generateBaseFontSizes,
   generateBaseSpacings,
   generateBaseTones,
+  generateBootstrapBaseColumns,
   generateBorderSegments,
   generateButtonTones,
   generatePaddingSegments,
@@ -130,6 +131,7 @@ export function useCompiledTheme(
         }))
         .slice(0, themeDefChain.length - 1),
       {
+        ...generateBootstrapBaseColumns(mergedThemeVars),
         ...generateBaseSpacings(mergedThemeVars),
         ...generatePaddingSegments(mergedThemeVars),
         ...generateBorderSegments(mergedThemeVars),
@@ -151,7 +153,7 @@ export function useCompiledTheme(
     return resultedTheme;
   }, [activeTone, themeDefChain]);
 
-  const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
+  const [allThemeVarsWithResolvedHierarchicalVars, rawAllThemeVars] = useMemo(() => {
     let mergedThemeVars: Record<string, string> = {};
 
     themeDefChainVars?.forEach((theme) => {
@@ -176,10 +178,12 @@ export function useCompiledTheme(
       }
     });
 
-    return resolveThemeVarsWithCssVars({
+    const rawVars = {
       ...mergedThemeVars,
       ...resolvedThemeVarsFromChains,
-    });
+    };
+
+    return [resolveThemeVarsWithCssVars(rawVars), rawVars];
   }, [componentThemeVars, themeDefChainVars]);
 
   const themeCssVars = useMemo(() => {
@@ -195,9 +199,9 @@ export function useCompiledTheme(
 
   const getThemeVar = useCallback(
     (varName: string) => {
-      return resolveThemeVar(varName, allThemeVarsWithResolvedHierarchicalVars);
+      return resolveThemeVar(varName, rawAllThemeVars);
     },
-    [allThemeVarsWithResolvedHierarchicalVars],
+    [rawAllThemeVars],
   );
 
   useEffect(() => {
@@ -272,7 +276,16 @@ function ThemeProvider({
     return defaultTone;
   });
 
+  // Sync activeThemeTone when defaultTone CHANGES after mount.
+  // The initial value is already set synchronously by useState above, so we
+  // skip the first run to avoid overriding a tone that was set programmatically
+  // (e.g., restored from localStorage by the App component's init effect).
+  const isToneInitialMount = useRef(true);
   useEffect(() => {
+    if (isToneInitialMount.current) {
+      isToneInitialMount.current = false;
+      return;
+    }
     if (defaultTone) {
       setActiveThemeTone(defaultTone);
     }
@@ -293,8 +306,26 @@ function ThemeProvider({
     return defaultTheme;
   });
 
+  // Sync activeThemeId when defaultTheme or availableThemeIds change (HMR use case).
+  // - Skip the first run (initial value already set by useState).
+  // - When only availableThemeIds changes (async theme loading in standalone mode),
+  //   do NOT reset — that would override a theme restored from localStorage by App.
+  // - Only reset when defaultTheme itself changes (explicit prop update / HMR).
+  const prevDefaultThemeRef = useRef(defaultTheme);
+  const isThemeInitialMount = useRef(true);
   useIsomorphicLayoutEffect(() => {
-    //we sync the activeThemeId with the default theme (mostly for HMR)
+    const prevDefault = prevDefaultThemeRef.current;
+    prevDefaultThemeRef.current = defaultTheme;
+
+    if (isThemeInitialMount.current) {
+      isThemeInitialMount.current = false;
+      return;
+    }
+
+    // availableThemeIds changed but defaultTheme is the same → do nothing
+    if (prevDefault === defaultTheme) return;
+
+    // defaultTheme changed (HMR or prop update) → sync to new default
     if (defaultTheme && availableThemeIds.includes(defaultTheme)) {
       setActiveThemeId(defaultTheme);
     } else {
@@ -321,8 +352,19 @@ function ThemeProvider({
 
   useIsomorphicLayoutEffect(() => {
     if (typeof document !== "undefined") {
-      if(domRoot instanceof ShadowRoot){
-        setRoot(domRoot.getElementById("nested-app-root"));
+      if (domRoot instanceof ShadowRoot) {
+        let portalContainer = domRoot.getElementById("nested-app-portal-root");
+        if (!portalContainer) {
+          portalContainer = document.createElement("div");
+          portalContainer.id = "nested-app-portal-root";
+        }
+        // Always (re-)append so the portal container is the last child of the
+        // shadow root.  After a NestedApp reset the React-managed #nested-app-root
+        // is removed and recreated, which can leave the portal container earlier in
+        // the DOM than the new app root — causing portalled content (dropdowns,
+        // tooltips) to render behind the app.
+        domRoot.appendChild(portalContainer);
+        setRoot(portalContainer);
       } else {
         setRoot(document.body);
       }

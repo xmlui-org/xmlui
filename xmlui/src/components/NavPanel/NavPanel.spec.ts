@@ -1322,3 +1322,239 @@ test.describe("showScrollerFade", () => {
     await expect(fadeOverlays).toHaveCount(2);
   });
 });
+
+// =============================================================================
+// DYNAMIC LINK TESTS
+// =============================================================================
+
+const DYNAMIC_LINKS_CODE = `
+  <App var.links="{ [{ id: 1 }, { id: 2 }, { id: 3 }] }">
+    <NavPanel>
+      <Items data="{links}">
+        <NavLink to="/link/{$item.id}" label="Item {$item.id}"/>
+      </Items>
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Button testId="add-btn" onClick="links.push({ id: links.length + 1 })">Add Link</Button>
+        <Button testId="remove-btn" onClick="links.pop()">Remove Link</Button>
+      </Page>
+      <Page url="/link/:id">
+        <h1>Link {$routeParams.id}</h1>
+      </Page>
+    </Pages>
+  </App>
+`;
+
+test.describe("dynamic link creation", () => {
+  test("renders initial links from dynamic data", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+  });
+
+  test("initial links have correct hrefs derived from item data", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toHaveAttribute("href", /\/link\/1/);
+    await expect(page.getByRole("link", { name: "Item 2" })).toHaveAttribute("href", /\/link\/2/);
+    await expect(page.getByRole("link", { name: "Item 3" })).toHaveAttribute("href", /\/link\/3/);
+  });
+
+  test("adds a new link when data array grows", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 4" })).not.toBeAttached();
+
+    await page.getByTestId("add-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 4" })).toHaveAttribute("href", /\/link\/4/);
+  });
+
+  test("removes the last link when data array shrinks", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+
+    await page.getByTestId("remove-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 3" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).toBeVisible();
+  });
+
+  test("reflects multiple sequential additions", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await page.getByTestId("add-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 5" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 4" })).toHaveAttribute("href", /\/link\/4/);
+    await expect(page.getByRole("link", { name: "Item 5" })).toHaveAttribute("href", /\/link\/5/);
+  });
+
+  test("addition then removal restores the previous link count", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+
+    await page.getByTestId("remove-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 3" })).toBeVisible();
+  });
+
+  test("can reduce links below initial count", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("remove-btn").click();
+    await page.getByTestId("remove-btn").click();
+
+    await expect(page.getByRole("link", { name: "Item 1" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Item 2" })).not.toBeAttached();
+    await expect(page.getByRole("link", { name: "Item 3" })).not.toBeAttached();
+  });
+
+  test("clicking an existing link navigates to the correct page", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByRole("link", { name: "Item 2" }).click();
+
+    await expect(page.getByRole("heading", { name: "Link 2" })).toBeVisible();
+  });
+
+  test("clicking a newly added link navigates to the correct page", async ({ initTestBed, page }) => {
+    await initTestBed(DYNAMIC_LINKS_CODE);
+
+    await page.getByTestId("add-btn").click();
+    await expect(page.getByRole("link", { name: "Item 4" })).toBeVisible();
+
+    await page.getByRole("link", { name: "Item 4" }).click();
+
+    await expect(page.getByRole("heading", { name: "Link 4" })).toBeVisible();
+  });
+});
+
+// =============================================================================
+// SYNCWITHCONTENT TESTS
+// =============================================================================
+
+// Build markup with enough NavLinks to overflow the NavPanel (viewport is 300px tall).
+// Links 1-8 are flat; link 9 is buried inside nested NavGroups.
+const SYNC_APP = `
+  <App layout="vertical">
+    <NavPanel testId="nav-panel" syncWithContent="true" syncScrollBehavior="instant" height="300px">
+      <NavLink to="/page1"  label="Page 1"  />
+      <NavLink to="/page2"  label="Page 2"  />
+      <NavLink to="/page3"  label="Page 3"  />
+      <NavLink to="/page4"  label="Page 4"  />
+      <NavLink to="/page5"  label="Page 5"  />
+      <NavLink to="/page6"  label="Page 6"  />
+      <NavLink to="/page7"  label="Page 7"  />
+      <NavLink to="/page8"  label="Page 8"  />
+      <NavGroup label="Group A">
+        <NavGroup label="Group B">
+          <NavLink to="/page9" label="Page 9" testId="link9" />
+        </NavGroup>
+      </NavGroup>
+    </NavPanel>
+    <Pages fallbackPath="/page1">
+      <Page url="/page1"><Text testId="content1">Content 1</Text></Page>
+      <Page url="/page2"><Text testId="content2">Content 2</Text></Page>
+      <Page url="/page3"><Text testId="content3">Content 3</Text></Page>
+      <Page url="/page4"><Text testId="content4">Content 4</Text></Page>
+      <Page url="/page5"><Text testId="content5">Content 5</Text></Page>
+      <Page url="/page6"><Text testId="content6">Content 6</Text></Page>
+      <Page url="/page7"><Text testId="content7">Content 7</Text></Page>
+      <Page url="/page8"><Text testId="content8">Content 8</Text></Page>
+      <Page url="/page9"><Text testId="content9">Content 9</Text></Page>
+    </Pages>
+  </App>
+`;
+
+test.describe("syncWithContent", () => {
+  test.use({ viewport: { width: 1024, height: 300 } });
+
+  test("active link is scrolled into the NavPanel viewport on navigation", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(SYNC_APP);
+
+    // Start at page1 (top of nav) — Page 1 link should already be visible
+    const link1 = page.getByRole("link", { name: "Page 1" });
+    await expect(link1).toBeVisible();
+    await expect(link1).toBeInViewport();
+
+    // Navigate to page8 which is off-screen below
+    await page.goto(page.url().replace(/\/page\d.*$/, "/page8"));
+    await expect(page.getByTestId("content8")).toBeVisible();
+
+    const link8 = page.getByRole("link", { name: "Page 8" });
+    await expect(link8).toBeInViewport();
+  });
+
+  test("syncWithContent=false does not scroll the NavPanel on navigation", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Same layout but without syncWithContent
+    await initTestBed(`
+      <App layout="vertical">
+        <NavPanel testId="nav-panel" height="300px">
+          <NavLink to="/page1" label="Page 1" />
+          <NavLink to="/page2" label="Page 2" />
+          <NavLink to="/page3" label="Page 3" />
+          <NavLink to="/page4" label="Page 4" />
+          <NavLink to="/page5" label="Page 5" />
+          <NavLink to="/page6" label="Page 6" />
+          <NavLink to="/page7" label="Page 7" />
+          <NavLink to="/page8" label="Page 8" />
+        </NavPanel>
+        <Pages fallbackPath="/page1">
+          <Page url="/page1"><Text testId="content1">Content 1</Text></Page>
+          <Page url="/page2"><Text testId="content2">Content 2</Text></Page>
+          <Page url="/page3"><Text testId="content3">Content 3</Text></Page>
+          <Page url="/page4"><Text testId="content4">Content 4</Text></Page>
+          <Page url="/page5"><Text testId="content5">Content 5</Text></Page>
+          <Page url="/page6"><Text testId="content6">Content 6</Text></Page>
+          <Page url="/page7"><Text testId="content7">Content 7</Text></Page>
+          <Page url="/page8"><Text testId="content8">Content 8</Text></Page>
+        </Pages>
+      </App>
+    `);
+
+    const link1 = page.getByRole("link", { name: "Page 1" });
+    await expect(link1).toBeVisible();
+
+    await page.goto(page.url().replace(/\/page\d.*$/, "/page8"));
+    await expect(page.getByTestId("content8")).toBeVisible();
+
+    // Without syncWithContent the nav panel stays at the top — Page 8 link is NOT in viewport
+    const link8 = page.getByRole("link", { name: "Page 8" });
+    await expect(link8).not.toBeInViewport();
+  });
+
+  test("active link inside nested NavGroups is scrolled into view after groups expand", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(SYNC_APP);
+
+    // Navigate directly to page9 which is inside Group A > Group B (collapsed by default)
+    await page.goto(page.url().replace(/\/page\d.*$/, "/page9"));
+    await expect(page.getByTestId("content9")).toBeVisible();
+
+    // NavGroups should have expanded and the leaf link scrolled into view.
+    // Use testId (not getByRole) since aria-hidden on collapsed NavGroup wrappers
+    // hides children from the accessibility tree until expansion is complete.
+    const link9 = page.getByTestId("link9");
+    await expect(link9).toBeVisible(); // wait for NavGroups to expand
+    await expect(link9).toBeInViewport();
+  });
+});

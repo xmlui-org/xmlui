@@ -1,7 +1,7 @@
 import styles from "./TextArea.module.scss";
 
 import { type PropertyValueDescription } from "../../abstractions/ComponentDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   createMetadata,
@@ -20,6 +20,8 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { type ResizeOptions, TextArea, defaultProps } from "./TextAreaNative";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TextArea";
 
@@ -132,46 +134,52 @@ export const TextAreaMd = createMetadata({
   },
 });
 
-export const textAreaComponentRenderer = createComponentRenderer(
-  COMP,
-  TextAreaMd,
-  ({
-    node,
-    extractValue,
-    state,
-    updateState,
-    className,
-    registerComponentApi,
-    lookupEventHandler,
-  }) => {
+type ThemedTextAreaProps = React.ComponentPropsWithoutRef<typeof TextArea>;
+
+export const ThemedTextArea = React.forwardRef<React.ElementRef<typeof TextArea>, ThemedTextAreaProps>(
+  function ThemedTextArea({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TextAreaMd);
     return (
       <TextArea
-        value={state?.value}
-        initialValue={extractValue(node.props.initialValue)}
-        updateState={updateState}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue(node.props.placeholder)}
-        onDidChange={lookupEventHandler("didChange")}
-        onFocus={lookupEventHandler("gotFocus")}
-        onBlur={lookupEventHandler("lostFocus")}
-        readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-        resize={node.props.resize as ResizeOptions}
-        enterSubmits={extractValue.asOptionalBoolean(node.props.enterSubmits)}
-        escResets={extractValue.asOptionalBoolean(node.props.escResets)}
-        className={className}
-        registerComponentApi={registerComponentApi}
-        maxRows={extractValue.asOptionalNumber(node.props.maxRows)}
-        minRows={extractValue.asOptionalNumber(node.props.minRows)}
-        maxLength={extractValue.asOptionalNumber(node.props.maxLength)}
-        rows={extractValue.asOptionalNumber(node.props.rows)}
-        autoSize={extractValue.asOptionalBoolean(node.props.autoSize)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        required={extractValue.asOptionalBoolean(node.props.required)}
-        verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-        validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-        validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
       />
     );
   },
 );
+
+export const textAreaComponentRenderer = wrapComponent(COMP, TextArea, TextAreaMd, {
+  exposeRegisterApi: true,
+  // resize is passed raw (not through extractValue). rows is valueType: "number" but
+  // maxRows/minRows are not — use customRender to preserve exact original extraction.
+  customRender: (_props, { node, extractValue, state, updateState, classes, registerComponentApi, lookupEventHandler }) => (
+    <TextArea
+      value={state?.value}
+      initialValue={extractValue(node.props.initialValue)}
+      updateState={updateState}
+      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+      placeholder={extractValue(node.props.placeholder)}
+      onDidChange={lookupEventHandler("didChange")}
+      onFocus={lookupEventHandler("gotFocus")}
+      onBlur={lookupEventHandler("lostFocus")}
+      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+      resize={node.props.resize as ResizeOptions}
+      enterSubmits={extractValue.asOptionalBoolean(node.props.enterSubmits)}
+      escResets={extractValue.asOptionalBoolean(node.props.escResets)}
+      classes={classes}
+      registerComponentApi={registerComponentApi}
+      maxRows={extractValue.asOptionalNumber(node.props.maxRows)}
+      minRows={extractValue.asOptionalNumber(node.props.minRows)}
+      maxLength={extractValue.asOptionalNumber(node.props.maxLength)}
+      rows={extractValue.asOptionalNumber(node.props.rows)}
+      autoSize={extractValue.asOptionalBoolean(node.props.autoSize)}
+      validationStatus={extractValue(node.props.validationStatus)}
+      required={extractValue.asOptionalBoolean(node.props.required)}
+      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
+      validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
+      validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
+    />
+  ),
+});

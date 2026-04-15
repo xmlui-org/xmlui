@@ -3,11 +3,13 @@ import { forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./ProgressBar.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 interface Props {
   value: number;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
 }
 
 export const defaultProps = {
@@ -15,13 +17,13 @@ export const defaultProps = {
 };
 
 export const ProgressBar = forwardRef(function ProgressBar(
-  { value = defaultProps.value, style, className, ...rest }: Props,
+  { value = defaultProps.value, style, className, classes, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
     <div
       {...rest}
-      className={classnames(styles.wrapper, className)}
+      className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className)}
       style={style}
       ref={forwardedRef}
     >

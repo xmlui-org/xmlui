@@ -244,10 +244,11 @@ describe("Xmlui parser", () => {
 
   it("Only text as source", () => {
     const { node, errors, getText } = parseSource("ABC");
-    expect(errors).toHaveLength(0);
+
+    const error = errors[0];
+    expect(error.code).toBe(ErrCodesParser.singleRootElem);
 
     const textElement = node.children![0];
-
     expect(textElement.kind).toBe(SyntaxKind.TextNode);
     expect(getText(textElement)).toBe("ABC");
   });
@@ -400,7 +401,7 @@ describe("Xmlui parser - expected parser errors", () => {
     const src = "</";
     const { node, getText, errors } = parseSource(src);
 
-    expect(errors.length).toEqual(1);
+    expect(errors.length).toEqual(2);
     const err = errors[0];
     expect(err.code).toEqual(ErrCodesParser.unexpectedCloseTag);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual("</");
@@ -411,12 +412,25 @@ describe("Xmlui parser - expected parser errors", () => {
     expect(errors[0].code).toBe(ErrCodesParser.uppercaseAttr);
   });
 
+  it("Multiple script tags", () => {
+    const { errors } = parseSource(`<Stack>
+      <script></script>
+      <script></script>
+      <script></script>
+    </Stack>`);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodesParser.multipleScriptTags);
+  });
+
   it("Text after root element", () => {
     const { errors, node } = parseSource("<A></A>ABC");
 
     expect(node.children![0].kind).toEqual(SyntaxKind.ElementNode);
     expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
-    expect(errors).toHaveLength(0);
+    expect(errors).toHaveLength(1);
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+    expect(errors[0].pos).toBe(7);
+    expect(errors[0].end).toBe(10);
   });
 
   it("no name for tag", () => {
@@ -514,11 +528,14 @@ describe("Xmlui parser - expected parser errors", () => {
 </Stack>
 </UnexpectedTag>`;
     const { errors } = parseSource(src);
-    expect(errors).toHaveLength(1);
+    expect(errors).toHaveLength(2);
     const err = errors[0];
     expect(err.code).toBe(ErrCodesParser.unexpectedCloseTag);
     expect(src.substring(err.contextPos, err.contextEnd)).toEqual(`</Stack>
 </UnexpectedTag>`);
+
+    expect(errors[1].code).toBe(ErrCodesParser.singleRootElem);
+    expect(src.substring(errors[1].pos, errors[1].end)).toEqual(`</UnexpectedTag>`);
   });
 
   it("multi-line tag name mismatch", () => {
@@ -559,25 +576,309 @@ describe("Xmlui parser - expected parser errors", () => {
 <>
 </Stack>`);
   });
+
+  it("multiple root elements", () => {
+    const { errors } = parseSource("<Stack/><Stack />");
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+  });
+
+  it("missing name in compound component", () => {
+    const { errors } = parseSource("<Component />");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNameExp);
+  });
+
+  it("invalid name in compound component", () => {
+    const { errors } = parseSource("<Component name='alma'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNameUppercase);
+  });
+
+  it("compound child in compound component", () => {
+    const { errors } = parseSource("<Component name='MyComp'><Component /></Component>");
+    const errCodes = errors.map((d) => d.code);
+    expect(errCodes).toContain(ErrCodesParser.nestedCompDefs);
+  });
+
+  it("invalid attribute in compound component", () => {
+    const { errors } = parseSource("<Component name='MyComp' blabla='123'><Stack/></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.invalidReusableCompAttr);
+  });
+
+  it("event attribute starts with on", () => {
+    const { errors } = parseSource("<Stack><event name='onClick' /></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.eventNoOnPrefix);
+  });
+
+  it("uses is invalid in a compound component", () => {
+    const { errors } = parseSource("<Component name='MyComp'><Stack/><uses /></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.invalidNodeName);
+  });
+
+  it("loaders is invalid in a compound component", () => {
+    const { errors } = parseSource("<Component name='MyComp'><Stack/><loaders /></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.invalidNodeName);
+  });
+
+  it("invalid attribute in property helper", () => {
+    const { errors } = parseSource("<Stack><property name='my' blabal='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("name required in property helper", () => {
+    const { errors } = parseSource("<Stack><property /></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("uses helper must have only a non-empty value attribute", () => {
+    const { errors } = parseSource("<Stack><uses/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.usesValueOnly);
+  });
+
+  it("property children can only be field or item nodes", () => {
+    const { errors } = parseSource("<Stack><property name='my'><dummy /></property></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyFieldOrItemChild);
+  });
+
+  it("cannot mix field and item children", () => {
+    const { errors } = parseSource(
+      "<Stack><property name='my'><field name='my' /><item value='3'/></property></Stack>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.cannotMixFieldItem);
+  });
+
+  it("item helper cannot have a name attribute", () => {
+    const { errors } = parseSource(
+      "<Stack><property name='my'><item name='my' value='3'/></property></Stack>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.cantHaveNameAttr);
+  });
+
+  it("multiple script tags error in same element", () => {
+    const { errors } = parseSource(`
+      <Stack>
+        <script>var a = 1;</script>
+        <script>var b = 2;</script>
+      </Stack>
+    `);
+    expect(errors[0].code).toBe(ErrCodesParser.multipleScriptTags);
+  });
+
+  it("nested compound component at any depth triggers nestedCompDefs", () => {
+    const { errors } = parseSource(
+      "<Component name='A'><Stack><Component name='B'/></Stack></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.nestedCompDefs);
+  });
+
+  it("compound component with no children triggers compDefNesedElem", () => {
+    const { errors } = parseSource("<Component name='MyComp'></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+  });
+
+  it("duplicate xmlns key triggers duplXmlns", () => {
+    const { errors } = parseSource("<App xmlns:ns='foo' xmlns:ns='bar'/>");
+    // duplAttr fires first (at attribute-parse level), then duplXmlns
+    expect(errors[1].code).toBe(ErrCodesParser.duplXmlns);
+  });
+
+  it("namespace on root element triggers rootCompNoNamespace", () => {
+    const { errors } = parseSource("<ns:App/>");
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
+  });
+
+  it("unresolved namespace prefix triggers nsNotFound", () => {
+    const { errors } = parseSource("<App><ns:Button/></App>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsNotFound);
+  });
+
+  it("namespace value with '#' triggers nsValueIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='#something'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsValueIncorrect);
+  });
+
+  it("namespace value with multiple colons triggers nsValueIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='a:b:c'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsValueIncorrect);
+  });
+
+  it("namespace value with unrecognised scheme triggers nsSchemeIncorrect", () => {
+    const { errors } = parseSource("<App xmlns:ns='bad-scheme:foo'/>");
+    expect(errors[0].code).toBe(ErrCodesParser.nsSchemeIncorrect);
+  });
+
+  it("empty source triggers singleRootElem", () => {
+    const { errors } = parseSource("");
+    expect(errors[0].code).toBe(ErrCodesParser.singleRootElem);
+  });
+
+  it("compound component with only comment child triggers compDefNesedElem", () => {
+    const { errors } = parseSource("<Component name='MyComp'><!-- comment--></Component>");
+    expect(errors[0].code).toBe(ErrCodesParser.compDefNesedElem);
+  });
+
+  it("variable helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><variable/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("variable helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><variable name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("property helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><property name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("template helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><template blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("template helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><template/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("template helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><template name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("event helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><event blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("event helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><event/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("event helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><event name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("method helper rejects invalid attribute", () => {
+    const { errors } = parseSource("<Stack><method blabla='123'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.onlyNameValueAttrs);
+  });
+
+  it("method helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><method></method></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("method helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><method name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("uses helper rejects non-value attributes alongside value", () => {
+    const { errors } = parseSource("<Stack><uses x='a' value='b'/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.usesValueOnly);
+  });
+
+  it("global helper requires name attribute", () => {
+    const { errors } = parseSource("<Stack><global/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("global helper rejects empty name", () => {
+    const { errors } = parseSource("<Stack><global name=''/></Stack>");
+    expect(errors[0].code).toBe(ErrCodesParser.nameAttrRequired);
+  });
+
+  it("global element in compound component triggers globalNotAllowedInComponent", () => {
+    const { errors } = parseSource(
+      "<Component name='Counter'><global name='x' value='{0}'/><Button/></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.globalNotAllowedInComponent);
+  });
+
+  it("global.* attribute in compound component triggers globalNotAllowedInComponent", () => {
+    const { errors } = parseSource(
+      "<Component name='Counter' global.x='{0}'><Button/></Component>",
+    );
+    expect(errors[0].code).toBe(ErrCodesParser.globalNotAllowedInComponent);
+  });
 });
 
 describe("Xmlui parser - child nodes", () => {
-  it("string child works #1", () => {
-    const { node, getText } = parseSource(`<Stack>" hello "</Stack>`);
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameId = nameNode.children[0];
-    const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
+  describe("remove StringLiterals from ContentListNode-s", () => {
+    it("loaders allowed as children of CompoundComponent's child nodes", () => {
+      const { errors } = parseSource(`<Component name='A'>
+        <Stack>
+          <loaders />
+        </Stack>
+      </Component>`);
+      expect(errors).toHaveLength(0);
+    });
 
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameId)).equal("Stack");
+    it("TextNode parsed for quoted content", () => {
+      const { node, getText } = parseSource(`<Stack>" hello "</Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
 
-    expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
-    expect(child0.kind).toEqual(SyntaxKind.StringLiteral);
-    expect(getText(child0)).equal('" hello "');
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
+
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+      expect(child0.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child0)).equal('" hello "');
+    });
+
+    it("TextNode and CDATA parsed in content", () => {
+      const { node, getText } = parseSource(`<Stack><![CDATA[hello]]> "there"</Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
+      const child1 = childElements.children[1];
+
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
+
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+
+      expect(child0.kind).toEqual(SyntaxKind.CData);
+      expect(getText(child0)).equal("<![CDATA[hello]]>");
+
+      expect(child1.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child1)).equal(' "there"');
+    });
+
+    it("CDATA and TextNode parsed in content", () => {
+      const { node, getText } = parseSource(`<Stack> "there" <![CDATA[hello]]></Stack>`);
+      const rootElem = node.children![0];
+      const nameNode = rootElem.children[1];
+      const nameId = nameNode.children[0];
+      const childElements = rootElem.children[3];
+      const child0 = childElements.children[0];
+      const child1 = childElements.children[1];
+
+      expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+      expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+      expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+      expect(getText(nameId)).equal("Stack");
+
+      expect(childElements.kind).toEqual(SyntaxKind.ContentListNode);
+
+      expect(child0.kind).toEqual(SyntaxKind.TextNode);
+      expect(getText(child0)).equal(' "there" ');
+
+      expect(child1.kind).toEqual(SyntaxKind.CData);
+      expect(getText(child1)).equal("<![CDATA[hello]]>");
+    });
   });
 
   it("string child works #1", () => {
@@ -804,7 +1105,7 @@ describe("namescpaces", () => {
 
   it("Single node with namespace fails #1", () => {
     const { errors } = parseSource("<ns:Stack></Stack>");
-    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
   });
   it("Single node with namespace fails #2", () => {
     const { errors } = parseSource("<Stack></ns:Stack>");
@@ -813,7 +1114,7 @@ describe("namescpaces", () => {
 
   it("Single node with namespace fails #3", () => {
     const { errors } = parseSource("<other:Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodesParser.tagNameMismatch);
+    expect(errors[0].code).toBe(ErrCodesParser.rootCompNoNamespace);
   });
 
   it("has namespace on attribute", () => {

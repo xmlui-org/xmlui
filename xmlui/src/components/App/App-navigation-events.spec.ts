@@ -7,7 +7,7 @@ import { expect, test } from "../../testing/fixtures";
 test.describe("Navigation Events", () => {
   test("didNavigate fires after Link click", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to, queryParams }"
       >
         <NavPanel>
@@ -35,7 +35,7 @@ test.describe("Navigation Events", () => {
 
   test("willNavigate fires on programmatic navigation", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         onWillNavigate="(to, queryParams) => testState = { event: 'willNavigate', to, queryParams }"
       >
         <Pages>
@@ -59,7 +59,7 @@ test.describe("Navigation Events", () => {
 
   test("didNavigate fires after programmatic navigation", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to, queryParams }"
       >
         <Pages>
@@ -79,14 +79,17 @@ test.describe("Navigation Events", () => {
     // Wait for navigation to complete
     await expect(page.locator(".xmlui-page-root")).toContainText("About");
 
-    const state = await testStateDriver.testState();
-    expect(state.event).toBe("didNavigate");
-    expect(state.to).toContain("/about");
+    await expect
+      .poll(testStateDriver.testState)
+      .toMatchObject({ event: "didNavigate", to: "/about" });
   });
 
-  test("willNavigate can cancel programmatic navigation by returning false", async ({ initTestBed, page }) => {
+  test("willNavigate can cancel programmatic navigation by returning false", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
-      <App 
+      <App
         onWillNavigate="(to, queryParams) => to === '/about' ? false : undefined"
       >
         <Pages>
@@ -115,9 +118,12 @@ test.describe("Navigation Events", () => {
     await expect(page.locator(".xmlui-page-root")).not.toContainText("About Page");
   });
 
-  test("willNavigate can allow programmatic navigation by returning undefined", async ({ initTestBed, page }) => {
+  test("willNavigate can allow programmatic navigation by returning undefined", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
-      <App 
+      <App
         onWillNavigate="(to, queryParams) => undefined"
       >
         <Pages>
@@ -143,10 +149,13 @@ test.describe("Navigation Events", () => {
     await expect(page.locator(".xmlui-page-root")).not.toContainText("Home Page");
   });
 
-  test("both willNavigate and didNavigate fire in sequence for programmatic navigation", async ({ initTestBed, page }) => {
+  test("both willNavigate and didNavigate fire in sequence for programmatic navigation", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment var.events="{[]}">
-        <App 
+        <App
           onWillNavigate="(to, queryParams) => { events.push('willNavigate'); testState = events; }"
           onDidNavigate="(to, queryParams) => { events.push('didNavigate'); testState = events; }"
         >
@@ -169,9 +178,9 @@ test.describe("Navigation Events", () => {
     await expect(page.locator(".xmlui-page-root")).toContainText("About");
 
     // Poll until we have both events
-    await expect.poll(testStateDriver.testState).toEqual(
-      expect.arrayContaining(["willNavigate", "didNavigate"])
-    );
+    await expect
+      .poll(testStateDriver.testState)
+      .toEqual(expect.arrayContaining(["willNavigate", "didNavigate"]));
 
     const events = await testStateDriver.testState();
     expect(events).toHaveLength(2);
@@ -179,10 +188,13 @@ test.describe("Navigation Events", () => {
     expect(events[1]).toBe("didNavigate");
   });
 
-  test("willNavigate blocks programmatic navigation before didNavigate fires", async ({ initTestBed, page }) => {
+  test("willNavigate blocks programmatic navigation before didNavigate fires", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment var.events="{[]}">
-        <App 
+        <App
           onWillNavigate="(to, queryParams) => { events.push('willNavigate'); testState = events; return to === '/about' ? false : undefined; }"
           onDidNavigate="(to, queryParams) => { events.push('didNavigate'); testState = events; }"
         >
@@ -214,7 +226,7 @@ test.describe("Navigation Events", () => {
 
   test("didNavigate fires on browser back button", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to }"
       >
         <Pages>
@@ -250,7 +262,7 @@ test.describe("Navigation Events", () => {
 
   test("didNavigate fires on browser forward button", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
-      <App 
+      <App
         onDidNavigate="(to, queryParams) => testState = { event: 'didNavigate', to }"
       >
         <Pages>
@@ -278,7 +290,7 @@ test.describe("Navigation Events", () => {
       (window as any).__XMLUI_TEST_STATE = null;
     });
 
-   // Go forward
+    // Go forward
     await page.goForward();
 
     // Wait for navigation to complete
@@ -288,10 +300,13 @@ test.describe("Navigation Events", () => {
     expect(state?.event).toBe("didNavigate");
   });
 
-  test("navigation events work with nested routes (programmatic)", async ({ initTestBed, page }) => {
+  test("navigation events work with nested routes (programmatic)", async ({
+    initTestBed,
+    page,
+  }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment var.navigationLog="{[]}">
-        <App 
+        <App
           onWillNavigate="(to, queryParams) => { navigationLog.push({ event: 'will', to }); testState = navigationLog; }"
           onDidNavigate="(to, queryParams) => { navigationLog.push({ event: 'did', to }); testState = navigationLog; }"
         >
@@ -322,10 +337,23 @@ test.describe("Navigation Events", () => {
     await detailBtn.click();
     await expect(page.locator(".xmlui-page-root")).toContainText("Product Detail");
 
+    // Wait for all navigation events (will + did for both navigations = 4 events).
+    // didNavigate fires asynchronously after the navigation completes, so we poll
+    // until testState reflects at least 4 entries.
+    await expect
+      .poll(
+        async () => {
+          const log = await testStateDriver.testState();
+          return Array.isArray(log) ? log.length : 0;
+        },
+        { timeout: 5000 },
+      )
+      .toBeGreaterThanOrEqual(4);
+
     const log = await testStateDriver.testState();
     // Should have logged 4 events: 2 for products, 2 for detail
     expect(log.length).toBeGreaterThanOrEqual(4);
-    
+
     // Verify the pattern of will/did pairs
     const lastTwoEvents = log.slice(-2);
     expect(lastTwoEvents[0].event).toBe("will");

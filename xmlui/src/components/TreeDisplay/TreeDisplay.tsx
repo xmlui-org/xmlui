@@ -1,9 +1,11 @@
 import styles from "./TreeDisplay.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "TreeDisplay";
 
@@ -29,6 +31,7 @@ export const TreeDisplayMd = createMetadata({
   events: {
     contextMenu: dContextMenu(COMP),
   },
+  defaultAriaLabel: "Tree",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$backgroundColor-CodeBlock",
@@ -45,19 +48,23 @@ export const TreeDisplayMd = createMetadata({
   },
 });
 
-export const treeDisplayComponentRenderer = createComponentRenderer(
-  COMP,
-  TreeDisplayMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
+type ThemedTreeDisplayProps = React.ComponentPropsWithoutRef<typeof TreeDisplay>;
+
+export const ThemedTreeDisplay = React.forwardRef<React.ElementRef<typeof TreeDisplay>, ThemedTreeDisplayProps>(
+  function ThemedTreeDisplay({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TreeDisplayMd);
     return (
       <TreeDisplay
-        className={className}
-        content={extractValue.asOptionalString(node.props.content)}
-        itemHeight={extractValue.asOptionalNumber(node.props.itemHeight)}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      >
-        {renderChild(node.children)}
-      </TreeDisplay>
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
   },
+);
+
+export const treeDisplayComponentRenderer = wrapComponent(
+  COMP,
+  ThemedTreeDisplay,
+  TreeDisplayMd,
 );

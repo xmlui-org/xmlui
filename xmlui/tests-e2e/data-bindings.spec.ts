@@ -1,10 +1,12 @@
 import type { ApiInterceptorDefinition } from "../src";
 import { expect, test } from "../src/testing/fixtures";
 
+// CustomComponent accepts an optional testId prop so multiple instances can
+// coexist in one Fragment with unique testIds.
 const CustomComponent = [
   `
   <Component name="CustomComponent">
-    <Text testId="dataValue">{$props.data}</Text>
+    <Text testId="{$props.testId ?? 'dataValue'}">{$props.data}</Text>
   </Component>
 `,
 ];
@@ -25,105 +27,46 @@ test("raw_data binds as data", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("dataValue")).toHaveText("RUNNING");
 });
 
-test("inline datasource as data", async ({ page, initTestBed }) => {
-  await initTestBed(
-    `
-      <CustomComponent>
-        <property name="data">
-          <DataSource url="/api/data"/>
-        </property>
-      </CustomComponent>
-    `,
-    {
-      components: CustomComponent,
-      apiInterceptor: apiInterceptor,
-    },
-  );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("datasource reference as data", async ({ page, initTestBed }) => {
-  await initTestBed(
-    `
-      <Fragment>
-        <DataSource url="/api/data" id="someDataSource"/>
-        <CustomComponent data="{someDataSource}"/>
-      </Fragment>
-    `,
-    {
-      components: CustomComponent,
-      apiInterceptor: apiInterceptor,
-    },
-  );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("datasource reference as any property", async ({ page, initTestBed }) => {
-  await initTestBed(
-    `
-      <Fragment>
-        <DataSource url="/api/data" id="someDataSource"/>
-        <Text testId="dataValue" value="{someDataSource}"/>
-      </Fragment>
-    `,
-    {
-      components: CustomComponent,
-      apiInterceptor: apiInterceptor,
-    },
-  );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("datasource reference outside of implicit container", async ({ page, initTestBed }) => {
-  await initTestBed(
-    `
-      <Fragment>
-        <DataSource url="/api/data" id="someDataSource"/>
-        <Stack backgroundColor="lightgreen" var.something="something that makes it an implicit container">
-          <CustomComponent data="{someDataSource}"/>
-        </Stack>
-      </Fragment>
-    `,
-    {
-      components: CustomComponent,
-      apiInterceptor: apiInterceptor,
-    },
-  );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("datasource value as data", async ({ page, initTestBed }) => {
-  await initTestBed(
-    `
-      <Fragment>
-        <DataSource url="/api/data" id="someDataSource"/>
-        <CustomComponent data="{someDataSource.value}"/>
-      </Fragment>
-    `,
-    {
-      components: CustomComponent,
-      apiInterceptor: apiInterceptor,
-    },
-  );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("data url", async ({ page, initTestBed }) => {
-  await initTestBed(`<CustomComponent data="/api/data"/>`, {
-    components: CustomComponent,
-    apiInterceptor: apiInterceptor,
-  });
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
-});
-
-test("data url from binding expression", async ({ page, initTestBed }) => {
+// All API-based binding mechanisms in one render: each uses a different approach
+// to deliver data from /api/data, all expected to display STRING_DATA_FROM_API.
+test("all API data binding mechanisms resolve correctly", async ({ page, initTestBed }) => {
   await initTestBed(
     `
       <Fragment>
         <script>
           var dataUrl = "/api/data";
         </script>
-        <CustomComponent data="{dataUrl}"/>
+
+        <!-- inline DataSource as a property node -->
+        <CustomComponent testId="t-inline">
+          <property name="data">
+            <DataSource url="/api/data"/>
+          </property>
+        </CustomComponent>
+
+        <!-- DataSource referenced by id -->
+        <DataSource url="/api/data" id="ds1"/>
+        <CustomComponent testId="t-ref" data="{ds1}"/>
+
+        <!-- DataSource value property via .value -->
+        <DataSource url="/api/data" id="ds2"/>
+        <CustomComponent testId="t-val" data="{ds2.value}"/>
+
+        <!-- DataSource reference used as any property (on Text, not CustomComponent) -->
+        <DataSource url="/api/data" id="ds3"/>
+        <Text testId="t-any-prop" value="{ds3}"/>
+
+        <!-- DataSource outside an implicit container (Stack with var.something) -->
+        <DataSource url="/api/data" id="ds4"/>
+        <Stack var.something="makes-it-a-container">
+          <CustomComponent testId="t-outside" data="{ds4}"/>
+        </Stack>
+
+        <!-- URL string passed directly as data prop -->
+        <CustomComponent testId="t-url" data="/api/data"/>
+
+        <!-- URL provided via binding expression -->
+        <CustomComponent testId="t-url-binding" data="{dataUrl}"/>
       </Fragment>
     `,
     {
@@ -131,5 +74,13 @@ test("data url from binding expression", async ({ page, initTestBed }) => {
       apiInterceptor: apiInterceptor,
     },
   );
-  await expect(page.getByTestId("dataValue")).toHaveText("STRING_DATA_FROM_API");
+
+  const expected = "STRING_DATA_FROM_API";
+  await expect(page.getByTestId("t-inline")).toHaveText(expected);      // inline DataSource
+  await expect(page.getByTestId("t-ref")).toHaveText(expected);         // DataSource reference
+  await expect(page.getByTestId("t-val")).toHaveText(expected);         // DataSource .value
+  await expect(page.getByTestId("t-any-prop")).toHaveText(expected);    // any-property binding
+  await expect(page.getByTestId("t-outside")).toHaveText(expected);     // outside implicit container
+  await expect(page.getByTestId("t-url")).toHaveText(expected);         // URL string
+  await expect(page.getByTestId("t-url-binding")).toHaveText(expected); // URL from binding
 });

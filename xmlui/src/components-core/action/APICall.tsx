@@ -14,14 +14,15 @@ function traceApiCall(
   details?: Record<string, any>,
 ) {
   if (appContext.appGlobals?.xsVerbose !== true) return;
+  const { _traceId, ...rest } = details || {};
   pushXsLog({
     ts: Date.now(),
     perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-    traceId: getCurrentTrace(),
+    traceId: _traceId || getCurrentTrace(),
     kind,
     url,
     method,
-    ...details,
+    ...rest,
   });
 }
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
@@ -261,6 +262,7 @@ type APICall = {
   confirmTitle?: string;
   confirmMessage?: string;
   confirmButtonLabel?: string;
+  cancelButtonLabel?: string;
   params?: any;
   payloadType?: string;
   optimisticValue?: any;
@@ -269,6 +271,7 @@ type APICall = {
   completedNotificationMessage?: string;
   errorNotificationMessage?: string;
   credentials?: "omit" | "same-origin" | "include";
+  omitTransactionId?: boolean;
 
   uid?: string | symbol;
   when?: string;
@@ -277,6 +280,8 @@ type APICall = {
   onSuccess?: string | ((...args: any[]) => Promise<any>);
   onProgress?: string;
   onError?: string;
+  onMockExecute?: string;
+  onResponseHeaders?: (headers: Record<string, string>) => void;
 } & ApiOperationDef;
 
 export async function callApi(
@@ -285,6 +290,7 @@ export async function callApi(
     confirmTitle,
     confirmMessage,
     confirmButtonLabel,
+    cancelButtonLabel,
     params = {},
     onBeforeRequest,
     onSuccess,
@@ -300,6 +306,9 @@ export async function callApi(
     errorNotificationMessage,
     uid: actionUid,
     onProgress,
+    omitTransactionId,
+    onMockExecute,
+    onResponseHeaders,
 
     //operation
     headers,
@@ -317,14 +326,16 @@ export async function callApi(
   if (!shouldKeep(when, stateContext, appContext)) {
     return;
   }
-  if (confirmTitle || confirmMessage || confirmButtonLabel) {
+  if (confirmTitle || confirmMessage || confirmButtonLabel || cancelButtonLabel) {
     const title = extractParam(stateContext, confirmTitle, appContext);
     const message = extractParam(stateContext, confirmMessage, appContext);
     const buttonLabel = extractParam(stateContext, confirmButtonLabel, appContext);
+    const cancelLabel = extractParam(stateContext, cancelButtonLabel, appContext);
     const dialogCheck = await appContext.confirm(
-      title ?? "Confirm Operation",
-      message ?? "Are you sure you want to perform this operation?",
-      buttonLabel ?? "Yes",
+      title,
+      message,
+      buttonLabel,
+      cancelLabel,
     );
     if (!dialogCheck) return;
   }
@@ -377,41 +388,74 @@ export async function callApi(
   }
 
   try {
-    const operation: ApiOperationDef = {
-      headers,
-      url,
-      queryParams,
-      rawBody,
-      method,
-      body,
-      payloadType,
-      credentials,
-    };
-    const _onProgress = lookupAction(onProgress, uid, {
-      eventName: "progress",
-    });
+    let result;
 
-    // Trace API call start
-    traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
-      transactionId: clientTxId,
-      body: resolvedBody,
-    });
+    if (onMockExecute) {
+      // Mock execution: resolve request properties and call the mock handler
+      const resolvedMockQueryParams = extractParam(stateContext, queryParams, appContext) || {};
+      const resolvedMockBody = rawBody
+        ? extractParam(stateContext, rawBody, appContext)
+        : body
+          ? extractParam(stateContext, body, appContext)
+          : undefined;
+      const resolvedMockHeaders = extractParam(stateContext, headers, appContext) || {};
 
-    const result = await new RestApiProxy(appContext, apiInstance).execute({
-      operation,
-      params: stateContext,
-      transactionId: clientTxId,
-      resolveBindingExpressions,
-      onProgress: _onProgress,
-    });
+      const mockFn = lookupAction(onMockExecute, uid, {
+        eventName: "mockExecute",
+        context: {
+          ...getCurrentState(),
+          $pathParams: {},
+          $queryParams: resolvedMockQueryParams,
+          $requestBody: resolvedMockBody,
+          $cookies: {},
+          $requestHeaders: resolvedMockHeaders,
+          $param: stateContext["$param"],
+          $params: stateContext["$params"],
+        },
+      });
+      result = await mockFn?.();
+    } else {
+      const operation: ApiOperationDef = {
+        headers,
+        url,
+        queryParams,
+        rawBody,
+        method,
+        body,
+        payloadType,
+        credentials,
+      };
+      const _onProgress = lookupAction(onProgress, uid, {
+        eventName: "progress",
+      });
 
-    // Trace API call completion
-    traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
-      transactionId: clientTxId,
-      body: resolvedBody,
-      result,
-      status: getLastApiStatus(clientTxId),
-    });
+      // Trace API call start — capture traceId before await so api:complete
+      // uses the same context (getCurrentTrace() may change after await)
+      const apiTraceId = getCurrentTrace();
+      traceApiCall(appContext, "api:start", resolvedUrl, resolvedMethod, {
+        transactionId: clientTxId,
+        body: resolvedBody,
+      });
+
+      result = await new RestApiProxy(appContext, apiInstance).execute({
+        operation,
+        params: stateContext,
+        transactionId: clientTxId,
+        omitTransactionId,
+        resolveBindingExpressions,
+        onProgress: _onProgress,
+        onResponseHeaders,
+      });
+
+      // Trace API call completion — reuse traceId from start
+      traceApiCall(appContext, "api:complete", resolvedUrl, resolvedMethod, {
+        transactionId: clientTxId,
+        body: resolvedBody,
+        result,
+        status: getLastApiStatus(clientTxId),
+        _traceId: apiTraceId,
+      });
+    }
 
     const onSuccessFn = typeof onSuccess === "function"
       ? onSuccess

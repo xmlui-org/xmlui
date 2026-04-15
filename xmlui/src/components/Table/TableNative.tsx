@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import { flushSync } from "react-dom";
 import type {
   CellContext,
@@ -25,6 +25,7 @@ import {
 } from "virtua";
 import { orderBy } from "lodash-es";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./Table.module.scss";
 
@@ -43,18 +44,19 @@ import {
 } from "../../components-core/utils/hooks";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
-import { Spinner } from "../Spinner/SpinnerNative";
-import { Toggle } from "../Toggle/Toggle";
-import { Icon } from "../Icon/IconNative";
+import { ThemedSpinner as Spinner } from "../Spinner/Spinner";
+import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
+import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { PaginationNative, type Position } from "../Pagination/PaginationNative";
+import { ThemedPagination as PaginationNative, type Position } from "../Pagination/Pagination";
 import { Part } from "../Part/Part";
 import {
   parseKeyBinding,
   matchesKeyEvent,
   type ParsedKeyBinding,
 } from "../../parsers/keybinding-parser/keybinding-parser";
+import { toCssVar } from "../../components-core/theming/layout-resolver";
 
 // =====================================================================================================================
 // Helper types
@@ -176,6 +178,7 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
+  toggleSelectionOnClick?: boolean;
   initiallySelected?: string[];
   syncWithAppState?: any;
   pageSizeOptions?: number[];
@@ -195,12 +198,15 @@ type TableProps = {
   willSort?: AsyncFunction;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   uid?: string;
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
   hideHeader?: boolean;
   hideNoDataView?: boolean;
   hideSelectionCheckboxes?: boolean;
+  renderVersion?: number;
+  hideSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxesHeader?: boolean;
   alwaysShowSelectionCheckboxes?: boolean;
   alwaysShowSortingIndicator?: boolean;
@@ -217,6 +223,8 @@ type TableProps = {
   checkboxTolerance?: CheckboxTolerance;
   rowHeight?: number;
   rowDoubleClick?: (item: any) => void;
+  headerUserSelect?: string;
+  cellUserSelect?: string;
   userSelectCell?: string;
   userSelectRow?: string;
   userSelectHeading?: string;
@@ -227,6 +235,7 @@ type TableProps = {
   onPasteAction?: AsyncFunction;
   onDeleteAction?: AsyncFunction;
   alwaysShowHeader?: boolean;
+  striped?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -241,65 +250,47 @@ const SELECT_COLUMN_WIDTH = 42;
 
 const DEFAULT_PAGE_SIZES = [10];
 
-/**
- * Maps checkbox tolerance values to pixel values
- * @param tolerance - The tolerance level
- * @returns The number of pixels for the tolerance
- */
-const getCheckboxTolerancePixels = (tolerance: CheckboxTolerance): number => {
-  switch (tolerance) {
-    case "none":
-      return 0;
-    case "compact":
-      return 8;
-    case "comfortable":
-      return 12;
-    case "spacious":
-      return 16;
-    default:
-      return 8; // fallback to compact
-  }
+type SelectionToggleProps = {
+  checkboxTolerance: CheckboxTolerance;
+  ariaLabel: string;
+  value: boolean;
+  indeterminate: boolean;
+  onDidChange: () => void;
+  alwaysVisibleClassName?: string;
 };
 
-/**
- * Helper function to check if a point is within the checkbox boundary
- * @param pointX - X coordinate of the point to check
- * @param pointY - Y coordinate of the point to check
- * @param checkboxRect - Bounding rectangle of the checkbox
- * @param tolerancePixels - Number of pixels to extend the boundary
- * @returns true if the point is within the checkbox or within tolerancePixels of its boundary
- */
-const isWithinCheckboxBoundary = (
-  pointX: number,
-  pointY: number,
-  checkboxRect: DOMRect,
-  tolerancePixels: number,
-): boolean => {
-  // Calculate distance from point to checkbox boundaries
-  const distanceToLeft = Math.abs(pointX - checkboxRect.left);
-  const distanceToRight = Math.abs(pointX - checkboxRect.right);
-  const distanceToTop = Math.abs(pointY - checkboxRect.top);
-  const distanceToBottom = Math.abs(pointY - checkboxRect.bottom);
-
-  // Check if point is within the checkbox bounds or within boundary pixels of any edge
-  const withinHorizontalBounds = pointX >= checkboxRect.left && pointX <= checkboxRect.right;
-  const withinVerticalBounds = pointY >= checkboxRect.top && pointY <= checkboxRect.bottom;
-  const withinCheckbox = withinHorizontalBounds && withinVerticalBounds;
-
-  const nearHorizontalBoundary =
-    withinVerticalBounds &&
-    (distanceToLeft <= tolerancePixels || distanceToRight <= tolerancePixels);
-  const nearVerticalBoundary =
-    withinHorizontalBounds &&
-    (distanceToTop <= tolerancePixels || distanceToBottom <= tolerancePixels);
-
-  return withinCheckbox || nearHorizontalBoundary || nearVerticalBoundary;
-};
+function SelectionToggle({
+  checkboxTolerance,
+  ariaLabel,
+  value,
+  indeterminate,
+  onDidChange,
+  alwaysVisibleClassName,
+}: SelectionToggleProps) {
+  const wrapperClassName = classnames(styles.checkBoxWrapper, alwaysVisibleClassName, {
+    [styles.toleranceCompact]: checkboxTolerance === "compact",
+    [styles.toleranceComfortable]: checkboxTolerance === "comfortable",
+    [styles.toleranceSpacious]: checkboxTolerance === "spacious",
+  });
+  return (
+    <div className={wrapperClassName}>
+      <Toggle
+        {...{
+          "aria-label": ariaLabel,
+          className: styles.selectionToggle,
+          value,
+          indeterminate,
+          onDidChange,
+        }}
+      />
+    </div>
+  );
+}
 
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
 //View the index.css file for more needed styles such as border-collapse: separate
-const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => {
+const getCommonPinningStyles = (column: Column<RowWithOrder>, isHeader = false): CSSProperties => {
   const isPinned = column.getIsPinned();
   // const isLastLeftPinnedColumn = isPinned === "left" && column.getIsLastColumn("left");
   // const isFirstRightPinnedColumn = isPinned === "right" && column.getIsFirstColumn("right");
@@ -312,9 +303,14 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
     //   : undefined,
     left: isPinned === "left" ? `${column.getStart("left")}px` : undefined,
     right: isPinned === "right" ? `${column.getAfter("right")}px` : undefined,
-    opacity: isPinned ? 0.95 : undefined,
     position: isPinned ? "sticky" : "relative",
-    backgroundColor: isPinned ? "inherit" : undefined,
+    backgroundColor: isPinned
+      ? isHeader
+        ? toCssVar("$backgroundColor-heading-Table")
+        : column.id === "select"
+          ? `var(--checkbox-cell-bg, ${toCssVar("$backgroundColor-selectionCell-Table")})`
+          : `var(--pinned-cell-bg, ${toCssVar("$backgroundColor-pinnedCell-Table")})`
+      : undefined,
     zIndex: isPinned ? 1 : undefined,
   };
 };
@@ -402,44 +398,39 @@ function useTableKeyboardActions({
       // Check each parsed binding
       for (const { binding, action } of Object.values(parsedBindings)) {
         if (matchesKeyEvent(event.nativeEvent, binding)) {
-          // Prevent default browser behavior immediately when key matches
-          event.preventDefault();
-
-          // If rowsSelectable is false, prevent default but don't execute any actions
-          if (!rowsSelectable) {
-            return true; // Event handled (prevented), but don't execute action
-          }
-
           // Call the appropriate handler
           let handled = false;
           switch (action) {
             case "selectAll":
-              // First, select all items via the API
-              selectionApi.selectAll();
+              // Only handle selectAll if rows are selectable
+              if (rowsSelectable) {
+                // First, select all items via the API
+                selectionApi.selectAll();
 
-              // Build the selectedRowIdMap for all items (since selectAll selects everything)
-              const allSelectedRowIdMap: Record<string, boolean> = {};
-              data.forEach((item: any) => {
-                allSelectedRowIdMap[String(item[idKey])] = true;
-              });
+                // Build the selectedRowIdMap for all items (since selectAll selects everything)
+                const allSelectedRowIdMap: Record<string, boolean> = {};
+                data.forEach((item: any) => {
+                  allSelectedRowIdMap[String(item[idKey])] = true;
+                });
 
-              // Build context with all items selected
-              const [row, allItems, allIds] = buildActionContext(
-                data, // All data items are selected
-                allSelectedRowIdMap,
-                focusedIndex,
-                data,
-                idKey,
-              );
+                // Build context with all items selected
+                const [row, allItems, allIds] = buildActionContext(
+                  data, // All data items are selected
+                  allSelectedRowIdMap,
+                  focusedIndex,
+                  data,
+                  idKey,
+                );
 
-              // Finally, invoke the event handler if provided
-              if (onSelectAllAction) {
-                onSelectAllAction(row, allItems, allIds);
+                // Finally, invoke the event handler if provided
+                if (onSelectAllAction) {
+                  onSelectAllAction(row, allItems, allIds);
+                }
+                handled = true;
               }
-              handled = true;
               break;
             case "cut":
-              if (onCutAction) {
+              if (rowsSelectable && onCutAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -452,7 +443,7 @@ function useTableKeyboardActions({
               }
               break;
             case "copy":
-              if (onCopyAction) {
+              if (rowsSelectable && onCopyAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -478,7 +469,7 @@ function useTableKeyboardActions({
               }
               break;
             case "delete":
-              if (onDeleteAction) {
+              if (rowsSelectable && onDeleteAction) {
                 const [row, items, ids] = buildActionContext(
                   selectedItems,
                   selectedRowIdMap,
@@ -493,6 +484,10 @@ function useTableKeyboardActions({
           }
 
           if (handled) {
+            // Prevent default browser behavior when key matches and action is handled.
+            // Also stop propagation so parent React onKeyDown handlers don't double-fire.
+            event.preventDefault();
+            event.stopPropagation();
             return true; // Signal that the event was handled
           }
         }
@@ -521,7 +516,7 @@ function useTableKeyboardActions({
 }
 
 // eslint-disable-next-line react/display-name
-export const Table = forwardRef(
+export const Table = memo(forwardRef(
   (
     {
       data = defaultProps.data,
@@ -531,6 +526,7 @@ export const Table = forwardRef(
       headerHeight,
       rowsSelectable = defaultProps.rowsSelectable,
       enableMultiRowSelection = defaultProps.enableMultiRowSelection,
+      toggleSelectionOnClick = defaultProps.toggleSelectionOnClick,
       initiallySelected = defaultProps.initiallySelected,
       syncWithAppState,
       pageSizeOptions = defaultProps.pageSizeOptions,
@@ -548,11 +544,14 @@ export const Table = forwardRef(
       lookupEventHandler,
       style,
       className,
+      classes,
       noDataRenderer,
       autoFocus = defaultProps.autoFocus,
       hideHeader = defaultProps.hideHeader,
       hideNoDataView = defaultProps.hideNoDataView,
       hideSelectionCheckboxes = defaultProps.hideSelectionCheckboxes,
+      renderVersion = 0,
+      hideSelectionCheckboxesHeader = defaultProps.hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes = defaultProps.alwaysShowSelectionCheckboxes,
       alwaysShowPagination,
       alwaysShowSelectionCheckboxesHeader = defaultProps.alwaysShowSelectionCheckboxesHeader,
@@ -571,6 +570,8 @@ export const Table = forwardRef(
       checkboxTolerance = defaultProps.checkboxTolerance,
       rowHeight = defaultProps.rowHeight,
       rowDoubleClick,
+      headerUserSelect,
+      cellUserSelect,
       userSelectCell,
       userSelectRow,
       userSelectHeading,
@@ -581,6 +582,7 @@ export const Table = forwardRef(
       onPasteAction,
       onDeleteAction,
       alwaysShowHeader = defaultProps.alwaysShowHeader,
+      striped = defaultProps.striped,
       ...rest
       // cols
     }: TableProps,
@@ -588,19 +590,28 @@ export const Table = forwardRef(
   ) => {
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
-      userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
+      cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
     const effectiveUserSelectRow =
       userSelectRow ?? getThemeVar("userSelect-row-Table") ?? defaultProps.userSelectRow;
     const effectiveUserSelectHeading =
+      headerUserSelect ??
       userSelectHeading ??
       getThemeVar("userSelect-heading-Table") ??
       defaultProps.userSelectHeading;
+
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
 
     const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
+
+    const effectivePageSizeOptions = useMemo(() => {
+      if (pageSizeOptions.includes(effectivePageSize)) {
+        return pageSizeOptions;
+      }
+      return [...pageSizeOptions, effectivePageSize].sort((a, b) => a - b);
+    }, [pageSizeOptions, effectivePageSize]);
 
     const effectiveIsPaginated = useMemo(() => {
       if (isPaginated !== undefined) {
@@ -631,15 +642,6 @@ export const Table = forwardRef(
     // --- Keep track of visible table rows
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
-    // --- Track which row should show forced hover for checkbox
-    const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-
-    // --- Track if the header checkbox should show forced hover
-    const [headerCheckboxHovered, setHeaderCheckboxHovered] = useState<boolean>(false);
-
-    // --- Calculate tolerance pixels from the prop
-    const tolerancePixels = getCheckboxTolerancePixels(checkboxTolerance);
-
     // --- Get the operations to manage selected rows in a table
     const {
       toggleRow,
@@ -654,6 +656,7 @@ export const Table = forwardRef(
       visibleItems,
       rowsSelectable,
       enableMultiRowSelection,
+      toggleSelectionOnClick,
       rowDisabledPredicate,
       rowUnselectablePredicate,
       onSelectionDidChange,
@@ -681,6 +684,13 @@ export const Table = forwardRef(
     // --- Create composite keyboard handler that handles both actions and navigation
     const compositeKeyDown = useCallback(
       (event: React.KeyboardEvent<HTMLDivElement>) => {
+        // Modifier-only keys match no table action. Without this guard they bubble to
+        // Main.xmlui → runCodeAsync → cloneDeep(state) → ~160ms freeze per key-repeat.
+        if (event.key === "Control" || event.key === "Meta" || event.key === "Shift" || event.key === "Alt") {
+          event.stopPropagation();
+          return;
+        }
+
         // First, try to handle keyboard actions (selectAll, cut, copy, paste, delete)
         const actionHandled = handleKeyboardActions(event);
 
@@ -689,7 +699,7 @@ export const Table = forwardRef(
           onKeyDown(event);
         }
       },
-      [handleKeyboardActions, onKeyDown],
+      [handleKeyboardActions, onKeyDown]
     );
 
     // --- Create data with order information whenever the items in the table change
@@ -763,7 +773,7 @@ export const Table = forwardRef(
         const customColumn = {
           ...col,
           header: col.header ?? col.accessorKey ?? " ",
-          id: "col_" + idx,
+          id: col.id ?? col.accessorKey ?? "col_" + idx,
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
@@ -800,11 +810,21 @@ export const Table = forwardRef(
               if (allowStarSize && starSizedWidthMatch) {
                 starSizedWidth = starSizedWidthMatch[1] + "*";
               } else {
-                const pixelWidthMatch = resolvedWidth.match(/^\s*(\d+)\s*(px)?\s*$/);
+                const pixelWidthMatch = resolvedWidth.match(/^\s*(\d+(?:\.\d+)?)\s*(px)?\s*$/);
                 if (pixelWidthMatch) {
-                  width = Number(pixelWidthMatch[1]);
+                  width = parseFloat(pixelWidthMatch[1]);
                 } else {
-                  throw new Error(`Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`);
+                  const remEmMatch = resolvedWidth.match(/^\s*(\d+(?:\.\d+)?)\s*(rem|em)\s*$/);
+                  if (remEmMatch) {
+                    const rootFontSize = parseFloat(
+                      getComputedStyle(document.documentElement).fontSize,
+                    );
+                    width = parseFloat(remEmMatch[1]) * (isNaN(rootFontSize) ? 16 : rootFontSize);
+                  } else {
+                    throw new Error(
+                      `Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`,
+                    );
+                  }
                 }
               }
             }
@@ -817,13 +837,10 @@ export const Table = forwardRef(
       });
     }, [getThemeVar, safeColumns]);
 
-    // --- Prepare column renderers according to columns defined in the table supporting optional row selection
-    const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
-      if (hideSelectionCheckboxes) {
-        return columnsWithCustomCell;
-      }
-      // --- Extend the columns with a selection checkbox (indeterminate)
-      const selectColumn = {
+    // --- Prepare the selection column separately so hover-driven updates stay isolated to it
+    const selectColumn: ColumnDef<any> = useMemo(() => {
+      // --- Extend the columns with a selection checkbox (indeterminate) without affecting the main column sizing pipeline
+      return {
         id: "select",
         size: SELECT_COLUMN_WIDTH,
         enableResizing: false,
@@ -832,28 +849,25 @@ export const Table = forwardRef(
           pinTo: "left",
         },
         header: ({ table }: HeaderContext<any, unknown>) =>
-          enableMultiRowSelection ? (
-            <Toggle
-              {...{
-                "aria-label": "Select all rows",
-                className: classnames(styles.checkBoxWrapper, {
-                  [styles.showInHeader]: alwaysShowSelectionCheckboxesHeader,
-                  [styles.forceHoverWrapper]: headerCheckboxHovered,
-                }),
-                value: table.getIsAllRowsSelected(),
-                indeterminate: table.getIsSomeRowsSelected(),
-                forceHover: headerCheckboxHovered,
-                onDidChange: () => {
-                  const allSelected = table
-                    .getRowModel()
-                    .rows.every(
-                      (row) =>
-                        rowDisabledPredicate(row.original) ||
-                        rowUnselectablePredicate(row.original) ||
-                        row.getIsSelected(),
-                    );
-                  checkAllRows(!allSelected);
-                },
+          enableMultiRowSelection && !hideSelectionCheckboxesHeader ? (
+            <SelectionToggle
+              checkboxTolerance={checkboxTolerance}
+              ariaLabel="Select all rows"
+              alwaysVisibleClassName={
+                alwaysShowSelectionCheckboxesHeader ? styles.showInHeader : undefined
+              }
+              value={table.getIsAllRowsSelected()}
+              indeterminate={table.getIsSomeRowsSelected()}
+              onDidChange={() => {
+                const allSelected = table
+                  .getRowModel()
+                  .rows.every(
+                    (row) =>
+                      rowDisabledPredicate(row.original) ||
+                      rowUnselectablePredicate(row.original) ||
+                      row.getIsSelected(),
+                  );
+                checkAllRows(!allSelected);
               }}
             />
           ) : null,
@@ -861,24 +875,21 @@ export const Table = forwardRef(
           return (
             <>
               {row.getCanSelect() && (
-                <Toggle
-                  {...{
-                    "aria-label": `Select ${row.original[idKey]}`,
-                    className: classnames(styles.checkBoxWrapper, {
-                      [styles.forceHoverWrapper]: hoveredRowId === row.id,
-                      [styles.showInRow]: alwaysShowSelectionCheckboxes,
-                    }),
-                    value: row.getIsSelected(),
-                    indeterminate: row.getIsSomeSelected(),
-                    forceHover: hoveredRowId === row.id,
-                    onDidChange: () => {
-                      // In single selection mode, allow deselection by checking if already selected
-                      if (!enableMultiRowSelection && row.getIsSelected()) {
-                        checkAllRows(false); // Deselect all (which is just this one row)
-                      } else {
-                        toggleRow(row.original, { metaKey: true });
-                      }
-                    },
+                <SelectionToggle
+                  checkboxTolerance={checkboxTolerance}
+                  ariaLabel={`Select ${row.original[idKey]}`}
+                  alwaysVisibleClassName={
+                    alwaysShowSelectionCheckboxes ? styles.showInRow : undefined
+                  }
+                  value={row.getIsSelected()}
+                  indeterminate={row.getIsSomeSelected()}
+                  onDidChange={() => {
+                    // In single selection mode, allow deselection by checking if already selected
+                    if (!enableMultiRowSelection && row.getIsSelected()) {
+                      checkAllRows(false); // Deselect all (which is just this one row)
+                    } else {
+                      toggleRow(row.original, { metaKey: true });
+                    }
                   }}
                 />
               )}
@@ -886,22 +897,26 @@ export const Table = forwardRef(
           );
         },
       };
-      return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
     }, [
       idKey,
-      rowsSelectable,
-      columnsWithCustomCell,
       enableMultiRowSelection,
       alwaysShowSelectionCheckboxesHeader,
       checkAllRows,
       toggleRow,
+      checkboxTolerance,
       rowDisabledPredicate,
       rowUnselectablePredicate,
-      hoveredRowId,
-      headerCheckboxHovered,
-      hideSelectionCheckboxes,
+      hideSelectionCheckboxesHeader,
       alwaysShowSelectionCheckboxes,
     ]);
+
+    // --- Prepare column renderers according to columns defined in the table supporting optional row selection
+    const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
+      if (hideSelectionCheckboxes) {
+        return columnsWithCustomCell;
+      }
+      return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
+    }, [rowsSelectable, columnsWithCustomCell, hideSelectionCheckboxes, selectColumn]);
 
     // --- Set up page information (using the first page size option)
     const [pagination, setPagination] = useState<PaginationState>({
@@ -932,6 +947,18 @@ export const Table = forwardRef(
     }, [effectiveIsPaginated, pageSizeOptions, prevIsPaginated, effectivePageSize]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
+
+    // layoutVersion tracks internal layout state changes that cells must respond to
+    // (column drag resize, window resize via recalculateStarSizes).
+    const prevColumnSizingRef = useRef(columnSizing);
+    const layoutVersionRef = useRef(0);
+    if (columnSizing !== prevColumnSizingRef.current) {
+      prevColumnSizingRef.current = columnSizing;
+      layoutVersionRef.current++;
+    }
+    const layoutVersion = layoutVersionRef.current;
+
+
 
     const columnPinning = useMemo(() => {
       const left: Array<string> = [];
@@ -1199,7 +1226,108 @@ export const Table = forwardRef(
     const rowsRef = useRef(rows);
     rowsRef.current = rows;
 
-    // Custom row component for Virtualizer - memoized to avoid recreation on every render
+    // --- Stable ref for all values accessed inside VirtualTableRow.
+    // Keeping VirtualTableRow identity stable is critical: virtua's ListItem uses
+    // useLayoutEffect(() => observe(ref, index), [index]) to register each row with
+    // ResizeObserver. If VirtualTableRow identity changes (useMemo recreates it),
+    // React remounts all <tr> elements, but the effect doesn't re-run (index is the
+    // same), so the new DOM nodes are never observed → rows stay visibility:hidden.
+    const rowState = {
+      focusedIndex,
+      rowDisabledPredicate,
+      noBottomBorder,
+      effectiveUserSelectRow,
+      toggleRow,
+      checkAllRows,
+      enableMultiRowSelection,
+      lookupEventHandler,
+      rowDoubleClick,
+      striped,
+      renderVersion: renderVersion + layoutVersion,
+    };
+    const rowStateRef = useRef(rowState);
+    rowStateRef.current = rowState;
+
+    // Stable ref for cell rendering context (effectiveUserSelectCell / cellVerticalAlign can
+    // change when theme/props change, but we don't want to recreate TableMemoizedCells for that).
+    const cellRenderStateRef = useRef({ effectiveUserSelectCell, cellVerticalAlign });
+    cellRenderStateRef.current = { effectiveUserSelectCell, cellVerticalAlign };
+
+    // TableMemoizedCells — analogous to TileGridMemoizedItem.
+    // Created ONCE (useMemo([], [])), reads latest cell data from rowsRef via closure.
+    // The custom comparator only allows a re-render when:
+    //   • renderVersion changes  (e.g. selectMode toggled → closures must refresh)
+    //   • rowIndex changes        (row at this slot changed)
+    //   • isSelected changes      (the only thing that changes on a click)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const TableMemoizedCells = useMemo(() => {
+      return memo(
+        function TableMemoizedCellsInner({
+          rowIndex,
+          isSelected: _isSelected,
+          renderVersion: _rv,
+        }: {
+          rowIndex: number;
+          isSelected: boolean;
+          renderVersion: number;
+        }) {
+          const row = rowsRef.current[rowIndex];
+          if (!row) return null;
+          const { effectiveUserSelectCell: userSelectCell, cellVerticalAlign: vertAlign } =
+            cellRenderStateRef.current;
+          return (
+            <>
+              {row.getVisibleCells().map((cell, i) => {
+                const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                const size = cell.column.getSize();
+                const columnClassName = cell.column.columnDef?.meta?.className;
+                const columnStyle = cell.column.columnDef?.meta?.style;
+                const { width: _ignoredWidth, ...styleWithoutWidth } = columnStyle || {};
+                const alignmentClass =
+                  vertAlign === "top"
+                    ? styles.alignTop
+                    : vertAlign === "bottom"
+                      ? styles.alignBottom
+                      : styles.alignCenter;
+                return (
+                  <td
+                    className={classnames(styles.cell, alignmentClass, columnClassName)}
+                    key={`${cell.id}-${i}`}
+                    data-column-id={cell.column.id}
+                    style={{
+                      width: size,
+                      "--column-width": `${size}px`,
+                      flexShrink: 0,
+                      ...getCommonPinningStyles(cell.column),
+                      ...styleWithoutWidth,
+                    } as React.CSSProperties}
+                  >
+                    <div
+                      className={styles.cellContent}
+                      style={{ userSelect: userSelectCell as React.CSSProperties["userSelect"] }}
+                    >
+                      {cellRenderer
+                        ? cellRenderer(row.original, rowIndex, i, cell?.getValue())
+                        : (flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          ) as ReactNode)}
+                    </div>
+                  </td>
+                );
+              })}
+            </>
+          );
+        },
+        (prev, next) =>
+          prev.rowIndex === next.rowIndex &&
+          prev.isSelected === next.isSelected &&
+          prev.renderVersion === next.renderVersion,
+      );
+    }, []);
+
+    // Custom row component for Virtualizer — created once, reads current values from refs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const VirtualTableRow = useMemo(() => {
       const RowComponent = forwardRef<HTMLTableRowElement, CustomItemComponentProps>(
         ({ style, children, index: rowIndex }, ref) => {
@@ -1208,6 +1336,7 @@ export const Table = forwardRef(
             console.warn(`Table: No row data found at index ${rowIndex}`);
             return null;
           }
+          const s = rowStateRef.current;
           const isFirstRow = rowIndex === 0;
           return (
             <tr
@@ -1215,13 +1344,16 @@ export const Table = forwardRef(
               ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
               style={{
                 ...style,
-                userSelect: effectiveUserSelectRow as React.CSSProperties["userSelect"],
+                minWidth: "max-content",
+                userSelect: s.effectiveUserSelectRow as React.CSSProperties["userSelect"],
               }}
               className={classnames(styles.row, {
                 [styles.selected]: row.getIsSelected(),
-                [styles.focused]: focusedIndex === rowIndex,
-                [styles.disabled]: rowDisabledPredicate(row.original),
-                [styles.noBottomBorder]: noBottomBorder,
+                [styles.focused]: s.focusedIndex === rowIndex,
+                [styles.disabled]: s.rowDisabledPredicate(row.original),
+                [styles.noBottomBorder]: s.noBottomBorder,
+                [styles.evenRow]: s.striped && rowIndex % 2 === 0,
+                [styles.oddRow]: s.striped && rowIndex % 2 !== 0,
               })}
               onClick={(event) => {
                 // On Windows, the second click of a double-click fires onClick before onDoubleClick.
@@ -1252,122 +1384,70 @@ export const Table = forwardRef(
                 // Focus the table wrapper to enable keyboard shortcuts (after checking input/button)
                 wrapperRef.current?.focus();
 
-                // Check if click is within checkbox boundary
-                const currentRow = event.currentTarget as HTMLElement;
-                const checkbox = currentRow.querySelector(
-                  'input[type="checkbox"]',
-                ) as HTMLInputElement;
+                const isSelectColumn =
+                  target.closest("td")?.getAttribute("data-column-id") === "select";
 
-                if (checkbox) {
-                  const checkboxRect = checkbox.getBoundingClientRect();
-                  const clickX = event.clientX;
-                  const clickY = event.clientY;
-
-                  if (isWithinCheckboxBoundary(clickX, clickY, checkboxRect, tolerancePixels)) {
-                    // Toggle the checkbox when clicking within the boundary
-                    // In single selection mode, allow deselection by checking if already selected
-                    if (!enableMultiRowSelection && row.getIsSelected()) {
-                      checkAllRows(false); // Deselect all (which is just this one row)
-                    } else {
-                      toggleRow(row.original, { metaKey: true });
-                    }
-                    return;
+                if (isSelectColumn) {
+                  const rs = rowStateRef.current;
+                  if (!rs.enableMultiRowSelection && row.getIsSelected()) {
+                    rs.checkAllRows(false); // Deselect all (which is just this one row)
+                  } else {
+                    rs.toggleRow(row.original, { metaKey: true });
                   }
+                  return;
                 }
-                toggleRow(row.original, event);
+
+                rowStateRef.current.toggleRow(row.original, event);
               }}
               onDoubleClick={(event) => {
                 // Prevent browser text selection on double-click
                 event.preventDefault();
 
                 // Call external handler if provided
-                if (rowDoubleClick && typeof rowDoubleClick === "function") {
+                const { rowDoubleClick: dblClick } = rowStateRef.current;
+                if (dblClick && typeof dblClick === "function") {
                   try {
-                    rowDoubleClick(row.original);
+                    dblClick(row.original);
                   } catch (e) {
                     console.error("Error in rowDoubleClick handler:", e);
                   }
                 }
               }}
-              onMouseMove={(event) => {
-                // Change cursor and hover state when within checkbox boundary
-                const currentRow = event.currentTarget as HTMLElement;
-                const checkbox = currentRow.querySelector(
-                  'input[type="checkbox"]',
-                ) as HTMLInputElement;
+              onContextMenu={
+                rowStateRef.current.lookupEventHandler
+                  ? (event) => {
+                      // Prevent default browser context menu only when a contextMenu handler is configured
+                      event.preventDefault();
 
-                if (checkbox) {
-                  const checkboxRect = checkbox.getBoundingClientRect();
-                  const mouseX = event.clientX;
-                  const mouseY = event.clientY;
+                      const handler = rowStateRef.current.lookupEventHandler("contextMenu", {
+                        context: {
+                          $item: row.original,
+                          $row: row.original,
+                          $rowIndex: rowIndex,
+                          $itemIndex: rowIndex,
+                        },
+                        ephemeral: true, // Don't cache this handler since context changes per row
+                      });
 
-                  const shouldShowHover = isWithinCheckboxBoundary(
-                    mouseX,
-                    mouseY,
-                    checkboxRect,
-                    tolerancePixels,
-                  );
-
-                  // Update hover state and cursor based on proximity to checkbox
-                  if (shouldShowHover) {
-                    setHoveredRowId(row.id);
-                    currentRow.style.cursor = "pointer";
-                  } else {
-                    setHoveredRowId(null);
-                    currentRow.style.cursor = "";
-                  }
-                }
-              }}
-              onMouseLeave={(event) => {
-                // Reset cursor and hover state when leaving the row
-                const currentRow = event.currentTarget as HTMLElement;
-                currentRow.style.cursor = "";
-                setHoveredRowId(null);
-              }}
-              onContextMenu={(event) => {
-                // Prevent default browser context menu
-                event.preventDefault();
-
-                // Use lookupEventHandler with context containing row variables
-                if (lookupEventHandler) {
-                  const handler = lookupEventHandler("contextMenu", {
-                    context: {
-                      $item: row.original,
-                      $row: row.original,
-                      $rowIndex: rowIndex,
-                      $itemIndex: rowIndex,
-                    },
-                    ephemeral: true, // Don't cache this handler since context changes per row
-                  });
-
-                  handler?.(event);
-                }
-              }}
+                      handler?.(event);
+                    }
+                  : undefined
+              }
             >
-              {children}
+              <TableMemoizedCells
+                rowIndex={rowIndex}
+                isSelected={row.getIsSelected()}
+                renderVersion={s.renderVersion}
+              />
             </tr>
           );
         },
       );
-      RowComponent.displayName = "VirtualTableRow";
-      return RowComponent;
-    }, [
-      focusedIndex,
-      rowDisabledPredicate,
-      noBottomBorder,
-      effectiveUserSelectRow,
-      firstRowRef,
-      toggleRow,
-      checkAllRows,
-      enableMultiRowSelection,
-      tolerancePixels,
-      wrapperRef,
-      setHoveredRowId,
-      lookupEventHandler,
-      rowDoubleClick,
-    ]);
+      return RowComponent as any;
+    }, []);
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
+    const lastMeasuredWidthRef = useRef<number | null>(null);
     const columnSizeTouched = useCallback((id: string) => {
       touchedSizesRef.current[id] = true;
     }, []);
@@ -1376,8 +1456,12 @@ export const Table = forwardRef(
       if (!tableRef.current) {
         return;
       }
-      let availableWidth = tableRef.current.clientWidth - 1;
-      // -1 to prevent horizontal scroll in scaled browsers (when you zoom in)
+      const measuredWidth = tableRef.current.clientWidth;
+      if (measuredWidth === lastMeasuredWidthRef.current) {
+        return;
+      }
+      lastMeasuredWidthRef.current = measuredWidth;
+      let availableWidth = measuredWidth;
       const widths: Record<string, number> = {};
       const columnsWithoutSize: Array<Column<RowWithOrder>> = [];
       const numberOfUnitsById: Record<string, number> = {};
@@ -1396,18 +1480,70 @@ export const Table = forwardRef(
           numberOfUnitsById[column.id] = units;
         }
       });
-      const numberOfAllUnits = Object.values(numberOfUnitsById).reduce((acc, val) => acc + val, 0);
-      columnsWithoutSize.forEach((column) => {
-        widths[column.id] = Math.floor(
-          availableWidth * (numberOfUnitsById[column.id] / numberOfAllUnits),
-        );
-      });
+      // Distribute available width respecting minSize/maxSize constraints of each column.
+      // When a column would exceed its maxSize (or fall below its minSize), pin it at
+      // that bound and redistribute the remaining space among the other star-sized columns.
+      let remaining = availableWidth;
+      const unitsMap = new Map<string, number>(
+        columnsWithoutSize.map((col) => [col.id, numberOfUnitsById[col.id]]),
+      );
+      const constrainedWidths = new Map<string, number>();
+
+      let changed = true;
+      while (changed && unitsMap.size > 0) {
+        changed = false;
+        const totalUnits = [...unitsMap.values()].reduce((s, v) => s + v, 0);
+        if (totalUnits === 0) break;
+        for (const [id, units] of [...unitsMap.entries()]) {
+          const col = columnsWithoutSize.find((c) => c.id === id)!;
+          const allocated = remaining * (units / totalUnits);
+          const maxSize = col.columnDef.maxSize ?? Number.MAX_SAFE_INTEGER;
+          const minSize = col.columnDef.minSize ?? 20;
+          if (allocated > maxSize) {
+            constrainedWidths.set(id, maxSize);
+            remaining -= maxSize;
+            unitsMap.delete(id);
+            changed = true;
+            break;
+          } else if (allocated < minSize) {
+            constrainedWidths.set(id, minSize);
+            remaining -= minSize;
+            unitsMap.delete(id);
+            changed = true;
+            break;
+          }
+        }
+      }
+
+      // Allocate remaining space to unconstrained columns, distributing any remainder
+      // from Math.floor to the last column so the total exactly equals the available width.
+      // This prevents the column sum from undershooting clientWidth, which would cause the
+      // parent flex container to shrink and trigger an infinite resize loop.
+      const finalTotalUnits = [...unitsMap.values()].reduce((s, v) => s + v, 0);
+      const unitsEntries = [...unitsMap.entries()];
+      let allocatedToUnconstrained = 0;
+      for (let i = 0; i < unitsEntries.length; i++) {
+        const [id, units] = unitsEntries[i];
+        if (i < unitsEntries.length - 1) {
+          widths[id] = Math.floor(remaining * (units / (finalTotalUnits || 1)));
+          allocatedToUnconstrained += widths[id];
+        } else {
+          // Last unconstrained column absorbs the remainder so sum = remaining exactly
+          widths[id] = remaining - allocatedToUnconstrained;
+        }
+      }
+      for (const [id, w] of constrainedWidths.entries()) {
+        widths[id] = w;
+      }
       flushSync(() => {
-        setColumnSizing((prev) => {
-          return {
-            ...prev,
-            ...widths,
-          };
+        setColumnSizing((prev: any) => {
+          const next = { ...prev, ...widths };
+          table.getAllColumns().forEach((col) => {
+            if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
+              delete next[col.id];
+            }
+          });
+          return next;
         });
       });
     });
@@ -1415,10 +1551,12 @@ export const Table = forwardRef(
     useResizeObserver(tableRef, recalculateStarSizes);
 
     useIsomorphicLayoutEffect(() => {
+      // Reset cached width so columns are recalculated when the column set changes
+      lastMeasuredWidthRef.current = null;
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes, safeColumns]);
+    }, [recalculateStarSizes, safeColumns, columnsWithCustomCell, rowsSelectable, hideSelectionCheckboxes]);
 
     useIsomorphicLayoutEffect(() => {
       registerComponentApi(selectionApi);
@@ -1429,7 +1567,7 @@ export const Table = forwardRef(
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         itemCount={safeData.length}
-        pageSizeOptions={pageSizeOptions}
+        pageSizeOptions={effectivePageSizeOptions}
         onPageDidChange={(page) => table.setPageIndex(page)}
         onPageSizeDidChange={(size) => table.setPageSize(size)}
         showCurrentPage={showCurrentPage}
@@ -1454,7 +1592,7 @@ export const Table = forwardRef(
     return (
       <div
         {...rest}
-        className={classnames(styles.wrapper, className, { [styles.noScroll]: hasOutsideScroll })}
+        className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={0}
         onKeyDown={compositeKeyDown}
         onClick={(e) => {
@@ -1480,7 +1618,7 @@ export const Table = forwardRef(
           (paginationControlsLocation === "top" || paginationControlsLocation === "both") &&
           paginationControls}
 
-        <table className={styles.table} ref={tableRef}>
+        <table className={styles.table} ref={tableRef} aria-label={(rest as any)["aria-label"]}>
           {!hideHeader && (
             <>
               <thead
@@ -1502,103 +1640,34 @@ export const Table = forwardRef(
                     })}
                     onClick={(event) => {
                       const target = event.target as HTMLElement;
+
+                      // Allow native checkbox clicks to be handled by Toggle's onChange
+                      if (target.tagName.toLowerCase() === "input" && target.getAttribute("type") === "checkbox") {
+                        return;
+                      }
+
                       const headerCell = target.closest("th");
 
-                      // Only handle clicks for the select column header
-                      if (headerCell && rowsSelectable && enableMultiRowSelection) {
-                        const header = headerGroup.headers.find((h) => {
-                          const headerElement = headerCell;
-                          return (
-                            headerElement?.getAttribute("data-column-id") === h.id ||
-                            h.id === "select"
-                          );
-                        });
+                      // Only handle clicks for the select column header when the header checkbox is visible
+                      if (
+                        headerCell &&
+                        rowsSelectable &&
+                        enableMultiRowSelection &&
+                        !hideSelectionCheckboxesHeader
+                      ) {
+                        const headerId = headerCell.getAttribute("data-column-id");
 
-                        if (header && header.id === "select") {
-                          const clickX = event.clientX;
-                          const clickY = event.clientY;
-                          const checkbox = headerCell.querySelector(
-                            'input[type="checkbox"]',
-                          ) as HTMLInputElement;
-
-                          if (checkbox) {
-                            const checkboxRect = checkbox.getBoundingClientRect();
-
-                            if (
-                              isWithinCheckboxBoundary(
-                                clickX,
-                                clickY,
-                                checkboxRect,
-                                tolerancePixels,
-                              )
-                            ) {
-                              // Prevent the default click and manually trigger the checkbox
-                              event.preventDefault();
-                              event.stopPropagation();
-
-                              const allSelected = table
-                                .getRowModel()
-                                .rows.every(
-                                  (row) =>
-                                    rowDisabledPredicate(row.original) ||
-                                    rowUnselectablePredicate(row.original) ||
-                                    row.getIsSelected(),
-                                );
-                              checkAllRows(!allSelected);
-                            }
-                          }
-                        }
-                      }
-                    }}
-                    onMouseMove={(event) => {
-                      if (rowsSelectable && enableMultiRowSelection) {
-                        const target = event.target as HTMLElement;
-                        const headerCell = target.closest("th");
-
-                        if (headerCell) {
-                          const header = headerGroup.headers.find((h) => {
-                            const headerElement = headerCell;
-                            return (
-                              headerElement?.getAttribute("data-column-id") === h.id ||
-                              h.id === "select"
+                        if (headerId === "select") {
+                          const allSelected = table
+                            .getRowModel()
+                            .rows.every(
+                              (row) =>
+                                rowDisabledPredicate(row.original) ||
+                                rowUnselectablePredicate(row.original) ||
+                                row.getIsSelected(),
                             );
-                          });
-
-                          if (header && header.id === "select") {
-                            const mouseX = event.clientX;
-                            const mouseY = event.clientY;
-                            const checkbox = headerCell.querySelector(
-                              'input[type="checkbox"]',
-                            ) as HTMLInputElement;
-
-                            if (checkbox) {
-                              const checkboxRect = checkbox.getBoundingClientRect();
-                              const shouldShowHover = isWithinCheckboxBoundary(
-                                mouseX,
-                                mouseY,
-                                checkboxRect,
-                                tolerancePixels,
-                              );
-
-                              if (shouldShowHover && !headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(true);
-                                event.currentTarget.style.cursor = "pointer";
-                              } else if (!shouldShowHover && headerCheckboxHovered) {
-                                setHeaderCheckboxHovered(false);
-                                event.currentTarget.style.cursor = "";
-                              }
-                            }
-                          } else if (headerCheckboxHovered) {
-                            setHeaderCheckboxHovered(false);
-                            event.currentTarget.style.cursor = "";
-                          }
+                          checkAllRows(!allSelected);
                         }
-                      }
-                    }}
-                    onMouseLeave={(event) => {
-                      if (headerCheckboxHovered) {
-                        setHeaderCheckboxHovered(false);
-                        event.currentTarget.style.cursor = "";
                       }
                     }}
                   >
@@ -1617,12 +1686,15 @@ export const Table = forwardRef(
                           data-column-id={header.id}
                           className={classnames(styles.columnCell, alignmentClass)}
                           colSpan={header.colSpan}
-                          style={{
-                            position: "relative",
-                            width: size,
-                            flexShrink: 0,
-                            ...getCommonPinningStyles(header.column),
-                          }}
+                          style={
+                            {
+                              ["--column-width" as string]: `${size}px`,
+                              position: "relative",
+                              width: size,
+                              flexShrink: 0,
+                              ...getCommonPinningStyles(header.column, true),
+                            } as React.CSSProperties
+                          }
                         >
                           <ClickableHeader
                             hasSorting={
@@ -1711,50 +1783,10 @@ export const Table = forwardRef(
               ref={virtualizerRef}
               scrollRef={wrapperRef}
               startMargin={startMargin}
+              itemSize={rowHeight}
             >
-              {rows.map((row, rowIndex) => (
-                <Fragment key={`${row.id}-${rowIndex}`}>
-                  {row.getVisibleCells().map((cell, i) => {
-                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                    const size = cell.column.getSize();
-                    const columnClassName = cell.column.columnDef?.meta?.className;
-                    const columnStyle = cell.column.columnDef?.meta?.style;
-
-                    const alignmentClass =
-                      cellVerticalAlign === "top"
-                        ? styles.alignTop
-                        : cellVerticalAlign === "bottom"
-                          ? styles.alignBottom
-                          : styles.alignCenter;
-                    return (
-                      <td
-                        className={classnames(styles.cell, alignmentClass, columnClassName)}
-                        key={`${cell.id}-${i}`}
-                        style={{
-                          "--column-width": `${size}px`,
-                          flexShrink: 0,
-                          ...getCommonPinningStyles(cell.column),
-                          ...columnStyle,
-                        } as CSSProperties}
-                      >
-                        <div
-                          className={styles.cellContent}
-                          style={{
-                            userSelect:
-                              effectiveUserSelectCell as React.CSSProperties["userSelect"],
-                          }}
-                        >
-                          {cellRenderer
-                            ? cellRenderer(cell.row.original, rowIndex, i, cell?.getValue())
-                            : (flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              ) as ReactNode)}
-                        </div>
-                      </td>
-                    );
-                  })}
-                </Fragment>
+              {rows.map((row) => (
+                <tr key={row.id} />
               ))}
             </Virtualizer>
           )}
@@ -1779,7 +1811,7 @@ export const Table = forwardRef(
       </div>
     );
   },
-);
+));
 
 type ClickableHeaderProps = {
   hasSorting?: boolean;
@@ -1811,14 +1843,14 @@ function ColumnOrderingIndicator({
   iconNoSort = "nosort:Table",
 }: ColumnOrderingIndicatorProps) {
   if (direction === "ascending") {
-    return <Icon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
+    return <ThemedIcon name={iconSortAsc} fallback="sortasc" size="12" />; //sortasc
   } else if (direction === "descending") {
-    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
+    return <ThemedIcon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
   }
   return iconNoSort !== "-" ? (
-    <Icon name={iconNoSort} fallback="nosort" size="12" />
+    <ThemedIcon name={iconNoSort} fallback="nosort" size="12" />
   ) : (
-    <Icon name={iconNoSort} size="12" />
+    <ThemedIcon name={iconNoSort} size="12" />
   ); //nosort
 }
 
@@ -1846,6 +1878,7 @@ export const defaultProps = {
   loading: false,
   rowsSelectable: false,
   enableMultiRowSelection: true,
+  toggleSelectionOnClick: false,
   initiallySelected: EMPTY_ARRAY,
   pageSizeOptions: [5, 10, 15],
   sortingDirection: "ascending" as SortingDirection,
@@ -1853,6 +1886,7 @@ export const defaultProps = {
   hideHeader: false,
   hideNoDataView: false,
   hideSelectionCheckboxes: false,
+  hideSelectionCheckboxesHeader: false,
   alwaysShowSelectionCheckboxesHeader: false,
   alwaysShowSelectionCheckboxes: false,
   alwaysShowSortingIndicator: false,
@@ -1878,4 +1912,5 @@ export const defaultProps = {
     delete: "Delete",
   },
   alwaysShowHeader: false,
+  striped: false,
 };

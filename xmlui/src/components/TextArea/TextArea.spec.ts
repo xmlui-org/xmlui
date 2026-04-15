@@ -481,27 +481,25 @@ test.describe("Visual States", () => {
   test("component applies theme variables correctly", async ({ initTestBed, page }) => {
     await initTestBed(`<TextArea testId="input" />`, {
       testThemeVars: {
-        "backgroundColor-TextArea--default": "rgb(255, 0, 0)",
-        "textColor-TextArea--default": "rgb(0, 255, 0)",
+        "backgroundColor-TextArea": "rgb(255, 0, 0)",
+        "textColor-TextArea": "rgb(0, 255, 0)",
       },
     });
     await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("background-color", "rgb(255, 0, 0)");
     await expect(page.getByTestId("input").locator("textarea")).toHaveCSS("color", "rgb(0, 255, 0)");
   });
 
-  test("component handles horizontal resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="horizontal" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "horizontal");
-  });
-
-  test("component handles vertical resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="vertical" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "vertical");
-  });
-
-  test("component handles both resize option", async ({ initTestBed, page }) => {
-    await initTestBed(`<TextArea resize="both" />`);
-    await expect(page.getByRole("textbox")).toHaveCSS("resize", "both");
+  test("resize prop controls CSS resize property", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <TextArea testId="ta-h" resize="horizontal" />
+        <TextArea testId="ta-v" resize="vertical" />
+        <TextArea testId="ta-b" resize="both" />
+      </Fragment>
+    `);
+    await expect(page.getByTestId("ta-h").getByRole("textbox")).toHaveCSS("resize", "horizontal");
+    await expect(page.getByTestId("ta-v").getByRole("textbox")).toHaveCSS("resize", "vertical");
+    await expect(page.getByTestId("ta-b").getByRole("textbox")).toHaveCSS("resize", "both");
   });
 
   test("component handles disabled visual state", async ({ initTestBed, page }) => {
@@ -1025,7 +1023,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 
 test.describe("Theme Variables", () => {
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

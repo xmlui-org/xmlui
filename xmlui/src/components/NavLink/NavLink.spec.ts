@@ -963,30 +963,29 @@ test("border, border-thickness-bottom", async ({ initTestBed, createNavLinkDrive
 // =============================================================================
 
 test.describe("noIndicator property", () => {
-  test("indicator not displayed when noIndicator is true", async ({
+  test("noIndicator=true suppresses indicator in active, displayActive=false, and vertical modes", async ({
     initTestBed,
-    createNavLinkDriver,
     page,
   }) => {
-    await initTestBed(`<NavLink to="/" active="true" noIndicator="true">Test</NavLink>`, {
-      testThemeVars: {
-        "color-indicator-NavLink--active": "rgb(255, 0, 0)",
-        "thickness-indicator-NavLink": "4px",
+    await initTestBed(
+      `<Fragment>
+        <NavLink testId="nli-active" to="/" active="true" noIndicator="true">T</NavLink>
+        <NavLink testId="nli-da" to="/" active="true" displayActive="false" noIndicator="true">T</NavLink>
+        <NavLink testId="nli-vert" to="/" active="true" vertical="true" noIndicator="true">T</NavLink>
+      </Fragment>`,
+      {
+        testThemeVars: {
+          "color-indicator-NavLink--active": "rgb(255, 0, 0)",
+          "thickness-indicator-NavLink": "4px",
+        },
       },
-    });
+    );
 
-    const driver = await createNavLinkDriver();
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-        backgroundColor: after.backgroundColor,
-        height: after.height,
-      };
-    });
-
-    // When noIndicator is true, the ::after element should not be rendered (content should be "none")
-    expect(afterElement.content).toBe("none");
+    for (const testId of ["nli-active", "nli-da", "nli-vert"]) {
+      const el = page.getByTestId(testId);
+      const content = await el.evaluate((el) => window.getComputedStyle(el, "::after").content);
+      expect(content).toBe("none");
+    }
   });
 
   test("indicator displayed when noIndicator is false (default)", async ({
@@ -1045,89 +1044,49 @@ test.describe("noIndicator property", () => {
     expect(afterElement.height).toBe("5px");
   });
 
-  test("indicator not shown on hover when noIndicator is true", async ({
+  test("noIndicator suppresses hover indicator; noIndicator=false shows it", async ({
     initTestBed,
-    createNavLinkDriver,
-    page,
-  }) => {
-    await initTestBed(`<NavLink to="/" noIndicator="true">Test</NavLink>`, {
-      testThemeVars: {
-        "color-indicator-NavLink--hover": "rgb(0, 0, 255)",
-        "thickness-indicator-NavLink": "3px",
-      },
-    });
-
-    const driver = await createNavLinkDriver();
-    await driver.component.hover();
-
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-        backgroundColor: after.backgroundColor,
-      };
-    });
-
-    // Even on hover, indicator should not be displayed when noIndicator is true
-    expect(afterElement.content).toBe("none");
-  });
-
-  test("indicator shown on hover when noIndicator is false", async ({
-    initTestBed,
-    createNavLinkDriver,
-    page,
-  }) => {
-    await initTestBed(`<NavLink to="/" noIndicator="false">Test</NavLink>`, {
-      testThemeVars: {
-        "thickness-indicator-NavLink": "3px",
-      },
-    });
-
-    const driver = await createNavLinkDriver();
-    await driver.component.hover();
-
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-        height: after.height,
-      };
-    });
-
-    // Indicator should be displayed on hover when noIndicator is false
-    expect(afterElement.content).toBe('""');
-    expect(afterElement.height).toBe("3px");
-  });
-
-  test("noIndicator works with displayActive false", async ({
-    initTestBed,
-    createNavLinkDriver,
     page,
   }) => {
     await initTestBed(
-      `<NavLink to="/" active="true" displayActive="false" noIndicator="true">Test</NavLink>`,
+      `<Fragment>
+        <NavLink testId="nli-no" to="/" noIndicator="true">T</NavLink>
+        <NavLink testId="nli-yes" to="/" noIndicator="false">T</NavLink>
+      </Fragment>`,
       {
         testThemeVars: {
-          "color-indicator-NavLink--active": "rgb(255, 0, 0)",
+          "color-indicator-NavLink--hover": "rgb(0, 0, 255)",
+          "thickness-indicator-NavLink": "3px",
         },
       },
     );
 
-    const driver = await createNavLinkDriver();
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
+    const noIndLink = page.getByTestId("nli-no");
+    await noIndLink.hover();
+    const noIndContent = await noIndLink.evaluate(
+      (el) => window.getComputedStyle(el, "::after").content,
+    );
+    expect(noIndContent).toBe("none");
 
-    // Indicator should not be shown (both displayActive and noIndicator prevent it)
-    expect(afterElement.content).toBe("none");
+    const withIndLink = page.getByTestId("nli-yes");
+    await withIndLink.hover();
+    const withIndAfter = await withIndLink.evaluate((el) => {
+      const after = window.getComputedStyle(el, "::after");
+      return { content: after.content, height: after.height };
+    });
+    expect(withIndAfter.content).toBe('""');
+    expect(withIndAfter.height).toBe("3px");
   });
 
-  test("noIndicator works in vertical mode", async ({ initTestBed, createNavLinkDriver, page }) => {
+  test("null and undefined noIndicator treated as false (indicator shown)", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(
-      `<NavLink to="/" active="true" vertical="true" noIndicator="true">Test</NavLink>`,
+      `<Fragment>
+        <NavLink testId="nli-null" to="/" active="true" noIndicator="{null}">T</NavLink>
+        <NavLink testId="nli-undef" to="/" active="true" noIndicator="{undefined}">T</NavLink>
+      </Fragment>`,
       {
         testThemeVars: {
           "color-indicator-NavLink--active": "rgb(255, 0, 0)",
@@ -1136,60 +1095,11 @@ test.describe("noIndicator property", () => {
       },
     );
 
-    const driver = await createNavLinkDriver();
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
-
-    // Indicator should not be shown in vertical mode when noIndicator is true
-    expect(afterElement.content).toBe("none");
-  });
-
-  test("handles null value for noIndicator", async ({ initTestBed, createNavLinkDriver, page }) => {
-    await initTestBed(`<NavLink to="/" active="true" noIndicator="{null}">Test</NavLink>`, {
-      testThemeVars: {
-        "color-indicator-NavLink--active": "rgb(255, 0, 0)",
-        "thickness-indicator-NavLink": "4px",
-      },
-    });
-
-    const driver = await createNavLinkDriver();
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
-
-    // Null should be treated as false (default), so indicator should be shown
-    expect(afterElement.content).toBe('""');
-  });
-
-  test("handles undefined value for noIndicator", async ({
-    initTestBed,
-    createNavLinkDriver,
-    page,
-  }) => {
-    await initTestBed(`<NavLink to="/" active="true" noIndicator="{undefined}">Test</NavLink>`, {
-      testThemeVars: {
-        "color-indicator-NavLink--active": "rgb(255, 0, 0)",
-        "thickness-indicator-NavLink": "4px",
-      },
-    });
-
-    const driver = await createNavLinkDriver();
-    const afterElement = await driver.component.evaluate((el) => {
-      const after = window.getComputedStyle(el, "::after");
-      return {
-        content: after.content,
-      };
-    });
-
-    // Undefined should be treated as false (default), so indicator should be shown
-    expect(afterElement.content).toBe('""');
+    for (const testId of ["nli-null", "nli-undef"]) {
+      const el = page.getByTestId(testId);
+      const content = await el.evaluate((el) => window.getComputedStyle(el, "::after").content);
+      expect(content).toBe('""');
+    }
   });
 });
 

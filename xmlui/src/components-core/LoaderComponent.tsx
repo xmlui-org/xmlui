@@ -14,6 +14,7 @@ import type {
 import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ContainerActionKind } from "./rendering/containers";
 import { createValueExtractor } from "./rendering/valueExtractor";
+import { useFnDeps } from "./FnDepsContext";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import type { AppContextObject } from "../abstractions/AppContextDefs";
 
@@ -68,10 +69,13 @@ export function LoaderComponent({
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
+  // --- Get the function dependencies from the parent container
+  const fnDeps = useFnDeps();
+
   // --- Memoizes the value extractor object
   const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef, fnDeps);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state, fnDeps]);
 
   // --- Memoizes the action resolution by action definition value
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
@@ -99,8 +103,8 @@ export function LoaderComponent({
   );
 
   const memoedLoaderLoaded = useCallback(
-    (data: any, pageInfo: any) => {
-      dispatch(loaderLoaded(uid, data, pageInfo));
+    (data: any, pageInfo: any, responseHeaders?: Record<string, string>) => {
+      dispatch(loaderLoaded(uid, data, pageInfo, responseHeaders));
     },
     [dispatch, uid],
   );
@@ -158,13 +162,14 @@ function loaderIsRefetchingChanged(uid: symbol, isRefetching: boolean) {
 }
 
 // Signs that a particular loader (`uid`) has just fetched its data (`pageInfo`) successfully.
-function loaderLoaded(uid: symbol, data: any, pageInfo?: any) {
+function loaderLoaded(uid: symbol, data: any, pageInfo?: any, responseHeaders?: Record<string, string>) {
   return {
     type: ContainerActionKind.LOADER_LOADED,
     payload: {
       uid,
       data,
       pageInfo,
+      responseHeaders,
     },
   };
 }

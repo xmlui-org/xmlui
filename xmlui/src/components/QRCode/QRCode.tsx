@@ -1,6 +1,6 @@
 import styles from "./QRCode.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { QRCodeNative, defaultProps } from "./QRCodeNative";
 import { createMetadata, d, dInit } from "../metadata-helpers";
@@ -81,27 +81,16 @@ export const QRCodeMd = createMetadata({
   },
 });
 
-export const qrCodeComponentRenderer = createComponentRenderer(
-  COMP,
-  QRCodeMd,
-  ({ node, extractValue, className, lookupEventHandler }) => {
-    const value = extractValue.asString(node.props.value);
-    const size = extractValue.asOptionalNumber(node.props.size);
-    const level = extractValue.asOptionalString(node.props.level) as "L" | "M" | "Q" | "H" | undefined;
-    const color = extractValue.asOptionalString(node.props.color);
-    const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);
-    const title = extractValue.asOptionalString(node.props.title);
-
-    return (
-      <QRCodeNative
-        className={className}
-        value={value}
-        size={size}
-        level={level}
-        color={color}
-        backgroundColor={backgroundColor}
-        title={title}
-      />
-    );
-  },
-);
+export const qrCodeComponentRenderer = wrapComponent(COMP, QRCodeNative, QRCodeMd, {
+  customRender: (_props, { node, extractValue, classes }) => (
+    <QRCodeNative
+      classes={classes}
+      value={extractValue.asString(node.props.value)}
+      size={extractValue.asOptionalNumber(node.props.size)}
+      level={extractValue.asOptionalString(node.props.level) as "L" | "M" | "Q" | "H" | undefined}
+      color={extractValue.asOptionalString(node.props.color)}
+      backgroundColor={extractValue.asOptionalString(node.props.backgroundColor)}
+      title={extractValue.asOptionalString(node.props.title)}
+    />
+  ),
+});

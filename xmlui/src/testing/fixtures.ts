@@ -1,8 +1,8 @@
 /* eslint react-hooks/rules-of-hooks: 0 */
 // The above exception is needed since it fires a false-positive
 // for the "use" function coming from the playwright test framework
-import { test as baseTest } from "@playwright/test";
-import type { Locator, Page } from "playwright-core";
+import { test as baseTest, devices } from "@playwright/test";
+import type { BrowserContext, Locator, Page } from "playwright-core";
 
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
@@ -55,7 +55,6 @@ import {
   FileInputDriver,
   FileUploadDropZoneDriver,
   LabelDriver,
-  BackdropDriver,
   SpinnerDriver,
   SliderDriver,
   ResponsiveBarDriver,
@@ -195,12 +194,93 @@ export type TestBedDescription = Omit<
   testThemeVars?: Record<string, string>;
   components?: string[];
   appGlobals?: Record<string, any>;
+  /** Script source for Globals.xs — declarations become app-wide globals */
+  globalsXs?: string;
+  /** @deprecated Use globalsXs instead. Alias kept for backward compatibility. */
   mainXs?: string;
   noFragmentWrapper?: boolean;
   extensionIds?: string | string[];
 };
 
-export const test = baseTest.extend<TestDriverExtenderProps>({
+const E2E_BASE_URL = `http://localhost:3211`;
+
+type WorkerFixtures = {
+  _sharedContext: BrowserContext;
+  _sharedPage: Page;
+};
+
+export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
+  // Worker-scoped browser context — reused across all tests in a worker
+  _sharedContext: [async ({ browser }, use) => {
+    const context = await browser.newContext({
+      ...devices["Desktop Chrome"],
+      baseURL: E2E_BASE_URL,
+      serviceWorkers: "allow",
+      permissions: ["clipboard-read", "clipboard-write"],
+    });
+    await use(context);
+    await context.close();
+  }, { scope: "worker" }],
+
+  // Worker-scoped page — reused across all tests in a worker
+  _sharedPage: [async ({ _sharedContext }, use) => {
+    const page = await _sharedContext.newPage();
+    await use(page);
+  }, { scope: "worker" }],
+
+  // Override test-scoped page to use the shared worker page.
+  // This avoids creating a new browser context + page per test.
+  page: async ({ _sharedPage, viewport }, use) => {
+    // Apply the viewport specified by test.use({ viewport }) to the shared page.
+    // Without this, viewport changes from one test would leak into subsequent tests.
+    if (viewport) {
+      await _sharedPage.setViewportSize(viewport);
+    }
+
+    // Intercept addInitScript so that scripts registered by tests can be replayed
+    // in the reinit fast path (which skips page.goto and wouldn't trigger them).
+    const initScriptQueue: Array<{ fn: Function; arg?: unknown }> = [];
+    const origAddInitScript = (_sharedPage.addInitScript as Function).bind(_sharedPage);
+    (_sharedPage as any).addInitScript = async (fn: any, arg?: any) => {
+      if (typeof fn === "function") {
+        initScriptQueue.push({ fn, arg });
+      }
+      return origAddInitScript(fn, arg);
+    };
+    (_sharedPage as any).__initScriptQueue__ = initScriptQueue;
+
+    await use(_sharedPage);
+
+    // Restore original addInitScript method and clear the queue.
+    (_sharedPage as any).addInitScript = origAddInitScript;
+    (_sharedPage as any).__initScriptQueue__ = undefined;
+
+    // Cleanup between tests: clear storage to prevent state leakage
+    try {
+      await _sharedPage.evaluate(() => {
+        localStorage.clear();
+        sessionStorage.clear();
+        // Reset page-level scroll so anchor navigation from this test doesn't
+        // bleed into the next test's initial-state assertions.
+        window.scrollTo(0, 0);
+        // Restore window.matchMedia if it was patched by a test (e.g.
+        // emulateTouchDevice in ScrollViewer tests). Without this, the patch
+        // persists into subsequent tests in the same worker and causes
+        // isTouchDevice=true, which forces normalizedScrollStyle='normal',
+        // hiding OverlayScrollbars fade overlays and making fade tests flaky.
+        if ((window as any).__originalMatchMedia) {
+          window.matchMedia = (window as any).__originalMatchMedia;
+          delete (window as any).__originalMatchMedia;
+        }
+      });
+      // Move mouse to a neutral position so :hover CSS from the previous
+      // test doesn't bleed into the next one.
+      await _sharedPage.mouse.move(0, 0);
+    } catch {
+      // Page might be in a bad state after a failed test; ignore
+    }
+  },
+
   // NOTE: the base Playwright test can be extended with fixture methods
   // as well as any other language constructs we deem useful
   baseComponentTestId: "test-id-component",
@@ -255,16 +335,17 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       });
 
       let runtime: any;
-      if (description?.mainXs) {
-        const parsedCodeBehind = collectCodeBehindFromSource("Main", description.mainXs);
+      const globalsXsSource = description?.globalsXs ?? description?.mainXs;
+      if (globalsXsSource) {
+        const parsedCodeBehind = collectCodeBehindFromSource("Globals", globalsXsSource);
         if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
           // Pass through the variable definitions with their source text intact
           // for StandaloneApp to process with transformMainXsToGlobalTags
           runtime = {
-            "/src/Main.xmlui.xs": {
+            "/src/Globals.xs": {
               vars: parsedCodeBehind.vars || {},
               functions: parsedCodeBehind.functions || {},
-              src: description.mainXs, // Include original source for debugging
+              src: globalsXsSource, // Include original source for debugging
             },
           };
         }
@@ -319,28 +400,91 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       };
 
       const clipboard = new Clipboard(page);
-      // --- Mock the clipboard API if in CI
-      if (isCI) {
-        await page.addInitScript(clipboard.init);
-      }
 
       // Normalize extensionIds to array format
       const extensionIds = description?.extensionIds 
         ? (Array.isArray(description.extensionIds) ? description.extensionIds : [description.extensionIds])
         : [];
 
-      await page.addInitScript(({ app, extensionIds }) => {
-        // @ts-ignore
-        window.TEST_ENV = app;
-        window.TEST_RUNTIME = app.runtime;
-        window.TEST_EXTENSION_IDS = extensionIds;
-      }, { app: _appDescription, extensionIds });
+      // Check if page already has the app loaded (from a previous test in this worker)
+      const isReady = await page.evaluate(() => !!(window as any).__XMLUI_READY__).catch(() => false);
+
+      if (isReady) {
+        // Fast path: update globals and reinit in-page (skip full page navigation).
+        // flushSync in __XMLUI_REINIT__ ensures the old DOM is removed synchronously,
+        // so the subsequent waitFor sees only the new render's elements.
+        try {
+          // Replay any init scripts registered via page.addInitScript() by this test.
+          // These normally run on page.goto() but the fast path skips navigation.
+          const initScriptQueue: Array<{ fn: Function; arg?: unknown }> =
+            (page as any).__initScriptQueue__ ?? [];
+          for (const { fn, arg } of initScriptQueue) {
+            try {
+              await (arg !== undefined ? page.evaluate(fn as any, arg) : page.evaluate(fn as any));
+            } catch {
+              // ignore non-serializable scripts
+            }
+          }
+          initScriptQueue.length = 0;
+
+          await page.evaluate(({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
+            // Reset URL so React Router starts fresh at the app root.
+            history.replaceState(null, "", "/");
+            // Reset page-level scroll: anchor navigation from the previous test
+            // (e.g. clicking a #hash link) scrolls the page and that scroll
+            // position persists across reinits unless we reset it here.
+            window.scrollTo(0, 0);
+            (window as any).TEST_ENV = app;
+            (window as any).TEST_RUNTIME = app.runtime;
+            (window as any).TEST_EXTENSION_IDS = extensionIds;
+            (window as any).__XMLUI_REINIT__();
+          }, { app: _appDescription, extensionIds });
+        } catch {
+          // Reinit failed (page crashed?), fall back to full navigation
+          await page.addInitScript(({ app, extensionIds }) => {
+            // @ts-ignore
+            window.TEST_ENV = app;
+            window.TEST_RUNTIME = app.runtime;
+            window.TEST_EXTENSION_IDS = extensionIds;
+          }, { app: _appDescription, extensionIds });
+          await page.goto("/");
+        }
+      } else {
+        // Slow path: first test in this worker — do full page navigation
+        if (isCI) {
+          await page.addInitScript(clipboard.init);
+        }
+        await page.addInitScript(({ app, extensionIds }) => {
+          // @ts-ignore
+          window.TEST_ENV = app;
+          window.TEST_RUNTIME = app.runtime;
+          window.TEST_EXTENSION_IDS = extensionIds;
+        }, { app: _appDescription, extensionIds });
+        await page.goto("/");
+      }
+
       const { width, height } = page.viewportSize();
 
-      await page.goto("/");
       if (!description?.noFragmentWrapper) {
         await page.getByTestId(testStateViewTestId).waitFor({ state: "attached" });
       }
+
+      // Wait for fonts to load, then one animation frame + one macrotask
+      // so that deferred React effects (useEffect, scheduled via MessageChannel)
+      // and browser style/layout computation finish before the test starts.
+      await page.evaluate(() =>
+        document.fonts.ready.then(
+          () => new Promise<void>(resolve => {
+            requestAnimationFrame(() => setTimeout(resolve, 0));
+          }),
+        ),
+      );
+
+      // Activate keyboard-navigation mode so that :focus-visible styles
+      // match reliably after programmatic .focus() calls.  Shift alone
+      // doesn't move focus or trigger component handlers — it only flips
+      // Chrome's internal had_keyboard_event flag.
+      await page.keyboard.press("Shift");
 
       // Create test icon locators
       const testIcons = {
@@ -384,11 +528,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   createButtonDriver: async ({ createDriver }, use) => {
     await use((testIdOrLocator?: string | Locator) => {
       return createDriver(ButtonDriver, testIdOrLocator);
-    });
-  },
-  createBackdropDriver: async ({ createDriver }, use) => {
-    await use((testIdOrLocator?: string | Locator) => {
-      return createDriver(BackdropDriver, testIdOrLocator);
     });
   },
   createContentSeparatorDriver: async ({ createDriver }, use) => {
@@ -689,7 +828,6 @@ type TestDriverExtenderProps = {
     testIdOrLocator?: string | Locator,
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
-  createBackdropDriver: ComponentDriverMethod<BackdropDriver>;
   createContentSeparatorDriver: ComponentDriverMethod<ContentSeparatorDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
   createFormDriver: ComponentDriverMethod<FormDriver>;

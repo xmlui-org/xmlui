@@ -55,6 +55,7 @@ import { processDeclarationsAsync, processStatementQueueAsync } from "./process-
 import {
   evalArrow,
   evalAssignmentCore,
+  allowedNewConstructors,
   evalBinaryCore,
   evalCalculatedMemberAccessCore,
   evalIdentifier,
@@ -608,13 +609,6 @@ async function evalNewExpressionAsync(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): Promise<any> {
-  // --- Allowed constructors
-  const allowedConstructors = new Map<string, Function>([
-    ["String", String],
-    ["Date", Date],
-    ["Blob", Blob],
-  ]);
-
   // --- Evaluate the callee to get the constructor
   await evaluator(thisStack, expr.callee, evalContext, thread);
   const constructorObj = await completeExprValue(expr.callee, thread);
@@ -622,7 +616,7 @@ async function evalNewExpressionAsync(
 
   // --- Check if the constructor is allowed
   let allowedConstructor: any = null;
-  for (const [name, ctor] of allowedConstructors) {
+  for (const [name, ctor] of allowedNewConstructors) {
     if (constructorObj === ctor) {
       allowedConstructor = ctor;
       break;

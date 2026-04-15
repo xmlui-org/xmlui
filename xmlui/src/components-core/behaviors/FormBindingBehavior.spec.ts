@@ -58,7 +58,7 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    await expect(page.getByRole("textbox")).toHaveValue("42");
+    await expect(page.getByRole("spinbutton")).toHaveValue("42");
   });
 
   test("NumberBox with 'bindTo' updates Form data", async ({ initTestBed, page }) => {
@@ -68,7 +68,7 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    await page.getByRole("textbox").fill("99");
+    await page.getByRole("spinbutton").fill("99");
     await page.getByRole("button", { name: "Save" }).click();
 
     await expect.poll(testStateDriver.testState).toEqual({
@@ -109,9 +109,8 @@ test.describe("Basic Functionality", () => {
       </Form>
     `);
 
-    const textboxes = page.getByRole("textbox");
-    await textboxes.first().fill("Jane");
-    await textboxes.last().fill("30");
+    await page.getByRole("textbox").fill("Jane");
+    await page.getByRole("spinbutton").fill("30");
 
     await page.getByRole("button", { name: "Save" }).click();
 
@@ -427,7 +426,7 @@ test.describe("Validation", () => {
   test("async validation reruns on input change", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
           onValidate="() => { testState = (testState || 0) + 1; return true; }"
         />
@@ -448,8 +447,8 @@ test.describe("Validation", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Form data="{{ firstName: 'Jo' }}">
-        <TextBox 
-          bindTo="firstName" 
+        <TextBox
+          bindTo="firstName"
           required="true"
           onValidate="arg => testState = { executed: true, value: arg }"
         />
@@ -499,7 +498,7 @@ test.describe("Validation", () => {
   test("validation executes with throttle delay", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
           customValidationsDebounce="1000"
           onValidate="arg => { testState = { count: (testState?.count || 0) + 1, value: arg };}"
@@ -562,7 +561,7 @@ test.describe("Validation", () => {
   test("required validation stops others from being evaluated", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="email"
           required="true"
           minLength="5"
@@ -595,7 +594,7 @@ test.describe("Validation", () => {
   test("rapid value changes cancel previous async validations", async ({ initTestBed, page }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
           onValidate="arg => {
             delay(100);
@@ -624,7 +623,7 @@ test.describe("Validation", () => {
   test("stale validation results are discarded", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="username"
           minLength="1"
           onValidate="arg => {
@@ -666,11 +665,11 @@ test.describe("Validation", () => {
       const { testStateDriver } = await initTestBed(`
       <Form data="{{ firstName: 'initial' }}" var.test="{{ validationCompleted: false }}">
         <Stack when="{ !test.unmounted }">
-          <TextBox 
+          <TextBox
             bindTo="firstName"
-            onValidate="arg => { 
-              delay(100); 
-              testState = { ...test, validationCompleted: true }; 
+            onValidate="arg => {
+              delay(100);
+              testState = { ...test, validationCompleted: true };
             }"
           />
         </Stack>
@@ -708,10 +707,10 @@ test.describe("Validation", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
           required="true"
-          onValidate="arg => { 
+          onValidate="arg => {
             delay(100);
             testState = { value: arg };
             return { isValid: true };
@@ -747,9 +746,9 @@ test.describe("Validation", () => {
     async ({ initTestBed, page }) => {
       await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
-          onValidate="arg => { 
+          onValidate="arg => {
             delay(100);
             testState = { value: arg };
             return { isValid: true };
@@ -773,7 +772,7 @@ test.describe("Validation", () => {
   test("partial flag set correctly during async validation", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form>
-        <TextBox 
+        <TextBox
           bindTo="firstName"
           minLength="3"
           onValidate="arg => { delay(100); return true; }"
@@ -828,13 +827,13 @@ test.describe("Validation", () => {
   }) => {
     await initTestBed(`
       <Form>
-        <TextBox testId="textbox" bindTo="name" required="true" requiredInvalidMessage="This field is required" label="Test" />
-        <TextBox testId="other" bindTo="other" label="Other" />
+        <TextBox bindTo="name" required="true" requiredInvalidMessage="This field is required" label="Test" />
       </Form>
     `);
 
     const textbox = page.getByRole("textbox").first();
     await expect(textbox).toBeVisible();
+    await expect(page.getByText("This field is required")).not.toBeVisible();
 
     // Type and clear to make dirty
     await textbox.fill("test");
@@ -2118,7 +2117,7 @@ test.describe("Phone Pattern Validation", () => {
     await expect(phoneField).not.toContainText("Not a valid phone number");
   });
 
-  test("shows warning for empty phone number", async ({
+  test("does not show warning for empty phone number (optional field)", async ({
     initTestBed,
     page,
     createTextBoxDriver,
@@ -2143,9 +2142,129 @@ test.describe("Phone Pattern Validation", () => {
 
     await page.getByTestId("validateBtn").click();
 
-    // Validation warning should be displayed
+    // Empty optional field should pass pattern validation — no warning expected
     const phoneField = page.getByTestId("phoneField");
-    await expect(phoneField).toContainText("Not a valid phone number");
+    await expect(phoneField).not.toContainText("Not a valid phone number");
+  });
+});
+
+// =============================================================================
+// REGEX VALIDATION TESTS
+// =============================================================================
+
+test.describe("Regex Validation", () => {
+  test("shows error for value not matching regex", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    await fieldInput.field.fill("abc123");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).toContainText("Letters only");
+  });
+
+  test("does not show error for value matching regex", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    await fieldInput.field.fill("hello");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("does not show error for empty value (optional field)", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="^[a-zA-Z]+$"
+          regexInvalidMessage="Letters only"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+    // Make the field dirty then clear — empty is valid for optional fields
+    await fieldInput.field.fill("x");
+    await fieldInput.field.clear();
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+
+    await expect(page.getByTestId("field")).not.toContainText("Letters only");
+  });
+
+  test("regex with brace quantifiers works when passed as JS expression", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    // Patterns containing curly braces (e.g. {3}) must be wrapped in a JS string
+    // expression — regex="{'^pattern{N}$'}" — to prevent XMLUI's expression
+    // parser from consuming the braces as reactive expressions.
+    await initTestBed(`
+      <Form id="testForm">
+        <TextBox
+          testId="field"
+          bindTo="code"
+          regex="{'^[a-z]{3}$'}"
+          regexInvalidMessage="Must be exactly 3 lowercase letters"
+          label="Code" />
+        <Button onClick="testForm.validate()" label="Validate" testId="validateBtn" />
+      </Form>
+    `);
+
+    const fieldInput = await createTextBoxDriver("field");
+
+    // "ab" is too short — should fail
+    await fieldInput.field.fill("ab");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).toContainText("Must be exactly 3 lowercase letters");
+
+    // "abc" matches exactly — should pass
+    await fieldInput.field.fill("abc");
+    await fieldInput.field.blur();
+    await page.getByTestId("validateBtn").click();
+    await expect(page.getByTestId("field")).not.toContainText(
+      "Must be exactly 3 lowercase letters",
+    );
   });
 });
 
@@ -2155,15 +2274,18 @@ test.describe("Phone Pattern Validation", () => {
 
 test.describe("Styling Tests", () => {
   test("theme variables are correctly applied", async ({ initTestBed, page }) => {
-    await initTestBed(`
+    await initTestBed(
+      `
       <Form>
         <TextBox bindTo="test" testId="field1" width="$testWidth" />
       </Form>
-    `, {
-      testThemeVars: {
-        "testWidth": "300px",
-      }
-    });
+    `,
+      {
+        testThemeVars: {
+          testWidth: "300px",
+        },
+      },
+    );
     const field1 = page.locator("[data-part-id='labeledItem']");
     await expect(field1).toHaveCSS("width", "300px");
   });

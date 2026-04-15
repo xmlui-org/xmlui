@@ -1,8 +1,8 @@
 # HStack [#hstack]
 
-This component is inherited from [Stack](/components/Stack)
+This component is inherited from [Stack](/docs/reference/components/Stack)
 
-See also: [CHStack](/components/CHStack), [CVStack](/components/CVStack), [VStack](/components/VStack)
+See also: [CHStack](/docs/reference/components/CHStack), [CVStack](/docs/reference/components/CVStack), [VStack](/docs/reference/components/VStack)
 
 `HStack` is a specialized, shorthand version for the regular `Stack` component with a horizontal orientation.
 

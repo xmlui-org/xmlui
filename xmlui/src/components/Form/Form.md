@@ -123,14 +123,42 @@ Fields can override `itemRequireLabelMode` with `requireLabelMode`:
 
 %-EVENT-START willSubmit
 
-The following example allows saving customer data only when the age is an even number. The `willSubmit` event handler returns `false` if this condition is not met.
+The `onWillSubmit` handler receives **two arguments**:
 
-```xmlui-pg display copy {4-9} name="Example: willSubmit"
+- **`data`** — the form data that will be passed to `onSubmit` (fields marked `noSubmit="true"` are already excluded).
+- **`allData`** — the complete form data including `noSubmit` fields, useful for cross-field validation.
+
+Fields marked with `noSubmit` are excluded from `onSubmit` regardless of what `willSubmit` does.
+
+The following example validates that a password and its confirmation match. The confirmation field is marked `noSubmit="true"` so it is not sent to the server, but it is available via `allData` for validation:
+
+```xmlui-pg display copy {4-11} name="Example: willSubmit with cross-field validation"
+<App>
+  <Form padding="0.5rem"
+    data="{{ username: '', password: '', confirmPassword: '' }}"
+    onWillSubmit="(data, allData) => {
+      if (allData.password !== allData.confirmPassword) {
+        toast.error('Passwords do not match');
+        return false;
+      }
+    }"
+    onSubmit="(data) => toast('Account created for ' + data.username)"
+    saveLabel="Create account">
+    <FormItem label="Username" bindTo="username" required="true" />
+    <FormItem label="Password" bindTo="password" type="password" required="true" />
+    <FormItem label="Confirm Password" bindTo="confirmPassword" type="password" required="true" noSubmit="true" />
+  </Form>
+</App>
+```
+
+The following example uses the first argument to inspect what will be submitted, and returns `false` to block submission when an age value is invalid:
+
+```xmlui-pg display copy {4-8} name="Example: willSubmit allowing data only when age is even"
 <App>
   <Form padding="0.5rem"
     data="{{ name: 'Joe', age: 43 }}"
-    onWillSubmit="(toSubmit) => {
-      if (toSubmit.age % 2) {
+    onWillSubmit="(data) => {
+      if (data.age % 2) {
         toast.error('Age must be an even number');
         return false;
       }
@@ -142,7 +170,7 @@ The following example allows saving customer data only when the age is an even n
         zeroOrPositive="true" />
     </FlowLayout>
   </Form>
-</App>  
+</App>
 ```
 
 %-EVENT-END

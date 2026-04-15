@@ -594,7 +594,7 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
 
 test.describe("Theme Variables", () => {
   [
-    { value: "--default", prop: "" },
+    { value: "", prop: "" },
     { value: "--warning", prop: 'validationStatus="warning"' },
     { value: "--error", prop: 'validationStatus="error"' },
     { value: "--success", prop: 'validationStatus="valid"' },

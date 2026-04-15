@@ -101,10 +101,28 @@ This event is triggered when the `Card` is clicked.
 
 ```xmlui-pg copy display name="Example: click"
 <App>
-  <Card maxWidth="300px" onClick="toast('Clicked!')">
+  <Card maxWidth="300px" onClick="toast.success('Clicked!')">
     <HStack verticalAlignment="center">
       <Icon name="info" />
       <Text value="Information" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
+</App>
+```
+
+%-EVENT-END
+
+%-EVENT-START doubleClick
+
+This event is triggered when the `Card` is double-clicked. When both `onClick` and `onDoubleClick` are used together, only the first click of the double-click fires `onClick`, so `onClick` is not called twice.
+
+```xmlui-pg copy display name="Example: doubleClick"
+<App>
+  <Card maxWidth="300px" onDoubleClick="toast('Double-clicked!')">
+    <HStack verticalAlignment="center">
+      <Icon name="info" />
+      <Text value="Double-click me" variant="strong" />
     </HStack>
     <Text value="This is an example text" />
   </Card>

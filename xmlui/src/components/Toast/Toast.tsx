@@ -1,4 +1,4 @@
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { Toast } from "./ToastNative";
 import { MemoizedItem } from "../container-helpers";
@@ -13,40 +13,37 @@ export const ToastMd = createMetadata({
   apis: {},
 });
 
-export const toastComponentRenderer = createComponentRenderer(
-  COMP,
-  ToastMd,
-  ({ node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) => {
-    return (
-      <Toast
-        registerComponentApi={registerComponentApi}
-        renderContent={(type, context) => {
-          let template = null;
-          switch (type) {
-            case "success":
-              template = node.props.successTemplate;
-              break;
-            case "loading":
-              template = node.props.loadingTemplate;
-              break;
-            case "error":
-              template = node.props.errorTemplate;
-              break;
-            default: {
-              template = node.children;
-            }
+export const toastComponentRenderer = wrapComponent(COMP, Toast, ToastMd, {
+  exposeRegisterApi: true,
+  customRender: (_props, { node, registerComponentApi, renderChild }) => (
+    <Toast
+      registerComponentApi={registerComponentApi}
+      renderContent={(type, context) => {
+        let template = null;
+        switch (type) {
+          case "success":
+            template = node.props.successTemplate;
+            break;
+          case "loading":
+            template = node.props.loadingTemplate;
+            break;
+          case "error":
+            template = node.props.errorTemplate;
+            break;
+          default: {
+            template = node.children;
           }
-          return (
-            <MemoizedItem
-              node={template || node.children}
-              contextVars={{
-                $param: context,
-              }}
-              renderChild={renderChild}
-            />
-          );
-        }}
-      />
-    );
-  },
-);
+        }
+        return (
+          <MemoizedItem
+            node={template || node.children}
+            contextVars={{
+              $param: context,
+            }}
+            renderChild={renderChild}
+          />
+        );
+      }}
+    />
+  ),
+});

@@ -10,11 +10,11 @@ import type {
   ValidationResult,
   ValidationSeverity,
 } from "../Form/FormContext";
-import { Stack } from "../Stack/StackNative";
-import { Icon } from "../Icon/IconNative";
-import { Text } from "../Text/TextNative";
-import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
-import { Button } from "../Button/ButtonNative";
+import { ThemedStack as Stack } from "../Stack/Stack";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedText as Text } from "../Text/Text";
+import { ThemedSpaceFiller as SpaceFiller } from "../SpaceFiller/SpaceFiller";
+import { ThemedButton as Button } from "../Button/Button";
 
 export type ValidationSummaryProps = {
   fieldValidationResults?: Record<string, ValidationResult>;
@@ -103,7 +103,7 @@ const ValidationDisplay = ({
       data-validation-display-severity={severity}
     >
       <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "0.5rem" }}>
-        <Icon className={styles.heading} name={severity} size="md" />
+        <ThemedIcon className={styles.heading} name={severity} size="md" />
         <div className={styles.heading}>
           <Text>{heading}</Text>
         </div>
@@ -114,7 +114,7 @@ const ValidationDisplay = ({
               onClick={onClose}
               variant={"ghost"}
               themeColor={"secondary"}
-              icon={<Icon name={"close"} size={"sm"} />}
+              icon={<ThemedIcon name={"close"} size={"sm"} />}
               orientation={"vertical"}
             />
           </>

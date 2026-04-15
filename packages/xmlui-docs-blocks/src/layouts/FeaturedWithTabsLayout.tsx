@@ -1,9 +1,9 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./FeaturedWithTabsLayout.xmlui";
 
 const COMP = "FeaturedWithTabsLayout";
 
-export const FeaturedWithTabsLayoutMd = createMetadata({
+export const FeaturedWithTabsLayoutMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
     "A featured layout with a highlighted post and tabbed grid, suitable for blogs or documentation hubs.",

@@ -1,6 +1,6 @@
 import styles from "./ProgressBar.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ProgressBar, defaultProps } from "./ProgressBarNative";
 import { createMetadata } from "../metadata-helpers";
@@ -31,15 +31,15 @@ export const ProgressBarMd = createMetadata({
   },
 });
 
-export const progressBarComponentRenderer = createComponentRenderer(
-  COMP,
-  ProgressBarMd,
-  ({ node, extractValue, className }) => {
-    return (
-      <ProgressBar
-        value={Math.max(0, Math.min(1, extractValue(node.props.value)))}
-        className={className}
-      />
-    );
-  },
-);
+export const progressBarComponentRenderer = wrapComponent(COMP, ProgressBar, ProgressBarMd, {
+  // Exclude "value" from the auto-processing loop: asOptionalNumber throws for
+  // non-numeric inputs (strings like "invalid", booleans). customRender handles
+  // the extraction and clamping directly.
+  exclude: ["value"],
+  customRender: (_props, { node, extractValue, classes }) => (
+    <ProgressBar
+      value={Math.max(0, Math.min(1, extractValue(node.props.value)))}
+      classes={classes}
+    />
+  ),
+});

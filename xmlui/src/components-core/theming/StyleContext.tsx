@@ -90,10 +90,11 @@ export function useDomRoot() {
 
 type InjectOptions = {
   prepend?: boolean;
+  layer?: string;
 };
 export function useStyles(
   styles: StyleObjectType,
-  { prepend }: InjectOptions = EMPTY_OBJECT,
+  { prepend, layer = "dynamic" }: InjectOptions = EMPTY_OBJECT,
 ): string {
   // we skip this whole thing if we're indexing
   const { indexing } = useIndexerContext();
@@ -109,8 +110,8 @@ export function useStyles(
     if (indexing || !styles || styles === EMPTY_OBJECT || Object.keys(styles).length === 0) {
       return { className: undefined, styleHash: undefined };
     }
-    return registry.register(styles);
-  }, [indexing, registry, styles]);
+    return registry.register(styles, layer);
+  }, [indexing, layer, registry, styles]);
 
   useInsertionEffect(() => {
     if (!styleHash) return;
@@ -129,7 +130,7 @@ export function useStyles(
     if (css) {
       const styleElement = document.createElement("style");
       styleElement.setAttribute("data-style-hash", styleHash);
-      styleElement.innerHTML = `@layer dynamic {\n${css}\n}`;
+      styleElement.innerHTML = `@layer ${layer} {\n${css}\n}`;
       if (prepend) {
         injectionTarget.insertBefore(styleElement, injectionTarget.firstChild.nextSibling);
       } else {
@@ -138,7 +139,7 @@ export function useStyles(
 
       registry.injected.add(styleHash);
     }
-  }, [registry, styleHash, injectionTarget]);
+  }, [layer, registry, styleHash, injectionTarget]);
 
   // HOOK 2: For lifecycle management (reference counting and CLEANUP).
   useEffect(() => {

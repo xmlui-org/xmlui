@@ -113,7 +113,8 @@ test.describe("basic functionality", () => {
   });
 
   test.describe("tabAlignment property", () => {
-    test("tabAlignment='start' positions tabs at the start of container (horizontal)", async ({ initTestBed, page }) => {
+    test("tabAlignment positions tabs correctly for start/end/center/stretch", async ({ initTestBed, page }) => {
+      // start - tabs at container start
       await initTestBed(`
         <Tabs tabAlignment="start" testId="tabs">
           <TabItem label="Tab 1">Content 1</TabItem>
@@ -121,18 +122,13 @@ test.describe("basic functionality", () => {
           <TabItem label="Tab 3">Content 3</TabItem>
         </Tabs>
       `);
-
-      const tabsContainer = page.getByTestId("tabs");
-      const tab1 = page.getByRole("tab", { name: "Tab 1" });
-      
-      const { left: containerLeft } = await getBounds(tabsContainer);
-      const { left: tab1Left } = await getBounds(tab1);
-
-      // Tab should be near the start of the container (within a small margin for padding)
+      let tabsContainer = page.getByTestId("tabs");
+      let tab1 = page.getByRole("tab", { name: "Tab 1" });
+      let { left: containerLeft } = await getBounds(tabsContainer);
+      let { left: tab1Left } = await getBounds(tab1);
       expect(tab1Left - containerLeft).toBeLessThan(50);
-    });
 
-    test("tabAlignment='end' positions tabs at the end of container (horizontal)", async ({ initTestBed, page }) => {
+      // end - tabs at container end
       await initTestBed(`
         <Tabs tabAlignment="end" testId="tabs">
           <TabItem label="Tab 1">Content 1</TabItem>
@@ -140,18 +136,13 @@ test.describe("basic functionality", () => {
           <TabItem label="Tab 3">Content 3</TabItem>
         </Tabs>
       `);
-
-      const tabsContainer = page.getByTestId("tabs");
+      tabsContainer = page.getByTestId("tabs");
       const tab3 = page.getByRole("tab", { name: "Tab 3" });
-      
-      const { right: containerRight } = await getBounds(tabsContainer);
-      const { right: tab3Right } = await getBounds(tab3);
-
-      // Last tab should be near the end of the container (within a small margin for padding)
+      let { right: containerRight } = await getBounds(tabsContainer);
+      let { right: tab3Right } = await getBounds(tab3);
       expect(containerRight - tab3Right).toBeLessThan(50);
-    });
 
-    test("tabAlignment='center' positions tabs in center of container (horizontal)", async ({ initTestBed, page }) => {
+      // center - tabs centered in container
       await initTestBed(`
         <Tabs tabAlignment="center" testId="tabs" style="width: 800px">
           <TabItem label="Tab 1">Content 1</TabItem>
@@ -159,23 +150,17 @@ test.describe("basic functionality", () => {
           <TabItem label="Tab 3">Content 3</TabItem>
         </Tabs>
       `);
-
-      const tabsContainer = page.getByTestId("tabs");
-      const tab1 = page.getByRole("tab", { name: "Tab 1" });
-      const tab3 = page.getByRole("tab", { name: "Tab 3" });
-      
-      const { left: containerLeft, right: containerRight, width: containerWidth } = await getBounds(tabsContainer);
-      const { left: tab1Left } = await getBounds(tab1);
-      const { right: tab3Right } = await getBounds(tab3);
-
-      const containerCenter = containerLeft + containerWidth / 2;
-      const tabsCenter = tab1Left + (tab3Right - tab1Left) / 2;
-
-      // Tabs should be centered (within a reasonable margin)
+      tabsContainer = page.getByTestId("tabs");
+      tab1 = page.getByRole("tab", { name: "Tab 1" });
+      const tab3c = page.getByRole("tab", { name: "Tab 3" });
+      let { left: cLeft, right: cRight, width: cWidth } = await getBounds(tabsContainer);
+      let { left: t1Left } = await getBounds(tab1);
+      let { right: t3Right } = await getBounds(tab3c);
+      const containerCenter = cLeft + cWidth / 2;
+      const tabsCenter = t1Left + (t3Right - t1Left) / 2;
       expect(Math.abs(tabsCenter - containerCenter)).toBeLessThan(50);
-    });
 
-    test("tabAlignment='stretch' makes tabs fill container width (horizontal)", async ({ initTestBed, page }) => {
+      // stretch - tabs fill container width
       await initTestBed(`
         <Tabs tabAlignment="stretch" testId="tabs" style="width: 600px">
           <TabItem label="Tab 1">Content 1</TabItem>
@@ -183,18 +168,13 @@ test.describe("basic functionality", () => {
           <TabItem label="Tab 3">Content 3</TabItem>
         </Tabs>
       `);
-
-      const tabsContainer = page.getByTestId("tabs");
-      const tab1 = page.getByRole("tab", { name: "Tab 1" });
-      const tab3 = page.getByRole("tab", { name: "Tab 3" });
-      
-      const { left: containerLeft, right: containerRight } = await getBounds(tabsContainer);
-      const { left: tab1Left } = await getBounds(tab1);
-      const { right: tab3Right } = await getBounds(tab3);
-
-      // First tab should start near container start
+      tabsContainer = page.getByTestId("tabs");
+      tab1 = page.getByRole("tab", { name: "Tab 1" });
+      const tab3s = page.getByRole("tab", { name: "Tab 3" });
+      ({ left: containerLeft, right: containerRight } = await getBounds(tabsContainer));
+      ({ left: tab1Left } = await getBounds(tab1));
+      ({ right: tab3Right } = await getBounds(tab3s));
       expect(tab1Left - containerLeft).toBeLessThan(50);
-      // Last tab should end near container end
       expect(containerRight - tab3Right).toBeLessThan(50);
     });
 
@@ -265,45 +245,33 @@ test.describe("basic functionality", () => {
       expect(Math.abs(tab2Width - tab3Width)).toBeLessThan(20);
     });
 
-    test("tabAlignment handles null value gracefully", async ({ initTestBed, page }) => {
+    test("tabAlignment handles null and undefined values gracefully", async ({ initTestBed, page }) => {
+      // null - falls back to 'start'
       await initTestBed(`
         <Tabs tabAlignment="{null}" testId="tabs">
           <TabItem label="Tab 1">Content 1</TabItem>
           <TabItem label="Tab 2">Content 2</TabItem>
         </Tabs>
       `);
-
-      // Should fall back to default 'start' alignment
-      const tabsContainer = page.getByTestId("tabs");
-      const tab1 = page.getByRole("tab", { name: "Tab 1" });
-      
+      let tabsContainer = page.getByTestId("tabs");
+      let tab1 = page.getByRole("tab", { name: "Tab 1" });
       await expect(tab1).toBeVisible();
-      
-      const { left: containerLeft } = await getBounds(tabsContainer);
-      const { left: tab1Left } = await getBounds(tab1);
-      
-      // Should behave like 'start' alignment
+      let { left: containerLeft } = await getBounds(tabsContainer);
+      let { left: tab1Left } = await getBounds(tab1);
       expect(tab1Left - containerLeft).toBeLessThan(50);
-    });
 
-    test("tabAlignment handles undefined value gracefully", async ({ initTestBed, page }) => {
+      // undefined - falls back to 'start'
       await initTestBed(`
         <Tabs tabAlignment="{undefined}" testId="tabs">
           <TabItem label="Tab 1">Content 1</TabItem>
           <TabItem label="Tab 2">Content 2</TabItem>
         </Tabs>
       `);
-
-      // Should fall back to default 'start' alignment
-      const tabsContainer = page.getByTestId("tabs");
-      const tab1 = page.getByRole("tab", { name: "Tab 1" });
-      
+      tabsContainer = page.getByTestId("tabs");
+      tab1 = page.getByRole("tab", { name: "Tab 1" });
       await expect(tab1).toBeVisible();
-      
-      const { left: containerLeft } = await getBounds(tabsContainer);
-      const { left: tab1Left } = await getBounds(tab1);
-      
-      // Should behave like 'start' alignment
+      ({ left: containerLeft } = await getBounds(tabsContainer));
+      ({ left: tab1Left } = await getBounds(tab1));
       expect(tab1Left - containerLeft).toBeLessThan(50);
     });
 
@@ -1623,5 +1591,179 @@ test.describe("regression tests", () => {
                            Math.abs(activeRgb.g - inactiveRgb.g) + 
                            Math.abs(activeRgb.b - inactiveRgb.b);
     expect(colorDifference).toBeGreaterThan(30);
+  });
+});
+
+// =============================================================================
+// KEEP MOUNTED TESTS
+// =============================================================================
+
+test.describe("keepMounted", () => {
+  test("inactive tab content is not in DOM by default outside of Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    await expect(page.getByTestId("content1")).toBeVisible();
+    await expect(page.getByTestId("content2")).toHaveCount(0);
+  });
+
+  test("keepMounted=true renders all tab panels in DOM", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs keepMounted="{true}">
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+        <TabItem label="Tab 3">
+          <Text testId="content3">Content 3</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    // Active tab visible
+    await expect(page.getByTestId("content1")).toBeVisible();
+    // Inactive tabs in DOM but hidden
+    await expect(page.getByTestId("content2")).toHaveCount(1);
+    await expect(page.getByTestId("content2")).not.toBeVisible();
+    await expect(page.getByTestId("content3")).toHaveCount(1);
+    await expect(page.getByTestId("content3")).not.toBeVisible();
+  });
+
+  test("keepMounted=true shows correct content after switching tabs", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs keepMounted="{true}">
+        <TabItem label="Tab 1">
+          <Text testId="content1">Content 1</Text>
+        </TabItem>
+        <TabItem label="Tab 2">
+          <Text testId="content2">Content 2</Text>
+        </TabItem>
+      </Tabs>
+    `);
+
+    // Switch to Tab 2
+    await page.getByRole("tab", { name: "Tab 2" }).click();
+    await expect(page.getByTestId("content2")).toBeVisible();
+    await expect(page.getByTestId("content1")).not.toBeVisible();
+    // Content1 still in DOM
+    await expect(page.getByTestId("content1")).toHaveCount(1);
+  });
+
+  test("keepMounted=false does not render inactive tabs even inside Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Tabs keepMounted="{false}">
+          <TabItem label="Tab 1">
+            <Text testId="content1">Content 1</Text>
+          </TabItem>
+          <TabItem label="Tab 2">
+            <Text testId="content2">Content 2</Text>
+          </TabItem>
+        </Tabs>
+      </Form>
+    `);
+
+    await expect(page.getByTestId("content1")).toBeVisible();
+    await expect(page.getByTestId("content2")).toHaveCount(0);
+  });
+
+  test("defaults to keepMounted=true inside Form", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <Tabs>
+          <TabItem label="Tab 1">
+            <Text testId="content1">Content 1</Text>
+          </TabItem>
+          <TabItem label="Tab 2">
+            <Text testId="content2">Content 2</Text>
+          </TabItem>
+        </Tabs>
+      </Form>
+    `);
+
+    // Active tab visible
+    await expect(page.getByTestId("content1")).toBeVisible();
+    // Inactive tab in DOM but hidden (because inside Form)
+    await expect(page.getByTestId("content2")).toHaveCount(1);
+    await expect(page.getByTestId("content2")).not.toBeVisible();
+  });
+
+  test("form fields in hidden tabs preserve values on submit", async ({ initTestBed, page }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form
+        data="{{ firstname: 'John', lastname: 'Doe', phone: '123-456-7890', email: 'john@example.com' }}"
+        onSubmit="data => testState = JSON.stringify(data)"
+      >
+        <Tabs>
+          <TabItem label="Personal">
+            <TextBox bindTo="firstname" label="First Name" />
+            <TextBox bindTo="lastname" label="Last Name" />
+          </TabItem>
+          <TabItem label="Contact">
+            <TextBox bindTo="phone" label="Phone" />
+            <TextBox bindTo="email" label="Email" />
+          </TabItem>
+        </Tabs>
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    // Submit without visiting the Contact tab
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.firstname).toBe("John");
+    expect(result.lastname).toBe("Doe");
+    expect(result.phone).toBe("123-456-7890");
+    expect(result.email).toBe("john@example.com");
+  });
+});
+
+// =============================================================================
+// GAP PROP AND THEME VARIABLE TESTS
+// =============================================================================
+
+test.describe("gap prop and paddingTop-TabItem theme variable", () => {
+  test("gap prop sets padding-top on tab content panel", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs gap="40px">
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `);
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "40px");
+  });
+
+  test("gap prop overrides theme variable", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs gap="0px">
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `, {
+      testThemeVars: { "paddingTop-TabItem": "24px" },
+    });
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "0px");
+  });
+
+  test("paddingTop-TabItem theme variable applies without gap prop", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Tabs>
+        <TabItem label="First">Content</TabItem>
+      </Tabs>
+    `, {
+      testThemeVars: { "paddingTop-TabItem": "32px" },
+    });
+    const panel = page.locator('[role="tabpanel"]');
+    await expect(panel).toHaveCSS("padding-top", "32px");
   });
 });

@@ -1,6 +1,6 @@
 import styles from "./Form.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
@@ -92,6 +92,22 @@ export const FormMd = createMetadata({
       type: "string",
       defaultValue: defaultProps.saveInProgressLabel,
     },
+    savePendingLabel: {
+      description:
+        "This property defines the label of the Save button to display while " +
+        "async field validation is still in-flight. During async validation, the Submit button " +
+        "is disabled to prevent submission before validation completes.",
+      type: "string",
+      defaultValue: defaultProps.savePendingLabel,
+    },
+    submitFeedbackDelay: {
+      description:
+        "The number of milliseconds to wait before switching the Save button label to " +
+        "`saveInProgressLabel` or `savePendingLabel`. This prevents a distracting label " +
+        "flash when submit or validation completes quickly.",
+      type: "number",
+      defaultValue: defaultProps.submitFeedbackDelay,
+    },
     swapCancelAndSave: {
       description:
         `By default, the Cancel button is to the left of the Save button. Set this property to ` +
@@ -110,6 +126,13 @@ export const FormMd = createMetadata({
         `This property hides the button row entirely when set to true.`,
       type: "boolean",
       defaultValue: defaultProps.hideButtonRow,
+    },
+    stickyButtonRow: {
+      description:
+        `When set to true, the button row sticks to the bottom of the scrollable content area. ` +
+        `Useful when the form is displayed inside a scrollable container such as a ModalDialog.`,
+      type: "boolean",
+      defaultValue: defaultProps.stickyButtonRow,
     },
     enableSubmit: {
       description:
@@ -137,17 +160,57 @@ export const FormMd = createMetadata({
       type: "string",
     },
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
+    persist: {
+      description:
+        "When set to `true` (or a non-empty string), the form temporarily saves its data to " +
+        "localStorage as the user types, so that unsaved changes survive a page reload or crash. " +
+        "On a successful submit the saved data is automatically cleared.",
+      type: "boolean",
+    },
+    storageKey: {
+      description:
+        "The key used to save the form's temporary data in localStorage when `persist` is enabled. " +
+        "If omitted, the form's `id` attribute is used. If the form has no `id`, the key " +
+        "defaults to `\"form-data\"`.",
+      type: "string",
+    },
+    doNotPersistFields: {
+      description:
+        "An optional list of field names (matching the `bindTo` values of nested `FormItem` " +
+        "components) that should be excluded from the temporary localStorage save. The fields " +
+        "are still submitted normally; they are only excluded from the persisted snapshot.",
+      type: "string[]",
+    },
+    keepOnCancel: {
+      description:
+        "When `persist` is enabled and the user cancels the form, this property controls " +
+        "whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
+      type: "boolean",
+      defaultValue: false,
+    },
+    dataAfterSubmit: {
+      description:
+        "Controls what happens to the form data after a successful submit. " +
+        "`\"keep\"` (default) leaves the submitted data in the form. " +
+        "`\"reset\"` restores the form to its initial data (the value of the `data` property). " +
+        "`\"clear\"` empties the form as if no `data` property were set.",
+      availableValues: ["keep", "reset", "clear"],
+      type: "string",
+      defaultValue: "keep",
+    },
   },
   events: {
     willSubmit: {
       description:
-        `The form infrastructure fires this event just before the form is submitted. The event argument ` +
-        `is the current \`data\` value to be submitted. The return value controls submission behavior: ` +
-        `returning \`false\` cancels the submission; returning a plain object submits that object instead; ` +
-        `returning \`null\`, \`undefined\`, an empty string, or any non-object value proceeds with normal submission.`,
-      signature: "willSubmit(data: Record<string, any>): false | Record<string, any> | null | undefined | void",
+        `The form infrastructure fires this event just before the form is submitted. The event receives ` +
+        `two arguments: the cleaned form data (fields marked \`noSubmit\` excluded) and the complete form data ` +
+        `(including all fields). The return value controls submission behavior: returning \`false\` cancels ` +
+        `the submission; returning a plain object submits that object instead; returning \`null\`, \`undefined\`, ` +
+        `an empty string, or any non-object value proceeds with normal submission.`,
+      signature: "willSubmit(data: Record<string, any>, allData: Record<string, any>): false | Record<string, any> | null | undefined | void",
       parameters: {
-        data: "The current form data to be submitted.",
+        data: "The form data to be submitted (fields marked with noSubmit=\"true\" are excluded).",
+        allData: "The complete form data including all fields, useful for cross-field validation.",
       },
     },
     submit: {
@@ -228,24 +291,27 @@ export const FormMd = createMetadata({
     "textColor-ValidationDisplay-warning": "$color-warning",
     "textColor-ValidationDisplay-info": "$color-info",
     "textColor-ValidationDisplay-valid": "$color-valid",
-    "marginTop-buttonRow-Form": "$space-4"
+    "marginTop-buttonRow-Form": "$space-4",
+    "paddingTop-buttonRow-Form": "0",
+    "backgroundColor-buttonRow-Form": "transparent",
   },
 });
 
-export const formComponentRenderer = createComponentRenderer(
+export const formComponentRenderer = wrapComponent(
   COMP,
+  FormWithContextVar,
   FormMd,
-  ({ node, renderChild, extractValue, className, lookupEventHandler, registerComponentApi, appContext }) => {
-    return (
+  {
+    customRender: (_props, { node, renderChild, extractValue, lookupEventHandler, classes, registerComponentApi, appContext }) => (
       <FormWithContextVar
         node={node as any}
         renderChild={renderChild}
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
-        className={className}
+        classes={classes}
         registerComponentApi={registerComponentApi}
         appContext={appContext}
       />
-    );
+    ),
   },
 );

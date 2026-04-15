@@ -14,6 +14,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import { isNil } from "lodash-es";
 
 import styles from "./TextArea.module.scss";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -51,6 +52,7 @@ type Props = {
   controlled?: boolean;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   registerComponentApi?: RegisterComponentApiFn;
   autoSize?: boolean;
   maxRows?: number;
@@ -103,6 +105,7 @@ export const TextArea = forwardRef(function TextArea(
     escResets,
     style,
     className,
+    classes,
     registerComponentApi,
     autoSize,
     maxRows,
@@ -250,7 +253,7 @@ export const TextArea = forwardRef(function TextArea(
     [enterSubmits, escResets],
   );
 
-  let classes = classnames(className, styles.textarea, {
+  let textareaClasses = classnames(className, styles.textarea, {
     [styles.resizeHorizontal]: resize === "horizontal",
     [styles.resizeVertical]: resize === "vertical",
     [styles.resizeBoth]: resize === "both",
@@ -264,7 +267,7 @@ export const TextArea = forwardRef(function TextArea(
     React.RefAttributes<HTMLTextAreaElement> = {
     ...rest,
     id,
-    className: classes,
+    className: textareaClasses,
     ref,
     style: style as any,
     value: controlled ? value || "" : undefined,
@@ -301,13 +304,13 @@ export const TextArea = forwardRef(function TextArea(
 
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
-      <div className={styles.container}>
+      <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
         <Part partId={PART_INPUT}>
           <TextAreaResizable
             ref={ref}
             {...textareaProps}
             style={style as any}
-            className={classnames(classes)}
+            className={classnames(textareaClasses)}
             maxRows={maxRows}
             minRows={minRows}
             rows={rows}
@@ -319,13 +322,13 @@ export const TextArea = forwardRef(function TextArea(
   }
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
-      <div className={styles.container}>
+      <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
         <Part partId={PART_INPUT}>
           <TextareaAutosize
             ref={ref}
             {...textareaProps}
             style={style as any}
-            className={classnames(classes)}
+            className={classnames(textareaClasses)}
             maxRows={maxRows}
             minRows={minRows}
             rows={rows}
@@ -337,9 +340,9 @@ export const TextArea = forwardRef(function TextArea(
   }
 
   return (
-    <div className={styles.container}>
+    <div className={classnames(styles.container, classes?.[COMPONENT_PART_KEY])}>
       <Part partId={PART_INPUT}>
-        <textarea ref={ref} {...textareaProps} rows={rows} className={classnames(classes)} />
+        <textarea ref={ref} {...textareaProps} rows={rows} className={classnames(textareaClasses)} />
       </Part>
       {renderConciseFeedback()}
     </div>

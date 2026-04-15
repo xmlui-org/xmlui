@@ -1,11 +1,9 @@
 import styles from "./TextBox.module.scss";
 
-import type { RegisterComponentApiFn, ValueExtractor } from "../../abstractions/RendererDefs";
-import type { AsyncFunction } from "../../abstractions/FunctionDefs";
-import type { LookupActionOptions } from "../../abstractions/ActionDefs";
-import { type ComponentDef } from "../../abstractions/ComponentDefs";
-import { createComponentRenderer } from "../../components-core/renderers";
+import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import {
   createMetadata,
   dAutoFocus,
@@ -25,6 +23,7 @@ import {
   dValidationStatus,
 } from "../metadata-helpers";
 import { TextBox, defaultProps } from "./TextBoxNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "TextBox";
 
@@ -83,6 +82,7 @@ export const TextBoxMd = createMetadata({
     showPasswordToggle: {
       description:
         "If `true`, a toggle button is displayed to switch between showing and hiding the password input.",
+      valueType: "boolean",
       defaultValue: false,
     },
     passwordVisibleIcon: {
@@ -99,15 +99,15 @@ export const TextBoxMd = createMetadata({
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
   },
   events: {
@@ -147,13 +147,14 @@ export const TextBoxMd = createMetadata({
     "borderStyle-Input": "solid",
     "borderColor-Input--disabled": "$borderColor--disabled",
     "textColor-Input--disabled": "$textColor--disabled",
-    "borderColor-Input--default": "$borderColor-Input-default",
-    "borderColor-Input--default--hover": "$borderColor-Input-default--hover",
+    "borderColor-Input": "$borderColor-Input-default",
+    "borderColor-Input--hover": "$borderColor-Input-default--hover",
     "borderColor-Input--error": "$borderColor-Input-default--error",
     "borderColor-Input--warning": "$borderColor-Input-default--warning",
     "borderColor-Input--success": "$borderColor-Input-default--success",
     "textColor-placeholder-Input": "$textColor-subtitle",
     "color-adornment-Input": "$textColor-subtitle",
+    "color-adornment-TextBox": "$textColor-subtitle",
 
     "outlineColor-Input--focus": "$outlineColor--focus",
     "outlineWidth-Input--focus": "$outlineWidth--focus",
@@ -170,80 +171,26 @@ export const TextBoxMd = createMetadata({
   },
 });
 
-type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
-
-function renderTextBox(
-  className: string | undefined,
-  state: any,
-  updateState: (componentState: any) => void,
-  extractValue: ValueExtractor,
-  node: TextBoxComponentDef,
-  lookupEventHandler: (
-    eventName: keyof NonNullable<TextBoxComponentDef["events"]>,
-    actionOptions?: LookupActionOptions,
-  ) => AsyncFunction | undefined,
-  registerComponentApi: RegisterComponentApiFn,
-  type: "text" | "password" = "text",
-) {
-  // TODO: How can we use the gap from the className?
-  //delete layoutCss.gap;
-  return (
-    <TextBox
-      type={type}
-      className={className}
-      value={state.value}
-      updateState={updateState}
-      initialValue={extractValue(node.props.initialValue)}
-      maxLength={extractValue(node.props.maxLength)}
-      enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-      placeholder={extractValue.asOptionalString(node.props.placeholder)}
-      validationStatus={extractValue(node.props.validationStatus)}
-      invalidMessages={extractValue(node.props.invalidMessages)}
-      onDidChange={lookupEventHandler("didChange")}
-      onFocus={lookupEventHandler("gotFocus")}
-      onBlur={lookupEventHandler("lostFocus")}
-      registerComponentApi={registerComponentApi}
-      startText={extractValue.asOptionalString(node.props.startText)}
-      startIcon={extractValue.asOptionalString(node.props.startIcon)}
-      endText={extractValue.asOptionalString(node.props.endText)}
-      endIcon={extractValue.asOptionalString(node.props.endIcon)}
-      gap={extractValue.asOptionalString(node.props.gap)}
-      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      required={extractValue.asOptionalBoolean(node.props.required)}
-      showPasswordToggle={extractValue.asOptionalBoolean(node.props.showPasswordToggle, false)}
-      passwordVisibleIcon={extractValue.asOptionalString(node.props.passwordVisibleIcon)}
-      passwordHiddenIcon={extractValue.asOptionalString(node.props.passwordHiddenIcon)}
-      verboseValidationFeedback={extractValue.asOptionalBoolean(node.props.verboseValidationFeedback)}
-      validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
-      validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
-    />
-  );
-}
-
-export const textBoxComponentRenderer = createComponentRenderer(
-  COMP,
-  TextBoxMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    className,
-    registerComponentApi,
-  }) => {
-    return renderTextBox(
-      className,
-      state,
-      updateState,
-      extractValue,
-      node as TextBoxComponentDef,
-      lookupEventHandler,
-      registerComponentApi,
-    );
+type ThemedTextBoxProps = React.ComponentProps<typeof TextBox> & { className?: string };
+export const ThemedTextBox = React.forwardRef<HTMLDivElement, ThemedTextBoxProps>(
+  function ThemedTextBox({ className, classes, ...props }: ThemedTextBoxProps, ref) {
+    const themeClass = useComponentThemeClass(TextBoxMd);
+    const themedClasses: Record<string, string> = {
+      ...(classes ?? {}),
+      [COMPONENT_PART_KEY]: [themeClass, classes?.[COMPONENT_PART_KEY]].filter(Boolean).join(" "),
+    };
+    return <TextBox {...props} className={className} classes={themedClasses} ref={ref} />;
   },
 );
+
+export const textBoxComponentRenderer = wrapComponent(COMP, ThemedTextBox, TextBoxMd, {
+  exposeRegisterApi: true,
+  events: {
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
+  },
+  deriveAriaLabel: (props) => props.label || props.placeholder,
+});
 
 export const PasswordMd = createMetadata({
   ...TextBoxMd,
@@ -252,27 +199,17 @@ export const PasswordMd = createMetadata({
     "to input and edit passwords.",
 });
 
-export const passwordInputComponentRenderer = createComponentRenderer(
-  "PasswordInput",
-  PasswordMd,
-  ({
-    node,
-    state,
-    updateState,
-    lookupEventHandler,
-    extractValue,
-    className,
-    registerComponentApi,
-  }) => {
-    return renderTextBox(
-      className,
-      state,
-      updateState,
-      extractValue,
-      node as TextBoxComponentDef,
-      lookupEventHandler,
-      registerComponentApi,
-      "password",
-    );
-  },
+// Password: same as ThemedTextBox but forces type="password"
+const PasswordBox = React.forwardRef((props: any, ref: any) =>
+  <ThemedTextBox {...props} ref={ref} type="password" />
 );
+PasswordBox.displayName = "PasswordBox";
+
+export const passwordInputComponentRenderer = wrapComponent("PasswordInput", PasswordBox, PasswordMd, {
+  exposeRegisterApi: true,
+  events: {
+    gotFocus: "onFocus",
+    lostFocus: "onBlur",
+  },
+  deriveAriaLabel: (props) => props.label || props.placeholder,
+});

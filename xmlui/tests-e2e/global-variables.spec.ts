@@ -5,33 +5,22 @@ import { expect, test } from "../src/testing/fixtures";
 // =============================================================================
 
 test.describe("Global variables", () => {
-  test("displays global variable in Text component", async ({ page, initTestBed }) => {
+  test("displays global variables and function results without interaction", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(
       `
       <App>
         <Text testId="countText">Count: {count}</Text>
-      </App>
-    `,
-      {
-        mainXs: `
-      var count = 42;
-    `,
-      },
-    );
-
-    await expect(page.getByTestId("countText")).toHaveText("Count: 42");
-  });
-
-  test("displays global variable from function call", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <App>
         <Text testId="resultText">Result: {getCount()}</Text>
+        <Text testId="exprText">Expression: {result}</Text>
       </App>
     `,
       {
         mainXs: `
       var count = 42;
+      var result = 6 * 7;
 
       function getCount() {
         return count;
@@ -40,7 +29,9 @@ test.describe("Global variables", () => {
       },
     );
 
-    await expect(page.getByTestId("resultText")).toHaveText("Result: 42");
+    await expect(page.getByTestId("countText")).toHaveText("Count: 42"); // global variable in Text
+    await expect(page.getByTestId("resultText")).toHaveText("Result: 42"); // global variable from function call
+    await expect(page.getByTestId("exprText")).toHaveText("Expression: 42"); // complex expression
   });
 
   test("modifies global variable via button click", async ({ page, initTestBed }) => {
@@ -81,9 +72,9 @@ test.describe("Global variables", () => {
 
     await expect(page.getByTestId("text1")).toHaveText("Text 1: 100");
     await expect(page.getByTestId("text2")).toHaveText("Text 2: 100");
-    
+
     await page.getByRole("button", { name: "Increment: 100" }).click();
-    
+
     await expect(page.getByTestId("text1")).toHaveText("Text 1: 101");
     await expect(page.getByTestId("text2")).toHaveText("Text 2: 101");
   });
@@ -141,12 +132,12 @@ test.describe("Global variables", () => {
 
     await expect(page.getByTestId("globalText")).toHaveText("Global: 42");
     await expect(page.getByTestId("localButton")).toHaveText("Local Button: 0");
-    
+
     // Click global button
     await page.getByRole("button", { name: "Global Button: 42" }).click();
     await expect(page.getByTestId("globalText")).toHaveText("Global: 43");
     await expect(page.getByTestId("localButton")).toHaveText("Local Button: 0");
-    
+
     // Click local button
     await page.getByTestId("localButton").click();
     await expect(page.getByTestId("globalText")).toHaveText("Global: 43");
@@ -180,32 +171,15 @@ test.describe("Global variables", () => {
     );
 
     await expect(page.getByTestId("countText")).toHaveText("Count: 5");
-    
+
     await page.getByRole("button", { name: "Button 1: 5" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 6");
-    
+
     await page.getByRole("button", { name: "Button 2: 6" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 7");
-    
+
     await page.getByRole("button", { name: "Button 3: 7" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 8");
-  });
-
-  test("global variable with complex expression", async ({ page, initTestBed }) => {
-    await initTestBed(
-      `
-      <App>
-        <Text testId="resultText">Result: {result}</Text>
-      </App>
-    `,
-      {
-        mainXs: `
-      var result = 6 * 7;
-    `,
-      },
-    );
-
-    await expect(page.getByTestId("resultText")).toHaveText("Result: 42");
   });
 
   test("global function modifying global variable", async ({ page, initTestBed }) => {
@@ -275,29 +249,70 @@ test.describe("Global variables", () => {
     // Initial values
     await expect(page.getByTestId("countText")).toHaveText("Count: 42");
     await expect(page.getByTestId("getCountText")).toHaveText("getCount: 42");
-    
+
     // Click first button
     await page.getByRole("button", { name: "First Button: 42" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 43");
     await expect(page.getByTestId("getCountText")).toHaveText("getCount: 43");
-    
+
     // Click second button
     await page.getByRole("button", { name: "Second Button: 43" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 44");
-    
+
     // Click third button
     await page.getByRole("button", { name: "3rd button: 44" }).click();
     await expect(page.getByTestId("countText")).toHaveText("Count: 45");
-    
+
     // Local button should still show 0
     await expect(page.getByTestId("localButton")).toHaveText("4th button (local): 0");
-    
+
     // Click local button
     await page.getByTestId("localButton").click();
     await expect(page.getByTestId("localButton")).toHaveText("4th button (local): 1");
-    
+
     // Global count should be unchanged
     await expect(page.getByTestId("countText")).toHaveText("Count: 45");
+  });
+
+  // Regression test for https://github.com/xmlui-org/xmlui/issues/2867#issuecomment-4008150804
+  // .xs variables should be resolvable in global.* initialization expressions
+  test("global.* attribute can reference Globals.xs variable", async ({ page, initTestBed }) => {
+    await initTestBed(
+      `
+      <App global.catColors="{categoryColorMap}">
+        <Text testId="type">type: {typeof catColors}</Text>
+        <Text testId="label">label: {catColors?.hello?.label}</Text>
+        <ChildReader />
+      </App>
+    `,
+      {
+        noFragmentWrapper: true,
+        mainXs: `
+      var categoryColorMap = {
+        hello: { label: '#6b5a9a', background: '#f0ecf6' },
+        hi: { label: '#green', background: 'yellow' },
+      };
+    `,
+        components: [
+          `
+      <Component name="ChildReader">
+        <Fragment>
+          <Text testId="childType">child type: {typeof catColors}</Text>
+          <Text testId="childLabel">child label: {catColors?.hello?.label}</Text>
+        </Fragment>
+      </Component>
+    `,
+        ],
+      },
+    );
+
+    // Parent should see the object
+    await expect(page.getByTestId("type")).toHaveText("type: object");
+    await expect(page.getByTestId("label")).toHaveText("label: #6b5a9a");
+
+    // Child component should also see the object (reactive global)
+    await expect(page.getByTestId("childType")).toHaveText("child type: object");
+    await expect(page.getByTestId("childLabel")).toHaveText("child label: #6b5a9a");
   });
 
   test("raises T032 error when component declares global variable", async ({
@@ -307,7 +322,7 @@ test.describe("Global variables", () => {
     // Attempting to create a component with global variables should fail at parse time
     let didThrow = false;
     let errorDetails = "";
-    
+
     try {
       await initTestBed(
         `
@@ -337,8 +352,8 @@ test.describe("Global variables", () => {
 
     // Should have thrown an error
     expect(didThrow).toBe(true);
-    
+
     // Error details should contain the T032 error code
-    expect(errorDetails).toContain("T032");
+    expect(errorDetails).toContain("U026");
   });
 });

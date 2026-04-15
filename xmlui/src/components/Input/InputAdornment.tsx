@@ -2,17 +2,18 @@ import classnames from "classnames";
 
 import styles from "./InputAdornment.module.scss";
 
-import { Icon } from "../Icon/IconNative";
-import { Text } from "../Text/TextNative";
+import { ThemedIcon } from "../Icon/Icon";
+import { ThemedText as Text } from "../Text/Text";
 
 interface AdornmentProps {
   iconName?: string;
   text?: string;
   className?: string;
   onClick?: () => void;
+  tabIndex?: number;
 }
 
-export function Adornment({ iconName, text, className, onClick, ...rest }: AdornmentProps) {
+export function Adornment({ iconName, text, className, onClick, tabIndex, ...rest }: AdornmentProps) {
   return (
     <>
       {iconName || text ? (
@@ -23,9 +24,9 @@ export function Adornment({ iconName, text, className, onClick, ...rest }: Adorn
           })}
           role={onClick ? "button" : "presentation"}
           onClick={onClick}
-          tabIndex={onClick ? 0 : undefined}
+          tabIndex={tabIndex ?? (onClick ? 0 : undefined)}
         >
-          <Icon name={iconName} style={{ color: "inherit" }} />
+          <ThemedIcon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>
               <Text style={{ fontSize: "inherit" }}>{text}</Text>

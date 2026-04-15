@@ -61,7 +61,7 @@ test("Themed AppHeader", async ({ page, initTestBed }) => {
           tones: {
             dark: {
               themeVars: {
-                "background-color": EXPECTED_COLOR,
+                "backgroundColor-AppHeader": EXPECTED_COLOR,
               },
             },
           },
@@ -96,7 +96,7 @@ test("Themed Footer", async ({ page, initTestBed }) => {
           tones: {
             dark: {
               themeVars: {
-                "background-color": EXPECTED_COLOR,
+                "backgroundColor-Footer": EXPECTED_COLOR,
               },
             },
           },
@@ -106,8 +106,11 @@ test("Themed Footer", async ({ page, initTestBed }) => {
     },
   );
 
-  const { backgroundColor } = await getStyles(page.getByTestId("app-footer"), "background-color");
-  const boundingRect = await getBounds(page.getByTestId("app-footer"));
+  const footer = page.getByTestId("app-footer");
+  await expect(footer).toBeVisible();
+
+  const { backgroundColor } = await getStyles(footer, "background-color");
+  const boundingRect = await getBounds(footer);
 
   expect(boundingRect.left).toBe(0);
   expect(boundingRect.bottom).toEqualWithTolerance(PAGE_HEIGHT, 0.01);

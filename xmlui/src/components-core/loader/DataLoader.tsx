@@ -177,10 +177,17 @@ function DataLoader({
   const doLoad = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
       // Capture the current trace ID when fetch is triggered
-      // This way the trace is preserved even if the handler completes before fetch does
+      // This way the trace is preserved even if the handler completes before fetch does.
+      // After startup is complete, don't capture the startup trace — otherwise
+      // DataSource re-fetches (e.g. after navigation) get incorrectly attributed to startup.
       if (typeof window !== "undefined") {
         const w = window as any;
-        pendingTraceIdRef.current = w._xsCurrentTrace;
+        const current = w._xsCurrentTrace;
+        if (current && w._xsStartupComplete && current === w._xsStartupTrace) {
+          pendingTraceIdRef.current = undefined;
+        } else {
+          pendingTraceIdRef.current = current;
+        }
       }
 
       // For CSV data type, handle directly rather than using RestApiProxy
@@ -232,6 +239,22 @@ function DataLoader({
           });
         } catch (error) {
           console.error("Error loading CSV:", error);
+          throw error;
+        }
+      } else if (loader.props.dataType === "text") {
+        try {
+          const method = extractParam(state, loader.props.method, appContext) || "GET";
+          const headers = extractParam(state, loader.props.headers, appContext) || {};
+          const fetchOptions: RequestInit = { method, headers };
+          if (abortSignal) { fetchOptions.signal = abortSignal; }
+          if (rawBody) { fetchOptions.body = rawBody; }
+          const response = await fetch(url, fetchOptions);
+          if (!response.ok) {
+            throw new Error(`Failed to fetch text: ${response.status} ${response.statusText}`);
+          }
+          return await response.text();
+        } catch (error) {
+          console.error("Error loading text:", error);
           throw error;
         }
       } else if (loader.props.dataType === "sql") {
@@ -397,6 +420,10 @@ function DataLoader({
               $pageParams: pageParams,
             },
             resolveBindingExpressions: true,
+            omitTransactionId: !!(loader.props as any).omitTransactionId,
+            onResponseHeaders: (h) => {
+              pendingResponseHeadersRef.current = h;
+            },
           });
 
           // Trace API call completion
@@ -451,6 +478,8 @@ function DataLoader({
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };
+
+  const pendingResponseHeadersRef = useRef<Record<string, string> | undefined>(undefined);
 
   const loadingToastIdRef = useRef<string | undefined>(undefined);
   const inProgress: LoaderInProgressChangedFn = useCallback(
@@ -512,7 +541,7 @@ function DataLoader({
         pendingTraceIdRef.current = undefined;
       }
 
-      loaderLoaded(data, pageInfo);
+      loaderLoaded(data, pageInfo, data !== undefined ? pendingResponseHeadersRef.current : undefined);
       // console.log("[DataLoader] After loaderLoaded() call");
 
       const completedMessage = extractParam(
@@ -573,7 +602,46 @@ function DataLoader({
     [appContext, loader.props.errorNotificationMessage, loaderError, onError],
   );
 
+  // --- Mock mode: when mockData prop is set, bypass all network logic and resolve directly
+  const hasMockData = loader.props?.mockData !== undefined;
+  const mockDataInner = useMemo(() => {
+    if (!hasMockData) return undefined;
+    return extractParam(state, loader.props.mockData, appContext);
+  }, [hasMockData, appContext, loader.props.mockData, state]);
+  const mockDataValue = useShallowCompareMemoize(mockDataInner);
+
+  const doLoadMock = useCallback(() => {
+    return mockDataValue ?? null;
+  }, [mockDataValue]);
+
+  const mockQueryId = useMemo<readonly any[] | undefined>(() => {
+    if (!hasMockData) return undefined;
+    return ["mockData", loader.uid, mockDataValue];
+  }, [hasMockData, loader.uid, mockDataValue]);
+
   const pollIntervalInSeconds = extractParam(state, loader.props.pollIntervalInSeconds, appContext);
+
+  if (hasMockData) {
+    return (
+      <Loader
+        queryId={mockQueryId}
+        key={`mock-${loader.uid}`}
+        state={state}
+        loader={loader}
+        loaderInProgressChanged={inProgress}
+        loaderIsRefetchingChanged={loaderIsRefetchingChanged}
+        loaderLoaded={loaded}
+        loaderError={error}
+        loaderFn={doLoadMock}
+        pollIntervalInSeconds={pollIntervalInSeconds}
+        registerComponentApi={registerComponentApi}
+        onLoaded={onLoaded}
+        transformResult={transformResult}
+        structuralSharing={structuralSharing}
+      />
+    );
+  }
+
   return hasPaging ? (
     <PageableLoader
       queryId={queryId}
@@ -630,8 +698,9 @@ export const DataLoaderMd = createMetadata({
     completedNotificationMessage: d("The message to show when the loader completes"),
     errorNotificationMessage: d("The message to show when an error occurs"),
     transformResult: d("Function for transforming the datasource result"),
-    dataType: d("Type of data to fetch (default: json, or csv, or sql)"),
+    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
     structuralSharing: d("Whether to use structural sharing for the data"),
+    mockData: d("Data to return directly without making a network request (for development and testing)"),
   },
   events: {
     loaded: d("Event to trigger when the data is loaded"),
@@ -663,8 +732,8 @@ export const dataLoaderRenderer = createLoaderRenderer(
     lookupSyncCallback,
     extractValue,
   }) => {
-    // --- Check for required properties
-    if (!loader.props?.url || !loader.props.url.trim()) {
+    // --- Check for required properties — url is not required when mockData is provided
+    if (!loader.props?.mockData && (!loader.props?.url || !loader.props.url.trim())) {
       throw new Error(
         "You must specify a non-empty (not whitespace-only) 'url' property for DataSource",
       );

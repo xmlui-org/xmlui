@@ -1,6 +1,6 @@
 import styles from "./NestedApp.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppNative";
 import { defaultProps } from "./defaultProps";
@@ -58,6 +58,7 @@ export const NestedAppMd = createMetadata({
     [`borderRadius-viewControls-${COMP}`]: "5px",
     [`padding-viewControls-${COMP}`]: "$space-0_5",
     [`borderBottom-header-${COMP}`]: "0.5px solid $borderColor",
+    [`backgroundColor-header-${COMP}`]: "$color-surface-100",
     [`color-loadingText-${COMP}`]: "$color-surface-600",
     // --- Split view styles
     [`padding-button-splitView-${COMP}`]: "1px 6px",
@@ -81,24 +82,20 @@ export const NestedAppMd = createMetadata({
   },
 });
 
-export const nestedAppComponentRenderer = createComponentRenderer(
-  COMP,
-  NestedAppMd,
-  ({ node, extractValue, className }) => {
-    return (
-      <IndexAwareNestedApp
-        app={node.props?.app}
-        resolvedApp={node.props?.resolvedApp}
-        resolvedComponents={node.props?.resolvedComponents}
-        asIsland={node.props?.asIsland}
-        className={className}
-        api={extractValue(node.props?.api)}
-        components={extractValue(node.props?.components)}
-        config={extractValue(node.props?.config)}
-        activeTheme={extractValue(node.props?.activeTheme)}
-        activeTone={extractValue(node.props?.activeTone)}
-        height={extractValue(node.props?.height)}
-      />
-    );
-  },
-);
+export const nestedAppComponentRenderer = wrapComponent(COMP, IndexAwareNestedApp, NestedAppMd, {
+  customRender: (_props, { node, extractValue, className }) => (
+    <IndexAwareNestedApp
+      app={node.props?.app}
+      resolvedApp={node.props?.resolvedApp}
+      resolvedComponents={node.props?.resolvedComponents}
+      asIsland={node.props?.asIsland}
+      className={className}
+      api={extractValue(node.props?.api)}
+      components={extractValue(node.props?.components)}
+      config={extractValue(node.props?.config)}
+      activeTheme={extractValue(node.props?.activeTheme)}
+      activeTone={extractValue(node.props?.activeTone)}
+      height={extractValue(node.props?.height)}
+    />
+  ),
+});

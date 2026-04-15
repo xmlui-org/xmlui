@@ -1,5 +1,5 @@
 <Component name="Overview">
-    <Stack width="100%" maxWidth="$maxWidth-content-NoToc" gap="$space-6">
+    <Stack width="100%" gap="$space-6">
         <Breadcrumbs />
         <VStack gap="$space-2">
             <H1 showAnchor="{false}">{$linkInfo.label}</H1>
@@ -19,7 +19,9 @@
                     to="{$item.to}"
                     label="{$item.label}"
                     icon="{getCardIcon($item, appGlobals.navSections)}"
-                    width="{getCardWidth(mediaSize)}"
+                    width="100%"
+                    width-sm="50%"
+                    width-md="33.33%"
                 />
             </Items>
         </FlowLayout>

@@ -1,0 +1,27 @@
+{
+  "name": "xmlui-echart",
+  "version": "0.1.2",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/xmlui-echart.js",
+  "module": "dist/xmlui-echart.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-echart.mjs",
+      "require": "./dist/xmlui-echart.js"
+    }
+  },
+  "dependencies": {
+    "echarts": "^5.6.0",
+    "echarts-for-react": "^3.0.2",
+    "classnames": "2.5.1"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  }
+}

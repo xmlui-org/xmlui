@@ -13,6 +13,7 @@ import styles from "./NumberBox.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useEvent } from "../../components-core/utils/misc";
 import {
   clamp,
@@ -28,9 +29,9 @@ import {
   toUsableNumber,
 } from "./numberbox-abstractions";
 import { type ValidationStatus } from "../abstractions";
-import { Icon } from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 import { Adornment } from "../Input/InputAdornment";
-import { Button } from "../Button/ButtonNative";
+import { ThemedButton as Button } from "../Button/Button";
 import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
@@ -65,6 +66,7 @@ type Props = {
   initialValue?: number | string | null;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   step?: number | string;
   enabled?: boolean;
   placeholder?: string;
@@ -95,6 +97,7 @@ type Props = {
   validationIconSuccess?: string;
   validationIconError?: string;
   invalidMessages?: string[];
+  "aria-label"?: string;
 };
 
 export const NumberBox = forwardRef(function NumberBox(
@@ -104,6 +107,7 @@ export const NumberBox = forwardRef(function NumberBox(
     initialValue,
     style,
     className,
+    classes,
     enabled = defaultProps.enabled,
     placeholder,
     validationStatus = defaultProps.validationStatus,
@@ -134,6 +138,7 @@ export const NumberBox = forwardRef(function NumberBox(
     validationIconSuccess,
     validationIconError,
     invalidMessages,
+    "aria-label": ariaLabel,
     ...rest
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -186,9 +191,11 @@ export const NumberBox = forwardRef(function NumberBox(
   }, [value]);
 
   // --- Initialize the related field with the input's initial value
+  // Validate initialValue: only store usable numbers, reject non-numeric strings
   useEffect(() => {
-    updateState({ value: initialValue }, { initial: true });
-  }, [initialValue, updateState]);
+    const parsed = toUsableNumber(initialValue, integersOnly);
+    updateState({ value: isEmptyLike(initialValue) ? null : parsed }, { initial: true });
+  }, [initialValue, integersOnly, updateState]);
 
   // --- Handle the value change events for this input
   const updateValue = useCallback(
@@ -603,7 +610,7 @@ export const NumberBox = forwardRef(function NumberBox(
   return (
     <div
       {...rest}
-      className={classnames(className, styles.inputRoot, {
+      className={classnames(styles.inputRoot, classes?.[COMPONENT_PART_KEY], className, {
         [styles.readOnly]: readOnly,
         [styles.disabled]: !enabled,
         [styles.noSpinBox]: !hasSpinBox,
@@ -612,8 +619,8 @@ export const NumberBox = forwardRef(function NumberBox(
         [styles.valid]: validationStatus === "valid",
         [styles.rtl]: direction === "rtl",
       })}
-      id={id}
       ref={forwardedRef}
+      aria-label={ariaLabel}
       tabIndex={-1}
       onFocus={() => {
         inputRef.current?.focus();
@@ -627,8 +634,12 @@ export const NumberBox = forwardRef(function NumberBox(
       <Part partId={PART_INPUT}>
         <input
           id={id}
+          role="spinbutton"
           type="text"
           inputMode="numeric"
+          aria-valuemin={min}
+          aria-valuemax={max}
+          aria-valuenow={isUsableNumber(valueStrRep, integersOnly) ? toUsableNumber(valueStrRep, integersOnly) as number : undefined}
           className={classnames(styles.input, {
             [styles.readOnly]: readOnly,
           })}
@@ -668,15 +679,15 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="up"
               type="button"
-              role="spinbutton"
               variant={"ghost"}
               themeColor={"secondary"}
               tabIndex={-1}
               className={styles.spinnerButton}
               disabled={!enabled || readOnly}
               ref={upButton}
+              aria-label={ariaLabel ? `Increase ${ariaLabel}` : "Increase"}
             >
-              <Icon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
+              <ThemedIcon name={spinnerUpIcon || "spinnerUp:NumberBox"} fallback="chevronup" size="sm" />
             </Button>
           </Part>
 
@@ -684,15 +695,15 @@ export const NumberBox = forwardRef(function NumberBox(
             <Button
               data-spinner="down"
               type="button"
-              role="spinbutton"
               tabIndex={-1}
               variant={"ghost"}
               themeColor={"secondary"}
               className={styles.spinnerButton}
               disabled={!enabled || readOnly}
               ref={downButton}
+              aria-label={ariaLabel ? `Decrease ${ariaLabel}` : "Decrease"}
             >
-              <Icon
+              <ThemedIcon
                 name={spinnerDownIcon || "spinnerDown:NumberBox"}
                 fallback="chevrondown"
                 size="sm"

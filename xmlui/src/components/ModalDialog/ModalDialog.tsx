@@ -1,11 +1,13 @@
 import styles from "./ModalDialog.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject, textSubject } from "../../components-core/theming/themes/base-utils";
 import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame, defaultProps } from "./ModalDialogNative";
 import { createMetadata, d } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "ModalDialog";
 
@@ -94,61 +96,85 @@ export const ModalDialogMd = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontFamily-${COMP}`]: "$fontFamily",
     [`maxWidth-${COMP}`]: "450px",
+    [`maxHeight-${COMP}`]: "100%",
     [`marginBottom-title-${COMP}`]: "0",
   },
 });
 
-export const modalViewComponentRenderer = createComponentRenderer(
-  COMP,
-  ModalDialogMd,
-  ({
-    node,
-    contextVars,
-    extractValue,
-    className,
-    renderChild,
-    lookupEventHandler,
-    registerComponentApi,
-    layoutContext,
-  }) => {
-    // --- If the ModalDialog is not inside a ModalDialogFrame, wrap it in one.
-    if (!layoutContext?._insideModalFrame) {
-      // --- Context variables are now directly available via contextVars parameter
-      return (
-        <ModalDialogFrame
-          isInitiallyOpen={extractValue(node.when) !== undefined}
-          registerComponentApi={registerComponentApi}
-          onClose={lookupEventHandler("close")}
-          onOpen={lookupEventHandler("open")}
-          renderDialog={({ openParams, ref }) => {
-            return (
-              <MemoizedItem
-                node={node}
-                renderChild={renderChild}
-                layoutContext={{ _insideModalFrame: true }}
-                contextVars={{ 
-                  ...contextVars, 
-                  $param: openParams?.[0], 
-                  $params: openParams 
-                }}
-              />
-            );
-          }}
-        />
-      );
-    }
+type ThemedModalDialogProps = React.ComponentPropsWithoutRef<typeof ModalDialog>;
 
+export const ThemedModalDialog = React.forwardRef<React.ElementRef<typeof ModalDialog>, ThemedModalDialogProps>(
+  function ThemedModalDialog({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(ModalDialogMd);
     return (
       <ModalDialog
-        className={className}
-        fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
-        title={extractValue(node.props?.title)}
-        titleTemplate={renderChild(node.props?.titleTemplate)}
-        closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
-        externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
-      >
-        {renderChild(node.children, { type: "Stack" })}
-      </ModalDialog>
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
     );
+  },
+);
+
+export const modalViewComponentRenderer = wrapComponent(
+  COMP,
+  ModalDialog,
+  ModalDialogMd,
+  {
+    exposeRegisterApi: true,
+    exclude: ["fullScreen", "title", "titleTemplate", "closeButtonVisible", "externalAnimation"],
+    events: [],
+    customRender(_props, {
+      node,
+      contextVars,
+      extractValue,
+      classes,
+      renderChild,
+      lookupEventHandler,
+      registerComponentApi,
+      layoutContext,
+    }) {
+      // --- If the ModalDialog is not inside a ModalDialogFrame, wrap it in one.
+      if (!layoutContext?._insideModalFrame) {
+        // --- Context variables are now directly available via contextVars parameter
+        return (
+          <ModalDialogFrame
+            isInitiallyOpen={extractValue(node.when) !== undefined}
+            registerComponentApi={registerComponentApi}
+            onClose={lookupEventHandler("close")}
+            onOpen={lookupEventHandler("open")}
+            renderDialog={({ openParams, ref }) => {
+              return (
+                <MemoizedItem
+                  node={node}
+                  renderChild={renderChild}
+                  layoutContext={{ _insideModalFrame: true }}
+                  contextVars={{ 
+                    ...contextVars, 
+                    $param: openParams?.[0], 
+                    $params: openParams 
+                  }}
+                  vars={(node as any)._savedVarDefs}
+                  functions={(node as any)._savedFunctionDefs}
+                />
+              );
+            }}
+          />
+        );
+      }
+
+      return (
+        <ModalDialog
+          classes={classes}
+          fullScreen={extractValue.asOptionalBoolean(node.props?.fullScreen)}
+          title={extractValue(node.props?.title)}
+          titleTemplate={renderChild(node.props?.titleTemplate)}
+          closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
+          externalAnimation={extractValue.asOptionalBoolean(node.props.externalAnimation)}
+        >
+          {renderChild(node.children, { type: "Stack" })}
+        </ModalDialog>
+      );
+    },
   },
 );

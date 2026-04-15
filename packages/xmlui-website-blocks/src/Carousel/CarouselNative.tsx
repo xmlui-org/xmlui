@@ -8,17 +8,22 @@ import classnames from "classnames";
 
 import styles from "./Carousel.module.scss";
 
-import { RegisterComponentApiFn, Icon } from "xmlui";
+import type { RegisterComponentApiFn } from "xmlui";
+import { Icon } from "xmlui";
+import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
+
+// Matches the COMPONENT_PART_KEY constant from xmlui internals
+const COMPONENT_PART_KEY = "-component";
 
 const noop = () => {};
 export type OrientationOptions = "horizontal" | "vertical";
-import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
 export type CarouselProps = {
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   orientation?: OrientationOptions;
   indicators?: boolean;
   controls?: boolean;
@@ -64,6 +69,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     children,
     style,
     className,
+    classes,
     indicators = defaultProps.indicators,
     onDisplayDidChange = noop,
     autoplay = defaultProps.autoplay,
@@ -82,9 +88,9 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 ) {
   const referenceElement = useRef<HTMLDivElement>(null);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [plugins, setPlugins] = useState<any[]>([]);
+  const [plugins, setPlugins] = useState<NonNullable<Parameters<typeof useEmblaCarousel>[1]>>([]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators ?? defaultProps.indicators as boolean);
+  const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators ?? true);
   const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const [carouselRef, api] = useEmblaCarousel(
@@ -97,8 +103,8 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     plugins,
   );
 
-  const prevIconName = prevIcon || orientation === "horizontal" ? "arrowleft" : "arrowup";
-  const nextIconName = nextIcon || orientation === "horizontal" ? "arrowright" : "arrowdown";
+  const prevIconName = prevIcon || (orientation === "horizontal" ? "arrowleft" : "arrowup");
+  const nextIconName = nextIcon || (orientation === "horizontal" ? "arrowright" : "arrowdown");
 
   useEffect(() => {
     if (autoplay) {
@@ -167,7 +173,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   }, [api]);
 
   const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
+    (event: KeyboardEvent) => {
       if (orientation === "horizontal") {
         if (event.key === "ArrowLeft") {
           event.preventDefault();
@@ -212,17 +218,21 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     };
   }, [api, onSelect]);
 
-  
+  useEffect(() => {
+    if (referenceElement?.current) {
+      referenceElement.current.addEventListener("keydown", handleKeyDown);
+    }
+  }, [ref, handleKeyDown]);
+
   return (
     <CarouselContext.Provider value={carouselContextValue}>
       <div
         {...rest}
         style={style}
         ref={ref}
-        className={classnames(styles.carousel, className)}
+        className={classnames(styles.carousel, classes?.[COMPONENT_PART_KEY], className)}
         role="region"
         tabIndex={-1}
-        onKeyDown={handleKeyDown}
         aria-roledescription="carousel"
       >
         <div ref={carouselRef} className={styles.carouselContentWrapper}>

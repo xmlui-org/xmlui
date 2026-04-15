@@ -1,10 +1,12 @@
 import styles from "./TableOfContents.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents, defaultProps } from "./TableOfContentsNative";
 import { useIndexerContext } from "../App/IndexerContext";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "TableOfContents";
 const COMP_CHILD = "TableOfContentsItem";
@@ -42,14 +44,16 @@ export const TableOfContentsMd = createMetadata({
       description: `This property determines the scrollbar style. Options: "normal" uses the browser's default ` +
         `scrollbar; "overlay" displays a themed scrollbar that is always visible; "whenMouseOver" shows the ` +
         `scrollbar only when hovering over the scroll container; "whenScrolling" displays the scrollbar ` +
-        `only while scrolling is active and fades out after 400ms of inactivity.`,
+        `only while scrolling is active and fades out after 400ms of inactivity. ` +
+        `On mobile/touch devices, this property is ignored and the browser's native scrollbar is always used.`,
       valueType: "string",
       availableValues: ["normal", "overlay", "whenMouseOver", "whenScrolling"],
       defaultValue: defaultProps.scrollStyle,
     },
     showScrollerFade: {
       description: `When enabled, displays gradient fade indicators at the top and bottom edges when scrollable ` +
-        `content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles.`,
+        `content extends beyond the visible area. Only works with "overlay", "whenMouseOver", and "whenScrolling" scroll styles. ` +
+        `On mobile/touch devices, this property has no effect.`,
       valueType: "boolean",
       defaultValue: defaultProps.showScrollerFade,
     },
@@ -90,6 +94,21 @@ export const TableOfContentsMd = createMetadata({
   },
 });
 
+type ThemedTableOfContentsProps = React.ComponentPropsWithoutRef<typeof TableOfContents>;
+
+export const ThemedTableOfContents = React.forwardRef<React.ElementRef<typeof TableOfContents>, ThemedTableOfContentsProps>(
+  function ThemedTableOfContents({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(TableOfContentsMd);
+    return (
+      <TableOfContents
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
 function IndexAwareTableOfContents(props: React.ComponentProps<typeof TableOfContents>) {
   const { indexing } = useIndexerContext();
   if (indexing) {
@@ -98,20 +117,16 @@ function IndexAwareTableOfContents(props: React.ComponentProps<typeof TableOfCon
   return <TableOfContents {...props} />;
 }
 
-export const tableOfContentsRenderer = createComponentRenderer(
-  COMP,
-  TableOfContentsMd,
-  ({ className, node, extractValue, lookupEventHandler }) => {
-    return (
-      <IndexAwareTableOfContents
-        className={className}
-        smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
-        maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
-        omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
-        scrollStyle={extractValue.asOptionalString(node.props?.scrollStyle, defaultProps.scrollStyle)}
-        showScrollerFade={extractValue.asOptionalBoolean(node.props?.showScrollerFade)}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      />
-    );
-  },
-);
+export const tableOfContentsRenderer = wrapComponent(COMP, IndexAwareTableOfContents, TableOfContentsMd, {
+  customRender: (_props, { className, node, extractValue, lookupEventHandler }) => (
+    <IndexAwareTableOfContents
+      className={className}
+      smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
+      maxHeadingLevel={extractValue.asOptionalNumber(node.props?.maxHeadingLevel)}
+      omitH1={extractValue.asOptionalBoolean(node.props?.omitH1)}
+      scrollStyle={extractValue.asOptionalString(node.props?.scrollStyle, defaultProps.scrollStyle)}
+      showScrollerFade={extractValue.asOptionalBoolean(node.props?.showScrollerFade)}
+      onContextMenu={lookupEventHandler("contextMenu")}
+    />
+  ),
+});

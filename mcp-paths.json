@@ -1,0 +1,9 @@
+{
+  "componentDocs": "website/content/docs/reference/components",
+  "componentSource": "xmlui/src/components",
+  "extensionDocs": "website/content/docs/reference/extensions",
+  "extensionSource": "packages",
+  "pages": "website/content/docs/pages",
+  "howto": "website/content/docs/pages/howto",
+  "blog": "website/content/blog"
+}

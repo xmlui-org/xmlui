@@ -72,6 +72,10 @@ $themeVars: t.composePaddingVars($themeVars, "footer-#{$component}") !global;
       border-right: $borderRight-NavPanel-vertical;
       width: $width-navPanel-App;
       min-width: $width-navPanel-App;
+
+      &.overlayScroll {
+        scrollbar-gutter: auto;
+      }
     }
 
     &.hasFooter {

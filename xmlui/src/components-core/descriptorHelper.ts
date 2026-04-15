@@ -39,6 +39,19 @@ export const layoutOptionKeys = [
   "overflowX",
   "overflowY",
   "zIndex",
+  "scrollSnapType",
+  "scrollSnapAlign",
+  "scrollSnapStop",
+  "scrollPadding",
+  "scrollPaddingTop",
+  "scrollPaddingRight",
+  "scrollPaddingBottom",
+  "scrollPaddingLeft",
+  "scrollMargin",
+  "scrollMarginTop",
+  "scrollMarginRight",
+  "scrollMarginBottom",
+  "scrollMarginLeft",
   "color",
   "fontFamily",
   "fontSize",
@@ -90,4 +103,37 @@ export const layoutOptionKeys = [
   "writingMode",
   "transition",
   "transform",
+];
+
+/**
+ * All property names contributed by built-in behaviors (trigger props + declared
+ * props from every behavior). Safe to import anywhere — no React/component imports.
+ * Keep in sync with the metadata defined in each behavior file under behaviors/.
+ */
+export const behaviorPropKeys: readonly string[] = [
+  // AnimationBehavior — triggerProps: animation
+  "animation", "animationOptions",
+  // BookmarkBehavior — triggerProps: bookmark
+  "bookmark", "bookmarkLevel", "bookmarkTitle", "bookmarkOmitFromToc",
+  // DisplayWhenBehavior — triggerProps: displayWhen
+  "displayWhen",
+  // FormBindingBehavior — triggerProps: bindTo
+  "bindTo", "initialValue", "noSubmit",
+  // LabelBehavior — triggerProps: label
+  "label", "labelPosition", "labelWidth", "labelBreak",
+  "required", "enabled", "shrinkToLabel", "style", "readOnly",
+  // PubSubBehavior — triggerProps: subscribeToTopic
+  "subscribeToTopic",
+  // TooltipBehavior — triggerProps: tooltip, tooltipMarkdown
+  "tooltip", "tooltipMarkdown", "tooltipOptions",
+  // ValidationBehavior — triggerProps: bindTo
+  "minLength", "maxLength", "lengthInvalidMessage", "lengthInvalidSeverity",
+  "minValue", "maxValue", "rangeInvalidMessage", "rangeInvalidSeverity",
+  "pattern", "patternInvalidMessage", "patternInvalidSeverity",
+  "regex", "regexInvalidMessage", "regexInvalidSeverity",
+  "validationMode", "verboseValidationFeedback",
+  // VariantBehavior — triggerProps: variant
+  "variant",
+  // EXPERIMENTAL: universal prop to bypass event propagation stop for specific events
+  "bubbleEvents",
 ];

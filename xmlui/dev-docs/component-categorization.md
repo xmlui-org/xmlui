@@ -43,7 +43,6 @@ Direct user-entry controls that capture values (text, numeric, temporal, choice,
 - **TimeInput**
 - **Select**
 - **AutoComplete**
-- **EmojiSelector**
 - **RadioGroup**
 - **Checkbox**
 - **Switch**

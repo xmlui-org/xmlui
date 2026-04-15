@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./SectionHeader.xmlui";
 
-export const SectionHeaderMd = createMetadata({
+export const SectionHeaderMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Section heading (H4) with padding.",
   props: {

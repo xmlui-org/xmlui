@@ -4,7 +4,7 @@ import { Item, ItemIndicator, ItemText } from "@radix-ui/react-select";
 import { useSelect } from "./SelectContext";
 import classnames from "classnames";
 import styles from "./Select.module.scss";
-import Icon from "../Icon/IconNative";
+import { ThemedIcon } from "../Icon/Icon";
 
 export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
   function SelectOption(option, ref) {
@@ -18,6 +18,8 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
         className={classnames(className, styles.selectOption)}
         value={value}
         textValue={label}
+        aria-label={label || value}
+        data-component-type="Option"
         disabled={!enabled}
         onClick={(event) => {
           event.stopPropagation();
@@ -35,7 +37,7 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
             </div>
             {selectedValue === value && (
               <ItemIndicator className={styles.selectOptionIndicator}>
-                <Icon name="checkmark" />
+                <ThemedIcon name="checkmark" />
               </ItemIndicator>
             )}
           </>
@@ -61,7 +63,7 @@ export const SelectOption = forwardRef<React.ElementRef<typeof Item>, Option>(
             </div>
             {selectedValue === value && (
               <ItemIndicator className={styles.selectItemIndicator}>
-                <Icon name="checkmark" />
+                <ThemedIcon name="checkmark" />
               </ItemIndicator>
             )}
           </>

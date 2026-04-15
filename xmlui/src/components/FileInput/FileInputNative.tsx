@@ -4,6 +4,7 @@ import type { Accept, DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import Papa from "papaparse";
 
 import styles from "./FileInput.module.scss";
@@ -14,8 +15,8 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { ButtonThemeColor, ButtonVariant, SizeType, IconPosition } from "../abstractions";
-import { Button } from "../Button/ButtonNative";
-import { TextBox } from "../TextBox/TextBoxNative";
+import { ThemedButton as Button } from "../Button/Button";
+import { ThemedTextBox as TextBox } from "../TextBox/TextBox";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -53,6 +54,7 @@ type Props = {
   enabled?: boolean;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   // Button styles
   buttonLabel?: string;
   variant?: ButtonVariant;
@@ -113,6 +115,7 @@ export const FileInput = ({
   enabled = defaultProps.enabled,
   style,
   className,
+  classes,
   placeholder,
   buttonPosition = defaultProps.buttonPosition,
   buttonLabel = defaultProps.buttonLabel,
@@ -382,7 +385,7 @@ export const FileInput = ({
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
       <div
-        className={classnames(styles.container, className, {
+        className={classnames(styles.container, classes?.[COMPONENT_PART_KEY], className, {
           [styles.buttonStart]: buttonPosition === "start",
           [styles.buttonEnd]: buttonPosition === "end",
         })}

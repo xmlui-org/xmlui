@@ -1,6 +1,6 @@
 import styles from "./Badge.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   Badge,
@@ -8,7 +8,7 @@ import {
   defaultProps,
   isBadgeColors,
   type BadgeColors,
-} from "./BadgeNative";
+} from "./BadgeReact";
 import { createMetadata, dContextMenu, dInternal } from "../metadata-helpers";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
@@ -56,39 +56,43 @@ export const BadgeMd = createMetadata({
     [`fontSize-${COMP}-pill`]: "0.8em",
     [`backgroundColor-${COMP}`]: "rgb(from $color-secondary-500 r g b / 0.6)",
     [`textColor-${COMP}`]: "$const-color-surface-0",
+    [`textAlign-${COMP}`]: "center",
   },
 });
 
-export const badgeComponentRenderer = createComponentRenderer(
+export const badgeComponentRenderer = wrapComponent(
   COMP,
+  Badge,
   BadgeMd,
-  ({ node, extractValue, renderChild, className, lookupEventHandler }) => {
-    const value = extractValue.asDisplayText(node.props.value);
-    const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
-      node.props?.colorMap,
-    );
-    let colorValue: string | BadgeColors | undefined;
-    if (colorMap && value) {
-      const resolvedColor = colorMap[value];
-      if (typeof resolvedColor === "string") {
-        colorValue = resolveColor(resolvedColor);
-      } else if (isBadgeColors(resolvedColor)) {
-        colorValue = {
-          label: resolveColor(resolvedColor.label),
-          background: resolveColor(resolvedColor.background),
-        };
+  {
+    events: { contextMenu: "onContextMenu" },
+    exclude: ["value", "colorMap"],
+    customRender: (props, { node, extractValue, renderChild }) => {
+      const value = extractValue.asDisplayText(node.props.value);
+      const colorMap: Record<string, string | BadgeColors> | undefined = extractValue(
+        node.props?.colorMap,
+      );
+      let colorValue: string | BadgeColors | undefined;
+      if (colorMap && value) {
+        const resolvedColor = colorMap[value];
+        if (typeof resolvedColor === "string") {
+          colorValue = resolveColor(resolvedColor);
+        } else if (isBadgeColors(resolvedColor)) {
+          colorValue = {
+            label: resolveColor(resolvedColor.label),
+            background: resolveColor(resolvedColor.background),
+          };
+        }
       }
-    }
-    return (
-      <Badge
-        variant={extractValue(node.props.variant)}
-        color={colorValue}
-        className={className}
-        onContextMenu={lookupEventHandler("contextMenu")}
-      >
-        {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
-      </Badge>
-    );
+      return (
+        <Badge
+          {...props}
+          color={colorValue as any}
+        >
+          {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
+        </Badge>
+      );
+    },
   },
 );
 

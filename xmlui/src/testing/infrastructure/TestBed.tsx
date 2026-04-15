@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import StandaloneApp from "../../../src/components-core/StandaloneApp";
 import type { StandaloneAppDescription } from "../../../src/components-core/abstractions/standalone";
 import StandaloneExtensionManager from "../../../src/components-core/StandaloneExtensionManager";
+import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
+import type { StyleRegistry } from "../../../src/components-core/theming/StyleRegistry";
 import { extensionRegistry } from "./extension-registry";
 import "xmlui/index.scss";
 
@@ -15,7 +17,7 @@ declare global {
   }
 }
 
-function TestBed() {
+function TestBed({ styleRegistry }: { styleRegistry?: StyleRegistry }) {
   const [extensionManager, setExtensionManager] = useState<StandaloneExtensionManager | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +51,7 @@ function TestBed() {
       setExtensionManager(manager);
     };
     
-    loadExtensions();
+    void loadExtensions();
   }, []);
 
   if (!window.TEST_ENV) {
@@ -63,16 +65,33 @@ function TestBed() {
   if (!extensionManager) {
     return <div>Loading...</div>;
   }
+
+  // Only wait for API interceptor when the test actually provides one.
+  // This avoids unnecessary MSW service worker setup for the ~98% of tests
+  // that don't use apiInterceptor.
+  const hasApiInterceptor = !!window.TEST_ENV?.apiInterceptor;
   
-  return (
+  const app = (
     <StandaloneApp 
       appDef={window.TEST_ENV} 
       runtime={window.TEST_RUNTIME} 
       extensionManager={extensionManager} 
       decorateComponentsWithTestId={true} 
-      waitForApiInterceptor={true}
+      waitForApiInterceptor={hasApiInterceptor}
     />
   );
+
+  // If a stable registry is provided (test infrastructure reinit path), wrap
+  // the app in an outer StyleProvider so that the inner StyleProvider inside
+  // AppRoot is a no-op (it detects the parent context and skips creating a new
+  // registry). This ensures old and new tree's useEffect cleanup/setup share the
+  // same StyleRegistry instance, preventing the race where the old tree's
+  // deferred setTimeout removes style tags that the new tree just injected.
+  if (styleRegistry) {
+    return <StyleProvider styleRegistry={styleRegistry}>{app}</StyleProvider>;
+  }
+
+  return app;
 }
 
 export default TestBed;

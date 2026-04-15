@@ -10,7 +10,8 @@ import {
 import classnames from "classnames";
 
 import styles from "./Stack.module.scss";
-import { Scroller, type ScrollStyle } from "../ScrollViewer/Scroller";
+import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
@@ -35,6 +36,7 @@ type Props = {
   verticalAlignment?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
@@ -68,6 +70,7 @@ export const Stack = forwardRef(function Stack(
     onMount,
     desktopOnly = defaultProps.desktopOnly,
     className,
+    classes,
     registerComponentApi,
     ...rest
   }: Props,
@@ -135,6 +138,7 @@ export const Stack = forwardRef(function Stack(
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
       className={classnames(
+        classes?.[COMPONENT_PART_KEY],
         className,
         styles.base,
         {

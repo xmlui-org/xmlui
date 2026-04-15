@@ -12,13 +12,14 @@ import React, {
 } from "react";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import classnames from "classnames";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 import styles from "./RadioGroup.module.scss";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
-import type { Option, ValidationStatus } from "../abstractions";
+import type { Option, OrientationOptions, ValidationStatus } from "../abstractions";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
 import { convertOptionValue } from "../Option/OptionNative";
@@ -29,8 +30,11 @@ type RadioGroupProps = {
   autofocus?: boolean;
   value?: string;
   enabled?: boolean;
+  orientation?: OrientationOptions;
+  gap?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   validationStatus?: ValidationStatus;
   label?: string;
   labelPosition?: string;
@@ -48,7 +52,7 @@ type RadioGroupProps = {
 
 export const defaultProps: Pick<
   RadioGroupProps,
-  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly"
+  "value" | "initialValue" | "enabled" | "validationStatus" | "required" | "readOnly" | "orientation" | "gap"
 > = {
   value: "",
   initialValue: "",
@@ -56,6 +60,8 @@ export const defaultProps: Pick<
   validationStatus: "none" as ValidationStatus,
   required: false,
   readOnly: false,
+  orientation: "vertical",
+  gap: "$gap-normal",
 };
 
 const RadioGroupStatusContext = createContext<{
@@ -75,6 +81,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
     initialValue = defaultProps.initialValue,
     autofocus,
     enabled = defaultProps.enabled,
+    orientation = defaultProps.orientation,
+    gap,
     validationStatus = defaultProps.validationStatus,
     label,
     labelPosition,
@@ -90,6 +98,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
     registerComponentApi,
     style,
     className,
+    classes,
     ...rest
   }: RadioGroupProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -151,6 +160,46 @@ export const RadioGroup = forwardRef(function RadioGroup(
     [updateValue, readOnly],
   );
 
+  // --- Handle arrow-key navigation to update the selected value
+  // Radix's built-in mechanism (click-on-focus via isArrowKeyPressedRef) is unreliable
+  // because keyup can fire before the deferred focus, preventing the click.
+  // We handle arrow keys directly on the group root (via event bubbling) so that the
+  // value always follows focus.
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (readOnly || !enabled) return;
+
+      const isVerticalKey = e.key === "ArrowDown" || e.key === "ArrowUp";
+      const isHorizontalKey = e.key === "ArrowRight" || e.key === "ArrowLeft";
+
+      if (!isVerticalKey && !isHorizontalKey) return;
+      if (orientation === "horizontal" && isVerticalKey) return;
+      if (orientation === "vertical" && isHorizontalKey) return;
+
+      const isNext = e.key === "ArrowDown" || e.key === "ArrowRight";
+
+      const radios = Array.from(
+        radioGroupRef.current?.querySelectorAll('[role="radio"]:not(:disabled)') ?? [],
+      ) as HTMLElement[];
+
+      if (radios.length === 0) return;
+
+      const focused = e.target as HTMLElement;
+      const currentIndex = radios.indexOf(focused);
+      if (currentIndex === -1) return;
+
+      const nextIndex = isNext
+        ? (currentIndex + 1) % radios.length
+        : (currentIndex - 1 + radios.length) % radios.length;
+
+      const nextValue = radios[nextIndex].getAttribute("value");
+      if (nextValue != null) {
+        onInputChange(nextValue);
+      }
+    },
+    [readOnly, enabled, orientation, onInputChange],
+  );
+
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(
     (ev: React.FocusEvent<HTMLDivElement, Element>) => {
@@ -188,19 +237,21 @@ export const RadioGroup = forwardRef(function RadioGroup(
       <RadioGroupStatusContext.Provider value={contextValue}>
         <InnerRadioGroup.Root
           {...rest}
-          style={style}
+          style={{ ...style, ...(gap != null ? { gap } : undefined) }}
           ref={radioGroupRef}
           id={id}
           onBlur={handleOnBlur}
           onFocus={handleOnFocus}
+          onKeyDown={handleKeyDown}
           onValueChange={onInputChange}
           value={value}
           disabled={!enabled}
           required={required}
           aria-readonly={readOnly}
-          className={classnames(className, styles.radioGroupContainer, {
+          className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.radioGroupContainer, {
             [styles.focused]: focused,
             [styles.disabled]: !enabled,
+            [styles.horizontal]: orientation === "horizontal",
           })}
         >
           {children}

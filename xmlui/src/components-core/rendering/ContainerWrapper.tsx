@@ -220,7 +220,12 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
 
   // --- Clone the node and remove the properties that will be moved to the container
   // --- Note: we need the "when" property in the ModalDialog component, so we don't remove it
-  const wrappedNode = { ...node, props: { ...node.props } };
+  const wrappedNode = { ...node, props: { ...node.props } } as any;
+  // Preserve var and function definitions so that components using two-pass rendering
+  // (e.g. ModalDialog) can re-resolve them in a context where dynamic context variables
+  // like $param are available.
+  if (node.vars) wrappedNode._savedVarDefs = node.vars;
+  if (node.functions) wrappedNode._savedFunctionDefs = node.functions;
   delete wrappedNode.loaders;
   delete wrappedNode.vars;
   delete wrappedNode.functions;
@@ -237,6 +242,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     type: "Container",
     uid: node.uid,
     when: node.when,
+    responsiveWhen: node.responsiveWhen,
     loaders: node.loaders,
     vars: node.vars,
     functions: node.functions,

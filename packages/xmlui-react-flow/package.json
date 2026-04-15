@@ -1,0 +1,16 @@
+{
+  "name": "xmlui-react-flow",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@xyflow/react": "^12.6.0"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  }
+}

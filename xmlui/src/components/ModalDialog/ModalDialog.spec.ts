@@ -197,6 +197,61 @@ test.describe("Open/Close", () => {
 
     await expect(page.getByTestId("pageBottomText")).not.toBeInViewport();
   });
+
+  // Regression: $param was undefined when used in a <variable> declared as a direct
+  // child of ModalDialog. It only worked when nested inside a <Fragment>.
+  test("$param is available in variable declared as direct child of ModalDialog", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open('PARAM_VALUE')">open</Button>
+        <ModalDialog id="modal">
+          <variable name="captured" value="{$param}" />
+          <Text testId="result">{captured}</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("button").click();
+    await expect(page.getByTestId("result")).toHaveText("PARAM_VALUE");
+  });
+
+  test("$param is available in variable declared as direct child of ModalDialog (object param)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="button" onClick="modal.open({host: 'example.com', port: 25})">open</Button>
+        <ModalDialog id="modal">
+          <variable name="captured" value="{$param}" />
+          <Text testId="host">{captured.host}</Text>
+          <Text testId="port">{captured.port}</Text>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("button").click();
+    await expect(page.getByTestId("host")).toHaveText("example.com");
+    await expect(page.getByTestId("port")).toHaveText("25");
+  });
+
+  test("variable declared as direct child of ModalDialog updates when modal is reopened with new param", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="btn1" onClick="modal.open('FIRST')">open first</Button>
+        <Button testId="btn2" onClick="modal.open('SECOND')">open second</Button>
+        <ModalDialog id="modal">
+          <variable name="captured" value="{$param}" />
+          <Text testId="result">{captured}</Text>
+          <Button testId="close" onClick="modal.close()">close</Button>
+        </ModalDialog>
+      </Fragment>
+    `);
+
+    await page.getByTestId("btn1").click();
+    await expect(page.getByTestId("result")).toHaveText("FIRST");
+    await page.getByTestId("close").click();
+
+    await page.getByTestId("btn2").click();
+    await expect(page.getByTestId("result")).toHaveText("SECOND");
+  });
 });
 
 // =============================================================================

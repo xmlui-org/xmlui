@@ -6,6 +6,7 @@ const COMP = "FormSection";
 
 export const FormSectionMd = createMetadata({
   status: "experimental",
+  deprecationMessage: "The `FormSection` component is deprecated and will be removed in a future release.",
   description:
     "`FormSection` groups elements within a `Form`. Child components are placed in " +
     "a [FlowLayout](/components/FlowLayout).",

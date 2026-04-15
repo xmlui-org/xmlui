@@ -1,8 +1,10 @@
 import type { CSSProperties, ForwardedRef} from "react";
 import { forwardRef } from "react";
+import classnames from "classnames";
 
-import { Image } from "../Image/ImageNative";
+import { ThemedImage as Image } from "../Image/Image";
 import { useLogoUrl } from "../AppHeader/AppHeaderNative";
+import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // Default props for Logo component
 export const defaultProps = {
@@ -14,11 +16,12 @@ type LogoProps = {
   alt?: string;
   style?: CSSProperties;
   className?: string;
+  classes?: Record<string, string>;
   inline?: boolean;
 };
 
 export const Logo = forwardRef(function Logo(
-  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, ...rest }: LogoProps,
+  { style, alt = defaultProps.alt, inline = defaultProps.inline, className, classes, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
   const logoUrl = useLogoUrl();
@@ -33,7 +36,7 @@ export const Logo = forwardRef(function Logo(
       src={logoUrl}
       alt={alt}
       inline={inline}
-      className={className}
+      className={classnames(classes?.[COMPONENT_PART_KEY], className)}
       style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );

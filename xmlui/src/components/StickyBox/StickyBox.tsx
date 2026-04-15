@@ -1,6 +1,6 @@
 import styles from "./StickyBox.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { StickyBox, defaultProps } from "./StickyBoxNative";
 import { createMetadata } from "../metadata-helpers";
@@ -27,14 +27,6 @@ export const StickyBoxMd = createMetadata({
   },
 });
 
-export const stickyBoxComponentRenderer = createComponentRenderer(
-  COMP,
-  StickyBoxMd,
-  ({ node, renderChild, extractValue, className }) => {
-    return (
-      <StickyBox uid={node.uid} className={className} to={extractValue(node.props?.to)}>
-        {renderChild(node.children)}
-      </StickyBox>
-    );
-  },
-);
+export const stickyBoxComponentRenderer = wrapComponent(COMP, StickyBox, StickyBoxMd, {
+  passUid: true,
+});

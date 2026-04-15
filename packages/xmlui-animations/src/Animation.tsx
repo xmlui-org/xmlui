@@ -1,4 +1,4 @@
-import { createComponentRenderer, createMetadata } from "xmlui";
+import { wrapComponent, createMetadata } from "xmlui";
 import { Animation, defaultProps } from "./AnimationNative";
 
 const COMP = "Animation";
@@ -44,25 +44,14 @@ export const AnimationMd = createMetadata({
   },
 });
 
-export const animationComponentRenderer = createComponentRenderer(
+export const animationComponentRenderer = wrapComponent(
   COMP,
+  Animation,
   AnimationMd,
-  ({ registerComponentApi, renderChild, node, extractValue, lookupEventHandler }) => {
-    return (
-      <Animation
-        registerComponentApi={registerComponentApi}
-        animation={extractValue(node.props.animation)}
-        onStop={lookupEventHandler("stopped")}
-        onStart={lookupEventHandler("started")}
-        duration={extractValue.asOptionalNumber(node.props.duration)}
-        animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
-        once={extractValue.asOptionalBoolean(node.props.once)}
-        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
-        loop={extractValue.asOptionalBoolean(node.props.loop)}
-        delay={extractValue.asOptionalNumber(node.props.delay)}
-      >
-        {renderChild(node.children)}
-      </Animation>
-    );
+  {
+    exposeRegisterApi: true,
+    events: { started: "onStart", stopped: "onStop" },
+    booleans: ["animateWhenInView", "once", "reverse", "loop"],
+    numbers: ["duration", "delay"],
   },
 );

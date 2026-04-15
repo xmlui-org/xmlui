@@ -17,9 +17,9 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
+| Display When | `displayWhen` |
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Publish/Subscribe | `subscribeToTopic` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
 | Styling Variant | `variant` |
@@ -322,13 +322,13 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TimeInput--active | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-item-TimeInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-menu-TimeInput | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--focus | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--hover | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--focus | *none* | *none* |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--focus | *none* | *none* |
@@ -337,13 +337,13 @@ The component has some parts that can be styled through layout properties and th
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--warning--focus | *none* | *none* |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-TimeInput--warning--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-menu-TimeInput | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--focus | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--focus | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--focus | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--hover | *none* | *none* |
@@ -353,32 +353,32 @@ The component has some parts that can be styled through layout properties and th
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-button-TimeInput | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-input-TimeInput | $borderRadius | $borderRadius |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-menu-TimeInput | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TimeInput--default | *none* | *none* |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TimeInput | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TimeInput--error | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TimeInput--success | *none* | *none* |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-TimeInput--warning | *none* | *none* |
-| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TimeInput--default | *none* | *none* |
+| [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TimeInput | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TimeInput--error | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TimeInput--success | *none* | *none* |
 | [borderStyle](/docs/styles-and-themes/common-units/#border-style)-TimeInput--warning | *none* | *none* |
-| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--default | *none* | *none* |
+| [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--error | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--success | *none* | *none* |
 | [borderWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-menu-TimeInput | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--default | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--default--focus | *none* | *none* |
-| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--default--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--error | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--error--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--error--hover | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--focus | *none* | *none* |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--success | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--success--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--success--hover | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--warning | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--warning--focus | *none* | *none* |
 | [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-TimeInput--warning--hover | *none* | *none* |
-| [color](/docs/styles-and-themes/common-units/#color)-adornment-TimeInput--default | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-adornment-TimeInput | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TimeInput--error | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TimeInput--success | *none* | *none* |
 | [color](/docs/styles-and-themes/common-units/#color)-adornment-TimeInput--warning | *none* | *none* |
@@ -386,7 +386,7 @@ The component has some parts that can be styled through layout properties and th
 | disabledColor-button-TimeInput | $textColor-disabled | $textColor-disabled |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-ampm-TimeInput | inherit | inherit |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-input-TimeInput | inherit | inherit |
-| [fontSize](/docs/styles-and-themes/common-units/#size-values)-TimeInput--default | *none* | *none* |
+| [fontSize](/docs/styles-and-themes/common-units/#size-values)-TimeInput | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TimeInput--error | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TimeInput--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TimeInput--warning | *none* | *none* |
@@ -401,24 +401,24 @@ The component has some parts that can be styled through layout properties and th
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-TimeInput--disabled | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-ampm-TimeInput--focused | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-button-TimeInput--focused | $color-accent-500 | $color-accent-500 |
-| [outlineColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--focus | *none* | *none* |
+| [outlineColor](/docs/styles-and-themes/common-units/#color)-TimeInput--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TimeInput--warning--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-ampm-TimeInput--focused | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-button-TimeInput--focused | 0 | 0 |
-| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TimeInput--default--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TimeInput--error--focus | *none* | *none* |
+| [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TimeInput--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TimeInput--success--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-TimeInput--warning--focus | *none* | *none* |
-| [outlineStyle](/docs/styles-and-themes/common-units/#border)-TimeInput--default--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TimeInput--error--focus | *none* | *none* |
+| [outlineStyle](/docs/styles-and-themes/common-units/#border)-TimeInput--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TimeInput--success--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-TimeInput--warning--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-ampm-TimeInput--focused | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-button-TimeInput--focused | 2px | 2px |
-| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--default--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--error--focus | *none* | *none* |
+| [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--success--focus | *none* | *none* |
 | [outlineWidth](/docs/styles-and-themes/common-units/#size-values)-TimeInput--warning--focus | *none* | *none* |
 | [padding](/docs/styles-and-themes/common-units/#size-values)-button-TimeInput | 4px 4px | 4px 4px |
@@ -433,13 +433,13 @@ The component has some parts that can be styled through layout properties and th
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-TimeInput | $space-2 | $space-2 |
 | spacing-divider-TimeInput | 1px 0 | 1px 0 |
 | [textAlign](/docs/styles-and-themes/common-units/#text-align)-input-TimeInput | center | center |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--focus | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--default--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--disabled | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--error--hover | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--focus | *none* | *none* |
+| [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--hover | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--focus | *none* | *none* |
 | [textColor](/docs/styles-and-themes/common-units/#color)-TimeInput--success--hover | *none* | *none* |

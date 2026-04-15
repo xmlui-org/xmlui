@@ -61,7 +61,6 @@ For each component in the XMLUI library, this document shows:
 | H5 | - | - | ✅ |
 | H6 | - | - | ✅ |
 | Heading | - | - | ✅ |
-| HoverCard | - | - | - |
 | IFrame | - | - | ✅ |
 | Image | - | - | ✅ |
 | InspectButton | - | - | - |
@@ -89,7 +88,6 @@ For each component in the XMLUI library, this document shows:
 | Pagination | - | - | ✅ |
 | Password | - | - | ✅ |
 | PieChart | - | - | - |
-| PositionedContainer | - | - | - |
 | ProgressBar | - | - | - |
 | Queue | - | - | - |
 | RadarChart | - | - | - |

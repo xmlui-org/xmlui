@@ -14,7 +14,7 @@ export const enum SyntaxKind {
   OpenNodeStart = 6,
   /** </ */
   CloseNodeStart = 7,
-  /** > */
+  /** `>` */
   NodeEnd = 8,
   /** /> */
   NodeClose = 9,
@@ -120,6 +120,6 @@ export function getSyntaxKindStrRepr(kind: SyntaxKind): string {
   return assertUnreachable(kind);
 }
 
-function assertUnreachable(x: never): never {
+function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
 }

@@ -238,10 +238,10 @@ export function NestedApp({
     // The app can be either a ComponentDef (with type property) or CompoundComponentDef (with component property)
     let appGlobalVars: Record<string, any> = {};
     if (component) {
-      if ('type' in component) {
+      if ("type" in component) {
         // It's a ComponentDef
         appGlobalVars = (component as ComponentDef).globalVars || {};
-      } else if ('component' in component) {
+      } else if ("component" in component) {
         // It's a CompoundComponentDef, get globalVars from the nested component
         appGlobalVars = (component as CompoundComponentDef).component?.globalVars || {};
       }
@@ -260,7 +260,7 @@ export function NestedApp({
       }
 
       // Extract globalVars from component definitions too
-      if (component && 'component' in component) {
+      if (component && "component" in component) {
         const compGlobalVars = (component as CompoundComponentDef).component?.globalVars;
         if (compGlobalVars) {
           appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
@@ -375,7 +375,7 @@ function NestedAppRoot({
     return vars;
   }, [themeStylesToReset]);
 
-  const resetClassName = useStyles(themeVarReset, { prepend: true });
+  const resetClassName = useStyles(themeVarReset, { prepend: true, layer: "themes" });
 
   return (
     <div className={classnames(resetClassName, styles.shadowRoot)} id={"nested-app-root"}>

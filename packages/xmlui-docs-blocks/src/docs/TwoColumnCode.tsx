@@ -1,7 +1,7 @@
-import { createMetadata, createUserDefinedComponentRenderer } from "xmlui";
+import { createMetadata, createUserDefinedComponentRenderer, type ComponentMetadata } from "xmlui";
 import componentSource from "./TwoColumnCode.xmlui";
 
-export const TwoColumnCodeMd = createMetadata({
+export const TwoColumnCodeMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description: "Two-column layout: code (with highlighter) in first column, markdown in second.",
   props: {},

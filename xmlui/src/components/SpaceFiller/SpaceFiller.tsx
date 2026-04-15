@@ -1,9 +1,11 @@
 import styles from "./SpaceFiller.module.scss";
 
-import { createComponentRenderer } from "../../components-core/renderers";
+import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { SpaceFiller } from "./SpaceFillerNative";
 import { createMetadata } from "../metadata-helpers";
+import React from "react";
+import { useComponentThemeClass } from "../../components-core/theming/utils";
 
 const COMP = "SpaceFiller";
 
@@ -15,6 +17,22 @@ export const SpaceFillerMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const spaceFillerComponentRenderer = createComponentRenderer(COMP, SpaceFillerMd, () => (
-  <SpaceFiller />
-));
+type ThemedSpaceFillerProps = React.ComponentPropsWithoutRef<typeof SpaceFiller>;
+
+export const ThemedSpaceFiller = React.forwardRef<React.ElementRef<typeof SpaceFiller>, ThemedSpaceFillerProps>(
+  function ThemedSpaceFiller({ className, ...props }, ref) {
+    const themeClass = useComponentThemeClass(SpaceFillerMd);
+    return (
+      <SpaceFiller
+        {...props}
+        className={`${themeClass}${className ? ` ${className}` : ""}`}
+        ref={ref}
+      />
+    );
+  },
+);
+
+export const spaceFillerComponentRenderer = wrapComponent(COMP, SpaceFiller, SpaceFillerMd, {
+  // Explicitly render with no props to ignore layout properties (width, height, etc.)
+  customRender: () => <SpaceFiller />,
+});

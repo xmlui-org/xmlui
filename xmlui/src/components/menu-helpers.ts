@@ -44,9 +44,10 @@ export function filterSeparators(
     };
   });
 
-  // Build the filtered list: skip hidden items, collapse adjacent/leading separators
+  // Build the filtered list: skip hidden items, collapse adjacent/leading separators.
+  // Initialize to true so that any leading separators are treated as duplicates and skipped.
   const filtered: ComponentDef[] = [];
-  let lastVisibleWasSeparator = false;
+  let lastVisibleWasSeparator = true;
 
   for (const { child, isSeparator, isVisible } of itemVisibility) {
     if (!isVisible) continue;
