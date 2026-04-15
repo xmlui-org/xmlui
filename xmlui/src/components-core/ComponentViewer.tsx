@@ -4,7 +4,7 @@ import React, { useMemo } from "react";
 import { useDevTools } from "./InspectorContext";
 import { Tooltip } from "../components/NestedApp/Tooltip";
 import styles from "../components/NestedApp/NestedApp.module.scss";
-import AiOutlineClose from "../components/Icon/svg/l-x.svg?react";
+import CloseIcon from "../components/Icon/svg/l-x.svg?react";
 import { useAppContext } from "./AppContext";
 
 export const ComponentViewer = () => {
@@ -78,7 +78,7 @@ export const ComponentViewer = () => {
                   setIsOpen(false);
                 }}
               >
-                <AiOutlineClose />
+                <CloseIcon />
               </button>
             }
             label="Close"

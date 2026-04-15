@@ -290,7 +290,7 @@ test.describe("Rendering Precision", () => {
     initTestBed,
     createIconDriver,
   }) => {
-    // "info" maps to FiAlertOctagonIcon which has strokeWidth="2" in its SVG source
+    // "info" maps to InfoIcon which has strokeWidth="2" in its SVG source
     await initTestBed(`<Icon testId="icon" name="info" size="md"/>`);
     const icon = await createIconDriver("icon");
     const strokeWidth = await icon.svgIcon.evaluate((el) => {
