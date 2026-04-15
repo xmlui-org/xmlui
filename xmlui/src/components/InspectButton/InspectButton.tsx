@@ -4,7 +4,7 @@ import { useInspectMode } from "../../components-core/InspectorContext";
 import styles from "./InspectButton.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { CSSProperties, ReactNode } from "react";
-import PiFileCode from "../Icon/svg/pi-file-code.svg?react";
+import PiFileCode from "../Icon/svg/l-file-code.svg?react";
 import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";

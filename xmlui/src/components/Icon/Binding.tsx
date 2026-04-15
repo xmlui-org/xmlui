@@ -1,5 +1,4 @@
-import type {IconBaseProps} from "./IconNative";
-import Binding from "./svg/binding.svg?react";
-import style from "./Binding.module.scss";
+import Icon from "./svg/l-link-2.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const BindingIcon = (props: IconBaseProps) => <Binding className={style.binding} {...props}/>
+export const BindingIcon = (props: IconBaseProps) => <Icon {...props}/>;
