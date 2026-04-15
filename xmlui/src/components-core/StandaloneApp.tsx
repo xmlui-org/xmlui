@@ -1212,7 +1212,7 @@ function useStandalone(
       // --- Fetch the main file
       const entryPointPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(MAIN_FILE);
+          const resp = await fetchWithoutCache(srcBase + "/" + MAIN_FILE);
           resolve(parseComponentMarkupResponse(resp));
         } catch (e) {
           resolve({
