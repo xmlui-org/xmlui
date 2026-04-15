@@ -1,5 +1,22 @@
 # xmlui
 
+## 0.12.19
+
+### Patch Changes
+
+- 74e7c88: Fix the build issue using multiple vite entry points
+
+## 0.12.18
+
+### Patch Changes
+
+- f502d2b: Fix function dependency tracking in nested containers (Items, List, etc.)
+
+  Script-defined functions used in expressions inside Items/List children were not triggering re-evaluation when the variables they reference changed. This was because child containers created by iteration components replaced the parent's function dependency context instead of merging with it.
+
+- 1039048: Select: Fixed `dropdownHeight` to produce a stable dropdown height regardless of scroll indicator visibility. Added `scrollIndicators` prop (default `true`) to control whether up/down scroll arrows are shown in the dropdown.
+- 8689e17: fix: bump "vite-plugin-lib-inject-css" which introduced css errors in case of multiple chunks in the lib
+
 ## 0.12.17
 
 ### Patch Changes
