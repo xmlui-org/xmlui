@@ -4623,3 +4623,135 @@ test.describe("Regression", () => {
     expect(finalBox!.width).toBeCloseTo(initialWidth, -1);
   });
 });
+
+// =============================================================================
+// TABLE IN HSTACK LAYOUT TESTS
+// =============================================================================
+
+test.describe("Table in HStack layout", () => {
+  test("Table inside HStack > VStack fills available width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="hstack">
+        <VStack testId="vstack">
+          <Table
+            data="{[
+              { code: 123, description: 'Agriculture, Forestry, Fishing and Hunting' },
+              { code: 456, description: 'Mining, Quarrying, and Oil and Gas Extraction' },
+              { code: 789, description: 'Utilities' },
+            ]}"
+            testId="table"
+          >
+            <Column header="Code" width="180px" bindTo="code"/>
+            <Column header="Description" bindTo="description"/>
+          </Table>
+        </VStack>
+      </HStack>
+    `);
+
+    const hstack = page.getByTestId("hstack");
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    const hstackBox = await hstack.boundingBox();
+    const tableBox = await table.boundingBox();
+    expect(hstackBox).not.toBeNull();
+    expect(tableBox).not.toBeNull();
+
+    // Table should fill the HStack's available width
+    expect(tableBox!.width).toBeCloseTo(hstackBox!.width, -1);
+  });
+
+  test("Table inside HStack (no VStack wrapper) renders correctly", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="hstack">
+        <Table
+          data="{[
+            { code: 123, description: 'Agriculture' },
+            { code: 456, description: 'Mining' },
+          ]}"
+          testId="table"
+        >
+          <Column header="Code" width="180px" bindTo="code"/>
+          <Column header="Description" bindTo="description"/>
+        </Table>
+      </HStack>
+    `);
+
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    const tableBox = await table.boundingBox();
+    expect(tableBox).not.toBeNull();
+    expect(tableBox!.width).toBeGreaterThan(0);
+  });
+
+  test("VStack with explicit width inside HStack respects the explicit width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="hstack">
+        <VStack testId="vstack" width="400px">
+          <Table
+            data="{[
+              { code: 123, description: 'Agriculture' },
+            ]}"
+            testId="table"
+          >
+            <Column header="Code" width="180px" bindTo="code"/>
+            <Column header="Description" bindTo="description"/>
+          </Table>
+        </VStack>
+      </HStack>
+    `);
+
+    const vstack = page.getByTestId("vstack");
+    const table = page.getByTestId("table");
+    await expect(table).toBeVisible();
+
+    const vstackBox = await vstack.boundingBox();
+    expect(vstackBox).not.toBeNull();
+    // VStack should respect its explicit 400px width
+    expect(vstackBox!.width).toBeCloseTo(400, 0);
+  });
+
+  test("Multiple VStacks in HStack share available width", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <HStack testId="hstack">
+        <VStack testId="vstack1">
+          <Table
+            data="{[{ code: 123, description: 'Agriculture' }]}"
+            testId="table1"
+          >
+            <Column header="Code" width="100px" bindTo="code"/>
+            <Column header="Description" bindTo="description"/>
+          </Table>
+        </VStack>
+        <VStack testId="vstack2">
+          <Table
+            data="{[{ code: 456, description: 'Mining' }]}"
+            testId="table2"
+          >
+            <Column header="Code" width="100px" bindTo="code"/>
+            <Column header="Description" bindTo="description"/>
+          </Table>
+        </VStack>
+      </HStack>
+    `);
+
+    const hstack = page.getByTestId("hstack");
+    const vstack1 = page.getByTestId("vstack1");
+    const vstack2 = page.getByTestId("vstack2");
+    await expect(vstack1).toBeVisible();
+    await expect(vstack2).toBeVisible();
+
+    const hstackBox = await hstack.boundingBox();
+    const vs1Box = await vstack1.boundingBox();
+    const vs2Box = await vstack2.boundingBox();
+    expect(hstackBox).not.toBeNull();
+    expect(vs1Box).not.toBeNull();
+    expect(vs2Box).not.toBeNull();
+
+    // Both VStacks should be visible side by side and share the available width
+    expect(vs1Box!.x + vs1Box!.width).toBeLessThanOrEqual(vs2Box!.x + 2);
+    // Combined width should approximately fill the HStack (allowing for gap)
+    expect(vs1Box!.width + vs2Box!.width).toBeGreaterThan(hstackBox!.width * 0.8);
+  });
+});
