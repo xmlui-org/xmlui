@@ -1,4 +1,4 @@
-import Icon from "./svg/trending-level.svg?react";
+import Icon from "./svg/l-minus.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
-export const TrendingLevelIcon = (props: IconBaseProps) => <Icon {...props} />;
+export const TrendingLevelIcon = (props: IconBaseProps) => <Icon {...props}/>;

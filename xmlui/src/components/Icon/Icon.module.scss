@@ -14,10 +14,8 @@ $themeVars: ();
     width: t.useVar(var(--icon-width), createThemeVar("size-Icon"));
     height: t.useVar(var(--icon-height), createThemeVar("size-Icon"));
 
-    // NOTE: browser compat problems with "revert-layer"
-    // NOTE #2: this solution is necessary because of the default stroke widths applied to our icons coming from react-icons:
-    // Different icons have different default stroke widths.
-    stroke-width: revert-layer;
+    // Stroke width is now controlled by each SVG's own attributes (e.g. strokeWidth="2").
+    // The previous `stroke-width: revert-layer` was a react-icons workaround that is no longer needed.
 
     &.clickable {
       cursor: pointer;

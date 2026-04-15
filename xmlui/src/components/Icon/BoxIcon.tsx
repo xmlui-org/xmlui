@@ -1,4 +1,4 @@
-import Box from "./svg/box.svg?react";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/l-box.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const BoxIcon = (props: IconBaseProps) => <Box {...props} />
+export const BoxIcon = (props: IconBaseProps) => <Icon {...props}/>;
