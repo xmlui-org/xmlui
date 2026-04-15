@@ -37,9 +37,7 @@
     "build-playground": "turbo run build:playground",
     "release-docs": "turbo run release:docs",
     "build-blog": "turbo run build:blog",
-    "generate-docs": "turbo run generate-docs",
-    "_test:e2e:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
-    "_test:e2e:smoke:with-unit-tests": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke"
+    "generate-docs": "turbo run generate-docs"
   },
   "optionalDependencies": {
     "@esbuild/darwin-arm64": "0.27.3"
