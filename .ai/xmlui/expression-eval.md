@@ -62,7 +62,7 @@ Source: `bannedFunctions.ts`
 | Everything else | **No** — throws `"XMLUI does not support the new operator with constructor '{name}'."` |
 
 Source: `allowedNewConstructors` in `eval-tree-common.ts`
-
+**Future:** This whitelist will be extended in future releases to support additional safe constructors.
 ### 4. `async`/`await` — Parsed but Rejected at Runtime
 
 | Construct | Parser | Runtime |
@@ -115,26 +115,18 @@ This means any function that returns a Promise (e.g., `fetch()`, any async opera
 
 `let` and `const` work as block-scoped declarations (like JavaScript) and are NOT reactive.
 
-### 8. `::` Global Scope Operator (XMLUI-Specific)
-
-`::identifier` bypasses all scopes (blocks, closures, localContext, appContext) and resolves directly from `globalThis`.
-
-- Parsed by the Lexer as `TokenType.Global` (`::`)
-- Sets `isGlobal: true` on the resulting `Identifier` AST node
-- In the evaluator, `getIdentifierScope()` returns `globalThis` directly
-
-Not available in JavaScript. Useful for accessing `window` properties explicitly: `::console.log(...)`, `::Math.PI`.
-
-### 9. Execution Timeout
+### 8. Execution Timeout
 
 | Track | Timeout | Configurable? |
 |-------|---------|---------------|
-| Sync | 1000ms hard limit | No (`SYNC_EVAL_TIMEOUT` constant) |
+| Sync | 1000ms default | Yes — `appGlobals.syncExecutionTimeout` (milliseconds) |
 | Async | `evalContext.timeout` | Yes |
 
-Error: `"Sync evaluation timeout exceeded 1000 milliseconds"`
+The sync timeout can be configured via `appGlobals.syncExecutionTimeout` in the app configuration. If not set, defaults to 1000ms.
 
-### 10. Statement Execution Model — Queue-Based
+Error: `"Sync evaluation timeout exceeded {N} milliseconds"`
+
+### 9. Statement Execution Model — Queue-Based
 
 Unlike JavaScript's call-stack model, XMLUI uses a **statement queue** with labels:
 
@@ -144,7 +136,7 @@ Unlike JavaScript's call-stack model, XMLUI uses a **statement queue** with labe
 - `try`/`catch`/`finally` is a 5-phase state machine with `exitType` tracking
 - Function calls create child threads (not stack frames)
 
-### 11. Import System — Named Imports Only
+### 10. Import System — Named Imports Only
 
 | Syntax | Supported |
 |--------|-----------|
@@ -164,28 +156,25 @@ Imports must appear at top of file (error W040).
 
 Circular imports detected by `CircularDependencyDetector` (error W041).
 
-### 12. Unsupported JavaScript Features
+### 11. Unsupported JavaScript Features
 
 | Feature | Status |
 |---------|--------|
 | `class`, `extends`, `super` | Not in lexer/parser |
 | `function*`, `yield`, `yield*` (generators) | Not in lexer/parser |
 | `void` operator | Not in lexer/parser |
-| `instanceof` operator | Not in lexer/parser |
 | `with` statement | Not in lexer/parser |
 | `debugger` statement | Not in lexer/parser |
 | Labeled statements (`label:`) | Not in parser (only `case:` labels) |
-| Computed property names `{ [expr]: val }` | Not in parser |
 | Getter/setter in object literals | Not in parser |
 | `dynamic import()` | Not in parser |
-| Optional catch binding `catch { }` | Not supported (catch variable required) |
 | `for await...of` | Not in parser |
 | Destructuring in function parameters | Partial — only in arrow function args via expansion |
 | `export` | Not in parser |
 | Private fields (`#field`) | Not in lexer/parser |
 | Nullish coalescing assignment on nested expressions | Supported at operator level but untested on complex patterns |
 
-### 13. Supported But Uncommon Features
+### 12. Supported But Uncommon Features
 
 | Feature | Notes |
 |---------|-------|
@@ -197,6 +186,9 @@ Circular imports detected by `CircularDependencyDetector` (error W041).
 | `typeof` | Standard semantics |
 | `delete` | Works on object properties via scope tracking |
 | `in` operator | Standard semantics (`prop in obj`) |
+| `instanceof` operator | Standard semantics (`obj instanceof Constructor`) |
+| Computed property names | `{ [expr]: value }` — expression evaluated as key |
+| Optional catch binding | `try { } catch { }` — catch variable is optional |
 | Bitwise operators | All supported: `&`, `|`, `^`, `~`, `<<`, `>>`, `>>>` |
 | All compound assignments | Including `&&=`, `||=`, `??=` |
 | Exponentiation `**` | Supported |
@@ -204,7 +196,7 @@ Circular imports detected by `CircularDependencyDetector` (error W041).
 
 ## Identifier Resolution Order
 
-When evaluating an identifier (not `::` prefixed):
+When evaluating an identifier:
 
 1. **Block scopes** — innermost to outermost in current thread
 2. **Closure scopes** — captured scopes from enclosing arrow functions

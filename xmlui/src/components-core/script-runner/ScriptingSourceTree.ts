@@ -476,7 +476,7 @@ export interface CalculatedMemberAccessExpression extends ExpressionBase {
 export interface Identifier extends ExpressionBase {
   type: IDENTIFIER;
   name: string;
-  isGlobal?: boolean;
+
 }
 
 export interface Literal extends ExpressionBase {
