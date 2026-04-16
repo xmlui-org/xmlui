@@ -79,7 +79,7 @@ export const Icon = forwardRef(function Icon(
   }
 
   return (
-    <span ref={ref} style={{ display: "inline-block" }}>
+    <span ref={ref} style={{ display: "inline-flex" }}>
       {renderedIcon}
     </span>
   );
@@ -178,10 +178,10 @@ function mapSizeToIconPack(size: string) {
   }
   return (
     {
-      xs: "0.75em",
-      sm: "1em",
-      md: "1.5rem",
-      lg: "2em",
+      xs: "12px",
+      sm: "16px",
+      md: "24px",
+      lg: "32px",
     }[size] || size
   );
 }

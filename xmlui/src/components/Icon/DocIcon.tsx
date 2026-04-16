@@ -1,6 +1,4 @@
-import Icon from "./svg/doc.svg?react";
-import type {IconBaseProps} from "./IconNative";
+import Icon from "./svg/l-file-text.svg?react";
+import type { IconBaseProps } from "./IconNative";
 
-export const DocIcon = (props: IconBaseProps) => (
-  <Icon {...props} />
-);
+export const DocIcon = (props: IconBaseProps) => <Icon {...props}/>;

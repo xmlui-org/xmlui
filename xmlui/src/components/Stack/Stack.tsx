@@ -241,6 +241,7 @@ type RenderStackPars = {
   showScrollerFade?: boolean;
   wrapContent?: boolean;
   itemWidth?: string;
+  containerStyle?: CSSProperties;
   registerComponentApi?: (api: any) => void;
   layoutContext?: LayoutContext;
 };
@@ -254,6 +255,7 @@ function renderDockLayout({
   renderChild,
   scrollStyle,
   showScrollerFade,
+  containerStyle,
   registerComponentApi,
   layoutContext,
 }: RenderStackPars) {
@@ -316,6 +318,7 @@ function renderDockLayout({
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
       classes={classes}
+      style={containerStyle}
       onClick={onClick}
       onContextMenu={onContextMenu}
       onMount={onMount}
@@ -379,6 +382,7 @@ function renderStack({
   showScrollerFade,
   wrapContent,
   itemWidth,
+  containerStyle,
   registerComponentApi,
   layoutContext,
 }: RenderStackPars) {
@@ -462,6 +466,7 @@ function renderStack({
       scrollStyle={scrollStyle as any}
       showScrollerFade={showScrollerFade}
       classes={classes}
+      style={containerStyle}
       onClick={onClick}
       onContextMenu={onContextMenu}
       onMount={onMount}
@@ -540,6 +545,12 @@ export const vStackComponentRenderer = wrapComponent(
       const itemWidth =
         extractValue.asSize(node.props?.itemWidth) ??
         extractValue.asOptionalString(node.props?.itemWidth, "100%");
+      // When VStack is inside a horizontal Stack and no explicit width is set,
+      // expand to fill the available horizontal space.
+      const containerStyle =
+        layoutContext?.orientation === "horizontal" && node.props?.width == null
+          ? { width: "100%", flexShrink: 1 }
+          : undefined;
       return renderStack({
         node,
         extractValue,
@@ -550,6 +561,7 @@ export const vStackComponentRenderer = wrapComponent(
         scrollStyle: props.scrollStyle,
         showScrollerFade: props.showScrollerFade,
         itemWidth,
+        containerStyle,
         onClick: props.onClick,
         onContextMenu: props.onContextMenu,
         onMount: props.onMount,
@@ -605,6 +617,12 @@ export const cvStackComponentRenderer = wrapComponent(
       const itemWidth =
         extractValue.asSize(node.props?.itemWidth) ??
         extractValue.asOptionalString(node.props?.itemWidth, "100%");
+      // When CVStack is inside a horizontal Stack and no explicit width is set,
+      // expand to fill the available horizontal space.
+      const containerStyle =
+        layoutContext?.orientation === "horizontal" && node.props?.width == null
+          ? { width: "100%", flexShrink: 1 }
+          : undefined;
       return renderStack({
         node,
         extractValue,
@@ -615,6 +633,7 @@ export const cvStackComponentRenderer = wrapComponent(
         scrollStyle: props.scrollStyle,
         showScrollerFade: props.showScrollerFade,
         itemWidth,
+        containerStyle,
         onClick: props.onClick,
         onContextMenu: props.onContextMenu,
         onMount: props.onMount,

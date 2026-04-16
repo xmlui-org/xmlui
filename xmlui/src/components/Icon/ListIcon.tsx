@@ -1,4 +1,4 @@
-import Icon from "./svg/fi-list.svg?react";
+import Icon from "./svg/l-list.svg?react";
 import type { IconBaseProps } from "./IconNative";
 
 export const ListIcon = (props: IconBaseProps) => <Icon {...props}/>;

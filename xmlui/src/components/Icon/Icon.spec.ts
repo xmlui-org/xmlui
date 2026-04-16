@@ -269,6 +269,69 @@ test.describe("click Event", () => {
 });
 
 // =============================================================================
+// RENDERING PRECISION TESTS
+// =============================================================================
+
+test.describe("Rendering Precision", () => {
+  test("pool icon wrapper uses inline-flex for pixel-aligned rendering", async ({
+    initTestBed,
+    createIconDriver,
+  }) => {
+    await initTestBed(`<Icon testId="icon" name="home"/>`);
+    const icon = await createIconDriver("icon");
+    const wrapperDisplay = await icon.svgIcon.evaluate((el) => {
+      const wrapper = el.closest("span");
+      return wrapper ? window.getComputedStyle(wrapper).display : null;
+    });
+    expect(wrapperDisplay).toBe("inline-flex");
+  });
+
+  test("icon preserves source stroke-width attribute", async ({
+    initTestBed,
+    createIconDriver,
+  }) => {
+    // "info" maps to InfoIcon which has strokeWidth="2" in its SVG source
+    await initTestBed(`<Icon testId="icon" name="info" size="md"/>`);
+    const icon = await createIconDriver("icon");
+    const strokeWidth = await icon.svgIcon.evaluate((el) => {
+      return window.getComputedStyle(el).strokeWidth;
+    });
+    expect(strokeWidth).toBe("2px");
+  });
+
+  test("predefined sizes resolve to integer pixel values at any font-size", async ({
+    initTestBed,
+    createIconDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Icon testId="xs" name="home" size="xs"/>
+        <Icon testId="sm" name="home" size="sm"/>
+        <Icon testId="md" name="home" size="md"/>
+        <Icon testId="lg" name="home" size="lg"/>
+      </Fragment>
+    `);
+
+    // Set a non-standard font-size that would cause fractional values with em/rem
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "13px";
+    });
+
+    for (const [id, expectedWidth] of [
+      ["xs", "12px"],
+      ["sm", "16px"],
+      ["md", "24px"],
+      ["lg", "32px"],
+    ] as [string, string][]) {
+      const icon = (await createIconDriver(id)).svgIcon;
+      const width = await icon.evaluate((el) => window.getComputedStyle(el).width);
+      expect(width).toBe(expectedWidth);
+    }
+  });
+});
+
+// =============================================================================
 // ACCESSIBILITY TESTS
 // =============================================================================
 
@@ -277,7 +340,8 @@ test.describe("Accessibility", () => {
     await initTestBed(`<Icon testId="icon" name="home"/>`);
     const icon = await createIconDriver("icon");
     const display = await icon.svgIcon.evaluate((el) => window.getComputedStyle(el).display);
-    expect(display).toBe("inline-block");
+    // SVG elements without explicit width/height attributes render as block
+    expect(display).toBe("block");
   });
 
   test("icon has correct vertical alignment", async ({ initTestBed, createIconDriver }) => {
@@ -367,7 +431,7 @@ test.describe("Theme Variables", () => {
   test("applies theme variable for size", async ({ initTestBed, createIconDriver }) => {
     await initTestBed(`<Icon testId="icon" name="home"/>`, {
       testThemeVars: {
-        "size-Icon": "3rem",
+        "size-Icon": "40px",
       },
     });
 
@@ -378,8 +442,8 @@ test.describe("Theme Variables", () => {
       return { width: style.width, height: style.height };
     });
 
-    expect(computedStyle.width).toBe("48px"); // 3rem calculated
-    expect(computedStyle.height).toBe("48px");
+    expect(computedStyle.width).toBe("40px");
+    expect(computedStyle.height).toBe("40px");
   });
 
   test("size prop overrides theme variable", async ({ initTestBed, createIconDriver }) => {

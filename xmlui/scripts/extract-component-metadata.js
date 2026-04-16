@@ -182,7 +182,6 @@ const specialFiles = [
   'Carousel/CarouselItem.tsx',
   'RadioGroup/RadioItem.tsx',
   'Tabs/TabItem.tsx',
-  'FormSection/FormSection.tsx',
 ];
 
 specialFiles.forEach(file => {
