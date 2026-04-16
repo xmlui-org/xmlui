@@ -162,11 +162,6 @@
           "icon": "component"
         },
         {
-          "to": "/docs/reference/components/FormSection",
-          "label": "FormSection",
-          "icon": "component"
-        },
-        {
           "to": "/docs/reference/components/FormSegment",
           "label": "FormSegment",
           "icon": "component"

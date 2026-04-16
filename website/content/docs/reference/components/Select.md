@@ -291,6 +291,12 @@ Set this property to `true` to disallow changing the component value.
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
+### `scrollIndicators` [#scrollindicators]
+
+> [!DEF]  default: **true**
+
+This property controls whether scroll indicator arrows are displayed at the top and bottom of the dropdown list when the content overflows.
+
 ### `searchable` [#searchable]
 
 > [!DEF]  default: **false**

@@ -58,7 +58,6 @@ Form scaffolding that binds controls, handles validation, grouping, and submissi
 
 - **Form**
 - **FormItem**
-- **FormSection**
 - **ValidationSummary**
 
 ## Logic

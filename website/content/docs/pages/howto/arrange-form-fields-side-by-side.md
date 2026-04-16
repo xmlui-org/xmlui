@@ -2,14 +2,15 @@
 
 Use HStack inside a Form to place two or more fields on the same row, or use itemLabelPosition="start" for a label-left layout.
 
-A checkout form keeps First Name and Last Name on the same row to save vertical space. Wrapping those two fields in an `HStack` and giving each `width="*"` splits the available width equally between them. More complex layouts mix HStack rows, full-width fields, and `FormSection` groupings.
+A checkout form keeps First Name and Last Name on the same row to save vertical space. Wrapping those two fields in an `HStack` and giving each `width="*"` splits the available width equally between them. More complex layouts mix HStack rows, full-width fields, and `FormSegment` groupings.
 
 ```xmlui-pg copy display name="Checkout form with side-by-side fields"
 ---app display
 <App>
   <Form
     data="{{ firstName: '', lastName: '', address: '', city: '', postcode: '' }}"
-    onSubmit="(data) => toast('Order placed for ' + data.firstName + ' ' + data.lastName)"
+    onSubmit="(data) => 
+      toast('Order placed for ' + data.firstName + ' ' + data.lastName)"
     saveLabel="Place order"
   >
     <HStack>
@@ -57,23 +58,23 @@ A checkout form keeps First Name and Last Name on the same row to save vertical 
 </Form>
 ```
 
-**`FormSection` groups related fields under a heading**: Add `FormSection` containers to create visually separated sections. `FormSection` supports its own `columnGap` and `rowGap`:
+**`FormSegment` groups related fields under a heading**: Add `FormSegment` containers to create visually separated sections. `FormSegment` supports its own `columnGap` and `rowGap`:
 
 ```xmlui
 <Form>
-  <FormSection heading="Personal Details">
+  <FormSegment heading="Personal Details">
     <HStack>
       <TextBox bindTo="firstName" label="First Name" width="*" />
       <TextBox bindTo="lastName" label="Last Name" width="*" />
     </HStack>
-  </FormSection>
-  <FormSection heading="Billing Address">
+  </FormSegment>
+  <FormSegment heading="Billing Address">
     <TextBox bindTo="address" label="Address" />
     <HStack>
       <TextBox bindTo="city" label="City" width="*" />
       <TextBox bindTo="postcode" label="Postcode" width="140px" />
     </HStack>
-  </FormSection>
+  </FormSegment>
 </Form>
 ```
 
@@ -90,4 +91,4 @@ A checkout form keeps First Name and Last Name on the same row to save vertical 
 **See also**
 - [Form component](/docs/reference/components/Form) — `itemLabelPosition`, `itemLabelWidth`
 - [TextBox component](/docs/reference/components/TextBox) — `labelPosition`, `labelWidth`, `width`
-- [FormSection component](/docs/reference/components/FormSection) — `heading`, `columnGap`, `rowGap`
+- [FormSegment component](/docs/reference/components/FormSegment) — `heading`, `columnGap`, `rowGap`

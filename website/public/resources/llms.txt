@@ -112,7 +112,6 @@ app/
 **Form Structure:**
 - **Form** - Data binding, validation, submission with `$data` context
 - **FormItem** - Field wrapper with validation, labeling, `$value` context
-- **FormSection** - Field grouping with FlowLayout
 
 **Input Controls:**
 - **TextBox/TextArea/PasswordInput** - Text input with validation support

@@ -66,7 +66,6 @@ import { FragmentMd } from "./Fragment/Fragment";
 import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
 import { DataSourceMd } from "./DataSource/DataSource";
-import { FormSectionMd } from "./FormSection/FormSection";
 import { ToneChangerButtonMd } from "./ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButtonMd } from "./NavPanelCollapseButton/NavPanelCollapseButton";
 import { ToneSwitchMd } from "./ToneSwitch/ToneSwitch";
@@ -342,7 +341,6 @@ export const collectedComponentMetadata = {
   Footer: FooterMd,
   Form: FormMd,
   FormItem: FormItemMd,
-  FormSection: FormSectionMd,
   FormSegment: FormSegmentMd,
   Heading: HeadingMd,
   H1: H1Md,
