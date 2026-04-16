@@ -85,7 +85,6 @@ import { fileInputRenderer } from "./FileInput/FileInput";
 import { spinnerComponentRenderer } from "./Spinner/Spinner";
 import { markdownComponentRenderer } from "./Markdown/Markdown";
 import { selectComponentRenderer } from "./Select/Select";
-import { formSectionRenderer } from "./FormSection/FormSection";
 import { checkboxComponentRenderer } from "./Checkbox/Checkbox";
 import { switchComponentRenderer } from "./Switch/Switch";
 import { appHeaderComponentRenderer } from "./AppHeader/AppHeader";
@@ -573,7 +572,6 @@ export class ComponentRegistry {
       this.registerCoreComponent(toneSwitchComponentRenderer);
       this.registerCoreComponent(inspectButtonComponentRenderer);
       this.registerCoreComponent(inspectorComponentRenderer);
-      this.registerCoreComponent(formSectionRenderer);
       this.registerCoreComponent(dropdownMenuComponentRenderer);
       this.registerCoreComponent(menuItemRenderer);
       this.registerCoreComponent(subMenuItemRenderer);
