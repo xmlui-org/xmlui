@@ -294,3 +294,95 @@ Record lessons learned here as we write documentation. These help maintain consi
 - **Custom rendering priority** — children (complex React nodes) → per-option `optionRenderer` function → component-level `optionRenderer` prop → plain `label` string. Later items are fallbacks only.
 - **For a new filterable selection component** — use `OptionContext` + `HiddenOption` for collection, then render your visible items from the collected `Set<Option>`. For always-visible options (no filtering), use RadioGroup-style direct context instead.
 
+### From Topic 24: Accessibility
+
+- **Semantic HTML before ARIA** — use `<button>`, `<nav>`, `<header>`, `<main>`, `<footer>` before reaching for `role="button"` etc. Sites with custom ARIA roles have 34% more a11y errors.
+- **Every interactive element needs keyboard support** — `Tab` to reach, `Enter`/`Space` to activate, arrow keys for composite widgets (menus, tabs, radio groups), `Escape` to dismiss overlays.
+- **ARIA state attributes must stay synchronized** — `aria-expanded`, `aria-selected`, `aria-checked`, `aria-disabled` must update in sync with visual state. A stale ARIA attribute is worse than no attribute.
+- **Icon-only elements require `aria-label`** — when a Button or trigger has no visible text, add `aria-label` on the container and `aria-hidden="true"` on the icon.
+- **Hint and error text need `aria-describedby`** — give the hint element an `id="hint-{input-id}"` and add `aria-describedby="hint-{input-id}"` to the input. This is currently missing from FormItem/TextBox.
+- **Link component has critical a11y failures** — it is not keyboard-focusable and does not respond to Enter/Space. Treat as a known debt item; do not build navigation features relying on its accessibility.
+- **Add `test.describe("Accessibility")` to every component spec** — test attribute presence, correct ARIA role, state transitions on interaction, and keyboard operability. Use `page.getByRole()` locators; they double as ARIA correctness checks.
+- **Touch targets ≥ 44×44px** — required for mobile; 24×24px is acceptable for pointer-only interfaces. Check bounding box in tests when in doubt.
+
+### From Topic 23: Testing Conventions
+
+- **E2E for behavior, unit for logic — never mix** — full rendering, interactions, accessibility, and event firing belong in Playwright E2E. Props normalization, hook behavior, and state transformations belong in Vitest unit tests.
+- **Always confirm `toBeFocused()` before pressing keys** — missing this wait is the #1 cause of parallel-execution flakiness. Never use `{ delay: X }` workarounds; find and add the correct `toBeFocused()` or `toBeVisible()` assertion.
+- **Run `--workers=10` before committing E2E tests** — tests that pass at `--workers=1` but fail at `--workers=10` have a race condition. Always verify parallel stability.
+- **Use `testState` + `expect.poll()` for event testing** — write to `testState` in the event handler, then `await expect.poll(testStateDriver.testState).toEqual(...)` after triggering the event. Never use `setTimeout` to wait.
+- **Template properties require `<property name="...">` wrapper** — the tag-based form (`<myTemplate>`) does not work in `initTestBed` strings and fails silently. Always use the `<property>` element form.
+- **Mock before import in unit tests** — `vi.mock()` must be declared before importing the module under test. Importing first causes mock configuration to be ignored for that module.
+- **Always wait for visibility before clicking** — elements may not yet be in the DOM immediately after `initTestBed()`. Add `await expect(el).toBeVisible()` before `.click()`.
+- **CSS pseudo-classes cannot be tested with `.toHaveCSS()`** — Playwright `.hover()` triggers JS events but not CSS `:hover`/`:focus`/`:active`. Test the functional outcome (tooltip appearing, class added by JS) instead.
+
+### From Topic 22: Monorepo Structure & Tooling
+
+- **Run `npm install` only at the repository root** — workspaces hoist all dependencies to root `node_modules/`. Running `npm install` inside a workspace package creates a duplicate `node_modules/` that shadows hoisted packages and causes version conflicts.
+- **Use `"workspace:*"` for cross-workspace dependencies** — extension packages must list `xmlui` as `"xmlui": "workspace:*"` in `devDependencies` (or `peerDependencies`). This is replaced by the actual published version when `changeset publish` runs.
+- **Create changeset files manually — never use `changeset add` in agents** — `changeset add` is interactive. Create `.changeset/<unique-name>.md` directly with the correct frontmatter. Verify with `npx changeset status`.
+- **All XMLUI changes are `patch` bumps unless explicitly stated otherwise** — minor and major bumps require deliberate decision. Do not upgrade to `minor` just because a feature was added.
+- **Only add changesets for user-facing changes** — internal refactors, test infrastructure, `.ai/` docs, and dev-docs do not need changesets. Changesets trigger version bumps and release notes.
+- **Never remove the `^` prefix from `dependsOn` to speed up a build** — `"^build:extension"` ensures upstream packages are built first. Removing it causes downstream builds to pick up stale outputs with no error message.
+- **`cache: false` in turbo.json means "always run, never replay"** — use this only for tasks that fetch external data or produce non-deterministic outputs. Setting it on a normal build task defeats the caching system.
+- **Build the CLI (`npm run build:bin`) before running any other framework build command** — the `xmlui` CLI binary reads from `xmlui/dist/bin/`. If `bin/` is missing or stale, every `xmlui *` command silently uses the old behavior.
+
+### From Topic 21: Build System & Deployment
+
+- **Two deployment modes are mutually exclusive** — standalone (buildless UMD `<script>` tag) and Vite (compiled, npm). The choice is made at project creation. The same `.xmlui` markup works in both; switching modes requires restructuring the project.
+- **Always build the CLI before running other build commands** — `npm run build:bin` must run first (from `xmlui/`). Other `xmlui *` commands use the compiled bin output; skipping this step causes confusing "command not found" or stale-code errors.
+- **`vite-xmlui-plugin` must be listed in `plugins[]` for `.xmlui` files to be bundled** — without it, `.xmlui` file imports resolve as empty modules or 404s. It handles `.xmlui`, `.xmlui.xs`, and `.xmlui.xm` transformations.
+- **`react`, `react-dom`, and `xmlui` are always external in extension builds** — they must be peer dependencies and never bundled. Bundling them causes duplicate React instances and `useContext` failures.
+- **Use `xmlui build --prod` for production; never ship a dev build** — `--prod` enables `INLINE_ALL` bundling, `flatDist`, relative roots, and disables MSW. Dev builds include mock service workers and unminified code.
+- **Metadata must be regenerated before the VS Code extension build** — the Turborepo pipeline (`gen:langserver-metadata` → `xmlui-vscode#build`) enforces this. If you bypass Turborepo, run `npm run gen:langserver-metadata` manually first.
+- **Extension lib builds use `xmlui build-lib`, not `vite build`** — `xmlui build-lib` applies the correct externalization, output format, and metadata extraction pipeline. Running `vite build` directly misses these configurations.
+- **`turbo.json` `^` prefix = upstream workspace ordering** — `"dependsOn": ["^build:extension"]` means all upstream `build:extension` tasks must complete before this package's task starts. Do not remove it to "speed up" a build — extension consumers will get stale outputs.
+
+### From Topic 20: Language Server (LSP)
+
+- **Regenerate `xmlui-metadata-generated.js` after any `createMetadata()` change** — run `npm run gen:langserver-metadata` and commit the updated file. If you skip this step, new props/events will be invisible to completions and hover.
+- **Do not import framework code into the language server** — the LSP runs in Node.js without React or browser APIs. Only the parsers, metadata types, and `vscode-languageserver` packages are safe to import.
+- **Do not call the XML parser directly in services** — always call `document.parse()`, which returns the cached `ParseResult`. Calling the parser directly bypasses caching and causes redundant parsing on every service request.
+- **Add new diagnostic rules in the parser, not the language server** — push a `ParserDiag` to `parseResult.errors` in the XML parser or transform stage; the LSP's diagnostic service automatically forwards all parser errors to VS Code.
+- **Do not modify `xmlui-metadata-generated.js` by hand** — it is a build artifact. Manual edits are overwritten by the next `npm run gen:langserver-metadata` run.
+- **New LSP features require three changes** — (1) a handler function in `services/`, (2) registration via `connection.on*()` in `server-common.ts`, and (3) the capability declared in `onInitialize`. Missing any one prevents VS Code from sending the request.
+- **Do not wire the lint pass as a diagnostic without performance testing** — lint is a second AST pass that checks unrecognized props. Running it on every keystroke risks causing typing lag; benchmark before enabling.
+- **Implicit props (`when`, `data`, `inspect`) are injected by `ComponentMetadataProvider`** — they are not in the generated metadata file. Do not add them to the generation script; they are hardcoded in the provider intentionally.
+
+### From Topic 19: Inspector & Debugging
+
+- **Always gate trace code on `xsVerbose`** — check `appContext.appGlobals?.xsVerbose === true` before constructing any log entry or calling `pushXsLog`. The function itself is a noop when `_xsLogs` is absent, but the guard also prevents expensive object construction and JSON serialization.
+- **Use `createLogEntry()` for all new entries** — it pre-fills `ts`, `perfTs`, and `traceId` automatically. Do not construct `XsLogEntry` objects by hand.
+- **Always pair `pushTrace()` with `popTrace()` in a `finally` block** — a mismatched trace stack silently corrupts the `traceId` field for every subsequent event in the session. There is no error thrown; the only symptom is trace IDs pointing to the wrong interaction.
+- **Pass `traceId` explicitly when starting a multi-step operation** — capture the return value of `pushTrace()`, pass it as the `traceId` field in every subsequent entry, and call `popTrace()` after the operation completes.
+- **Do not pass live React or React Query objects into `pushXsLog`** — the safe-clone in `pushXsLog` handles circular references, but complex live objects may lose properties; serialize into the `text` field with `JSON.stringify` instead.
+- **Every new framework subsystem should emit at least start/complete/error entries** — anything that can fail or take measurable time should have these three entry kinds so it is visible in the inspector trace. Name them `"mysubsystem:start"`, `"mysubsystem:complete"`, `"mysubsystem:error"`.
+- **`kind` strings follow a `"namespace:event"` convention** — built-in kinds use `api:`, `handler:`, `state:`, `error:`, `modal:`. New subsystems should define their own namespace prefix to avoid collisions.
+- **Do not add tracing to event handlers manually** — `event-handlers.ts` already wraps every `on*` handler universally. Adding trace calls inside a handler body produces duplicate entries.
+- **The buffer is a circular log capped at 200 by default** — if you need more history during a debugging session, set `xsVerboseLogMax` in globals. Entries of important kinds (interactions, API calls, navigations) are preserved during trimming.
+
+### From Topic 18: Parsers
+
+- **Use the right parser for the right language** — XML markup → `parseXmlUiMarkup()`, JS expressions → `Parser.parseExpr()`, CSS values → `StyleParser.parseSize()/parseBorder()/parseColor()`, keyboard shortcuts → `parseKeyBinding()`. Do not attempt to parse one language with another parser.
+- **Expressions are compiled lazily** — attribute values like `{count + 1}` are stored as raw strings by the XML parser and compiled by the scripting parser the first time they are evaluated. This is by design; do not attempt to pre-compile expressions during XML parsing.
+- **Imported modules may only contain function declarations** — `ModuleValidator` enforces this. Any top-level statement that is not a function declaration in a `<script src>` module will produce a parse error. This is intentional to ensure modules are safe to cache and free of side effects.
+- **Always use `ModuleLoader` to load script modules** — calling `parseScriptModule()` directly bypasses circular dependency detection and caching. All module loading must go through `ModuleLoader.loadModule()`.
+- **The XML parser is error-recovering; the style parser is not** — the XML parser collects multiple diagnostics and continues. The style parser throws `StyleParserError` immediately on the first invalid token. Handle these differently in error reporting code.
+- **`ParserDiag` includes `contextPos`/`contextEnd`** — these wider bounds are specifically for the language server to draw squiggles over the right range. Do not conflate `pos`/`end` (error location) with `contextPos`/`contextEnd` (highlight range).
+- **Circular import errors include the full chain** — `CircularDependencyDetector` returns an array like `["A", "B", "A"]`. Use the entire chain in error messages so the developer can trace the loop.
+- **Theme variables are first-class tokens in the style lexer** — the `xmlui-` prefix is recognized as a `ThemeId` token, not an error. When writing tests for style parsing, include theme variable inputs alongside literal value inputs.
+- **Both parsers run in Vite mode and standalone mode** — the same source handles build-time and browser-runtime parsing. Do not introduce any Node.js-only or browser-only APIs into the parser modules.
+
+### From Topic 17: Error Handling Strategy
+
+- **Every component has its own ErrorBoundary automatically** — `StateContainer` wraps each component's `Container` in an `ErrorBoundary` with `location="container"`. A render crash in one component shows an inline red overlay; all siblings and ancestors continue working. Do NOT add manual ErrorBoundary wrappers inside component renderers.
+- **ErrorBoundary auto-resets when `node` prop changes** — navigating to a new page replaces the root ComponentDef node, which triggers `componentDidUpdate` → `setState({ hasError: false })`. Error state clears on navigation without any manual intervention.
+- **`signError()` is the universal error notifier** — it shows a red toast, logs `[xmlui] <message>` to console, and records to the trace system. The `[xmlui]` prefix is intentional for Playwright test capture via `page.on('console')`.
+- **Event handler errors always call `signError()` by default** — the central `try/catch` in `event-handlers.ts` calls `signError()` unless `options.signError === false`. This means any unhandled exception in an `onClick`, `onSubmit`, etc. automatically surfaces as a toast.
+- **Loader errors set `$error` in scope** — `LOADER_ERROR` reducer action makes `{ statusCode, message, details, response }` available as `$error` in `onError` handlers and `errorNotificationMessage` expressions. Returning `false` from `onError` suppresses the automatic toast.
+- **Parse errors replace broken components, not the whole app** — `errReportComponent()`, `errReportScriptError()`, and `errReportModuleErrors()` substitute failed `.xmlui` components with inline full-page error UIs showing file/line/column. The rest of the app renders normally.
+- **`pushXsLog()` is a noop in production** — all trace logging for errors (kind: `"error:boundary"`, `"error:runtime"`, `"error:handler"`) is zero-cost when `window._xsVerbose` is not set. Set it in DevTools to enable verbose trace collection.
+- **`GenericBackendError` normalizes multiple server error formats** — RFC 7807, Google-style, and Microsoft-style error responses all produce the same `.statusCode`/`.message`/`.details` interface. Check `err.statusCode` for 401/403/404 special cases.
+- **`ThrowStatementError` is the markup throw mechanism** — explicit `throw` in markup script produces a `ThrowStatementError`. It carries `errorObject` (whatever was thrown) and `.message` for the toast. It is caught by the event handler try/catch like any other error.
+- **`data-error-boundary` attribute marks fallback elements** — use `page.locator('[data-error-boundary]')` in Playwright tests to assert an error boundary was triggered.
+
