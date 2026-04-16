@@ -2,32 +2,33 @@
     <Stack horizontalAlignment="center" marginTop="$space-6">
       <Text>The UI button shows a live XMLUI app. Try it! Then switch to XML to see the code.</Text>
     </Stack>
-    <Theme themeId="xmlui-landing-theme">
+    <Theme themeId="xmlui-landing-theme"
+           minHeight-Button="0">
     <Markdown>
         <![CDATA[
 ```xmlui-pg splitView height="534px" immediate withSplashScreen
 ---app display
 <App layout="condensed-sticky">
-  <AppHeader>
-    <Text variant="strong">Our Team</Text>
-    <SpaceFiller />
-    <ToneSwitch />
-  </AppHeader>
-  
-  <List data="/api/users">
-    <Card title="{$item.username}" subtitle="{$item.email}"
-      orientation="horizontal" avatarUrl="{$item.avatar_url}">
+    <AppHeader>
+      <Text variant="strong">Our Team</Text>
       <SpaceFiller />
-      <Badge when-md value="{$item.status}" />
-      <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
-        <event name="click">
-          <APICall url="/api/users/{$item.id}" method="delete"
-            confirmTitle="Delete {$item.username}?"
-            completedNotificationMessage="{$item.username} deleted" />
-        </event>
-      </Button>
-    </Card>
-  </List>
+      <ToneSwitch />
+    </AppHeader>
+
+    <List data="/api/users">
+      <Card title="{$item.username}" subtitle="{$item.email}"
+        orientation="horizontal" avatarUrl="{$item.avatar_url}">
+        <SpaceFiller />
+        <Badge when-md value="{$item.status}" />
+        <Button variant="ghost" icon="close" tooltip="Delete {$item.username}">
+          <event name="click">
+            <APICall url="/api/users/{$item.id}" method="delete"
+              confirmTitle="Delete {$item.username}?"
+              completedNotificationMessage="{$item.username} deleted" />
+          </event>
+        </Button>
+      </Card>
+    </List>
 </App>
 ---api
 {

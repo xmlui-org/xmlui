@@ -130,6 +130,7 @@ $outlineOffset-DateInput--success--focus: createThemeVar("Input:outlineOffset-#{
 $color-adornment-DateInput--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
 
 // Variables for @layer section
+$minHeight-DateInput: createThemeVar("Input:minHeight-#{$componentName}");
 $gap-adornment-DateInput: createThemeVar("Input:gap-adornment-#{$componentName}");
 $backgroundColor-DateInput--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
 $textColor-DateInput--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
@@ -183,6 +184,8 @@ $borderColor-DateInput--disabled: createThemeVar("Input:borderColor-#{$component
     align-items: center;
     width: fit-content;
     height: max-content;
+    min-height: $minHeight-DateInput;
+    line-height: normal;
     border-style: solid;
     border-width: 1px;
     transition: $transition-background-DateInput;
