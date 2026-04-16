@@ -66,7 +66,7 @@ import type {
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
-const SYNC_EVAL_TIMEOUT = 1000;
+const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
 // --- Helper function to process the entire queue synchronously
 export function processStatementQueue(
@@ -102,11 +102,12 @@ export function processStatementQueue(
   // --- Consume the queue
   while (queue.length > 0) {
     // --- Check sync timeout
+    const syncTimeout = evalContext.appContext?.appGlobals?.syncExecutionTimeout ?? DEFAULT_SYNC_EVAL_TIMEOUT;
     if (
       evalContext.startTick !== undefined &&
-      new Date().valueOf() - evalContext.startTick > SYNC_EVAL_TIMEOUT
+      new Date().valueOf() - evalContext.startTick > syncTimeout
     ) {
-      throw new Error(`Sync evaluation timeout exceeded ${SYNC_EVAL_TIMEOUT} milliseconds`);
+      throw new Error(`Sync evaluation timeout exceeded ${syncTimeout} milliseconds`);
     }
 
     // --- Process the first item

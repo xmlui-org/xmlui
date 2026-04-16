@@ -54,11 +54,7 @@ export function getIdentifierScope(
   let scope: any;
 
   // --- Search for primary value scope
-  if (expr.isGlobal) {
-    // --- Use the global scope only
-    scope = globalThis;
-    type = "global";
-  } else {
+  {
     // --- Iterate trough threads from the current to the parent
     let currentThread: LogicalThread | undefined = thread ?? evalContext.mainThread;
     while (currentThread && !scope) {
@@ -312,6 +308,9 @@ export function evalBinaryCore(
       break;
     case "in":
       value = l in r;
+      break;
+    case "instanceof":
+      value = l instanceof r;
       break;
     case "==":
       // eslint-disable-next-line eqeqeq
