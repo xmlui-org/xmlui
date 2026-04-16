@@ -172,7 +172,7 @@ The complete theming system from theme definitions through CSS variable generati
 - Runtime theme switching via `ThemeContext` and `useTheme()`
 - Responsive layout: breakpoint system, `layout-resolver.ts`
 
-**Current state:** Well-covered in `theming-styling.md` (comprehensive architecture) and `.ai/xmlui/components/styling.md` (SCSS patterns). Gap: responsive layout/breakpoint system is not documented. `ThemeContext` internals in `dev-docs/next/theme-context.md` (draft state).
+**Current state:** ✅ **DONE.** AI doc: `.ai/xmlui/theming-styling.md`. Human doc: `xmlui/dev-docs/guide/07-theming-styling.md`. Existing SCSS patterns in `.ai/xmlui/components/styling.md`. Key learnings in `guidelines.md` (Topic 7 section).
 
 ---
 
@@ -191,11 +191,11 @@ How XMLUI fetches, caches, and provides data to components.
 - `createLoaderRenderer()` factory
 - File operations: `FileUpload`, `FileDownload` action components
 
-**Current state:** Well-covered from user perspective in `.ai/xmlui/data.md`. Architecture covered in `data-operations.md`. Gap: the loader-to-container integration (reducer flow) and React Query cache management internals could be more explicit.
+**Current state:** ✅ **DONE.** AI doc: `.ai/xmlui/data-operations.md` (internal architecture). User-facing markup patterns remain in `.ai/xmlui/data.md`. Human doc: `xmlui/dev-docs/guide/08-data-operations.md`. Key learnings in `guidelines.md` (Topic 8 section).
 
 ---
 
-### 9. Behaviors System
+### 9. Behaviors System ✅ DONE
 
 **Priority: High — cross-cutting concerns**
 
@@ -208,6 +208,8 @@ Auto-attached behaviors that wrap components based on their props.
   - `Variant` — `variant` prop → CSS class addition
   - `Animation` — `animation` prop → CSS animation wrapping
   - `Bookmark` — `bookmark` prop → URL hash management
+
+**Docs:** `.ai/xmlui/behaviors.md` (AI) · `xmlui/dev-docs/guide/09-behaviors.md` (guide)
   - `PubSub` — `onMessage`/`publishMessage` → inter-component messaging
   - `FormBinding` — inside a Form → two-way value binding
   - `Validation` — `validationState`/`required`/`pattern` → input validation
@@ -220,26 +222,7 @@ Auto-attached behaviors that wrap components based on their props.
 
 ---
 
-### 10. Form Infrastructure
-
-**Priority: Medium-High — complex subsystem**
-
-Forms, validation, and data submission.
-
-- `Form` → `FormItem` → input component hierarchy
-- FormState structure: field tracking, dirty state, validation results, submission state
-- Validation timing strategies: onChange, onBlur, onSubmit
-- The reducer pattern for form state transitions
-- Interaction flags: `isDirty`, `isTouched`, `isSubmitting`, `isValid`
-- `FormWithContextVar` → `Form` → `FormItem` pipeline
-- Known issues and code smells (from `form-infrastructure-issues.md`)
-- Async validation and race conditions
-
-**Current state:** Thoroughly documented in `form-infrastructure.md`. Design considerations in `form-design.md`. Issues tracked in `form-infrastructure-issues.md`. Good coverage — needs consolidation more than new content.
-
----
-
-### 11. Action Execution Model
+### 10. Action Execution Model ✅ DONE
 
 **Priority: Medium-High — event handling core**
 
@@ -256,11 +239,11 @@ How user interactions become side effects.
   - Form vs raw body handling
 - How actions integrate with the inspector/trace system
 
-**Current state:** Partially covered in `data-operations.md`. `ApiBoundComponent` has zero documentation. The action execution lifecycle (definition → lookup → context creation → execution → cache invalidation) is not explained anywhere.
+**Docs:** `.ai/xmlui/action-execution.md` (AI) · `xmlui/dev-docs/guide/10-action-execution.md` (guide)
 
 ---
 
-### 12. User-Defined Components
+### 11. User-Defined Components
 
 **Priority: Medium — extensibility model**
 
@@ -274,6 +257,25 @@ How app developers create reusable components in `.xmlui` files.
 - `createUserDefinedComponentRenderer()` factory
 
 **Current state:** Well-documented in `ud-components.md` (deep architecture dive). Gap: no concise quick-reference for the pattern.
+
+---
+
+### 12. Form Infrastructure
+
+**Priority: Medium-High — complex subsystem**
+
+Forms, validation, and data submission.
+
+- `Form` → `FormItem` → input component hierarchy
+- FormState structure: field tracking, dirty state, validation results, submission state
+- Validation timing strategies: onChange, onBlur, onSubmit
+- The reducer pattern for form state transitions
+- Interaction flags: `isDirty`, `isTouched`, `isSubmitting`, `isValid`
+- `FormWithContextVar` → `Form` → `FormItem` pipeline
+- Known issues and code smells (from `form-infrastructure-issues.md`)
+- Async validation and race conditions
+
+**Current state:** Thoroughly documented in `form-infrastructure.md`. Design considerations in `form-design.md`. Issues tracked in `form-infrastructure-issues.md`. Good coverage — needs consolidation more than new content.
 
 ---
 
