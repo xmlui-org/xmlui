@@ -274,7 +274,7 @@ var x = 2;`,
 
       await expect(
         collectCodeBehindFromSourceWithImports("/main.xs", modules["/main.xs"], fetcher),
-      ).rejects.toThrow("Duplicated var declaration");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Duplicated var declaration") });
     });
   });
 

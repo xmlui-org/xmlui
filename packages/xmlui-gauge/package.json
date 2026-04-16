@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "smart-webcomponents-react": "^19.0.0",
+    "smart-webcomponents-react": "^25.0.0",
     "classnames": "2.5.1"
   },
   "devDependencies": {

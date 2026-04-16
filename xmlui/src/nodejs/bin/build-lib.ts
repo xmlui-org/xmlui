@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { build as viteBuild, defineConfig, loadEnv, type UserConfig, Plugin } from "vite";
+import type { Plugin } from "vite";
+import { build as viteBuild, defineConfig, loadEnv, type UserConfig } from "vite";
 // @ts-ignore
 import path from "path";
 import react from "@vitejs/plugin-react";
