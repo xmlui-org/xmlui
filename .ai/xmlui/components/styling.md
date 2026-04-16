@@ -62,13 +62,27 @@ defaultThemeVars: {
 
 ## Naming Conventions
 
+Full convention: `property[-partNameOrScreenSize][-ComponentName][-variantName][--stateName][--stateNameN]`
+
+`-` separates positional segments; `--` introduces state names. Segment classification is by first letter:
+
+| Position | Segment | Case | Identification |
+|----------|---------|------|----------------|
+| 1 | `property` | camelCase | required; starts lowercase |
+| 2 | `partName` or `screenSize` | camelCase/lowercase | `xs`/`sm`/`md`/`lg`/`xl` = screen size; else part name |
+| 3 | `ComponentName` | PascalCase | starts uppercase |
+| 4 | `variantName` | camelCase | starts lowercase |
+| after `--` | `stateName` (repeatable) | camelCase | follows `--` |
+
 | Pattern | Example |
 |---|---|
 | `property-ComponentName` | `backgroundColor-Button` |
-| `property-ComponentName-VariantName` | `backgroundColor-Button-Primary` |
-| `property-ComponentName-StateName` | `borderColor-Input-Focus` |
+| `property-screenSize-ComponentName` | `fontSize-sm-Text` |
+| `property-partName-ComponentName` | `backgroundColor-label-Button` |
+| `property-ComponentName-variantName` | `backgroundColor-Button-primary` |
+| `property-ComponentName--stateName` | `borderColor-Input--focus` |
 
-`property` uses camelCase. ComponentName and VariantName use PascalCase.
+Writing `Primary` (uppercase) where a variant is expected is rejected as a duplicate component name.
 
 ## Parts Styling
 
