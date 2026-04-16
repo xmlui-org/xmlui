@@ -219,3 +219,78 @@ Record lessons learned here as we write documentation. These help maintain consi
 - **`state` is a snapshot; `getCurrentState()` is live** — in async action code, `state` (from `ActionExecutionContext`) reflects the state at call time. After any `await`, use `getCurrentState()` to read current values. Container state may have changed during the async operation.
 - **Nested action handlers are embedded recursively** — `success`, `error`, `progress`, `beforeRequest`, and `mockExecute` children of an `APICall` are each processed by `generateEventHandler()` and embedded inline in the generated string. This means deeply nested action chains are fully serialized into a single handler string.
 - **`onBeforeRequest` can abort `callApi`** — if the `onBeforeRequest` handler returns `false` (boolean, not falsy), the HTTP request is cancelled before it fires. This is the correct hook for async pre-flight checks (e.g., validating form state before submission).
+
+### From Topic 11: User-Defined Components
+
+- **Behaviors skip compound components** — `ComponentAdapter` checks `isCompoundComponent` and skips the entire behavior chain (DisplayWhen, Variant, Tooltip, Label, etc.). Behaviors apply only to built-in components inside the UDC's implementation. If you add a new behavior, it will automatically be excluded from UDC wrappers.
+- **Named slots must end with `Template` suffix** — `slotRenderer()` validates this at runtime and renders `InvalidComponent` with an error message if the name doesn't match. This is not just a convention — it's enforced.
+- **Slot content renders in parent scope, not component scope** — `parentRenderContext.renderChild` carries the parent's render function. Expressions like `{userName}` in a parent's template resolve in the parent's scope even though the template physically renders inside the component's layout. This is the most common source of confusion.
+- **Code-behind overrides inline on name conflicts** — `createUserDefinedComponentRenderer()` merges code-behind via spread: `{ ...inlineVars, ...codeBehindVars }`. If both define `query`, the code-behind version wins.
+- **`$props` is a snapshot, not a live binding** — resolved in parent scope via `extractValue`, shallow-memoized via `useShallowCompareMemoize`. Mutations to `$props` inside the component do not propagate back. Use `emitEvent()` to communicate changes to the parent.
+- **`emitEvent` naming convention strips `on` prefix** — `emitEvent('valueChanged')` looks up the `valueChanged` event, which was parsed from the parent's `onValueChanged` attribute. The parser strips `on` and lowercases the first character: `onValueChanged` → `"valueChanged"`.
+- **Auto-generated metadata discovers props by walking `$props` references** — `generateUdComponentMetadata()` introspects the component tree at registration time, collecting every `$props.<member>` access. Explicit metadata merges on top. This means unused props won't appear in completions.
+- **Parent render context is lazy** — only created when parent provides templates or children. `hasTemplateProps` uses a heuristic (name ends with `Template`, or value has `type` field) rather than scanning all props.
+- **Component name must match filename in standalone mode** — `ActionBar.xmlui` must contain `<Component name="ActionBar">`. Built mode does not enforce this, which can cause subtle bugs when switching modes.
+
+### From Topic 12: Form Infrastructure
+
+- **Form owns ALL state — FormItems are stateless** — the entire form is a single `useReducer` with Immer. FormItems dispatch actions and subscribe to context slices. Never add field-level state to FormItem.
+- **`useFormContextPart` is the critical optimization** — uses `use-context-selector` so each FormItem subscribes only to its specific data slice. Without this, every keystroke re-renders all fields (O(n) per character). Always use `useFormContextPart` instead of raw `useContext(FormContext)`.
+- **Lodash `set()` is only safe inside Immer** — the reducer uses `set(state.subject, path, value)` which mutates in place. Outside of `produce()`, this corrupts state. Never use Lodash `set()` on FormState outside the reducer.
+- **`partial: true` bridges sync and async validation** — sync validators return immediately with `partial: true` if `onValidate` exists. The Save button shows "Validating..." and disables until `partial` becomes `false`. Always dispatch the partial result first, then the complete result.
+- **Form event handlers are the awaited exception** — `onWillSubmit`, `onSubmit`, `onSuccess` are all `await`ed with return values observed. `onWillSubmit` returning `false` cancels submission; returning an object replaces the data. This differs from all other XMLUI event handlers which are fire-and-forget.
+- **`resetVersion` forces React re-mount** — Form renders with `key={resetVersion}`. Incrementing it unmounts/remounts everything, clearing uncontrolled input state. This is intentional, not a hack.
+- **Backend errors require `GenericBackendError` shape** — the catch block only parses structured errors with `errorCategory: "GenericBackendError"` and `details.issues[]`. Other error shapes become a generic "Couldn't save the form" message.
+- **`cleanUpSubject` vs `cleanUpSubjectForWillSubmit`** — `onSubmit` receives cleaned data (no unbound/noSubmit fields). `onWillSubmit` receives both cleaned AND full data, enabling cross-field validation involving excluded fields.
+- **InteractionFlags implement "late error" UX** — seven boolean flags per field drive sophisticated display timing. The default `errorLate` mode shows errors only after the first blur post-edit, then continues updating per keystroke. Don't simplify these flags without understanding the UX implications.
+
+### From Topic 13: Routing
+
+- **`Pages` = `<Routes>`, `Page` = `<Route>`** — XMLUI routing is a thin declarative wrapper over react-router-dom v6. Never manipulate the router directly; use `Pages`/`Page` in markup and `navigate()` in scripts.
+- **HashRouter is the default** — `useHashBasedRouting` defaults to `true`, producing `/#/path` URLs that work on any static host. BrowserRouter requires server-side fallback routing to prevent 404s on direct URL access.
+- **`$routeParams`, `$queryParams`, `$pathname` are Layer 6 state** — injected by `useRoutingParams()` into every component's expression context automatically. They're reactive: expressions re-evaluate on navigation. Never use `window.location` or `useParams()` directly in component code.
+- **`RouteWrapper` is the bridge between react-router and XMLUI state** — it wraps each Page's children in an implicit container (`vars: {}`), calling `useParams()` and making results available as `$routeParams`. Changing a Page's `url` prop remounts the wrapper via `key`.
+- **`willNavigate` only fires for `navigate()` calls** — it does NOT fire for `<Link>` clicks or browser back/forward. If you need navigation guards, replace `<Link>` with a `<Button onClick="navigate(...)">` and put the guard logic in the `willNavigate` handler.
+- **`$linkInfo` is populated by NavPanel, not by Pages** — `LinkInfoContext` builds a map from NavGroup/NavLink children. `$linkInfo` gives breadcrumbs, prev/next links, and page metadata. Pages with no matching NavLink entry see `$linkInfo` as `{}`.
+- **`TableOfContentsContext` is for in-page anchors, not URL routing** — each Page wraps children in `<TableOfContentsProvider>` for heading-level TOC support. This is completely separate from react-router and does not affect URL-based navigation.
+- **MemoryRouter is used for preview/embed and SSR** — if `previewMode` is set or `window` is undefined (SSR), the app falls back to MemoryRouter automatically. No URL changes occur.
+
+### From Topic 14: Extension Packages
+
+- **Extension = default export object with `namespace`, `components`, `themes`, `functions`** — that is the entire public API of an extension package. The rest is build tooling and registration wiring.
+- **Three namespace pools: core, app, extensions** — lookup order is core first, then app, then extensions. Core components always win. Extension components cannot shadow built-in names. The default `"XMLUIExtensions"` namespace allows unqualified component names in markup.
+- **Vite mode: import and bundle; standalone mode: UMD self-registers** — in Vite mode, list extensions in `extensions.ts` and import them. In standalone mode, load UMD scripts before the runtime; `build-lib` auto-injects the registration footer.
+- **`subscribeToRegistrations()` fires immediately for already-registered extensions** — the `StandaloneExtensionManager` replays all stored extensions to any late subscriber. Registration order doesn't matter as long as everything registers before first render.
+- **Theme variables from extension components are merged automatically** — when a component renderer with `metadata.themeVars` is registered, its vars go into the global `themeVars` set. No extra wiring needed.
+- **Functions merge with first-write-wins** — extension `functions` become global expression utilities. If a name collides with a built-in or another extension, the first-registered wins silently. Use distinctive names.
+- **Behaviors can only be contributed via `ContributesDefinition`, not `Extension`** — the `Extension` interface has no `behaviors` field. Custom behaviors belong in the app's `ContributesDefinition` entry-point config.
+- **`xmlui build-lib` produces UMD + ESM; `--mode=metadata` produces IDE support files** — react, react-dom, and xmlui are always externals. Third-party deps the extension uses are bundled.
+- **Never bundle react into an extension** — declare react/react-dom as peer dependencies, not regular dependencies. Two React instances break hooks silently.
+
+### From Topic 15: Global Context & Utilities
+
+- **`AppContextObject` is a flat evaluation scope, not a state layer** — it is merged into each component's expression context alongside the 6 state composition layers, but it is NOT one of those layers. It does not participate in `initialState` or `$root` traversal.
+- **Only `avg` and `sum` exist as math utilities** — `min` and `max` are NOT in AppContext. Use `Math.min(...arr)` and `Math.max(...arr)` for those. Declaring otherwise in documentation is incorrect.
+- **localStorage uses dot-path semantics** — the key `"prefs.theme.tone"` reads `localStorage["prefs"]` then uses lodash `get` for the sub-path `theme.tone`. The first segment is always the root entry name; the rest is a lodash path into the parsed JSON value.
+- **`storageTimestamp` is the reactive trigger for storage changes** — it increments after every `writeLocalStorage`, `deleteLocalStorage`, or `clearLocalStorage` call. Pair it with `<ChangeListener listenTo="{storageTimestamp}">` to react to any storage mutation.
+- **`confirm()` is async — always `await` it** — it returns `Promise<boolean>`. Calling it without `await` discards the result. Event handlers that use `confirm` must be declared `async`.
+- **Extension `functions` land in `globalVars`, NOT in AppContext** — they are merged during `StandaloneApp` initialization, before the first render. Both paths make functions callable from expressions, but through different injection mechanisms. First-write-wins applies to `globalVars` (extension functions); AppContext wins over nothing since it's always present.
+- **`appGlobals` is for static config, not callable functions** — it mirrors the contents of `config.json` or `App` props. Access as `appGlobals.myKey`. Do NOT place function references there.
+- **`Actions` namespace uses the ComponentRegistry action pipeline** — `Actions.myAction()` is different from calling a JavaScript function directly. It runs through the full async pipeline with success/error handling and inspector tracing.
+- **`mediaSize.size` is a breakpoint string (`"xs"` through `"xxl"`)** — boolean shorthand exists (`mediaSize.phone`, `mediaSize.desktop`, etc.) but `mediaSize.sizeIndex` (0–5) enables numeric comparisons for column counts and threshold logic.
+- **Never import `date-fns` directly in component code** — use the AppContext date functions instead. They apply system locale and the XMLUI-standard formatting choices automatically.
+- **`toast.promise()` is the cleanest async feedback pattern** — it handles loading/success/error transitions in one call and avoids manual ID-tracking for dismiss.
+
+### From Topic 16: Option-Based Components
+
+- **Two contexts, two concerns** — `OptionTypeProvider` controls *how* Options render (which React component handles them); `OptionContext` controls *data collection* (what options exist). They are independent — a component may need both, one, or neither.
+- **`OptionNative` has zero rendering logic** — it purely delegates to whatever `OptionTypeProvider` has specified. If no provider exists, it renders nothing. Never add rendering logic to `OptionNative`.
+- **`HiddenOption` enables filterable option lists** — in Select advanced mode and AutoComplete, `<Option>` elements render as invisible `HiddenOption` components that register into a `Set<Option>`. The visible dropdown items are generated from that Set, not from the React tree. This is why `<Option>` children are invisible in searchable/multi-select mode.
+- **RadioGroup deliberately skips both option contexts** — it uses `RadioGroupStatusContext` instead, because all options are always visible and no collection/filtering phase is needed. This is correct design, not an oversight.
+- **Option `value` must be a scalar** — `convertOptionValue` normalizes objects, arrays, and NaN to `""`. Only `string`, `number`, `boolean`, and `null` are valid option values.
+- **`keywords` is free search coverage** — any option can carry a `keywords` string array. The Select filter concatenates `value + label + keywords.join(" ")` before matching. Use this for abbreviations, alternate names, and synonyms.
+- **`groupBy` uses extra Option fields** — pass any extra field on your `<Option>` elements (e.g., `department="Engineering"`) and set `groupBy="department"` on Select. Options without the named field land in "Ungrouped" (shown first).
+- **Pagination generates options with `OptionNative` directly** — it bypasses XMLUI markup and constructs `<OptionNative>` elements programmatically. This is an internal pattern; application developers don't write `<OptionNative>` in markup.
+- **Custom rendering priority** — children (complex React nodes) → per-option `optionRenderer` function → component-level `optionRenderer` prop → plain `label` string. Later items are fallbacks only.
+- **For a new filterable selection component** — use `OptionContext` + `HiddenOption` for collection, then render your visible items from the collected `Set<Option>`. For always-visible options (no filtering), use RadioGroup-style direct context instead.
+

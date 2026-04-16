@@ -243,7 +243,7 @@ How user interactions become side effects.
 
 ---
 
-### 11. User-Defined Components
+### 11. User-Defined Components ✅ DONE
 
 **Priority: Medium — extensibility model**
 
@@ -256,11 +256,11 @@ How app developers create reusable components in `.xmlui` files.
 - Context variable propagation through slots
 - `createUserDefinedComponentRenderer()` factory
 
-**Current state:** Well-documented in `ud-components.md` (deep architecture dive). Gap: no concise quick-reference for the pattern.
+**Docs:** `.ai/xmlui/user-defined-components.md` (AI) · `xmlui/dev-docs/guide/11-user-defined-components.md` (guide)
 
 ---
 
-### 12. Form Infrastructure
+### 12. Form Infrastructure ✅ DONE
 
 **Priority: Medium-High — complex subsystem**
 
@@ -275,11 +275,11 @@ Forms, validation, and data submission.
 - Known issues and code smells (from `form-infrastructure-issues.md`)
 - Async validation and race conditions
 
-**Current state:** Thoroughly documented in `form-infrastructure.md`. Design considerations in `form-design.md`. Issues tracked in `form-infrastructure-issues.md`. Good coverage — needs consolidation more than new content.
+**Docs:** `.ai/xmlui/form-infrastructure.md` (AI) · `xmlui/dev-docs/guide/12-form-infrastructure.md` (guide)
 
 ---
 
-### 13. Routing
+### 13. Routing ✅ DONE
 
 **Priority: Medium — navigation infrastructure**
 
@@ -293,11 +293,13 @@ How XMLUI handles page navigation and URL mapping.
 - Navigation via `navigate()` global function
 - How `NavPanel`, `NavGroup`, `NavLink` integrate with routing
 
-**Current state:** No dedicated routing doc. Covered briefly in `.ai/xmlui/overview.md` from user perspective. Internal routing architecture is undocumented.
+**Artifacts:**
+- AI doc: `.ai/xmlui/routing.md`
+- Human doc: `xmlui/dev-docs/guide/13-routing.md`
 
 ---
 
-### 14. Extension Packages
+### 14. Extension Packages ✅ DONE
 
 **Priority: Medium — ecosystem growth**
 
@@ -311,11 +313,13 @@ How to build, register, and publish XMLUI extension packages.
 - Package structure conventions (from existing packages in `packages/`)
 - Build configuration for extensions (`xmlui build-lib`)
 
-**Current state:** Zero documentation. The extension system is simple but there's no guide. Existing packages in `packages/` serve as examples but no reference doc.
+**Artifacts:**
+- AI doc: `.ai/xmlui/extension-packages.md`
+- Human doc: `xmlui/dev-docs/guide/14-extension-packages.md`
 
 ---
 
-### 15. Global Context & Utilities (AppContext)
+### 15. Global Context & Utilities (AppContext) ✅ DONE
 
 **Priority: Medium — everyday usage**
 
@@ -333,9 +337,14 @@ The global functions and utilities available in expressions and event handlers.
 
 **Current state:** `.ai/xmlui/overview.md` lists available functions from user perspective. No dev-docs on the internal implementation, how to add new global functions, or the interceptor system.
 
+**Artifacts:**
+- AI doc: `.ai/xmlui/app-context.md`
+- Human doc: `xmlui/dev-docs/guide/15-app-context.md`
+- Guidelines: `guidelines.md` — "From Topic 15: Global Context & Utilities"
+
 ---
 
-### 16. Option-Based Components
+### 16. Option-Based Components ✅ DONE
 
 **Priority: Medium — common pattern**
 
@@ -348,6 +357,11 @@ Shared architecture for selectable-choice components.
 - How to extend or customize option rendering
 
 **Current state:** Documented in `components-with-options.md`. Solid architecture doc. Needs only light updates.
+
+**Artifacts:**
+- AI doc: `.ai/xmlui/option-components.md`
+- Human doc: `xmlui/dev-docs/guide/16-option-components.md`
+- Guidelines: `guidelines.md` — "From Topic 16: Option-Based Components"
 
 ---
 
