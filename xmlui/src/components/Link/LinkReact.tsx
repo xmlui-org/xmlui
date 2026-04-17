@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   type HTMLAttributeReferrerPolicy,
   type ReactNode,
   useMemo,
@@ -58,7 +59,7 @@ export const defaultProps: Pick<Props, "active" | "enabled" | "noIndicator" | "p
   ellipses: true,
 };
 
-export const LinkNative = forwardRef(function LinkNative(
+export const LinkNative = memo(forwardRef(function LinkNative(
   props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -222,7 +223,7 @@ export const LinkNative = forwardRef(function LinkNative(
       )}
     </Node>
   );
-});
+}));
 
 /**
  * Converts generic types to more specific ones.

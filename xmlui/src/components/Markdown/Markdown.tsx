@@ -45,7 +45,7 @@ export const MarkdownMd = createMetadata({
         "removed from the markdown content. If set to `true`, the shortest " +
         "indent found at the start of the content lines is removed from the " +
         "beginning of every line.",
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.removeIndents,
     },
     removeBr: {
@@ -54,7 +54,7 @@ export const MarkdownMd = createMetadata({
         "omitted from the rendered output. When set to `true`, `<br/>` tags in the " +
         "markdown content will not be rendered. When `false` (default), `<br/>` tags " +
         "render as horizontal bars.",
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.removeBr,
     },
     showHeadingAnchors: {
@@ -62,7 +62,7 @@ export const MarkdownMd = createMetadata({
         "This boolean property specifies whether heading anchors should be " +
         "displayed. If set to `true`, heading anchors will be displayed on hover " +
         "next to headings.",
-      valueType: "boolean",
+      type: "boolean",
     },
     anchorTemplate: dComponent(
       "An optional template to customize the anchor link rendered next to each heading. " +
@@ -74,14 +74,14 @@ export const MarkdownMd = createMetadata({
         "This boolean property specifies whether images should be displayed in " +
         "grayscale. If set to `true`, all images within the markdown will be " +
         "rendered in grayscale.",
-      valueType: "boolean",
+      type: "boolean",
     },
     truncateLinks: {
       description:
         "This boolean property specifies whether long links should be " +
         "truncated with ellipsis. If set to `true`, links will be displayed " +
         "with a maximum width and overflow will be hidden with text-overflow: ellipsis.",
-      valueType: "boolean",
+      type: "boolean",
     },
     openLinkInNewTab: {
       description:
@@ -89,7 +89,7 @@ export const MarkdownMd = createMetadata({
         "If set to `true`, all links within the markdown will open in a new tab " +
         "with `target=\"_blank\"`. Links that explicitly specify their own target " +
         "using the `| target=...` syntax will override this setting.",
-      valueType: "boolean",
+      type: "boolean",
     },
     breakMode: {
       description:
@@ -97,7 +97,7 @@ export const MarkdownMd = createMetadata({
         "`normal` uses standard word boundaries, `word` breaks long words to prevent overflow, " +
         "`anywhere` breaks at any character, `keep` prevents word breaking, " +
         "and `hyphenate` uses automatic hyphenation. When not specified, uses the default browser behavior or theme variables.",
-      valueType: "string",
+      type: "string",
       defaultValue: "normal",
       availableValues: [
         { value: "normal", description: "Uses standard word boundaries for breaking" },
@@ -114,7 +114,7 @@ export const MarkdownMd = createMetadata({
         "`ellipsis` shows ellipses when text is truncated, `scroll` forces single line with horizontal scrolling, " +
         "and `flow` allows multi-line wrapping with vertical scrolling when needed. " +
         "When not specified, uses the default text behavior.",
-      valueType: "string",
+      type: "string",
       defaultValue: "not specified",
       availableValues: [
         {

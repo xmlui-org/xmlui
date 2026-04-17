@@ -22,7 +22,7 @@ import { capitalizeFirstLetter } from "../../components-core/utils/misc";
 
 import { ThemedAvatar as Avatar } from "../Avatar/Avatar";
 import { ThemedLinkNative as LinkNative } from "../Link/Link";
-import type { HeadingProps } from "../Heading/HeadingNative";
+import type { HeadingProps } from "../Heading/HeadingReact";
 import { ThemedHeading as Heading } from "../Heading/Heading";
 import { ThemedText as Text } from "../Text/Text";
 

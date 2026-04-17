@@ -2,6 +2,7 @@ import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   type ReactNode,
   useCallback,
   useContext,
@@ -9,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./Heading.module.scss";
@@ -53,7 +54,7 @@ export const defaultProps: Pick<
   showAnchor: false,
 };
 
-export const Heading = forwardRef(function Heading(
+export const Heading = memo(forwardRef(function Heading(
   {
     uid,
     level = defaultProps.level,
@@ -86,7 +87,7 @@ export const Heading = forwardRef(function Heading(
     showAnchor = appContext?.appGlobals?.showHeadingAnchors ?? false;
   }
 
-  const ref = forwardedRef ? composeRefs(elementRef, forwardedRef) : elementRef;
+  const ref = useComposedRefs(elementRef, forwardedRef);
 
   const scrollIntoView = useCallback((options?: ScrollIntoViewOptions) => {
     if (elementRef.current) {
@@ -186,4 +187,4 @@ export const Heading = forwardRef(function Heading(
       )}
     </Element>
   );
-});
+}));

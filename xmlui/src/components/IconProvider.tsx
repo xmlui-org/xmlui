@@ -3,7 +3,7 @@ import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 import { extraCharRegex, IconRegistryContext, svgAttributeMap } from "./IconRegistryContext";
-import type { IconBaseProps } from "./Icon/IconNative";
+import type { IconBaseProps } from "./Icon/IconReact";
 import { InfoIcon } from "./Icon/InfoIcon";
 import { ValidIcon } from "./Icon/ValidIcon";
 import { ChevronDownIcon } from "./Icon/ChevronDownIcon";

@@ -6,7 +6,7 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Heading, defaultProps } from "./HeadingNative";
+import { Heading, defaultProps } from "./HeadingReact";
 import { resolveAndCleanProps } from "../../components-core/utils/extractParam";
 import type { HeadingLevel } from "./abstractions";
 import { d, dComponent, createMetadata } from "../metadata-helpers";

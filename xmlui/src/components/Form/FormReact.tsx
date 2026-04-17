@@ -4,6 +4,7 @@ import {
   type FormEvent,
   type ForwardedRef,
   forwardRef,
+  memo,
   type ReactNode,
   useEffect,
   useMemo,
@@ -361,7 +362,7 @@ function cleanUpSubjectForWillSubmit(subject: any) {
   );
 }
 
-const Form = forwardRef(function (
+const Form = memo(forwardRef(function (
   {
     formState,
     dispatch,
@@ -850,8 +851,7 @@ const Form = forwardRef(function (
       )}
     </>
   );
-});
-Form.displayName = "Form";
+}));
 
 type FormComponentDef = ComponentDef<typeof FormMd>;
 

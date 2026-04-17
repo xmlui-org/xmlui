@@ -1,6 +1,7 @@
 import type React from "react";
 import { type CSSProperties, forwardRef, memo, useEffect, useRef } from "react";
 import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./IFrame.module.scss";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -37,6 +38,7 @@ export const IFrame = memo(forwardRef(function IFrame(
   ref: React.ForwardedRef<HTMLIFrameElement>,
 ) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const composedRef = useComposedRefs(ref, iframeRef);
 
   // Register component APIs
   useEffect(() => {
@@ -59,7 +61,7 @@ export const IFrame = memo(forwardRef(function IFrame(
   return (
     <iframe
       {...rest}
-      ref={iframeRef}
+      ref={composedRef}
       src={src}
       srcDoc={srcdoc}
       allow={allow}

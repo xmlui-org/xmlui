@@ -3,7 +3,7 @@ import styles from "./IFrame.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
-import { IFrame } from "./IFrameNative";
+import { IFrame } from "./IFrameReact";
 
 const COMP = "IFrame";
 

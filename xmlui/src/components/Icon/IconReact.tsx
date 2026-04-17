@@ -1,4 +1,4 @@
-import { type CSSProperties, forwardRef, type ForwardedRef } from "react";
+import { type CSSProperties, forwardRef, memo, type ForwardedRef } from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
@@ -21,7 +21,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Icon = forwardRef(function Icon(
+export const Icon = memo(forwardRef(function Icon(
   {
     name,
     fallback,
@@ -41,7 +41,7 @@ export const Icon = forwardRef(function Icon(
   const handleKeyDown = (event: React.KeyboardEvent<any>) => {
     if (onClick && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
-      onClick(event as any);
+      onClick(event as unknown as React.MouseEvent<any>);
     }
     onKeyDown?.(event);
   };
@@ -83,7 +83,7 @@ export const Icon = forwardRef(function Icon(
       {renderedIcon}
     </span>
   );
-});
+}));
 
 const CustomIcon = forwardRef(function CustomIcon(
   props: IconBaseProps & { size?: string; iconResourceUrl: string },
@@ -106,7 +106,7 @@ const CustomIcon = forwardRef(function CustomIcon(
   const handleKeyDown = (event: React.KeyboardEvent<any>) => {
     if (onClick && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
-      onClick(event as any);
+      onClick(event as unknown as React.MouseEvent<any>);
     }
     onKeyDown?.(event);
   };
@@ -123,7 +123,7 @@ const CustomIcon = forwardRef(function CustomIcon(
       //to prevent layout shift
       return (
         <span
-          {...(rest as any)}
+          {...(rest as unknown as Record<string, unknown>)}
           data-icon-name={name}
           ref={ref as ForwardedRef<HTMLSpanElement>}
           style={style}
@@ -141,7 +141,7 @@ const CustomIcon = forwardRef(function CustomIcon(
         onClick={onClick}
         onKeyDown={handleKeyDown}
         tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
-        {...(rest as any)}
+        {...(rest as unknown as Record<string, unknown>)}
         data-icon-name={name}
       >
         {renderedIcon}
@@ -159,7 +159,7 @@ const CustomIcon = forwardRef(function CustomIcon(
       onClick={onClick}
       onKeyDown={handleKeyDown}
       tabIndex={onClick ? (tabIndex ?? 0) : tabIndex}
-      {...(rest as any)}
+      {...(rest as unknown as Record<string, unknown>)}
     />
   );
 });

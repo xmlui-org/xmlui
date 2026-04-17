@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef} from "react";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import classnames from "classnames";
 
 import { ThemedImage as Image } from "../Image/Image";
@@ -20,7 +20,7 @@ type LogoProps = {
   inline?: boolean;
 };
 
-export const Logo = forwardRef(function Logo(
+export const Logo = memo(forwardRef(function Logo(
   { style, alt = defaultProps.alt, inline = defaultProps.inline, className, classes, ...rest }: LogoProps,
   forwardedRef: ForwardedRef<HTMLImageElement>,
 ) {
@@ -40,4 +40,4 @@ export const Logo = forwardRef(function Logo(
       style={{ width: "auto", boxShadow: "none", ...style }}
     />
   );
-});
+}));

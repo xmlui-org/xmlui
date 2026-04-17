@@ -740,11 +740,7 @@ export const htmlEmbedTagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const props = p.asRest();
-    return (
-      <embed className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
-        {renderChild(node.children)}
-      </embed>
-    );
+    return <embed className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
   },
 );
 
@@ -1049,11 +1045,7 @@ export const htmlHrTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
-    return (
-      <hr className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </hr>
-    );
+    return <hr className={classes?.[COMPONENT_PART_KEY]} {...props} />;
   },
 );
 
@@ -1133,12 +1125,8 @@ export const htmlImgTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
-    const props = p.asRest() as Record<string, any>;
-    return (
-      <img className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
-        {renderChild(node.children)}
-      </img>
-    );
+    const props = p.asRest() as unknown as Record<string, unknown>;
+    return <img className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
   },
 );
 
@@ -1623,11 +1611,7 @@ export const htmlParamTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
-    return (
-      <param className={classes?.[COMPONENT_PART_KEY]} {...props}>
-        {renderChild(node.children)}
-      </param>
-    );
+    return <param className={classes?.[COMPONENT_PART_KEY]} {...props} />;
   },
 );
 
@@ -1923,11 +1907,7 @@ export const htmlSourceTagRenderer = createComponentRenderer(
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const { src } = p.asUrlResource("src");
     const props = p.asRest();
-    return (
-      <source className={classes?.[COMPONENT_PART_KEY]} src={src} {...props}>
-        {renderChild(node.children)}
-      </source>
-    );
+    return <source className={classes?.[COMPONENT_PART_KEY]} src={src} {...props} />;
   },
 );
 
@@ -2350,11 +2330,7 @@ export const htmlTrackTagRenderer = createComponentRenderer(
     const { src } = p.asUrlResource("src");
     const { default: defaultProp } = p.asOptionalBoolean("default");
     const props = p.asRest();
-    return (
-      <track className={classes?.[COMPONENT_PART_KEY]} default={defaultProp ?? false} src={src} {...props}>
-        {renderChild(node.children)}
-      </track>
-    );
+    return <track className={classes?.[COMPONENT_PART_KEY]} default={defaultProp ?? false} src={src} {...props} />;
   },
 );
 
@@ -2411,7 +2387,7 @@ export const HtmlVarMd = createMetadata({
 
 export const htmlVarTagRenderer = createComponentRenderer(
   "var",
-  HtmlCodeMd,
+  HtmlVarMd,
   ({ node, renderChild, extractValue, extractResourceUrl, classes }) => {
     const p = new PropsTrasform(extractValue, extractResourceUrl, node.props);
     const props = p.asRest();
