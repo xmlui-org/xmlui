@@ -58,8 +58,7 @@ export const DateInputMd = createMetadata({
     validationStatus: dValidationStatus(defaultProps.validationStatus),
     invalidMessages: {
       description: "The invalid messages to display for the input component.",
-      type: "array",
-      valueType: "string",
+      valueType: "any",
     },
     mode: {
       description: "The mode of the date input (single or range)",
@@ -168,15 +167,15 @@ export const DateInputMd = createMetadata({
     endIcon: dEndIcon(),
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
   },
   events: {

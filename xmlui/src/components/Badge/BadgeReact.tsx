@@ -22,7 +22,7 @@ export function isBadgeColors(color: unknown): color is BadgeColors {
   );
 }
 
-type Props = React.HTMLAttributes<HTMLDivElement> & {
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
   classes?: Record<string, string>;
@@ -47,8 +47,8 @@ export const Badge = memo(forwardRef(function Badge(
 
   return (
     <div
-      {...rest}
       ref={forwardedRef}
+      {...rest}
       className={classnames(
         styles.container,
         {

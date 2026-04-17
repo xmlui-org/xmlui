@@ -17,3 +17,5 @@ export const PART_TITLE = "title";
 export const PART_SUBTITLE = "subtitle";
 export const PART_HEADER = "header";
 export const PART_CONTENT = "content";
+export const PART_HAMBURGER = "hamburger";
+export const PART_LIST_WRAPPER = "listWrapper";

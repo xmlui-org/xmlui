@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   forwardRef,
+  memo,
   type ReactNode,
   createContext,
   useContext,
@@ -74,7 +75,7 @@ export const defaultDropdownMenuProps: Pick<
   triggerButtonIconPosition: "end",
 };
 
-export const DropdownMenu = forwardRef(function DropdownMenu(
+export const DropdownMenu = memo(forwardRef(function DropdownMenu(
   {
     triggerTemplate,
     children,
@@ -187,7 +188,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
       </DropdownMenuPrimitive.Root>
     </DropdownMenuContext.Provider>
   );
-});
+}));
 
 type MenuItemProps = {
   icon?: ReactNode;
@@ -210,7 +211,7 @@ export const defaultMenuItemProps: Pick<MenuItemProps, "iconPosition" | "active"
   active: false,
 };
 
-export const MenuItem = forwardRef(function MenuItem(
+export const MenuItem = memo(forwardRef(function MenuItem(
   {
     children,
     onClick = noop,
@@ -259,7 +260,7 @@ export const MenuItem = forwardRef(function MenuItem(
       {!iconToStart && icon}
     </DropdownMenuPrimitive.Item>
   );
-});
+}));
 
 type SubMenuItemProps = {
   label?: string;

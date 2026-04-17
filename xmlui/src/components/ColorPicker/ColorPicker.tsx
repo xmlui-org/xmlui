@@ -80,7 +80,7 @@ export const ThemedColorPicker = React.forwardRef<React.ElementRef<typeof ColorP
 
 export const colorPickerComponentRenderer = wrapComponent(
   "ColorPicker",
-  ColorPicker,
+  ThemedColorPicker,
   ColorPickerMd,
   {
     exposeRegisterApi: true,

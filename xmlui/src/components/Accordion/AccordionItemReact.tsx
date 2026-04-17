@@ -1,6 +1,7 @@
 import {
   type ForwardedRef,
   forwardRef,
+  memo,
   type ReactNode,
   useEffect,
   useId,
@@ -22,20 +23,10 @@ function defaultRenderer(header: string) {
 
 type Props = {
   id: string;
-  /**
-   * The header of the accordion.
-   */
   header: string;
-
   headerRenderer?: (header: string) => ReactNode;
-
-  /**
-   * The content of the accordion.
-   */
   content: ReactNode;
-
   initiallyExpanded?: boolean;
-
   style?: React.CSSProperties;
   className?: string;
   classes?: Record<string, string>;
@@ -46,7 +37,7 @@ export const defaultProps: Pick<Props, "initiallyExpanded" | "headerRenderer"> =
   headerRenderer: defaultRenderer,
 };
 
-export const AccordionItemComponent = forwardRef(function AccordionItemComponent(
+export const AccordionItemComponent = memo(forwardRef(function AccordionItemComponent(
   {
     id,
     header,
@@ -75,6 +66,13 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
     unRegister,
   } = useAccordionContext();
   const expanded = useMemo(() => (expandedItems ?? []).includes(itemId), [itemId, expandedItems]);
+  const iconStyle = useMemo(
+    () => ({
+      transform: expanded && !expandedIcon ? `rotate(${rotateExpanded})` : "rotate(0deg)",
+      transition: "transform 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+    }),
+    [expanded, expandedIcon, rotateExpanded],
+  );
   const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {
@@ -115,12 +113,7 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
         >
           {headerRenderer(header)}
           {!hideIcon && (
-            <span
-              style={{
-                transform: expanded && !expandedIcon ? `rotate(${rotateExpanded})` : "rotate(0deg)",
-                transition: "transform 300ms cubic-bezier(0.87, 0, 0.13, 1)",
-              }}
-            >
+            <span style={iconStyle}>
               <ThemedIcon
                 name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
                 className={styles.chevron}
@@ -135,4 +128,4 @@ export const AccordionItemComponent = forwardRef(function AccordionItemComponent
       </RAccordion.Content>
     </RAccordion.Item>
   );
-});
+}));

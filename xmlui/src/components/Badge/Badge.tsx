@@ -26,14 +26,14 @@ export const BadgeMd = createMetadata({
         "The text that the component displays. If this is not defined, the component renders " +
         "its children as the content of the badge. If neither text nor any child is defined, " +
         "the component renders a single frame for the badge with a non-breakable space.",
-      type: "string",
+      valueType: "string",
       isRequired: true,
     },
     variant: {
       description:
         "Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant " +
         "with fully rounded corners.",
-      type: "string",
+      valueType: "string",
       availableValues: badgeVariantValues,
       defaultValue: defaultProps.variant,
     },
@@ -87,7 +87,7 @@ export const badgeComponentRenderer = wrapComponent(
       return (
         <Badge
           {...props}
-          color={colorValue as any}
+          color={colorValue}
         >
           {value || (node.children && renderChild(node.children)) || String.fromCharCode(0xa0)}
         </Badge>

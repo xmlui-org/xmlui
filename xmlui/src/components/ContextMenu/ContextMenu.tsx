@@ -3,7 +3,7 @@ import styles from "./ContextMenu.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata } from "../metadata-helpers";
-import { ContextMenu } from "./ContextMenuNative";
+import { ContextMenu } from "./ContextMenuReact";
 import type { ContainerWrapperDef } from "../../components-core/rendering/ContainerWrapper";
 import { filterSeparators } from "../menu-helpers";
 
@@ -26,7 +26,7 @@ export const ContextMenuMd = createMetadata({
   },
   props: {
     menuWidth: {
-      type: "string",
+      valueType: "string",
       description: "Sets the width of the context menu.",
     },
   },

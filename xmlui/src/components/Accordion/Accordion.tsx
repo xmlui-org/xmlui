@@ -3,7 +3,7 @@ import styles from "./Accordion.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dFocus } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
-import { AccordionComponent, defaultProps } from "./AccordionNative";
+import { AccordionComponent, defaultProps } from "./AccordionReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Accordion";
@@ -24,30 +24,30 @@ export const AccordionMd = createMetadata({
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
         `follows the header.`,
       defaultValue: defaultProps.triggerPosition,
-      valueType: "string",
+      type: "string",
       availableValues: triggerPositionNames,
     },
     collapsedIcon: {
       description:
         "This property is the name of the icon that is displayed when the accordion is " +
         "collapsed. This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-down icon is used.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.collapsedIcon,
     },
     expandedIcon: {
       description:
         "This property is the name of the icon that is displayed when the accordion is " +
         "expanded. If not provided, a chevron-up icon is used.",
-      valueType: "string",
+      type: "string",
     },
     hideIcon: {
       description: `This property indicates that the trigger icon is not displayed (\`true\`).`,
       defaultValue: defaultProps.hideIcon,
-      valueType: "boolean",
+      type: "boolean",
     },
     rotateExpanded: {
       description: `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.rotateExpanded,
     },
   },
@@ -96,6 +96,7 @@ export const AccordionMd = createMetadata({
     [`color-content-${COMP}`]: "$textColor-primary",
     [`backgroundColor-content-${COMP}`]: "transparent",
     [`color-icon-${COMP}`]: "$color-surface-50",
+    [`padding-content-${COMP}`]: "$space-2",
   },
 });
 

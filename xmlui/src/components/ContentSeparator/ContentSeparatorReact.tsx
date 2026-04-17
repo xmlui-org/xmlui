@@ -1,4 +1,4 @@
-import { forwardRef, type CSSProperties } from "react";
+import { forwardRef, memo, type CSSProperties } from "react";
 import classnames from "classnames";
 
 import styles from "./ContentSeparator.module.scss";
@@ -18,7 +18,7 @@ export const defaultProps: Pick<ContentSeparatorProps, "orientation"> = {
   orientation: "horizontal",
 };
 
-export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps>(
+export const ContentSeparator = memo(forwardRef<HTMLDivElement, ContentSeparatorProps>(
   (
     { orientation = defaultProps.orientation, thickness, length, hasExplicitLength = false, style, classes, className, ...rest },
     ref,
@@ -63,4 +63,4 @@ export const ContentSeparator = forwardRef<HTMLDivElement, ContentSeparatorProps
       />
     );
   },
-);
+));

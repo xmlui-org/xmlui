@@ -12,12 +12,6 @@ description: Implement a new XMLUI component end-to-end
 3. Read these reference files (load only what applies):
    - `.ai/xmlui/component-architecture.md` — two-file pattern, metadata, renderer, native (always)
    - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (always for wrapped components)
-   - `.ai/xmlui/components/metadata.md` — metadata API (always)
-   - `.ai/xmlui/components/renderer.md` — renderer pattern (always)
-   - `.ai/xmlui/components/native.md` — native component pattern (always for complex components)
-   - `.ai/xmlui/components/styling.md` — SCSS & theme variables (visual components only)
-   - `.ai/xmlui/components/parts.md` — parts pattern (only if sub-elements need individual styling)
-   - `.ai/xmlui/components/state.md` — state management (only if component exposes state to markup)
    - `.ai/xmlui/theming-styling.md` — theming system (visual components only)
    - `.ai/xmlui/behaviors.md` — behavior system (if component interacts with forms, labels, validation)
    - `.ai/xmlui/testing-conventions.md` — testing patterns (when tests are requested)
@@ -67,15 +61,15 @@ Verify the project still compiles (check for TypeScript errors in the Problems p
 ### Step 5 — Add SCSS module (visual components only)
 
 Create `xmlui/src/components/ComponentName/ComponentName.module.scss`:
-- Use the boilerplate from `.ai/xmlui/components/styling.md`
+- Use the SCSS boilerplate from `.ai/xmlui/component-architecture.md` (SCSS section)
 - Declare all theme variables referenced in `feature.md`
 - Add `defaultThemeVars` in the metadata for each variable
 
 ### Step 6 — Complete the implementation
 
 - Finish the native component's render logic, event handlers, and imperative API
-- Wire the parts pattern if applicable (`.ai/xmlui/components/parts.md`)
-- Implement state management if needed (`.ai/xmlui/components/state.md`)
+- Wire the parts pattern if applicable (see `.ai/xmlui/theming-styling.md`)
+- Implement state management if needed (see `.ai/xmlui/component-architecture.md`)
 
 ### Step 7 — Add a changeset (if user-facing)
 

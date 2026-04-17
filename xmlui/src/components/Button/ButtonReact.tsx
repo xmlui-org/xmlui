@@ -1,4 +1,4 @@
-import React, { type CSSProperties, type ForwardedRef, forwardRef, memo, useRef, useEffect } from "react";
+import React, { type ForwardedRef, forwardRef, memo, useRef, useEffect } from "react";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { PART_ICON } from "../../components-core/parts";
@@ -11,7 +11,6 @@ import {
   isSizeType,
   type SizeType,
   type AlignmentOptions,
-  type ButtonAria,
   type ButtonThemeColor,
   type ButtonType,
   type ButtonVariant,
@@ -21,36 +20,19 @@ import {
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { VisuallyHidden } from "../VisuallyHidden";
 
-type Props = {
-  id?: string;
+type Props = Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "type" | "form"> & {
   type?: ButtonType;
   variant?: ButtonVariant;
   themeColor?: ButtonThemeColor;
   size?: SizeType;
-  disabled?: boolean;
-  children?: React.ReactNode;
   icon?: React.ReactNode;
   iconPosition?: IconPosition;
   contentPosition?: AlignmentOptions;
   orientation?: OrientationOptions;
   formId?: string;
-  style?: CSSProperties;
-  autoFocus?: boolean;
   contextualLabel?: string;
   classes?: Record<string, string>;
-} & Pick<
-  React.HTMLAttributes<HTMLButtonElement>,
-  | "onClick"
-  | "onContextMenu"
-  | "onFocus"
-  | "onBlur"
-  | "onMouseEnter"
-  | "onMouseLeave"
-  | ButtonAria
-  | "tabIndex"
-  | "className"
-  | "role"
->;
+};
 
 export const defaultProps: Pick<
   Props,
@@ -62,7 +44,7 @@ export const defaultProps: Pick<
   | "themeColor"
   | "size"
   | "autoFocus"
-> = {
+> & { enabled: boolean } = {
   type: "button",
   iconPosition: "start",
   contentPosition: "center",
@@ -71,6 +53,7 @@ export const defaultProps: Pick<
   themeColor: "primary",
   size: "sm",
   autoFocus: false,
+  enabled: true,
 };
 
 export const Button = memo(forwardRef(function Button(

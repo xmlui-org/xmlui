@@ -15,7 +15,7 @@ import {
   MenuItem,
   MenuSeparator,
   SubMenuItem,
-} from "./DropdownMenuNative";
+} from "./DropdownMenuReact";
 
 export { DropdownMenuContext };
 import { filterSeparators } from "../menu-helpers";
@@ -124,7 +124,7 @@ export const ThemedDropdownMenu = React.forwardRef<HTMLButtonElement, ThemedDrop
   },
 );
 
-export const dropdownMenuComponentRenderer = wrapComponent(DDMCOMP, DropdownMenu, DropdownMenuMd, {
+export const dropdownMenuComponentRenderer = wrapComponent(DDMCOMP, ThemedDropdownMenu, DropdownMenuMd, {
   exposeRegisterApi: true,
   contentClassName: true,
   exclude: ["enabled"],

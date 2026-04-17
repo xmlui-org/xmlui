@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
@@ -15,7 +16,7 @@ type Props = {
   onDidUpdate?: AsyncFunction;
 };
 
-export function AppState({
+export const AppState = memo(function AppState({
   bucket = defaultProps.bucket,
   updateState,
   initialValue,
@@ -67,4 +68,4 @@ export function AppState({
   }, [bucket, registerComponentApi, update, value]);
 
   return null;
-}
+});

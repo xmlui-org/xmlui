@@ -11,7 +11,7 @@ These rules apply whenever editing Playwright test files (`.spec.ts`).
 | Topic | AI Doc |
 |-------|--------|
 | E2E & unit test patterns | `.ai/xmlui/testing-conventions.md` |
-| Detailed E2E conventions | `.ai/xmlui/testing/e2e.md` |
+| Detailed E2E conventions | `.ai/xmlui/testing-conventions.md` |
 | Accessibility testing | `.ai/xmlui/accessibility.md` |
 
 Verified rules: `guidelines.md` at the repo root (Topics 23, 24).

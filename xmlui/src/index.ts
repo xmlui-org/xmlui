@@ -122,7 +122,7 @@ import {
   ThemedDropdownMenu as DropdownMenu,
   ThemedMenuItem as MenuItem,
 } from "./components/DropdownMenu/DropdownMenu";
-import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
+import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorReact";
 import { MemoizedItem } from "./components/container-helpers";
 import { HiddenOption } from "./components/Select/HiddenOption";
 import OptionTypeProvider from "./components/Option/OptionTypeProvider";

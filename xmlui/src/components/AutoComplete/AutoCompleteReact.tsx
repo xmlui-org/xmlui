@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   type ReactNode,
   useId,
   useCallback,
@@ -25,13 +26,12 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
+import { PART_CONCISE_VALIDATION_FEEDBACK, PART_LIST_WRAPPER } from "../../components-core/parts";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 
-const PART_LIST_WRAPPER = "listWrapper";
-const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 type AutoCompleteProps = {
   id?: string;
@@ -89,7 +89,7 @@ export const defaultProps: Partial<AutoCompleteProps> = {
   initiallyOpen: false,
 };
 
-export const AutoComplete = forwardRef(function AutoComplete(
+export const AutoComplete = memo(forwardRef(function AutoComplete(
   {
     id,
     initialValue,
@@ -688,7 +688,7 @@ export const AutoComplete = forwardRef(function AutoComplete(
       </OptionContext.Provider>
     </AutoCompleteContext.Provider>
   );
-});
+}));
 
 type CreatableItemProps = {
   onNewItem: (item: string) => void;

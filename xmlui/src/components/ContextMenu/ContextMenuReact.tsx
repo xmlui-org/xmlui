@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   forwardRef,
+  memo,
   type ReactNode,
   useCallback,
   useState,
@@ -28,7 +29,7 @@ type ContextMenuProps = {
   menuWidth?: string;
 };
 
-export const ContextMenu = forwardRef(function ContextMenu(
+export const ContextMenu = memo(forwardRef(function ContextMenu(
   {
     children,
     registerComponentApi,
@@ -201,4 +202,4 @@ export const ContextMenu = forwardRef(function ContextMenu(
       </DropdownMenuPrimitive.Root>
     </DropdownMenuContext.Provider>
   );
-});
+}));

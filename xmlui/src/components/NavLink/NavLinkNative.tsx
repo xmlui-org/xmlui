@@ -9,7 +9,7 @@ import styles from "./NavLink.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import type { LinkAria, LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
-import { getAppLayoutOrientation } from "../App/AppNative";
+import { getAppLayoutOrientation } from "../App/AppReact";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";

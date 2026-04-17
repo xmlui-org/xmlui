@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   type ReactNode,
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -29,7 +30,7 @@ import {
 import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Sheet, SheetContent } from "./Sheet";
-import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderNative";
+import { AppContextAwareAppHeader } from "../AppHeader/AppHeaderReact";
 import { AppHeaderMd } from "../AppHeader/AppHeader";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
@@ -47,7 +48,6 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 // --- Slot Components Factory ---
 
 function createSlot<T extends HTMLElement = HTMLDivElement>(
-  displayName: string,
   className?: string,
   elementType: keyof JSX.IntrinsicElements = "div",
 ) {
@@ -61,16 +61,15 @@ function createSlot<T extends HTMLElement = HTMLDivElement>(
       );
     },
   );
-  Slot.displayName = displayName;
   return Slot;
 }
 
-const AppContainer = createSlot("AppContainer");
-const AppHeaderSlot = createSlot<HTMLElement>("AppHeaderSlot", styles.headerWrapper, "header");
-const AppFooterSlot = createSlot("AppFooterSlot", styles.footerWrapper);
-const AppNavPanelSlot = createSlot("AppNavPanelSlot", styles.navPanelWrapper);
-const AppContentSlot = createSlot("AppContentSlot", styles.mainContentArea);
-const AppPagesSlot = createSlot("AppPagesSlot", styles.pagesContainer);
+const AppContainer = createSlot();
+const AppHeaderSlot = createSlot<HTMLElement>(styles.headerWrapper, "header");
+const AppFooterSlot = createSlot(styles.footerWrapper);
+const AppNavPanelSlot = createSlot(styles.navPanelWrapper);
+const AppContentSlot = createSlot(styles.mainContentArea);
+const AppPagesSlot = createSlot(styles.pagesContainer);
 
 // --- Component Types ---
 
@@ -124,12 +123,6 @@ export const defaultProps: Pick<
   | "persistTheme"
   | "toneStorageKey"
   | "themeStorageKey"
-  | "onReady"
-  | "onMessageReceived"
-  | "onKeyDown"
-  | "onKeyUp"
-  | "onWillNavigate"
-  | "onDidNavigate"
 > = {
   scrollWholePage: true,
   noScrollbarGutters: false,
@@ -140,18 +133,8 @@ export const defaultProps: Pick<
   persistTheme: false,
   toneStorageKey: "appTone",
   themeStorageKey: "appTheme",
-  onReady: noop,
-  onMessageReceived: noop,
-  onKeyDown: noop,
-  onKeyUp: noop,
-  onWillNavigate: undefined,
-  onDidNavigate: undefined,
 };
 
-/**
- * List of valid layout types for the App component.
- * Used for runtime validation to provide helpful error messages.
- */
 const VALID_LAYOUTS: AppLayoutType[] = [
   "vertical",
   "vertical-sticky",
@@ -163,23 +146,7 @@ const VALID_LAYOUTS: AppLayoutType[] = [
   "desktop",
 ];
 
-/**
- * Determines whether the NavPanel should be visible inline (not in a drawer).
- *
- * @param hasNavPanel - Whether a NavPanel is defined and rendered
- * @param isLargeScreen - Whether the viewport is large enough for sidebar layout
- * @param hasHeader - Whether a header is registered
- * @param layout - Current layout type
- * @returns true if NavPanel should be shown inline, false if it should be in a drawer
- *
- * Logic:
- * - If no NavPanel exists, return false
- * - On large screens: always show inline
- * - On small screens: show inline only if there's no header to contain the drawer button,
- *   except for condensed layouts which always use the header for the drawer button
- */
-
-export function App({
+export const App = memo(function App({
   children,
   style = EMPTY_OBJECT,
   layout,
@@ -187,12 +154,12 @@ export function App({
   scrollWholePage = defaultProps.scrollWholePage,
   noScrollbarGutters = defaultProps.noScrollbarGutters,
   fitContent = defaultProps.fitContent,
-  onReady = defaultProps.onReady,
-  onMessageReceived = defaultProps.onMessageReceived,
-  onKeyDown = defaultProps.onKeyDown,
-  onKeyUp = defaultProps.onKeyUp,
-  onWillNavigate = defaultProps.onWillNavigate,
-  onDidNavigate = defaultProps.onDidNavigate,
+  onReady = noop,
+  onMessageReceived = noop,
+  onKeyDown = noop,
+  onKeyUp = noop,
+  onWillNavigate,
+  onDidNavigate,
   header,
   navPanel,
   footer,
@@ -426,7 +393,7 @@ export function App({
     el.addEventListener("scroll", saveScroll);
     return () => {
       el.removeEventListener("scroll", saveScroll);
-      saveScroll.flush();
+      saveScroll.cancel?.();
     };
   }, [scrollRestorationEnabled, location.key, scrollContainerRef]);
 
@@ -444,7 +411,7 @@ export function App({
 
   const [subNavPanelSlot, setSubNavPanelSlot] = useState(null);
 
-  const registerSubNavPanelSlot = useCallback((element) => {
+  const registerSubNavPanelSlot = useCallback((element: HTMLElement | null) => {
     setSubNavPanelSlot(element);
   }, []);
 
@@ -667,7 +634,7 @@ export function App({
       </AppLayoutContext.Provider>
     </>
   );
-}
+});
 
 export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
   switch (appLayout) {
@@ -680,16 +647,6 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
   }
 }
 
-/**
- * Custom hook to manage theme and tone initialization.
- * Handles initial theme setup and system theme preference detection.
- *
- * @param defaultTone - Initial tone preference ("dark", "light", or undefined for auto-detect)
- * @param defaultTheme - Initial theme ID to activate
- * @param autoDetectTone - Whether to auto-detect system theme preference
- * @param setActiveThemeTone - Function to set the active theme tone
- * @param setActiveThemeId - Function to set the active theme ID
- */
 function useThemeInitialization({
   defaultTone,
   defaultTheme,
@@ -797,10 +754,6 @@ function useThemeInitialization({
   }, [autoDetectTone, defaultTone, setActiveThemeTone]);
 }
 
-/**
- * Custom hook to manage drawer state with auto-close behavior.
- * Consolidates all drawer-related state updates in one place.
- */
 function useDrawerState(
   location: ReturnType<typeof useLocation>,
   navPanelVisible: boolean,
@@ -831,10 +784,6 @@ function useDrawerState(
   };
 }
 
-/**
- * Custom hook for observing element size changes.
- * Returns a ref callback and the observed height.
- */
 function useElementSizeObserver() {
   const ref = useRef<HTMLElement | null>(null);
   const [height, setHeight] = useState(0);
@@ -856,9 +805,6 @@ function useElementSizeObserver() {
   return { refCallback, height };
 }
 
-/**
- * Layout configuration interface defining how each layout variant should be rendered.
- */
 interface LayoutConfig {
   containerClasses: string[];
   containerScrollRef?: boolean;
@@ -871,9 +817,6 @@ interface LayoutConfig {
   showCondensedHeader?: boolean;
 }
 
-/**
- * Base layout configuration with common defaults.
- */
 const baseLayoutConfig: LayoutConfig = {
   containerClasses: [],
   headerClasses: [],
@@ -882,10 +825,6 @@ const baseLayoutConfig: LayoutConfig = {
   contentWrapperRef: "content",
 };
 
-/**
- * Layout configurations for all supported layout types.
- * Defines the structure and styling for each layout variant.
- */
 const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
   vertical: {
     ...baseLayoutConfig,
@@ -942,10 +881,6 @@ const layoutConfigs: Record<AppLayoutType, LayoutConfig> = {
   },
 };
 
-/**
- * Custom hook for creating the App layout context value.
- * Encapsulates the logic for building the layout context and its dependencies.
- */
 function useAppLayoutContextValue({
   hasRegisteredNavPanel,
   hasRegisteredHeader,
@@ -1041,14 +976,3 @@ function useAppLayoutContextValue({
     ],
   );
 }
-
-/**
- * Helper function to determine if header/footer height CSS variables should be set
- * based on the layout type and scroll strategy.
- *
- * Non-sticky layouts (vertical, horizontal, condensed) with scrollWholePage=true don't
- * need height compensation because the header/footer scroll with the page.
- *
- * Sticky layouts (vertical-sticky, vertical-full-header, desktop) or content-only scroll
- * need height compensation so content can be positioned correctly.
- */

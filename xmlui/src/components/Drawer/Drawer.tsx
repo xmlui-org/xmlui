@@ -2,7 +2,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { createMetadata, dComponent } from "../metadata-helpers";
-import { DrawerNative, defaultProps } from "./DrawerNative";
+import { DrawerNative, defaultProps } from "./DrawerReact";
 
 import styles from "./Drawer.module.scss";
 
@@ -106,6 +106,7 @@ export const DrawerMd = createMetadata({
 
 export const drawerComponentRenderer = wrapComponent(COMP, DrawerNative, DrawerMd, {
   exposeRegisterApi: true,
+  events: { open: "onOpen", close: "onClose" },
   customRender: (props, { node, extractValue, renderChild }) => {
     // Read layout properties that should override the corresponding theme variables
     const backgroundColor = extractValue.asOptionalString(node.props.backgroundColor);

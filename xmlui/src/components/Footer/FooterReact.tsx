@@ -1,6 +1,6 @@
 import type { ForwardedRef, ReactNode } from "react";
 import type React from "react";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import classnames from "classnames";
 
 import styles from "./Footer.module.scss";
@@ -15,7 +15,7 @@ export const defaultProps = {
   sticky: true,
 };
 
-export const Footer = forwardRef(function Footer(
+export const Footer = memo(forwardRef(function Footer(
   {
     children,
     style,
@@ -52,4 +52,4 @@ export const Footer = forwardRef(function Footer(
       </div>
     </div>
   );
-});
+}));
