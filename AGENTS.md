@@ -4,7 +4,7 @@ Agent-oriented reference for the XMLUI monorepo. Read this first for any task.
 For deeper detail, refer to:
 
 - **`xmlui/dev-docs/`** — architecture & subsystem reference (rendering, containers, theming, forms, etc.)
-- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/components/overview.md` (component authoring), `.ai/xmlui/components/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing/e2e.md` (E2E conventions).
+- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/component-architecture.md` (component authoring — metadata, renderer, native patterns), `.ai/xmlui/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing-conventions.md` (E2E + unit test conventions), `.ai/xmlui/qa-checklist.md` (QA audit checklist).
 
 ---
 
@@ -149,19 +149,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `accessibility.md` | ARIA, keyboard nav, per-component audit | Accessibility fixes |
 | `doc-generation.md` | Generate-docs pipeline, MetadataProcessor | Documentation generation |
 
-### Component Authoring (`.ai/xmlui/components/`)
-
-| File | Covers |
-|------|--------|
-| `overview.md` | Component authoring entry point |
-| `metadata.md` | `createMetadata` API reference |
-| `renderer.md` | Renderer function patterns |
-| `native.md` | Native component patterns |
-| `styling.md` | SCSS modules, theme variables |
-| `parts.md` | Parts pattern for sub-elements |
-| `state.md` | Component state management |
-| `behaviors.md` | Behavior authoring and registration |
-| `qa-checklist.md` | QA audit checklist |
+| `qa-checklist.md` | QA audit checklist — actionable per-section checklist for component reviews |
 
 ### Human-Readable Guides (`xmlui/dev-docs/guide/`)
 

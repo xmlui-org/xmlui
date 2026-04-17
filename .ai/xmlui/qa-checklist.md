@@ -1,3 +1,5 @@
+<!-- Audience: component authors / reviewers. Actionable audit checklist. -->
+
 # XMLUI Component QA Checklist
 
 Quick reference for auditing and refactoring XMLUI components. Each item is

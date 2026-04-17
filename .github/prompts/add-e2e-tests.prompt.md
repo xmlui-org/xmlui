@@ -12,7 +12,7 @@ description: Add or expand Playwright E2E tests for an XMLUI component
 3. Read these reference files:
    - `.ai/xmlui/testing-conventions.md` — E2E patterns, `initTestBed`, locators, event testing (always)
    - `.ai/xmlui/accessibility.md` — accessibility test patterns (always for interactive components)
-   - `.ai/xmlui/testing/e2e.md` — detailed E2E conventions (if more detail needed)
+   - `.ai/xmlui/testing-conventions.md` — detailed E2E conventions (if more detail needed)
 4. Read the component's source and existing tests:
    - `ComponentName.tsx` — metadata (lists all props, events, APIs to test)
    - `ComponentNameNative.tsx` — implementation details

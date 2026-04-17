@@ -9,7 +9,7 @@ description: Review a component's source code against QA conventions and fix the
 
 1. Read `guidelines.md` at the repo root — focus on Topics 4–5 (component architecture), 7 (theming/SCSS), 9 (behaviors), 23 (testing), 24 (accessibility).
 2. Read these reference files:
-   - `.ai/xmlui/components/qa-checklist.md` — primary checklist driving this entire review (always)
+   - `.ai/xmlui/qa-checklist.md` — primary checklist driving this entire review (always)
    - `.ai/xmlui/component-architecture.md` — two-file pattern, metadata, renderer, native (always)
    - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (if component uses wrapComponent)
    - `.ai/xmlui/theming-styling.md` — CSS variables, SCSS conventions (visual components)
@@ -29,7 +29,7 @@ description: Review a component's source code against QA conventions and fix the
 
 ### Step 1 — Full source audit
 
-Run the complete `.ai/xmlui/components/qa-checklist.md` checklist against all component files.
+Run the complete `.ai/xmlui/qa-checklist.md` checklist against all component files.
 Produce a structured findings report covering all 9 sections:
 
 1. File Structure
@@ -110,10 +110,10 @@ All tests must pass. If a test fails:
 
 ### Step 7 — Propose QA checklist improvements (if any)
 
-If during the review you encountered patterns, anti-patterns, or edge cases not covered by `.ai/xmlui/components/qa-checklist.md`, propose additions or corrections:
+If during the review you encountered patterns, anti-patterns, or edge cases not covered by `.ai/xmlui/qa-checklist.md`, propose additions or corrections:
 
 - List each proposed change with the target section, the exact text to add/modify, and the rationale.
-- **Do not edit** `.ai/xmlui/components/qa-checklist.md` until the user explicitly approves.
+- **Do not edit** `.ai/xmlui/qa-checklist.md` until the user explicitly approves.
 - If the user approves, apply the updates to the checklist file.
 
 ### Step 8 — Final checklist sign-off

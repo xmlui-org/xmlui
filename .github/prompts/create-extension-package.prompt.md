@@ -14,7 +14,6 @@ description: Create a new XMLUI extension package with component(s)
    - `.ai/xmlui/build-system.md` — `xmlui build-lib` and extension build patterns (always)
    - `.ai/xmlui/monorepo-structure.md` — workspace config, package categories (always)
    - `.ai/xmlui/component-architecture.md` — two-file pattern (always)
-   - `.ai/xmlui/components/metadata.md` — metadata API (always)
    - `.ai/xmlui/testing-conventions.md` — testing patterns (always)
 4. Study an existing extension package (e.g., `packages/xmlui-hello-world/`) as a structural reference.
 

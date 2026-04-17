@@ -2,7 +2,7 @@
 
 Behaviors are decorator-like objects that automatically wrap rendered components with cross-cutting functionality. They activate based on props — components need no knowledge of them.
 
-> **Component patterns** (user-facing): See `.ai/xmlui/components/behaviors.md`.
+> **Component author rules**: See `.ai/xmlui/qa-checklist.md` §6 (Parts & Accessibility) and the behavior table in `.ai/xmlui/component-architecture.md`.
 > **Architecture reference**: See `xmlui/dev-docs/component-behaviors.md`.
 
 ## The `Behavior` Interface

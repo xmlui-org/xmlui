@@ -32,7 +32,7 @@ Make every AI assistant session in this workspace immediately productive for com
 | T3 | Create a new extension package | ✗ | No prompt at all |
 | T4 | Fix a bug with regression tests | ✗ | No prompt at all |
 | T5 | Extend an existing component | `extend-component.prompt.md` ✓ | Doesn't reference 25-topic docs, no E2E section |
-| T6 | QA review an existing component | ✗ | QA checklist exists (`.ai/xmlui/components/qa-checklist.md`) but no prompt workflow |
+| T6 | QA review an existing component | ✗ | QA checklist exists (`.ai/xmlui/qa-checklist.md`) but no prompt workflow |
 | T7 | Add E2E tests to a component | ✗ | Testing conventions exist but no prompt |
 | T8 | Refactor core code | `refactor-core.prompt.md` ✓ | References old doc paths |
 | T9 | Write documentation for a component | ✗ | No prompt at all |
