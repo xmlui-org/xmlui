@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   forwardRef,
+  memo,
   type ReactNode,
   useCallback,
   useEffect,
@@ -52,7 +53,7 @@ export const defaultExpandableItemProps: Pick<
   fullWidthSummary: false,
 };
 
-export const ExpandableItem = forwardRef(function ExpandableItem(
+export const ExpandableItem = memo(forwardRef(function ExpandableItem(
   {
     summary,
     children,
@@ -162,7 +163,7 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
         [styles.withSwitch]: withSwitch,
       })}
       style={style}
-      ref={ref as any}
+      ref={ref}
     >
       <Part partId={PART_SUMMARY}>
         <div
@@ -214,4 +215,4 @@ export const ExpandableItem = forwardRef(function ExpandableItem(
       </Part>
     </div>
   );
-});
+}));

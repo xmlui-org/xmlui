@@ -15,6 +15,7 @@ export const DataSourceMd = createMetadata({
       description: `Set the HTTP method.`,
       defaultValue: "get",
       availableValues: httpMethodNames,
+      valueType: "string",
     },
     id: {
       description:
@@ -101,18 +102,21 @@ export const DataSourceMd = createMetadata({
       description:
         "Set an optional function to perform a final transformation of the " +
         "response data. If this value is not set, the result is not transformed.",
+      valueType: "any",
     },
     prevPageSelector: {
       description:
         `When using \`${COMP}\` with paging, the response may contain information about the ` +
         `previous and next page. This property defines the selector that extracts the ` +
         `previous page information from the response deserialized to an object.`,
+      valueType: "string",
     },
     nextPageSelector: {
       description:
         `When using \`${COMP}\` with paging, the response may contain information about ` +
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,
+      valueType: "string",
     },
     dataType: {
       description:
@@ -132,7 +136,8 @@ export const DataSourceMd = createMetadata({
         "the original reference if nothing has changed in the data. If a subset has " +
         "changed, `DataSource` will keep the unchanged parts and only replace the changed " +
         "parts. If you do not need this behavior, set this property to `false`.",
-      defaultValue: "true",
+      valueType: "boolean",
+      defaultValue: true,
     },
     omitTransactionId: {
       description:

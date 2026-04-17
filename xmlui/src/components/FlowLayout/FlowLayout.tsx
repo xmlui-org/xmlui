@@ -8,11 +8,11 @@ import { isComponentDefChildren } from "../../components-core/utils/misc";
 import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutNative";
+import { FlowItemBreak, FlowItemWrapper, FlowLayout, defaultProps } from "./FlowLayoutReact";
 import { collectResponsiveWidthProps } from "./flow-layout-utils";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 
-export { FlowItemBreak, FlowItemWrapper } from "./FlowLayoutNative";
+export { FlowItemBreak, FlowItemWrapper } from "./FlowLayoutReact";
 import { alignmentOptionValues } from "../abstractions";
 
 const COMP = "FlowLayout";

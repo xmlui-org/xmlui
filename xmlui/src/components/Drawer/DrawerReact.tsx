@@ -2,6 +2,7 @@ import React, {
   type CSSProperties,
   type ReactNode,
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -88,7 +89,7 @@ function useDrawerOpenState(
 // Native React component
 // =============================================================================
 
-export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function DrawerNative(
+export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(function DrawerNative(
   {
     position = defaultProps.position,
     hasBackdrop = defaultProps.hasBackdrop,
@@ -142,7 +143,7 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
       (root as HTMLElement).removeChild(childEl);
       setChildPortalContainer(null);
     };
-  }, [root, className]);
+  }, [root, className, classes]);
 
   // Override the theme context's portal root for children inside the drawer
   // so that portalled content (Select dropdowns, tooltips, etc.) renders into
@@ -247,4 +248,4 @@ export const DrawerNative = forwardRef<HTMLDivElement, DrawerProps>(function Dra
       </Dialog.Portal>
     </Dialog.Root>
   );
-});
+}));

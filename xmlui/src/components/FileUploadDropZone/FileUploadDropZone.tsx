@@ -2,7 +2,7 @@ import styles from "./FileUploadDropZone.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneNative";
+import { FileUploadDropZone, defaultProps } from "./FileUploadDropZoneReact";
 import { createMetadata, d } from "../metadata-helpers";
 
 const COMP = "FileUploadDropZone";
@@ -91,7 +91,7 @@ export const fileUploadDropZoneComponentRenderer = wrapComponent(
     exposeRegisterApi: true,
     customRender: (props, { node, extractValue, renderChild, updateState }) => (
       <FileUploadDropZone
-        {...(props as any)}
+        {...props}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
         updateState={updateState}
       >

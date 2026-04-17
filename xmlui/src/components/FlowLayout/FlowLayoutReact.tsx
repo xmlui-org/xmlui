@@ -3,6 +3,7 @@ import {
   type Dispatch,
   type ForwardedRef,
   forwardRef,
+  memo,
   type ReactNode,
   type SetStateAction,
   createContext,
@@ -354,7 +355,7 @@ export const defaultProps: Pick<FlowLayoutProps, "columnGap" | "rowGap" | "itemW
   showScrollerFade: true,
 };
 
-export const FlowLayout = forwardRef(function FlowLayout(
+export const FlowLayout = memo(forwardRef(function FlowLayout(
   {
     style,
     className,
@@ -450,4 +451,4 @@ export const FlowLayout = forwardRef(function FlowLayout(
       </Scroller>
     </FlowLayoutContext.Provider>
   );
-});
+}));

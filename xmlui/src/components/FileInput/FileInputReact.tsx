@@ -1,5 +1,5 @@
 import type React from "react";
-import { type CSSProperties, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { type CSSProperties, forwardRef, memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { Accept, DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -92,10 +92,6 @@ export const defaultProps: Pick<
   | "buttonLabel"
   | "multiple"
   | "directory"
-  | "updateState"
-  | "onDidChange"
-  | "onFocus"
-  | "onBlur"
   | "buttonThemeColor"
 > = {
   enabled: true,
@@ -104,45 +100,44 @@ export const defaultProps: Pick<
   multiple: false,
   directory: false,
   buttonThemeColor: "primary",
-  updateState: noop,
-  onDidChange: noop,
-  onFocus: noop,
-  onBlur: noop,
 };
 
-export const FileInput = ({
-  id,
-  enabled = defaultProps.enabled,
-  style,
-  className,
-  classes,
-  placeholder,
-  buttonPosition = defaultProps.buttonPosition,
-  buttonLabel = defaultProps.buttonLabel,
-  buttonIcon,
-  buttonIconPosition,
-  variant,
-  buttonThemeColor,
-  buttonSize,
+export const FileInput = memo(forwardRef(function FileInput(
+  {
+    id,
+    enabled = defaultProps.enabled,
+    style,
+    className,
+    classes,
+    placeholder,
+    buttonPosition = defaultProps.buttonPosition,
+    buttonLabel = defaultProps.buttonLabel,
+    buttonIcon,
+    buttonIconPosition,
+    variant,
+    buttonThemeColor,
+    buttonSize,
 
-  autoFocus,
-  validationStatus,
-  updateState = defaultProps.updateState,
-  onDidChange = defaultProps.onDidChange,
-  onFocus = defaultProps.onFocus,
-  onBlur = defaultProps.onBlur,
-  registerComponentApi,
-  value,
-  initialValue,
-  acceptsFileType,
-  multiple = defaultProps.multiple,
-  directory = defaultProps.directory,
-  required,
-  parseAs,
-  csvOptions,
-  onParseError,
-  ...rest
-}: Props) => {
+    autoFocus,
+    validationStatus,
+    updateState,
+    onDidChange,
+    onFocus,
+    onBlur,
+    registerComponentApi,
+    value,
+    initialValue,
+    acceptsFileType,
+    multiple = defaultProps.multiple,
+    directory = defaultProps.directory,
+    required,
+    parseAs,
+    csvOptions,
+    onParseError,
+    ...rest
+  }: Props,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const _id = useId();
   id = id || _id;
   // Don't accept any (initial) value if it is not a File array explicitly
@@ -440,7 +435,7 @@ export const FileInput = ({
         </Button>
       </div>
   );
-};
+}));
 
 export function isFile(value: any): value is File {
   return value instanceof File;

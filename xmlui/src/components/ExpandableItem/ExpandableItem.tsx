@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { iconPositionMd } from "../abstractions";
 import { createMetadata, d, dComponent } from "../../components/metadata-helpers";
-import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemNative";
+import { defaultExpandableItemProps, ExpandableItem, PART_CONTENT, PART_SUMMARY } from "./ExpandableItemReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 

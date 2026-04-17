@@ -2,7 +2,7 @@ import styles from "./Footer.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Footer } from "./FooterNative";
+import { Footer } from "./FooterReact";
 import { createMetadata } from "../metadata-helpers";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";

@@ -1,6 +1,6 @@
 import type * as React from "react";
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef, useCallback, useEffect, useRef } from "react";
+import { forwardRef, memo, useCallback, useEffect, useRef } from "react";
 import * as dropzone from "react-dropzone";
 
 import styles from "./FileUploadDropZone.module.scss";
@@ -36,9 +36,8 @@ type Props = {
 
 export const defaultProps: Pick<
   Props,
-  "onUpload" | "uid" | "allowPaste" | "text" | "icon" | "disabled"
+  "uid" | "allowPaste" | "text" | "icon" | "disabled"
 > = {
-  onUpload: asyncNoop,
   uid: "fileUploadDialog",
   allowPaste: false,
   text: "Drop files here",
@@ -46,10 +45,10 @@ export const defaultProps: Pick<
   disabled: false,
 };
 
-export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
+export const FileUploadDropZone = memo(forwardRef(function FileUploadDropZone(
   {
     children,
-    onUpload = defaultProps.onUpload,
+    onUpload,
     uid = defaultProps.uid,
     registerComponentApi,
     style,
@@ -205,7 +204,7 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
           <ThemedIcon name={icon}></ThemedIcon>
           {text}
         </div>
-      )}
+      )}  
     </div>
   );
-});
+}));
