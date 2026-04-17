@@ -387,7 +387,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         }
       }
 
-
+      // *** RISK, needs a lot of review
       const applyRegistryStyles = () => {
         if (!window.__XMLUI_STYLES__) return;
 
