@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useMemo, useState, type ForwardedRef } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useState, type ForwardedRef } from "react";
 import * as RAccordion from "@radix-ui/react-accordion";
 import classnames from "classnames";
 
@@ -34,7 +34,7 @@ export const defaultProps: Pick<
   rotateExpanded: "180deg",
 };
 
-export const AccordionComponent = forwardRef(function AccordionComponent(
+export const AccordionComponent = memo(forwardRef(function AccordionComponent(
   {
     className,
     classes,
@@ -186,4 +186,4 @@ export const AccordionComponent = forwardRef(function AccordionComponent(
       </RAccordion.Root>
     </AccordionContext.Provider>
   );
-});
+}));

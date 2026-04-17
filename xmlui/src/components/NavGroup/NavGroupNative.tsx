@@ -38,7 +38,7 @@ import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { NavGroupContext } from "./NavGroupContext";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
-import { getAppLayoutOrientation } from "../App/AppNative";
+import { getAppLayoutOrientation } from "../App/AppReact";
 import { useAppContext } from "../../components-core/AppContext";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;

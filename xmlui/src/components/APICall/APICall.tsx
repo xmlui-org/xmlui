@@ -3,7 +3,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
-import { APICallNative, defaultProps } from "./APICallNative";
+import { APICallReact, defaultProps } from "./APICallReact";
 
 const COMP = "APICall";
 
@@ -41,7 +41,7 @@ export const APICallMd = createMetadata({
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
-      valueType: "string",
+      type: "string",
       availableValues: httpMethodNames,
       defaultValue: defaultProps.method,
     },
@@ -49,21 +49,21 @@ export const APICallMd = createMetadata({
       description:
         "Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.",
       isRequired: true,
-      valueType: "string",
+      type: "string",
     },
     rawBody: {
       description:
         "This optional property sets the request body to the value provided here without any conversion. " +
         "Use the * \`body\` property if you want the object sent in JSON. When you define " +
         "\`body\` and \`rawBody\`, the latest one prevails.",
-      valueType: "string",
+      type: "string",
     },
     body: {
       description:
         "This optional property sets the request body. Use to pass an object that will be " +
         "serialized as a JSON string. If you have an object that is already serialized as " +
         "a JSON string, use `rawBody` instead.",
-      valueType: "string",
+      type: "string",
     },
     queryParams: {
       description:
@@ -93,108 +93,108 @@ export const APICallMd = createMetadata({
           description: "Always send credentials, even for cross-origin requests",
         },
       ],
-      valueType: "string",
+      type: "string",
     },
     confirmTitle: {
       description:
         "This optional string sets the title in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
-      valueType: "string",
+      type: "string",
     },
     confirmMessage: {
       description:
         "This optional string sets the message in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
-      valueType: "string",
+      type: "string",
     },
     confirmButtonLabel: {
       description:
         "This optional string property enables the customization of the submit button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
-      valueType: "string",
+      type: "string",
     },
     cancelButtonLabel: {
       description:
         "This optional string property enables the customization of the cancel button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
-      valueType: "string",
+      type: "string",
     },
     deferredMode: {
       description:
         "Enable deferred operation mode for long-running operations that return 202 Accepted. " +
         "When enabled, the component will automatically poll a status endpoint to track operation progress. " +
         "(Experimental feature)",
-      valueType: "boolean",
-      defaultValue: false,
+      type: "boolean",
+      defaultValue: defaultProps.deferredMode,
     },
     statusUrl: {
       description:
         "The URL to poll for status updates when deferredMode is enabled. " +
         "Can use $result context from initial response (e.g., '/api/status/{$result.operationId}'). " +
         "Required when deferredMode is true.",
-      valueType: "string",
+      type: "string",
     },
     statusMethod: {
       description: "HTTP method for status requests. Defaults to 'get'.",
-      valueType: "string",
+      type: "string",
       availableValues: httpMethodNames,
-      defaultValue: "get",
+      defaultValue: defaultProps.statusMethod,
     },
     pollingInterval: {
       description: "Milliseconds between status polls. Defaults to 2000ms.",
-      valueType: "number",
-      defaultValue: 2000,
+      type: "number",
+      defaultValue: defaultProps.pollingInterval,
     },
     maxPollingDuration: {
       description:
         "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
-      valueType: "number",
-      defaultValue: 300000,
+      type: "number",
+      defaultValue: defaultProps.maxPollingDuration,
     },
     pollingBackoff: {
       description:
         "Strategy for increasing polling interval over time. Options: 'none' (fixed interval), " +
         "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
-      valueType: "string",
+      type: "string",
       availableValues: ["none", "linear", "exponential"],
-      defaultValue: "none",
+      defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {
       description:
         "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
-      valueType: "number",
-      defaultValue: 30000,
+      type: "number",
+      defaultValue: defaultProps.maxPollingInterval,
     },
     completionCondition: {
       description:
         "Expression that returns true when the deferred operation is complete. " +
         "Can access $statusData context variable containing the latest status response.",
-      valueType: "string",
+      type: "string",
     },
     errorCondition: {
       description:
         "Expression that returns true when the deferred operation has failed. " +
         "Can access $statusData context variable containing the latest status response.",
-      valueType: "string",
+      type: "string",
     },
     progressExtractor: {
       description:
         "Expression to extract progress value (0-100) from the status response. " +
         "Can access $statusData context variable. If not specified, no progress tracking.",
-      valueType: "string",
+      type: "string",
     },
     cancelUrl: {
       description:
         "URL to call when cancelling the deferred operation. " +
         "Can use $result context from initial response (e.g., '/api/cancel/{$result.operationId}'). " +
         "If not provided, cancel() will only stop polling without notifying the server.",
-      valueType: "string",
+      type: "string",
     },
     cancelMethod: {
       description: "HTTP method for cancel requests. Defaults to 'post'.",
-      valueType: "string",
+      type: "string",
       availableValues: httpMethodNames,
-      defaultValue: "post",
+      defaultValue: defaultProps.cancelMethod,
     },
     cancelBody: {
       description:
@@ -206,19 +206,19 @@ export const APICallMd = createMetadata({
         "Message to show in toast notification during deferred operation polling. " +
         "Can include {$progress}, {$statusData.property}, and other context variables. " +
         "Notification will update on each poll with current values.",
-      valueType: "string",
+      type: "string",
     },
     completedNotificationMessage: {
       description:
         "Message to show in toast notification when deferred operation completes successfully. " +
         "Can include {$statusData.property} and other context variables from the final status.",
-      valueType: "string",
+      type: "string",
     },
     errorNotificationMessage: {
       description:
         "Message to show in toast notification when deferred operation fails. " +
         "Can include {$statusData.property} and other context variables from the error status.",
-      valueType: "string",
+      type: "string",
     },
     payloadType: dInternal(),
     invalidates: dInternal(),
@@ -405,7 +405,7 @@ export const apiCallRenderer = createComponentRenderer(
   APICallMd,
   ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
     return (
-      <APICallNative
+      <APICallReact
         registerComponentApi={registerComponentApi}
         node={node as any}
         uid={uid}
@@ -413,6 +413,8 @@ export const apiCallRenderer = createComponentRenderer(
         onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
+        onPollingStart={lookupEventHandler("pollingStart")}
+        onPollingComplete={lookupEventHandler("pollingComplete")}
         hasMockExecute={!!node.events?.mockExecute}
       />
     );

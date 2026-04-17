@@ -1,8 +1,8 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
 import type { ForwardedRef } from "react";
-import React, { Children, forwardRef, useEffect, useId, useMemo, useState } from "react";
+import React, { Children, forwardRef, memo, useEffect, useId, useMemo, useState } from "react";
 import { useCallback } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn } from "../..";
 import { isPlainObject } from "lodash-es";
@@ -102,9 +102,6 @@ export const parseAnimation = (animation: string | object): object => {
   return presetAnimations[animation] || { from: {}, to: {} };
 };
 
-/**
- * Helper function to parse a single animation-specific option value.
- */
 function parseAnimationOptionValue(name: string, value: string): any {
   switch (name) {
     case "duration":
@@ -126,9 +123,6 @@ function parseAnimationOptionValue(name: string, value: string): any {
   }
 }
 
-/**
- * Parses animation options from a string or object.
- */
 export function parseAnimationOptions(input: any): Partial<AnimationProps> {
   if (isPlainObject(input)) {
     return input as Partial<AnimationProps>;
@@ -168,7 +162,7 @@ export function parseAnimationOptions(input: any): Partial<AnimationProps> {
   return {};
 }
 
-export const Animation = forwardRef(function Animation(
+export const Animation = memo(forwardRef(function Animation(
   {
     children,
     registerComponentApi,
@@ -249,7 +243,7 @@ export const Animation = forwardRef(function Animation(
   const [ref, animationStyles] = useInView(() => animationSettings, {
     once,
   });
-  const composedRef = ref ? composeRefs(ref, forwardedRef) : forwardedRef;
+  const composedRef = useComposedRefs(ref, forwardedRef);
 
   const startAnimation = useCallback(() => {
     void api.start(_animation);
@@ -284,4 +278,4 @@ export const Animation = forwardRef(function Animation(
   }, [animateWhenInView, animationStyles, children, springs, rest, composedRef, forwardedRef]);
 
   return content;
-});
+}));

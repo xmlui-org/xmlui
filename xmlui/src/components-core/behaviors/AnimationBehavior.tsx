@@ -3,7 +3,7 @@ import {
   Animation,
   parseAnimationOptions,
   parseAnimation,
-} from "../../components/Animation/AnimationNative";
+} from "../../components/Animation/AnimationReact";
 import { Behavior } from "./Behavior";
 
 /**

@@ -4,7 +4,7 @@ import { MemoizedItem } from "../../components/container-helpers";
 import {
   AccordionItemComponent,
   defaultProps,
-} from "../../components/Accordion/AccordionItemNative";
+} from "../../components/Accordion/AccordionItemReact";
 
 const COMP = "AccordionItem";
 
@@ -16,14 +16,14 @@ export const AccordionItemMd = createMetadata({
   props: {
     header: {
       description: "This property declares the text used in the component's header. If not provided, the header will be empty.",
-      valueType: "string"
+      type: "string"
     },
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
     ),
     initiallyExpanded: {
       description: `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.initiallyExpanded
     },
   },

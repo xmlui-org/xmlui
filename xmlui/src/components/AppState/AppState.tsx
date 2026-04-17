@@ -1,6 +1,6 @@
 import { createComponentRenderer } from "../../components-core/renderers";
 import { createMetadata, d } from "../metadata-helpers";
-import { AppState, defaultProps } from "./AppStateNative";
+import { AppState, defaultProps } from "./AppStateReact";
 
 const COMP = "AppState";
 
@@ -31,7 +31,7 @@ export const AppStateMd = createMetadata({
         `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
         `Multiple \`${COMP}\` instances with the same bucket will share the same state object: any ` +
         `of them updating the state will cause the other instances to view the new, updated state.`,
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.bucket,
     },
     initialValue: {

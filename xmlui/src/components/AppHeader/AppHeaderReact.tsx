@@ -1,5 +1,4 @@
-import type { ReactNode } from "react";
-import { useRef } from "react";
+import { type ReactNode, forwardRef, memo, useRef } from "react";
 import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -16,8 +15,7 @@ import { ThemedNavLink } from "../../components/NavLink/NavLink";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-
-const PART_HAMBURGER = "hamburger";
+import { PART_HAMBURGER } from "../../components-core/parts";
 
 type Props = {
   children?: ReactNode;
@@ -56,7 +54,7 @@ export function useLogoUrl() {
   return toneLogoUrl || baseLogoUrl;
 }
 
-export const AppHeader = ({
+export const AppHeader = memo(forwardRef<HTMLDivElement, Props>(function AppHeader({
   children,
   profileMenu,
   style = EMPTY_OBJECT,
@@ -72,7 +70,7 @@ export const AppHeader = ({
   titleContent,
   registerSubNavPanelSlot,
   ...rest
-}: Props) => {
+}: Props, ref) {
   const { mediaSize } = useAppContext();
   const logoUrl = useLogoUrl();
   const subNavPanelSlot = useRef(null);
@@ -91,7 +89,7 @@ export const AppHeader = ({
   }, []);
 
   return (
-    <div {...rest} className={classnames(styles.header, classes?.[COMPONENT_PART_KEY], className)} style={style} role="banner">
+    <div ref={ref} {...rest} className={classnames(styles.header, classes?.[COMPONENT_PART_KEY], className)} style={style} role="banner">
       <div
         className={classnames(styles.headerInner, {
           [styles.full]: !canRestrictContentWidth,
@@ -134,7 +132,7 @@ export const AppHeader = ({
       </div>
     </div>
   );
-};
+}));
 
 type AppContextAwareAppHeaderProps = {
   children?: ReactNode;
@@ -149,7 +147,7 @@ type AppContextAwareAppHeaderProps = {
   renderChild: RenderChildFn;
 };
 
-export function AppContextAwareAppHeader({
+export const AppContextAwareAppHeader = memo(forwardRef<HTMLDivElement, AppContextAwareAppHeaderProps>(function AppContextAwareAppHeader({
   children,
   logoContent,
   profileMenu,
@@ -160,7 +158,7 @@ export function AppContextAwareAppHeader({
   titleContent,
   showLogo = true,
   renderChild,
-}: AppContextAwareAppHeaderProps) {
+}: AppContextAwareAppHeaderProps, ref) {
   const appLayoutContext = useAppLayoutContext();
 
   const {
@@ -180,6 +178,7 @@ export function AppContextAwareAppHeader({
 
   return (
     <AppHeader
+      ref={ref}
       hasRegisteredNavPanel={hasRegisteredNavPanel}
       navPanelVisible={effectiveNavPanelVisible}
       toggleDrawer={toggleDrawer}
@@ -200,4 +199,4 @@ export function AppContextAwareAppHeader({
       {children}
     </AppHeader>
   );
-}
+}));

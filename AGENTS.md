@@ -107,6 +107,7 @@ Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke wi
 | Create a new extension package | `#create-extension-package` | Setting up a brand-new `packages/xmlui-*` package with component(s) |
 | Fix a bug | `#fix-bug` | Diagnosing and fixing a component issue with regression tests |
 | QA review a component | `#qa-review` | Auditing an existing component against conventions, accessibility, and test coverage |
+| Review and fix a component | `#review-component` | Auditing a component with the QA checklist and applying fixes, including Native→React rename |
 | Add E2E tests | `#add-e2e-tests` | Adding or expanding Playwright tests for an under-tested component |
 | Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
 | Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |

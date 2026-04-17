@@ -78,7 +78,7 @@ export const ButtonMd = createMetadata({
         `This optional string describes how the ${COMP} appears in an HTML context. You ` +
         `rarely need to set this property explicitly.`,
       availableValues: buttonTypesMd,
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.type,
     },
     enabled: {
@@ -86,7 +86,7 @@ export const ButtonMd = createMetadata({
         `The value of this property indicates whether the button accepts actions (\`true\`) ` +
         `or does not react to them (\`false\`).`,
       type: "boolean",
-      defaultValue: true,
+      defaultValue: defaultProps.enabled,
     },
     orientation: dOrientation(defaultProps.orientation),
     icon: {
@@ -132,6 +132,9 @@ export const ButtonMd = createMetadata({
 
     [`width-${COMP}`]: "fit-content",
     [`height-${COMP}`]: "fit-content",
+    [`width-${COMP}-vertical`]: "fit-content",
+    [`height-${COMP}-vertical`]: "fit-content",
+    [`gap-${COMP}-vertical`]: "$space-1",
     [`minHeight-${COMP}`]: "2.5rem",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontSize-${COMP}`]: "$fontSize-sm",
@@ -216,7 +219,7 @@ export const buttonComponentRenderer = wrapComponent(
         <Button
           {...props}
           icon={iconName && <ThemedIcon name={iconName} aria-hidden />}
-          disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+          disabled={!extractValue.asOptionalBoolean(node.props.enabled, defaultProps.enabled)}
         >
           {renderedChildren}
         </Button>

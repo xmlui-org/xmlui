@@ -18,7 +18,7 @@ import {
   createMetadata,
   d,
 } from "../metadata-helpers";
-import { AutoComplete, defaultProps } from "./AutoCompleteNative";
+import { AutoComplete, defaultProps } from "./AutoCompleteReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
@@ -83,21 +83,21 @@ export const AutoCompleteMd = createMetadata({
     modal: {
       isInternal: true,
       description: "internal radix modal prop",
-      valueType: "boolean",
+      type: "boolean",
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      valueType: "boolean" as const,
+      type: "boolean" as const,
       isInternal: true,
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      valueType: "string" as const,
+      type: "string" as const,
       isInternal: true,
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      valueType: "string" as const,
+      type: "string" as const,
       isInternal: true,
     },
   },

@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
-import { App as AppComponent, defaultProps } from "./AppNative";
+import { App as AppComponent, defaultProps } from "./AppReact";
 import { useRef } from "react";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";
@@ -32,33 +32,33 @@ export const AppMd = createMetadata({
       description:
         "Stores information about the currently logged-in user. By not defining this property, " +
         "you can indicate that no user is logged in.",
-      valueType: "string",
+      type: "string",
     },
     logoTemplate: dComponent("Optional template of the app logo"),
     logo: {
       description: "Optional logo path",
-      valueType: "string",
+      type: "string",
     },
     "logo-dark": {
       description: "Optional logo path in dark tone",
-      valueType: "string",
+      type: "string",
     },
     "logo-light": {
       description: "Optional logo path in light tone",
-      valueType: "string",
+      type: "string",
     },
     name: {
       description:
         "Optional application name (visible in the browser tab). When you do not define " +
         "this property, the tab name falls back to the one defined in the app\'s configuration. " +
         'If the name is not configured, "XMLUI App" is displayed in the tab.',
-      valueType: "string",
+      type: "string",
     },
     scrollWholePage: {
       description:
         `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.scrollWholePage,
     },
     fitContent: {
@@ -67,24 +67,24 @@ export const AppMd = createMetadata({
         `filling its container's viewport. Intended for embedding an app inside an iframe ` +
         `or as a block within a larger page: the host page becomes the sole scroll container. ` +
         `This overrides \`scrollWholePage\`'s viewport pinning.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.fitContent,
     },
     noScrollbarGutters: {
       description:
         "This boolean property specifies whether the scrollbar gutters should be hidden.",
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.noScrollbarGutters,
     },
     defaultTone: {
       description: 'This property sets the app\'s default tone ("light" or "dark").',
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.defaultTone,
       availableValues: ["light", "dark"],
     },
     defaultTheme: {
       description: "This property sets the app's default theme.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.defaultTheme,
     },
     autoDetectTone: {
@@ -93,7 +93,7 @@ export const AppMd = createMetadata({
         'When set to true and no defaultTone is specified, the app will automatically use ' +
         '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
         'also respond to changes in the system theme preference.',
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.autoDetectTone,
     },
     persistTheme: {
@@ -101,7 +101,7 @@ export const AppMd = createMetadata({
         'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
         'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
         'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.persistTheme,
       isInternal: true,
     },
@@ -109,7 +109,7 @@ export const AppMd = createMetadata({
       description:
         'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
         'Change this if you need to namespace the key per-app or per-user.',
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.themeStorageKey,
       isInternal: true,
     },
@@ -117,7 +117,7 @@ export const AppMd = createMetadata({
       description:
         'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
         'Change this if you need to namespace the key per-app or per-user.',
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.toneStorageKey,
       isInternal: true,
     },

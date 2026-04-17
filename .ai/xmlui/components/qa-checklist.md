@@ -16,6 +16,7 @@ actionable and maps to a concrete, verifiable pattern.
 ## 2. Metadata
 
 - [ ] All props, events, APIs, contextVars, and themeVars declared in `createMetadata`.
+- [ ] All prop field keys use the correct names: `type`, `description`, `defaultValue`, `availableValues`. The key `valueType` is silently ignored by the metadata system — TypeScript will not catch it.
 - [ ] `defaultValue` references `defaultProps.<prop>` — never a literal.
 - [ ] Event helper keys match the strings passed to `lookupEventHandler(...)` in the renderer.
 - [ ] `label` declared in `props` when the component renders its own label (prevents behavior double-wrapping).
@@ -44,9 +45,10 @@ actionable and maps to a concrete, verifiable pattern.
 
 ### Structure
 - [ ] Wrapped with `memo(forwardRef(function ComponentName(...) { ... }))`. Both wrappers required.
-- [ ] `displayName` NOT set — hard prohibition.
+- [ ] **Non-visual components** (renders `null`, `nonVisual: true` in metadata) — wrap with `memo(function Name(...))` only. `forwardRef` is only needed when the component exposes a DOM node.
+- [ ] `displayName` NOT set — hard prohibition. Applies to directly-declared components AND components created by a factory function (e.g. `createSlot`, `createPart`): remove any `Slot.displayName = ...` inside the factory.
 - [ ] `useImperativeHandle` NOT used — use `registerComponentApi`.
-- [ ] `defaultProps` exported as a const; function signature destructuring defaults reference it.
+- [ ] `defaultProps` exported as a const; function signature destructuring defaults reference it. **Event handler props (`onReady`, `onKeyDown`, etc.) must NOT appear in `defaultProps`** — they are renderer-wired and should default to `noop`/`undefined` directly in the destructuring.
 - [ ] Void elements (`<br />`, `<img />`, `<input />`) self-closing with no children.
 
 ### Refs
@@ -58,6 +60,7 @@ actionable and maps to a concrete, verifiable pattern.
 
 ### Props interface
 - [ ] `Props` extends `React.HTMLAttributes<HTMLElement>` (or the specific element base). Consequence: remove now-redundant explicit declarations of `style`, `className`, `children`, and any picked event handlers.
+- [ ] When a prop narrows an HTML attribute to a component-specific union type (e.g., `type?: ButtonType` vs HTML's `type?: string`), use `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> & { type?: ButtonType }` — not `Pick<>`. Also `Omit` any HTML attribute that is aliased under a different prop name (e.g., `formId` aliasing the HTML `form` attribute).
 - [ ] `{...rest}` spread on root element, placed **before** internally-controlled props so internal handlers (e.g. `tabIndex`, `onKeyDown`) take precedence.
 - [ ] Infrastructure props (`updateState?`, `registerComponentApi?`) typed as optional — component must work standalone.
 - [ ] No dead props (declared but never used). Also check `defaultProps` for keys absent from the `Props` type.
@@ -76,6 +79,7 @@ actionable and maps to a concrete, verifiable pattern.
 - [ ] No variable shadowing: don't name a `setTimeout` return value `id` when `id` is also a prop — use `timeoutId`.
 - [ ] `updateState` called when the public value changes.
 - [ ] External prop → local state sync uses a ref guard to prevent loops.
+- [ ] Never mutate the object passed to a `setState` updater callback — always return a new value. For Sets/Maps: `setItems(prev => new Set([...prev, newItem]))`, not `prev.add(x); return prev`.
 - [ ] Keyboard handlers use runtime element order (`findIndex` on refs), not hard-coded field sequences.
 - [ ] Pure constants and utilities at module scope, not inside the component body.
 
@@ -145,7 +149,7 @@ actionable and maps to a concrete, verifiable pattern.
 
 | Anti-pattern | Fix |
 |---|---|
-| `displayName` set | Remove — hard prohibition. |
+| `displayName` set on component or factory output | Remove — hard prohibition (direct components and factory-created components alike). |
 | `useImperativeHandle` | Replace with `registerComponentApi`. |
 | Hook inside renderer function | Move to native component. |
 | `index.ts` in component folder | Delete. |
@@ -153,6 +157,7 @@ actionable and maps to a concrete, verifiable pattern.
 | Raw `node.props.foo` without `extractValue` | Wrap with `extractValue.*`. |
 | Hardcoded value in SCSS | `createThemeVar(...)`. |
 | Literal default in metadata | `defaultProps.propName`. |
+| Event handler key in `defaultProps` (e.g. `onReady: noop`) | Remove — default directly in the destructuring. `defaultProps` is consumed by the metadata system and must only contain prop values visible to XMLUI users. |
 | `forwardRef` ref not connected to DOM | `useComposedRefs(ref, innerRef)` on root. |
 | `composeRefs(...)` called in render | `useComposedRefs(...)` — stable hook form. |
 | `ref ? composeRefs(...) : inner` | `useComposedRefs(ref, inner)` — handles null internally. |
@@ -161,6 +166,7 @@ actionable and maps to a concrete, verifiable pattern.
 | `Props` with no HTML base type | Extend `HTMLAttributes<HTMLElement>`; remove duplicate `style`/`className`/`children`. |
 | `{...rest}` after internal props | Move to front. |
 | `Pick<HTMLAttributes<T>, "onClick">` when more attrs needed | Extend `HTMLAttributes<T>` directly. |
+| `& Pick<HTMLAttributes<T>, "onClick" \| ...>` intersection on Props | Extend `ButtonHTMLAttributes<T>` (or the relevant element base) instead; `Pick` re-declares what the base already provides. |
 | Dead prop in Props or defaultProps | Remove — may silently reach DOM via `...rest`. |
 | `ThemedFoo = forwardRef<HTMLDivElement>` when element varies | Union: `forwardRef<HTMLImageElement \| HTMLDivElement>`. |
 | `as any` | `as unknown as T`. |
@@ -169,6 +175,7 @@ actionable and maps to a concrete, verifiable pattern.
 | `isFoo(x: any)` type guard | `x: unknown`; cast after narrowing. |
 | Inline `style={{ ... }}` in memo component | `useMemo(() => ({ ... }), [deps])`. |
 | `children?: ReactNode \| ReactNode[]` | `children?: ReactNode`. |
+| `setState(prev => { prev.add(x); return prev; })` mutating callback | `setState(prev => new Set([...prev, x]))` — return a new object. |
 | `useMemo(() => value, [value])` | Remove — no-op. |
 | `useCallback(() => (e) => {...}, [])` factory | Inline: `useCallback((e) => {...}, [deps])`. |
 | `registerComponentApi` callbacks inline in effect | Extract to `useCallback`; add to deps. |

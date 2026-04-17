@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
@@ -17,6 +17,8 @@ interface Props {
   onSuccess?: (...args: any[]) => Promise<any>;
   onStatusUpdate?: (statusData: any, progress: number) => void | Promise<void>;
   onTimeout?: () => void | Promise<void>;
+  onPollingStart?: (initialResult: any) => void | Promise<void>;
+  onPollingComplete?: (finalStatus: any, reason: string) => void | Promise<void>;
   hasMockExecute?: boolean;
 }
 
@@ -30,16 +32,19 @@ interface DeferredState {
 
 export const defaultProps = {
   method: "get",
+  deferredMode: false,
+  statusMethod: "get",
+  pollingInterval: 2000,
+  maxPollingDuration: 300000,
+  pollingBackoff: "none",
+  maxPollingInterval: 30000,
+  cancelMethod: "post",
 };
 
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
 
-/**
- * Interpolates notification messages with context variables
- * Replaces {$progress}, {$statusData.property}, etc. with actual values
- */
 function interpolateNotificationMessage(
   template: string | undefined,
   context: { progress: number; statusData: any; result?: any }
@@ -70,9 +75,6 @@ function interpolateNotificationMessage(
   return message;
 }
 
-/**
- * Calculate next polling interval based on backoff strategy
- */
 function calculateNextInterval(
   baseInterval: number,
   attempt: number,
@@ -92,10 +94,6 @@ function calculateNextInterval(
   }
 }
 
-/**
- * Interpolates URL templates with result context variables
- * Example: "/api/status/{$result.taskId}" -> "/api/status/task-123"
- */
 function interpolateUrl(template: string, result: any): string {
   if (!result || typeof result !== 'object') return template;
   
@@ -104,9 +102,6 @@ function interpolateUrl(template: string, result: any): string {
   });
 }
 
-/**
- * Updates component state with deferred operation context variables
- */
 function updateDeferredState(
   deferredState: DeferredState,
   updateState: ((state: any) => void) | undefined
@@ -125,10 +120,6 @@ function updateDeferredState(
   });
 }
 
-/**
- * Extracts progress value from status data using progressExtractor expression
- * Returns a number between 0 and 100
- */
 function extractProgress(
   statusData: any,
   progressExtractor: string | undefined,
@@ -169,9 +160,6 @@ function extractProgress(
   return 0;
 }
 
-/**
- * Evaluates a boolean condition expression against the given status data context.
- */
 function evaluateCondition(
   conditionExpr: string | undefined,
   statusData: any,
@@ -199,7 +187,7 @@ function evaluateCondition(
   }
 }
 
-export function APICallNative({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout, hasMockExecute }: Props) {
+export const APICallReact = memo(function APICallReact({ registerComponentApi, node, uid, updateState, onSuccess, onStatusUpdate, onTimeout, onPollingStart, onPollingComplete, hasMockExecute }: Props) {
   // Track deferred state using ref to avoid re-renders
   const deferredStateRef = useRef<DeferredState>({
     isPolling: false,
@@ -255,9 +243,6 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   // DEFERRED OPERATIONS HANDLERS
   // =============================================================================
   
-  /**
-   * Handles polling timeout - stops polling and fires onTimeout event
-   */
   const handlePollingTimeout = useEvent(async (elapsedTime: number) => {
     const timeoutState = {
       ...deferredStateRef.current,
@@ -279,11 +264,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         console.error("onTimeout event handler error:", eventError);
       }
     }
+    if (onPollingComplete) {
+      void onPollingComplete(timeoutState.statusData, "timeout");
+    }
   });
   
-  /**
-   * Handles polling error condition - stops polling and updates error state
-   */
   const handlePollingError = useEvent((updatedState: DeferredState, result: any) => {
     if (pollingIntervalRef.current) {
       clearTimeout(pollingIntervalRef.current);
@@ -314,11 +299,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     } else if (toastIdRef.current) {
       toast.dismiss(toastIdRef.current);
     }
+    if (onPollingComplete) {
+      void onPollingComplete(errorState.statusData, "failed");
+    }
   });
 
-  /**
-   * Handles polling completion - stops polling and shows completion notification
-   */
   const handlePollingCompletion = useEvent((updatedState: DeferredState, result: any) => {
     if (pollingIntervalRef.current) {
       clearTimeout(pollingIntervalRef.current);
@@ -349,11 +334,11 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
         toast.success(interpolated, { id: toastIdRef.current });
       }
     }
+    if (onPollingComplete) {
+      void onPollingComplete(completionState.statusData, "completed");
+    }
   });
   
-  /**
-   * Executes a single status poll (no continuous polling)
-   */
   const executeSinglePoll = useEvent(async (
     executionContext: ActionExecutionContext,
     statusUrl: string,
@@ -388,9 +373,6 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     }
   });
   
-  /**
-   * Executes continuous polling with backoff strategy
-   */
   const executePollingLoop = useEvent((
     executionContext: ActionExecutionContext,
     statusUrl: string,
@@ -410,6 +392,9 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
     };
     deferredStateRef.current = newState;
     updateDeferredState(newState, updateState);
+    if (onPollingStart) {
+      void onPollingStart(result);
+    }
     
     // Show initial progress notification
     const inProgressMessage = (node.props as any)?.inProgressNotificationMessage;
@@ -801,4 +786,4 @@ export function APICallNative({ registerComponentApi, node, uid, updateState, on
   }, [execute, stopPolling, resumePolling, getStatus, isPolling, cancel, registerComponentApi]);
 
   return null;
-}
+});

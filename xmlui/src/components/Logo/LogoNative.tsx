@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 import classnames from "classnames";
 
 import { ThemedImage as Image } from "../Image/Image";
-import { useLogoUrl } from "../AppHeader/AppHeaderNative";
+import { useLogoUrl } from "../AppHeader/AppHeaderReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // Default props for Logo component

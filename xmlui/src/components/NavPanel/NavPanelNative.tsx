@@ -10,7 +10,7 @@ import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { ThemedLogo as Logo } from "../Logo/Logo";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
-import { getAppLayoutOrientation } from "../App/AppNative";
+import { getAppLayoutOrientation } from "../App/AppReact";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
 import { Part } from "../Part/Part";
 
