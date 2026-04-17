@@ -37,7 +37,6 @@ enum LexerPhase {
   IdTail,
   Dot,
   DotDot,
-  Colon,
   Zero,
   QuestionMark,
   HexaFirst,
@@ -329,11 +328,9 @@ export class Lexer {
             case ")":
               return completeToken(TokenType.RParent);
 
-            // --- ":" or "::"
+            // --- ":"
             case ":":
-              phase = LexerPhase.Colon;
-              tokenType = TokenType.Colon;
-              break;
+              return completeToken(TokenType.Colon);
 
             case "`":
               return completeToken(TokenType.Backtick);
@@ -451,9 +448,6 @@ export class Lexer {
 
         // ====================================================================
         // Process miscellaneous tokens
-
-        case LexerPhase.Colon:
-          return ch === ":" ? completeToken(TokenType.Global) : makeToken();
 
         case LexerPhase.Slash:
           if (ch === "*") {
@@ -1112,6 +1106,7 @@ resolverHash.set("false", TokenType.False);
 resolverHash.set("undefined", TokenType.Undefined);
 resolverHash.set("null", TokenType.Null);
 resolverHash.set("in", TokenType.In);
+resolverHash.set("instanceof", TokenType.Instanceof);
 resolverHash.set("let", TokenType.Let);
 resolverHash.set("const", TokenType.Const);
 resolverHash.set("var", TokenType.Var);

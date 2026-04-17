@@ -140,7 +140,7 @@ export const TextBoxMd = createMetadata({
     "textColor-Input": "$textColor-primary",
     "backgroundColor-Input--disabled": "$backgroundColor--disabled",
     "borderWidth-Input": "1px",
-    "minHeight-Input": "39px",
+    "minHeight-Input": "2.5rem",
     [`paddingHorizontal-${COMP}`]: "$space-2",
     [`paddingVertical-${COMP}`]: "$space-2",
     "gap-adornment-Input": "$space-2",

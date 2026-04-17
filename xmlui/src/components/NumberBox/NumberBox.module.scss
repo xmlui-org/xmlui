@@ -113,6 +113,7 @@ $fontSize-placeholder-NumberBox--success: createThemeVar("Input:fontSize-placeho
 $color-adornment-NumberBox--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
 
 // Variables for @layer section
+$minHeight-NumberBox: createThemeVar("Input:minHeight-#{$componentName}");
 $gap-adornment-NumberBox: createThemeVar("Input:gap-adornment-#{$componentName}");
 $backgroundColor-NumberBox--disabled: createThemeVar("Input:backgroundColor-NumberBox--disabled");
 $textColor-NumberBox--disabled: createThemeVar("Input:textColor-NumberBox--disabled");
@@ -177,6 +178,8 @@ $borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--d
     gap: $gap-adornment-NumberBox;
     width: 100%;
     height: max-content;
+    min-height: $minHeight-NumberBox;
+    line-height: normal;
     border-style: solid;
     border-width: 1px;
     transition: background-color ease-in 0.1s;
@@ -239,6 +242,7 @@ $borderColor-NumberBox--disabled: createThemeVar("Input:borderColor-NumberBox--d
     .spinnerButton {
       padding: 0 !important;
       width: t.$space-6;
+      min-height: fit-content;
       border: none;
       line-height: 1;
 

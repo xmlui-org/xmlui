@@ -79,6 +79,7 @@ $textColor-placeholder-AutoComplete--success: createThemeVar("Input:textColor-pl
 $fontSize-placeholder-AutoComplete--success: createThemeVar("Input:fontSize-placeholder-#{$component}--success");
 
 // Variables for @layer section
+$minHeight-AutoComplete: createThemeVar("Input:minHeight-#{$component}");
 $gap-adornment-AutoComplete: createThemeVar("Input:gap-adornment-#{$component}");
 $backgroundColor-AutoComplete--disabled: createThemeVar("Input:backgroundColor-#{$component}--disabled");
 $textColor-AutoComplete--disabled: createThemeVar("Input:textColor-#{$component}--disabled");
@@ -145,6 +146,8 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     outline: none;
     width: 100%;
     height: max-content;
+    min-height: $minHeight-AutoComplete;
+    line-height: normal;
     gap: t.$space-1;
     display: flex;
     flex-direction: row;

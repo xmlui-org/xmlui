@@ -2333,7 +2333,7 @@ export class Parser {
 
   /**
    * relOrInExpr
-   *   : shiftExpr ( ( "<" | "<=" | ">" | ">=", "in" ) shiftExpr )?
+   *   : shiftExpr ( ( "<" | "<=" | ">" | ">=", "in", "instanceof" ) shiftExpr )?
    *   ;
    */
   private parseRelOrInExpr(): Expression | null {
@@ -2351,6 +2351,7 @@ export class Parser {
         TokenType.GreaterThan,
         TokenType.GreaterThanOrEqual,
         TokenType.In,
+        TokenType.Instanceof,
       ))
     ) {
       const rightExpr = this.parseShiftExpr();
@@ -2938,23 +2939,7 @@ export class Parser {
         );
       }
 
-      case TokenType.Global: {
-        this._lexer.get();
-        const idToken = this._lexer.get();
-        if (idToken.type !== TokenType.Identifier) {
-          this.reportError("W003");
-          return null;
-        }
-        return this.createExpressionNode<Identifier>(
-          T_IDENTIFIER,
-          {
-            name: idToken.text,
-            isGlobal: true,
-          },
-          idToken,
-          idToken,
-        );
-      }
+
       case TokenType.Backtick:
         return this.parseTemplateLiteral();
 

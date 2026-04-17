@@ -68,7 +68,6 @@ export enum TokenType {
   SignedShiftRight,
   Dot,
   Spread,
-  Global,
   Backtick,
   DollarLBrace,
   Arrow,
@@ -87,6 +86,7 @@ export enum TokenType {
   Null,
   Undefined,
   In,
+  Instanceof,
 
   Let,
   Const,

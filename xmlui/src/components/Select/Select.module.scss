@@ -180,6 +180,7 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
     flex-wrap: wrap;
     min-height: $minHeight-Select;
     min-width: $minWidth-Select;
+    line-height: normal;
     @include t.paddingVars($themeVars, $componentName);
 
     @include variant("");

@@ -8,16 +8,23 @@ description: Extend an existing XMLUI component with new props, events, theme va
 ## Before starting
 
 1. Read `feature.md` at the repo root — it describes what is being added and why.
-2. Read the existing component's files:
+2. Read `guidelines.md` at the repo root — focus on rules from Topics 4, 5, 7, 9, 23, 24.
+3. Read the existing component's files:
    - `xmlui/src/components/ComponentName/ComponentName.tsx` — metadata and renderer (source of truth for the API)
    - `xmlui/src/components/ComponentName/ComponentNameNative.tsx` — React implementation
    - `xmlui/src/components/ComponentName/ComponentName.module.scss` — theme variables (if visual)
-3. Read only the sub-files relevant to what you are adding:
+4. Read only the sub-files relevant to what you are adding:
+   - `.ai/xmlui/component-architecture.md` — two-file pattern overview (always)
+   - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (if component uses wrapComponent)
    - `.ai/xmlui/components/metadata.md` — adding props/events/apis/contextVars
    - `.ai/xmlui/components/styling.md` — adding theme variables
    - `.ai/xmlui/components/parts.md` — adding parts
    - `.ai/xmlui/components/state.md` — adding stateful behavior
-4. Find the component's existing E2E tests (`ComponentName.spec.ts` in the same folder) to understand current test coverage.
+   - `.ai/xmlui/theming-styling.md` — theming system (if adding visual props)
+   - `.ai/xmlui/behaviors.md` — behavior system (if new prop triggers a behavior)
+   - `.ai/xmlui/testing-conventions.md` — testing patterns (when adding tests)
+   - `.ai/xmlui/accessibility.md` — accessibility (if adding interactive elements)
+5. Find the component's existing E2E tests (`ComponentName.spec.ts` in the same folder) to understand current test coverage.
 
 ## Implementation steps
 
@@ -60,7 +67,8 @@ All existing tests must still pass.
 
 ### Step 6 — Add tests (only when explicitly requested)
 
-Add new tests to `ComponentName.spec.ts` for the new behavior. Follow `.ai/xmlui/testing/e2e.md`.
+Add new tests to `ComponentName.spec.ts` for the new behavior. Follow `.ai/xmlui/testing-conventions.md`.
+If the change adds interactive elements, add accessibility tests (see `.ai/xmlui/accessibility.md`).
 
 ### Step 7 — Add a changeset (if user-facing)
 

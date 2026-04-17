@@ -159,6 +159,7 @@ $outlineOffset-TimeInput--success--focus: createThemeVar("Input:outlineOffset-#{
 $color-adornment-TimeInput--success: createThemeVar("Input:color-adornment-#{$componentName}--success");
 
 // Variables for @layer section
+$minHeight-TimeInput: createThemeVar("Input:minHeight-#{$componentName}");
 $gap-adornment-TimeInput: createThemeVar("Input:gap-adornment-#{$componentName}");
 $backgroundColor-TimeInput--disabled: createThemeVar("Input:backgroundColor-#{$componentName}--disabled");
 $textColor-TimeInput--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
@@ -212,6 +213,8 @@ $borderColor-TimeInput--disabled: createThemeVar("Input:borderColor-#{$component
     align-items: center;
     width: fit-content;
     height: max-content;
+    min-height: $minHeight-TimeInput;
+    line-height: normal;
     border-style: solid;
     border-width: 1px;
     transition: $transition-background-TimeInput;

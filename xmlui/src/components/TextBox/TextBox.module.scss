@@ -123,6 +123,7 @@ $color-passwordToggle-TextBox--hover: createThemeVar("Input:color-passwordToggle
 $color-passwordToggle-TextBox--focus: createThemeVar("Input:color-passwordToggle-#{$componentName}--focus");
 
 // Variables for @layer section
+$minHeight-TextBox: createThemeVar("Input:minHeight-#{$componentName}");
 $gap-adornment-TextBox: createThemeVar("Input:gap-adornment-#{$componentName}");
 $textColor-TextBox--disabled: createThemeVar("Input:textColor-#{$componentName}--disabled");
 $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentName}--disabled");
@@ -204,6 +205,8 @@ $borderColor-TextBox--disabled: createThemeVar("Input:borderColor-#{$componentNa
     gap: $gap-adornment-TextBox;
     width: 100%;
     height: max-content;
+    min-height: $minHeight-TextBox;
+    line-height: normal;
     border-style: solid;
     border-width: 1px;
     transition: background-color ease-in 0.1s;

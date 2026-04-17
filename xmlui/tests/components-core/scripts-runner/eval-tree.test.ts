@@ -28,8 +28,6 @@ describe("Evaluate binding expression tree (exp)", () => {
 
     { src: "Math", exp: Math },
     { src: "Math", con: { Math: 123 }, exp: 123 },
-    { src: "::Math", exp: Math },
-    { src: "::Math", con: { Math: 123 }, exp: Math },
   ];
   literalCases.forEach((c) => {
     it(`Eval literal: ${c.src}`, () => {
