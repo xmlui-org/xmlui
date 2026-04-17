@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
@@ -67,7 +67,7 @@ function AnimatedLogo() {
   );
 }
 
-export function LazyNestedApp({
+export const LazyNestedApp = memo(function LazyNestedApp({
   immediate,
   ...restProps
 }: NestedAppProps & { immediate?: boolean }) {
@@ -83,18 +83,18 @@ export function LazyNestedApp({
     return null;
   }
   return <NestedApp {...restProps} />;
-}
+});
 
-export function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolean }) {
+export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolean }) {
   const { indexing } = useIndexerContext();
   if (indexing) {
     return null;
   }
 
   return <LazyNestedApp {...props} />;
-}
+});
 
-export function NestedApp({
+export const NestedApp = memo(function NestedApp({
   api,
   app,
   components = EMPTY_ARRAY,
@@ -367,7 +367,7 @@ export function NestedApp({
       />
     </div>
   );
-}
+});
 
 function NestedAppRoot({
   children,

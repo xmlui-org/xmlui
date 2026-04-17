@@ -47,7 +47,7 @@ import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
 import { ThemedText as Text } from "./components/Text/Text";
 import { ThemedTextBox as TextBox } from "./components/TextBox/TextBox";
-import { NestedApp } from "./components/NestedApp/NestedAppNative";
+import { NestedApp } from "./components/NestedApp/NestedAppReact";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { ThemedLinkNative as LinkNative } from "./components/Link/Link";

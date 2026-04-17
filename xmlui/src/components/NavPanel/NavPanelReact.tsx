@@ -1,7 +1,8 @@
-import React, { forwardRef, type ReactNode, useCallback, useEffect, useRef } from "react";
+import React, { forwardRef, memo, type ReactNode, useCallback, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { PART_NAV_PANEL_FOOTER } from "../../components-core/parts";
 
 import styles from "./NavPanel.module.scss";
 import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
@@ -13,8 +14,6 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { getAppLayoutOrientation } from "../App/AppReact";
 import { useLinkInfoContext } from "../App/LinkInfoContext";
 import { Part } from "../Part/Part";
-
-export const PART_NAV_PANEL_FOOTER = "footer";
 
 // Define navigation hierarchy node structure
 export interface NavHierarchyNode {
@@ -277,7 +276,7 @@ const contextValue = {
   inDrawer: true,
 };
 
-function DrawerNavPanel({
+const DrawerNavPanel = memo(function DrawerNavPanel({
   logoContent,
   footerContent,
   children,
@@ -317,14 +316,16 @@ function DrawerNavPanel({
           {children}
         </Scroller>
         {hasFooter && (
-          <div className={styles.footer} data-part="footer">
-            {footerContent}
-          </div>
+          <Part partId={PART_NAV_PANEL_FOOTER}>
+            <div className={styles.footer}>
+              {footerContent}
+            </div>
+          </Part>
         )}
       </div>
     </NavPanelContext.Provider>
   );
-}
+});
 
 type Props = {
   children: ReactNode;
@@ -343,7 +344,7 @@ type Props = {
   syncScrollPosition?: ScrollLogicalPosition;
 };
 
-export const NavPanel = forwardRef(function NavPanel(
+export const NavPanel = memo(forwardRef(function NavPanel(
   {
     children,
     style,
@@ -361,7 +362,7 @@ export const NavPanel = forwardRef(function NavPanel(
     syncScrollPosition = defaultProps.syncScrollPosition,
     ...rest
   }: Props,
-  forwardedRef: React.ForwardedRef<any>,
+  forwardedRef: React.ForwardedRef<HTMLDivElement>,
 ) {
   const appLayoutContext = useAppLayoutContext();
   const linkInfoContext = useLinkInfoContext();
@@ -518,4 +519,4 @@ export const NavPanel = forwardRef(function NavPanel(
   );
 
   return wrapperEl;
-});
+}));

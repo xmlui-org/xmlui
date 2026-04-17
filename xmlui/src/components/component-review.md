@@ -60,11 +60,11 @@ Status symbols: ⏳ pending | ✅ reviewed
 | Menu | ⏳ |
 | MessageListener | ✅ |
 | ModalDialog | ✅ |
-| NavGroup | ⏳ |
-| NavLink | ⏳ |
-| NavPanel | ⏳ |
-| NavPanelCollapseButton | ⏳ |
-| NestedApp | ⏳ |
+| NavGroup | ✅ |
+| NavLink | ✅ |
+| NavPanel | ✅ |
+| NavPanelCollapseButton | ✅ |
+| NestedApp | ✅ |
 | NoResult | ⏳ |
 | NumberBox | ⏳ |
 | Option | ⏳ |

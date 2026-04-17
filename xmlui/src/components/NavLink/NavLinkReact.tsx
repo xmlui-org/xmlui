@@ -1,6 +1,6 @@
-import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
+import type { CSSProperties, MouseEventHandler, ReactNode } from "react";
 import type React from "react";
-import { forwardRef, useContext, useMemo } from "react";
+import { forwardRef, type ForwardedRef, memo, useContext, useMemo } from "react";
 import { NavLink as RrdNavLink } from "react-router-dom";
 import type { To } from "react-router-dom";
 import classnames from "classnames";
@@ -11,7 +11,7 @@ import type { LinkAria, LinkTarget } from "../abstractions";
 import { createUrlWithQueryParams } from "../component-utils";
 import { getAppLayoutOrientation } from "../App/AppReact";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
-import { NavPanelContext } from "../NavPanel/NavPanelNative";
+import { NavPanelContext } from "../NavPanel/NavPanelReact";
 import { NavGroupContext } from "../NavGroup/NavGroupContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 
@@ -39,11 +39,10 @@ type Props = {
   onClick?: MouseEventHandler;
   icon?: React.ReactNode;
   iconAlignment?: "baseline" | "start" | "center" | "end";
-  accessibilityProps?: any;
   exact?: boolean;
 } & Pick<React.HTMLAttributes<HTMLAnchorElement>, LinkAria>;
 
-export const NavLink = forwardRef(function NavLink(
+export const NavLink = memo(forwardRef(function NavLink(
   {
     /* eslint-disable react/prop-types */
     uid,
@@ -64,7 +63,7 @@ export const NavLink = forwardRef(function NavLink(
     classes,
     ...rest
   }: Props,
-  ref: Ref<any>,
+  ref: ForwardedRef<HTMLButtonElement | HTMLAnchorElement>,
 ) {
   const { getThemeVar } = useTheme();
   const effectiveIconAlignment = iconAlignment ?? getThemeVar("iconAlignment-NavLink") ?? "center";
@@ -123,7 +122,7 @@ export const NavLink = forwardRef(function NavLink(
     content = (
       <button
         {...rest}
-        ref={ref}
+        ref={ref as React.Ref<HTMLButtonElement>}
         onClick={onClick}
         className={baseClasses}
         style={styleObj}
@@ -137,7 +136,7 @@ export const NavLink = forwardRef(function NavLink(
       <RrdNavLink
         {...rest}
         id={uid}
-        ref={ref}
+        ref={ref as React.Ref<HTMLAnchorElement>}
         to={smartTo as To}
         end={exact}
         style={styleObj}
@@ -156,4 +155,4 @@ export const NavLink = forwardRef(function NavLink(
   }
 
   return content;
-});
+}));

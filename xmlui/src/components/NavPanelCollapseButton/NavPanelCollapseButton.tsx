@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { ThemedButton as Button } from "../Button/Button";
 import { ThemedIcon } from "../Icon/Icon";
@@ -14,31 +15,38 @@ export const NavPanelCollapseButtonMd = createMetadata({
   props: {
     icon: {
       description: "Icon name for the button when the panel is expanded (collapse action).",
-      valueType: "string",
+      type: "string",
       defaultValue: "sidebar-collapse",
     },
     iconCollapsed: {
       description: "Icon name for the button when the panel is collapsed (expand action).",
-      valueType: "string",
+      type: "string",
       defaultValue: "sidebar-collapse",
     },
     "aria-label": {
       description: "Accessible label for the button when expanded.",
-      valueType: "string",
+      type: "string",
     },
     "aria-labelCollapsed": {
       description: "Accessible label for the button when collapsed.",
-      valueType: "string",
+      type: "string",
     },
   },
 });
 
-export function NavPanelCollapseButton({
+type NavPanelCollapseButtonProps = {
+  icon?: string;
+  iconCollapsed?: string;
+  "aria-label"?: string;
+  "aria-labelCollapsed"?: string;
+};
+
+export const NavPanelCollapseButton = memo(function NavPanelCollapseButton({
   icon = "sidebar-collapse",
   iconCollapsed = "sidebar-collapse",
   "aria-label": ariaLabel = "Collapse sidebar",
   "aria-labelCollapsed": ariaLabelCollapsed = "Expand sidebar",
-}) {
+}: NavPanelCollapseButtonProps) {
   const layoutContext = useAppLayoutContext();
   const collapsed = layoutContext?.navPanelCollapsed ?? false;
   const toggle = layoutContext?.toggleNavPanelCollapsed;
@@ -55,7 +63,7 @@ export function NavPanelCollapseButton({
       onClick={toggle}
     />
   );
-}
+});
 
 export const navPanelCollapseButtonComponentRenderer = wrapComponent(
   COMP,

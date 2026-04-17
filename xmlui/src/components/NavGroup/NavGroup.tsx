@@ -5,7 +5,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { defaultProps, NavGroup } from "./NavGroupNative";
+import { defaultProps, NavGroup } from "./NavGroupReact";
 
 const COMP = "NavGroup";
 
@@ -25,38 +25,38 @@ export const NavGroupMd = createMetadata({
     enabled: dEnabled(),
     to: {
       description: `This property defines an optional navigation link.`,
-      valueType: "string",
+      type: "string",
     },
     icon: {
       description: `This property defines an optional icon to display along with the \`${COMP}\` label.`,
-      valueType: "string",
+      type: "string",
     },
     iconHorizontalExpanded: {
       description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.iconHorizontalExpanded,
     },
     iconVerticalExpanded: {
       description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.iconVerticalExpanded,
     },
     iconHorizontalCollapsed: {
       description:
         "Set a custom icon to display when the navigation menu is collapsed, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.iconHorizontalCollapsed,
     },
     iconVerticalCollapsed: {
       description:
         "Set a custom icon to display when the navigation menu is collapsed, " +
         "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
-      valueType: "string",
+      type: "string",
       defaultValue: defaultProps.iconVerticalCollapsed,
     },
     noIndicator: {
@@ -64,32 +64,32 @@ export const NavGroupMd = createMetadata({
         `This Boolean property controls whether to hide the visual indicator for active and ` +
         `hovered states. When set to \`true\`, the indicator line will not be displayed on the ` +
         `\`${COMP}\` toggle button.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
     iconAlignment: {
       description:
         `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
         `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
-      valueType: "string",
+      type: "string",
       availableValues: [
         { value: "baseline", description: "Align icon with the first line of text" },
         { value: "start", description: "Align icon to the top" },
         { value: "center", description: "Align icon to the center (default)" },
         { value: "end", description: "Align icon to the bottom" },
       ],
-      defaultValue: "center",
+      defaultValue: defaultProps.iconAlignment,
     },
     expandIconAlignment: {
       description:
         `This property controls the horizontal alignment of the expand/collapse arrow icon. ` +
         `Set to \`start\` to display the arrow immediately after the label, or \`end\` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).`,
-      valueType: "string",
+      type: "string",
       availableValues: [
         { value: "start", description: "Display arrow immediately after the label (default)" },
         { value: "end", description: "Push arrow to the right edge of the NavGroup" },
       ],
-      defaultValue: "start",
+      defaultValue: defaultProps.expandIconAlignment,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

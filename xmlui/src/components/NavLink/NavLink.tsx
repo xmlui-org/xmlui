@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
-import { NavLink, defaultProps } from "./NavLinkNative";
+import { NavLink, defaultProps } from "./NavLinkReact";
 import { LinkTargetMd } from "../abstractions";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -31,7 +31,7 @@ export const NavLinkMd = createMetadata({
         `This property indicates if the particular navigation is an active link. An active link ` +
         `has a particular visual appearance, provided its [\`displayActive\`](#displayactive) ` +
         `property is set to \`true\`.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.active,
     },
     target: {
@@ -45,20 +45,20 @@ export const NavLinkMd = createMetadata({
         `This property sets how the active status is displayed on the \`${COMP}\` component. If ` +
         `set to true, the indicator is displayed on the side which lends itself to a vertically ` +
         `aligned navigation menu. By default, it displays a horizontal indicator.`,
-      valueType: "boolean",
+      type: "boolean",
     },
     displayActive: {
       description:
         `This Boolean property indicates if the active state of a link should have a visual ` +
         `indication. Setting it to \`false\` removes the visual indication of an active link.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.displayActive,
     },
     noIndicator: {
       description:
         `This Boolean property controls whether to hide the visual indicator for active and ` +
         `hovered states. When set to \`true\`, the indicator line will not be displayed.`,
-      valueType: "boolean",
+      type: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
     exact: {
@@ -66,7 +66,7 @@ export const NavLinkMd = createMetadata({
         `When set to true, the link is only considered active when the current URL matches the ` +
         `\`to\` value exactly. When false or omitted, the link also counts as active for nested ` +
         `paths that start with the same prefix (e.g. a link with to="/a" is active on "/a/b").`,
-      valueType: "boolean",
+      type: "boolean",
     },
     icon: d(
       `This property allows you to add an optional icon (specify the icon's name) to the navigation link.`,
@@ -75,7 +75,7 @@ export const NavLinkMd = createMetadata({
       description:
         `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
         `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
-      valueType: "string",
+      type: "string",
       availableValues: [
         { value: "baseline", description: "Align icon with the first line of text" },
         { value: "start", description: "Align icon to the top" },
@@ -89,7 +89,7 @@ export const NavLinkMd = createMetadata({
         `This property specifies the nesting level (1-4) for the navigation link, which affects its padding. ` +
         `Higher levels typically have more left padding to indicate hierarchy. When used inside a NavGroup, ` +
         `the level is automatically inherited from the group context.`,
-      valueType: "number",
+      type: "number",
       availableValues: [1, 2, 3, 4],
     },
   },

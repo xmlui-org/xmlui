@@ -19,3 +19,4 @@ export const PART_HEADER = "header";
 export const PART_CONTENT = "content";
 export const PART_HAMBURGER = "hamburger";
 export const PART_LIST_WRAPPER = "listWrapper";
+export const PART_NAV_PANEL_FOOTER = "footer";

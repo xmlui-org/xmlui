@@ -2,8 +2,10 @@ import {
   cloneElement,
   type CSSProperties,
   forwardRef,
+  type ForwardedRef,
   type ReactElement,
   type ReactNode,
+  memo,
   useContext,
   useEffect,
   useMemo,
@@ -32,7 +34,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import { ThemedIcon } from "../Icon/Icon";
 import { ThemedNavLink as NavLink } from "../NavLink/NavLink";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
-import { NavPanelContext } from "../NavPanel/NavPanelNative";
+import { NavPanelContext } from "../NavPanel/NavPanelReact";
 import type { NavGroupMd } from "./NavGroup";
 import { useLocation } from "react-router-dom";
 import classnames from "classnames";
@@ -70,6 +72,7 @@ export const defaultProps: Pick<
   | "iconVerticalExpanded"
   | "iconVerticalCollapsed"
   | "noIndicator"
+  | "iconAlignment"
   | "expandIconAlignment"
 > = {
   iconHorizontalExpanded: "chevronright",
@@ -77,10 +80,11 @@ export const defaultProps: Pick<
   iconVerticalExpanded: "chevrondown",
   iconVerticalCollapsed: "chevronright",
   noIndicator: false,
+  iconAlignment: "center",
   expandIconAlignment: "start",
 };
 
-export const NavGroup = forwardRef(function NavGroup(
+export const NavGroup = memo(forwardRef(function NavGroup(
   {
     node,
     style,
@@ -101,7 +105,7 @@ export const NavGroup = forwardRef(function NavGroup(
     expandIconAlignment,
     ...rest
   }: Props,
-  ref,
+  ref: ForwardedRef<HTMLDivElement>,
 ) {
   const { getThemeVar } = useTheme();
   const effectiveExpandIconAlignment =
@@ -184,7 +188,7 @@ export const NavGroup = forwardRef(function NavGroup(
       )}
     </NavGroupContext.Provider>
   );
-});
+}));
 
 type ExpandableNavGroupProps = {
   style?: CSSProperties;
@@ -219,7 +223,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     expandIconAlignment = "start",
     ...rest
   }: ExpandableNavGroupProps,
-  ref,
+  ref: ForwardedRef<HTMLDivElement>,
 ) {
   const { level, iconVerticalCollapsed, iconVerticalExpanded, layoutIsVertical } =
     useContext(NavGroupContext);
@@ -229,6 +233,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
   const { pathname } = useLocation();
 
   useEffect(() => {
+    if (!groupContentInnerRef.current) return;
     const hasActiveNavLink =
       groupContentInnerRef.current.querySelector(".xmlui-navlink-active") !== null;
     if (hasActiveNavLink) {
@@ -236,11 +241,11 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     }
   }, [pathname]);
 
-  const toggleStyle = {
+  const toggleStyle = useMemo(() => ({
     ...style,
     "--nav-link-level": layoutIsVertical ? level : 0,
     ...(expandIconAlignment === "end" && { width: "100%" }),
-  };
+  }), [style, layoutIsVertical, level, expandIconAlignment]);
 
   const handleClick = (e: React.MouseEvent) => {
     const isMobile = mediaSize.sizeIndex <= 2;
@@ -336,7 +341,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     iconAlignment?: "baseline" | "start" | "center" | "end";
     expandIconAlignment?: "start" | "end";
   },
-  ref,
+  ref: ForwardedRef<HTMLDivElement>,
 ) {
   const {
     level,
