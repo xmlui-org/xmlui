@@ -92,3 +92,87 @@ The cli tool is interactive, so instead do the following manual steps:
 2. The frontmatter contains pairs of (affected package name - semver increments), like `"xmlui": patch`. All changes are strictly marked as `patch` changes, unless stated otherwise.
 3. Markdow body is the change description
 4. Check your changes are recognised by running `npx changeset status` at the monorepo root
+
+---
+
+## Task Quick Reference
+
+Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke with `#prompt-name` in VS Code Copilot chat.
+
+| Task | Prompt file | When to use |
+|------|-------------|-------------|
+| Create a new component (core) | `#create-component` | Building a new built-in XMLUI component in `xmlui/src/components/` |
+| Extend an existing component | `#extend-component` | Adding props, events, theme variables, or behavior to an existing component |
+| Create a component in an extension package | `#create-extension-component` | Building a component in `packages/xmlui-*` instead of core |
+| Create a new extension package | `#create-extension-package` | Setting up a brand-new `packages/xmlui-*` package with component(s) |
+| Fix a bug | `#fix-bug` | Diagnosing and fixing a component issue with regression tests |
+| QA review a component | `#qa-review` | Auditing an existing component against conventions, accessibility, and test coverage |
+| Add E2E tests | `#add-e2e-tests` | Adding or expanding Playwright tests for an under-tested component |
+| Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
+| Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |
+| Add a new stereotype task | `#add-stereotype` | Creating a new prompt file for a repeatable task pattern |
+
+If no prompt is invoked, use the documentation map below to find the right reference material for your task.
+
+---
+
+## Documentation Map
+
+### Architecture & Internals (`.ai/xmlui/`)
+
+| AI Doc | Topic | When to read |
+|--------|-------|-------------|
+| `mental-model.md` | Framework lifecycle, key abstractions | Refactoring core, understanding rendering flow |
+| `rendering-pipeline.md` | `renderChild`, `ComponentWrapper`, behavior chain | Modifying rendering, debugging render issues |
+| `container-state.md` | State composition (6 layers), proxy tracking, reducers | Stateful components, debugging state issues |
+| `component-architecture.md` | Two-file pattern, metadata, renderer, native | Any component work |
+| `wrapcomponent.md` | `wrapComponent` config API, events, templates, state | Components using `wrapComponent` |
+| `expression-eval.md` | Parser pipeline, AST, sync/async eval, dependency tracking | Expression bugs, scripting issues |
+| `theming-styling.md` | CSS variables, SCSS modules, tone management | Visual components, theme customization |
+| `data-operations.md` | DataSource, APICall, loaders, React Query | Data-fetching components |
+| `behaviors.md` | The 9 auto-attached behaviors, application order | Behavior interactions, form components |
+| `action-execution.md` | Action model, ApiBoundComponent, nested actions | Event handling, API calls |
+| `user-defined-components.md` | UDCs, slots, template composition | User-facing extensibility |
+| `form-infrastructure.md` | Form/FormItem, validation, dirty/touched state | Form components |
+| `routing.md` | Pages/Page, react-router integration, navigation | Routing changes |
+| `extension-packages.md` | Extension interface, registration, build config | Extension package work |
+| `app-context.md` | Global functions, Actions namespace, utilities | Adding global functions |
+| `option-components.md` | Option/OptionContext, search, filtering | Select, AutoComplete, RadioGroup |
+| `error-handling.md` | ErrorBoundary, error propagation, loader errors | Error-related bugs |
+| `parsers.md` | XML, scripting, style, keybinding parsers | Parser modifications |
+| `inspector-debugging.md` | Trace system, `pushXsLog`, verbose mode | Debugging, inspector |
+| `language-server.md` | LSP, MetadataProvider, completions, diagnostics | VS Code extension |
+| `build-system.md` | CLI commands, Vite plugin, framework builds | Build configuration |
+| `monorepo-structure.md` | Workspaces, Turborepo, changesets, releases | Repo structure, CI/CD |
+| `testing-conventions.md` | E2E + unit patterns, `initTestBed`, locators | Any testing work |
+| `accessibility.md` | ARIA, keyboard nav, per-component audit | Accessibility fixes |
+| `doc-generation.md` | Generate-docs pipeline, MetadataProcessor | Documentation generation |
+
+### Component Authoring (`.ai/xmlui/components/`)
+
+| File | Covers |
+|------|--------|
+| `overview.md` | Component authoring entry point |
+| `metadata.md` | `createMetadata` API reference |
+| `renderer.md` | Renderer function patterns |
+| `native.md` | Native component patterns |
+| `styling.md` | SCSS modules, theme variables |
+| `parts.md` | Parts pattern for sub-elements |
+| `state.md` | Component state management |
+| `behaviors.md` | Behavior authoring and registration |
+| `qa-checklist.md` | QA audit checklist |
+
+### Human-Readable Guides (`xmlui/dev-docs/guide/`)
+
+Numbered 01–25, same topics as above. Read for deeper explanations and conceptual context. AI docs are sufficient for most implementation tasks.
+
+### Project Rules (`guidelines.md`)
+
+Contains ~300 lines of verified rules organized by topic. Read the section relevant to your task:
+- **Topics 4–5**: Component architecture and `wrapComponent` rules
+- **Topics 7**: Theming and SCSS conventions
+- **Topics 9**: Behavior attachment rules
+- **Topics 12**: Form infrastructure rules
+- **Topics 17**: Error handling rules
+- **Topics 23**: Testing conventions
+- **Topics 24**: Accessibility rules

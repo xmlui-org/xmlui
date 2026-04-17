@@ -8,16 +8,20 @@ These rules apply whenever editing files in `xmlui/src/components-core/`.
 
 ## Architecture docs by subsystem
 
-Before editing any subsystem, read its corresponding doc:
+Before editing any subsystem, read its corresponding AI doc in `.ai/xmlui/`:
 
-| Subsystem | Path | Doc |
+| Subsystem | Path | AI Doc |
 |---|---|---|
-| Rendering pipeline | `rendering/` | `xmlui/dev-docs/standalone-app.md` |
-| State / containers | `containers/` | `xmlui/dev-docs/containers.md` |
-| Theming / CSS | `theming/` | `xmlui/dev-docs/theming-styling.md` |
+| Rendering pipeline | `rendering/` | `.ai/xmlui/rendering-pipeline.md` |
+| State / containers | `containers/` | `.ai/xmlui/container-state.md` |
+| Theming / CSS | `theming/` | `.ai/xmlui/theming-styling.md` |
 | Parts | `parts/` | `.ai/xmlui/components/parts.md` |
-| Form infrastructure | `form*/` | `xmlui/dev-docs/form-infrastructure.md` |
-| User-defined components | `ud-components/` | `xmlui/dev-docs/ud-components.md` |
+| Form infrastructure | `form*/` | `.ai/xmlui/form-infrastructure.md` |
+| User-defined components | `ud-components/` | `.ai/xmlui/user-defined-components.md` |
+| Error handling | `ErrorBoundary*` | `.ai/xmlui/error-handling.md` |
+| Expression evaluation | `parsers/` | `.ai/xmlui/expression-eval.md` |
+
+Verified rules: `guidelines.md` at the repo root.
 
 ## Refactoring
 
