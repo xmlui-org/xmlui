@@ -1,4 +1,5 @@
-import { useCallback, useMemo } from "react";
+import { forwardRef, memo, useCallback, useMemo } from "react";
+import type { ForwardedRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
@@ -86,7 +87,10 @@ type FormSegmentNativeProps = {
   registerComponentApi?: (api: any) => void;
 };
 
-export function FormSegmentNative({ node, renderChild, extractValue, registerComponentApi }: FormSegmentNativeProps) {
+export const FormSegmentNative = memo(forwardRef(function FormSegmentNative(
+  { node, renderChild, extractValue, registerComponentApi }: FormSegmentNativeProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   // Determine the stack orientation (vertical or horizontal).
   const orientation = useMemo(() => {
     const orientationProp = extractValue.asOptionalString(node.props?.orientation);
@@ -205,4 +209,4 @@ export function FormSegmentNative({ node, renderChild, extractValue, registerCom
   );
 
   return <>{renderChild(stackNode)}</>;
-}
+}));

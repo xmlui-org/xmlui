@@ -2,6 +2,7 @@ import React, {
   createContext,
   type CSSProperties,
   forwardRef,
+  memo,
   type ReactNode,
   useCallback,
   useContext,
@@ -666,7 +667,7 @@ const useShift = (listData: any[], idKey: any) => {
   return shouldShift.current;
 };
 
-export const ListNative = forwardRef(function DynamicHeightList2(
+export const ListNative = memo(forwardRef(function DynamicHeightList2(
   {
     items = EMPTY_ARRAY,
     itemRenderer = defaultItemRenderer,
@@ -1165,7 +1166,7 @@ export const ListNative = forwardRef(function DynamicHeightList2(
       </ListContext.Provider>
     </ListItemTypeContext.Provider>
   );
-});
+}));
 
 // --- Helper function for List item rendering
 export function MemoizedSection({

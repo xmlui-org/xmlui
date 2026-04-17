@@ -11,7 +11,7 @@ import {
 import type { LayoutContext, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { FormItemValidations, ValidationSeverity } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-import { FormItemContext, useIsInsideFormItem } from "./FormItemNative";
+import { FormItemContext, useIsInsideFormItem } from "./FormItemReact";
 import {
   fieldChanged,
   fieldFocused,
@@ -20,7 +20,7 @@ import {
   fieldRemoved,
   UNBOUND_FIELD_SUFFIX,
 } from "../Form/formActions";
-import { getByPath } from "../Form/FormNative";
+import { getByPath } from "../Form/FormReact";
 import { useEvent } from "../../components-core/utils/misc";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import { ItemWithLabel } from "./ItemWithLabel";

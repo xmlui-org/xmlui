@@ -15,7 +15,7 @@ import {
   StandaloneSelectionStore,
   useSelectionContext,
 } from "../SelectionStore/SelectionStoreNative";
-import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListNative";
+import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListReact";
 
 const COMP = "List";
 

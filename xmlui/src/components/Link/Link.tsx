@@ -4,7 +4,7 @@ import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
-import { LinkNative, defaultProps } from "./LinkNative";
+import { LinkNative, defaultProps } from "./LinkReact";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
 

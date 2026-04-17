@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dComponent, dEnabled, dInternal } from "../metadata-helpers";
 import { labelPositionMd, requireLabelModeMd } from "../abstractions";
-import { FormWithContextVar, defaultProps } from "./FormNative";
+import { FormWithContextVar, defaultProps } from "./FormReact";
 
 const COMP = "Form";
 

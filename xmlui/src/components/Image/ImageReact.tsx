@@ -1,7 +1,9 @@
 import {
   type CSSProperties,
+  type ForwardedRef,
   type HTMLAttributes,
   forwardRef,
+  memo,
   useEffect,
   useMemo,
   useState,
@@ -34,7 +36,7 @@ export const defaultProps: Pick<Props, "fit" | "lazyLoad" | "inline" | "grayscal
   grayscale: false,
 };
 
-export const Image = forwardRef(function Img(
+export const Image = memo(forwardRef(function Img(
   {
     src,
     alt,
@@ -49,7 +51,7 @@ export const Image = forwardRef(function Img(
     grayscale = defaultProps.grayscale,
     ...rest
   }: Props,
-  ref,
+  ref: ForwardedRef<HTMLImageElement>,
 ) {
   const [blobUrl, setBlobUrl] = useState<string | null>(null);
 
@@ -89,7 +91,7 @@ export const Image = forwardRef(function Img(
     <img
       {...rest}
       src={imageSrc}
-      ref={ref as any}
+      ref={ref}
       alt={alt}
       loading={lazyLoad ? "lazy" : "eager"}
       className={classnames(
@@ -111,7 +113,7 @@ export const Image = forwardRef(function Img(
       onClick={onClick}
     />
   );
-});
+}));
 
 function safeConvertPropToString(prop: unknown): string | undefined {
   if (typeof prop === "string") return prop;

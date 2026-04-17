@@ -1,4 +1,4 @@
 import Icon from "./svg/l-file-cog.svg?react";
-import type { IconBaseProps } from "./IconNative";
+import type { IconBaseProps } from "./IconReact";
 
 export const FileConfigIcon = (props: IconBaseProps) => <Icon {...props}/>;

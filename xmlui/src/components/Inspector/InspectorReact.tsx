@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, forwardRef, memo, type ForwardedRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Inspector.module.scss";
@@ -25,15 +25,18 @@ export const defaultProps = {
   dialogHeight: "95vh",
 };
 
-export function Inspector({
-  src = defaultProps.src,
-  tooltip = defaultProps.tooltip,
-  dialogTitle = defaultProps.dialogTitle,
-  dialogWidth = defaultProps.dialogWidth,
-  dialogHeight = defaultProps.dialogHeight,
-  classes,
-  registerComponentApi,
-}: Props) {
+export const Inspector = memo(forwardRef(function Inspector(
+  {
+    src = defaultProps.src,
+    tooltip = defaultProps.tooltip,
+    dialogTitle = defaultProps.dialogTitle,
+    dialogWidth = defaultProps.dialogWidth,
+    dialogHeight = defaultProps.dialogHeight,
+    classes,
+    registerComponentApi,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLSpanElement>,
+) {
   const [open, setOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +63,7 @@ export function Inspector({
   return (
     <>
       <span
+        ref={forwardedRef}
         className={classnames(styles.iconButton, classes?.[COMPONENT_PART_KEY])}
         onClick={() => setOpen(true)}
         title={tooltip}
@@ -96,4 +100,4 @@ export function Inspector({
       )}
     </>
   );
-}
+}));

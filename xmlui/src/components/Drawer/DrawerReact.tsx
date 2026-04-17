@@ -18,7 +18,7 @@ import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { ThemeContext } from "../../components-core/theming/ThemeContext";
 import { useEvent } from "../../components-core/utils/misc";
-import { Icon } from "../Icon/IconNative";
+import { Icon } from "../Icon/IconReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 // =============================================================================

@@ -8,6 +8,8 @@ $themeVars: ();
 
 $component: "Inspector";
 $color-icon-Inspector: createThemeVar("color-icon-#{$component}");
+$backgroundColor-dialog-Inspector: createThemeVar("backgroundColor-dialog-#{$component}");
+$borderColor-dialog-Inspector: createThemeVar("borderColor-dialog-#{$component}");
 
 @layer components {
   .iconButton {
@@ -35,7 +37,7 @@ $color-icon-Inspector: createThemeVar("color-icon-#{$component}");
   }
 
   .dialog {
-    background: var(--backgroundColor-primary, #fff);
+    background: $backgroundColor-dialog-Inspector;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
@@ -49,7 +51,7 @@ $color-icon-Inspector: createThemeVar("color-icon-#{$component}");
     align-items: center;
     justify-content: space-between;
     padding: 8px 12px;
-    border-bottom: 1px solid var(--borderColor, #e5e7eb);
+    border-bottom: 1px solid $borderColor-dialog-Inspector;
   }
 
   .title {

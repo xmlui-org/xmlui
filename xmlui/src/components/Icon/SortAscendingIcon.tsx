@@ -1,4 +1,4 @@
-import type { IconBaseProps } from "./IconNative";
+import type { IconBaseProps } from "./IconReact";
 
 export const SortAscendingIcon = (props: IconBaseProps) => {
   return (

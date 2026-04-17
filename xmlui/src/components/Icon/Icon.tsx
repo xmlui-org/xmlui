@@ -1,7 +1,7 @@
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import Icon from "./IconNative";
-import type { IconBaseProps } from "./IconNative";
+import Icon from "./IconReact";
+import type { IconBaseProps } from "./IconReact";
 import { createMetadata, d } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";

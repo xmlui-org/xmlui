@@ -3,7 +3,7 @@ import { noop } from "lodash-es";
 
 type Props = {
   children?: ReactNode;
-  onMessageReceived?: (data: any, event: MessageEvent) => void;
+  onMessageReceived?: (data: any, event: MessageEvent<any>) => void;
 };
 
 export const defaultProps: Pick<Props, "onMessageReceived"> = {

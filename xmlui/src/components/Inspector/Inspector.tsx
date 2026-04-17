@@ -3,7 +3,7 @@ import styles from "./Inspector.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
-import { Inspector, defaultProps } from "./InspectorNative";
+import { Inspector, defaultProps } from "./InspectorReact";
 
 const COMP = "Inspector";
 

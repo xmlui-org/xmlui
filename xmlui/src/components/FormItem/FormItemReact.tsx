@@ -1,6 +1,7 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import {
   createContext,
+  forwardRef,
   memo,
   useCallback,
   useContext,
@@ -39,7 +40,7 @@ import {
 import { ThemedTextArea as TextArea } from "../TextArea/TextArea";
 import { useEvent } from "../../components-core/utils/misc";
 import { ThemedDatePicker as DatePicker } from "../DatePicker/DatePicker";
-import { getByPath } from "../Form/FormNative";
+import { getByPath } from "../Form/FormReact";
 import { ThemedAutoComplete as AutoComplete } from "../AutoComplete/AutoComplete";
 import type { LabelPosition, RequireLabelMode } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
@@ -47,7 +48,7 @@ import { ItemWithLabel } from "./ItemWithLabel";
 import { resolveFormItemId } from "./FormItemUtils";
 import { ThemedSlider as Slider } from "../Slider/Slider";
 import { ThemedColorPicker as ColorPicker } from "../ColorPicker/ColorPicker";
-import { Items } from "../Items/ItemsNative";
+import { Items } from "../Items/ItemsReact";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 
@@ -147,7 +148,7 @@ function ArrayLikeFormItem({
   return <FormItemContext.Provider value={formContextValue}>{children}</FormItemContext.Provider>;
 }
 
-export const FormItem = memo(function FormItem({
+export const FormItem = memo(forwardRef(function FormItem({
   // --- validation props
   required,
   requiredInvalidMessage,
@@ -195,7 +196,9 @@ export const FormItem = memo(function FormItem({
   validationInProgress,
   layoutContext,
   ...rest
-}: Props & { layoutContext?: any }) {
+}: Props & { layoutContext?: any },
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const validations: FormItemValidations = useShallowCompareMemoize({
     required,
     requiredInvalidMessage,
@@ -555,7 +558,7 @@ export const FormItem = memo(function FormItem({
       </ItemWithLabel>
     </FormItemContext.Provider>
   );
-});
+}));
 
 type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
