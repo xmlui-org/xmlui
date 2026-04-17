@@ -44,6 +44,9 @@ type ToggleProps = {
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
   tabIndex?: number;
   "aria-label"?: string;
+  invalidMessages?: string[];
+  validationResult?: ReactNode;
+  validationInProgress?: boolean;
 };
 
 export const defaultProps: Pick<
@@ -81,6 +84,12 @@ export const Toggle = forwardRef(function Toggle(
     inputRenderer,
     tabIndex,
     "aria-label": ariaLabel,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    invalidMessages: _invalidMessages,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validationResult: _validationResult,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validationInProgress: _validationInProgress,
     ...rest
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
