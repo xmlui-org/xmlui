@@ -43,10 +43,31 @@ this.registerCoreComponent(componentNameComponentRenderer);
 - Do NOT edit `package.json` unless explicitly asked.
 - Do NOT create files in `docs/content/components/` — those are auto-generated.
 
+## Reference documentation
+
+Before making significant changes, read the relevant AI docs in `.ai/xmlui/`:
+
+| Topic | AI Doc |
+|-------|--------|
+| Component architecture | `.ai/xmlui/component-architecture.md` |
+| wrapComponent API | `.ai/xmlui/wrapcomponent.md` |
+| Theming & SCSS | `.ai/xmlui/theming-styling.md` |
+| Behaviors | `.ai/xmlui/behaviors.md` |
+| Forms | `.ai/xmlui/form-infrastructure.md` |
+| Testing | `.ai/xmlui/testing-conventions.md` |
+| Accessibility | `.ai/xmlui/accessibility.md` |
+| Option components | `.ai/xmlui/option-components.md` |
+
+Verified rules: `guidelines.md` at the repo root (Topics 4, 5, 7, 9, 12, 23, 24).
+
 ## Prompt files for common tasks
 
-- **New component**: use `.github/prompts/create-component.prompt.md`
-- **Extend a component**: use `.github/prompts/extend-component.prompt.md`
+- **New component**: use `#create-component`
+- **Extend a component**: use `#extend-component`
+- **Fix a bug**: use `#fix-bug`
+- **QA review**: use `#qa-review`
+- **Add E2E tests**: use `#add-e2e-tests`
+- **Write docs**: use `#write-component-docs`
 
 ## Running tests
 

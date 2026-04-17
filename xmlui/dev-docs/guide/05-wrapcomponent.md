@@ -248,6 +248,60 @@ formatExternalValue?: (value: any, props: Record<string, any>) => any
 
 ---
 
+## Migration Pitfalls
+
+When migrating a `createComponentRenderer` to `wrapComponent`, these problems recur across components.
+
+### 1. Wrong or missing `valueType`
+
+`wrapComponent` reads `valueType` (not `type`) to choose the correct extractor. Three causes:
+
+- **`type` instead of `valueType`** — Link used `type: "boolean"` for `active`; wrapComponent ignores `type`.
+- **`d()` shorthand** — produces no `valueType`, so the prop falls through to raw `extractValue`. Affected Link (`maxLines`), Icon (`name`, `size`), Image (`src`, `alt`), Card (`avatarUrl`).
+- **Wrong `valueType` breaks native logic** — setting `valueType: "string"` on Image's `data` caused `asOptionalString()` to be called, which converted a `Blob` to a string, breaking `instanceof Blob` checks.
+
+**Fix:** always use the full object form with `valueType` for typed props; omit `valueType` when the native component needs the raw value (e.g., Blob or arbitrary object).
+
+### 2. Children not rendered
+
+`wrapComponent` auto-renders `node.children` only when children exist. If your original renderer passed a layout context to `renderChild`, use `childrenLayoutContext` (static object only). If the layout context requires runtime values, use `customRender`.
+
+### 3. Prop name or semantic mismatch
+
+- **`enabled` vs `disabled`** — XMLUI uses `enabled`; if the native expects `disabled`, change the native to accept `enabled` directly rather than adding an adapter.
+- **XMLUI name ≠ React name** — use `rename: { data: "imageData" }`.
+- **Resource URLs** — props resolved via `extractResourceUrl` need `isResourceUrl: true` in metadata.
+
+### 4. Unsupported extractor types
+
+`extractValue.asSize()` and `extractValue.asDisplayText()` have no equivalent in `wrapComponent`. Components requiring these (ContentSeparator, Badge, Text) must stay in `createComponentRenderer`.
+
+### 5. Computed or derived props
+
+Migration is blocked when:
+- A prop's default depends on another prop (Stack's `itemWidth` defaults from `orientation`)
+- Multiple props merge into one React prop (Badge's `color` from `colorMap` + `value`)
+- A prop is derived from engine-injected layout properties (`height`, `width`)
+
+### 6. Complex render logic
+
+These patterns are not expressible with `wrapComponent`:
+- Conditional JSX trees (Stack branches to DockLayout, FlowLayout, or Stack)
+- Per-child `wrapChild` callbacks
+- Multiple component variants sharing a render helper (VStack/HStack/CVStack/CHStack)
+- Runtime prop subsetting via whitelist (Text's `VariantPropsKeys`)
+
+### Pre-migration checklist
+
+| Area | Check |
+|------|-------|
+| Metadata | All props use `valueType`, not `type`; no `d()` on typed props |
+| Props | No cross-prop defaults; no multi-prop → single React prop; mismatches covered by `rename` |
+| Children | Layout context is static or absent |
+| Render | Single unconditional JSX path; no per-child wrapChild; no dynamic prop subsetting |
+
+---
+
 ## Complete Example
 
 A hypothetical `Rating` component with events, a template, and an API:

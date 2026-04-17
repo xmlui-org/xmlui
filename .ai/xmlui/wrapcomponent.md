@@ -320,6 +320,21 @@ export const stackComponentRenderer = wrapComponent(
 );
 ```
 
+## Migration Pitfalls
+
+When converting `createComponentRenderer` to `wrapComponent`:
+
+| Problem | Root cause | Fix |
+|---------|-----------|-----|
+| Wrong valueType | `type` instead of `valueType`, or `d()` shorthand | Always use full object form with `valueType` |
+| Children not rendered | Layout context passed to `renderChild` | Use `childrenLayoutContext` (static only) or `customRender` |
+| Prop name mismatch | XMLUI name ≠ React name | Use `rename: { xmluiName: "reactName" }` |
+| Unsupported extractors | `asSize()`, `asDisplayText()` have no equivalent | Stay with `createComponentRenderer` |
+| Computed/derived props | Default depends on another prop, or multi-prop merge | Stay with `createComponentRenderer` |
+| Complex render logic | Conditional JSX, per-child wrapChild, dynamic prop subsetting | Stay with `createComponentRenderer` |
+
+**Pre-migration checklist:** All props use `valueType` (not `type`/`d()`); no cross-prop defaults; children layout context is static or absent; single unconditional JSX path.
+
 ## Anti-Patterns
 
 | Anti-pattern | Fix |
@@ -340,4 +355,4 @@ export const stackComponentRenderer = wrapComponent(
 | `WrapComponentConfig` type | same file |
 | `RendererConfig` type | same file |
 | `MemoizedItem` (template rendering) | `xmlui/src/components/container-helpers.tsx` |
-| Lessons learned doc | `xmlui/dev-docs/wrapComponent-integration.md` |
+| Migration pitfalls reference | Guide 05 (`xmlui/dev-docs/guide/05-wrapcomponent.md`) |

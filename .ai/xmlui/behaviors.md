@@ -165,6 +165,34 @@ export default {
 };
 ```
 
+## Condition Tree Types
+
+`BehaviorMetadata.condition` supports declarative attachment rules:
+
+| Type | Meaning |
+|------|--------|
+| `hasProp` | Instance declares the named prop |
+| `hasApi` | Metadata exposes the named API method |
+| `hasEvent` | Metadata exposes the named event |
+| `visual` | Component is visual (`nonVisual` is falsy) |
+| `and` / `or` / `not` | Boolean combinators over child conditions |
+
+Example — attach when `bindTo` is present AND component exposes `value` + `setValue`:
+```typescript
+condition: {
+  type: "and",
+  children: [
+    { type: "hasProp", prop: "bindTo" },
+    { type: "hasApi", api: "value" },
+    { type: "hasApi", api: "setValue" },
+  ],
+}
+```
+
+## PubSub Behavior (Dormant)
+
+File exists (`PubSubBehavior.tsx`) but is **not registered**. Trigger props: `subscribeToTopic`, `onTopicReceived`. Wraps in `PubSubWrapper` subscribing to topics via `PubSubService`. Publishing: `AppContext.publishTopic(topic, data?)`. Topics are app-instance scoped, fire-and-forget, no history.
+
 ## Key Files
 
 | File | Role |

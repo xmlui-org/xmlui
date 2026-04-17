@@ -283,6 +283,45 @@ export const myBehavior: Behavior = {
 - `attach` should read its configuration from `context.node.props` (the component definition), not from the `node` ReactNode argument — that's the rendered output, which has no props to read.
 - Return a valid `ReactNode`. If you don't need to wrap, return `node` unchanged.
 
+### Condition Tree Types
+
+`BehaviorMetadata.condition` lets you declaratively express when a behavior attaches. Internally, the framework resolves these into `canAttach` logic. When writing custom behaviors you can use these condition tree types instead of (or in addition to) a manual `canAttach`:
+
+| Type | Meaning | Example |
+|------|---------|---------|
+| `hasProp` | Instance declares the named prop | `{ type: "hasProp", prop: "myProp" }` |
+| `hasApi` | Metadata exposes the named API method | `{ type: "hasApi", api: "setValue" }` |
+| `hasEvent` | Metadata exposes the named event | `{ type: "hasEvent", event: "onChange" }` |
+| `visual` | Component is visual (`nonVisual` is falsy) | `{ type: "visual" }` |
+| `and` | All children must be true | `{ type: "and", children: [...] }` |
+| `or` | At least one child must be true | `{ type: "or", children: [...] }` |
+| `not` | Negates the child condition | `{ type: "not", child: { ... } }` |
+
+Composite example — attach when the instance has `bindTo` AND the component exposes both `value` and `setValue` APIs:
+
+```typescript
+condition: {
+  type: "and",
+  children: [
+    { type: "hasProp", prop: "bindTo" },
+    { type: "hasApi", api: "value" },
+    { type: "hasApi", api: "setValue" },
+  ],
+}
+```
+
+### PubSub Behavior (Dormant)
+
+`PubSubBehavior.tsx` exists in `components-core/behaviors/` but is **not registered**. It is documented here because the implementation is complete and may be activated in a future release.
+
+**Trigger props:** `subscribeToTopic`, `onTopicReceived`.
+
+**How it works:** wraps the component in `<PubSubWrapper>`, which subscribes to one or more topics via `PubSubService` (a Map-based service created in AppContent and exposed through `AppContext.pubSubService`). When a topic is published, the `onTopicReceived` callback fires with `(topic, data?)`.
+
+**Publishing:** Any event handler or action can call `publishTopic(topic, data?)` via `AppContext.publishTopic`.
+
+**Limitations:** Topics are scoped to a single app instance (not shared across tabs). Publish is fire-and-forget — no acknowledgment from subscribers. No message history — subscribers only receive publications made after subscription.
+
 ---
 
 ## Key Takeaways
