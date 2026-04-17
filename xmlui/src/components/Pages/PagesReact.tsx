@@ -1,5 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useMemo, useEffect } from "react";
+import { type CSSProperties, type ReactNode, memo, useEffect, useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -14,6 +13,12 @@ import { useAppLayoutContext } from "../App/AppLayoutContext";
 // Default props for Pages component
 export const defaultProps = {
   fallbackPath: "/",
+  defaultScrollRestoration: false,
+};
+
+// Default props for Page component
+export const pageDefaultProps = {
+  searchIndexable: true,
 };
 
 // --- We need this component to make sure all the child routes are wrapped in a
@@ -28,7 +33,7 @@ type RouteWrapperProps = {
   uid?: string;
 };
 
-export function RouteWrapper({
+export const RouteWrapper = memo(function RouteWrapper({
   childRoute = EMPTY_ARRAY,
   renderChild,
   layoutContext,
@@ -68,7 +73,7 @@ export function RouteWrapper({
       {renderChild(wrappedWithContainer, layoutContext)}
     </div>
   );
-}
+});
 
 type PageComponentDef = ComponentDef<typeof PageMd>;
 
@@ -79,10 +84,10 @@ type PagesProps = {
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   children?: ReactNode;
-  className?: ReactNode;
+  className?: string;
 };
 
-export function Pages({
+export const Pages = memo(function Pages({
   node,
   renderChild,
   extractValue,
@@ -117,4 +122,4 @@ export function Pages({
       {renderChild(restChildren)}
     </>
   );
-}
+});

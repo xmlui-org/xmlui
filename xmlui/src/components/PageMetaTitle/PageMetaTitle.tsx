@@ -1,11 +1,12 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { PageMetaTitle, defaultProps } from "./PageMetaTilteNative";
+import { PageMetaTitle, defaultProps } from "./PageMetaTitleReact";
 
 const COMP = "PageMetaTitle";
 
 export const PageMetaTitleMd = createMetadata({
   status: "stable",
+  nonVisual: true,
   description:
     "`PageMetaTitle` dynamically sets or updates the browser tab title, enabling " +
     "pages and components to override the default application name with context-specific titles.",

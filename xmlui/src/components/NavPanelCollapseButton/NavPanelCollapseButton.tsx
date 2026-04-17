@@ -15,21 +15,21 @@ export const NavPanelCollapseButtonMd = createMetadata({
   props: {
     icon: {
       description: "Icon name for the button when the panel is expanded (collapse action).",
-      type: "string",
+      valueType: "string",
       defaultValue: "sidebar-collapse",
     },
     iconCollapsed: {
       description: "Icon name for the button when the panel is collapsed (expand action).",
-      type: "string",
+      valueType: "string",
       defaultValue: "sidebar-collapse",
     },
     "aria-label": {
       description: "Accessible label for the button when expanded.",
-      type: "string",
+      valueType: "string",
     },
     "aria-labelCollapsed": {
       description: "Accessible label for the button when collapsed.",
-      type: "string",
+      valueType: "string",
     },
   },
 });

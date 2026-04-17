@@ -23,7 +23,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { defaultProps, NumberBox } from "./NumberBoxNative";
+import { defaultProps, NumberBox } from "./NumberBoxReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "NumberBox";
@@ -48,11 +48,14 @@ export const NumberBoxMd = createMetadata({
     input: {
       description: "The text box input area.",
     },
-    spinnerButtonUp: {
+    spinnerUp: {
       description: "The spinner button for incrementing the value.",
     },
-    spinnerButtonDown: {
+    spinnerDown: {
       description: "The spinner button for decrementing the value.",
+    },
+    conciseValidationFeedback: {
+      description: "The concise validation feedback indicator.",
     },
   },
   props: {
@@ -123,15 +126,15 @@ export const NumberBoxMd = createMetadata({
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
   },
   events: {
@@ -182,6 +185,7 @@ export const numberBoxComponentRenderer = wrapComponent(COMP, ThemedNumberBox, N
   events: {
     gotFocus: "onFocus",
     lostFocus: "onBlur",
+    didChange: "onDidChange",
   },
   deriveAriaLabel: (props) => props.label || props.placeholder,
 });

@@ -3,7 +3,7 @@ import styles from "./ResponsiveBar.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dTriggerTemplate } from "../metadata-helpers";
-import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarNative";
+import { defaultResponsiveBarProps, ResponsiveBar } from "./ResponsiveBarReact";
 import { ResponsiveBarItem } from "./ResponsiveBarItem";
 import { alignmentOptionMd } from "../abstractions";
 
@@ -18,6 +18,11 @@ export const ResponsiveBarMd = createMetadata({
     "navigation items, toolbar buttons, or other components that need to adapt to varying " +
     "container dimensions while maintaining full functionality.",
   docFolder: COMP,
+  parts: {
+    overflow: {
+      description: "The overflow dropdown container that holds items that don't fit in the bar.",
+    },
+  },
   props: {
     orientation: {
       description:

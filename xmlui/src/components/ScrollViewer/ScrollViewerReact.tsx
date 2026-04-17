@@ -1,4 +1,4 @@
-import React, { forwardRef, type ReactNode, type CSSProperties } from "react";
+import React, { forwardRef, memo, type CSSProperties } from "react";
 import classnames from "classnames";
 import { Scroller, type ScrollStyle } from "./Scroller";
 import styles from "./ScrollViewer.module.scss";
@@ -10,21 +10,14 @@ export const defaultProps = {
 };
 
 type Props = {
-  children: ReactNode;
-  header?: ReactNode;
-  footer?: ReactNode;
-  className?: string;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
   classes?: Record<string, string>;
-  style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-/**
- * ScrollViewer is a simple layout container that stretches to fill its parent's viewport
- * and provides customizable scrollbar styles for its content.
- */
-export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollViewer(
+export const ScrollViewer = memo(forwardRef<HTMLDivElement, Props>(function ScrollViewer(
   {
     children,
     header,
@@ -92,4 +85,4 @@ export const ScrollViewer = forwardRef<HTMLDivElement, Props>(function ScrollVie
       {children}
     </Scroller>
   );
-});
+}));

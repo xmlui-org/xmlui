@@ -1,5 +1,4 @@
-import type { CSSProperties, ForwardedRef} from "react";
-import { forwardRef } from "react";
+import { type ForwardedRef, type HTMLAttributes, forwardRef, memo } from "react";
 import classnames from "classnames";
 
 import styles from "./NoResult.module.scss";
@@ -13,16 +12,14 @@ export const defaultProps = {
   icon: "noresult",
 };
 
-type Props = {
+type Props = HTMLAttributes<HTMLDivElement> & {
   label: string;
   icon?: string;
   hideIcon?: boolean;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
 };
 
-export const NoResult = forwardRef(function NoResult(
+export const NoResult = memo(forwardRef(function NoResult(
   {
     label,
     icon = defaultProps.icon,
@@ -45,4 +42,4 @@ export const NoResult = forwardRef(function NoResult(
       {label}
     </div>
   );
-});
+}));

@@ -29,7 +29,7 @@ export const FlowLayoutMd = createMetadata({
       description:
         `This property defines the gap between items in the same row and between rows. The ${COMP} ` +
         `component creates a new row when an item is about to overflow the current row.`,
-      type: "string",
+      valueType: "string",
       defaultValue: "$gap-normal",
     },
     itemWidth: {

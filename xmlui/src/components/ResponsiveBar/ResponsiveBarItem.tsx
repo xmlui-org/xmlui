@@ -33,5 +33,3 @@ export const ResponsiveBarItem = memo(
     return <>{renderChild(nodeWithContext, layoutContext)}</>;
   },
 );
-
-ResponsiveBarItem.displayName = "ResponsiveBarItem";

@@ -1,8 +1,8 @@
 import React, {
   createContext,
-  type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -10,6 +10,7 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -21,10 +22,10 @@ import { noop } from "../../components-core/constants";
 import { useEvent } from "../../components-core/utils/misc";
 import type { Option, OrientationOptions, ValidationStatus } from "../abstractions";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
-import { UnwrappedRadioItem } from "./RadioItemNative";
-import { convertOptionValue } from "../Option/OptionNative";
+import { UnwrappedRadioItem } from "./RadioItemReact";
+import { convertOptionValue } from "../Option/OptionReact";
 
-type RadioGroupProps = {
+type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defaultValue"> & {
   id?: string;
   initialValue?: string;
   autofocus?: boolean;
@@ -32,8 +33,6 @@ type RadioGroupProps = {
   enabled?: boolean;
   orientation?: OrientationOptions;
   gap?: string;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
   validationStatus?: ValidationStatus;
   label?: string;
@@ -44,9 +43,6 @@ type RadioGroupProps = {
   readOnly?: boolean;
   updateState?: UpdateStateFn;
   onDidChange?: (newValue: string) => void;
-  onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
-  onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
-  children?: React.ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
@@ -74,7 +70,7 @@ const RadioGroupStatusContext = createContext<{
   enabled: defaultProps.enabled,
 });
 
-export const RadioGroup = forwardRef(function RadioGroup(
+export const RadioGroup = memo(forwardRef(function RadioGroup(
   {
     id,
     value = defaultProps.value,
@@ -92,8 +88,8 @@ export const RadioGroup = forwardRef(function RadioGroup(
     readOnly = defaultProps.readOnly,
     updateState = noop,
     onDidChange = noop,
-    onFocus = noop,
-    onBlur = noop,
+    onFocus,
+    onBlur,
     children,
     registerComponentApi,
     style,
@@ -105,6 +101,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
 ) {
   const [focused, setFocused] = React.useState(false);
   const radioGroupRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(forwardedRef, radioGroupRef);
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
@@ -238,7 +235,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
         <InnerRadioGroup.Root
           {...rest}
           style={{ ...style, ...(gap != null ? { gap } : undefined) }}
-          ref={radioGroupRef}
+          ref={composedRef}
           id={id}
           onBlur={handleOnBlur}
           onFocus={handleOnFocus}
@@ -259,7 +256,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
       </RadioGroupStatusContext.Provider>
     </OptionTypeProvider>
   );
-});
+}));
 
 export const RadioGroupOption = ({
   value,

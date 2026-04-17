@@ -1,9 +1,13 @@
-import { forwardRef, useEffect, useState, useCallback, useMemo, useRef, useId } from "react";
+import { forwardRef, memo, useEffect, useState, useCallback, useMemo, useRef, useId } from "react";
 import classnames from "classnames";
-import type { CSSProperties, ReactNode } from "react";
 
 import styles from "./Pagination.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import {
+  PART_PAGINATION_CONTROLS,
+  PART_PAGE_INFO,
+  PART_PAGE_SIZE_SELECTOR_CONTAINER,
+} from "../../components-core/parts";
 import { ThemedButton as Button } from "../Button/Button";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { ThemedText as Text } from "../Text/Text";
@@ -12,7 +16,7 @@ import type { OrientationOptions } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { Part } from "../Part/Part";
 import { ThemedSelect as Select } from "../Select/Select";
-import { convertOptionValue, OptionNative } from "../Option/OptionNative";
+import { convertOptionValue, OptionNative } from "../Option/OptionReact";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 
 export const PageNumberValues = [1, 3, 5] as const;
@@ -22,7 +26,6 @@ export const PositionValues = ["start", "center", "end"] as const;
 export type Position = (typeof PositionValues)[number];
 
 type Props = {
-  id?: string;
   enabled?: boolean;
   itemCount?: number;
   pageSize?: number;
@@ -42,8 +45,6 @@ type Props = {
   onPageSizeDidChange?: (pageSize: number) => void;
   registerComponentApi?: RegisterComponentApiFn;
   updateState?: UpdateStateFn;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
 } & React.HTMLAttributes<HTMLDivElement>;
 
@@ -83,7 +84,9 @@ export interface PaginationAPI extends ComponentApi {
   currentPageSize: number;
 }
 
-export const PaginationNative = forwardRef<PaginationAPI, Props>(function PaginationNative(
+const ICON_BUTTON_STYLE = { minHeight: "36px", padding: "8px" } as const;
+
+export const Pagination = memo(forwardRef<HTMLElement, Props>(function Pagination(
   {
     id,
     enabled = true,
@@ -194,7 +197,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
         {...rest}
         role="navigation"
         aria-label="Pagination"
-        ref={ref as any}
+        ref={ref}
         id={id}
         className={classnames(
           styles.pagination,
@@ -222,7 +225,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               disabled={!enabled || !hasPrevPage}
               onClick={() => handlePageChange(currentPage - 1)}
               contextualLabel="Previous page"
-              style={{ minHeight: "36px", padding: "8px" }}
+              style={ICON_BUTTON_STYLE}
               aria-label="Previous page"
             >
               <ThemedIcon
@@ -241,7 +244,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               disabled={!enabled || !hasNextPage}
               onClick={() => handlePageChange(currentPage + 1)}
               contextualLabel="Next page"
-              style={{ minHeight: "36px", padding: "8px" }}
+              style={ICON_BUTTON_STYLE}
               aria-label="Next page"
             >
               <ThemedIcon
@@ -288,7 +291,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   const isFirstPage = currentPage === 0;
   const isLastPage = currentPage === totalPages - 1;
   const buttonRow = (
-    <Part partId="pagination-controls">
+    <Part partId={PART_PAGINATION_CONTROLS}>
       <ul
         className={classnames(styles.buttonRow, {
           [styles.paginationListVertical]: orientation === "vertical",
@@ -303,7 +306,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             disabled={!enabled || isFirstPage}
             onClick={() => handlePageChange(0)}
             contextualLabel="First page"
-            style={{ minHeight: "36px", padding: "8px" }}
+            style={ICON_BUTTON_STYLE}
             aria-label="First page"
           >
             <ThemedIcon
@@ -323,7 +326,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               disabled={!enabled || isFirstPage}
               onClick={() => handlePageChange(currentPage - 1)}
               contextualLabel="Previous page"
-              style={{ minHeight: "36px", padding: "8px" }}
+              style={ICON_BUTTON_STYLE}
               aria-label="Previous page"
             >
               <ThemedIcon
@@ -373,7 +376,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
               disabled={!enabled || isLastPage}
               onClick={() => handlePageChange(currentPage + 1)}
               contextualLabel="Next page"
-              style={{ minHeight: "36px", padding: "8px" }}
+              style={ICON_BUTTON_STYLE}
               aria-label="Next page"
             >
               <ThemedIcon
@@ -393,7 +396,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
             disabled={!enabled || isLastPage}
             onClick={() => handlePageChange(totalPages - 1)}
             contextualLabel="Last page"
-            style={{ minHeight: "36px", padding: "8px" }}
+              style={ICON_BUTTON_STYLE}
             aria-label="Last page"
           >
             <ThemedIcon
@@ -410,7 +413,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
   const pageSizeSelector = showPageSizeSelector &&
     pageSizeOptions &&
     pageSizeOptions.length > 1 && (
-      <Part partId="page-size-selector-container">
+      <Part partId={PART_PAGE_SIZE_SELECTOR_CONTAINER}>
         <div className={classnames(styles.selectorContainer)}>
           <ItemWithLabel
             id={`${id}-page-size-selector`}
@@ -435,7 +438,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       </Part>
     );
   const pageInfo = showPageInfo && (
-    <Part partId="page-info">
+    <Part partId={PART_PAGE_INFO}>
       <div className={classnames(styles.pageInfo)}>
         <Text variant="secondary">
           Page {currentPageNumber} of {totalPages} ({itemCount} items)
@@ -451,7 +454,7 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       {...rest}
       role="navigation"
       aria-label="Pagination"
-      ref={ref as any}
+      ref={ref}
       id={id}
       className={classnames(
         styles.pagination,
@@ -493,4 +496,4 @@ export const PaginationNative = forwardRef<PaginationAPI, Props>(function Pagina
       )}
     </nav>
   );
-});
+}));

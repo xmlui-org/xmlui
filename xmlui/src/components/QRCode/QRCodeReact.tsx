@@ -1,5 +1,5 @@
-import type { CSSProperties, Ref } from "react";
-import { forwardRef, memo } from "react";
+import type { ForwardedRef } from "react";
+import { forwardRef, memo, useMemo } from "react";
 import classnames from "classnames";
 import QRCodeLib from "react-qr-code";
 
@@ -14,10 +14,8 @@ type Props = {
   color?: string;
   backgroundColor?: string;
   title?: string;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export const defaultProps: Required<Pick<Props, "size" | "level" | "color" | "backgroundColor">> = {
   size: 256,
@@ -26,8 +24,8 @@ export const defaultProps: Required<Pick<Props, "size" | "level" | "color" | "ba
   backgroundColor: "#FFFFFF",
 };
 
-export const QRCodeNative = memo(
-  forwardRef(function QRCodeNative(
+export const QRCode = memo(
+  forwardRef(function QRCode(
     {
       value,
       size,
@@ -40,23 +38,24 @@ export const QRCodeNative = memo(
       classes,
       ...rest
     }: Props,
-    ref: Ref<HTMLDivElement>,
+    ref: ForwardedRef<HTMLDivElement>,
   ) {
     const { getThemeVar } = useTheme();
     const themeSizeVar = getThemeVar("size-QRCode");
     const themeSizeNum = themeSizeVar ? parseInt(themeSizeVar as string, 10) : undefined;
     const effectiveSize = size ?? themeSizeNum ?? defaultProps.size;
 
+    const containerStyle = useMemo(
+      () => ({ ...style, width: effectiveSize, height: effectiveSize }),
+      [style, effectiveSize],
+    );
+
     return (
       <div
         {...rest}
         ref={ref}
         className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.container)}
-        style={{
-          ...style,
-          width: effectiveSize,
-          height: effectiveSize,
-        }}
+        style={containerStyle}
       >
         <QRCodeLib
           value={value || ""}

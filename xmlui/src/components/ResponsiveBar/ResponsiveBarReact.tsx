@@ -1,5 +1,7 @@
 import React, {
   forwardRef,
+  memo,
+  useCallback,
   useRef,
   useEffect,
   useState,
@@ -7,6 +9,7 @@ import React, {
   type ReactNode,
   type ReactElement,
 } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./ResponsiveBar.module.scss";
@@ -16,87 +19,7 @@ import { ThemedDropdownMenu as DropdownMenu, ThemedMenuItem as MenuItem } from "
 import type { AlignmentOptions } from "../abstractions";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { Part } from "../Part/Part";
-
-
-// Component part names
-const PART_OVERFLOW = "overflow";
-
-/**
- * ResponsiveBar Component - Adaptive Layout with Overflow Management
- * 
- * The ResponsiveBar is a sophisticated layout component that automatically manages space
- * by moving child components that don't fit into a dropdown menu. It supports both horizontal 
- * and vertical orientations, making it ideal for toolbars, navigation bars, sidebars, and 
- * action panels that need to adapt to different screen sizes and container dimensions.
- * 
- * ## How It Works:
- * 
- * ### Orientation Support
- * - **Horizontal**: Items are arranged left-to-right, overflow is based on container width
- * - **Vertical**: Items are arranged top-to-bottom, overflow is based on container height
- * - Uses the parent container's available space (width for horizontal, height for vertical)
- * 
- * ### Two-Phase Rendering System
- * The component uses a two-phase rendering approach to accurately calculate layout:
- * 
- * **Phase 1 - Measurement Phase:**
- * - Renders all child components invisibly (visibility: hidden, opacity: 0) 
- * - Measures the actual size of each child component using getBoundingClientRect()
- * - For horizontal: measures width; for vertical: measures height
- * - Also measures the dropdown button size for accurate overflow calculations
- * - This phase ensures we have precise measurements before making layout decisions
- * 
- * **Phase 2 - Layout Phase:**
- * - Uses the measured dimensions to calculate which items fit in the available space
- * - Renders visible items in the main container and overflow items in a dropdown menu
- * - Accounts for gaps between items and the space needed for the dropdown button
- * 
- * ### Overflow Logic
- * The overflow calculation works as follows:
- * 1. Calculate total size needed for all items (including gaps)
- * 2. If all items fit: show all items, no dropdown
- * 3. If overflow needed: calculate how many items can fit alongside the dropdown button
- * 4. Ensure at least one item is always visible (even if it means showing dropdown with one item)
- * 5. Account for gaps between items and the gap before the dropdown button
- * 
- * ### Responsive Behavior
- * - Uses ResizeObserver to detect container size changes and recalculate layout
- * - Monitors width changes for horizontal orientation, height changes for vertical
- * - Prevents infinite loops by only triggering recalculation during the layout phase
- * - Debounces calculations to avoid excessive re-renders during rapid resize events
- * 
- * ### Performance Optimizations
- * - Stable children array using React.useMemo to prevent unnecessary re-measurements
- * - Reference tracking to detect actual changes vs. rendering artifacts
- * - Calculation throttling to prevent excessive DOM measurements
- * - Layout completion tracking to ignore temporary children changes during layout updates
- * 
- * ### Key Features
- * - **Dual orientation support**: Works in both horizontal and vertical layouts
- * - **Automatic overflow management**: Items that don't fit are moved to a dropdown
- * - **Configurable gaps**: Consistent spacing between items and dropdown
- * - **Custom overflow icon**: Customizable dropdown trigger button icon
- * - **Responsive**: Automatically adapts to container size changes
- * - **Accessible**: Uses proper dropdown menu with keyboard navigation
- * - **Performance optimized**: Minimal re-renders and efficient DOM measurements
- * 
- * @example
- * ```tsx
- * // Horizontal toolbar
- * <ResponsiveBar orientation="horizontal" gap={8} overflowIcon="menu">
- *   <Button>Action 1</Button>
- *   <Button>Action 2</Button>
- *   <Button>Action 3</Button>
- * </ResponsiveBar>
- * 
- * // Vertical sidebar
- * <ResponsiveBar orientation="vertical" gap={4} overflowIcon="moreVertical">
- *   <NavItem>Home</NavItem>
- *   <NavItem>Settings</NavItem>
- *   <NavItem>Profile</NavItem>
- * </ResponsiveBar>
- * ```
- */
+import { PART_OVERFLOW } from "../../components-core/parts";
 
 type ResponsiveBarProps = {
   children?: ReactNode;
@@ -115,7 +38,6 @@ type ResponsiveBarProps = {
   onClick?: () => void;
   onWillOpen?: () => Promise<boolean | undefined>;
   registerComponentApi?: RegisterComponentApiFn;
-  [key: string]: any; // For test props
 };
 
 interface LayoutState {
@@ -168,7 +90,7 @@ export const defaultResponsiveBarProps = {
   reverse: false,
 };
 
-export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(function ResponsiveBar(
+export const ResponsiveBar = memo(forwardRef<HTMLDivElement, ResponsiveBarProps>(function ResponsiveBar(
   {
     children,
     childNodes,
@@ -193,6 +115,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   // Compute default alignment based on reverse if not explicitly provided
   const effectiveAlignment: AlignmentOptions = dropdownAlignment ?? (reverse ? "start" : "end");
   const containerRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, containerRef);
   const measurementDropdownRef = useRef<HTMLDivElement>(null);
   const isCalculatingRef = useRef(false);
   const lastContainerSize = useRef(0); // Renamed for clarity - stores width OR height
@@ -223,22 +146,28 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
   // Stable children count to prevent unnecessary re-measurements
   const childrenCount = childrenArray.length;
 
+  const openDropdown = useCallback(() => {
+    dropdownApiRef.current?.open();
+  }, []);
+
+  const closeDropdown = useCallback(() => {
+    dropdownApiRef.current?.close();
+  }, []);
+
+  const hasOverflow = useCallback(() => {
+    return layout.overflowItems.length > 0;
+  }, [layout.overflowItems.length]);
+
   // Register component API
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({
-        open: () => {
-          dropdownApiRef.current?.open();
-        },
-        close: () => {
-          dropdownApiRef.current?.close();
-        },
-        hasOverflow: () => {
-          return layout.overflowItems.length > 0;
-        },
+        open: openDropdown,
+        close: closeDropdown,
+        hasOverflow,
       });
     }
-  }, [registerComponentApi, layout.overflowItems.length]);
+  }, [registerComponentApi, openDropdown, closeDropdown, hasOverflow]);
 
   // Measurement phase - measure all items in the same container
   const measureItems = () => {
@@ -476,14 +405,7 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
 
   return (
     <div
-      ref={(el) => {
-        containerRef.current = el;
-        if (typeof ref === "function") {
-          ref(el);
-        } else if (ref) {
-          ref.current = el;
-        }
-      }}
+      ref={composedRef}
       className={classnames(
         styles.responsiveBar, 
         orientation === "vertical" ? styles.vertical : styles.horizontal,
@@ -603,4 +525,4 @@ export const ResponsiveBar = forwardRef<HTMLDivElement, ResponsiveBarProps>(func
       )}
     </div>
   );
-});
+}));

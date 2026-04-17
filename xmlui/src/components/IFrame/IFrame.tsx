@@ -31,7 +31,7 @@ export const IFrameMd = createMetadata({
     ),
     referrerPolicy: {
       description: "Controls how much referrer information is sent when fetching the iframe content.",
-      type: "string",
+      valueType: "string",
       availableValues: [
         { value: "no-referrer", description: "Never send referrer information" },
         { value: "no-referrer-when-downgrade", description: "Send referrer only for same-security destinations" },

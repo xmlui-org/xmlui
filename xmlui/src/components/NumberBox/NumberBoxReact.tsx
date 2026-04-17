@@ -2,6 +2,7 @@ import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useId,
@@ -32,14 +33,10 @@ import { type ValidationStatus } from "../abstractions";
 import { ThemedIcon } from "../Icon/Icon";
 import { Adornment } from "../Input/InputAdornment";
 import { ThemedButton as Button } from "../Button/Button";
-import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../components-core/parts";
+import { PART_CONCISE_VALIDATION_FEEDBACK, PART_END_ADORNMENT, PART_INPUT, PART_SPINNER_DOWN, PART_SPINNER_UP, PART_START_ADORNMENT } from "../../components-core/parts";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-
-const PART_SPINNER_UP = "spinnerUp";
-const PART_SPINNER_DOWN = "spinnerDown";
-const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -100,7 +97,7 @@ type Props = {
   "aria-label"?: string;
 };
 
-export const NumberBox = forwardRef(function NumberBox(
+export const NumberBox = memo(forwardRef(function NumberBox(
   {
     id,
     value,
@@ -714,7 +711,7 @@ export const NumberBox = forwardRef(function NumberBox(
       )}
     </div>
   );
-});
+}));
 
 function applyStep(
   valueStrRep: string,

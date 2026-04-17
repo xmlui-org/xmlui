@@ -17,12 +17,12 @@ export const FileUploadDropZoneMd = createMetadata({
       description:
         "With this property, you can change the default text to display in the drop zone.",
       defaultValue: defaultProps.text,
-      type: "string",
+      valueType: "string",
     },
     icon: {
       description: `Specifies an icon name. The framework will render an icon if XMLUI recognizes the icon by its name.`,
       defaultValue: defaultProps.icon,
-      type: "string",
+      valueType: "string",
     },
     allowPaste: {
       description:
@@ -31,7 +31,7 @@ export const FileUploadDropZoneMd = createMetadata({
         "only dragged files (\`false\`). By default, paste-triggered uploads are disabled " +
         "to prevent unexpected upload dialogs when users paste text into inputs within the drop zone. " +
         "When enabled, paste events originating from text inputs and editable elements are still ignored.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.allowPaste,
     },
     enabled: d(

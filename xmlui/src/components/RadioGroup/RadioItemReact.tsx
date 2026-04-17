@@ -1,11 +1,11 @@
 import type React from "react";
-import { useCallback, useId } from "react";
+import { memo, useCallback, useId } from "react";
 import styles from "./RadioGroup.module.scss";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { noop } from "../../components-core/constants";
 
 import classnames from "classnames";
-import { convertOptionValue } from "../Option/OptionNative";
+import { convertOptionValue } from "../Option/OptionReact";
 
 export const defaultProps = {
   checked: false,
@@ -19,19 +19,19 @@ type RadioItemProps = {
   onDidChange?: (value: string) => void;
 };
 
-export const RadioItem = ({
+export const RadioItem = memo(function RadioItem({
   checked = defaultProps.checked,
   style,
   value = defaultProps.value,
   onDidChange = noop,
-}: RadioItemProps) => {
+}: RadioItemProps) {
   const id = useId();
   return (
     <div key={id} className={styles.radioOptionContainer} style={style}>
       <UnwrappedRadioItem id={id} checked={checked} value={value} onDidChange={onDidChange} />
     </div>
   );
-};
+});
 
 type UnwrappedRadioItemProps = Omit<RadioItemProps, "style"> & {
   id: string;
@@ -40,14 +40,14 @@ type UnwrappedRadioItemProps = Omit<RadioItemProps, "style"> & {
   onDidChange?: (value: string) => void;
 };
 
-export const UnwrappedRadioItem = ({
+export const UnwrappedRadioItem = memo(function UnwrappedRadioItem({
   id,
   checked = defaultProps.checked,
   value = defaultProps.value,
   statusStyles,
   disabled,
   onDidChange = noop,
-}: UnwrappedRadioItemProps) => {
+}: UnwrappedRadioItemProps) {
   const onInputChange = useCallback(
     (_: React.MouseEvent<HTMLButtonElement>) => {
       onDidChange(value);
@@ -67,4 +67,4 @@ export const UnwrappedRadioItem = ({
       <InnerRadioGroup.Indicator className={classnames(styles.indicator, statusStyles)} />
     </InnerRadioGroup.Item>
   );
-};
+});

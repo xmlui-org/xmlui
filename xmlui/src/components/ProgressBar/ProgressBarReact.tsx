@@ -1,14 +1,12 @@
-import type { CSSProperties, ForwardedRef} from "react";
-import { forwardRef } from "react";
+import type { ForwardedRef } from "react";
+import { forwardRef, memo } from "react";
 import classnames from "classnames";
 
 import styles from "./ProgressBar.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   value: number;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
 }
 
@@ -16,7 +14,7 @@ export const defaultProps = {
   value: 0,
 };
 
-export const ProgressBar = forwardRef(function ProgressBar(
+export const ProgressBar = memo(forwardRef(function ProgressBar(
   { value = defaultProps.value, style, className, classes, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -37,4 +35,4 @@ export const ProgressBar = forwardRef(function ProgressBar(
       />
     </div>
   );
-});
+}));

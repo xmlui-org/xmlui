@@ -13,7 +13,7 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { RatingInput, defaultProps } from "./RatingInputNative";
+import { RatingInput, defaultProps } from "./RatingInputReact";
 import styles from "./RatingInput.module.scss";
 
 const COMP = "RatingInput";

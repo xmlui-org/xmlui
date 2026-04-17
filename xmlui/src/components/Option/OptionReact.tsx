@@ -20,11 +20,10 @@ export function convertOptionValue(value: any): any {
   return value;
 }
 
-export const OptionNative = memo((props: Option) => {
+export const OptionNative = memo(function OptionNative(props: Option) {
   const OptionType = useOptionType();
   if (!OptionType) {
     return null;
   }
   return <OptionType {...props} />;
 });
-OptionNative.displayName = "OptionNative";

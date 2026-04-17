@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "../metadata-helpers";
-import { QueueWithContextVar, defaultProps } from "./QueueNative";
+import { QueueWithContextVar, defaultProps } from "./QueueReact";
 
 const COMP = "Queue";
 
@@ -11,20 +11,25 @@ export const QueueMd = createMetadata({
     "`Queue` manages sequential processing of items in FIFO (first-in, first-out) " +
     "order. It is a non-visual component but provides UI progress reporting and result display.",
   props: {
-    progressFeedback: d(
-      "This property defines the component template of the UI that displays " +
-        "progress information whenever, the queue's \`progressReport\` function " +
+    progressFeedback: {
+      description:
+        "This property defines the component template of the UI that displays " +
+        "progress information whenever, the queue's `progressReport` function " +
         "in invoked. If not set, no progress feedback is displayed.",
-    ),
-    resultFeedback: d(
-      "This property defines the component template of the UI that displays result " +
+      valueType: "ComponentDef",
+    },
+    resultFeedback: {
+      description:
+        "This property defines the component template of the UI that displays result " +
         "information when the queue becomes empty after processing all queued items. If not set, " +
         "no result feedback is displayed.",
-    ),
+      valueType: "ComponentDef",
+    },
     clearAfterFinish: {
       description:
         `This property indicates the completed items (successful or error) should ` +
         `be removed from the queue after completion.`,
+      valueType: "boolean",
       defaultValue: defaultProps.clearAfterFinish,
     },
   },
@@ -126,6 +131,7 @@ export const QueueMd = createMetadata({
 
 export const queueComponentRenderer = wrapComponent(COMP, QueueWithContextVar, QueueMd, {
   exposeRegisterApi: true,
+  exclude: ["progressFeedback", "resultFeedback"],
   customRender: (_props, { node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => (
     <QueueWithContextVar
       node={node as any}

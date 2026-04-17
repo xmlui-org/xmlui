@@ -1,5 +1,4 @@
-import type React from "react";
-import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import { memo, useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import toast from "react-hot-toast";
 import produce from "immer";
 import { isEqual } from "lodash-es";
@@ -36,8 +35,14 @@ export const defaultProps = {
   clearAfterFinish: false,
 };
 
+const getTraceIdForQueue = () => {
+  if (typeof window === "undefined") return undefined;
+  const w = window as any;
+  return w._xsCurrentTrace;
+};
+
 type Props = {
-  registerComponentApi: RegisterComponentApiFn;
+  registerComponentApi?: RegisterComponentApiFn;
   willProcessItem?: AsyncFunction;
   processItem?: AsyncFunction;
   didProcessItem?: AsyncFunction;
@@ -133,7 +138,7 @@ const INITIAL_STATE: QueueState = {
   queueState: {},
 };
 
-export function Queue({
+export const Queue = memo(function Queue({
   registerComponentApi,
   willProcessItem,
   processItem,
@@ -154,13 +159,7 @@ export function Queue({
   const queueState = externalQueueState ?? internalQueueState;
   const dispatch = externalDispatch ?? internalDispatch;
 
-  let appContext = useAppContext();
-
-  const getTraceIdForQueue = () => {
-    if (typeof window === "undefined") return undefined;
-    const w = window as any;
-    return w._xsCurrentTrace;
-  };
+  const appContext = useAppContext();
 
   // --- This Queue API adds a single item to the queue
   const enqueueItem = useEvent((item: any) => {
@@ -361,7 +360,7 @@ export function Queue({
   }, [doComplete, doSingle, prevQueue, queue]);
 
   return null;
-}
+});
 
 type QueueItemState = "pending" | "started" | "in-progress" | "completed" | "error";
 
@@ -386,7 +385,7 @@ type QueueState = {
 
 type QueueComponentDef = ComponentDef<typeof QueueMd>;
 
-export function QueueWithContextVar({
+export const QueueWithContextVar = memo(function QueueWithContextVar({
   node,
   renderChild,
   extractValue,
@@ -484,4 +483,4 @@ export function QueueWithContextVar({
       clearAfterFinish={extractValue.asOptionalBoolean(node.props.clearAfterFinish)}
     />
   );
-}
+});

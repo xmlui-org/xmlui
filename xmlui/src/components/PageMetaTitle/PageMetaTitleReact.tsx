@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { memo, useEffect } from "react";
 import { Helmet, HelmetProvider } from "react-helmet-async";
 import { useAppContext } from "../../components-core/AppContext";
 
@@ -8,13 +8,13 @@ export const defaultProps = {
   noSuffix: false,
 };
 
-export const PageMetaTitle = ({
+export const PageMetaTitle = memo(function PageMetaTitle({
   title = defaultProps.title,
   noSuffix = defaultProps.noSuffix,
 }: {
   title: string;
   noSuffix?: boolean;
-}) => {
+}) {
   const { appGlobals } = useAppContext();
   const appName = appGlobals?.name;
 
@@ -29,4 +29,4 @@ export const PageMetaTitle = ({
   return noSuffix
     ? <Helmet title={title} titleTemplate="%s" />
     : <Helmet title={title} />;
-};
+});

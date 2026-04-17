@@ -3,7 +3,7 @@ import styles from "./Pages.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { createMetadata, d, dInternal } from "../metadata-helpers";
-import { Pages, RouteWrapper, defaultProps } from "./PagesNative";
+import { Pages, RouteWrapper, defaultProps, pageDefaultProps } from "./PagesReact";
 import { extractPaddings } from "../../components-core/utils/css-utils";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 
@@ -25,8 +25,8 @@ export const PageMd = createMetadata({
     // NOTE: This is experimental
     searchIndexable: {
       description: "Whether the content of this page should be indexed for search. Defaults to true.",
-      type: "boolean",
-      defaultValue: true,
+      valueType: "boolean",
+      defaultValue: pageDefaultProps.searchIndexable,
       isInternal: true,
     },
     navLabel: dInternal(
@@ -68,8 +68,8 @@ export const PagesMd = createMetadata({
     },
     defaultScrollRestoration: {
       description: "When set to true, the page scroll position is restored when navigating back via browser history.",
-      type: "boolean",
-      defaultValue: false,
+      valueType: "boolean",
+      defaultValue: defaultProps.defaultScrollRestoration,
     },
   },
     themeVars: parseScssVar(styles.themeVars),

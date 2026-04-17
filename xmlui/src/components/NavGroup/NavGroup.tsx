@@ -25,38 +25,38 @@ export const NavGroupMd = createMetadata({
     enabled: dEnabled(),
     to: {
       description: `This property defines an optional navigation link.`,
-      type: "string",
+      valueType: "string",
     },
     icon: {
       description: `This property defines an optional icon to display along with the \`${COMP}\` label.`,
-      type: "string",
+      valueType: "string",
     },
     iconHorizontalExpanded: {
       description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.iconHorizontalExpanded,
     },
     iconVerticalExpanded: {
       description:
         "Set a custom icon to display when the navigation menu is expanded, " +
         "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.iconVerticalExpanded,
     },
     iconHorizontalCollapsed: {
       description:
         "Set a custom icon to display when the navigation menu is collapsed, " +
         "is in a **horizontal** app layout, and is in a navigation submenu.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.iconHorizontalCollapsed,
     },
     iconVerticalCollapsed: {
       description:
         "Set a custom icon to display when the navigation menu is collapsed, " +
         "is in a **vertical** app layout, or is in a **horizontal** layout and is the top-level navigation item in the menu.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.iconVerticalCollapsed,
     },
     noIndicator: {
@@ -64,14 +64,14 @@ export const NavGroupMd = createMetadata({
         `This Boolean property controls whether to hide the visual indicator for active and ` +
         `hovered states. When set to \`true\`, the indicator line will not be displayed on the ` +
         `\`${COMP}\` toggle button.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.noIndicator,
     },
     iconAlignment: {
       description:
         `This property controls the vertical alignment of the icon when the label text wraps to multiple lines. ` +
         `Set to \`baseline\` to align with the first line of text, \`start\` to align to the top, \`center\` for middle alignment (default), or \`end\` for bottom alignment.`,
-      type: "string",
+      valueType: "string",
       availableValues: [
         { value: "baseline", description: "Align icon with the first line of text" },
         { value: "start", description: "Align icon to the top" },
@@ -84,7 +84,7 @@ export const NavGroupMd = createMetadata({
       description:
         `This property controls the horizontal alignment of the expand/collapse arrow icon. ` +
         `Set to \`start\` to display the arrow immediately after the label, or \`end\` to push it to the right edge of the NavGroup (only applies when the NavGroup has a defined width).`,
-      type: "string",
+      valueType: "string",
       availableValues: [
         { value: "start", description: "Display arrow immediately after the label (default)" },
         { value: "end", description: "Push arrow to the right edge of the NavGroup" },

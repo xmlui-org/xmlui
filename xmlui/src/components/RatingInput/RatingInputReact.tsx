@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import styles from "./RatingInput.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -41,11 +42,6 @@ export const defaultProps: {
   maxRating: number;
   enabled: boolean;
   readOnly: boolean;
-  className?: string;
-  updateState: UpdateStateFn;
-  onFocus: () => void;
-  onBlur: () => void;
-  onDidChange: (value: number) => void;
   initialValue?: number;
   value?: number;
   validationStatus: ValidationStatus;
@@ -54,18 +50,13 @@ export const defaultProps: {
   maxRating: DEFAULT_MAX_RATING,
   enabled: true,
   readOnly: false,
-  className: undefined,
-  updateState: noop,
-  onFocus: noop,
-  onBlur: noop,
-  onDidChange: noop,
   initialValue: undefined,
   value: undefined,
   validationStatus: "none",
   invalidMessages: DEFAULT_INVALID_MESSAGES,
 };
 
-export function RatingInput({
+export const RatingInput = memo(forwardRef<HTMLDivElement, Props>(function RatingInput({
   id,
   value,
   maxRating = defaultProps.maxRating,
@@ -73,10 +64,10 @@ export function RatingInput({
   readOnly = defaultProps.readOnly,
   classes,
   className,
-  updateState = defaultProps.updateState,
-  onFocus = defaultProps.onFocus,
-  onBlur = defaultProps.onBlur,
-  onDidChange = defaultProps.onDidChange,
+  updateState = noop,
+  onFocus = noop,
+  onBlur = noop,
+  onDidChange = noop,
   initialValue = defaultProps.initialValue,
   validationStatus = defaultProps.validationStatus,
   invalidMessages = defaultProps.invalidMessages,
@@ -87,8 +78,9 @@ export function RatingInput({
   verboseValidationFeedback,
   registerComponentApi,
   ...rest
-}: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
+}: Props, ref: React.ForwardedRef<HTMLDivElement>) {
+  const innerRef = useRef<HTMLDivElement>(null);
+  const containerRef = useComposedRefs(ref, innerRef);
   const max = useMemo(() => {
     const numericMax = typeof maxRating === "number" ? maxRating : DEFAULT_MAX_RATING;
     const safeMax = Number.isFinite(numericMax) ? numericMax : DEFAULT_MAX_RATING;
@@ -120,13 +112,13 @@ export function RatingInput({
     [onDidChange, updateState],
   );
 
-  const handleSelect = (nextValue: number) => {
+  const handleSelect = useCallback((nextValue: number) => {
     if (!isInteractive) return;
     updateValue(nextValue);
-  };
+  }, [isInteractive, updateValue]);
 
   const focus = useCallback(() => {
-    containerRef.current?.focus();
+    innerRef.current?.focus();
   }, []);
 
   const setValue = useEvent((newValue: number | string) => {
@@ -153,9 +145,10 @@ export function RatingInput({
 
   useEffect(() => {
     if (!autoFocus) return;
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       focus();
     }, 0);
+    return () => clearTimeout(timeoutId);
   }, [autoFocus, focus]);
 
   const finalVerboseValidationFeedback = verboseValidationFeedback ?? true;
@@ -180,11 +173,11 @@ export function RatingInput({
         ]
           .filter(Boolean)
           .join(" ")}
+        {...rest}
         onFocus={isInteractive ? onFocus : undefined}
         onBlur={isInteractive ? onBlur : undefined}
         aria-disabled={!isInteractive}
         tabIndex={-1}
-        {...rest}
       >
         {(localValue === undefined || localValue === null) && placeholder && (
           <span className={styles.placeholder}>{placeholder}</span>
@@ -221,4 +214,4 @@ export function RatingInput({
       </div>
     </Part>
   );
-}
+}));

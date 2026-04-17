@@ -49,7 +49,7 @@ import { ThemedToggle as Toggle } from "../Checkbox/Checkbox";
 import { ThemedIcon } from "../Icon/Icon";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import useRowSelection from "./useRowSelection";
-import { ThemedPagination as PaginationNative, type Position } from "../Pagination/Pagination";
+import { ThemedPagination, type Position } from "../Pagination/Pagination";
 import { Part } from "../Part/Part";
 import {
   parseKeyBinding,
@@ -1563,7 +1563,7 @@ export const Table = memo(forwardRef(
     }, [registerComponentApi, selectionApi]);
 
     const paginationControls = (
-      <PaginationNative
+      <ThemedPagination
         pageIndex={pagination.pageIndex}
         pageSize={pagination.pageSize}
         itemCount={safeData.length}

@@ -83,21 +83,21 @@ export const AutoCompleteMd = createMetadata({
     modal: {
       isInternal: true,
       description: "internal radix modal prop",
-      type: "boolean",
+      valueType: "boolean",
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean" as const,
+      valueType: "boolean" as const,
       isInternal: true,
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string" as const,
+      valueType: "string" as const,
       isInternal: true,
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string" as const,
+      valueType: "string" as const,
       isInternal: true,
     },
   },
