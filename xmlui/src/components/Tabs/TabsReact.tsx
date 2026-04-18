@@ -1,8 +1,9 @@
 import type { ForwardedRef } from "react";
-import {
-  type CSSProperties,
+import React, {
   forwardRef,
+  memo,
   type ReactNode,
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -25,7 +26,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 import { useIsInsideForm } from "../Form/FormContext";
 
-type Props = {
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onContextMenu"> & {
   id?: string;
   activeTab?: number;
   orientation?: "horizontal" | "vertical";
@@ -37,10 +38,7 @@ type Props = {
     label: string;
     isActive: boolean;
   }) => ReactNode;
-  style?: CSSProperties;
-  children?: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
-  className?: string;
   classes?: Record<string, string>;
   distributeEvenly?: boolean;
   onDidChange?: (index: number, id: string, label: string) => void;
@@ -58,7 +56,7 @@ export const defaultProps = {
   keepMounted: undefined as boolean | undefined,
 };
 
-export const Tabs = forwardRef(function Tabs(
+export const Tabs = memo(forwardRef(function Tabs(
   {
     activeTab = defaultProps.activeTab,
     orientation = defaultProps.orientation,
@@ -153,6 +151,11 @@ export const Tabs = forwardRef(function Tabs(
     });
   }, [next, prev, setActiveTabIndex, setActiveTabById, registerComponentApi]);
 
+  const gapStyle = useMemo(
+    () => ({ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }),
+    [style, gap],
+  );
+
   // Accordion view: render tabs with interleaved headers and content
   if (accordionView) {
     return (
@@ -162,7 +165,7 @@ export const Tabs = forwardRef(function Tabs(
           id={tabsId}
           ref={forwardedRef}
           className={classnames(styles.tabs, styles.accordionView, classes?.[COMPONENT_PART_KEY], className)}
-          style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
+          style={gapStyle}
         >
           <RTabsRoot
             value={`${currentTab}`}
@@ -235,9 +238,9 @@ export const Tabs = forwardRef(function Tabs(
   return (
     <TabContext.Provider value={tabContextValue}>
       <RTabsRoot
-        {...rest}
+        {...(rest as any)}
         id={tabsId}
-        ref={forwardedRef}
+        ref={forwardedRef as React.Ref<HTMLDivElement>}
         className={classnames(styles.tabs, classes?.[COMPONENT_PART_KEY], className)}
         value={`${currentTab}`}
         onContextMenu={onContextMenu}
@@ -264,7 +267,7 @@ export const Tabs = forwardRef(function Tabs(
           }
         }}
         orientation={orientation}
-        style={{ ...style, ...(gap !== undefined ? { "--paddingTop-TabItem": gap } as React.CSSProperties : {}) }}
+        style={gapStyle}
       >
         <RTabsList
           className={classnames(styles.tabsList, {
@@ -316,4 +319,4 @@ export const Tabs = forwardRef(function Tabs(
       </RTabsRoot>
     </TabContext.Provider>
   );
-});
+}));

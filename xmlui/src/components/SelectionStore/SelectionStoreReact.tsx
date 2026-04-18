@@ -1,9 +1,9 @@
-import React, { type ReactNode, useMemo, useState, useContext, useRef } from "react";
-import { isEqual, noop } from "lodash-es";
+import React, { memo, type ReactNode, useMemo, useState, useContext, useRef } from "react";
+import { isEqual } from "lodash-es";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
-import { EMPTY_ARRAY } from "../../components-core/constants";
+import { EMPTY_ARRAY, noop } from "../../components-core/constants";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 
 export const defaultProps = {
@@ -37,13 +37,13 @@ export const StandaloneSelectionStore = ({
   );
 };
 
-export const SelectionStore = ({
+export const SelectionStore = memo(function SelectionStore({
   updateState = noop,
   idKey = defaultProps.idKey,
   children,
   selectedItems = defaultProps.selectedItems,
   registerComponentApi = noop,
-}: SelectionStoreProps) => {
+}: SelectionStoreProps) {
   const [items, setItems] = useState<any[]>(selectedItems);
   const valueInitializedRef = useRef(false);
   const currentItemsRef = useRef<any[]>(selectedItems);
@@ -92,7 +92,7 @@ export const SelectionStore = ({
   }, [refreshSelection, selectedItems, setSelectedRowIds, idKey]);
 
   return <SelectionContext.Provider value={contextValue}>{children}</SelectionContext.Provider>;
-};
+});
 
 // Defines the elements of the current selection tracking
 interface SelectionState {

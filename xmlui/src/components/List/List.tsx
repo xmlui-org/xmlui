@@ -14,7 +14,7 @@ import { scrollAnchoringValues } from "../abstractions";
 import {
   StandaloneSelectionStore,
   useSelectionContext,
-} from "../SelectionStore/SelectionStoreNative";
+} from "../SelectionStore/SelectionStoreReact";
 import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListReact";
 
 const COMP = "List";

@@ -1,7 +1,6 @@
-import type { CSSProperties } from "react";
-import type React from "react";
-import { forwardRef, useMemo, useRef, useCallback, useEffect, memo } from "react";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import type { ForwardedRef } from "react";
+import React, { forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./Text.module.scss";
@@ -98,17 +97,14 @@ export function getCustomVariantCacheStats() {
 // Component Definition
 // =============================================================================
 
-type TextProps = {
+type TextProps = Omit<React.HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   uid?: string;
-  children?: React.ReactNode;
   variant?: TextVariant;
   maxLines?: number;
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
   onContextMenu?: any;
   registerComponentApi?: RegisterComponentApiFn;
@@ -123,7 +119,7 @@ export const defaultProps = {
   breakMode: "normal" as BreakMode | undefined,
 };
 
-export const Text = forwardRef(function Text(
+export const Text = memo(forwardRef(function Text(
   {
     uid,
     variant,
@@ -140,10 +136,10 @@ export const Text = forwardRef(function Text(
     registerComponentApi,
     ...variantSpecificProps
   }: TextProps,
-  forwardedRef,
+  forwardedRef: ForwardedRef<HTMLElement>,
 ) {
   const innerRef = useRef<HTMLElement>(null);
-  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
+  const ref = useComposedRefs(innerRef, forwardedRef);
 
   // Implement hasOverflow function
   const hasOverflow = useCallback((): boolean => {
@@ -318,7 +314,7 @@ export const Text = forwardRef(function Text(
   return (
     <Element
       {...restVariantSpecificProps}
-      ref={ref as any}
+      ref={ref as React.Ref<any>}
       onContextMenu={onContextMenu}
       className={classnames(
         syntaxHighlightClasses,
@@ -345,4 +341,4 @@ export const Text = forwardRef(function Text(
       {children}
     </Element>
   );
-});
+}));

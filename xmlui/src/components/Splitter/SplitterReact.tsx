@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { forwardRef, memo, useEffect, useRef, useState, useMemo } from "react";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -7,6 +7,9 @@ import styles from "./Splitter.module.scss";
 import { noop } from "../../components-core/constants";
 import { parseSize, toPercentage } from "../Splitter/utils";
 import type { OrientationOptions } from "../abstractions";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
+import { PART_PRIMARY_PANEL, PART_SECONDARY_PANEL } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
 export const defaultProps = {
   initialPrimarySize: "50%",
@@ -17,10 +20,8 @@ export const defaultProps = {
   floating: false,
 };
 
-type SplitterProps = {
-  children: React.ReactNode[] | React.ReactNode;
-  style?: React.CSSProperties;
-  className?: string;
+type SplitterProps = Omit<React.HTMLAttributes<HTMLDivElement>, "children"> & {
+  children?: React.ReactNode;
   classes?: Record<string, string>;
   splitterTemplate?: React.ReactNode;
   orientation?: OrientationOptions;
@@ -33,7 +34,7 @@ type SplitterProps = {
   visibleChildCount?: number;
 };
 
-export const Splitter = ({
+export const Splitter = memo(forwardRef(function Splitter({
   initialPrimarySize = defaultProps.initialPrimarySize,
   minPrimarySize = defaultProps.minPrimarySize,
   maxPrimarySize = defaultProps.maxPrimarySize,
@@ -48,10 +49,12 @@ export const Splitter = ({
   resize = noop,
   visibleChildCount,
   ...rest
-}: SplitterProps) => {
+}: SplitterProps, forwardedRef: React.ForwardedRef<HTMLDivElement>) {
   const [sizePercentage, setSizePercentage] = useState(50);
   const [containerSize, setContainerSize] = useState(100);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
+  const splitterRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(forwardedRef, splitterRef, setSplitter as React.RefCallback<HTMLDivElement>);
   const [resizerVisible, setResizerVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
@@ -66,6 +69,14 @@ export const Splitter = ({
   const size = useMemo(() => {
     return (sizePercentage / 100) * containerSize;
   }, [sizePercentage, containerSize]);
+
+  const floatingResizerStyle = useMemo(
+    () => ({
+      top: orientation === "horizontal" ? 0 : size,
+      left: orientation === "horizontal" ? size : 0,
+    }),
+    [orientation, size],
+  );
 
   // Since the XMLUI renderer now pre-filters children, we can use them directly
   const childrenArray = React.Children.toArray(children);
@@ -219,7 +230,7 @@ export const Splitter = ({
   return (
     <div
       {...rest}
-      ref={(s) => setSplitter(s)}
+      ref={composedRef}
       className={classnames(
         styles.splitter,
         {
@@ -234,19 +245,21 @@ export const Splitter = ({
     >
       {isMultiPanel ? (
         <>
-          <div
-            style={
-              !swapped
-                ? { flexBasis: isInitialized ? size : initialPrimarySize }
-                : {}
-            }
-            className={classnames({
-              [styles.primaryPanel]: !swapped,
-              [styles.secondaryPanel]: swapped,
-            })}
-          >
-            {childrenArray[0]}
-          </div>
+          <Part partId={!swapped ? PART_PRIMARY_PANEL : PART_SECONDARY_PANEL}>
+            <div
+              style={
+                !swapped
+                  ? { flexBasis: isInitialized ? size : initialPrimarySize }
+                  : {}
+              }
+              className={classnames({
+                [styles.primaryPanel]: !swapped,
+                [styles.secondaryPanel]: swapped,
+              })}
+            >
+              {childrenArray[0]}
+            </div>
+          </Part>
           {!floating && (
             <div
               className={classnames(styles.resizer, {
@@ -258,19 +271,21 @@ export const Splitter = ({
               {splitterTemplate}
             </div>
           )}
-          <div
-            className={classnames({
-              [styles.primaryPanel]: swapped,
-              [styles.secondaryPanel]: !swapped,
-            })}
-            style={
-              swapped
-                ? { flexBasis: isInitialized ? size : initialPrimarySize }
-                : {}
-            }
-          >
-            {childrenArray[1]}
-          </div>
+          <Part partId={swapped ? PART_PRIMARY_PANEL : PART_SECONDARY_PANEL}>
+            <div
+              className={classnames({
+                [styles.primaryPanel]: swapped,
+                [styles.secondaryPanel]: !swapped,
+              })}
+              style={
+                swapped
+                  ? { flexBasis: isInitialized ? size : initialPrimarySize }
+                  : {}
+              }
+            >
+              {childrenArray[1]}
+            </div>
+          </Part>
           {floating && (
             <div
               ref={(fr) => setFloatingResizer(fr)}
@@ -278,10 +293,7 @@ export const Splitter = ({
                 [styles.horizontal]: orientation === "horizontal",
                 [styles.vertical]: orientation === "vertical",
               })}
-              style={{
-                top: orientation === "horizontal" ? 0 : size,
-                left: orientation === "horizontal" ? size : 0,
-              }}
+              style={floatingResizerStyle}
             >
               {splitterTemplate}
             </div>
@@ -292,4 +304,4 @@ export const Splitter = ({
       )}
     </div>
   );
-};
+}));

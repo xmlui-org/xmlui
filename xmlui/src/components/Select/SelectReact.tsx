@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -12,7 +13,7 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import classnames from "classnames";
 import styles from "./Select.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
@@ -29,10 +30,11 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-
-const PART_LIST_WRAPPER = "listWrapper";
-const PART_CLEAR_BUTTON = "clearButton";
-const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
+import {
+  PART_LIST_WRAPPER,
+  PART_CLEAR_BUTTON,
+  PART_CONCISE_VALIDATION_FEEDBACK,
+} from "../../components-core/parts";
 
 export const defaultProps = {
   enabled: true,
@@ -54,7 +56,7 @@ export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
 
 // Core Select component props
-interface SelectProps {
+interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBlur"> {
   // Basic props
   id?: string;
   initialValue?: ValueType;
@@ -66,8 +68,6 @@ interface SelectProps {
   required?: boolean;
 
   // Styling
-  style?: CSSProperties;
-  className?: string;
   contentClassName?: string;
   classes?: Record<string, string>;
   dropdownHeight?: CSSProperties["height"];
@@ -247,7 +247,7 @@ const SelectTriggerActions = ({
   );
 };
 
-export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
+export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
     // Basic props
     id,
@@ -308,6 +308,10 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   forwardedRef,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const composedTriggerRef = useComposedRefs(
+    setReferenceElement as React.RefCallback<HTMLElement>,
+    forwardedRef,
+  );
   const ariaLabelRef = useRef("");
   if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
     ariaLabelRef.current = (rest as any)["aria-label"] || "";
@@ -350,6 +354,11 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
         : [];
     }
   }, [multiSelect, options, value]);
+
+  const popoverContentStyle = useMemo(
+    () => ({ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" as const }),
+    [panelWidth, dropdownHeight],
+  );
 
   // Use initialValue as fallback when value is undefined
   // This ensures the component displays the initial value immediately on first render
@@ -792,8 +801,8 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
             >
               <Part partId={PART_LIST_WRAPPER}>
                 <PopoverTrigger
-                  {...rest}
-                  ref={composeRefs(setReferenceElement, forwardedRef)}
+                  {...(rest as unknown as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+                  ref={composedTriggerRef as React.Ref<HTMLButtonElement>}
                   id={id}
                   aria-haspopup="listbox"
                   style={style}
@@ -871,7 +880,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
               </Part>
               <Portal container={root}>
                 <PopoverContent
-                  style={{ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" }}
+                  style={popoverContentStyle}
                   className={classnames(
                     contentClassName,
                     styles.selectContent,
@@ -965,7 +974,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
-});
+}));
 
 // Internal option component for rendering items in the dropdown
 function SelectOptionItem(option: Option & { isHighlighted?: boolean; itemIndex?: number }) {

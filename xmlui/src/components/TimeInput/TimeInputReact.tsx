@@ -1,6 +1,7 @@
 import { type CSSProperties } from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ForwardedRef, forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import styles from "./TimeInput.module.scss";
 import { PartialInput } from "../Input/PartialInput";
@@ -86,7 +87,7 @@ export const defaultProps = {
   emptyCharacter: "-",
 };
 
-export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeInputNative(
+export const TimeInputNative = memo(forwardRef<HTMLDivElement, Props>(function TimeInput(
   {
     id,
     initialValue,
@@ -121,9 +122,10 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
     ariaLabel,
     ...rest
   },
-  ref,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const timeInputRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(timeInputRef, forwardedRef);
 
   // Refs for auto-tabbing between inputs
   const hourInputRef = useRef<HTMLInputElement>(null);
@@ -518,7 +520,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   }, [showSeconds, is12HourFormat]);
 
   // Create the arrow key handler instance
-  const handleArrowKeys = createArrowKeyHandler();
+  const handleArrowKeys = useMemo(() => createArrowKeyHandler(), [createArrowKeyHandler]);
 
   const clear = useCallback(() => {
     // Reset to initial value if provided, otherwise null
@@ -642,7 +644,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
 
   const timeInputComponent = (
     <div
-      ref={timeInputRef}
+      ref={composedRef}
       className={classnames(
         styles.timeInputWrapper,
         {
@@ -772,7 +774,7 @@ export const TimeInputNative = forwardRef<HTMLDivElement, Props>(function TimeIn
   );
 
   return timeInputComponent;
-});
+}));
 
 // AmPm component types and implementation
 type AmPmProps = {

@@ -1,28 +1,25 @@
-import type { CSSProperties, ForwardedRef } from "react";
-import { forwardRef, useEffect, useState } from "react";
+import type { ForwardedRef } from "react";
+import { forwardRef, memo, useEffect, useState } from "react";
 
 import styles from "./Spinner.module.scss";
 import classnames from "classnames";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-
-const PART_RING = "ring";
+import { PART_RING } from "../../components-core/parts";
 
 export const defaultProps = {
   delay: 400,
   fullScreen: false,
 };
 
-type SpinnerProps = {
+type SpinnerProps = React.HTMLAttributes<HTMLDivElement> & {
   delay?: number;
   fullScreen?: boolean;
-  style?: CSSProperties;
   classes?: Record<string, string>;
-  className?: string;
 };
 
 // source https://loading.io/css/
-export const Spinner = forwardRef(function Spinner(
+export const Spinner = memo(forwardRef(function Spinner(
   {
     delay = defaultProps.delay,
     fullScreen = defaultProps.fullScreen,
@@ -84,4 +81,4 @@ export const Spinner = forwardRef(function Spinner(
       </div>
     );
   }
-});
+}));

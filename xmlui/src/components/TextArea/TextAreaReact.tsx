@@ -3,6 +3,7 @@ import React, {
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
+  memo,
   type TextareaHTMLAttributes,
   useCallback,
   useEffect,
@@ -22,7 +23,7 @@ import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import TextAreaResizable from "./TextAreaResizable";
 import { PART_INPUT } from "../../components-core/parts";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
@@ -84,7 +85,7 @@ export const defaultProps = {
   enabled: true,
 };
 
-export const TextArea = forwardRef(function TextArea(
+export const TextArea = memo(forwardRef(function TextArea(
   {
     id,
     value = defaultProps.value,
@@ -123,7 +124,7 @@ export const TextArea = forwardRef(function TextArea(
 ) {
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;
+  const ref = useComposedRefs(inputRef, forwardedRef);
   const [cursorPosition, setCursorPosition] = useState(null);
   const [focused, setFocused] = React.useState(false);
 
@@ -347,4 +348,4 @@ export const TextArea = forwardRef(function TextArea(
       {renderConciseFeedback()}
     </div>
   );
-});
+}));

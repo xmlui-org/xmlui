@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
+import { type ForwardedRef, forwardRef, useMemo, useRef, useState, memo, startTransition } from "react";
 import produce from "immer";
 
 import styles from "./Table.module.scss";
@@ -21,13 +21,13 @@ import { TableContext } from "../Column/TableContext";
 import {
   StandaloneSelectionStore,
   useSelectionContext,
-} from "../SelectionStore/SelectionStoreNative";
+} from "../SelectionStore/SelectionStoreReact";
 import {
   Table,
   TablePaginationControlsLocationValues,
   CheckboxToleranceValues,
   defaultProps,
-} from "./TableNative";
+} from "./TableReact";
 import type { RendererContext, LayoutContext } from "../../abstractions/RendererDefs";
 import { createChildLayoutContext } from "../../abstractions/layout-context-utils";
 import { PositionValues } from "../Pagination/Pagination";
@@ -576,7 +576,7 @@ const TableWithColumns = memo(
         | "registerComponentApi"
         | "lookupSyncCallback"
       > & { layoutContext?: LayoutContext },
-      ref,
+      ref: ForwardedRef<HTMLDivElement>,
     ) => {
       const idKey = extractValue.asOptionalString(node.props.idKey, defaultProps.idKey);
       const data = extractValue(node.props.items) || extractValue(node.props.data);

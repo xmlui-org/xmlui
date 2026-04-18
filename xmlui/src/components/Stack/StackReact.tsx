@@ -1,13 +1,16 @@
 import {
   type CSSProperties,
   forwardRef,
+  memo,
+  type ForwardedRef,
   type ReactNode,
-  type Ref,
-  useImperativeHandle,
+  useCallback,
   useRef,
   useEffect,
 } from "react";
+import React from "react";
 import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./Stack.module.scss";
 import { ThemedScroller as Scroller, type ScrollStyle } from "../ScrollViewer/ScrollViewer";
@@ -15,6 +18,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 
 export const DEFAULT_ORIENTATION = "vertical";
 
@@ -28,23 +32,20 @@ export const defaultProps = {
   showScrollerFade: true,
 };
 
-type Props = {
-  children: ReactNode;
+type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onClick" | "onContextMenu"> & {
   orientation?: string;
   uid?: string;
   horizontalAlignment?: string;
   verticalAlignment?: string;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
-  onClick?: any;
-  onContextMenu?: any;
-  onMount?: any;
+  onClick?: AsyncFunction;
+  onContextMenu?: AsyncFunction;
+  onMount?: AsyncFunction;
   desktopOnly?: boolean;
   registerComponentApi?: (api: any) => void;
 };
@@ -52,7 +53,7 @@ type Props = {
 // =====================================================================================================================
 // Stack React component
 
-export const Stack = forwardRef(function Stack(
+export const Stack = memo(forwardRef(function Stack(
   {
     uid,
     children,
@@ -74,10 +75,11 @@ export const Stack = forwardRef(function Stack(
     registerComponentApi,
     ...rest
   }: Props,
-  ref: Ref<any>,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   useOnMount(onMount);
   const containerRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(forwardedRef, containerRef);
 
   const { horizontal, vertical } = useContentAlignment(
     orientation,
@@ -85,55 +87,35 @@ export const Stack = forwardRef(function Stack(
     verticalAlignment,
   );
 
-  // Expose ref to parent
-  useImperativeHandle(ref, () => containerRef.current as HTMLDivElement);
+  const scrollToTop = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ top: 0, behavior });
+  }, []);
+
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ top: containerRef.current.scrollHeight, behavior });
+  }, []);
+
+  const scrollToStart = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ left: 0, behavior });
+  }, []);
+
+  const scrollToEnd = useCallback((behavior: ScrollBehavior = "instant") => {
+    containerRef.current?.scrollTo({ left: containerRef.current?.scrollWidth, behavior });
+  }, []);
 
   // Register API methods
   useEffect(() => {
     if (registerComponentApi) {
-      registerComponentApi({
-        scrollToTop: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: 0,
-              behavior,
-            });
-          }
-        },
-        scrollToBottom: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              top: containerRef.current.scrollHeight,
-              behavior,
-            });
-          }
-        },
-        scrollToStart: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: 0,
-              behavior,
-            });
-          }
-        },
-        scrollToEnd: (behavior: ScrollBehavior = "instant") => {
-          if (containerRef.current) {
-            containerRef.current.scrollTo({
-              left: containerRef.current.scrollWidth,
-              behavior,
-            });
-          }
-        },
-      });
+      registerComponentApi({ scrollToTop, scrollToBottom, scrollToStart, scrollToEnd });
     }
-  }, [registerComponentApi]);
+  }, [registerComponentApi, scrollToTop, scrollToBottom, scrollToStart, scrollToEnd]);
 
   return (
     <Scroller
       {...rest}
       onClick={onClick}
       onContextMenu={onContextMenu}
-      ref={containerRef}
+      ref={composedRef}
       style={style}
       scrollStyle={scrollStyle}
       showScrollerFade={showScrollerFade}
@@ -157,4 +139,4 @@ export const Stack = forwardRef(function Stack(
       {children}
     </Scroller>
   );
-});
+}));

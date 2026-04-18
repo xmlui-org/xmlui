@@ -1,7 +1,7 @@
-import {
-  type CSSProperties,
+import React, {
   type ForwardedRef,
   forwardRef,
+  memo,
   useCallback,
   useEffect,
   useMemo,
@@ -10,7 +10,7 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import scrollIntoView from "scroll-into-view-if-needed";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./TableOfContents.module.scss";
@@ -26,9 +26,7 @@ const SCROLL_OPTIONS = {
   scrollMode: "always" as const,
 } as const;
 
-type Props = {
-  style?: CSSProperties;
-  className?: string;
+type Props = Omit<React.HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   smoothScrolling?: boolean;
   maxHeadingLevel?: number;
   omitH1?: boolean;
@@ -45,7 +43,7 @@ export const defaultProps = {
   showScrollerFade: true,
 };
 
-export const TableOfContents = forwardRef(function TableOfContents(
+export const TableOfContents = memo(forwardRef(function TableOfContents(
   {
     style,
     smoothScrolling = defaultProps.smoothScrolling,
@@ -69,7 +67,7 @@ export const TableOfContents = forwardRef(function TableOfContents(
   } = useTableOfContents();
   const [activeAnchorId, setActiveId] = useState(initialActiveAnchorId);
 
-  const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
+  const ref = useComposedRefs(wrapperRef, forwardedRef);
 
   const filteredHeadings = useMemo(
     () =>
@@ -169,4 +167,4 @@ export const TableOfContents = forwardRef(function TableOfContents(
       </Scroller>
     </nav>
   );
-});
+}));

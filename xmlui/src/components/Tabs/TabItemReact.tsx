@@ -1,5 +1,5 @@
 import type { ForwardedRef } from "react";
-import { forwardRef, useEffect, useId } from "react";
+import { forwardRef, memo, useMemo, useEffect, useId } from "react";
 import { Content } from "@radix-ui/react-tabs";
 import classnames from "classnames";
 
@@ -9,7 +9,7 @@ import type { Tab } from "../abstractions";
 import { useTabContext } from "./TabContext";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-export const TabItemComponent = forwardRef(function TabItemComponent(
+export const TabItemComponent = memo(forwardRef(function TabItemComponent(
   { children, label, headerRenderer, style, id, className, classes, activated, ...rest }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -39,12 +39,20 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   const isActive = activeTabId === innerId;
 
-  if (!isActive && !keepMounted) return null;
-
-  // Find the index of this tab for ordering
   const tabItems = getTabItems();
   const tabIndex = tabItems?.findIndex(item => item.innerId === innerId) ?? 0;
   const contentOrder = tabIndex * 2 + 1;
+
+  const contentStyle = useMemo(
+    () => ({
+      ...style,
+      order: contentOrder,
+      ...(keepMounted && !isActive ? { display: "none" } as const : {}),
+    }),
+    [style, contentOrder, keepMounted, isActive],
+  );
+
+  if (!isActive && !keepMounted) return null;
 
   return (
     <Content
@@ -54,13 +62,9 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
       forceMount={keepMounted ? true : undefined}
       className={classnames(styles.tabsContent, classes?.[COMPONENT_PART_KEY], className)}
       ref={forwardedRef}
-      style={{
-        ...style,
-        order: contentOrder,
-        ...(keepMounted && !isActive ? { display: "none" } : {}),
-      }}
+      style={contentStyle}
     >
       {children}
     </Content>
   );
-});
+}));

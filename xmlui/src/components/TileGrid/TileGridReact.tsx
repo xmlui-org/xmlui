@@ -1,7 +1,7 @@
 import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { CSSProperties, KeyboardEvent, ReactNode } from "react";
+import type { CSSProperties, ForwardedRef, KeyboardEvent, ReactNode } from "react";
 import classnames from "classnames";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import type { CustomItemComponent, CustomItemComponentProps, VirtualizerHandle } from "virtua";
 import { Virtualizer } from "virtua";
 import styles from "./TileGrid.module.scss";
@@ -151,7 +151,7 @@ export const defaultProps = {
 // TileGrid native React component — virtualized grid (Steps 3-7)
 
 export const TileGridNative = memo(
-  forwardRef<HTMLDivElement, TileGridProps>(function TileGridNative(
+  forwardRef<HTMLDivElement, TileGridProps>(function TileGrid(
     {
       data,
       itemWidth = defaultProps.itemWidth,
@@ -181,11 +181,11 @@ export const TileGridNative = memo(
       className,
       classes,
     },
-    ref,
+    forwardedRef: ForwardedRef<HTMLDivElement>,
   ) {
     // --- refs
     const outerRef = useRef<HTMLDivElement | null>(null);
-    const composedRef = ref ? composeRefs(outerRef, ref) : outerRef;
+    const composedRef = useComposedRefs(outerRef, forwardedRef);
     const virtualizerRef = useRef<VirtualizerHandle>(null);
 
     // --- container dimensions for column/page calculation

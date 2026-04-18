@@ -26,3 +26,6 @@ export const PART_PAGINATION_CONTROLS = "pagination-controls";
 export const PART_PAGE_INFO = "page-info";
 export const PART_PAGE_SIZE_SELECTOR_CONTAINER = "page-size-selector-container";
 export const PART_OVERFLOW = "overflow";
+export const PART_RING = "ring";
+export const PART_PRIMARY_PANEL = "primaryPanel";
+export const PART_SECONDARY_PANEL = "secondaryPanel";

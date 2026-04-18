@@ -1,5 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { TabItemComponent } from "./TabItemNative";
+import { TabItemComponent } from "./TabItemReact";
 import { createMetadata, d, dComponent, dLabel } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
 import React from "react";

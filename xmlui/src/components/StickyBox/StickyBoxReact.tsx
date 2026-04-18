@@ -1,5 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
+import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
 import { RenderPropSticky } from "react-sticky-el";
 import styles from "./StickyBox.module.scss";
@@ -16,16 +15,14 @@ export const defaultProps = {
   to: "top" as const,
 };
 
-type Props = {
-  children: ReactNode;
-  uid?: string;
-  style?: CSSProperties;
-  className?: string;
+const HIDDEN_STYLE = { display: "none" } as const;
+
+type Props = React.HTMLAttributes<HTMLElement> & {
   classes?: Record<string, string>;
   to: "top" | "bottom";
 };
 
-export function StickyBox({ children, uid, style, to = defaultProps.to, className, classes }: Props) {
+export const StickyBox = memo(function StickyBox({ children, style, to = defaultProps.to, className, classes, ...rest }: Props) {
   const sentinelRef = useRef(null);
   const [wrapper, setWrapper] = useState(null);
   const [stuck, setStuck] = useState(false);
@@ -37,14 +34,13 @@ export function StickyBox({ children, uid, style, to = defaultProps.to, classNam
         "--xmlui-scroll-margin-top",
         wrapper.clientHeight + "px",
       );
-      // scrollParent.setAttribute("data-xmlui-scroll-padding", true);
     }
   }, [scrollParent, wrapper]);
   const wrapperClassName = classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY], className);
-  const stickyStyles = {
-    backgroundColor: realBackground,
-    ...style,
-  };
+  const stickyStyles = useMemo(
+    () => ({ backgroundColor: realBackground, ...style }),
+    [realBackground, style],
+  );
   const stickyClassName = "";
   return (
     <>
@@ -52,14 +48,7 @@ export function StickyBox({ children, uid, style, to = defaultProps.to, classNam
         <RenderPropSticky
           mode={to}
           onFixedToggle={setStuck}
-          // hideOnBoundaryHit={hideOnBoundaryHit}
-          // offsetTransforms={offsetTransforms}
-          // disabled={disabled}
-          // boundaryElement={boundaryElement}
           scrollElement={scrollParent}
-          // bottomOffset={bottomOffset}
-          // topOffset={topOffset}
-          // positionRecheckInterval={positionRecheckInterval}
         >
           {({ isFixed, wrapperStyles, wrapperRef, holderStyles, holderRef }) => (
             <div ref={holderRef} style={holderStyles}>
@@ -75,10 +64,10 @@ export function StickyBox({ children, uid, style, to = defaultProps.to, classNam
         </RenderPropSticky>
       )}
       <div
-        style={{ display: "none" }}
+        style={HIDDEN_STYLE}
         ref={sentinelRef}
         className={to === "top" ? styles.sentinel : ""}
       />
     </>
   );
-}
+});

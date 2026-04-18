@@ -22,7 +22,7 @@ import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { ThemedStack as Stack } from "./components/Stack/Stack";
 import { ThemedButton as Button } from "./components/Button/Button";
-import { Splitter } from "./components/Splitter/SplitterNative";
+import { Splitter } from "./components/Splitter/SplitterReact";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
@@ -61,7 +61,7 @@ import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
-import { Theme } from "./components/Theme/ThemeNative";
+import { Theme } from "./components/Theme/ThemeReact";
 import { OptionContext, useOption } from "./components/Select/OptionContext";
 
 import {

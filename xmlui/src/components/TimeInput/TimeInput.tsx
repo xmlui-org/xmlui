@@ -18,7 +18,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TimeInputNative, defaultProps } from "./TimeInputNative";
+import { TimeInputNative, defaultProps } from "./TimeInputReact";
 
 const COMP = "TimeInput";
 
@@ -169,7 +169,7 @@ export const timeInputComponentRenderer = wrapComponent(
   {
     exposeRegisterApi: true,
     stateful: true,
-    events: [],
+    events: {},
     customRender(_props, {
       node,
       state,

@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import React, { useCallback, useEffect, useId, useRef } from "react";
+import React, { memo, useCallback, useEffect, useId, useRef } from "react";
 import { forwardRef } from "react";
 import { Root, Range, Track, Thumb } from "@radix-ui/react-slider";
 import styles from "./Slider.module.scss";
@@ -11,14 +11,12 @@ import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { ThemedTooltip as Tooltip } from "../Tooltip/Tooltip";
 import { isNaN } from "lodash-es";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
-export type Props = {
+export type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBlur"> & {
   id?: string;
   value?: number | number[];
   initialValue?: number | number[];
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
   step?: number;
   max?: number;
@@ -102,7 +100,7 @@ const formatValue = (
   return [clampValue(defaultVal)];
 };
 
-export const Slider = forwardRef(
+export const Slider = memo(forwardRef(
   (
     {
       id,
@@ -133,10 +131,11 @@ export const Slider = forwardRef(
       valueFormat = defaultProps.valueFormat,
       ...rest
     }: Props,
-    forwardedRef: ForwardedRef<HTMLInputElement>,
+    forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
     const inputRef = useRef(null);
-    const ref = forwardedRef ? composeRefs(inputRef, forwardedRef) : inputRef;
+    const outerDivRef = useRef<HTMLDivElement>(null);
+    const composedRef = useComposedRefs(forwardedRef, outerDivRef);
     const tooltipRef = useRef<HTMLDivElement>(null);
     const thumbsRef = useRef<(HTMLSpanElement | null)[]>([]);
     min = parseValue(min, defaultProps.min);
@@ -277,7 +276,7 @@ export const Slider = forwardRef(
     }, [displayValue.length]);
 
       return (
-          <div {...rest} ref={ref} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container>
+          <div {...rest} ref={composedRef} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container>
             <Root
               ref={inputRef}
               minStepsBetweenThumbs={minStepsBetweenThumbs}
@@ -345,6 +344,4 @@ export const Slider = forwardRef(
         </div>
     );
   },
-);
-
-Slider.displayName = "Slider";
+));

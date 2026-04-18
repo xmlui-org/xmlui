@@ -1,6 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
-import { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, memo, useEffect, useRef } from "react";
 import classnames from "classnames";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./StickySection.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -12,12 +12,9 @@ export const defaultProps = {
   stickTo: "top" as const,
 };
 
-type Props = {
-  children?: ReactNode;
+type Props = React.HTMLAttributes<HTMLDivElement> & {
   stickTo?: "top" | "bottom";
   uid?: string;
-  style?: CSSProperties;
-  className?: string;
   classes?: Record<string, string>;
 };
 
@@ -70,21 +67,12 @@ function recomputeZIndices(attr: string, scrollParent: HTMLElement) {
   }
 }
 
-export const StickySection = forwardRef<HTMLDivElement, Props>(function StickySection(
-  { children, stickTo = defaultProps.stickTo, uid, style, className, classes },
+export const StickySection = memo(forwardRef<HTMLDivElement, Props>(function StickySection(
+  { children, stickTo = defaultProps.stickTo, uid, style, className, classes, ...rest },
   ref,
 ) {
   const innerRef = useRef<HTMLDivElement>(null);
-
-  // Compose external ref with internal ref
-  const composedRef = (node: HTMLDivElement | null) => {
-    (innerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    if (typeof ref === "function") {
-      ref(node);
-    } else if (ref) {
-      (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
-    }
-  };
+  const composedRef = useComposedRefs(ref, innerRef);
 
   useEffect(() => {
     const el = innerRef.current;
@@ -110,6 +98,7 @@ export const StickySection = forwardRef<HTMLDivElement, Props>(function StickySe
 
   return (
     <div
+      {...rest}
       ref={composedRef}
       data-uid={uid}
       className={classnames(
@@ -123,4 +112,4 @@ export const StickySection = forwardRef<HTMLDivElement, Props>(function StickySe
       {children}
     </div>
   );
-});
+}));

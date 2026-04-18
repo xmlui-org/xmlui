@@ -1,4 +1,4 @@
-import { type CSSProperties, type ForwardedRef, forwardRef, useState } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef, memo, useState } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "classnames";
 
@@ -107,7 +107,7 @@ export const defaultProps: Pick<
   passwordHiddenIcon: "eye-off",
 };
 
-export const TextBox = forwardRef(function TextBox(
+export const TextBox = memo(forwardRef(function TextBox(
   {
     id,
     type = defaultProps.type,
@@ -144,7 +144,7 @@ export const TextBox = forwardRef(function TextBox(
     validationIconError,
     ...rest
   }: Props,
-  ref: ForwardedRef<HTMLDivElement>,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -257,7 +257,7 @@ export const TextBox = forwardRef(function TextBox(
   return (
     <div
       {...rest}
-      ref={ref}
+      ref={forwardedRef}
       className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.inputRoot, {
         [styles.disabled]: !enabled,
         [styles.readOnly]: readOnly,
@@ -332,4 +332,4 @@ export const TextBox = forwardRef(function TextBox(
       )}
     </div>
   );
-});
+}));

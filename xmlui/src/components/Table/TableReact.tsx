@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
 import { flushSync } from "react-dom";
 import type {
@@ -16,7 +16,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import {
   Virtualizer,
   type VirtualizerHandle,
@@ -515,11 +515,9 @@ function useTableKeyboardActions({
   return handleKeyboardActions;
 }
 
-// eslint-disable-next-line react/display-name
-export const Table = memo(forwardRef(
-  (
-    {
-      data = defaultProps.data,
+export const Table = memo(forwardRef(function Table(
+  {
+    data = defaultProps.data,
       columns = defaultProps.columns,
       isPaginated,
       loading = defaultProps.loading,
@@ -586,8 +584,8 @@ export const Table = memo(forwardRef(
       ...rest
       // cols
     }: TableProps,
-    forwardedRef,
-  ) => {
+    forwardedRef: ForwardedRef<HTMLDivElement>,
+  ) {
     const { getThemeVar } = useTheme();
     const effectiveUserSelectCell =
       cellUserSelect ?? userSelectCell ?? getThemeVar("userSelect-cell-Table") ?? defaultProps.userSelectCell;
@@ -601,7 +599,7 @@ export const Table = memo(forwardRef(
 
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
+    const ref = useComposedRefs(wrapperRef, forwardedRef);
     const tableRef = useRef<HTMLTableElement>(null);
 
     const effectivePageSize = pageSize ?? (pageSizeOptions?.[0] || DEFAULT_PAGE_SIZES[0]);
@@ -1338,10 +1336,11 @@ export const Table = memo(forwardRef(
           }
           const s = rowStateRef.current;
           const isFirstRow = rowIndex === 0;
+          const composedRowRef = useComposedRefs(ref, isFirstRow ? firstRowRef : null);
           return (
             <tr
               data-index={rowIndex}
-              ref={composeRefs(ref, isFirstRow ? firstRowRef : undefined)}
+              ref={composedRowRef}
               style={{
                 ...style,
                 minWidth: "max-content",
@@ -1810,7 +1809,7 @@ export const Table = memo(forwardRef(
           paginationControls}
       </div>
     );
-  },
+  }
 ));
 
 type ClickableHeaderProps = {
