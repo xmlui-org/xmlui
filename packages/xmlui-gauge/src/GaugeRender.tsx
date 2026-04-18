@@ -1,11 +1,29 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
 import { forwardRef } from "react";
+import type { ForwardedRef } from "react";
 import { Gauge } from "smart-webcomponents-react/gauge";
 import "smart-webcomponents-react/source/styles/smart.default.css";
 import styles from "./Gauge.module.scss";
 import classnames from "classnames";
 
-export const GaugeRender = forwardRef(({
+type Props = React.HTMLAttributes<HTMLDivElement> & {
+  value?: number;
+  onChange?: (value: number) => void;
+  registerApi?: (api: Record<string, unknown>) => void;
+  min?: number;
+  max?: number;
+  analogDisplayType?: string;
+  digitalDisplay?: boolean;
+  startAngle?: number;
+  endAngle?: number;
+  scalePosition?: string;
+  animation?: string;
+  unit?: string;
+  showUnit?: boolean;
+  enabled?: boolean;
+};
+
+export const GaugeRender = memo(forwardRef(function GaugeRender({
   value, onChange, registerApi, className,
   min = 0, max = 100,
   analogDisplayType = "needle",
@@ -16,21 +34,24 @@ export const GaugeRender = forwardRef(({
   unit = "", showUnit = false,
   enabled = true,
   ...rest
-}: any, ref: any) => {
+}: Props, ref: ForwardedRef<HTMLDivElement>) {
   const gaugeRef = useRef<any>(null);
   const numValue = typeof value === "number" ? value : min;
 
+  const focusApi = useCallback(() => gaugeRef.current?.focus(), []);
+  const setValueApi = useCallback((v: unknown) => onChange?.(Number(v)), [onChange]);
+
   useEffect(() => {
     registerApi?.({
-      focus: () => gaugeRef.current?.focus(),
-      setValue: (v: any) => onChange?.(Number(v)),
+      focus: focusApi,
+      setValue: setValueApi,
     });
-  }, [registerApi, onChange]);
+  }, [registerApi, focusApi, setValueApi]);
 
   const handleChange = useCallback((event: any) => {
     const newVal = event?.detail?.value ?? event?.detail;
     if (newVal != null) {
-      onChange(Math.round(Number(newVal) * 100) / 100);
+      onChange?.(Math.round(Number(newVal) * 100) / 100);
     }
   }, [onChange]);
 
@@ -55,6 +76,4 @@ export const GaugeRender = forwardRef(({
       />
     </div>
   );
-});
-
-GaugeRender.displayName = "GaugeRender";
+}));

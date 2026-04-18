@@ -1,11 +1,17 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, forwardRef, useEffect, useMemo, useState } from "react";
+import React, { Children, ForwardedRef, forwardRef, memo, useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
 import type { RegisterComponentApiFn } from "xmlui";
 
+export type SpringAnimation = {
+  from: Record<string, unknown>;
+  to: Record<string, unknown>;
+  config?: Record<string, unknown>;
+};
+
 export type AnimationProps = {
   children?: React.ReactNode;
-  animation: any;
+  animation: SpringAnimation;
   registerComponentApi?: RegisterComponentApiFn;
   onStop?: () => void;
   onStart?: () => void;
@@ -18,21 +24,26 @@ export type AnimationProps = {
 };
 
 const AnimatedComponent = animated(
-  forwardRef(function InlineComponentDef(props: any, ref) {
+  forwardRef(function InlineComponentDef(
+    props: React.HTMLAttributes<HTMLElement> & { children: React.ReactElement },
+    ref: ForwardedRef<HTMLElement>,
+  ) {
     const { children, ...rest } = props;
     return React.cloneElement(children, { ...rest, ref });
   }),
 );
 
-export const defaultProps: Pick<AnimationProps, "delay" | "animateWhenInView" |"reverse" | "loop" | "once"> = {
+export const defaultProps: Pick<AnimationProps, "delay" | "animateWhenInView" | "reverse" | "loop" | "once"> = {
   delay: 0,
   animateWhenInView: false,
   reverse: false,
   loop: false,
-  once: false
+  once: false,
 };
 
-export const Animation = ({
+const TIMES = 1;
+
+export const Animation = memo(function Animation({
   children,
   registerComponentApi,
   animation,
@@ -44,21 +55,24 @@ export const Animation = ({
   reverse = defaultProps.reverse,
   loop = defaultProps.loop,
   once = defaultProps.once,
-}: AnimationProps) => {
+}: AnimationProps) {
   const [_animation] = useState(animation);
   const [toggle, setToggle] = useState(false);
   const [reset, setReset] = useState(false);
   const [count, setCount] = useState(0);
-  const times = 1;
-  const animationSettings = useMemo<any>(
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const effectiveDuration = reducedMotion ? 0 : duration;
+  const effectiveDelay = reducedMotion ? 0 : delay;
+
+  const animationSettings = useMemo(
     () => ({
       from: _animation.from,
       to: _animation.to,
       config: {
         ..._animation.config,
-        duration,
+        duration: effectiveDuration,
       },
-      delay,
+      delay: effectiveDelay,
       loop,
       reset,
       reverse: toggle,
@@ -71,7 +85,7 @@ export const Animation = ({
           }
           setReset(true);
         } else {
-          if (reverse && count < times) {
+          if (reverse && count < TIMES) {
             setCount(count + 1);
             setToggle(!toggle);
           }
@@ -84,8 +98,8 @@ export const Animation = ({
       _animation.from,
       _animation.to,
       count,
-      delay,
-      duration,
+      effectiveDelay,
+      effectiveDuration,
       loop,
       onStart,
       onStop,
@@ -125,8 +139,9 @@ export const Animation = ({
   }, [registerComponentApi, startAnimation, stopAnimation]);
 
   const content = useMemo(() => {
-    return Children.map(children, (child, index) =>
-      animateWhenInView ? (
+    return Children.map(children, (child, index) => {
+      if (!React.isValidElement(child)) return child;
+      return animateWhenInView ? (
         <AnimatedComponent style={animationStyles} key={index} ref={ref}>
           {child}
         </AnimatedComponent>
@@ -134,9 +149,9 @@ export const Animation = ({
         <AnimatedComponent style={springs} key={index}>
           {child}
         </AnimatedComponent>
-      ),
-    );
+      );
+    });
   }, [animateWhenInView, animationStyles, children, ref, springs]);
 
   return content;
-};
+});

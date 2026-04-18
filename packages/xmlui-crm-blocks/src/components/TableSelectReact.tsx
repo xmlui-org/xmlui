@@ -1,16 +1,13 @@
-import type React from "react";
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { memo, forwardRef, useState, useEffect, useRef, useCallback, useMemo } from "react";
+import type { ForwardedRef } from "react";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import type { RegisterComponentApiFn } from "xmlui";
-
-type UpdateStateFn = (componentState: any, options?: any) => void;
-import { Icon } from "xmlui";
+import { Icon, COMPONENT_PART_KEY } from "xmlui";
+import classnames from "classnames";
 import styles from "./TableSelect.module.scss";
 
-/**
- * Render the portal INSIDE the nearest Radix dialog so that the dialog's
- * FocusScope allows focus into the search input.
- */
+type UpdateStateFn = (componentState: any, options?: any) => void;
+
 function findPortalContainer(from: HTMLElement | null): HTMLElement {
   const dialog = from?.closest('[role="dialog"]') as HTMLElement | null;
   return dialog ?? document.body;
@@ -21,9 +18,9 @@ export type ColumnDef = {
   label: string;
 };
 
-type Props = {
+type Props = React.HTMLAttributes<HTMLDivElement> & {
   id?: string;
-  className?: string;
+  classes?: Record<string, string>;
   data?: Record<string, unknown>[];
   columns?: ColumnDef[];
   valueKey?: string;
@@ -46,9 +43,9 @@ function resolveColumns(data: Record<string, unknown>[], columns?: ColumnDef[]):
   return Object.keys(data[0]).map((key) => ({ key, label: key }));
 }
 
-export function TableSelect({
+export const TableSelect = memo(forwardRef(function TableSelect({
   id,
-  className,
+  classes,
   data = [],
   columns,
   valueKey,
@@ -59,7 +56,8 @@ export function TableSelect({
   onChange,
   updateState,
   registerComponentApi,
-}: Props) {
+  ...rest
+}: Props, ref: ForwardedRef<HTMLDivElement>) {
   const [isOpen, setIsOpen] = useState(false);
   const [filterText, setFilterText] = useState("");
   const [internalValue, setInternalValue] = useState<string>(initialValue ?? "");
@@ -107,16 +105,21 @@ export function TableSelect({
   }, [isOpen, isInDialog, id]);
 
   // Expose value/setValue API for XMLUI form binding (bindTo support)
+  const setValueApi = useCallback(
+    (newVal: unknown) => {
+      const v = newVal != null ? String(newVal) : "";
+      setInternalValue(v);
+      updateState?.({ value: v });
+    },
+    [updateState],
+  );
+
   useEffect(() => {
     registerComponentApi?.({
       value: effectiveValue,
-      setValue: (newVal: unknown) => {
-        const v = newVal != null ? String(newVal) : "";
-        setInternalValue(v);
-        updateState?.({ value: v });
-      },
+      setValue: setValueApi,
     });
-  }, [registerComponentApi, effectiveValue, updateState]);
+  }, [registerComponentApi, effectiveValue, setValueApi]);
 
   const resolvedColumns = useMemo(() => resolveColumns(data, columns), [data, columns]);
 
@@ -214,7 +217,7 @@ export function TableSelect({
     valueKey ?? (resolvedColumns.length > 0 ? resolvedColumns[0].key : null);
 
   return (
-    <div className={`${styles.wrapper} ${className ?? ""}`}>
+    <div ref={ref} {...rest} className={classnames(styles.wrapper, classes?.[COMPONENT_PART_KEY])}>
       <Popover open={isOpen} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <button
@@ -333,4 +336,4 @@ export function TableSelect({
       </Popover>
     </div>
   );
-}
+}));

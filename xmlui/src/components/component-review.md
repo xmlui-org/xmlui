@@ -119,36 +119,36 @@ Status symbols: ⏳ pending | ✅ reviewed
 
 | Component | Status |
 |-----------|--------|
-| Animation | ⏳ |
-| FadeAnimation | ⏳ |
-| FadeInAnimation | ⏳ |
-| FadeOutAnimation | ⏳ |
-| ScaleAnimation | ⏳ |
-| SlideInAnimation | ⏳ |
+| Animation | ✅ |
+| FadeAnimation | ✅ |
+| FadeInAnimation | ✅ |
+| FadeOutAnimation | ✅ |
+| ScaleAnimation | ✅ |
+| SlideInAnimation | ✅ |
 
 ### xmlui-crm-blocks
 
 | Component | Status |
 |-----------|--------|
-| TableSelect | ⏳ |
+| TableSelect | ✅ |
 
 ### xmlui-echart
 
 | Component | Status |
 |-----------|--------|
-| EChartWrapped | ⏳ |
+| EChartWrapped | ✅ |
 
 ### xmlui-gauge
 
 | Component | Status |
 |-----------|--------|
-| GaugeWrapped | ⏳ |
+| GaugeWrapped | ✅ |
 
 ### xmlui-grid-layout
 
 | Component | Status |
 |-----------|--------|
-| GridLayoutWrapped | ⏳ |
+| GridLayoutWrapped | ✅ |
 
 ### xmlui-hello-world
 

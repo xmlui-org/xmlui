@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationReact";
 
 const COMP = "ScaleAnimation";
 
@@ -63,7 +63,7 @@ export const scaleAnimationRenderer = wrapComponent(
   ScaleAnimationMd,
   {
     exposeRegisterApi: true,
-    events: [],
+    events: {},
     exclude: ["from", "to", "animateWhenInView", "reverse", "loop", "delay", "duration"],
     customRender(_props, { node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) {
       return (

@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationReact";
 
 const COMP = "Animation";
 
@@ -13,25 +13,31 @@ export const AnimationMd = createMetadata({
     },
     animateWhenInView: {
       description: `Indicates whether the animation should start when the component is in view`,
+      valueType: "boolean",
     },
     duration: {
       description: `The duration of the animation in milliseconds`,
+      valueType: "number",
     },
     once: {
       description: `Indicates whether the animation should only run once`,
       defaultValue: defaultProps.once,
+      valueType: "boolean",
     },
     reverse: {
       description: `Indicates whether the animation should run in reverse after the normal animation completes`,
       defaultValue: defaultProps.reverse,
+      valueType: "boolean",
     },
     loop: {
       description: `Indicates whether the animation should loop`,
       defaultValue: defaultProps.loop,
+      valueType: "boolean",
     },
     delay: {
       description: `The delay before the animation starts in milliseconds`,
       defaultValue: defaultProps.delay,
+      valueType: "number",
     },
   },
   events: {
