@@ -1,4 +1,5 @@
-import { type ReactNode, type ForwardedRef, forwardRef } from "react";
+import { type ForwardedRef, forwardRef, memo } from "react";
+import type React from "react";
 import * as RadixTooltip from "@radix-ui/react-tooltip";
 import { isPlainObject } from "lodash-es";
 import classnames from "classnames";
@@ -55,7 +56,7 @@ type TooltipOptions = {
   avoidCollisions?: boolean;
 };
 
-type TooltipProps = TooltipOptions & {
+type TooltipProps = TooltipOptions & React.HTMLAttributes<HTMLDivElement> & {
   /**
    * The open state of the tooltip externally controlled
    */
@@ -74,17 +75,8 @@ type TooltipProps = TooltipOptions & {
   /**
    * The template for the tooltip content
    */
-  tooltipTemplate?: ReactNode;
+  tooltipTemplate?: React.ReactNode;
 
-  /**
-   * The content that will trigger the tooltip (used when triggerRef is not provided)
-   */
-  children?: ReactNode;
-
-  /**
-   * Optional extra CSS class names to apply to the tooltip content element
-   */
-  className?: string;
   classes?: Record<string, string>;
 };
 
@@ -102,7 +94,7 @@ export const defaultProps: TooltipOptions = {
   avoidCollisions: true,
 };
 
-export const Tooltip = forwardRef(function Tooltip({
+export const Tooltip = memo(forwardRef(function Tooltip({
   text,
   markdown,
   tooltipTemplate,
@@ -153,7 +145,7 @@ export const Tooltip = forwardRef(function Tooltip({
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   );
-});
+}));
 
 /**
  * Parses tooltip options from any input and returns an object containing only the option properties

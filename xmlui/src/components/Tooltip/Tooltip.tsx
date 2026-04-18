@@ -3,9 +3,9 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { Tooltip } from "./TooltipNative";
-import type { TooltipProps } from "./TooltipNative";
-export { parseTooltipOptions } from "./TooltipNative";
+import { Tooltip, defaultProps } from "./TooltipReact";
+import type { TooltipProps } from "./TooltipReact";
+export { parseTooltipOptions } from "./TooltipReact";
 import styles from "./Tooltip.module.scss";
 
 const COMP = "Tooltip";
@@ -16,68 +16,68 @@ export const TooltipMd = createMetadata({
   props: {
     text: {
       description: "The text content to display in the tooltip",
-      type: "string",
+      valueType: "string",
       isRequired: false,
     },
     markdown: {
       description: "The markdown content to display in the tooltip",
-      type: "string",
+      valueType: "string",
       isRequired: false,
     },
     tooltipTemplate: {
       description: "The template for the tooltip content",
-      type: "Component",
+      valueType: "ComponentDef",
       isRequired: false,
     },
     delayDuration: {
       description:
         "The duration from when the mouse enters a tooltip trigger until the tooltip opens (in ms)",
-      type: "number",
-      defaultValue: 700,
+      valueType: "number",
+      defaultValue: defaultProps.delayDuration,
     },
     skipDelayDuration: {
       description:
         "How much time a user has to enter another trigger without incurring a delay again (in ms)",
-      type: "number",
-      defaultValue: 300,
+      valueType: "number",
+      defaultValue: defaultProps.skipDelayDuration,
     },
     defaultOpen: {
       description: "The open state of the tooltip when it is initially rendered",
-      type: "boolean",
-      defaultValue: false,
+      valueType: "boolean",
+      defaultValue: defaultProps.defaultOpen,
     },
     showArrow: {
       description: "Whether to show the arrow pointing to the trigger element",
-      type: "boolean",
-      defaultValue: false,
+      valueType: "boolean",
+      defaultValue: defaultProps.showArrow,
     },
     side: {
       description: "The preferred side of the trigger to render against when open",
-      type: "string",
+      valueType: "string",
       availableValues: ["top", "right", "bottom", "left"],
-      defaultValue: "top",
+      defaultValue: defaultProps.side,
     },
     align: {
       description: "The preferred alignment against the trigger",
-      type: "string",
+      valueType: "string",
       availableValues: ["start", "center", "end"],
-      defaultValue: "center",
+      defaultValue: defaultProps.align,
     },
     sideOffset: {
       description: "The distance in pixels from the trigger",
-      type: "number",
-      defaultValue: 4,
+      valueType: "number",
+      defaultValue: defaultProps.sideOffset,
     },
     alignOffset: {
       description: "An offset in pixels from the 'start' or 'end' alignment options",
-      type: "number",
-      defaultValue: 0,
+      valueType: "number",
+      defaultValue: defaultProps.alignOffset,
     },
     avoidCollisions: {
       description:
         "When true, overrides the side and align preferences to prevent collisions with boundary edges",
-      type: "boolean",
-      defaultValue: true,
+      valueType: "boolean",
+      defaultValue: defaultProps.avoidCollisions,
     },
   },
   events: {},
@@ -88,7 +88,7 @@ export const TooltipMd = createMetadata({
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "$color-surface-0",
     [`border-${COMP}`]: "none",
-    [`textColor-${COMP}`]: "$textcolor-primary",
+    [`textColor-${COMP}`]: "$textColor-primary",
     [`borderRadius-${COMP}`]: "0.25em",
     [`fontSize-${COMP}`]: "1em",
     [`lineHeight-${COMP}`]: "1",

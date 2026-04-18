@@ -71,6 +71,22 @@ $themeVars: ();
     @include validationDisplayVariant("warning");
     @include validationDisplayVariant("info");
     @include validationDisplayVariant("valid");
+
+    &.noCloseButton {
+      padding-top: 0.5rem;
+    }
+  }
+
+  .headerStack {
+    gap: 0.5rem;
+  }
+
+  .entrySpan {
+    display: inline-flex;
+  }
+
+  .entrySpanWithField {
+    gap: 0.25rem;
   }
 }
 

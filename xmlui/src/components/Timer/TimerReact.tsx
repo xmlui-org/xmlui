@@ -1,5 +1,5 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import { forwardRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { memo, forwardRef, useEffect, useRef, useState, useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 export interface TimerApi {
@@ -23,11 +23,11 @@ type TimerProps = {
   initialDelay?: number;
   onTick?: () => void | Promise<void>;
   registerComponentApi?: RegisterComponentApiFn;
-  style?: CSSProperties;
-  className?: string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export const Timer = forwardRef(function Timer(
+const HIDDEN_STYLE: CSSProperties = { display: "none" };
+
+export const Timer = memo(forwardRef(function Timer(
   {
     enabled = defaultProps.enabled,
     interval = defaultProps.interval,
@@ -35,8 +35,6 @@ export const Timer = forwardRef(function Timer(
     initialDelay = defaultProps.initialDelay,
     onTick,
     registerComponentApi,
-    style,
-    className,
     ...rest
   }: TimerProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -51,7 +49,7 @@ export const Timer = forwardRef(function Timer(
   // Refs for current values to ensure handleTick has stable dependencies
   const enabledRef = useRef(enabled);
   const isPausedRef = useRef(isPaused);
-  const intervalRef2 = useRef(interval);
+  const intervalValueRef = useRef(interval);
   const onTickRef = useRef(onTick);
   const onceRef = useRef(once);
   const hasExecutedOnceRef = useRef(hasExecutedOnce);
@@ -60,7 +58,7 @@ export const Timer = forwardRef(function Timer(
   // Update refs when values change
   enabledRef.current = enabled;
   isPausedRef.current = isPaused;
-  intervalRef2.current = interval;
+  intervalValueRef.current = interval;
   onTickRef.current = onTick;
   onceRef.current = once;
   hasExecutedOnceRef.current = hasExecutedOnce;
@@ -115,7 +113,7 @@ export const Timer = forwardRef(function Timer(
 
   const handleTick = useCallback(async () => {
     // Check if timer should still be running (enabled, not paused, valid interval)
-    if (!enabledRef.current || isPausedRef.current || intervalRef2.current <= 0) {
+    if (!enabledRef.current || isPausedRef.current || intervalValueRef.current <= 0) {
       return;
     }
 
@@ -217,9 +215,8 @@ export const Timer = forwardRef(function Timer(
   // Timer is a non-visual component
   return (
     <div
+      {...rest}
       ref={forwardedRef}
-      style={{ display: "none", ...style }}
-      className={className}
       data-timer-enabled={enabled}
       data-timer-interval={interval}
       data-timer-initial-delay={initialDelay}
@@ -228,7 +225,7 @@ export const Timer = forwardRef(function Timer(
       data-timer-paused={isPaused}
       data-timer-in-initial-delay={isInInitialDelay}
       data-timer-has-executed={hasExecutedOnce}
-      {...rest}
+      style={HIDDEN_STYLE}
     />
   );
-});
+}));

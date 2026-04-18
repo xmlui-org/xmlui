@@ -1,7 +1,7 @@
 import styles from "./TreeDisplay.module.scss";
 
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { TreeDisplay, defaultProps } from "./TreeDisplayNative";
+import { TreeDisplay, defaultProps } from "./TreeDisplayReact";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";

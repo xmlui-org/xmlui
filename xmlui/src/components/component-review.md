@@ -101,15 +101,15 @@ Status symbols: ⏳ pending | ✅ reviewed
 | Theme | ✅ |
 | TileGrid | ✅ |
 | TimeInput | ✅ |
-| Timer | ⏳ |
-| Toast | ⏳ |
-| Toggle | ⏳ |
-| ToneChangerButton | ⏳ |
-| ToneSwitch | ⏳ |
-| Tooltip | ⏳ |
-| Tree | ⏳ |
-| TreeDisplay | ⏳ |
-| ValidationSummary | ⏳ |
+| Timer | ✅ |
+| Toast | ✅ |
+| Toggle | ✅ |
+| ToneChangerButton | ✅ |
+| ToneSwitch | ✅ |
+| Tooltip | ✅ |
+| Tree | ✅ |
+| TreeDisplay | ✅ |
+| ValidationSummary | ✅ |
 
 ---
 

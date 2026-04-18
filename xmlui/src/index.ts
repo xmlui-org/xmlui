@@ -116,8 +116,8 @@ import {
   dValueApi,
 } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
-import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
-import { Tooltip } from "./components/Tooltip/TooltipNative";
+import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchReact";
+import { Tooltip } from "./components/Tooltip/TooltipReact";
 import {
   ThemedDropdownMenu as DropdownMenu,
   ThemedMenuItem as MenuItem,

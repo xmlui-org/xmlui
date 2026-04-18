@@ -1,4 +1,5 @@
-import { forwardRef } from "react";
+import { memo, forwardRef, useCallback } from "react";
+import type { CSSProperties } from "react";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { ThemedIcon } from "../Icon/Icon";
 import { Toggle } from "../Toggle/Toggle";
@@ -11,47 +12,51 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 const DEFAULT_LIGHT_ICON = "sun";
 const DEFAULT_DARK_ICON = "moon";
 
+const ROOT_STYLE: CSSProperties = { width: "fit-content", display: "inline-block" };
+const TOGGLE_STYLE: CSSProperties = { width: "fit-content" };
+
 export type ToneSwitchProps = {
   iconLight?: string;
   iconDark?: string;
   className?: string;
   classes?: Record<string, string>;
-  onChange?: (tone: "light" | "dark") => void;
+  onDidChange?: (tone: "light" | "dark") => void;
 };
 
-export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function ToneSwitch(
+export const ToneSwitch = memo(forwardRef<HTMLDivElement, ToneSwitchProps>(function ToneSwitch(
   {
     iconLight = DEFAULT_LIGHT_ICON,
     iconDark = DEFAULT_DARK_ICON,
     className,
     classes,
-    onChange = noop,
+    onDidChange = noop,
     ...rest
   }: ToneSwitchProps,
   ref,
 ) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
-  //console.log('ToneSwitch render - activeThemeTone:', activeThemeTone); // Debug log
 
-  const handleChange = (isDark: boolean) => {
-    setActiveThemeTone(isDark ? "dark" : "light");
-    onChange?.(isDark ? "dark" : "light");
-  };
+  const handleChange = useCallback(
+    (isDark: boolean) => {
+      setActiveThemeTone(isDark ? "dark" : "light");
+      onDidChange?.(isDark ? "dark" : "light");
+    },
+    [setActiveThemeTone, onDidChange],
+  );
 
   return (
     <div
       {...rest}
       ref={ref}
-      style={{ width: "fit-content", display: "inline-block" }}
+      style={ROOT_STYLE}
       className={classnames(classes?.[COMPONENT_PART_KEY], className)}
     >
       <Toggle
         value={activeThemeTone === "dark"}
         onDidChange={handleChange}
         variant="switch"
-        style={{ width: "fit-content" }}
+        style={TOGGLE_STYLE}
         inputRenderer={(contextVars) => {
-          //console.log('ToneSwitch contextVars:', contextVars); // Debug log
           return (
             <div
               className={classnames(styles.iconSwitch, {
@@ -72,4 +77,4 @@ export const ToneSwitch = forwardRef<HTMLDivElement, ToneSwitchProps>(function T
       />
     </div>
   );
-});
+}));
