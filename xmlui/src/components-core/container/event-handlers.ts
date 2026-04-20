@@ -343,7 +343,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
               statementPromises.current.delete(key);
 
               // Development-only monitoring for potential memory leaks
-              if (process.env.NODE_ENV === "development") {
+              if (import.meta.env.DEV) {
                 const mapSize = statementPromises.current.size;
                 if (mapSize > 100) {
                   console.warn(

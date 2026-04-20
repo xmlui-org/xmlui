@@ -586,12 +586,12 @@ async function runDebugSsgServer() {
     },
     define: {
       ...viteConfig.define,
-      "process.env.VITE_BUILD_MODE": '"ALL"',
-      "process.env.VITE_DEV_MODE": true,
-      "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
-      "process.env.VITE_MOCK_ENABLED": true,
-      "process.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
-      "process.env.VITE_USER_COMPONENTS_Inspect": '"true"',
+      "import.meta.env.VITE_BUILD_MODE": '"ALL"',
+      "import.meta.env.VITE_DEV_MODE": true,
+      "import.meta.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
+      "import.meta.env.VITE_MOCK_ENABLED": true,
+      "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
+      "import.meta.env.VITE_USER_COMPONENTS_Inspect": '"true"',
     },
     plugins: [...basePlugins, ssgDebugPlugin],
   } as InlineConfig);
@@ -727,10 +727,10 @@ export const ssg = async ({
       },
       define: {
         ...viteConfig.define,
-        "process.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
-        "process.env.VITE_DEV_MODE": false,
-        "process.env.VITE_MOCK_ENABLED": false,
-        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
+        "import.meta.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
+        "import.meta.env.VITE_DEV_MODE": false,
+        "import.meta.env.VITE_MOCK_ENABLED": false,
+        "import.meta.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
       },
       build: {
         ...viteConfig.build,

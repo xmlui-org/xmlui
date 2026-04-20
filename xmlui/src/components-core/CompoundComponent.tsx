@@ -184,7 +184,7 @@ export const CompoundComponent = forwardRef(
     // compound component's template produces multiple root children.
     // The parser wraps multiple root children in a synthetic "Fragment" node,
     // so compound.type === "Fragment" reliably indicates this case.
-    if (process.env.NODE_ENV !== "production" && extraClassName) {
+    if (import.meta.env.DEV && extraClassName) {
       if (compound.type === "Fragment") {
         const usedLayoutProps = layoutOptionKeys.filter((key) => key in node.props);
         if (usedLayoutProps.length > 0 && !warnedLayoutForwardTypes.has(node.type)) {

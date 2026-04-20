@@ -364,14 +364,14 @@ export class ComponentRegistry {
       this.registerAppComponent({ compoundComponentDef: def });
     });
 
-    if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerCoreComponent(stackComponentRenderer);
       this.registerCoreComponent(vStackComponentRenderer);
       this.registerCoreComponent(hStackComponentRenderer);
       this.registerCoreComponent(cvStackComponentRenderer);
       this.registerCoreComponent(chStackComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_ResponsiveBar !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_ResponsiveBar !== "false") {
       this.registerCoreComponent(responsiveBarComponentRenderer);
     }
 
@@ -380,55 +380,55 @@ export class ComponentRegistry {
     this.registerCoreComponent(textNodePropHolder);
     this.registerCoreComponent(textNodeCDataPropHolder);
     this.registerCoreComponent(includeNavSectionPropHolder);
-    if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerCoreComponent(spaceFillerComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Textarea !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Textarea !== "false") {
       this.registerCoreComponent(textAreaComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_AppHeader !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_AppHeader !== "false") {
       this.registerCoreComponent(appHeaderComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Footer !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Footer !== "false") {
       this.registerCoreComponent(footerRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Logo !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Logo !== "false") {
       this.registerCoreComponent(logoComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_NavLink !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_NavLink !== "false") {
       this.registerCoreComponent(navLinkComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_NavGroup !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_NavGroup !== "false") {
       this.registerCoreComponent(navGroupComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Link !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Link !== "false") {
       this.registerCoreComponent(localLinkComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Form !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Form !== "false") {
       this.registerCoreComponent(formComponentRenderer);
       this.registerCoreComponent(formItemComponentRenderer);
       this.registerCoreComponent(formSegmentComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Tree !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Tree !== "false") {
       this.registerCoreComponent(treeComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_TreeDisplay !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_TreeDisplay !== "false") {
       this.registerCoreComponent(treeDisplayComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_ScrollViewer !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_ScrollViewer !== "false") {
       this.registerCoreComponent(scrollViewerComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Button !== "false") {
       this.registerCoreComponent(buttonComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
       this.registerCoreComponent(checkboxComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Switch !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Switch !== "false") {
       this.registerCoreComponent(switchComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Heading !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Heading !== "false") {
       this.registerCoreComponent(headingComponentRenderer);
       this.registerCoreComponent(h1ComponentRenderer);
       this.registerCoreComponent(h2ComponentRenderer);
@@ -437,116 +437,116 @@ export class ComponentRegistry {
       this.registerCoreComponent(h5ComponentRenderer);
       this.registerCoreComponent(h6ComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Text !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Text !== "false") {
       this.registerCoreComponent(textComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Fragment !== "false") {
       this.registerCoreComponent(fragmentComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_MessageListener !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_MessageListener !== "false") {
       this.registerCoreComponent(messageListenerComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);
       this.registerCoreComponent(columnComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_List !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerCoreComponent(dynamicHeightListComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_TileGrid !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_TileGrid !== "false") {
       this.registerCoreComponent(tileGridComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_App !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_App !== "false") {
       this.registerCoreComponent(appRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
       this.registerCoreComponent(navPanelRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Pages !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Pages !== "false") {
       this.registerCoreComponent(pagesRenderer);
       this.registerCoreComponent(pageRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Redirect !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Redirect !== "false") {
       this.registerCoreComponent(redirectRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_StickyBox !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_StickyBox !== "false") {
       this.registerCoreComponent(stickyBoxComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_StickySection !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_StickySection !== "false") {
       this.registerCoreComponent(stickySectionComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Badge !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Badge !== "false") {
       this.registerCoreComponent(badgeComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_SimpleTooltip !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_SimpleTooltip !== "false") {
       this.registerCoreComponent(tooltipComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Avatar !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Avatar !== "false") {
       this.registerCoreComponent(avatarComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_ContentSeparator !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_ContentSeparator !== "false") {
       this.registerCoreComponent(contentSeparatorComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Card !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Card !== "false") {
       this.registerCoreComponent(cardComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_ColorPicker !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_ColorPicker !== "false") {
       this.registerCoreComponent(colorPickerComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
       this.registerCoreComponent(flowLayoutComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_ModalDialog !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_ModalDialog !== "false") {
       this.registerCoreComponent(modalViewComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_NoResult !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_NoResult !== "false") {
       this.registerCoreComponent(noResultComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerCoreComponent(optionComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerCoreComponent(tabItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerCoreComponent(accordionItemComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Icon !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Icon !== "false") {
       this.registerCoreComponent(iconComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Items !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Items !== "false") {
       this.registerCoreComponent(itemsComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
       this.registerCoreComponent(selectionStoreComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Image !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Image !== "false") {
       this.registerCoreComponent(imageComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_IFrame !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_IFrame !== "false") {
       this.registerCoreComponent(iframeComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_Markdown !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_Pagination !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_Pagination !== "false") {
       this.registerCoreComponent(paginationComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
+    if (import.meta.env.VITE_USED_COMPONENTS_DatePicker !== "false") {
       this.registerCoreComponent(datePickerComponentRenderer);
       this.registerCoreComponent(dateInputComponentRenderer);
       this.registerCoreComponent(timeInputComponentRenderer);
       this.registerCoreComponent(timerComponentRenderer);
     }
 
-    if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
+    if (import.meta.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
       //TODO, if it proves to be a working solution, make these components skippable, too
       this.registerCoreComponent(pageMetaTitleComponentRenderer);
       this.registerCoreComponent(progressBarComponentRenderer);
@@ -596,7 +596,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(apiCallRenderer);
     this.registerCoreComponent(drawerComponentRenderer);
 
-    if (process.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
+    if (import.meta.env.VITE_INCLUDE_HTML_COMPONENTS !== "false") {
       this.registerCoreComponent(htmlATagRenderer);
       this.registerCoreComponent(htmlAbbrTagRenderer);
       this.registerCoreComponent(htmlAddressTagRenderer);
