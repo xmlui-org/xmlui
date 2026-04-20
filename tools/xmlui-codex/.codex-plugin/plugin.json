@@ -1,0 +1,10 @@
+{
+  "name": "xmlui-codex",
+  "version": "1.1.0",
+  "description": "XMLUI development environment setup for Codex",
+  "author": {
+    "name": "XMLUI"
+  },
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}
