@@ -1,7 +1,7 @@
 import { createComponentRenderer, createMetadata, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
 import styles from "./TableSelect.module.scss";
-import { TableSelect, defaultProps } from "./TableSelectNative";
+import { TableSelect, defaultProps } from "./TableSelectReact";
 
 const COMP = "TableSelect";
 
@@ -53,17 +53,16 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
     didChange: {
       description:
         "Fired when the user selects a row. Receives the value determined by `valueKey`.",
-      type: "function",
     },
   },
   apis: {
     value: {
       description: "The currently selected value.",
-      type: "string",
+      signature: "get value(): string",
     },
     setValue: {
       description: "Programmatically set the selected value.",
-      type: "function",
+      signature: "setValue(value: string): void",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -103,13 +102,13 @@ export const TableSelectMd: ComponentMetadata = createMetadata({
 export const tableSelectComponentRenderer = createComponentRenderer(
   COMP,
   TableSelectMd,
-  ({ node, state, extractValue, lookupEventHandler, className, registerComponentApi, updateState }) => {
-    const props = node.props as any;
+  ({ node, state, extractValue, lookupEventHandler, classes, registerComponentApi, updateState }) => {
+    const props = node.props as Record<string, unknown>;
     const isControlled = props?.value !== undefined;
     return (
       <TableSelect
         id={extractValue.asOptionalString(props?.id)}
-        className={className}
+        classes={classes}
         data={extractValue(props?.data) as Record<string, unknown>[] | undefined}
         columns={extractValue(props?.columns) as any}
         valueKey={extractValue.asOptionalString(props?.valueKey)}

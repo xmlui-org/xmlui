@@ -18,7 +18,7 @@ actionable and maps to a concrete, verifiable pattern.
 ## 2. Metadata
 
 - [ ] All props, events, APIs, contextVars, and themeVars declared in `createMetadata`.
-- [ ] All prop field keys use the correct names: `type`, `description`, `defaultValue`, `availableValues`. The key `valueType` is silently ignored by the metadata system — TypeScript will not catch it.
+- [ ] All prop field keys use the correct names: `valueType`, `description`, `defaultValue`, `availableValues`. `valueType` is the only runtime field for type classification — `wrapComponent` auto-extraction reads `propMeta.valueType` to classify boolean/number props for `asOptionalBoolean`/`asOptionalNumber` coercion. Do not use `type` — it is not a field on `ComponentPropertyMetadata` and is silently ignored.
 - [ ] `defaultValue` references `defaultProps.<prop>` — never a literal.
 - [ ] Event helper keys match the strings passed to `lookupEventHandler(...)` in the renderer.
 - [ ] `label` declared in `props` when the component renders its own label (prevents behavior double-wrapping).
@@ -159,6 +159,7 @@ actionable and maps to a concrete, verifiable pattern.
 | Raw `node.props.foo` without `extractValue` | Wrap with `extractValue.*`. |
 | Hardcoded value in SCSS | `createThemeVar(...)`. |
 | Literal default in metadata | `defaultProps.propName`. |
+| `type: "boolean"` / `type: "string"` / `type: "number"` in metadata | Use `valueType` — `type` is not a field on `ComponentPropertyMetadata` and is silently ignored. |
 | Event handler key in `defaultProps` (e.g. `onReady: noop`) | Remove — default directly in the destructuring. `defaultProps` is consumed by the metadata system and must only contain prop values visible to XMLUI users. |
 | `forwardRef` ref not connected to DOM | `useComposedRefs(ref, innerRef)` on root. |
 | `composeRefs(...)` called in render | `useComposedRefs(...)` — stable hook form. |

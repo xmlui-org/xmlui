@@ -60,56 +60,56 @@ Status symbols: ⏳ pending | ✅ reviewed
 | Menu | ⏳ |
 | MessageListener | ✅ |
 | ModalDialog | ✅ |
-| NavGroup | ⏳ |
-| NavLink | ⏳ |
-| NavPanel | ⏳ |
-| NavPanelCollapseButton | ⏳ |
-| NestedApp | ⏳ |
-| NoResult | ⏳ |
-| NumberBox | ⏳ |
-| Option | ⏳ |
-| PageMetaTitle | ⏳ |
-| Pages | ⏳ |
-| Pagination | ⏳ |
-| Part | ⏳ |
-| ProfileMenu | ⏳ |
-| ProgressBar | ⏳ |
-| QRCode | ⏳ |
-| Queue | ⏳ |
-| RadioGroup | ⏳ |
-| RatingInput | ⏳ |
-| Redirect | ⏳ |
-| ResponsiveBar | ⏳ |
-| ScrollViewer | ⏳ |
-| Select | ⏳ |
-| SelectionStore | ⏳ |
-| Slider | ⏳ |
-| Slot | ⏳ |
-| SpaceFiller | ⏳ |
-| Spinner | ⏳ |
-| Splitter | ⏳ |
-| Stack | ⏳ |
-| StickyBox | ⏳ |
-| StickySection | ⏳ |
-| Switch | ⏳ |
-| Table | ⏳ |
-| TableOfContents | ⏳ |
-| Tabs | ⏳ |
-| Text | ⏳ |
-| TextArea | ⏳ |
-| TextBox | ⏳ |
-| Theme | ⏳ |
-| TileGrid | ⏳ |
-| TimeInput | ⏳ |
-| Timer | ⏳ |
-| Toast | ⏳ |
-| Toggle | ⏳ |
-| ToneChangerButton | ⏳ |
-| ToneSwitch | ⏳ |
-| Tooltip | ⏳ |
-| Tree | ⏳ |
-| TreeDisplay | ⏳ |
-| ValidationSummary | ⏳ |
+| NavGroup | ✅ |
+| NavLink | ✅ |
+| NavPanel | ✅ |
+| NavPanelCollapseButton | ✅ |
+| NestedApp | ✅ |
+| NoResult | ✅ |
+| NumberBox | ✅ |
+| Option | ✅ |
+| PageMetaTitle | ✅ |
+| Pages | ✅ |
+| Pagination | ✅ |
+| Part | ✅ |
+| ProfileMenu | ✅ |
+| ProgressBar | ✅ |
+| QRCode | ✅ |
+| Queue | ✅ |
+| RadioGroup | ✅ |
+| RatingInput | ✅ |
+| Redirect | ✅ |
+| ResponsiveBar | ✅ |
+| ScrollViewer | ✅ |
+| Select | ✅ |
+| SelectionStore | ✅ |
+| Slider | ✅ |
+| Slot | ✅ |
+| SpaceFiller | ✅ |
+| Spinner | ✅ |
+| Splitter | ✅ |
+| Stack | ✅ |
+| StickyBox | ✅ |
+| StickySection | ✅ |
+| Switch | ✅ |
+| Table | ✅ |
+| TableOfContents | ✅ |
+| Tabs | ✅ |
+| Text | ✅ |
+| TextArea | ✅ |
+| TextBox | ✅ |
+| Theme | ✅ |
+| TileGrid | ✅ |
+| TimeInput | ✅ |
+| Timer | ✅ |
+| Toast | ✅ |
+| Toggle | ✅ |
+| ToneChangerButton | ✅ |
+| ToneSwitch | ✅ |
+| Tooltip | ✅ |
+| Tree | ✅ |
+| TreeDisplay | ✅ |
+| ValidationSummary | ✅ |
 
 ---
 
@@ -119,54 +119,54 @@ Status symbols: ⏳ pending | ✅ reviewed
 
 | Component | Status |
 |-----------|--------|
-| Animation | ⏳ |
-| FadeAnimation | ⏳ |
-| FadeInAnimation | ⏳ |
-| FadeOutAnimation | ⏳ |
-| ScaleAnimation | ⏳ |
-| SlideInAnimation | ⏳ |
+| Animation | ✅ |
+| FadeAnimation | ✅ |
+| FadeInAnimation | ✅ |
+| FadeOutAnimation | ✅ |
+| ScaleAnimation | ✅ |
+| SlideInAnimation | ✅ |
 
 ### xmlui-crm-blocks
 
 | Component | Status |
 |-----------|--------|
-| TableSelect | ⏳ |
+| TableSelect | ✅ |
 
 ### xmlui-echart
 
 | Component | Status |
 |-----------|--------|
-| EChartWrapped | ⏳ |
+| EChartWrapped | ✅ |
 
 ### xmlui-gauge
 
 | Component | Status |
 |-----------|--------|
-| GaugeWrapped | ⏳ |
+| GaugeWrapped | ✅ |
 
 ### xmlui-grid-layout
 
 | Component | Status |
 |-----------|--------|
-| GridLayoutWrapped | ⏳ |
+| GridLayoutWrapped | ✅ |
 
 ### xmlui-hello-world
 
 | Component | Status |
 |-----------|--------|
-| HelloWorld | ⏳ |
+| HelloWorld | ✅ |
 
 ### xmlui-masonry
 
 | Component | Status |
 |-----------|--------|
-| MasonryWrapped | ⏳ |
+| MasonryWrapped | ✅ |
 
 ### xmlui-pdf
 
 | Component | Status |
 |-----------|--------|
-| Pdf | ⏳ |
+| Pdf | ✅ |
 
 ### xmlui-react-flow
 
@@ -178,41 +178,35 @@ Status symbols: ⏳ pending | ✅ reviewed
 
 | Component | Status |
 |-----------|--------|
-| AreaChart | ⏳ |
-| BarChart | ⏳ |
-| DonutChart | ⏳ |
-| LabelList | ⏳ |
-| Legend | ⏳ |
-| LineChart | ⏳ |
-| PieChart | ⏳ |
-| RadarChart | ⏳ |
-| Tooltip | ⏳ |
+| AreaChart | ✅ |
+| BarChart | ✅ |
+| DonutChart | ✅ |
+| LabelList | ✅ |
+| Legend | ✅ |
+| LineChart | ✅ |
+| PieChart | ✅ |
+| RadarChart | ✅ |
+| Tooltip | ✅ |
 
 ### xmlui-search
 
 | Component | Status |
 |-----------|--------|
-| Search | ⏳ |
-
-### xmlui-select
-
-| Component | Status |
-|-----------|--------|
-| (see package src/) | pending |
+| Search | ✅ |
 
 ### xmlui-tiptap-editor
 
 | Component | Status |
 |-----------|--------|
-| TiptapEditorWrapped | ⏳ |
+| TiptapEditorWrapped | ✅ |
 
 ### xmlui-website-blocks
 
 | Component | Status |
 |-----------|--------|
-| Backdrop | ⏳ |
-| Breakout | ⏳ |
-| Carousel | ⏳ |
-| FancyButton | ⏳ |
-| HeroSection | ⏳ |
-| ScrollToTop | ⏳ |
+| Backdrop | ✅ |
+| Breakout | ✅ |
+| Carousel | ✅ |
+| FancyButton | ✅ |
+| HeroSection | ✅ |
+| ScrollToTop | ✅ |

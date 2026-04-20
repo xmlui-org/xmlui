@@ -16,12 +16,12 @@ export const LogoMd = createMetadata({
   props: {
     alt: {
       description: "Alternative text for the logo image for accessibility.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.alt,
     },
     inline: {
       description: `When set to true, the image will be displayed as an inline element instead of a block element.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.inline,
     },
   },

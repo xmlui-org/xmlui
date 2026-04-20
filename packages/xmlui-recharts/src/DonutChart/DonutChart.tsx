@@ -1,6 +1,6 @@
 import { wrapComponent, parseScssVar, createMetadata, type ComponentMetadata } from "xmlui";
 import styles from "../PieChart/PieChartNative.module.scss";
-import { defaultProps, PieChart } from "../PieChart/PieChartNative";
+import { defaultProps, PieChart, type PieChartProps } from "../PieChart/PieChartReact";
 
 const COMP = "DonutChart";
 
@@ -57,7 +57,7 @@ export const DonutChartMd: ComponentMetadata = createMetadata({
 
 export const donutChartComponentRenderer = wrapComponent(COMP, PieChart, DonutChartMd, {
   customRender: (props, context) => (
-    <PieChart {...(props as any)} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
+    <PieChart {...(props as PieChartProps)} innerRadius={props.innerRadius ?? defaultPropsDonut.innerRadius}>
       {context.renderChild(context.node.children)}
     </PieChart>
   ),

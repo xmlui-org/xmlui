@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { memo, useState, useEffect, useCallback } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -34,7 +34,7 @@ function resolveCssLength(value: string, fallback: number): number {
   return px;
 }
 
-export function GridLayoutRender({
+export const GridLayoutRender = memo(function GridLayoutRender({
   layout,
   columns = 12,
   rowHeight = 60,
@@ -138,4 +138,4 @@ export function GridLayoutRender({
       })}
     </ResponsiveGridLayout>
   );
-}
+});

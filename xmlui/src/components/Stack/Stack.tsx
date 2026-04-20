@@ -13,7 +13,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dClick, dContextMenu, dInternal } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
-import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackNative";
+import { DEFAULT_ORIENTATION, Stack, defaultProps } from "./StackReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { alignmentOptionValues } from "../abstractions";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper, FlowItemBreak } from "../FlowLayout/FlowLayout";

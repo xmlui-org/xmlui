@@ -60,7 +60,7 @@ export const FormItemMd = createMetadata({
       description:
         `This boolean value indicates if the label can be split into multiple lines if it would ` +
         `overflow the available label width.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.labelBreak,
     },
     enabled: dEnabled(),
@@ -75,7 +75,7 @@ export const FormItemMd = createMetadata({
     },
     customValidationsDebounce: {
       description: `This optional number prop determines the time interval between two runs of a custom validation.`,
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.customValidationsDebounce,
     },
     validationDisplayDelay: {
@@ -83,7 +83,7 @@ export const FormItemMd = createMetadata({
         `When an async \`onValidate\` handler takes longer than this many milliseconds, ` +
         `the validation result is shown immediately once it resolves — without waiting for the ` +
         `field to lose focus. Set to \`0\` to disable early display. Default: \`400\`.`,
-      type: "number",
+      valueType: "number",
       defaultValue: 400,
     },
     validationMode: {
@@ -95,7 +95,7 @@ export const FormItemMd = createMetadata({
     },
     requireLabelMode: {
       description: "Controls how required/optional status is visually indicated in the label.",
-      type: "string",
+      valueType: "string",
       availableValues: requireLabelModeMd,
       isRequired: false,
     },
@@ -209,7 +209,7 @@ export const FormItemMd = createMetadata({
         "This is useful for fields that should be present in the form but not submitted, " +
         "similar to hidden fields. If multiple FormItems reference the same `bindTo` value " +
         "and any of them has `noSubmit` set to `true`, the field will NOT be submitted.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.noSubmit,
     },
   },

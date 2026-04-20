@@ -27,6 +27,7 @@
     "build-xmlui": "turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
     "test": "turbo run //#_test:e2e:with-unit-tests",
+    "_test:e2e:with-unit-tests": "playwright test",
     "test-smoke": "turbo run //#_test:e2e:smoke:with-unit-tests",
     "test-e2e-dev": "playwright test",
     "test-e2e-fast": "turbo run xmlui#build:xmlui-test-bed && cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",

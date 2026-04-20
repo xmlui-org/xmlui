@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { SelectionStore, defaultProps } from "./SelectionStoreNative";
+import { SelectionStore, defaultProps } from "./SelectionStoreReact";
 
 const COMP = "SelectionStore";
 
@@ -15,16 +15,17 @@ export const SelectionStoreMd = createMetadata({
       description: `The selected items in the selection store needs to have a unique ID to use as an ` +
         `unambiguous key for that particular item. This property uniquely identifies the ` +
         `selected object item via a given property. By default, the key attribute is \`"id"\`.`,
+      valueType: "string",
       defaultValue: defaultProps.idKey,
     },
   },
 });
 
 export const selectionStoreComponentRenderer = wrapComponent(COMP, SelectionStore, SelectionStoreMd, {
-  customRender: (_props, { node, state, updateState, renderChild, registerComponentApi }) => (
+  customRender: (_props, { node, state, updateState, extractValue, renderChild, registerComponentApi }) => (
     <SelectionStore
       updateState={updateState}
-      idKey={node.props.idKey}
+      idKey={extractValue.asOptionalString(node.props.idKey)}
       selectedItems={state?.value}
       registerComponentApi={registerComponentApi}
     >

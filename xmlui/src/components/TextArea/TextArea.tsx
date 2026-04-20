@@ -19,7 +19,7 @@ import {
   dSetValueApi,
   dValidationStatus,
 } from "../metadata-helpers";
-import { type ResizeOptions, TextArea, defaultProps } from "./TextAreaNative";
+import { type ResizeOptions, TextArea, defaultProps } from "./TextAreaReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 

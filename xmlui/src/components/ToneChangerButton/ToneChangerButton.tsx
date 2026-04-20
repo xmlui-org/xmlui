@@ -1,18 +1,20 @@
+import { memo, useCallback } from "react";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { ThemedButton as Button } from "../Button/Button";
 import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, dClick } from "../metadata-helpers";
-import { noop } from "lodash-es";
+import { noop } from "../../components-core/constants";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "ToneChangerButton";
 const LIGHT_TO_DARK_ICON = "lightToDark:ToneChangerButton";
 const DARK_TO_LIGHT_ICON = "darkToLight:ToneChangerButton";
 
+const GHOST_BUTTON_STYLE = { flexShrink: 0 };
+
 export const defaultProps = {
   lightToDarkIcon: LIGHT_TO_DARK_ICON,
   darkToLightIcon: DARK_TO_LIGHT_ICON,
-  onClick: noop,
 };
 
 export const ToneChangerButtonMd = createMetadata({
@@ -45,35 +47,39 @@ export const ToneChangerButtonMd = createMetadata({
   defaultAriaLabel: "Toggle color mode",
 });
 
-export function ToneChangerButton({
+export const ToneChangerButton = memo(function ToneChangerButton({
   lightToDarkIcon = defaultProps.lightToDarkIcon,
   darkToLightIcon = defaultProps.darkToLightIcon,
-  onClick = defaultProps.onClick,
+  onClick = noop,
+}: {
+  lightToDarkIcon?: string;
+  darkToLightIcon?: string;
+  onClick?: (tone: string) => void;
 }) {
   const { activeThemeTone, setActiveThemeTone } = useThemes();
 
-  // Use the direct icon name as both the main icon and the fallback
-  // This ensures we always have a working icon
   const iconName = activeThemeTone === "light" ? lightToDarkIcon : darkToLightIcon;
   const fallbackIcon = activeThemeTone === "light" ? "lightToDark" : "darkToLight";
+
+  const handleClick = useCallback(() => {
+    if (activeThemeTone === "light") {
+      setActiveThemeTone("dark");
+      onClick?.("dark");
+    } else {
+      setActiveThemeTone("light");
+      onClick?.("light");
+    }
+  }, [activeThemeTone, setActiveThemeTone, onClick]);
 
   return (
     <Button
       variant="ghost"
-      style={{ flexShrink: 0 }}
+      style={GHOST_BUTTON_STYLE}
       icon={<ThemedIcon name={iconName} fallback={fallbackIcon} />}
-      onClick={() => {
-        if (activeThemeTone === "light") {
-          setActiveThemeTone("dark");
-          onClick?.("dark");
-        } else {
-          setActiveThemeTone("light");
-          onClick?.("light");
-        }
-      }}
+      onClick={handleClick}
     />
   );
-}
+});
 
 export const toneChangerButtonComponentRenderer = wrapComponent(
   COMP,

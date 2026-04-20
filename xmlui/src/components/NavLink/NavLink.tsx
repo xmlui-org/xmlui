@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dClick, dEnabled, dLabel } from "../metadata-helpers";
 import { ThemedIcon } from "../Icon/Icon";
-import { NavLink, defaultProps } from "./NavLinkNative";
+import { NavLink, defaultProps } from "./NavLinkReact";
 import { LinkTargetMd } from "../abstractions";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -37,7 +37,7 @@ export const NavLinkMd = createMetadata({
     target: {
       description: `This optionally property specifies how to open the clicked link.`,
       availableValues: LinkTargetMd,
-      type: "string",
+      valueType: "string",
     },
     label: dLabel(),
     vertical: {

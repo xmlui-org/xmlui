@@ -1,4 +1,4 @@
-import { Slider } from "./SliderNative";
+import { Slider, defaultProps } from "./SliderReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import styles from "./Slider.module.scss";
@@ -44,16 +44,17 @@ export const SliderMd = createMetadata({
     minValue: {
       description: `This property specifies the minimum value of the allowed input range.`,
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.min,
     },
     maxValue: {
       description: `This property specifies the maximum value of the allowed input range.`,
       valueType: "number",
-      defaultValue: 10,
+      defaultValue: defaultProps.max,
     },
     step: {
       description: `This property defines the increment value for the slider, determining the allowed intervals between selectable values.`,
-      defaultValue: 1,
+      valueType: "number",
+      defaultValue: defaultProps.step,
     },
     minStepsBetweenThumbs: d(
       `This property sets the minimum number of steps required between multiple thumbs on the slider, ensuring they maintain a specified distance.`,

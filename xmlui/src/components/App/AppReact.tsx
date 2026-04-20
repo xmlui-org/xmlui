@@ -36,7 +36,7 @@ import { useComponentThemeClass } from "../../components-core/theming/utils";
 import type { AppLayoutType, IAppLayoutContext } from "../App/AppLayoutContext";
 import { AppLayoutContext } from "../App/AppLayoutContext";
 import { SearchContextProvider } from "./SearchContext";
-import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
+import type { NavHierarchyNode } from "../NavPanel/NavPanelReact";
 import { LinkInfoContext } from "./LinkInfoContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import { writeLocalStorage } from "../../components-core/appContext/local-storage-functions";

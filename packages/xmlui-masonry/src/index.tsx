@@ -1,4 +1,4 @@
-import { masonryComponentRenderer } from "./MasonryWrapped";
+import { masonryComponentRenderer } from "./Masonry";
 
 export default {
   namespace: "XMLUIExtensions",

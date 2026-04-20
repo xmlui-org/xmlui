@@ -1,5 +1,5 @@
 import { type ReactNode, useCallback, useState } from "react";
-import { IndexAwareNestedApp } from "./NestedAppNative";
+import { IndexAwareNestedApp } from "./NestedAppReact";
 import { Markdown } from "../Markdown/Markdown";
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { ThemedButton as Button } from "../Button/Button";

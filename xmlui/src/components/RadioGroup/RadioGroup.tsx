@@ -17,7 +17,7 @@ import {
   dRequired,
   dValidationStatus,
 } from "../metadata-helpers";
-import { RadioGroup, defaultProps } from "./RadioGroupNative";
+import { RadioGroup, defaultProps } from "./RadioGroupReact";
 
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;

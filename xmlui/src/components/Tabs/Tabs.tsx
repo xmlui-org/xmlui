@@ -4,7 +4,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 import { MemoizedItem } from "../container-helpers";
-import { Tabs, defaultProps } from "./TabsNative";
+import { Tabs, defaultProps } from "./TabsReact";
 import { createMetadata, d, dComponent, dDidChange, dContextMenu } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
@@ -70,6 +70,13 @@ export const TabsMd = createMetadata({
         `Accepts any valid CSS length (e.g. \`"8px"\`, \`"1rem"\`). ` +
         `When set, this overrides the \`paddingTop-TabItem\` theme variable.`,
       valueType: "string",
+    },
+    distributeEvenly: {
+      description:
+        `When enabled, all tabs are distributed evenly across the full width of the tab strip, ` +
+        `each taking equal horizontal space. Equivalent to setting \`tabAlignment\` to \`"stretch"\`.`,
+      valueType: "boolean",
+      defaultValue: defaultProps.distributeEvenly,
     },
   },
   events: {

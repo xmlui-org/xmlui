@@ -31,7 +31,7 @@ export const AppStateMd = createMetadata({
         `This property is the identifier of the bucket to which the \`${COMP}\` instance is bound. ` +
         `Multiple \`${COMP}\` instances with the same bucket will share the same state object: any ` +
         `of them updating the state will cause the other instances to view the new, updated state.`,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.bucket,
     },
     initialValue: {

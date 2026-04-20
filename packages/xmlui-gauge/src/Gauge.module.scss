@@ -8,9 +8,9 @@ $themeVars: ();
 
 $componentName: "Gauge";
 
-$backgroundColor-Gauge: createThemeVar("Input:backgroundColor-#{$componentName}");
-$textColor-Gauge: createThemeVar("Input:textColor-#{$componentName}");
-$primaryColor-Gauge: createThemeVar("Input:primaryColor-#{$componentName}");
+$backgroundColor-Gauge: createThemeVar("backgroundColor-#{$componentName}");
+$textColor-Gauge: createThemeVar("textColor-#{$componentName}");
+$primaryColor-Gauge: createThemeVar("primaryColor-#{$componentName}");
 
 @layer components {
   .gaugeContainer {

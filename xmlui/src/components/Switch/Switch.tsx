@@ -101,7 +101,7 @@ export const switchComponentRenderer = wrapComponent(
   {
     exposeRegisterApi: true,
     stateful: true,
-    events: [],
+    events: {},
     customRender(_props, {
       node,
       extractValue,

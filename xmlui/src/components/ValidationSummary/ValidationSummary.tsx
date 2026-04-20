@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import classnames from "classnames";
 
@@ -33,12 +33,12 @@ type ValidationDisplayProps = {
   heading?: string;
   issues: Array<ValidationIssue>;
   severity?: ValidationSeverity | "info";
-  onClose?: (...args: any[]) => any;
+  onClose?: () => void;
 };
 
 type ValidationIssue = { field?: string; message: string };
 
-export function ValidationSummary({
+export const ValidationSummary = memo(function ValidationSummary({
   fieldValidationResults = defaultProps.fieldValidationResults,
   generalValidationResults = defaultProps.generalValidationResults,
 }: ValidationSummaryProps) {
@@ -79,14 +79,14 @@ export function ValidationSummary({
       />
     </div>
   );
-}
+});
 
-const ValidationDisplay = ({
+const ValidationDisplay = memo(function ValidationDisplay({
   heading,
   issues = EMPTY_ARRAY,
   severity = "error",
   onClose,
-}: ValidationDisplayProps) => {
+}: ValidationDisplayProps) {
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
   if (issues.length === 0) {
     return null;
@@ -98,11 +98,11 @@ const ValidationDisplay = ({
         [styles.info]: severity === "info",
         [styles.warning]: severity === "warning",
         [styles.error]: severity === "error",
+        [styles.noCloseButton]: !onClose,
       })}
-      style={{ paddingTop: !onClose ? "0.5rem" : undefined }}
       data-validation-display-severity={severity}
     >
-      <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "0.5rem" }}>
+      <Stack orientation="horizontal" verticalAlignment="center" className={styles.headerStack}>
         <ThemedIcon className={styles.heading} name={severity} size="md" />
         <div className={styles.heading}>
           <Text>{heading}</Text>
@@ -127,14 +127,14 @@ const ValidationDisplay = ({
       </ul>
     </div>
   );
-};
+});
 
 // --- ValidationEntry
-const ValidationEntry = ({ issue }: { issue: ValidationIssue }) => {
+const ValidationEntry = memo(function ValidationEntry({ issue }: { issue: ValidationIssue }) {
   const { field, message } = issue;
   return (
     <li>
-      <span style={{ display: "inline-flex", gap: field ? "0.25rem" : undefined }}>
+      <span className={classnames(styles.entrySpan, { [styles.entrySpanWithField]: !!field })}>
         {field && <Text variant="small" fontWeight="bold">{`${field}:`}</Text>}
         <Text variant="small" preserveLinebreaks={true}>
           {message}
@@ -142,4 +142,4 @@ const ValidationEntry = ({ issue }: { issue: ValidationIssue }) => {
       </span>
     </li>
   );
-};
+});

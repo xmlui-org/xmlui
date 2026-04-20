@@ -33,7 +33,7 @@ export const FormMd = createMetadata({
         `This property sets the position of the item labels within the form.` +
         `Individual \`FormItem\` instances can override this property.`,
       availableValues: labelPositionMd,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.itemLabelPosition,
     },
     itemLabelWidth: {
@@ -42,31 +42,31 @@ export const FormMd = createMetadata({
         "\`FormItem\` instances can override this property. If this property is not set, " +
         "each form item nested in the form uses its calculated label width. These widths " +
         "may be different for each item.",
-      type: "string",
+      valueType: "string",
     },
     itemLabelBreak: {
       description:
         `This boolean value indicates if form item labels can be split into multiple ` +
         `lines if it would overflow the available label width. Individual \`FormItem\` ` +
         `instances can override this property.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.itemLabelBreak,
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     keepModalOpenOnSubmit: {
       description: "This property prevents the modal from closing when the form is submitted.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.keepModalOpenOnSubmit,
     },
     data: {
@@ -77,19 +77,19 @@ export const FormMd = createMetadata({
     },
     cancelLabel: {
       description: "This property defines the label of the Cancel button.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.cancelLabel,
     },
     saveLabel: {
       description: `This property defines the label of the Save button.`,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.saveLabel,
     },
     saveInProgressLabel: {
       description:
         "This property defines the label of the Save button to display during the " +
         "form data submit (save) operation.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.saveInProgressLabel,
     },
     savePendingLabel: {
@@ -97,7 +97,7 @@ export const FormMd = createMetadata({
         "This property defines the label of the Save button to display while " +
         "async field validation is still in-flight. During async validation, the Submit button " +
         "is disabled to prevent submission before validation completes.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.savePendingLabel,
     },
     submitFeedbackDelay: {
@@ -105,40 +105,40 @@ export const FormMd = createMetadata({
         "The number of milliseconds to wait before switching the Save button label to " +
         "`saveInProgressLabel` or `savePendingLabel`. This prevents a distracting label " +
         "flash when submit or validation completes quickly.",
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.submitFeedbackDelay,
     },
     swapCancelAndSave: {
       description:
         `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.swapCancelAndSave,
     },
     hideButtonRowUntilDirty: {
       description:
         `This property hides the button row until the form data is modified (dirty).`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.hideButtonRowUntilDirty,
     },
     hideButtonRow: {
       description:
         `This property hides the button row entirely when set to true.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.hideButtonRow,
     },
     stickyButtonRow: {
       description:
         `When set to true, the button row sticks to the bottom of the scrollable content area. ` +
         `Useful when the form is displayed inside a scrollable container such as a ModalDialog.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.stickyButtonRow,
     },
     enableSubmit: {
       description:
         `This property controls whether the submit button is enabled. When set to false, ` +
         `the submit button is disabled and the form cannot be submitted.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.enableSubmit,
     },
     submitUrl: d(`URL to submit the form data.`),
@@ -157,7 +157,7 @@ export const FormMd = createMetadata({
         `Individual \`FormItem\` instances can override this property.`,
       availableValues: requireLabelModeMd,
       defaultValue: defaultProps.itemRequireLabelMode,
-      type: "string",
+      valueType: "string",
     },
     _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
     persist: {
@@ -165,14 +165,14 @@ export const FormMd = createMetadata({
         "When set to `true` (or a non-empty string), the form temporarily saves its data to " +
         "localStorage as the user types, so that unsaved changes survive a page reload or crash. " +
         "On a successful submit the saved data is automatically cleared.",
-      type: "boolean",
+      valueType: "boolean",
     },
     storageKey: {
       description:
         "The key used to save the form's temporary data in localStorage when `persist` is enabled. " +
         "If omitted, the form's `id` attribute is used. If the form has no `id`, the key " +
         "defaults to `\"form-data\"`.",
-      type: "string",
+      valueType: "string",
     },
     doNotPersistFields: {
       description:
@@ -185,7 +185,7 @@ export const FormMd = createMetadata({
       description:
         "When `persist` is enabled and the user cancels the form, this property controls " +
         "whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: false,
     },
     dataAfterSubmit: {
@@ -195,7 +195,7 @@ export const FormMd = createMetadata({
         "`\"reset\"` restores the form to its initial data (the value of the `data` property). " +
         "`\"clear\"` empties the form as if no `data` property were set.",
       availableValues: ["keep", "reset", "clear"],
-      type: "string",
+      valueType: "string",
       defaultValue: "keep",
     },
   },

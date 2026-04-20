@@ -31,11 +31,11 @@ export const AppHeaderMd = createMetadata({
     ),
     title: {
       description: "Title for the application logo",
-      type: "string",
+      valueType: "string",
     },
     showLogo: {
       description: "Show the logo in the header",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.showLogo,
     },
   },

@@ -31,7 +31,7 @@ export const ModalDialogMd = createMetadata({
       description:
         `Toggles whether the dialog encompasses the whole UI (\`true\`) or not and has a minimum ` +
         `width and height (\`false\`).`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.fullScreen,
     },
     title: d(`Provides a prestyled heading to display the intent of the dialog.`),
@@ -40,7 +40,7 @@ export const ModalDialogMd = createMetadata({
     },
     closeButtonVisible: {
       description: `Shows (\`true\`) or hides (\`false\`) the visibility of the close button on the dialog.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.closeButtonVisible,
     },
   },

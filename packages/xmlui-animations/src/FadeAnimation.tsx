@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationReact";
 
 const COMP = "FadeAnimation";
 
@@ -15,14 +15,14 @@ export const FadeAnimationMd = createMetadata({
   props: {
     from: {
       description:
-        "Sets the initial opacity of the content." +
+        "Sets the initial opacity of the content. " +
         "If the `to` property is not set, the initial opacity set here will be used as the final opacity.",
       valueType: "number",
       defaultValue: defaultAnimationValues.from,
     },
     to: {
       description:
-        "Sets the final opacity of the content." +
+        "Sets the final opacity of the content. " +
         "If the `from` property is not set, the initial opacity set here will be used as the final opacity.",
       valueType: "number",
       defaultValue: defaultAnimationValues.to,
@@ -67,7 +67,7 @@ export const fadeAnimationRenderer = wrapComponent(
   FadeAnimationMd,
   {
     exposeRegisterApi: true,
-    events: [],
+    events: {},
     exclude: ["from", "to", "animateWhenInView", "reverse", "loop", "delay", "duration"],
     customRender(_props, { node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) {
       return (

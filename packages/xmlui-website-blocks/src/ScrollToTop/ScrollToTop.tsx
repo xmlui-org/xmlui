@@ -2,7 +2,7 @@ import styles from "./ScrollToTop.module.scss";
 
 import { wrapComponent, createMetadata, d, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import * as ScrollToTopNative from "./ScrollToTopNative";
+import * as ScrollToTopNative from "./ScrollToTopReact";
 
 const COMP = "ScrollToTop";
 const { ScrollToTop, defaultProps } = ScrollToTopNative;
@@ -18,34 +18,36 @@ export const ScrollToTopMd: ComponentMetadata = createMetadata({
   props: {
     position: {
       description: "Horizontal position of the button at the bottom of the screen",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.position,
-      options: ["start", "center", "end"],
+      availableValues: ["start", "center", "end"],
     },
     visible: {
       description: "Whether the button is visible",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.visible,
     },
     threshold: {
       description: "Scroll position threshold (in pixels) after which the button becomes visible",
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.threshold,
     },
     icon: {
       description: "Name of the icon to display in the button",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.icon,
     },
     behavior: {
       description: "Scroll behavior when scrolling to top",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.behavior,
-      options: ["smooth", "instant", "auto"],
+      availableValues: ["smooth", "instant", "auto"],
     },
   },
   events: {
-    click: d("Triggered when the scroll to top button is clicked"),
+    click: {
+      description: "Triggered when the scroll to top button is clicked",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

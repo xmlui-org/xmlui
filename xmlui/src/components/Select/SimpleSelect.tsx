@@ -5,7 +5,7 @@ import styles from "./Select.module.scss";
 import { ThemedIcon } from "../Icon/Icon";
 import classnames from "classnames";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import type { SingleValueType } from "./SelectNative";
+import type { SingleValueType } from "./SelectReact";
 import type { Option, ValidationStatus } from "../abstractions";
 import {
   Root,

@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import React, {
-  type CSSProperties,
   type ForwardedRef,
   forwardRef,
   useCallback,
@@ -22,12 +21,13 @@ import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormItemInputId } from "../FormItem/FormItemReact";
 
-type ToggleProps = {
-  id?: string;
+type ToggleProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "value" | "onChange" | "readOnly" | "onClick" | "onFocus" | "onBlur"
+> & {
   initialValue?: boolean;
   value?: boolean;
   enabled?: boolean;
-  style?: CSSProperties;
   readOnly?: boolean;
   validationStatus?: ValidationStatus;
   updateState?: UpdateStateFn;
@@ -38,12 +38,8 @@ type ToggleProps = {
   variant?: "checkbox" | "switch";
   indeterminate?: boolean;
   classes?: Record<string, string>;
-  className?: string;
-  required?: boolean;
-  autoFocus?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   inputRenderer?: (contextVars: any, input?: ReactNode) => ReactNode;
-  tabIndex?: number;
   "aria-label"?: string;
   invalidMessages?: string[];
   validationResult?: ReactNode;
@@ -61,7 +57,29 @@ export const defaultProps: Pick<
   indeterminate: false,
 };
 
-export const Toggle = forwardRef(function Toggle(
+function transformToLegitValue(inp: unknown): boolean {
+  if (typeof inp === "undefined" || inp === null) {
+    return false;
+  }
+  if (typeof inp === "boolean") {
+    return inp;
+  }
+  if (typeof inp === "number") {
+    return !isNaN(inp) && !!inp;
+  }
+  if (typeof inp === "string") {
+    return inp.trim() !== "" && inp.toLowerCase() !== "false";
+  }
+  if (Array.isArray(inp)) {
+    return inp.length > 0;
+  }
+  if (typeof inp === "object") {
+    return Object.keys(inp).length > 0;
+  }
+  return false;
+}
+
+export const Toggle = memo(forwardRef(function Toggle(
   {
     id: idProp,
     initialValue = defaultProps.initialValue,
@@ -98,28 +116,6 @@ export const Toggle = forwardRef(function Toggle(
   const id = useFormItemInputId(idProp);
   const innerRef = React.useRef<HTMLInputElement | null>(null);
   const composedRef = useComposedRefs(forwardedRef, innerRef);
-
-  const transformToLegitValue = (inp: any): boolean => {
-    if (typeof inp === "undefined" || inp === null) {
-      return false;
-    }
-    if (typeof inp === "boolean") {
-      return inp;
-    }
-    if (typeof inp === "number") {
-      return !isNaN(inp) && !!inp;
-    }
-    if (typeof inp === "string") {
-      return inp.trim() !== "" && inp.toLowerCase() !== "false";
-    }
-    if (Array.isArray(inp)) {
-      return inp.length > 0;
-    }
-    if (typeof inp === "object") {
-      return Object.keys(inp).length > 0;
-    }
-    return false;
-  };
 
   const initialCycleRef = React.useRef(true);
   const [suppressTransition, setSuppressTransition] = useState(() => transformToLegitValue(initialValue));
@@ -273,4 +269,4 @@ export const Toggle = forwardRef(function Toggle(
   ) : (
     input
   );
-});
+}));

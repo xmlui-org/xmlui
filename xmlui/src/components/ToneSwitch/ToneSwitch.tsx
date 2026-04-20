@@ -2,9 +2,14 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./ToneSwitch.module.scss";
-import { ToneSwitch, type ToneSwitchProps } from "./ToneSwitchNative";
+import { ToneSwitch } from "./ToneSwitchReact";
 
 const COMP = "ToneSwitch";
+
+export const defaultProps = {
+  iconLight: "sun",
+  iconDark: "moon",
+};
 
 export const ToneSwitchMd = createMetadata({
   status: "stable",
@@ -12,14 +17,23 @@ export const ToneSwitchMd = createMetadata({
     "`ToneSwitch` enables the user to switch between light and dark modes using a switch control.",
   props: {
     iconLight: {
-      type: "string",
+      valueType: "string",
       description: "Icon to display for light mode",
-      defaultValue: "sun",
+      defaultValue: defaultProps.iconLight,
     },
     iconDark: {
-      type: "string",
+      valueType: "string",
       description: "Icon to display for dark mode",
-      defaultValue: "moon",
+      defaultValue: defaultProps.iconDark,
+    },
+  },
+  events: {
+    didChange: {
+      description: "This event is fired when the user switches between light and dark modes.",
+      signature: "didChange(tone: string): void",
+      parameters: {
+        tone: "The new tone value: \"light\" or \"dark\".",
+      },
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -31,6 +45,8 @@ export const ToneSwitchMd = createMetadata({
     [`color-${COMP}-dark`]: "$color-surface-0",
     [`borderColor-${COMP}`]: "$color-surface-200",
     [`borderColor-${COMP}--hover`]: "$color-surface-300",
+    [`backgroundColor-indicator-${COMP}`]: "white",
+    [`boxShadow-indicator-${COMP}`]: "0 2px 4px rgba(0, 0, 0, 0.1)",
 
     dark: {
       [`backgroundColor-${COMP}-light`]: "$color-surface-700",
@@ -41,4 +57,6 @@ export const ToneSwitchMd = createMetadata({
   },
 });
 
-export const toneSwitchComponentRenderer = wrapComponent(COMP, ToneSwitch, ToneSwitchMd, {});
+export const toneSwitchComponentRenderer = wrapComponent(COMP, ToneSwitch, ToneSwitchMd, {
+  events: { didChange: "onDidChange" },
+});

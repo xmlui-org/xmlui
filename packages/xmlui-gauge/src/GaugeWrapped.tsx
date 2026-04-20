@@ -13,6 +13,19 @@ import {
 
 const COMP = "Gauge";
 
+export const defaultProps = {
+  minValue: 0,
+  maxValue: 100,
+  analogDisplayType: "needle",
+  digitalDisplay: false,
+  startAngle: -30,
+  endAngle: 210,
+  scalePosition: "inside",
+  animation: "none",
+  unit: "",
+  showUnit: false,
+};
+
 export const GaugeMd: ComponentMetadata = createMetadata({
   status: "experimental",
   description:
@@ -23,27 +36,27 @@ export const GaugeMd: ComponentMetadata = createMetadata({
     minValue: {
       description: "Minimum value of the allowed range.",
       valueType: "number",
-      defaultValue: 0,
+      defaultValue: defaultProps.minValue,
     },
     maxValue: {
       description: "Maximum value of the allowed range.",
       valueType: "number",
-      defaultValue: 100,
+      defaultValue: defaultProps.maxValue,
     },
     analogDisplayType: d(
       "Display type: 'needle', 'fill', or 'line'.",
-      undefined, "string", "needle",
+      undefined, "string", defaultProps.analogDisplayType,
     ),
-    digitalDisplay: d("Show digital value display.", undefined, "boolean", false),
-    startAngle: d("Start angle in degrees.", undefined, "number", -30),
-    endAngle: d("End angle in degrees.", undefined, "number", 210),
+    digitalDisplay: d("Show digital value display.", undefined, "boolean", defaultProps.digitalDisplay),
+    startAngle: d("Start angle in degrees.", undefined, "number", defaultProps.startAngle),
+    endAngle: d("End angle in degrees.", undefined, "number", defaultProps.endAngle),
     scalePosition: d(
       "Scale position: 'inside', 'outside', or 'none'.",
-      undefined, "string", "inside",
+      undefined, "string", defaultProps.scalePosition,
     ),
-    animation: d("Animation type: 'none' or 'advanced'.", undefined, "string", "none"),
-    unit: d("Unit text appended to values.", undefined, "string", ""),
-    showUnit: d("Whether to show the unit.", undefined, "boolean", false),
+    animation: d("Animation type: 'none' or 'advanced'.", undefined, "string", defaultProps.animation),
+    unit: d("Unit text appended to values.", undefined, "string", defaultProps.unit),
+    showUnit: d("Whether to show the unit.", undefined, "boolean", defaultProps.showUnit),
     enabled: dEnabled(),
   },
   events: {

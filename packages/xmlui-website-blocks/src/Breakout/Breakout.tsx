@@ -1,6 +1,6 @@
 import { wrapComponent, createMetadata } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { Breakout } from "./BreakoutNative";
+import { Breakout } from "./BreakoutReact";
 
 const COMP = "Breakout";
 

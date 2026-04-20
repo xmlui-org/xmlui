@@ -41,27 +41,27 @@ export const ButtonMd = createMetadata({
     autoFocus: {
       description: "Indicates if the button should receive focus when the page loads.",
       isRequired: false,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.autoFocus,
     },
     variant: {
       description: "The button variant determines the level of emphasis the button should possess.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       availableValues: buttonVariantMd,
       defaultValue: defaultProps.variant,
     },
     themeColor: {
       description: "Sets the button color scheme defined in the application theme.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       availableValues: buttonThemeMd,
       defaultValue: defaultProps.themeColor,
     },
     size: {
       description: "Sets the size of the button.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       availableValues: sizeMd,
       defaultValue: defaultProps.size,
     },
@@ -71,21 +71,21 @@ export const ButtonMd = createMetadata({
         `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
         `small icon button. When the ${COMP} has nested children, it will display them and ` +
         `ignore the value of the \`label\` prop.`,
-      type: "string",
+      valueType: "string",
     },
     type: {
       description:
         `This optional string describes how the ${COMP} appears in an HTML context. You ` +
         `rarely need to set this property explicitly.`,
       availableValues: buttonTypesMd,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.type,
     },
     enabled: {
       description:
         `The value of this property indicates whether the button accepts actions (\`true\`) ` +
         `or does not react to them (\`false\`).`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.enabled,
     },
     orientation: dOrientation(defaultProps.orientation),
@@ -94,12 +94,12 @@ export const ButtonMd = createMetadata({
         `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
         `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
         `displays only that icon.`,
-      type: "string",
+      valueType: "string",
     },
     iconPosition: {
       description: `This optional string determines the location of the icon in the ${COMP}.`,
       availableValues: iconPositionMd,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.iconPosition,
     },
     contentPosition: {
@@ -107,12 +107,12 @@ export const ButtonMd = createMetadata({
         `This optional value determines how the label and icon (or nested children) should be placed` +
         `inside the ${COMP} component.`,
       availableValues: alignmentOptionMd,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.contentPosition,
     },
     contextualLabel: {
       description: `This optional value is used to provide an accessible name for the ${COMP} in the context of its usage.`,
-      type: "string",
+      valueType: "string",
     },
   },
   events: {

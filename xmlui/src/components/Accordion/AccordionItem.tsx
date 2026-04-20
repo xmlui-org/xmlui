@@ -16,14 +16,14 @@ export const AccordionItemMd = createMetadata({
   props: {
     header: {
       description: "This property declares the text used in the component's header. If not provided, the header will be empty.",
-      type: "string"
+      valueType: "string"
     },
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
     ),
     initiallyExpanded: {
       description: `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.initiallyExpanded
     },
   },

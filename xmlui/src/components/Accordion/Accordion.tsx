@@ -24,30 +24,30 @@ export const AccordionMd = createMetadata({
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
         `follows the header.`,
       defaultValue: defaultProps.triggerPosition,
-      type: "string",
+      valueType: "string",
       availableValues: triggerPositionNames,
     },
     collapsedIcon: {
       description:
         "This property is the name of the icon that is displayed when the accordion is " +
         "collapsed. This property is the name of the icon that is displayed when the accordion is expanded. If not provided, a chevron-down icon is used.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.collapsedIcon,
     },
     expandedIcon: {
       description:
         "This property is the name of the icon that is displayed when the accordion is " +
         "expanded. If not provided, a chevron-up icon is used.",
-      type: "string",
+      valueType: "string",
     },
     hideIcon: {
       description: `This property indicates that the trigger icon is not displayed (\`true\`).`,
       defaultValue: defaultProps.hideIcon,
-      type: "boolean",
+      valueType: "boolean",
     },
     rotateExpanded: {
       description: `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.rotateExpanded,
     },
   },
