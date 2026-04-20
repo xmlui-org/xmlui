@@ -51,6 +51,8 @@ import { NestedApp } from "./components/NestedApp/NestedAppReact";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
+import { useLinkInfo } from "./components/App/LinkInfoContext";
+import type { NavHierarchyNode } from "./components/NavPanel/NavPanelReact";
 import { ThemedHeading as Heading } from "./components/Heading/Heading";
 import { ThemedImage as Image } from "./components/Image/Image";
 import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
@@ -148,6 +150,7 @@ export type {
   ThemeTone,
   XmlUiNode,
   SearchItemData,
+  NavHierarchyNode,
 };
 export {
   StandaloneApp,
@@ -221,6 +224,7 @@ export {
   NestedApp,
   VisuallyHidden,
   LinkNative,
+  useLinkInfo,
   Heading,
   Image,
   Markdown,
