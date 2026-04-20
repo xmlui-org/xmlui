@@ -263,3 +263,246 @@ In an `Items` component, each row gets its own fresh context object with `$item`
 5. **State is composed, not inherited** — the 6-layer pipeline assembles state from parent, reducer, APIs, context vars, local vars, and globals; live refs are resolved as a post-processing step.
 6. **Variables re-evaluate every render** — but reducer values shadow expression results, which is how mutations persist.
 7. **Children share references, not copies** — parent state is passed by reference. When the owner updates, children see the change on re-render without any copying.
+
+## Examples
+
+### Example: Global Variables
+
+Global variables (declared with `var.global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
+
+```xml
+<App var.global.theme="{'dark'}">
+  <Sidebar />
+  <MainContent />
+</App>
+```
+
+```mermaid
+graph TD
+  subgraph RootContainer["RootContainer — owns theme (global)"]
+    GlobalOwned["global state<br>theme = 'dark'"]
+
+    subgraph SidebarContainer["SidebarContainer"]
+      SidebarL6["Layer 6 — global vars<br>theme = 'dark'"]
+      SidebarRender(["renders sidebar<br>with theme"])
+    end
+
+    subgraph MainContainer["MainContainer"]
+      MainL6["Layer 6 — global vars<br>theme = 'dark'"]
+      MainRender(["renders content<br>with theme"])
+    end
+  end
+
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| SidebarL6
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| MainL6
+  SidebarL6 --> SidebarRender
+  MainL6 --> MainRender
+```
+
+Let's say an event happened that sets the theme from 'dark' to 'light':
+
+```mermaid
+graph TD
+  subgraph RootContainer["RootContainer — owns theme (global)"]
+    GlobalOwned["global state<br>theme = 'light'"]
+
+    subgraph SidebarContainer["SidebarContainer"]
+      SidebarL6["Layer 6 — global vars<br>theme = 'light'"]
+      SidebarRender(["renders sidebar<br>with theme"])
+    end
+
+    subgraph MainContainer["MainContainer"]
+      MainL6["Layer 6 — global vars<br>theme = 'light'"]
+      MainRender(["renders content<br>with theme"])
+      MainMutate(["mutation event -> theme = 'light'"])
+    end
+  end
+
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| SidebarL6
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| MainL6
+  SidebarL6 --> SidebarRender
+  MainL6 --> MainRender
+  MainMutate -.->|"theme is global — bubbles all the way to root"| GlobalOwned
+```
+
+### Example: User Input Affecting State
+
+A `sequenceDiagram` is the clearest way to show a state change triggered by a user action: it makes the temporal flow explicit and separates the before/after states without ambiguity. The static structure (what owns what) can be shown with a `graph TD` if needed, but for runtime behaviour the sequence is the right tool.
+
+```xml
+<App var.query="{''}">
+  <TextInput onValueChange="(val) => query = val" />
+  <Text>{query}</Text>
+</App>
+```
+
+When the user types, `onValueChange` fires and writes to `query`. The proxy intercepts the write, routes it to `AppContainer`'s reducer (since `query` is App's local var), and both `TextInput` and `Text` re-render with the new value.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant TextInput
+  participant Handler as onValueChange handler
+  participant Proxy
+  participant AppReducer as reducer (AppContainer)
+  participant React
+
+  User->>TextInput: types 'hello'
+  TextInput->>Handler: fires onValueChange('hello')
+  Handler->>Proxy: query = 'hello'
+  Proxy->>Proxy: compare old '' vs new 'hello'
+  Proxy->>AppReducer: dispatch STATE_PART_CHANGED
+  AppReducer->>React: new state: query = 'hello'
+  React->>TextInput: re-render (value = 'hello')
+  React->>Text: re-render — sees query = 'hello'
+```
+
+### Example: Context Variables in Iteration
+
+`Items` creates one container per row and injects `$item` and `$itemIndex` as fresh **Layer 4 context variables**. Each row's context is an independent object — mutating one row never affects another.
+
+```xml
+<App>
+  <Items data="{[{name: 'Alice'}, {name: 'Bob'}]}">
+    <Text>{$item.name}</Text>
+  </Items>
+</App>
+```
+
+```mermaid
+graph TD
+  DataSource["data<br>[ {name:'Alice'}, {name:'Bob'} ]"]
+
+  subgraph ItemsComp["&lt;Items&gt; — creates one container per row"]
+    subgraph Row1["Row 1 container"]
+      Ctx1["Layer 4 — context vars<br>$item = {name:'Bob'}<br>$itemIndex = 1"]
+      Render1(["renders: Bob"])
+      Ctx1 --> Render1
+    end
+
+    subgraph Row0["Row 0 container"]
+      Ctx0["Layer 4 — context vars<br>$item = {name:'Alice'}<br>$itemIndex = 0"]
+      Render0(["renders: Alice"])
+      Ctx0 --> Render0
+    end
+  end
+
+  DataSource -->|"row 0 — fresh context object"| Ctx0
+  DataSource -->|"row 1 — fresh context object"| Ctx1
+```
+
+Each row container is **fully isolated**: `$item` in Row 0 and `$item` in Row 1 are separate objects. There is no shared reference between rows.
+
+### Example: Multiple Instances of a User-Defined Component
+
+Every instance of a user-defined component (UDC) gets its **own container** with independent state. Variables declared inside the UDC are not shared across instances.
+
+```xml
+<!-- Counter.xmlui -->
+<Stack var.count="{0}">
+  <Button onClick="count = count + 1" label="Increment" />
+  <Text>{count}</Text>
+</Stack>
+
+<!-- Main.xmlui -->
+<App>
+  <Counter />
+  <Counter />
+</App>
+```
+
+```mermaid
+graph LR
+  subgraph App["&lt;App&gt;"]
+    subgraph Counter2["&lt;Counter&gt; — instance 2 (own container)"]
+      direction TB
+      C2Count["local vars<br>count = 0"]
+      
+      subgraph Stack2["Stack"]
+        C2Button["&lt;Button&gt;<br>onClick: count = count + 1"]
+        C2Text(["renders: 0"])
+      end
+    end
+
+    subgraph Counter1["&lt;Counter&gt; — instance 1 (own container)"]
+      direction TB
+      C1Count["local vars<br>count = 0"]
+
+      subgraph Stack1["Stack"]
+        direction TB
+        C1Button["&lt;Button&gt;<br>onClick: count = count + 1"]
+        C1Text(["renders: 0"])
+      end
+    end
+    
+    C2Count --> C2Text
+    C2Button -.->|"mutates — stays in this container"| C2Count
+    C1Count --> C1Text
+    C1Button -.->|"mutates — stays in this container"| C1Count
+  end
+```
+
+Clicking the button on instance 1 dispatches `STATE_PART_CHANGED` to Counter 1's reducer only. Counter 2's `count` is untouched. There is no shared state between UDC instances unless a parent variable is passed in explicitly.
+
+### Example: `id` Registration container (Component APIs)
+
+When a component has an `id`, it registers its methods with the **nearest enclosing container** via `registerComponentApi`. Those methods land in Layer 3 of that container's state, making them available to any expression in the container's scope — even on sibling components.
+
+```xml
+<App>
+  <TextInput id="myInput" />
+  <Button onClick="myInput.focus()" label="Focus" />
+</App>
+```
+
+```mermaid
+graph TD
+  subgraph AppContainer["AppContainer — Layer 3"]
+    L3["component APIs<br>myInput = { focus(), setValue(), … }"]
+    subgraph AppComp["&lt;App&gt;"]
+      TI["&lt;TextInput id='myInput'&gt;<br>(stateless — no own container)"]
+      Btn["&lt;Button onClick='myInput.focus()'&gt;"]
+    end
+  end
+
+  TI -->|"on mount: registerComponentApi('myInput', ...)"| L3
+  Btn -->|"reads myInput from Layer 3<br>at call time"| L3
+  L3 -->|"myInput.focus()"| TI
+```
+
+`TextInput` itself has no container — it is stateless. It delegates `registerComponentApi` upward to `AppContainer`. When the button's `onClick` evaluates `myInput.focus()`, the framework looks up `myInput` in the combined state at Layer 3 and calls the registered method directly on the underlying DOM element.
+
+### Example: Mutation Persistence
+
+`var.foo="{expr}"` re-evaluates `expr` on **every render** from scratch (Layer 5). The first time a handler writes `foo = newVal`, the new value enters the reducer at **Layer 2**. Because Layer 2 always wins over Layer 5, the expression result is permanently overshadowed — until the container unmounts and remounts.
+
+```xml
+<App var.label="{defaultLabel}">
+  <Button onClick="label = 'Custom'" label="Override" />
+  <Text>{label}</Text>
+</App>
+```
+
+```mermaid
+sequenceDiagram
+  participant Expr as Layer 5 expression<br>label = defaultLabel
+  participant Reducer as Layer 2 reducer state
+  participant Combined as combined state
+  participant Text
+
+  Note over Expr,Text: Initial render — no mutation yet
+  Expr->>Combined: label = 'Default' (Layer 5 wins, Layer 2 empty)
+  Combined->>Text: renders 'Default'
+
+  Note over Expr,Text: User clicks Override
+  Reducer->>Combined: label = 'Custom' (Layer 2 now set)
+  Note over Combined: Layer 2 shadows Layer 5
+  Combined->>Text: renders 'Custom'
+
+  Note over Expr,Text: Any subsequent render
+  Expr->>Expr: re-evaluates → still 'Default'
+  Reducer->>Combined: label = 'Custom' (Layer 2 still wins)
+  Combined->>Text: renders 'Custom' — expression result ignored
+```
+
+This is why mutations persist across re-renders even though expressions re-evaluate every time. The only way to reset `label` back to the expression result is to dispatch a write that explicitly sets it back to `defaultLabel`, which replaces the Layer 2 value.
