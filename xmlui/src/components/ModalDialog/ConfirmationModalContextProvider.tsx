@@ -20,6 +20,7 @@ type ConfirmOptions = {
   actionLabel?: string;
   cancelLabel?: string;
   width?: string;
+  actionThemeColor?: ButtonThemeColor;
 };
 
 type ConfirmFn = {
@@ -94,6 +95,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
       let actionLabel: string;
       let cancelLabel: string;
       let resolvedWidth: string | undefined;
+      let actionThemeColor: ButtonThemeColor | undefined;
       if (typeof titleOrOptions === "string") {
         title = titleOrOptions;
         message = messageArg;
@@ -106,6 +108,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         actionLabel = titleOrOptions.actionLabel ?? "Yes";
         cancelLabel = titleOrOptions.cancelLabel ?? "Cancel";
         resolvedWidth = titleOrOptions.width;
+        actionThemeColor = titleOrOptions.actionThemeColor;
       }
       // Trace confirmation modal show
       if (isTracingActive()) {
@@ -126,7 +129,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
         });
       }
       setTitle(title);
-      setButtons([{ label: actionLabel, value: true }]);
+      setButtons([{ label: actionLabel, value: true, themeColor: actionThemeColor }]);
       setMessage(message);
       setCancelLabel(cancelLabel);
       setWidth(resolvedWidth);

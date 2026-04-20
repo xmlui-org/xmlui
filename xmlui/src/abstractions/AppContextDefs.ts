@@ -13,6 +13,7 @@ import type { SetupWorker } from "msw/browser";
 import type { IApiInterceptor } from "../components-core/interception/abstractions";
 import type { AppState } from "../components-core/rendering/appState";
 import type { PubSubService } from "../components-core/pubsub/PubSubService";
+import type { ButtonThemeColor } from "../components/abstractions";
 
 // This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
@@ -23,6 +24,7 @@ export type ConfirmOptions = {
   actionLabel?: string;
   cancelLabel?: string;
   width?: string;
+  actionThemeColor?: ButtonThemeColor;
 };
 
 export type AppContextObject = {
