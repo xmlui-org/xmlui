@@ -9,7 +9,6 @@ import yaml from "js-yaml";
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "./abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
-import "../index.scss";
 import { AppRoot } from "./rendering/AppRoot";
 import { normalizePath } from "./utils/misc";
 import { ApiInterceptorProvider } from "./interception/ApiInterceptorProvider";
@@ -59,6 +58,7 @@ import { MetadataProvider } from "../language-server/services/common/metadata-ut
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
+import { StyleInjectionTargetContext } from "./theming/StyleContext";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -111,6 +111,7 @@ type RuntimeProps = {
 type StandaloneAppProps = {
   // --- The standalone app description (the engine renders this definition)
   appDef?: StandaloneAppDescription;
+  srcBase?: string;
   appGlobals?: Record<string, any>;
 
   // --- In E2E tests, we can decorate the components with test IDs
@@ -129,6 +130,9 @@ type StandaloneAppProps = {
   waitForApiInterceptor?: boolean;
   helmetContext?: Record<string, unknown>;
   children?: ReactNode;
+
+  // --- When true, the app is rendered as an island (embedded into a host page).
+  asIsland?: boolean;
 };
 
 /**
@@ -139,8 +143,18 @@ type StandaloneAppProps = {
  * AppRoot is responsible for rendering the app (using an internal
  * representation); ApiInterceptor can emulate some backend functionality
  * running in the browser.
+ *
+ * Note: base styles (index.scss) are NOT imported here as a side-effect.
+ * Instead, the `RootClasses` component (ThemeReact.tsx) injects them as a
+ * `<style id="xmlui-base-styles">` tag prepended into the correct target
+ * (document.head for normal apps, shadow root for islands). This ensures
+ * the @layer declaration always evaluates first — before any Vite-injected
+ * component styles — and that island styles are fully scoped to their
+ * shadow root without leaking to the host page.
  */
 function StandaloneApp({
+  srcBase,
+  asIsland,
   appDef,
   appGlobals: globals,
   decorateComponentsWithTestId,
@@ -158,6 +172,7 @@ function StandaloneApp({
     appDef,
     runtime,
     extensionManager,
+    srcBase,
   );
   usePrintVersionNumber(standaloneApp);
 
@@ -274,6 +289,7 @@ function StandaloneApp({
     >
       <SsgEnvProvider>
         <AppRoot
+          asIsland={asIsland}
           projectCompilation={projectCompilation}
           decorateComponentsWithTestId={shouldDecorateWithTestId}
           node={entryPoint!}
@@ -863,6 +879,7 @@ function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
   extensionManager?: StandaloneExtensionManager,
+  srcBase?: string,
 ): {
   standaloneApp: StandaloneAppDescription | null;
   projectCompilation?: ProjectCompilation;
@@ -1207,7 +1224,7 @@ function useStandalone(
       // --- Fetch the main file
       const entryPointPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(MAIN_FILE);
+          const resp = await fetchWithoutCache(srcBase + "/" + MAIN_FILE);
           resolve(parseComponentMarkupResponse(resp));
         } catch (e) {
           resolve({
@@ -1755,6 +1772,34 @@ export function startApp(
   contentRoot.render(<StandaloneApp runtime={runtime} extensionManager={extensionManager} />);
   return contentRoot;
 }
+
+
+export function startIslands(
+  extensionManager: StandaloneExtensionManager = new StandaloneExtensionManager(),
+): () => void {
+  const roots: ReturnType<typeof ReactDOM.createRoot>[] = [];
+
+  document.querySelectorAll("[data-xmlui-src]").forEach((el) => {
+    const srcBase = el.getAttribute("data-xmlui-src");
+    // Create shadow DOM eagerly so ALL styles (including from the outer
+    // React tree) are scoped from the very first render.  This prevents
+    // any style leakage to the host page — even if future changes add
+    // styled components to the provider layers above NestedApp.
+    const shadowRoot = (el as HTMLElement).attachShadow({ mode: "open" });
+    const root = ReactDOM.createRoot(shadowRoot);
+    roots.push(root);
+    root.render(
+      <StyleInjectionTargetContext.Provider value={shadowRoot}>
+        <StandaloneApp extensionManager={extensionManager} srcBase={srcBase} asIsland={true}/>
+      </StyleInjectionTargetContext.Provider>
+    );
+  });
+
+  return () => {
+    roots.forEach((root) => root.unmount());
+  };
+}
+
 
 /**
  * Transform Globals.xs variables into globalVars property to leverage

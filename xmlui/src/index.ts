@@ -3,7 +3,7 @@ import type {
   StandaloneJsonConfig,
 } from "./components-core/abstractions/standalone";
 import type { ApiInterceptorDefinition } from "./components-core/interception/abstractions";
-import StandaloneApp, { startApp } from "./components-core/StandaloneApp";
+import StandaloneApp, { startApp, startIslands } from "./components-core/StandaloneApp";
 import type {
   ComponentDef,
   ComponentLike,
@@ -194,6 +194,7 @@ export {
   dValueApi,
   parseScssVar,
   startApp,
+  startIslands,
   useTheme,
   AppRoot,
   ErrorBoundary,

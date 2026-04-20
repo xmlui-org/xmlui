@@ -36,6 +36,8 @@ export const queryClient = new QueryClient({
  * the app accordingly.
  */
 export function AppRoot({
+  asIsland,
+  mainSrc,
   apiInterceptor,
   contributes,
   node,
@@ -67,13 +69,32 @@ export function AppRoot({
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
   const rootNode = useMemo(() => {
-    const themedRoot = {
-      type: "Theme",
-      props: {
-        root: true,
-      },
-      children: [node],
-    };
+    if (asIsland) {
+      return {
+        type: "NestedApp",
+        props: {
+          resolvedApp: node,
+          resolvedComponents: contributes.compoundComponents,
+          asIsland
+        },
+        children: [],
+      };
+    }
+    let themedRoot = node;
+    if (node.type !== "Theme") {
+      themedRoot = {
+        type: "Theme",
+        props: {
+          root: true,
+        },
+        children: [node],
+      };
+    } else {
+      if (!node.props) {
+        node.props = {};
+      }
+      node.props.root = true;
+    }
     return {
       type: "Container",
       uid: "root",
@@ -81,7 +102,7 @@ export function AppRoot({
       uses: [],
       globalVars: globalVars || {},
     };
-  }, [node, globalVars]);
+  }, [asIsland, node, globalVars, contributes?.compoundComponents]);
 
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;

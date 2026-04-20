@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Daily Update</title>
+  <style>
+      /* Base Styles */
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          /*font-family: 'Comic Sans MS', cursive, sans-serif;*/
+          margin: 0;
+          padding: 0;
+          background-color: #f8f9fa;
+          color: #333;
+      }
+
+      /* Header */
+      header {
+          background-color: #2c3e50;
+          color: white;
+          padding: 20px 0;
+          text-align: center;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      header h1 {
+          margin: 0;
+          font-size: 2.5rem;
+          letter-spacing: 1px;
+      }
+
+      header p {
+          margin: 5px 0 0 0;
+          font-size: 1rem;
+          color: #bdc3c7;
+      }
+
+      /* Main Container */
+      .container {
+          max-width: 1200px;
+          margin: 40px auto;
+          padding: 0 20px;
+      }
+
+      /* News Grid Layout */
+      .news-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+          gap: 30px;
+      }
+
+      /* Individual News Card */
+      .news-card {
+          background: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .news-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+      }
+
+      .news-image {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+      }
+
+      .news-content {
+          padding: 20px;
+      }
+
+      .news-tag {
+          display: inline-block;
+          background-color: #e74c3c;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: bold;
+          margin-bottom: 10px;
+          text-transform: uppercase;
+      }
+
+      .news-title {
+          margin: 0 0 10px 0;
+          font-size: 1.4rem;
+          color: #2c3e50;
+          line-height: 1.3;
+      }
+
+      .news-excerpt {
+          margin: 0 0 20px 0;
+          color: #666;
+          line-height: 1.6;
+      }
+
+      .read-more {
+          display: inline-block;
+          text-decoration: none;
+          color: #3498db;
+          font-weight: bold;
+          border-bottom: 2px solid transparent;
+          transition: border-color 0.2s ease;
+      }
+
+      .read-more:hover {
+          border-bottom-color: #3498db;
+      }
+
+      /* Footer */
+      footer {
+          background-color: #2c3e50;
+          color: #bdc3c7;
+          text-align: center;
+          padding: 20px 0;
+          margin-top: 50px;
+      }
+  </style>
+</head>
+<body>
+<script type="module" src="/index.ts"></script>
+<header>
+  <h1>The Daily Update</h1>
+  <p>Your source for absolutely random, completely fictional news.</p>
+</header>
+
+<div class="container">
+  <div class="news-grid">
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/1025/400/300" alt="Dog in a field" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">Local</span>
+        <h2 class="news-title">Local Golden Retriever Elected Mayor in Landslide Victory</h2>
+        <p class="news-excerpt">Citizens of Oakhaven have spoken, electing a five-year-old Golden Retriever named "Barnaby" as their new mayor. His platform consisted entirely of belly rubs and extended park hours.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/42/400/300" alt="Coffee cup" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">Science</span>
+        <h2 class="news-title">Scientists Discover Coffee Bean That Never Goes Cold</h2>
+        <p class="news-excerpt">A team of researchers in Switzerland have bio-engineered a new strain of coffee bean that naturally maintains a perfect drinking temperature of 60°C indefinitely.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/532/400/300" alt="Night sky" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">Space</span>
+        <h2 class="news-title">Mars Colony Surpasses 1,000 Residents</h2>
+        <p class="news-excerpt">The Alpha Centauri base on Mars celebrated a major milestone today as the colony welcomed its 1,000th permanent resident. They marked the occasion with a low-gravity pizza party.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+    <div data-xmlui-src="./bio"></div>
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/119/400/300" alt="Old technology" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">Tech</span>
+        <h2 class="news-title">Gen Z Sparks Massive Flip Phone Revival</h2>
+        <p class="news-excerpt">Smartphone sales have plummeted this quarter as younger generations flock back to early-2000s flip phones in a bid to reclaim their attention spans and avoid group chats.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+    <div data-xmlui-src="./checkout-form"></div>
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/160/400/300" alt="Technology" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">AI</span>
+        <h2 class="news-title">New AI Model Masters the Art of the "Dad Joke"</h2>
+        <p class="news-excerpt">Tech giant's latest artificial intelligence project has reportedly achieved consciousness, but only uses it to deliver agonizing, perfectly-timed puns at social gatherings.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+    <article class="news-card">
+      <img src="https://picsum.photos/id/292/400/300" alt="Cooking" class="news-image">
+      <div class="news-content">
+        <span class="news-tag">World</span>
+        <h2 class="news-title">Global Pizza Shortage Narrowly Averted</h2>
+        <p class="news-excerpt">A sudden blight threatening the world's mozzarella supply was stopped in its tracks by a coalition of Italian grandmothers utilizing ancient, previously secret cheese-making techniques.</p>
+        <a href="#" class="read-more">Read Full Story &rarr;</a>
+      </div>
+    </article>
+
+  </div>
+</div>
+
+<footer>
+  <p>&copy; 2026 The Daily Update. All news is 100% fake and generated for fun.</p>
+</footer>
+
+</body>
+</html>

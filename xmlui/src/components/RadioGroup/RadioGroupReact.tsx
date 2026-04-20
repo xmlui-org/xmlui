@@ -185,6 +185,8 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
       const currentIndex = radios.indexOf(focused);
       if (currentIndex === -1) return;
 
+      e.preventDefault();
+
       const nextIndex = isNext
         ? (currentIndex + 1) % radios.length
         : (currentIndex - 1 + radios.length) % radios.length;
@@ -192,6 +194,7 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
       const nextValue = radios[nextIndex].getAttribute("value");
       if (nextValue != null) {
         onInputChange(nextValue);
+        radios[nextIndex].focus();
       }
     },
     [readOnly, enabled, orientation, onInputChange],

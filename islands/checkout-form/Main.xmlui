@@ -1,0 +1,11 @@
+<Theme tone="dark" fontFamily="Comic Sans MS" backgroundColor-Badge="violet">
+  <Card height="100%" title="XMLUI card here on my island">
+    <Form>
+      <FormItem bindTo="name" placeholder="Your name"/>
+      <FormItem bindTo="email" placeholder="example@something.com"/>
+    </Form>
+    <Button onClick="modal.open()">Open modal</Button>
+    <MyComp/>
+  </Card>
+  <ModalDialog id="modal" title="myModal"/>
+</Theme>
