@@ -26,6 +26,7 @@ import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemReact";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
@@ -86,7 +87,7 @@ export const defaultProps = {
 
 export const TextArea = forwardRef(function TextArea(
   {
-    id,
+    id: idProp,
     value = defaultProps.value,
     placeholder = defaultProps.placeholder,
     required = defaultProps.required,
@@ -121,6 +122,7 @@ export const TextArea = forwardRef(function TextArea(
   }: Props,
   forwardedRef: ForwardedRef<HTMLTextAreaElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const ref = forwardedRef ? composeRefs(forwardedRef, inputRef) : inputRef;

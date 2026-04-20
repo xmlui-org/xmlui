@@ -183,26 +183,34 @@ export function FormBindingWrapper({
   // Always wrap with ItemWithLabel if label is provided or inside a form
   // This ensures labels are displayed for components with bindTo prop even outside of Forms
   return (
-    <ItemWithLabel
-      id={formItemId}
-      labelPosition={labelPositionValue}
-      label={label}
-      labelWidth={labelWidthValue}
-      labelBreak={labelBreakValue}
-      enabled={isEnabled}
-      required={validations.required}
-      validationInProgress={validationInProgress}
-      onFocus={onFocus}
-      onBlur={onBlur}
-      style={style}
-      className={className}
-      cloneStyle={true}
-      validationResult={validationResult}
-      requireLabelMode={requireLabelMode ?? formRequireLabelMode}
-      layoutContext={layoutContext}
+    <FormItemContext.Provider
+      value={{
+        parentFormItemId,
+        isInsideFormItem: true,
+        inputId: formItemId,
+      }}
     >
-      {enhancedInput}
-    </ItemWithLabel>
+      <ItemWithLabel
+        id={formItemId}
+        labelPosition={labelPositionValue}
+        label={label}
+        labelWidth={labelWidthValue}
+        labelBreak={labelBreakValue}
+        enabled={isEnabled}
+        required={validations.required}
+        validationInProgress={validationInProgress}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+        className={className}
+        cloneStyle={true}
+        validationResult={validationResult}
+        requireLabelMode={requireLabelMode ?? formRequireLabelMode}
+        layoutContext={layoutContext}
+      >
+        {enhancedInput}
+      </ItemWithLabel>
+    </FormItemContext.Provider>
   );
 }
 

@@ -29,6 +29,7 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemReact";
 
 const PART_LIST_WRAPPER = "listWrapper";
 const PART_CLEAR_BUTTON = "clearButton";
@@ -250,7 +251,7 @@ const SelectTriggerActions = ({
 export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
     // Basic props
-    id,
+    id: idProp,
     initialValue,
     value,
     enabled = defaultProps.enabled,
@@ -307,6 +308,7 @@ export const Select = forwardRef<HTMLDivElement, SelectProps>(function Select(
   },
   forwardedRef,
 ) {
+  const id = useFormItemInputId(idProp);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const ariaLabelRef = useRef("");
   if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {

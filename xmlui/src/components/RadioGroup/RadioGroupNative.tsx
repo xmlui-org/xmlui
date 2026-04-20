@@ -23,6 +23,7 @@ import type { Option, OrientationOptions, ValidationStatus } from "../abstractio
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemNative";
 import { convertOptionValue } from "../Option/OptionNative";
+import { useFormItemInputId } from "../FormItem/FormItemReact";
 
 type RadioGroupProps = {
   id?: string;
@@ -76,7 +77,7 @@ const RadioGroupStatusContext = createContext<{
 
 export const RadioGroup = forwardRef(function RadioGroup(
   {
-    id,
+    id: idProp,
     value = defaultProps.value,
     initialValue = defaultProps.initialValue,
     autofocus,
@@ -103,6 +104,7 @@ export const RadioGroup = forwardRef(function RadioGroup(
   }: RadioGroupProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   const [focused, setFocused] = React.useState(false);
   const radioGroupRef = useRef<HTMLDivElement>(null);
 

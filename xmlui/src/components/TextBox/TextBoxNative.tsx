@@ -18,6 +18,7 @@ import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemReact";
 
 /**
  * TextBox component that supports text input with various configurations.
@@ -109,7 +110,7 @@ export const defaultProps: Pick<
 
 export const TextBox = forwardRef(function TextBox(
   {
-    id,
+    id: idProp,
     type = defaultProps.type,
     value = defaultProps.value,
     updateState = defaultProps.updateState,
@@ -146,6 +147,7 @@ export const TextBox = forwardRef(function TextBox(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // State to control password visibility

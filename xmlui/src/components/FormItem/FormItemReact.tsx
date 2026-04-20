@@ -102,9 +102,11 @@ export const defaultProps: Pick<
 export const FormItemContext = createContext<{
   parentFormItemId: string | null;
   isInsideFormItem: boolean;
+  inputId: string | null;
 }>({
   parentFormItemId: null,
   isInsideFormItem: false,
+  inputId: null,
 });
 
 /**
@@ -114,6 +116,20 @@ export const FormItemContext = createContext<{
 export function useIsInsideFormItem(): boolean {
   const context = useContext(FormItemContext);
   return context.isInsideFormItem;
+}
+
+/**
+ * Returns the DOM id an input component should apply to its focusable element so
+ * the FormItem label's `htmlFor` connects to the actual input.
+ *
+ * Priority: explicit `id` prop > `FormItemContext.inputId` (set by the surrounding
+ * FormItem/FormBindingWrapper so labels can target inputs even when rendered via
+ * a custom template) > local `useId()` fallback (for inputs outside a FormItem).
+ */
+export function useFormItemInputId(explicitId?: string): string {
+  const context = useContext(FormItemContext);
+  const fallbackId = useId();
+  return explicitId ?? context.inputId ?? fallbackId;
 }
 
 function ArrayLikeFormItem({
@@ -127,6 +143,7 @@ function ArrayLikeFormItem({
     return {
       parentFormItemId: formItemId,
       isInsideFormItem: true,
+      inputId: null,
     };
   }, [formItemId]);
 
@@ -218,6 +235,7 @@ export const FormItem = memo(forwardRef(function FormItem({
     regexInvalidSeverity,
   });
   const defaultId = useId();
+  const inputId = useId();
   const { parentFormItemId } = useContext(FormItemContext);
   const formItemId = useMemo(() => {
     if (formItemIdFromProps) {
@@ -532,13 +550,15 @@ export const FormItem = memo(forwardRef(function FormItem({
     () => ({
       parentFormItemId: formItemId ?? null,
       isInsideFormItem: true,
+      inputId,
     }),
-    [formItemId],
+    [formItemId, inputId],
   );
 
   return (
     <FormItemContext.Provider value={formItemContextValue}>
       <ItemWithLabel
+        id={inputId}
         labelPosition={labelPositionValue}
         label={label}
         labelWidth={labelWidthValue}

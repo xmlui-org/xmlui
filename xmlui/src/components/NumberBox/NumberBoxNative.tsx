@@ -4,7 +4,6 @@ import React, {
   forwardRef,
   useCallback,
   useEffect,
-  useId,
   useRef,
 } from "react";
 import classnames from "classnames";
@@ -36,6 +35,7 @@ import { PART_END_ADORNMENT, PART_INPUT, PART_START_ADORNMENT } from "../../comp
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemReact";
 
 const PART_SPINNER_UP = "spinnerUp";
 const PART_SPINNER_DOWN = "spinnerDown";
@@ -102,7 +102,7 @@ type Props = {
 
 export const NumberBox = forwardRef(function NumberBox(
   {
-    id,
+    id: idProp,
     value,
     initialValue,
     style,
@@ -143,8 +143,7 @@ export const NumberBox = forwardRef(function NumberBox(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
+  const id = useFormItemInputId(idProp);
   // --- Ensure the provided value is a number or null
 
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
