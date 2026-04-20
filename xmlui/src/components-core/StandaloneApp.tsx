@@ -130,6 +130,9 @@ type StandaloneAppProps = {
   waitForApiInterceptor?: boolean;
   helmetContext?: Record<string, unknown>;
   children?: ReactNode;
+
+  // --- When true, the app is rendered as an island (embedded into a host page).
+  asIsland?: boolean;
 };
 
 /**
@@ -140,6 +143,14 @@ type StandaloneAppProps = {
  * AppRoot is responsible for rendering the app (using an internal
  * representation); ApiInterceptor can emulate some backend functionality
  * running in the browser.
+ *
+ * Note: base styles (index.scss) are NOT imported here as a side-effect.
+ * Instead, the `RootClasses` component (ThemeReact.tsx) injects them as a
+ * `<style id="xmlui-base-styles">` tag prepended into the correct target
+ * (document.head for normal apps, shadow root for islands). This ensures
+ * the @layer declaration always evaluates first — before any Vite-injected
+ * component styles — and that island styles are fully scoped to their
+ * shadow root without leaking to the host page.
  */
 function StandaloneApp({
   srcBase,
@@ -1765,37 +1776,28 @@ export function startApp(
 
 export function startIslands(
   extensionManager: StandaloneExtensionManager = new StandaloneExtensionManager(),
-) {
+): () => void {
+  const roots: ReturnType<typeof ReactDOM.createRoot>[] = [];
 
   document.querySelectorAll("[data-xmlui-src]").forEach((el) => {
-    let contentRoot = null;
     const srcBase = el.getAttribute("data-xmlui-src");
-    console.log({ srcBase, el });
     // Create shadow DOM eagerly so ALL styles (including from the outer
     // React tree) are scoped from the very first render.  This prevents
     // any style leakage to the host page — even if future changes add
     // styled components to the provider layers above NestedApp.
     const shadowRoot = (el as HTMLElement).attachShadow({ mode: "open" });
-    contentRoot = ReactDOM.createRoot(shadowRoot);
-    contentRoot.render(
+    const root = ReactDOM.createRoot(shadowRoot);
+    roots.push(root);
+    root.render(
       <StyleInjectionTargetContext.Provider value={shadowRoot}>
         <StandaloneApp extensionManager={extensionManager} srcBase={srcBase} asIsland={true}/>
       </StyleInjectionTargetContext.Provider>
     );
   });
 
-  // extensionManager.registerExtension(extensions);
-  // let rootElement: HTMLElement | null = document.getElementById("root");
-  // if (!rootElement) {
-  //   rootElement = document.createElement("div");
-  //   rootElement.setAttribute("id", "root");
-  //   document.body.appendChild(rootElement);
-  // }
-  // if (!contentRoot) {
-  //   contentRoot = ReactDOM.createRoot(rootElement);
-  // }
-  // contentRoot.render(<StandaloneApp runtime={runtime} extensionManager={extensionManager} />);
-  // return contentRoot;
+  return () => {
+    roots.forEach((root) => root.unmount());
+  };
 }
 
 

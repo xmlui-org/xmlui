@@ -35,6 +35,9 @@ type NestedAppProps = {
   refreshVersion?: number;
   withSplashScreen?: boolean;
   className?: string;
+  resolvedApp?: ComponentDef | CompoundComponentDef;
+  resolvedComponents?: CompoundComponentDef[];
+  asIsland?: boolean;
 };
 
 function AnimatedLogo() {
@@ -168,55 +171,7 @@ export const NestedApp = memo(function NestedApp({
 
   useIsomorphicLayoutEffect(() => {
     if (!shadowRef.current && rootRef.current) {
-      // Clone existing style and link tags
       shadowRef.current = rootRef.current.attachShadow({ mode: "open" });
-      // let style = document.createElement("style");
-
-      // since we are using shadow DOM, we need to define the layers here
-      // to ensure that the styles are applied correctly (the adopted styleheets setting is asynchronous, so the layer order might not be respected if we don't do this)
-      // MUST BE IN SYNC WITH THE STYLESHEET ORDER IN index.scss
-      // style.innerHTML = "@layer reset, base, components, dynamic;";
-      // shadowRef.current.appendChild(style);
-
-      // // This should run once to prepare the stylesheets
-      // const sheetPromises = Array.from(document.styleSheets).map(async (sheet) => {
-      //   // Check if the owner element has the attribute you want to skip
-      //   if (
-      //     sheet.ownerNode &&
-      //     sheet.ownerNode instanceof Element &&
-      //     sheet.ownerNode.hasAttribute("data-style-hash")
-      //   ) {
-      //     return null; // Skip this stylesheet
-      //   }
-      //   // Can't access cross-origin sheets, so skip them
-      //   if (!sheet.href || sheet.href.startsWith(window.location.origin)) {
-      //     try {
-      //       // Create a new CSSStyleSheet object
-      //       const newSheet = new CSSStyleSheet();
-      //       // Get the CSS rules as text
-      //       const cssText = Array.from(sheet.cssRules)
-      //         .map((rule) => rule.cssText)
-      //         .join(" \n");
-      //       // Apply the text to the new sheet object
-      //       await newSheet.replace(cssText);
-      //       return newSheet;
-      //     } catch (e) {
-      //       // console.error('Could not process stylesheet:', sheet.href, e);
-      //       return null;
-      //     }
-      //   }
-      //   return null;
-      // });
-      //
-      // // When your component mounts and the shadow root is available...
-      // void Promise.all(sheetPromises).then((sheets) => {
-      //   // Filter out any sheets that failed to load
-      //   const validSheets = sheets.filter(Boolean);
-      //
-      //   // Apply the array of constructed stylesheets to the shadow root
-      //   // This is synchronous and does not trigger new network requests
-      //   shadowRef.current.adoptedStyleSheets = validSheets;
-      // });
     }
     if (!contentRootRef.current && shadowRef.current) {
       contentRootRef.current = ReactDOM.createRoot(shadowRef.current);
