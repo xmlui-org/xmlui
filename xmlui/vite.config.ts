@@ -11,7 +11,6 @@ import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
 // @ts-ignore
 import * as packageJson from "./package.json";
-import cssInjectedByJsPlugin from "vite-plugin-css-injected-by-js";
 
 export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -19,14 +18,13 @@ export default ({ mode = "lib" }) => {
   let define;
   let distSubDirName = "";
   switch (mode) {
-    case "standalone":
-    case "islands": {
-      distSubDirName = mode;
+    case "standalone": {
+      distSubDirName = "standalone";
       lib = {
-        entry: [path.resolve("src", `index-${mode}.ts`)],
+        entry: [path.resolve("src", "index-standalone.ts")],
         name: "xmlui",
         formats: ["umd"] as any,
-        fileName: (format: any) => `xmlui-${mode}.${format}.js`,
+        fileName: (format: any) => `xmlui-standalone.${format}.js`,
       };
       define = {
         "process.env": {
@@ -120,23 +118,7 @@ export default ({ mode = "lib" }) => {
       svgr(),
       ViteYaml(),
       ViteXmlui({}),
-      ...(mode === "standalone" || mode === "islands"
-        ? [
-            cssInjectedByJsPlugin({
-              injectCode: (cssCode) => {
-                return `
-      if (typeof window !== 'undefined') {
-        window.__XMLUI_STYLES__ = window.__XMLUI_STYLES__ || '';
-        window.__XMLUI_STYLES__ += ${cssCode};
-
-        // Dispatch an event so XMLUIRoot knows the styles are ready
-        window.dispatchEvent(new CustomEvent('xmlui-styles-loaded'));
-      }
-    `;
-              },
-            }),
-          ]
-        : [libInjectCss()]),
+      libInjectCss(),
       dts({ rollupTypes: true }),
     ] as Plugin[];
   }
@@ -195,7 +177,7 @@ export default ({ mode = "lib" }) => {
       rollupOptions: {
         treeshake: mode === "metadata" ? "smallest" : undefined,
         external:
-          mode === "standalone" || mode === "inspector-parser" || mode === "islands"
+          mode === "standalone" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
