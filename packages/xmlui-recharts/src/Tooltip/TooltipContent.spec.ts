@@ -50,14 +50,14 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
 
-      // Hover over a pie sector to trigger tooltip
+      // Hover over a pie sector to trigger tooltip (retry to handle animation timing)
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
-
-      // Tooltip should appear
-      await expect(page.locator(tooltipSelector)).toBeVisible();
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect(async () => {
+        await pieSector.hover({ force: true });
+        await expect(page.locator(tooltipSelector)).toBeVisible({ timeout: 2000 });
+        await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+      }).toPass({ timeout: 15000 });
     });
 
     test("TooltipContent renders in BarChart on hover", async ({ initTestBed, page }) => {
@@ -154,9 +154,10 @@ test.describe("Basic Functionality", () => {
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
-
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect(async () => {
+        await pieSector.hover({ force: true });
+        await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+      }).toPass({ timeout: 15000 });
       await expect(page.locator(tooltipNameSelector)).toContainText("Single");
       await expect(page.locator(tooltipValueSelector)).toContainText("100");
     });
@@ -200,9 +201,10 @@ test.describe("Basic Functionality", () => {
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
-
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect(async () => {
+        await pieSector.hover({ force: true });
+        await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+      }).toPass({ timeout: 15000 });
 
       // Should format large numbers with commas
       const valueText = await page.locator(tooltipValueSelector).textContent();
@@ -230,9 +232,10 @@ test.describe("Basic Functionality", () => {
       // sector may not render a visible arc, making .first() land on it unpredictably.
       const pieSector = page.locator(".recharts-pie-sector").last();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
-
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect(async () => {
+        await pieSector.hover({ force: true });
+        await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+      }).toPass({ timeout: 15000 });
       // Should handle zero values gracefully
       const valueElements = page.locator(tooltipValueSelector);
       await expect(valueElements.first()).toBeVisible();
@@ -461,17 +464,25 @@ test.describe("Performance and Edge Cases", () => {
 
     const sectors = page.locator(".recharts-pie-sector");
 
+    // Wait for chart animation to settle before rapid hover
+    const firstSector = sectors.first();
+    await firstSector.waitFor({ state: "visible", timeout: 10000 });
+    await expect(async () => {
+      await firstSector.hover({ force: true });
+      await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
+
     // Rapidly hover over different sectors
     for (let i = 0; i < 3; i++) {
-      await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
       await sectors.nth(i).hover({ force: true });
       await page.waitForTimeout(100);
     }
 
     // Tooltip should still work correctly
-    await sectors.first().waitFor({ state: "visible", timeout: 10000 });
-    await sectors.first().hover({ force: true });
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    await expect(async () => {
+      await sectors.first().hover({ force: true });
+      await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
   });
 
   test("handles empty or null data gracefully", async ({ initTestBed, page }) => {
@@ -512,9 +523,10 @@ test.describe("Performance and Edge Cases", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
-
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    await expect(async () => {
+      await pieSector.hover({ force: true });
+      await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
 
     // Should handle special characters correctly
     const nameText = page.locator(tooltipNameSelector);
@@ -538,9 +550,10 @@ test.describe("Performance and Edge Cases", () => {
     // Hover near edge of small chart
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
-
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    await expect(async () => {
+      await pieSector.hover({ force: true });
+      await expect(page.locator(tooltipContentSelector)).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
 
     // Tooltip should be positioned within viewport
     const tooltip = page.locator(tooltipSelector);

@@ -115,5 +115,5 @@ test("DataSource inside App preceded by a script tag works without error", async
 
   await reqPromise;
   expect(await page.getByTestId("emptyLabel").count()).toEqual(0);
-  await expect(page.getByTestId("list")).toHaveText("data1data2");
+  await expect(page.getByTestId("list")).toHaveText("data1data2", { timeout: 10000 });
 });

@@ -1,9 +1,0 @@
-{
-    "name": "Tutorial",
-    "version": "0.0.1",
-    "resources": {
-        "logo": "resources/xmlui-logo.svg",
-        "favicon": "resources/favicon.ico"
-    },
-    "themes": []
-}

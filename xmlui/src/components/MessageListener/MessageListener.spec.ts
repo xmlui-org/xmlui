@@ -101,6 +101,11 @@ test.describe("Basic Functionality", () => {
       </VStack>
     `);
 
+    // Wait for all elements to be visible and laid out before measuring
+    await expect(page.getByTestId("item1")).toBeVisible();
+    await expect(page.getByTestId("item2")).toBeVisible();
+    await expect(page.getByTestId("item3")).toBeVisible();
+
     const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
     const { top: item2Top } = await getBounds(page.getByTestId("item2"));
     const { bottom: item2Bottom } = await getBounds(page.getByTestId("item2"));
