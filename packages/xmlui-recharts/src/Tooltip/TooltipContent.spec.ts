@@ -377,13 +377,12 @@ test.describe("Accessibility", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
 
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
-
-    // Tooltip content should be accessible
     const tooltipContent = page.locator(tooltipContentSelector);
-    await expect(tooltipContent).toBeVisible();
+    await expect(async () => {
+      await pieSector.hover({ force: true });
+      await expect(tooltipContent).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
 
     // Text content should be readable
     const nameText = page.locator(tooltipNameSelector);
@@ -474,7 +473,9 @@ test.describe("Performance and Edge Cases", () => {
 
     // Rapidly hover over different sectors
     for (let i = 0; i < 3; i++) {
-      await sectors.nth(i).hover({ force: true });
+      await expect(async () => {
+        await sectors.nth(i).hover({ force: true });
+      }).toPass({ timeout: 5000 });
       await page.waitForTimeout(100);
     }
 
