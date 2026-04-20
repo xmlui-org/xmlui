@@ -2,34 +2,25 @@ import { memo, Fragment } from "react";
 import { Icon, LinkNative, useLinkInfo, type NavHierarchyNode } from "xmlui";
 import styles from "./Breadcrumbs.module.scss";
 
-type BreadcrumbItem = Pick<NavHierarchyNode, "label" | "to">;
+export type BreadcrumbItem = { label: string; to?: string };
 
 type Props = {
-  useDefault?: boolean;
+  defaultItems?: BreadcrumbItem[];
 };
-
-export const defaultProps: Required<Pick<Props, "useDefault">> = {
-  useDefault: false,
-};
-
-const DEFAULT_ITEMS: BreadcrumbItem[] = [
-  { label: "Documentation", to: "/docs" },
-  { label: "Learn XMLUI", to: "/docs/learn" },
-  { label: "Introduction" },
-];
 
 function buildItems(linkInfo: NavHierarchyNode | undefined): BreadcrumbItem[] {
   const root: BreadcrumbItem = { label: "Documentation", to: "/docs" };
   if (!linkInfo?.label) return [root];
-  const segments = (linkInfo.pathSegments || []).filter((s) => s?.label);
+  const segments = (linkInfo.pathSegments || [])
+    .filter((s) => s?.label)
+    .map((s) => ({ label: s.label!, to: s.to }));
   return [root, ...segments, { label: linkInfo.label, to: linkInfo.to }];
 }
 
-export const Breadcrumbs = memo(function Breadcrumbs({
-  useDefault = defaultProps.useDefault,
-}: Props) {
+export const Breadcrumbs = memo(function Breadcrumbs({ defaultItems }: Props) {
   const linkInfo = useLinkInfo();
-  const items = useDefault ? DEFAULT_ITEMS : buildItems(linkInfo);
+  const items =
+    defaultItems && defaultItems.length > 0 ? defaultItems : buildItems(linkInfo);
 
   return (
     <nav aria-label="Breadcrumb" className={styles.breadcrumbs}>

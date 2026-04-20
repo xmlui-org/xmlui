@@ -1,6 +1,6 @@
 import { createMetadata, parseScssVar, wrapComponent, type ComponentMetadata } from "xmlui";
 import styles from "./Breadcrumbs.module.scss";
-import { Breadcrumbs, defaultProps } from "./BreadcrumbsNative";
+import { Breadcrumbs } from "./BreadcrumbsNative";
 
 const COMP = "Breadcrumbs";
 
@@ -10,12 +10,12 @@ export const BreadcrumbsMd: ComponentMetadata = createMetadata({
     "Breadcrumb navigation rendered from the current route's `linkInfo` " +
     "(label and `pathSegments`).",
   props: {
-    useDefault: {
+    defaultItems: {
       description:
-        "When true, shows a static `Documentation > Learn XMLUI > Introduction` " +
-        "trail. Use this on landing pages where no route-specific `linkInfo` is available.",
-      valueType: "boolean",
-      defaultValue: defaultProps.useDefault,
+        "Explicit list of breadcrumb items `{ label, to? }`. When provided and " +
+        "non-empty, these items are rendered instead of deriving the trail from " +
+        "the current route's `linkInfo`. The last item is rendered as the current " +
+        "(non-link) page.",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -28,6 +28,4 @@ export const BreadcrumbsMd: ComponentMetadata = createMetadata({
   },
 });
 
-export const breadcrumbsRenderer = wrapComponent(COMP, Breadcrumbs, BreadcrumbsMd, {
-  booleans: ["useDefault"],
-});
+export const breadcrumbsRenderer = wrapComponent(COMP, Breadcrumbs, BreadcrumbsMd);

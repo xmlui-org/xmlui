@@ -1194,7 +1194,11 @@
             <Page url="/docs">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/intro.md']}"
-                    useDefault="{true}"
+                    defaultItems="{[
+                        { label: 'Documentation', to: '/docs' },
+                        { label: 'Learn XMLUI', to: '/docs/learn' },
+                        { label: 'Introduction' }
+                    ]}"
                 />
             </Page>
             <Page url="/docs/reactive-intro">
