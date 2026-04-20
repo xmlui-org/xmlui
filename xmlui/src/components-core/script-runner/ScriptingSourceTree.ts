@@ -406,7 +406,8 @@ export type BinaryOpSymbols =
   | "&&"
   | "||"
   | "??"
-  | "in";
+  | "in"
+  | "instanceof";
 
 export type AssignmentSymbols =
   | "="

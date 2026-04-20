@@ -20,9 +20,9 @@ const { useDropzone } = dropzone;
 
 type Props = {
   children: ReactNode;
-  onUpload: (files: File[]) => void;
+  onUpload?: (files: File[]) => void;
   uid?: string;
-  registerComponentApi: RegisterComponentApiFn;
+  registerComponentApi?: RegisterComponentApiFn;
   style?: CSSProperties;
   className?: string;
   allowPaste?: boolean;

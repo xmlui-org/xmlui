@@ -721,13 +721,13 @@ export const PdfNative = memo(forwardRef<HTMLDivElement, PdfNativeProps>(
         signerFontIndex: signature.signerFontIndex ?? 0,
       });
       // Apply signature image to the annotation value with metadata
-      const next = internalAnnotationsRef.current.map(a =>
+      const next = internalAnnotationsRef.current.map((a): Annotation =>
         a.id === fieldId
           ? {
               ...a,
               value: signature.data,
               properties: {
-                ...(a.properties || {}),
+                ...a.properties,
                 signerDate: now,
               },
               modified: new Date(),
@@ -746,13 +746,13 @@ export const PdfNative = memo(forwardRef<HTMLDivElement, PdfNativeProps>(
       
       signatureMethodsRef.current.clearSignature(fieldId);
       signatureMetaRef.current.delete(fieldId);
-      const next = internalAnnotationsRef.current.map(a =>
+      const next = internalAnnotationsRef.current.map((a): Annotation =>
         a.id === fieldId
           ? {
               ...a,
               value: undefined,
               properties: {
-                ...(a.properties || {}),
+                ...a.properties,
                 signerName: undefined,
                 signerFontIndex: undefined,
                 signerDate: undefined,
