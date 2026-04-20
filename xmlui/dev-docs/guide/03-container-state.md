@@ -33,6 +33,27 @@ Using `uses="[]"` (empty array) creates a full state boundary: no parent state f
 
 <!-- DIAGRAM: Two side-by-side trees. Left: implicit container inheriting all parent variables. Right: explicit container with uses=["count"] filtering parent state to only "count". -->
 
+```mermaid
+graph TB
+  subgraph Left["Implicit — inherits ALL parent state"]
+    direction TB
+    P1["App<br>var.count=0, var.name='Alice'"]
+    subgraph C1["Stack (implicit container)"]
+      V1["sees count=0<br>sees name='Alice'"]
+    end
+    P1 --> C1
+  end
+
+  subgraph Right["Explicit — uses=['count'] only"]
+    direction TB
+    P2["App<br>var.count=0, var.name='Alice'"]
+    subgraph C2["Stack (uses=['count'])"]
+      V2["sees count=0<br>name is blocked"]
+    end
+    P2 -->|"filters to count"| C2
+  end
+```
+
 ## State Composition: The 6 Layers
 
 `StateContainer` composes the final state object from six sources. Each layer can shadow keys from earlier layers.
@@ -119,6 +140,23 @@ The no-op optimisation is important: if you write `count = count` (same value), 
 
 <!-- DIAGRAM: Flow from user mutation → proxy set trap → callback → statePartChanged → dispatch → reducer → re-render -->
 
+```mermaid
+sequenceDiagram
+  actor User
+  participant Proxy
+  participant statePartChanged
+  participant Reducer
+  participant React
+
+  User->>Proxy: count = count + 1
+  Proxy->>Proxy: compare old vs new value
+  Proxy->>statePartChanged: callback(["count"], newVal)
+  statePartChanged->>statePartChanged: find owning container
+  statePartChanged->>Reducer: dispatch STATE_PART_CHANGED
+  Reducer->>React: produces new state (Immer)
+  React->>React: re-render
+```
+
 ## Mutation Routing
 
 When the proxy callback fires, `statePartChanged` in `StateContainer` decides where to send the mutation:
@@ -131,6 +169,50 @@ When the proxy callback fires, `statePartChanged` in `StateContainer` decides wh
 4. **Otherwise** → If `uses` includes the key, bubble to parent. If not, the mutation is dropped (no owner found).
 
 This routing ensures that only the container that owns a variable processes its updates. Children receive parent state as a reference prop, not a copy — when the owning container's reducer produces a new state object, all children see the updated reference on the next render.
+
+### Example: Variable Ownership and Reference Passing
+
+Consider the following code snippet:
+
+```xml
+<App var.x="{0}">
+  <Text var.y="{'hello'}">
+    {x}
+  </Text>
+</App>
+```
+
+`App` owns `x`; `Text` owns `y`. `TextContainer` receives `x` via **Layer 1 (inherited parent state)** as a stable reference to the same object held by `AppContainer` — no copy is made. If an event handler inside `Text` writes `x = newVal`, the proxy intercepts the write, finds that `x` is not a local variable of `TextContainer`, and bubbles the mutation up to `AppContainer`'s reducer. `AppContainer` fires `STATE_PART_CHANGED`, Immer produces a new state object, and `TextContainer` sees the updated value on the next render. There is exactly one owner of `x` at all times.
+
+```mermaid
+graph TD
+  subgraph AppContainer["AppContainer (implicit) — owns x"]
+    direction TB
+    AppOwned["owned state<br>x = 0"]
+
+    subgraph AppComp["&lt;App&gt;"]
+      direction TB
+      AppVarDecl["var.x = '{0}'"]
+
+      subgraph TextContainer["TextContainer (implicit) — owns y"]
+        direction TB
+        TextL5["local state<br>y = 'hello'"]
+
+        subgraph TextComp["&lt;Text&gt;"]
+          direction TB
+          TextVarDecl["var.y = 'hello'"]
+          TextRender(["renders {x} → 0"])
+        end
+
+      end
+    end
+
+    AppOwned -->|"is declared as"| AppVarDecl
+    AppOwned -->|"inherited parent state with stable ref (not a copy)"| TextRender
+    TextL5 -->|"is declared as"| TextVarDecl
+    TextRender -.->|"write x = 1 → bubbles up to owner (state)"| AppOwned
+  end
+```
 
 ## The Event Handler Subsystem
 
