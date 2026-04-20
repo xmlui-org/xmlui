@@ -1,0 +1,6 @@
+interface:
+  display_name: "XMLUI Setup"
+  short_description: "Install XMLUI CLI, configure MCP, and scaffold a project"
+
+policy:
+  allow_implicit_invocation: false
