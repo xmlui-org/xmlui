@@ -120,9 +120,11 @@ export default ({ mode = "lib" }) => {
       svgr(),
       ViteYaml(),
       ViteXmlui({}),
-      cssInjectedByJsPlugin({
-        injectCode: (cssCode) => {
-          return `
+      ...(mode === "standalone" || mode === "islands"
+        ? [
+            cssInjectedByJsPlugin({
+              injectCode: (cssCode) => {
+                return `
       if (typeof window !== 'undefined') {
         window.__XMLUI_STYLES__ = window.__XMLUI_STYLES__ || '';
         window.__XMLUI_STYLES__ += ${cssCode};
@@ -131,8 +133,10 @@ export default ({ mode = "lib" }) => {
         window.dispatchEvent(new CustomEvent('xmlui-styles-loaded'));
       }
     `;
-        },
-      }),
+              },
+            }),
+          ]
+        : [libInjectCss()]),
       dts({ rollupTypes: true }),
     ] as Plugin[];
   }

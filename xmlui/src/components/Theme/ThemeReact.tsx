@@ -349,7 +349,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
     if (typeof document !== "undefined") {
       const insideShadowRoot = domRoot instanceof ShadowRoot;
 
-      const target: HTMLElement = insideShadowRoot ? domRoot.getRootNode() : document.head;
+      const target: HTMLElement | ShadowRoot = insideShadowRoot ? domRoot : document.head;
       // 2. FORCE BASE STYLES TO THE TOP using a physical <style> tag
       // We do NOT use adoptedStyleSheets here to ensure the @layer declaration evaluates first.
       if (!target.querySelector(`#${STYLE_ID}`)) {
@@ -383,13 +383,17 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
             m.forEach((mu) => mu.addedNodes.forEach(syncDevStyles)),
           );
           observer.observe(document.head, { childList: true });
-          return () => observer.disconnect();
+          return () => {
+            observer.disconnect();
+            documentElement.classList.remove(...classNames);
+            portalContainer?.classList.remove(...classNames);
+          };
         }
       }
 
       // *** RISK, needs a lot of review
       const applyRegistryStyles = () => {
-        if (!window.__XMLUI_STYLES__) return;
+        if (!(window as any).__XMLUI_STYLES__) return;
 
         let styleTag = target.querySelector(`#${PROD_STYLE_ID}`);
         if (!styleTag) {
@@ -398,7 +402,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
           // Append so it evaluates after the prepended baseStyles
           target.appendChild(styleTag);
         }
-        styleTag.textContent = window.__XMLUI_STYLES__;
+        styleTag.textContent = (window as any).__XMLUI_STYLES__;
       };
 
       // Apply immediately if available

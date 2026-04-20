@@ -157,7 +157,6 @@ export const RootThemeDefinition: ThemeDefinition = {
     "textColor-attention": "$color-danger-600",
     "textColor-subtitle": "$color-surface-500",
     "textColor--disabled": "$color-surface-500",
-    "textColor": "$textColor-primary",
 
     // --- Default background colors (component use these values as their defaults)
     "backgroundColor-primary": "$color-surface-50",
