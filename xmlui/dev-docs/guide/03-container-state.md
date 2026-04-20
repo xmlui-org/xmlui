@@ -471,38 +471,3 @@ graph TD
 ```
 
 `TextInput` itself has no container — it is stateless. It delegates `registerComponentApi` upward to `AppContainer`. When the button's `onClick` evaluates `myInput.focus()`, the framework looks up `myInput` in the combined state at Layer 3 and calls the registered method directly on the underlying DOM element.
-
-### Example: Mutation Persistence
-
-`var.foo="{expr}"` re-evaluates `expr` on **every render** from scratch (Layer 5). The first time a handler writes `foo = newVal`, the new value enters the reducer at **Layer 2**. Because Layer 2 always wins over Layer 5, the expression result is permanently overshadowed — until the container unmounts and remounts.
-
-```xml
-<App var.label="{defaultLabel}">
-  <Button onClick="label = 'Custom'" label="Override" />
-  <Text>{label}</Text>
-</App>
-```
-
-```mermaid
-sequenceDiagram
-  participant Expr as Layer 5 expression<br>label = defaultLabel
-  participant Reducer as Layer 2 reducer state
-  participant Combined as combined state
-  participant Text
-
-  Note over Expr,Text: Initial render — no mutation yet
-  Expr->>Combined: label = 'Default' (Layer 5 wins, Layer 2 empty)
-  Combined->>Text: renders 'Default'
-
-  Note over Expr,Text: User clicks Override
-  Reducer->>Combined: label = 'Custom' (Layer 2 now set)
-  Note over Combined: Layer 2 shadows Layer 5
-  Combined->>Text: renders 'Custom'
-
-  Note over Expr,Text: Any subsequent render
-  Expr->>Expr: re-evaluates → still 'Default'
-  Reducer->>Combined: label = 'Custom' (Layer 2 still wins)
-  Combined->>Text: renders 'Custom' — expression result ignored
-```
-
-This is why mutations persist across re-renders even though expressions re-evaluate every time. The only way to reset `label` back to the expression result is to dispatch a write that explicitly sets it back to `defaultLabel`, which replaces the Layer 2 value.
