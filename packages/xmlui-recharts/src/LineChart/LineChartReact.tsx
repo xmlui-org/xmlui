@@ -7,16 +7,16 @@ import {
   Legend as RLegend,
   YAxis,
 } from "recharts";
-import type { ForwardedRef, ReactNode } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ForwardedRef, ReactNode, HTMLAttributes } from "react";
 import type React from "react";
-import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "xmlui";
 import classnames from "classnames";
 import styles from "./LineChart.module.scss";
 
-export type LineChartProps = {
+export type LineChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
   dataKeys: string[];
   nameKey: string;
@@ -63,7 +63,8 @@ const defaultChartParams = {
   chartWidth: 800,
 };
 
-export const LineChart = forwardRef(function LineChart(
+export const LineChart = memo(
+  forwardRef(function LineChart(
   {
     data,
     dataKeys = [],
@@ -80,9 +81,10 @@ export const LineChart = forwardRef(function LineChart(
     children,
     showLegend = defaultProps.showLegend,
     tooltipRenderer,
+    ...rest
   }: LineChartProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
-) {
+  ) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -154,7 +156,7 @@ export const LineChart = forwardRef(function LineChart(
             payloadArray.push({
               label: dataKey,
               value: originalPayload[dataKey],
-              color: colorValues[index] || colorValues[0],
+              color: colorValues[index] || colorValues[0] || "",
             });
           }
         });
@@ -231,8 +233,7 @@ export const LineChart = forwardRef(function LineChart(
               ))
           : null}
       </div>
-      <div
-        ref={forwardedRef}
+      <div        {...rest}        ref={forwardedRef}
         className={classnames(className, styles.wrapper)}
         style={{ flexGrow: 1, ...style }}
       >
@@ -296,4 +297,5 @@ export const LineChart = forwardRef(function LineChart(
       </div>
     </ChartProvider>
   );
-});
+}),
+);

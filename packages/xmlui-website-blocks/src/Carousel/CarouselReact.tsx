@@ -1,19 +1,16 @@
 import * as React from "react";
 import type { CSSProperties, ForwardedRef } from "react";
-import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useRef, useState } from "react";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
 import styles from "./Carousel.module.scss";
 
 import type { RegisterComponentApiFn } from "xmlui";
-import { Icon } from "xmlui";
+import { Icon, COMPONENT_PART_KEY } from "xmlui";
 import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
-
-// Matches the COMPONENT_PART_KEY constant from xmlui internals
-const COMPONENT_PART_KEY = "-component";
 
 const noop = () => {};
 export type OrientationOptions = "horizontal" | "vertical";
@@ -63,7 +60,8 @@ export const defaultProps: Pick<
   stopAutoplayOnInteraction: true,
 };
 
-export const CarouselComponent = forwardRef(function CarouselComponent(
+export const CarouselComponent = memo(
+  forwardRef(function CarouselComponent(
   {
     orientation = defaultProps.orientation,
     children,
@@ -91,7 +89,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [plugins, setPlugins] = useState<NonNullable<Parameters<typeof useEmblaCarousel>[1]>>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const { carouselContextValue, carouselItems } = useCarouselContextValue(indicators ?? true);
-  const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
+  const ref = useComposedRefs(referenceElement, forwardedRef);
 
   const [carouselRef, api] = useEmblaCarousel(
     {
@@ -222,6 +220,9 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     if (referenceElement?.current) {
       referenceElement.current.addEventListener("keydown", handleKeyDown);
     }
+    return () => {
+      referenceElement.current?.removeEventListener("keydown", handleKeyDown);
+    };
   }, [ref, handleKeyDown]);
 
   return (
@@ -296,4 +297,5 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
       </div>
     </CarouselContext.Provider>
   );
-});
+}),
+);

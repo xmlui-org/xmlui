@@ -1,75 +1,87 @@
 import {
-  RadarChart as RRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
+  AreaChart as RAreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
   ResponsiveContainer,
   Tooltip,
   Legend as RLegend,
 } from "recharts";
 
-import type { ReactNode} from "react";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useMemo } from "react";
+import type { ReactNode, ForwardedRef, HTMLAttributes, MutableRefObject } from "react";
+import { useEffect, useRef, useState, useCallback, forwardRef, memo, useMemo } from "react";
+import classnames from "classnames";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
+
 import { useTheme } from "xmlui";
 
-export type RadarChartProps = {
+export type AreaChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
   nameKey: string;
   dataKeys?: string[];
   className?: string;
-  hideGrid?: boolean;
-  hideAngleAxis?: boolean;
-  hideRadiusAxis?: boolean;
+  hideTickX?: boolean;
+  hideTickY?: boolean;
+  hideX?: boolean;
+  hideY?: boolean;
   hideTooltip?: boolean;
+  tickFormatterX?: (value: any) => any;
+  tickFormatterY?: (value: any) => any;
   children?: ReactNode;
   showLegend?: boolean;
-  filled?: boolean;
-  strokeWidth?: number;
-  fillOpacity?: number;
+  stacked?: boolean;
+  curved?: boolean;
   tooltipRenderer?: (tooltipData: any) => ReactNode;
 };
 
 export const defaultProps: Pick<
-  RadarChartProps,
-  | "hideGrid"
-  | "hideAngleAxis"
-  | "hideRadiusAxis"
+  AreaChartProps,
+  | "hideTickX"
+  | "hideTickY"
+  | "hideX"
+  | "hideY"
   | "hideTooltip"
+  | "tickFormatterX"
+  | "tickFormatterY"
   | "showLegend"
-  | "filled"
-  | "strokeWidth"
-  | "fillOpacity"
+  | "stacked"
+  | "curved"
 > = {
-  hideGrid: false,
-  hideAngleAxis: false,
-  hideRadiusAxis: false,
+  hideTickX: false,
+  hideTickY: false,
+  hideX: false,
+  hideY: false,
   hideTooltip: false,
+  tickFormatterX: (value) => value,
+  tickFormatterY: (value) => value,
   showLegend: false,
-  filled: true,
-  strokeWidth: 2,
-  fillOpacity: 0.3,
+  stacked: false,
+  curved: false,
 };
 
-export function RadarChart({
+export const AreaChart = memo(
+  forwardRef(function AreaChart({
   data = [],
   nameKey,
   dataKeys = [],
-  hideGrid = defaultProps.hideGrid,
-  hideAngleAxis = defaultProps.hideAngleAxis,
-  hideRadiusAxis = defaultProps.hideRadiusAxis,
+  hideTickX = defaultProps.hideTickX,
+  hideTickY = defaultProps.hideTickY,
+  hideY = defaultProps.hideY,
+  hideX = defaultProps.hideX,
   hideTooltip = defaultProps.hideTooltip,
+  tickFormatterX = defaultProps.tickFormatterX,
+  tickFormatterY = defaultProps.tickFormatterY,
   className,
   children,
   showLegend = defaultProps.showLegend,
-  filled = defaultProps.filled,
-  strokeWidth = defaultProps.strokeWidth,
-  fillOpacity = defaultProps.fillOpacity,
+  stacked = defaultProps.stacked,
+  curved = defaultProps.curved,
   tooltipRenderer,
-}: RadarChartProps) {
+  style,
+  ...rest
+}: AreaChartProps, ref: ForwardedRef<HTMLDivElement>) {
   // Validate and normalize data
   const validData = Array.isArray(data) ? data : [];
   const { getThemeVar } = useTheme();
@@ -106,42 +118,53 @@ export function RadarChart({
   }, [colorValues, dataKeys]);
 
   const chartContextValue = useChartContextValue({ dataKeys, nameKey });
-  
-  // Process data and create radar elements based on dataKeys
-  const radarElements = useMemo(() => {
+
+  // Process data and create chart elements based on dataKeys
+  const chartElements = useMemo(() => {
     return dataKeys.map((key, index) => {
       const color = colorValues[index % colorValues.length];
-      
+
       return (
-        <Radar
+        <Area
           key={key}
-          name={key}
           dataKey={key}
+          fill={color}
           stroke={color}
-          fill={filled ? color : "none"}
-          fillOpacity={filled ? fillOpacity : 0}
-          strokeWidth={strokeWidth}
+          fillOpacity={0.6}
+          strokeWidth={2}
+          type={curved ? "monotone" : "linear"}
+          stackId={stacked ? "1" : undefined}
         />
       );
     });
-  }, [dataKeys, colorValues, filled, fillOpacity, strokeWidth]);
+  }, [dataKeys, colorValues, curved, stacked]);
 
   // Handle responsive behavior
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setContainerSize({ width, height });
-      }
-    };
-
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    const el = containerRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setContainerSize({ width, height });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
+
+  const setDivRef = useCallback(
+    (el: HTMLDivElement | null) => {
+      containerRef.current = el;
+      if (typeof ref === "function") {
+        ref(el);
+      } else if (ref) {
+        (ref as MutableRefObject<HTMLDivElement | null>).current = el;
+      }
+    },
+    [ref],
+  );
 
   // Determine if we're in mini mode (very small container)
   const isMiniMode = containerSize.height < 150;
@@ -170,30 +193,27 @@ export function RadarChart({
 
   return (
     <ChartProvider value={chartContextValue}>
-      <div ref={containerRef} className={className}>
+      <div {...rest} ref={setDivRef} className={classnames(className)} style={style}>
         <ResponsiveContainer width="100%" height="100%">
-          <RRadarChart data={validData}>
-            {!hideGrid && <PolarGrid />}
-            {!hideAngleAxis && (
-              <PolarAngleAxis
+          <RAreaChart data={validData}>
+            {!hideX && (
+              <XAxis
                 dataKey={nameKey}
+                tick={!hideTickX}
+                tickFormatter={tickFormatterX}
                 hide={isMiniMode}
               />
             )}
-            {!hideRadiusAxis && (
-              <PolarRadiusAxis
-                hide={isMiniMode}
-              />
-            )}
-            {!isMiniMode && !hideTooltip && (
-              <Tooltip content={safeTooltipRenderer} />
-            )}
+            {!hideY && <YAxis tick={!hideTickY} tickFormatter={tickFormatterY} hide={isMiniMode} />}
+            <CartesianGrid strokeDasharray="3 3" />
+            {!isMiniMode && !hideTooltip && <Tooltip content={safeTooltipRenderer} />}
             {showLegend && !isMiniMode && <RLegend />}
-            {radarElements}
+            {chartElements}
             {children}
-          </RRadarChart>
+          </RAreaChart>
         </ResponsiveContainer>
       </div>
     </ChartProvider>
   );
-}
+}),
+);

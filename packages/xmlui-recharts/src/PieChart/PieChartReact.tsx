@@ -9,8 +9,8 @@ import {
 } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 import styles from "./PieChartNative.module.scss";
-import type { CSSProperties, ReactNode } from "react";
-import { useMemo, useRef, useEffect, useState } from "react";
+import type { CSSProperties, MutableRefObject, ReactNode, ForwardedRef, HTMLAttributes } from "react";
+import { useMemo, useRef, useEffect, useState, forwardRef, memo, useCallback } from "react";
 import type { LabelPosition } from "recharts/types/component/Label";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 
@@ -18,7 +18,7 @@ import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "xmlui";
 import classnames from "classnames";
 
-export type PieChartProps = {
+export type PieChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
   dataKey: string;
   nameKey: string;
@@ -109,7 +109,8 @@ const renderActiveShape = (props: PieSectorDataItem) => {
   );
 };
 
-export function PieChart({
+export const PieChart = memo(
+  forwardRef(function PieChart({
   data,
   dataKey,
   nameKey,
@@ -122,7 +123,8 @@ export function PieChart({
   children,
   outerRadius, // no default; we'll compute when undefined or "auto"
   showLegend = defaultProps.showLegend,
-}: PieChartProps) {
+  ...rest
+}: PieChartProps, ref: ForwardedRef<HTMLDivElement>) {
   const { getThemeVar } = useTheme();
 
   const colorValues = useMemo(() => {
@@ -178,6 +180,12 @@ export function PieChart({
 
   // --- measurement for auto radius ---
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  // Combine the forwarded ref with the internal wrapperRef for ResizeObserver
+  const setDivRef = useCallback((el: HTMLDivElement | null) => {
+    wrapperRef.current = el;
+    if (typeof ref === "function") ref(el);
+    else if (ref) (ref as MutableRefObject<HTMLDivElement | null>).current = el;
+  }, [ref]);
   const [box, setBox] = useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   useEffect(() => {
@@ -223,7 +231,7 @@ export function PieChart({
   return (
     <ChartProvider value={chartContextValue}>
       {children}
-      <div ref={wrapperRef} className={classnames(styles.wrapper, className)} style={style}>
+      <div {...rest} ref={setDivRef} className={classnames(styles.wrapper, className)} style={style}>
         <ResponsiveContainer width="100%" height="100%" minWidth={0}>
           <RPieChart
             margin={{ top: 8, right: 8, bottom: labelsOutside ? 16 : 8, left: 8 }}
@@ -259,4 +267,5 @@ export function PieChart({
       </div>
     </ChartProvider>
   );
-}
+}),
+);

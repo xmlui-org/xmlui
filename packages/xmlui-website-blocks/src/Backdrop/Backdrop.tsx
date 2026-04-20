@@ -2,7 +2,7 @@ import styles from "./Backdrop.module.scss";
 
 import { wrapComponent, createMetadata, dComponent, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { Backdrop } from "./BackdropNative";
+import { Backdrop } from "./BackdropReact";
 
 const COMP = "Backdrop";
 

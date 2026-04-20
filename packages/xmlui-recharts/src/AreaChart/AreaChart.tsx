@@ -1,4 +1,4 @@
-import { AreaChart, defaultProps } from "./AreaChartNative";
+import { AreaChart, defaultProps } from "./AreaChartReact";
 import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "AreaChart";

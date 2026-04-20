@@ -1,7 +1,7 @@
 import styles from "./LabelList.module.scss";
 import type { LabelPosition } from "recharts/types/component/Label";
 import type { CSSProperties } from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, memo } from "react";
 import { LabelList as RLabelList } from "recharts";
 import { useChart, useLabelList } from "../utils/ChartProvider";
 import classnames from "classnames";
@@ -17,7 +17,7 @@ export const defaultProps: Pick<Props, "position"> = {
   position: "inside",
 };
 
-export const LabelList = ({ position = defaultProps.position, nameKey: key, style, className }: Props) => {
+export const LabelList = memo(function LabelList({ position = defaultProps.position, nameKey: key, style, className }: Props) {
   const { nameKey } = useChart();
   const { setLabelList } = useLabelList();
 
@@ -40,4 +40,4 @@ export const LabelList = ({ position = defaultProps.position, nameKey: key, styl
   }, [content, setLabelList]);
 
   return null;
-};
+});

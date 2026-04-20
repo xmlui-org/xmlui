@@ -1,38 +1,38 @@
-import { useRef, useState, type ReactNode, type CSSProperties, useLayoutEffect } from "react";
+import { useRef, useState, type HTMLAttributes, type CSSProperties, useLayoutEffect, forwardRef, memo, type ForwardedRef } from "react";
+import { useComposedRefs } from "@radix-ui/react-compose-refs";
 
 import styles from "./Breakout.module.scss";
 
-type Props = {
-  children?: ReactNode;
-  style?: CSSProperties;
-};
+type Props = HTMLAttributes<HTMLDivElement>;
 
-export const Breakout = ({ children, style, ...rest }: Props) => {
-  const ref = useRef<HTMLDivElement>(null);
+export const Breakout = memo(
+  forwardRef(function Breakout({ children, style, ...rest }: Props, ref: ForwardedRef<HTMLDivElement>) {
+  const innerRef = useRef<HTMLDivElement>(null);
+  const composedRef = useComposedRefs(ref, innerRef);
   const [breakoutStyle, setBreakoutStyle] = useState<CSSProperties>({});
   const calculatedRef = useRef(false);
 
   useLayoutEffect(() => {
     const updateBreakoutStyle = () => {
-      if (!ref.current) return;
+      if (!innerRef.current) return;
 
       // Get the element's position WITHOUT margins applied
       // We need to temporarily remove margins to get the true container position
-      const currentMarginLeft = ref.current.style.marginLeft;
-      const currentMarginRight = ref.current.style.marginRight;
-      const currentWidth = ref.current.style.width;
+      const currentMarginLeft = innerRef.current.style.marginLeft;
+      const currentMarginRight = innerRef.current.style.marginRight;
+      const currentWidth = innerRef.current.style.width;
 
-      ref.current.style.marginLeft = "0px";
-      ref.current.style.marginRight = "0px";
-      ref.current.style.width = "auto";
+      innerRef.current.style.marginLeft = "0px";
+      innerRef.current.style.marginRight = "0px";
+      innerRef.current.style.width = "auto";
 
-      const rect = ref.current.getBoundingClientRect();
+      const rect = innerRef.current.getBoundingClientRect();
       const viewportWidth = window.innerWidth;
 
       // Restore previous values temporarily
-      ref.current.style.marginLeft = currentMarginLeft;
-      ref.current.style.marginRight = currentMarginRight;
-      ref.current.style.width = currentWidth;
+      innerRef.current.style.marginLeft = currentMarginLeft;
+      innerRef.current.style.marginRight = currentMarginRight;
+      innerRef.current.style.width = currentWidth;
 
       // Calculate how far the element is from the left edge of the viewport
       const offsetLeft = rect.left;
@@ -67,8 +67,9 @@ export const Breakout = ({ children, style, ...rest }: Props) => {
   }, []);
 
   return (
-    <div {...rest} ref={ref} style={{ ...breakoutStyle, ...style }} className={styles.breakout}>
+    <div {...rest} ref={composedRef} style={{ ...breakoutStyle, ...style }} className={styles.breakout}>
       {children}
     </div>
   );
-};
+}),
+);

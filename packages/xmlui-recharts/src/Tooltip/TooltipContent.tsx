@@ -1,10 +1,10 @@
 import type React from "react";
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import styles from "./TooltipContent.module.scss";
 import classnames from "classnames";
 import type { Tooltip as RTooltip } from "recharts";
 
-export const TooltipContent = forwardRef<
+export const TooltipContent = memo(forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RTooltip> &
     React.ComponentProps<"div"> & {
@@ -52,6 +52,4 @@ export const TooltipContent = forwardRef<
   }
 
   return null;
-});
-
-TooltipContent.displayName = "TooltipContent";
+}));

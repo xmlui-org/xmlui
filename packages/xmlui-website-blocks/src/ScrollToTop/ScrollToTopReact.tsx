@@ -1,17 +1,15 @@
-import { forwardRef, useEffect, useState, useCallback } from "react";
+import { forwardRef, memo, useEffect, useState, useCallback, type HTMLAttributes } from "react";
 import { Icon } from "xmlui";
 import classnames from "classnames";
 import styles from "./ScrollToTop.module.scss";
 
-type Props = {
+type Props = Omit<HTMLAttributes<HTMLButtonElement>, "onClick"> & {
   position?: "start" | "center" | "end";
   visible?: boolean;
   threshold?: number;
   icon?: string;
   behavior?: "smooth" | "instant" | "auto";
   onClick?: () => void;
-  className?: string;
-  style?: React.CSSProperties;
 };
 
 export const defaultProps: Pick<Props, "position" | "visible" | "threshold" | "icon" | "behavior"> = {
@@ -28,20 +26,22 @@ function isMainScrollContainer(element: HTMLElement): boolean {
   return element.offsetHeight > window.innerHeight * 0.5;
 }
 
-export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
-  function ScrollToTop(
-    {
-      position = defaultProps.position,
-      visible = defaultProps.visible,
-      threshold = defaultProps.threshold,
-      icon = defaultProps.icon,
-      behavior = defaultProps.behavior,
-      onClick,
-      className,
-      style,
-    }: Props,
-    ref,
-  ) {
+export const ScrollToTop = memo(
+  forwardRef<HTMLButtonElement, Props>(
+    function ScrollToTop(
+      {
+        position = defaultProps.position,
+        visible = defaultProps.visible,
+        threshold = defaultProps.threshold,
+        icon = defaultProps.icon,
+        behavior = defaultProps.behavior,
+        onClick,
+        className,
+        style,
+        ...rest
+      }: Props,
+      ref,
+    ) {
     const [isVisible, setIsVisible] = useState(false);
 
     const validPosition = ["start", "center", "end"].includes(position || "") ? position : "end";
@@ -136,6 +136,7 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
 
     return (
       <button
+        {...rest}
         ref={ref}
         className={classnames(
           styles.scrollToTop,
@@ -155,4 +156,5 @@ export const ScrollToTop = forwardRef<HTMLButtonElement, Props>(
       </button>
     );
   },
+  ),
 );

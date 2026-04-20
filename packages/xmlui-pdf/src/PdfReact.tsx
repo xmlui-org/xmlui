@@ -1,4 +1,6 @@
-import { forwardRef, useState, CSSProperties, useEffect, useRef, useMemo } from "react";
+import { memo, forwardRef, useState, CSSProperties, useEffect, useRef, useMemo, useCallback } from "react";
+import type { HTMLAttributes } from "react";
+import type { RegisterComponentApiFn } from "xmlui";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -14,7 +16,31 @@ import { SignatureCapture } from "./components/SignatureCapture/SignatureCapture
 import { useSignature } from "./hooks/useSignature";
 import { createSignatureTimestamp } from "./utils/signatureUtils";
 
-pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+// Minimal interface covering PDF.js document proxy methods used by the API
+interface PdfDocProxy {
+  numPages: number;
+  getMetadata(): Promise<{ info: unknown; metadata: unknown }>;
+  getOutline(): Promise<unknown[] | null>;
+  getPageLabels(): Promise<string[] | null>;
+  getPermissions(): Promise<number[] | null>;
+  getFieldObjects(): Promise<Record<string, unknown[]> | null>;
+  getPage(pageNumber: number): Promise<{ getTextContent(): Promise<{ items: Array<{ str: string }> }> }>;
+  getAttachments(): Promise<Record<string, unknown> | null>;
+  getViewerPreferences(): Promise<unknown | null>;
+  getDestinations(): Promise<Record<string, unknown[]> | null>;
+  getDestination(id: string): Promise<unknown[] | null>;
+  hasJSActions(): Promise<boolean>;
+  getJSActions(): Promise<unknown | null>;
+  getOptionalContentConfig(): Promise<unknown | null>;
+  getPageLayout(): Promise<string | null>;
+  getPageMode(): Promise<string | null>;
+  getOpenAction(): Promise<unknown[] | null>;
+  getData(): Promise<Uint8Array | null>;
+  getAnnotationsByType(types: Set<number>, pageIndexesToSkip?: Set<number>): Promise<unknown[] | null>;
+  saveDocument(): Promise<Uint8Array | null>;
+  getMarkInfo(): Promise<unknown | null>;
+  getDownloadInfo(): Promise<{ length: number } | null>;
+}
 
 /**
  * Walk up the DOM from `start` to find the nearest ancestor that acts as a
@@ -35,66 +61,19 @@ function getNearestScrollAncestor(start: HTMLElement | null): HTMLElement {
   return document.documentElement;
 }
 
-// =====================================================================================================================
-// PdfNative component - React implementation
-
 export type PdfMode = "view" | "edit";
 
-export interface PdfNativeProps {
-  // Document source
-  /**
-   * URL path to the PDF document.
-   * Example: "/documents/sample.pdf" or "https://example.com/file.pdf"
-   */
+export interface PdfNativeProps extends Omit<HTMLAttributes<HTMLDivElement>, "onScroll"> {
   src?: string;
-  
-  /**
-   * Binary PDF data for in-memory display.
-   * Supports multiple formats:
-   * - ArrayBuffer: From fetch() or file readers
-   * - Uint8Array: Typed array with PDF bytes
-   * - Blob: File or Blob objects
-   * - string: Data URL ("data:application/pdf;base64,...")
-   * 
-   * Examples:
-   * ```tsx
-   * // From fetch
-   * const response = await fetch('/api/pdf');
-   * const arrayBuffer = await response.arrayBuffer();
-   * <Pdf data={arrayBuffer} />
-   * 
-   * // From file input
-   * const file = event.target.files[0];
-   * <Pdf data={file} />
-   * 
-   * // From Uint8Array
-   * const bytes = new Uint8Array([...]); 
-   * <Pdf data={bytes} />
-   * 
-   * // From base64
-   * const dataUrl = `data:application/pdf;base64,${base64String}`;
-   * <Pdf data={dataUrl} />
-   * ```
-   */
   data?: PdfSource;
-  
-  // Display and interaction
   mode?: PdfMode;
   scale?: number;
   currentPage?: number;
-  
-  // Annotations (Phase 1)
   annotations?: Annotation[];
-  
-  // Signature (Phase 2)
   signatureData?: SignatureData;
-
-  // UI visibility
   horizontalAlignment?: "start" | "center" | "end";
   verticalAlignment?: "start" | "center" | "end";
   scrollStyle?: "normal" | "overlay" | "whenMouseOver" | "whenScrolling";
-  
-  // Events
   onDocumentLoad?: (numPages: number) => void;
   onPageChange?: (page: number) => void;
   onAnnotationCreate?: (annotation: Annotation) => void;
@@ -104,15 +83,8 @@ export interface PdfNativeProps {
   onSignatureCapture?: (signature: SignatureData) => void;
   onSignatureApply?: (fieldId: string, signature: SignatureData) => void;
   onExportRequest?: (data: PdfExportData) => void;
-  
-  // API registration
-  registerComponentApi?: (api: any) => void;
+  registerComponentApi?: RegisterComponentApiFn;
   updateState?: (state: any) => void;
-  
-  // Standard props
-  id?: string;
-  className?: string;
-  style?: CSSProperties;
 }
 
 export const defaultProps = {
@@ -124,7 +96,7 @@ export const defaultProps = {
   scrollStyle: "normal" as "normal" | "overlay" | "whenMouseOver" | "whenScrolling",
 };
 
-export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
+export const PdfNative = memo(forwardRef<HTMLDivElement, PdfNativeProps>(
   function PdfNative(
     {
       src,
@@ -148,9 +120,9 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       onExportRequest,
       registerComponentApi,
       updateState,
-      id,
       className,
       style,
+      ...rest
     },
     ref
   ) {
@@ -168,7 +140,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     // (bypasses React render cycle so the scrollbar appears on the very first scroll event)
     const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    function handleViewportScroll() {
+    const handleViewportScroll = useCallback(() => {
       if (scrollStyle !== "whenScrolling") return;
       const el = viewportRef.current;
       if (!el) return;
@@ -176,8 +148,15 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
       scrollTimerRef.current = setTimeout(() => {
         el.setAttribute("data-scrolling", "false");
+        scrollTimerRef.current = null;
       }, 600);
-    }
+    }, [scrollStyle]);
+
+    useEffect(() => {
+      return () => {
+        if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+      };
+    }, []);
     // Measurement sentinel: an absolutely-positioned div that always reflects the true
     // available layout space, independent of PDF content size. Using viewportRef itself
     // fails inside ScrollViewer because that container grows with content — causing a
@@ -205,7 +184,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
     const signatureMethodsRef = useRef(signatures);
     signatureMethodsRef.current = signatures;
     // Ref to the loaded PDFDocumentProxy — used by document-level API methods
-    const docProxyRef = useRef<any>(null);
+    const docProxyRef = useRef<PdfDocProxy | null>(null);
 
     // Sync internalScale when the scale prop changes externally
     const prevScaleProp = useRef(scale);
@@ -425,14 +404,14 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           setInternalScale(clamped);
           latestValues.current.updateState?.({ scale: clamped });
         },
-        addAnnotation: (annotationData: any, scrollIntoView: boolean = false, scrollBehavior: "smooth" | "instant" = "smooth") => {
+        addAnnotation: (annotationData: Partial<Annotation>, scrollIntoView: boolean = false, scrollBehavior: "smooth" | "instant" = "smooth") => {
           const { onAnnotationCreate } = latestValues.current;
-          const newAnnotation: Annotation = {
+          const newAnnotation = {
             ...annotationData,
             id: annotationData.id || `annotation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             created: new Date(),
             modified: new Date(),
-          };
+          } as Annotation;
           const next = [...internalAnnotationsRef.current, newAnnotation];
           setInternalAnnotations(next);
           latestValues.current.updateState?.({ annotations: next });
@@ -448,7 +427,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           }
           return newAnnotation.id;
         },
-        updateAnnotation: (id: string, updates: any) => {
+        updateAnnotation: (id: string, updates: Partial<Annotation>) => {
           const { onAnnotationUpdate } = latestValues.current;
           const annotation = internalAnnotationsRef.current.find(a => a.id === id);
           if (!annotation) return;
@@ -523,9 +502,8 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           const { info, metadata } = await proxy.getMetadata();
           return {
             info,
-            // Convert XMP metadata object to a plain key-value map when available
             xmp: metadata ? Object.fromEntries(
-              (metadata as any)._metadataMap ?? []
+              ((metadata as unknown as { _metadataMap?: Iterable<[string, unknown]> })._metadataMap ?? [])
             ) : null,
           };
         },
@@ -553,18 +531,16 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           const proxy = docProxyRef.current;
           if (!proxy) return null;
           if (pageNumber != null) {
-            // Single page
             const page = await proxy.getPage(pageNumber);
             const tc = await page.getTextContent();
-            return tc.items.map((i: any) => i.str).join(" ");
+            return tc.items.map((i) => i.str).join(" ");
           }
-          // All pages — concatenate page-by-page
           const total = proxy.numPages as number;
           const parts: string[] = [];
           for (let p = 1; p <= total; p++) {
             const page = await proxy.getPage(p);
             const tc = await page.getTextContent();
-            parts.push(tc.items.map((i: any) => i.str).join(" "));
+            parts.push(tc.items.map((i) => i.str).join(" "));
           }
           return parts.join("\n");
         },
@@ -648,7 +624,8 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           if (!proxy) return null;
 
           // Get the original PDF bytes from PDF.js
-          const originalBytes: Uint8Array = await proxy.getData();
+          const originalBytes = await proxy.getData();
+          if (!originalBytes) return null;
 
           // Load into pdf-lib for editing
           const pdfDoc = await PDFDocument.load(originalBytes, { ignoreEncryption: true });
@@ -757,7 +734,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             }
           : a
       );
-      setInternalAnnotations(next as any);
+      setInternalAnnotations(next);
       updateState?.({ annotations: next });
       setSignatureModalFieldId(null);
     }
@@ -765,7 +742,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       // Handle signature clear from annotation
     function handleSignatureClear(fieldId: string) {
       // Fire clear event (null signature indicates clearing)
-      onSignatureApply?.(fieldId, null as any);
+      onSignatureApply?.(fieldId, null as unknown as SignatureData);
       
       signatureMethodsRef.current.clearSignature(fieldId);
       signatureMetaRef.current.delete(fieldId);
@@ -784,14 +761,14 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
             }
           : a
       );
-      setInternalAnnotations(next as any);
+      setInternalAnnotations(next);
       updateState?.({ annotations: next });
     }
 
-    // Note: id prop is used internally by XMLUI, not applied to DOM
     return (
-      <div 
-        ref={ref} 
+      <div
+        {...rest}
+        ref={ref}
         className={className}
         style={{ ...style, position: "relative", display: "flex", gap: "16px", minHeight: 0, overflow: "hidden" }}
       >
@@ -815,7 +792,7 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
           }}
         >
           <Document
-          file={fileSource as any}
+          file={fileSource as unknown as string}
           onLoadSuccess={handleLoadSuccess}
           className={styles.document}
           options={documentOptions}
@@ -888,4 +865,4 @@ export const PdfNative = forwardRef<HTMLDivElement, PdfNativeProps>(
       </div>
     );
   }
-);
+));

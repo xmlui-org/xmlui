@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
-import { CarouselItemComponent } from "./CarouselItemNative";
+import { CarouselItemComponent } from "./CarouselItemReact";
 
 const COMP = "CarouselItem";
 

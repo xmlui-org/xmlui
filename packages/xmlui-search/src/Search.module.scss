@@ -28,6 +28,7 @@ $componentListPanel: "SearchPanel";
 $themeVars: t.composeBorderVars($themeVars, $componentListPanel);
 $themeVars: t.composePaddingVars($themeVars, $componentListPanel);
 $backgroundColor-Search: createThemeVar("backgroundColor-#{$componentListPanel}");
+$width-SearchPanel: createThemeVar("width-#{$componentListPanel}");
 $boxShadow-Search: createThemeVar("boxShadow-#{$componentListPanel}");
 
 $componentListItem: "SearchItem";
@@ -62,6 +63,7 @@ $backgroundColor-SearchSortButton--active: createThemeVar("backgroundColor-Searc
 $textColor-SearchSortButton--active: createThemeVar("textColor-SearchSortButton--active");
 
 $textColor-SearchResultCount: createThemeVar("textColor-SearchResultCount");
+$maxHeight-SearchList: createThemeVar("maxHeight-SearchList");
 
 $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 
@@ -93,7 +95,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
   @include t.paddingVars($themeVars, $componentListPanel);
   background-color: $backgroundColor-Search;
   overflow: hidden;
-  width: 580px;
+  width: $width-SearchPanel;
   margin-top: 4px;
   box-shadow: $boxShadow-Search;
   position: relative;
@@ -106,7 +108,7 @@ $textColor-SearchDidYouMean: createThemeVar("textColor-SearchDidYouMean");
 
 .list {
   background-color: $backgroundColor-Search;
-  max-height: 360px;
+  max-height: $maxHeight-SearchList;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-gutter: stable;

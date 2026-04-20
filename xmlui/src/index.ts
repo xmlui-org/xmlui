@@ -57,6 +57,7 @@ import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
 import { ThemedTableOfContents as TableOfContents } from "./components/TableOfContents/TableOfContents";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
 import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
+import { Part } from "./components/Part/Part";
 import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
@@ -226,6 +227,7 @@ export {
   FlowLayout,
   FlowItemWrapper,
   COMPONENT_PART_KEY,
+  Part,
   useAppContext,
   ToneChangerButton,
   NavPanelCollapseButton,

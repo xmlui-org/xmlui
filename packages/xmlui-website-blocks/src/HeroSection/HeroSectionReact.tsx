@@ -1,12 +1,11 @@
-import { forwardRef, type ReactNode } from "react";
-import { Button, Icon, useTheme } from "xmlui";
-import { Breakout } from "../Breakout/BreakoutNative";
+import { forwardRef, memo, type ReactNode, type ForwardedRef } from "react";
+import { Button, Icon, Part, useTheme } from "xmlui";
+import { Breakout } from "../Breakout/BreakoutReact";
 
 import styles from "./HeroSection.module.scss";
 
 import classnames from "classnames";
 import { Theme } from "xmlui";
-import { Part } from "../../../../xmlui/src/components/Part/Part";
 
 const PART_HEADER = "header";
 const PART_CONTENT = "content";
@@ -56,36 +55,37 @@ export const defaultProps: Pick<
   contentWidth: "$maxWidth-content",
 };
 
-export const HeroSection = forwardRef(
-  (
-    {
-      children,
-      backgroundTemplate,
-      headerAlignment,
-      contentPlacement = defaultProps.contentPlacement,
-      contentAlignment = defaultProps.contentAlignment,
-      headerWidth = defaultProps.headerWidth,
-      contentWidth,
-      gap,
-      preamble,
-      headline,
-      subheadline,
-      mainText,
-      mainTextTemplate,
-      ctaButtonIcon,
-      ctaButtonText,
-      ctaButtonTemplate,
-      image,
-      imageWidth,
-      imageHeight,
-      fullWidthBackground = defaultProps.fullWidthBackground,
-      className,
-      headerTone,
-      contentTone,
-      onCtaClick,
-    }: Props,
-    ref: React.Ref<HTMLDivElement>,
-  ) => {
+export const HeroSection = memo(
+  forwardRef(
+    (
+      {
+        children,
+        backgroundTemplate,
+        headerAlignment,
+        contentPlacement = defaultProps.contentPlacement,
+        contentAlignment = defaultProps.contentAlignment,
+        headerWidth = defaultProps.headerWidth,
+        contentWidth,
+        gap,
+        preamble,
+        headline,
+        subheadline,
+        mainText,
+        mainTextTemplate,
+        ctaButtonIcon,
+        ctaButtonText,
+        ctaButtonTemplate,
+        image,
+        imageWidth,
+        imageHeight,
+        fullWidthBackground = defaultProps.fullWidthBackground,
+        className,
+        headerTone,
+        contentTone,
+        onCtaClick,
+      }: Props,
+      ref: ForwardedRef<HTMLDivElement>,
+    ) => {
     // Validate contentPlacement and default to "bottom" if invalid
     const validContentPlacements = ["left", "right", "bottom"] as const;
     const effectiveContentPlacement = validContentPlacements.includes(contentPlacement as any)
@@ -233,5 +233,6 @@ export const HeroSection = forwardRef(
     );
 
     return fullWidthBackground ? <Breakout>{heroContent}</Breakout> : heroContent;
-  },
+    },
+  ),
 );

@@ -1,17 +1,15 @@
-import type { ForwardedRef, ReactNode } from "react";
-import { forwardRef, useEffect, useId } from "react";
+import type { ForwardedRef, HTMLAttributes } from "react";
+import { forwardRef, memo, useEffect, useId } from "react";
 import classnames from "classnames";
 
 import styles from "./Carousel.module.scss";
 
 import { useCarousel } from "./CarouselContext";
 
-type Props = {
-  children: ReactNode;
-  style?: React.CSSProperties;
-};
+type Props = HTMLAttributes<HTMLDivElement>;
 
-export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
+export const CarouselItemComponent = memo(
+  forwardRef(function CarouselItemComponent(
   { children, style, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
@@ -22,7 +20,7 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
     register({
       id,
     });
-  }, [id, children, style, register, forwardedRef]);
+  }, [id, register]);
 
   useEffect(() => {
     return () => {
@@ -42,4 +40,5 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
       </div>
     </div>
   );
-});
+}),
+);

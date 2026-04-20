@@ -1,4 +1,4 @@
-import { MasonryRender } from "./MasonryRender";
+import { MasonryReact } from "./MasonryReact";
 import { wrapComponent, createMetadata, type ComponentMetadata, d } from "xmlui";
 
 const COMP = "Masonry";
@@ -56,4 +56,4 @@ export const MasonryMd: ComponentMetadata = createMetadata({
 });
 
 // No config needed — mergeWithMetadata infers types from valueType in metadata.
-export const masonryComponentRenderer = wrapComponent(COMP, MasonryRender, MasonryMd);
+export const masonryComponentRenderer = wrapComponent(COMP, MasonryReact, MasonryMd);

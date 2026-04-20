@@ -1,6 +1,6 @@
 import * as RechartsPrimitive from "recharts";
 import { useLegend } from "../utils/ChartProvider";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, memo } from "react";
 import type {
   HorizontalAlignmentType,
   VerticalAlignmentType,
@@ -29,10 +29,10 @@ export const defaultProps: Pick<Props, "verticalAlign" | "align"> = {
   align: "center",
 };
 
-export const Legend = ({
+export const Legend = memo(function Legend({
   verticalAlign = defaultProps.verticalAlign,
   align = defaultProps.align,
-}: Props) => {
+}: Props) {
   const { setLegend } = useLegend();
 
   const content = useMemo(
@@ -45,4 +45,4 @@ export const Legend = ({
   }, [content, setLegend]);
 
   return null;
-};
+});

@@ -12,19 +12,23 @@ import {
 import {
   type CSSProperties,
   type ReactNode,
+  type ForwardedRef,
+  type HTMLAttributes,
   useEffect,
   useRef,
   useState,
   useCallback,
+  useMemo,
+  forwardRef,
+  memo,
 } from "react";
-import { useMemo } from "react";
 import ChartProvider, { useChartContextValue } from "../utils/ChartProvider";
 import { TooltipContent } from "../Tooltip/TooltipContent";
 import { useTheme } from "xmlui";
 import classnames from "classnames";
 import styles from "./BarChart.module.scss";
 
-export type BarChartProps = {
+export type BarChartProps = Omit<HTMLAttributes<HTMLDivElement>, "data"> & {
   data: any[];
   layout?: "horizontal" | "vertical";
   nameKey: string;
@@ -74,7 +78,8 @@ const defaultChartParams = {
   chartHeight: 300,
 };
 
-export function BarChart({
+export const BarChart = memo(
+  forwardRef(function BarChart({
   data = [],
   layout = defaultProps.layout,
   nameKey,
@@ -92,7 +97,8 @@ export function BarChart({
   children,
   showLegend = defaultProps.showLegend,
   tooltipRenderer,
-}: BarChartProps) {
+  ...rest
+}: BarChartProps, ref: ForwardedRef<HTMLDivElement>) {
   // Validate and normalize data
   const validData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
   const { getThemeVar } = useTheme();
@@ -152,7 +158,7 @@ export function BarChart({
             payloadArray.push({
               label: dataKey,
               value: originalPayload[dataKey],
-              color: colorValues[index] || colorValues[0],
+              color: colorValues[index] || colorValues[0] || "",
             });
           }
         });
@@ -186,9 +192,9 @@ export function BarChart({
 
   const chartContextValue = useChartContextValue({ dataKeys, nameKey });
 
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
-  const [interval, setIntervalState] = useState(0);
+  const [tickInterval, setTickInterval] = useState(0);
   const [xAxisHeight, setXAxisHeight] = useState(50);
   const [yTickCount, setYTickCount] = useState(5);
   const fontSize = 12;
@@ -241,7 +247,7 @@ export function BarChart({
         rightMargin = Math.ceil((maxWidth * Math.cos(rad)) / 1.8);
         xAxisH = Math.ceil(Math.abs(maxWidth * Math.sin(rad)) + Math.abs(fontSize * Math.cos(rad)));
       }
-      setIntervalState(skip);
+      setTickInterval(skip);
       setTickAngle(angle);
       setTickAnchor(anchor);
       const xTicks = Array.from(
@@ -279,7 +285,7 @@ export function BarChart({
   const [tooltipWidth, setTooltipWidth] = useState(0);
 
   const onMouseEnter = useCallback(
-    (e) => {
+    (e: { x: number; y: number }) => {
       setTooltipPosition({ x: e.x - tooltipWidth / 2, y: e.y });
     },
     [setTooltipPosition, tooltipWidth],
@@ -341,7 +347,7 @@ export function BarChart({
           height: miniMode || hideX ? 0 : xAxisHeight,
           tick: miniMode || hideTickX ? false : { fill: "currentColor", fontSize },
           tickFormatter: miniMode || hideTickX ? undefined : tickFormatterX,
-          interval: interval,
+          interval: tickInterval,
           tickLine: false,
           angle: tickAngle,
           textAnchor: tickAnchor,
@@ -392,10 +398,10 @@ export function BarChart({
           ))}
       </div>
       <div
+        {...rest}
+        ref={ref}
         className={classnames(className, styles.wrapper)}
-        style={{ flexGrow: 1, ...style }}
-        ref={wrapperRef}
-      >
+        style={{ flexGrow: 1, ...style }}>
         <ResponsiveContainer
           ref={containerRef}
           minWidth={60}
@@ -451,4 +457,5 @@ export function BarChart({
       </div>
     </ChartProvider>
   );
-}
+}),
+);

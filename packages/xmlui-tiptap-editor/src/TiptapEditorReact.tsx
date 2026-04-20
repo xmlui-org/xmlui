@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, type HTMLAttributes, type ForwardedRef } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { useTheme } from "xmlui";
 import StarterKit from "@tiptap/starter-kit";
@@ -118,10 +118,24 @@ function Sep({ color }: { color?: string }) {
   );
 }
 
-export const TiptapEditorRender = React.forwardRef(
-  ({ value, onChange, onNativeEvent, registerApi, placeholder,
-     editable = true, toolbar = true, toolbarItems,
-     className, height = "300px", width, ...rest }: any, ref: any) => {
+type Props = Omit<HTMLAttributes<HTMLDivElement>, "onChange"> & {
+  value?: string;
+  onChange?: (value: string) => void;
+  onNativeEvent?: (event: { type: string; displayLabel: string }) => void;
+  registerApi?: (api: Record<string, unknown>) => void;
+  placeholder?: string;
+  editable?: boolean;
+  toolbar?: boolean;
+  toolbarItems?: string;
+  height?: string;
+  width?: string;
+};
+
+export const TiptapEditorRender = memo(
+  React.forwardRef(
+    ({ value, onChange, onNativeEvent, registerApi, placeholder,
+       editable = true, toolbar = true, toolbarItems,
+       className, height = "300px", width, style, ...rest }: Props, ref: ForwardedRef<HTMLDivElement>) => {
     const { getThemeVar } = useTheme();
     const colors = useMemo(() => {
       const bg = getThemeVar("color-surface-50") || "#fafafa";
@@ -255,6 +269,5 @@ export const TiptapEditorRender = React.forwardRef(
       </div>
     );
   },
+  ),
 );
-
-TiptapEditorRender.displayName = "TiptapEditorRender";

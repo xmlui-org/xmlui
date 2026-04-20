@@ -11,6 +11,9 @@ $component: "HelloWorld";
 // Define basic theme variables
 $backgroundColor: createThemeVar("backgroundColor-#{$component}");
 $textColor: createThemeVar("textColor-#{$component}");
+$backgroundColor-button-HelloWorld: createThemeVar("backgroundColor-button-#{$component}");
+$textColor-button-HelloWorld: createThemeVar("textColor-button-#{$component}");
+$borderRadius-button-HelloWorld: createThemeVar("borderRadius-button-#{$component}");
 
 .container {
   background-color: $backgroundColor;
@@ -28,11 +31,11 @@ $textColor: createThemeVar("textColor-#{$component}");
 }
 
 .button {
-  background-color: #4a90e2;
-  color: white;
+  background-color: $backgroundColor-button-HelloWorld;
+  color: $textColor-button-HelloWorld;
   border: none;
   padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  border-radius: $borderRadius-button-HelloWorld;
   cursor: pointer;
   font-size: 1rem;
   margin-bottom: 1rem;

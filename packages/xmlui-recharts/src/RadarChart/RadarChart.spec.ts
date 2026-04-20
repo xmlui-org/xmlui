@@ -412,7 +412,9 @@ test.describe("tooltip", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over radar area to trigger tooltip
-    await page.locator(radarElementsSelector).first().hover();
+    const _radarEl = page.locator(radarElementsSelector).first();
+    await _radarEl.waitFor({ state: "visible", timeout: 10000 });
+    await _radarEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).toBeVisible();
   });
 
@@ -431,7 +433,9 @@ test.describe("tooltip", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over radar area - tooltip should not appear
-    await page.locator(radarElementsSelector).first().hover();
+    const _radarEl = page.locator(radarElementsSelector).first();
+    await _radarEl.waitFor({ state: "visible", timeout: 10000 });
+    await _radarEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });

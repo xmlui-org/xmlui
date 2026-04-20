@@ -369,7 +369,9 @@ test.describe("tooltip", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over chart area to trigger tooltip
-    await page.locator(chartElementsSelector).first().hover();
+    const _chartEl = page.locator(chartElementsSelector).first();
+    await _chartEl.waitFor({ state: "visible", timeout: 10000 });
+    await _chartEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).toBeVisible();
   });
 
@@ -388,7 +390,9 @@ test.describe("tooltip", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over chart area - tooltip should not appear
-    await page.locator(chartElementsSelector).first().hover();
+    const _chartEl = page.locator(chartElementsSelector).first();
+    await _chartEl.waitFor({ state: "visible", timeout: 10000 });
+    await _chartEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });
@@ -805,7 +809,9 @@ test.describe("hideTooltip prop", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.locator(chartElementsSelector).first().hover();
+    const _chartEl = page.locator(chartElementsSelector).first();
+    await _chartEl.waitFor({ state: "visible", timeout: 10000 });
+    await _chartEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).toBeVisible();
   });
 
@@ -822,7 +828,9 @@ test.describe("hideTooltip prop", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.locator(chartElementsSelector).first().hover();
+    const _chartEl = page.locator(chartElementsSelector).first();
+    await _chartEl.waitFor({ state: "visible", timeout: 10000 });
+    await _chartEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 
@@ -839,7 +847,9 @@ test.describe("hideTooltip prop", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.locator(chartElementsSelector).first().hover();
+    const _chartEl = page.locator(chartElementsSelector).first();
+    await _chartEl.waitFor({ state: "visible", timeout: 10000 });
+    await _chartEl.hover({ force: true });
     await expect(page.locator(tooltipSelector)).toBeVisible();
   });
 });

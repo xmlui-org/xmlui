@@ -1,20 +1,18 @@
-import { type CSSProperties, type ForwardedRef, forwardRef, type ReactNode } from "react";
+import { type ForwardedRef, forwardRef, memo, type HTMLAttributes, type ReactNode } from "react";
 
 import styles from "./Backdrop.module.scss";
 import classNames from "classnames";
+import { COMPONENT_PART_KEY } from "xmlui";
 
-const COMPONENT_PART_KEY = "-component";
-
-type Props = {
-  style?: CSSProperties;
+type Props = HTMLAttributes<HTMLDivElement> & {
   classes?: Record<string, string>;
-  children?: ReactNode;
   overlayTemplate?: ReactNode;
   opacity?: string;
   backgroundColor?: string;
 };
 
-export const Backdrop = forwardRef(function Backdrop(
+export const Backdrop = memo(
+  forwardRef(function Backdrop(
   {
     style,
     classes,
@@ -38,4 +36,5 @@ export const Backdrop = forwardRef(function Backdrop(
       {overlayTemplate && <div className={styles.overlay}>{overlayTemplate}</div>}
     </div>
   );
-});
+}),
+);
