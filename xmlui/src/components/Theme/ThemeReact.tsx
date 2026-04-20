@@ -410,6 +410,12 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
 
       // Listen for the JS chunk finishing its evaluation
       window.addEventListener("xmlui-styles-loaded", applyRegistryStyles);
+
+      // Re-apply after registering the listener to close a theoretical race
+      // where a chunk dispatches the event between the initial apply and the
+      // addEventListener call.
+      applyRegistryStyles();
+
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);

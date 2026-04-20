@@ -198,29 +198,47 @@ of the xmlui package, not just islands.
    `standalone` or `islands` mode, not for the `lib` build. Currently it affects all
    build modes.
 
-### Phase 3: Validate hypotheses
+### Phase 3: Validate hypotheses — COMPLETED
 
-6. **Hypothesis 1** (host page safety): The Shadow DOM isolation in `NestedApp` correctly
-   prevents XMLUI styles from leaking to the host. The `RootClasses` component correctly
-   targets the shadow root when `insideShadowRoot` is true. **Hypothesis is VALID** for
-   the shadow-rooted island path.
+6. **Hypothesis 1** (host page safety): **VALID.** The Shadow DOM isolation in
+   `NestedApp` correctly prevents XMLUI styles from leaking to the host. The
+   `RootClasses` component correctly targets the shadow root when `insideShadowRoot`
+   is true.
 
-   **Caveat**: The `startIslands` function renders `StandaloneApp` into the host DOM
-   element, which means React's own `<style>` tags (from `useInsertionEffect` in
-   `StyleContext.tsx`) will be injected into `document.head` before the Shadow DOM
-   is established. The `useDomRoot()` context might not yet return a ShadowRoot at
-   initial render. **This needs verification.**
+   **Caveat RESOLVED**: `startIslands` now creates the shadow DOM eagerly on the host
+   element *before* creating the React root. The React tree renders directly inside
+   the shadow root, and a `StyleInjectionTargetContext.Provider` wraps `StandaloneApp`
+   with the shadow root as the injection target. This guarantees that ALL styles — even
+   from the outer provider tree — target the shadow root from the very first render.
 
-7. **Hypothesis 2** (XMLUI app safety): The base styles and module styles are correctly
-   injected into the shadow root via `RootClasses`. The `@layer` ordering is preserved
-   by the prepend. **Hypothesis is VALID** assuming all CSS is captured by
-   `window.__XMLUI_STYLES__`.
+   Verified: the outer tree (`AppRoot → StyleProvider → AppWrapper → ThemeProvider →
+   rendering pipeline → NestedApp`) contains zero `useStyles` calls today.
+   `ComponentWrapper`, `AppWrapper`, `ThemeProvider`, `DebugViewProvider`, and
+   `ComponentProvider` are all style-free. The eager shadow DOM is defense-in-depth
+   against future changes.
 
-   **Caveat**: Lazy-loaded components whose CSS loads after the `xmlui-styles-loaded` event
-   would be missing styles inside the shadow root. The event listener approach handles this
-   via `applyRegistryStyles` being called on each event, but styles loaded between
-   `RootClasses` mount and the event dispatch are concatenated with `+=`, not
-   deduplicated.
+   NestedApp still creates a nested shadow DOM inside the outer one for its inner
+   React root. Nested shadow DOM is valid and the inner tree is fully self-contained
+   with its own `StyleProvider` and `StyleInjectionTargetContext`.
+
+7. **Hypothesis 2** (XMLUI app safety): **VALID.** The base styles and module styles
+   are correctly injected into the shadow root via `RootClasses`. The `@layer` ordering
+   is preserved by the prepend.
+
+   **Caveat RESOLVED**: The deduplication concern was unfounded — `applyRegistryStyles`
+   uses `textContent =` (full replacement), not append. Each invocation sets the style
+   tag's content to the complete accumulated `window.__XMLUI_STYLES__` string, so no
+   CSS is ever lost or duplicated.
+
+   For the lazy-loading timing concern: a defensive second `applyRegistryStyles()` call
+   was added immediately after `addEventListener` registration in `RootClasses`. This
+   closes the theoretical micro-gap where a chunk could dispatch `xmlui-styles-loaded`
+   between the initial apply and the listener registration.
+
+   In practice, the standalone/islands UMD is a single bundle — all CSS is accumulated
+   in `window.__XMLUI_STYLES__` during synchronous script evaluation, before React
+   renders. The `applyRegistryStyles()` call on mount always finds the complete CSS.
+   The event listener + defensive re-apply handle any future code-splitting scenario.
 
 ### Phase 4: Clean up
 

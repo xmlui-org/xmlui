@@ -58,6 +58,7 @@ import { MetadataProvider } from "../language-server/services/common/metadata-ut
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
+import { StyleInjectionTargetContext } from "./theming/StyleContext";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -1770,8 +1771,17 @@ export function startIslands(
     let contentRoot = null;
     const srcBase = el.getAttribute("data-xmlui-src");
     console.log({ srcBase, el });
-    contentRoot = ReactDOM.createRoot(el);
-    contentRoot.render(<StandaloneApp extensionManager={extensionManager} srcBase={srcBase} asIsland={true}/>);
+    // Create shadow DOM eagerly so ALL styles (including from the outer
+    // React tree) are scoped from the very first render.  This prevents
+    // any style leakage to the host page — even if future changes add
+    // styled components to the provider layers above NestedApp.
+    const shadowRoot = (el as HTMLElement).attachShadow({ mode: "open" });
+    contentRoot = ReactDOM.createRoot(shadowRoot);
+    contentRoot.render(
+      <StyleInjectionTargetContext.Provider value={shadowRoot}>
+        <StandaloneApp extensionManager={extensionManager} srcBase={srcBase} asIsland={true}/>
+      </StyleInjectionTargetContext.Provider>
+    );
   });
 
   // extensionManager.registerExtension(extensions);
