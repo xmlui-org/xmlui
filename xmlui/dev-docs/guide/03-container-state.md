@@ -33,6 +33,27 @@ Using `uses="[]"` (empty array) creates a full state boundary: no parent state f
 
 <!-- DIAGRAM: Two side-by-side trees. Left: implicit container inheriting all parent variables. Right: explicit container with uses=["count"] filtering parent state to only "count". -->
 
+```mermaid
+graph TB
+  subgraph Left["Implicit — inherits ALL parent state"]
+    direction TB
+    P1["App<br>var.count=0, var.name='Alice'"]
+    subgraph C1["Stack (implicit container)"]
+      V1["sees count=0<br>sees name='Alice'"]
+    end
+    P1 --> C1
+  end
+
+  subgraph Right["Explicit — uses=['count'] only"]
+    direction TB
+    P2["App<br>var.count=0, var.name='Alice'"]
+    subgraph C2["Stack (uses=['count'])"]
+      V2["sees count=0<br>name is blocked"]
+    end
+    P2 -->|"filters to count"| C2
+  end
+```
+
 ## State Composition: The 6 Layers
 
 `StateContainer` composes the final state object from six sources. Each layer can shadow keys from earlier layers.
@@ -119,6 +140,23 @@ The no-op optimisation is important: if you write `count = count` (same value), 
 
 <!-- DIAGRAM: Flow from user mutation → proxy set trap → callback → statePartChanged → dispatch → reducer → re-render -->
 
+```mermaid
+sequenceDiagram
+  actor User
+  participant Proxy
+  participant statePartChanged
+  participant Reducer
+  participant React
+
+  User->>Proxy: count = count + 1
+  Proxy->>Proxy: compare old vs new value
+  Proxy->>statePartChanged: callback(["count"], newVal)
+  statePartChanged->>statePartChanged: find owning container
+  statePartChanged->>Reducer: dispatch STATE_PART_CHANGED
+  Reducer->>React: produces new state (Immer)
+  React->>React: re-render
+```
+
 ## Mutation Routing
 
 When the proxy callback fires, `statePartChanged` in `StateContainer` decides where to send the mutation:
@@ -131,6 +169,50 @@ When the proxy callback fires, `statePartChanged` in `StateContainer` decides wh
 4. **Otherwise** → If `uses` includes the key, bubble to parent. If not, the mutation is dropped (no owner found).
 
 This routing ensures that only the container that owns a variable processes its updates. Children receive parent state as a reference prop, not a copy — when the owning container's reducer produces a new state object, all children see the updated reference on the next render.
+
+### Example: Variable Ownership and Reference Passing
+
+Consider the following code snippet:
+
+```xml
+<App var.x="{0}">
+  <Text var.y="{'hello'}">
+    {x}
+  </Text>
+</App>
+```
+
+`App` owns `x`; `Text` owns `y`. `TextContainer` receives `x` via **Layer 1 (inherited parent state)** as a stable reference to the same object held by `AppContainer` — no copy is made. If an event handler inside `Text` writes `x = newVal`, the proxy intercepts the write, finds that `x` is not a local variable of `TextContainer`, and bubbles the mutation up to `AppContainer`'s reducer. `AppContainer` fires `STATE_PART_CHANGED`, Immer produces a new state object, and `TextContainer` sees the updated value on the next render. There is exactly one owner of `x` at all times.
+
+```mermaid
+graph TD
+  subgraph AppContainer["AppContainer (implicit) — owns x"]
+    direction TB
+    AppOwned["owned state<br>x = 0"]
+
+    subgraph AppComp["&lt;App&gt;"]
+      direction TB
+      AppVarDecl["var.x = '{0}'"]
+
+      subgraph TextContainer["TextContainer (implicit) — owns y"]
+        direction TB
+        TextL5["local state<br>y = 'hello'"]
+
+        subgraph TextComp["&lt;Text&gt;"]
+          direction TB
+          TextVarDecl["var.y = 'hello'"]
+          TextRender(["renders {x} → 0"])
+        end
+
+      end
+    end
+
+    AppOwned -->|"is declared as"| AppVarDecl
+    AppOwned -->|"inherited parent state with stable ref (not a copy)"| TextRender
+    TextL5 -->|"is declared as"| TextVarDecl
+    TextRender -.->|"write x = 1 → bubbles up to owner (state)"| AppOwned
+  end
+```
 
 ## The Event Handler Subsystem
 
@@ -181,3 +263,211 @@ In an `Items` component, each row gets its own fresh context object with `$item`
 5. **State is composed, not inherited** — the 6-layer pipeline assembles state from parent, reducer, APIs, context vars, local vars, and globals; live refs are resolved as a post-processing step.
 6. **Variables re-evaluate every render** — but reducer values shadow expression results, which is how mutations persist.
 7. **Children share references, not copies** — parent state is passed by reference. When the owner updates, children see the change on re-render without any copying.
+
+## Examples
+
+### Example: Global Variables
+
+Global variables (declared with `var.global.*`) are owned by the **root container** and flow to every other container via Layer 6. Any container can read them; mutations anywhere bubble all the way up to the root owner.
+
+```xml
+<App var.global.theme="{'dark'}">
+  <Sidebar />
+  <MainContent />
+</App>
+```
+
+```mermaid
+graph TD
+  subgraph RootContainer["RootContainer — owns theme (global)"]
+    GlobalOwned["global state<br>theme = 'dark'"]
+
+    subgraph SidebarContainer["SidebarContainer"]
+      SidebarL6["Layer 6 — global vars<br>theme = 'dark'"]
+      SidebarRender(["renders sidebar<br>with theme"])
+    end
+
+    subgraph MainContainer["MainContainer"]
+      MainL6["Layer 6 — global vars<br>theme = 'dark'"]
+      MainRender(["renders content<br>with theme"])
+    end
+  end
+
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| SidebarL6
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| MainL6
+  SidebarL6 --> SidebarRender
+  MainL6 --> MainRender
+```
+
+Let's say an event happened that sets the theme from 'dark' to 'light':
+
+```mermaid
+graph TD
+  subgraph RootContainer["RootContainer — owns theme (global)"]
+    GlobalOwned["global state<br>theme = 'light'"]
+
+    subgraph SidebarContainer["SidebarContainer"]
+      SidebarL6["Layer 6 — global vars<br>theme = 'light'"]
+      SidebarRender(["renders sidebar<br>with theme"])
+    end
+
+    subgraph MainContainer["MainContainer"]
+      MainL6["Layer 6 — global vars<br>theme = 'light'"]
+      MainRender(["renders content<br>with theme"])
+      MainMutate(["mutation event -> theme = 'light'"])
+    end
+  end
+
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| SidebarL6
+  GlobalOwned -->|"Layer 6 — same ref to all containers"| MainL6
+  SidebarL6 --> SidebarRender
+  MainL6 --> MainRender
+  MainMutate -.->|"theme is global — bubbles all the way to root"| GlobalOwned
+```
+
+### Example: User Input Affecting State
+
+A `sequenceDiagram` is the clearest way to show a state change triggered by a user action: it makes the temporal flow explicit and separates the before/after states without ambiguity. The static structure (what owns what) can be shown with a `graph TD` if needed, but for runtime behaviour the sequence is the right tool.
+
+```xml
+<App var.query="{''}">
+  <TextInput onValueChange="(val) => query = val" />
+  <Text>{query}</Text>
+</App>
+```
+
+When the user types, `onValueChange` fires and writes to `query`. The proxy intercepts the write, routes it to `AppContainer`'s reducer (since `query` is App's local var), and both `TextInput` and `Text` re-render with the new value.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant TextInput
+  participant Handler as onValueChange handler
+  participant Proxy
+  participant AppReducer as reducer (AppContainer)
+  participant React
+
+  User->>TextInput: types 'hello'
+  TextInput->>Handler: fires onValueChange('hello')
+  Handler->>Proxy: query = 'hello'
+  Proxy->>Proxy: compare old '' vs new 'hello'
+  Proxy->>AppReducer: dispatch STATE_PART_CHANGED
+  AppReducer->>React: new state: query = 'hello'
+  React->>TextInput: re-render (value = 'hello')
+  React->>Text: re-render — sees query = 'hello'
+```
+
+### Example: Context Variables in Iteration
+
+`Items` creates one container per row and injects `$item` and `$itemIndex` as fresh **Layer 4 context variables**. Each row's context is an independent object — mutating one row never affects another.
+
+```xml
+<App>
+  <Items data="{[{name: 'Alice'}, {name: 'Bob'}]}">
+    <Text>{$item.name}</Text>
+  </Items>
+</App>
+```
+
+```mermaid
+graph TD
+  DataSource["data<br>[ {name:'Alice'}, {name:'Bob'} ]"]
+
+  subgraph ItemsComp["&lt;Items&gt; — creates one container per row"]
+    subgraph Row1["Row 1 container"]
+      Ctx1["Layer 4 — context vars<br>$item = {name:'Bob'}<br>$itemIndex = 1"]
+      Render1(["renders: Bob"])
+      Ctx1 --> Render1
+    end
+
+    subgraph Row0["Row 0 container"]
+      Ctx0["Layer 4 — context vars<br>$item = {name:'Alice'}<br>$itemIndex = 0"]
+      Render0(["renders: Alice"])
+      Ctx0 --> Render0
+    end
+  end
+
+  DataSource -->|"row 0 — fresh context object"| Ctx0
+  DataSource -->|"row 1 — fresh context object"| Ctx1
+```
+
+Each row container is **fully isolated**: `$item` in Row 0 and `$item` in Row 1 are separate objects. There is no shared reference between rows.
+
+### Example: Multiple Instances of a User-Defined Component
+
+Every instance of a user-defined component (UDC) gets its **own container** with independent state. Variables declared inside the UDC are not shared across instances.
+
+```xml
+<!-- Counter.xmlui -->
+<Stack var.count="{0}">
+  <Button onClick="count = count + 1" label="Increment" />
+  <Text>{count}</Text>
+</Stack>
+
+<!-- Main.xmlui -->
+<App>
+  <Counter />
+  <Counter />
+</App>
+```
+
+```mermaid
+graph LR
+  subgraph App["&lt;App&gt;"]
+    subgraph Counter2["&lt;Counter&gt; — instance 2 (own container)"]
+      direction TB
+      C2Count["local vars<br>count = 0"]
+      
+      subgraph Stack2["Stack"]
+        C2Button["&lt;Button&gt;<br>onClick: count = count + 1"]
+        C2Text(["renders: 0"])
+      end
+    end
+
+    subgraph Counter1["&lt;Counter&gt; — instance 1 (own container)"]
+      direction TB
+      C1Count["local vars<br>count = 0"]
+
+      subgraph Stack1["Stack"]
+        direction TB
+        C1Button["&lt;Button&gt;<br>onClick: count = count + 1"]
+        C1Text(["renders: 0"])
+      end
+    end
+    
+    C2Count --> C2Text
+    C2Button -.->|"mutates — stays in this container"| C2Count
+    C1Count --> C1Text
+    C1Button -.->|"mutates — stays in this container"| C1Count
+  end
+```
+
+Clicking the button on instance 1 dispatches `STATE_PART_CHANGED` to Counter 1's reducer only. Counter 2's `count` is untouched. There is no shared state between UDC instances unless a parent variable is passed in explicitly.
+
+### Example: `id` Registration container (Component APIs)
+
+When a component has an `id`, it registers its methods with the **nearest enclosing container** via `registerComponentApi`. Those methods land in Layer 3 of that container's state, making them available to any expression in the container's scope — even on sibling components.
+
+```xml
+<App>
+  <TextInput id="myInput" />
+  <Button onClick="myInput.focus()" label="Focus" />
+</App>
+```
+
+```mermaid
+graph TD
+  subgraph AppContainer["AppContainer — Layer 3"]
+    L3["component APIs<br>myInput = { focus(), setValue(), … }"]
+    subgraph AppComp["&lt;App&gt;"]
+      TI["&lt;TextInput id='myInput'&gt;<br>(stateless — no own container)"]
+      Btn["&lt;Button onClick='myInput.focus()'&gt;"]
+    end
+  end
+
+  TI -->|"on mount: registerComponentApi('myInput', ...)"| L3
+  Btn -->|"reads myInput from Layer 3<br>at call time"| L3
+  L3 -->|"myInput.focus()"| TI
+```
+
+`TextInput` itself has no container — it is stateless. It delegates `registerComponentApi` upward to `AppContainer`. When the button's `onClick` evaluates `myInput.focus()`, the framework looks up `myInput` in the combined state at Layer 3 and calls the registered method directly on the underlying DOM element.
