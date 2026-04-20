@@ -26,6 +26,10 @@ import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 
+import baseStyles from "../../index.scss?inline";
+const STYLE_ID = 'xmlui-base-styles';
+const PROD_STYLE_ID = "xmlui-module-styles";
+
 type Props = {
   id?: string;
   isRoot?: boolean;
@@ -338,12 +342,24 @@ type HtmlClassProps = {
 export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
   const registry = useStyleRegistry();
   const domRoot = useDomRoot();
+  const isServer = typeof document === "undefined";
 
   useIsomorphicLayoutEffect(() => {
     // This runs on the client to handle dynamic updates.
     // The SSR part is handled by the render itself.
     if (typeof document !== "undefined") {
       const insideShadowRoot = domRoot instanceof ShadowRoot;
+
+      const target: HTMLElement | ShadowRoot = insideShadowRoot ? domRoot : document.head;
+      // 2. FORCE BASE STYLES TO THE TOP using a physical <style> tag
+      // We do NOT use adoptedStyleSheets here to ensure the @layer declaration evaluates first.
+      if (!target.querySelector(`#${STYLE_ID}`)) {
+        const styleTag = document.createElement("style");
+        styleTag.id = STYLE_ID;
+        styleTag.textContent = baseStyles;
+        target.prepend(styleTag); // Prepend makes it evaluate before Vite's injected styles
+      }
+
       let documentElement = insideShadowRoot
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
@@ -352,17 +368,76 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         ? domRoot.getElementById("nested-app-portal-root")
         : null;
       portalContainer?.classList.add(...classNames);
+
+      if(insideShadowRoot){
+        // A. Local Vite Dev Mode (Still needs to catch Vite's HMR styles)
+        if (import.meta.env.DEV) {
+          const syncDevStyles = (node) => {
+            if (node.tagName === "STYLE" && node.hasAttribute("data-vite-dev-id")) {
+              const viteId = node.getAttribute("data-vite-dev-id");
+              const exists = target.querySelector(`style[data-vite-dev-id="${viteId}"]`);
+              if (!exists) target.appendChild(node.cloneNode(true));
+            }
+          };
+          document.head.querySelectorAll("style").forEach(syncDevStyles);
+          const observer = new MutationObserver((m) =>
+            m.forEach((mu) => mu.addedNodes.forEach(syncDevStyles)),
+          );
+          observer.observe(document.head, { childList: true });
+          return () => {
+            observer.disconnect();
+            documentElement.classList.remove(...classNames);
+            portalContainer?.classList.remove(...classNames);
+          };
+        }
+      }
+
+      // *** RISK, needs a lot of review
+      const applyRegistryStyles = () => {
+        if (!(window as any).__XMLUI_STYLES__) return;
+
+        let styleTag = target.querySelector(`#${PROD_STYLE_ID}`);
+        if (!styleTag) {
+          styleTag = document.createElement("style");
+          styleTag.id = PROD_STYLE_ID;
+          // Append so it evaluates after the prepended baseStyles
+          target.appendChild(styleTag);
+        }
+        styleTag.textContent = (window as any).__XMLUI_STYLES__;
+      };
+
+      // Apply immediately if available
+      applyRegistryStyles();
+
+      // Listen for the JS chunk finishing its evaluation
+      window.addEventListener("xmlui-styles-loaded", applyRegistryStyles);
+
+      // Re-apply after registering the listener to close a theoretical race
+      // where a chunk dispatches the event between the initial apply and the
+      // addEventListener call.
+      applyRegistryStyles();
+
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);
         portalContainer?.classList.remove(...classNames);
+        window.removeEventListener("xmlui-styles-loaded", applyRegistryStyles);
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classNames]);
 
-  // For SSR, we just add the class to the registry. The component renders nothing.
+  // For SSR, collect the html classes and emit the base stylesheet into the head
+  // so prerendered pages do not flash unstyled before hydration.
   registry.addRootClasses(classNames);
+
+  if (isServer) {
+    return (
+      <Helmet>
+        <style id={STYLE_ID}>{baseStyles}</style>
+      </Helmet>
+    );
+  }
 
   return null;
 }

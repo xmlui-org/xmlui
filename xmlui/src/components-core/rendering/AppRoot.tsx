@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
-import type { ComponentLike } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
 import { resetErrors } from "../reportEngineError";
 import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
@@ -36,6 +36,7 @@ export const queryClient = new QueryClient({
  * the app accordingly.
  */
 export function AppRoot({
+  asIsland,
   apiInterceptor,
   contributes,
   node,
@@ -67,13 +68,32 @@ export function AppRoot({
   // --- the root node must be wrapped in a `Container` component managing
   // --- the app's top-level state.
   const rootNode = useMemo(() => {
-    const themedRoot = {
-      type: "Theme",
-      props: {
-        root: true,
-      },
-      children: [node],
-    };
+    if (asIsland) {
+      return {
+        type: "NestedApp",
+        props: {
+          resolvedApp: node,
+          resolvedComponents: contributes.compoundComponents,
+          asIsland
+        },
+        children: [],
+      };
+    }
+    let themedRoot = node;
+    if ("type" in node && node.type !== "Theme") {
+      themedRoot = {
+        type: "Theme",
+        props: {
+          root: true,
+        },
+        children: [node as ComponentDef],
+      };
+    } else if ("props" in node) {
+      if (!node.props) {
+        node.props = {};
+      }
+      node.props.root = true;
+    }
     return {
       type: "Container",
       uid: "root",
@@ -81,7 +101,7 @@ export function AppRoot({
       uses: [],
       globalVars: globalVars || {},
     };
-  }, [node, globalVars]);
+  }, [asIsland, node, globalVars, contributes?.compoundComponents]);
 
   if (projectCompilation) {
     const entryDeps = projectCompilation.entrypoint.dependencies;
