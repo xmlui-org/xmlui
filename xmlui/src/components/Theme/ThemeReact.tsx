@@ -342,7 +342,6 @@ type HtmlClassProps = {
 export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
   const registry = useStyleRegistry();
   const domRoot = useDomRoot();
-  const isServer = typeof document === "undefined";
 
   useIsomorphicLayoutEffect(() => {
     // This runs on the client to handle dynamic updates.
@@ -427,17 +426,8 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classNames]);
 
-  // For SSR, collect the html classes and emit the base stylesheet into the head
-  // so prerendered pages do not flash unstyled before hydration.
+  // For SSR, we just add the class to the registry. The component renders nothing.
   registry.addRootClasses(classNames);
-
-  if (isServer) {
-    return (
-      <Helmet>
-        <style id={STYLE_ID}>{baseStyles}</style>
-      </Helmet>
-    );
-  }
 
   return null;
 }
