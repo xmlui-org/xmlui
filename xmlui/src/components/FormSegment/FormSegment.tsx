@@ -22,7 +22,7 @@ export const FormSegmentMd = createMetadata({
         "etc.) are transposed to this container.",
       availableValues: ["horizontal", "vertical"],
       valueType: "string",
-      defaultValue: defaultProps.orientation,
+      defaultValue: "vertical",
     },
     fields: d(
       "An optional comma-separated list of field names (matching the `bindTo` values of " +

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
-import type { ComponentLike } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
 import { resetErrors } from "../reportEngineError";
 import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
@@ -37,7 +37,6 @@ export const queryClient = new QueryClient({
  */
 export function AppRoot({
   asIsland,
-  mainSrc,
   apiInterceptor,
   contributes,
   node,
@@ -81,15 +80,15 @@ export function AppRoot({
       };
     }
     let themedRoot = node;
-    if (node.type !== "Theme") {
+    if ("type" in node && node.type !== "Theme") {
       themedRoot = {
         type: "Theme",
         props: {
           root: true,
         },
-        children: [node],
+        children: [node as ComponentDef],
       };
-    } else {
+    } else if ("props" in node) {
       if (!node.props) {
         node.props = {};
       }
