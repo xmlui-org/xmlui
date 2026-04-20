@@ -20,11 +20,11 @@ $fontWeight-Breadcrumbs--current: createThemeVar("fontWeight-#{$component}--curr
     flex-wrap: wrap;
     align-items: center;
     gap: $gap-Breadcrumbs;
-    --xmlui-textDecorationLine-Link: none;
   }
 
   .link {
     color: $color-Breadcrumbs;
+    --xmlui-textDecorationLine-Link: none !important;
 
 
     &:hover {
