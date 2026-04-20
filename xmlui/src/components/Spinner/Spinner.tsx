@@ -2,7 +2,7 @@ import styles from "./Spinner.module.scss";
 
 import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Spinner, defaultProps } from "./SpinnerNative";
+import { Spinner, defaultProps } from "./SpinnerReact";
 import { createMetadata } from "../metadata-helpers";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -15,6 +15,11 @@ export const SpinnerMd = createMetadata({
   description:
     "`Spinner` is an animated indicator that represents an action in progress " +
     "with no deterministic progress value.",
+  parts: {
+    ring: {
+      description: "The animated ring element of the spinner.",
+    },
+  },
   props: {
     delay: {
       description: `The delay in milliseconds before the spinner is displayed.`,

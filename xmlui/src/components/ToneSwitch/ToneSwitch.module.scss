@@ -14,6 +14,8 @@ $backgroundColor-ToneSwitch-light: createThemeVar("backgroundColor-ToneSwitch-li
 $color-ToneSwitch-light: createThemeVar("color-ToneSwitch-light");
 $backgroundColor-ToneSwitch-dark: createThemeVar("backgroundColor-ToneSwitch-dark");
 $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
+$backgroundColor-indicator-ToneSwitch: createThemeVar("backgroundColor-indicator-ToneSwitch");
+$boxShadow-indicator-ToneSwitch: createThemeVar("boxShadow-indicator-ToneSwitch");
 
 @layer components {
   .iconSwitch {
@@ -41,9 +43,9 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
     width: t.$fontSize;
     height: t.$fontSize;
     border-radius: 50%;
-    background-color: white;
+    background-color: $backgroundColor-indicator-ToneSwitch;
     transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: $boxShadow-indicator-ToneSwitch;
     pointer-events: none;
   }
 
@@ -76,13 +78,11 @@ $color-ToneSwitch-dark: createThemeVar("color-ToneSwitch-dark");
   }
 
   .icon {
-    // font-size: t.$fontSize;
     width: t.$fontSize;
     height: t.$fontSize;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--icon-color, #666);
     pointer-events: none;
   }
 }

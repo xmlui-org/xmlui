@@ -1,5 +1,5 @@
 import styles from "./LabelList.module.scss";
-import { defaultProps, LabelList } from "./LabelListNative";
+import { defaultProps, LabelList } from "./LabelListReact";
 import { LabelPositionValues } from "../utils/abstractions";
 import { parseScssVar, wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
 

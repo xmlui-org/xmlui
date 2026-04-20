@@ -22,7 +22,7 @@ import { ThemedIcon as Icon } from "./components/Icon/Icon";
 import { ErrorBoundary } from "./components-core/rendering/ErrorBoundary";
 import { ThemedStack as Stack } from "./components/Stack/Stack";
 import { ThemedButton as Button } from "./components/Button/Button";
-import { Splitter } from "./components/Splitter/SplitterNative";
+import { Splitter } from "./components/Splitter/SplitterReact";
 import { useTheme, useThemes } from "./components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import { getColor } from "./components-core/utils/css-utils";
@@ -47,7 +47,7 @@ import type { XmlUiNode } from "./parsers/xmlui-parser";
 import { XmlUiHelper } from "./parsers/xmlui-parser";
 import { ThemedText as Text } from "./components/Text/Text";
 import { ThemedTextBox as TextBox } from "./components/TextBox/TextBox";
-import { NestedApp } from "./components/NestedApp/NestedAppNative";
+import { NestedApp } from "./components/NestedApp/NestedAppReact";
 import { builtInThemes } from "./components-core/theming/ThemeProvider";
 import { VisuallyHidden } from "./components/VisuallyHidden";
 import { ThemedLinkNative as LinkNative } from "./components/Link/Link";
@@ -57,11 +57,12 @@ import { ThemedMarkdown as Markdown } from "./components/Markdown/Markdown";
 import { ThemedTableOfContents as TableOfContents } from "./components/TableOfContents/TableOfContents";
 import { ThemedFlowLayout as FlowLayout, FlowItemWrapper } from "./components/FlowLayout/FlowLayout";
 import { COMPONENT_PART_KEY } from "./components-core/theming/responsive-layout";
+import { Part } from "./components/Part/Part";
 import { useAppContext } from "./components-core/AppContext";
 import { ToneChangerButton } from "./components/ToneChangerButton/ToneChangerButton";
 import { NavPanelCollapseButton } from "./components/NavPanelCollapseButton/NavPanelCollapseButton";
 import { Logo } from "./components/Logo/LogoNative";
-import { Theme } from "./components/Theme/ThemeNative";
+import { Theme } from "./components/Theme/ThemeReact";
 import { OptionContext, useOption } from "./components/Select/OptionContext";
 
 import {
@@ -116,13 +117,13 @@ import {
   dValueApi,
 } from "./components/metadata-helpers";
 import StandaloneComponent from "./components-core/rendering/StandaloneComponent";
-import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchNative";
-import { Tooltip } from "./components/Tooltip/TooltipNative";
+import { ToneSwitch } from "./components/ToneSwitch/ToneSwitchReact";
+import { Tooltip } from "./components/Tooltip/TooltipReact";
 import {
   ThemedDropdownMenu as DropdownMenu,
   ThemedMenuItem as MenuItem,
 } from "./components/DropdownMenu/DropdownMenu";
-import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorNative";
+import { ContentSeparator } from "./components/ContentSeparator/ContentSeparatorReact";
 import { MemoizedItem } from "./components/container-helpers";
 import { HiddenOption } from "./components/Select/HiddenOption";
 import OptionTypeProvider from "./components/Option/OptionTypeProvider";
@@ -227,6 +228,7 @@ export {
   FlowLayout,
   FlowItemWrapper,
   COMPONENT_PART_KEY,
+  Part,
   useAppContext,
   ToneChangerButton,
   NavPanelCollapseButton,

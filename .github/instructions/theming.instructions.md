@@ -11,8 +11,8 @@ These rules apply whenever editing SCSS module files.
 | Topic | AI Doc |
 |-------|--------|
 | Theming system | `.ai/xmlui/theming-styling.md` |
-| SCSS conventions | `.ai/xmlui/components/styling.md` |
-| Parts pattern | `.ai/xmlui/components/parts.md` |
+| SCSS conventions | `.ai/xmlui/theming-styling.md` |
+| Parts pattern | `.ai/xmlui/theming-styling.md` |
 
 Verified rules: `guidelines.md` at the repo root (Topic 7).
 

@@ -326,4 +326,4 @@ throw "error message"     // ✅  instead of: throw new Error("...")
 
 Use `delay(ms)` instead of `setTimeout`. Compose async work by writing statements in order.
 
-See `testing/e2e.md` for applied examples in the test context.
+See `testing-conventions.md` for applied examples in the test context.

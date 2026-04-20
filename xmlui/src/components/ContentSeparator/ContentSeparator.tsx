@@ -3,7 +3,7 @@ import styles from "./ContentSeparator.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { orientationOptionMd } from "../abstractions";
-import { ContentSeparator, defaultProps } from "./ContentSeparatorNative";
+import { ContentSeparator, defaultProps } from "./ContentSeparatorReact";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "ContentSeparator";

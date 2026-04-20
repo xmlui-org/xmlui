@@ -2,7 +2,7 @@ import styles from "./TableOfContents.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { TableOfContents, defaultProps } from "./TableOfContentsNative";
+import { TableOfContents, defaultProps } from "./TableOfContentsReact";
 import { useIndexerContext } from "../App/IndexerContext";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
 import React from "react";

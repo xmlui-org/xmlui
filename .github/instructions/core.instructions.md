@@ -15,7 +15,7 @@ Before editing any subsystem, read its corresponding AI doc in `.ai/xmlui/`:
 | Rendering pipeline | `rendering/` | `.ai/xmlui/rendering-pipeline.md` |
 | State / containers | `containers/` | `.ai/xmlui/container-state.md` |
 | Theming / CSS | `theming/` | `.ai/xmlui/theming-styling.md` |
-| Parts | `parts/` | `.ai/xmlui/components/parts.md` |
+| Parts | `parts/` | `.ai/xmlui/theming-styling.md` |
 | Form infrastructure | `form*/` | `.ai/xmlui/form-infrastructure.md` |
 | User-defined components | `ud-components/` | `.ai/xmlui/user-defined-components.md` |
 | Error handling | `ErrorBoundary*` | `.ai/xmlui/error-handling.md` |

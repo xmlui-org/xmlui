@@ -10,7 +10,7 @@ description: Audit an existing component for conventions, accessibility, and tes
 1. Read `feature.md` at the repo root — if it specifies which component to review and any focus areas.
 2. Read `guidelines.md` at the repo root — all topic sections are relevant for a QA review.
 3. Read these reference files:
-   - `.ai/xmlui/components/qa-checklist.md` — the primary QA checklist (always, this drives the review)
+   - `.ai/xmlui/qa-checklist.md` — the primary QA checklist (always, this drives the review)
    - `.ai/xmlui/component-architecture.md` — two-file pattern, metadata, renderer, native (always)
    - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (if component uses wrapComponent)
    - `.ai/xmlui/theming-styling.md` — CSS variables, SCSS conventions (visual components)
@@ -30,14 +30,14 @@ description: Audit an existing component for conventions, accessibility, and tes
 
 ### Step 1 — File structure audit
 
-From `.ai/xmlui/components/qa-checklist.md` § 1:
+From `.ai/xmlui/qa-checklist.md` § 1:
 - [ ] No `index.ts` in the component folder
 - [ ] Correct file naming pattern
 - [ ] Single-file for non-visual, dual-file for complex components
 
 ### Step 2 — Metadata audit
 
-From `.ai/xmlui/components/qa-checklist.md` § 2:
+From `.ai/xmlui/qa-checklist.md` § 2:
 - [ ] All props, events, APIs, contextVars, themeVars declared
 - [ ] `defaultValue` references `defaultProps.<prop>`, never a literal
 - [ ] Event helpers match `lookupEventHandler()` strings
@@ -47,7 +47,7 @@ From `.ai/xmlui/components/qa-checklist.md` § 2:
 
 ### Step 3 — Renderer audit
 
-From `.ai/xmlui/components/qa-checklist.md` § 3:
+From `.ai/xmlui/qa-checklist.md` § 3:
 - [ ] No React hooks in the renderer
 - [ ] All props extracted with correct `extractValue.*` calls
 - [ ] Events wired with `lookupEventHandler`
@@ -56,7 +56,7 @@ From `.ai/xmlui/components/qa-checklist.md` § 3:
 
 ### Step 4 — Native component audit
 
-From `.ai/xmlui/components/qa-checklist.md` § 4+:
+From `.ai/xmlui/qa-checklist.md` § 4+:
 - [ ] `forwardRef` + `memo` used
 - [ ] `defaultProps` exported and used for defaults
 - [ ] No `useImperativeHandle` (use `registerComponentApi`)
@@ -65,7 +65,7 @@ From `.ai/xmlui/components/qa-checklist.md` § 4+:
 
 ### Step 5 — Theming and styling audit
 
-- [ ] SCSS module follows naming conventions from `.ai/xmlui/components/styling.md`
+- [ ] SCSS module follows naming conventions from `.ai/xmlui/theming-styling.md`
 - [ ] Theme variables use `createThemeVar` pattern
 - [ ] `:export { themeVars }` block present
 - [ ] No hardcoded colors or sizes that should be theme variables

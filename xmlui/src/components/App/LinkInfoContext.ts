@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { NavHierarchyNode } from "../NavPanel/NavPanelNative";
+import type { NavHierarchyNode } from "../NavPanel/NavPanelReact";
 
 export interface ILinkInfoContext {
   linkMap?: Map<string, NavHierarchyNode>;

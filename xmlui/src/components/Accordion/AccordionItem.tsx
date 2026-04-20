@@ -4,7 +4,7 @@ import { MemoizedItem } from "../../components/container-helpers";
 import {
   AccordionItemComponent,
   defaultProps,
-} from "../../components/Accordion/AccordionItemNative";
+} from "../../components/Accordion/AccordionItemReact";
 
 const COMP = "AccordionItem";
 

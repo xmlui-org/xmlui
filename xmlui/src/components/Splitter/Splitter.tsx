@@ -11,7 +11,7 @@ import { NotAComponentDefError } from "../../components-core/EngineError";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
-import { Splitter, defaultProps } from "./SplitterNative";
+import { Splitter, defaultProps } from "./SplitterReact";
 
 const COMP = "Splitter";
 

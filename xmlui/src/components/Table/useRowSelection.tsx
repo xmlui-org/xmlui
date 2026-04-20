@@ -5,7 +5,7 @@ import { union, uniq } from "lodash-es";
 import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { usePrevious } from "../../components-core/utils/hooks";
-import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
+import { useSelectionContext } from "../SelectionStore/SelectionStoreReact";
 import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 /**

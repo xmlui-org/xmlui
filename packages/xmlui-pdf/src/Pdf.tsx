@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata, d, parseScssVar, type ComponentMetadata } from "xmlui";
-import { LazyPdf } from "./LazyPdfNative";
+import { LazyPdf } from "./LazyPdfReact";
 import styles from "./Pdf.module.scss";
 
 const COMP = "Pdf";
@@ -20,6 +20,7 @@ export const PdfMd: ComponentMetadata = createMetadata({
     mode: {
       description: `Display mode: "view" for read-only or "edit" for annotation editing. Default: "view".`,
       valueType: "string",
+      defaultValue: "view",
     },
     scale: {
       description: `Zoom level for the PDF pages. Default: 1.0.`,
@@ -38,10 +39,12 @@ export const PdfMd: ComponentMetadata = createMetadata({
     horizontalAlignment: {
       description: `Horizontal alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
       valueType: "string",
+      defaultValue: "start",
     },
     verticalAlignment: {
       description: `Vertical alignment of PDF pages within the viewer. Options: "start" (default), "center", "end".`,
       valueType: "string",
+      defaultValue: "start",
     },
     scrollStyle: {
       description:
@@ -427,28 +430,25 @@ export const PdfMd: ComponentMetadata = createMetadata({
     // Page styling
     "boxShadow-page-Pdf": "$boxShadow-md",
     "gap-pages-Pdf": "$space-4",
-    
-    // Annotation box styling
-    "borderColor-annotationBox-Pdf": "transparent",
-    "backgroundColor-annotationBox-Pdf": "rgba(255, 255, 255, 0.8)",
-    "borderColor-selected-Pdf": "#007bff",
+
+    // Annotation field styling (maps to Pdf.module.scss $borderColor-field-Pdf, $backgroundColor-field-Pdf)
+    "borderColor-field-Pdf": "transparent",
+    "backgroundColor-field-Pdf": "rgba(255, 255, 255, 0.8)",
+    "color-selected-Pdf": "#007bff",
     "boxShadow-selected-Pdf": "0 0 0 2px rgba(0, 123, 255, 0.25)",
-    
+
     // Type-specific background colors
     "backgroundColor-text-Pdf": "rgba(255, 255, 220, 0.8)",
     "backgroundColor-checkbox-Pdf": "rgba(220, 255, 220, 0.8)",
     "backgroundColor-signature-Pdf": "rgba(220, 220, 255, 0.8)",
-    
-    // Text styling
-    "color-label-Pdf": "#333",
-    "color-value-Pdf": "#666",
-    "backgroundColor-deleteButton-Pdf": "#dc3545",
-    "backgroundColor-deleteButton-hover-Pdf": "#c82333",
-    "color-deleteButton-Pdf": "white",
-    
-    // Resize handle styling
-    "backgroundColor-resizeHandle-Pdf": "#007bff",
-    "backgroundColor-resizeHandle-hover-Pdf": "#0056b3",
+
+    // Delete / resize handle colors
+    "color-delete-Pdf": "#dc3545",
+    "color-resizeHandle-Pdf": "#007bff",
+
+    // Toolbar styling
+    "backgroundColor-toolbar-Pdf": "#ffffff",
+    "borderColor-toolbar-Pdf": "#dee2e6",
 
     // Scrollbar styling — same defaults as ScrollViewer/Scroller so the scrollbar
     // works correctly even when ScrollViewer is not registered in the host app.

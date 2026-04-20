@@ -4,7 +4,7 @@ Agent-oriented reference for the XMLUI monorepo. Read this first for any task.
 For deeper detail, refer to:
 
 - **`xmlui/dev-docs/`** — architecture & subsystem reference (rendering, containers, theming, forms, etc.)
-- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/components/overview.md` (component authoring), `.ai/xmlui/components/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing/e2e.md` (E2E conventions).
+- **`.ai/xmlui/`** — contribution conventions and patterns (components, testing, QA checklist). Key files: `.ai/xmlui/markup.md` (XMLUI markup patterns, context variables, scripting semantics), `.ai/xmlui/data.md` (DataSource/APICall patterns), `.ai/xmlui/component-architecture.md` (component authoring — metadata, renderer, native patterns), `.ai/xmlui/behaviors.md` (auto-attached behaviors), `.ai/xmlui/testing-conventions.md` (E2E + unit test conventions), `.ai/xmlui/qa-checklist.md` (QA audit checklist).
 
 ---
 
@@ -107,6 +107,7 @@ Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke wi
 | Create a new extension package | `#create-extension-package` | Setting up a brand-new `packages/xmlui-*` package with component(s) |
 | Fix a bug | `#fix-bug` | Diagnosing and fixing a component issue with regression tests |
 | QA review a component | `#qa-review` | Auditing an existing component against conventions, accessibility, and test coverage |
+| Review and fix a component | `#review-component` | Auditing a component with the QA checklist and applying fixes, including Native→React rename |
 | Add E2E tests | `#add-e2e-tests` | Adding or expanding Playwright tests for an under-tested component |
 | Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
 | Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |
@@ -148,19 +149,7 @@ If no prompt is invoked, use the documentation map below to find the right refer
 | `accessibility.md` | ARIA, keyboard nav, per-component audit | Accessibility fixes |
 | `doc-generation.md` | Generate-docs pipeline, MetadataProcessor | Documentation generation |
 
-### Component Authoring (`.ai/xmlui/components/`)
-
-| File | Covers |
-|------|--------|
-| `overview.md` | Component authoring entry point |
-| `metadata.md` | `createMetadata` API reference |
-| `renderer.md` | Renderer function patterns |
-| `native.md` | Native component patterns |
-| `styling.md` | SCSS modules, theme variables |
-| `parts.md` | Parts pattern for sub-elements |
-| `state.md` | Component state management |
-| `behaviors.md` | Behavior authoring and registration |
-| `qa-checklist.md` | QA audit checklist |
+| `qa-checklist.md` | QA audit checklist — actionable per-section checklist for component reviews |
 
 ### Human-Readable Guides (`xmlui/dev-docs/guide/`)
 

@@ -5,7 +5,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { createMetadata, dComponent } from "../../components/metadata-helpers";
 import { SlotItem } from "../../components/SlotItem";
-import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderNative";
+import { AppContextAwareAppHeader, defaultProps } from "./AppHeaderReact";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 

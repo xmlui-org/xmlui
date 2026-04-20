@@ -2,7 +2,7 @@ import styles from "./HeroSection.module.scss";
 
 import { wrapComponent, createMetadata, dComponent, d, parseScssVar } from "xmlui";
 import type { ComponentMetadata } from "xmlui";
-import { HeroSection, defaultProps } from "./HeroSectionNative";
+import { HeroSection, defaultProps } from "./HeroSectionReact";
 
 const COMP = "HeroSection";
 
@@ -44,90 +44,90 @@ export const HeroSectionMd: ComponentMetadata = createMetadata({
   props: {
     headerAlignment: {
       description: "Alignment of the header content",
-      type: "string",
+      valueType: "string",
       defaultValue: "center",
-      options: ["start", "center", "end"],
+      availableValues: ["start", "center", "end"],
     },
     contentPlacement: {
       description: "Position of the content area relative to the header",
-      type: "string", 
+      valueType: "string", 
       defaultValue: defaultProps.contentPlacement,
-      options: ["left", "right", "bottom"],
+      availableValues: ["left", "right", "bottom"],
     },
     contentAlignment: {
       description: "Horizontal alignment of the content within its area",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.contentAlignment,
-      options: ["start", "center", "end"],
+      availableValues: ["start", "center", "end"],
     },
     headerWidth: {
       description: "Width of the header section in horizontal layouts",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.headerWidth,
     },
     contentWidth: {
       description: "Width of the hero content (header + content sections)",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.contentWidth,
     },
     gap: {
       description: "Gap between header and content sections",
-      type: "string",
+      valueType: "string",
     },
     preamble: {
       description: "The preamble text for the hero section",
-      type: "string",
+      valueType: "string",
     },
     headline: {
       description: "The headline text for the hero section",
-      type: "string",
+      valueType: "string",
     },
     subheadline: {
       description: "The subheadline text for the hero section",
-      type: "string",
+      valueType: "string",
     },
     mainText: {
       description: "The main text content for the hero section",
-      type: "string",
+      valueType: "string",
     },
     mainTextTemplate: dComponent("The template for the text content in the hero section"),
     ctaButtonIcon: {
       description: "The icon for the call-to-action button",
-      type: "string",
+      valueType: "string",
     },
     ctaButtonText: {
       description: "The text for the call-to-action button",
-      type: "string",
+      valueType: "string",
     },
     ctaButtonTemplate: dComponent("The template for the call-to-action button"),
     fullWidthBackground: {
       description: "Whether the background should span the full width of the viewport",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.fullWidthBackground,
     },
     image: {
       description: "The image for the hero section",
-      type: "string",
+      valueType: "string",
     },
     imageWidth: {
       description: "The width of the image",
-      type: "string",
+      valueType: "string",
     },
     imageHeight: {
       description: "The height of the image",
-      type: "string",
+      valueType: "string",
     },
     backgroundTemplate: dComponent("The template for the background of the hero section"),
     headerTone: {
       description: "The tone for the header section, affecting text colors",
-      type: "string",
-      options: ["light", "dark", "reverse"],
+      valueType: "string",
+      availableValues: ["light", "dark", "reverse"],
       defaultValue: "dark",
     },
     contentTone: {
       description: "The tone for the content section, affecting text colors",
-      type: "string",
-      options: ["light", "dark", "reverse"],
+      valueType: "string",
+      availableValues: ["light", "dark", "reverse"],
       defaultValue: "dark",
     },
     className: d("Additional CSS class names to apply to the hero section", undefined, "string"),

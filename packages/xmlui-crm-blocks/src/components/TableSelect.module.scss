@@ -10,6 +10,7 @@ $component: "TableSelect";
 
 $borderColor:           createThemeVar("borderColor-#{$component}");
 $borderColorHover:      createThemeVar("borderColor-#{$component}--hover");
+$borderColorFocus:      createThemeVar("borderColor-#{$component}--focus");
 $outlineColor:          createThemeVar("outlineColor-#{$component}--focus");
 $outlineWidth:          createThemeVar("outlineWidth-#{$component}--focus");
 $outlineStyle:          createThemeVar("outlineStyle-#{$component}--focus");
@@ -72,7 +73,7 @@ $rowBorderColor:        createThemeVar("borderColor-#{$component}-row");
     outline-width: $outlineWidth;
     outline-style: $outlineStyle;
     outline-offset: $outlineOffset;
-    border-color: $borderColorHover;
+    border-color: $borderColorFocus;
   }
 
   &.open {

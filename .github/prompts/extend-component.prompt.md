@@ -16,11 +16,8 @@ description: Extend an existing XMLUI component with new props, events, theme va
 4. Read only the sub-files relevant to what you are adding:
    - `.ai/xmlui/component-architecture.md` — two-file pattern overview (always)
    - `.ai/xmlui/wrapcomponent.md` — wrapComponent config API (if component uses wrapComponent)
-   - `.ai/xmlui/components/metadata.md` — adding props/events/apis/contextVars
-   - `.ai/xmlui/components/styling.md` — adding theme variables
-   - `.ai/xmlui/components/parts.md` — adding parts
-   - `.ai/xmlui/components/state.md` — adding stateful behavior
-   - `.ai/xmlui/theming-styling.md` — theming system (if adding visual props)
+   - `.ai/xmlui/theming-styling.md` — theming system (if adding visual props or parts)
+   - `.ai/xmlui/container-state.md` — state management (if adding stateful behavior)
    - `.ai/xmlui/behaviors.md` — behavior system (if new prop triggers a behavior)
    - `.ai/xmlui/testing-conventions.md` — testing patterns (when adding tests)
    - `.ai/xmlui/accessibility.md` — accessibility (if adding interactive elements)

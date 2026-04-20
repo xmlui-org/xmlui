@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationReact";
 
 const COMP = "FadeInAnimation";
 
@@ -53,7 +53,7 @@ export const fadeInAnimationRenderer = wrapComponent(
   FadeInAnimationMd,
   {
     exposeRegisterApi: true,
-    events: [],
+    events: {},
     exclude: ["animateWhenInView", "reverse", "loop", "delay", "duration"],
     customRender(_props, { node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) {
       return (

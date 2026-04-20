@@ -2,7 +2,7 @@ import styles from "./SpaceFiller.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { SpaceFiller } from "./SpaceFillerNative";
+import { SpaceFiller } from "./SpaceFillerReact";
 import { createMetadata } from "../metadata-helpers";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";

@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 
 import { createMetadata, dComponent } from "../metadata-helpers";
 import { appLayoutMd } from "../App/AppLayoutContext";
-import { App as AppComponent, defaultProps } from "./AppNative";
+import { App as AppComponent, defaultProps } from "./AppReact";
 import { useRef } from "react";
 import { SearchIndexCollector } from "./SearchIndexCollector";
 import { extractAppComponents, extractNavPanelFromPages } from "./AppNavigation";

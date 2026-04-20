@@ -4,8 +4,8 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { createMetadata } from "../../components/metadata-helpers";
-import { ScrollViewer, defaultProps } from "./ScrollViewerNative";
-import { Scroller } from "./Scroller";
+import { ScrollViewer, defaultProps } from "./ScrollViewerReact";
+import { Scroller, type ScrollStyle } from "./Scroller";
 export { type ScrollStyle } from "./Scroller";
 
 const COMP = "ScrollViewer";
@@ -179,7 +179,7 @@ export const scrollViewerComponentRenderer = wrapComponent(
       return (
         <ScrollViewer
           classes={classes}
-          scrollStyle={scrollStyle as any}
+          scrollStyle={scrollStyle as ScrollStyle}
           showScrollerFade={showScrollerFade}
           header={header}
           footer={footer}

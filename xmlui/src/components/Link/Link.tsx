@@ -4,7 +4,7 @@ import React from "react";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
 import { LinkTargetMd, alignmentOptionValues } from "../abstractions";
-import { LinkNative, defaultProps } from "./LinkNative";
+import { LinkNative, defaultProps } from "./LinkReact";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
@@ -29,12 +29,12 @@ export const LinkMd = createMetadata({
     enabled: dEnabled(),
     active: {
       description: `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.active,
     },
     noIndicator: {
       description: `Indicates whether this link should have a distinct visual appearance.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: false,
     },
     target: {
@@ -42,7 +42,7 @@ export const LinkMd = createMetadata({
         `This property specifies where to open the link represented by the \`${COMP}\`. This ` +
         `property accepts the following values (in accordance with the HTML standard):`,
       availableValues: LinkTargetMd,
-      type: "string",
+      valueType: "string",
     },
     label: dLabel(),
     icon: d(

@@ -45,6 +45,10 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
     font-family: $fontFamily-ExpandableItem;
     font-size: $fontSize-ExpandableItem;
     font-weight: $fontWeight-ExpandableItem;
+    box-sizing: border-box;
+    // Allow the component to shrink below its intrinsic content width when placed
+    // in flex/grid containers, so a wide expanded content does not push siblings.
+    min-width: 0;
     &.disabled {
       color: $color-ExpandableItem--disabled;
       cursor: not-allowed;
@@ -112,11 +116,13 @@ $animationDuration-content-ExpandableItem: createThemeVar("animationDuration-con
     
     .content {
       width: 100%;
+      box-sizing: border-box;
+      min-width: 0;
       @include t.paddingVars($themeVars, "content-#{$component}");
       @include t.borderVars($themeVars, "content-#{$component}");
       @include t.textVars($themeVars, "content-#{$component}");
       animation: expandableItemSlideIn $animationDuration-content-ExpandableItem $animation-content-ExpandableItem;
-      
+
       &.contentHidden {
         display: none;
       }

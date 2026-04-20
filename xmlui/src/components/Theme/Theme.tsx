@@ -1,7 +1,7 @@
 import type { ThemeTone } from "../../abstractions/ThemingDefs";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
-import { Theme, defaultProps } from "./ThemeNative";
+import { Theme, defaultProps } from "./ThemeReact";
 
 const COMP = "Theme";
 

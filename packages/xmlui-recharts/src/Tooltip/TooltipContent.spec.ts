@@ -52,7 +52,8 @@ test.describe("Basic Functionality", () => {
 
       // Hover over a pie sector to trigger tooltip
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       // Tooltip should appear
       await expect(page.locator(tooltipSelector)).toBeVisible();
@@ -98,7 +99,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       const indicator = page.locator(tooltipIndicatorSelector);
@@ -151,7 +153,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       await expect(page.locator(tooltipNameSelector)).toContainText("Single");
@@ -196,7 +199,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -222,8 +226,11 @@ test.describe("Basic Functionality", () => {
       `, { extensionIds: "xmlui-recharts" });
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
-      const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      // Use .last() — the positive-value sector is last in data order; the zero-value
+      // sector may not render a visible arc, making .first() land on it unpredictably.
+      const pieSector = page.locator(".recharts-pie-sector").last();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
       // Should handle zero values gracefully
@@ -247,7 +254,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -274,7 +282,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -299,7 +308,8 @@ test.describe("Basic Functionality", () => {
 
       await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
-      await pieSector.hover();
+      await pieSector.waitFor({ state: "visible", timeout: 10000 });
+      await pieSector.hover({ force: true });
 
       await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -363,7 +373,8 @@ test.describe("Accessibility", () => {
 
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
 
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -391,7 +402,8 @@ test.describe("Accessibility", () => {
 
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
 
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -451,12 +463,14 @@ test.describe("Performance and Edge Cases", () => {
 
     // Rapidly hover over different sectors
     for (let i = 0; i < 3; i++) {
-      await sectors.nth(i).hover();
+      await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
+      await sectors.nth(i).hover({ force: true });
       await page.waitForTimeout(100);
     }
 
     // Tooltip should still work correctly
-    await sectors.first().hover();
+    await sectors.first().waitFor({ state: "visible", timeout: 10000 });
+    await sectors.first().hover({ force: true });
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
   });
 
@@ -497,7 +511,8 @@ test.describe("Performance and Edge Cases", () => {
 
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
 
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
 
@@ -522,7 +537,8 @@ test.describe("Performance and Edge Cases", () => {
 
     // Hover near edge of small chart
     const pieSector = page.locator(".recharts-pie-sector").first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
 
     await expect(page.locator(tooltipContentSelector)).toBeVisible();
 

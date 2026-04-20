@@ -9,9 +9,9 @@ import { EMPTY_OBJECT } from "../../components-core/constants";
 import { createMetadata, d, dComponent } from "../metadata-helpers";
 import type { PropertyValueDescription, ComponentDef } from "../../abstractions/ComponentDefs";
 import type { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
-import { TileGridNative, defaultProps } from "./TileGridNative";
-import type { CheckboxPosition } from "./TileGridNative";
-import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreNative";
+import { TileGridNative, defaultProps } from "./TileGridReact";
+import type { CheckboxPosition } from "./TileGridReact";
+import { StandaloneSelectionStore } from "../SelectionStore/SelectionStoreReact";
 
 const COMP = "TileGrid";
 

@@ -289,6 +289,71 @@ test.describe("Basic Functionality", () => {
     expect(summaryBox.width).toBeCloseTo(parentBox.width, 0);
   });
 
+  test("component respects explicit width prop", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(
+      `
+    <ExpandableItem summary="Test" width="300px" initiallyExpanded="true" testId="test-id-component">
+      <Text>Content</Text>
+    </ExpandableItem>
+  `,
+      {},
+    );
+    const driver = await createExpandableItemDriver();
+
+    const componentBox = await driver.component.boundingBox();
+    expect(componentBox.width).toBeCloseTo(300, 0);
+  });
+
+  test("component respects explicit width even when expanded content is wider", async ({
+    initTestBed,
+    createExpandableItemDriver,
+  }) => {
+    await initTestBed(
+      `
+    <ExpandableItem summary="Test" width="300px" initiallyExpanded="true" testId="test-id-component">
+      <Stack width="800px" backgroundColor="lightgreen">Very wide content</Stack>
+    </ExpandableItem>
+  `,
+      {},
+    );
+    const driver = await createExpandableItemDriver();
+
+    const componentBox = await driver.component.boundingBox();
+    expect(componentBox.width).toBeCloseTo(300, 0);
+  });
+
+  test("expanding one ExpandableItem with wide content does not push its sibling in an HStack", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `
+    <HStack width="600px" gap="0" testId="parent">
+      <ExpandableItem summary="First" width="300px" initiallyExpanded="true" testId="first">
+        <Stack width="800px" backgroundColor="lightgreen">Very wide content</Stack>
+      </ExpandableItem>
+      <ExpandableItem summary="Second" width="300px" testId="second">
+        <Text>Second content</Text>
+      </ExpandableItem>
+    </HStack>
+  `,
+      {},
+    );
+
+    const first = page.getByTestId("first");
+    const second = page.getByTestId("second");
+    const firstBox = await first.boundingBox();
+    const secondBox = await second.boundingBox();
+
+    expect(firstBox.width).toBeCloseTo(300, 0);
+    expect(secondBox.width).toBeCloseTo(300, 0);
+    // Second item must start exactly where the first ends (no push-shift).
+    expect(secondBox.x).toBeCloseTo(firstBox.x + firstBox.width, 0);
+  });
+
   test("fullWidthSummary with iconPosition='end' takes full width", async ({
     initTestBed,
     createExpandableItemDriver,

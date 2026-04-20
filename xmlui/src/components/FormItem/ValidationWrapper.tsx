@@ -8,10 +8,10 @@ import type {
   ValidationMode,
 } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-import { getByPath } from "../Form/FormNative";
+import { getByPath } from "../Form/FormReact";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { HelperText } from "./HelperText";
-import { FormItemContext } from "./FormItemNative";
+import { FormItemContext } from "./FormItemReact";
 import { resolveFormItemId } from "./FormItemUtils";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 import styles from "./FormItem.module.scss";

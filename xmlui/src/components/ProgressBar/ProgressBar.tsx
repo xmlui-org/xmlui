@@ -2,7 +2,7 @@ import styles from "./ProgressBar.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { ProgressBar, defaultProps } from "./ProgressBarNative";
+import { ProgressBar, defaultProps } from "./ProgressBarReact";
 import { createMetadata } from "../metadata-helpers";
 
 const COMP = "ProgressBar";
@@ -28,6 +28,7 @@ export const ProgressBarMd = createMetadata({
     [`thickness-${COMP}`]: "0.5em",
     [`backgroundColor-${COMP}`]: "$color-surface-200",
     [`color-indicator-${COMP}`]: "$color-primary-500",
+    [`color-indicator-${COMP}--complete`]: "$color-success-500",
   },
 });
 

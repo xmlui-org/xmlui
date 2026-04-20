@@ -3,7 +3,7 @@ import { createComponentRenderer } from "../../components-core/renderers";
 import type { ApiOperationDef } from "../../components-core/RestApiProxy";
 import { createMetadata, dInternal } from "../../components/metadata-helpers";
 import { httpMethodNames } from "../abstractions";
-import { APICallNative, defaultProps } from "./APICallNative";
+import { APICallReact, defaultProps } from "./APICallReact";
 
 const COMP = "APICall";
 
@@ -125,7 +125,7 @@ export const APICallMd = createMetadata({
         "When enabled, the component will automatically poll a status endpoint to track operation progress. " +
         "(Experimental feature)",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.deferredMode,
     },
     statusUrl: {
       description:
@@ -138,18 +138,18 @@ export const APICallMd = createMetadata({
       description: "HTTP method for status requests. Defaults to 'get'.",
       valueType: "string",
       availableValues: httpMethodNames,
-      defaultValue: "get",
+      defaultValue: defaultProps.statusMethod,
     },
     pollingInterval: {
       description: "Milliseconds between status polls. Defaults to 2000ms.",
       valueType: "number",
-      defaultValue: 2000,
+      defaultValue: defaultProps.pollingInterval,
     },
     maxPollingDuration: {
       description:
         "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
       valueType: "number",
-      defaultValue: 300000,
+      defaultValue: defaultProps.maxPollingDuration,
     },
     pollingBackoff: {
       description:
@@ -157,13 +157,13 @@ export const APICallMd = createMetadata({
         "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
       valueType: "string",
       availableValues: ["none", "linear", "exponential"],
-      defaultValue: "none",
+      defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {
       description:
         "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
       valueType: "number",
-      defaultValue: 30000,
+      defaultValue: defaultProps.maxPollingInterval,
     },
     completionCondition: {
       description:
@@ -194,7 +194,7 @@ export const APICallMd = createMetadata({
       description: "HTTP method for cancel requests. Defaults to 'post'.",
       valueType: "string",
       availableValues: httpMethodNames,
-      defaultValue: "post",
+      defaultValue: defaultProps.cancelMethod,
     },
     cancelBody: {
       description:
@@ -405,7 +405,7 @@ export const apiCallRenderer = createComponentRenderer(
   APICallMd,
   ({ node, registerComponentApi, uid, updateState, lookupEventHandler }) => {
     return (
-      <APICallNative
+      <APICallReact
         registerComponentApi={registerComponentApi}
         node={node as any}
         uid={uid}
@@ -413,6 +413,8 @@ export const apiCallRenderer = createComponentRenderer(
         onSuccess={lookupEventHandler("success")}
         onStatusUpdate={lookupEventHandler("statusUpdate")}
         onTimeout={lookupEventHandler("timeout")}
+        onPollingStart={lookupEventHandler("pollingStart")}
+        onPollingComplete={lookupEventHandler("pollingComplete")}
         hasMockExecute={!!node.events?.mockExecute}
       />
     );

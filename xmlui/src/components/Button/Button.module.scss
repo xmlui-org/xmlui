@@ -210,9 +210,9 @@ $transition-Button: createThemeVar('transition-#{$component}');
 
     &.buttonVertical {
       flex-direction: column;
-      gap: t.$space-1;
-      width: fit-content;
-      height: fit-content;
+      gap: createThemeVar('gap-Button-vertical');
+      width: createThemeVar('width-Button-vertical');
+      height: createThemeVar('height-Button-vertical');
 
       &.xs {
         @include t.paddingVars($themeVars, "#{$component}-xs");

@@ -81,7 +81,7 @@ Use the documentation map in `AGENTS.md` to identify which AI docs are relevant:
 | Task focus | Likely docs |
 |-----------|-------------|
 | Any component work | `component-architecture.md`, `wrapcomponent.md` |
-| Visual components | `theming-styling.md`, `components/styling.md` |
+| Visual components | `theming-styling.md` |
 | Interactive components | `accessibility.md`, `behaviors.md` |
 | Form components | `form-infrastructure.md`, `behaviors.md` |
 | Data components | `data-operations.md` |

@@ -3,7 +3,7 @@ import styles from "./IFrame.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, d } from "../metadata-helpers";
-import { IFrame } from "./IFrameNative";
+import { IFrame } from "./IFrameReact";
 
 const COMP = "IFrame";
 
@@ -31,7 +31,7 @@ export const IFrameMd = createMetadata({
     ),
     referrerPolicy: {
       description: "Controls how much referrer information is sent when fetching the iframe content.",
-      type: "string",
+      valueType: "string",
       availableValues: [
         { value: "no-referrer", description: "Never send referrer information" },
         { value: "no-referrer-when-downgrade", description: "Send referrer only for same-security destinations" },

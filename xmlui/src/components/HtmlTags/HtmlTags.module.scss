@@ -340,25 +340,6 @@ $marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
   }
 }
 
-// --- Details
-
-$themeVarsDetails: ();
-
-@function createThemeVarDetails($componentVariable) {
-  $themeVarsDetails: t.appendThemeVar($themeVarsDetails, $componentVariable) !global;
-  @return t.getThemeVar($themeVarsDetails, $componentVariable);
-}
-
-$marginTop-HtmlDetails: createThemeVarDetails("marginTop-HtmlDetails");
-$marginBottom-HtmlDetails: createThemeVarDetails("marginBottom-HtmlDetails");
-
-@layer components {
-  .htmlDetails {
-    margin-top: $marginTop-HtmlDetails;
-    margin-bottom: $marginBottom-HtmlDetails;
-  }
-}
-
 // --- We export the theme variables to add them to the component renderer
 :export {
   themeVarsTable: t.json-stringify($themeVarsTable);

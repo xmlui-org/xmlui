@@ -4,7 +4,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, dContextMenu } from "../metadata-helpers";
-import { TreeComponent, defaultProps } from "./TreeNative";
+import { TreeComponent, defaultProps } from "./TreeReact";
 import styles from "./TreeComponent.module.scss";
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
 
@@ -66,6 +66,9 @@ export const TreeMd = createMetadata({
     selectedValue: {
       description: `The selected item ID in source data format.`,
     },
+    selectedId: {
+      description: `An alias for selectedValue — selects a tree node by its source data ID.`,
+    },
     defaultExpanded: {
       description: `Initial expansion state: "none", "all", "first-level", or array of specific IDs.`,
       valueType: "string",
@@ -107,8 +110,8 @@ export const TreeMd = createMetadata({
         `When set to \`true\`, the tree will measure the height of the first item and use that ` +
         `as a fixed size hint for all items. This improves scroll performance when all items have ` +
         `the same height. If items have varying heights, leave this as \`false\`.`,
-      type: "boolean",
-      defaultValue: false,
+      valueType: "boolean",
+      defaultValue: defaultProps.animateExpand,
     },
     animateExpand: {
       description: `When true, uses only the collapsed icon and rotates it for expansion instead of switching icons (default: false).`,

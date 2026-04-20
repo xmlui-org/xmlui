@@ -1,5 +1,6 @@
-import { BarChart, defaultProps } from "./BarChartNative";
-import { wrapComponent, createMetadata, type ComponentMetadata } from "xmlui";
+import { BarChart, defaultProps } from "./BarChartReact";
+import { wrapComponent, createMetadata, type ComponentMetadata, parseScssVar } from "xmlui";
+import styles from "./BarChart.module.scss";
 
 const COMP = "BarChart";
 
@@ -90,6 +91,7 @@ export const BarChartMd: ComponentMetadata = createMetadata({
       description: "This property allows replacing the default template to display a tooltip.",
     },
   },
+  themeVars: parseScssVar(styles.themeVars),
 });
 
 export const barChartComponentRenderer = wrapComponent(COMP, BarChart, BarChartMd, {

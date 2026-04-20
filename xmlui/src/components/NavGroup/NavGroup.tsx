@@ -5,7 +5,7 @@ import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ThemedIcon } from "../Icon/Icon";
 import { createMetadata, d, dEnabled, dLabel } from "../metadata-helpers";
-import { defaultProps, NavGroup } from "./NavGroupNative";
+import { defaultProps, NavGroup } from "./NavGroupReact";
 
 const COMP = "NavGroup";
 
@@ -78,7 +78,7 @@ export const NavGroupMd = createMetadata({
         { value: "center", description: "Align icon to the center (default)" },
         { value: "end", description: "Align icon to the bottom" },
       ],
-      defaultValue: "center",
+      defaultValue: defaultProps.iconAlignment,
     },
     expandIconAlignment: {
       description:
@@ -89,7 +89,7 @@ export const NavGroupMd = createMetadata({
         { value: "start", description: "Display arrow immediately after the label (default)" },
         { value: "end", description: "Push arrow to the right edge of the NavGroup" },
       ],
-      defaultValue: "start",
+      defaultValue: defaultProps.expandIconAlignment,
     },
   },
   themeVars: parseScssVar(styles.themeVars),

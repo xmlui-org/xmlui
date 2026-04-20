@@ -16,9 +16,10 @@ export const MessageListenerMd = createMetadata({
   events: {
     messageReceived: {
       description: `This event fires when the \`${COMP}\` component receives a message from another window or iframe via the window.postMessage API.`,
-      signature: "(data: any) => void",
+      signature: "(data: any, event: MessageEvent<any>) => void",
       parameters: {
         data: "The data sent from the other window via postMessage.",
+        event: "The MessageEvent object containing the message and additional metadata.",
       },
     },
   },

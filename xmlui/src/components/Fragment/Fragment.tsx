@@ -14,7 +14,7 @@ export const FragmentMd = createMetadata({
   },
 });
 
-export const fragmentComponentRenderer = wrapComponent(COMP, Fragment as any, FragmentMd, {
+export const fragmentComponentRenderer = wrapComponent(COMP, Fragment as unknown as React.ComponentType, FragmentMd, {
   customRender: (_props, { node, extractValue, renderChild, layoutContext }) => {
     const renderedChild = renderChild(node.children, layoutContext);
     if (Array.isArray(renderedChild)) {

@@ -4,7 +4,7 @@ import {
   horizontalAlignmentValues,
   Legend,
   verticalAlignmentValues,
-} from "./LegendNative";
+} from "./LegendReact";
 
 const COMP = "Legend";
 

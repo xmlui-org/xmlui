@@ -24,7 +24,7 @@ import {
   DatePickerModeValues,
   defaultProps,
   WeekDays,
-} from "./DatePickerNative";
+} from "./DatePickerReact";
 import React from "react";
 import { useComponentThemeClass } from "../../components-core/theming/utils";
 
@@ -129,20 +129,19 @@ export const DatePickerMd = createMetadata({
     endIcon: dEndIcon(),
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     invalidMessages: {
       description: "The invalid messages to display for the input component.",
-      type: "array",
-      valueType: "string",
+      valueType: "any",
     },
   },
   events: {
@@ -200,7 +199,7 @@ export const ThemedDatePicker = React.forwardRef<React.ElementRef<typeof DatePic
 
 export const datePickerComponentRenderer = wrapComponent(
   COMP,
-  DatePicker,
+  ThemedDatePicker,
   DatePickerMd,
   {
     events: { didChange: "onDidChange", gotFocus: "onFocus", lostFocus: "onBlur" },

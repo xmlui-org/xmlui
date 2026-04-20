@@ -3,7 +3,7 @@ import styles from "./NoResult.module.scss";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dLabel } from "../metadata-helpers";
-import { NoResult, defaultProps } from "./NoResultNative";
+import { NoResult, defaultProps } from "./NoResultReact";
 
 const COMP = "NoResult";
 
@@ -43,7 +43,7 @@ export const noResultComponentRenderer = wrapComponent(COMP, NoResult, NoResultM
   customRender: (_props, { node, extractValue, classes }) => (
     <NoResult
       label={extractValue.asDisplayText(node.props.label || node.children || "No results found")}
-      icon={node.props.icon}
+      icon={extractValue.asOptionalString(node.props.icon)}
       hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
       classes={classes}
     />

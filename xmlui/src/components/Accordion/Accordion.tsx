@@ -3,7 +3,7 @@ import styles from "./Accordion.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { createMetadata, dFocus } from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
-import { AccordionComponent, defaultProps } from "./AccordionNative";
+import { AccordionComponent, defaultProps } from "./AccordionReact";
 import { wrapComponent } from "../../components-core/wrapComponent";
 
 const COMP = "Accordion";
@@ -96,6 +96,7 @@ export const AccordionMd = createMetadata({
     [`color-content-${COMP}`]: "$textColor-primary",
     [`backgroundColor-content-${COMP}`]: "transparent",
     [`color-icon-${COMP}`]: "$color-surface-50",
+    [`padding-content-${COMP}`]: "$space-2",
   },
 });
 

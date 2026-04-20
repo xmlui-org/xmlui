@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { ThemedButton as Button } from "../Button/Button";
 import { ThemedIcon } from "../Icon/Icon";
@@ -33,12 +34,19 @@ export const NavPanelCollapseButtonMd = createMetadata({
   },
 });
 
-export function NavPanelCollapseButton({
+type NavPanelCollapseButtonProps = {
+  icon?: string;
+  iconCollapsed?: string;
+  "aria-label"?: string;
+  "aria-labelCollapsed"?: string;
+};
+
+export const NavPanelCollapseButton = memo(function NavPanelCollapseButton({
   icon = "sidebar-collapse",
   iconCollapsed = "sidebar-collapse",
   "aria-label": ariaLabel = "Collapse sidebar",
   "aria-labelCollapsed": ariaLabelCollapsed = "Expand sidebar",
-}) {
+}: NavPanelCollapseButtonProps) {
   const layoutContext = useAppLayoutContext();
   const collapsed = layoutContext?.navPanelCollapsed ?? false;
   const toggle = layoutContext?.toggleNavPanelCollapsed;
@@ -55,7 +63,7 @@ export function NavPanelCollapseButton({
       onClick={toggle}
     />
   );
-}
+});
 
 export const navPanelCollapseButtonComponentRenderer = wrapComponent(
   COMP,

@@ -1,7 +1,7 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d, dComponent, dInternal } from "../metadata-helpers";
-import { Items, defaultProps } from "./ItemsNative";
+import { Items, defaultProps } from "./ItemsReact";
 
 const COMP = "Items";
 
@@ -19,7 +19,7 @@ export const ItemsMd = createMetadata({
     reverse: {
       description:
         "This property reverses the order in which data is mapped to template components.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.reverse,
     },
     itemTemplate: dComponent("The component template to display a single item"),

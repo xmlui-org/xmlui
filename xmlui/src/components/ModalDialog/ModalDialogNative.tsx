@@ -1,6 +1,7 @@
 import React, {
   type CSSProperties,
   type ReactNode,
+  memo,
   useContext,
   useEffect,
   useMemo,
@@ -24,14 +25,15 @@ import { Part } from "../Part/Part";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
-const PART_TITLE = "title";
-const PART_CONTENT = "content";
-
 // Default props for ModalDialog component
 export const defaultProps = {
   fullScreen: false,
   closeButtonVisible: true,
 };
+
+// Part IDs for theming
+const PART_TITLE = "title";
+const PART_CONTENT = "content";
 
 // =====================================================================================================================
 // React component definition
@@ -86,7 +88,6 @@ export const ModalDialogFrame = React.forwardRef(
     ) : null;
   },
 );
-ModalDialogFrame.displayName = "ModalDialogFrame";
 
 const ModalStateContext = React.createContext(null);
 
@@ -131,7 +132,7 @@ function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: On
   return modalStateContext || modalLocalOpenState;
 }
 
-export const ModalDialog = React.forwardRef(
+export const ModalDialog = memo(React.forwardRef(
   (
     {
       children,
@@ -317,6 +318,4 @@ export const ModalDialog = React.forwardRef(
       </Dialog.Root>
     );
   },
-);
-
-ModalDialog.displayName = "ModalDialog";
+));

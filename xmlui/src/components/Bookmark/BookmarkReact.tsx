@@ -1,4 +1,4 @@
-import type { ForwardedRef, ReactNode } from "react";
+import type { ForwardedRef } from "react";
 import { forwardRef, memo, useCallback, useContext, useEffect, useRef } from "react";
 import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
@@ -12,7 +12,6 @@ type Props = React.HTMLAttributes<HTMLSpanElement> & {
   level?: number;
   title?: string;
   omitFromToc?: boolean;
-  children: ReactNode;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
