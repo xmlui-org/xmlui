@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.12.20
+
+### Patch Changes
+
+- 87ae4e9: The XMLUI islands concept is ready for QA
+- 5ddb712: refactor: Migrated all monochrome pool icons from mixed icon packs to Lucide — a single, consistent icon set
+- b400578: feat: enhance ExpandableItem to respect explicit width and prevent sibling push in flex/grid layouts
+- 16bff91: Scripting engine improvements: removed deprecated `::` global scope operator, added configurable sync execution timeout via `appGlobals.syncExecutionTimeout`, implemented `instanceof` operator support.
+- 8d59847: Fix VStack not filling available width inside HStack, causing Table star-sized columns to render too narrow
+
 ## 0.12.19
 
 ### Patch Changes
