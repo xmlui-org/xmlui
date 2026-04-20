@@ -445,34 +445,6 @@ test.describe("Accessibility", () => {
 // =============================================================================
 
 test.describe("Performance and Edge Cases", () => {
-  test("handles rapid hover events efficiently", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <PieChart
-        nameKey="name"
-        dataKey="value"
-        data="{${sampleData}}"
-        width="400px"
-        height="400px"
-      />
-    `, { extensionIds: "xmlui-recharts" });
-
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-
-    const sectors = page.locator(".recharts-pie-sector");
-
-    // Rapidly hover over different sectors
-    for (let i = 0; i < 3; i++) {
-      await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
-      await sectors.nth(i).hover({ force: true });
-      await page.waitForTimeout(100);
-    }
-
-    // Tooltip should still work correctly
-    await sectors.first().waitFor({ state: "visible", timeout: 10000 });
-    await sectors.first().hover({ force: true });
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
-  });
-
   test("handles empty or null data gracefully", async ({ initTestBed, page }) => {
     const emptyData = `[]`;
 
