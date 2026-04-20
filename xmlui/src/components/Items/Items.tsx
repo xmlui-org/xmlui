@@ -19,7 +19,7 @@ export const ItemsMd = createMetadata({
     reverse: {
       description:
         "This property reverses the order in which data is mapped to template components.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.reverse,
     },
     itemTemplate: dComponent("The component template to display a single item"),

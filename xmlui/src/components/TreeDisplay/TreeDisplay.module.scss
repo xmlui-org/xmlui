@@ -16,6 +16,8 @@ $backgroundColor-TreeDisplay: createThemeVar("backgroundColor-#{$component}");
 $padding-TreeDisplay: createThemeVar("padding-#{$component}");
 $paddingLeft-TreeDisplay: createThemeVar("paddingLeft-#{$component}");
 $fontFamily-TreeDisplay: createThemeVar("fontFamily-#{$component}");
+$fontWeight-TreeDisplay: createThemeVar("fontWeight-#{$component}");
+$boxShadow-TreeDisplay: createThemeVar("boxShadow-#{$component}");
 $color-TreeDisplay: createThemeVar("color-#{$component}");
 $color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
 
@@ -26,6 +28,7 @@ $color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
     background-color: $backgroundColor-TreeDisplay;
     padding: $padding-TreeDisplay;
     padding-left: $paddingLeft-TreeDisplay;
+    box-shadow: $boxShadow-TreeDisplay;
   }
 
   .content {
@@ -33,6 +36,7 @@ $color-connect-TreeDisplay: createThemeVar("color-connect-#{$component}");
     word-break: break-word;
     font-family: $fontFamily-TreeDisplay;
     font-size: $fontSize-TreeDisplay;
+    font-weight: $fontWeight-TreeDisplay;
     color: $color-TreeDisplay;
   }
 

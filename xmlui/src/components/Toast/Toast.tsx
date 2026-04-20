@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata } from "../metadata-helpers";
-import { Toast } from "./ToastNative";
+import { Toast } from "./ToastReact";
 import { MemoizedItem } from "../container-helpers";
 
 const COMP = "Toast";

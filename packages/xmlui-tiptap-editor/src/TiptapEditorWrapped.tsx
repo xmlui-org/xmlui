@@ -1,4 +1,4 @@
-import { TiptapEditorRender } from "./TiptapEditorRender";
+import { TiptapEditorRender } from "./TiptapEditorReact";
 import {
   wrapCompound,
   createMetadata,

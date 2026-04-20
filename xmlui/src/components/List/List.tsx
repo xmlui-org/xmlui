@@ -14,7 +14,7 @@ import { scrollAnchoringValues } from "../abstractions";
 import {
   StandaloneSelectionStore,
   useSelectionContext,
-} from "../SelectionStore/SelectionStoreNative";
+} from "../SelectionStore/SelectionStoreReact";
 import { ListNative, MemoizedSection, defaultProps, selectionCheckboxPositionValues, selectionCheckboxAnchorValues } from "./ListReact";
 
 const COMP = "List";
@@ -47,7 +47,7 @@ export const ListMd = createMetadata({
     scrollAnchor: {
       description: `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
       availableValues: scrollAnchoringValues,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.scrollAnchor,
     },
     fixedItemSize: {
@@ -55,7 +55,7 @@ export const ListMd = createMetadata({
         `When set to \`true\`, the list will measure the height of the first item and use that ` +
         `as a fixed size hint for all items. This improves scroll performance when all items have ` +
         `the same height. If items have varying heights, leave this as \`false\`.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: false,
     },
     groupBy: d(
@@ -93,7 +93,7 @@ export const ListMd = createMetadata({
     ),
     idKey: {
       description: "Denotes which attribute of an item acts as the ID or key of the item",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.idKey,
     },
     groupsInitiallyExpanded: d(

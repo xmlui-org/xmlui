@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { createContext, useContext } from "react";
 
 import type { Option } from "../abstractions";
-import type { SingleValueType } from "../Select/SelectNative";
+import type { SingleValueType } from "../Select/SelectReact";
 
 type AutoCompleteContextValue = {
   multi?: boolean;

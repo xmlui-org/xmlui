@@ -22,7 +22,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "../metadata-helpers";
-import { TextBox, defaultProps } from "./TextBoxNative";
+import { TextBox, defaultProps } from "./TextBoxReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
 const COMP = "TextBox";

@@ -1,6 +1,6 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { createMetadata, dDidChange } from "../metadata-helpers";
-import { RadioItem, defaultProps } from "./RadioItemNative";
+import { RadioItem, defaultProps } from "./RadioItemReact";
 
 const COMP = "RadioItem";
 
@@ -10,10 +10,12 @@ export const RadioItemMd = createMetadata({
   props: {
     checked: {
       description: "This property specifies whether the radio button is checked.",
+      valueType: "boolean",
       defaultValue: defaultProps.checked,
     },
     value: {
       description: "This property specifies the value of the radio button.",
+      valueType: "string",
       defaultValue: defaultProps.value,
     },
   },

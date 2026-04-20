@@ -1,4 +1,4 @@
-import React, { forwardRef, useState, useEffect, type ReactNode, type CSSProperties } from "react";
+import React, { forwardRef, memo, useState, useEffect } from "react";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import type { OverlayScrollbars } from "overlayscrollbars";
 import "overlayscrollbars/styles/overlayscrollbars.css";
@@ -14,24 +14,12 @@ export const defaultProps = {
 };
 
 type Props = {
-  children: ReactNode;
-  className?: string;
   containerClassName?: string;
-  style?: CSSProperties;
   scrollStyle?: ScrollStyle;
   showScrollerFade?: boolean;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-/**
- * Scroller component provides customizable scrollbar styles for scroll containers.
- * 
- * @param scrollStyle - Determines the scrollbar behavior:
- *   - "normal": Standard browser scrollbar
- *   - "overlay": Overlay scrollbar using theme variables (always visible)
- *   - "whenMouseOver": Scrollbar appears only on hover (200ms delay)
- *   - "whenScrolling": Scrollbar appears during scrolling and fades out after 400ms of inactivity
- */
-export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
+export const Scroller = memo(forwardRef<HTMLDivElement, Props>(function Scroller(
   {
     children,
     className,
@@ -274,4 +262,4 @@ export const Scroller = forwardRef<HTMLDivElement, Props>(function Scroller(
       )}
     </div>
   );
-});
+}));

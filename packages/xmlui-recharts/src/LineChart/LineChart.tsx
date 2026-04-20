@@ -1,4 +1,4 @@
-import { defaultProps, LineChart } from "./LineChartNative";
+import { defaultProps, LineChart } from "./LineChartReact";
 import { wrapComponent, createMetadata, type ComponentMetadata, d, parseScssVar } from "xmlui";
 import styles from "./LineChart.module.scss";
 

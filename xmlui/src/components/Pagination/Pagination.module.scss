@@ -125,7 +125,6 @@ $gap-buttonRow-Pagination: createThemeVar("gap-buttonRow-Pagination");
     flex-direction: row;
     align-items: center;
     gap: t.$space-6;
-    flex-direction: row;
     
     .paginationVertical & {
       flex-direction: column;

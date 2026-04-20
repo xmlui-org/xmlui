@@ -22,7 +22,7 @@ import {
   d,
 } from "../metadata-helpers";
 import { MemoizedItem } from "../container-helpers";
-import { Select, defaultProps } from "./SelectNative";
+import { Select, defaultProps } from "./SelectReact";
 
 const COMP = "Select";
 
@@ -86,6 +86,8 @@ export const SelectMd = createMetadata({
     ),
     dropdownHeight: d(
       "This property sets the height of the dropdown list. If not set, the height is determined automatically.",
+      undefined,
+      "string",
     ),
     scrollIndicators: {
       description:
@@ -103,18 +105,22 @@ export const SelectMd = createMetadata({
     },
     searchable: {
       description: `This property enables the search functionality in the dropdown list.`,
+      valueType: "boolean",
       defaultValue: defaultProps.searchable,
     },
     inProgress: {
       description: `This property indicates whether the component is in progress. It can be used to show a loading message.`,
+      valueType: "boolean",
       defaultValue: defaultProps.inProgress,
     },
     inProgressNotificationMessage: {
       description: `This property indicates the message to display when the component is in progress.`,
+      valueType: "string",
       defaultValue: defaultProps.inProgressNotificationMessage,
     },
     clearable: {
       description: `This property enables a clear button that allows the user to clear the selected value(s).`,
+      valueType: "boolean",
       defaultValue: defaultProps.clearable,
     },
     modal: {
@@ -143,15 +149,15 @@ export const SelectMd = createMetadata({
     },
     verboseValidationFeedback: {
       description: "Enables a concise validation summary (icon) in input components.",
-      type: "boolean",
+      valueType: "boolean",
     },
     validationIconSuccess: {
       description: "Icon to display for valid state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
     validationIconError: {
       description: "Icon to display for error state when concise validation summary is enabled.",
-      type: "string",
+      valueType: "string",
     },
   },
   events: {

@@ -68,7 +68,7 @@ const ELLIPSES_DESC = {
   description:
     `This property indicates whether ellipses should be displayed (\`true\`) when the heading ` +
     `text is cropped or not (\`false\`).`,
-  type: "boolean",
+  valueType: "boolean" as const,
   defaultValue: defaultProps.ellipses,
 };
 const PRESERVE_DESC = d(
@@ -80,14 +80,14 @@ const PRESERVE_DESC = d(
 const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
 const OMIT_FROM_TOC_DESC = {
   description: "If true, this heading will be excluded from the table of contents.",
-  type: "boolean",
+  valueType: "boolean" as const,
   defaultValue: defaultProps.omitFromToc,
 };
 const SHOW_ANCHOR_DESC = {
   description:
     "This property indicates whether an anchor link should be displayed next to the heading. " +
     "If set to `true`, an anchor link will be displayed on hover next to the heading.",
-  type: "boolean",
+  valueType: "boolean" as const,
   defaultValue: defaultProps.showAnchor,
 };
 const ANCHOR_TEMPLATE_DESC = dComponent(

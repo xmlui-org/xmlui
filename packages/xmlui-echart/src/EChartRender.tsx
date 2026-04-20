@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ReactECharts from "echarts-for-react";
 import * as echarts from "echarts";
 import { useTheme } from "xmlui";
+import type { RegisterComponentApiFn } from "xmlui";
 import styles from "./EChart.module.scss";
 import classnames from "classnames";
 
@@ -26,62 +27,75 @@ function resolveCssValue(value: string | undefined, el: HTMLElement | undefined)
   return value;
 }
 
-function formatDisplayLabel(event: any, eventName: string): string | undefined {
+function formatDisplayLabel(event: unknown, eventName: string): string | undefined {
   if (!event || typeof event !== "object") return undefined;
-  if (event.name != null && event.selected != null) {
-    const isSelected = event.selected[event.name];
-    return `${event.name}: ${isSelected ? "show" : "hide"}`;
+  const e = event as Record<string, unknown>;
+  if (e.name != null && e.selected != null) {
+    const isSelected = (e.selected as Record<string, unknown>)[e.name as string];
+    return `${e.name}: ${isSelected ? "show" : "hide"}`;
   }
-  if (event.seriesName != null && event.name != null) {
-    const val = event.value != null ? ` = ${event.value}` : "";
-    return `${event.seriesName} → ${event.name}${val}`;
+  if (e.seriesName != null && e.name != null) {
+    const val = e.value != null ? ` = ${e.value}` : "";
+    return `${e.seriesName} → ${e.name}${val}`;
   }
-  if (eventName === "datarangeselected" && event.selected != null) {
-    const sel = Array.isArray(event.selected)
-      ? event.selected
-      : Object.values(event.selected)[0];
+  if (eventName === "datarangeselected" && e.selected != null) {
+    const sel = Array.isArray(e.selected)
+      ? e.selected
+      : Object.values(e.selected as Record<string, unknown>)[0];
     if (Array.isArray(sel) && sel.length === 2) {
       return `${Math.round(sel[0] as number)} – ${Math.round(sel[1] as number)}`;
     }
   }
-  if (event.start != null && event.end != null) {
-    return `${Math.round(event.start)}% – ${Math.round(event.end)}%`;
+  if (e.start != null && e.end != null) {
+    return `${Math.round(e.start as number)}% – ${Math.round(e.end as number)}%`;
   }
   if (eventName === "graphroam") {
-    if (event.zoom != null) return `zoom: ${event.zoom.toFixed(2)}`;
-    if (event.originX != null && event.originY != null) {
-      return `pan: ${Math.round(event.originX)}, ${Math.round(event.originY)}`;
+    if (e.zoom != null) return `zoom: ${(e.zoom as number).toFixed(2)}`;
+    if (e.originX != null && e.originY != null) {
+      return `pan: ${Math.round(e.originX as number)}, ${Math.round(e.originY as number)}`;
     }
     return "roam";
   }
-  if (eventName === "timelinechanged" && event.currentIndex != null) {
-    return `index: ${event.currentIndex}`;
+  if (eventName === "timelinechanged" && e.currentIndex != null) {
+    return `index: ${e.currentIndex}`;
   }
-  if (eventName === "timelineplaychanged" && event.playState != null) {
-    return event.playState ? "play" : "pause";
+  if (eventName === "timelineplaychanged" && e.playState != null) {
+    return e.playState ? "play" : "pause";
   }
-  if (eventName === "magictypechanged" && event.currentType != null) {
-    return event.currentType;
+  if (eventName === "magictypechanged" && e.currentType != null) {
+    return String(e.currentType);
   }
   if (eventName === "restore") return "restore";
-  if (eventName === "brush" && event.areas != null) {
-    return `${event.areas.length} area${event.areas.length !== 1 ? "s" : ""}`;
+  if (eventName === "brush" && e.areas != null) {
+    const areas = e.areas as unknown[];
+    return `${areas.length} area${areas.length !== 1 ? "s" : ""}`;
   }
-  if (eventName === "brushEnd" && event.areas != null) {
-    return `${event.areas.length} area${event.areas.length !== 1 ? "s" : ""}`;
+  if (eventName === "brushEnd" && e.areas != null) {
+    const areas = e.areas as unknown[];
+    return `${areas.length} area${areas.length !== 1 ? "s" : ""}`;
   }
-  if (eventName === "selectchanged" && event.selected != null) {
-    const total = event.selected.reduce(
-      (sum: number, s: any) => sum + (s.dataIndex?.length || 0), 0
+  if (eventName === "selectchanged" && e.selected != null) {
+    const total = (e.selected as Array<{ dataIndex?: unknown[] }>).reduce(
+      (sum: number, s) => sum + (s.dataIndex?.length || 0), 0
     );
     return total > 0 ? `${total} selected` : "none selected";
   }
-  if (event.name != null) return String(event.name);
-  if (event.seriesName != null) return String(event.seriesName);
+  if (e.name != null) return String(e.name);
+  if (e.seriesName != null) return String(e.seriesName);
   return undefined;
 }
 
-export function EChartRender({
+type Props = {
+  option?: unknown;
+  className?: string;
+  width?: string;
+  height?: string;
+  renderer?: "canvas" | "svg";
+  registerComponentApi?: RegisterComponentApiFn;
+  onNativeEvent?: (event: Record<string, unknown>) => void;
+};
+
+export const EChartRender = memo(function EChartRender({
   option,
   className,
   width,
@@ -89,19 +103,20 @@ export function EChartRender({
   renderer = "canvas",
   registerComponentApi,
   onNativeEvent,
-}: any) {
-  const chartRef = useRef<any>(null);
+}: Props) {
+  const chartRef = useRef<InstanceType<typeof ReactECharts> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { getThemeVar, root } = useTheme();
 
   const onEvents = useMemo(() => {
     if (!onNativeEvent) return undefined;
-    const map: Record<string, (event: any) => void> = {};
+    const map: Record<string, (event: unknown) => void> = {};
     for (const eventName of ECHARTS_EVENTS) {
-      map[eventName] = (event: any) => {
-        const type = event?.type || eventName;
+      map[eventName] = (event: unknown) => {
+        const e = event as Record<string, unknown>;
+        const type = (e?.type as string) || eventName;
         onNativeEvent({
-          ...event,
+          ...e,
           type,
           displayLabel: formatDisplayLabel(event, eventName),
         });
@@ -141,7 +156,7 @@ export function EChartRender({
   const bgColor = "transparent";
 
   const themedOption = useMemo(() => {
-    const defaults: any = {
+    const defaults: Record<string, unknown> = {
       color: palette,
       backgroundColor: bgColor,
       textStyle: { color: textColor },
@@ -156,53 +171,56 @@ export function EChartRender({
 
     if (!option) return defaults;
 
-    const merged = { ...defaults, ...option };
-    if (option.color) merged.color = option.color;
-    if (option.textStyle) {
-      merged.textStyle = { ...defaults.textStyle, ...option.textStyle };
+    const opt = option as Record<string, unknown>;
+    const merged: Record<string, unknown> = { ...defaults, ...opt };
+    if (opt.color) merged.color = opt.color;
+    if (opt.textStyle) {
+      merged.textStyle = { ...(defaults.textStyle as object), ...(opt.textStyle as object) };
     }
-    if (option.tooltip) {
-      merged.tooltip = { ...defaults.tooltip, ...option.tooltip };
-      if (option.tooltip.textStyle) {
-        merged.tooltip.textStyle = { ...defaults.tooltip.textStyle, ...option.tooltip.textStyle };
+    if (opt.tooltip) {
+      merged.tooltip = { ...(defaults.tooltip as object), ...(opt.tooltip as object) };
+      if ((opt.tooltip as Record<string, unknown>).textStyle) {
+        merged.tooltip = { ...merged.tooltip as object, textStyle: { ...((defaults.tooltip as Record<string, unknown>).textStyle as object), ...((opt.tooltip as Record<string, unknown>).textStyle as object) } };
       }
     }
-    if (option.legend) {
-      merged.legend = { ...defaults.legend, ...option.legend };
-      if (option.legend.textStyle) {
-        merged.legend.textStyle = { ...defaults.legend.textStyle, ...option.legend.textStyle };
+    if (opt.legend) {
+      merged.legend = { ...(defaults.legend as object), ...(opt.legend as object) };
+      if ((opt.legend as Record<string, unknown>).textStyle) {
+        merged.legend = { ...merged.legend as object, textStyle: { ...((defaults.legend as Record<string, unknown>).textStyle as object), ...((opt.legend as Record<string, unknown>).textStyle as object) } };
       }
     }
-    if (option.title) {
-      merged.title = { ...defaults.title, ...option.title };
-      if (option.title.textStyle) {
-        merged.title.textStyle = { ...defaults.title.textStyle, ...option.title.textStyle };
+    if (opt.title) {
+      merged.title = { ...(defaults.title as object), ...(opt.title as object) };
+      if ((opt.title as Record<string, unknown>).textStyle) {
+        merged.title = { ...merged.title as object, textStyle: { ...((defaults.title as Record<string, unknown>).textStyle as object), ...((opt.title as Record<string, unknown>).textStyle as object) } };
       }
     }
 
-    const applyAxisDefaults = (axis: any) => {
+    const applyAxisDefaults = (axis: unknown) => {
       if (!axis) return axis;
       const axes = Array.isArray(axis) ? axis : [axis];
-      return axes.map((a: any) => ({
+      return axes.map((a: unknown) => ({
         axisLine: { lineStyle: { color: borderColor } },
         axisTick: { lineStyle: { color: borderColor } },
         axisLabel: { color: textColor },
         splitLine: { lineStyle: { color: borderColor } },
-        ...a,
+        ...(a as object),
       }));
     };
 
-    if (option.xAxis) merged.xAxis = applyAxisDefaults(option.xAxis);
-    if (option.yAxis) merged.yAxis = applyAxisDefaults(option.yAxis);
+    if (opt.xAxis) merged.xAxis = applyAxisDefaults(opt.xAxis);
+    if (opt.yAxis) merged.yAxis = applyAxisDefaults(opt.yAxis);
 
     return merged;
   }, [option, palette, textColor, borderColor, tooltipBg, bgColor]);
 
+  const getEchartsInstance = useCallback(() => chartRef.current?.getEchartsInstance(), []);
+
   useEffect(() => {
     registerComponentApi?.({
-      getEchartsInstance: () => chartRef.current?.getEchartsInstance(),
+      getEchartsInstance,
     });
-  }, [registerComponentApi]);
+  }, [registerComponentApi, getEchartsInstance]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -241,4 +259,4 @@ export function EChartRender({
       />
     </div>
   );
-}
+});

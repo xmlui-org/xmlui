@@ -347,7 +347,8 @@ test.describe("tooltip", () => {
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
     
     // Wait for tooltip to appear
     await page.waitForTimeout(500);
@@ -367,7 +368,8 @@ test.describe("tooltip", () => {
     
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
     
     await page.waitForTimeout(500);
     const tooltip = page.locator(tooltipSelector);
@@ -395,7 +397,8 @@ test.describe("tooltip", () => {
     const sectorCount = await sectors.count();
     
     for (let i = 0; i < Math.min(sectorCount, 2); i++) {
-      await sectors.nth(i).hover();
+      await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
+      await sectors.nth(i).hover({ force: true });
       await page.waitForTimeout(300);
       await expect(page.locator(tooltipSelector)).toBeVisible();
     }
@@ -582,7 +585,8 @@ test.describe("interactions", () => {
     const pieSector = page.locator(pieSectorSelector).first();
     
     // Hover should trigger visual feedback
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true });
     await page.waitForTimeout(300);
     
     // The sector should still be visible and potentially highlighted
@@ -605,7 +609,8 @@ test.describe("interactions", () => {
     
     // Hover over multiple sectors
     for (let i = 0; i < Math.min(await sectors.count(), 3); i++) {
-      await sectors.nth(i).hover();
+      await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
+      await sectors.nth(i).hover({ force: true });
       await page.waitForTimeout(200);
       await expect(sectors.nth(i)).toBeVisible();
     }

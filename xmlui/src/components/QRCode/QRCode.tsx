@@ -2,7 +2,7 @@ import styles from "./QRCode.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { QRCodeNative, defaultProps } from "./QRCodeNative";
+import { QRCode, defaultProps } from "./QRCodeReact";
 import { createMetadata, d, dInit } from "../metadata-helpers";
 
 const COMP = "QRCode";
@@ -81,9 +81,9 @@ export const QRCodeMd = createMetadata({
   },
 });
 
-export const qrCodeComponentRenderer = wrapComponent(COMP, QRCodeNative, QRCodeMd, {
+export const qrCodeComponentRenderer = wrapComponent(COMP, QRCode, QRCodeMd, {
   customRender: (_props, { node, extractValue, classes }) => (
-    <QRCodeNative
+    <QRCode
       classes={classes}
       value={extractValue.asString(node.props.value)}
       size={extractValue.asOptionalNumber(node.props.size)}

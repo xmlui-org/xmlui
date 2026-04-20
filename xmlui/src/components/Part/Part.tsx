@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { ReactNode } from "react";
 import { Slot } from "@radix-ui/react-slot";
 
@@ -8,6 +9,6 @@ type Props = {
   partId?: string;
 };
 
-export const Part = ({ children, partId }: Props) => {
+export const Part = memo(function Part({ children, partId }: Props) {
   return <Slot data-part-id={partId}>{children}</Slot>;
-};
+});

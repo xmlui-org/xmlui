@@ -1,7 +1,7 @@
 import styles from "./Carousel.module.scss";
 
 import { wrapComponent, parseScssVar, createMetadata } from "xmlui";
-import { CarouselComponent, defaultProps } from "./CarouselNative";
+import { CarouselComponent, defaultProps } from "./CarouselReact";
 
 const COMP = "Carousel";
 

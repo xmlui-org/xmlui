@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 
-import type { SingleValueType, ValueType } from "./SelectNative";
+import type { SingleValueType, ValueType } from "./SelectReact";
 import type { Option } from "../abstractions";
 
 type SelectContextValue = {

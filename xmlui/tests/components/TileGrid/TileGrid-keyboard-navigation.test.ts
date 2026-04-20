@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeNextFocusIndex } from "../../../src/components/TileGrid/TileGridNative";
+import { computeNextFocusIndex } from "../../../src/components/TileGrid/TileGridReact";
 
 // ---------------------------------------------------------------------------
 // Base test scenario: 12 items displayed in a 4-column grid

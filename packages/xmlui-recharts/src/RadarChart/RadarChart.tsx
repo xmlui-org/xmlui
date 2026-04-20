@@ -1,4 +1,4 @@
-import { RadarChart, defaultProps } from "./RadarChartNative";
+import { RadarChart, defaultProps } from "./RadarChartReact";
 import { wrapComponent, createMetadata } from "xmlui";
 
 const COMP = "RadarChart";

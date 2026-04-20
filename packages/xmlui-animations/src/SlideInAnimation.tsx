@@ -1,5 +1,5 @@
 import { wrapComponent, createMetadata } from "xmlui";
-import { Animation, defaultProps } from "./AnimationNative";
+import { Animation, defaultProps } from "./AnimationReact";
 
 const COMP = "SlideInAnimation";
 
@@ -9,7 +9,7 @@ const defaultAnimationValues = {
 
 export const SlideInAnimationMd = createMetadata({
   status: "experimental",
-  description: `The \`${COMP}\` component represents an animation that slides in the content from the left.`,
+  description: `The \`${COMP}\` component represents an animation that slides in the content from a configurable direction.`,
   docFolder: "src",
   props: {
       direction: {
@@ -58,7 +58,7 @@ export const slideInAnimationRenderer = wrapComponent(
   SlideInAnimationMd,
   {
     exposeRegisterApi: true,
-    events: [],
+    events: {},
     exclude: ["direction", "animateWhenInView", "reverse", "loop", "delay", "duration"],
     customRender(_props, { node, extractValue, lookupEventHandler, registerComponentApi, renderChild }) {
       const direction = extractValue.asOptionalString(node.props.direction, defaultAnimationValues.direction);

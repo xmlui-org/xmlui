@@ -8,10 +8,10 @@ import {
   defaultProps,
   type PageNumber,
   PageNumberValues,
-  PaginationNative,
-} from "./PaginationNative";
-export { PositionValues } from "./PaginationNative";
-export type { Position } from "./PaginationNative";
+  Pagination,
+} from "./PaginationReact";
+export { PositionValues } from "./PaginationReact";
+export type { Position } from "./PaginationReact";
 import styles from "./Pagination.module.scss";
 import {
   orientationOptionMd,
@@ -27,13 +27,13 @@ export const PaginationMd = createMetadata({
     "`Pagination` enables navigation through large datasets by dividing content into pages. " +
     "It provides controls for page navigation and can display current page information.",
   parts: {
-    buttonRow: {
+    "pagination-controls": {
       description: "The container for pagination buttons.",
     },
-    pageInfo: {
+    "page-info": {
       description: "The container for page information display.",
     },
-    pageSizeSelector: {
+    "page-size-selector-container": {
       description: "The container for the page size selector dropdown.",
     },
   },
@@ -89,21 +89,21 @@ export const PaginationMd = createMetadata({
     orientation: {
       description: "Layout orientation of the pagination component",
       options: orientationOptionValues,
-      type: "string",
+      valueType: "string",
       availableValues: orientationOptionMd,
-      default: defaultProps.orientation,
+      defaultValue: defaultProps.orientation,
     },
     pageSizeSelectorPosition: {
       description: "Determines where to place the page size selector in the layout.",
       options: PositionValues,
-      type: "string",
-      default: defaultProps.pageSizeSelectorPosition,
+      valueType: "string",
+      defaultValue: defaultProps.pageSizeSelectorPosition,
     },
     pageInfoPosition: {
       description: "Determines where to place the page information in the layout.",
       options: PositionValues,
-      type: "string",
-      default: defaultProps.pageInfoPosition,
+      valueType: "string",
+      defaultValue: defaultProps.pageInfoPosition,
     },
     buttonRowPosition: d(
       "Determines where to place the pagination button row in the layout.",
@@ -165,13 +165,13 @@ export const PaginationMd = createMetadata({
   },
 });
 
-type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof PaginationNative>;
+type ThemedPaginationProps = React.ComponentPropsWithoutRef<typeof Pagination>;
 
-export const ThemedPagination = React.forwardRef<React.ElementRef<typeof PaginationNative>, ThemedPaginationProps>(
+export const ThemedPagination = React.forwardRef<React.ElementRef<typeof Pagination>, ThemedPaginationProps>(
   function ThemedPagination({ className, ...props }, ref) {
     const themeClass = useComponentThemeClass(PaginationMd);
     return (
-      <PaginationNative
+      <Pagination
         {...props}
         className={`${themeClass}${className ? ` ${className}` : ""}`}
         ref={ref}
@@ -182,7 +182,7 @@ export const ThemedPagination = React.forwardRef<React.ElementRef<typeof Paginat
 
 export const paginationComponentRenderer = wrapComponent(
   COMP,
-  PaginationNative,
+  Pagination,
   PaginationMd,
   {
     exposeRegisterApi: true,
@@ -213,7 +213,7 @@ export const paginationComponentRenderer = wrapComponent(
       }
 
       return (
-        <PaginationNative
+        <Pagination
           enabled={extractValue.asOptionalBoolean(node.props.enabled, true)}
           itemCount={extractValue.asOptionalNumber(node.props.itemCount)}
           pageSize={extractValue.asOptionalNumber(node.props.pageSize, defaultProps.pageSize)}

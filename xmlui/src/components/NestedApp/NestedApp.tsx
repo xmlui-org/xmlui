@@ -2,7 +2,7 @@ import styles from "./NestedApp.module.scss";
 
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { IndexAwareNestedApp } from "./NestedAppNative";
+import { IndexAwareNestedApp } from "./NestedAppReact";
 import { defaultProps } from "./defaultProps";
 import { createMetadata } from "../metadata-helpers";
 

@@ -32,33 +32,33 @@ export const AppMd = createMetadata({
       description:
         "Stores information about the currently logged-in user. By not defining this property, " +
         "you can indicate that no user is logged in.",
-      type: "string",
+      valueType: "string",
     },
     logoTemplate: dComponent("Optional template of the app logo"),
     logo: {
       description: "Optional logo path",
-      type: "string",
+      valueType: "string",
     },
     "logo-dark": {
       description: "Optional logo path in dark tone",
-      type: "string",
+      valueType: "string",
     },
     "logo-light": {
       description: "Optional logo path in light tone",
-      type: "string",
+      valueType: "string",
     },
     name: {
       description:
         "Optional application name (visible in the browser tab). When you do not define " +
         "this property, the tab name falls back to the one defined in the app\'s configuration. " +
         'If the name is not configured, "XMLUI App" is displayed in the tab.',
-      type: "string",
+      valueType: "string",
     },
     scrollWholePage: {
       description:
         `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.scrollWholePage,
     },
     fitContent: {
@@ -67,24 +67,24 @@ export const AppMd = createMetadata({
         `filling its container's viewport. Intended for embedding an app inside an iframe ` +
         `or as a block within a larger page: the host page becomes the sole scroll container. ` +
         `This overrides \`scrollWholePage\`'s viewport pinning.`,
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.fitContent,
     },
     noScrollbarGutters: {
       description:
         "This boolean property specifies whether the scrollbar gutters should be hidden.",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.noScrollbarGutters,
     },
     defaultTone: {
       description: 'This property sets the app\'s default tone ("light" or "dark").',
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.defaultTone,
       availableValues: ["light", "dark"],
     },
     defaultTheme: {
       description: "This property sets the app's default theme.",
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.defaultTheme,
     },
     autoDetectTone: {
@@ -93,7 +93,7 @@ export const AppMd = createMetadata({
         'When set to true and no defaultTone is specified, the app will automatically use ' +
         '"light" or "dark" tone based on the user\'s system theme setting. The app will ' +
         'also respond to changes in the system theme preference.',
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.autoDetectTone,
     },
     persistTheme: {
@@ -101,7 +101,7 @@ export const AppMd = createMetadata({
         'When set to `true`, both the current theme ID and tone ("light" or "dark") are ' +
         'automatically saved to `localStorage` and restored on the next visit. The persisted ' +
         'values take precedence over `defaultTheme`, `defaultTone`, and `autoDetectTone`.',
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.persistTheme,
       isInternal: true,
     },
@@ -109,7 +109,7 @@ export const AppMd = createMetadata({
       description:
         'The `localStorage` key used to persist the theme ID when `persistTheme` is `true`. ' +
         'Change this if you need to namespace the key per-app or per-user.',
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.themeStorageKey,
       isInternal: true,
     },
@@ -117,7 +117,7 @@ export const AppMd = createMetadata({
       description:
         'The `localStorage` key used to persist the tone when `persistTheme` is `true`. ' +
         'Change this if you need to namespace the key per-app or per-user.',
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.toneStorageKey,
       isInternal: true,
     },

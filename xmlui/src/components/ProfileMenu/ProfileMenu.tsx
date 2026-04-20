@@ -1,3 +1,4 @@
+import { memo } from "react";
 import styles from "./ProfileMenu.module.scss";
 
 import { useThemes } from "../../components-core/theming/ThemeContext";
@@ -7,11 +8,18 @@ import { ThemedDropdownMenu as DropdownMenu, ThemedMenuItem as MenuItem, ThemedM
 // =====================================================================================================================
 // Heading React component
 
+interface LoggedInUser {
+  name?: string;
+  displayName?: string;
+  email?: string;
+  avatarUrl?: string;
+}
+
 type Props = {
-  loggedInUser: any | null;
+  loggedInUser: LoggedInUser | null;
 };
 
-export const ProfileMenu = ({ loggedInUser }: Props) => {
+export const ProfileMenu = memo(function ProfileMenu({ loggedInUser }: Props) {
   const { activeThemeId, setActiveThemeId } = useThemes();
 
   if (!loggedInUser) {
@@ -31,4 +39,4 @@ export const ProfileMenu = ({ loggedInUser }: Props) => {
       <MenuItem>Log out</MenuItem>
     </DropdownMenu>
   );
-};
+});

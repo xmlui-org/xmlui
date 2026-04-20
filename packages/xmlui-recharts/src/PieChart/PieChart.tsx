@@ -1,5 +1,5 @@
 import type { ComponentMetadata } from "xmlui";
-import { defaultProps, PieChart } from "./PieChartNative";
+import { defaultProps, PieChart } from "./PieChartReact";
 import styles from "./PieChartNative.module.scss";
 import { LabelPositionValues } from "../utils/abstractions";
 import { parseScssVar, wrapComponent, createMetadata, d } from "xmlui";

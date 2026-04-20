@@ -1,6 +1,6 @@
 import styles from "./HelloWorld.module.scss";
 import { createComponentRenderer, parseScssVar, createMetadata } from "xmlui";
-import { HelloWorld, defaultProps } from "./HelloWorldNative";
+import { HelloWorld, defaultProps } from "./HelloWorldReact";
 
 const HelloWorldMd = createMetadata({
   description:
@@ -10,7 +10,7 @@ const HelloWorldMd = createMetadata({
     message: {
       description: "The greeting message to display.",
       isRequired: false,
-      type: "string",
+      valueType: "string",
       defaultValue: defaultProps.message,
     },
   },
@@ -18,31 +18,31 @@ const HelloWorldMd = createMetadata({
     onClick: {
       description:
         "Triggered when the click button is pressed. " + "Receives the current click count.",
-      type: "function",
     },
     onReset: {
       description:
         "Triggered when the reset button is pressed. " + "Called when count is reset to 0.",
-      type: "function",
     },
   },
   apis: {
     value: {
       description: "The current click count value.",
-      type: "number",
+      signature: "value: number",
     },
     setValue: {
       description: "Set the click count to a specific value.",
-      type: "function",
+      signature: "setValue(count: number): void",
     },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-HelloWorld`]: "$color-surface-50",
     [`textColor-HelloWorld`]: "$color-content-primary",
+    [`backgroundColor-button-HelloWorld`]: "#4a90e2",
+    [`textColor-button-HelloWorld`]: "white",
+    [`borderRadius-button-HelloWorld`]: "4px",
     dark: {
       [`backgroundColor-HelloWorld`]: "$color-surface-800",
-      // No textColor override needed - $color-content-primary should auto-adapt
     },
   },
 });
@@ -51,14 +51,14 @@ export const helloWorldComponentRenderer = createComponentRenderer(
   "HelloWorld",
   HelloWorldMd,
 
-  ({ node, extractValue, lookupEventHandler, className, registerComponentApi }) => {
+  ({ node, extractValue, lookupEventHandler, classes, registerComponentApi }) => {
+    const props = node.props as unknown as Record<string, any>;
     return (
       <HelloWorld
-        id={extractValue.asOptionalString(node.props?.id)}
-        message={extractValue.asOptionalString(node.props?.message)}
+        message={extractValue.asOptionalString(props?.message)}
         onClick={lookupEventHandler("onClick")}
         onReset={lookupEventHandler("onReset")}
-        className={className}
+        classes={classes}
         registerComponentApi={registerComponentApi}
       />
     );

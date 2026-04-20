@@ -41,7 +41,7 @@ export const APICallMd = createMetadata({
   props: {
     method: {
       description: "The method of data manipulation can be done via setting this property.",
-      type: "string",
+      valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: defaultProps.method,
     },
@@ -49,21 +49,21 @@ export const APICallMd = createMetadata({
       description:
         "Use this property to set the URL to which data will be sent. If not provided, an empty URL is used.",
       isRequired: true,
-      type: "string",
+      valueType: "string",
     },
     rawBody: {
       description:
         "This optional property sets the request body to the value provided here without any conversion. " +
         "Use the * \`body\` property if you want the object sent in JSON. When you define " +
         "\`body\` and \`rawBody\`, the latest one prevails.",
-      type: "string",
+      valueType: "string",
     },
     body: {
       description:
         "This optional property sets the request body. Use to pass an object that will be " +
         "serialized as a JSON string. If you have an object that is already serialized as " +
         "a JSON string, use `rawBody` instead.",
-      type: "string",
+      valueType: "string",
     },
     queryParams: {
       description:
@@ -93,38 +93,38 @@ export const APICallMd = createMetadata({
           description: "Always send credentials, even for cross-origin requests",
         },
       ],
-      type: "string",
+      valueType: "string",
     },
     confirmTitle: {
       description:
         "This optional string sets the title in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
-      type: "string",
+      valueType: "string",
     },
     confirmMessage: {
       description:
         "This optional string sets the message in the confirmation dialog that is displayed before " +
         `the \`${COMP}\` is executed.`,
-      type: "string",
+      valueType: "string",
     },
     confirmButtonLabel: {
       description:
         "This optional string property enables the customization of the submit button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
-      type: "string",
+      valueType: "string",
     },
     cancelButtonLabel: {
       description:
         "This optional string property enables the customization of the cancel button in the " +
         `confirmation dialog that is displayed before the \`${COMP}\` is executed.`,
-      type: "string",
+      valueType: "string",
     },
     deferredMode: {
       description:
         "Enable deferred operation mode for long-running operations that return 202 Accepted. " +
         "When enabled, the component will automatically poll a status endpoint to track operation progress. " +
         "(Experimental feature)",
-      type: "boolean",
+      valueType: "boolean",
       defaultValue: defaultProps.deferredMode,
     },
     statusUrl: {
@@ -132,67 +132,67 @@ export const APICallMd = createMetadata({
         "The URL to poll for status updates when deferredMode is enabled. " +
         "Can use $result context from initial response (e.g., '/api/status/{$result.operationId}'). " +
         "Required when deferredMode is true.",
-      type: "string",
+      valueType: "string",
     },
     statusMethod: {
       description: "HTTP method for status requests. Defaults to 'get'.",
-      type: "string",
+      valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: defaultProps.statusMethod,
     },
     pollingInterval: {
       description: "Milliseconds between status polls. Defaults to 2000ms.",
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.pollingInterval,
     },
     maxPollingDuration: {
       description:
         "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.maxPollingDuration,
     },
     pollingBackoff: {
       description:
         "Strategy for increasing polling interval over time. Options: 'none' (fixed interval), " +
         "'linear' (adds 1 second per attempt), 'exponential' (doubles each time). Defaults to 'none'.",
-      type: "string",
+      valueType: "string",
       availableValues: ["none", "linear", "exponential"],
       defaultValue: defaultProps.pollingBackoff,
     },
     maxPollingInterval: {
       description:
         "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
-      type: "number",
+      valueType: "number",
       defaultValue: defaultProps.maxPollingInterval,
     },
     completionCondition: {
       description:
         "Expression that returns true when the deferred operation is complete. " +
         "Can access $statusData context variable containing the latest status response.",
-      type: "string",
+      valueType: "string",
     },
     errorCondition: {
       description:
         "Expression that returns true when the deferred operation has failed. " +
         "Can access $statusData context variable containing the latest status response.",
-      type: "string",
+      valueType: "string",
     },
     progressExtractor: {
       description:
         "Expression to extract progress value (0-100) from the status response. " +
         "Can access $statusData context variable. If not specified, no progress tracking.",
-      type: "string",
+      valueType: "string",
     },
     cancelUrl: {
       description:
         "URL to call when cancelling the deferred operation. " +
         "Can use $result context from initial response (e.g., '/api/cancel/{$result.operationId}'). " +
         "If not provided, cancel() will only stop polling without notifying the server.",
-      type: "string",
+      valueType: "string",
     },
     cancelMethod: {
       description: "HTTP method for cancel requests. Defaults to 'post'.",
-      type: "string",
+      valueType: "string",
       availableValues: httpMethodNames,
       defaultValue: defaultProps.cancelMethod,
     },
@@ -206,19 +206,19 @@ export const APICallMd = createMetadata({
         "Message to show in toast notification during deferred operation polling. " +
         "Can include {$progress}, {$statusData.property}, and other context variables. " +
         "Notification will update on each poll with current values.",
-      type: "string",
+      valueType: "string",
     },
     completedNotificationMessage: {
       description:
         "Message to show in toast notification when deferred operation completes successfully. " +
         "Can include {$statusData.property} and other context variables from the final status.",
-      type: "string",
+      valueType: "string",
     },
     errorNotificationMessage: {
       description:
         "Message to show in toast notification when deferred operation fails. " +
         "Can include {$statusData.property} and other context variables from the error status.",
-      type: "string",
+      valueType: "string",
     },
     payloadType: dInternal(),
     invalidates: dInternal(),
