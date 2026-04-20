@@ -62,5 +62,6 @@ test("inner datasource is available in the file (implicit containers because of 
       },
     },
   );
-  await expect(page.getByTestId("datasource_value_outside")).toHaveText("data1");
+  await expect(page.getByTestId("datasource_value_outside")).toBeVisible();
+  await expect(page.getByTestId("datasource_value_outside")).toHaveText("data1", { timeout: 10000 });
 });

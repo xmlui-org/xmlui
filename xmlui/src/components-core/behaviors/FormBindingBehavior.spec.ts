@@ -839,8 +839,8 @@ test.describe("Validation", () => {
     await textbox.fill("test");
     await textbox.clear();
 
-    // Explicitly blur the field to trigger validation
-    await textbox.blur();
+    // Click outside the textbox to trigger blur and validation
+    await page.locator("body").click({ position: { x: 0, y: 0 } });
 
     // Wait for validation error message to appear
     await expect(page.getByText("This field is required")).toBeVisible();
