@@ -92,7 +92,10 @@ test.describe("Basic Functionality", () => {
 
     const driver = await createSelectDriver("select");
     await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "Option 2" })).toBeVisible();
     await driver.selectLabel("Option 2");
+    // Wait for the dropdown to close and the selected value to be reflected
+    await expect(driver.component).toContainText("Option 2");
 
     await page.getByRole("button", { name: "Save" }).click();
 

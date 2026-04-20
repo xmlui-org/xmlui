@@ -369,11 +369,13 @@ test.describe("tooltip", () => {
     await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
-    
-    await page.waitForTimeout(500);
+
     const tooltip = page.locator(tooltipSelector);
-    await expect(tooltip).toBeVisible();
+    await expect(async () => {
+      await pieSector.hover({ force: true });
+      await expect(tooltip).toBeVisible({ timeout: 2000 });
+    }).toPass({ timeout: 15000 });
+
     // Tooltip should contain data from the first sector
     await expect(tooltip).toContainText("Desktop");
     await expect(tooltip).toContainText("400");
