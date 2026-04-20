@@ -1,5 +1,17 @@
 # xmlui-website
 
+## 0.0.19
+
+### Patch Changes
+
+- 5ddb712: refactor: Migrated all monochrome pool icons from mixed icon packs to Lucide — a single, consistent icon set
+- Updated dependencies [87ae4e9]
+- Updated dependencies [5ddb712]
+- Updated dependencies [b400578]
+- Updated dependencies [16bff91]
+- Updated dependencies [8d59847]
+  - xmlui@0.12.20
+
 ## 0.0.18
 
 ### Patch Changes
