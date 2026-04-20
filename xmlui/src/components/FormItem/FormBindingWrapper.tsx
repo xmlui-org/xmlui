@@ -11,7 +11,7 @@ import {
 import type { LayoutContext, RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { FormItemValidations, ValidationSeverity } from "../Form/FormContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
-import { FormItemContext, useIsInsideFormItem } from "./FormItemReact";
+import { FormItemContext, useIsInsideFormItem } from "./FormItemContext";
 import {
   fieldChanged,
   fieldFocused,

@@ -19,7 +19,7 @@ import { PART_INPUT } from "../../components-core/parts";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 type ToggleProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,

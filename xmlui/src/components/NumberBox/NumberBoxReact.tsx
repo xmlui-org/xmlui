@@ -36,7 +36,7 @@ import { PART_CONCISE_VALIDATION_FEEDBACK, PART_END_ADORNMENT, PART_INPUT, PART_
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 // Default props for NumberBox component
 export const defaultProps = {

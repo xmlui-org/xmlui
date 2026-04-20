@@ -18,7 +18,7 @@ import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 /**
  * TextBox component that supports text input with various configurations.

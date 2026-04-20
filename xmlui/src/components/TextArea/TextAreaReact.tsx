@@ -27,7 +27,7 @@ import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 

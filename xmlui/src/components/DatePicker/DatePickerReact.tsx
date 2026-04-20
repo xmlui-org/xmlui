@@ -19,7 +19,7 @@ import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormContextPart } from "../Form/FormContext";
 import { ThemedIcon } from "../Icon/Icon";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 

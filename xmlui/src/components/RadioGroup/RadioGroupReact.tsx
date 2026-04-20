@@ -24,7 +24,7 @@ import type { Option, OrientationOptions, ValidationStatus } from "../abstractio
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 import { UnwrappedRadioItem } from "./RadioItemReact";
 import { convertOptionValue } from "../Option/OptionReact";
-import { useFormItemInputId } from "../FormItem/FormItemReact";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defaultValue"> & {
   id?: string;
