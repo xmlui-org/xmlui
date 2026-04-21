@@ -133,6 +133,16 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
    width: 100%;
   }
 
+  // Stack wrapper for FormItem type="items" children. Reuses the Form's own
+  // row gap so rows inside an items loop get the same vertical spacing as
+  // plain sibling FormItems rendered directly inside the Form.
+  .itemsStack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--xmlui-gap-Form);
+    width: 100%;
+  }
+
   .wrapper {
     display: flex;
     flex-direction: column;
