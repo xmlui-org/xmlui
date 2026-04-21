@@ -126,6 +126,11 @@ test.describe("Basic Functionality", () => {
       </HStack>
     `);
 
+    // Wait for all elements to be visible and laid out before measuring
+    await expect(page.getByTestId("item1")).toBeVisible();
+    await expect(page.getByTestId("item2")).toBeVisible();
+    await expect(page.getByTestId("item3")).toBeVisible();
+
     const { right: item1Right } = await getBounds(page.getByTestId("item1"));
     const { left: item2Left } = await getBounds(page.getByTestId("item2"));
     const { right: item2Right } = await getBounds(page.getByTestId("item2"));

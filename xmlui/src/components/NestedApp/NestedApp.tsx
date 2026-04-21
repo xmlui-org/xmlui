@@ -1,10 +1,16 @@
 import styles from "./NestedApp.module.scss";
-
 import { wrapComponent } from "../../components-core/wrapComponent";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { IndexAwareNestedApp } from "./NestedAppReact";
 import { defaultProps } from "./defaultProps";
 import { createMetadata } from "../metadata-helpers";
+
+// Wrapper to defer access to IndexAwareNestedApp until render time, avoiding
+// TDZ from the circular init cycle:
+// NestedApp → NestedAppReact → AppRoot → ComponentProvider → NestedApp
+function NestedAppWrapper(props: React.ComponentProps<typeof IndexAwareNestedApp>) {
+  return <IndexAwareNestedApp {...props} />;
+}
 
 const COMP = "NestedApp";
 
@@ -82,9 +88,9 @@ export const NestedAppMd = createMetadata({
   },
 });
 
-export const nestedAppComponentRenderer = wrapComponent(COMP, IndexAwareNestedApp, NestedAppMd, {
+export const nestedAppComponentRenderer = wrapComponent(COMP, NestedAppWrapper, NestedAppMd, {
   customRender: (_props, { node, extractValue, className }) => (
-    <IndexAwareNestedApp
+    <NestedAppWrapper
       app={node.props?.app}
       className={className}
       api={extractValue(node.props?.api)}

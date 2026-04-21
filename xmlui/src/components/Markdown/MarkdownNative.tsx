@@ -724,7 +724,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       note: <ThemedIcon name="admonition_note" />,
       tip: <ThemedIcon name="admonition_tip" />,
       card: null,
-      feat: <ThemedIcon name="star" />,
+      feat: <ThemedIcon name="star" size="$space-2_5" />,
       def: <ThemedIcon name="definition" />,
     };
 

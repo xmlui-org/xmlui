@@ -599,6 +599,7 @@ function confirm(options: {
   actionLabel?: string;
   cancelLabel?: string;
   width?: string;
+  actionThemeColor?: "attention" | "primary" | "secondary";
 }): Promise<boolean>;
 ```
 
@@ -623,6 +624,7 @@ const ok = await confirm({
 - `actionLabel`: Label for the confirm button (default: `"Yes"`)
 - `cancelLabel`: Label for the cancel button (default: `"Cancel"`)
 - `width`: Optional CSS width for the dialog (e.g. `"400px"`, `"50vw"`)
+- `actionThemeColor`: Theme color for the action button — `"attention"` (default), `"primary"`, or `"secondary"`
 
 ### `signError`
 

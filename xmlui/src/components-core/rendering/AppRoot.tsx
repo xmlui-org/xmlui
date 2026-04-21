@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
-import type { ComponentLike } from "../../abstractions/ComponentDefs";
+import type { ComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
 import { resetErrors } from "../reportEngineError";
 import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";

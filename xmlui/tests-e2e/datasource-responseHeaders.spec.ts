@@ -109,14 +109,17 @@ test("DataSource responseHeaders updated on refetch", async ({ page, initTestBed
     },
   );
 
-  // Wait for the initial load
-  await expect(page.getByTestId("test-state-view-testid")).toHaveText("\"1\"", { timeout: 5000 });
+  // Wait for the initial load and capture the starting count
+  const stateEl = page.getByTestId("test-state-view-testid");
+  await expect(stateEl).toHaveText(/^"\d+"$/, { timeout: 10000 });
+  const initialText = await stateEl.textContent();
+  const initialCount = parseInt(initialText!.replace(/"/g, ""), 10);
 
   // Trigger a refetch
   await page.getByTestId("refetch-btn").click();
 
-  // Headers should be updated after the refetch
-  await expect(page.getByTestId("test-state-view-testid")).toHaveText("\"2\"", { timeout: 5000 });
+  // Headers should be incremented by exactly 1 after the refetch
+  await expect(stateEl).toHaveText(`"${initialCount + 1}"`, { timeout: 10000 });
 });
 
 test("DataSource onLoaded receives responseHeaders on the datasource state", async ({

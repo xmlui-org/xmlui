@@ -1,5 +1,77 @@
 [
   {
+    "tag_name": "xmlui@0.12.20",
+    "published_at": "2026-04-20T11:42:06Z",
+    "changes": [
+      {
+        "description": "The XMLUI islands concept is ready for QA",
+        "commit_sha": "87ae4e9"
+      },
+      {
+        "description": "refactor: Migrated all monochrome pool icons from mixed icon packs to Lucide — a single, consistent icon set",
+        "commit_sha": "5ddb712"
+      },
+      {
+        "description": "feat: enhance ExpandableItem to respect explicit width and prevent sibling push in flex/grid layouts",
+        "commit_sha": "b400578"
+      },
+      {
+        "description": "Scripting engine improvements: removed deprecated `::` global scope operator, added configurable sync execution timeout via `appGlobals.syncExecutionTimeout`, implemented `instanceof` operator support.",
+        "commit_sha": "16bff91"
+      },
+      {
+        "description": "Fix VStack not filling available width inside HStack, causing Table star-sized columns to render too narrow",
+        "commit_sha": "8d59847"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.20.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.20/xmlui-0.12.20.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.19",
+    "published_at": "2026-04-15T12:15:32Z",
+    "changes": [
+      {
+        "description": "Fix the build issue using multiple vite entry points",
+        "commit_sha": "74e7c88"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.19.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.19/xmlui-0.12.19.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.18",
+    "published_at": "2026-04-15T10:13:55Z",
+    "changes": [
+      {
+        "description": "Fix function dependency tracking in nested containers (Items, List, etc.)",
+        "commit_sha": "f502d2b"
+      },
+      {
+        "description": "Select: Fixed `dropdownHeight` to produce a stable dropdown height regardless of scroll indicator visibility. Added `scrollIndicators` prop (default `true`) to control whether up/down scroll arrows are shown in the dropdown.",
+        "commit_sha": "1039048"
+      },
+      {
+        "description": "fix: bump \"vite-plugin-lib-inject-css\" which introduced css errors in case of multiple chunks in the lib",
+        "commit_sha": "8689e17"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.18.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.18/xmlui-0.12.18.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.17",
     "published_at": "2026-04-14T10:23:37Z",
     "changes": [
@@ -356,154 +428,6 @@
       {
         "name": "xmlui-0.12.12.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.12/xmlui-0.12.12.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.11",
-    "published_at": "2026-03-19T14:32:36Z",
-    "changes": [
-      {
-        "description": "Fix FormItem theme variable regression",
-        "commit_sha": "3daa045"
-      },
-      {
-        "description": "Charts moved from xmlui core to the xmlui-recharts extension",
-        "commit_sha": "93a19dd"
-      },
-      {
-        "description": "Fix FormItem type=\"checkbox\" regression",
-        "commit_sha": "8a3180d"
-      },
-      {
-        "description": "fix: JSDOM preventing running xmlui commands when bundled into executable file",
-        "commit_sha": "1b695f0"
-      },
-      {
-        "description": "List can handle row selection (similarly to Table)",
-        "commit_sha": "c903b50"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.11.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.11/xmlui-0.12.11.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.10",
-    "published_at": "2026-03-18T14:19:35Z",
-    "changes": [
-      {
-        "description": "fix error callback running on previous failed ApiCall after component mounts, as if the current call failed.",
-        "commit_sha": "166139f"
-      },
-      {
-        "description": "Add bootstrap-like column widths",
-        "commit_sha": "bb6dfd8"
-      },
-      {
-        "description": "Remove RealTimeAdapter component",
-        "commit_sha": "83c84c6"
-      },
-      {
-        "description": "Move Backdrop and Breakout to the xmlui-website-blocks extension",
-        "commit_sha": "d456b4b"
-      },
-      {
-        "description": "Add experimental local storage persistence",
-        "commit_sha": "bd49e49"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.10.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.10/xmlui-0.12.10.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.9",
-    "published_at": "2026-03-17T14:29:27Z",
-    "changes": [
-      {
-        "description": "Retry patch release",
-        "commit_sha": "39b3847"
-      },
-      {
-        "description": "Add TileGrid component — a responsive, virtualized tile grid",
-        "commit_sha": "f889233"
-      },
-      {
-        "description": "Fix Markdown xmlui-pg regression",
-        "commit_sha": "6ccb0e6"
-      },
-      {
-        "description": "Fix issues with mobile NavPanel",
-        "commit_sha": "20be4248f1393b2f7b5bc6edd4f644bc75f6e785"
-      },
-      {
-        "description": "Add \"spacing\" to applyLayoutProperties",
-        "commit_sha": "70a091c7ee783f02306f9f9be3aa73fa01864647"
-      },
-      {
-        "description": "fix: Improve styling flexibility and theme handling across components",
-        "commit_sha": "551775b681541510ba3718292e93416b243f17b3"
-      },
-      {
-        "description": "Implement scroll-snap related layout properties",
-        "commit_sha": "7e5c62f7d05da66d3ffa7a8bcad20b8f07d47f89"
-      },
-      {
-        "description": "Fix responsive width properties (e.g. width-md) not working on FlowLayout/HStack-wrap children",
-        "commit_sha": "41552d1734cbc798a57778e0b5fd2698905495c5"
-      },
-      {
-        "description": "Add debounceWaitInMs property to ChangeListener",
-        "commit_sha": "7d85f4a220ace63cbd2560781ca2607a9d563e71"
-      },
-      {
-        "description": "Initialize global variables of App before children are initialized",
-        "commit_sha": "fe26c40464d4c809e854b534d837cde1e6f94630"
-      },
-      {
-        "description": "DataSource and APICall now return repsonse headers",
-        "commit_sha": "a9e8c428ab88e1acf4172d7504d055253dc9ac31"
-      },
-      {
-        "description": "Make transaction IDs optional to avoid CORS preflight failures with third-party APIs.",
-        "commit_sha": "8660487d501945e26c944ffd950cea9ab29362b6"
-      },
-      {
-        "description": "Fix NavGroup trigger alignment",
-        "commit_sha": "3211bce655d8c0b437399f1d40a1aa3ab4b3ef98"
-      },
-      {
-        "description": "fix: playground - theme handing",
-        "commit_sha": "2a5d32f4ca5c34dcec873464f0a14ec6612b9f7f"
-      },
-      {
-        "description": "fix: wrapComponent - prevent layout props from being forwarded to native components unless explicitly declared in metadata",
-        "commit_sha": "36e79df7d172d8cd0d57d8e0201764d50ee11c62"
-      },
-      {
-        "description": "Upgrade react-router-dom from 6.26.2 to 6.30.3 to address -https://github.com/advisories/GHSA-9jcx-v3wj-wh4m (XSS via Open Redirects in @remix-run/router). axios was already upgraded to 1.13.5 to address https://github.com/advisories/GHSA-43fc-jf86-j433 (DoS via __proto__ key in mergeConfig).",
-        "commit_sha": "c6aea4fd0a2f370094a6d3e1ac1717c91711eea3"
-      },
-      {
-        "description": "Fix dependency regression with global variables",
-        "commit_sha": "2f368e4e00c4bbb9a83a8f167a47bf61f60b5fb5"
-      },
-      {
-        "description": "Add \"strict\" setting so lintSeverity",
-        "commit_sha": "9031871ae7ec25af0a8c75117fedecc13367c786"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.9.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.9/xmlui-0.12.9.js"
       }
     ]
   }

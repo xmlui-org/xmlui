@@ -1,3 +1,4 @@
+import type React from "react";
 import {
   type CSSProperties,
   forwardRef,
@@ -72,7 +73,7 @@ export const ExpandableItem = memo(forwardRef(function ExpandableItem(
     registerComponentApi,
     ...rest
   }: ExpandableItemProps,
-  ref,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const [isOpen, setIsOpen] = useState(initiallyExpanded);
   const generatedId = useId();

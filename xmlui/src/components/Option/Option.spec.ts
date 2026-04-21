@@ -198,6 +198,8 @@ test.describe("Basic Functionality", () => {
 
     const driver = await createSelectDriver("testSelect");
     await driver.toggleOptionsVisibility();
+    await expect(page.getByRole("option", { name: "Second" })).toBeVisible();
+    await driver.selectLabel("Second");
     const secondOption = page.getByRole("option", { name: "Second" });
     await expect(secondOption).toBeVisible();
     await secondOption.click();
@@ -273,9 +275,9 @@ test.describe("Basic Functionality", () => {
 
     const driver = await createSelectDriver("booleanSelect");
     await driver.toggleOptionsVisibility();
-    const falseOption = page.getByRole("option", { name: "False" });
-    await expect(falseOption).toBeVisible();
-    await falseOption.click();
+    await expect(page.getByRole("option", { name: "True" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "False" })).toBeVisible();
+    await driver.selectLabel("False");
 
     await expect.poll(testStateDriver.testState).toEqual(false);
   });

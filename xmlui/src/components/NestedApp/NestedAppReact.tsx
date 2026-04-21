@@ -67,33 +67,6 @@ function AnimatedLogo() {
   );
 }
 
-export const LazyNestedApp = memo(function LazyNestedApp({
-  immediate,
-  ...restProps
-}: NestedAppProps & { immediate?: boolean }) {
-  const [shouldRender, setShouldRender] = useState(immediate || false);
-  useEffect(() => {
-    if (!immediate) {
-      startTransition(() => {
-        setShouldRender(true);
-      });
-    }
-  }, [immediate]);
-  if (!shouldRender) {
-    return null;
-  }
-  return <NestedApp {...restProps} />;
-});
-
-export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolean }) {
-  const { indexing } = useIndexerContext();
-  if (indexing) {
-    return null;
-  }
-
-  return <LazyNestedApp {...props} />;
-});
-
 export const NestedApp = memo(function NestedApp({
   api,
   app,
@@ -393,3 +366,30 @@ function NestedAppRoot({
     </div>
   );
 }
+
+export const LazyNestedApp = memo(function LazyNestedApp({
+  immediate,
+  ...restProps
+}: NestedAppProps & { immediate?: boolean }) {
+  const [shouldRender, setShouldRender] = useState(immediate || false);
+  useEffect(() => {
+    if (!immediate) {
+      startTransition(() => {
+        setShouldRender(true);
+      });
+    }
+  }, [immediate]);
+  if (!shouldRender) {
+    return null;
+  }
+  return <NestedApp {...restProps} />;
+});
+
+export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolean }) {
+  const { indexing } = useIndexerContext();
+  if (indexing) {
+    return null;
+  }
+
+  return <LazyNestedApp {...props} />;
+});

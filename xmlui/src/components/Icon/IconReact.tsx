@@ -17,6 +17,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   style?: CSSProperties;
   className?: string;
   tabIndex?: number;
+  onClick?: React.MouseEventHandler<any>;
   onKeyDown?: React.KeyboardEventHandler<any>;
 }
 
