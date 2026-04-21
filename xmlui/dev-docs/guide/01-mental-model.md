@@ -28,6 +28,28 @@ Both modes converge once components are resolved. From `AppRoot` onward, the ren
 
 <!-- DIAGRAM: Side-by-side flow showing standalone (fetch → parse → AppRoot) vs Vite (import → compile → AppRoot) converging at the rendering pipeline -->
 
+```mermaid
+graph TB
+  subgraph Standalone["Standalone mode"]
+    S1["browser loads<br>xmlui-standalone.umd.js"]
+    S2["fetch Main.xmlui<br>+ components/*.xmlui"]
+    S3["parse XML at runtime"]
+    S1 --> S2 --> S3
+  end
+
+  subgraph Vite["Vite mode"]
+    V1["vite-xmlui-plugin<br>compiles .xmlui → JS modules"]
+    V2["import.meta.glob()<br>pre-bundles all components"]
+    V3["no runtime XML parsing"]
+    V1 --> V2 --> V3
+  end
+
+  Converge["AppRoot —<br>rendering pipeline begins"]
+
+  S3 -->|"components resolved"| Converge
+  V3 -->|"components resolved"| Converge
+```
+
 ## The Full Lifecycle
 
 Here is what happens from the moment a user opens an XMLUI app to the moment pixels appear on screen, and then what happens when they interact.
@@ -74,6 +96,35 @@ The router type is chosen based on configuration: `HashRouter` (default), `Brows
 
 <!-- DIAGRAM: Nested provider stack as concentric rectangles, from outermost (ComponentProvider) to innermost (root Container) -->
 
+```mermaid
+graph TD
+  subgraph CP["ComponentProvider"]
+    subgraph SP["StyleProvider"]
+      subgraph DP["DebugViewProvider"]
+        subgraph R["Router (Hash / Browser / Memory)"]
+          subgraph QC["QueryClient (TanStack React Query)"]
+            subgraph H["Helmet (document head)"]
+              subgraph L["Logger"]
+                subgraph I["Icons"]
+                  subgraph T["Theme"]
+                    subgraph Insp["Inspector"]
+                      subgraph Conf["Confirmation"]
+                        subgraph AC["AppContent (global functions)"]
+                          RC["Root Container<br>renderChild() begins"]
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+```
+
 ### Phase 3: Rendering
 
 Rendering is driven by `renderChild()`, the recursive function at the heart of XMLUI. It is called for every node in the component tree.
@@ -92,6 +143,35 @@ Rendering is driven by `renderChild()`, the recursive function at the heart of X
    - If the node is stateless, it goes directly to `ComponentAdapter` — no container overhead.
 
 <!-- DIAGRAM: Flowchart: renderChild → when check → node type switch → ComponentWrapper → container-like? → ContainerWrapper or ComponentAdapter -->
+
+```mermaid
+graph TD
+  Start(["renderChild(node)"])
+  When{"when / responsiveWhen<br>condition true?"}
+  Skip(["return null"])
+  TypeSwitch{"node type?"}
+  TextNode(["evaluate expression<br>return text"])
+  SlotNode(["resolve slot children<br>from parent component"])
+  CW["ComponentWrapper"]
+  Transform["transform props<br>(DataSource, childrenAsTemplate)"]
+  Stateful{"has vars / functions<br>/ uses / loaders?"}
+  CWrap["ContainerWrapper<br>→ StateContainer → Container"]
+  CAdapter["ComponentAdapter<br>(stateless path)"]
+  Recurse(["recursive renderChild()<br>for each child"])
+
+  Start --> When
+  When -->|"false"| Skip
+  When -->|"true"| TypeSwitch
+  TypeSwitch -->|"TextNode / CData"| TextNode
+  TypeSwitch -->|"Slot"| SlotNode
+  TypeSwitch -->|"element"| CW
+  CW --> Transform
+  Transform --> Stateful
+  Stateful -->|"yes"| CWrap
+  Stateful -->|"no"| CAdapter
+  CWrap --> Recurse
+  CAdapter --> Recurse
+```
 
 ### Phase 4: State Composition
 
@@ -124,6 +204,24 @@ The final merged state is a single flat object available to all expressions with
 
 <!-- DIAGRAM: Stacked layers (1 at bottom, 6 at top) with arrows showing shadowing direction. Label each with concrete example. -->
 
+```mermaid
+graph BT
+  L1["Layer 1 — Parent state<br>inherited via uses prop<br>e.g. userData from parent container"]
+  L2["Layer 2 — Component reducer state<br>loader results, event flags<br>e.g. DataSource value, submitInProgress"]
+  L3["Layer 3 — Component APIs<br>methods from id-registered children<br>e.g. myInput.focus(), myInput.setValue()"]
+  L4["Layer 4 — Context variables<br>iteration and routing vars<br>e.g. $item, $itemIndex, $routeParams"]
+  L5["Layer 5 — Local variables<br>declared with var.*<br>e.g. var.total = price * quantity"]
+  L6["Layer 6 — Global variables<br>owned by root container<br>e.g. var.global.theme = 'dark'"]
+  Combined(["combined state object<br>higher layers shadow lower layers"])
+
+  L1 -->|"shadowed by L2"| L2
+  L2 -->|"shadowed by L3"| L3
+  L3 -->|"shadowed by L4"| L4
+  L4 -->|"shadowed by L5"| L5
+  L5 -->|"shadowed by L6"| L6
+  L6 --> Combined
+```
+
 ### Phase 5: Expression Evaluation
 
 Every `{expression}` in the markup is evaluated against the composed state. The expression evaluator has access to:
@@ -153,6 +251,30 @@ When the user interacts with the app:
 9. The DOM updates
 
 <!-- DIAGRAM: Circular flow: User clicks → event handler → statePartChanged → mutation routing → reducer → re-render → renderChild → DOM update → back to user -->
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant DOM
+  participant Handler as event handler
+  participant Proxy
+  participant SPC as statePartChanged
+  participant Reducer
+  participant React
+  participant RC as renderChild
+
+  User->>DOM: clicks / types / interacts
+  DOM->>Handler: React synthetic event fires
+  Handler->>Proxy: mutates variable (e.g. count++)
+  Proxy->>SPC: callback(["count"], newVal)
+  SPC->>SPC: find owning container
+  SPC->>Reducer: dispatch STATE_PART_CHANGED
+  Reducer->>React: new immutable state (Immer)
+  React->>RC: re-render container subtree
+  RC->>RC: re-evaluate {expressions}
+  RC->>DOM: updated React elements → DOM update
+  DOM->>User: UI reflects new state
+```
 
 ## Containers: The Unit of State
 
