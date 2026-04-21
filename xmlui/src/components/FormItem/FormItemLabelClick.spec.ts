@@ -151,6 +151,178 @@ test.describe("FormItem label click focuses the input", () => {
     await label.click();
     await expect(input).toBeFocused();
   });
+
+  test("type=password focuses the password input", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Password" bindTo="pwd" type="password" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Password" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("type", "password");
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("type=number focuses the number input", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Amount" bindTo="amt" type="number" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Amount" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("type=integer focuses the number input", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Count" bindTo="count" type="integer" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Count" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("type=textarea focuses the textarea", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Bio" bindTo="bio" type="textarea" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Bio" });
+    const forId = await label.getAttribute("for");
+    const target = page.locator(`[id="${forId}"]`);
+    await expect(target).toHaveJSProperty("tagName", "TEXTAREA");
+    await label.click();
+    await expect(target).toBeFocused();
+  });
+
+  test("type=select opens dropdown on label click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Country" bindTo="country" type="select">
+          <Option label="Hungary" value="hu" />
+          <Option label="Germany" value="de" />
+        </FormItem>
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Country" });
+    const forId = await label.getAttribute("for");
+    const trigger = page.locator(`[id="${forId}"]`);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await label.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("type=datePicker opens calendar on label click", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Birthday" bindTo="bday" type="datePicker" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Birthday" });
+    const forId = await label.getAttribute("for");
+    const trigger = page.locator(`[id="${forId}"]`);
+    await expect(trigger).toHaveAttribute("aria-expanded", "false");
+    await label.click();
+    await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  });
+
+  test("type=radioGroup legend click focuses the first radio option", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Size" bindTo="size" type="radioGroup">
+          <Option label="Small" value="s" />
+          <Option label="Medium" value="m" />
+          <Option label="Large" value="l" />
+        </FormItem>
+      </Form>
+    `);
+    const legend = page.locator("legend", { hasText: "Size" });
+    await expect(legend).toBeVisible();
+    const firstRadio = page.getByRole("radio").first();
+    await legend.click();
+    await expect(firstRadio).toBeFocused();
+  });
+
+  test("type=autocomplete focuses the autocomplete input on label click", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Fruit" bindTo="fruit" type="autocomplete">
+          <Option label="Apple" value="apple" />
+          <Option label="Banana" value="banana" />
+        </FormItem>
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Fruit" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("role", "combobox");
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("type=file focuses the file input button on label click", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Attachment" bindTo="file" type="file" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Attachment" });
+    const forId = await label.getAttribute("for");
+    const button = page.locator(`[id="${forId}"]`);
+    await expect(button).toHaveJSProperty("tagName", "BUTTON");
+    await label.click();
+    await expect(button).toBeFocused();
+  });
+
+  test("type=slider wires label to the slider thumb", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Volume" bindTo="vol" type="slider" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Volume" });
+    const forId = await label.getAttribute("for");
+    const thumb = page.locator(`[id="${forId}"]`);
+    await expect(thumb).toHaveCount(1);
+    await expect(thumb).toHaveAttribute("role", "slider");
+  });
+
+  test("type=colorpicker focuses the color input on label click", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FormItem label="Color" bindTo="color" type="colorpicker" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Color" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("type", "color");
+    await label.click();
+    await expect(input).toBeFocused();
+  });
 });
 
 // Same behavior must hold when the input is used directly inside a Form via
@@ -263,5 +435,127 @@ test.describe("bindTo on core component directly (no FormItem wrapper)", () => {
     await expect(sw).not.toBeChecked();
     await label.click();
     await expect(sw).toBeChecked();
+  });
+
+  test("TextBox type=password bindTo + label focuses the password input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <TextBox bindTo="pwd" label="Password" type="password" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Password" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("type", "password");
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("NumberBox integersOnly bindTo + label focuses the input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <NumberBox bindTo="count" label="Count" integersOnly="true" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Count" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("RadioGroup bindTo + label legend click focuses the first radio option", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <RadioGroup bindTo="size" label="Size">
+          <Option label="Small" value="s" />
+          <Option label="Medium" value="m" />
+        </RadioGroup>
+      </Form>
+    `);
+    const legend = page.locator("legend", { hasText: "Size" });
+    await expect(legend).toBeVisible();
+    const firstRadio = page.getByRole("radio").first();
+    await legend.click();
+    await expect(firstRadio).toBeFocused();
+  });
+
+  test("AutoComplete bindTo + label focuses the autocomplete input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <AutoComplete bindTo="fruit" label="Fruit">
+          <Option label="Apple" value="apple" />
+          <Option label="Banana" value="banana" />
+        </AutoComplete>
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Fruit" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("role", "combobox");
+    await label.click();
+    await expect(input).toBeFocused();
+  });
+
+  test("FileInput bindTo + label focuses the file input button", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <FileInput bindTo="file" label="Attachment" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Attachment" });
+    const forId = await label.getAttribute("for");
+    const button = page.locator(`[id="${forId}"]`);
+    await expect(button).toHaveJSProperty("tagName", "BUTTON");
+    await label.click();
+    await expect(button).toBeFocused();
+  });
+
+  test("Slider bindTo + label wires label to the slider thumb", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <Slider bindTo="vol" label="Volume" min="0" max="100" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Volume" });
+    const forId = await label.getAttribute("for");
+    const thumb = page.locator(`[id="${forId}"]`);
+    await expect(thumb).toHaveCount(1);
+    await expect(thumb).toHaveAttribute("role", "slider");
+  });
+
+  test("ColorPicker bindTo + label focuses the color input", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Form>
+        <ColorPicker bindTo="color" label="Color" />
+      </Form>
+    `);
+    const label = page.locator("label", { hasText: "Color" });
+    const forId = await label.getAttribute("for");
+    const input = page.locator(`[id="${forId}"]`);
+    await expect(input).toHaveAttribute("type", "color");
+    await label.click();
+    await expect(input).toBeFocused();
   });
 });

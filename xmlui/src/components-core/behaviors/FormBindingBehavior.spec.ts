@@ -92,7 +92,9 @@ test.describe("Basic Functionality", () => {
 
     const driver = await createSelectDriver("select");
     await driver.toggleOptionsVisibility();
-    await driver.selectLabel("Option 2");
+    const option2 = page.getByRole("option", { name: "Option 2" });
+    await expect(option2).toBeVisible();
+    await option2.click();
 
     await page.getByRole("button", { name: "Save" }).click();
 

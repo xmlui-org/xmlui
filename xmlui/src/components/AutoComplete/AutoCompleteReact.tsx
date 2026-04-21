@@ -31,6 +31,7 @@ import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-lay
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 
 type AutoCompleteProps = {
@@ -91,7 +92,7 @@ export const defaultProps: Partial<AutoCompleteProps> = {
 
 export const AutoComplete = memo(forwardRef(function AutoComplete(
   {
-    id,
+    id: idProp,
     initialValue,
     value,
     enabled = defaultProps.enabled,
@@ -126,6 +127,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(initiallyOpen);

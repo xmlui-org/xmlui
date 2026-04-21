@@ -1,5 +1,6 @@
 import type React from "react";
 import { type CSSProperties, forwardRef, memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 import type { Accept, DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
@@ -104,7 +105,7 @@ export const defaultProps: Pick<
 
 export const FileInput = memo(forwardRef(function FileInput(
   {
-    id,
+    id: idProp,
     enabled = defaultProps.enabled,
     style,
     className,
@@ -138,8 +139,8 @@ export const FileInput = memo(forwardRef(function FileInput(
   }: Props,
   ref: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
+  const id = useFormItemInputId(idProp);
+  const displayTextBoxId = useId();
   // Don't accept any (initial) value if it is not a File array explicitly
   const _initialValue: File[] | undefined = isFileArray(initialValue) ? initialValue : undefined;
   const _value: File[] | undefined = isFileArray(value) ? value : undefined;
@@ -411,6 +412,7 @@ export const FileInput = memo(forwardRef(function FileInput(
           </VisuallyHidden.Root>
 
           <TextBox
+            id={displayTextBoxId}
             placeholder={placeholder}
             enabled={enabled}
             value={displayedFiles?.map((v) => v.name).join(", ") || ""}

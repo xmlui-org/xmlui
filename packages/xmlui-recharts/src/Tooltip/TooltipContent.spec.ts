@@ -535,12 +535,28 @@ test.describe("Performance and Edge Cases", () => {
 
     await page.waitForSelector(chartRoot, { timeout: 10000 });
 
-    // Hover near edge of small chart
+    // Wait for at least one pie sector to be rendered
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
 
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    // On a 200x200 chart, the individual pie sectors are tiny and Playwright's
+    // "hover at bounding-box center" of a sector can miss its actual filled
+    // path. Move the mouse manually to the chart's geometric center — which
+    // reliably lies inside a pie sector — and poll until the tooltip appears.
+    const chartBox = await page.locator(chartRoot).boundingBox();
+    expect(chartBox).toBeTruthy();
+    const centerX = chartBox!.x + chartBox!.width / 2;
+    const centerY = chartBox!.y + chartBox!.height / 2;
+    await page.mouse.move(0, 0);
+    await expect
+      .poll(
+        async () => {
+          await page.mouse.move(centerX, centerY);
+          return await page.locator(tooltipContentSelector).isVisible();
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
 
     // Tooltip should be positioned within viewport
     const tooltip = page.locator(tooltipSelector);
