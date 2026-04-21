@@ -11,7 +11,7 @@ import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
 import { getByPath } from "../Form/FormReact";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { HelperText } from "./HelperText";
-import { FormItemContext } from "./FormItemReact";
+import { FormItemContext } from "./FormItemContext";
 import { resolveFormItemId } from "./FormItemUtils";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 import styles from "./FormItem.module.scss";

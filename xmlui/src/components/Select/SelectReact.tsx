@@ -30,6 +30,8 @@ import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseV
 import { Part } from "../Part/Part";
 import { OptionContext } from "./OptionContext";
 import { useFormContextPart, useIsInsideForm } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
+
 import {
   PART_LIST_WRAPPER,
   PART_CLEAR_BUTTON,
@@ -250,7 +252,7 @@ const SelectTriggerActions = ({
 export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Select(
   {
     // Basic props
-    id,
+    id: idProp,
     initialValue,
     value,
     enabled = defaultProps.enabled,
@@ -307,6 +309,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   },
   forwardedRef,
 ) {
+  const id = useFormItemInputId(idProp);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const composedTriggerRef = useComposedRefs(
     setReferenceElement as React.RefCallback<HTMLElement>,

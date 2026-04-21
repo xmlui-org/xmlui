@@ -11,6 +11,7 @@ import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { PART_INPUT } from "../../components-core/parts";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 type Props = {
   id?: string;
@@ -43,7 +44,7 @@ export const defaultProps: Pick<Props, "initialValue" | "value" | "enabled" | "v
 export const ColorPicker = memo(forwardRef(
   (
     {
-      id,
+      id: idProp,
       style,
       className,
       classes,
@@ -64,6 +65,7 @@ export const ColorPicker = memo(forwardRef(
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
+    const id = useFormItemInputId(idProp);
     const [isPending, startTransition] = useTransition();
     const inputRef = useRef<HTMLInputElement>(null);
     const composedRef = useComposedRefs(forwardedRef, inputRef);

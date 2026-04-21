@@ -19,6 +19,7 @@ import { PART_INPUT } from "../../components-core/parts";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 type ToggleProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -80,7 +81,7 @@ function transformToLegitValue(inp: unknown): boolean {
 
 export const Toggle = memo(forwardRef(function Toggle(
   {
-    id,
+    id: idProp,
     initialValue = defaultProps.initialValue,
     value = defaultProps.value,
     enabled = defaultProps.enabled,
@@ -112,6 +113,7 @@ export const Toggle = memo(forwardRef(function Toggle(
   }: ToggleProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   const innerRef = React.useRef<HTMLInputElement | null>(null);
   const composedRef = useComposedRefs(forwardedRef, innerRef);
 

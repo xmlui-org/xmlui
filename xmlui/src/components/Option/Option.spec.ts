@@ -189,7 +189,7 @@ test.describe("Basic Functionality", () => {
   }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Select id="testSelect" onDidChange="arg => testState = arg">
+        <Select testId="testSelect" onDidChange="arg => testState = arg">
           <Option label="First" value="1" />
           <Option label="Second" value="2" />
         </Select>
@@ -200,6 +200,9 @@ test.describe("Basic Functionality", () => {
     await driver.toggleOptionsVisibility();
     await expect(page.getByRole("option", { name: "Second" })).toBeVisible();
     await driver.selectLabel("Second");
+    const secondOption = page.getByRole("option", { name: "Second" });
+    await expect(secondOption).toBeVisible();
+    await secondOption.click();
 
     await expect.poll(testStateDriver.testState).toEqual("2");
   });
@@ -263,7 +266,7 @@ test.describe("Basic Functionality", () => {
   test("handles boolean values correctly", async ({ initTestBed, page, createSelectDriver }) => {
     const { testStateDriver } = await initTestBed(`
       <Fragment>
-        <Select id="booleanSelect" onDidChange="arg => testState = arg">
+        <Select testId="booleanSelect" onDidChange="arg => testState = arg">
           <Option label="True" value="{true}" />
           <Option label="False" value="{false}" />
         </Select>

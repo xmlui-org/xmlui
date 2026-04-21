@@ -5,7 +5,6 @@ import React, {
   memo,
   useCallback,
   useEffect,
-  useId,
   useRef,
 } from "react";
 import classnames from "classnames";
@@ -37,6 +36,7 @@ import { PART_CONCISE_VALIDATION_FEEDBACK, PART_END_ADORNMENT, PART_INPUT, PART_
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Part } from "../Part/Part";
 import { useFormContextPart } from "../Form/FormContext";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 // Default props for NumberBox component
 export const defaultProps = {
@@ -99,7 +99,7 @@ type Props = {
 
 export const NumberBox = memo(forwardRef(function NumberBox(
   {
-    id,
+    id: idProp,
     value,
     initialValue,
     style,
@@ -140,8 +140,7 @@ export const NumberBox = memo(forwardRef(function NumberBox(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const _id = useId();
-  id = id || _id;
+  const id = useFormItemInputId(idProp);
   // --- Ensure the provided value is a number or null
 
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true

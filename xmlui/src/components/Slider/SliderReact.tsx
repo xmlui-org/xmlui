@@ -1,5 +1,6 @@
 import type { CSSProperties, ForwardedRef } from "react";
-import React, { memo, useCallback, useEffect, useId, useRef } from "react";
+import React, { memo, useCallback, useEffect, useRef } from "react";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 import { forwardRef } from "react";
 import { Root, Range, Track, Thumb } from "@radix-ui/react-slider";
 import styles from "./Slider.module.scss";
@@ -103,7 +104,7 @@ const formatValue = (
 export const Slider = memo(forwardRef(
   (
     {
-      id,
+      id: idProp,
       style,
       className,
       classes,
@@ -133,6 +134,7 @@ export const Slider = memo(forwardRef(
     }: Props,
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) => {
+    const id = useFormItemInputId(idProp);
     const inputRef = useRef(null);
     const outerDivRef = useRef<HTMLDivElement>(null);
     const composedRef = useComposedRefs(forwardedRef, outerDivRef);

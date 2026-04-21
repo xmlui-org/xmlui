@@ -19,6 +19,7 @@ import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormContextPart } from "../Form/FormContext";
 import { ThemedIcon } from "../Icon/Icon";
+import { useFormItemInputId } from "../FormItem/FormItemContext";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
@@ -162,7 +163,7 @@ const Chevron = ({ ...props }) => {
 
 export const DatePicker = forwardRef(function DatePicker(
   {
-    id,
+    id: idProp,
     initialValue,
     value,
     mode = defaultProps.mode,
@@ -204,6 +205,7 @@ export const DatePicker = forwardRef(function DatePicker(
   }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const id = useFormItemInputId(idProp);
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [_, setIsMenuFocused] = useState(false);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
