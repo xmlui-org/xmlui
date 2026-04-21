@@ -96,9 +96,6 @@ function resolveStoredTheme(
 }
 
 export type AppWrapperProps = {
-  // --- When true, the app is rendered as an island (embedded into a host page).
-  asIsland?: boolean;
-
   // --- The root node of the application definition; the internal
   // --- representation of the entire app to run
   node: ComponentLike;

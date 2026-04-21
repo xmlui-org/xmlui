@@ -92,9 +92,6 @@ export const nestedAppComponentRenderer = wrapComponent(COMP, NestedAppWrapper, 
   customRender: (_props, { node, extractValue, className }) => (
     <NestedAppWrapper
       app={node.props?.app}
-      resolvedApp={node.props?.resolvedApp}
-      resolvedComponents={node.props?.resolvedComponents}
-      asIsland={node.props?.asIsland}
       className={className}
       api={extractValue(node.props?.api)}
       components={extractValue(node.props?.components)}

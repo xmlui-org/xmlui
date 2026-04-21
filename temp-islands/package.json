@@ -1,0 +1,15 @@
+{
+  "name": "temp-islands",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "VITE_STANDALONE=true xmlui start",
+    "build": "VITE_STANDALONE=true xmlui build",
+    "preview": "xmlui preview",
+    "build-prod": "npm run build -- --prod",
+    "release-ci": "npm run build-prod && xmlui zip-dist"
+  },
+  "dependencies": {
+    "xmlui": "*"
+  }
+}
