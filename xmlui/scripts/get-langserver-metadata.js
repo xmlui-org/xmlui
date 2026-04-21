@@ -1,4 +1,4 @@
-import { collectedComponentMetadata } from "../dist/metadata/xmlui-metadata.js";
+import { collectedComponentMetadata } from "../dist/metadata/xmlui-metadata.cjs";
 generateLangServerMetadata(collectedComponentMetadata);
 
 /**
