@@ -165,7 +165,7 @@ export default ({ mode = "lib" }) => {
       lib,
       sourcemap: true,
       rolldownOptions: {
-        treeshake: mode === "metadata" ? true : undefined,
+        treeshake: mode === "metadata" ? { moduleSideEffects: false } : undefined,
         external:
           mode === "standalone" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds
