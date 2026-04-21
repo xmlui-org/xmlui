@@ -1284,7 +1284,7 @@
                 <Overview />
             </Page>
             <Page url="/docs/howto">
-                <Overview />
+                <HowtoOverview />
             </Page>
             <Page url="/docs/reference/components">
                 <Overview />
