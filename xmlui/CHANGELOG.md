@@ -1,5 +1,14 @@
 # xmlui
 
+## 0.12.21
+
+### Patch Changes
+
+- 4b7a288: Extend the confirm global function with the actionThemeColor option
+- aa3cd6e: Emit XMLUI base styles during SSR so SSG pages render with framework styling before hydration.
+- cb88c69: Revert the xmlui islands feature
+- b10ff4d: fix: circular module initialization resulting in problems when building the vscode extension
+
 ## 0.12.20
 
 ### Patch Changes
