@@ -16,10 +16,6 @@
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/standalone/**"]
     },
-    "build:xmlui-islands": {
-      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
-      "outputs": ["dist/islands/**"]
-    },
     "build:xmlui-metadata": {
       "inputs": [
         "$TURBO_DEFAULT$",
@@ -59,7 +55,6 @@
         "build:xmlui-metadata",
         "build:xmlui",
         "build:xmlui-standalone",
-        "build:xmlui-islands",
         "build:extension"
       ],
       "outputs": ["dist/**"]
