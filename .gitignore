@@ -56,6 +56,7 @@ myworkdriveclient/
 CLAUDE.md
 GEMINI.md
 .github/copilot-instructions.md
-
+.github/context-mode
+.github/hooks
 
 docs/scripts/component-metadata.json
