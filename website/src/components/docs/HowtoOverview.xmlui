@@ -1,0 +1,34 @@
+<Component name="HowtoOverview">
+    <Stack width="100%" gap="$space-6">
+        <Breadcrumbs />
+        <VStack gap="$space-2">
+            <H1 showAnchor="{false}">{$linkInfo.label}</H1>
+            <Text when="{getPageDescription($linkInfo, appGlobals.navSections)}" variant="subtitle">
+                {getPageDescription($linkInfo, appGlobals.navSections)}
+            </Text>
+        </VStack>
+
+        <Items data="{$linkInfo.children}">
+            <VStack
+                var.category="{$item}"
+                gap="$space-3"
+                marginTop="$space-4"
+            >
+                <H2 showAnchor="{false}">{category.label}</H2>
+                <FlowLayout gap="$space-4" columnGap="$space-4" rowGap="$space-4">
+                    <Items data="{category.children}">
+                        <OverviewCard
+                            when="{$item.to}"
+                            to="{$item.to}"
+                            label="{$item.label}"
+                            icon="{$item.icon || 'article'}"
+                            width="100%"
+                            width-sm="50%"
+                            width-md="33.33%"
+                        />
+                    </Items>
+                </FlowLayout>
+            </VStack>
+        </Items>
+    </Stack>
+</Component>
