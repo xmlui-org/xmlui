@@ -25,6 +25,9 @@ import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
+import baseStyles from "../../index.scss?inline";
+
+const STYLE_ID = "xmlui-base-styles";
 
 type Props = {
   id?: string;

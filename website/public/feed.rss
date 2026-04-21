@@ -5,8 +5,16 @@
     <link>https://docs.xmlui.org</link>
     <description>Latest updates, tutorials, and insights for XMLUI - the declarative UI framework. Stay informed about new features, best practices, and community highlights.</description>
     <language>en</language>
-    <lastBuildDate>Tue, 14 Apr 2026 18:02:07 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 21 Apr 2026 06:18:58 GMT</lastBuildDate>
 
+    <item>
+      <title>Supabase + XMLUI</title>
+      <link>https://docs.xmlui.org/supabase-and-xmlui</link>
+      <description>Supabase provides a powerful backend: Postgres database, authentication, real-time subscriptions, storage, and edge functions. But building a frontend typically means setting up a build system, managing dependencies, and writing lots of boilerplate....</description>
+      <pubDate>Tue, 21 Apr 2026 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://docs.xmlui.org/supabase-and-xmlui</guid>
+    </item>
     <item>
       <title>Semantic tracing: how ARIA unlocks debugging, testing, and AI reasoning</title>
       <link>https://docs.xmlui.org/semantic-trace</link>
@@ -40,28 +48,20 @@
       <guid>https://docs.xmlui.org/xmlui-powered-blog</guid>
     </item>
     <item>
-      <title>Introducing XMLUI</title>
-      <link>https://docs.xmlui.org/introducing-xmlui</link>
-      <description>&gt; [!TIP] &gt; Ed. note: This is the post that was discussed on Hacker News. In the mid-1990s you could create useful software without being an ace coder. You had Visual Basic, you had a rich ecosystem of components, you could wire them together to creat...</description>
-      <pubDate>Fri, 18 Jul 2025 00:00:00 GMT</pubDate>
-      <author>support@xmlui.org (Jon Udell)</author>
-      <guid>https://docs.xmlui.org/introducing-xmlui</guid>
-    </item>
-    <item>
-      <title>Supabase + XMLUI</title>
-      <link>https://docs.xmlui.org/supabase-and-xmlui</link>
-      <description>Supabase provides a powerful backend: Postgres database, authentication, real-time subscriptions, storage, and edge functions. But building a frontend typically means setting up a build system, managing dependencies, and writing lots of boilerplate....</description>
-      <pubDate>Invalid Date</pubDate>
-      <author>support@xmlui.org (Jon Udell)</author>
-      <guid>https://docs.xmlui.org/supabase-and-xmlui</guid>
-    </item>
-    <item>
       <title>Reproducible XMLUI</title>
       <link>https://docs.xmlui.org/xmlui-playground</link>
       <description>The XMLUI docs are full of live working examples that use Playground, an extension package that runs XMLUI code inside an XMLUI app. We use playgrounds to bring component documentation to life. Why just tell you about the enabled property of a Checkb...</description>
       <pubDate>Mon, 27 Oct 2025 00:00:00 GMT</pubDate>
       <author>support@xmlui.org (Jon Udell)</author>
       <guid>https://docs.xmlui.org/xmlui-playground</guid>
+    </item>
+    <item>
+      <title>Introducing XMLUI</title>
+      <link>https://docs.xmlui.org/introducing-xmlui</link>
+      <description>&gt; [!TIP] &gt; Ed. note: This is the post that was discussed on Hacker News. In the mid-1990s you could create useful software without being an ace coder. You had Visual Basic, you had a rich ecosystem of components, you could wire them together to creat...</description>
+      <pubDate>Fri, 18 Jul 2025 00:00:00 GMT</pubDate>
+      <author>support@xmlui.org (Jon Udell)</author>
+      <guid>https://docs.xmlui.org/introducing-xmlui</guid>
     </item>
   </channel>
 </rss>
