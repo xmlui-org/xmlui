@@ -1,12 +1,12 @@
 # Expression Evaluation & Scripting
 
-XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XML attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
+XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XMLUI attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
 
-<!-- DIAGRAM: Pipeline overview — XML attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
+<!-- DIAGRAM: Pipeline overview — XMLUI attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
 
 ```mermaid
 graph TD
-  Attr["XML attribute value<br>e.g. 'Hello {name}, you have {count} items'"]
+  Attr["XMLUI attribute value<br>e.g. 'Hello {name}, you have {count} items'"]
   AVP["AttributeValueParser<br>split into literal + expression segments"]
 
   subgraph Segments["Segments"]
