@@ -109,7 +109,9 @@ export const build = async ({
       "import.meta.env.VITE_MOCK_ENABLED": withMock,
       "import.meta.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION),
 
-      "import.meta.env.VITE_USED_COMPONENTS_App": JSON.stringify(process.env.VITE_USED_COMPONENTS_App),
+      "import.meta.env.VITE_USED_COMPONENTS_App": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_App,
+      ),
       "import.meta.env.VITE_USED_COMPONENTS_Chart": JSON.stringify(
         process.env.VITE_USED_COMPONENTS_Chart,
       ),
@@ -140,7 +142,9 @@ export const build = async ({
       "import.meta.env.VITE_USED_COMPONENTS_SpaceFiller": JSON.stringify(
         process.env.VITE_USED_COMPONENTS_SpaceFiller,
       ),
-      "import.meta.env.VITE_USED_COMPONENTS_Pdf": JSON.stringify(process.env.VITE_USED_COMPONENTS_Pdf),
+      "import.meta.env.VITE_USED_COMPONENTS_Pdf": JSON.stringify(
+        process.env.VITE_USED_COMPONENTS_Pdf,
+      ),
       "import.meta.env.VITE_USED_COMPONENTS_Textarea": JSON.stringify(
         process.env.VITE_USED_COMPONENTS_Textarea,
       ),
