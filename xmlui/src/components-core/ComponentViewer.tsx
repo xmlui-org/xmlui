@@ -58,7 +58,7 @@ export const ComponentViewer = () => {
       .join("\n");
   }, [inspectedNode, sources]);
 
-  return process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
+  return import.meta.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
     isOpen &&
     inspectedNode !== null ? (
     <InspectorDialog isOpen={isOpen} setIsOpen={setIsOpen} clickPosition={clickPosition}>

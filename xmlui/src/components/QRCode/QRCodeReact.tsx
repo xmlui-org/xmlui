@@ -1,7 +1,7 @@
 import type { ForwardedRef } from "react";
 import { forwardRef, memo, useMemo } from "react";
 import classnames from "classnames";
-import QRCodeLib from "react-qr-code";
+import { QRCode as QRCodeLib } from "react-qr-code";
 
 import styles from "./QRCode.module.scss";
 import { useTheme } from "../../components-core/theming/ThemeContext";

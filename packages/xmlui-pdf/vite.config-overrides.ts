@@ -26,8 +26,8 @@ const suppressUseClientWarnings = (): Plugin => ({
   name: "suppress-use-client-warnings",
   enforce: "post",
   configResolved(config) {
-    const originalOnwarn = config.build.rollupOptions.onwarn;
-    config.build.rollupOptions.onwarn = (warning, warn) => {
+    const originalOnwarn = config.build.rolldownOptions.onwarn;
+    config.build.rolldownOptions.onwarn = (warning, warn) => {
       // Suppress "use client" directive warnings
       if (
         warning.code === "MODULE_LEVEL_DIRECTIVE" &&

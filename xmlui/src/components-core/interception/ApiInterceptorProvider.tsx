@@ -65,7 +65,7 @@ export function ApiInterceptorProvider({
         let interceptorWorker: SetupWorker;
         void (async () => {
           // --- Create the worker on the fly
-          if (process.env.VITE_MOCK_ENABLED) {
+          if (import.meta.env.VITE_MOCK_ENABLED) {
             const [{ createApiInterceptorWorker }, { initMock }] = await Promise.all([
               useWorker
                 ? import("./apiInterceptorWorker")
@@ -78,7 +78,7 @@ export function ApiInterceptorProvider({
               interceptorWorker = await createApiInterceptorWorker(apiInstance);
               // if the apiWorker comes from the outside, we don't handle the lifecycle here
               const workerFileLocation = normalizePath(
-                process.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js",
+                import.meta.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js",
               );
               await interceptorWorker.start({
                 onUnhandledRequest: "bypass",
@@ -132,7 +132,7 @@ export function ApiInterceptorProvider({
   ]);
 
   const isMocked = useCallback(
-    (url) => interceptor !== undefined && !!process.env.VITE_MOCK_ENABLED,
+    (url) => interceptor !== undefined && !!import.meta.env.VITE_MOCK_ENABLED,
     [interceptor],
   );
 

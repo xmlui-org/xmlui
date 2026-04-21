@@ -169,7 +169,7 @@ export function InspectorProvider({
     <ProjectCompilationContext.Provider value={{ projectCompilation }}>
       <InspectorContext.Provider value={contextValue}>
         {children}
-        {process.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
+        {import.meta.env.VITE_USER_COMPONENTS_Inspect !== "false" &&
           inspectable &&
           Object.values(inspectable).map((item: any) => {
           return (
