@@ -3295,3 +3295,107 @@ test.describe("scrollIndicators property", () => {
     expect(isScrollable).toBe(true);
   });
 });
+
+// =============================================================================
+// data / valueField / labelField PROPS
+// =============================================================================
+
+test.describe("data property", () => {
+  test("renders options from data array using default valueField and labelField", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel" data="{[{value:'a',label:'Alpha'},{value:'b',label:'Beta'}]}" />
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+  });
+
+  test("renders options from data array using custom valueField and labelField", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Select testId="sel"
+        data="{[{id:'x',name:'Xray'},{id:'y',name:'Yankee'}]}"
+        valueField="id"
+        labelField="name"
+      />
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Xray" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Yankee" })).toBeVisible();
+  });
+
+  test("selection works with data prop", async ({
+    initTestBed,
+    createSelectDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Select testId="sel" id="mySelect"
+          data="{[{value:'a',label:'Alpha'},{value:'b',label:'Beta'}]}"
+        />
+        <Text testId="val">{mySelect.value}</Text>
+      </Fragment>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await driver.selectLabel("Beta");
+    await expect(page.getByTestId("val")).toHaveText("b");
+  });
+
+  test("options update when data reference changes", async ({
+    initTestBed,
+    createSelectDriver,
+    createButtonDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.items="{[{value:'a',label:'Alpha'}]}">
+        <Button testId="btn" label="Add" onClick="items=[{value:'a',label:'Alpha'},{value:'b',label:'Beta'}]" />
+        <Select testId="sel" data="{items}" />
+      </App>
+    `);
+    const driver = await createSelectDriver("sel");
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).not.toBeVisible();
+    await page.keyboard.press("Escape");
+
+    const btn = await createButtonDriver("btn");
+    await btn.click();
+
+    await driver.click();
+    await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "Beta" })).toBeVisible();
+  });
+
+  test("does not re-render options when unrelated state changes", async ({
+    initTestBed,
+    createSelectDriver,
+    createTextBoxDriver,
+    page,
+  }) => {
+    await initTestBed(`
+      <App var.txt="" var.countries="{[{value:'us',label:'United States'},{value:'gb',label:'United Kingdom'}]}">
+        <TextBox testId="input" bindTo="txt" />
+        <Select testId="sel" data="{countries}" />
+      </App>
+    `);
+    const driver = await createSelectDriver("sel");
+    const textDriver = await createTextBoxDriver("input");
+    await textDriver.input.fill("hello");
+
+    await driver.click();
+    await expect(page.getByRole("option", { name: "United States" })).toBeVisible();
+    await expect(page.getByRole("option", { name: "United Kingdom" })).toBeVisible();
+  });
+});

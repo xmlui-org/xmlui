@@ -357,9 +357,23 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                         ))}
                   </>
                 ) : (
-                  // Render flat options
+                  // Render flat options.
+                  // If options are provided as an array (data prop), render them directly.
+                  // Otherwise fall through to OptionTypeProvider which renders Option children.
                   <>
-                    {<OptionTypeProvider Component={SelectOption}>{children}</OptionTypeProvider>}
+                    {options.length > 0 && !children ? (
+                      options.map((option) => (
+                        <SelectOption
+                          key={option.value}
+                          value={String(option.value)}
+                          label={option.label}
+                          enabled={option.enabled}
+                          className={styles.selectOption}
+                        />
+                      ))
+                    ) : (
+                      <OptionTypeProvider Component={SelectOption}>{children}</OptionTypeProvider>
+                    )}
                     {options.length === 0 && emptyListNode}
                   </>
                 )}

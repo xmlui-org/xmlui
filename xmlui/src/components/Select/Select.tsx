@@ -74,6 +74,24 @@ export const SelectMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
+    data: d(
+      "The data array to populate the option list from. When provided, `Option` children are not needed — " +
+        "the component builds options from this array using `valueField` and `labelField`. " +
+        "This is the most efficient approach for large lists because the options are derived in JavaScript " +
+        "and re-evaluated only when the data reference changes, not on every unrelated state update.",
+    ),
+    valueField: {
+      description:
+        "The property name of each data item to use as the option value when `data` is provided. Defaults to `\"value\"`.",
+      valueType: "string",
+      defaultValue: "value",
+    },
+    labelField: {
+      description:
+        "The property name of each data item to use as the option label when `data` is provided. Defaults to `\"label\"`.",
+      valueType: "string",
+      defaultValue: "label",
+    },
     optionLabelTemplate: dComponent(
       `This property allows replacing the default template to display an option in the dropdown list.`,
     ),
@@ -269,6 +287,9 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
     "verboseValidationFeedback",
     "validationIconSuccess",
     "validationIconError",
+    "data",
+    "valueField",
+    "labelField",
   ],
   events: [],
   customRender(
@@ -287,6 +308,12 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
     const multiSelect = extractValue.asOptionalBoolean(node.props.multiSelect);
     const searchable = extractValue.asOptionalBoolean(node.props.searchable);
     const clearable = extractValue.asOptionalBoolean(node.props.clearable);
+    const data = extractValue(node.props.data);
+    const valueField = extractValue.asOptionalString(node.props.valueField);
+    const labelField = extractValue.asOptionalString(node.props.labelField);
+
+    // When data is provided, children are ignored — options are derived in JS.
+    const hasData = data != null;
 
     const isControlled = node.props.value !== undefined;
     return (
@@ -324,6 +351,9 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
         )}
         validationIconSuccess={extractValue.asOptionalString(node.props.validationIconSuccess)}
         validationIconError={extractValue.asOptionalString(node.props.validationIconError)}
+        data={data}
+        valueField={valueField}
+        labelField={labelField}
         groupHeaderRenderer={
           node.props.groupHeaderTemplate
             ? (contextVars) => {
@@ -384,7 +414,7 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
             : undefined
         }
       >
-        {renderChild(node.children)}
+        {!hasData && renderChild(node.children)}
       </Select>
     );
   },

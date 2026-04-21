@@ -102,6 +102,11 @@ interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onFocu
   groupHeaderRenderer?: (contextVars: Record<string, any>) => ReactNode;
   ungroupedHeaderRenderer?: () => ReactNode;
 
+  // Data-driven options (alternative to Option children)
+  data?: any[];
+  valueField?: string;
+  labelField?: string;
+
   // Internal
   updateState?: UpdateStateFn;
   registerComponentApi?: RegisterComponentApiFn;
@@ -295,6 +300,11 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
     groupHeaderRenderer,
     ungroupedHeaderRenderer,
 
+    // Data-driven options
+    data,
+    valueField = "value",
+    labelField = "label",
+
     // Internal
     updateState = noop,
     registerComponentApi,
@@ -327,6 +337,23 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
+  // When `data` is provided, derive options directly from the array — bypassing the
+  // Option-children registration cycle entirely. `useMemo` ensures the derived array
+  // is only recomputed when `data`, `valueField`, or `labelField` changes, so unrelated
+  // parent state updates (e.g. typing in another form field) never trigger option work.
+  const dataOptions = useMemo<Option[] | null>(() => {
+    if (!data) return null;
+    const items = Array.isArray(data) ? data : Object.values(data);
+    return items.map((item) => ({
+      value: item[valueField],
+      label: item[labelField],
+    }));
+  }, [data, valueField, labelField]);
+
+  // effectiveOptions is the single source of truth for option lookups.
+  // Uses data-derived options when available, falling back to child-registered options.
+  const effectiveOptions: Option[] = dataOptions ?? options;
+
   const contextVerboseValidationFeedback = useFormContextPart(
     (ctx) => ctx?.verboseValidationFeedback,
   );
@@ -350,13 +377,13 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
 
   const selectedOptions = useMemo(() => {
     if (!multiSelect) {
-      return options.filter((option) => `${option.value}` === `${value}`);
+      return effectiveOptions.filter((option) => `${option.value}` === `${value}`);
     } else {
       return Array.isArray(value)
-        ? options.filter((option) => value.map((v) => String(v)).includes(String(option.value)))
+        ? effectiveOptions.filter((option) => value.map((v) => String(v)).includes(String(option.value)))
         : [];
     }
-  }, [multiSelect, options, value]);
+  }, [multiSelect, effectiveOptions, value]);
 
   const popoverContentStyle = useMemo(
     () => ({ minWidth: panelWidth, maxHeight: dropdownHeight, height: "auto" as const }),
@@ -370,22 +397,22 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   // Filter options based on search term
   const filteredOptions = useMemo(() => {
     if (!searchTerm || searchTerm.trim() === "") {
-      return Array.from(options);
+      return Array.from(effectiveOptions);
     }
 
     const searchLower = searchTerm.toLowerCase();
-    return Array.from(options).filter((option) => {
+    return Array.from(effectiveOptions).filter((option) => {
       const extendedValue =
         option.value + " " + option.label + " " + (option.keywords || []).join(" ");
       return extendedValue.toLowerCase().includes(searchLower);
     });
-  }, [options, searchTerm]);
+  }, [effectiveOptions, searchTerm]);
 
   // Group options if groupBy is provided
   const groupedOptions = useMemo(() => {
     if (!groupBy) return null;
 
-    const optionsToGroup = searchTerm ? filteredOptions : Array.from(options);
+    const optionsToGroup = searchTerm ? filteredOptions : Array.from(effectiveOptions);
 
     // Early return if no options to group - prevents empty dropdown issue
     if (optionsToGroup.length === 0) return null;
@@ -415,7 +442,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
 
     // Return null if no groups have any options
     return Object.keys(sortedGroups).length > 0 ? sortedGroups : null;
-  }, [groupBy, options, filteredOptions, searchTerm]);
+  }, [groupBy, effectiveOptions, filteredOptions, searchTerm]);
 
   // Create a flat list from grouped options for keyboard navigation
   const flattenedGroupedOptions = useMemo(() => {
@@ -452,7 +479,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   useEffect(() => {
     if (!isInsideForm) return;
     if (hasValidatedInitialValueRef.current) return;
-    if (options.length === 0) return;
+    if (effectiveOptions.length === 0) return;
     // Wait until the form has actually provided a concrete value (not just "not yet set")
     if (value === undefined || value === null) return;
 
@@ -460,7 +487,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
 
     if (!multiSelect) {
       if (value !== "") {
-        const isValid = options.some((opt) => `${opt.value}` === `${value}`);
+        const isValid = effectiveOptions.some((opt) => `${opt.value}` === `${value}`);
         if (!isValid) {
           // Use formOnly:true so the form field is cleared without updating the
           // component's own display state. Updating to undefined would cause
@@ -472,14 +499,14 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
     } else {
       if (Array.isArray(value) && value.length > 0) {
         const validValues = value.filter((v) =>
-          options.some((opt) => String(opt.value) === String(v)),
+          effectiveOptions.some((opt) => String(opt.value) === String(v)),
         );
         if (validValues.length !== value.length) {
           updateState({ value: validValues });
         }
       }
     }
-  }, [isInsideForm, options, value, multiSelect, updateState]);
+  }, [isInsideForm, effectiveOptions, value, multiSelect, updateState]);
 
   // Observe the size of the reference element
   useEffect(() => {
@@ -521,7 +548,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
       // internally without firing a DOM click that AppContent can capture.
       // Gated on _xsLogs existence (proxy for xsVerbose) to avoid work when tracing is off.
       if (typeof window !== "undefined" && Array.isArray((window as any)._xsLogs)) {
-        const selectedOption = options.find((o) => String(o.value) === String(selectedValue));
+        const selectedOption = effectiveOptions.find((o) => String(o.value) === String(selectedValue));
         const optionLabel = selectedOption?.label || String(selectedValue);
         pushXsLog({
           ts: Date.now(),
@@ -548,7 +575,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
         setOpen(false);
       }
     },
-    [multiSelect, currentValue, updateState, onDidChange, options],
+    [multiSelect, currentValue, updateState, onDidChange, effectiveOptions],
   );
 
   // Clear selected value
@@ -760,7 +787,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
             value={currentValue as SingleValueType}
             onValueChange={(val) => toggleOption(val)}
             id={id}
-            options={options}
+            options={effectiveOptions}
             style={style}
             className={classnames(className, classes?.[COMPONENT_PART_KEY])}
             contentClassName={contentClassName}
@@ -972,7 +999,12 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
           </>
         )}
         <div style={{ display: "none" }}>
-          <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+          {/* Only render Option children when data prop is not used.
+              When data is provided, options are derived directly in JS and no
+              XMLUI Option traversal is needed. */}
+          {!data && (
+            <OptionTypeProvider Component={HiddenOption}>{children}</OptionTypeProvider>
+          )}
         </div>
       </OptionContext.Provider>
     </SelectContext.Provider>
