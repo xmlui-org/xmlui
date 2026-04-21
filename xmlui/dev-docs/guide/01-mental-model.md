@@ -97,7 +97,7 @@ The router type is chosen based on configuration: `HashRouter` (default), `Brows
 <!-- DIAGRAM: Nested provider stack as concentric rectangles, from outermost (ComponentProvider) to innermost (root Container) -->
 
 ```mermaid
-graph TD
+graph LR
   subgraph CP["ComponentProvider"]
     subgraph SP["StyleProvider"]
       subgraph DP["DebugViewProvider"]
