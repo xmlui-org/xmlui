@@ -12,6 +12,8 @@ import { FormItemContext, useIsInsideFormItem, useFormItemInputId } from "./Form
 export { FormItemContext, useIsInsideFormItem, useFormItemInputId };
 import classnames from "classnames";
 
+import styles from "./FormItem.module.scss";
+
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
@@ -492,7 +494,9 @@ export const FormItem = memo(forwardRef(function FormItem({
           updateState={onStateChange}
           value={value}
         >
-          <Items items={value} renderItem={inputRenderer} />
+          <div className={styles.itemsStack}>
+            <Items items={value} renderItem={inputRenderer} />
+          </div>
         </ArrayLikeFormItem>
       );
       break;
