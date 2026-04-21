@@ -31,6 +31,34 @@ The key fork is in `ComponentWrapper`: **stateful nodes** get a full container s
 
 <!-- DIAGRAM: Flowchart of the pipeline above, with arrows and boxes for each step. Highlight the stateful vs stateless fork. -->
 
+```mermaid
+graph TD
+  RC(["renderChild(node)"])
+  CW["ComponentWrapper<br>normalise node props"]
+  Fork{"has vars / loaders<br>/ functions / uses<br>/ script?"}
+  Recurse(["renderChild() — recursive<br>for each child node"])
+
+  subgraph StatefulPath["Stateful path"]
+    CWrap["ContainerWrapper"]
+    EB["ErrorBoundary"]
+    SC["StateContainer<br>compose 6-layer state"]
+    Cont["Container<br>event handlers + renderChild()"]
+    CWrap --> EB --> SC --> Cont
+  end
+
+  subgraph StatelessPath["Stateless path"]
+    CA["ComponentAdapter<br>extract values, layout,<br>renderer call, behaviors"]
+  end
+
+  RC --> CW
+  CW --> Fork
+  Fork -->|"yes"| CWrap
+  Fork -->|"no"| CA
+  Cont -.->|"renders children"| Recurse
+  CA -.->|"renders children"| Recurse
+  Recurse --> RC
+```
+
 ## Step 1: renderChild
 
 `renderChild()` is the recursive entry point, called for every node in the component tree.
@@ -106,6 +134,21 @@ The distinction between **implicit** and **explicit** matters for state inherita
 
 <!-- DIAGRAM: ComponentAdapter as a vertical pipeline of numbered steps, each labeled. -->
 
+```mermaid
+graph TD
+  S1["1. Value extraction<br>ValueExtractor evaluates {expressions}<br>resolves resource:// URLs"]
+  S2["2. Layout resolution<br>CSS props: width, height, padding, gap…<br>responsive variants + part overrides"]
+  S3["3. Component lookup<br>ComponentRegistry → renderer fn<br>+ metadata + isCompound flag"]
+  S4["4. RendererContext assembly<br>uid, node.props, state, extractValue,<br>renderChild, lookupEventHandler, …"]
+  S5["5. Renderer call<br>renderer(context) → ReactNode"]
+  S6["6. Behavior application<br>canAttach() per behavior → wrap output<br>(skipped for compound components)"]
+  S7["7. Theme class<br>useComponentThemeClass()"]
+  S8["8. Test ID decoration<br>testId → data-testid via ComponentDecorator"]
+  S9["9. API-bound wrapping<br>DataSource / APICall → ApiBoundComponent"]
+
+  S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9
+```
+
 ## Step 4: Behaviors
 
 Behaviors are cross-cutting wrappers applied automatically based on a component's props and metadata. They are registered in `ComponentProvider` and applied in registration order inside `ComponentAdapter`.
@@ -131,6 +174,26 @@ Behaviors are cross-cutting wrappers applied automatically based on a component'
 Use `displayWhen` when you need to toggle visibility without losing state (e.g., a form that should remember values while hidden).
 
 <!-- DIAGRAM: Side-by-side showing when=false (nothing in DOM) vs displayWhen=false (div with display:none in DOM) -->
+
+```mermaid
+graph TB
+  subgraph WhenFalse["`when` = false"]
+    WP["Parent renders"]
+    WN["null — component<br>not in DOM"]
+    WNote["state is lost<br>on re-mount"]
+    WP --> WN
+    WN -.->|"consequence"| WNote
+  end
+
+  subgraph DisplayWhenFalse["`displayWhen` = false"]
+    DP["Parent renders"]
+    DW["&lt;div style='display:none'&gt;"]
+    DC["component — still<br>mounted in DOM"]
+    DNote["state preserved<br>no reinitialisation"]
+    DP --> DW --> DC
+    DC -.->|"consequence"| DNote
+  end
+```
 
 ## Error Boundaries
 
