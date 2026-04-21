@@ -536,6 +536,40 @@ test.describe("Label", () => {
 
     expect(labelRight).toBeLessThan(checkboxLeft);
   });
+
+  test("labelPosition=end inside VStack keeps label snug against checkbox", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <Checkbox direction="ltr" label="Annual Revenue" labelPosition="end" testId="cb1" />
+        <Checkbox direction="ltr" label="City" labelPosition="end" testId="cb2" />
+      </VStack>
+    `);
+
+    const cb1 = page.getByTestId("cb1");
+    const { right: checkboxRight } = await getBounds(cb1.getByRole("checkbox"));
+    const { left: labelLeft } = await getBounds(cb1.getByText("Annual Revenue"));
+
+    expect(labelLeft).toBeGreaterThan(checkboxRight);
+    // Container must not stretch to full width inside a VStack row; the label
+    // should sit right next to the checkbox instead of being pushed to the
+    // row's far edge by a flex:1 wrapper.
+    expect(labelLeft - checkboxRight).toBeLessThan(40);
+  });
+
+  test("labelPosition=start inside VStack keeps label snug against checkbox", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <Checkbox direction="ltr" label="Annual Revenue" labelPosition="start" testId="cb1" />
+      </VStack>
+    `);
+
+    const cb1 = page.getByTestId("cb1");
+    const { left: checkboxLeft } = await getBounds(cb1.getByRole("checkbox"));
+    const { right: labelRight } = await getBounds(cb1.getByText("Annual Revenue"));
+
+    expect(labelRight).toBeLessThan(checkboxLeft);
+    expect(checkboxLeft - labelRight).toBeLessThan(40);
+  });
 });
 
 // =============================================================================

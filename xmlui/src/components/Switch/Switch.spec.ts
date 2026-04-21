@@ -489,6 +489,36 @@ test.describe("Label", () => {
 
     expect(labelRight).toBeLessThan(switchLeft);
   });
+
+  test("labelPosition=end inside VStack keeps label snug against switch", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <Switch direction="ltr" label="Enable feature" labelPosition="end" testId="sw1" />
+      </VStack>
+    `);
+
+    const sw = page.getByTestId("sw1");
+    const { right: switchRight } = await getBounds(sw.getByRole("switch"));
+    const { left: labelLeft } = await getBounds(sw.getByText("Enable feature"));
+
+    expect(labelLeft).toBeGreaterThan(switchRight);
+    expect(labelLeft - switchRight).toBeLessThan(40);
+  });
+
+  test("labelPosition=start inside VStack keeps label snug against switch", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <VStack>
+        <Switch direction="ltr" label="Enable feature" labelPosition="start" testId="sw1" />
+      </VStack>
+    `);
+
+    const sw = page.getByTestId("sw1");
+    const { left: switchLeft } = await getBounds(sw.getByRole("switch"));
+    const { right: labelRight } = await getBounds(sw.getByText("Enable feature"));
+
+    expect(labelRight).toBeLessThan(switchLeft);
+    expect(switchLeft - labelRight).toBeLessThan(40);
+  });
 });
 
 // =============================================================================
