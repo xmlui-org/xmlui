@@ -678,6 +678,10 @@ Available values: `normal` **(default)**, `overlay`, `whenMouseOver`, `whenScrol
 
 The property name in source data for selectable state (default: "selectable").
 
+### `selectedId` [#selectedid]
+
+An alias for selectedValue — selects a tree node by its source data ID.
+
 ### `selectedValue` [#selectedvalue]
 
 The selected item ID in source data format.

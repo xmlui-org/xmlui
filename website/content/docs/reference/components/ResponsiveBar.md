@@ -166,6 +166,12 @@ This method opens the overflow dropdown menu.
 
 **Signature**: `open(): void`
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`overflow`**: The overflow dropdown container that holds items that don't fit in the bar.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

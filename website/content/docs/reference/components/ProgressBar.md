@@ -59,5 +59,5 @@ This component does not expose any methods.
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-indicator-ProgressBar | 999em | 999em |
 | [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-ProgressBar | 999em | 999em |
 | [color](/docs/styles-and-themes/common-units/#color)-indicator-ProgressBar | $color-primary-500 | $color-primary-500 |
-| [color](/docs/styles-and-themes/common-units/#color)-indicator-ProgressBar--complete | *none* | *none* |
+| [color](/docs/styles-and-themes/common-units/#color)-indicator-ProgressBar--complete | $color-success-500 | $color-success-500 |
 | [thickness](/docs/styles-and-themes/common-units/#size-values)-ProgressBar | 0.5em | 0.5em |

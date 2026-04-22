@@ -25,9 +25,10 @@ This component does not have any properties.
 
 This event fires when the `MessageListener` component receives a message from another window or iframe via the window.postMessage API.
 
-**Signature**: `(data: any) => void`
+**Signature**: `(data: any, event: MessageEvent<any>) => void`
 
 - `data`: The data sent from the other window via postMessage.
+- `event`: The MessageEvent object containing the message and additional metadata.
 
 ```xmlui-pg copy display name="Example: messageReceived" /onMessageReceived/ /window.postMessage/
 <App var.message="(no message received yet)">

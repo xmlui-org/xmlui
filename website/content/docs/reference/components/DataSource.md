@@ -286,7 +286,7 @@ This `Table` uses the filtered array.
 
 ### `structuralSharing` [#structuralsharing]
 
-> [!DEF]  default: **"true"**
+> [!DEF]  default: **true**
 
 This property allows structural sharing. When turned on, `DataSource` will keep the original reference if nothing has changed in the data. If a subset has changed, `DataSource` will keep the unchanged parts and only replace the changed parts. If you do not need this behavior, set this property to `false`.
 

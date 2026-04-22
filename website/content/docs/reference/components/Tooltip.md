@@ -283,4 +283,4 @@ This component does not expose any methods.
 | [paddingVertical](/docs/styles-and-themes/common-units/#size-values)-Tooltip | *none* | *none* |
 | [stroke](/docs/styles-and-themes/common-units/#color)-arrow-Tooltip | $color-surface-200 | $color-surface-200 |
 | [strokeWidth](/docs/styles-and-themes/common-units/#size-values)-arrow-Tooltip | 0 | 0 |
-| [textColor](/docs/styles-and-themes/common-units/#color)-Tooltip | $textcolor-primary | $textcolor-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-Tooltip | $textColor-primary | $textColor-primary |

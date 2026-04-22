@@ -109,13 +109,15 @@ Available values: `1` **(default)**, `3`, `5`
 
 ### `orientation` [#orientation]
 
+> [!DEF]  default: **"horizontal"**
+
 Layout orientation of the pagination component
 
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `horizontal` | The component will fill the available space horizontally |
+| `horizontal` | The component will fill the available space horizontally **(default)** |
 | `vertical` | The component will fill the available space vertically |
 
 ### `pageIndex` [#pageindex]
@@ -125,6 +127,8 @@ Available values:
 Current page index (0-based)
 
 ### `pageInfoPosition` [#pageinfoposition]
+
+> [!DEF]  default: **"end"**
 
 Determines where to place the page information in the layout.
 
@@ -139,6 +143,8 @@ Number of items per page
 Array of page sizes the user can select from. If provided, shows a page size selector dropdown
 
 ### `pageSizeSelectorPosition` [#pagesizeselectorposition]
+
+> [!DEF]  default: **"start"**
 
 Determines where to place the page size selector in the layout.
 
@@ -216,9 +222,9 @@ Moves to the previous page
 
 The component has some parts that can be styled through layout properties and theme variables separately:
 
-- **`buttonRow`**: The container for pagination buttons.
-- **`pageInfo`**: The container for page information display.
-- **`pageSizeSelector`**: The container for the page size selector dropdown.
+- **`page-info`**: The container for page information display.
+- **`page-size-selector-container`**: The container for the page size selector dropdown.
+- **`pagination-controls`**: The container for pagination buttons.
 
 ## Styling [#styling]
 

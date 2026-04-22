@@ -125,6 +125,12 @@ The accordion view is particularly useful for mobile layouts or when you need to
 
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab. If not set, the first tab is selected by default.
 
+### `distributeEvenly` [#distributeevenly]
+
+> [!DEF]  default: **false**
+
+When enabled, all tabs are distributed evenly across the full width of the tab strip, each taking equal horizontal space. Equivalent to setting `tabAlignment` to `"stretch"`.
+
 ### `gap` [#gap]
 
 Sets the gap (padding) between the tab header strip and the active tab panel content. Accepts any valid CSS length (e.g. `"8px"`, `"1rem"`). When set, this overrides the `paddingTop-TabItem` theme variable.

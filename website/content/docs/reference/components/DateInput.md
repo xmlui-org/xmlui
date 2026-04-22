@@ -511,6 +511,7 @@ The component has some parts that can be styled through layout properties and th
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-DateInput | *none* | *none* |
 | hoverColor-button-DateInput | $color-surface-800 | $color-surface-800 |
 | [margin](/docs/styles-and-themes/common-units/#size-values)-input-DateInput | *none* | *none* |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-DateInput | *none* | *none* |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-input-DateInput | 0.54em | 0.54em |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-DateInput--disabled | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-button-DateInput--focused | $color-accent-500 | $color-accent-500 |
