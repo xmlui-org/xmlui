@@ -4,6 +4,23 @@ XMLUI's form system provides automatic data management, validation, and submissi
 
 Understanding the form infrastructure matters for framework developers because it touches behaviors (FormBinding), the reducer pattern shared with containers, context variable injection, and the event handler exception where form handlers are awaited rather than fire-and-forget.
 
+```xml
+<!-- FormWithContextVar wraps Form, which wraps FormItems -->
+<!-- Each FormItem wires its input to the form's subject via bindTo -->
+<Form onSubmit="(data) => saveUser.execute(data)">
+  <FormItem bindTo="name" label="Full Name" required="true" />
+  <FormItem bindTo="email" label="Email" type="email" required="true" />
+  <FormItem
+    bindTo="role"
+    label="Role"
+    type="select"
+    validationMessage="Please choose a role">
+    <Option value="admin" label="Admin" />
+    <Option value="user" label="User" />
+  </FormItem>
+</Form>
+```
+
 <!-- DIAGRAM: Form architecture — FormWithContextVar → Form → FormContext → FormItem → Input + Validation -->
 
 ```mermaid

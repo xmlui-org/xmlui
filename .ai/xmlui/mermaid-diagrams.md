@@ -111,3 +111,23 @@ end
 ```
 
 The `id` Registration example and the mutation routing examples follow this pattern. The first "Implicit vs Explicit Containers" diagram does not (it was written for compactness) — treat it as an exception only when nesting depth would make the diagram unreadable. When in doubt, prefer accuracy over compactness.
+
+---
+
+## Pairing XMLUI code snippets with diagrams
+
+Add a fenced ` ```xml ` example immediately after a diagram when the diagram depicts something a framework user can write in markup. The snippet grounds the abstract diagram in concrete usage.
+
+**Add an XML example when the diagram shows:**
+- Component nesting or containment (`Form` > `FormItem`, `Items` > `$item` context, UDC `<Slot>`)
+- Data binding (`DataSource` wired to a prop via `{loader.value}`)
+- State ownership that maps to `var.*` declarations
+- Props that activate a feature (e.g. `bindTo`, `uses`, `displayWhen`)
+
+**Skip the XML example when the diagram shows:**
+- Internal React infrastructure (provider stack, `useReducer`, React Query internals)
+- Parser or evaluator pipelines (AST transforms, expression scope resolution)
+- Build / registry internals (theme compilation, extension loading, component registry lookup)
+- Accessibility tree paths or ARIA mapping
+
+The test: *can a framework user write markup that directly exercises what the diagram shows?* If yes, add a snippet. If the diagram is about what happens inside the framework when the user's markup runs, skip it.

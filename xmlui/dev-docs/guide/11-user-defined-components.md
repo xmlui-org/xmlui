@@ -4,6 +4,23 @@ User-defined components (UDCs) let application developers create reusable compon
 
 Understanding UDCs matters for framework developers because the compound rendering path touches ComponentAdapter (behavior skip), CompoundComponent (the runtime bridge), the parser (definition extraction), and the slot transposition system. Changes to any of these areas must account for the UDC pipeline.
 
+```xml
+<!-- ContactCard.xmlui — definition: declares props, exposes a default Slot -->
+<Component name="ContactCard">
+  <Card>
+    <H3>{$props.name}</H3>
+    <Text>{$props.email}</Text>
+    <!-- Slot marks where the caller's children are inserted -->
+    <Slot />
+  </Card>
+</Component>
+
+<!-- Main.xmlui — usage: caller's children flow into the Slot -->
+<ContactCard name="Alice" email="alice@example.com">
+  <Badge label="Admin" />
+</ContactCard>
+```
+
 <!-- DIAGRAM: UDC lifecycle — .xmlui file → parse → register → CompoundComponent → Container → Slot transposition -->
 
 ```mermaid
