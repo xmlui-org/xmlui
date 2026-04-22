@@ -4733,6 +4733,38 @@ test.describe("Value preservation across unmount/remount", () => {
     expect(result.name).toBe("Alice");
   });
 
+  test("bare TextBox with bindTo preserves its value across `when` unmount/remount", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    // Sanity check: the fix lives at the reducer level, so it applies to any
+    // component auto-wrapped by FormBindingBehavior — not only FormItem.
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.visible="{true}">
+        <Button testId="toggle" label="Toggle" onClick="visible = !visible" />
+        <Form onSubmit="data => testState = JSON.stringify(data)">
+          <TextBox bindTo="name" when="{visible}" testId="nameBox" />
+          <Button testId="submit" type="submit" label="Submit" />
+        </Form>
+      </Fragment>
+    `);
+
+    const box1 = await createTextBoxDriver("nameBox");
+    await box1.field.fill("Alice");
+
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("nameBox")).toHaveCount(0);
+    await page.getByTestId("toggle").click();
+
+    const box2 = await createTextBoxDriver("nameBox");
+    await expect(box2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.name).toBe("Alice");
+  });
+
   test("unedited prefilled value is still picked up on first mount", async ({
     initTestBed,
     page,
