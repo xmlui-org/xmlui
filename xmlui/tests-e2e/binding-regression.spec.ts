@@ -340,30 +340,10 @@ test("Array push direct/indirect works", async ({ page, initTestBed }) => {
   await expect(page.getByTestId("text2")).toHaveText("hello,hello");
 });
 
-test("Cannot write read-only var", async ({ page, initTestBed }) => {
-  await initTestBed(`
-    <Stack
-      var.msg=""
-      var.$counter="{ { value: 0 } }"
-      var.incrementFunc="{x => { try { x.value++; } catch { msg += ' read-only' } } }"
-    >
-      <Button
-        testId="button1"
-        label="{$counter.value}{msg}"
-        onClick="incrementFunc($counter)"
-      />
-      <Button
-        testId="button2"
-        label="{$counter.value} {msg}"
-        onClick="const n = $counter; incrementFunc(n)"
-      />
-    </Stack>`);
-  await expect(page.getByTestId("button1")).toHaveText("0");
-  await page.getByTestId("button1").click();
-  await expect(page.getByTestId("button1")).toHaveText("0 read-only");
-  await expect(page.getByTestId("button2")).toHaveText("0 read-only");
-  await page.getByTestId("button2").click();
-  await expect(page.getByTestId("button2")).toHaveText("0 read-only read-only");
+test("var.$name declaration is rejected with T032", async ({ initTestBed }) => {
+  await expect(
+    initTestBed(`<Stack var.$counter="{ { value: 0 } }"><Text testId="t">{$counter.value}</Text></Stack>`),
+  ).rejects.toThrow("T032");
 });
 
 test("Event body transform to arrow works", async ({ page, initTestBed }) => {

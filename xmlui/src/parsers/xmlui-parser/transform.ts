@@ -340,6 +340,9 @@ export function nodeToComponentDef(
               comp.vars ??= {};
               comp.vars[name] = value;
             },
+            (name) => {
+              if (name.startsWith("$")) reportError(DIAGS_TRANSFORM.varNameStartsWithDollar(name));
+            },
           );
           return;
 
@@ -357,6 +360,9 @@ export function nodeToComponentDef(
               if (!isComponent(comp)) return;
               comp.globalVars ??= {};
               comp.globalVars[name] = value;
+            },
+            (name) => {
+              if (name.startsWith("$")) reportError(DIAGS_TRANSFORM.varNameStartsWithDollar(name));
             },
           );
           return;
@@ -450,11 +456,19 @@ export function nodeToComponentDef(
         }
 
         if (startSegment === "var") {
+          if (name!.startsWith("$")) {
+            reportError(DIAGS_TRANSFORM.varNameStartsWithDollar(name!));
+            return;
+          }
           comp.vars ??= {};
           comp.vars[name] = value;
         } else if (startSegment === "global") {
           if (!allowGlobalVars) {
             reportError(DIAGS_TRANSFORM.globalNotAllowedInNested);
+            return;
+          }
+          if (name!.startsWith("$")) {
+            reportError(DIAGS_TRANSFORM.varNameStartsWithDollar(name!));
             return;
           }
           comp.globalVars ??= {};

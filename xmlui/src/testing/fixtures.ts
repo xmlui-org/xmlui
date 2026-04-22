@@ -338,6 +338,13 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const globalsXsSource = description?.globalsXs ?? description?.mainXs;
       if (globalsXsSource) {
         const parsedCodeBehind = collectCodeBehindFromSource("Globals", globalsXsSource);
+        const moduleErrors = parsedCodeBehind?.moduleErrors ?? {};
+        if (Object.keys(moduleErrors).length > 0) {
+          const errText = Object.entries(moduleErrors)
+            .flatMap(([, errs]) => errs.map((e) => `code: "${e.code}" msg: "${e.text}"`))
+            .join("\n");
+          throw new Error(`Errors while parsing globalsXs:\n${errText}`);
+        }
         if (parsedCodeBehind?.vars || parsedCodeBehind?.functions) {
           // Pass through the variable definitions with their source text intact
           // for StandaloneApp to process with transformMainXsToGlobalTags

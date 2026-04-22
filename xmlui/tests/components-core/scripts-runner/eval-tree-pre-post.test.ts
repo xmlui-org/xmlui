@@ -1,7 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, assert } from "vitest";
 
 import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
-import { createEvalContext } from "./test-helpers";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
+import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
+import { createEvalContext, parseStatements } from "./test-helpers";
 
 describe("Evaluate prefix/postfix expressions (exp)", () => {
   const prePostCases1 = [
@@ -114,5 +116,41 @@ describe("Evaluate prefix/postfix expressions (exp)", () => {
 
     // --- Arrange
     expect(value).equal(7);
+  });
+
+  const undefinedVarOps = ["++dummy", "--dummy", "dummy++", "dummy--"];
+
+  undefinedVarOps.forEach((src) => {
+    it(`cannot apply '${src}' to non-defined variable - sync`, () => {
+      // --- Arrange
+      const evalContext = createEvalContext({ localContext: {} });
+      const statements = parseStatements(`${src};`);
+
+      // --- Act/Assert
+      try {
+        processStatementQueue(statements, evalContext);
+      } catch (err: any) {
+        expect(err.toString()).toContain("not found");
+        return;
+      }
+      assert.fail("Exception expected");
+    });
+  });
+
+  undefinedVarOps.forEach((src) => {
+    it(`cannot apply '${src}' to non-defined variable - async`, async () => {
+      // --- Arrange
+      const evalContext = createEvalContext({ localContext: {} });
+      const statements = parseStatements(`${src};`);
+
+      // --- Act/Assert
+      try {
+        await processStatementQueueAsync(statements, evalContext);
+      } catch (err: any) {
+        expect(err.toString()).toContain("not found");
+        return;
+      }
+      assert.fail("Exception expected");
+    });
   });
 });
