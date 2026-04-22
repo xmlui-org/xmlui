@@ -38,7 +38,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/a.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
 
     it("should detect self-import", async () => {
@@ -65,7 +65,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/self.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
 
     it("should detect A imports A directly", async () => {
@@ -92,7 +92,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/direct.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
   });
 
@@ -120,7 +120,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/a.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
 
     it("should detect A imports B, B imports C, C imports D, D imports A", async () => {
@@ -150,7 +150,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/a.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
 
     it("should detect complex chain: A→B→C→B", async () => {
@@ -176,7 +176,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/a.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
   });
 
@@ -493,7 +493,7 @@ describe("ModuleResolver - Circular Import Detection", () => {
 
       await expect(
         ModuleResolver.resolveModule("/components/Button.xs"),
-      ).rejects.toThrow("Circular import");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Circular import") });
     });
 
     it("should handle safe component with shared utilities", async () => {

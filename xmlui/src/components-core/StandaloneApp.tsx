@@ -876,8 +876,8 @@ function useStandalone(
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
     // --- we must have the app definition available.
     if (
-      (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
-      !process.env.VITE_STANDALONE
+      (import.meta.env.VITE_DEV_MODE || import.meta.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+      !import.meta.env.VITE_STANDALONE
     ) {
       if (!appDef) {
         throw new Error("couldn't find the application metadata");
@@ -1082,8 +1082,8 @@ function useStandalone(
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
-        (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
-        !process.env.VITE_STANDALONE
+        (import.meta.env.VITE_DEV_MODE || import.meta.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+        !import.meta.env.VITE_STANDALONE
       ) {
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
@@ -1163,7 +1163,7 @@ function useStandalone(
       // --- In standalone mode, we must fetch the XMLUI app's source files,
       // --- compile them, and prepare the app's definition for the rendering
       // --- engine.
-      if (process.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
+      if (import.meta.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
         // --- In config-only mode, we override the pre-compiled app definition
         // --- with elements from the configuration file. Note that we do not
         // --- check whether the config file's content is semantically valid.
@@ -1711,9 +1711,9 @@ function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
       return;
     }
     logged.current = true;
-    let log = `XMLUI version: ${process.env.VITE_XMLUI_VERSION || "dev"}`;
+    let log = `XMLUI version: ${import.meta.env.VITE_XMLUI_VERSION || "dev"}`;
     if (standaloneApp?.name) {
-      log += `; ${standaloneApp.name} version: ${process.env.VITE_APP_VERSION || "dev"}`;
+      log += `; ${standaloneApp.name} version: ${import.meta.env.VITE_APP_VERSION || "dev"}`;
     }
     console.log(log);
   }, [standaloneApp?.name]);

@@ -27,16 +27,17 @@ export default ({ mode = "lib" }) => {
         fileName: (format: any) => `xmlui-standalone.${format}.js`,
       };
       define = {
-        "process.env": {
-          NODE_ENV: env.NODE_ENV,
-          VITE_MOCK_ENABLED: true,
-          VITE_MOCK_WORKER_LOCATION: "mockApi.js",
-          VITE_USED_COMPONENTS_XmluiCodeHightlighter: "false",
-          VITE_USED_COMPONENTS_TableEditor: "false",
-          // VITE_USED_COMPONENTS_Charts: "false",
-          // VITE_USER_COMPONENTS_Inspect: "false",
-          VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
-        },
+        "process.env.NODE_ENV": '"production"',
+        "import.meta.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
+        "import.meta.env.VITE_MOCK_ENABLED": "true",
+        "import.meta.env.VITE_MOCK_WORKER_LOCATION": JSON.stringify("mockApi.js"),
+        "import.meta.env.VITE_USED_COMPONENTS_XmluiCodeHightlighter": JSON.stringify("false"),
+        "import.meta.env.VITE_USED_COMPONENTS_TableEditor": JSON.stringify("false"),
+        // "import.meta.env.VITE_USED_COMPONENTS_Charts": JSON.stringify("false"),
+        // "import.meta.env.VITE_USER_COMPONENTS_Inspect": JSON.stringify("false"),
+        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(
+          `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
+        ),
       };
       break;
     }
@@ -51,9 +52,7 @@ export default ({ mode = "lib" }) => {
         fileName: (format: any) => `xmlui-parser.${format}.js`,
       };
       define = {
-        "process.env": {
-          NODE_ENV: env.NODE_ENV,
-        },
+        "import.meta.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
       };
       break;
     }
@@ -86,9 +85,7 @@ export default ({ mode = "lib" }) => {
         name: "xmlui-metadata",
       };
       define = {
-        "process.env": {
-          NODE_ENV: env.NODE_ENV,
-        },
+        "import.meta.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
       };
       break;
     }
@@ -154,14 +151,6 @@ export default ({ mode = "lib" }) => {
       },
     },
     define,
-    esbuild: {
-      target: "es2020",
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        target: "es2020",
-      },
-    },
     css: {
       preprocessorOptions: {
         scss: {
@@ -170,15 +159,21 @@ export default ({ mode = "lib" }) => {
       },
     },
     build: {
-      minify: "terser",
+      minify: true,
       emptyOutDir: true,
       outDir: `dist/${distSubDirName}`,
       lib,
-      rollupOptions: {
-        treeshake: mode === "metadata" ? "smallest" : undefined,
+      sourcemap: true,
+      rolldownOptions: {
+        treeshake: mode === "metadata" ? { moduleSideEffects: false } : undefined,
         external:
           mode === "standalone" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds
+            : mode === "metadata"
+            ? // immer must be bundled (not external) in metadata mode: rolldown's CJS interop
+              // incorrectly wraps __esModule:true packages with a default=module object, so
+              // calling produce() via w.default() fails at Node.js load time.
+              [...Object.keys(packageJson.dependencies).filter((d) => d !== "immer"), "react/jsx-runtime", "@playwright/test"]
             : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
         output: {
           globals: {

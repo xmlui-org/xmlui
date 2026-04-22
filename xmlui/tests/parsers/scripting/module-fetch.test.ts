@@ -240,7 +240,7 @@ export class ConfigBuilder {
 
       await expect(
         ModuleResolver.resolveModule("/nonexistent.xs"),
-      ).rejects.toThrow("Failed to fetch module at /nonexistent.xs");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Failed to fetch module at /nonexistent.xs") });
     });
 
     it("should throw error when fetcher throws", async () => {
@@ -252,14 +252,14 @@ export class ConfigBuilder {
 
       await expect(
         ModuleResolver.resolveModule("/forbidden.xs"),
-      ).rejects.toThrow("Access denied");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Access denied") });
     });
 
     it("should throw error when no fetcher configured", async () => {
       // Don't set a fetcher
       await expect(
         ModuleResolver.resolveModule("/test.xs"),
-      ).rejects.toThrow("No custom fetcher configured");
+      ).rejects.toMatchObject({ message: expect.stringContaining("No custom fetcher configured") });
     });
 
     it("should wrap fetch errors with module path context", async () => {
@@ -274,11 +274,11 @@ export class ConfigBuilder {
 
       await expect(
         ModuleResolver.resolveModule("/wrapped.xs"),
-      ).rejects.toThrow("Failed to fetch module at /wrapped.xs");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Failed to fetch module at /wrapped.xs") });
 
       await expect(
         ModuleResolver.resolveModule("/wrapped.xs"),
-      ).rejects.toThrow("Original error message");
+      ).rejects.toMatchObject({ message: expect.stringContaining("Original error message") });
     });
   });
 
@@ -456,7 +456,7 @@ export function doSomething() {
 
       await expect(
         ModuleResolver.resolveModule("/test.xs"),
-      ).rejects.toThrow("No custom fetcher configured");
+      ).rejects.toMatchObject({ message: expect.stringContaining("No custom fetcher configured") });
     });
   });
 

@@ -2811,6 +2811,115 @@ test(`submit with type 'items', empty bindTo`, async ({
   });
 });
 
+// --- --- nested FormItem labels inside type="items"
+
+test(`labelWidth on nested FormItem inside type='items' is honored`, async ({
+  initTestBed,
+  createFormItemDriver,
+}) => {
+  await initTestBed(`
+    <Form data="{{ lines: [{ name: '' }, { name: '' }] }}">
+      <FormItem type="items" bindTo="lines">
+        <FormItem
+          testId="row{$itemIndex}"
+          bindTo="name"
+          label="Row {$itemIndex}"
+          labelPosition="start"
+          labelWidth="180px"
+        />
+      </FormItem>
+    </Form>`);
+
+  for (const testId of ["row0", "row1"]) {
+    const driver = await createFormItemDriver(testId);
+    await expect(driver.label).toHaveCSS("width", "180px");
+    await expect(driver.label).toHaveCSS("flex-shrink", "0");
+  }
+});
+
+test(`labelPosition on nested FormItem inside type='items' is honored`, async ({
+  initTestBed,
+  createFormItemDriver,
+  page,
+}) => {
+  await initTestBed(`
+    <Form data="{{ lines: [{ name: '' }] }}">
+      <FormItem type="items" bindTo="lines">
+        <FormItem
+          testId="row{$itemIndex}"
+          bindTo="name"
+          label="Row {$itemIndex}"
+          labelPosition="start"
+          labelWidth="140px"
+        />
+      </FormItem>
+    </Form>`);
+
+  // With labelPosition="start", the label and the input sit on the same row,
+  // so the label's right edge is to the left of the input's left edge.
+  const driver = await createFormItemDriver("row0");
+  const labelBounds = await getBounds(driver.label);
+  const inputBounds = await getBounds(driver.textBox);
+  expect(labelBounds.top).toBeCloseTo(inputBounds.top, -1);
+  expect(labelBounds.right).toBeLessThanOrEqual(inputBounds.left);
+});
+
+test(`rows inside type='items' are separated by the Form's row gap`, async ({
+  initTestBed,
+  createFormItemDriver,
+}) => {
+  await initTestBed(`
+    <Form data="{{ lines: [{ name: '' }, { name: '' }, { name: '' }] }}">
+      <FormItem type="items" bindTo="lines">
+        <FormItem
+          testId="row{$itemIndex}"
+          bindTo="name"
+          label="Row {$itemIndex}"
+          labelPosition="start"
+          labelWidth="120px"
+        />
+      </FormItem>
+    </Form>`);
+
+  const row0 = await getBounds((await createFormItemDriver("row0")).component);
+  const row1 = await getBounds((await createFormItemDriver("row1")).component);
+  const row2 = await getBounds((await createFormItemDriver("row2")).component);
+  const gap01 = row1.top - row0.bottom;
+  const gap12 = row2.top - row1.bottom;
+  // Default gap-Form is "$space-4" → 16px. Allow a 1px tolerance for rounding.
+  expect(gap01).toBeCloseTo(16, 0);
+  expect(gap12).toBeCloseTo(16, 0);
+});
+
+test(`rows inside type='items' follow a custom gap-Form theme var`, async ({
+  initTestBed,
+  createFormItemDriver,
+}) => {
+  await initTestBed(
+    `
+    <Form data="{{ lines: [{ name: '' }, { name: '' }] }}">
+      <FormItem type="items" bindTo="lines">
+        <FormItem
+          testId="row{$itemIndex}"
+          bindTo="name"
+          label="Row {$itemIndex}"
+          labelPosition="start"
+          labelWidth="120px"
+        />
+      </FormItem>
+    </Form>`,
+    {
+      testThemeVars: {
+        "gap-Form": "2rem",
+      },
+    },
+  );
+
+  const row0 = await getBounds((await createFormItemDriver("row0")).component);
+  const row1 = await getBounds((await createFormItemDriver("row1")).component);
+  expect(row1.top - row0.bottom).toBeCloseTo(32, 0);
+});
+
 // --- Testing
 
 // --- --- buttonRowTemplate

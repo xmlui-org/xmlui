@@ -82,10 +82,22 @@ export async function getViteConfig({
     },
     optimizeDeps: {
       extensions: [".xmlui", ".xmlui.xs", ".xs"],
+      rolldownOptions: {
+        // Tell Rolldown's dep scanner to treat these extensions as JS modules.
+        // Without this, Rolldown auto-detects the content type of .xmlui files,
+        // sees XML opening tags like <Theme and incorrectly classifies them as JSX,
+        // which then fails to parse because JSX is not enabled for these extensions.
+        // Setting moduleTypes bypasses content detection and ensures the Vite plugin
+        // transform hook runs first, converting XML → dataToEsm JS before parsing.
+        moduleTypes: {
+          ".xmlui": "js",
+          ".xs": "js",
+        },
+      },
       ...overrides.optimizeDeps,
     },
     build: {
-      rollupOptions: {
+      rolldownOptions: {
         input: path.resolve(process.cwd(), "index.html"),
         output: {
           assetFileNames: (assetInfo) => {

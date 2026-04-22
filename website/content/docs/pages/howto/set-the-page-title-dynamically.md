@@ -49,4 +49,3 @@ Use `PageMetaTitle` with a bound `value` expression to update the browser tab pe
 
 - [Show toast notifications from code](/docs/howto/show-toast-notifications-from-code) — display transient messages alongside the title update
 - [Navigate programmatically](/docs/howto/navigate-programmatically) — change routes from code, which triggers a new `PageMetaTitle`
-- [Redirect users after login](/docs/howto/redirect-users-after-login) — route-level metadata changes after authentication

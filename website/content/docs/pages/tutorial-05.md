@@ -8,15 +8,34 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
   <Statuses />
 </App>
 ---desc
-`Statuses` uses three critical properties of `DonutChart`.
+`Statuses` wraps `EChart` in a `SimpleDonutChart` component that accepts familiar props: `data`, `dataKey`, and `nameKey`. Internally it builds the ECharts option object.
 - `data`: The ubiquitous attribute that refers to data that may be defined literally or, as in this case, via an API call backed by a database query.
 - `dataKey`: The object key that holds data.
 - `nameKey`: The object key whose value is the data label.
+---comp display
+<Component name="SimpleDonutChart">
+  <EChart
+    height="{$props.height || '100%'}"
+    option="{
+      {
+        tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+        legend: { orient: $props.layout === 'vertical' ? 'vertical' : 'horizontal', bottom: 0 },
+        series: [{
+          type: 'pie',
+          radius: ['40%', '70%'],
+          label: { show: true, formatter: '{b}' },
+          data: ($props.data || []).map(function(item) {
+            return { name: item[$props.nameKey || 'name'], value: item[$props.dataKey || 'value'] }
+          })
+        }]
+      }
+    }" />
+</Component>
 ---comp display copy /dataKey/ /nameKey/
 <Component name="Statuses">
   <DataSource id="dashboardStats" url="/resources/files/dashboard-stats.json" method="GET" />
   <Card title="Statuses" height="400px" width="{$props.width}">
-    <DonutChart
+    <SimpleDonutChart
       data="{
         [
           {
@@ -42,13 +61,39 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
 
 ## Multiseries charts
 
-[PieChart](/docs/reference/components/PieChart) and [DonutChart](/docs/reference/components/DonutChart) work with a single series of data and use `dataKey`. [BarChart](/docs/reference/components/BarChart) and [LineChart](/docs/reference/components/LineChart) can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
+The `SimpleDonutChart` works with a single series of data and uses `dataKey`. A `SimpleBarChart` wrapper can display multiple series denoted by `yKeys`. We see that in the `MonthlyStatus` chart.
 
 ```xmlui-pg /data/ noHeader
 ---app display /data/ /xKey/ /yKeys/
 <App>
   <MonthlyStatus />
 </App>
+---comp display
+<Component name="SimpleBarChart">
+  <EChart
+    height="{$props.height || '100%'}"
+    option="{
+      {
+        tooltip: { trigger: 'axis' },
+        legend: $props.showLegend ? {} : undefined,
+        grid: { containLabel: true },
+        xAxis: $props.orientation === 'horizontal'
+          ? { type: 'category', data: ($props.data || []).map(function(d) { return d[$props.xKey] }), axisLabel: { formatter: $props.tickFormatterX } }
+          : { type: 'value', axisLabel: { formatter: $props.tickFormatterY } },
+        yAxis: $props.orientation === 'horizontal'
+          ? { type: 'value', axisLabel: { formatter: $props.tickFormatterY } }
+          : { type: 'category', data: ($props.data || []).map(function(d) { return d[$props.xKey] }), axisLabel: { formatter: $props.tickFormatterX } },
+        series: ($props.yKeys || []).map(function(k) {
+          return {
+            type: 'bar',
+            name: k,
+            stack: ($props.stacked === 'true' || $props.stacked === true) ? 'total' : undefined,
+            data: ($props.data || []).map(function(d) { return d[k] })
+          }
+        })
+      }
+    }" />
+</Component>
 ---comp display /data/ /yKeys/
 <Component name="MonthlyStatus">
 
@@ -61,16 +106,14 @@ The `Dashboard` page continues with a donut chart that visualizes some of the sa
         <H1>{$props.title}</H1>
 
         <Card height="400px">
-        <BarChart
+        <SimpleBarChart
           orientation="horizontal"
-          data="{ monthlyStatus }"
+          data="{monthlyStatus.value}"
           xKey="month"
           yKeys="{['paid_revenue', 'sent_revenue']}"
           stacked="true"
           showLegend="true"
-          tickFormatter="{(value) => {
-            return window.formatMonth(value);
-          }}"
+          tickFormatterX="{(value) => window.formatMonth(value)}"
         />
         </Card>
     </VStack>

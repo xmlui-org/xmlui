@@ -39,12 +39,12 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
       },
       define: {
         ...viteConfig.define,
-        "process.env.VITE_BUILD_MODE": '"ALL"',
-        "process.env.VITE_DEV_MODE": true,
-        "process.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
-        "process.env.VITE_MOCK_ENABLED": withMock,
-        "process.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
-        "process.env.VITE_USER_COMPONENTS_Inspect": '"true"',
+        "import.meta.env.VITE_BUILD_MODE": '"ALL"',
+        "import.meta.env.VITE_DEV_MODE": true,
+        "import.meta.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
+        "import.meta.env.VITE_MOCK_ENABLED": withMock,
+        "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
+        "import.meta.env.VITE_USER_COMPONENTS_Inspect": '"true"',
       },
     } as InlineConfig);
 

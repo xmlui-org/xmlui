@@ -1,5 +1,33 @@
 [
   {
+    "tag_name": "xmlui@0.12.21",
+    "published_at": "2026-04-21T09:16:01Z",
+    "changes": [
+      {
+        "description": "Extend the confirm global function with the actionThemeColor option",
+        "commit_sha": "4b7a288"
+      },
+      {
+        "description": "Emit XMLUI base styles during SSR so SSG pages render with framework styling before hydration.",
+        "commit_sha": "aa3cd6e"
+      },
+      {
+        "description": "Revert the xmlui islands feature",
+        "commit_sha": "cb88c69"
+      },
+      {
+        "description": "fix: circular module initialization resulting in problems when building the vscode extension",
+        "commit_sha": "b10ff4d"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.21.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.21/xmlui-0.12.21.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.20",
     "published_at": "2026-04-20T11:42:06Z",
     "changes": [

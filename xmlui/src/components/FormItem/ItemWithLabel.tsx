@@ -108,6 +108,18 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   );
   const resolvedLabelPosition = labelPosition ?? formItemLabelPosition ?? "top";
 
+  // Toggle-style components (compactInlineLabel) treat "start"/"end" the same as
+  // "before"/"after" so the small control and its label stay snug together
+  // instead of the control being pushed to one edge by a flex:1 wrapper filling
+  // the row (e.g. a Checkbox inside a VStack).
+  const effectiveLabelPosition: LabelPosition = compactInlineLabel
+    ? resolvedLabelPosition === "end"
+      ? "after"
+      : resolvedLabelPosition === "start"
+        ? "before"
+        : resolvedLabelPosition
+    : resolvedLabelPosition;
+
   const formItemLabelWidth = useFormContextPart<string | undefined>(
     (value) => value?.itemLabelWidth,
   );
@@ -146,15 +158,15 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
   }, [inputElement]);
 
   const labelWrapperHeight =
-    resolvedLabelPosition === "start" || resolvedLabelPosition === "end" ||
-    resolvedLabelPosition === "before" || resolvedLabelPosition === "after"
+    effectiveLabelPosition === "start" || effectiveLabelPosition === "end" ||
+    effectiveLabelPosition === "before" || effectiveLabelPosition === "after"
       ? inputHeight
       : "auto";
 
   const resolvedLabelWidth =
     resolvedLabelWidthProp !== undefined
       ? (numberRegex.test(resolvedLabelWidthProp) ? `${resolvedLabelWidthProp}px` : resolvedLabelWidthProp)
-      : (compactInlineLabel && (resolvedLabelPosition === "before" || resolvedLabelPosition === "after"))
+      : (compactInlineLabel && (effectiveLabelPosition === "before" || effectiveLabelPosition === "after"))
         ? "fit-content"
         : undefined;
 
@@ -184,12 +196,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
       >
         <div
           className={classnames(styles.container, {
-            [styles.top]: resolvedLabelPosition === "top",
-            [styles.bottom]: resolvedLabelPosition === "bottom",
-            [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
-            [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
-            [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
-            [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
+            [styles.top]: effectiveLabelPosition === "top",
+            [styles.bottom]: effectiveLabelPosition === "bottom",
+            [styles.start]: effectiveLabelPosition === "start" || (!compactInlineLabel && effectiveLabelPosition === "before"),
+            [styles.end]: effectiveLabelPosition === "end" || (!compactInlineLabel && effectiveLabelPosition === "after"),
+            [styles.before]: compactInlineLabel && effectiveLabelPosition === "before",
+            [styles.after]: compactInlineLabel && effectiveLabelPosition === "after",
             [styles.shrinkToLabel]: shrinkToLabel,
           })}
           dir={rest?.direction}
@@ -271,12 +283,12 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel(
     <div {...rest} ref={ref} style={style} className={classnames(className, styles.itemWithLabel)}>
       <div
         className={classnames(styles.container, {
-          [styles.top]: resolvedLabelPosition === "top",
-          [styles.bottom]: resolvedLabelPosition === "bottom",
-          [styles.start]: resolvedLabelPosition === "start" || (!compactInlineLabel && resolvedLabelPosition === "before"),
-          [styles.end]: resolvedLabelPosition === "end" || (!compactInlineLabel && resolvedLabelPosition === "after"),
-          [styles.before]: compactInlineLabel && resolvedLabelPosition === "before",
-          [styles.after]: compactInlineLabel && resolvedLabelPosition === "after",
+          [styles.top]: effectiveLabelPosition === "top",
+          [styles.bottom]: effectiveLabelPosition === "bottom",
+          [styles.start]: effectiveLabelPosition === "start" || (!compactInlineLabel && effectiveLabelPosition === "before"),
+          [styles.end]: effectiveLabelPosition === "end" || (!compactInlineLabel && effectiveLabelPosition === "after"),
+          [styles.before]: compactInlineLabel && effectiveLabelPosition === "before",
+          [styles.after]: compactInlineLabel && effectiveLabelPosition === "after",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
         dir={rest?.direction}

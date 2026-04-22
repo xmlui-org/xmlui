@@ -200,6 +200,10 @@ test.describe("Basic Functionality", () => {
     await driver.toggleOptionsVisibility();
     await expect(page.getByRole("option", { name: "Second" })).toBeVisible();
     await driver.selectLabel("Second");
+    await driver.toggleOptionsVisibility();
+    const secondOption = page.getByRole("option", { name: "Second" });
+    await expect(secondOption).toBeVisible();
+    await secondOption.click();
 
     await expect.poll(testStateDriver.testState).toEqual("2");
   });
