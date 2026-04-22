@@ -13,6 +13,28 @@ This document covers both layers: how event handlers execute (and the consequenc
 
 <!-- DIAGRAM: XMLUI markup (APICall child) → ApiBoundComponent generates event handler string → scripting engine evaluates → Actions.callApi() → RestApiProxy → HTTP → onSuccess → invalidateQueries -->
 
+```mermaid
+sequenceDiagram
+  actor User
+  participant ABC as ApiBoundComponent
+  participant SE as Scripting Engine<br>(runCodeAsync)
+  participant Actions
+  participant Proxy as RestApiProxy
+  participant Server as HTTP Server
+  participant QC as QueryClient
+
+  User->>ABC: triggers event (e.g. onClick)
+  ABC->>SE: evaluate handler string
+  SE->>Actions: Actions.callApi(apiCallDef)
+  Actions->>Proxy: build + send HTTP request
+  Proxy->>Server: fetch()
+  Server-->>Proxy: HTTP response
+  Proxy-->>Actions: resolved data
+  Actions->>SE: run onSuccess handler
+  Actions->>QC: invalidateQueries(invalidation keys)
+  QC-->>ABC: dependent DataSources refetch
+```
+
 ---
 
 ## Event Handlers: The Async Execution Model

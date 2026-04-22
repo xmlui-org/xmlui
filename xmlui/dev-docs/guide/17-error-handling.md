@@ -87,6 +87,84 @@ Additional boundaries exist at:
 
 <!-- DIAGRAM: Tree showing the nesting of ErrorBoundaries: root-outer (AppWrapper) → theme-root (ThemeNative) → container (StateContainer per component). Show how a crash at any level is caught by the nearest ancestor boundary without affecting siblings. -->
 
+```mermaid
+graph TD
+  RO["root-outer ErrorBoundary<br>(AppWrapper)<br>last resort — catches full app crashes"]
+  subgraph EBTR["ErrorBoundary for theme-root - catches theme subtree crashes"]
+    TR["theme-root (ThemeNative)"]
+  end
+
+  subgraph EBNA["ErrorBoundary for NestedApp"]
+    subgraph NA["nested app (NestedAppNative) for &lt;App&gt; component"]
+      A["&lt;App&gt;"]
+    end
+  end
+
+  subgraph EBC1["ErrorBoundary for Card"]
+    subgraph SA1["StateContainer"]
+      Card["&lt;Card&gt;"]
+    end
+  end
+
+  subgraph EBC2["ErrorBoundary for Sidebar"]
+    subgraph SA2["StateContainer"]
+      Sidebar["&lt;Sidebar&gt;"]
+    end
+  end
+
+  subgraph EBC3["ErrorBoundary for Form"]
+    subgraph SA3["StateContainer"]
+      Form["&lt;Form&gt;"]
+    end
+  end
+
+  RO --> EBTR
+  EBTR --> EBNA
+  EBTR --> EBC1
+  EBTR --> EBC2
+  EBTR --> EBC3
+```
+
+Crashes and errors are caught in their respective ErrorBoundaries:
+
+```mermaid
+graph TD
+  RO["root-outer ErrorBoundary<br>(AppWrapper)<br>last resort — catches full app crashes"]
+  subgraph EBTR["ErrorBoundary for theme-root - catches theme subtree crashes"]
+    Crash2(["crash in Theme<br>→ ErrorBoundary catches it<br>root-outer still alive"])
+  end
+
+  subgraph EBNA["ErrorBoundary for NestedApp"]
+    subgraph NA["nested app (NestedAppNative) for &lt;App&gt; component"]
+      A["&lt;App&gt;"]
+    end
+  end
+
+  subgraph EBC1["ErrorBoundary for Card"]
+    subgraph SA1["StateContainer"]
+      Crash1(["crash in Card<br>→ ErrorBoundary catches it<br>Sidebar + Form unaffected"])
+    end
+  end
+
+  subgraph EBC2["ErrorBoundary for Sidebar"]
+    subgraph SA2["StateContainer"]
+      Sidebar["&lt;Sidebar&gt;"]
+    end
+  end
+
+  subgraph EBC3["ErrorBoundary for Form"]
+    subgraph SA3["StateContainer"]
+      Form["&lt;Form&gt;"]
+    end
+  end
+
+  RO --> EBTR
+  EBTR --> EBNA
+  EBTR --> EBC1
+  EBTR --> EBC2
+  EBTR --> EBC3
+```
+
 ### Auto-Recovery on Navigation
 
 When the user navigates to a new page, the `node` prop on the relevant boundaries changes

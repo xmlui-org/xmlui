@@ -14,6 +14,7 @@ Lessons learned authoring Mermaid diagrams for the XMLUI dev docs.
   Node["var.y = '{`hello`}'"]      ✓ workaround with backticks
   ```
 - HTML entities work in labels: `&lt;` → `<`, `&gt;` → `>`, `&quot;` → `"`.
+- Use `·` (middle dot, U+00B7) as a compact inline separator when listing short items that don't warrant a full `<br>`. Example: `"subject · validationResults · interactionFlags"`. Reserve `<br>` for longer or structured content that genuinely needs a new line.
 
 ---
 
@@ -51,6 +52,42 @@ Lessons learned authoring Mermaid diagrams for the XMLUI dev docs.
 - Use solid arrows (`-->`) for data flow and structural relationships (ownership, inheritance, declaration).
 - Use dashed arrows (`-.->`) for event-driven or conditional flows (mutations bubbling, writes, user interactions).
 - Label edges with `|"label text"|` for clarity on non-obvious relationships.
+
+---
+
+## Nodes vs edges: what goes where
+
+- **Nodes are nouns** — they represent things that exist: components, state objects, registries, DOM nodes.
+- **Edges are verbs** — they represent what happens between nodes: transformations, checks, dispatches, wraps.
+- If a node label contains a question ("label prop present?") or an imperative ("wrap with Label element"), that text belongs on the **edge**, not the node. The condition and its outcome describe the *transition*, not the *thing*.
+
+**Wrong** — stuffs the transition logic into the node:
+```
+B1["label behavior<br>label prop present?<br>wrap with Label element"]
+B2["animation behavior<br>..."]
+B1 --> B2
+```
+
+**Correct** — node is the name, edge carries the logic:
+```
+B1["label"]
+B2["animation"]
+B1 -->|"label prop? → wrap with Label element"| B2
+```
+
+---
+
+## Bidirectional state flows
+
+When a diagram shows both a provider pushing data down and consumers dispatching updates back up (e.g., React context + reducer), model both directions explicitly:
+
+```
+State -->|"populates"| FC
+FC -.->|"useContextSelector: field value"| Input
+Input -.->|"dispatch FIELD_VALUE_CHANGED"| State
+```
+
+Use solid arrows for the top-down provision (structural) and dashed arrows for the bottom-up dispatches (event-driven). This makes the state loop visible rather than flattening it into a one-way chain.
 
 ---
 

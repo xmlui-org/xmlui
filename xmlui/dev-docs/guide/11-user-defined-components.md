@@ -6,6 +6,24 @@ Understanding UDCs matters for framework developers because the compound renderi
 
 <!-- DIAGRAM: UDC lifecycle — .xmlui file → parse → register → CompoundComponent → Container → Slot transposition -->
 
+```mermaid
+graph TD
+  F[".xmlui file<br>&lt;Component name='ContactCard'&gt;..."]
+  P["XML Parser"]
+  Reg["Component Registry"]
+  CC["CompoundComponent renderer"]
+  Cont["Container"]
+  Slot["Slot transposition"]
+  DOM(["rendered output"])
+
+  F -->|"collectCompoundComponent()<br>extracts name, props, events, vars, slots"| P
+  P -->|"CompoundComponentDef stored<br>isCompoundComponent: true"| Reg
+  Reg -->|"resolves caller props<br>into inner ComponentDef vars"| CC
+  CC -->|"isolated state per instance<br>(implicit wrapping)"| Cont
+  Cont -->|"caller's children inserted<br>at &lt;Slot&gt; positions in template"| Slot
+  Slot --> DOM
+```
+
 ---
 
 ## The Lifecycle: From Markup to Pixels

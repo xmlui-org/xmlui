@@ -6,6 +6,23 @@ This document covers the internals: how `DataSource` and `APICall` work under th
 
 <!-- DIAGRAM: DataSource markup → ApiBoundComponent → LoaderComponent → React Query useQuery → LOADER_LOADED dispatch → container state → {loaderName.value} -->
 
+```mermaid
+graph TD
+  DSM["DataSource markup<br>&lt;DataSource id='users' url='/api/users'/&gt;"]
+  State["container state<br>state[uid].value · loaded · error"]
+  Binding["{loaderName.value}<br>reactive expression"]
+
+  subgraph ABC["ApiBoundComponent — wraps component, creates loader infrastructure"]
+    LC["LoaderComponent<br>one per DataSource"]
+    RQ["React Query useQuery<br>key = [url, params]<br>caches + deduplicates fetches"]
+    LC --> RQ
+  end
+
+  DSM -->|"prop ref detected · creates LoaderDef"| LC
+  RQ -.->|"LOADER_LOADED dispatch"| State
+  State -->|"reactive re-evaluation"| Binding
+```
+
 ---
 
 ## Background: React Query

@@ -6,6 +6,20 @@ This document covers how themes are defined, compiled, applied, and extended.
 
 <!-- DIAGRAM: ThemeDefinition → inheritance chain → tone overlay → derived tokens → $ref resolution → CSS variables → SCSS consumption -->
 
+```mermaid
+graph TD
+  TD1["ThemeDefinition<br>id, extends, themeVars, tones"]
+  TD2["Inheritance chain<br>collectThemeChainByExtends()<br>root → xmlui → custom theme"]
+  TD3["Merge base themeVars<br>left-to-right, later overrides earlier"]
+  TD4["Tone overlay<br>tones.light / tones.dark themeVars<br>merged on top of base"]
+  TD5["Derived token generation<br>transformThemeVars()<br>spacing scale, color palettes, font sizes"]
+  TD6["\$ref resolution<br>\$color-primary-500<br>→ var(--xmlui-color-primary-500)"]
+  TD7["CSS variable map<br>Record&lt;--xmlui-*, string&gt;<br>injected on &lt;html&gt; or nested &lt;div&gt;"]
+  TD8["SCSS consumption<br>createThemeVar() → var(--xmlui-*)<br>useComponentThemeClass() → className"]
+
+  TD1 --> TD2 --> TD3 --> TD4 --> TD5 --> TD6 --> TD7 --> TD8
+```
+
 ---
 
 ## How It Works at a Glance

@@ -6,6 +6,28 @@ Understanding the form infrastructure matters for framework developers because i
 
 <!-- DIAGRAM: Form architecture — FormWithContextVar → Form → FormContext → FormItem → Input + Validation -->
 
+```mermaid
+graph TD
+  subgraph FCV["FormWithContextVar — owns all form state"]
+    State["formReducer state<br>subject · validationResults<br>interactionFlags · submitInProgress"]
+    subgraph F["Form (FormNative) — &lt;form&gt; element"]
+      FC["FormContext.Provider<br>dispatch · enabled · labelWidth"]
+      Buttons["Save / Cancel / Reset"]
+      subgraph FI["FormItem — one per bindTo field"]
+        Input["Input component<br>bindTo-wired value"]
+        Val["Validation pipeline<br>required · pattern · custom · backend"]
+      end
+    end
+  end
+
+  State -->|"populates"| FC
+  FC -.->|"useFormContextPart: field value"| Input
+  FC -.->|"useFormContextPart: validation result"| Val
+  Input -.->|"dispatch FIELD_VALUE_CHANGED"| State
+  Val -.->|"dispatch FIELD_VALIDATED"| State
+  Buttons -.->|"doSubmit / reset / cancel"| State
+```
+
 ---
 
 ## The Architecture at a Glance
