@@ -458,6 +458,10 @@ export function evalPreOrPostCore(
     throw new Error(`Evaluation of ${expr.op} requires a left-hand value.`);
   }
 
+  if (operand.valueScope === globalThis && !(operand.valueIndex in operand.valueScope)) {
+    throw new Error(`Left value variable (${operand.valueIndex}) not found in the scope.`);
+  }
+
   // --- Check for const value
   if (expr.expr.type === T_IDENTIFIER) {
     if (isConstVar(expr.expr.name, thread)) {

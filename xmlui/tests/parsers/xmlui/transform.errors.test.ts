@@ -147,3 +147,80 @@ onSubmit="
     }
   });
 });
+
+describe("Xmlui transform - T032: variable names cannot start with '$'", () => {
+  describe("var.* attribute syntax", () => {
+    it("throws T032 for var.$name attribute", () => {
+      try {
+        transformSource(`<App var.$dummy="World" />`);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T032");
+      }
+    });
+
+    it("allows var.name without $ prefix", () => {
+      const cd = transformSource(`<App var.dummy="World" />`) as any;
+      expect(cd.vars!.dummy).equal("World");
+    });
+  });
+
+  describe("<variable> element syntax", () => {
+    it("throws T032 for <variable name='$name'>", () => {
+      try {
+        transformSource(`<App><variable name="$dummy" value="World" /></App>`);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T032");
+      }
+    });
+
+    it("allows <variable name='name'> without $ prefix", () => {
+      const cd = transformSource(`<App><variable name="dummy" value="World" /></App>`) as any;
+      expect(cd.vars!.dummy).equal("World");
+    });
+  });
+
+  describe("global.* attribute syntax", () => {
+    it("throws T032 for global.$name attribute", () => {
+      try {
+        transformSource(`<App global.$dummy="World" />`);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T032");
+      }
+    });
+
+    it("allows global.name without $ prefix", () => {
+      const cd = transformSource(`<App global.dummy="World" />`) as any;
+      expect(cd.globalVars!.dummy).equal("World");
+    });
+  });
+
+  describe("<global> element syntax", () => {
+    it("throws T032 for <global name='$name'>", () => {
+      try {
+        transformSource(`<App><global name="$dummy" value="World" /></App>`);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("T032");
+      }
+    });
+
+    it("allows <global name='name'> without $ prefix", () => {
+      const cd = transformSource(`<App><global name="dummy" value="World" /></App>`) as any;
+      expect(cd.globalVars!.dummy).equal("World");
+    });
+  });
+
+  describe("<script> tag reactive var declaration", () => {
+    it("throws W031 for reactive var $name in script tag", () => {
+      try {
+        transformSource(`<App><script>var $dummy = "World";</script></App>`);
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).includes("W031");
+      }
+    });
+  });
+});

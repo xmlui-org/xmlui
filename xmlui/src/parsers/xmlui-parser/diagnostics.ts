@@ -315,6 +315,7 @@ export const ErrCodesTransform = {
   cantPutReusableDefInSlot: "T024",
   scriptParse: "T030",
   globalNotAllowedInNested: "T031",
+  varNameStartsWithDollar: "T032",
   ...ErrorCodes,
 } as const;
 
@@ -365,6 +366,12 @@ export const DIAGS_TRANSFORM = {
     code: ErrCodesTransform.globalNotAllowedInNested,
     message:
       "Global variables can only be declared in the root element of Main.xmlui, not in nested components.",
+  },
+  varNameStartsWithDollar: function (varName: string) {
+    return {
+      code: ErrCodesTransform.varNameStartsWithDollar,
+      message: `Reactive variable names cannot start with '$': '${varName}'.`,
+    };
   },
 } as const;
 
