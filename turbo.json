@@ -115,24 +115,14 @@
       "dependsOn": ["^build:extension"],
       "cache": false
     },
-    "//#_test:e2e:with-unit-tests": {
+    "//#_e2e": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
     },
-    "//#_test:e2e:smoke:with-unit-tests": {
+    "//#_e2e:smoke": {
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
-      "outputs": ["playwright-report/**"]
-    },
-    "//#test:e2e": {
-      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
-      "dependsOn": ["xmlui#build:xmlui-test-bed"],
-      "outputs": ["playwright-report/**"]
-    },
-    "//#test:e2e:smoke": {
-      "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
-      "dependsOn": ["xmlui#build:xmlui-test-bed"],
       "outputs": ["playwright-report/**"]
     }
   }
