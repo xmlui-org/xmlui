@@ -25,6 +25,37 @@
 - `$result`: Response data (available in `completedNotificationMessage`)
 - `$statusData`: Latest status response data when in deferred mode (available in event handlers and notifications)
 
+## Deferred (long-running) operations [#deferred-operations]
+
+Some endpoints respond with `202 Accepted` and a job reference, then complete work asynchronously. Use `deferredMode` to handle this: after the initial call, `APICall` polls `statusUrl` automatically until `completionCondition` evaluates to `true`.
+
+**Minimal setup:**
+
+1. Set `deferredMode="true"` and provide a `statusUrl` that embeds the job reference from the initial response using `{$result.jobId}` (or whichever field your API returns).
+2. Set `completionCondition` to an expression over `$statusData` that returns `true` when the job is done.
+3. Optionally set `errorCondition` to detect failure states.
+4. Use `inProgressNotificationMessage`, `completedNotificationMessage`, and `errorNotificationMessage` for built-in toast feedback.
+
+```xmlui
+<APICall
+  id="exportJob"
+  url="/api/export"
+  method="post"
+  deferredMode="true"
+  statusUrl="/api/jobs/{$result.jobId}/status"
+  completionCondition="{$statusData.state === 'done'}"
+  errorCondition="{$statusData.state === 'failed'}"
+  inProgressNotificationMessage="Exporting… {$progress}%"
+  completedNotificationMessage="Export complete!"
+  invalidates="exports"
+/>
+<Button label="Export" onClick="exportJob.execute()" />
+```
+
+While polling is active, `exportJob.isPolling()` returns `true` and `exportJob.getStatus()` returns the latest status response. Call `exportJob.stopPolling()` to abort polling locally (the server-side job continues unless you also configure `cancelUrl` and call `exportJob.cancel()`).
+
+See [`deferredMode`](#deferredmode), [`statusUrl`](#statusurl), [`completionCondition`](#completioncondition), [`pollingInterval`](#pollinginterval), [`pollingBackoff`](#pollingbackoff), and [`maxPollingDuration`](#maxpollingduration) for full tuning options.
+
 ## Behaviors [#behaviors]
 
 No behaviors are applicable to this component.

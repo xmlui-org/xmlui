@@ -170,7 +170,18 @@ Local variables can shadow global variables:
 </Component>
 ```
 
+> [!WARNING]
+> **Assigning to an undeclared name raises an error toast.** Writing `foo = value` in an event handler when `foo` was never declared with `var.foo`, `<variable>`, `global.foo`, or `<global>` triggers a runtime error. Always declare the variable on an ancestor component before assigning to it from descendants.
 
+```xmlui
+<!-- Produces runtime error: count was never declared -->
+<Button onClick="count = count + 1" label="Increment" />
+
+<!-- Declare first, then assign freely from descendants -->
+<App var.count="{0}">
+  <Button onClick="count = count + 1" label="Increment" />
+</App>
+```
 
 ## Component IDs
 

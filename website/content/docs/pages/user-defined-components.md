@@ -80,3 +80,42 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
   </method>
 </Component>
 ```
+
+## Passing data into slot content
+
+A component can pass data back to the slot content that the parent provides. This is how reusable container components expose per-item context to their callers.
+
+Add extra attributes to the `<Slot>` tag. Each attribute becomes a context variable (prefixed with `$`) inside the parent's template content.
+
+```xmlui-pg noHeader
+---app display
+<App>
+  <StatusList
+    items="{[
+      { label: 'Build', ok: true },
+      { label: 'Tests', ok: false },
+      { label: 'Deploy', ok: true }
+    ]}"
+  >
+    <property name="rowTemplate">
+      <HStack>
+        <Icon name="{$item.ok ? 'check' : 'close'}" />
+        <Text>{$item.label}</Text>
+      </HStack>
+    </property>
+  </StatusList>
+</App>
+---comp display
+<Component name="StatusList">
+  <Items data="{$props.items}">
+    <Slot name="rowTemplate" item="{$item}">
+      <Text>{$item.label}</Text>
+    </Slot>
+  </Items>
+</Component>
+```
+
+Inside `StatusList`, `item="{$item}"` on the `<Slot>` passes each list item as a slot prop. The parent's `<property name="rowTemplate">` block receives it as `$item`.
+
+> [!NOTE]
+> Named slot names must end with **`Template`** (e.g. `rowTemplate`, `headerTemplate`). XMLUI shows an error if the name does not end with `Template`.
