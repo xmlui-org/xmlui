@@ -214,3 +214,85 @@ When you write JavaScript expressions in XMLUI attributes you typically write si
   </event>
 </Button>
 ```
+
+## Differences from standard JavaScript
+
+If you already know JavaScript, XMLUI scripting will feel immediately familiar — most everyday syntax works as-is. However, the scripting engine is a **sandboxed interpreter**, not the browser's native JavaScript engine. A few behaviors differ in ways that are invisible from reading the code and only surface at runtime. This section lists every meaningful difference so you can write XMLUI scripts confidently from day one.
+
+### Null-safe property access (default, not opt-in)
+
+In standard JavaScript, reading a property on `null` or `undefined` throws a `TypeError`. In XMLUI, the same access silently returns `undefined`:
+
+```xmlui
+<!-- Standard JS: throws TypeError if user or user.address is null -->
+<!-- XMLUI: returns undefined — no error, no crash -->
+<Text value="{user.address.city ?? 'Unknown'}" />
+```
+
+This makes bindings resilient while data is loading, but it also means null-reference mistakes won't produce the instant red error you'd see in a browser console. Use `??` or explicit `when` guards to handle genuinely missing data intentionally.
+
+### `var` is reactive; `let` and `const` are not
+
+At **component scope** (in markup attributes or code-behind top-level), `var.name` declares a reactive variable that re-evaluates its initializer expression whenever dependencies change. `let` and `const` are non-reactive and are only available inside event handlers, where they act as ordinary local variables:
+
+```xmlui
+<App var.count="{0}">
+  <!-- count is reactive: Text updates automatically -->
+  <Text value="Count: {count}" />
+
+  <Button onClick="let doubled = count * 2; count = doubled" label="Double" />
+  <!-- doubled is a handler-local variable; it cannot be used outside this handler -->
+</App>
+```
+
+A subtlety: `var.x="{expr}"` is reactive only until you **explicitly assign** to `x` in a handler. After the first write, `x` holds the assigned value and the initializer expression stops re-evaluating. See [When does a variable stop following its initial value?](/docs/guides/markup#when-does-a-variable-stop-following-its-initial-value) for details.
+
+### Unsupported syntax
+
+The following JavaScript features are **not available** in the XMLUI scripting engine:
+
+| Feature | Status | Alternative |
+|---------|--------|-------------|
+| `async` / `await` | Not supported | Event handlers are already async; use chained calls |
+| `class` declarations | Not supported | Use plain objects and functions |
+| Destructuring assignment (`const { a, b } = obj`) | Not supported | Access properties directly: `obj.a`, `obj.b` |
+| Generator functions (`function*`) | Not supported | — |
+| Template literals (`` `Hello ${name}` ``) | Not supported | Use string concatenation or XMLUI interpolation `{expr}` |
+| `import` / `export` | Not available in inline code | Use code-behind files with top-level `function` declarations |
+
+### Unavailable globals
+
+The browser globals you use in ordinary JavaScript are not accessible inside XMLUI scripts. Use the XMLUI equivalents instead:
+
+| Unavailable | Use instead |
+|-------------|-------------|
+| `fetch()` | `<DataSource>` for queries, `<APICall>` for mutations |
+| `setTimeout()` / `setInterval()` | [`delay(ms)`](/docs/markup#delay) helper function; [`pollIntervalInSeconds`](/docs/reference/components/DataSource#pollintervalinseconds) on `DataSource` |
+| `window`, `document` | Not accessible; use XMLUI layout and [navigation APIs](/docs/globals#navigate) |
+| `console.log()` | Available for debugging, but only in development mode |
+
+### Code-behind file restrictions
+
+`.xmlui.xs` code-behind files support only **top-level `var` and `function` declarations**. Unlike a standard JavaScript module, you cannot use `let`, `const`, `class`, control-flow statements, or plain expressions at the module's top level — those are compile errors:
+
+```js
+// ✓ Valid in a .xmlui.xs file
+var selectedId = null;
+
+function handleSelect(id) {
+  selectedId = id;
+}
+
+// ✗ Not valid at the top level of a .xmlui.xs file
+const MAX = 100;            // use var instead
+if (condition) { ... }      // not allowed at top level
+someFunction();             // expression statements not allowed
+```
+
+Code-behind functions have full access to component variables and the XMLUI globals, just as inline handlers do.
+
+### Execution time limit
+
+Synchronous expressions (bindings in markup attributes) are subject to a **1000 ms timeout**. An expression that takes longer than one second to evaluate throws an error to prevent the UI from freezing. If you hit this limit, move the work into an event handler (which runs asynchronously) or pre-process data in a `transformResult` function on a `DataSource`.
+
+The timeout threshold can be raised by setting [`appGlobals.syncExecutionTimeout`](/docs/app-globals#syncExecutionTimeout) (in milliseconds) in your app configuration, but increasing it is rarely the right solution — it usually indicates that computation belongs in an async handler instead.

@@ -89,6 +89,65 @@ Or using the `<variable>` helper tag.
 </App>
 ```
 
+### When does a variable stop following its initial value?
+
+A variable declared with `var.name="{expr}"` starts as a **reactive binding** — the framework re-evaluates `expr` whenever its dependencies change and keeps the variable in sync. But this reactive tracking ends the moment you **assign to the variable explicitly** in an event handler. After that first write, the variable holds whatever value you gave it, and the original expression is no longer evaluated.
+
+```xmlui-pg copy name="Variable stops tracking after assignment" display
+<App var.items="{['Alpha', 'Beta', 'Gamma']}">
+  <!-- Before any click: items tracks this list reactively -->
+  <Items data="{items}">
+    <Text>{$item}</Text>
+  </Items>
+
+  <!-- After clicking, items is set manually and no longer tracks the expression above -->
+  <Button
+    label="Override list"
+    onClick="items = ['Delta', 'Epsilon']"
+  />
+</App>
+```
+
+This is intentional: the first explicit assignment signals that the user (or handler) has taken manual control of the variable. Think of the initial expression as a default that applies until something more specific overwrites it.
+
+A common place this surprises developers is when a variable mirrors a `DataSource` result:
+
+```xmlui-pg copy name="Var decouples from DataSource after assignment" display
+<App>
+  <DataSource id="apiResult" url="/api/items" />
+
+  <!-- items starts as a reactive alias for apiResult.value -->
+  <variable name="items" value="{apiResult.value}" />
+
+  <!-- After this button is clicked, items is fixed; refreshing apiResult
+       will NOT update items anymore -->
+  <Button label="Edit list locally" onClick="items = items.filter(i => i.active)" />
+
+  <Items data="{items}">
+    <Text>{$item.name}</Text>
+  </Items>
+</App>
+```
+
+If you need the variable to stay reactive while also supporting local overrides, keep the override in a separate variable and combine them in the binding expression:
+
+```xmlui-pg copy name="Keeping reactivity with a separate override variable" display
+<App>
+  <DataSource id="apiResult" url="/api/items" />
+  <variable name="localOverride" value="{null}" />
+
+  <Items data="{localOverride ?? apiResult.value}">
+    <Text>{$item.name}</Text>
+  </Items>
+
+  <!-- Only sets the override; apiResult continues to track normally -->
+  <Button
+    label="Filter locally"
+    onClick="localOverride = apiResult.value.filter(i => i.active)"
+  />
+</App>
+```
+
 ### Nested variables
 
 The same variable name can be declared in nested scopes. The engine resolves the name to the variable in the closest (innermost) scope.

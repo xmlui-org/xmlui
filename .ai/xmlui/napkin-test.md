@@ -169,7 +169,7 @@ XMLUI scripting covers everyday JavaScript (expressions, arrow functions, array/
 
 ### Complication 1 — The Scope Rule Requires Two Sentences, Not One
 
-Rule 4 and Rule 8 describe the same thing from two angles: scope flows downward into all nested built-in components, but stops at user-defined component file boundaries. These two rules are logically one rule, but they cannot be collapsed into a single clean sentence without the exception-clause making it long.
+Rule 5 and Rule 8 describe the same thing from two angles: scope flows downward into all nested built-in components, but stops at user-defined component file boundaries. These two rules are logically one rule, but they cannot be collapsed into a single clean sentence without the exception-clause making it long.
 
 The gap that makes this worse: the `scoping.md` user-facing article demonstrates the two cases well but does not open with a compact summary rule. A reader has to infer the unified principle from the examples.
 

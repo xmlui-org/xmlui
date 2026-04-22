@@ -1,5 +1,7 @@
 # Scoping
 
+Variables declared on a component flow downward through all nested components in the same file. They stop at the boundary of a user-defined component file. Pass them explicitly as props, or declare them as `global.` variables if they are needed everywhere.
+
 ## Variables
 
 A variable declared in the `Main.xmlui` file is visible to built-in child components (e.g. `Text`) at any level.

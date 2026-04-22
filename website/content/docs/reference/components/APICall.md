@@ -217,6 +217,36 @@ You can optionally define request header values as key-value pairs, where the ke
 
 Message to show in toast notification during deferred operation polling. Can include {$progress}, {$statusData.property}, and other context variables. Notification will update on each poll with current values.
 
+### `invalidates` [#invalidates]
+
+A string or array of strings identifying the `DataSource` IDs (or URL patterns) whose cached data should be discarded after this `APICall` completes successfully. Matching data sources re-fetch automatically.
+
+> [!WARNING]
+> **Omitting `invalidates` invalidates the entire app data cache.** Every `DataSource` in the app will re-fetch after the call completes. In small apps this is harmless, but in larger apps it causes unnecessary network traffic and visible loading flicker. Always set `invalidates` explicitly.
+
+```xmlui
+<!-- Only the users DataSource re-fetches -->
+<APICall
+  id="deleteUser"
+  url="/api/users/{selectedId}"
+  method="DELETE"
+  invalidates="users"
+/>
+
+<!-- Omitting `invalidates`: every DataSource in the app re-fetches -->
+<APICall
+  id="deleteUser"
+  url="/api/users/{selectedId}"
+  method="DELETE"
+/>
+```
+
+To invalidate multiple data sources, pass a comma-separated string or a JSON array expression:
+
+```xmlui
+<APICall invalidates="users, teams" />
+```
+
 ### `maxPollingDuration` [#maxpollingduration]
 
 > [!DEF]  default: **300000**
