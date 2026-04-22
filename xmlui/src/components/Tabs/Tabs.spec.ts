@@ -1726,6 +1726,117 @@ test.describe("keepMounted", () => {
     expect(result.phone).toBe("123-456-7890");
     expect(result.email).toBe("john@example.com");
   });
+
+  test("typed values survive tab switches with default keepMounted inside Form", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = JSON.stringify(data)">
+        <Tabs>
+          <TabItem label="Personal">
+            <TextBox bindTo="firstname" testId="firstname" />
+          </TabItem>
+          <TabItem label="Contact">
+            <TextBox bindTo="email" testId="email" />
+          </TabItem>
+        </Tabs>
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    const firstname = await createTextBoxDriver("firstname");
+    await firstname.field.fill("Alice");
+    await page.getByRole("tab", { name: "Contact" }).click();
+    const email = await createTextBoxDriver("email");
+    await email.field.fill("alice@example.com");
+    await page.getByRole("tab", { name: "Personal" }).click();
+    await expect(firstname.field).toHaveValue("Alice");
+    await page.getByRole("tab", { name: "Contact" }).click();
+    await expect(email.field).toHaveValue("alice@example.com");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.firstname).toBe("Alice");
+    expect(result.email).toBe("alice@example.com");
+  });
+
+  test("typed values survive tab switches even with keepMounted=false", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form onSubmit="data => testState = JSON.stringify(data)">
+        <Tabs keepMounted="{false}">
+          <TabItem label="Personal">
+            <TextBox bindTo="firstname" testId="firstname" />
+          </TabItem>
+          <TabItem label="Contact">
+            <TextBox bindTo="email" testId="email" />
+          </TabItem>
+        </Tabs>
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    // Tab 1 content is mounted; type a value, then switch away (unmount)
+    const firstname1 = await createTextBoxDriver("firstname");
+    await firstname1.field.fill("Alice");
+    await page.getByRole("tab", { name: "Contact" }).click();
+    // Tab 1 is unmounted while Contact tab is active
+    await expect(page.getByTestId("firstname")).toHaveCount(0);
+    const email = await createTextBoxDriver("email");
+    await email.field.fill("alice@example.com");
+
+    // Switch back — Tab 1 remounts; the typed value must be preserved
+    await page.getByRole("tab", { name: "Personal" }).click();
+    const firstname2 = await createTextBoxDriver("firstname");
+    await expect(firstname2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.firstname).toBe("Alice");
+    expect(result.email).toBe("alice@example.com");
+  });
+
+  test("edited values from prefilled data survive tab switches with keepMounted=false", async ({
+    initTestBed,
+    page,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form
+        data="{{ firstname: 'John', email: 'john@example.com' }}"
+        onSubmit="data => testState = JSON.stringify(data)"
+      >
+        <Tabs keepMounted="{false}">
+          <TabItem label="Personal">
+            <TextBox bindTo="firstname" testId="firstname" />
+          </TabItem>
+          <TabItem label="Contact">
+            <TextBox bindTo="email" testId="email" />
+          </TabItem>
+        </Tabs>
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    // Edit the prefilled value on tab 1
+    const firstname1 = await createTextBoxDriver("firstname");
+    await firstname1.field.fill("Alice");
+    // Switch away and back — the edit must survive the remount
+    await page.getByRole("tab", { name: "Contact" }).click();
+    await page.getByRole("tab", { name: "Personal" }).click();
+    const firstname2 = await createTextBoxDriver("firstname");
+    await expect(firstname2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.firstname).toBe("Alice");
+    expect(result.email).toBe("john@example.com");
+  });
 });
 
 // =============================================================================

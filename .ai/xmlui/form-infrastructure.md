@@ -38,17 +38,21 @@ interface FormState {
 
 | Action | Trigger | Effect |
 |--------|---------|--------|
-| `FIELD_INITIALIZED` | FormItem mount | Sets initial value (if not dirty), registers noSubmit |
+| `FIELD_INITIALIZED` | FormItem mount | Sets initial value **only when the subject has no value yet at this path** (or `force: true`), registers noSubmit |
 | `FIELD_VALUE_CHANGED` | User input | `set(state.subject, uid, value)`, marks `isDirty` |
 | `FIELD_VALIDATED` | useValidation | Stores `ValidationResult`, handles `partial` flag |
 | `FIELD_FOCUSED` | Input focus | Snapshots `isValidOnFocus` |
 | `FIELD_LOST_FOCUS` | Input blur | Sets `afterFirstDirtyBlur`, clears `invalidToValid` |
-| `FIELD_REMOVED` | FormItem unmount | Deletes validation/interaction/noSubmit entries |
+| `FIELD_REMOVED` | FormItem unmount | Deletes validation/interaction/noSubmit entries; **subject value is preserved** so it survives remount |
 | `TRIED_TO_SUBMIT` | Submit clicked | Sets `forceShowValidationResult: true` on ALL fields |
 | `SUBMITTING` | doSubmit starts | `submitInProgress = true` |
 | `SUBMITTED` | doSubmit succeeds | Clears interaction flags, removes backend errors |
 | `BACKEND_VALIDATION_ARRIVED` | API error | Maps `issue.field` → field results, no-field → general |
 | `RESET` | Reset button | Fresh state, increments `resetVersion` |
+
+### Values survive FormItem unmount
+
+When a FormItem unmounts (tab switch with `keepMounted=false`, `when` evaluating to false, multi-step navigation, etc.), `FIELD_REMOVED` is dispatched but the value in `state.subject` stays put. On remount, `FIELD_INITIALIZED` checks `get(state.subject, uid) !== undefined` and refuses to clobber an existing value — so the user's typed value survives. The first-ever mount still populates from `initialValue` because the subject path is genuinely undefined at that point. This guarantees correctness across Tabs, `FormSegment + when`, modals, and any custom layout that unmounts its children.
 
 Reducer uses Immer's `produce()` — direct mutations become immutable updates. Lodash `set()` handles nested paths like `address.city`.
 

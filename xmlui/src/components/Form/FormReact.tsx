@@ -84,12 +84,19 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      // Only set the value if initialValue is defined and field is not dirty (or force is true)
-      if (
-        action.payload.value !== undefined &&
-        (!state.interactionFlags[uid].isDirty || action.payload.force)
-      ) {
-        set(state.subject, uid, action.payload.value);
+      // Initialize the value only when the field truly has no value yet.
+      // A FormItem may remount (tab switch with keepMounted=false, conditional
+      // rendering, multi-step wizard) — in that case state.subject[uid] already
+      // holds the user's typed value and must not be clobbered. `force` still
+      // allows explicit re-initialization.
+      if (action.payload.value !== undefined) {
+        const alreadyHasValue = get(state.subject, uid) !== undefined;
+        const shouldSet =
+          action.payload.force ||
+          (!alreadyHasValue && !state.interactionFlags[uid].isDirty);
+        if (shouldSet) {
+          set(state.subject, uid, action.payload.value);
+        }
       }
       // Track noSubmit flag - if multiple FormItems reference the same bindTo,
       // and any of them has noSubmit: true, the field should NOT be submitted.
