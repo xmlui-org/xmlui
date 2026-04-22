@@ -252,20 +252,10 @@ export const build = async ({
   }
   const distPath = "/dist";
   const themesFolder = flatDist ? "" : "themes";
-  const componentsFolder = flatDist ? "" : "components";
   const themesFolderPath = flatDist ? distPath : path.join(distPath, themesFolder);
-  const componentsFolderPath = flatDist ? distPath : path.join(distPath, componentsFolder);
 
   function getThemeFileName(theme: ThemeDefinition) {
     return flatDist ? `${flatDistUiPrefix}theme_${theme.id}` : theme.id;
-  }
-
-  function getComponentFileName(component: CompoundComponentDef) {
-    return flatDist ? `${flatDistUiPrefix}component_${component.name}` : component.name;
-  }
-
-  function getEntrypointFileName() {
-    return flatDist ? `${flatDistUiPrefix}entrypoint` : `app`;
   }
 
   if (buildMode === "CONFIG_ONLY") {
