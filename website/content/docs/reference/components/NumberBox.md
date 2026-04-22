@@ -421,11 +421,12 @@ See an example in the `setValue` API method.
 
 The component has some parts that can be styled through layout properties and theme variables separately:
 
+- **`conciseValidationFeedback`**: The concise validation feedback indicator.
 - **`endAdornment`**: The adornment displayed at the end of the text box.
 - **`input`**: The text box input area.
 - **`label`**: The label displayed for the text box.
-- **`spinnerButtonDown`**: The spinner button for decrementing the value.
-- **`spinnerButtonUp`**: The spinner button for incrementing the value.
+- **`spinnerDown`**: The spinner button for decrementing the value.
+- **`spinnerUp`**: The spinner button for incrementing the value.
 - **`startAdornment`**: The adornment displayed at the start of the text box.
 
 ## Styling [#styling]
@@ -499,6 +500,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-NumberBox--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-NumberBox--warning | *none* | *none* |
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-NumberBox | *none* | *none* |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-NumberBox | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-NumberBox--error--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-NumberBox--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-NumberBox--success--focus | *none* | *none* |

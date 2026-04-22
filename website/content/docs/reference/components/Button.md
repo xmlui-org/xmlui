@@ -467,7 +467,10 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Button-secondary-outlined | *none* | *none* |
 | [fontWeight](/docs/styles-and-themes/common-units/#fontWeight)-Button-secondary-solid | *none* | *none* |
 | [gap](/docs/styles-and-themes/common-units/#size)-Button | $space-2 | $space-2 |
+| [gap](/docs/styles-and-themes/common-units/#size)-Button-vertical | $space-1 | $space-1 |
 | [height](/docs/styles-and-themes/common-units/#size-values)-Button | fit-content | fit-content |
+| [height](/docs/styles-and-themes/common-units/#size-values)-Button-vertical | fit-content | fit-content |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Button | 2.5rem | 2.5rem |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button-attention-ghost--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button-attention-outlined--focus | *none* | *none* |
@@ -579,3 +582,4 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [transition](/docs/styles-and-themes/common-units/#transition)-Button-primary-solid | *none* | *none* |
 | [transition](/docs/styles-and-themes/common-units/#transition)-Button-secondary-solid | *none* | *none* |
 | [width](/docs/styles-and-themes/common-units/#size-values)-Button | fit-content | fit-content |
+| [width](/docs/styles-and-themes/common-units/#size-values)-Button-vertical | fit-content | fit-content |

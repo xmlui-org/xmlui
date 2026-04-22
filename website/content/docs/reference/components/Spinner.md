@@ -71,6 +71,12 @@ This component does not have any events.
 
 This component does not expose any methods.
 
+## Parts [#parts]
+
+The component has some parts that can be styled through layout properties and theme variables separately:
+
+- **`ring`**: The animated ring element of the spinner.
+
 ## Styling [#styling]
 
 ### Theme Variables [#theme-variables]

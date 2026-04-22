@@ -395,6 +395,7 @@ The component has some parts that can be styled through layout properties and th
 | [margin](/docs/styles-and-themes/common-units/#size-values)-icon-TimeInput | *none* | *none* |
 | [margin](/docs/styles-and-themes/common-units/#size-values)-input-TimeInput | *none* | *none* |
 | [maxHeight](/docs/styles-and-themes/common-units/#size-values)-menu-TimeInput | *none* | *none* |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-TimeInput | *none* | *none* |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-ampm-TimeInput | 2.2em | 2.2em |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-input-TimeInput | 0.54em | 0.54em |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-item-TimeInput--disabled | *none* | *none* |

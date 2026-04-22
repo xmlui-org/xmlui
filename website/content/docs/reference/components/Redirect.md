@@ -39,16 +39,7 @@ The following app demonstrates two different patterns for using `Redirect`.
 
 ## Behaviors [#behaviors]
 
-This component supports the following behaviors:
-
-| Behavior | Properties |
-| --- | --- |
-| Animation | `animation`, `animationOptions` |
-| Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Display When | `displayWhen` |
-| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
-| Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Styling Variant | `variant` |
+No behaviors are applicable to this component.
 
 ## Properties [#properties]
 

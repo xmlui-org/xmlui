@@ -8,6 +8,7 @@
 - **Search functionality**: Optional filtering to quickly find options in large lists
 - **Custom templates**: Configurable option display, value presentation, and empty state templates
 - **Dynamic options**: Supports both static [Option](/docs/reference/components/Option) children and dynamic lists via [Items](/docs/reference/components/Items).
+- **Data-driven options**: Populates the option list directly from a data array using `data`, `valueField`, and `labelField` — the most efficient approach for large lists.
 
 ## Using `Select` [#using-select]
 
@@ -34,6 +35,32 @@ You can use `Select` with dynamic options:
       <Option value="{$itemIndex}" label="{$item}" />
     </Items>
   </Select>
+</App>
+```
+
+For large or externally-loaded datasets, use the `data` prop to supply the option list directly. This is more efficient than using `Option` children or `Items` because the option list is derived in JavaScript and only re-evaluated when the data reference changes, not on every unrelated state update in the same form:
+
+```xmlui-pg copy display name="Example: using Select with data prop" height="200px"
+<App>
+  <variable name="options" value="{[
+    { value: 'opt1', label: 'first' },
+    { value: 'opt2', label: 'second' },
+    { value: 'opt3', label: 'third' }
+  ]}" />
+  <Select data="{options}" />
+</App>
+```
+
+If your data uses different field names, set `valueField` and `labelField` accordingly:
+
+```xmlui-pg copy display name="Example: custom valueField and labelField" height="200px"
+<App>
+  <variable name="countries" value="{[
+    { code: 'us', name: 'United States' },
+    { code: 'ca', name: 'Canada' },
+    { code: 'gb', name: 'United Kingdom' }
+  ]}" />
+  <Select data="{countries}" valueField="code" labelField="name" />
 </App>
 ```
 
@@ -71,6 +98,23 @@ If this property is set to `true`, the component gets the focus automatically wh
 > [!DEF]  default: **false**
 
 This property enables a clear button that allows the user to clear the selected value(s).
+
+### `data` [#data]
+
+The data array to populate the option list from. When provided, `Option` children are not needed — the component builds options from this array using `valueField` and `labelField`. This is the most efficient approach for large lists because the options are derived in JavaScript and re-evaluated only when the data reference changes, not on every unrelated state update.
+
+Provide an array of objects to populate the option list. When `data` is set, `Option` children are not required. Each item in the array is mapped to an option using `valueField` (default: `"value"`) and `labelField` (default: `"label"`).
+
+```xmlui-pg copy display name="Example: data" height="200px"
+<App>
+  <variable name="options" value="{[
+    { value: 'opt1', label: 'first' },
+    { value: 'opt2', label: 'second' },
+    { value: 'opt3', label: 'third' }
+  ]}" />
+  <Select data="{options}" />
+</App>
+```
 
 ### `dropdownHeight` [#dropdownheight]
 
@@ -193,6 +237,16 @@ This property indicates whether the component is in progress. It can be used to 
 > [!DEF]  default: **""**
 
 This property indicates the message to display when the component is in progress.
+
+### `labelField` [#labelfield]
+
+> [!DEF]  default: **"label"**
+
+The property name of each data item to use as the option label when `data` is provided. Defaults to `"label"`.
+
+Specifies which property of each data item to use as the option's display label. Only relevant when `data` is provided. Defaults to `"label"`.
+
+See the `valueField` example above for usage.
 
 ### `multiSelect` [#multiselect]
 
@@ -350,6 +404,25 @@ Available values:
   <Select validationStatus="valid" />
   <Select validationStatus="warning" />
   <Select validationStatus="error" />
+</App>
+```
+
+### `valueField` [#valuefield]
+
+> [!DEF]  default: **"value"**
+
+The property name of each data item to use as the option value when `data` is provided. Defaults to `"value"`.
+
+Specifies which property of each data item to use as the option's value. Only relevant when `data` is provided. Defaults to `"value"`.
+
+```xmlui-pg copy display name="Example: valueField and labelField" height="200px"
+<App>
+  <variable name="countries" value="{[
+    { code: 'us', name: 'United States' },
+    { code: 'ca', name: 'Canada' },
+    { code: 'gb', name: 'United Kingdom' }
+  ]}" />
+  <Select data="{countries}" valueField="code" labelField="name" />
 </App>
 ```
 
@@ -608,7 +681,7 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-Select-badge | $fontSize-sm | $fontSize-sm |
 | [minHeight](/docs/styles-and-themes/common-units/#size-values)-item-Select | $space-7 | $space-7 |
-| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Select | $space-7 | $space-7 |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Select | 2.5rem | 2.5rem |
 | [minWidth](/docs/styles-and-themes/common-units/#size-values)-Select | $space-16 | $space-16 |
 | [opacity](/docs/styles-and-themes/common-units/#opacity)-text-item-Select--disabled | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Select--error--focus | *none* | *none* |

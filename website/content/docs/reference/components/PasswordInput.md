@@ -275,7 +275,8 @@ The component has some parts that can be styled through layout properties and th
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-TextBox--warning | *none* | *none* |
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-Input | $space-2 | $space-2 |
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-TextBox | *none* | *none* |
-| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Input | 39px | 39px |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Input | 2.5rem | 2.5rem |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-TextBox | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Input--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TextBox--error--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-TextBox--focus | *none* | *none* |

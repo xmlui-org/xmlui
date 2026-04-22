@@ -44,7 +44,13 @@ Icon to display for light mode
 
 ## Events [#events]
 
-This component does not have any events.
+### `didChange` [#didchange]
+
+This event is fired when the user switches between light and dark modes.
+
+**Signature**: `didChange(tone: string): void`
+
+- `tone`: The new tone value: "light" or "dark".
 
 ## Exposed Methods [#exposed-methods]
 
@@ -56,9 +62,11 @@ This component does not expose any methods.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-ToneSwitch | white | white |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch-dark | $color-primary-500 | $color-primary-500 |
 | [backgroundColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch-light | $color-surface-200 | $color-surface-700 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch | $color-surface-200 | $color-surface-600 |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-ToneSwitch--hover | $color-surface-300 | $color-surface-500 |
+| [boxShadow](/docs/styles-and-themes/common-units/#boxShadow)-indicator-ToneSwitch | 0 2px 4px rgba(0, 0, 0, 0.1) | 0 2px 4px rgba(0, 0, 0, 0.1) |
 | [color](/docs/styles-and-themes/common-units/#color)-ToneSwitch-dark | $color-surface-0 | $color-surface-0 |
 | [color](/docs/styles-and-themes/common-units/#color)-ToneSwitch-light | $color-text-primary | $color-text-primary |

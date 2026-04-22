@@ -334,6 +334,7 @@ This API allows you to get or set the value of the component. If no value is set
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--success | *none* | *none* |
 | [fontSize](/docs/styles-and-themes/common-units/#size-values)-placeholder-AutoComplete--warning | *none* | *none* |
 | [gap](/docs/styles-and-themes/common-units/#size)-adornment-AutoComplete | *none* | *none* |
+| [minHeight](/docs/styles-and-themes/common-units/#size-values)-AutoComplete | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-AutoComplete--focus | *none* | *none* |
 | [outlineOffset](/docs/styles-and-themes/common-units/#size-values)-AutoComplete--focus | *none* | *none* |
 | [outlineStyle](/docs/styles-and-themes/common-units/#border)-AutoComplete--focus | *none* | *none* |
