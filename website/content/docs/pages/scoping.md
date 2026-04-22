@@ -1,5 +1,7 @@
 # Scoping
 
+Variables declared on a component flow downward through all nested components in the same file. They stop at the boundary of a user-defined component file. Pass them explicitly as props, or declare them as `global.` variables if they are needed everywhere.
+
 ## Variables
 
 A variable declared in the `Main.xmlui` file is visible to built-in child components (e.g. `Text`) at any level.
@@ -168,7 +170,18 @@ Local variables can shadow global variables:
 </Component>
 ```
 
+> [!WARNING]
+> **Assigning to an undeclared name raises an error toast.** Writing `foo = value` in an event handler when `foo` was never declared with `var.foo`, `<variable>`, `global.foo`, or `<global>` triggers a runtime error. Always declare the variable on an ancestor component before assigning to it from descendants.
 
+```xmlui
+<!-- Produces runtime error: count was never declared -->
+<Button onClick="count = count + 1" label="Increment" />
+
+<!-- Declare first, then assign freely from descendants -->
+<App var.count="{0}">
+  <Button onClick="count = count + 1" label="Increment" />
+</App>
+```
 
 ## Component IDs
 

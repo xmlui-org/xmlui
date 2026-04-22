@@ -80,6 +80,26 @@ Each component may adjust the padding around children and gaps between adjacent 
 > [!INFO]
 > Web and desktop UI frameworks typically use margins to establish layout. XMLUI layout components do not use margins, they only use paddings and gaps. Although you can use margins, they tend to complicate layouts so use them as a last resort.
 
+### Shorthand spacing properties
+
+Instead of setting the four directional properties individually, you can use these shorthand props that expand to their directional equivalents:
+
+| Shorthand | Expands to |
+|-----------|------------|
+| `paddingHorizontal` | `paddingLeft` + `paddingRight` |
+| `paddingVertical` | `paddingTop` + `paddingBottom` |
+| `marginHorizontal` | `marginLeft` + `marginRight` |
+| `marginVertical` | `marginTop` + `marginBottom` |
+| `borderHorizontal` | `borderLeft` + `borderRight` |
+| `borderVertical` | `borderTop` + `borderBottom` |
+
+```xmlui
+<!-- set left and right padding in one prop -->
+<Card paddingHorizontal="16" paddingVertical="8">
+  <Text>Content</Text>
+</Card>
+```
+
 ## Dimensions
 
 Each component has a default strategy for determining the dimensions (height and width) of its children.

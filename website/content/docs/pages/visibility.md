@@ -38,6 +38,8 @@ When `when` is omitted or evaluates to `true`, the component renders normally.
 </App>
 ```
 
+One subtlety: if `when` starts as `false`, `onInit` does **not** fire at that point. It fires the first time `when` transitions from `false` to `true` — that is, when the component first becomes visible. Each subsequent `false`→`true` transition fires `onInit` again; the matching `true`→`false` transition fires `onCleanup`.
+
 ## Responsive `when-*` attributes
 
 The responsive variants follow a **mobile-first** (min-width) convention. Each attribute name is `when-` followed by a breakpoint name:
@@ -129,3 +131,59 @@ When no rule matches **and `when` is absent**, the base visibility is inferred a
 | (absent) | `false` | `true` | hidden | visible |
 | `false` | (absent) | `true` | hidden (explicit `when`) | visible |
 | `true` | (absent) | `false` | visible (explicit `when`) | hidden |
+
+## `when` vs `displayWhen` — choosing the right tool
+
+XMLUI has two ways to hide a component. Picking the wrong one for form fields leads to silent bugs.
+
+| | `when="{false}"` | `displayWhen="{false}"` |
+|---|---|---|
+| Component rendered? | No — removed from the tree | Yes — hidden via `display: none` |
+| Form field registered with `Form`? | **No** — excluded from submission and validation | **Yes** — validated and submitted even while hidden |
+| Field values preserved? | No — reset when `when` becomes `true` | Yes — always in memory |
+| Component lifecycle runs? | No — `onInit` / `onCleanup` fire on transitions | Yes — always mounted |
+| Use when… | The field is **conditionally irrelevant** (e.g. billing address only when different from shipping) | The field **must always submit** but lives on a hidden step (multi-step wizards) |
+
+The key distinction is form registration. `when=false` removes the field completely — it does not validate, its value is not included in `$data`, and required-field checks do not fire for it. `displayWhen=false` keeps the field fully registered: it validates, its value submits, and required-field errors will block form submission even while the field is invisible.
+
+**Use `when` for conditional fields:**
+
+```xmlui
+<!-- billing address only appears — and only validates — when the checkbox is checked -->
+<App var.differentBilling="{false}">
+  <Form data="{{ shipping: '', billing: '' }}">
+    <TextBox label="Shipping address" bindTo="shipping" required="true" />
+    <Checkbox label="Use different billing address" bindTo="differentBilling" />
+    <TextBox
+      label="Billing address"
+      bindTo="billing"
+      required="true"
+      when="{differentBilling}"
+    />
+  </Form>
+</App>
+```
+
+**Use `displayWhen` for wizard steps:**
+
+```xmlui
+<!-- both steps stay registered; submitting from step 2 still validates step 1 fields -->
+<App var.step="{1}">
+  <Form data="{{ name: '', email: '' }}" onSubmit="(d) => toast('Submitted: ' + d.name)">
+    <VStack displayWhen="{step === 1}">
+      <TextBox label="Name" bindTo="name" required="true" />
+      <Button label="Next" onClick="step = 2" />
+    </VStack>
+    <VStack displayWhen="{step === 2}">
+      <TextBox label="Email" bindTo="email" required="true" />
+      <HStack>
+        <Button label="Back" variant="outlined" onClick="step = 1" />
+        <Button label="Submit" type="submit" />
+      </HStack>
+    </VStack>
+  </Form>
+</App>
+```
+
+> [!NOTE]
+> `displayWhen` is covered in full — including a live example — in the [DisplayWhen behavior](/docs/behaviors#displaywhen) reference.

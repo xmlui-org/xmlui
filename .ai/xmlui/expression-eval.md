@@ -122,7 +122,7 @@ This means any function that returns a Promise (e.g., `fetch()`, any async opera
 | Sync | 1000ms default | Yes — `appGlobals.syncExecutionTimeout` (milliseconds) |
 | Async | `evalContext.timeout` | Yes |
 
-The sync timeout can be configured via `appGlobals.syncExecutionTimeout` in the app configuration. If not set, defaults to 1000ms.
+The sync timeout can be configured via [`appGlobals.syncExecutionTimeout`](/docs/app-globals#syncExecutionTimeout) in the app configuration. If not set, defaults to 1000ms.
 
 Error: `"Sync evaluation timeout exceeded {N} milliseconds"`
 

@@ -25,6 +25,37 @@
 - `$result`: Response data (available in `completedNotificationMessage`)
 - `$statusData`: Latest status response data when in deferred mode (available in event handlers and notifications)
 
+## Deferred (long-running) operations [#deferred-operations]
+
+Some endpoints respond with `202 Accepted` and a job reference, then complete work asynchronously. Use `deferredMode` to handle this: after the initial call, `APICall` polls `statusUrl` automatically until `completionCondition` evaluates to `true`.
+
+**Minimal setup:**
+
+1. Set `deferredMode="true"` and provide a `statusUrl` that embeds the job reference from the initial response using `{$result.jobId}` (or whichever field your API returns).
+2. Set `completionCondition` to an expression over `$statusData` that returns `true` when the job is done.
+3. Optionally set `errorCondition` to detect failure states.
+4. Use `inProgressNotificationMessage`, `completedNotificationMessage`, and `errorNotificationMessage` for built-in toast feedback.
+
+```xmlui
+<APICall
+  id="exportJob"
+  url="/api/export"
+  method="post"
+  deferredMode="true"
+  statusUrl="/api/jobs/{$result.jobId}/status"
+  completionCondition="{$statusData.state === 'done'}"
+  errorCondition="{$statusData.state === 'failed'}"
+  inProgressNotificationMessage="Exporting… {$progress}%"
+  completedNotificationMessage="Export complete!"
+  invalidates="exports"
+/>
+<Button label="Export" onClick="exportJob.execute()" />
+```
+
+While polling is active, `exportJob.isPolling()` returns `true` and `exportJob.getStatus()` returns the latest status response. Call `exportJob.stopPolling()` to abort polling locally (the server-side job continues unless you also configure `cancelUrl` and call `exportJob.cancel()`).
+
+See [`deferredMode`](#deferredmode), [`statusUrl`](#statusurl), [`completionCondition`](#completioncondition), [`pollingInterval`](#pollinginterval), [`pollingBackoff`](#pollingbackoff), and [`maxPollingDuration`](#maxpollingduration) for full tuning options.
+
 ## Behaviors [#behaviors]
 
 No behaviors are applicable to this component.
@@ -216,6 +247,36 @@ You can optionally define request header values as key-value pairs, where the ke
 ### `inProgressNotificationMessage` [#inprogressnotificationmessage]
 
 Message to show in toast notification during deferred operation polling. Can include {$progress}, {$statusData.property}, and other context variables. Notification will update on each poll with current values.
+
+### `invalidates` [#invalidates]
+
+A string or array of strings identifying the `DataSource` IDs (or URL patterns) whose cached data should be discarded after this `APICall` completes successfully. Matching data sources re-fetch automatically.
+
+> [!WARNING]
+> **Omitting `invalidates` invalidates the entire app data cache.** Every `DataSource` in the app will re-fetch after the call completes. In small apps this is harmless, but in larger apps it causes unnecessary network traffic and visible loading flicker. Always set `invalidates` explicitly.
+
+```xmlui
+<!-- Only the users DataSource re-fetches -->
+<APICall
+  id="deleteUser"
+  url="/api/users/{selectedId}"
+  method="DELETE"
+  invalidates="users"
+/>
+
+<!-- Omitting `invalidates`: every DataSource in the app re-fetches -->
+<APICall
+  id="deleteUser"
+  url="/api/users/{selectedId}"
+  method="DELETE"
+/>
+```
+
+To invalidate multiple data sources, pass a comma-separated string or a JSON array expression:
+
+```xmlui
+<APICall invalidates="users, teams" />
+```
 
 ### `maxPollingDuration` [#maxpollingduration]
 
