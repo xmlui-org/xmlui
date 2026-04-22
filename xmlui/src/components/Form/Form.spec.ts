@@ -4576,3 +4576,191 @@ test.describe("stickyButtonRow property", () => {
     expect(buttonRowBounds.top).toBeGreaterThan(scrollBodyBounds.bottom);
   });
 });
+
+// =============================================================================
+// VALUE PRESERVATION ACROSS UNMOUNT/REMOUNT
+// =============================================================================
+
+test.describe("Value preservation across unmount/remount", () => {
+  test("typed value is preserved when FormItem unmounts via `when` and remounts", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.visible="{true}">
+        <Button testId="toggle" label="Toggle" onClick="visible = !visible" />
+        <Form onSubmit="data => testState = JSON.stringify(data)">
+          <FormItem bindTo="name" when="{visible}" testId="nameItem" />
+          <Button testId="submit" type="submit" label="Submit" />
+        </Form>
+      </Fragment>
+    `);
+
+    const nameItem = await createFormItemDriver("nameItem");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+
+    // Unmount
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("nameItem")).toHaveCount(0);
+    // Remount
+    await page.getByTestId("toggle").click();
+    const nameItem2 = await createFormItemDriver("nameItem");
+    const nameInput2 = await createTextBoxDriver(nameItem2.input);
+    await expect(nameInput2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.name).toBe("Alice");
+  });
+
+  test("typed value is preserved across multi-step FormSegments switched via `when`", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.step="{1}">
+        <Form hideButtonRow="true" onSubmit="data => testState = JSON.stringify(data)">
+          <FormSegment when="{step === 1}">
+            <FormItem bindTo="name" testId="nameItem" />
+          </FormSegment>
+          <FormSegment when="{step === 2}">
+            <FormItem bindTo="email" testId="emailItem" />
+          </FormSegment>
+          <Button testId="next" label="Next" onClick="step = 2" />
+          <Button testId="prev" label="Prev" onClick="step = 1" />
+          <Button testId="submit" label="Submit" type="submit" />
+        </Form>
+      </Fragment>
+    `);
+
+    // Step 1: type name
+    const nameItem = await createFormItemDriver("nameItem");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await nameInput.field.fill("Alice");
+
+    // Step 2: step 1 segment unmounts
+    await page.getByTestId("next").click();
+    await expect(page.getByTestId("nameItem")).toHaveCount(0);
+    const emailItem = await createFormItemDriver("emailItem");
+    const emailInput = await createTextBoxDriver(emailItem.input);
+    await emailInput.field.fill("alice@example.com");
+
+    // Back to step 1: segment remounts — name must still be there
+    await page.getByTestId("prev").click();
+    const nameItem2 = await createFormItemDriver("nameItem");
+    const nameInput2 = await createTextBoxDriver(nameItem2.input);
+    await expect(nameInput2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result).toEqual({ name: "Alice", email: "alice@example.com" });
+  });
+
+  test("edited value from prefilled data is preserved across unmount/remount", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.visible="{true}">
+        <Button testId="toggle" label="Toggle" onClick="visible = !visible" />
+        <Form
+          data="{{ name: 'John' }}"
+          onSubmit="data => testState = JSON.stringify(data)"
+        >
+          <FormItem bindTo="name" when="{visible}" testId="nameItem" />
+          <Button testId="submit" type="submit" label="Submit" />
+        </Form>
+      </Fragment>
+    `);
+
+    // Edit the prefilled value
+    const nameItem = await createFormItemDriver("nameItem");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await expect(nameInput.field).toHaveValue("John");
+    await nameInput.field.fill("Alice");
+
+    // Unmount + remount
+    await page.getByTestId("toggle").click();
+    await expect(page.getByTestId("nameItem")).toHaveCount(0);
+    await page.getByTestId("toggle").click();
+    // The edit — not the prefill — must survive the remount
+    const nameItem2 = await createFormItemDriver("nameItem");
+    const nameInput2 = await createTextBoxDriver(nameItem2.input);
+    await expect(nameInput2.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.name).toBe("Alice");
+  });
+
+  test("user edit is not clobbered when the reactive data prop changes", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    // Regression: the original reducer guarded against this via `isDirty`.
+    // The new guard (already-has-value) must keep the same behavior when the
+    // form's `data` prop changes while a field has a typed value.
+    const { testStateDriver } = await initTestBed(`
+      <Fragment var.payload="{{ name: 'John' }}">
+        <Button testId="reload" label="Reload" onClick="payload = { name: 'Mallory' }" />
+        <Form data="{payload}" onSubmit="data => testState = JSON.stringify(data)">
+          <FormItem bindTo="name" testId="nameItem" />
+          <Button testId="submit" type="submit" label="Submit" />
+        </Form>
+      </Fragment>
+    `);
+
+    const nameItem = await createFormItemDriver("nameItem");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    await expect(nameInput.field).toHaveValue("John");
+    await nameInput.field.fill("Alice");
+
+    // Simulate a data refresh from the host app
+    await page.getByTestId("reload").click();
+    await expect(nameInput.field).toHaveValue("Alice");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result.name).toBe("Alice");
+  });
+
+  test("unedited prefilled value is still picked up on first mount", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    // Regression: we only skip the initialization when the field already has a
+    // value. The first-ever mount must still populate the subject from `data`.
+    const { testStateDriver } = await initTestBed(`
+      <Form
+        data="{{ name: 'John', email: 'john@example.com' }}"
+        onSubmit="data => testState = JSON.stringify(data)"
+      >
+        <FormItem bindTo="name" testId="nameItem" />
+        <FormItem bindTo="email" testId="emailItem" />
+        <Button testId="submit" type="submit" label="Submit" />
+      </Form>
+    `);
+
+    const nameItem = await createFormItemDriver("nameItem");
+    const nameInput = await createTextBoxDriver(nameItem.input);
+    const emailItem = await createFormItemDriver("emailItem");
+    const emailInput = await createTextBoxDriver(emailItem.input);
+    await expect(nameInput.field).toHaveValue("John");
+    await expect(emailInput.field).toHaveValue("john@example.com");
+
+    await page.getByTestId("submit").click();
+    const result = JSON.parse(await testStateDriver.testState());
+    expect(result).toEqual({ name: "John", email: "john@example.com" });
+  });
+});
