@@ -81,6 +81,34 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
 </Component>
 ```
 
+You can also declare a method inline using the `method:` attribute prefix instead of a `<method>` child tag:
+
+```xmlui
+<Component name="Counter">
+  <variable name="count" value="{0}" />
+  <Text value="{count}" />
+
+  <!-- equivalent to a <method name="reset"> child tag -->
+  <Button label="Reset" method:reset="count = 0" />
+</Component>
+```
+
+A component can call its own exported methods internally using the reserved name `$self`:
+
+```xmlui
+<Component name="Wizard">
+  <variable name="step" value="{1}" />
+  <Text value="Step {step}" />
+
+  <method name="next">
+    step = step + 1;
+  </method>
+
+  <!-- calls the exported method from within the component itself -->
+  <Button label="Next" onClick="$self.next()" />
+</Component>
+```
+
 ## Passing data into slot content
 
 A component can pass data back to the slot content that the parent provides. This is how reusable container components expose per-item context to their callers.

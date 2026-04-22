@@ -100,6 +100,20 @@ These are the key context variables available in XMLUI components.
 - **Scope:** Available in event handlers, especially in `<event name="submit">` or API calls.
 - **What it is:** The data passed to the event or API call, often the form data at the time of submission.
 
+### `$params`
+
+- **Scope:** Available in `APICall` event handlers (`onSuccess`, `onError`, `mockExecute`, etc.).
+- **What it is:** An array of all arguments passed to `id.execute(arg1, arg2, ...)`. Access individual arguments as `$params[0]`, `$params[1]`, and so on. Use `$param` (singular) as a shorthand for `$params[0]` when only one argument is passed.
+- **Example:**
+  ```xmlui
+  <APICall id="save" url="/api/items" method="POST">
+    <event name="success">
+      toast('Saved: ' + $params[0].name);
+    </event>
+  </APICall>
+  <Button label="Save" onClick="save.execute({ name: 'Widget' })" />
+  ```
+
 ## List
 
 ### `groupBy`
