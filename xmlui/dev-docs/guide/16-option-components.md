@@ -54,6 +54,26 @@ Two React contexts work together to make the pattern work:
 
 <!-- DIAGRAM: Two-column diagram showing OptionContext (left: data flow, onOptionAdd/onOptionRemove arrows from Option up to parent state) and OptionTypeProvider (right: renderer dispatch, parent picks component type, OptionNative reads and delegates) -->
 
+```mermaid
+graph TB
+  subgraph TypeProvider["OptionTypeProvider — which renderer?"]
+    direction TB
+    PT["Select / RadioGroup / AutoComplete<br>wraps children in<br>OptionTypeProvider Component={SelectOption}"]
+    ON["OptionNative<br>reads useOptionType()"]
+    Delegate(["SelectOption / RadioGroupOption / …<br>actual rendered element"])
+    PT --> ON --> Delegate
+  end
+
+  subgraph DataCtx["OptionContext — what options exist?"]
+    direction TB
+    PD["parent provides<br>onOptionAdd / onOptionRemove callbacks"]
+    OC["&lt;Option value='x' label='Y'/&gt;<br>calls onOptionAdd on mount<br>calls onOptionRemove on unmount"]
+    PS["parent state<br>options[], labels, values<br>(for filtering, keyboard nav)"]
+    PD --> OC
+    OC -.->|"onOptionAdd / onOptionRemove"| PS
+  end
+```
+
 ### OptionTypeProvider: "Which renderer should I use?"
 
 Every parent component wraps its children in `OptionTypeProvider` with a specific React

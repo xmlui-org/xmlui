@@ -4,7 +4,36 @@ XMLUI provides a declarative data layer built on top of React Query. Components 
 
 This document covers the internals: how `DataSource` and `APICall` work under the hood, how the loader lifecycle integrates with the container state system, and how file operations are handled.
 
+```xml
+<!-- DataSource is declared with an id on the container -->
+<Stack>
+  <DataSource id="users" url="/api/users" />
+
+  <!-- ApiBoundComponent detects the {users.value} prop ref and wires the loader -->
+  <List data="{users.value}">
+    <Text>{$item.name}</Text>
+  </List>
+</Stack>
+```
+
 <!-- DIAGRAM: DataSource markup → ApiBoundComponent → LoaderComponent → React Query useQuery → LOADER_LOADED dispatch → container state → {loaderName.value} -->
+
+```mermaid
+graph TD
+  DSM["DataSource markup<br>&lt;DataSource id='users' url='/api/users'/&gt;"]
+  State["container state<br>state[uid].value · loaded · error"]
+  Binding["{loaderName.value}<br>reactive expression"]
+
+  subgraph ABC["ApiBoundComponent — wraps component, creates loader infrastructure"]
+    LC["LoaderComponent<br>one per DataSource"]
+    RQ["React Query useQuery<br>key = [url, params]<br>caches + deduplicates fetches"]
+    LC --> RQ
+  end
+
+  DSM -->|"prop ref detected · creates LoaderDef"| LC
+  RQ -.->|"LOADER_LOADED dispatch"| State
+  State -->|"reactive re-evaluation"| Binding
+```
 
 ---
 

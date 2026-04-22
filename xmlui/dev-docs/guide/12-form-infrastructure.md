@@ -4,7 +4,46 @@ XMLUI's form system provides automatic data management, validation, and submissi
 
 Understanding the form infrastructure matters for framework developers because it touches behaviors (FormBinding), the reducer pattern shared with containers, context variable injection, and the event handler exception where form handlers are awaited rather than fire-and-forget.
 
+```xml
+<!-- FormWithContextVar wraps Form, which wraps FormItems -->
+<!-- Each FormItem wires its input to the form's subject via bindTo -->
+<Form onSubmit="(data) => saveUser.execute(data)">
+  <FormItem bindTo="name" label="Full Name" required="true" />
+  <FormItem bindTo="email" label="Email" type="email" required="true" />
+  <FormItem
+    bindTo="role"
+    label="Role"
+    type="select"
+    validationMessage="Please choose a role">
+    <Option value="admin" label="Admin" />
+    <Option value="user" label="User" />
+  </FormItem>
+</Form>
+```
+
 <!-- DIAGRAM: Form architecture — FormWithContextVar → Form → FormContext → FormItem → Input + Validation -->
+
+```mermaid
+graph TD
+  subgraph FCV["FormWithContextVar — owns all form state"]
+    State["formReducer state<br>subject · validationResults<br>interactionFlags · submitInProgress"]
+    subgraph F["Form (FormNative) — &lt;form&gt; element"]
+      FC["FormContext.Provider<br>dispatch · enabled · labelWidth"]
+      Buttons["Save / Cancel / Reset"]
+      subgraph FI["FormItem — one per bindTo field"]
+        Input["Input component<br>bindTo-wired value"]
+        Val["Validation pipeline<br>required · pattern · custom · backend"]
+      end
+    end
+  end
+
+  State -->|"populates"| FC
+  FC -.->|"useFormContextPart: field value"| Input
+  FC -.->|"useFormContextPart: validation result"| Val
+  Input -.->|"dispatch FIELD_VALUE_CHANGED"| State
+  Val -.->|"dispatch FIELD_VALIDATED"| State
+  Buttons -.->|"doSubmit / reset / cancel"| State
+```
 
 ---
 

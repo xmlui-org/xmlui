@@ -16,6 +16,23 @@ The trace system writes to a circular buffer on `window._xsLogs`. Every signific
 
 <!-- DIAGRAM: Timeline of one interaction: user click (interaction) → handler:start → api:start → api:complete → state:changes → handler:complete, all linked by traceId -->
 
+```mermaid
+sequenceDiagram
+  actor User
+  participant Framework as XMLUI Framework
+  participant Log as window._xsLogs
+
+  User->>Framework: click button
+  Framework->>Log: {kind: 'interaction', traceId: 'abc123'}
+  Framework->>Log: {kind: 'handler:start', traceId: 'abc123'}
+  Framework->>Log: {kind: 'api:start', traceId: 'abc123', url: '/api/save'}
+  Note over Framework,Log: HTTP request in flight…
+  Framework->>Log: {kind: 'api:complete', traceId: 'abc123', status: 200}
+  Framework->>Log: {kind: 'state:changes', traceId: 'abc123', path: 'items'}
+  Framework->>Log: {kind: 'handler:complete', traceId: 'abc123'}
+  Note over Log: all 6 entries share traceId 'abc123'<br>Inspector displays them as one connected chain
+```
+
 The buffer is capped (default 200 entries). When it fills, old entries are trimmed, but entries of significant kinds — interactions, API calls, navigations, and modal events — are never discarded. The most important events are always present even in a long-running session.
 
 ### Enabling Tracing

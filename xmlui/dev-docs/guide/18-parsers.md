@@ -130,6 +130,29 @@ When a component has `<script src="helpers.js">`, the framework loads that file 
 
 <!-- DIAGRAM: Module loading flow: resolve path → check cache → fetch content → parse → validate → recursively load imports → cache result -->
 
+```mermaid
+graph TD
+  Start(["loadModule(path)"])
+  Resolve["path resolution<br>ModuleResolver<br>relative → absolute URL"]
+  Cache{"AST in<br>ModuleCache?"}
+  CacheHit(["return cached ScriptModule"])
+  Fetch["fetch content<br>browser fetch (standalone)<br>or file read (Vite)"]
+  Parse["parseScriptModule()<br>lexer + parser → Statement[] AST"]
+  Validate["ModuleValidator<br>only function declarations allowed<br>no top-level side effects"]
+  Circular{"circular<br>dependency?"}
+  CircErr(["error: circular import chain<br>full chain reported"])
+  Recurse["recursively load imports<br>(repeat for each import statement)"]
+  Store["cache ScriptModule<br>ModuleCache.store()"]
+  Result(["return ScriptModule"])
+
+  Start --> Resolve --> Cache
+  Cache -->|"hit"| CacheHit
+  Cache -->|"miss"| Fetch
+  Fetch --> Parse --> Validate --> Circular
+  Circular -->|"yes"| CircErr
+  Circular -->|"no"| Recurse --> Store --> Result
+```
+
 1. **Path resolution** — converts relative paths to absolute using `ModuleResolver`. Handles both URL-style paths (in standalone mode) and file-system paths (in Vite mode).
 2. **Cache check** — `ModuleCache` has two tiers: raw content and parsed AST. If the parsed AST is already cached, loading short-circuits here.
 3. **Fetch** — retrieves the file content via an injected fetcher function (browser `fetch` in standalone mode, file system read in Vite mode). The fetcher is injected rather than hardcoded so the same parser works in both environments.
@@ -230,6 +253,23 @@ The same parsers are bundled inside `xmlui-standalone.umd.js`. When the browser 
 In both modes, the **scripting parser is lazy for expressions**. An attribute value like `{count + 1}` is not compiled when the XML file is parsed; it is compiled the first time that attribute is evaluated. The compiled result is then cached.
 
 <!-- DIAGRAM: Timeline comparing Vite mode (parse at build → bundle → run) vs Standalone mode (fetch file → parse → run, all in browser) -->
+
+```mermaid
+graph TB
+  subgraph ViteMode["Vite mode (build time)"]
+    V1["vite-xmlui-plugin<br>invokes XML + scripting parsers<br>for every .xmlui file"]
+    V2["component definitions compiled<br>to JS modules<br>parsers NOT shipped in bundle"]
+    V3["browser loads optimized bundle<br>no XML parsing at runtime<br>expressions still parsed lazily"]
+    V1 --> V2 --> V3
+  end
+
+  subgraph StandaloneMode["Standalone mode (runtime)"]
+    S1["browser loads<br>xmlui-standalone.umd.js<br>(parsers included)"]
+    S2["fetch .xmlui files from server<br>XML parser runs in browser"]
+    S3["scripting parser runs lazily<br>on first expression evaluation<br>compiled AST cached for reuse"]
+    S1 --> S2 --> S3
+  end
+```
 
 ---
 

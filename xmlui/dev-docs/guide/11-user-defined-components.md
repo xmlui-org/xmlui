@@ -4,7 +4,42 @@ User-defined components (UDCs) let application developers create reusable compon
 
 Understanding UDCs matters for framework developers because the compound rendering path touches ComponentAdapter (behavior skip), CompoundComponent (the runtime bridge), the parser (definition extraction), and the slot transposition system. Changes to any of these areas must account for the UDC pipeline.
 
+```xml
+<!-- ContactCard.xmlui — definition: declares props, exposes a default Slot -->
+<Component name="ContactCard">
+  <Card>
+    <H3>{$props.name}</H3>
+    <Text>{$props.email}</Text>
+    <!-- Slot marks where the caller's children are inserted -->
+    <Slot />
+  </Card>
+</Component>
+
+<!-- Main.xmlui — usage: caller's children flow into the Slot -->
+<ContactCard name="Alice" email="alice@example.com">
+  <Badge label="Admin" />
+</ContactCard>
+```
+
 <!-- DIAGRAM: UDC lifecycle — .xmlui file → parse → register → CompoundComponent → Container → Slot transposition -->
+
+```mermaid
+graph TD
+  F[".xmlui file<br>&lt;Component name='ContactCard'&gt;..."]
+  P["XML Parser"]
+  Reg["Component Registry"]
+  CC["CompoundComponent renderer"]
+  Cont["Container"]
+  Slot["Slot transposition"]
+  DOM(["rendered output"])
+
+  F -->|"collectCompoundComponent()<br>extracts name, props, events, vars, slots"| P
+  P -->|"CompoundComponentDef stored<br>isCompoundComponent: true"| Reg
+  Reg -->|"resolves caller props<br>into inner ComponentDef vars"| CC
+  CC -->|"isolated state per instance<br>(implicit wrapping)"| Cont
+  Cont -->|"caller's children inserted<br>at &lt;Slot&gt; positions in template"| Slot
+  Slot --> DOM
+```
 
 ---
 

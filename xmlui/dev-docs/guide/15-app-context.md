@@ -39,6 +39,30 @@ From markup's perspective, AppContext functions are just "global functions you c
 
 <!-- DIAGRAM: Layered diagram showing AppContext (outer layer) wrapping all expression evaluation contexts in every component. State layers (parent state, vars, loaders, etc.) and AppContext are combined to form the complete expression scope. -->
 
+```mermaid
+graph LR
+  subgraph AppCtx["AppContext (available in every expression, every component)"]
+    direction LR
+    Nav["navigate(), goBack()"]
+    Toast["toast.success(), toast.error()"]
+    Confirm["confirm()"]
+    ActionsNode["Actions.callApi()<br>Actions.download(), Actions.upload()"]
+    Utils["formatDate(), avg(), sum()<br>getLocalStorage(), setLocalStorage()"]
+  end
+
+  subgraph ExprScope["Expression evaluation scope (per component instance)"]
+    direction LR
+    L6["Layer 6 — global vars"]
+    L5["Layer 5 — local vars (var.*)"]
+    L4["Layer 4 — context vars (\$item, \$routeParams)"]
+    L3["Layer 3 — component APIs"]
+    L2["Layer 2 — reducer state"]
+    L1["Layer 1 — parent state"]
+  end
+
+  AppCtx -->|"merged into scope at eval time"| ExprScope
+```
+
 ---
 
 ## How AppContext is Assembled

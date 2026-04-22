@@ -338,6 +338,17 @@ Before marking a component as complete, verify:
 
 <!-- DIAGRAM: Accessibility tree showing XMLUI component → ARIA role → screen reader announcement path -->
 
+```mermaid
+graph TD
+  XComp["XMLUI component<br>&lt;Button label='Save'/&gt;"]
+  Native["native React component<br>ButtonNative<br>renders semantic HTML"]
+  HTML["HTML element<br>&lt;button aria-label='Save'<br>aria-disabled='false'&gt;"]
+  ATree["browser accessibility tree<br>role: button<br>accessible name: 'Save'<br>state: enabled"]
+  SR["screen reader<br>announces: 'Save, button'"]
+
+  XComp --> Native --> HTML --> ATree --> SR
+```
+
 ---
 
 ## Key Takeaways

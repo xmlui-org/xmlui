@@ -33,6 +33,18 @@ Using `uses="[]"` (empty array) creates a full state boundary: no parent state f
 
 <!-- DIAGRAM: Two side-by-side trees. Left: implicit container inheriting all parent variables. Right: explicit container with uses=["count"] filtering parent state to only "count". -->
 
+```xml
+<App var.count=0, var.name='Alice'>
+  <Stack>
+    {count + ' ' + name}
+  </Stack>
+
+  <Stack uses="['count']">
+    {count}
+  </Stack>
+</App>
+```
+
 ```mermaid
 graph TB
   subgraph Left["Implicit — inherits ALL parent state"]
@@ -41,7 +53,6 @@ graph TB
     subgraph C1["Stack (implicit container)"]
       V1["sees count=0<br>sees name='Alice'"]
     end
-    P1 --> C1
   end
 
   subgraph Right["Explicit — uses=['count'] only"]
@@ -50,8 +61,10 @@ graph TB
     subgraph C2["Stack (uses=['count'])"]
       V2["sees count=0<br>name is blocked"]
     end
-    P2 -->|"filters to count"| C2
   end
+
+  P1 --> C1
+  P2 -->|"filters to count"| C2
 ```
 
 ## State Composition: The 6 Layers
@@ -137,6 +150,22 @@ The proxy wraps every object and array in the state tree:
 - **`deleteProperty` trap** — Fires a callback with an `"unset"` action.
 
 The no-op optimisation is important: if you write `count = count` (same value), no callback fires and no re-render occurs.
+
+```xml
+<App var.count="{0}" var.users="{[{name: 'Alice'}]}">
+  <!-- Scalar mutation: proxy compares 0 vs 1, fires callback -->
+  <Button onClick="count = count + 1" label="Increment" />
+
+  <!-- No-op: old and new value are identical, no callback fires, no re-render -->
+  <Button onClick="count = count" label="No-op (same value)" />
+
+  <!-- Nested mutation: proxy intercepts at path ["users", 0, "name"] -->
+  <Button onClick="users[0].name = 'Bob'" label="Rename" />
+
+  <Text>{count}</Text>
+  <Text>{users[0].name}</Text>
+</App>
+```
 
 <!-- DIAGRAM: Flow from user mutation → proxy set trap → callback → statePartChanged → dispatch → reducer → re-render -->
 

@@ -14,6 +14,30 @@ The XMLUI VS Code extension (`tools/vscode/`) launches a separate Node.js proces
 
 <!-- DIAGRAM: VS Code extension process ↔ (IPC) ↔ Language Server process; server uses: parser (shared with runtime), metadata from generated JSON, document store -->
 
+```mermaid
+graph TD
+  subgraph ExtProcess["VS Code Extension process"]
+    Ext["extension.ts<br>Language Client<br>(vscode-languageclient)"]
+  end
+
+  IPC["IPC / stdio<br>Language Server Protocol (LSP)"]
+
+  subgraph LSProcess["Language Server process (Node.js)"]
+    Server["server.ts + server-common.ts<br>capability registration + handler wiring"]
+    Project["Project<br>ProjectDocumentManager<br>MetadataProvider"]
+    Services["Services<br>completion, hover, diagnostic,<br>format, definition, folding"]
+    Parser["XML Parser<br>(shared with XMLUI runtime)"]
+    Meta["xmlui-metadata-generated.js<br>component metadata JSON"]
+    Server --> Project
+    Server --> Services
+    Project --> Parser
+    Project --> Meta
+  end
+
+  Ext <-->|"LSP messages"| IPC
+  IPC <-->|"LSP messages"| Server
+```
+
 The language server reuses the XMLUI XML parser directly. This means the same parser that runs in the browser also runs in the IDE, guaranteeing that errors shown in VS Code match errors that would occur at runtime.
 
 ---
@@ -103,6 +127,23 @@ This caching is what keeps completions and hover fast. The parser is invoked at 
 Completions fire when the user types `<` or `/`, or when they are explicitly requested inside an element.
 
 <!-- DIAGRAM: Completion scopes: "<" → component names list; "<Component " → attribute list; inside attr key → attribute list; "</" → closing tag name -->
+
+```mermaid
+graph TD
+  Trigger(["user types in .xmlui file"])
+  Q1{"what did the user type?"}
+  CNames["all component names<br>from metadata registry<br>e.g. Button, Stack, Text"]
+  CloseTag["matching closing tag name only<br>e.g. &lt;/Button&gt;"]
+  AttrList["attribute list for component<br>props → events → APIs → layout props<br>(alphabetical within each group)"]
+  Resolve["completionItem/resolve request<br>lazy: generate full markdown docs<br>for the selected item"]
+
+  Trigger --> Q1
+  Q1 -->|"after '&lt;'"| CNames
+  Q1 -->|"after '&lt;/'"| CloseTag
+  Q1 -->|"after tag name<br>or inside attr key"| AttrList
+  CNames -.->|"user selects item"| Resolve
+  AttrList -.->|"user selects item"| Resolve
+```
 
 | What the user types | What is offered |
 |---------------------|-----------------|

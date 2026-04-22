@@ -6,6 +6,30 @@ This document explains how the behavior system works internally, covers all eigh
 
 <!-- DIAGRAM: renderer() → renderedNode → [label? → wrap] → [animation? → wrap] → [tooltip? → wrap] → [variant? → wrap] → [bookmark? → wrap] → [formBinding? → wrap] → [validation? → wrap] → [displayWhen? → wrap] → final DOM node -->
 
+```mermaid
+graph TD
+  R["renderer(context) → ReactNode"]
+  B1["label"]
+  B2["animation"]
+  B3["tooltip"]
+  B4["variant"]
+  B5["bookmark"]
+  B6["formBinding"]
+  B7["validation"]
+  B8["displayWhen"]
+  DOM(["final DOM node"])
+
+  R --> B1
+  B1 -->|"label prop? → wrap with Label element (innermost)"| B2
+  B2 -->|"animation prop? → wrap with CSS animation"| B3
+  B3 -->|"tooltip prop? → wrap with Tooltip overlay"| B4
+  B4 -->|"variant prop? → add CSS variant class"| B5
+  B5 -->|"bookmark prop? → URL hash management"| B6
+  B6 -->|"bindTo + value/setValue API? → wire two-way form value"| B7
+  B7 -->|"validationState / required / pattern? → wrap with validation state"| B8
+  B8 -->|"displayWhen prop? → wrap with display:none div (outermost)"| DOM
+```
+
 ---
 
 ## What Is a Behavior?

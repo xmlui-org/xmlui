@@ -24,6 +24,25 @@ The choice of router depends on configuration and environment:
 
 <!-- DIAGRAM: Decision tree for router selection: previewMode → MemoryRouter; SSR (no window) → MemoryRouter; useHashBasedRouting=true (default) → HashRouter; useHashBasedRouting=false → BrowserRouter -->
 
+```mermaid
+graph TD
+  Start(["AppWrapper initialises router"])
+  Q1{"previewMode or<br>embed mode?"}
+  Q2{"SSR environment<br>(no window)?"}
+  Q3{"useHashBasedRouting<br>= false?"}
+  MR["MemoryRouter<br>no URL changes<br>in-memory only"]
+  HR["HashRouter (default)<br>https://app.com/#/path<br>works without server config"]
+  BR["BrowserRouter<br>https://app.com/path<br>requires server catch-all"]
+
+  Start --> Q1
+  Q1 -->|"yes"| MR
+  Q1 -->|"no"| Q2
+  Q2 -->|"yes"| MR
+  Q2 -->|"no"| Q3
+  Q3 -->|"yes"| BR
+  Q3 -->|"no"| HR
+```
+
 | Condition | Router | URL Style |
 |---|---|---|
 | Preview/embed mode | `MemoryRouter` | No URL changes |

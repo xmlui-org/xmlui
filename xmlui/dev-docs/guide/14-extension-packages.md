@@ -47,6 +47,24 @@ The `ComponentProvider` in the framework core maintains three **namespace pools*
 
 <!-- DIAGRAM: Three pools labeled #xmlui-core-ns (built-in framework components), #app-ns (app-specific components), XMLUIExtensions (extension packages). Lookup order arrows show: unnamespaced component lookup tries core → app → extensions. -->
 
+```mermaid
+graph TD
+  Lookup(["renderer encounters &lt;Animation&gt;"])
+  Core["#xmlui-core-ns<br>all built-in components<br>(highest priority)"]
+  App["#app-ns<br>app-specific components"]
+  Ext["XMLUIExtensions<br>extension package components<br>(lowest priority)"]
+  Found(["renderer function returned"])
+  NotFound(["unknown component error"])
+
+  Lookup -->|"1. check core"| Core
+  Core -->|"found"| Found
+  Core -->|"not found"| App
+  App -->|"found"| Found
+  App -->|"not found"| Ext
+  Ext -->|"found"| Found
+  Ext -->|"not found"| NotFound
+```
+
 | Pool | Internal Name | Contents |
 |---|---|---|
 | Core | `#xmlui-core-ns` | All built-in XMLUI components |
@@ -224,6 +242,31 @@ order-independent — the framework can subscribe after extensions have loaded a
 everything correctly.
 
 <!-- DIAGRAM: Sequence diagram showing: 1) UMD script loads → calls registerExtension() → stored in array, 2) Runtime loads → ComponentProvider subscribes → fires callback for each stored extension → components registered -->
+
+```mermaid
+sequenceDiagram
+  participant UMD as UMD script<br>(extension bundle)
+  participant Registry as window.XMLUIExtensions<br>(global registry)
+  participant CP as ComponentProvider
+  participant Pool as Extension pool
+
+  UMD->>Registry: registerExtension(extensionObj)
+  Note over Registry: stored — framework may not be loaded yet
+
+  CP->>Registry: subscribeToRegistrations(callback)
+  Note over Registry: fires callback immediately for all already-stored extensions
+  Registry-->>CP: callback(ext1), callback(ext2), ...
+
+  loop each stored extension
+    CP->>Pool: register components
+    CP->>Pool: merge themeVars + defaultThemeVars
+  end
+
+  Note over UMD,Pool: extensions registered AFTER subscribe also fire immediately
+  UMD->>Registry: registerExtension(lateExtension)
+  Registry-->>CP: callback(lateExtension)
+  CP->>Pool: register components
+```
 
 ---
 

@@ -1,8 +1,38 @@
 # Expression Evaluation & Scripting
 
-XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XML attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
+XMLUI uses its own scripting engine — a restricted JavaScript subset with custom semantics. Understanding where it differs from JavaScript is essential for writing correct markup and debugging unexpected behavior. This document covers the full pipeline from XMLUI attribute parsing through evaluation, and catalogs every semantic difference from standard JavaScript.
 
-<!-- DIAGRAM: Pipeline overview — XML attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
+<!-- DIAGRAM: Pipeline overview — XMLUI attribute → AttributeValueParser → Parser → AST → eval-tree-sync/async → result -->
+
+```mermaid
+graph TD
+  Attr["XMLUI attribute value<br>e.g. 'Hello {name}, you have {count} items'"]
+  AVP["AttributeValueParser<br>split into literal + expression segments"]
+
+  subgraph Segments["Segments"]
+    Lit["literal segment<br>'Hello ', ', you have ', ' items'"]
+    Expr["expression segment<br>{name}, {count}"]
+  end
+
+  Parser["Parser (scripting/Parser.ts)<br>parse expression text → AST"]
+
+  subgraph EvalFork["Evaluation track"]
+    Sync["Sync evaluator<br>eval-tree-sync.ts<br>attribute bindings {expr}"]
+    Async["Async evaluator<br>eval-tree-async.ts<br>event handlers onClick=\"…\""]
+  end
+
+  Result["result value<br>typed (string / number / bool / object)"]
+
+  Attr --> AVP
+  AVP --> Lit
+  AVP --> Expr
+  Expr --> Parser
+  Parser --> Sync
+  Parser --> Async
+  Sync -->|"synchronous"| Result
+  Async -->|"Promise-aware"| Result
+  Lit -.->|"string-concat with expr result"| Result
+```
 
 ---
 
@@ -279,6 +309,24 @@ When XMLUI encounters an identifier like `count` or `user`, it searches through 
 6. **globalThis** — browser globals (`Math`, `JSON`, `console`, `window`, etc.)
 
 <!-- DIAGRAM: Scope resolution ladder — block → closure → parent thread → localContext → appContext → globalThis -->
+
+```mermaid
+graph BT
+  GT["6. globalThis<br>Math, JSON, console, window, …"]
+  AC["5. appContext<br>navigate(), toast(), confirm()<br>Actions.*, formatDate(), …"]
+  LC["4. localContext<br>reactive container state<br>var.* variables, $item, $routeParams, …"]
+  PT["3. parent thread scopes<br>repeat steps 1–2 up the call chain"]
+  CL["2. closure scopes<br>captured vars from enclosing arrow fns"]
+  BL["1. block scopes (innermost first)<br>let / const in current + enclosing blocks"]
+  Resolved(["identifier resolved"])
+
+  GT -->|"fallback if not found above"| AC
+  AC -->|"fallback"| LC
+  LC -->|"fallback"| PT
+  PT -->|"fallback"| CL
+  CL -->|"fallback"| BL
+  BL --> Resolved
+```
 
 ---
 
