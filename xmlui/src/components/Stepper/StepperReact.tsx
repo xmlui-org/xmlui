@@ -28,7 +28,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   id?: string;
   activeStep?: number;
   orientation?: StepperOrientation;
-  alternativeLabel?: boolean;
+  stackedLabel?: boolean;
   nonLinear?: boolean;
   classes?: Record<string, string>;
   registerComponentApi?: RegisterComponentApiFn;
@@ -40,7 +40,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
 export const defaultProps = {
   activeStep: 0,
   orientation: "horizontal" as StepperOrientation,
-  alternativeLabel: false,
+  stackedLabel: false,
   nonLinear: false,
 };
 
@@ -49,7 +49,7 @@ export const Stepper = memo(
     {
       activeStep = defaultProps.activeStep,
       orientation = defaultProps.orientation,
-      alternativeLabel = defaultProps.alternativeLabel,
+      stackedLabel = defaultProps.stackedLabel,
       nonLinear = defaultProps.nonLinear,
       id,
       className,
@@ -97,7 +97,7 @@ export const Stepper = memo(
 
     const { stepItems, contextValue } = useStepperContextValue(
       orientation,
-      alternativeLabel,
+      stackedLabel,
       nonLinear,
       "",
       activeIndex,
@@ -229,7 +229,7 @@ export const Stepper = memo(
     const rootClassName = classnames(
       styles.stepper,
       orientation === "horizontal" ? styles.horizontal : styles.vertical,
-      { [styles.alternativeLabel]: alternativeLabel && orientation === "horizontal" },
+      { [styles.stackedLabel]: stackedLabel },
       classes?.[COMPONENT_PART_KEY],
       className,
     );

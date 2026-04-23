@@ -24,7 +24,7 @@ interface IStepperContext {
   activeStepId: string;
   activeIndex: number;
   orientation: StepperOrientation;
-  alternativeLabel: boolean;
+  stackedLabel: boolean;
   nonLinear: boolean;
   onStepClick: (innerId: string) => void;
 }
@@ -36,14 +36,14 @@ export const StepperContext = createContext<IStepperContext>({
   activeStepId: "",
   activeIndex: 0,
   orientation: "horizontal",
-  alternativeLabel: false,
+  stackedLabel: false,
   nonLinear: false,
   onStepClick: () => {},
 });
 
 export function useStepperContextValue(
   orientation: StepperOrientation,
-  alternativeLabel: boolean,
+  stackedLabel: boolean,
   nonLinear: boolean,
   activeStepId: string,
   activeIndex: number,
@@ -84,7 +84,7 @@ export function useStepperContextValue(
       activeStepId,
       activeIndex,
       orientation,
-      alternativeLabel,
+      stackedLabel,
       nonLinear,
       onStepClick,
     }),
@@ -95,7 +95,7 @@ export function useStepperContextValue(
       activeStepId,
       activeIndex,
       orientation,
-      alternativeLabel,
+      stackedLabel,
       nonLinear,
       onStepClick,
     ],

@@ -35,12 +35,12 @@ export const StepperMd = createMetadata({
       availableValues: ["horizontal", "vertical"],
       defaultValue: defaultProps.orientation,
     },
-    alternativeLabel: {
+    stackedLabel: {
       description:
-        "When `true` (horizontal orientation only), step labels are placed below the " +
-        "step icons instead of next to them.",
+        "When `true`, step labels are placed below the step icons instead of next to them. " +
+        "Works in both horizontal and vertical orientations.",
       valueType: "boolean",
-      defaultValue: defaultProps.alternativeLabel,
+      defaultValue: defaultProps.stackedLabel,
     },
     nonLinear: {
       description:

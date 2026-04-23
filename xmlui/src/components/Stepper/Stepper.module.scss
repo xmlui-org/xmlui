@@ -115,7 +115,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     border-radius: 4px;
   }
 
-  .alternativeLabel .headerItemInner {
+  .stackedLabel .headerItemInner {
     flex-direction: column;
     align-items: center;
     gap: 6px;
@@ -162,7 +162,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     line-height: 1.2;
   }
 
-  .alternativeLabel .labelBlock {
+  .stackedLabel .labelBlock {
     align-items: center;
   }
 
@@ -205,7 +205,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     border-top-color: $borderColor-connector-Stepper--completed;
   }
 
-  .alternativeLabel .connector {
+  .stackedLabel .connector {
     margin-top: calc($size-icon-Stepper / 2);
   }
 
@@ -249,6 +249,16 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     color: inherit;
     text-align: left;
     align-self: flex-start;
+  }
+
+  .vertical.stackedLabel .verticalHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .vertical.stackedLabel .labelBlock {
+    align-items: flex-start;
   }
 
   .vertical .verticalHeader.clickable {
