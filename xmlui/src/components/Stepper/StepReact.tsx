@@ -4,7 +4,11 @@ import classnames from "classnames";
 
 import styles from "./Stepper.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
-import { useStepperContext } from "./StepperContext";
+import {
+  useStepperSettings,
+  useStepperState,
+} from "./StepperContext";
+import { panelIdFor, tabIdFor } from "./StepperReact";
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   label?: string;
@@ -31,15 +35,13 @@ export const Step = memo(
     forwardedRef: ForwardedRef<HTMLDivElement>,
   ) {
     const innerId = useId();
-    const {
-      register,
-      unRegister,
-      getStepItems,
-      activeStepId,
-      orientation,
-      nonLinear,
-      onStepClick,
-    } = useStepperContext();
+    // Registration + static config: depends only on the settings slice of the
+    // stepper context, which is stable across step transitions.
+    const { register, unRegister, getStepItems, orientation, nonLinear, onStepClick, stepperInstanceId } =
+      useStepperSettings();
+    // Active-step state lives in a separate context so re-renders triggered
+    // by navigation do not invalidate the registration effect above.
+    const { activeStepId } = useStepperState();
 
     useEffect(() => {
       register({
@@ -57,6 +59,8 @@ export const Step = memo(
     }, [innerId, unRegister]);
 
     const isActive = activeStepId === innerId;
+    const tabId = stepperInstanceId ? tabIdFor(stepperInstanceId, innerId) : undefined;
+    const panelId = stepperInstanceId ? panelIdFor(stepperInstanceId, innerId) : undefined;
 
     useEffect(() => {
       if (isActive && activated) {
@@ -65,6 +69,9 @@ export const Step = memo(
     }, [isActive, activated]);
 
     // Horizontal mode: only the active step renders its content below the header strip.
+    // The Stepper wrapper already provides the `role="tabpanel"` semantics and
+    // dynamic `aria-labelledby`, so we do NOT add another tabpanel role here
+    // (nested tabpanels are invalid ARIA and confuse assistive tech).
     if (orientation === "horizontal") {
       if (!isActive) return null;
       return (
@@ -73,7 +80,6 @@ export const Step = memo(
           ref={forwardedRef}
           className={classnames(styles.horizontalContent, classes?.[COMPONENT_PART_KEY], className)}
           style={style}
-          role="tabpanel"
         >
           {children}
         </div>
@@ -119,23 +125,31 @@ export const Step = memo(
         className={classnames(styles.verticalItem, classes?.[COMPONENT_PART_KEY], className)}
         style={style}
       >
-        {nonLinear ? (
-          <button
-            type="button"
-            className={classnames(styles.verticalHeader, styles.clickable)}
-            aria-current={isActive ? "step" : undefined}
-            onClick={() => onStepClick(innerId)}
-          >
-            {iconEl}
-            {labelEl}
-          </button>
-        ) : (
-          <div className={styles.verticalHeader} aria-current={isActive ? "step" : undefined}>
-            {iconEl}
-            {labelEl}
-          </div>
-        )}
-        <div className={classnames(styles.verticalBody, { [styles.last]: isLast })}>
+        <button
+          type="button"
+          id={tabId}
+          role="tab"
+          aria-selected={isActive}
+          aria-controls={panelId}
+          aria-current={isActive ? "step" : undefined}
+          aria-disabled={!nonLinear && !isActive ? true : undefined}
+          tabIndex={isActive ? 0 : -1}
+          className={classnames(styles.verticalHeader, {
+            [styles.clickable]: nonLinear,
+          })}
+          disabled={!nonLinear && !isActive}
+          onClick={nonLinear ? () => onStepClick(innerId) : undefined}
+        >
+          {iconEl}
+          {labelEl}
+        </button>
+        <div
+          className={classnames(styles.verticalBody, { [styles.last]: isLast })}
+          role="tabpanel"
+          id={panelId}
+          aria-labelledby={tabId}
+          hidden={!isActive || undefined}
+        >
           {isActive && children && <div className={styles.verticalContent}>{children}</div>}
         </div>
       </div>

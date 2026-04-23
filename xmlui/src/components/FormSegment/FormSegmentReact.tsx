@@ -8,7 +8,8 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { SingleValidationResult } from "../Form/FormContext";
 import { useFormContextPart } from "../Form/FormContext";
-import { useStepperContext } from "../Stepper/StepperContext";
+import { useStepperSettings, useStepperState } from "../Stepper/StepperContext";
+import { panelIdFor, tabIdFor } from "../Stepper/StepperReact";
 
 // Properties that should be transposed from FormSegment to its internal stack container.
 const LAYOUT_PROPERTIES = [
@@ -197,27 +198,34 @@ export const FormSegmentNative = memo(
     // acts as a step: it registers itself so the Stepper can render the header
     // strip, and it renders its body only when active (horizontal) or alongside
     // its own per-step header (vertical).
-    const stepperCtx = useStepperContext();
+    //
+    // The two hooks are deliberately split: `useStepperSettings()` returns a
+    // slice that stays referentially stable across step transitions so the
+    // registration effect below does NOT re-run (and therefore cannot cause
+    // stepItems to be re-appended at the end of the list). `useStepperState()`
+    // exposes the mutable active-step slice that drives rendering.
+    const stepperSettings = useStepperSettings();
+    const stepperState = useStepperState();
     const innerId = useId();
     const label = extractValue.asOptionalString(node.props?.label);
     const description = extractValue.asOptionalString(node.props?.description);
     const icon = extractValue.asOptionalString(node.props?.icon);
 
     useEffect(() => {
-      if (!stepperCtx.inStepper) return;
-      stepperCtx.register({ innerId, label, description, icon });
-      return () => stepperCtx.unRegister(innerId);
+      if (!stepperSettings.inStepper) return;
+      stepperSettings.register({ innerId, label, description, icon });
+      return () => stepperSettings.unRegister(innerId);
     }, [
-      stepperCtx.inStepper,
-      stepperCtx.register,
-      stepperCtx.unRegister,
+      stepperSettings.inStepper,
+      stepperSettings.register,
+      stepperSettings.unRegister,
       innerId,
       label,
       description,
       icon,
     ]);
 
-    const isActive = stepperCtx.activeStepId === innerId;
+    const isActive = stepperState.activeStepId === innerId;
 
     // Build the Fragment node that injects the segment-scoped vars into the children subtree.
     const nodeWithVars = useMemo(
@@ -244,13 +252,22 @@ export const FormSegmentNative = memo(
     );
 
     // Not in a stepper — render the normal segment layout.
-    if (!stepperCtx.inStepper) {
+    if (!stepperSettings.inStepper) {
       return <>{renderChild(stackNode)}</>;
     }
 
+    const tabId = stepperSettings.stepperInstanceId
+      ? tabIdFor(stepperSettings.stepperInstanceId, innerId)
+      : undefined;
+    const panelId = stepperSettings.stepperInstanceId
+      ? panelIdFor(stepperSettings.stepperInstanceId, innerId)
+      : undefined;
+
     // --- Horizontal stepper mode: only the active segment renders its body. The
-    // step header itself is drawn by the Stepper based on the registered item.
-    if (stepperCtx.orientation === "horizontal") {
+    // Stepper wrapper already provides the `role="tabpanel"` semantics and
+    // dynamic `aria-labelledby`, so we just render the stack contents here
+    // (nested tabpanels would be invalid ARIA).
+    if (stepperSettings.orientation === "horizontal") {
       if (!isActive) return null;
       return <>{renderChild(stackNode)}</>;
     }
@@ -265,7 +282,9 @@ export const FormSegmentNative = memo(
         description={description}
         icon={icon}
         isActive={isActive}
-        stepperCtx={stepperCtx}
+        stepperSettings={stepperSettings}
+        tabId={tabId}
+        panelId={panelId}
       >
         {renderChild(stackNode)}
       </VerticalSegmentFrame>
@@ -284,7 +303,9 @@ function VerticalSegmentFrame({
   description,
   icon,
   isActive,
-  stepperCtx,
+  stepperSettings,
+  tabId,
+  panelId,
   children,
 }: {
   innerId: string;
@@ -292,11 +313,13 @@ function VerticalSegmentFrame({
   description?: string;
   icon?: string;
   isActive: boolean;
-  stepperCtx: ReturnType<typeof useStepperContext>;
+  stepperSettings: ReturnType<typeof useStepperSettings>;
+  tabId?: string;
+  panelId?: string;
   children: ReactNode;
 }) {
-  const items = stepperCtx.getStepItems();
-  const index = items.findIndex((s) => s.innerId === innerId);
+  const items = stepperSettings.getStepItems();
+  const index = items.findIndex((s: { innerId: string }) => s.innerId === innerId);
   const isLast = index === items.length - 1;
 
   // --- Accordion-style open/close -----------------------------------------
@@ -402,27 +425,32 @@ function VerticalSegmentFrame({
 
   return (
     <div className={stepperStyles.verticalItem}>
-      {stepperCtx.nonLinear ? (
-        <button
-          type="button"
-          className={classnames(stepperStyles.verticalHeader, stepperStyles.clickable)}
-          aria-current={isActive ? "step" : undefined}
-          onClick={() => stepperCtx.onStepClick(innerId)}
-        >
-          {headerContent}
-        </button>
-      ) : (
-        <div
-          className={stepperStyles.verticalHeader}
-          aria-current={isActive ? "step" : undefined}
-        >
-          {headerContent}
-        </div>
-      )}
+      <button
+        type="button"
+        id={tabId}
+        role="tab"
+        aria-selected={isActive}
+        aria-controls={panelId}
+        aria-current={isActive ? "step" : undefined}
+        aria-disabled={!stepperSettings.nonLinear && !isActive ? true : undefined}
+        tabIndex={isActive ? 0 : -1}
+        className={classnames(stepperStyles.verticalHeader, {
+          [stepperStyles.clickable]: stepperSettings.nonLinear,
+        })}
+        disabled={!stepperSettings.nonLinear && !isActive}
+        onClick={
+          stepperSettings.nonLinear ? () => stepperSettings.onStepClick(innerId) : undefined
+        }
+      >
+        {headerContent}
+      </button>
       <div
         className={classnames(stepperStyles.verticalBody, {
           [stepperStyles.last]: isLast,
         })}
+        role="tabpanel"
+        id={panelId}
+        aria-labelledby={tabId}
         style={{ height }}
       >
         {shouldRender && (

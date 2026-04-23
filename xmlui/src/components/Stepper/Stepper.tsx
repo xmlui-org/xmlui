@@ -49,6 +49,13 @@ export const StepperMd = createMetadata({
       valueType: "boolean",
       defaultValue: defaultProps.nonLinear,
     },
+    ariaLabel: {
+      description:
+        "Accessible name announced by screen readers on the step tab list. Localise " +
+        "this when the surrounding UI is not in English.",
+      valueType: "string",
+      defaultValue: defaultProps.ariaLabel,
+    },
   },
   events: {
     didChange: dDidChange(COMP),
@@ -73,6 +80,41 @@ export const StepperMd = createMetadata({
       signature: "setActiveStep(index: number): void",
     },
   },
+  parts: {
+    header: {
+      description:
+        "The container wrapping every step header (the `role=\"tablist\"` strip in " +
+        "horizontal mode).",
+    },
+    step: {
+      description:
+        "A single step header cell. Applied once per step — to the active and " +
+        "inactive entries alike.",
+    },
+    icon: {
+      description:
+        "The circular indicator inside a step header (step number, icon, or " +
+        "completed/error glyph).",
+    },
+    label: {
+      description: "The primary step label text.",
+    },
+    description: {
+      description:
+        "The secondary description / optional-label text shown under a step label.",
+    },
+    connector: {
+      description:
+        "The line drawn between two consecutive steps (horizontal top border or " +
+        "vertical left border, depending on orientation).",
+    },
+    content: {
+      description:
+        "The step content area. In horizontal mode this is the shared region under " +
+        "the header strip; in vertical mode it is the per-step body.",
+    },
+  },
+  defaultPart: "content",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`backgroundColor-${COMP}`]: "transparent",

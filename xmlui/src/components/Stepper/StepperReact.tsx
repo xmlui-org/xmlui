@@ -1,4 +1,4 @@
-import type { ForwardedRef, ReactNode } from "react";
+import type { ForwardedRef, ReactNode, KeyboardEvent } from "react";
 import React, {
   forwardRef,
   memo,
@@ -18,11 +18,30 @@ import { useEvent } from "../../components-core/utils/misc";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import {
-  StepperContext,
+  StepperSettingsContext,
+  StepperStateContext,
   useStepperContextValue,
   type StepItem,
   type StepperOrientation,
 } from "./StepperContext";
+
+// CSS part keys – must match `parts` declared in Stepper metadata. Kept as
+// module-local constants so the classnames and any theming consumer share a
+// single source of truth.
+export const PART_HEADER = "header";
+export const PART_STEP = "step";
+export const PART_ICON = "icon";
+export const PART_LABEL = "label";
+export const PART_DESCRIPTION = "description";
+export const PART_CONNECTOR = "connector";
+export const PART_CONTENT = "content";
+
+// Helper: build a `tab` DOM id from the stepper instance + inner step id.
+export const tabIdFor = (stepperId: string, innerId: string) =>
+  `${stepperId}-tab-${innerId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+// Helper: build a `tabpanel` DOM id from the stepper instance + inner step id.
+export const panelIdFor = (stepperId: string, innerId: string) =>
+  `${stepperId}-panel-${innerId.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
 
 type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   id?: string;
@@ -30,6 +49,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   orientation?: StepperOrientation;
   stackedLabel?: boolean;
   nonLinear?: boolean;
+  ariaLabel?: string;
   classes?: Record<string, string>;
   registerComponentApi?: RegisterComponentApiFn;
   updateState?: UpdateStateFn;
@@ -42,6 +62,7 @@ export const defaultProps = {
   orientation: "horizontal" as StepperOrientation,
   stackedLabel: false,
   nonLinear: false,
+  ariaLabel: "Stepper",
 };
 
 export const Stepper = memo(
@@ -51,6 +72,7 @@ export const Stepper = memo(
       orientation = defaultProps.orientation,
       stackedLabel = defaultProps.stackedLabel,
       nonLinear = defaultProps.nonLinear,
+      ariaLabel = defaultProps.ariaLabel,
       id,
       className,
       classes,
@@ -79,8 +101,8 @@ export const Stepper = memo(
     // Horizontal-mode sequential cross-fade: on step change we first fade out
     // the currently displayed step, then swap the content, then fade in the
     // new step. `displayedIndex` is what the body actually renders, while
-    // `activeIndex` (above) is what the header highlights and what external
-    // consumers see. Header highlight flips immediately; body eases over.
+    // `activeIndex` is what the header highlights. Header highlight flips
+    // immediately; the body eases over.
     const [displayedIndex, setDisplayedIndex] = useState<number>(activeIndex);
     const [bodyVisible, setBodyVisible] = useState<boolean>(true);
 
@@ -107,9 +129,15 @@ export const Stepper = memo(
       return () => clearTimeout(swapTimer);
     }, [activeIndex, displayedIndex, orientation, bodyVisible]);
 
+    // `updateState` is normally referentially stable (from `wrapComponent`).
+    // We still guard against a churning identity by keeping the *latest*
+    // reference in a ref and firing the publish effect only when the index
+    // itself changes.
+    const updateStateRef = useRef(updateState);
+    updateStateRef.current = updateState;
     useEffect(() => {
-      updateState?.({ activeStep: activeIndex });
-    }, [activeIndex, updateState]);
+      updateStateRef.current?.({ activeStep: activeIndex });
+    }, [activeIndex]);
 
     const stepItemsRef = useRef<StepItem[]>([]);
 
@@ -126,13 +154,14 @@ export const Stepper = memo(
       });
     });
 
-    const { stepItems, contextValue } = useStepperContextValue(
+    const { stepItems, settingsValue, stateValue } = useStepperContextValue(
       orientation,
       stackedLabel,
       nonLinear,
       "",
       activeIndex,
       handleStepClick,
+      stepperId,
     );
     stepItemsRef.current = stepItems;
 
@@ -147,9 +176,9 @@ export const Stepper = memo(
       return stepItems[indexForBody]?.innerId ?? "";
     }, [stepItems, indexForBody]);
 
-    const contextWithActiveId = useMemo(
-      () => ({ ...contextValue, activeStepId }),
-      [contextValue, activeStepId],
+    const stateValueWithActiveId = useMemo(
+      () => ({ ...stateValue, activeStepId }),
+      [stateValue, activeStepId],
     );
 
     // Imperative APIs
@@ -209,10 +238,46 @@ export const Stepper = memo(
       });
     }, [registerComponentApi, next, prev, reset, setActiveStep]);
 
+    // --- Keyboard navigation (roving tabindex) ------------------------------
+    // ArrowLeft/ArrowRight move among horizontal tabs; ArrowUp/ArrowDown move
+    // among vertical tab headers; Home/End jump to first/last. Disabled tabs
+    // (linear mode, non-active) are skipped.
+    const handleHeaderKeyDown = useCallback(
+      (e: KeyboardEvent<HTMLDivElement>) => {
+        const items = stepItemsRef.current;
+        if (items.length === 0) return;
+        const isHorizontalNav =
+          e.key === "ArrowLeft" || e.key === "ArrowRight";
+        const isVerticalNav = e.key === "ArrowUp" || e.key === "ArrowDown";
+        const isHomeEnd = e.key === "Home" || e.key === "End";
+        if (!isHorizontalNav && !isVerticalNav && !isHomeEnd) return;
+        // Only interpret arrow keys matching the current orientation.
+        if (isHorizontalNav && orientation !== "horizontal") return;
+        if (isVerticalNav && orientation !== "vertical") return;
+        e.preventDefault();
+        let nextIdx = activeIndex;
+        if (e.key === "Home") nextIdx = 0;
+        else if (e.key === "End") nextIdx = items.length - 1;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+          nextIdx = Math.max(0, activeIndex - 1);
+        else if (e.key === "ArrowRight" || e.key === "ArrowDown")
+          nextIdx = Math.min(items.length - 1, activeIndex + 1);
+        if (nextIdx === activeIndex) return;
+        // Respect linear mode: only nonLinear steppers accept arbitrary jumps
+        // from the keyboard. In linear mode, arrows are inert (use next/prev
+        // programmatic APIs to step through).
+        if (!nonLinear) return;
+        setActiveIndex(nextIdx);
+        const item = items[nextIdx];
+        onDidChange?.(nextIdx, item?.id ?? item?.innerId ?? "");
+      },
+      [orientation, activeIndex, nonLinear, onDidChange],
+    );
+
     // --- Rendering helpers (horizontal mode)
     const renderIcon = useCallback(
       (
-        item: { completed?: boolean; error?: boolean },
+        item: StepItem,
         index: number,
         isActive: boolean,
       ) => {
@@ -220,18 +285,18 @@ export const Stepper = memo(
         const error = !!item.error;
         return (
           <span
-            className={classnames(styles.iconCircle, {
+            className={classnames(styles.iconCircle, classes?.[PART_ICON], {
               [styles.active]: isActive && !completed && !error,
               [styles.completed]: completed && !error,
               [styles.error]: error,
             })}
             aria-hidden="true"
           >
-            {error ? "!" : completed ? "✓" : index + 1}
+            {error ? "!" : completed ? "✓" : item.icon ? item.icon : index + 1}
           </span>
         );
       },
-      [],
+      [classes],
     );
 
     const renderLabelBlock = useCallback(
@@ -244,7 +309,7 @@ export const Stepper = memo(
           <span className={styles.labelBlock}>
             {hasLabel && (
               <span
-                className={classnames(styles.label, {
+                className={classnames(styles.label, classes?.[PART_LABEL], {
                   [styles.active]: isActive,
                   [styles.completed]: !!item.completed && !item.error,
                   [styles.error]: !!item.error,
@@ -253,14 +318,24 @@ export const Stepper = memo(
                 {item.label}
               </span>
             )}
-            {hasDescription && <span className={styles.description}>{item.description}</span>}
+            {hasDescription && (
+              <span
+                className={classnames(styles.description, classes?.[PART_DESCRIPTION])}
+              >
+                {item.description}
+              </span>
+            )}
             {showOptional && !hasDescription && (
-              <span className={styles.description}>{item.optionalLabel || "Optional"}</span>
+              <span
+                className={classnames(styles.description, classes?.[PART_DESCRIPTION])}
+              >
+                {item.optionalLabel || "Optional"}
+              </span>
             )}
           </span>
         );
       },
-      [],
+      [classes],
     );
 
     const rootClassName = classnames(
@@ -274,85 +349,114 @@ export const Stepper = memo(
     // --- Horizontal rendering
     if (orientation === "horizontal") {
       return (
-        <StepperContext.Provider value={contextWithActiveId}>
+        <StepperSettingsContext.Provider value={settingsValue}>
+          <StepperStateContext.Provider value={stateValueWithActiveId}>
+            <div
+              {...rest}
+              id={stepperId}
+              ref={forwardedRef}
+              className={rootClassName}
+              style={style}
+            >
+              <div
+                className={classnames(styles.header, classes?.[PART_HEADER])}
+                role="tablist"
+                aria-label={ariaLabel}
+                aria-orientation="horizontal"
+                onKeyDown={handleHeaderKeyDown}
+              >
+                {stepItems.map((item, index) => {
+                  const isActive = index === activeIndex;
+                  const isLast = index === stepItems.length - 1;
+                  const tabId = tabIdFor(stepperId, item.innerId);
+                  const panelId = panelIdFor(stepperId, item.innerId);
+                  // Roving tabindex: only the active tab takes tab focus; the
+                  // rest are reachable via arrow keys.
+                  const tabIndex = isActive ? 0 : -1;
+                  // Linear mode headers are static (not keyboard-navigable as
+                  // tabs). We still render the `tab` role so screen readers
+                  // recognise the structure, but mark non-active ones
+                  // `aria-disabled="true"` and make them non-clickable.
+                  return (
+                    <React.Fragment key={item.innerId}>
+                      <div
+                        className={classnames(styles.headerItem, classes?.[PART_STEP])}
+                      >
+                        <button
+                          type="button"
+                          id={tabId}
+                          role="tab"
+                          aria-selected={isActive}
+                          aria-controls={panelId}
+                          aria-current={isActive ? "step" : undefined}
+                          aria-disabled={!nonLinear && !isActive ? true : undefined}
+                          tabIndex={tabIndex}
+                          className={classnames(styles.headerItemInner, {
+                            [styles.clickable]: nonLinear,
+                          })}
+                          disabled={!nonLinear && !isActive}
+                          onClick={
+                            nonLinear ? () => handleStepClick(item.innerId) : undefined
+                          }
+                        >
+                          {renderIcon(item, index, isActive)}
+                          {renderLabelBlock(item, isActive)}
+                        </button>
+                      </div>
+                      {!isLast && (
+                        <div
+                          className={classnames(styles.connector, classes?.[PART_CONNECTOR], {
+                            [styles.completed]: !!item.completed,
+                          })}
+                          aria-hidden="true"
+                        />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+              </div>
+              {/* Active Step/FormSegment renders its children inside; the
+                  wrapper below supplies the tabpanel semantics. */}
+              <div
+                className={classnames(
+                  styles.content,
+                  styles.horizontalContent,
+                  classes?.[PART_CONTENT],
+                )}
+                role="tabpanel"
+                id={activeStepId ? panelIdFor(stepperId, activeStepId) : undefined}
+                aria-labelledby={
+                  activeStepId ? tabIdFor(stepperId, activeStepId) : undefined
+                }
+                style={{ opacity: bodyVisible ? 1 : 0 }}
+              >
+                {children}
+              </div>
+            </div>
+          </StepperStateContext.Provider>
+        </StepperSettingsContext.Provider>
+      );
+    }
+
+    // --- Vertical rendering: Step children render their own header+content+connector
+    return (
+      <StepperSettingsContext.Provider value={settingsValue}>
+        <StepperStateContext.Provider value={stateValueWithActiveId}>
           <div
             {...rest}
             id={stepperId}
             ref={forwardedRef}
             className={rootClassName}
             style={style}
-            role="group"
-            aria-label="Stepper"
+            role="tablist"
+            aria-label={ariaLabel}
+            aria-orientation="vertical"
+            onKeyDown={handleHeaderKeyDown}
           >
-            <div className={styles.header} role="list">
-              {stepItems.map((item, index) => {
-                const isActive = index === activeIndex;
-                const isLast = index === stepItems.length - 1;
-                const clickable = nonLinear;
-                return (
-                  <React.Fragment key={item.innerId}>
-                    <div className={styles.headerItem} role="listitem">
-                      {clickable ? (
-                        <button
-                          type="button"
-                          className={classnames(styles.headerItemInner, styles.clickable)}
-                          aria-current={isActive ? "step" : undefined}
-                          onClick={() => handleStepClick(item.innerId)}
-                        >
-                          {renderIcon(item, index, isActive)}
-                          {renderLabelBlock(item, isActive)}
-                        </button>
-                      ) : (
-                        <div
-                          className={styles.headerItemInner}
-                          aria-current={isActive ? "step" : undefined}
-                        >
-                          {renderIcon(item, index, isActive)}
-                          {renderLabelBlock(item, isActive)}
-                        </div>
-                      )}
-                    </div>
-                    {!isLast && (
-                      <div
-                        className={classnames(styles.connector, {
-                          [styles.completed]: !!item.completed,
-                        })}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </React.Fragment>
-                );
-              })}
-            </div>
-            {/* Only the active Step's content is rendered (Step decides internally). */}
-            {/* Opacity is driven by `bodyVisible`: on step change we fade out, */}
-            {/* swap `displayedIndex`, then fade the new content back in. */}
-            <div
-              className={classnames(styles.content, styles.horizontalContent)}
-              style={{ opacity: bodyVisible ? 1 : 0 }}
-            >
-              {children}
-            </div>
+            {children}
           </div>
-        </StepperContext.Provider>
-      );
-    }
-
-    // --- Vertical rendering: Step children render their own header+content+connector
-    return (
-      <StepperContext.Provider value={contextWithActiveId}>
-        <div
-          {...rest}
-          id={stepperId}
-          ref={forwardedRef}
-          className={rootClassName}
-          style={style}
-          role="group"
-          aria-label="Stepper"
-        >
-          {children}
-        </div>
-      </StepperContext.Provider>
+        </StepperStateContext.Provider>
+      </StepperSettingsContext.Provider>
     );
   }),
 );

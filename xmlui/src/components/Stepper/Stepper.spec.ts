@@ -12,7 +12,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
         <Step label="Step 2">Content 2</Step>
       </Stepper>
     `);
-    await expect(page.getByRole("group", { name: "Stepper" })).toBeVisible();
+    await expect(page.getByRole("tablist", { name: "Stepper" })).toBeVisible();
   });
 
   test("renders step labels", async ({ initTestBed, page }) => {
@@ -47,7 +47,9 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 test.describe("Basic Functionality", () => {
   test("renders without children", async ({ initTestBed, page }) => {
     await initTestBed(`<Stepper />`);
-    await expect(page.getByRole("group", { name: "Stepper" })).toBeVisible();
+    // An empty tablist has no intrinsic size; assert it is attached rather
+    // than visible (there's nothing to paint).
+    await expect(page.getByRole("tablist", { name: "Stepper" })).toBeAttached();
   });
 
   test("activeStep=0 is default (first step active)", async ({ initTestBed, page }) => {
@@ -85,7 +87,7 @@ test.describe("Basic Functionality", () => {
     `);
     // When out of range, activeIndex stays at provided value initially but no step matches it,
     // so no content renders. This is acceptable behavior; verify nothing crashes.
-    await expect(page.getByRole("group", { name: "Stepper" })).toBeVisible();
+    await expect(page.getByRole("tablist", { name: "Stepper" })).toBeVisible();
   });
 
   test("activeStep negative falls back to 0", async ({ initTestBed, page }) => {
@@ -143,10 +145,10 @@ test.describe("Basic Functionality", () => {
         <Step label="C">C</Step>
       </Stepper>
     `);
-    // Headers are a list of step indicators; numbering is 1-based.
-    await expect(page.getByRole("list")).toContainText("1");
-    await expect(page.getByRole("list")).toContainText("2");
-    await expect(page.getByRole("list")).toContainText("3");
+    // Headers are a tablist of step indicators; numbering is 1-based.
+    await expect(page.getByRole("tablist")).toContainText("1");
+    await expect(page.getByRole("tablist")).toContainText("2");
+    await expect(page.getByRole("tablist")).toContainText("3");
   });
 });
 
@@ -378,13 +380,82 @@ test.describe("didChange event", () => {
 // =============================================================================
 
 test.describe("Accessibility", () => {
-  test("root has role='group' and aria-label='Stepper'", async ({ initTestBed, page }) => {
+  test("root has role='tablist' and aria-label='Stepper'", async ({ initTestBed, page }) => {
     await initTestBed(`<Stepper><Step label="A">A</Step></Stepper>`);
-    const root = page.getByRole("group", { name: "Stepper" });
+    const root = page.getByRole("tablist", { name: "Stepper" });
     await expect(root).toBeVisible();
   });
 
-  test("active step header gets aria-current='step' in horizontal mode", async ({
+  test("horizontal tablist advertises aria-orientation='horizontal'", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`<Stepper><Step label="A">A</Step></Stepper>`);
+    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "horizontal");
+  });
+
+  test("vertical tablist advertises aria-orientation='vertical'", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(
+      `<Stepper orientation="vertical"><Step label="A">A</Step></Stepper>`,
+    );
+    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
+  });
+
+  test("step tabs expose role='tab' with aria-selected + aria-controls", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Stepper activeStep="{1}" nonLinear="true">
+        <Step label="A">A</Step>
+        <Step label="B">B</Step>
+        <Step label="C">C</Step>
+      </Stepper>
+    `);
+    const tabs = page.getByRole("tab");
+    await expect(tabs).toHaveCount(3);
+    await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "false");
+    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "false");
+    // aria-controls must reference an existing tabpanel id
+    for (let i = 0; i < 3; i++) {
+      await expect(tabs.nth(i)).toHaveAttribute("aria-controls");
+    }
+  });
+
+  test("active step tab gets aria-current='step'", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stepper activeStep="{1}" nonLinear="true">
+        <Step label="A">A</Step>
+        <Step label="B">B</Step>
+        <Step label="C">C</Step>
+      </Stepper>
+    `);
+    const tabs = page.getByRole("tab");
+    await expect(tabs.nth(0)).not.toHaveAttribute("aria-current", /step/);
+    await expect(tabs.nth(1)).toHaveAttribute("aria-current", "step");
+    await expect(tabs.nth(2)).not.toHaveAttribute("aria-current", /step/);
+  });
+
+  test("tabpanel is aria-labelledby the active tab", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stepper activeStep="{0}">
+        <Step label="A">A</Step>
+        <Step label="B">B</Step>
+      </Stepper>
+    `);
+    const panel = page.getByRole("tabpanel");
+    await expect(panel).toBeVisible();
+    const labelledby = await panel.getAttribute("aria-labelledby");
+    expect(labelledby).toBeTruthy();
+    const activeTab = page.getByRole("tab", { selected: true });
+    await expect(activeTab).toHaveAttribute("id", labelledby!);
+  });
+
+  test("roving tabindex: only the active tab receives tab focus", async ({
     initTestBed,
     page,
   }) => {
@@ -395,47 +466,59 @@ test.describe("Accessibility", () => {
         <Step label="C">C</Step>
       </Stepper>
     `);
-    const listItems = page.getByRole("listitem");
-    await expect(listItems.nth(0).locator('[aria-current="step"]')).toHaveCount(0);
-    await expect(listItems.nth(1).locator('[aria-current="step"]')).toHaveCount(1);
-    await expect(listItems.nth(2).locator('[aria-current="step"]')).toHaveCount(0);
+    const tabs = page.getByRole("tab");
+    await expect(tabs.nth(0)).toHaveAttribute("tabindex", "-1");
+    await expect(tabs.nth(1)).toHaveAttribute("tabindex", "0");
+    await expect(tabs.nth(2)).toHaveAttribute("tabindex", "-1");
   });
 
-  test("nonLinear headers are <button> with type='button'", async ({ initTestBed, page }) => {
+  test("linear mode inactive tabs are aria-disabled", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stepper activeStep="{0}">
+        <Step label="A">A</Step>
+        <Step label="B">B</Step>
+      </Stepper>
+    `);
+    const tabs = page.getByRole("tab");
+    // Active tab must not be marked disabled
+    await expect(tabs.nth(0)).not.toHaveAttribute("aria-disabled", "true");
+    // Inactive tabs in linear mode are programmatically unreachable; mark as disabled
+    await expect(tabs.nth(1)).toHaveAttribute("aria-disabled", "true");
+  });
+
+  test("nonLinear mode exposes all tabs as enabled", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Stepper nonLinear="true">
         <Step label="A">A</Step>
         <Step label="B">B</Step>
       </Stepper>
     `);
-    // Two clickable step headers → two buttons
-    const buttons = page.getByRole("group", { name: "Stepper" }).getByRole("button");
-    await expect(buttons).toHaveCount(2);
+    const tabs = page.getByRole("tab");
+    for (let i = 0; i < 2; i++) {
+      await expect(tabs.nth(i)).not.toHaveAttribute("aria-disabled", "true");
+    }
   });
 
-  test("default (linear) headers do not expose buttons", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <Stepper>
-        <Step label="A">A</Step>
-        <Step label="B">B</Step>
-      </Stepper>
-    `);
-    const buttons = page.getByRole("group", { name: "Stepper" }).getByRole("button");
-    await expect(buttons).toHaveCount(0);
-  });
-
-  test("horizontal header strip uses role='list' with 'listitem' children", async ({
+  test("arrow keys navigate between tabs in nonLinear mode", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(`
-      <Stepper>
+      <Stepper nonLinear="true">
         <Step label="A">A</Step>
         <Step label="B">B</Step>
+        <Step label="C">C</Step>
       </Stepper>
     `);
-    await expect(page.getByRole("list")).toBeVisible();
-    await expect(page.getByRole("listitem")).toHaveCount(2);
+    const tabs = page.getByRole("tab");
+    await tabs.nth(0).focus();
+    await expect(tabs.nth(0)).toBeFocused();
+    await page.keyboard.press("ArrowRight");
+    await expect(tabs.nth(1)).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("End");
+    await expect(tabs.nth(2)).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Home");
+    await expect(tabs.nth(0)).toHaveAttribute("aria-selected", "true");
   });
 });
 
@@ -462,7 +545,7 @@ test.describe("Theme Variables", () => {
       },
     );
     // Second (inactive) step's circle
-    const items = page.getByRole("listitem");
+    const items = page.getByRole("tab");
     const inactiveCircle = items.nth(1).locator("span").first();
     await expect(inactiveCircle).toHaveCSS("background-color", "rgb(10, 20, 30)");
   });
@@ -484,7 +567,7 @@ test.describe("Theme Variables", () => {
         },
       },
     );
-    const items = page.getByRole("listitem");
+    const items = page.getByRole("tab");
     const activeCircle = items.nth(0).locator("span").first();
     await expect(activeCircle).toHaveCSS("background-color", "rgb(200, 50, 50)");
   });
@@ -526,9 +609,9 @@ test.describe("Theme Variables", () => {
         },
       },
     );
-    // The connector is a <div aria-hidden="true"> between listitems.
+    // The connector is a <div aria-hidden="true"> between tab headers.
     // iconCircle is a <span aria-hidden="true"> — restrict to div to disambiguate.
-    const connector = page.getByRole("list").locator('div[aria-hidden="true"]').first();
+    const connector = page.getByRole("tablist").locator('div[aria-hidden="true"]').first();
     await expect(connector).toHaveCSS("border-top-color", "rgb(123, 45, 67)");
   });
 });
@@ -539,25 +622,31 @@ test.describe("Theme Variables", () => {
 
 test.describe("Behaviors and Parts", () => {
   test.describe("orientation", () => {
-    test("horizontal mode renders a role='list' header strip", async ({ initTestBed, page }) => {
+    test("horizontal mode renders a role='tablist' header strip", async ({
+      initTestBed,
+      page,
+    }) => {
       await initTestBed(`
         <Stepper orientation="horizontal">
           <Step label="A">A</Step>
           <Step label="B">B</Step>
         </Stepper>
       `);
-      await expect(page.getByRole("list")).toBeVisible();
+      const tablist = page.getByRole("tablist");
+      await expect(tablist).toBeVisible();
+      await expect(tablist).toHaveAttribute("aria-orientation", "horizontal");
     });
 
-    test("vertical mode omits the horizontal header strip", async ({ initTestBed, page }) => {
+    test("vertical mode renders a vertical role='tablist'", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Stepper orientation="vertical">
           <Step label="A">A</Step>
           <Step label="B">B</Step>
         </Stepper>
       `);
-      // Vertical mode renders per-step headers, not a horizontal list strip
-      await expect(page.getByRole("list")).toHaveCount(0);
+      const tablist = page.getByRole("tablist");
+      await expect(tablist).toBeVisible();
+      await expect(tablist).toHaveAttribute("aria-orientation", "vertical");
       // Both labels are still visible (per-step)
       await expect(page.getByText("A", { exact: true }).first()).toBeVisible();
       await expect(page.getByText("B", { exact: true }).first()).toBeVisible();
@@ -585,7 +674,7 @@ test.describe("Behaviors and Parts", () => {
   });
 
   test.describe("nonLinear", () => {
-    test("clicking a header in horizontal nonLinear mode activates that step", async ({
+    test("clicking a tab in horizontal nonLinear mode activates that step", async ({
       initTestBed,
       page,
     }) => {
@@ -597,14 +686,13 @@ test.describe("Behaviors and Parts", () => {
         </Stepper>
       `);
       await expect(page.getByText("A body")).toBeVisible();
-      // Click the third header's button
-      const buttons = page.getByRole("group", { name: "Stepper" }).getByRole("button");
-      await buttons.nth(2).click();
+      const tabs = page.getByRole("tab");
+      await tabs.nth(2).click();
       await expect(page.getByText("C body")).toBeVisible();
       await expect(page.getByText("A body")).not.toBeVisible();
     });
 
-    test("clicking a header in vertical nonLinear mode activates that step", async ({
+    test("clicking a tab in vertical nonLinear mode activates that step", async ({
       initTestBed,
       page,
     }) => {
@@ -616,12 +704,12 @@ test.describe("Behaviors and Parts", () => {
         </Stepper>
       `);
       await expect(page.getByText("Alpha body")).toBeVisible();
-      const buttons = page.getByRole("group", { name: "Stepper" }).getByRole("button");
-      await buttons.nth(1).click();
+      const tabs = page.getByRole("tab");
+      await tabs.nth(1).click();
       await expect(page.getByText("Beta body")).toBeVisible();
     });
 
-    test("linear mode header click has no effect", async ({ initTestBed, page }) => {
+    test("linear mode tab click is ignored (tab is disabled)", async ({ initTestBed, page }) => {
       await initTestBed(`
         <Stepper>
           <Step label="A"><Text>A body</Text></Step>
@@ -629,8 +717,10 @@ test.describe("Behaviors and Parts", () => {
         </Stepper>
       `);
       await expect(page.getByText("A body")).toBeVisible();
-      // Headers exist but are not buttons — clicking the label should not advance
-      await page.getByText("B", { exact: true }).click();
+      // Inactive tabs in linear mode are disabled buttons — clicks do not
+      // trigger the handler (use the imperative next/prev APIs instead).
+      const tabs = page.getByRole("tab");
+      await tabs.nth(1).click({ force: true }).catch(() => undefined);
       await expect(page.getByText("A body")).toBeVisible();
       await expect(page.getByText("B body")).not.toBeVisible();
     });
@@ -642,8 +732,8 @@ test.describe("Behaviors and Parts", () => {
           <Step label="B">B</Step>
         </Stepper>
       `);
-      const buttons = page.getByRole("group", { name: "Stepper" }).getByRole("button");
-      await buttons.nth(1).click();
+      const tabs = page.getByRole("tab");
+      await tabs.nth(1).click();
       await expect.poll(testStateDriver.testState).toEqual(1);
     });
   });
@@ -656,10 +746,9 @@ test.describe("Behaviors and Parts", () => {
           <Step label="B">B</Step>
         </Stepper>
       `);
-      const headerItem = page.getByRole("listitem").first();
-      const inner = headerItem.locator("> *").first();
-      // flex-direction: column indicates stacked layout
-      await expect(inner).toHaveCSS("flex-direction", "column");
+      const tab = page.getByRole("tab").first();
+      // flex-direction: column indicates stacked layout (applied on the tab button itself)
+      await expect(tab).toHaveCSS("flex-direction", "column");
     });
 
     test("default (no stackedLabel) uses inline icon+label", async ({ initTestBed, page }) => {
@@ -669,9 +758,8 @@ test.describe("Behaviors and Parts", () => {
           <Step label="B">B</Step>
         </Stepper>
       `);
-      const headerItem = page.getByRole("listitem").first();
-      const inner = headerItem.locator("> *").first();
-      await expect(inner).toHaveCSS("flex-direction", "row");
+      const tab = page.getByRole("tab").first();
+      await expect(tab).toHaveCSS("flex-direction", "row");
     });
   });
 });
@@ -736,7 +824,7 @@ test.describe("Step", () => {
 test.describe("Other Edge Cases", () => {
   test("empty Stepper (no children) renders without crashing", async ({ initTestBed, page }) => {
     await initTestBed(`<Stepper />`);
-    await expect(page.getByRole("group", { name: "Stepper" })).toBeVisible();
+    await expect(page.getByRole("tablist", { name: "Stepper" })).toBeAttached();
   });
 
   test("APIs on an empty Stepper are no-ops", async ({ initTestBed, page }) => {
