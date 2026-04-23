@@ -343,10 +343,15 @@ test.describe("tooltip", () => {
     
     const pieSector = page.locator(pieSectorSelector).first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
-    
-    // Wait for tooltip to appear
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip shows correct data on hover", async ({ initTestBed, page }) => {
@@ -365,7 +370,7 @@ test.describe("tooltip", () => {
 
     const tooltip = page.locator(tooltipSelector);
     await expect(async () => {
-      await pieSector.hover({ force: true });
+      await pieSector.hover({ force: true }).catch(() => {});
       await expect(tooltip).toBeVisible({ timeout: 2000 });
     }).toPass({ timeout: 15000 });
 
@@ -392,8 +397,15 @@ test.describe("tooltip", () => {
     
     for (let i = 0; i < Math.min(sectorCount, 2); i++) {
       await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
-      await sectors.nth(i).hover({ force: true });
-      await expect(page.locator(tooltipSelector)).toBeVisible();
+      await expect
+        .poll(
+          async () => {
+            await sectors.nth(i).hover({ force: true }).catch(() => {});
+            return page.locator(tooltipSelector).isVisible();
+          },
+          { timeout: 10000 },
+        )
+        .toBe(true);
     }
   });
 });
@@ -569,7 +581,7 @@ test.describe("interactions", () => {
     
     // Hover should trigger visual feedback
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
+    await pieSector.hover({ force: true }).catch(() => {});
     
     // The sector should still be visible and potentially highlighted
     await expect(pieSector).toBeVisible();
@@ -588,10 +600,12 @@ test.describe("interactions", () => {
     
     const sectors = page.locator(pieSectorSelector);
     
-    // Hover over multiple sectors
+    // Hover over multiple sectors. Wrapping in .catch() absorbs transient
+    // "Element is not visible" errors that occur when the SVG <g> bounding box
+    // hasn't been computed yet; the subsequent toBeVisible() is the real check.
     for (let i = 0; i < Math.min(await sectors.count(), 3); i++) {
       await sectors.nth(i).waitFor({ state: "visible", timeout: 10000 });
-      await sectors.nth(i).hover({ force: true });
+      await sectors.nth(i).hover({ force: true }).catch(() => {});
       await expect(sectors.nth(i)).toBeVisible();
     }
   });

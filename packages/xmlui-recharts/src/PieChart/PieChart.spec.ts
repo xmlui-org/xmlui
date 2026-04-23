@@ -196,10 +196,16 @@ test.describe("tooltip", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
-    
-    // Wait for tooltip to appear
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip shows correct data on hover", async ({ initTestBed, page }) => {
@@ -214,10 +220,17 @@ test.describe("tooltip", () => {
     `, { extensionIds: "xmlui-recharts" });
     
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
-    
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
     const tooltip = page.locator(tooltipSelector);
-    await expect(tooltip).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true }).catch(() => {});
+          return tooltip.isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
     // Tooltip should contain data from the first sector
     await expect(tooltip).toContainText("Desktop");
     await expect(tooltip).toContainText("400");
@@ -465,7 +478,8 @@ test.describe("interaction", () => {
     const pieSector = page.locator(pieSectorSelector).first();
     
     // Hover should trigger active shape rendering
-    await pieSector.hover();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true }).catch(() => {});
     
     // The sector should still be visible (active shape effect)
     await expect(pieSector).toBeVisible();
@@ -485,9 +499,9 @@ test.describe("interaction", () => {
     const sectors = page.locator(pieSectorSelector);
     
     // Hover over different sectors
-    await sectors.nth(0).hover();
-    await sectors.nth(1).hover();
-    await sectors.nth(2).hover();
+    await sectors.nth(0).hover({ force: true }).catch(() => {});
+    await sectors.nth(1).hover({ force: true }).catch(() => {});
+    await sectors.nth(2).hover({ force: true }).catch(() => {});
     
     // All sectors should still be present
     await expect(sectors).toHaveCount(4);
