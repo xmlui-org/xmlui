@@ -1,0 +1,290 @@
+@use "../../components-core/theming/themes" as t;
+
+// --- Collect theme variables used in this module
+$component: "Stepper";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// Stepper root
+$backgroundColor-Stepper: createThemeVar("backgroundColor-Stepper");
+$padding-Stepper: createThemeVar("padding-Stepper");
+$gap-Stepper: createThemeVar("gap-Stepper");
+
+// Step icon (circle)
+$size-icon-Stepper: createThemeVar("size-icon-Stepper");
+$fontSize-icon-Stepper: createThemeVar("fontSize-icon-Stepper");
+$fontWeight-icon-Stepper: createThemeVar("fontWeight-icon-Stepper");
+
+$backgroundColor-icon-Stepper: createThemeVar("backgroundColor-icon-Stepper");
+$textColor-icon-Stepper: createThemeVar("textColor-icon-Stepper");
+
+$backgroundColor-icon-Stepper--active: createThemeVar("backgroundColor-icon-Stepper--active");
+$textColor-icon-Stepper--active: createThemeVar("textColor-icon-Stepper--active");
+
+$backgroundColor-icon-Stepper--completed: createThemeVar("backgroundColor-icon-Stepper--completed");
+$textColor-icon-Stepper--completed: createThemeVar("textColor-icon-Stepper--completed");
+
+$backgroundColor-icon-Stepper--error: createThemeVar("backgroundColor-icon-Stepper--error");
+$textColor-icon-Stepper--error: createThemeVar("textColor-icon-Stepper--error");
+
+// Step label
+$fontSize-label-Stepper: createThemeVar("fontSize-label-Stepper");
+$fontWeight-label-Stepper: createThemeVar("fontWeight-label-Stepper");
+$textColor-label-Stepper: createThemeVar("textColor-label-Stepper");
+$textColor-label-Stepper--active: createThemeVar("textColor-label-Stepper--active");
+$textColor-label-Stepper--completed: createThemeVar("textColor-label-Stepper--completed");
+$textColor-label-Stepper--error: createThemeVar("textColor-label-Stepper--error");
+
+// Step description / optional hint
+$fontSize-description-Stepper: createThemeVar("fontSize-description-Stepper");
+$textColor-description-Stepper: createThemeVar("textColor-description-Stepper");
+
+// Connector line
+$borderColor-connector-Stepper: createThemeVar("borderColor-connector-Stepper");
+$borderColor-connector-Stepper--completed: createThemeVar("borderColor-connector-Stepper--completed");
+$borderWidth-connector-Stepper: createThemeVar("borderWidth-connector-Stepper");
+$borderStyle-connector-Stepper: createThemeVar("borderStyle-connector-Stepper");
+
+// Content area
+$padding-content-Stepper: createThemeVar("padding-content-Stepper");
+
+@layer components {
+  .stepper {
+    display: flex;
+    width: 100%;
+    background-color: $backgroundColor-Stepper;
+    padding: $padding-Stepper;
+
+    &.horizontal {
+      flex-direction: column;
+    }
+
+    &.vertical {
+      flex-direction: column;
+    }
+  }
+
+  // Horizontal header strip
+  .header {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    width: 100%;
+    gap: $gap-Stepper;
+  }
+
+  .headerItem {
+    display: flex;
+    align-items: center;
+    flex: 0 0 auto;
+
+    &.withConnector {
+      flex: 1 1 auto;
+    }
+  }
+
+  .headerItemInner {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: default;
+    color: inherit;
+    text-align: left;
+  }
+
+  .headerItemInner.clickable {
+    cursor: pointer;
+  }
+
+  .headerItemInner.clickable:hover .label {
+    text-decoration: underline;
+  }
+
+  .headerItemInner:focus-visible {
+    outline: 2px solid $backgroundColor-icon-Stepper--active;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .alternativeLabel .headerItemInner {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  // Circle / icon
+  .iconCircle {
+    width: $size-icon-Stepper;
+    height: $size-icon-Stepper;
+    min-width: $size-icon-Stepper;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $fontSize-icon-Stepper;
+    font-weight: $fontWeight-icon-Stepper;
+    background-color: $backgroundColor-icon-Stepper;
+    color: $textColor-icon-Stepper;
+    line-height: 1;
+    user-select: none;
+    flex-shrink: 0;
+  }
+
+  .iconCircle.active {
+    background-color: $backgroundColor-icon-Stepper--active;
+    color: $textColor-icon-Stepper--active;
+  }
+
+  .iconCircle.completed {
+    background-color: $backgroundColor-icon-Stepper--completed;
+    color: $textColor-icon-Stepper--completed;
+  }
+
+  .iconCircle.error {
+    background-color: $backgroundColor-icon-Stepper--error;
+    color: $textColor-icon-Stepper--error;
+  }
+
+  // Label / description block
+  .labelBlock {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+
+  .alternativeLabel .labelBlock {
+    align-items: center;
+  }
+
+  .label {
+    font-size: $fontSize-label-Stepper;
+    font-weight: $fontWeight-label-Stepper;
+    color: $textColor-label-Stepper;
+  }
+
+  .label.active {
+    color: $textColor-label-Stepper--active;
+  }
+
+  .label.completed {
+    color: $textColor-label-Stepper--completed;
+  }
+
+  .label.error {
+    color: $textColor-label-Stepper--error;
+  }
+
+  .description {
+    font-size: $fontSize-description-Stepper;
+    color: $textColor-description-Stepper;
+    margin-top: 2px;
+  }
+
+  // Horizontal connector (between header items)
+  .connector {
+    flex: 1 1 auto;
+    align-self: center;
+    margin: 0 8px;
+    border-top-width: $borderWidth-connector-Stepper;
+    border-top-style: $borderStyle-connector-Stepper;
+    border-top-color: $borderColor-connector-Stepper;
+    min-width: 8px;
+  }
+
+  .connector.completed {
+    border-top-color: $borderColor-connector-Stepper--completed;
+  }
+
+  .alternativeLabel .connector {
+    margin-top: calc($size-icon-Stepper / 2);
+  }
+
+  // Content area (below header for horizontal)
+  .content {
+    padding: $padding-content-Stepper;
+  }
+
+  // Vertical mode
+  .vertical .verticalItem {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .vertical .verticalLeft {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 0 0 auto;
+  }
+
+  .vertical .verticalRight {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding-left: 12px;
+    padding-bottom: 12px;
+  }
+
+  .vertical .verticalConnector {
+    flex: 1 1 auto;
+    min-height: 12px;
+    width: 0;
+    border-left-width: $borderWidth-connector-Stepper;
+    border-left-style: $borderStyle-connector-Stepper;
+    border-left-color: $borderColor-connector-Stepper;
+    margin-top: 4px;
+    margin-bottom: 4px;
+  }
+
+  .vertical .verticalConnector.completed {
+    border-left-color: $borderColor-connector-Stepper--completed;
+  }
+
+  .vertical .verticalHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: default;
+    color: inherit;
+    text-align: left;
+  }
+
+  .vertical .verticalHeader.clickable {
+    cursor: pointer;
+  }
+
+  .vertical .verticalHeader.clickable:hover .label {
+    text-decoration: underline;
+  }
+
+  .vertical .verticalHeader:focus-visible {
+    outline: 2px solid $backgroundColor-icon-Stepper--active;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .vertical .verticalContent {
+    padding: $padding-content-Stepper;
+  }
+}
+
+// --- Export theme vars
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

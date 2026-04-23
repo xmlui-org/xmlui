@@ -135,6 +135,8 @@ import { appStateComponentRenderer } from "./AppState/AppState";
 import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
+import { stepperComponentRenderer } from "./Stepper/Stepper";
+import { stepComponentRenderer } from "./Stepper/Step";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
@@ -509,6 +511,9 @@ export class ComponentRegistry {
     if (import.meta.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerCoreComponent(tabItemComponentRenderer);
     }
+    if (import.meta.env.VITE_USED_COMPONENTS_Step !== "false") {
+      this.registerCoreComponent(stepComponentRenderer);
+    }
     if (import.meta.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerCoreComponent(accordionItemComponentRenderer);
     }
@@ -579,6 +584,7 @@ export class ComponentRegistry {
       this.registerCoreComponent(contextMenuComponentRenderer);
       this.registerCoreComponent(expandableItemComponentRenderer);
       this.registerCoreComponent(tabsComponentRenderer);
+      this.registerCoreComponent(stepperComponentRenderer);
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
       this.registerCoreComponent(codeBlockComponentRenderer);
