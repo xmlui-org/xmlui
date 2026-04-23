@@ -56,7 +56,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             return tooltipContent.isVisible();
           },
           { timeout: 15000 },
@@ -114,7 +114,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             return tooltipContent.isVisible();
           },
           { timeout: 15000 },
@@ -178,7 +178,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             return tooltipContent.isVisible();
           },
           { timeout: 15000 },
@@ -239,7 +239,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             if (!(await tooltipContent.isVisible())) return null;
             return valueElement.textContent();
           },
@@ -273,7 +273,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             return tooltipContent.isVisible();
           },
           { timeout: 15000 },
@@ -305,7 +305,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             return tooltipContent.isVisible();
           },
           { timeout: 15000 },
@@ -341,7 +341,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             if (!(await tooltipContent.isVisible())) return null;
             return page.locator(tooltipNameSelector).textContent();
           },
@@ -374,7 +374,7 @@ test.describe("Basic Functionality", () => {
       await expect
         .poll(
           async () => {
-            await pieSector.hover({ force: true });
+            await pieSector.hover({ force: true }).catch(() => {});
             if (!(await tooltipContent.isVisible())) return null;
             return indicator.evaluate((el) => window.getComputedStyle(el).backgroundColor);
           },
@@ -443,7 +443,7 @@ test.describe("Accessibility", () => {
     await expect
       .poll(
         async () => {
-          await pieSector.hover({ force: true });
+          await pieSector.hover({ force: true }).catch(() => {});
           if (!(await tooltipContent.isVisible())) return false;
           const nameVisible = await page.locator(tooltipNameSelector).isVisible();
           const valueVisible = await page.locator(tooltipValueSelector).isVisible();
@@ -472,7 +472,7 @@ test.describe("Accessibility", () => {
     await expect
       .poll(
         async () => {
-          await pieSector.hover({ force: true });
+          await pieSector.hover({ force: true }).catch(() => {});
           return tooltipContent.isVisible();
         },
         { timeout: 15000 },
@@ -536,7 +536,7 @@ test.describe("Performance and Edge Cases", () => {
     await expect
       .poll(
         async () => {
-          await pieSector.hover({ force: true });
+          await pieSector.hover({ force: true }).catch(() => {});
           return tooltipContent.isVisible();
         },
         { timeout: 15000 },

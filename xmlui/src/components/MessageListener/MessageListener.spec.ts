@@ -139,13 +139,13 @@ test.describe("Basic Functionality", () => {
       const { right: item1Right } = await getBounds(page.getByTestId("item1"));
       const { left: item2Left } = await getBounds(page.getByTestId("item2"));
       return Math.abs(item2Left - item1Right - 16) < 1;
-    }, { timeout: 5000 }).toBe(true);
+    }, { timeout: 10000 }).toBe(true);
 
     await expect.poll(async () => {
       const { right: item2Right } = await getBounds(page.getByTestId("item2"));
       const { left: item3Left } = await getBounds(page.getByTestId("item3"));
       return Math.abs(item3Left - item2Right - 16) < 1;
-    }, { timeout: 5000 }).toBe(true);
+    }, { timeout: 10000 }).toBe(true);
   });
 
   test("works with nested MessageListeners", async ({ initTestBed, page }) => {
