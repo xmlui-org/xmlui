@@ -62,6 +62,8 @@ import { TextMd } from "./Text/Text";
 import { TextAreaMd } from "./TextArea/TextArea";
 import { AccordionMd } from "./Accordion/Accordion";
 import { TabItemMd } from "./Tabs/TabItem";
+import { StepperMd } from "./Stepper/Stepper";
+import { StepMd } from "./Stepper/Step";
 import { FragmentMd } from "./Fragment/Fragment";
 import { TreeMd } from "./Tree/Tree";
 import { APICallMd } from "./APICall/APICall";
@@ -400,6 +402,8 @@ export const collectedComponentMetadata = {
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,
+  Stepper: StepperMd,
+  Step: StepMd,
   Text: TextMd,
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
