@@ -11,6 +11,8 @@ test("EChart renders and attaches to the DOM", async ({ initTestBed, page }) => 
     mainXs: BASIC_OPTION,
   });
   await expect(page.getByTestId("chart")).toBeAttached();
+  // Wait for ECharts to initialise and render the canvas element
+  await expect(page.getByTestId("chart").locator("canvas, div").first()).toBeAttached();
 });
 
 test("EChart renders a canvas element by default", async ({ initTestBed, page }) => {

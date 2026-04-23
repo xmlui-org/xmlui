@@ -29,7 +29,7 @@ const largeDataset = `[
 
 // Chart selectors - Legend specific
 const chartRoot = ".recharts-responsive-container";
-const chartSvg = ".recharts-surface";
+const chartSvg = ".recharts-wrapper > .recharts-surface";
 const legendSelector = ".recharts-legend-wrapper";
 const legendItemSelector = ".recharts-legend-item";
 const legendTextSelector = ".recharts-legend-item-text";
@@ -55,7 +55,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       await expect(page.locator(chartRoot)).toBeVisible();
       await expect(page.locator(legendSelector)).toBeVisible();
     });
@@ -74,7 +73,6 @@ test.describe("Basic Functionality", () => {
         </BarChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       await expect(page.locator(chartRoot)).toBeVisible();
       await expect(page.locator(legendSelector)).toBeVisible();
     });
@@ -95,7 +93,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
       
@@ -117,7 +114,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
     });
@@ -135,7 +131,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
       
@@ -160,7 +155,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
       
@@ -182,7 +176,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
     });
@@ -200,7 +193,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legend = page.locator(legendSelector);
       await expect(legend).toBeVisible();
       
@@ -225,7 +217,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       await expect(page.locator(legendSelector)).toBeVisible();
     });
 
@@ -242,7 +233,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       await expect(page.locator(legendSelector)).toBeVisible();
     });
 
@@ -259,7 +249,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       await expect(page.locator(legendSelector)).toBeVisible();
     });
   });
@@ -279,7 +268,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legendItems = page.locator(legendItemSelector);
       await expect(legendItems).toHaveCount(4); // Desktop, Mobile, Tablet, Other
       
@@ -303,7 +291,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legendItems = page.locator(legendItemSelector);
       await expect(legendItems).toHaveCount(1);
       await expect(page.locator(legendTextSelector).filter({ hasText: "Desktop" })).toBeVisible();
@@ -322,7 +309,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       // Legend should still be present but with no items
       const legendItems = page.locator(legendItemSelector);
       await expect(legendItems).toHaveCount(0);
@@ -341,7 +327,6 @@ test.describe("Basic Functionality", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(legendSelector, { timeout: 10000 });
       const legendItems = page.locator(legendItemSelector);
       await expect(legendItems).toHaveCount(10);
     });
@@ -363,7 +348,7 @@ test.describe("Basic Functionality", () => {
         </LineChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
+      await expect(page.locator(chartSvg)).toBeVisible();
       await expect(page.locator(legendSelector)).toBeVisible();
     });
 
@@ -380,7 +365,7 @@ test.describe("Basic Functionality", () => {
         </DonutChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
+      await expect(page.locator(chartSvg)).toBeVisible();
       await expect(page.locator(legendSelector)).toBeVisible();
     });
   });
@@ -404,7 +389,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     const legend = page.locator(legendSelector);
     await expect(legend).toBeVisible();
     
@@ -426,7 +410,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     
     // Tab navigation should work through legend items
     await page.keyboard.press("Tab");
@@ -447,7 +430,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     const legendText = page.locator(legendTextSelector).first();
     await expect(legendText).toBeVisible();
     
@@ -468,7 +450,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     
     // Legend should be announced properly by screen readers
     const legendItems = page.locator(legendItemSelector);
@@ -498,12 +479,10 @@ test.describe("Performance and Edge Cases", () => {
       <Button onClick="testState = testState === 'center' ? 'left' : 'center'">Toggle Align</Button>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     
     // Rapidly change alignment
     for (let i = 0; i < 5; i++) {
       await page.getByRole("button", { name: "Toggle Align" }).click();
-      await page.waitForTimeout(100);
     }
     
     // Legend should still be visible and functional
@@ -523,7 +502,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     const legendItems = page.locator(legendItemSelector);
     await expect(legendItems).toHaveCount(10);
     
@@ -547,11 +525,9 @@ test.describe("Performance and Edge Cases", () => {
       <Button onClick="testState = testState === '400px' ? '200px' : '400px'">Toggle Size</Button>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     
     // Change container size
     await page.getByRole("button", { name: "Toggle Size" }).click();
-    await page.waitForTimeout(500);
     
     // Legend should still be visible and properly positioned
     await expect(page.locator(legendSelector)).toBeVisible();
@@ -577,7 +553,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     
     // Check that Unicode characters are displayed correctly
     await expect(page.locator(legendTextSelector).filter({ hasText: "🖥️" })).toBeVisible();
@@ -599,7 +574,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should fall back to default values and still render
     await expect(page.locator(legendSelector)).toBeVisible();
   });
@@ -618,7 +592,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Only one legend should be rendered (last one wins)
     const legends = page.locator(legendSelector);
     await expect(legends).toHaveCount(1);
