@@ -17,7 +17,7 @@
     "@playwright/test": "1.57.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "cross-env": "^10.1.0",
-    "turbo": "^2.8.3",
+    "turbo": "^2.9.0",
     "vite": "8.0.9"
   },
   "packageManager": "npm@10.9.2",
@@ -27,18 +27,14 @@
     "changeset:publish": "changeset publish",
     "build-xmlui": "turbo run build:xmlui-all",
     "build-vscode-extension": "turbo run xmlui-vscode#build:vsix",
-    "test": "turbo run //#_test:e2e:with-unit-tests",
-    "_test:e2e:with-unit-tests": "playwright test",
-    "test-smoke": "turbo run //#_test:e2e:smoke:with-unit-tests",
+    "test": "turbo run //#_e2e",
+    "_e2e": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
+    "test-smoke": "turbo run //#_e2e:smoke",
+    "_e2e:smoke": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke",
     "test-e2e-dev": "playwright test",
-    "test-e2e-fast": "turbo run xmlui#build:xmlui-test-bed && cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
-    "test:e2e": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test",
-    "test:e2e:smoke": "cross-env PLAYWRIGHT_USE_DEV_SERVER=false playwright test --project=*-smoke",
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs",
     "build-playground": "turbo run build:playground",
-    "release-docs": "turbo run release:docs",
-    "build-blog": "turbo run build:blog",
     "generate-docs": "turbo run generate-docs"
   }
 }

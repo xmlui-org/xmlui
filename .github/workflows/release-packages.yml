@@ -25,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest-8-core
     timeout-minutes: 60
     env:
+      TURBO_UI: "false"
       NODE_OPTIONS: "--max-old-space-size=8192"
     # needs: [create_version_pr] # This is implied by the trigger conditions
     steps:

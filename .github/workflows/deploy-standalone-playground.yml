@@ -5,6 +5,8 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      TURBO_UI: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
