@@ -276,9 +276,9 @@ test.describe("Basic Functionality", () => {
 
     const driver = await createSelectDriver("booleanSelect");
     await driver.toggleOptionsVisibility();
-    await expect(page.getByRole("option", { name: "True" })).toBeVisible();
-    await expect(page.getByRole("option", { name: "False" })).toBeVisible();
-    await driver.selectLabel("False");
+    await expect(page.getByRole("option", { name: "True", exact: true })).toBeVisible();
+    await expect(page.getByRole("option", { name: "False", exact: true })).toBeVisible();
+    await page.getByRole("option", { name: "False", exact: true }).click();
 
     await expect.poll(testStateDriver.testState).toEqual(false);
   });
