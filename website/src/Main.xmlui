@@ -245,15 +245,87 @@
                         to="/docs/guides/local-persistence"
                     />
                     <NavLink
-                        icon="build"
-                        label="Build a HelloWorld Component"
-                        to="/docs/guides/build-hello-world-component"
-                    />
-                    <NavLink
                         icon="deploy"
                         label="Hosted Deployment"
                         to="/docs/guides/hosted-deployment"
                     />
+                    <NavGroup
+                        label="Wrapping and Theming"
+                        to="/docs/guides/wrap-component"
+                    >
+                        <NavGroup label="Wrapping techniques">
+                            <NavLink
+                                label="wrapComponent"
+                                to="/docs/guides/wrap-component/wrap-component-fn"
+                            />
+                            <NavLink
+                                label="wrapCompound"
+                                to="/docs/guides/wrap-component/wrap-compound-fn"
+                            />
+                        </NavGroup>
+                        <NavGroup label="Level 1: Basic wrapping">
+                            <NavLink
+                                label="Prop forwarding"
+                                to="/docs/guides/wrap-component/prop-forwarding"
+                            />
+                            <NavLink
+                                label="Free tracing"
+                                to="/docs/guides/wrap-component/free-tracing"
+                            />
+                        </NavGroup>
+                        <NavGroup label="Level 2: Enrichment">
+                            <NavLink
+                                label="File objects"
+                                to="/docs/guides/wrap-component/file-objects"
+                            />
+                            <NavLink
+                                label="BigCalendar"
+                                to="/docs/guides/wrap-component/bigcalendar"
+                            />
+                        </NavGroup>
+                        <NavGroup label="Level 3: Theming">
+                            <NavLink
+                                label="Gauge (SCSS)"
+                                to="/docs/guides/wrap-component/gauge-theme"
+                            />
+                            <NavLink
+                                label="Calendar (runtime)"
+                                to="/docs/guides/wrap-component/calendar-theme"
+                            />
+                        </NavGroup>
+                        <NavGroup label="Level 4: Layout">
+                            <NavLink
+                                label="Masonry"
+                                to="/docs/guides/wrap-component/masonry"
+                            />
+                            <NavLink
+                                label="GridLayout"
+                                to="/docs/guides/wrap-component/grid-layout"
+                            />
+                        </NavGroup>
+                        <NavGroup label="Ecosystem">
+                            <NavLink
+                                label="ECharts"
+                                to="/docs/guides/wrap-component/echarts"
+                            />
+                            <NavLink
+                                label="Tiptap"
+                                to="/docs/guides/wrap-component/tiptap"
+                            />
+                            <NavLink
+                                label="Masonry"
+                                to="/docs/guides/wrap-component/masonry"
+                            />
+                            <NavLink
+                                label="GridLayout"
+                                to="/docs/guides/wrap-component/grid-layout"
+                            />
+                        </NavGroup>
+                        <NavLink
+                            label="Extension packaging"
+                            to="/docs/guides/wrap-component/extension-packaging"
+                        />
+                    </NavGroup>
                 </NavGroup>
                 <NavGroup
                     label="Tutorial"
@@ -1480,11 +1552,88 @@
                     content="{appGlobals.docsContent['pages/glossary.md']}"
                 />
             </Page>
-            <Page
-                url="/docs/guides/build-hello-world-component"
-            >
+            <Page url="/docs/guides/wrap-component">
                 <DocumentPage
-                    content="{appGlobals.docsContent['pages/build-hello-world-component.md']}"
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/_overview.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/wrap-component-fn">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/wrap-component-fn.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/wrap-compound-fn">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/wrap-compound-fn.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/prop-forwarding">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/prop-forwarding.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/free-tracing">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/free-tracing.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/file-objects">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/file-objects.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/bigcalendar">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/bigcalendar.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/gauge-theme">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/gauge-theme.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/calendar-theme">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/calendar-theme.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/masonry">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/masonry.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/grid-layout">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/grid-layout.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/echarts">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/echarts.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/tiptap">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/tiptap.md']}"
+                />
+            </Page>
+            <Page url="/docs/guides/wrap-component/extension-packaging">
+                <DocumentPage
+                    showInspector="true"
+                    content="{appGlobals.docsContent['pages/wrap-component/extension-packaging.md']}"
                 />
             </Page>
             <Page url="/docs/build-editor-component">

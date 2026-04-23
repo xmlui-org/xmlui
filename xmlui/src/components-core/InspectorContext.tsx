@@ -93,7 +93,10 @@ export function InspectorProvider({
     // Only run if xsVerbose tracing is active
     if (!Array.isArray(w._xsLogs)) return;
     if (sources) {
-      w._xsSources = sources;
+      w._xsSources = {
+        ...(w._xsSources || {}),
+        ...sources,
+      };
     }
   }, [sources]);
 
@@ -110,7 +113,8 @@ export function InspectorProvider({
     projectCompilation.components?.forEach((comp) => {
       if (comp?.filename) files.push(comp.filename);
     });
-    w._xsSourceFiles = files;
+    const existing = Array.isArray(w._xsSourceFiles) ? w._xsSourceFiles : [];
+    w._xsSourceFiles = Array.from(new Set([...existing, ...files]));
   }, [projectCompilation]);
   const contextValue: IInspectorContext = useMemo(() => {
     return {

@@ -1,0 +1,26 @@
+{
+  "name": "xmlui-calendar",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/xmlui-calendar.js",
+  "module": "dist/xmlui-calendar.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-calendar.mjs",
+      "require": "./dist/xmlui-calendar.js"
+    }
+  },
+  "dependencies": {
+    "react-big-calendar": "^1.16.3",
+    "classnames": "2.5.1"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  }
+}

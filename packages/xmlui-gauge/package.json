@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "dist/xmlui-gauge.js",
+  "module": "dist/xmlui-gauge.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-gauge.mjs",
+      "require": "./dist/xmlui-gauge.js"
+    }
+  },
   "dependencies": {
     "smart-webcomponents-react": "^25.0.0",
     "classnames": "2.5.1"
