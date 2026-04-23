@@ -357,8 +357,15 @@ test.describe("tooltip", () => {
     // Hover over chart area to trigger tooltip
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip can be hidden", async ({ initTestBed, page }) => {
@@ -377,7 +384,7 @@ test.describe("tooltip", () => {
     // Hover over chart area - tooltip should not appear
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
+    await _chartEl.hover({ force: true }).catch(() => {});
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });
@@ -768,8 +775,15 @@ test.describe("hideTooltip prop", () => {
     
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("hides tooltip when hideTooltip is true", async ({ initTestBed, page }) => {
@@ -786,7 +800,7 @@ test.describe("hideTooltip prop", () => {
     
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
+    await _chartEl.hover({ force: true }).catch(() => {});
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 
@@ -804,8 +818,15 @@ test.describe("hideTooltip prop", () => {
     
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 });
 

@@ -4,12 +4,17 @@ import { test, expect } from "xmlui/testing";
 // PDF COMPONENT TESTS
 // =============================================================================
 
+// Use a small PDF served by the test bed itself. Going through an external
+// URL (e.g. w3.org) makes these tests dependent on network availability and
+// is the historical cause of CI flakes.
+const SAMPLE_PDF = "/resources/sample.pdf";
+
 test.describe("PDF Component", () => {
   test("renders PDF component on screen", async ({ initTestBed, page }) => {
     await initTestBed(
       `
       <App>
-        <Pdf testId="pdfComponent" src="https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table1.pdf" />
+        <Pdf testId="pdfComponent" src="${SAMPLE_PDF}" />
       </App>
     `,
       {
@@ -25,7 +30,7 @@ test.describe("PDF Component", () => {
     await initTestBed(
       `
       <App>
-        <Pdf testId="pdfComponent" src="https://www.w3.org/WAI/WCAG21/Techniques/pdf/img/table1.pdf" />
+        <Pdf testId="pdfComponent" src="${SAMPLE_PDF}" />
       </App>
     `,
       {

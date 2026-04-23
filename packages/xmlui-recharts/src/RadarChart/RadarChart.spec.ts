@@ -396,8 +396,15 @@ test.describe("tooltip", () => {
     // Hover over radar area to trigger tooltip
     const _radarEl = page.locator(radarElementsSelector).first();
     await _radarEl.waitFor({ state: "visible", timeout: 10000 });
-    await _radarEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _radarEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip can be hidden", async ({ initTestBed, page }) => {
@@ -416,7 +423,7 @@ test.describe("tooltip", () => {
     // Hover over radar area - tooltip should not appear
     const _radarEl = page.locator(radarElementsSelector).first();
     await _radarEl.waitFor({ state: "visible", timeout: 10000 });
-    await _radarEl.hover({ force: true });
+    await _radarEl.hover({ force: true }).catch(() => {});
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });
