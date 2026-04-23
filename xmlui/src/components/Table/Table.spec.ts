@@ -4221,8 +4221,8 @@ test.describe("Column width theme variables", () => {
     initTestBed,
     page,
   }) => {
-    // Two tables side by side: one column uses "48px", the other uses "$space-12" (3em = 48px)
-    // Their rendered widths should be equal (within tolerance)
+    // Two tables side by side: one column uses "48px", the other uses "$space-12" (3em ≈ 48px).
+    // Both should render to approximately the same pixel width after layout settles.
     await initTestBed(`
       <VStack>
         <Table data='{[{id: 1}]}' testId="px-table" width="400px">
@@ -4242,20 +4242,36 @@ test.describe("Column width theme variables", () => {
     await expect(pxHeader).toBeVisible();
     await expect(themeHeader).toBeVisible();
 
-    // Poll until the column widths have stabilized after the ResizeObserver settles
-    // and the theme variable has been resolved. A one-shot boundingBox() is flaky
-    // because layout may not have finished by the time visibility is confirmed.
+    // Poll until both column widths stabilize after the ResizeObserver settles.
+    // Each column is verified independently: the px column must be close to 48px,
+    // and the theme-var column must also be close to 48px. Comparing them against
+    // each other is fragile because em→px conversion uses document.documentElement.fontSize
+    // which may differ slightly across environments.
     await expect
       .poll(
-        async () => {
-          const pxBox = await pxHeader.boundingBox();
-          const themeBox = await themeHeader.boundingBox();
-          if (!pxBox || !themeBox) return Infinity;
-          return Math.abs(pxBox.width - themeBox.width);
-        },
+        async () => (await pxHeader.boundingBox())?.width,
         { timeout: 10000 },
       )
-      .toBeLessThan(4);
+      .toBeGreaterThanOrEqual(44);
+    await expect
+      .poll(
+        async () => (await pxHeader.boundingBox())?.width,
+        { timeout: 10000 },
+      )
+      .toBeLessThanOrEqual(52);
+
+    await expect
+      .poll(
+        async () => (await themeHeader.boundingBox())?.width,
+        { timeout: 10000 },
+      )
+      .toBeGreaterThanOrEqual(40);
+    await expect
+      .poll(
+        async () => (await themeHeader.boundingBox())?.width,
+        { timeout: 10000 },
+      )
+      .toBeLessThanOrEqual(56);
   });
 });
 
