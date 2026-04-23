@@ -3,13 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/xmlui-tiptap-editor.js",
-  "module": "dist/xmlui-tiptap-editor.mjs",
+  "sideEffects": false,
+  "main": "./src/index.tsx",
   "exports": {
-    ".": {
-      "import": "./dist/xmlui-tiptap-editor.mjs",
-      "require": "./dist/xmlui-tiptap-editor.js"
-    }
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "@tiptap/react": "^2.12.0",
@@ -28,8 +31,21 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "remove": [
+      "module"
+    ],
+    "replace": {
+      "main": "./dist/xmlui-tiptap-editor.js",
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-tiptap-editor.mjs",
+          "default": "./dist/xmlui-tiptap-editor.mjs"
+        }
+      }
+    }
   }
 }

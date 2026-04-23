@@ -3,6 +3,20 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "start": "xmlui start",
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
+  },
   "dependencies": {
     "recharts": "^2.15.1",
     "classnames": "2.5.1"
@@ -10,9 +24,24 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "start": "xmlui start",
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "remove": [
+      "module"
+    ],
+    "replace": {
+      "main": "./dist/xmlui-recharts.js",
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-recharts.mjs",
+          "default": "./dist/xmlui-recharts.mjs"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

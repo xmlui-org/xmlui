@@ -139,11 +139,15 @@
     "xmlui": "./src/nodejs/bin/bootstrap.js"
   },
   "clean-package": {
+    "remove": [
+      "module"
+    ],
     "replace": {
       "bin": {
         "xmlui": "dist/nodejs/bin/index.mjs"
       },
       "main": "./dist/standalone/xmlui-standalone.umd.js",
+      "module": "./dist/lib/xmlui.js",
       "types": "./dist/lib/xmlui.d.ts",
       "exports": {
         ".": {
@@ -187,6 +191,7 @@
     }
   },
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
     "./parser": "./src/parsers/xmlui-parser/index.ts",
