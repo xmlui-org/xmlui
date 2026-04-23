@@ -35,8 +35,6 @@
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs",
     "build-playground": "turbo run build:playground",
-    "release-docs": "turbo run release:docs",
-    "build-blog": "turbo run build:blog",
     "generate-docs": "turbo run generate-docs"
   }
 }

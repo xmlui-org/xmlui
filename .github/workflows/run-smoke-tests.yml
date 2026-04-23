@@ -20,6 +20,7 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest-8-core
     env:
+      TURBO_UI: "false"
       NODE_OPTIONS: "--max-old-space-size=8192"
     steps:
       - uses: actions/checkout@v4
