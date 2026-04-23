@@ -1,7 +1,7 @@
 import React, { memo, useCallback, useEffect, useRef } from "react";
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { Gauge } from "smart-webcomponents-react/gauge";
+import { Gauge } from "smart-webcomponents-react/gauge/gauge.umd.js";
 import "smart-webcomponents-react/source/styles/smart.default.css";
 import styles from "./Gauge.module.scss";
 import classnames from "classnames";
