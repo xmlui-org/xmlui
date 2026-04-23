@@ -198,6 +198,40 @@ export const FormMd = createMetadata({
       valueType: "string",
       defaultValue: "keep",
     },
+    stepper: {
+      description:
+        "When `true`, the form's children are rendered inside a [Stepper](/components/Stepper) " +
+        "and each nested `FormSegment` becomes a step. Use together with `stepperOrientation`, " +
+        "`activeStep`, `nonLinear`, and `stackedLabel` to control wizard behavior.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    stepperOrientation: {
+      description:
+        "Orientation of the built-in stepper when `stepper=true`. Same values as the `Stepper` " +
+        "component's `orientation` prop.",
+      valueType: "string",
+      availableValues: ["horizontal", "vertical"],
+      defaultValue: "horizontal",
+    },
+    activeStep: {
+      description:
+        "The 0-based index of the currently active step (only used when `stepper=true`). " +
+        "Bind to a reactive variable to drive navigation from custom buttons.",
+      valueType: "number",
+    },
+    nonLinear: {
+      description:
+        "When `stepper=true`, allows users to jump to any step by clicking its header.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    stackedLabel: {
+      description:
+        "When `stepper=true`, places the step label below the step icon instead of beside it.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   events: {
     willSubmit: {

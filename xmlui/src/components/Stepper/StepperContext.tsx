@@ -18,6 +18,7 @@ export type StepItem = {
 export type StepperOrientation = "horizontal" | "vertical";
 
 interface IStepperContext {
+  inStepper: boolean;
   register: (item: StepItem) => void;
   unRegister: (innerId: string) => void;
   getStepItems: () => StepItem[];
@@ -30,6 +31,7 @@ interface IStepperContext {
 }
 
 export const StepperContext = createContext<IStepperContext>({
+  inStepper: false,
   register: () => {},
   unRegister: () => {},
   getStepItems: () => [],
@@ -78,6 +80,7 @@ export function useStepperContextValue(
 
   const contextValue = useMemo<IStepperContext>(
     () => ({
+      inStepper: true,
       register,
       unRegister,
       getStepItems,

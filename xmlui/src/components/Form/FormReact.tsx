@@ -939,6 +939,36 @@ export const FormWithContextVar = forwardRef(function (
     [$validationIssues],
   );
 
+  const stepperEnabled = extractValue.asOptionalBoolean((node.props as any).stepper);
+  const stepperOrientation = extractValue.asOptionalString(
+    (node.props as any).stepperOrientation,
+  );
+  const stepperActiveStep = (node.props as any).activeStep;
+  const stepperNonLinear = extractValue.asOptionalBoolean((node.props as any).nonLinear);
+  const stepperStackedLabel = extractValue.asOptionalBoolean((node.props as any).stackedLabel);
+
+  const formChildren = useMemo(() => {
+    if (!stepperEnabled) return node.children;
+    const stepperNode: any = {
+      type: "Stepper",
+      props: {
+        orientation: stepperOrientation,
+        activeStep: stepperActiveStep,
+        nonLinear: stepperNonLinear,
+        stackedLabel: stepperStackedLabel,
+      },
+      children: node.children,
+    };
+    return [stepperNode];
+  }, [
+    stepperEnabled,
+    stepperOrientation,
+    stepperActiveStep,
+    stepperNonLinear,
+    stepperStackedLabel,
+    node.children,
+  ]);
+
   const nodeWithItem = useMemo(() => {
     return {
       type: "Fragment",
@@ -947,9 +977,9 @@ export const FormWithContextVar = forwardRef(function (
         $validationIssues: $validationIssues,
         $hasValidationIssue: $hasValidationIssue,
       },
-      children: node.children,
+      children: formChildren,
     };
-  }, [$data, $validationIssues, $hasValidationIssue, node.children]);
+  }, [$data, $validationIssues, $hasValidationIssue, formChildren]);
 
   const rawInitialValue = extractValue(node.props.data);
   // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.

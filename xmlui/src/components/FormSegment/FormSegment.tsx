@@ -1,6 +1,5 @@
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { defaultProps } from "../DateInput/DateInputReact";
-import { createMetadata, d } from "../metadata-helpers";
+import { createMetadata, d, dLabel } from "../metadata-helpers";
 import { FormSegmentNative } from "./FormSegmentReact";
 
 const COMP = "FormSegment";
@@ -13,7 +12,9 @@ export const FormSegmentMd = createMetadata({
     "multi-step wizards, collapsible sections, or any layout that needs per-section " +
     "data and validation state without creating a nested form. Children are automatically " +
     'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
-    "transposed from the segment.",
+    "transposed from the segment. When placed inside a `Stepper` (or a `Form` with " +
+    "`stepper=true`), the segment acts as a step — the `label`, `description`, and `icon` " +
+    "props feed the step header.",
   props: {
     orientation: {
       description:
@@ -29,6 +30,18 @@ export const FormSegmentMd = createMetadata({
         "nested inputs) that belong to this segment. When omitted the segment auto-discovers " +
         "field names by inspecting its direct and nested children for `bindTo` attributes.",
     ),
+    label: dLabel(),
+    description: {
+      description:
+        "Optional secondary text shown under the step label when this segment is rendered " +
+        "inside a stepper.",
+      valueType: "string",
+    },
+    icon: {
+      description:
+        "Optional icon name to display in the step indicator (only used inside a stepper).",
+      valueType: "string",
+    },
   },
   contextVars: {
     $segmentData: d(
