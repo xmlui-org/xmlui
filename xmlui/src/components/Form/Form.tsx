@@ -202,7 +202,10 @@ export const FormMd = createMetadata({
       description:
         "When `true`, the form's children are rendered inside a [Stepper](/components/Stepper) " +
         "and each nested `FormSegment` becomes a step. Use together with `stepperOrientation`, " +
-        "`activeStep`, `nonLinear`, and `stackedLabel` to control wizard behavior.",
+        "`activeStep`, `nonLinear`, and `stackedLabel` to control wizard behavior. " +
+        "If `buttonRowTemplate` is not provided, the Form renders a built-in wizard button " +
+        "row (Back / Reset / Next on intermediate steps, Back / Reset / Submit on the last " +
+        "step). Provide `buttonRowTemplate` to override with custom navigation.",
       valueType: "boolean",
       defaultValue: false,
     },

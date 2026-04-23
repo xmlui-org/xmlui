@@ -42,6 +42,7 @@ import { ThemedText as Text } from "../../components/Text/Text";
 import { ThemedStack as Stack } from "../../components/Stack/Stack";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
 import { ThemedButton as Button } from "../Button/Button";
+import { ThemedStepper } from "../Stepper/Stepper";
 import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
 import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
 import { type FormAction, formReset } from "../Form/formActions";
@@ -298,6 +299,16 @@ type Props = {
   onPersistClear?: () => void;
   dataAfterSubmit?: "keep" | "reset" | "clear";
   onClearAfterSubmit?: () => void;
+  // Stepper-mode metadata (only populated when Form is in stepper mode).
+  // Used to render a built-in stepper button row when the user does not
+  // provide a custom `buttonRowTemplate`.
+  stepperMode?: boolean;
+  stepperActiveStep?: number;
+  stepperTotalSteps?: number;
+  onStepperActiveStepChange?: (newIndex: number) => void;
+  stepperBackLabel?: string;
+  stepperNextLabel?: string;
+  stepperResetLabel?: string;
 };
 
 export const defaultProps: Pick<
@@ -412,6 +423,13 @@ const Form = memo(forwardRef(function (
     onPersistClear,
     dataAfterSubmit = defaultProps.dataAfterSubmit,
     onClearAfterSubmit,
+    stepperMode,
+    stepperActiveStep,
+    stepperTotalSteps,
+    onStepperActiveStepChange,
+    stepperBackLabel = "Back",
+    stepperNextLabel = "Next",
+    stepperResetLabel = "Reset",
     ...rest
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
@@ -799,14 +817,88 @@ const Form = memo(forwardRef(function (
     });
   }, [doReset, updateData, doValidate, getData, registerComponentApi, getIsDirtyFlag]);
 
+  // When the form is in stepper mode and no custom buttonRowTemplate is
+  // provided, render a built-in wizard button row (Back / Reset / Next /
+  // Submit). The submit button only appears on the last step, and Next is
+  // hidden there.
+  const stepperButtonRow = useMemo(() => {
+    if (!stepperMode) return null;
+    const total = stepperTotalSteps ?? 0;
+    const current = stepperActiveStep ?? 0;
+    const isLast = total > 0 && current >= total - 1;
+    const isFirst = current <= 0;
+    const goTo = (idx: number) => {
+      const clamped = total > 0 ? Math.max(0, Math.min(total - 1, idx)) : Math.max(0, idx);
+      onStepperActiveStepChange?.(clamped);
+    };
+    return (
+      <div
+        className={classnames(styles.buttonRow, { [styles.stickyButtonRow]: stickyButtonRow })}
+      >
+        {!isFirst && (
+          <Button
+            key="stepper-back"
+            type="button"
+            variant="outlined"
+            themeColor="secondary"
+            onClick={() => goTo(current - 1)}
+          >
+            {stepperBackLabel}
+          </Button>
+        )}
+        {cancelLabel !== "" && (
+          <Button
+            key="stepper-reset"
+            type="button"
+            variant="ghost"
+            themeColor="secondary"
+            onClick={() => {
+              doReset();
+              goTo(0);
+            }}
+          >
+            {stepperResetLabel}
+          </Button>
+        )}
+        {!isLast && (
+          <Button
+            key="stepper-next"
+            type="button"
+            onClick={() => goTo(current + 1)}
+          >
+            {stepperNextLabel}
+          </Button>
+        )}
+        {isLast && submitButton}
+      </div>
+    );
+  }, [
+    stepperMode,
+    stepperTotalSteps,
+    stepperActiveStep,
+    stepperBackLabel,
+    stepperNextLabel,
+    stepperResetLabel,
+    cancelLabel,
+    onStepperActiveStepChange,
+    doReset,
+    stickyButtonRow,
+    submitButton,
+  ]);
+
   let safeButtonRow = (
     <>
-      {buttonRow || (
-        <div className={classnames(styles.buttonRow, { [styles.stickyButtonRow]: stickyButtonRow })}>
-          {swapCancelAndSave && [submitButton, cancelButton]}
-          {!swapCancelAndSave && [cancelButton, submitButton]}
-        </div>
-      )}
+      {buttonRow ||
+        stepperButtonRow || (
+          <div
+            className={classnames(styles.buttonRow, {
+              [styles.stickyButtonRow]: stickyButtonRow,
+            })}
+          >
+            {swapCancelAndSave && [submitButton, cancelButton]}
+            {!swapCancelAndSave && [cancelButton, submitButton]}
+          </div>
+        )}
     </>
   );
   return (
@@ -943,31 +1035,55 @@ export const FormWithContextVar = forwardRef(function (
   const stepperOrientation = extractValue.asOptionalString(
     (node.props as any).stepperOrientation,
   );
-  const stepperActiveStep = (node.props as any).activeStep;
+  const stepperActiveStepProp = extractValue.asOptionalNumber((node.props as any).activeStep);
   const stepperNonLinear = extractValue.asOptionalBoolean((node.props as any).nonLinear);
   const stepperStackedLabel = extractValue.asOptionalBoolean((node.props as any).stackedLabel);
 
-  const formChildren = useMemo(() => {
-    if (!stepperEnabled) return node.children;
-    const stepperNode: any = {
-      type: "Stepper",
-      props: {
-        orientation: stepperOrientation,
-        activeStep: stepperActiveStep,
-        nonLinear: stepperNonLinear,
-        stackedLabel: stepperStackedLabel,
-      },
-      children: node.children,
-    };
-    return [stepperNode];
-  }, [
-    stepperEnabled,
-    stepperOrientation,
-    stepperActiveStep,
-    stepperNonLinear,
-    stepperStackedLabel,
-    node.children,
-  ]);
+  const hasCustomButtonRow = !!node.props.buttonRowTemplate;
+
+  // Count FormSegment children to determine total step count for the
+  // built-in stepper button row. Users can freely intersperse non-segment
+  // nodes (e.g. comments) — only FormSegments count.
+  const stepperTotalSteps = useMemo(() => {
+    if (!stepperEnabled) return 0;
+    const children = Array.isArray(node.children) ? node.children : [];
+    return children.filter((c: any) => c?.type === "FormSegment").length;
+  }, [stepperEnabled, node.children]);
+
+  // Internal step state used when no custom buttonRowTemplate drives the
+  // stepper. Seeded from the `activeStep` prop on mount and re-synced when
+  // that prop changes reactively.
+  const [internalStepperStep, setInternalStepperStep] = useState<number>(() => {
+    return typeof stepperActiveStepProp === "number" && stepperActiveStepProp >= 0
+      ? stepperActiveStepProp
+      : 0;
+  });
+
+  useEffect(() => {
+    if (hasCustomButtonRow) return;
+    if (typeof stepperActiveStepProp !== "number") return;
+    if (stepperActiveStepProp < 0) return;
+    setInternalStepperStep((prev) =>
+      prev === stepperActiveStepProp ? prev : stepperActiveStepProp,
+    );
+  }, [hasCustomButtonRow, stepperActiveStepProp]);
+
+  // Effective active step delivered to the Stepper: the user's `activeStep`
+  // prop when they drive the flow themselves, otherwise the Form-managed
+  // internal step.
+  const effectiveStepperActiveStep = hasCustomButtonRow
+    ? typeof stepperActiveStepProp === "number" && stepperActiveStepProp >= 0
+      ? stepperActiveStepProp
+      : 0
+    : internalStepperStep;
+
+  const handleStepperDidChange = useCallback(
+    (newIndex: number) => {
+      if (hasCustomButtonRow) return;
+      setInternalStepperStep(newIndex);
+    },
+    [hasCustomButtonRow],
+  );
 
   const nodeWithItem = useMemo(() => {
     return {
@@ -977,9 +1093,9 @@ export const FormWithContextVar = forwardRef(function (
         $validationIssues: $validationIssues,
         $hasValidationIssue: $hasValidationIssue,
       },
-      children: formChildren,
+      children: node.children,
     };
-  }, [$data, $validationIssues, $hasValidationIssue, formChildren]);
+  }, [$data, $validationIssues, $hasValidationIssue, node.children]);
 
   const rawInitialValue = extractValue(node.props.data);
   // Use EMPTY_OBJECT when the current resetVersion was produced by a "clear" submit.
@@ -1080,8 +1196,24 @@ export const FormWithContextVar = forwardRef(function (
           extractValue.asOptionalBoolean(node.props.enabled, true) &&
           !extractValue.asOptionalBoolean((node.props as any).loading, false)
         } //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
+        stepperMode={stepperEnabled}
+        stepperActiveStep={effectiveStepperActiveStep}
+        stepperTotalSteps={stepperTotalSteps}
+        onStepperActiveStepChange={setInternalStepperStep}
       >
-        {renderChild(nodeWithItem)}
+        {stepperEnabled ? (
+          <ThemedStepper
+            activeStep={effectiveStepperActiveStep}
+            orientation={stepperOrientation as any}
+            nonLinear={stepperNonLinear}
+            stackedLabel={stepperStackedLabel}
+            onDidChange={handleStepperDidChange}
+          >
+            {renderChild(nodeWithItem)}
+          </ThemedStepper>
+        ) : (
+          renderChild(nodeWithItem)
+        )}
       </Form>
     </Slot>
   );
