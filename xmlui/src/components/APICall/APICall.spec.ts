@@ -2418,8 +2418,8 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
             }
           }"
         />
-        <Button onClick="api.execute()" testId="exec" />
-        <Button onClick="testState = { ...(testState || {}), isPolling: api.isPolling() }" testId="check" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
+        <Button onClick="testState = { ...(testState || {}), isPolling: api.isPolling() }" testId="check" label="check"/>
       </Fragment>
     `, {
       apiInterceptor: statusUpdateMock,
@@ -2462,7 +2462,7 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
             }
           }"
         />
-        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
         <Button onClick="testState = { ...(testState || {}), pollingStatus: api.isPolling() }" testId="check" />
       </Fragment>
     `, {
@@ -2520,7 +2520,7 @@ test.describe("Deferred Mode - Step 5: Status Update Event", () => {
             }
           }"
         />
-        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
         <Button onClick="testState = { ...(testState || {}), pollingStatus: api.isPolling() }" testId="check" />
       </Fragment>
     `, {
@@ -2693,7 +2693,7 @@ test.describe("Deferred Mode - Step 7: Notifications", () => {
           inProgressNotificationMessage="Uploading: {$progress}% complete"
           completedNotificationMessage="Upload complete!"
         />
-        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
       </Fragment>
     `, {
       apiInterceptor: {
@@ -2754,7 +2754,7 @@ test.describe("Deferred Mode - Step 8: Timeout", () => {
           completionCondition="$statusData.done === true"
           onTimeout="() => testState = 'timeout'"
         />
-        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
       </Fragment>
     `, {
       apiInterceptor: {
@@ -2808,7 +2808,7 @@ test.describe("Deferred Mode - Step 9: Retry Logic", () => {
             testState = { updateCount: updateCount, done: statusData.done };
           }"
         />
-        <Button onClick="api.execute()" testId="exec" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
       </Fragment>
     `, {
       apiInterceptor: {
@@ -2929,9 +2929,9 @@ test.describe("Deferred Mode - Step 11: Cancellation", () => {
           cancelUrl="/api/operation/cancel/{$result.operationId}"
           pollingInterval="500"
         />
-        <Button onClick="api.execute()" testId="exec" />
-        <Button onClick="api.cancel()" testId="cancel" />
-        <Button onClick="testState = api.isPolling()" testId="check" />
+        <Button onClick="api.execute()" testId="exec" label="exec"/>
+        <Button onClick="api.cancel()" testId="cancel" label="cancel"/>
+        <Button onClick="testState = api.isPolling()" testId="check" label="check"/>
       </Fragment>
     `, {
       apiInterceptor: {
@@ -3343,7 +3343,7 @@ test.describe("mockExecute event", () => {
           onSuccess="result => testState = result.id"
           onMockExecute="() => ({ id: 99, name: 'Mocked' })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3369,7 +3369,7 @@ test.describe("mockExecute event", () => {
           onError="() => testState = 'error'"
           onMockExecute="() => ({ id: 1 })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3393,7 +3393,7 @@ test.describe("mockExecute event", () => {
           onSuccess="result => testState = result.term"
           onMockExecute="() => ({ term: $queryParams.term })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3417,7 +3417,7 @@ test.describe("mockExecute event", () => {
           onSuccess="result => testState = result"
           onMockExecute="() => ({ name: $requestBody.name, age: $requestBody.age })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3441,7 +3441,7 @@ test.describe("mockExecute event", () => {
           onSuccess="result => testState = result.found"
           onMockExecute="() => ({ found: $requestHeaders['x-custom-header'] })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3510,7 +3510,7 @@ test.describe("mockExecute event", () => {
           onSuccess="result => testState = result.name"
           onMockExecute="() => ({ id: 1, name: 'MockedUser' })"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
@@ -3533,7 +3533,7 @@ test.describe("mockExecute event", () => {
           onError="() => testState = 'mock-error'"
           onMockExecute="() => { throw 'simulated error'; }"
         />
-        <Button testId="trigger" onClick="api.execute()" />
+        <Button testId="trigger" onClick="api.execute()" label="execute"/>
       </Fragment>
     `);
 
