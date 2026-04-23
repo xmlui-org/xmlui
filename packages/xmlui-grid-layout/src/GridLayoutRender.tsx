@@ -1,7 +1,101 @@
-import React, { memo, useState, useEffect, useCallback } from "react";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import React, { memo, useState, useEffect, useCallback, useMemo } from "react";
+import * as ReactDOM from "react-dom";
+import reactGridLayoutUrl from "react-grid-layout/dist/react-grid-layout.min.js?url";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+type ReactGridLayoutGlobal = {
+  Responsive: React.ComponentType<any>;
+  WidthProvider: (component: React.ComponentType<any>) => React.ComponentType<any>;
+};
+
+let reactGridLayoutPromise: Promise<ReactGridLayoutGlobal> | null = null;
+
+async function loadReactGridLayout(): Promise<ReactGridLayoutGlobal> {
+  if (typeof window === "undefined") {
+    throw new Error("react-grid-layout is only available in the browser");
+  }
+
+  const win = window as typeof window & {
+    React?: typeof React;
+    ReactDOM?: typeof ReactDOM;
+    ReactGridLayout?:
+      | ReactGridLayoutGlobal
+      | (React.ComponentType<any> & ReactGridLayoutGlobal);
+  };
+
+  const getGridLayoutApi = () => {
+    const responsive = win.ReactGridLayout?.Responsive;
+    const widthProvider = win.ReactGridLayout?.WidthProvider;
+
+    if (responsive && widthProvider) {
+      return {
+        Responsive: responsive,
+        WidthProvider: widthProvider,
+      };
+    }
+
+    return null;
+  };
+
+  const existingApi = getGridLayoutApi();
+  if (existingApi) {
+    return existingApi;
+  }
+
+  if (!reactGridLayoutPromise) {
+    reactGridLayoutPromise = new Promise<ReactGridLayoutGlobal>((resolve, reject) => {
+      win.React ||= React;
+      win.ReactDOM ||= ReactDOM;
+
+      const existingScript = document.querySelector<HTMLScriptElement>(
+        "script[data-xmlui-react-grid-layout]",
+      );
+
+      const handleReady = () => {
+        const api = getGridLayoutApi();
+        if (api) {
+          resolve(api);
+        } else {
+          reactGridLayoutPromise = null;
+          reject(new Error("react-grid-layout loaded without expected globals"));
+        }
+      };
+
+      const handleError = () => {
+        reactGridLayoutPromise = null;
+        reject(new Error("Failed to load react-grid-layout"));
+      };
+
+      if (existingScript) {
+        if (existingScript.dataset.loaded === "true") {
+          handleReady();
+          return;
+        }
+        existingScript.addEventListener("load", handleReady, { once: true });
+        existingScript.addEventListener("error", handleError, { once: true });
+        return;
+      }
+
+      const script = document.createElement("script");
+      script.src = reactGridLayoutUrl;
+      script.async = true;
+      script.dataset.xmluiReactGridLayout = "true";
+      script.addEventListener(
+        "load",
+        () => {
+          script.dataset.loaded = "true";
+          handleReady();
+        },
+        { once: true },
+      );
+      script.addEventListener("error", handleError, { once: true });
+      document.head.appendChild(script);
+    });
+  }
+
+  return reactGridLayoutPromise;
+}
 
 function flattenChildren(children: React.ReactNode): React.ReactNode[] {
   const flat: React.ReactNode[] = [];
@@ -70,6 +164,7 @@ export const GridLayoutRender = memo(function GridLayoutRender({
 
   const [resolvedGap, setResolvedGap] = useState(() => resolveCssLength(gap, 16));
   const [currentLayout, setCurrentLayout] = useState<any[]>(layout || []);
+  const [gridLayoutApi, setGridLayoutApi] = useState<ReactGridLayoutGlobal | null>(null);
 
   useEffect(() => {
     setResolvedGap(resolveCssLength(gap, 16));
@@ -78,6 +173,24 @@ export const GridLayoutRender = memo(function GridLayoutRender({
   useEffect(() => {
     if (layout) setCurrentLayout(layout);
   }, [layout]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    loadReactGridLayout()
+      .then((api) => {
+        if (!cancelled) {
+          setGridLayoutApi(api);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to initialize GridLayout", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLayoutChange = useCallback((newLayout: any[]) => {
     setCurrentLayout(newLayout);
@@ -106,9 +219,29 @@ export const GridLayoutRender = memo(function GridLayoutRender({
 
   // Flatten children (unwrap XMLUI Items/template wrapper elements)
   const flatChildren = flattenChildren(children);
+  const ResponsiveGridLayout = useMemo(
+    () => (gridLayoutApi ? gridLayoutApi.WidthProvider(gridLayoutApi.Responsive) : null),
+    [gridLayoutApi],
+  );
 
   // react-grid-layout matches children to layout items by child.key.
   // Ensure each child div has a key and data-grid matching the layout.
+  if (!ResponsiveGridLayout) {
+    return (
+      <div className={className}>
+        {flatChildren.map((child, i) => {
+          const layoutItem = currentLayout[i];
+          const key = layoutItem?.i ?? `_gl_${i}`;
+          return (
+            <div key={key} style={{ overflow: "auto", marginBottom: resolvedGap }}>
+              {child}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <ResponsiveGridLayout
       className={className}
