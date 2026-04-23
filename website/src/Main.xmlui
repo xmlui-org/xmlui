@@ -537,6 +537,11 @@
                         />
                         <NavLink
                             icon="article"
+                            label="Prevent undefined requests in chained DataSources"
+                            to="/docs/howto/prevent-undefined-requests-in-chained-datasources"
+                        />
+                        <NavLink
+                            icon="article"
                             label="Chain a DataSource refetch"
                             to="/docs/howto/chain-a-refetch"
                         />
@@ -1688,6 +1693,13 @@
             >
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/delay-a-datasource-until-another-datasource-is-ready.md']}"
+                />
+            </Page>
+            <Page
+                url="/docs/howto/prevent-undefined-requests-in-chained-datasources"
+            >
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/prevent-undefined-requests-in-chained-datasources.md']}"
                 />
             </Page>
             <Page
