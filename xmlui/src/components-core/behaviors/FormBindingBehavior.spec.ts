@@ -844,6 +844,8 @@ test.describe("Validation", () => {
     await expect(textbox).toBeFocused();
     await textbox.fill("test");
     await textbox.fill("");
+    // Confirm React has processed the fill before blurring
+    await expect(textbox).toHaveValue("");
 
     // Explicitly blur the field to trigger validation
     await textbox.blur();
@@ -1783,6 +1785,7 @@ test.describe("Other Edge Cases", () => {
     const input = driver.input;
 
     await input.fill("va");
+    await expect(input).toHaveValue("va");
     await input.blur({ timeout: 500 });
     await input.focus();
     await expect(page.getByText("Input should be at least 3 characters")).toBeVisible();
@@ -1803,6 +1806,7 @@ test.describe("Other Edge Cases", () => {
     const input = driver.input;
 
     await input.fill("va");
+    await expect(input).toHaveValue("va");
     await input.blur({ timeout: 500 });
     await input.focus({ timeout: 500 });
     await input.fill("val");
@@ -1826,6 +1830,7 @@ test.describe("Other Edge Cases", () => {
     const input = driver.input;
 
     await input.fill("va");
+    await expect(input).toHaveValue("va");
     await input.blur({ timeout: 500 });
 
     await input.focus({ timeout: 500 });

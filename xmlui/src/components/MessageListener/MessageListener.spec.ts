@@ -101,18 +101,26 @@ test.describe("Basic Functionality", () => {
       </VStack>
     `);
 
-    const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
-    const { top: item2Top } = await getBounds(page.getByTestId("item2"));
-    const { bottom: item2Bottom } = await getBounds(page.getByTestId("item2"));
-    const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+    // Wait for all elements to be visible and laid out before measuring
+    await expect(page.getByTestId("item1")).toBeVisible();
+    await expect(page.getByTestId("item2")).toBeVisible();
+    await expect(page.getByTestId("item3")).toBeVisible();
 
-    // Gap between item1 and item2 (should be space-8 = 32px)
-    const gap1 = item2Top - item1Bottom;
-    expect(gap1).toBeCloseTo(32, 0);
+    // Poll measurements to allow layout to fully stabilize before asserting.
+    // Sub-pixel rendering and deferred effects can cause a single getBounds
+    // snapshot to be slightly off; retrying until the value is stable is more
+    // reliable than a one-shot assertion.
+    await expect.poll(async () => {
+      const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
+      const { top: item2Top } = await getBounds(page.getByTestId("item2"));
+      return Math.abs(item2Top - item1Bottom - 32) < 1;
+    }, { timeout: 10000 }).toBe(true);
 
-    // Gap between item2 and item3 (should be space-8 = 32px)
-    const gap2 = item3Top - item2Bottom;
-    expect(gap2).toBeCloseTo(32, 0);
+    await expect.poll(async () => {
+      const { bottom: item2Bottom } = await getBounds(page.getByTestId("item2"));
+      const { top: item3Top } = await getBounds(page.getByTestId("item3"));
+      return Math.abs(item3Top - item2Bottom - 32) < 1;
+    }, { timeout: 10000 }).toBe(true);
   });
 
   test("doesn't disrupt HStack layout gaps", async ({ initTestBed, page }) => {
