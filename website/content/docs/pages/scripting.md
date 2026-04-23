@@ -253,11 +253,10 @@ The following JavaScript features are **not available** in the XMLUI scripting e
 
 | Feature | Status | Alternative |
 |---------|--------|-------------|
-| `async` / `await` | Not supported | Event handlers are already async; use chained calls |
+| `async` / `await` | Not supported | Event handlers are already async; the engine is smart enough and awaits the async calls |
 | `class` declarations | Not supported | Use plain objects and functions |
 | Destructuring assignment (`const { a, b } = obj`) | Not supported | Access properties directly: `obj.a`, `obj.b` |
 | Generator functions (`function*`) | Not supported | — |
-| Template literals (`` `Hello ${name}` ``) | Not supported | Use string concatenation or XMLUI interpolation `{expr}` |
 | `import` / `export` | Not available in inline code | Use code-behind files with top-level `function` declarations |
 
 ### Unavailable globals
