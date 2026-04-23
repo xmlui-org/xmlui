@@ -337,15 +337,18 @@ Some backends accept a request and return a job ID, then process asynchronously.
   url="/api/jobs"
   method="POST"
   body="{jobConfig}"
-  pollUrl="/api/jobs/{$result.jobId}/status"
-  pollIntervalMs="2000"
-  maxPollAttemptsBeforeFail="30"
+  deferredMode="true"
+  statusUrl="/api/jobs/{$result.jobId}/status"
+  pollingInterval="2000"
+  maxPollingDuration="300000"
+  pollingBackoff="exponential"
+  maxPollingInterval="30000"
   completionCondition="$statusData.status === 'done'"
   progressExtractor="$statusData.percentComplete"
 />
 ```
 
-The initial request fires, then XMLUI polls `pollUrl` every `pollIntervalMs` milliseconds until `completionCondition` evaluates to true (or max attempts are reached). The `progress` event fires with `$progress` after each poll.
+The initial request fires, then XMLUI polls `statusUrl` every `pollingInterval` milliseconds (with optional backoff) until `completionCondition` evaluates to true or `maxPollingDuration` is exceeded. The `progress` event fires with `$progress` and `$statusData` after each poll. Context variables `$attempts` and `$elapsed` track the number of polls and elapsed time.
 
 ---
 

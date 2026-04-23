@@ -119,7 +119,54 @@ Available values:
 
 > [!DEF]  default: **false**
 
-Enable deferred operation mode for long-running operations that return 202 Accepted. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)
+Enable deferred operation mode for long-running operations that return **202 Accepted**. When enabled, the component will automatically poll a status endpoint to track operation progress. (Experimental feature)
+
+First, `APICall` executes the initial request, then `statusUrl` polls until completion or failure.
+
+Use `statusUrl` to define the polling endpoint. If you need query parameters for status checks, include them directly in the URL template.
+
+```xmlui-pg name="Example: deferredMode with statusUrl and status query params"
+---app copy display {7,8}
+<App>
+  <APICall
+    id="startExport"
+    method="post"
+    url="/api/exports"
+    body="{{ format: 'csv' }}"
+    deferredMode="true"
+    statusUrl="/api/exports/{$result.jId}/status?tenant={$result.tId}&includeProgress=true"
+    statusMethod="get"
+    pollingInterval="1000"
+    maxPollingDuration="60000"
+    completionCondition="{$statusData.state === 'completed'}"
+    errorCondition="{$statusData.state === 'failed'}"
+    progressExtractor="{$statusData.progress}"
+    inProgressNotificationMessage="Preparing export: {$progress}%"
+    completedNotificationMessage="Export is ready"
+    errorNotificationMessage="Export failed: {$statusData.message}"
+  />
+
+  <Button label="Start export" onClick="startExport.execute()" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.exportJobs = {}",
+  "operations": {
+    "start-export": {
+      "url": "/exports",
+      "method": "post",
+      "handler": "const id = 'job-' + Date.now(); $state.exportJobs[id] = { progress: 0, state: 'running', message: 'Export in progress' }; return { jId: id, tId: 'tenant-a' };"
+    },
+    "get-export-status": {
+      "url": "/exports/:jId/status",
+      "method": "get",
+      "pathParamTypes": { "jId": "string" },
+      "handler": "const job = $state.exportJobs[$pathParams.jId]; if (!job) return { state: 'failed', progress: 0, message: 'Job not found' }; if (job.state === 'running') { job.progress = Math.min(100, job.progress + 25); if (job.progress >= 100) { job.state = 'completed'; job.message = 'Export completed'; } } return { state: job.state, progress: job.progress, message: job.message, tenant: $queryParams.tenant, includeProgress: $queryParams.includeProgress };"
+    }
+  }
+}
+```
 
 ### `errorCondition` [#errorcondition]
 
@@ -221,13 +268,13 @@ Message to show in toast notification during deferred operation polling. Can inc
 
 > [!DEF]  default: **300000**
 
-Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).
+Maximum time to poll before timing out, in milliseconds.
 
 ### `maxPollingInterval` [#maxpollinginterval]
 
 > [!DEF]  default: **30000**
 
-Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).
+Maximum interval between polls when using backoff strategies, in milliseconds.
 
 ### `method` [#method]
 
@@ -249,7 +296,52 @@ Available values: `none` **(default)**, `linear`, `exponential`
 
 > [!DEF]  default: **2000**
 
-Milliseconds between status polls. Defaults to 2000ms.
+Controls how often status checks run in deferred mode (in milliseconds).
+
+Combine it with `pollingBackoff` to reduce server load for long-running tasks.
+
+Note how in this example, the progress toast shows up less frequently as polling time is increased from the preset one.
+
+```xmlui-pg name="Example: pollingInterval with pollingBackoff"
+---app copy display {8,9}
+<App>
+  <APICall
+    id="rebuildSearch"
+    method="post"
+    url="/api/search/rebuild"
+    deferredMode="true"
+    statusUrl="/api/search/rebuild/{$result.operationId}/status"
+    pollingInterval="1000"
+    pollingBackoff="exponential"
+    maxPollingInterval="10000"
+    maxPollingDuration="180000"
+    completionCondition="{$statusData.done === true}"
+    errorCondition="{$statusData.failed === true}"
+    progressExtractor="{$statusData.percent}"
+    inProgressNotificationMessage="Rebuilding index: {$progress}%"
+  />
+
+  <Button label="Rebuild search index" onClick="rebuildSearch.execute()" />
+</App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.rebuildOps = {}",
+  "operations": {
+    "start-rebuild": {
+      "url": "/search/rebuild",
+      "method": "post",
+      "handler": "const id = 'op-' + Date.now(); $state.rebuildOps[id] = { percent: 0, done: false, failed: false }; return { operationId: id };"
+    },
+    "get-rebuild-status": {
+      "url": "/search/rebuild/:operationId/status",
+      "method": "get",
+      "pathParamTypes": { "operationId": "string" },
+      "handler": "const op = $state.rebuildOps[$pathParams.operationId]; if (!op) return { percent: 0, done: false, failed: true }; if (!op.done && !op.failed) { op.percent = Math.min(100, op.percent + 20); if (op.percent >= 100) op.done = true; } return { percent: op.percent, done: op.done, failed: op.failed };"
+    }
+  }
+}
+```
 
 ### `progressExtractor` [#progressextractor]
 

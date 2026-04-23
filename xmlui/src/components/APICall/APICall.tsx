@@ -121,7 +121,7 @@ export const APICallMd = createMetadata({
     },
     deferredMode: {
       description:
-        "Enable deferred operation mode for long-running operations that return 202 Accepted. " +
+        "Enable deferred operation mode for long-running operations that return **202 Accepted**. " +
         "When enabled, the component will automatically poll a status endpoint to track operation progress. " +
         "(Experimental feature)",
       valueType: "boolean",
@@ -141,13 +141,13 @@ export const APICallMd = createMetadata({
       defaultValue: defaultProps.statusMethod,
     },
     pollingInterval: {
-      description: "Milliseconds between status polls. Defaults to 2000ms.",
+      description: "Controls how often status checks run in deferred mode (in milliseconds).",
       valueType: "number",
       defaultValue: defaultProps.pollingInterval,
     },
     maxPollingDuration: {
       description:
-        "Maximum time to poll before timing out, in milliseconds. Defaults to 300000ms (5 minutes).",
+        "Maximum time to poll before timing out, in milliseconds.",
       valueType: "number",
       defaultValue: defaultProps.maxPollingDuration,
     },
@@ -161,7 +161,7 @@ export const APICallMd = createMetadata({
     },
     maxPollingInterval: {
       description:
-        "Maximum interval between polls when using backoff strategies, in milliseconds. Defaults to 30000ms (30 seconds).",
+        "Maximum interval between polls when using backoff strategies, in milliseconds.",
       valueType: "number",
       defaultValue: defaultProps.maxPollingInterval,
     },
