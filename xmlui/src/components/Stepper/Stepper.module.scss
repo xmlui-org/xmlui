@@ -215,36 +215,11 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
   }
 
   .horizontalContent {
-    will-change: transform, opacity;
-    animation: stepSlideIn 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-
-  @keyframes stepSlideIn {
-    0% {
-      opacity: 0;
-      transform: translate3d(40px, 0, 0);
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
-  }
-
-  @keyframes stepFadeIn {
-    0% {
-      opacity: 0;
-      transform: translate3d(0, 20px, 0);
-    }
-    60% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 1;
-      transform: translate3d(0, 0, 0);
-    }
+    will-change: opacity;
+    // Sequential cross-fade is driven by inline `opacity` toggled from React
+    // (see StepperReact `bodyVisible` state). Keep the transition duration
+    // in sync with FADE_MS in that file.
+    transition: opacity 180ms ease-out;
   }
 
   // Vertical mode

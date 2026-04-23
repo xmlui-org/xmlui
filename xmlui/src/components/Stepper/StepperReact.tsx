@@ -76,6 +76,37 @@ export const Stepper = memo(
       setActiveIndex(next);
     }, [activeStep]);
 
+    // Horizontal-mode sequential cross-fade: on step change we first fade out
+    // the currently displayed step, then swap the content, then fade in the
+    // new step. `displayedIndex` is what the body actually renders, while
+    // `activeIndex` (above) is what the header highlights and what external
+    // consumers see. Header highlight flips immediately; body eases over.
+    const [displayedIndex, setDisplayedIndex] = useState<number>(activeIndex);
+    const [bodyVisible, setBodyVisible] = useState<boolean>(true);
+
+    useEffect(() => {
+      if (orientation !== "horizontal") {
+        // Vertical mode does its own per-segment accordion animation; keep
+        // `displayedIndex` in sync so switching orientations does not leave
+        // the body stale.
+        if (displayedIndex !== activeIndex) setDisplayedIndex(activeIndex);
+        if (!bodyVisible) setBodyVisible(true);
+        return;
+      }
+      if (activeIndex === displayedIndex) return;
+      // Fade out the current step first.
+      setBodyVisible(false);
+      const FADE_MS = 180;
+      const swapTimer = setTimeout(() => {
+        setDisplayedIndex(activeIndex);
+        // Next frame: fade the (now-swapped) new step back in.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => setBodyVisible(true));
+        });
+      }, FADE_MS);
+      return () => clearTimeout(swapTimer);
+    }, [activeIndex, displayedIndex, orientation, bodyVisible]);
+
     useEffect(() => {
       updateState?.({ activeStep: activeIndex });
     }, [activeIndex, updateState]);
@@ -105,10 +136,16 @@ export const Stepper = memo(
     );
     stepItemsRef.current = stepItems;
 
+    // In horizontal mode we delay the body swap until the fade-out finishes,
+    // so the context's activeStepId follows `displayedIndex` (not the raw
+    // `activeIndex`). In vertical mode `displayedIndex` tracks `activeIndex`
+    // one-for-one so per-segment accordions open and close immediately.
+    const indexForBody =
+      orientation === "horizontal" ? displayedIndex : activeIndex;
     const activeStepId = useMemo(() => {
-      if (activeIndex < 0 || activeIndex >= stepItems.length) return "";
-      return stepItems[activeIndex]?.innerId ?? "";
-    }, [stepItems, activeIndex]);
+      if (indexForBody < 0 || indexForBody >= stepItems.length) return "";
+      return stepItems[indexForBody]?.innerId ?? "";
+    }, [stepItems, indexForBody]);
 
     const contextWithActiveId = useMemo(
       () => ({ ...contextValue, activeStepId }),
@@ -288,11 +325,11 @@ export const Stepper = memo(
               })}
             </div>
             {/* Only the active Step's content is rendered (Step decides internally). */}
-            {/* Keyed by activeIndex so the content remounts on step change and */}
-            {/* re-triggers the `stepFadeIn` keyframe animation. */}
+            {/* Opacity is driven by `bodyVisible`: on step change we fade out, */}
+            {/* swap `displayedIndex`, then fade the new content back in. */}
             <div
-              key={activeIndex}
               className={classnames(styles.content, styles.horizontalContent)}
+              style={{ opacity: bodyVisible ? 1 : 0 }}
             >
               {children}
             </div>
