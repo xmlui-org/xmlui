@@ -1232,7 +1232,7 @@ test.describe("Validation Feedback", () => {
     await expect(conciseFeedback).toBeVisible();
   });
 
-  test("shows valid icon in concise mode when valid", async ({ initTestBed, page, createAutoCompleteDriver }) => {
+  test("shows valid icon in concise mode when valid", async ({ initTestBed, page }) => {
     await initTestBed(`
       <Form verboseValidationFeedback="{false}">
         <AutoComplete testId="input" bindTo="input" required="{true}">
@@ -1242,16 +1242,17 @@ test.describe("Validation Feedback", () => {
       </Form>
     `);
     
-    const driver = await createAutoCompleteDriver("input");
-    
     // First make it invalid
     await page.getByTestId("submit").click();
     
-    // Now make it valid
-    await driver.click();
-    await driver.selectLabel("Option 1");
-    // Blur to trigger validation if needed
-    await page.getByRole("combobox").blur();
+    // Now make it valid — click the combobox directly to ensure it has focus,
+    // then select the option without force so focus returns to the combobox
+    const combobox = page.getByRole("combobox");
+    await combobox.click();
+    await page.getByRole("option", { name: "Option 1" }).click();
+    // Ensure combobox has focus before blur so the blur event fires and triggers validation
+    await expect(combobox).toBeFocused();
+    await combobox.blur();
     
     const conciseFeedback = page.locator("[data-part-id='conciseValidationFeedback']");
     await expect(conciseFeedback).toBeVisible();

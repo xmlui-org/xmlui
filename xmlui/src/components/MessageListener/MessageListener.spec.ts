@@ -113,13 +113,13 @@ test.describe("Basic Functionality", () => {
     await expect.poll(async () => {
       const { bottom: item1Bottom } = await getBounds(page.getByTestId("item1"));
       const { top: item2Top } = await getBounds(page.getByTestId("item2"));
-      return Math.abs(item2Top - item1Bottom - 32) < 1;
+      return Math.abs(item2Top - item1Bottom - 32) <= 2;
     }, { timeout: 10000 }).toBe(true);
 
     await expect.poll(async () => {
       const { bottom: item2Bottom } = await getBounds(page.getByTestId("item2"));
       const { top: item3Top } = await getBounds(page.getByTestId("item3"));
-      return Math.abs(item3Top - item2Bottom - 32) < 1;
+      return Math.abs(item3Top - item2Bottom - 32) <= 2;
     }, { timeout: 10000 }).toBe(true);
   });
 

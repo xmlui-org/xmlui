@@ -1535,9 +1535,13 @@ test.describe("syncWithContent", () => {
     await page.goto(page.url().replace(/\/page\d.*$/, "/page8"));
     await expect(page.getByTestId("content8")).toBeVisible();
 
-    // Without syncWithContent the nav panel stays at the top — Page 8 link is NOT in viewport
-    const link8 = page.getByRole("link", { name: "Page 8" });
-    await expect(link8).not.toBeInViewport();
+    // Without syncWithContent the nav panel stays at the top: scrollTop should remain 0.
+    // Asserting on scrollTop is more robust than `toBeInViewport`, which can be sub-pixel
+    // sensitive when a link sits right at the viewport edge.
+    const navPanel = page.getByTestId("nav-panel");
+    await expect
+      .poll(async () => navPanel.evaluate((el) => (el as HTMLElement).scrollTop))
+      .toBe(0);
   });
 
   test("active link inside nested NavGroups is scrolled into view after groups expand", async ({
