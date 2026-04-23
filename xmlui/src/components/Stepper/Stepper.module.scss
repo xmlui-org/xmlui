@@ -214,41 +214,26 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     padding: $padding-content-Stepper;
   }
 
+  .horizontalContent {
+    animation: stepFadeIn 220ms ease;
+  }
+
+  @keyframes stepFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
   // Vertical mode
   .vertical .verticalItem {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
-  }
-
-  .vertical .verticalLeft {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 0 0 auto;
-  }
-
-  .vertical .verticalRight {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    padding-left: 12px;
-    padding-bottom: 12px;
-  }
-
-  .vertical .verticalConnector {
-    flex: 1 1 auto;
-    min-height: 12px;
-    width: 0;
-    border-left-width: $borderWidth-connector-Stepper;
-    border-left-style: $borderStyle-connector-Stepper;
-    border-left-color: $borderColor-connector-Stepper;
-    margin-top: 4px;
-    margin-bottom: 4px;
-  }
-
-  .vertical .verticalConnector.completed {
-    border-left-color: $borderColor-connector-Stepper--completed;
   }
 
   .vertical .verticalHeader {
@@ -263,6 +248,7 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     cursor: default;
     color: inherit;
     text-align: left;
+    align-self: flex-start;
   }
 
   .vertical .verticalHeader.clickable {
@@ -279,8 +265,23 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     border-radius: 4px;
   }
 
+  .vertical .verticalBody {
+    margin-left: calc($size-icon-Stepper / 2);
+    padding-left: calc($size-icon-Stepper / 2 + 12px);
+    border-left-width: $borderWidth-connector-Stepper;
+    border-left-style: $borderStyle-connector-Stepper;
+    border-left-color: $borderColor-connector-Stepper;
+    min-height: 16px;
+  }
+
+  .vertical .verticalBody.last {
+    border-left-color: transparent;
+    min-height: 0;
+  }
+
   .vertical .verticalContent {
     padding: $padding-content-Stepper;
+    animation: stepFadeIn 220ms ease;
   }
 }
 

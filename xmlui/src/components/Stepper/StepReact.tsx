@@ -71,7 +71,7 @@ export const Step = memo(
         <div
           {...rest}
           ref={forwardedRef}
-          className={classnames(classes?.[COMPONENT_PART_KEY], className)}
+          className={classnames(styles.horizontalContent, classes?.[COMPONENT_PART_KEY], className)}
           style={style}
           role="tabpanel"
         >
@@ -119,26 +119,23 @@ export const Step = memo(
         className={classnames(styles.verticalItem, classes?.[COMPONENT_PART_KEY], className)}
         style={style}
       >
-        <div className={styles.verticalLeft}>
-          {nonLinear ? (
-            <button
-              type="button"
-              className={classnames(styles.verticalHeader, styles.clickable)}
-              aria-current={isActive ? "step" : undefined}
-              onClick={() => onStepClick(innerId)}
-            >
-              {iconEl}
-              {labelEl}
-            </button>
-          ) : (
-            <div className={styles.verticalHeader} aria-current={isActive ? "step" : undefined}>
-              {iconEl}
-              {labelEl}
-            </div>
-          )}
-          {!isLast && <div className={styles.verticalConnector} aria-hidden="true" />}
-        </div>
-        <div className={styles.verticalRight}>
+        {nonLinear ? (
+          <button
+            type="button"
+            className={classnames(styles.verticalHeader, styles.clickable)}
+            aria-current={isActive ? "step" : undefined}
+            onClick={() => onStepClick(innerId)}
+          >
+            {iconEl}
+            {labelEl}
+          </button>
+        ) : (
+          <div className={styles.verticalHeader} aria-current={isActive ? "step" : undefined}>
+            {iconEl}
+            {labelEl}
+          </div>
+        )}
+        <div className={classnames(styles.verticalBody, { [styles.last]: isLast })}>
           {isActive && children && <div className={styles.verticalContent}>{children}</div>}
         </div>
       </div>

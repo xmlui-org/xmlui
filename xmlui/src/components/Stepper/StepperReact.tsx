@@ -13,7 +13,7 @@ import classnames from "classnames";
 
 import styles from "./Stepper.module.scss";
 
-import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
 import { noop } from "../../components-core/constants";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -32,6 +32,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   nonLinear?: boolean;
   classes?: Record<string, string>;
   registerComponentApi?: RegisterComponentApiFn;
+  updateState?: UpdateStateFn;
   onDidChange?: (newIndex: number, id: string) => void;
   children?: ReactNode;
 };
@@ -56,6 +57,7 @@ export const Stepper = memo(
       style,
       children,
       registerComponentApi,
+      updateState,
       onDidChange = noop,
       ...rest
     }: Props,
@@ -73,6 +75,10 @@ export const Stepper = memo(
       const next = Number.isFinite(activeStep) && activeStep >= 0 ? activeStep : 0;
       setActiveIndex(next);
     }, [activeStep]);
+
+    useEffect(() => {
+      updateState?.({ activeStep: activeIndex });
+    }, [activeIndex, updateState]);
 
     const stepItemsRef = useRef<StepItem[]>([]);
 
