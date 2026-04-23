@@ -211,22 +211,28 @@ type WorkerFixtures = {
 
 export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
   // Worker-scoped browser context — reused across all tests in a worker
-  _sharedContext: [async ({ browser }, use) => {
-    const context = await browser.newContext({
-      ...devices["Desktop Chrome"],
-      baseURL: E2E_BASE_URL,
-      serviceWorkers: "allow",
-      permissions: ["clipboard-read", "clipboard-write"],
-    });
-    await use(context);
-    await context.close();
-  }, { scope: "worker" }],
+  _sharedContext: [
+    async ({ browser }, use) => {
+      const context = await browser.newContext({
+        ...devices["Desktop Chrome"],
+        baseURL: E2E_BASE_URL,
+        serviceWorkers: "allow",
+        permissions: ["clipboard-read", "clipboard-write"],
+      });
+      await use(context);
+      await context.close();
+    },
+    { scope: "worker" },
+  ],
 
   // Worker-scoped page — reused across all tests in a worker
-  _sharedPage: [async ({ _sharedContext }, use) => {
-    const page = await _sharedContext.newPage();
-    await use(page);
-  }, { scope: "worker" }],
+  _sharedPage: [
+    async ({ _sharedContext }, use) => {
+      const page = await _sharedContext.newPage();
+      await use(page);
+    },
+    { scope: "worker" },
+  ],
 
   // Override test-scoped page to use the shared worker page.
   // This avoids creating a new browser context + page per test.
@@ -334,7 +340,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const components = description?.components?.map((c) => {
         const { component, errors, erroneousCompoundComponentName } = parseComponentIfNecessary(c);
         if (erroneousCompoundComponentName) {
-          const errorMessages = errors.map(e => `[${e.code}] ${e.message}`).join("\n");
+          const errorMessages = errors.map((e) => `[${e.code}] ${e.message}`).join("\n");
           throw new Error(
             `Error parsing component "${erroneousCompoundComponentName}":\n${errorMessages}`,
           );
@@ -417,12 +423,16 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const clipboard = new Clipboard(page);
 
       // Normalize extensionIds to array format
-      const extensionIds = description?.extensionIds 
-        ? (Array.isArray(description.extensionIds) ? description.extensionIds : [description.extensionIds])
+      const extensionIds = description?.extensionIds
+        ? Array.isArray(description.extensionIds)
+          ? description.extensionIds
+          : [description.extensionIds]
         : [];
 
       // Check if page already has the app loaded (from a previous test in this worker)
-      const isReady = await page.evaluate(() => !!(window as any).__XMLUI_READY__).catch(() => false);
+      const isReady = await page
+        .evaluate(() => !!(window as any).__XMLUI_READY__)
+        .catch(() => false);
 
       if (isReady) {
         // Fast path: update globals and reinit in-page (skip full page navigation).
@@ -442,26 +452,32 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           }
           initScriptQueue.length = 0;
 
-          await page.evaluate(({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
-            // Reset URL so React Router starts fresh at the app root.
-            history.replaceState(null, "", "/");
-            // Reset page-level scroll: anchor navigation from the previous test
-            // (e.g. clicking a #hash link) scrolls the page and that scroll
-            // position persists across reinits unless we reset it here.
-            window.scrollTo(0, 0);
-            (window as any).TEST_ENV = app;
-            (window as any).TEST_RUNTIME = app.runtime;
-            (window as any).TEST_EXTENSION_IDS = extensionIds;
-            (window as any).__XMLUI_REINIT__();
-          }, { app: _appDescription, extensionIds });
+          await page.evaluate(
+            ({ app, extensionIds }: { app: any; extensionIds: string[] }) => {
+              // Reset URL so React Router starts fresh at the app root.
+              history.replaceState(null, "", "/");
+              // Reset page-level scroll: anchor navigation from the previous test
+              // (e.g. clicking a #hash link) scrolls the page and that scroll
+              // position persists across reinits unless we reset it here.
+              window.scrollTo(0, 0);
+              (window as any).TEST_ENV = app;
+              (window as any).TEST_RUNTIME = app.runtime;
+              (window as any).TEST_EXTENSION_IDS = extensionIds;
+              (window as any).__XMLUI_REINIT__();
+            },
+            { app: _appDescription, extensionIds },
+          );
         } catch {
           // Reinit failed (page crashed?), fall back to full navigation
-          await page.addInitScript(({ app, extensionIds }) => {
-            // @ts-ignore
-            window.TEST_ENV = app;
-            window.TEST_RUNTIME = app.runtime;
-            window.TEST_EXTENSION_IDS = extensionIds;
-          }, { app: _appDescription, extensionIds });
+          await page.addInitScript(
+            ({ app, extensionIds }) => {
+              // @ts-ignore
+              window.TEST_ENV = app;
+              window.TEST_RUNTIME = app.runtime;
+              window.TEST_EXTENSION_IDS = extensionIds;
+            },
+            { app: _appDescription, extensionIds },
+          );
           await page.goto("/");
         }
       } else {
@@ -469,12 +485,15 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
         if (isCI) {
           await page.addInitScript(clipboard.init);
         }
-        await page.addInitScript(({ app, extensionIds }) => {
-          // @ts-ignore
-          window.TEST_ENV = app;
-          window.TEST_RUNTIME = app.runtime;
-          window.TEST_EXTENSION_IDS = extensionIds;
-        }, { app: _appDescription, extensionIds });
+        await page.addInitScript(
+          ({ app, extensionIds }) => {
+            // @ts-ignore
+            window.TEST_ENV = app;
+            window.TEST_RUNTIME = app.runtime;
+            window.TEST_EXTENSION_IDS = extensionIds;
+          },
+          { app: _appDescription, extensionIds },
+        );
         await page.goto("/");
       }
 
@@ -489,9 +508,10 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       // and browser style/layout computation finish before the test starts.
       await page.evaluate(() =>
         document.fonts.ready.then(
-          () => new Promise<void>(resolve => {
-            requestAnimationFrame(() => setTimeout(resolve, 0));
-          }),
+          () =>
+            new Promise<void>((resolve) => {
+              requestAnimationFrame(() => setTimeout(resolve, 0));
+            }),
         ),
       );
 

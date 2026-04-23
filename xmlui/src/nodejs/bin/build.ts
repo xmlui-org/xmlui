@@ -12,7 +12,6 @@ import { pathToFileURL } from "node:url";
 import path from "node:path";
 
 type ApiInterceptorDefinition = any;
-type CompoundComponentDef = any;
 type ThemeDefinition = any;
 
 // --- Set up the configuration
