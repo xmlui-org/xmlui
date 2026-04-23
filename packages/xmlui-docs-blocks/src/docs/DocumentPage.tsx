@@ -7,6 +7,10 @@ export const DocumentPageMd: ComponentMetadata = createMetadata({
   props: {
     content: { description: "Markdown content string." },
     url: { description: "URL to load markdown from." },
+    showInspector: {
+      description: "Show a page-level Inspector button and enable tracing for markdown playgrounds on this page.",
+      valueType: "boolean",
+    },
     hideToc: { description: "Hide table of contents.", valueType: "boolean" },
     maxHeadingLevel: { description: "Max TOC heading level.", valueType: "number" },
   },

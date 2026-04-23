@@ -33,7 +33,7 @@ $borderColor-dialog-Inspector: createThemeVar("borderColor-dialog-#{$component}"
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999;
+    z-index: 100000;
   }
 
   .dialog {

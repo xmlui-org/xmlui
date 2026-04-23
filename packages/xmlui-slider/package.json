@@ -1,18 +1,19 @@
 {
-  "name": "xmlui-gauge",
+  "name": "xmlui-slider",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
-  "main": "dist/xmlui-gauge.js",
-  "module": "dist/xmlui-gauge.mjs",
+  "main": "dist/xmlui-slider.js",
+  "module": "dist/xmlui-slider.mjs",
   "exports": {
     ".": {
-      "import": "./dist/xmlui-gauge.mjs",
-      "require": "./dist/xmlui-gauge.js"
+      "import": "./dist/xmlui-slider.mjs",
+      "require": "./dist/xmlui-slider.js"
     }
   },
   "dependencies": {
-    "smart-webcomponents-react": "^25.0.0",
+    "rc-slider": "^11.1.7",
     "classnames": "2.5.1"
   },
   "devDependencies": {

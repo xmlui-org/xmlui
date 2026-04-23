@@ -1,18 +1,19 @@
 {
-  "name": "xmlui-gauge",
+  "name": "xmlui-calendar",
   "version": "0.1.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
-  "main": "dist/xmlui-gauge.js",
-  "module": "dist/xmlui-gauge.mjs",
+  "main": "dist/xmlui-calendar.js",
+  "module": "dist/xmlui-calendar.mjs",
   "exports": {
     ".": {
-      "import": "./dist/xmlui-gauge.mjs",
-      "require": "./dist/xmlui-gauge.js"
+      "import": "./dist/xmlui-calendar.mjs",
+      "require": "./dist/xmlui-calendar.js"
     }
   },
   "dependencies": {
-    "smart-webcomponents-react": "^25.0.0",
+    "react-big-calendar": "^1.16.3",
     "classnames": "2.5.1"
   },
   "devDependencies": {

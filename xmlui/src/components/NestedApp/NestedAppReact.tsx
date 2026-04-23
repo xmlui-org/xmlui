@@ -9,6 +9,7 @@ import { errReportComponent, xmlUiMarkupToComponent } from "../../components-cor
 import { ApiInterceptorProvider } from "../../components-core/interception/ApiInterceptorProvider";
 import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { ProjectCompilation } from "../../abstractions/scripting/Compilation";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import { useIndexerContext } from "../App/IndexerContext";
@@ -36,6 +37,15 @@ type NestedAppProps = {
   withSplashScreen?: boolean;
   className?: string;
 };
+
+const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
+const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
+
+function toSafeFileStem(value: string | undefined, fallback: string): string {
+  if (!value) return fallback;
+  const normalized = value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+  return normalized || fallback;
+}
 
 function AnimatedLogo() {
   return (
@@ -198,9 +208,12 @@ export const NestedApp = memo(function NestedApp({
   }, []);
 
   useEffect(() => {
-    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(app);
+    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+      app,
+      PLAYGROUND_ENTRY_FILE,
+    );
     if (errors.length > 0) {
-      component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
+      component = errReportComponent(errors, PLAYGROUND_ENTRY_FILE, erroneousCompoundComponentName);
     }
 
     // Extract globalVars from the parsed app component
@@ -216,17 +229,36 @@ export const NestedApp = memo(function NestedApp({
       }
     }
 
-    const compoundComponents: CompoundComponentDef[] = (components ?? []).map((src) => {
+    const sources: Record<string, string> = {
+      [PLAYGROUND_ENTRY_FILE]: app,
+    };
+    const projectCompilation: ProjectCompilation = {
+      entrypoint: {
+        filename: PLAYGROUND_ENTRY_FILE,
+        definition: component as ComponentDef,
+        markupSource: app,
+        dependencies: new Set(),
+      },
+      components: [],
+      themes: {},
+    };
+
+    const compoundComponents: CompoundComponentDef[] = (components ?? []).map((src, index) => {
       const isErrorReportComponent = typeof src !== "string";
       if (isErrorReportComponent) {
         return src;
       }
+      const fallbackName = `Component${index + 1}`;
+      const parsedNameMatch = src.match(/<Component\s+name=["']([^"']+)["']/);
+      const componentFile = `${PLAYGROUND_COMPONENTS_DIR}/${toSafeFileStem(parsedNameMatch?.[1], fallbackName)}.xmlui`;
       let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
         src as string,
+        componentFile,
       );
       if (errors.length > 0) {
         return errReportComponent(errors, `nested xmlui`, erroneousCompoundComponentName);
       }
+      sources[componentFile] = src as string;
 
       // Extract globalVars from component definitions too
       if (component && "component" in component) {
@@ -234,6 +266,12 @@ export const NestedApp = memo(function NestedApp({
         if (compGlobalVars) {
           appGlobalVars = { ...appGlobalVars, ...compGlobalVars };
         }
+        projectCompilation.components.push({
+          filename: componentFile,
+          definition: component as CompoundComponentDef,
+          markupSource: src as string,
+          dependencies: new Set(),
+        });
       }
 
       return component;
@@ -271,7 +309,9 @@ export const NestedApp = memo(function NestedApp({
                     compoundComponents,
                     themes: config?.themes,
                   }}
+                  projectCompilation={projectCompilation}
                   resources={config?.resources}
+                  sources={sources}
                   extensionManager={componentRegistry.getExtensionManager()}
                 />
               </NestedAppRoot>

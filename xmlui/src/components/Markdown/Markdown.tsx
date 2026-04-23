@@ -91,6 +91,11 @@ export const MarkdownMd = createMetadata({
         "using the `| target=...` syntax will override this setting.",
       valueType: "boolean",
     },
+    enablePlaygroundTracing: {
+      description: "Automatically enables xsVerbose for xmlui-pg blocks rendered by this Markdown.",
+      valueType: "boolean",
+      isInternal: true,
+    },
     breakMode: {
       description:
         "This property controls how text breaks into multiple lines. " +
@@ -248,7 +253,7 @@ export const markdownComponentRenderer = wrapComponent(
     exclude: [
       "content", "removeIndents", "removeBr", "codeHighlighter",
       "showHeadingAnchors", "grayscale", "truncateLinks", "openLinkInNewTab",
-      "overflowMode", "breakMode", "anchorTemplate",
+      "overflowMode", "breakMode", "anchorTemplate", "enablePlaygroundTracing",
     ],
     customRender(_props, { node, extractValue, renderChild, classes }) {
       let renderedChildren = "";
@@ -286,6 +291,7 @@ export const markdownComponentRenderer = wrapComponent(
           openLinkInNewTab={extractValue.asOptionalBoolean(node.props.openLinkInNewTab)}
           overflowMode={extractValue(node.props.overflowMode) as OverflowMode | undefined}
           breakMode={extractValue(node.props.breakMode) as BreakMode | undefined}
+          enablePlaygroundTracing={extractValue.asOptionalBoolean(node.props.enablePlaygroundTracing)}
           anchorRenderer={node.props.anchorTemplate
             ? (anchorId: string, anchorHref: string) => (
                 <MemoizedItem
@@ -318,6 +324,7 @@ type TransformedMarkdownProps = {
   openLinkInNewTab?: boolean;
   overflowMode?: OverflowMode;
   breakMode?: BreakMode;
+  enablePlaygroundTracing?: boolean;
   anchorRenderer?: (anchorId: string, anchorHref: string) => React.ReactNode;
 };
 
@@ -337,6 +344,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
       openLinkInNewTab,
       overflowMode,
       breakMode,
+      enablePlaygroundTracing,
       anchorRenderer,
     }: TransformedMarkdownProps,
     ref,
@@ -356,7 +364,9 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
 
         resolvedMd =
           resolvedMd.slice(0, nextPlayground[0]) +
-          convertPlaygroundPatternToMarkdown(nextPlayground[2]) +
+          convertPlaygroundPatternToMarkdown(nextPlayground[2], {
+            enableTracing: enablePlaygroundTracing,
+          }) +
           resolvedMd.slice(nextPlayground[1]);
       }
 
@@ -371,7 +381,7 @@ const TransformedMarkdown = forwardRef<HTMLDivElement, TransformedMarkdownProps>
 
       resolvedMd = parseBindingExpression(resolvedMd, extractValue);
       return resolvedMd;
-    }, [children, extractValue]);
+    }, [children, enablePlaygroundTracing, extractValue]);
 
     return (
       <Markdown

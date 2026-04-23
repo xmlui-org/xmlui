@@ -19,7 +19,13 @@
     "xmlui-hello-world": "*",
     "xmlui-website-blocks": "*",
     "xmlui-docs-blocks": "*",
-    "xmlui-echart": "*"
+    "xmlui-echart": "*",
+    "xmlui-slider": "*",
+    "xmlui-calendar": "*",
+    "xmlui-gauge": "*",
+    "xmlui-grid-layout": "*",
+    "xmlui-masonry": "*",
+    "xmlui-tiptap-editor": "*"
   },
   "msw": {
     "workerDirectory": [
@@ -30,6 +36,12 @@
     "xmlui-website-blocks": "*",
     "xmlui-animations": "*",
     "xmlui-echart": "*",
+    "xmlui-slider": "*",
+    "xmlui-calendar": "*",
+    "xmlui-gauge": "*",
+    "xmlui-grid-layout": "*",
+    "xmlui-masonry": "*",
+    "xmlui-tiptap-editor": "*",
     "@emotion/is-prop-valid": "^1.3.1",
     "@octokit/rest": "^22.0.0"
   }

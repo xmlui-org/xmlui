@@ -1261,6 +1261,54 @@ describe("Playground pattern parsing", () => {
     });
   });
 
+  it("Convert default app with tracing enabled injects xsVerbose config", () => {
+    const content = `\`\`\`xmlui-pg
+<Button>Click me</Button>
+  \`\`\``;
+
+    const result = convertPlaygroundPatternToMarkdown(content, { enableTracing: true });
+    const base64 = result.match(/data-pg-content="([^"]+)"/)?.[1];
+
+    expect(base64).toBeDefined();
+    expect(base64ToJson(base64!)).toStrictEqual({
+      app: "<Button>Click me</Button>\n",
+      config: {
+        appGlobals: {
+          xsVerbose: true,
+        },
+      },
+    });
+  });
+
+  it("Convert existing config with tracing enabled merges xsVerbose into appGlobals", () => {
+    const content = `\`\`\`xmlui-pg
+---app
+<Button>Click me</Button>
+---config
+{
+  "apiUrl": "/api",
+  "appGlobals": {
+    "traceBucket": "docs"
+  }
+}
+  \`\`\``;
+
+    const result = convertPlaygroundPatternToMarkdown(content, { enableTracing: true });
+    const base64 = result.match(/data-pg-content="([^"]+)"/)?.[1];
+
+    expect(base64).toBeDefined();
+    expect(base64ToJson(base64!)).toStrictEqual({
+      app: "<Button>Click me</Button>\n",
+      config: {
+        apiUrl: "/api",
+        appGlobals: {
+          traceBucket: "docs",
+          xsVerbose: true,
+        },
+      },
+    });
+  });
+
   it("Convert explicit app+comp+config+api #1", () => {
     // --- Act
     const base64 =
