@@ -39,7 +39,6 @@ That's it. The component auto-registers and is immediately available in XMLUI ma
 
 | Package | Size | Third-party library |
 |---|---|---|
-| xmlui-slider | ~50 KB | @radix-ui/react-slider |
 | xmlui-calendar | ~200 KB | react-big-calendar |
 | xmlui-gauge | ~2.4 MB | smart-webcomponents-react |
 | xmlui-echart | ~1.1 MB | Apache ECharts |

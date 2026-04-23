@@ -13,14 +13,18 @@
     }
   },
   "dependencies": {
-    "react-big-calendar": "^1.16.3",
+    "react-big-calendar": "^1.19.4",
+    "dayjs": "^1.11.13",
     "classnames": "2.5.1"
   },
   "devDependencies": {
     "xmlui": "*"
   },
   "scripts": {
-    "build:extension": "node -e \"console.log('xmlui-calendar is dist-only; skipping extension build')\"",
-    "build:meta": "node -e \"console.log('xmlui-calendar is dist-only; skipping metadata build')\""
-  }
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata"
+  },
+  "files": [
+    "dist"
+  ]
 }
