@@ -36,15 +36,15 @@ interface Behavior {
 Behaviors execute in registration order. Each output becomes the next behavior's input. Registration order = innermost → outermost wrapping:
 
 ```
-label → animation → tooltip → variant → bookmark → formBinding → validation → displayWhen
-                                                                               (outermost)
+label → animation → tooltip → variant → bookmark → formBinding → validation
+                                                                  (outermost)
 ```
 
-External behaviors (from `ContributesDefinition`) are appended after `displayWhen`.
+External behaviors (from `ContributesDefinition`) are appended after `validation`.
 
 The outer-to-inner nesting in the DOM is the reverse of registration order.
 
-## The 8 Framework Behaviors
+## The 7 Framework Behaviors
 
 | # | Name | Trigger prop(s) | Skips / special logic |
 |---|------|----------------|-----------------------|
@@ -54,8 +54,7 @@ The outer-to-inner nesting in the DOM is the reverse of registration order.
 | 4 | `variant` | `variant` | Button: skips built-in variants (`solid`, `outlined`, `ghost`); Badge: skips built-in badge variants |
 | 5 | `bookmark` | `bookmark` | — |
 | 6 | `formBinding` | `bindTo` + value/setValue APIs | Also handles label rendering; skips `FormItem` type |
-| 7 | `validation` | `bindTo` + value/setValue APIs, or `FormItem` type | — |
-| 8 | `displayWhen` | `displayWhen` | Outermost wrapper; uses CSS `display:none` — never unmounts |
+| 7 | `validation` | `bindTo` + value/setValue APIs, or `FormItem` type | Outermost wrapper |
 
 > **`PubSubBehavior.tsx` exists** in `components-core/behaviors/` but is **not registered** in the current framework. It is not active.
 
@@ -80,15 +79,6 @@ canAttach: (context, node, metadata) => {
 
 When `formBindingBehavior` attaches (component has `bindTo` + value/setValue APIs), it takes over label rendering. `labelBehavior` explicitly checks for this and skips to prevent double-wrapping.
 
-## displayWhen — Mount vs. Visibility
-
-| Prop | React tree | DOM | Form fields |
-|------|-----------|-----|-------------|
-| `when="{false}"` | Unmounted | Absent | Not registered |
-| `displayWhen="{false}"` | **Mounted** | Hidden (`display:none`) | **Still registered** |
-
-`displayWhen` is registered last (outermost) so the entire composed node — label, tooltip, form binding — is hidden or revealed as a unit. Essential for multi-step wizard forms where hidden steps must keep their fields registered.
-
 ## Variant Behavior — CSS Variable Fallback Chain
 
 For `variant="premium"` on a Button, generates:
@@ -107,9 +97,7 @@ this.registerBehavior(tooltipBehavior);
 this.registerBehavior(variantBehavior);
 this.registerBehavior(bookmarkBehavior);
 this.registerBehavior(formBindingBehavior);
-this.registerBehavior(validationBehavior);
-// displayWhen last → outermost wrapper
-this.registerBehavior(displayWhenBehavior);
+this.registerBehavior(validationBehavior); // outermost wrapper
 
 // External behaviors appended after all framework behaviors
 contributes.behaviors?.forEach((behavior) => {
@@ -205,7 +193,6 @@ File exists (`PubSubBehavior.tsx`) but is **not registered**. Trigger props: `su
 | `components-core/behaviors/BookmarkBehavior.tsx` | Scroll-to-anchor support |
 | `components-core/behaviors/FormBindingBehavior.tsx` | Form field binding and label rendering |
 | `components-core/behaviors/ValidationBehavior.tsx` | Validation rules and feedback |
-| `components-core/behaviors/DisplayWhenBehavior.tsx` | CSS-based visibility (never unmounts) |
 | `components-core/behaviors/PubSubBehavior.tsx` | Pub/sub subscription (file exists, not registered) |
 | `components/ComponentProvider.tsx` | `ComponentRegistry.registerBehavior()`, registration site |
 | `components-core/ComponentAdapter.tsx` | Application site: calls `canAttach`/`attach` per behavior |

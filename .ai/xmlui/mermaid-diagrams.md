@@ -122,7 +122,7 @@ Add a fenced ` ```xml ` example immediately after a diagram when the diagram dep
 - Component nesting or containment (`Form` > `FormItem`, `Items` > `$item` context, UDC `<Slot>`)
 - Data binding (`DataSource` wired to a prop via `{loader.value}`)
 - State ownership that maps to `var.*` declarations
-- Props that activate a feature (e.g. `bindTo`, `uses`, `displayWhen`)
+- Props that activate a feature (e.g. `bindTo`, `uses`)
 
 **Skip the XML example when the diagram shows:**
 - Internal React infrastructure (provider stack, `useReducer`, React Query internals)

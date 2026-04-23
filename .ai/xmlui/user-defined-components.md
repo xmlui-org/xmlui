@@ -89,7 +89,7 @@ if (!isCompoundComponent) {
 }
 ```
 
-Behaviors (DisplayWhen, Variant, Tooltip, etc.) apply only to the inner built-in components within the UDC's markup, not to the UDC wrapper itself.
+Behaviors (Variant, Tooltip, etc.) apply only to the inner built-in components within the UDC's markup, not to the UDC wrapper itself.
 
 ## Slot Transposition
 
