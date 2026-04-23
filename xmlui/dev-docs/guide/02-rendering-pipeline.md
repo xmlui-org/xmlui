@@ -26,7 +26,7 @@ The key fork is in `ComponentWrapper`: **stateful nodes** get a full container s
 | 2 | `ComponentWrapper` | Node normalisation (data transforms), stateful/stateless routing |
 | 3a | `ContainerWrapper` → `StateContainer` → `Container` | State isolation, 6-layer state composition, event handler setup |
 | 3b | `ComponentAdapter` | Value extraction, layout, renderer call, behavior application, theming |
-| 4 | Behaviors | Cross-cutting wrappers (label, tooltip, formBinding, displayWhen, …) |
+| 4 | Behaviors | Cross-cutting wrappers (label, tooltip, formBinding, …) |
 | ∞ | `renderChild()` (recursive) | Children of the container rendered by repeating from step 1 |
 
 <!-- DIAGRAM: Flowchart of the pipeline above, with arrows and boxes for each step. Highlight the stateful vs stateless fork. -->
@@ -163,37 +163,9 @@ Behaviors are cross-cutting wrappers applied automatically based on a component'
 | `variant` | `variant` prop | Adds CSS variant class |
 | `bookmark` | `bookmark` prop | URL hash management |
 | `formBinding` | `bindTo` prop + component has `value`/`setValue` APIs | Two-way form value binding |
-| `validation` | `validationState`/`required`/`pattern` | Validation state wrapping |
-| `displayWhen` *(outermost)* | `displayWhen` prop + visual component | `<div style="display:none">` |
+| `validation` *(outermost)* | `validationState`/`required`/`pattern` | Validation state wrapping |
 
-**`when` vs `displayWhen`** — These look similar but work very differently:
-
-- `when` is evaluated in `renderChild()`. When false, the component returns `null` — it unmounts completely and loses all state.
-- `displayWhen` is applied by a behavior. When false, the component is wrapped in `display: none` — it stays mounted, state is preserved, and it can be shown again without reinitialisation.
-
-Use `displayWhen` when you need to toggle visibility without losing state (e.g., a form that should remember values while hidden).
-
-<!-- DIAGRAM: Side-by-side showing when=false (nothing in DOM) vs displayWhen=false (div with display:none in DOM) -->
-
-```mermaid
-graph TB
-  subgraph WhenFalse["`when` = false"]
-    WP["Parent renders"]
-    WN["null — component<br>not in DOM"]
-    WNote["state is lost<br>on re-mount"]
-    WP --> WN
-    WN -.->|"consequence"| WNote
-  end
-
-  subgraph DisplayWhenFalse["`displayWhen` = false"]
-    DP["Parent renders"]
-    DW["&lt;div style='display:none'&gt;"]
-    DC["component — still<br>mounted in DOM"]
-    DNote["state preserved<br>no reinitialisation"]
-    DP --> DW --> DC
-    DC -.->|"consequence"| DNote
-  end
-```
+**`when` and visibility** — `when` is evaluated in `renderChild()`. When false, the component returns `null` — it unmounts completely and loses all state.
 
 ## Error Boundaries
 
@@ -219,7 +191,7 @@ This means a user-defined component named the same as a core component will be s
 
 1. **The stateful/stateless fork is central** — `ComponentWrapper` routes stateful nodes through a full `StateContainer` + `Container` stack, and stateless nodes directly to `ComponentAdapter`. Knowing which path a component takes explains most rendering behaviour.
 2. **`ComponentAdapter` is where rendering actually happens** — value extraction, layout resolution, renderer call, behavior application, theme classes, and test IDs all happen here.
-3. **Behaviors wrap from inside out** — registration order determines nesting. `label` is innermost, `displayWhen` is outermost.
+3. **Behaviors wrap from inside out** — registration order determines nesting. `label` is innermost, `validation` is outermost.
 4. **Compound components never get behaviors** — if you're building a user-defined component, behavior props (`tooltip`, `variant`, etc.) won't work unless you explicitly handle them in the template.
-5. **`when` unmounts; `displayWhen` hides** — the choice between them has real consequences for state preservation.
+5. **`when` unmounts the component** — when `when` is false the subtree is removed from the React tree and state is lost.
 6. **Error boundaries are per-container** — a render error in one component subtree doesn't crash the rest of the app.

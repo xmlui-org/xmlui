@@ -96,6 +96,48 @@
           ]
         },
         {
+          "label": "Xmlui Recharts",
+          "to": "/docs/reference/extensions/xmlui-recharts/_overview",
+          "children": [
+            {
+              "label": "Extension Overview",
+              "to": "/docs/reference/extensions/xmlui-recharts/_overview"
+            },
+            {
+              "label": "AreaChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/AreaChart"
+            },
+            {
+              "label": "BarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/BarChart"
+            },
+            {
+              "label": "DonutChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/DonutChart"
+            },
+            {
+              "label": "LabelList",
+              "to": "/docs/reference/extensions/xmlui-recharts/LabelList"
+            },
+            {
+              "label": "Legend",
+              "to": "/docs/reference/extensions/xmlui-recharts/Legend"
+            },
+            {
+              "label": "LineChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/LineChart"
+            },
+            {
+              "label": "PieChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/PieChart"
+            },
+            {
+              "label": "RadarChart",
+              "to": "/docs/reference/extensions/xmlui-recharts/RadarChart"
+            }
+          ]
+        },
+        {
           "label": "Xmlui Tiptap Editor",
           "to": "/docs/reference/extensions/xmlui-tiptap-editor/_overview",
           "children": [

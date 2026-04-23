@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "main": "dist/xmlui-masonry.js",
+  "module": "dist/xmlui-masonry.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-masonry.mjs",
+      "require": "./dist/xmlui-masonry.js"
+    }
+  },
   "dependencies": {},
   "devDependencies": {
     "xmlui": "*"

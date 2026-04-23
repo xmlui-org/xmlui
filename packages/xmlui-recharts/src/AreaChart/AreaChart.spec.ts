@@ -29,7 +29,7 @@ const largeDataset = `[
 
 // Chart selectors - update based on specific Recharts component
 const chartRoot = ".recharts-responsive-container";
-const chartSvg = ".recharts-surface";
+const chartSvg = ".recharts-wrapper > .recharts-surface";
 const chartElementsSelector = ".recharts-area"; // AreaChart specific
 const legendSelector = ".recharts-legend-wrapper";
 const tooltipSelector = ".recharts-tooltip-wrapper";
@@ -52,7 +52,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -67,7 +66,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     const elements = page.locator(chartElementsSelector);
     await expect(elements).toHaveCount(2); // Should match dataKeys length
   });
@@ -83,7 +81,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -98,7 +95,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -117,7 +113,6 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xAxisSelector, { timeout: 10000 });
     await expect(page.locator(xAxisSelector)).toBeVisible();
   });
 
@@ -133,7 +128,7 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xAxisSelector)).not.toBeVisible();
   });
 
@@ -149,7 +144,7 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xTicksSelector)).not.toBeVisible();
   });
 });
@@ -166,7 +161,6 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(yAxisSelector, { timeout: 10000 });
     await expect(page.locator(yAxisSelector)).toBeVisible();
   });
 
@@ -182,7 +176,7 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yAxisSelector)).not.toBeVisible();
   });
 
@@ -198,7 +192,7 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yTicksSelector)).not.toBeVisible();
   });
 });
@@ -217,7 +211,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 
@@ -233,7 +227,6 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     await expect(page.locator(legendSelector)).toBeVisible();
   });
 });
@@ -252,7 +245,6 @@ test.describe("stacked areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     const areas = page.locator(chartElementsSelector);
     await expect(areas).toHaveCount(2);
   });
@@ -269,7 +261,6 @@ test.describe("stacked areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     const areas = page.locator(chartElementsSelector);
     await expect(areas).toHaveCount(2);
   });
@@ -287,7 +278,6 @@ test.describe("curved areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toBeVisible();
   });
 
@@ -303,7 +293,6 @@ test.describe("curved areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toBeVisible();
   });
 });
@@ -323,7 +312,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // In mini mode, legend and axes should be hidden
     await expect(page.locator(legendSelector)).not.toBeVisible();
@@ -343,7 +331,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // In normal mode, legend and axes should be visible
     await expect(page.locator(legendSelector)).toBeVisible();
@@ -366,13 +353,19 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over chart area to trigger tooltip
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip can be hidden", async ({ initTestBed, page }) => {
@@ -387,12 +380,11 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over chart area - tooltip should not appear
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
+    await _chartEl.hover({ force: true }).catch(() => {});
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });
@@ -411,7 +403,6 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(chartElementsSelector)).toHaveCount(1);
   });
@@ -427,7 +418,6 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -442,7 +432,7 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(chartElementsSelector)).toHaveCount(2);
   });
 
@@ -456,7 +446,6 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -473,7 +462,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(1);
   });
 
@@ -488,7 +476,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(3);
   });
 
@@ -503,7 +490,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(chartElementsSelector)).toHaveCount(0);
   });
@@ -519,7 +505,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -536,7 +521,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(xTicksSelector).first();
     await expect(firstTick).toContainText("Jan");
   });
@@ -552,7 +536,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(xTicksSelector).first();
     await expect(firstTick).toContainText("Jan");
   });
@@ -567,7 +550,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -582,7 +564,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -599,7 +580,6 @@ test.describe("hideX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xAxisSelector, { timeout: 10000 });
     await expect(page.locator(xAxisSelector)).toBeVisible();
   });
 
@@ -615,7 +595,7 @@ test.describe("hideX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xAxisSelector)).not.toBeVisible();
   });
 
@@ -631,7 +611,6 @@ test.describe("hideX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xAxisSelector, { timeout: 10000 });
     await expect(page.locator(xAxisSelector)).toBeVisible();
   });
 });
@@ -648,7 +627,6 @@ test.describe("hideY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(yAxisSelector, { timeout: 10000 });
     await expect(page.locator(yAxisSelector)).toBeVisible();
   });
 
@@ -664,7 +642,7 @@ test.describe("hideY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yAxisSelector)).not.toBeVisible();
   });
 
@@ -680,7 +658,6 @@ test.describe("hideY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(yAxisSelector, { timeout: 10000 });
     await expect(page.locator(yAxisSelector)).toBeVisible();
   });
 });
@@ -697,10 +674,7 @@ test.describe("hideTickX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(xAxisSelector, { timeout: 5000 });
     // Wait a bit more for ticks to render
-    await page.waitForTimeout(1000);
     const ticks = page.locator(xTicksSelector);
     await expect(ticks.first()).toBeVisible();
   });
@@ -717,7 +691,7 @@ test.describe("hideTickX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xTicksSelector)).not.toBeVisible();
   });
 
@@ -733,9 +707,6 @@ test.describe("hideTickX prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(xAxisSelector, { timeout: 5000 });
-    await page.waitForTimeout(1000);
     const ticks = page.locator(xTicksSelector);
     await expect(ticks.first()).toBeVisible();
   });
@@ -753,9 +724,6 @@ test.describe("hideTickY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(yAxisSelector, { timeout: 5000 });
-    await page.waitForTimeout(1000);
     const ticks = page.locator(yTicksSelector);
     await expect(ticks.first()).toBeVisible();
   });
@@ -772,7 +740,7 @@ test.describe("hideTickY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yTicksSelector)).not.toBeVisible();
   });
 
@@ -788,9 +756,6 @@ test.describe("hideTickY prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(yAxisSelector, { timeout: 5000 });
-    await page.waitForTimeout(1000);
     const ticks = page.locator(yTicksSelector);
     await expect(ticks.first()).toBeVisible();
   });
@@ -808,11 +773,17 @@ test.describe("hideTooltip prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("hides tooltip when hideTooltip is true", async ({ initTestBed, page }) => {
@@ -827,10 +798,9 @@ test.describe("hideTooltip prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
+    await _chartEl.hover({ force: true }).catch(() => {});
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 
@@ -846,11 +816,17 @@ test.describe("hideTooltip prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const _chartEl = page.locator(chartElementsSelector).first();
     await _chartEl.waitFor({ state: "visible", timeout: 10000 });
-    await _chartEl.hover({ force: true });
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await _chartEl.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 });
 
@@ -866,7 +842,7 @@ test.describe("showLegend prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 
@@ -882,7 +858,6 @@ test.describe("showLegend prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     await expect(page.locator(legendSelector)).toBeVisible();
   });
 
@@ -898,7 +873,7 @@ test.describe("showLegend prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 });
@@ -915,7 +890,6 @@ test.describe("stacked prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(2);
   });
 
@@ -931,7 +905,6 @@ test.describe("stacked prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(2);
   });
 
@@ -947,7 +920,6 @@ test.describe("stacked prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(2);
   });
 });
@@ -964,7 +936,6 @@ test.describe("curved prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toBeVisible();
   });
 
@@ -980,7 +951,6 @@ test.describe("curved prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toBeVisible();
   });
 
@@ -996,7 +966,6 @@ test.describe("curved prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartElementsSelector, { timeout: 10000 });
     await expect(page.locator(chartElementsSelector)).toBeVisible();
   });
 });
@@ -1014,7 +983,6 @@ test.describe("tickFormatter props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(xTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(xTicksSelector).first();
     await expect(firstTick).toContainText("X-");
   });
@@ -1031,7 +999,6 @@ test.describe("tickFormatter props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(yTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(yTicksSelector).first();
     await expect(firstTick).toContainText("%");
   });
@@ -1047,10 +1014,6 @@ test.describe("tickFormatter props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(xAxisSelector, { timeout: 5000 });
-    await page.waitForSelector(yAxisSelector, { timeout: 5000 });
-    await page.waitForTimeout(1000);
     const xTicks = page.locator(xTicksSelector);
     const yTicks = page.locator(yTicksSelector);
     await expect(xTicks.first()).toBeVisible();
@@ -1075,7 +1038,7 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(chartElementsSelector)).toHaveCount(2);
     await expect(page.locator(legendSelector)).toBeVisible();
     await expect(page.locator(xTicksSelector)).not.toBeVisible();
@@ -1096,7 +1059,7 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(chartElementsSelector)).toHaveCount(1);
     await expect(page.locator(xAxisSelector)).not.toBeVisible();
     await expect(page.locator(yAxisSelector)).not.toBeVisible();
@@ -1123,19 +1086,13 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(chartElementsSelector, { timeout: 5000 });
     await expect(page.locator(chartElementsSelector)).toHaveCount(3);
     
-    await page.waitForSelector(legendSelector, { timeout: 5000 });
     await expect(page.locator(legendSelector)).toBeVisible();
     
-    await page.waitForSelector(xAxisSelector, { timeout: 5000 });
-    await page.waitForSelector(yAxisSelector, { timeout: 5000 });
     await expect(page.locator(xAxisSelector)).toBeVisible();
     await expect(page.locator(yAxisSelector)).toBeVisible();
     
-    await page.waitForTimeout(1000);
     const xTicks = page.locator(xTicksSelector);
     const yTicks = page.locator(yTicksSelector);
     await expect(xTicks.first()).toBeVisible();

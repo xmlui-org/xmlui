@@ -38,6 +38,8 @@ When `when` is omitted or evaluates to `true`, the component renders normally.
 </App>
 ```
 
+One subtlety: if `when` starts as `false`, `onInit` does **not** fire at that point. It fires the first time `when` transitions from `false` to `true` — that is, when the component first becomes visible. Each subsequent `false`→`true` transition fires `onInit` again; the matching `true`→`false` transition fires `onCleanup`.
+
 ## Responsive `when-*` attributes
 
 The responsive variants follow a **mobile-first** (min-width) convention. Each attribute name is `when-` followed by a breakpoint name:

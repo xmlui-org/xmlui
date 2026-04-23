@@ -36,7 +36,6 @@ The following table summarizes the currently supported XMLUI behaviors.
 |---|---|---|
 | `Animation` | Applies visual animations to components with configurable duration, timing, and looping options. | `animation` |
 | `Bookmark` | Adds navigation anchors and table of contents integration to visual components. | `bookmark` |
-| `DisplayWhen` | Hides a component via `display: none` while keeping it mounted — essential for multi-step wizard forms. | `displayWhen` |
 | `FormBinding` | Binds input components directly to form data without requiring a FormItem wrapper. | `bindTo` |
 | `Label` | Wraps components with a label element for form inputs and other labeled content. | `label` |
 | `Tooltip` | Displays informational text or markdown content when hovering over visual components. | `tooltip`, `tooltipMarkdown` |
@@ -311,50 +310,6 @@ You can add validation functionality to input components with validation-related
 | `verboseValidationFeedback` | Whether to display verbose validation feedback (show all validation errors instead of just the first one) |
 
 _TBD_: Add validation example
-
-## DisplayWhen
-
-This behavior makes a component invisible without removing it from the rendered output. Unlike the standard `when` attribute — which stops rendering entirely — `displayWhen` keeps the component and all its children alive at all times, just invisible to the user.
-
-This distinction is critical for **multi-step wizard forms**: fields on hidden steps remain registered with the enclosing `Form`, so their values and validation state are preserved while the user navigates between steps.
-
-**Trigger Properties**
-
-| Name | Description |
-|---|---|
-| `displayWhen` | When `false`, makes the component invisible while keeping it and its children active |
-
-The following table compares `when` and `displayWhen`:
-
-| | `when="{false}"` | `displayWhen="{false}"` |
-|---|---|---|
-| Component rendered? | No | **Yes** (invisible) |
-| Form fields registered? | No | **Yes** |
-| Use when… | Content is truly irrelevant | Hidden steps must preserve their field values |
-
-```xmlui-pg display copy /displayWhen/ name="Example: wizard form with displayWhen"
-<App var.step="{1}">
-  <Form
-    data="{{ firstName: '', lastName: '' }}"
-    hideButtonRow="{true}"
-    onSubmit="(data) => toast('Submitted: ' + data.firstName + ' ' + data.lastName)"
-  >
-    <VStack displayWhen="{step === 1}">
-      <H4>Step 1 — Personal</H4>
-      <TextBox label="First Name" bindTo="firstName" required="true" />
-      <Button label="Next" onClick="step = 2" />
-    </VStack>
-    <VStack displayWhen="{step === 2}">
-      <H4>Step 2 — Account</H4>
-      <TextBox label="Last Name" bindTo="lastName" required="true" />
-      <HStack>
-        <Button label="Back" variant="outlined" onClick="step = 1" />
-        <Button label="Submit" type="submit" themeColor="primary" />
-      </HStack>
-    </VStack>
-  </Form>
-</App>
-```
 
 ## Variant
 

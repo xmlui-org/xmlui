@@ -48,7 +48,6 @@ test.describe("Basic Functionality", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -65,7 +64,6 @@ test.describe("Basic Functionality", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should render labels for each data point
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
@@ -86,7 +84,6 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -109,7 +106,6 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /A|B/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -127,7 +123,6 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const emojiLabels = page.locator(labelTextSelector).filter({ hasText: /😀|📱|💻|👨‍👩‍👧‍👦/ });
     await expect(emojiLabels.first()).toBeVisible();
   });
@@ -145,7 +140,6 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -162,7 +156,6 @@ test.describe("Key Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -189,7 +182,6 @@ test.describe("Position Property", () => {
         </PieChart>
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       await expect(page.locator(chartRoot)).toBeVisible();
       // Labels should be visible regardless of position
       const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
@@ -210,7 +202,6 @@ test.describe("Position Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -228,7 +219,6 @@ test.describe("Position Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -245,7 +235,6 @@ test.describe("Position Property", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -264,7 +253,6 @@ test.describe("Chart Integration", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -282,7 +270,6 @@ test.describe("Chart Integration", () => {
       </DonutChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -300,7 +287,6 @@ test.describe("Chart Integration", () => {
       </BarChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -317,7 +303,6 @@ test.describe("Chart Integration", () => {
       </LineChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -335,7 +320,6 @@ test.describe("Chart Integration", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -352,7 +336,6 @@ test.describe("Chart Integration", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Category/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -370,7 +353,6 @@ test.describe("Chart Integration", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -393,7 +375,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Labels should be rendered as text elements that are accessible
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
@@ -416,7 +397,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     const firstLabel = labels.first();
     
@@ -438,7 +418,6 @@ test.describe("Accessibility", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -464,7 +443,6 @@ test.describe("Theme Variables", () => {
       testThemeVars: { "textColor-LabelList": "rgb(255, 0, 0)" },
     });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     const firstLabel = labels.first();
     console.log(await firstLabel.textContent());
@@ -489,7 +467,6 @@ test.describe("Theme Variables", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     const firstLabel = labels.first();
     await expect(firstLabel).toBeVisible();
@@ -517,13 +494,11 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Component should remain stable during multiple renders
     for (let i = 0; i < 3; i++) {
       const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
       await expect(labels.first()).toBeVisible();
-      await page.waitForTimeout(100);
     }
   });
 
@@ -545,7 +520,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Very Long Label|Another Extremely Long/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -569,7 +543,6 @@ test.describe("Performance and Edge Cases", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const labels = page.locator(labelTextSelector).filter({ hasText: /Label &|Math|Star/ });
     await expect(labels.first()).toBeVisible();
   });
@@ -588,12 +561,10 @@ test.describe("Performance and Edge Cases", () => {
       <Button onClick="testState = testState === 'inside' ? 'outside' : 'inside'">Toggle Position</Button>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Toggle position multiple times to test performance
     for (let i = 0; i < 3; i++) {
       await page.getByRole("button", { name: "Toggle Position" }).click();
-      await page.waitForTimeout(100);
       const labels = page.locator(labelTextSelector).filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
       await expect(labels.first()).toBeVisible();
     }

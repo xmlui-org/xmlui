@@ -264,6 +264,23 @@ appGlobals: {
 
 ---
 
+### `syncExecutionTimeout`
+
+```ts
+syncExecutionTimeout?: number; // default: 1000ms
+```
+
+Affects the synchronous expression (bindings in markup attributes) execution timeout.
+If an expression times out, an error is thrown.
+
+```ts
+appGlobals: {
+  syncExecutionTimeout: 500,
+}
+```
+
+---
+
 ### `useHashBasedRouting`
 
 ```ts

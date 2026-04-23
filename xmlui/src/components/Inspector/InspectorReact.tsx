@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState, forwardRef, memo, type ForwardedRef } from "react";
+import { createPortal } from "react-dom";
 import classnames from "classnames";
 
 import styles from "./Inspector.module.scss";
@@ -18,7 +19,7 @@ type Props = {
 };
 
 export const defaultProps = {
-  src: "xmlui/xs-diff.html",
+  src: "/xmlui/xs-diff.html",
   tooltip: "Inspector",
   dialogTitle: "XMLUI Inspector",
   dialogWidth: "95vw",
@@ -39,6 +40,16 @@ export const Inspector = memo(forwardRef(function Inspector(
 ) {
   const [open, setOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLSpanElement>(null);
+
+  const setButtonRef = (node: HTMLSpanElement | null) => {
+    buttonRef.current = node;
+    if (typeof forwardedRef === "function") {
+      forwardedRef(node);
+    } else if (forwardedRef) {
+      forwardedRef.current = node;
+    }
+  };
 
   useEffect(() => {
     registerComponentApi?.({
@@ -60,10 +71,38 @@ export const Inspector = memo(forwardRef(function Inspector(
     if (e.target === overlayRef.current) setOpen(false);
   };
 
+  const ownerDocument = buttonRef.current?.ownerDocument ?? (typeof document !== "undefined" ? document : null);
+
+  const dialog = (
+    <div
+      ref={overlayRef}
+      className={styles.overlay}
+      onClick={handleOverlayClick}
+      data-testid="InspectorDialog"
+    >
+      <div
+        className={styles.dialog}
+        style={{ minWidth: dialogWidth, minHeight: dialogHeight }}
+      >
+        <div className={styles.header}>
+          <span className={styles.title}>{dialogTitle}</span>
+          <button className={styles.closeButton} onClick={() => setOpen(false)}>
+            &times;
+          </button>
+        </div>
+        <iframe
+          src={normalizePath(src)}
+          className={styles.iframe}
+          data-testid="InspectorFrame"
+        />
+      </div>
+    </div>
+  );
+
   return (
     <>
       <span
-        ref={forwardedRef}
+        ref={setButtonRef}
         className={classnames(styles.iconButton, classes?.[COMPONENT_PART_KEY])}
         onClick={() => setOpen(true)}
         title={tooltip}
@@ -73,31 +112,7 @@ export const Inspector = memo(forwardRef(function Inspector(
       >
         <SearchCodeIcon className={styles.icon} />
       </span>
-      {open && (
-        <div
-          ref={overlayRef}
-          className={styles.overlay}
-          onClick={handleOverlayClick}
-          data-testid="InspectorDialog"
-        >
-          <div
-            className={styles.dialog}
-            style={{ minWidth: dialogWidth, minHeight: dialogHeight }}
-          >
-            <div className={styles.header}>
-              <span className={styles.title}>{dialogTitle}</span>
-              <button className={styles.closeButton} onClick={() => setOpen(false)}>
-                &times;
-              </button>
-            </div>
-            <iframe
-              src={normalizePath(src)}
-              className={styles.iframe}
-              data-testid="InspectorFrame"
-            />
-          </div>
-        </div>
-      )}
+      {open && ownerDocument?.body && createPortal(dialog, ownerDocument.body)}
     </>
   );
 }));

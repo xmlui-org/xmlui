@@ -4,7 +4,7 @@ import { unlink, readdir, mkdir, writeFile, rm, readFile } from "fs/promises";
 import { ErrorWithSeverity, LOGGER_LEVELS, logger } from "./logger.mjs";
 import { winPathToPosix, deleteFileIfExists, fromKebabtoReadable, createTable } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
-import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
+import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.cjs";
 import { FOLDERS } from "./folders.mjs";
 import { existsSync } from "fs";
 import { configManager, pathResolver } from "./configuration-management.mjs";

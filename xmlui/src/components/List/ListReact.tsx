@@ -123,6 +123,7 @@ export function useListData({
 }: ListData) {
   // Filter out null and undefined items
   const validItems = useMemo(() => {
+    if (!Array.isArray(items)) return [];
     return items.filter((item) => item != null);
   }, [items]);
 

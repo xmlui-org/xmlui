@@ -30,6 +30,10 @@ export type PlaygroundPattern = {
   api?: SegmentProps;
 };
 
+export type ConvertPlaygroundPatternOptions = {
+  enableTracing?: boolean;
+};
+
 export function observePlaygroundPattern(content: string): [number, number, string] | null {
   const startPattern = "```xmlui-pg";
   const endPattern = "```";
@@ -311,7 +315,40 @@ export function parsePlaygroundPattern(content: string): PlaygroundPattern {
   }
 }
 
-export function convertPlaygroundPatternToMarkdown(content: string): string {
+function ensurePlaygroundTracingConfig(config: unknown): unknown {
+  if (config == null) {
+    return {
+      appGlobals: {
+        xsVerbose: true,
+      },
+    };
+  }
+
+  if (typeof config !== "object" || Array.isArray(config)) {
+    return config;
+  }
+
+  const resolvedConfig = config as Record<string, any>;
+  const resolvedAppGlobals =
+    resolvedConfig.appGlobals &&
+    typeof resolvedConfig.appGlobals === "object" &&
+    !Array.isArray(resolvedConfig.appGlobals)
+      ? resolvedConfig.appGlobals
+      : {};
+
+  return {
+    ...resolvedConfig,
+    appGlobals: {
+      ...resolvedAppGlobals,
+      xsVerbose: resolvedAppGlobals.xsVerbose ?? true,
+    },
+  };
+}
+
+export function convertPlaygroundPatternToMarkdown(
+  content: string,
+  options?: ConvertPlaygroundPatternOptions,
+): string {
   const pattern = parsePlaygroundPattern(content);
 
   // --- Determine max order for segments
@@ -442,7 +479,11 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
           const fence = codeFenceFor(segment.content);
           markdownContent += fence + "json " + segmentAttrs + "\n" + segment.content + fence + "\n\n";
         }
-        pgContent.config = segment.content;
+        try {
+          pgContent.config = JSON.parse(segment.content);
+        } catch {
+          pgContent.config = segment.content;
+        }
         break;
       }
       case "api":
@@ -462,6 +503,10 @@ export function convertPlaygroundPatternToMarkdown(content: string): string {
         markdownContent += segment.content + "\n";
         break;
     }
+  }
+
+  if (options?.enableTracing) {
+    pgContent.config = ensurePlaygroundTracingConfig(pgContent.config);
   }
 
   // --- Convert the JSON representation of pgContent to a base64 string

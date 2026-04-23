@@ -14,8 +14,8 @@ Here's a simple component to package a name/value pair.
 ---comp display
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name} </Text>
-    <Text>Value: { $props.value} </Text>
+    <Text>Name: {$props.name} </Text>
+    <Text>Value: {$props.value} </Text>
   </Card>
 </Component>
 ```
@@ -27,8 +27,8 @@ Here's how you can define default values for properties.
 ```xmlui
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name ?? '[no name]' } </Text>
-    <Text>Value: { $props.value ?? '[no value]' } </Text>
+    <Text>Name: {$props.name ?? '[no name]'} </Text>
+    <Text>Value: {$props.value ?? '[no value]'} </Text>
   </Card>
 </Component>
 ```
@@ -58,6 +58,7 @@ The `<IncButton>` component increments its value for every click, and notifies i
 
 ## Methods
 
+This section describes how to expose a component's internal [methods](/docs/helper-tags#method).
 The `<UsingInternalModal>` component exports the `open` method of the `ModalDialog` that it defines.
 
 ```xmlui-pg noHeader
@@ -80,3 +81,64 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
   </method>
 </Component>
 ```
+
+A component can call its own exported methods internally using the reserved name `$self`:
+
+```xmlui-pg
+---app display
+<App>
+  <Counter id="counter1"/>
+  <Button label="Reset Counter (external)" onClick="counter1.reset()" />
+</App>
+---comp display /$self.reset()/
+<Component 
+  name="Counter" 
+  method.reset="count = 0"
+>
+  <variable name="count" value="{0}" />
+  <Text value="{count}" />
+  <Button label="Increment" onClick="count++" />
+​
+  <!-- equivalent to a <method name="reset"> child tag -->
+  <Button label="Reset" onClick="$self.reset()" />
+</Component>
+```
+
+## Passing data into slot content
+
+A component can pass data back to the slot content that the parent provides. This is how reusable container components expose per-item context to their callers.
+
+Add extra attributes to the `<Slot>` tag. Each attribute becomes a context variable (prefixed with `$`) inside the parent's template content.
+
+```xmlui-pg noHeader
+---app display
+<App>
+  <StatusList
+    items="{[
+      { label: 'Build', ok: true },
+      { label: 'Tests', ok: false },
+      { label: 'Deploy', ok: true }
+    ]}"
+  >
+    <property name="rowTemplate">
+      <HStack>
+        <Icon name="{$item.ok ? 'checkmark' : 'close'}" />
+        <Text>{$item.label}</Text>
+      </HStack>
+    </property>
+  </StatusList>
+</App>
+---comp display
+<Component name="StatusList">
+  <Items data="{$props.items}">
+    <Slot name="rowTemplate" item="{$item}">
+      <Text>{$item.label}</Text>
+    </Slot>
+  </Items>
+</Component>
+```
+
+Inside `StatusList`, `item="{$item}"` on the `<Slot>` passes each list item as a slot prop. The parent's `<property name="rowTemplate">` block receives it as `$item`.
+
+> [!NOTE]
+> Named slot names must end with **`Template`** (e.g. `rowTemplate`, `headerTemplate`). XMLUI shows an error if the name does not end with `Template`.

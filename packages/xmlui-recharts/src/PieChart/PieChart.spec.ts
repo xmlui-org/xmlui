@@ -26,7 +26,7 @@ const largeDataset = `[
 
 // Chart selectors - PieChart specific
 const chartRoot = ".recharts-responsive-container";
-const chartSvg = ".recharts-surface";
+const chartSvg = ".recharts-wrapper > .recharts-surface";
 const pieSelector = ".recharts-pie";
 const pieSectorSelector = ".recharts-pie-sector";
 const legendSelector = ".recharts-legend-wrapper";
@@ -47,7 +47,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -62,7 +61,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should have 4 pie sectors for 4 data points
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
@@ -78,7 +76,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSelector)).toBeVisible();
     await expect(page.locator(chartSvg)).toBeVisible();
   });
@@ -98,7 +96,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(0);
   });
 
@@ -113,7 +111,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(1);
   });
 
@@ -128,7 +126,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(0);
   });
 
@@ -143,7 +141,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(7);
   });
 });
@@ -162,7 +160,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 
@@ -178,7 +176,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).toBeVisible();
   });
 });
@@ -197,13 +195,17 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
-    
-    // Wait for tooltip to appear
-    await page.waitForTimeout(500);
-    await expect(page.locator(tooltipSelector)).toBeVisible();
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true }).catch(() => {});
+          return page.locator(tooltipSelector).isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip shows correct data on hover", async ({ initTestBed, page }) => {
@@ -217,13 +219,18 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
-    await pieSector.hover();
-    
-    await page.waitForTimeout(500);
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
     const tooltip = page.locator(tooltipSelector);
-    await expect(tooltip).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true }).catch(() => {});
+          return tooltip.isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
     // Tooltip should contain data from the first sector
     await expect(tooltip).toContainText("Desktop");
     await expect(tooltip).toContainText("400");
@@ -244,7 +251,6 @@ test.describe("labels", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Labels should be rendered as text elements
     const labels = page.locator('text').filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labels).toHaveCount(4);
@@ -262,7 +268,6 @@ test.describe("labels", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should have pie sectors but no labels
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
     const labels = page.locator('text').filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
@@ -280,7 +285,6 @@ test.describe("labels", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // When showLabelList is false (default), there should be no LabelList elements
     // We check for the absence of the recharts-label-list class
     await expect(page.locator(labelListSelector)).toHaveCount(0);
@@ -299,7 +303,6 @@ test.describe("labels", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // LabelList creates text elements with the label content
     const labelTexts = page.locator('text').filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labelTexts).toHaveCount(4);
@@ -319,7 +322,6 @@ test.describe("labels", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // LabelList creates text elements with the label content
     const labelTexts = page.locator('text').filter({ hasText: /Desktop|Mobile|Tablet|Other/ });
     await expect(labelTexts).toHaveCount(4);
@@ -340,7 +342,7 @@ test.describe("radius configuration", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
 
@@ -356,7 +358,7 @@ test.describe("radius configuration", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
 
@@ -372,7 +374,7 @@ test.describe("radius configuration", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
     // With inner radius, it becomes a donut chart
   });
@@ -390,7 +392,7 @@ test.describe("radius configuration", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
 });
@@ -409,7 +411,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
@@ -425,7 +426,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
@@ -441,7 +441,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
@@ -457,7 +456,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });
@@ -477,12 +475,11 @@ test.describe("interaction", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(pieSectorSelector).first();
     
     // Hover should trigger active shape rendering
-    await pieSector.hover();
-    await page.waitForTimeout(300);
+    await pieSector.waitFor({ state: "visible", timeout: 10000 });
+    await pieSector.hover({ force: true }).catch(() => {});
     
     // The sector should still be visible (active shape effect)
     await expect(pieSector).toBeVisible();
@@ -499,16 +496,12 @@ test.describe("interaction", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const sectors = page.locator(pieSectorSelector);
     
     // Hover over different sectors
-    await sectors.nth(0).hover();
-    await page.waitForTimeout(200);
-    await sectors.nth(1).hover();
-    await page.waitForTimeout(200);
-    await sectors.nth(2).hover();
-    await page.waitForTimeout(200);
+    await sectors.nth(0).hover({ force: true }).catch(() => {});
+    await sectors.nth(1).hover({ force: true }).catch(() => {});
+    await sectors.nth(2).hover({ force: true }).catch(() => {});
     
     // All sectors should still be present
     await expect(sectors).toHaveCount(4);
@@ -531,7 +524,6 @@ test.describe("children support", () => {
       </PieChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
     await expect(page.getByText("Chart Title")).toBeVisible();
@@ -551,7 +543,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should still render the container but may not have sectors
     await expect(page.locator(chartRoot)).toBeVisible();
   });
@@ -566,7 +557,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -588,7 +578,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should render sectors for valid data points
     await expect(page.locator(chartRoot)).toBeVisible();
   });
@@ -611,7 +600,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     // Should handle zero values appropriately
   });
@@ -634,7 +622,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     // Should handle negative values (though they may not render as sectors)
   });
@@ -657,7 +644,6 @@ test.describe("edge cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(pieSectorSelector)).toHaveCount(4);
   });

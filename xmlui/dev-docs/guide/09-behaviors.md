@@ -4,7 +4,7 @@ Every component in XMLUI can gain additional capabilities automatically — with
 
 This document explains how the behavior system works internally, covers all eight framework behaviors, and shows how extension packages can contribute their own.
 
-<!-- DIAGRAM: renderer() → renderedNode → [label? → wrap] → [animation? → wrap] → [tooltip? → wrap] → [variant? → wrap] → [bookmark? → wrap] → [formBinding? → wrap] → [validation? → wrap] → [displayWhen? → wrap] → final DOM node -->
+<!-- DIAGRAM: renderer() → renderedNode → [label? → wrap] → [animation? → wrap] → [tooltip? → wrap] → [variant? → wrap] → [bookmark? → wrap] → [formBinding? → wrap] → [validation? → wrap] → final DOM node -->
 
 ```mermaid
 graph TD
@@ -16,7 +16,6 @@ graph TD
   B5["bookmark"]
   B6["formBinding"]
   B7["validation"]
-  B8["displayWhen"]
   DOM(["final DOM node"])
 
   R --> B1
@@ -26,8 +25,7 @@ graph TD
   B4 -->|"variant prop? → add CSS variant class"| B5
   B5 -->|"bookmark prop? → URL hash management"| B6
   B6 -->|"bindTo + value/setValue API? → wire two-way form value"| B7
-  B7 -->|"validationState / required / pattern? → wrap with validation state"| B8
-  B8 -->|"displayWhen prop? → wrap with display:none div (outermost)"| DOM
+  B7 -->|"validationState / required / pattern? → wrap with validation state (outermost)"| DOM
 ```
 
 ---
@@ -67,10 +65,10 @@ renderer() → node₀
   animationBehavior.canAttach()? → yes → node₂ = animation.attach(node₁)
   tooltipBehavior.canAttach()?   → no  → node₂ (unchanged)
   ...
-  displayWhenBehavior.canAttach()? → yes → node_final = displayWhen.attach(...)
+  validationBehavior.canAttach()? → yes → node_final = validation.attach(...)
 ```
 
-The result is a tree of nested wrappers. Registration order is innermost → outermost: `label` registers first and wraps closest to the real component; `displayWhen` registers last and is the outermost wrapper in the DOM.
+The result is a tree of nested wrappers. Registration order is innermost → outermost: `label` registers first and wraps closest to the real component; `validation` registers last and is the outermost wrapper in the DOM.
 
 ### Two absolute skip conditions
 
@@ -81,9 +79,9 @@ Behaviors never attach to:
 
 ---
 
-## The Eight Framework Behaviors
+## The Seven Framework Behaviors
 
-The framework registers eight behaviors in `ComponentProvider.tsx`, in this exact order:
+The framework registers seven behaviors in `ComponentProvider.tsx`, in this exact order:
 
 | Order | Name | Trigger | What it does |
 |-------|------|---------|--------------|
@@ -94,7 +92,6 @@ The framework registers eight behaviors in `ComponentProvider.tsx`, in this exac
 | 5 | `bookmark` | `bookmark` prop | Adds scroll-to-anchor navigation |
 | 6 | `formBinding` | `bindTo` prop + value/setValue APIs | Connects the component to the enclosing `<Form>`, handles label rendering |
 | 7 | `validation` | `bindTo` + value/setValue, or `FormItem` type | Adds validation rules and displays inline feedback |
-| 8 | `displayWhen` | `displayWhen` prop | Hides via CSS `display:none` — component stays mounted |
 
 > **Note on PubSub:** `PubSubBehavior.tsx` exists in `components-core/behaviors/` but is not currently registered. It is not active in the framework.
 
@@ -200,27 +197,6 @@ Validation props supported: `required`, `minLength`, `maxLength`, `minValue`, `m
 
 ---
 
-### 8. displayWhen Behavior
-
-Controls visibility via CSS `display: none` rather than unmounting from the React tree. This is a deliberate distinction from the `when` prop:
-
-| Prop | React tree | DOM | Form fields registered |
-|------|-----------|-----|------------------------|
-| `when="{false}"` | Unmounted | Absent | No |
-| `displayWhen="{false}"` | **Mounted** | Hidden | **Yes** |
-
-```xmlui
-<VStack displayWhen="{step === 1}">
-  <TextBox bindTo="firstName" label="First Name" required="true" />
-</VStack>
-```
-
-Because the subtree is never unmounted, `FormBindingWrapper` and `ValidationWrapper` stay active. Hidden steps in a multi-step wizard keep their field registrations — values and validation state are preserved while the user navigates.
-
-**Why registered last:** `displayWhen` is deliberately registered after all other behaviors, making it the outermost wrapper. The entire composed node — label, tooltip, form binding, validation — is hidden or revealed as a unit. Registering it earlier would mean some wrappers sit outside the visibility control.
-
----
-
 ## Registration Architecture
 
 All behaviors are registered centrally in `ComponentRegistry`, which lives in `ComponentProvider`. The registry stores them in a plain array; `getBehaviors()` returns the array in order.
@@ -233,9 +209,7 @@ this.registerBehavior(tooltipBehavior);
 this.registerBehavior(variantBehavior);
 this.registerBehavior(bookmarkBehavior);
 this.registerBehavior(formBindingBehavior);
-this.registerBehavior(validationBehavior);
-// Registered last — outermost wrapper
-this.registerBehavior(displayWhenBehavior);
+this.registerBehavior(validationBehavior); // outermost wrapper
 
 // External behaviors appended after all framework behaviors
 contributes.behaviors?.forEach((behavior) => {
@@ -351,8 +325,7 @@ condition: {
 ## Key Takeaways
 
 - **Behaviors are transparent to components.** A component simply renders; behaviors wrap it without any coupling.
-- **Registration order is application order.** Earlier = more inner; later = more outer. `displayWhen` is always the outermost wrapper.
+- **Registration order is application order.** Earlier = more inner; later = more outer. `validation` is always the outermost framework wrapper.
 - **The label metadata rule is critical for component authors.** Declare `label` in your metadata if your component renders its own label — otherwise the behavior will wrap it with a second label.
-- **`displayWhen` vs. `when` is not interchangeable.** Use `displayWhen` for form fields that must stay registered while hidden (wizard forms). Use `when` when you want the subtree fully unmounted.
 - **External behaviors register after framework behaviors.** Use positioned registration to insert earlier in the sequence if needed.
 - **`PubSubBehavior.tsx` is not active.** The file exists but the behavior is not registered.

@@ -115,7 +115,6 @@ import { variantBehavior } from "../components-core/behaviors/VariantBehavior";
 import { bookmarkBehavior } from "../components-core/behaviors/BookmarkBehavior";
 import { formBindingBehavior } from "../components-core/behaviors/FormBindingBehavior";
 import { validationBehavior } from "../components-core/behaviors/ValidationBehavior";
-import { displayWhenBehavior } from "../components-core/behaviors/DisplayWhenBehavior";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
@@ -825,10 +824,6 @@ export class ComponentRegistry {
     this.registerBehavior(bookmarkBehavior);
     this.registerBehavior(formBindingBehavior);
     this.registerBehavior(validationBehavior);
-    // displayWhen is registered last so it is the outermost wrapper.
-    // Everything — including labels, form binding, and validation — is kept
-    // mounted inside the hidden div, preserving form field registration.
-    this.registerBehavior(displayWhenBehavior);
 
     // Register external behaviors from contributes
     contributes.behaviors?.forEach((behavior) => {

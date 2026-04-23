@@ -21,6 +21,42 @@ test.describe("Basic Functionality", () => {
     await expect(page.getByText("Volume")).toBeVisible();
   });
 
+  test("forwards title to the outer container", async ({ initTestBed, page }) => {
+    await initTestBed(`<Slider title="Pick a temperature" />`);
+    await expect(page.locator("[data-slider-container]")).toHaveAttribute("title", "Pick a temperature");
+  });
+
+  test("forwards inverted to the rendered slider", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <Slider testId="normal" width="200px" minValue="0" maxValue="100" initialValue="25" />
+        <Slider testId="inverted" width="200px" minValue="0" maxValue="100" initialValue="25" inverted="true" />
+      </Fragment>`);
+
+    const normalTrack = page.getByTestId("normal").locator("[data-track]");
+    const invertedTrack = page.getByTestId("inverted").locator("[data-track]");
+    const normalThumb = page.getByTestId("normal").getByRole("slider");
+    const invertedThumb = page.getByTestId("inverted").getByRole("slider");
+
+    const normalTrackBox = await normalTrack.boundingBox();
+    const invertedTrackBox = await invertedTrack.boundingBox();
+    const normalThumbBox = await normalThumb.boundingBox();
+    const invertedThumbBox = await invertedThumb.boundingBox();
+
+    expect(normalTrackBox).not.toBeNull();
+    expect(invertedTrackBox).not.toBeNull();
+    expect(normalThumbBox).not.toBeNull();
+    expect(invertedThumbBox).not.toBeNull();
+
+    const normalThumbCenter = normalThumbBox!.x + normalThumbBox!.width / 2;
+    const invertedThumbCenter = invertedThumbBox!.x + invertedThumbBox!.width / 2;
+    const normalTrackCenter = normalTrackBox!.x + normalTrackBox!.width / 2;
+    const invertedTrackCenter = invertedTrackBox!.x + invertedTrackBox!.width / 2;
+
+    expect(normalThumbCenter).toBeLessThan(normalTrackCenter);
+    expect(invertedThumbCenter).toBeGreaterThan(invertedTrackCenter);
+  });
+
   test("sets initialValue of field", async ({ initTestBed, page }) => {
     await initTestBed(`
         <Fragment>

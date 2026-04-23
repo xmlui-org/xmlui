@@ -139,15 +139,7 @@ Behaviors are registered in this order. **Last registered = outermost wrapper** 
 | 4 | `variantBehavior` | `variant` prop |
 | 5 | `bookmarkBehavior` | `bookmark` prop |
 | 6 | `formBindingBehavior` | `bindTo` prop + component has `value`/`setValue` APIs |
-| 7 | `validationBehavior` | `validationState`/`required`/`pattern` props |
-| 8 (outermost) | `displayWhenBehavior` | `displayWhen` prop + visual component |
-
-### `when` vs `displayWhen`
-
-| Prop | Mechanism | Effect |
-|------|-----------|--------|
-| `when` | `renderChild()` returns `null` | Component unmounts; state lost |
-| `displayWhen` | `DisplayWhenBehavior` sets `display: none` | Component stays mounted; state preserved |
+| 7 (outermost) | `validationBehavior` | `validationState`/`required`/`pattern` props |
 
 ### BehaviorCondition Types
 
@@ -183,5 +175,4 @@ type BehaviorCondition =
 | ComponentProvider | `xmlui/src/components-core/ComponentProvider.tsx` |
 | renderers | `xmlui/src/components-core/renderers.ts` |
 | Behavior interface | `xmlui/src/components-core/behaviors/Behavior.tsx` |
-| displayWhenBehavior | `xmlui/src/components-core/behaviors/DisplayWhenBehavior.tsx` |
 | formBindingBehavior | `xmlui/src/components-core/behaviors/FormBindingBehavior.tsx` |

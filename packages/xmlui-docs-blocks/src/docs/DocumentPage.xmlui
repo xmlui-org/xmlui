@@ -1,10 +1,15 @@
 <Component name="DocumentPage">
     <HStack gap="$space-5">
         <VStack width="*">
-            <Breadcrumbs />
+            <HStack width="100%" verticalAlignment="center">
+                <Breadcrumbs />
+                <SpaceFiller />
+                <Inspector when="{$props.showInspector}" />
+            </HStack>
             <Markdown
                 content="{$props.content}"
-                data="{$props.url}" />
+                data="{$props.url}"
+                enablePlaygroundTracing="{$props.showInspector}" />
             <Slot />
             <DocumentLinks />
         </VStack>

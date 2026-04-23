@@ -16,6 +16,8 @@ import { SignatureCapture } from "./components/SignatureCapture/SignatureCapture
 import { useSignature } from "./hooks/useSignature";
 import { createSignatureTimestamp } from "./utils/signatureUtils";
 
+pdfjs.GlobalWorkerOptions.workerSrc = workerUrl;
+
 // Minimal interface covering PDF.js document proxy methods used by the API
 interface PdfDocProxy {
   numPages: number;
