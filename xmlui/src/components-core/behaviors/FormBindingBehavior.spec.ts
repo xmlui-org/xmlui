@@ -839,16 +839,21 @@ test.describe("Validation", () => {
     await expect(textbox).toBeVisible();
     await expect(page.getByText("This field is required")).not.toBeVisible();
 
-    // Focus, type and clear to make dirty
+    // Focus the field, then type and clear via keyboard so the framework
+    // observes proper input/change events and marks the field as dirty.
     await textbox.focus();
     await expect(textbox).toBeFocused();
-    await textbox.fill("test");
-    await textbox.fill("");
-    // Confirm React has processed the fill before blurring
+
+    await page.keyboard.type("test");
+    await expect(textbox).toHaveValue("test");
+
+    await page.keyboard.press("ControlOrMeta+A");
+    await page.keyboard.press("Delete");
     await expect(textbox).toHaveValue("");
 
-    // Explicitly blur the field to trigger validation
-    await textbox.blur();
+    // Use Tab to blur so React's focus/blur handlers run normally.
+    await page.keyboard.press("Tab");
+    await expect(textbox).not.toBeFocused();
 
     // Wait for validation error message to appear
     await expect(page.getByText("This field is required")).toBeVisible();

@@ -384,7 +384,11 @@ test.describe("Events", () => {
     `);
 
     await page.getByTestId("openBtn").click();
-    await expect(page.getByRole("dialog")).toBeVisible();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    // Wait for the open animation to fully settle so Radix's pointer-down-outside
+    // listener is registered before we click outside.
+    await expect(dialog).toHaveAttribute("data-state", "open");
     // Click the far-left area, well outside the right-side drawer (320px wide)
     await page.mouse.click(100, 300);
     await expect.poll(testStateDriver.testState).toEqual("closed");
