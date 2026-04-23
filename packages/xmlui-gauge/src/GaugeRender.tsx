@@ -1,7 +1,6 @@
-import React, { memo, useCallback, useEffect, useRef } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { Gauge } from "smart-webcomponents-react/gauge/gauge.umd.js";
 import "smart-webcomponents-react/source/styles/smart.default.css";
 import styles from "./Gauge.module.scss";
 import classnames from "classnames";
@@ -36,7 +35,26 @@ export const GaugeRender = memo(forwardRef(function GaugeRender({
   ...rest
 }: Props, ref: ForwardedRef<HTMLDivElement>) {
   const gaugeRef = useRef<any>(null);
+  const [isReady, setIsReady] = useState(false);
   const numValue = typeof value === "number" ? value : min;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    import("smart-webcomponents-react/source/modules/smart.gauge.js")
+      .then(() => {
+        if (!cancelled) {
+          setIsReady(true);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load smart gauge component", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const focusApi = useCallback(() => gaugeRef.current?.focus(), []);
   const setValueApi = useCallback((v: unknown) => onChange?.(Number(v)), [onChange]);
@@ -55,25 +73,55 @@ export const GaugeRender = memo(forwardRef(function GaugeRender({
     }
   }, [onChange]);
 
+  useEffect(() => {
+    const gauge = gaugeRef.current;
+    if (!isReady || !gauge) return;
+
+    const onGaugeChange = (event: Event) => handleChange(event);
+    gauge.addEventListener("change", onGaugeChange);
+    return () => {
+      gauge.removeEventListener("change", onGaugeChange);
+    };
+  }, [handleChange, isReady]);
+
+  useEffect(() => {
+    const gauge = gaugeRef.current;
+    if (!isReady || !gauge) return;
+
+    Object.assign(gauge, {
+      value: numValue,
+      min,
+      max,
+      analogDisplayType,
+      digitalDisplay,
+      startAngle,
+      endAngle,
+      scalePosition,
+      animation,
+      unit,
+      showUnit,
+      disabled: !enabled,
+      precisionDigits: 0,
+    });
+  }, [
+    analogDisplayType,
+    animation,
+    digitalDisplay,
+    enabled,
+    endAngle,
+    isReady,
+    max,
+    min,
+    numValue,
+    scalePosition,
+    showUnit,
+    startAngle,
+    unit,
+  ]);
+
   return (
     <div ref={ref} className={classnames(styles.gaugeContainer, className)} {...rest}>
-      <Gauge
-        ref={gaugeRef}
-        value={numValue}
-        min={min}
-        max={max}
-        analogDisplayType={analogDisplayType}
-        digitalDisplay={digitalDisplay}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        scalePosition={scalePosition}
-        animation={animation}
-        unit={unit}
-        showUnit={showUnit}
-        disabled={!enabled}
-        precisionDigits={0}
-        onChange={handleChange}
-      />
+      {isReady ? React.createElement("smart-gauge", { ref: gaugeRef }) : null}
     </div>
   );
 }));
