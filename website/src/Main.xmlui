@@ -298,10 +298,6 @@
                                 label="Masonry"
                                 to="/docs/guides/wrap-component/masonry"
                             />
-                            <NavLink
-                                label="GridLayout"
-                                to="/docs/guides/wrap-component/grid-layout"
-                            />
                         </NavGroup>
                         <NavGroup label="Ecosystem">
                             <NavLink
@@ -315,10 +311,6 @@
                             <NavLink
                                 label="Masonry"
                                 to="/docs/guides/wrap-component/masonry"
-                            />
-                            <NavLink
-                                label="GridLayout"
-                                to="/docs/guides/wrap-component/grid-layout"
                             />
                         </NavGroup>
                         <NavLink
@@ -1610,12 +1602,6 @@
                 <DocumentPage
                     showInspector="true"
                     content="{appGlobals.docsContent['pages/wrap-component/masonry.md']}"
-                />
-            </Page>
-            <Page url="/docs/guides/wrap-component/grid-layout">
-                <DocumentPage
-                    showInspector="true"
-                    content="{appGlobals.docsContent['pages/wrap-component/grid-layout.md']}"
                 />
             </Page>
             <Page url="/docs/guides/wrap-component/echarts">
