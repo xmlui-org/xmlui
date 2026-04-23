@@ -91,65 +91,142 @@ Or using the `<variable>` helper tag.
 
 ### When does a variable stop following its initial value?
 
-A variable declared with `var.name="{expr}"` starts as a **reactive binding** — the framework re-evaluates `expr` whenever its dependencies change and keeps the variable in sync. But this reactive tracking ends the moment you **assign to the variable explicitly** in an event handler. After that first write, the variable holds whatever value you gave it, and the original expression is no longer evaluated.
+A variable declared with `var.name="{expr}"` starts as a **reactive binding**. XMLUI re-evaluates `expr` when its dependencies change.
 
-```xmlui-pg copy name="Variable stops tracking after assignment" display
-<App var.items="{['Alpha', 'Beta', 'Gamma']}">
-  <!-- Before any click: items tracks this list reactively -->
-  <Items data="{items}">
-    <Text>{$item}</Text>
-  </Items>
+As soon as you **assign to that same variable** in an event handler, the variable switches to the assigned runtime value. In practice: it no longer follows the original expression.
 
-  <!-- 
-    After clicking, items is set manually and no longer 
-    tracks the expression above
-  -->
-  <Button
-    label="Override list"
-    onClick="items = ['Delta', 'Epsilon']"
-  />
+Click `Increment source` first: `mirror` follows `source`.
+Then click `Override mirror`: from that point, `mirror` no longer tracks `source`.
+
+This is intentional: explicit assignment means "from now on, use this runtime value for this variable."
+
+```xmlui-pg copy name="A variable follows until reassigned" display
+<App var.source="{0}" var.mirror="{source}">
+  <Text>source = {source}</Text>
+  <Text>mirror = {mirror}</Text>
+
+  <Button label="Increment source" onClick="source++" />
+  <Button label="Override mirror" onClick="mirror = 999" />
 </App>
 ```
 
-This is intentional: the first explicit assignment signals that the user (or handler) has taken manual control of the variable. Think of the initial expression as a default that applies until something more specific overwrites it.
+A common place this surprises developers is when a variable mirrors a `DataSource` result.
+In this example, `items` starts reactive (`apiResult.value ?? []`) and then gets reassigned to a filtered snapshot. After that reassignment, `items` does not follow refetches:
 
-A common place this surprises developers is when a variable mirrors a `DataSource` result:
-
-```xmlui-pg copy name="Var decouples from DataSource after assignment" display
+```xmlui-pg copy name="Snapshot decouples from DataSource after assignment" display
+---app
 <App>
-  <DataSource id="apiResult" url="/api/items" />
+  <DataSource id="apiResult" url="/api/names-with-activity-decoupled" />
+  <APICall
+    id="addItem"
+    method="post"
+    url="/api/names-with-activity-decoupled"
+    invalidates="/api/names-with-activity-decoupled"
+  />
 
-  <!-- items starts as a reactive alias for apiResult.value -->
-  <variable name="items" value="{apiResult.value}" />
+  <variable name="items" value="{apiResult.value ?? []}" />
 
-  <!-- After this button is clicked, items is fixed; refreshing apiResult
-       will NOT update items anymore -->
-  <Button label="Edit list locally" onClick="items = items.filter(i => i.active)" />
+  <Text>DataSource count: {(apiResult.value ?? []).length}</Text>
+  <Text>items count: {items.length}</Text>
+
+  <Button
+    label="Take snapshot of active items"
+    onClick="items = (apiResult.value ?? []).filter(i => i.active)"
+  />
+  <Button
+    label="Add active item"
+    onClick="addItem.execute().then(() => apiResult.refetch())"
+  />
 
   <Items data="{items}">
     <Text>{$item.name}</Text>
   </Items>
 </App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [
+    { id: 1, name: 'Anna', active: true },
+    { id: 2, name: 'Helga', active: false },
+    { id: 3, name: 'Bob', active: true },
+    { id: 4, name: 'John', active: false }
+  ]",
+  "operations": {
+    "get-names-with-activity-decoupled": {
+      "url": "/names-with-activity-decoupled",
+      "method": "get",
+      "handler": "return $state.items"
+    },
+    "add-names-with-activity-decoupled": {
+      "url": "/names-with-activity-decoupled",
+      "method": "post",
+      "handler": "$state.items = [...$state.items, { id: $state.items.length + 1, name: 'Frank', active: true }]"
+    }
+  }
+}
 ```
 
 If you need the variable to stay reactive while also supporting local overrides, keep the override in a separate variable and combine them in the binding expression:
 
 ```xmlui-pg copy name="Keeping reactivity with a separate override variable" display
+---app
 <App>
-  <DataSource id="apiResult" url="/api/items" />
-  <variable name="localOverride" value="{null}" />
+  <DataSource id="apiResult" url="/api/names-with-activity-live" />
+  <APICall
+    id="addItem"
+    method="post"
+    url="/api/names-with-activity-live"
+    invalidates="/api/names-with-activity-live"
+  />
+  <variable name="activeOnly" value="{false}" />
 
-  <Items data="{localOverride ?? apiResult.value}">
+  <Text>
+    Visible count: {
+      (apiResult.value ?? []).filter(i => !activeOnly || i.active).length
+    }
+  </Text>
+
+  <Button
+    label="Toggle active filter"
+    onClick="activeOnly = !activeOnly"
+  />
+  <Button
+    label="Add active item"
+    onClick="addItem.execute().then(() => apiResult.refetch())"
+  />
+
+  <Items
+    data="{(apiResult.value ?? []).filter(i => !activeOnly || i.active)}"
+  >
     <Text>{$item.name}</Text>
   </Items>
-
-  <!-- Only sets the override; apiResult continues to track normally -->
-  <Button
-    label="Filter locally"
-    onClick="localOverride = apiResult.value.filter(i => i.active)"
-  />
 </App>
+---api
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [
+    { id: 1, name: 'Anna', active: true },
+    { id: 2, name: 'Helga', active: false },
+    { id: 3, name: 'Bob', active: true },
+    { id: 4, name: 'John', active: false }
+  ]",
+  "operations": {
+    "get-names-with-activity-live": {
+      "url": "/names-with-activity-live",
+      "method": "get",
+      "handler": "return $state.items"
+    },
+    "add-names-with-activity-live": {
+      "url": "/names-with-activity-live",
+      "method": "post",
+      "handler": "$state.items.push({ id: $state.items.length + 1, name: 'Frank', active: true })"
+    }
+  }
+}
 ```
+
+> [!INFO]
+> Special case: assigning a variable directly to a component API object (for example `myData = ds`) is tracked as a live API reference so it can stay reactive to API updates.
 
 ### Nested variables
 
@@ -168,7 +245,7 @@ The same variable name can be declared in nested scopes. The engine resolves the
 
 <Text>Each counter is a separate instance of `CounterTest` with its own local component variables.</Text>
 
-```xmlui-pg  name="Isolated component instances"
+```xmlui-pg name="Isolated component instances"
 ---app display
 <App>
     <HStack horizontalAlignment="center">
