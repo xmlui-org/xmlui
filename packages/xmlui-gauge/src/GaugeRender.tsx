@@ -1,7 +1,6 @@
-import React, { memo, useCallback, useEffect, useRef } from "react";
+import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import { forwardRef } from "react";
 import type { ForwardedRef } from "react";
-import { Gauge } from "smart-webcomponents-react/gauge/gauge.umd.js";
 import "smart-webcomponents-react/source/styles/smart.default.css";
 import styles from "./Gauge.module.scss";
 import classnames from "classnames";
@@ -36,7 +35,26 @@ export const GaugeRender = memo(forwardRef(function GaugeRender({
   ...rest
 }: Props, ref: ForwardedRef<HTMLDivElement>) {
   const gaugeRef = useRef<any>(null);
+  const [GaugeComponent, setGaugeComponent] = useState<any>(null);
   const numValue = typeof value === "number" ? value : min;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    import("smart-webcomponents-react/gauge/gauge.esm.js")
+      .then((mod) => {
+        if (!cancelled) {
+          setGaugeComponent(() => mod.Gauge);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load smart gauge component", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const focusApi = useCallback(() => gaugeRef.current?.focus(), []);
   const setValueApi = useCallback((v: unknown) => onChange?.(Number(v)), [onChange]);
@@ -57,23 +75,25 @@ export const GaugeRender = memo(forwardRef(function GaugeRender({
 
   return (
     <div ref={ref} className={classnames(styles.gaugeContainer, className)} {...rest}>
-      <Gauge
-        ref={gaugeRef}
-        value={numValue}
-        min={min}
-        max={max}
-        analogDisplayType={analogDisplayType}
-        digitalDisplay={digitalDisplay}
-        startAngle={startAngle}
-        endAngle={endAngle}
-        scalePosition={scalePosition}
-        animation={animation}
-        unit={unit}
-        showUnit={showUnit}
-        disabled={!enabled}
-        precisionDigits={0}
-        onChange={handleChange}
-      />
+      {GaugeComponent ? (
+        <GaugeComponent
+          ref={gaugeRef}
+          value={numValue}
+          min={min}
+          max={max}
+          analogDisplayType={analogDisplayType}
+          digitalDisplay={digitalDisplay}
+          startAngle={startAngle}
+          endAngle={endAngle}
+          scalePosition={scalePosition}
+          animation={animation}
+          unit={unit}
+          showUnit={showUnit}
+          disabled={!enabled}
+          precisionDigits={0}
+          onChange={handleChange}
+        />
+      ) : null}
     </div>
   );
 }));
