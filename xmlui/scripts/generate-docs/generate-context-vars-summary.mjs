@@ -1,7 +1,7 @@
 import { join } from "path";
 import { writeFile } from "fs/promises";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
-import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
+import { collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.cjs";
 import { FOLDERS } from "./folders.mjs";
 import { createTable } from "./utils.mjs";
 

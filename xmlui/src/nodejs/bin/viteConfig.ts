@@ -21,6 +21,51 @@ logger.warn = (msg, options) => {
   loggerWarn(msg, options);
 };
 
+const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
+
+/**
+ * Ensures the canonical CSS @layer cascade order is established before any other
+ * stylesheet is parsed by the browser. Vite 8 / Rolldown can split CSS into
+ * per-module chunks (e.g. one whose only content is `@layer components { ... }`)
+ * and may emit them with `<link>` tags that load before the main entry CSS.
+ * Without this guard the browser would derive the layer order from those chunks
+ * and end up with `components` ranked LOWER than `base`, inverting the cascade
+ * (the CSS reset would then beat component styles, leaving every Button etc.
+ * with `background-color: rgba(0,0,0,0)`).
+ *
+ * The plugin both:
+ *   1. Injects an inline <style> block with the layer-order declaration as the
+ *      very first element of <head> (transformIndexHtml).
+ *   2. Prepends the same declaration to every emitted CSS asset, so it remains
+ *      effective in builds that don't go through index.html (e.g. lib/UMD).
+ */
+function cssLayerOrderPlugin(): Plugin {
+  return {
+    name: "xmlui:css-layer-order",
+    enforce: "post",
+    transformIndexHtml: {
+      order: "pre",
+      handler(html) {
+        const tag = `<style>${CSS_LAYER_ORDER}</style>`;
+        if (html.includes(tag)) return html;
+        return html.replace(/<head(\s[^>]*)?>/i, (m) => `${m}\n    ${tag}`);
+      },
+    },
+    generateBundle(_options, bundle) {
+      for (const file of Object.values(bundle)) {
+        if (file.type === "asset" && file.fileName.endsWith(".css")) {
+          const source = typeof file.source === "string"
+            ? file.source
+            : new TextDecoder().decode(file.source);
+          if (!source.startsWith(CSS_LAYER_ORDER)) {
+            file.source = `${CSS_LAYER_ORDER}\n${source}`;
+          }
+        }
+      }
+    },
+  };
+}
+
 export async function getViteConfig({
   flatDist = false,
   withRelativeRoot = false,
@@ -41,6 +86,7 @@ export async function getViteConfig({
       svgr(),
       ViteYaml(),
       ViteXmlui({}) as Plugin,
+      cssLayerOrderPlugin(),
       ...(overrides.plugins || []),
     ] as Plugin[],
     customLogger: logger,

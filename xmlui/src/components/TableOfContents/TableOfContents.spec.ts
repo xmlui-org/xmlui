@@ -685,10 +685,21 @@ test.describe("Theme Variables", () => {
     const firstHeading = page.getByRole("link", { name: "First Heading" });
     const listItem = firstHeading.locator("..");
 
-    await firstHeading.hover();
+    // Poll the hover assertions — the CSS :hover pseudo-class is only applied
+    // after the browser processes the pointer-move event, which can be delayed
+    // on a loaded CI machine. Re-triggering the hover on each poll attempt
+    // avoids a race between the event and the assertion.
+    await expect
+      .poll(
+        async () => {
+          await firstHeading.hover().catch(() => {});
+          return listItem.evaluate((el) => getComputedStyle(el).backgroundColor);
+        },
+        { timeout: 10000 },
+      )
+      .toBe("rgb(200, 200, 200)");
 
     await Promise.all([
-      expect(listItem).toHaveCSS("background-color", "rgb(200, 200, 200)"),
       expect(firstHeading).toHaveCSS("color", "rgb(100, 100, 100)"),
       expect(firstHeading).toHaveCSS("font-weight", "900"),
     ]);

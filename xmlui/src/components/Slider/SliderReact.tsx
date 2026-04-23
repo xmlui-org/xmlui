@@ -277,8 +277,41 @@ export const Slider = memo(forwardRef(
       thumbsRef.current = thumbsRef.current.slice(0, displayValue.length);
     }, [displayValue.length]);
 
+    // Radix UI uses String(step) to count decimal places for rounding.
+    // When step < 1e-7 JavaScript converts it to scientific notation (e.g. "1e-9"),
+    // causing Radix UI to count 0 decimal places and round incremented values back
+    // to the current value — so onValueChange never fires. We intercept keyboard
+    // events in the capture phase for these small steps and compute the value ourselves.
+    const handleKeyDownCapture = useCallback(
+      (e: React.KeyboardEvent) => {
+        const stepStr = String(step);
+        if (!stepStr.includes("e") && !stepStr.includes("E")) return;
+        if (readOnly || !enabled) return;
+
+        let delta = 0;
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") delta = step;
+        else if (e.key === "ArrowLeft" || e.key === "ArrowDown") delta = -step;
+        else return;
+
+        const focusedThumbIndex = thumbsRef.current.findIndex(
+          (thumb) => thumb === document.activeElement,
+        );
+        if (focusedThumbIndex === -1) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentThumbValue = displayValue[focusedThumbIndex];
+        const newThumbValue = Math.max(min, Math.min(max, currentThumbValue + delta));
+        const newValues = [...displayValue];
+        newValues[focusedThumbIndex] = newThumbValue;
+        onInputChange(newValues);
+      },
+      [step, readOnly, enabled, displayValue, min, max, onInputChange],
+    );
+
       return (
-          <div {...rest} ref={composedRef} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container>
+          <div {...rest} ref={composedRef} style={style} className={classnames(styles.sliderContainer, classes?.[COMPONENT_PART_KEY], className)} data-slider-container onKeyDownCapture={handleKeyDownCapture}>
             <Root
               ref={inputRef}
               minStepsBetweenThumbs={minStepsBetweenThumbs}

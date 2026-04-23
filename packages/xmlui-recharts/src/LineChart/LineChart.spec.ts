@@ -16,7 +16,7 @@ const singlePointData = `[
 
 // Chart selectors - updated for actual Recharts output
 const chartRoot = ".recharts-responsive-container";
-const chartSvg = ".recharts-surface";
+const chartSvg = ".recharts-wrapper > .recharts-surface";
 const linesSelector = ".recharts-line";
 const legendSelector = ".recharts-legend-wrapper";
 const tooltipSelector = ".recharts-tooltip-wrapper";
@@ -39,7 +39,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -54,7 +53,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(linesSelector)).toHaveCount(2);
   });
 });
@@ -73,7 +72,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(linesSelector)).toHaveCount(0);
   });
 
@@ -88,7 +87,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(linesSelector)).toHaveCount(2);
   });
 
@@ -103,7 +102,7 @@ test.describe("data handling", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(linesSelector)).toHaveCount(0);
   });
 });
@@ -122,7 +121,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 
@@ -138,7 +137,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).toBeVisible();
   });
 });
@@ -157,12 +156,10 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const chart = page.locator(chartSvg).first();
     await chart.hover({ position: { x: 200, y: 100 } });
     
     // Wait for tooltip to appear
-    await page.waitForTimeout(500);
     await expect(page.locator(tooltipSelector)).toBeVisible();
   });
 
@@ -178,11 +175,9 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const chart = page.locator(chartSvg).first();
     await chart.hover({ position: { x: 200, y: 100 } });
     
-    await page.waitForTimeout(500);
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
   });
 });
@@ -201,7 +196,7 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xAxisSelector)).toBeVisible();
     // Check that at least one tick is present
     const tickCount = await page.locator(xTicksSelector).count();
@@ -220,7 +215,7 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(xTicksSelector)).toHaveCount(0);
   });
 
@@ -236,7 +231,6 @@ test.describe("x-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // When hideTickX is true, ticks should not be rendered in DOM
     await expect(page.locator(xTicksSelector)).toHaveCount(0);
     // But the axis line itself should still be present (though not visible due to tickLine=false)
@@ -256,7 +250,7 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yAxisSelector)).toBeVisible();
     // Check that at least one tick is present
     const tickCount = await page.locator(yTicksSelector).count();
@@ -275,7 +269,7 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(yTicksSelector)).toHaveCount(0);
   });
 
@@ -291,7 +285,6 @@ test.describe("y-axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // When hideTickY is true, ticks should not be rendered in DOM
     await expect(page.locator(yTicksSelector)).toHaveCount(0);
     // But the axis line itself should still be present (though not visible due to tickLine=false)
@@ -314,7 +307,6 @@ test.describe("formatters", () => {
         />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Check that formatted text appears in x-axis ticks
     await expect(page.locator(xTicksSelector).first()).toContainText("(X)");
   });
@@ -331,7 +323,6 @@ test.describe("formatters", () => {
         />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Check that formatted text appears in y-axis ticks
     await expect(page.locator(yTicksSelector).first()).toContainText("$");
   });
@@ -355,7 +346,6 @@ test.describe("margins", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Chart should render with custom margins applied
     await expect(page.locator(chartRoot)).toBeVisible();
   });
@@ -375,7 +365,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // In mini mode, x-axis ticks should be hidden (tick=false)
     await expect(page.locator(xTicksSelector)).toHaveCount(0);
     // Y-axis ticks should also be hidden in mini mode
@@ -395,7 +384,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // With adequate height, should have ticks
     const tickCount = await page.locator(xTicksSelector).count();
     expect(tickCount).toBeGreaterThan(0);
@@ -414,7 +402,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     // Should still render with narrow width
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(linesSelector)).toHaveCount(2);
@@ -443,12 +430,10 @@ test.describe("tooltipTemplate", () => {
       </LineChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const chart = page.locator(chartSvg).first();
     await chart.hover({ position: { x: 200, y: 100 } });
     
     // Wait for tooltip to appear
-    await page.waitForTimeout(500);
     await expect(page.locator(tooltipSelector)).toBeVisible();
     
     // Check for custom tooltip content
@@ -473,11 +458,9 @@ test.describe("tooltipTemplate", () => {
       </LineChart>
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const chart = page.locator(chartSvg).first();
     await chart.hover({ position: { x: 200, y: 100 } });
     
-    await page.waitForTimeout(500);
     await expect(page.locator(tooltipSelector)).not.toBeVisible();
     await expect(page.getByText("This tooltip should not appear")).not.toBeVisible();
   });
@@ -493,11 +476,9 @@ test.describe("tooltipTemplate", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
       
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const chart = page.locator(chartSvg).first();
       await chart.hover({ position: { x: 200, y: 100 } });
       
-      await page.waitForTimeout(500);
       await expect(page.locator(tooltipSelector)).toBeVisible();
       
       // Default tooltip should contain standard recharts tooltip content

@@ -166,8 +166,10 @@ export const AreaChart = memo(
     [ref],
   );
 
-  // Determine if we're in mini mode (very small container)
-  const isMiniMode = containerSize.height < 150;
+  // Determine if we're in mini mode (very small container).
+  // Only enter mini mode once we have real measurements (width > 0 && height > 0)
+  // so the chart doesn't start in mini mode before the ResizeObserver has fired.
+  const isMiniMode = containerSize.width > 0 && containerSize.height > 0 && containerSize.height < 150;
 
   const safeTooltipRenderer = useCallback(
     (props: any) => {

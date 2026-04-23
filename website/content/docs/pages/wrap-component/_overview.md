@@ -47,4 +47,6 @@ XMLUI provides a solid core that wraps a curated set of React components for mos
 
 **[Masonry](/docs/guides/wrap-component/masonry).** CSS multi-column layout for content feeds and galleries. Items of varying height flow into responsive columns -- no third-party dependency, just a lightweight wrapper around the browser's native column algorithm.
 
+**[GridLayout](/docs/guides/wrap-component/grid-layout).** Draggable, resizable dashboard layout built on `react-grid-layout`. Users can rearrange and resize cards, while XMLUI still provides the surrounding declarative structure.
+
 All of these ship as independent extension packages. Apps include only the components they need. See [Extension packaging](/docs/guides/wrap-component/extension-packaging) for details.

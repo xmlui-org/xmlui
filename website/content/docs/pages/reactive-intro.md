@@ -72,22 +72,4 @@ There's a name for this pattern: reactive data binding. It's what spreadsheets d
 
 So far we've seen examples of built-in XMLUI components. But it's easy to make your own too, in the next chapter we'll see how.
 
-## Chaining data sources
-
-When a second `DataSource` depends on the result of a first - for example, fetching a user's details and then their orders using the resolved ID - there is a common pitfall: the dependent `DataSource` fetches immediately on mount, before the first one has loaded. The unresolved value is interpolated into the URL as the string `"undefined"`.
-
-```xmlui
-<!-- Incorrect: fetches /api/orders/undefined on mount while userId is still loading -->
-<DataSource id="user" url="/api/users/me" />
-<DataSource id="orders" url="/api/orders/{user.value.id}" />
-```
-
-Guard the dependent `DataSource` with a `when` attribute so it only activates once its dependency is ready:
-
-```xmlui
-<!-- Correct: orders only fetches after user.value.id is available -->
-<DataSource id="user" url="/api/users/me" />
-<DataSource id="orders" url="/api/orders/{user.value.id}" when="{user.value.id}" />
-```
-
-When `user.value.id` is `undefined` (still loading), `when` evaluates falsy and the orders `DataSource` is skipped entirely. As soon as the first `DataSource` resolves and `user.value.id` becomes a real value, `when` turns truthy and the second fetch fires automatically.
+For a focused pattern on sequencing dependent `DataSource` requests, see [Prevent undefined requests in chained DataSources](/docs/howto/prevent-undefined-requests-in-chained-datasources).

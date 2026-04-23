@@ -287,7 +287,15 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
   testStateViewTestId: "test-state-view-testid",
 
   initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
+    // Each initTestBed call gets a unique marker ID to prevent the fast-path
+    // __XMLUI_REINIT__ race: flushSync removes the old testStateViewTestId
+    // synchronously in the browser, but Playwright's CDP connection has small
+    // latency so waitFor({ state: "attached" }) could find the OLD element
+    // before the DOM-change notification arrives. Using a unique ID per call
+    // ensures we always wait for a freshly created element.
+    let _callCount = 0;
     await use(async (source: string, description?: TestBedDescription) => {
+      const _markerTestId = `${testStateViewTestId}-${++_callCount}`;
       // Default test icon resources
       const defaultTestResources = {
         "icon.box": "/resources/box.svg",
@@ -305,7 +313,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
             ${source}
             <Stack width="0" height="0">
               <Text
-                testId="${testStateViewTestId}"
+                testId="${_markerTestId}"
                 value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
             </Stack>
           </Fragment>
@@ -473,7 +481,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       const { width, height } = page.viewportSize();
 
       if (!description?.noFragmentWrapper) {
-        await page.getByTestId(testStateViewTestId).waitFor({ state: "attached" });
+        await page.getByTestId(_markerTestId).waitFor({ state: "attached" });
       }
 
       // Wait for fonts to load, then one animation frame + one macrotask
@@ -504,7 +512,7 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
       };
 
       return {
-        testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
+        testStateDriver: new TestStateDriver(page.getByTestId(_markerTestId)),
         clipboard,
         width: width ?? 0,
         height: height ?? 0,

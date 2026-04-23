@@ -14,8 +14,8 @@ Here's a simple component to package a name/value pair.
 ---comp display
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name} </Text>
-    <Text>Value: { $props.value} </Text>
+    <Text>Name: {$props.name} </Text>
+    <Text>Value: {$props.value} </Text>
   </Card>
 </Component>
 ```
@@ -27,8 +27,8 @@ Here's how you can define default values for properties.
 ```xmlui
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name ?? '[no name]' } </Text>
-    <Text>Value: { $props.value ?? '[no value]' } </Text>
+    <Text>Name: {$props.name ?? '[no name]'} </Text>
+    <Text>Value: {$props.value ?? '[no value]'} </Text>
   </Card>
 </Component>
 ```
@@ -58,6 +58,7 @@ The `<IncButton>` component increments its value for every click, and notifies i
 
 ## Methods
 
+This section describes how to expose a component's internal [methods](/docs/helper-tags#method).
 The `<UsingInternalModal>` component exports the `open` method of the `ModalDialog` that it defines.
 
 ```xmlui-pg noHeader
@@ -81,31 +82,25 @@ The `<UsingInternalModal>` component exports the `open` method of the `ModalDial
 </Component>
 ```
 
-You can also declare a method inline using the `method:` attribute prefix instead of a `<method>` child tag:
-
-```xmlui
-<Component name="Counter">
-  <variable name="count" value="{0}" />
-  <Text value="{count}" />
-
-  <!-- equivalent to a <method name="reset"> child tag -->
-  <Button label="Reset" method:reset="count = 0" />
-</Component>
-```
-
 A component can call its own exported methods internally using the reserved name `$self`:
 
-```xmlui
-<Component name="Wizard">
-  <variable name="step" value="{1}" />
-  <Text value="Step {step}" />
-
-  <method name="next">
-    step = step + 1;
-  </method>
-
-  <!-- calls the exported method from within the component itself -->
-  <Button label="Next" onClick="$self.next()" />
+```xmlui-pg
+---app display
+<App>
+  <Counter id="counter1"/>
+  <Button label="Reset Counter (external)" onClick="counter1.reset()" />
+</App>
+---comp display /$self.reset()/
+<Component 
+  name="Counter" 
+  method.reset="count = 0"
+>
+  <variable name="count" value="{0}" />
+  <Text value="{count}" />
+  <Button label="Increment" onClick="count++" />
+​
+  <!-- equivalent to a <method name="reset"> child tag -->
+  <Button label="Reset" onClick="$self.reset()" />
 </Component>
 ```
 
@@ -127,7 +122,7 @@ Add extra attributes to the `<Slot>` tag. Each attribute becomes a context varia
   >
     <property name="rowTemplate">
       <HStack>
-        <Icon name="{$item.ok ? 'check' : 'close'}" />
+        <Icon name="{$item.ok ? 'checkmark' : 'close'}" />
         <Text>{$item.label}</Text>
       </HStack>
     </property>

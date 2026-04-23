@@ -3440,8 +3440,7 @@ test("regression: data url through modal context", async ({
   initTestBed,
   createButtonDriver,
   createFormDriver,
-  createFormItemDriver,
-  createTextBoxDriver,
+  page,
 }) => {
   await initTestBed(
     `
@@ -3459,14 +3458,20 @@ test("regression: data url through modal context", async ({
     },
   );
   const formDriver = await createFormDriver("modalForm");
-  const inputElement = (await createFormItemDriver("nameInput")).input;
-  const inputDriver = await createTextBoxDriver(inputElement);
+  // Use getByRole("textbox") directly — avoids the nested FormItemDriver → TextBoxDriver
+  // locator chain that can race with modal-open + data-fetch timing under parallel load.
+  const inputField = page.getByTestId("nameInput").getByRole("textbox");
 
+  // Set up the GET listener before clicking so we don't miss a fast response.
+  const dataLoadedPromise = page.waitForResponse(
+    (r) => r.url().includes("/entities/10") && r.request().method() === "GET",
+  );
   await (await createButtonDriver("openModalButton")).click();
+  await dataLoadedPromise;
 
-  await expect(inputDriver.field).toHaveValue("Smith");
+  await expect(inputField).toHaveValue("Smith");
 
-  await inputDriver.field.fill("EDITED-Smith");
+  await inputField.fill("EDITED-Smith");
 
   const responsePromise = formDriver.waitForSubmitResponse();
   await formDriver.submitForm("click");

@@ -1895,7 +1895,7 @@ test.describe("Grouping Functionality", () => {
     await driver.toggleOptionsVisibility();
     await driver.selectLabel("Carrot");
 
-    await expect(page.getByText("Carrot")).toBeVisible();
+    await expect(page.getByText("Carrot").first()).toBeVisible();
   });
 
   test("searchable Select with groupBy displays filtered grouped options", async ({

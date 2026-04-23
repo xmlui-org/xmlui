@@ -33,7 +33,7 @@ A new-employee onboarding form has three sections — Personal Info, Work Detail
     </HStack>
 
     <!-- Step 1: Personal Info -->
-    <FormSegment id="step1Segment"  displayWhen="{step === 1}">
+    <FormSegment id="step1Segment" when="{step === 1}">
         <H4>
           Personal Information
         </H4>
@@ -46,7 +46,7 @@ A new-employee onboarding form has three sections — Personal Info, Work Detail
     </FormSegment>
 
     <!-- Step 2: Work Details -->
-    <FormSegment id="step2Segment" displayWhen="{step === 2}">
+    <FormSegment id="step2Segment" when="{step === 2}">
       <H4>
         Work Details
       </H4>
@@ -60,7 +60,7 @@ A new-employee onboarding form has three sections — Personal Info, Work Detail
     </FormSegment>
 
     <!-- Step 3: Account Setup -->
-    <FormSegment id="step3Segment" displayWhen="{step === 3}">
+    <FormSegment id="step3Segment" when="{step === 3}">
       <H4>
         Account Setup
       </H4>
@@ -104,10 +104,10 @@ A new-employee onboarding form has three sections — Personal Info, Work Detail
   - Primary color if the step is valid  
 Show an additional "issues" badge using `when="{$hasValidationIssue()}"` to alert users when validation errors exist anywhere in the form.
 
-**`displayWhen="{step === N}"` for step visibility**: Each step is shown conditionally on the form variable. Fields remain mounted in the DOM when hidden, preserving their values:
+**`when="{step === N}"` for step visibility**: Each step is shown conditionally on the form variable. When a step is hidden its fields are unmounted, but values already entered are preserved in the Form's state:
 
 ```xmlui
-<FormSegment id="step2Segment" displayWhen="{step === 2}">
+<FormSegment id="step2Segment" when="{step === 2}">
   <TextBox label="Department" bindTo="department" required="true" />
 </FormSegment>
 ```
@@ -116,7 +116,7 @@ Show an additional "issues" badge using `when="{$hasValidationIssue()}"` to aler
 
 ```xmlui
 <Form hideButtonRow="true" onSubmit="(data) => toast('Submitted')">
-  <FormSegment displayWhen="{step === 3}">
+  <FormSegment when="{step === 3}">
     <Button label="Back" onClick="step = 2" />
     <Button label="Create Account" type="submit" variant="solid" />
   </FormSegment>

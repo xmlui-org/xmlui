@@ -100,7 +100,10 @@ A variable declared with `var.name="{expr}"` starts as a **reactive binding** â€
     <Text>{$item}</Text>
   </Items>
 
-  <!-- After clicking, items is set manually and no longer tracks the expression above -->
+  <!-- 
+    After clicking, items is set manually and no longer 
+    tracks the expression above
+  -->
   <Button
     label="Override list"
     onClick="items = ['Delta', 'Epsilon']"

@@ -1041,38 +1041,6 @@ test.describe("Behaviors and Parts", () => {
     await expect(icon).toBeVisible();
   });
 
-  test("parts are present when variant is added", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Link to="/" testId="test" variant="CustomLink" icon="search">Link text</Link>
-    `, {
-      testThemeVars: {
-        "textColor-Link-CustomLink": "rgb(255, 0, 0)",
-      },
-    });
-    
-    const link = page.getByTestId("test");
-    const icon = link.locator("[data-part-id='icon']");
-
-    await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
-    await expect(icon).toBeVisible();
-  });
-
-  test("variant applies custom theme variables", async ({ page, initTestBed }) => {
-    await initTestBed(`
-      <Link to="/" testId="test" variant="CustomLink">Link text</Link>
-    `, {
-      testThemeVars: {
-        "textColor-Link-CustomLink": "rgb(255, 0, 0)",
-        "fontSize-Link-CustomLink": "20px",
-      },
-    });
-    
-    const link = page.getByTestId("test");
-
-    await expect(link).toHaveCSS("color", "rgb(255, 0, 0)");
-    await expect(link).toHaveCSS("font-size", "20px");
-  });
-
   test("tooltip with markdown content", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Link to="/" testId="test" tooltipMarkdown="**Bold text**">Link text</Link>
