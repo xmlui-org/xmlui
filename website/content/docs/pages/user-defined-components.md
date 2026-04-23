@@ -14,8 +14,8 @@ Here's a simple component to package a name/value pair.
 ---comp display
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name} </Text>
-    <Text>Value: { $props.value} </Text>
+    <Text>Name: {$props.name} </Text>
+    <Text>Value: {$props.value} </Text>
   </Card>
 </Component>
 ```
@@ -27,8 +27,8 @@ Here's how you can define default values for properties.
 ```xmlui
 <Component name="NameValue">
   <Card width="20%">
-    <Text>Name: { $props.name ?? '[no name]' } </Text>
-    <Text>Value: { $props.value ?? '[no value]' } </Text>
+    <Text>Name: {$props.name ?? '[no name]'} </Text>
+    <Text>Value: {$props.value ?? '[no value]'} </Text>
   </Card>
 </Component>
 ```
@@ -127,7 +127,7 @@ Add extra attributes to the `<Slot>` tag. Each attribute becomes a context varia
   >
     <property name="rowTemplate">
       <HStack>
-        <Icon name="{$item.ok ? 'check' : 'close'}" />
+        <Icon name="{$item.ok ? 'checkmark' : 'close'}" />
         <Text>{$item.label}</Text>
       </HStack>
     </property>

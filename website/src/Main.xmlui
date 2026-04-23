@@ -1169,7 +1169,7 @@
                         to="/docs/helper-tags"
                     />
                     <NavLink
-                        icon="core-props"
+                        icon="table-properties"
                         label="Core Properties"
                         to="/docs/core-properties"
                     />
