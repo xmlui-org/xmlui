@@ -1,6 +1,6 @@
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
-import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.js";
+import { collectedThemes, collectedComponentMetadata } from "../../dist/metadata/xmlui-metadata.cjs";
 import { ERROR_HANDLING } from "./constants.mjs";
 import { handleFatalError, validateDependencies } from "./error-handling.mjs";
 import { createScopedLogger } from "./logging-standards.mjs";

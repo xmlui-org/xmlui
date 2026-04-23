@@ -14,7 +14,6 @@ This component supports the following behaviors:
 | Behavior | Properties |
 | --- | --- |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Display When | `displayWhen` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
