@@ -220,6 +220,7 @@ test.describe("Basic Functionality", () => {
     // Focus slider and move it
     const slider = page.getByRole("slider");
     await slider.focus();
+    await expect(slider).toBeFocused();
     // Move it significantly
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("ArrowRight");
@@ -579,7 +580,7 @@ test.describe("Validation", () => {
 
     // Empty - required fails first (only 1 validation runs - short-circuit)
     await input.fill("a");
-    await input.clear();
+    await input.fill("");
     await input.blur();
     await expect(page.getByText("This field is required")).toBeVisible();
     await expect(wrapper).toHaveAttribute("data-validations-evaluated", "1");
@@ -838,9 +839,11 @@ test.describe("Validation", () => {
     await expect(textbox).toBeVisible();
     await expect(page.getByText("This field is required")).not.toBeVisible();
 
-    // Type and clear to make dirty
+    // Focus, type and clear to make dirty
+    await textbox.focus();
+    await expect(textbox).toBeFocused();
     await textbox.fill("test");
-    await textbox.clear();
+    await textbox.fill("");
 
     // Explicitly blur the field to trigger validation
     await textbox.blur();
@@ -1684,12 +1687,14 @@ test.describe("Other Edge Cases", () => {
     const input = driver.input;
 
     await input.focus({ timeout: 500 });
+    await expect(input).toBeFocused();
     await page.keyboard.type("v");
     await expect(page.getByText("Input should be at least 2 characters")).not.toBeVisible();
     await input.blur();
     await expect(page.getByText("Input should be at least 2 characters")).toBeVisible();
 
     await input.focus({ timeout: 500 });
+    await expect(input).toBeFocused();
     await page.keyboard.type("a");
     await expect(page.getByText("Input should be at least 2 characters")).not.toBeVisible();
     await input.blur();
@@ -1732,6 +1737,7 @@ test.describe("Other Edge Cases", () => {
     const input = driver.input;
 
     await input.focus({ timeout: 500 });
+    await expect(input).toBeFocused();
     await page.keyboard.type("v");
     await expect(page.getByText("Input should be at least 3 characters")).not.toBeVisible();
 
