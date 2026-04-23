@@ -91,7 +91,7 @@ component.functions = { ...component.functions, ...codeBehind.functions };
 
 When a parent component uses `<ContactCard name="Mary" value="123">`, the rendering pipeline reaches `ComponentAdapter`, which queries the registry. Finding `isCompoundComponent === true`, it:
 
-- **Skips behavior application** — behaviors (DisplayWhen, Tooltip, Variant, Label, etc.) are NOT applied to the compound wrapper. They apply only to built-in components inside the UDC's implementation.
+- **Skips behavior application** — behaviors (Tooltip, Variant, Label, etc.) are NOT applied to the compound wrapper. They apply only to built-in components inside the UDC's implementation.
 - **Calls the renderer**, which creates a `CompoundComponent` instance.
 
 ---

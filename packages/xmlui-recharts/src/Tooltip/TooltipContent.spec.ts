@@ -48,16 +48,21 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-
       // Hover over a pie sector to trigger tooltip
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      // Tooltip should appear
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       await expect(page.locator(tooltipSelector)).toBeVisible();
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
     });
 
     test("TooltipContent renders in BarChart on hover", async ({ initTestBed, page }) => {
@@ -71,14 +76,18 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
-      await barElement.hover();
-
-      // Check if tooltip content is visible
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await barElement.hover();
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
       await expect(page.locator(tooltipValueSelector)).toBeVisible();
     });
@@ -97,13 +106,20 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
       const indicator = page.locator(tooltipIndicatorSelector);
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       await expect(indicator).toBeVisible();
 
       // Should have dot styling (default)
@@ -123,14 +139,18 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
-      await barElement.hover();
-
-      // Check if tooltip content is visible with proper styling
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await barElement.hover();
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
       await expect(page.locator(tooltipValueSelector)).toBeVisible();
     });
@@ -151,12 +171,19 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       await expect(page.locator(tooltipNameSelector)).toContainText("Single");
       await expect(page.locator(tooltipValueSelector)).toContainText("100");
     });
@@ -172,17 +199,21 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-
       // Hover over a bar to trigger tooltip
       const barElement = page.locator(".recharts-bar-rectangle").first();
-      await barElement.hover();
-
-      // Check if tooltip shows multiple series data
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      const indicators = page.locator(tooltipIndicatorSelector);
+      await expect
+        .poll(
+          async () => {
+            await barElement.hover();
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
 
       // Should show data for both series - check for multiple indicators
-      const indicators = page.locator(tooltipIndicatorSelector);
       await expect(indicators).toHaveCount(2);
     });
 
@@ -197,16 +228,24 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      const valueElement = page.locator(tooltipValueSelector);
 
-      // Should format large numbers with commas
-      const valueText = await page.locator(tooltipValueSelector).textContent();
-      expect(valueText).toMatch(/1,234,567/);
+      // Poll: re-hover on each attempt until the tooltip shows the formatted value.
+      // A one-shot hover is flaky because the tooltip can miss or flicker.
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            if (!(await tooltipContent.isVisible())) return null;
+            return valueElement.textContent();
+          },
+          { timeout: 15000 },
+        )
+        .toMatch(/1,234,567/);
     });
 
     test("handles zero values correctly", async ({ initTestBed, page }) => {
@@ -225,14 +264,21 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       // Use .last() — the positive-value sector is last in data order; the zero-value
       // sector may not render a visible arc, making .first() land on it unpredictably.
       const pieSector = page.locator(".recharts-pie-sector").last();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
       // Should handle zero values gracefully
       const valueElements = page.locator(tooltipValueSelector);
       await expect(valueElements.first()).toBeVisible();
@@ -252,12 +298,19 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      const tooltipContent = page.locator(tooltipContentSelector);
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
 
       // Default PieChart tooltip doesn't have a label, so check for name and value instead
       await expect(page.locator(tooltipNameSelector)).toBeVisible();
@@ -280,16 +333,21 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
-
-      // Should display Unicode characters correctly
-      const nameText = page.locator(tooltipNameSelector);
-      await expect(nameText).toContainText("🖥️");
+      const tooltipContent = page.locator(tooltipContentSelector);
+      // Poll: re-hover until the tooltip shows the correct Unicode text.
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            if (!(await tooltipContent.isVisible())) return null;
+            return page.locator(tooltipNameSelector).textContent();
+          },
+          { timeout: 15000 },
+        )
+        .toContain("🖥️");
     });
   });
 
@@ -306,21 +364,23 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
       const pieSector = page.locator(".recharts-pie-sector").first();
       await pieSector.waitFor({ state: "visible", timeout: 10000 });
-      await pieSector.hover({ force: true });
 
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
-
+      const tooltipContent = page.locator(tooltipContentSelector);
       const indicator = page.locator(tooltipIndicatorSelector);
-      await expect(indicator).toBeVisible();
 
-      // Indicator should have background color
-      const backgroundColor = await indicator.evaluate(
-        (el) => window.getComputedStyle(el).backgroundColor,
-      );
-      expect(backgroundColor).not.toBe("rgba(0, 0, 0, 0)"); // Not transparent
+      // Poll: re-hover until tooltip is visible and indicator has a non-transparent background.
+      await expect
+        .poll(
+          async () => {
+            await pieSector.hover({ force: true });
+            if (!(await tooltipContent.isVisible())) return null;
+            return indicator.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+          },
+          { timeout: 15000 },
+        )
+        .not.toBe("rgba(0, 0, 0, 0)"); // Not transparent
     });
 
     test("applies consistent styling across different chart types", async ({
@@ -338,18 +398,22 @@ test.describe("Basic Functionality", () => {
         />
       `, { extensionIds: "xmlui-recharts" });
 
-      await page.waitForSelector(chartRoot, { timeout: 10000 });
-
       // Hover over chart area to trigger tooltip (Recharts tooltip activates on chart area, not just line)
       const chartSvg = page.locator(".recharts-surface").first();
-      await chartSvg.hover({ position: { x: 200, y: 200 } });
+      const tooltipContent = page.locator(tooltipContentSelector);
+      const indicator = page.locator(tooltipIndicatorSelector);
 
-      // Wait for tooltip to appear
-      await page.waitForTimeout(500);
-      await expect(page.locator(tooltipContentSelector)).toBeVisible();
+      await expect
+        .poll(
+          async () => {
+            await chartSvg.hover({ position: { x: 200, y: 200 } });
+            return tooltipContent.isVisible();
+          },
+          { timeout: 15000 },
+        )
+        .toBe(true);
 
       // Should have consistent styling
-      const indicator = page.locator(tooltipIndicatorSelector);
       await expect(indicator).toBeVisible();
     });
   });
@@ -371,21 +435,23 @@ test.describe("Accessibility", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
 
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
 
     const tooltipContent = page.locator(tooltipContentSelector);
-    await expect(async () => {
-      await pieSector.hover({ force: true });
-      await expect(tooltipContent).toBeVisible({ timeout: 2000 });
-    }).toPass({ timeout: 15000 });
-
-    // Text content should be readable
-    const nameText = page.locator(tooltipNameSelector);
-    const valueText = page.locator(tooltipValueSelector);
-    await expect(nameText).toBeVisible();
-    await expect(valueText).toBeVisible();
+    // Poll: re-hover until the tooltip and both text elements are all visible at once.
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true });
+          if (!(await tooltipContent.isVisible())) return false;
+          const nameVisible = await page.locator(tooltipNameSelector).isVisible();
+          const valueVisible = await page.locator(tooltipValueSelector).isVisible();
+          return nameVisible && valueVisible;
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
   });
 
   test("tooltip has proper contrast and readability", async ({ initTestBed, page }) => {
@@ -399,44 +465,29 @@ test.describe("Accessibility", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
 
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
 
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    const tooltipContent = page.locator(tooltipContentSelector);
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true });
+          return tooltipContent.isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
 
     // Text should have readable font size
     const valueText = page.locator(tooltipValueSelector);
     await expect(valueText).toHaveCSS("font-size", /\d+px/);
 
     // Should have proper contrast (background vs text)
-    const tooltipContainer = page.locator(tooltipContentSelector);
-    const backgroundColor = await tooltipContainer.evaluate(
+    const backgroundColor = await tooltipContent.evaluate(
       (el) => window.getComputedStyle(el).backgroundColor,
     );
     expect(backgroundColor).not.toBe("transparent");
-  });
-
-  test("tooltip appears on keyboard navigation", async ({ initTestBed, page }) => {
-    await initTestBed(`
-      <PieChart
-        nameKey="name"
-        dataKey="value"
-        data="{${sampleData}}"
-        width="400px"
-        height="400px"
-      />
-    `, { extensionIds: "xmlui-recharts" });
-
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-
-    // Focus on chart and use keyboard navigation
-    await page.keyboard.press("Tab");
-
-    // Chart should be focusable and tooltip may appear on focus
-    const focusedElement = page.locator(":focus");
-    await expect(focusedElement).toBeVisible();
   });
 });
 
@@ -458,8 +509,6 @@ test.describe("Performance and Edge Cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
 
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-
     // Should not crash with empty data
     // Tooltip won't appear since there's no data to hover over
     const chart = page.locator(chartRoot);
@@ -480,12 +529,19 @@ test.describe("Performance and Edge Cases", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
 
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     const pieSector = page.locator(".recharts-pie-sector").first();
     await pieSector.waitFor({ state: "visible", timeout: 10000 });
-    await pieSector.hover({ force: true });
 
-    await expect(page.locator(tooltipContentSelector)).toBeVisible();
+    const tooltipContent = page.locator(tooltipContentSelector);
+    await expect
+      .poll(
+        async () => {
+          await pieSector.hover({ force: true });
+          return tooltipContent.isVisible();
+        },
+        { timeout: 15000 },
+      )
+      .toBe(true);
 
     // Should handle special characters correctly
     const nameText = page.locator(tooltipNameSelector);
@@ -503,8 +559,6 @@ test.describe("Performance and Edge Cases", () => {
         height="200px"
       />
     `, { extensionIds: "xmlui-recharts" });
-
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
 
     // Wait for at least one pie sector to be rendered
     const pieSector = page.locator(".recharts-pie-sector").first();

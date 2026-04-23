@@ -4242,14 +4242,20 @@ test.describe("Column width theme variables", () => {
     await expect(pxHeader).toBeVisible();
     await expect(themeHeader).toBeVisible();
 
-    const pxBox = await pxHeader.boundingBox();
-    const themeBox = await themeHeader.boundingBox();
-
-    expect(pxBox).not.toBeNull();
-    expect(themeBox).not.toBeNull();
-
-    // The widths should match within a few pixels
-    expect(Math.abs(pxBox!.width - themeBox!.width)).toBeLessThan(4);
+    // Poll until the column widths have stabilized after the ResizeObserver settles
+    // and the theme variable has been resolved. A one-shot boundingBox() is flaky
+    // because layout may not have finished by the time visibility is confirmed.
+    await expect
+      .poll(
+        async () => {
+          const pxBox = await pxHeader.boundingBox();
+          const themeBox = await themeHeader.boundingBox();
+          if (!pxBox || !themeBox) return Infinity;
+          return Math.abs(pxBox.width - themeBox.width);
+        },
+        { timeout: 10000 },
+      )
+      .toBeLessThan(4);
   });
 });
 

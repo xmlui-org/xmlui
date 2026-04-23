@@ -21,9 +21,9 @@ import {
   FILE_EXTENSIONS,
   DOCS_COMPONENTS_PATH,
 } from "./constants.mjs";
-import { collectedBehaviorMetadata } from "../../dist/metadata/behaviors.js";
-import { canBehaviorAttachToComponent } from "../../dist/metadata/behavior-evaluator.js";
-import { ComponentMetadataProvider } from "../../dist/metadata/metadata-utils.js";
+import { collectedBehaviorMetadata } from "../../dist/metadata/behaviors.cjs";
+import { canBehaviorAttachToComponent } from "../../dist/metadata/behavior-evaluator.cjs";
+import { ComponentMetadataProvider } from "../../dist/metadata/metadata-utils.cjs";
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 

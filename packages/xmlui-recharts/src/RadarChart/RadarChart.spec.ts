@@ -32,7 +32,7 @@ const largeDataset = `[
 
 // Chart selectors - update based on specific Recharts RadarChart output
 const chartRoot = ".recharts-responsive-container";
-const chartSvg = ".recharts-surface";
+const chartSvg = ".recharts-wrapper > .recharts-surface";
 const radarElementsSelector = ".recharts-radar"; // RadarChart specific
 const legendSelector = ".recharts-legend-wrapper";
 const tooltipSelector = ".recharts-tooltip-wrapper";
@@ -56,7 +56,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -71,7 +70,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     const elements = page.locator(radarElementsSelector);
     await expect(elements).toHaveCount(2); // Should match dataKeys length
   });
@@ -87,7 +85,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 
@@ -102,7 +99,6 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -121,7 +117,6 @@ test.describe("polar grid", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(polarGridSelector, { timeout: 10000 });
     await expect(page.locator(polarGridSelector)).toBeVisible();
   });
 
@@ -137,7 +132,7 @@ test.describe("polar grid", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(polarGridSelector)).not.toBeVisible();
   });
 });
@@ -154,7 +149,6 @@ test.describe("angle axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(polarAngleAxisSelector, { timeout: 10000 });
     await expect(page.locator(polarAngleAxisSelector)).toBeVisible();
   });
 
@@ -170,7 +164,7 @@ test.describe("angle axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(polarAngleAxisSelector)).not.toBeVisible();
   });
 });
@@ -187,7 +181,6 @@ test.describe("radius axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(polarRadiusAxisSelector, { timeout: 10000 });
     await expect(page.locator(polarRadiusAxisSelector)).toBeVisible();
   });
 
@@ -203,7 +196,7 @@ test.describe("radius axis", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(polarRadiusAxisSelector)).not.toBeVisible();
   });
 });
@@ -222,7 +215,7 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(legendSelector)).not.toBeVisible();
   });
 
@@ -238,7 +231,6 @@ test.describe("legend", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(legendSelector, { timeout: 10000 });
     await expect(page.locator(legendSelector)).toBeVisible();
   });
 });
@@ -257,7 +249,6 @@ test.describe("filled areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     const radars = page.locator(radarElementsSelector);
     await expect(radars).toHaveCount(2);
   });
@@ -274,7 +265,6 @@ test.describe("filled areas", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     const radars = page.locator(radarElementsSelector);
     await expect(radars).toHaveCount(2);
   });
@@ -292,7 +282,6 @@ test.describe("stroke width", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toBeVisible();
   });
 
@@ -308,7 +297,6 @@ test.describe("stroke width", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toBeVisible();
   });
 });
@@ -325,7 +313,6 @@ test.describe("fill opacity", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toBeVisible();
   });
 
@@ -341,7 +328,6 @@ test.describe("fill opacity", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toBeVisible();
   });
 });
@@ -361,10 +347,8 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Wait for chart to fully render and responsive behavior to take effect
-    await page.waitForTimeout(1000);
     
     // In mini mode, legend should be hidden
     await expect(page.locator(legendSelector)).not.toBeVisible();
@@ -386,7 +370,6 @@ test.describe("responsive behavior", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // In normal mode, legend and axes should be visible
     await expect(page.locator(legendSelector)).toBeVisible();
@@ -409,7 +392,6 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over radar area to trigger tooltip
     const _radarEl = page.locator(radarElementsSelector).first();
@@ -430,7 +412,6 @@ test.describe("tooltip", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     
     // Hover over radar area - tooltip should not appear
     const _radarEl = page.locator(radarElementsSelector).first();
@@ -454,7 +435,6 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(radarElementsSelector)).toHaveCount(1);
   });
@@ -470,7 +450,7 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(radarElementsSelector)).toHaveCount(2);
   });
 
@@ -484,7 +464,6 @@ test.describe("data prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
   });
 });
@@ -501,7 +480,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toHaveCount(1);
   });
 
@@ -516,7 +494,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(radarElementsSelector, { timeout: 10000 });
     await expect(page.locator(radarElementsSelector)).toHaveCount(3);
   });
 
@@ -531,7 +508,6 @@ test.describe("dataKeys prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
     await expect(page.locator(chartRoot)).toBeVisible();
     await expect(page.locator(radarElementsSelector)).toHaveCount(0);
   });
@@ -549,7 +525,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(angleAxisTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(angleAxisTicksSelector).first();
     await expect(firstTick).toContainText("Math");
   });
@@ -565,7 +540,6 @@ test.describe("nameKey prop", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(angleAxisTicksSelector, { timeout: 10000 });
     const firstTick = page.locator(angleAxisTicksSelector).first();
     await expect(firstTick).toContainText("Communication");
   });
@@ -588,7 +562,7 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(radarElementsSelector)).toHaveCount(2);
     await expect(page.locator(legendSelector)).toBeVisible();
     await expect(page.locator(polarGridSelector)).toBeVisible();
@@ -610,7 +584,7 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
+    await expect(page.locator(chartSvg)).toBeVisible();
     await expect(page.locator(radarElementsSelector)).toHaveCount(1);
     await expect(page.locator(polarGridSelector)).not.toBeVisible();
     await expect(page.locator(polarAngleAxisSelector)).not.toBeVisible();
@@ -636,16 +610,10 @@ test.describe("combined props", () => {
       />
     `, { extensionIds: "xmlui-recharts" });
     
-    await page.waitForSelector(chartRoot, { timeout: 10000 });
-    await page.waitForSelector(radarElementsSelector, { timeout: 5000 });
     await expect(page.locator(radarElementsSelector)).toHaveCount(3);
     
-    await page.waitForSelector(legendSelector, { timeout: 5000 });
     await expect(page.locator(legendSelector)).toBeVisible();
     
-    await page.waitForSelector(polarGridSelector, { timeout: 5000 });
-    await page.waitForSelector(polarAngleAxisSelector, { timeout: 5000 });
-    await page.waitForSelector(polarRadiusAxisSelector, { timeout: 5000 });
     await expect(page.locator(polarGridSelector)).toBeVisible();
     await expect(page.locator(polarAngleAxisSelector)).toBeVisible();
     await expect(page.locator(polarRadiusAxisSelector)).toBeVisible();
