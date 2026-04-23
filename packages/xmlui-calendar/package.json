@@ -20,7 +20,7 @@
     "xmlui": "*"
   },
   "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+    "build:extension": "node -e \"console.log('xmlui-calendar is dist-only; skipping extension build')\"",
+    "build:meta": "node -e \"console.log('xmlui-calendar is dist-only; skipping metadata build')\""
   }
 }
