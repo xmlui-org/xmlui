@@ -35,18 +35,16 @@ A wrapped component needs to respect the design system. Three strategies, depend
 
 ## Level 4: Layout
 
-XMLUI's core layout components -- HStack, VStack, FlowLayout -- handle most needs. But some layouts require algorithms the core doesn't provide. [Masonry](/docs/guides/wrap-component/masonry) wraps CSS multi-column layout for content feeds and galleries where items of varying height flow into columns. [GridLayout](/docs/guides/wrap-component/grid-layout) wraps react-grid-layout for draggable, resizable dashboard grids where items have explicit positions. Same wrapping pattern, very different layout engines.
+XMLUI's core layout components -- HStack, VStack, FlowLayout -- handle most needs. But some layouts require algorithms the core doesn't provide. [Masonry](/docs/guides/wrap-component/masonry) wraps CSS multi-column layout for content feeds and galleries where items of varying height flow into columns.
 
 ## The ecosystem unlocked
 
-XMLUI provides a solid core that wraps a curated set of React components for most basic needs. And it makes it straightforward for a React developer to wrap components that support a range of advanced uses. Here we show: charting (ECharts), rich-text editing (Tiptap), responsive multi-column layout (Masonry), and interactive dashboard grids (GridLayout) -- four very different libraries, all wrapped with the same pattern, all getting prop forwarding, semantic tracing, theming, and extension packaging for free. See [Extension packaging](/docs/guides/wrap-component/extension-packaging) for details on how to do the wrapping.
+XMLUI provides a solid core that wraps a curated set of React components for most basic needs. And it makes it straightforward for a React developer to wrap components that support a range of advanced uses. Here we show: charting (ECharts), rich-text editing (Tiptap), and responsive multi-column layout (Masonry) -- three very different libraries, all wrapped with the same pattern, all getting prop forwarding, semantic tracing, theming, and extension packaging for free. See [Extension packaging](/docs/guides/wrap-component/extension-packaging) for details on how to do the wrapping.
 
 **[ECharts](/docs/guides/wrap-component/echarts).** One of the most powerful charting libraries available -- time series with zoom, treemaps, donuts, toolbox interactions. Canvas-rendered, with option-level theming and comprehensive native event capture.
 
 **[Tiptap](/docs/guides/wrap-component/tiptap).** A headless rich-text editor built on ProseMirror. Every keystroke and format toggle is semantically classified into trace-friendly native events.
 
 **[Masonry](/docs/guides/wrap-component/masonry).** CSS multi-column layout for content feeds and galleries. Items of varying height flow into responsive columns -- no third-party dependency, just a lightweight wrapper around the browser's native column algorithm.
-
-**[GridLayout](/docs/guides/wrap-component/grid-layout).** Draggable, resizable dashboard grids via react-grid-layout. Items are positioned on an explicit column/row grid and can be rearranged by users at runtime. Drag and resize events are captured as native trace events.
 
 All of these ship as independent extension packages. Apps include only the components they need. See [Extension packaging](/docs/guides/wrap-component/extension-packaging) for details.
