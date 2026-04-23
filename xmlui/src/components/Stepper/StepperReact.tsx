@@ -288,7 +288,14 @@ export const Stepper = memo(
               })}
             </div>
             {/* Only the active Step's content is rendered (Step decides internally). */}
-            <div className={styles.content}>{children}</div>
+            {/* Keyed by activeIndex so the content remounts on step change and */}
+            {/* re-triggers the `stepFadeIn` keyframe animation. */}
+            <div
+              key={activeIndex}
+              className={classnames(styles.content, styles.horizontalContent)}
+            >
+              {children}
+            </div>
           </div>
         </StepperContext.Provider>
       );

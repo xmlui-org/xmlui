@@ -215,17 +215,35 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
   }
 
   .horizontalContent {
-    animation: stepFadeIn 220ms ease;
+    will-change: transform, opacity;
+    animation: stepSlideIn 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes stepSlideIn {
+    0% {
+      opacity: 0;
+      transform: translate3d(40px, 0, 0);
+    }
+    60% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
 
   @keyframes stepFadeIn {
-    from {
+    0% {
       opacity: 0;
-      transform: translateY(4px);
+      transform: translate3d(0, 20px, 0);
     }
-    to {
+    60% {
       opacity: 1;
-      transform: translateY(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
     }
   }
 
@@ -282,6 +300,16 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     border-left-style: $borderStyle-connector-Stepper;
     border-left-color: $borderColor-connector-Stepper;
     min-height: 16px;
+    // Accordion open/close: the inline `height` is set by React (0 when
+    // collapsed, scrollHeight while expanding, `auto` once expanded). CSS
+    // transitions interpolate between those numeric heights so the previous
+    // step closes as the next one opens. `auto` isn't animatable, so the
+    // component locks the height to a pixel value one frame before toggling.
+    overflow: hidden;
+    transition:
+      height 520ms cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 320ms ease-out;
+    will-change: height;
   }
 
   .vertical .verticalBody.last {
@@ -291,7 +319,6 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
 
   .vertical .verticalContent {
     padding: $padding-content-Stepper;
-    animation: stepFadeIn 220ms ease;
   }
 }
 

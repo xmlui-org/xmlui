@@ -1,4 +1,4 @@
-import { forwardRef, memo, useCallback, useEffect, useId, useMemo } from "react";
+import { forwardRef, memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ForwardedRef, ReactNode } from "react";
 import classnames from "classnames";
 
@@ -273,6 +273,9 @@ export const FormSegmentNative = memo(
   }),
 );
 
+// Duration must match `.verticalBody` transition in Stepper.module.scss.
+const ACCORDION_TRANSITION_MS = 520;
+
 // Internal per-step vertical frame — mirrors the Step component's vertical layout
 // so FormSegment looks identical to Step when used as a step.
 function VerticalSegmentFrame({
@@ -295,6 +298,73 @@ function VerticalSegmentFrame({
   const items = stepperCtx.getStepItems();
   const index = items.findIndex((s) => s.innerId === innerId);
   const isLast = index === items.length - 1;
+
+  // --- Accordion-style open/close -----------------------------------------
+  // Two pieces of state orchestrate the animation:
+  //   - `shouldRender`   — whether the content is mounted in the DOM at all.
+  //                        True from the moment the step becomes active until
+  //                        the close animation finishes.
+  //   - `height`         — the inline `height` applied to the wrapper. 0 when
+  //                        collapsed, the measured scrollHeight while
+  //                        expanding/expanded. After expansion ends we let it
+  //                        fall back to `auto` so nested content can grow.
+  const [contentEl, setContentEl] = useState<HTMLDivElement | null>(null);
+  const [shouldRender, setShouldRender] = useState<boolean>(isActive);
+  const [height, setHeight] = useState<string | number>(isActive ? "auto" : 0);
+  const prevActive = useRef<boolean>(isActive);
+  // Marks that we are waiting for the content div to mount so we can launch
+  // the opening animation. Needed because `setShouldRender(true)` schedules a
+  // render that may commit after our RAF fires — by the time we look up a
+  // plain ref inside RAF, it can still be null.
+  const pendingOpenRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isActive === prevActive.current) return;
+    prevActive.current = isActive;
+
+    if (isActive) {
+      // Opening phase 1: ensure the content div is mounted with height 0.
+      // The actual animation is launched once the element is attached (see
+      // the effect below that watches `contentEl`).
+      pendingOpenRef.current = true;
+      setShouldRender(true);
+      setHeight(0);
+      return;
+    }
+
+    // Closing: lock the current height (so `auto` transitions), then on
+    // the next frame animate to 0, then unmount after the transition ends.
+    pendingOpenRef.current = false;
+    if (contentEl) setHeight(contentEl.scrollHeight);
+    const raf1 = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setHeight(0));
+    });
+    const settleTimer = setTimeout(() => {
+      setShouldRender(false);
+    }, ACCORDION_TRANSITION_MS);
+    return () => {
+      cancelAnimationFrame(raf1);
+      clearTimeout(settleTimer);
+    };
+  }, [isActive, contentEl]);
+
+  // Opening phase 2: once the content element is attached AND we're still
+  // pending an open, measure the natural height and animate from 0 to it,
+  // then drop back to `auto` so nested content can grow freely.
+  useEffect(() => {
+    if (!pendingOpenRef.current) return;
+    if (!contentEl) return;
+    pendingOpenRef.current = false;
+    const sh = contentEl.scrollHeight;
+    const raf = requestAnimationFrame(() => {
+      setHeight(sh);
+    });
+    const settleTimer = setTimeout(() => setHeight("auto"), ACCORDION_TRANSITION_MS);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(settleTimer);
+    };
+  }, [contentEl]);
 
   const iconEl = (
     <span
@@ -353,8 +423,13 @@ function VerticalSegmentFrame({
         className={classnames(stepperStyles.verticalBody, {
           [stepperStyles.last]: isLast,
         })}
+        style={{ height }}
       >
-        {isActive && <div className={stepperStyles.verticalContent}>{children}</div>}
+        {shouldRender && (
+          <div ref={setContentEl} className={stepperStyles.verticalContent}>
+            {children}
+          </div>
+        )}
       </div>
     </div>
   );
