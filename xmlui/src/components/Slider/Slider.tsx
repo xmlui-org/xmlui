@@ -161,31 +161,34 @@ export const ThemedSlider = React.forwardRef<React.ElementRef<typeof Slider>, Th
 
 export const sliderComponentRenderer = wrapComponent(COMP, Slider, SliderMd, {
   // minValue, maxValue, minStepsBetweenThumbs are number-typed in metadata — asOptionalNumber throws
-  // for non-numeric strings (e.g. "invalid"). Exclude them so customRender handles via raw extractValue.
-  exclude: ["minValue", "maxValue", "minStepsBetweenThumbs"],
-  customRender: (_props, { node, extractValue, lookupEventHandler, lookupSyncCallback, classes, updateState, state, registerComponentApi }) => (
-    <Slider
-      validationStatus={extractValue(node.props.validationStatus)}
-      minStepsBetweenThumbs={extractValue(node.props?.minStepsBetweenThumbs)}
-      value={state.value}
-      initialValue={extractValue(node.props.initialValue)}
-      updateState={updateState}
-      onDidChange={lookupEventHandler("didChange")}
-      onFocus={lookupEventHandler("gotFocus")}
-      onBlur={lookupEventHandler("lostFocus")}
-      registerComponentApi={registerComponentApi}
-      classes={classes}
-      step={extractValue(node.props?.step)}
-      min={extractValue(node.props?.minValue)}
-      max={extractValue(node.props?.maxValue)}
-      enabled={extractValue.asOptionalBoolean(node.props?.enabled)}
-      autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-      readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
-      required={extractValue.asOptionalBoolean(node.props.required)}
-      rangeStyle={extractValue(node.props?.rangeStyle)}
-      thumbStyle={extractValue(node.props?.thumbStyle)}
-      showValues={extractValue.asOptionalBoolean(node.props?.showValues)}
-      valueFormat={lookupSyncCallback(node.props?.valueFormat)}
-    />
-  ),
+  // for non-numeric strings (e.g. "invalid"). invalidMessages is handled by form wrappers and should
+  // not leak to the underlying slider DOM.
+  exclude: ["minValue", "maxValue", "minStepsBetweenThumbs", "invalidMessages"],
+  customRender: (props, { node, extractValue, lookupEventHandler, lookupSyncCallback, classes, updateState, state, registerComponentApi }) => {
+    const {
+      invalidMessages: _invalidMessages,
+      labelPosition: _labelPosition,
+      requireLabelMode: _requireLabelMode,
+      ...sliderProps
+    } = props;
+
+    return (
+      <Slider
+        {...sliderProps}
+        value={state.value}
+        initialValue={extractValue(node.props.initialValue)}
+        updateState={updateState}
+        onDidChange={lookupEventHandler("didChange")}
+        onFocus={lookupEventHandler("gotFocus")}
+        onBlur={lookupEventHandler("lostFocus")}
+        registerComponentApi={registerComponentApi}
+        classes={classes}
+        validationStatus={extractValue(node.props.validationStatus)}
+        minStepsBetweenThumbs={extractValue(node.props?.minStepsBetweenThumbs)}
+        min={extractValue(node.props?.minValue)}
+        max={extractValue(node.props?.maxValue)}
+        valueFormat={lookupSyncCallback(node.props?.valueFormat)}
+      />
+    );
+  },
 });
