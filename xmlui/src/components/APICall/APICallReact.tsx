@@ -516,7 +516,7 @@ export const APICallReact = memo(function APICallReact({ registerComponentApi, n
     };
     
     // Start polling
-    pollStatus();
+    void pollStatus();
   });
   
   // =============================================================================

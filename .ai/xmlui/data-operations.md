@@ -194,17 +194,23 @@ The predicate matches any cached query whose key starts with the same base URL (
 
 ## Deferred (Long-Running) Operations
 
-APICall supports polling for async backend jobs via `APICallNative.tsx`:
+APICall supports polling for async backend jobs when `deferredMode` is enabled:
 
 | Prop | Description |
 |------|-------------|
-| `pollUrl` | URL to poll for status (may contain `{$result.jobId}`) |
-| `pollIntervalMs` | Polling interval in milliseconds |
-| `maxPollAttemptsBeforeFail` | Max polls before treating as failure |
-| `completionStatusCodePattern` | Regex matched against status response code |
-| `completionCondition` | Expression evaluated against `$statusData` |
-| `progressExtractor` | Expression to extract progress (0–100) from `$statusData` |
-| `statusUrlTemplate` | URL template for constructing the status URL |
+| `deferredMode` | Enable deferred operation mode for long-running operations that return 202 Accepted |
+| `statusUrl` | URL to poll for status updates (may contain `{$result.jobId}` or other result interpolations) |
+| `statusMethod` | HTTP method for status requests (default: `'get'`) |
+| `pollingInterval` | Milliseconds between status polls (default: 2000ms) |
+| `maxPollingDuration` | Maximum time to poll before timing out (default: 300000ms / 5 minutes) |
+| `pollingBackoff` | Backoff strategy: `'none'` (fixed), `'linear'` (adds 1s/attempt), `'exponential'` (doubles each time) |
+| `maxPollingInterval` | Maximum interval between polls when using backoff (default: 30000ms / 30 seconds) |
+| `completionCondition` | Expression evaluated against `$statusData`; if true, polling stops |
+| `errorCondition` | Expression evaluated against `$statusData`; if true, polling stops as error |
+| `progressExtractor` | Expression to extract progress value (0–100) from `$statusData` |
+| `cancelUrl` | URL to call when cancelling the operation (may use `{$result.jobId}` interpolation) |
+| `cancelMethod` | HTTP method for cancel requests (default: `'post'`) |
+| `cancelBody` | Optional body to send with cancel request |
 
 ## APICall Context Variables
 
