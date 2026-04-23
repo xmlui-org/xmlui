@@ -128,7 +128,7 @@ test("APICall lastResponseHeaders is undefined before first execution", async ({
   page,
   initTestBed,
 }) => {
-  await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<Fragment>
       <APICall id="api" url="/api/action" method="post" />
       <Button testId="check" onClick="testState = api.lastResponseHeaders === undefined ? 'undefined' : 'defined'" label="Check" />
@@ -147,7 +147,5 @@ test("APICall lastResponseHeaders is undefined before first execution", async ({
   );
 
   await page.getByTestId("check").click();
-  await expect(page.getByTestId("test-state-view-testid")).toHaveText('"undefined"', {
-    timeout: 5000,
-  });
+  await expect.poll(testStateDriver.testState, { timeout: 5000 }).toBe("undefined");
 });
