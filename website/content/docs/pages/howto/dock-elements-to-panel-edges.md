@@ -1,34 +1,47 @@
 # Dock elements to panel edges
 
-Use dock on Stack children to pin items to top, bottom, left, or right of a container.
+Use `dock` on `Stack` children to build fixed-height panels with pinned headers, scrollable middle content, and bottom action bars.
 
-A file-explorer side panel needs a fixed title bar at the top, a scrollable file list in the middle, and action buttons permanently pinned to the bottom — regardless of how many files are present. The `dock` prop on `Stack` children activates DockPanel mode, which handles this anchoring declaratively.
+A common case is a panel or dialog section with a long, scrollable body and buttons that must remain visible at the bottom. Put the scrollable region in a child with `dock="stretch"` and the actions in a child with `dock="bottom"`. The parent `Stack` must have an explicit height.
 
-```xmlui-pg copy display name="File-explorer panel with docked header and footer" height="450px"
+```xmlui-pg copy display name="Scrollable panel with bottom actions" height="340px"
 ---app display
 <App scrollWholePage="false">
-  <Stack height="100%" borderWidth="1px" borderColor="$color-surface-200">
+  <Stack height="100%" borderWidth="1px" borderColor="$color-surface-200" gap="0">
     <HStack
-      dock="top" 
+      dock="top"
       padding="$space-2 $space-3"
       backgroundColor="$color-surface-100"
+      borderBottom="1px solid $color-surface-200"
     >
-      <Icon name="folder" />
-      <Text variant="strong">src / components</Text>
+      <Text variant="strong">Preview events</Text>
     </HStack>
-    <VStack dock="stretch" paddingVertical="$space-2">
-      <Card title="Button.xmlui" />
-      <Card title="Card.xmlui" />
-      <Card title="Form.xmlui" />
-    </VStack>
+    <ScrollViewer dock="stretch" showScrollerFade="{false}">
+      <VStack padding="$space-2" gap="$space-2">
+        <Text>Community forum at the library</Text>
+        <Text>Neighborhood cleanup on Saturday</Text>
+        <Text>Summer concert in the park</Text>
+        <Text>Transit board meeting</Text>
+        <Text>Farmers market opening day</Text>
+        <Text>After-school robotics demo</Text>
+        <Text>Public art walk downtown</Text>
+        <Text>Book club at the branch library</Text>
+        <Text>Tenant association meeting</Text>
+        <Text>Neighborhood potluck in the park</Text>
+        <Text>Open studio night at the arts center</Text>
+        <Text>Community bike ride kickoff</Text>
+      </VStack>
+    </ScrollViewer>
     <HStack
       dock="bottom"
-      padding="$space-3 $space-2"
-      backgroundColor="$color-surface-50"
+      padding="$space-2"
+      gap="$space-2"
+      horizontalAlignment="end"
+      backgroundColor="$color-surface-0"
+      borderTop="1px solid $color-surface-200"
     >
-      <Button label="New File" variant="solid" themeColor="primary" />
-      <SpaceFiller />
-      <Button label="Delete" variant="outlined" />
+      <Button label="Back" variant="ghost" />
+      <Button label="Add Feed" />
     </HStack>
   </Stack>
 </App>
@@ -112,6 +125,15 @@ The next example uses all four edges at once — a toolbar at the top, a status 
 </Stack>
 ```
 
+`dock="stretch"` is the usual place for a `ScrollViewer` when the middle region should scroll while the action row remains fixed:
+
+```xmlui
+<Stack height="400px" gap="0">
+  <ScrollViewer dock="stretch">…long content…</ScrollViewer>
+  <HStack dock="bottom">…buttons…</HStack>
+</Stack>
+```
+
 **Parent `height` is required for `dock="bottom"` to take effect**: Without an explicit height the outer container collapses to content size and the bottom-docked child simply follows the content instead of anchoring to the edge:
 
 ```xmlui
@@ -128,6 +150,15 @@ The next example uses all four edges at once — a toolbar at the top, a status 
   <HStack dock="top">…toolbar…</HStack>
   <VStack dock="left" width="160px">…sidebar…</VStack>
   <VStack dock="stretch">…content…</VStack>
+</Stack>
+```
+
+**Use `dock="bottom"` for parent-owned action bars, not `ScrollViewer.footerTemplate`**: `footerTemplate` belongs to the scroll container itself. When you need a panel or dialog section with a scrollable body and a bottom action row, make the action row a sibling in the parent `Stack` and dock it to the bottom:
+
+```xmlui
+<Stack height="400px" gap="0">
+  <ScrollViewer dock="stretch">…body…</ScrollViewer>
+  <HStack dock="bottom">…Back / Save…</HStack>
 </Stack>
 ```
 
