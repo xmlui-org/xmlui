@@ -53,24 +53,37 @@ function toKebabCase(str: string): string {
  * @param obj The object to stringify.
  * @returns A stable string representation.
  */
-function stableJSONStringify(obj: any): string {
-  return JSON.stringify(obj);
-  // if (obj === null || typeof obj !== 'object') {
-  //   return JSON.stringify(obj);
-  // }
-  //
-  // if (Array.isArray(obj)) {
-  //   const arrayStr = obj.map(item => stableJSONStringify(item)).join(',');
-  //   return `[${arrayStr}]`;
-  // }
-  //
-  // const keys = Object.keys(obj).sort();
-  // const props = keys.map(key => {
-  //   const value = stableJSONStringify(obj[key]);
-  //   return `"${key}":${value}`;
-  // });
-  //
-  // return `{${props.join(',')}}`;
+function stableJSONStringify(obj: any, seen = new WeakSet()): string {
+  if (obj === null || typeof obj !== "object") {
+    return JSON.stringify(obj);
+  }
+
+  if (seen.has(obj)) {
+    return '"[Circular]"';
+  }
+
+  // Non-plain objects (DOM nodes, class instances, etc.) are not valid CSS
+  // values. Represent them with a stable placeholder to avoid enumerating
+  // thousands of DOM properties or hitting circular-reference loops.
+  const proto = Object.getPrototypeOf(obj);
+  if (proto !== Object.prototype && proto !== null && !Array.isArray(obj)) {
+    return `"[Object ${(obj as any).constructor?.name ?? "Unknown"}]"`;
+  }
+
+  seen.add(obj);
+
+  if (Array.isArray(obj)) {
+    const arrayStr = obj.map((item) => stableJSONStringify(item, seen)).join(",");
+    return `[${arrayStr}]`;
+  }
+
+  const keys = Object.keys(obj).sort();
+  const props = keys.map((key) => {
+    const value = stableJSONStringify(obj[key], seen);
+    return `"${key}":${value}`;
+  });
+
+  return `{${props.join(",")}}`;
 }
 
 // --- The StyleRegistry Class (with updated logic) ---
@@ -111,16 +124,23 @@ export class StyleRegistry {
    * @param styles - The style object to process.
    * @returns A string of CSS rules.
    */
-  private _generateCss(selector: string, styles: StyleObjectType): string {
+  private _generateCss(selector: string, styles: StyleObjectType, seen = new WeakSet()): string {
     const directProps: string[] = [];
     const nestedRules: string[] = [];
 
     // 1. Separate direct CSS properties from nested rules.
     for (const key in styles) {
       const value = styles[key];
-      if (typeof value === 'object' && value !== null) {
+      if (value !== null && typeof value === "object") {
+        // Only recurse into plain objects (style/selector maps).
+        // Non-plain objects (DOM nodes, class instances, React fibers) are silently
+        // skipped — they cannot represent valid CSS rules and would otherwise cause
+        // infinite recursion through circular React-fiber references.
+        const proto = Object.getPrototypeOf(value);
+        const isPlain = proto === Object.prototype || proto === null;
+        if (!isPlain || seen.has(value)) continue;
         // It's a nested rule (e.g., '&:hover', '@media').
-        nestedRules.push(this._processNestedRule(selector, key, value as StyleObjectType));
+        nestedRules.push(this._processNestedRule(selector, key, value as StyleObjectType, seen));
       } else {
         // It's a direct CSS property (e.g., 'backgroundColor').
         directProps.push(`${toKebabCase(key)}:${value};`);
@@ -140,17 +160,22 @@ export class StyleRegistry {
     return finalCss;
   }
 
-  private _processNestedRule(parentSelector: string, nestedKey: string, nestedStyles: StyleObjectType): string {
+  private _processNestedRule(
+    parentSelector: string,
+    nestedKey: string,
+    nestedStyles: StyleObjectType,
+    seen: WeakSet<object>,
+  ): string {
     // If the key is an at-rule (@media, @container, @keyframes), wrap the recursive call.
     if (nestedKey.startsWith('@')) {
       // The inner content is generated relative to the original parent selector.
-      return `${nestedKey}{${this._generateCss(parentSelector, nestedStyles)}}`;
+      return `${nestedKey}{${this._generateCss(parentSelector, nestedStyles, seen)}}`;
     }
 
     // If the key is a nested selector, resolve the '&' placeholder.
     // e.g., parent='.css-123', nestedKey='&:hover' -> '.css-123:hover'
     const newSelector = nestedKey.replace(/&/g, parentSelector);
-    return this._generateCss(newSelector, nestedStyles);
+    return this._generateCss(newSelector, nestedStyles, seen);
   }
 
   public getSsrStyles(): string {
