@@ -637,11 +637,14 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   // If the component explicitly declares a prop in its metadata, it owns that prop
   // and it must always be forwarded (even if the same name is also a behavior-consumed
   // prop that was added to specialProps above). Remove any such keys from specialProps.
-  // Exception: props handled as templates or renderers must stay in specialProps so
-  // the general forwarding loop does not overwrite the rendered output with the raw AST.
+  // Exceptions: props handled as templates, renderers, callbacks, or resource URLs must
+  // stay in specialProps so their dedicated handlers are not bypassed by the general
+  // forwarding loop (which runs after those handlers and would overwrite their output).
   if (metadata.props) {
     for (const propName of Object.keys(metadata.props)) {
       if (propName in templateMap || propName in rendererConfigs) continue;
+      if (propName in callbackMap) continue;
+      if (resourceUrlSet.has(propName)) continue;
       specialProps.delete(propName);
     }
   }
@@ -1110,8 +1113,12 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   // If the component explicitly declares a prop in its metadata, it owns that prop
   // and it must always be forwarded (even if the same name is also a behavior-consumed
   // prop that was added to specialProps above). Remove any such keys from specialProps.
+  // Exceptions: props handled as templates, renderers, or callbacks must stay in
+  // specialProps so their dedicated handlers are not bypassed by the general forwarding loop.
   if (metadata.props) {
     for (const propName of Object.keys(metadata.props)) {
+      if (propName in templateMap || propName in rendererConfigs) continue;
+      if (propName in callbackMap) continue;
       specialProps.delete(propName);
     }
   }
