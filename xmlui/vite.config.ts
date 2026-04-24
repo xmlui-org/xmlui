@@ -170,11 +170,20 @@ export default ({ mode = "lib" }) => {
           mode === "standalone" || mode === "inspector-parser"
             ? [] // Bundle everything for standalone builds
             : mode === "metadata"
-            ? // immer must be bundled (not external) in metadata mode: rolldown's CJS interop
-              // incorrectly wraps __esModule:true packages with a default=module object, so
-              // calling produce() via w.default() fails at Node.js load time.
-              [...Object.keys(packageJson.dependencies).filter((d) => d !== "immer"), "react/jsx-runtime", "@playwright/test"]
-            : [...Object.keys(packageJson.dependencies), "react/jsx-runtime", "@playwright/test"],
+              ? // immer must be bundled (not external) in metadata mode: rolldown's CJS interop
+                // incorrectly wraps __esModule:true packages with a default=module object, so
+                // calling produce() via w.default() fails at Node.js load time.
+                [
+                  ...Object.keys(packageJson.dependencies).filter((d) => d !== "immer"),
+                  "react/jsx-runtime",
+                  "@playwright/test",
+                ]
+              : [
+                  ...Object.keys(packageJson.dependencies),
+                  "react/jsx-runtime",
+                  "react-dom/client",
+                  "@playwright/test",
+                ],
         output: {
           globals: {
             react: "React",
