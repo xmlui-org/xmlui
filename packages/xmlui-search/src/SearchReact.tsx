@@ -12,7 +12,7 @@ import {
   type HTMLAttributes,
   type ForwardedRef,
 } from "react";
-import { flushSync } from "react-dom";
+import { createPortal, flushSync } from "react-dom";
 import {
   LinkNative,
   Text,
@@ -530,9 +530,11 @@ export const Search = memo(function Search({
           </div>
         )}
 
-        {/* Overlay */}
-        {isOverlayOpen && (
-          <div className={className}>
+        {/* Overlay — rendered in a portal so the DOM parent is document.body.
+             Without this, the browser traverses the nav-bar ancestor chain on every
+             keypress to scroll the focused input into view, causing the page to drift. */}
+        {isOverlayOpen && createPortal(
+          <div>
             {/* Backdrop — click outside to close */}
             <div
               className={classnames(
@@ -560,7 +562,6 @@ export const Search = memo(function Search({
                     className={styles.overlayInput}
                     type="search"
                     placeholder={placeholder ?? "Type to search…"}
-                    value={inputValue}
                     onDidChange={(value) => setInputValue(value)}
                     onKeyDown={handleKeyDown}
                     aria-autocomplete="list"
@@ -601,7 +602,8 @@ export const Search = memo(function Search({
                 )}
               </div>
             </div>
-          </div>
+          </div>,
+          document.body,
         )}
       </span>
     );

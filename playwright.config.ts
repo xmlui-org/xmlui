@@ -23,7 +23,7 @@ export default defineConfig({
   testMatch: "*.spec.ts",
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!CI,
-  workers: CI ? "100%" : "75%",
+  workers: CI ? "80%" : "75%",
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: CI ? [["github"], ["html"]] : [["html", { open: "never" }]],
 

@@ -212,8 +212,8 @@ test("url property handles relative paths", async ({ initTestBed, createAvatarDr
   await initTestBed(`<Avatar url="${RELATIVE_URL}" name="Test User"/>`, {});
   const driver = await createAvatarDriver();
 
-  // Browser normalizes relative paths by adding leading slash
-  await expect(driver.component).toHaveAttribute("src", `/${RELATIVE_URL}`);
+  // URL is passed through as-is
+  await expect(driver.component).toHaveAttribute("src", RELATIVE_URL);
   await expect(driver.component).toBeVisible();
 });
 
@@ -224,8 +224,8 @@ test("url property handles data URLs", async ({ initTestBed, createAvatarDriver 
   await initTestBed(`<Avatar url="${DATA_URL}" name="Test User"/>`, {});
   const driver = await createAvatarDriver();
 
-  // Browser normalizes data URLs by adding leading slash
-  await expect(driver.component).toHaveAttribute("src", `/${DATA_URL}`);
+  // Data URLs are passed through as-is
+  await expect(driver.component).toHaveAttribute("src", DATA_URL);
   await expect(driver.component).toBeVisible();
 });
 

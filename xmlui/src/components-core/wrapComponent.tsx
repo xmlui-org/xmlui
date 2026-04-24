@@ -634,6 +634,18 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   specialProps.add("bookmarkTitle");
   specialProps.add("bookmarkOmitFromToc");
 
+  // If the component explicitly declares a prop in its metadata, it owns that prop
+  // and it must always be forwarded (even if the same name is also a behavior-consumed
+  // prop that was added to specialProps above). Remove any such keys from specialProps.
+  // Exception: props handled as templates or renderers must stay in specialProps so
+  // the general forwarding loop does not overwrite the rendered output with the raw AST.
+  if (metadata.props) {
+    for (const propName of Object.keys(metadata.props)) {
+      if (propName in templateMap || propName in rendererConfigs) continue;
+      specialProps.delete(propName);
+    }
+  }
+
   return createComponentRenderer(type, metadata, (context) => {
     const {
       node,
@@ -1094,6 +1106,15 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   specialProps.add("bookmarkLevel");
   specialProps.add("bookmarkTitle");
   specialProps.add("bookmarkOmitFromToc");
+
+  // If the component explicitly declares a prop in its metadata, it owns that prop
+  // and it must always be forwarded (even if the same name is also a behavior-consumed
+  // prop that was added to specialProps above). Remove any such keys from specialProps.
+  if (metadata.props) {
+    for (const propName of Object.keys(metadata.props)) {
+      specialProps.delete(propName);
+    }
+  }
 
   // StateWrapper uses an outer/inner split to solve the stale-closure
   // problem with React.memo.  XMLUI's createComponentRenderer creates new

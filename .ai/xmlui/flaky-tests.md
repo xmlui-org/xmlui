@@ -8,3 +8,4 @@ ion theme variables
 ows valid icon in concise mode when valid
 - xmlui/src/components/Table/Table.spec.ts:4195:3 › Column width theme variables › column 
 width theme variable with rem value resolves to correct pixel size
+- xmlui/src/components/RadioGroup/RadioGroup.spec.ts:1003:3 › Keyboard Navigation › sequential ArrowDown visits all options in order
