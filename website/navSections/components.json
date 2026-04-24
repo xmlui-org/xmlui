@@ -412,6 +412,16 @@
           "icon": "component"
         },
         {
+          "to": "/docs/reference/components/Step",
+          "label": "Step",
+          "icon": "component"
+        },
+        {
+          "to": "/docs/reference/components/Stepper",
+          "label": "Stepper",
+          "icon": "component"
+        },
+        {
           "to": "/docs/reference/components/StickyBox",
           "label": "StickyBox",
           "icon": "component"

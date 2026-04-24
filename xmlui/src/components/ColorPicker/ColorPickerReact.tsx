@@ -31,6 +31,7 @@ type Props = {
   readOnly?: boolean;
   enabled?: boolean;
   validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
 };
 
 export const defaultProps: Pick<Props, "initialValue" | "value" | "enabled" | "validationStatus"> =
@@ -60,6 +61,7 @@ export const ColorPicker = memo(forwardRef(
       tabIndex = 0,
       required,
       validationStatus = defaultProps.validationStatus,
+      invalidMessages: _invalidMessages,
       initialValue = defaultProps.initialValue,
       ...rest
     }: Props,

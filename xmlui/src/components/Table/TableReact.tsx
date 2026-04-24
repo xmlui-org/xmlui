@@ -993,8 +993,9 @@ export const Table = memo(forwardRef(function Table(
       enableMultiRowSelection,
       columnResizeMode: "onChange",
       getRowId: useCallback(
-        (originalRow: any) => {
-          return originalRow[idKey] + "";
+        (originalRow: any, index: number) => {
+          const idVal = originalRow[idKey];
+          return idVal != null ? String(idVal) : String(index);
         },
         [idKey],
       ),

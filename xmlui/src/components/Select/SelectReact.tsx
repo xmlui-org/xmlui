@@ -344,10 +344,12 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
   const dataOptions = useMemo<Option[] | null>(() => {
     if (!data) return null;
     const items = Array.isArray(data) ? data : Object.values(data);
-    return items.map((item) => ({
-      value: item[valueField],
-      label: item[labelField],
-    }));
+    return items.map((item) => {
+      if (item === null || typeof item !== "object") {
+        return { value: String(item), label: String(item) };
+      }
+      return { value: item[valueField], label: item[labelField] };
+    });
   }, [data, valueField, labelField]);
 
   // effectiveOptions is the single source of truth for option lookups.

@@ -344,7 +344,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                             )}
                             {groupOptions.map((option) => (
                               <SelectOption
-                                key={option.value}
+                                key={option.value ?? option.label}
                                 value={option.value}
                                 label={option.label}
                                 enabled={option.enabled}
@@ -364,7 +364,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
                     {options.length > 0 && !children ? (
                       options.map((option) => (
                         <SelectOption
-                          key={option.value}
+                          key={option.value ?? option.label}
                           value={String(option.value)}
                           label={option.label}
                           enabled={option.enabled}

@@ -59,4 +59,5 @@ export const ToneSwitchMd = createMetadata({
 
 export const toneSwitchComponentRenderer = wrapComponent(COMP, ToneSwitch, ToneSwitchMd, {
   events: { didChange: "onDidChange" },
+  stateful: false,
 });

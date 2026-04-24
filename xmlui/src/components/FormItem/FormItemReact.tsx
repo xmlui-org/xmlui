@@ -102,13 +102,13 @@ export const defaultProps: Pick<
   noSubmit: false,
 };
 
-function ArrayLikeFormItem({
+const ArrayLikeFormItem = forwardRef(function ArrayLikeFormItem({
   children,
   formItemId,
   registerComponentApi,
   value = EMPTY_ARRAY,
   updateState,
-}) {
+}: any, _ref: ForwardedRef<unknown>) {
   const formContextValue = useMemo(() => {
     return {
       parentFormItemId: formItemId,
@@ -133,7 +133,7 @@ function ArrayLikeFormItem({
   }, [addItem, registerComponentApi, removeItem]);
 
   return <FormItemContext.Provider value={formContextValue}>{children}</FormItemContext.Provider>;
-}
+});
 
 export const FormItem = memo(forwardRef(function FormItem({
   // --- validation props
@@ -554,7 +554,7 @@ export const FormItem = memo(forwardRef(function FormItem({
 
 type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
-export function CustomFormItem({
+export const CustomFormItem = forwardRef(function CustomFormItem({
   renderChild,
   node,
   bindTo,
@@ -562,7 +562,7 @@ export function CustomFormItem({
   renderChild: RenderChildFn;
   node: FormItemComponentDef;
   bindTo: string;
-}) {
+}, _ref: ForwardedRef<unknown>) {
   // IMPORTANT NOTE:
   //  why we use useFormContextPart, and not useFormContext?
   //  because we want to avoid re-rendering the whole form when the form state changes.
@@ -587,4 +587,4 @@ export function CustomFormItem({
   }, [bindTo, dispatch, node.children, node.vars, validationResult, value]);
 
   return <>{renderChild(decoratedMetadata as any)}</>;
-}
+});

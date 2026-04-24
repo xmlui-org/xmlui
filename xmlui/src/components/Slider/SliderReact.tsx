@@ -24,6 +24,7 @@ export type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onFocus" | "onBl
   min?: number;
   inverted?: false;
   validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
   minStepsBetweenThumbs?: number;
   onDidChange?: (newValue: number | number[]) => void;
   onFocus?: (ev: React.FocusEvent<HTMLDivElement>) => void;
@@ -124,6 +125,7 @@ export const Slider = memo(forwardRef(
       tabIndex = defaultProps.tabIndex,
       required,
       validationStatus = defaultProps.validationStatus,
+      invalidMessages: _invalidMessages,
       initialValue,
       minStepsBetweenThumbs = defaultProps.minStepsBetweenThumbs,
       rangeStyle,

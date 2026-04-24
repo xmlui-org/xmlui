@@ -178,7 +178,9 @@ export const LinkNative = memo(forwardRef(function LinkNative(
     [overflowMode, maxLines],
   );
 
-  const Node = to ? Link : "div";
+  // Use <span> (not <div>) when there is no destination so this element remains
+  // valid phrasing content and can safely be nested inside <p> or <a> tags.
+  const Node = to ? Link : "span";
   return (
     <Node
       {...anchorProps}

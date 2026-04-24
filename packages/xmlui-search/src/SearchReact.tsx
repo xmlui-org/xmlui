@@ -1,7 +1,6 @@
 import {
   memo,
   useCallback,
-  useDeferredValue,
   useId,
   useEffect,
   useLayoutEffect,
@@ -144,7 +143,12 @@ export const Search = memo(function Search({
   }, []);
 
   const [inputValue, setInputValue] = useState("");
-  const debouncedValue = useDeferredValue(inputValue);
+  const [debouncedValue, setDebouncedValue] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(inputValue), 150);
+    return () => clearTimeout(timer);
+  }, [inputValue]);
 
   const effectivePageSize = pageSize ?? limit;
   const [page, setPage] = useState(1);

@@ -36,6 +36,7 @@ type RadioGroupProps = Omit<React.HTMLAttributes<HTMLDivElement>, "dir" | "defau
   gap?: string;
   classes?: Record<string, string>;
   validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
   label?: string;
   labelPosition?: string;
   labelWidth?: string;
@@ -81,6 +82,7 @@ export const RadioGroup = memo(forwardRef(function RadioGroup(
     orientation = defaultProps.orientation,
     gap,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages: _invalidMessages,
     label,
     labelPosition,
     labelWidth,

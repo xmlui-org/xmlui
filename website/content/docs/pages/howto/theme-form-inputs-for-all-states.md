@@ -32,17 +32,14 @@ TextBox, NumberBox, and TextArea share an identical theme variable structure. Ev
       <TextBox 
         label="Error state" 
         validationStatus="error" 
-        validationMessage="This field is required." 
       />
       <TextBox 
         label="Warning state" 
         validationStatus="warning" 
-        validationMessage="Value may be incorrect." 
       />
       <TextBox 
         label="Success state" 
         validationStatus="valid" 
-        validationMessage="Looks good!" 
       />
       <TextBox 
         label="Disabled input" 

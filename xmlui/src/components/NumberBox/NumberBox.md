@@ -32,7 +32,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 %-PROP-START endIcon
 
-This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
+This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name](/docs/reference/components/Icon).
 
 ```xmlui-pg copy display name="Example: endIcon"
 <App>
@@ -172,7 +172,7 @@ If true, the component's value cannot be modified with user interactions.
 
 %-PROP-START startIcon
 
-This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
+This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name](/docs/reference/components/Icon).
 
 ```xmlui-pg copy display name="Example: startIcon"
 <App>

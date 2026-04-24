@@ -70,6 +70,10 @@ type Props = {
   onBlur?: () => void;
   registerComponentApi?: RegisterComponentApiFn;
   validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
+  validationResult?: unknown;
+  validationInProgress?: boolean;
+  formItemId?: string;
   autoFocus?: boolean;
   // Component-specific props
   value?: any;
@@ -121,6 +125,10 @@ export const FileInput = memo(forwardRef(function FileInput(
 
     autoFocus,
     validationStatus,
+    invalidMessages: _invalidMessages,
+    validationResult: _validationResult,
+    validationInProgress: _validationInProgress,
+    formItemId: _formItemId,
     updateState,
     onDidChange,
     onFocus,
