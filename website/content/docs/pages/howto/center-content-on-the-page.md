@@ -12,7 +12,7 @@ A login page should display a single card perfectly centred horizontally and ver
       <VStack>
         <H4>Sign in</H4>
         <TextBox label="Email" placeholder="you@example.com" />
-        <TextBox label="Password" inputType="password" />
+        <TextBox label="Password" type="password" />
         <Button label="Sign in" variant="solid" themeColor="primary" />
       </VStack>
     </Card>

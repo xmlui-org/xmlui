@@ -54,7 +54,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 This property sets an optional icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
-This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
+This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name](/docs/reference/components/Icon).
 
 ```xmlui-pg copy display name="Example: endIcon"
 <App>
@@ -212,7 +212,7 @@ Allows setting an alternate icon displayed in the NumberBox spinner for incremen
 
 This property sets an optional icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
-This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
+This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name](/docs/reference/components/Icon).
 
 ```xmlui-pg copy display name="Example: startIcon"
 <App>

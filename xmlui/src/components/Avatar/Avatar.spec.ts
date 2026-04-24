@@ -226,6 +226,7 @@ test("url property handles data URLs", async ({ initTestBed, createAvatarDriver 
 
   // Browser normalizes data URLs by adding leading slash
   await expect(driver.component).toHaveAttribute("src", `/${DATA_URL}`);
+
   await expect(driver.component).toBeVisible();
 });
 

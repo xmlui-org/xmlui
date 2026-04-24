@@ -158,6 +158,13 @@ export type WrapComponentConfig = {
   exposeRegisterApi?: boolean;
 
   /**
+   * When false, suppresses the `updateState` prop even for stateful components.
+   * Use for components that are stateful only because of `didChange` (they fire
+   * the event but never call `updateState` themselves). Defaults to true.
+   */
+  passUpdateState?: boolean;
+
+  /**
    * When true, passes `node.uid` as the `uid` prop to the native component.
    * Use for components that need their XMLUI id as an HTML anchor / DOM id
    * (e.g., Bookmark).
@@ -580,6 +587,67 @@ export function wrapComponent<TMd extends ComponentMetadata>(
   // bubbleEvents is consumed by ComponentAdapter's useMouseEventHandlers and must
   // never reach native components (it is not a valid HTML attribute).
   specialProps.add("bubbleEvents");
+  // updateState is an XMLUI-internal callback and must never be forwarded to
+  // native DOM elements (it causes a React prop warning).
+  specialProps.add("updateState");
+  // The following props are consumed by FormBindingBehavior from node.props directly
+  // and must not be forwarded as React props (they are not valid HTML attributes).
+  specialProps.add("noSubmit");
+  specialProps.add("itemIndex");
+  specialProps.add("labelPosition");
+  specialProps.add("labelWidth");
+  specialProps.add("labelBreak");
+  specialProps.add("requireLabelMode");
+  specialProps.add("customValidationsDebounce");
+  // Validation message/severity props — consumed by FormBindingBehavior only.
+  // Components that need them (FormItem) use customRender and extract from node.props directly.
+  specialProps.add("requiredInvalidMessage");
+  specialProps.add("lengthInvalidMessage");
+  specialProps.add("lengthInvalidSeverity");
+  specialProps.add("rangeInvalidMessage");
+  specialProps.add("rangeInvalidSeverity");
+  specialProps.add("patternInvalidMessage");
+  specialProps.add("patternInvalidSeverity");
+  specialProps.add("regexInvalidMessage");
+  specialProps.add("regexInvalidSeverity");
+  specialProps.add("validationDisplayDelay");
+  specialProps.add("validationMode");
+  // Tooltip behavior props — consumed by TooltipBehavior and must not be forwarded
+  // to native DOM elements (they are not valid HTML attributes).
+  specialProps.add("tooltip");
+  specialProps.add("tooltipMarkdown");
+  specialProps.add("tooltipOptions");
+  // LabelBehavior props — consumed by LabelBehavior. Components that need these
+  // natively (e.g. `required` on TextBox) declare them explicitly in their metadata
+  // props, which places them in booleanSet/numberSet/stringSet and causes them to
+  // be forwarded with proper type conversion (see forwarding loop below).
+  specialProps.add("required");
+  specialProps.add("shrinkToLabel");
+  // PubSubBehavior — consumed by PubSubBehavior only.
+  specialProps.add("subscribeToTopic");
+  // AnimationBehavior — consumed by AnimationBehavior only.
+  specialProps.add("animation");
+  specialProps.add("animationOptions");
+  // BookmarkBehavior — consumed by BookmarkBehavior only.
+  specialProps.add("bookmark");
+  specialProps.add("bookmarkLevel");
+  specialProps.add("bookmarkTitle");
+  specialProps.add("bookmarkOmitFromToc");
+
+  // If the component explicitly declares a prop in its metadata, it owns that prop
+  // and it must always be forwarded (even if the same name is also a behavior-consumed
+  // prop that was added to specialProps above). Remove any such keys from specialProps.
+  // Exceptions: props handled as templates, renderers, callbacks, or resource URLs must
+  // stay in specialProps so their dedicated handlers are not bypassed by the general
+  // forwarding loop (which runs after those handlers and would overwrite their output).
+  if (metadata.props) {
+    for (const propName of Object.keys(metadata.props)) {
+      if (propName in templateMap || propName in rendererConfigs) continue;
+      if (propName in callbackMap) continue;
+      if (resourceUrlSet.has(propName)) continue;
+      specialProps.delete(propName);
+    }
+  }
 
   return createComponentRenderer(type, metadata, (context) => {
     const {
@@ -622,7 +690,9 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     }
 
     if (isStateful) {
-      props.updateState = updateState;
+      if (config.passUpdateState !== false) {
+        props.updateState = updateState;
+      }
       props.value = state.value;
       props.initialValue = extractValue(node.props?.initialValue);
     }
@@ -789,19 +859,24 @@ export function wrapComponent<TMd extends ComponentMetadata>(
     // --- Forward all remaining node.props ---
     if (node.props) {
       for (const [key, rawValue] of Object.entries(node.props)) {
-        if (specialProps.has(key)) continue;
         if (excludeSet.has(key)) continue;
 
         // Determine the React prop name (after rename)
         const reactKey = renameMap[key] ?? key;
 
-        // Extract with the appropriate type converter
+        // Explicitly-typed props always forward, even if the key is also in
+        // specialProps (e.g. `required` is in specialProps to block untyped
+        // forwarding, but a component that declares `required: dRequired()` in
+        // its metadata gets it forwarded as a proper boolean here).
         if (booleanSet.has(key)) {
           props[reactKey] = extractValue.asOptionalBoolean(rawValue);
         } else if (numberSet.has(key)) {
           props[reactKey] = extractValue.asOptionalNumber(rawValue);
         } else if (stringSet.has(key)) {
           props[reactKey] = extractValue.asOptionalString(rawValue);
+        } else if (specialProps.has(key)) {
+          // Not an explicitly-typed component prop and in the blocked set → skip.
+          continue;
         } else {
           props[reactKey] = extractValue(rawValue);
         }
@@ -1018,6 +1093,35 @@ export function wrapCompound<TMd extends ComponentMetadata>(
   // Behavior-consumed props that must never be forwarded to native React components.
   specialProps.add("bindTo");
   specialProps.add("onValidate");
+  // Tooltip behavior props — consumed by TooltipBehavior and must not be forwarded
+  // to native DOM elements (they are not valid HTML attributes).
+  specialProps.add("tooltip");
+  specialProps.add("tooltipMarkdown");
+  specialProps.add("tooltipOptions");
+  // LabelBehavior props — see wrapComponent for rationale.
+  specialProps.add("required");
+  specialProps.add("shrinkToLabel");
+  // PubSubBehavior, AnimationBehavior, BookmarkBehavior — consumed by their respective behaviors.
+  specialProps.add("subscribeToTopic");
+  specialProps.add("animation");
+  specialProps.add("animationOptions");
+  specialProps.add("bookmark");
+  specialProps.add("bookmarkLevel");
+  specialProps.add("bookmarkTitle");
+  specialProps.add("bookmarkOmitFromToc");
+
+  // If the component explicitly declares a prop in its metadata, it owns that prop
+  // and it must always be forwarded (even if the same name is also a behavior-consumed
+  // prop that was added to specialProps above). Remove any such keys from specialProps.
+  // Exceptions: props handled as templates, renderers, or callbacks must stay in
+  // specialProps so their dedicated handlers are not bypassed by the general forwarding loop.
+  if (metadata.props) {
+    for (const propName of Object.keys(metadata.props)) {
+      if (propName in templateMap || propName in rendererConfigs) continue;
+      if (propName in callbackMap) continue;
+      specialProps.delete(propName);
+    }
+  }
 
   // StateWrapper uses an outer/inner split to solve the stale-closure
   // problem with React.memo.  XMLUI's createComponentRenderer creates new
@@ -1138,6 +1242,9 @@ export function wrapCompound<TMd extends ComponentMetadata>(
         __registerComponentApi,
         __value,
         __onDidChange,
+        // onDidChange is the XMLUI-mapped handler for the didChange event — consumed
+        // by the state wrapper. It must not be forwarded to the native render component.
+        onDidChange: _onDidChange,
         ...nativeProps
       }: any,
       ref: any,
@@ -1402,17 +1509,19 @@ export function wrapCompound<TMd extends ComponentMetadata>(
     // --- Forward all remaining node.props ---
     if (node.props) {
       for (const [key, rawValue] of Object.entries(node.props)) {
-        if (specialProps.has(key)) continue;
         if (excludeSet.has(key)) continue;
 
         const reactKey = renameMap[key] ?? key;
 
+        // Explicitly-typed props always forward even if also in specialProps.
         if (booleanSet.has(key)) {
           props[reactKey] = extractValue.asOptionalBoolean(rawValue);
         } else if (numberSet.has(key)) {
           props[reactKey] = extractValue.asOptionalNumber(rawValue);
         } else if (stringSet.has(key)) {
           props[reactKey] = extractValue.asOptionalString(rawValue);
+        } else if (specialProps.has(key)) {
+          continue;
         } else {
           props[reactKey] = extractValue(rawValue);
         }

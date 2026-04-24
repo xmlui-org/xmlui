@@ -1,4 +1,4 @@
-import { forwardRef, memo, useCallback, useMemo } from "react";
+import { forwardRef, memo, useCallback, useEffect, useMemo } from "react";
 import type { ForwardedRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -175,7 +175,7 @@ export const FormSegmentNative = memo(forwardRef(function FormSegmentNative(
   }, [$segmentValidationIssues]);
 
   // Register APIs if the callback is provided
-  useMemo(() => {
+  useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({
         isValid,

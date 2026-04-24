@@ -54,6 +54,7 @@ type Props = {
   onBlur?: (ev: React.FocusEvent<HTMLDivElement>) => void;
   onInvalidChange?: () => void;
   validationStatus?: ValidationStatus;
+  invalidMessages?: string[];
   registerComponentApi?: RegisterComponentApiFn;
   hour24?: boolean;
   seconds?: boolean;
@@ -102,6 +103,7 @@ export const TimeInputNative = memo(forwardRef<HTMLDivElement, Props>(function T
     onBlur,
     onInvalidChange,
     validationStatus = defaultProps.validationStatus,
+    invalidMessages: _invalidMessages,
     registerComponentApi,
     hour24 = defaultProps.hour24,
     seconds = defaultProps.seconds,

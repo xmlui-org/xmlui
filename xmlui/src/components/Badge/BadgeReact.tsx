@@ -26,6 +26,7 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "color"> & {
   variant?: BadgeVariant;
   color?: string | BadgeColors;
   classes?: Record<string, string>;
+  themeColor?: string;
 };
 
 export const defaultProps: Pick<Props, "variant"> = {
@@ -33,7 +34,7 @@ export const defaultProps: Pick<Props, "variant"> = {
 };
 
 export const Badge = memo(forwardRef(function Badge(
-  { children, color, variant = defaultProps.variant, style, classes, className, onContextMenu, ...rest }: Props,
+  { children, color, variant = defaultProps.variant, style, classes, className, onContextMenu, themeColor: _themeColor, ...rest }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const mergedStyle = useMemo<CSSProperties | undefined>(() => {

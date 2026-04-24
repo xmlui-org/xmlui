@@ -77,7 +77,7 @@ This boolean property value indicates whether the component responds to user eve
   Disabled checkboxes:
   <HStack>
     <Checkbox initialValue="true" enabled="false" />
-    <Checkbox initilaValue="false" enabled="false" />
+    <Checkbox initialValue="false" enabled="false" />
   </HStack>
 </App>
 ```
@@ -132,7 +132,7 @@ Set this property to `true` to disallow changing the component value.
 ```xmlui-pg copy {3} display name="Example: readOnly"
 <App>
   <Checkbox readOnly="true" label="Checked" initialValue="true" />
-  <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
+  <Checkbox readOnly="true" label="Unchecked" initialValue="false" />
 </App>
 ```
 

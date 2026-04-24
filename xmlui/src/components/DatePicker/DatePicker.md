@@ -221,7 +221,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
   <DatePicker
     inline
     disabledDates="{{before: getDate()}}"
-    intialValue="{getDate()}"/>
+    initialValue="{getDate()}"/>
 </App>
 ```
 
@@ -230,7 +230,7 @@ The `disabledDates` prop supports multiple patterns for disabling specific dates
   <DatePicker
     inline
     disabledDates="{[getDate(), {after: getDate()}]}"
-    intialValue="{getDate()}"/>
+    initialValue="{getDate()}"/>
 </App>
 ```
 

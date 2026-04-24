@@ -47,6 +47,46 @@ function getImageKey(node: any): string {
   return `${node?.position?.start?.offset}|${node?.position?.end?.offset}`;
 }
 
+// Complete set of known HTML and SVG element tag names. Any tag not in this set
+// is a custom/unknown element (e.g. XMLUI component names used in doc examples)
+// and will be replaced with <span> to avoid React "unrecognized tag" warnings.
+const KNOWN_HTML_TAGS = new Set([
+  "a","abbr","address","area","article","aside","audio","b","base","bdi","bdo",
+  "blockquote","body","br","button","canvas","caption","cite","code","col",
+  "colgroup","data","datalist","dd","del","details","dfn","dialog","div","dl",
+  "dt","em","embed","fieldset","figcaption","figure","footer","form","h1","h2",
+  "h3","h4","h5","h6","head","header","hgroup","hr","html","i","iframe","img",
+  "input","ins","kbd","label","legend","li","link","main","map","mark","menu",
+  "meta","meter","nav","noscript","object","ol","optgroup","option","output","p",
+  "picture","pre","progress","q","rp","rt","ruby","s","samp","script","search",
+  "section","select","slot","small","source","span","strong","style","sub",
+  "summary","sup","table","tbody","td","template","textarea","tfoot","th",
+  "thead","time","title","tr","track","u","ul","var","video","wbr",
+  // SVG
+  "svg","animate","animatemotion","animatetransform","circle","clippath","defs",
+  "desc","ellipse","feblend","fecolormatrix","fecomponenttransfer","fecomposite",
+  "feconvolvematrix","fediffuselighting","fedisplacementmap","fedistantlight",
+  "fedropshadow","feflood","fefunca","fefuncb","fefuncg","fefuncr",
+  "fegaussianblur","feimage","femerge","femergenode","femorphology","feoffset",
+  "fepointlight","fespecularlighting","fespotlight","fetile","feturbulence",
+  "filter","foreignobject","g","image","line","lineargradient","marker","mask",
+  "metadata","mpath","path","pattern","polygon","polyline","radialgradient",
+  "rect","set","stop","switch","symbol","text","textpath","tspan","use","view",
+]);
+
+/** Rehype plugin that replaces unknown HTML/SVG elements with <span> so React
+ *  does not warn about unrecognized tags (e.g. XMLUI component names like <app>,
+ *  <test>, used as examples in documentation). */
+const replaceUnknownElements = () => {
+  return function transformer(tree: Node) {
+    visit(tree, "element", (node: any) => {
+      if (!KNOWN_HTML_TAGS.has(node.tagName)) {
+        node.tagName = "span";
+      }
+    });
+  };
+};
+
 /** Rehype plugin that unwraps a samp playground element from its surrounding <p> tag. */
 const preventPlaygroundParagraphWrap = () => {
   return function transformer(tree: Node) {
@@ -74,7 +114,7 @@ const preventPlaygroundParagraphWrap = () => {
 };
 
 /** Stable rehype plugin array — same reference across all Markdown renders. */
-const stableRehypePlugins = [rehypeRaw, preventPlaygroundParagraphWrap];
+const stableRehypePlugins = [rehypeRaw, replaceUnknownElements, preventPlaygroundParagraphWrap];
 
 /**
  * Stable component for rendering xmlui-pg playground elements inside Markdown.

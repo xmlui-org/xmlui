@@ -31,7 +31,7 @@ The `initialValue` and `value` properties of the checkbox are transformed to a B
   Disabled checkboxes:
   <HStack>
     <Checkbox initialValue="true" enabled="false" />
-    <Checkbox initilaValue="false" enabled="false" />
+    <Checkbox initialValue="false" enabled="false" />
   </HStack>
 </App>
 ```
@@ -72,7 +72,7 @@ Try this sample by clicking the bottom group of checkboxes.
 ```xmlui-pg copy display name="Example: label"
 <App>
   <Checkbox label="Example label" initialValue="true" />
-  <Checkbox label="Another label" intialValue="false" />
+  <Checkbox label="Another label" initialValue="false" />
 </App>
 ```
 
@@ -96,7 +96,7 @@ Try this sample by clicking the bottom group of checkboxes.
 ```xmlui-pg copy {3} display name="Example: readOnly"
 <App>
   <Checkbox readOnly="true" label="Checked" initialValue="true" />
-  <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
+  <Checkbox readOnly="true" label="Unchecked" initialValue="false" />
 </App>
 ```
 
