@@ -1,203 +1,160 @@
 # wrapCompound
 
-`wrapCompound` creates a stateful XMLUI renderer that manages the full value lifecycle: `initialValue` parsing, local state, external value syncing, and automatic `updateState` calls on change. It extends everything `wrapComponent` does -- prop forwarding, event auto-tracing, resource URLs -- and adds state management via a `StateWrapper`.
+`wrapCompound` is a specialization of `wrapComponent` for wrappers that want to hide XMLUI's value machinery from the React render component. Instead of receiving `initialValue`, `updateState`, and other XMLUI-facing props directly, the render component gets a smaller interface:
 
-**When to use it:** Components with `initialValue` and `didChange` -- Slider, TextBox, Select, DatePicker, ColorPicker, FileInput. If the component has a value that changes, use `wrapCompound`.
+- `value`
+- `onChange(newValue)`
+- `registerApi(apis)`
+- the rest of the forwarded props
+
+That makes it a good fit for wrappers around third-party controls that already think in terms of controlled React state.
+
+## When to use it
+
+- Use `wrapCompound` when you want the wrapper to own value parsing, local value state, and callback freshness.
+- Use it when the render component should be plain React with no XMLUI-specific imports or prop contract.
+- Use it when `parseInitialValue` and `formatExternalValue` are useful boundary hooks.
+- Do not use it just because a component has `didChange` or `initialValue`. Many stateful components, including built-in `Slider`, still use `wrapComponent`.
+
+Current note: there are no built-in `wrapCompound` users in `xmlui/src/components` today. The real examples in this repo are extension components such as `Gauge` and `TiptapEditor`.
 
 ## Architecture
 
-```
- SETUP (once, at registration time)
- ===================================
+```text
+SETUP
 
- SliderWrapped.tsx                  wrapCompound.tsx
- ────────────────                   ────────────────
- SliderWMd = createMetadata(...)    mergeWithMetadata(metadata, config)
-       │                                │
-       ▼                                ▼
- wrapCompound(                      auto-classifies props/events
-   "SliderW",       ──────────►     (same as wrapComponent)
-   SliderRender,                        │
-   SliderWMd,                           ▼
-   { parseInitialValue,             builds StateWrapper:
-     formatExternalValue,             CallbackSync (outer, not memoized)
-     rename, callbacks }                  └─► MemoizedInner (memoized)
- )                                              └─► SliderRender
-       │                                │
-       ▼                                ▼
- sliderWComponentRenderer           createComponentRenderer(type, metadata, renderFn)
-       │                                │
-       ▼                                ▼
- registered with XMLUI engine       registers renderFn with the engine
-
-
- RENDER (every time engine evaluates <SliderW .../>)
- ===================================================
-
- XMLUI markup              engine                    wrapCompound's renderFn
- ────────────              ──────                    ──────────────────────
- <SliderW                  parses node,              receives context
-   minValue="0"     ──►    creates context    ──►      │
-   maxValue="100"                                      ▼
-   initialValue="50"                              builds props:
-   onDidChange=                                   ┌────────────────────────────────┐
-     "{(v)=>x=v}"                                 │ __initialValue ← extractValue  │
- />                                               │ __value ← engine state         │
-                                                  │ __updateState ← engine         │
-                                                  │ __onDidChange = (newVal) => {  │
-                                                  │    pushTrace()                 │
-                                                  │    updateState({value:newVal}) │
-                                                  │    handler(newVal)             │
-                                                  │    pushXsLog(value:change ...) │
-                                                  │    popTrace()                  │
-                                                  │ }                              │
-                                                  │ min, max, step ← extractValue  │
-                                                  └────────────────────────────────┘
-                                                           │
-                                                           ▼
-                                                  <StateWrapper {...props} />
-
-
- INSIDE StateWrapper (React component tree)
- ===========================================
-
- CallbackSync (outer — renders every time, cheap)
- ┌─────────────────────────────────────────���───────────────────┐
- │ Receives __onDidChange, __updateState, etc. from renderer.  │
- │ Writes them into a stable ref (callbackRef).                │
- │ No DOM work — just keeps the ref current.                   │
- └────────────────────────────┬──────────────────────���─────────┘
-                              │ passes callbackRef + value props
-                              ▼
- MemoizedInner (inner — only re-renders when value/className change)
- ┌─────────────────────────────────────────────────────────────┐
- │ Owns localValue state (React.useState).                     │
- │ On mount: parseInitialValue("50") → [50], tell engine.      │
- │ On external change: formatExternalValue, setLocalValue.     │
- │ Provides stable onChange and registerApi via useCallback.   │
- │                                                             │
- │ onChange(newVal):                                           │
- │   setLocalValue(newVal)          ← update React state       │
- │   callbackRef.__onDidChange(53)  ← triggers trace + engine  │
- └────────────────────────────┬────────────────────────────────┘
-                              │ passes value, onChange, registerApi
-                              ▼
- SliderRender (plain React component — no XMLUI imports)
- ┌─────────────────────────────────────────────────────────────┐
- │ Receives: value=[50], onChange, registerApi, min, max, ...  │
- │ Renders: Radix UI <Slider.Root> with Radix props.           │
- │ On user drag: calls onChange(53).                           │
- │ On mount: calls registerApi({ focus, setValue, value }).    │
- └─────────────────────────────────────────────────────────────┘
+  metadata + config
+          |
+          v
+  mergeWithMetadata
+          |
+          v
+  wrapCompound(...)
+          |
+          v
+  build StateWrapper
+          |
+          v
+  createComponentRenderer(...)
+          |
+          v
+  registered with the XMLUI engine
 ```
 
-## Why `mergeWithMetadata` enables progressive enhancement
+```text
+RENDER
 
-Both `wrapComponent` and `wrapCompound` call `mergeWithMetadata` at setup time. It reads `valueType` annotations and event declarations from the metadata and auto-classifies them -- so the wrapper config only needs to specify exceptions. Here's what SliderW's config would look like without it:
+  XMLUI node + renderer context
+              |
+              v
+      build wrapper props
+              |
+              v
+  __initialValue / __value / __onDidChange /
+  __registerComponentApi
+              |
+              v
+      CallbackSync (outer)
+              |
+              v
+     MemoizedInner (inner)
+              |
+              v
+  RenderComponent(value, onChange, registerApi, ...)
+
+  onChange(newValue)
+        |
+        +--> update localValue
+        |
+        +--> route through didChange path
+
+  external XMLUI value changes
+        |
+        +--> sync back into MemoizedInner
+```
+
+## What it adds beyond `wrapComponent`
+
+- **StateWrapper.** `CallbackSync` keeps callback refs current while `MemoizedInner` avoids re-rendering on every XMLUI evaluation.
+- **Simplified render contract.** The render component works with `value`, `onChange`, and `registerApi` instead of XMLUI plumbing props.
+- **Boundary hooks.** `parseInitialValue` converts the raw markup value into the native format; `formatExternalValue` normalizes values flowing back in from XMLUI state.
+- **Same metadata-driven inference for most wrapper work.** Booleans, numbers, strings, events, callbacks, templates, renderers, renames, and exclusions are still inferred through `mergeWithMetadata`.
+
+## Relationship to `wrapComponent`
+
+The two wrappers are not competitors. `wrapComponent` is the base primitive; `wrapCompound` is a convenience layer for a narrower render-component shape.
+
+Use this rule of thumb:
+
+- If the native component already knows how to work with `value`, `initialValue`, `updateState`, and XMLUI-style callbacks, start with `wrapComponent`.
+- If you want the wrapper to absorb that plumbing and hand the render component a simpler controlled-input interface, use `wrapCompound`.
+
+## Example: Gauge
+
+`Gauge` is a real `wrapCompound` example from `packages/xmlui-gauge`. The wrapper handles value normalization and XMLUI integration. The render component only worries about the Smart UI gauge element and its native `change` event.
 
 ```typescript
-wrapCompound(COMP, SliderRender, SliderWMd, {
-  booleans: ["enabled", "readOnly", "required", "autoFocus", "showValues"],
-  numbers: ["minValue", "maxValue", "step", "minStepsBetweenThumbs"],
-  events: {
-    didChange: "onDidChange",
-    gotFocus: "onGotFocus",
-    lostFocus: "onLostFocus",
-  },
-  callbacks: { valueFormat: "valueFormat" },
-  rename: { minValue: "min", maxValue: "max" },
-  parseInitialValue: ...,
-  formatExternalValue: ...,
-})
-```
-
-Instead, `mergeWithMetadata` infers booleans, numbers, and events from the metadata, so the actual config is just:
-
-```typescript
-wrapCompound(COMP, SliderRender, SliderWMd, {
-  callbacks: { valueFormat: "valueFormat" },
-  rename: { minValue: "min", maxValue: "max" },
-  parseInitialValue: ...,
-  formatExternalValue: ...,
-})
-```
-
-No `booleans`, no `numbers`, no `events` -- because the metadata already declares those types. This makes progressive enhancement incremental: add `valueType: "boolean"` to a prop's metadata and `mergeWithMetadata` picks it up automatically. The wrapper config never grows -- only the metadata does.
-
-**What you get beyond wrapComponent:**
-
-- **Value lifecycle.** The wrapper parses `initialValue`, maintains `localValue` state in React, syncs external value changes, and calls `updateState` automatically when the value changes.
-- **parseInitialValue / formatExternalValue.** Optional hooks to transform values at the boundaries -- parse a string `"[10,90]"` into an array, clamp to min/max, normalize date formats.
-- **StateWrapper (CallbackSync + MemoizedInner).** A two-component split that solves React.memo's stale-closure problem. The outer component (CallbackSync) always renders but does no DOM work -- it just updates a ref. The inner component (MemoizedInner) only re-renders when non-function props change. This keeps wrapped components performant even when XMLUI re-evaluates frequently.
-- **Clean render component interface.** The React render component receives `value`, `onChange`, and `registerApi` -- no XMLUI imports needed.
-
-## Example: SliderW
-
-SliderW wraps a Radix UI slider. It uses `parseInitialValue` to parse string values and clamp to min/max, `formatExternalValue` to validate incoming values, `rename` to map XMLUI's `minValue`/`maxValue` to Radix's `min`/`max`, and `callbacks` for a custom `valueFormat` function.
-
-```typescript
-// SliderWrapped.tsx — exports sliderWComponentRenderer (registered with engine)
-
-import { SliderRender } from "./SliderRender";     // plain React component
+import { GaugeRender } from "./GaugeRender";
 import {
-  wrapCompound, createMetadata, d,
-  dDidChange, dEnabled, dGotFocus, dInitialValue,
-  dLostFocus, dReadonly, dRequired,
+  wrapCompound,
+  createMetadata,
+  d,
+  dDidChange,
+  dEnabled,
+  dInitialValue,
 } from "xmlui";
 
-const COMP = "SliderW";
+const COMP = "Gauge";
 
-// Metadata → consumed by wrapCompound, docs site, and IDE plugins.
-export const SliderWMd = createMetadata({
-  status: "stable",
-  description: "SliderW — wrapCompound version of Slider.",
+export const GaugeMd = createMetadata({
+  status: "experimental",
+  description: "`Gauge` wraps the Smart UI Gauge web component.",
   props: {
     initialValue: dInitialValue(),
-    minValue:  { valueType: "number", defaultValue: 0 },
-    maxValue:  { valueType: "number", defaultValue: 10 },
-    step:      { valueType: "number", defaultValue: 1 },
+    minValue: { valueType: "number", defaultValue: 0 },
+    maxValue: { valueType: "number", defaultValue: 100 },
+    analogDisplayType: d("Display type.", undefined, "string", "needle"),
+    digitalDisplay: d("Show digital value display.", undefined, "boolean", false),
     enabled: dEnabled(),
-    readOnly: dReadonly(),
-    showValues: { valueType: "boolean", defaultValue: true },
-    valueFormat: { valueType: "any" },
   },
   events: {
     didChange: dDidChange(COMP),
-    gotFocus: dGotFocus(COMP),
-    lostFocus: dLostFocus(COMP),
   },
 });
 
-export const sliderWComponentRenderer = wrapCompound(
-  COMP,
-  SliderRender,
-  SliderWMd,
-  {
-    callbacks: { valueFormat: "valueFormat" },
-    rename: { minValue: "min", maxValue: "max" },
-
-    parseInitialValue: (raw, props) => {
-      const min = Number(props.min) || 0;
-      const max = Number(props.max) || 10;
-      let val = raw;
-      if (typeof raw === "string") {
-        try { val = JSON.parse(raw); }
-        catch { val = parseFloat(raw); }
-      }
-      if (val == null || (typeof val === "number" && isNaN(val))) val = min;
-      const arr = Array.isArray(val) ? val : [val];
-      return arr.map((v) =>
-        Math.min(max, Math.max(min, Number(v) || min)));
-    },
-
-    formatExternalValue: (value, props) => {
-      const min = Number(props.min) || 0;
-      const max = Number(props.max) || 10;
-      const arr = Array.isArray(value)
-        ? value : value != null ? [value] : [min];
-      return arr.map((v) =>
-        Math.min(max, Math.max(min, Number(v) || min)));
-    },
+export const gaugeComponentRenderer = wrapCompound(COMP, GaugeRender, GaugeMd, {
+  rename: {
+    minValue: "min",
+    maxValue: "max",
   },
-);
+  parseInitialValue: (raw, props) => {
+    const min = Number(props.min) || 0;
+    const max = Number(props.max) || 100;
+    const val = typeof raw === "string" ? parseFloat(raw) : Number(raw);
+    if (Number.isNaN(val)) return min;
+    return Math.min(max, Math.max(min, val));
+  },
+  formatExternalValue: (value, props) => {
+    const min = Number(props.min) || 0;
+    const max = Number(props.max) || 100;
+    const val = Number(value);
+    if (Number.isNaN(val)) return min;
+    return Math.min(max, Math.max(min, val));
+  },
+});
 ```
+
+The corresponding render component is plain React. Its important props look like this:
+
+```typescript
+type Props = {
+  value?: number;
+  onChange?: (value: number) => void;
+  registerApi?: (api: Record<string, unknown>) => void;
+  min?: number;
+  max?: number;
+  enabled?: boolean;
+};
+```
+
+That is the point of `wrapCompound`: the wrapper owns the XMLUI-specific state bridge, while the render component stays focused on the third-party control.

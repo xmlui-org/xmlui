@@ -1,113 +1,112 @@
 # wrapComponent
 
-`wrapComponent` creates a stateless XMLUI renderer. It bridges XMLUI markup to a React component by automatically forwarding props, binding events with semantic tracing, and resolving resource URLs. It does not manage value lifecycle -- no `initialValue` parsing, no local state, no `updateState` calls.
+`wrapComponent` is the default wrapper primitive. It turns XMLUI metadata plus a small config object into a component renderer that extracts props, wires events, renders templates, and forwards everything else to a React component.
 
-**When to use it:** Components that render props but don't need XMLUI's value/state machinery. Avatar, Icon, Badge, Markdown -- anything without `initialValue` and `didChange`.
+Use `wrapComponent` first. Reach for `wrapCompound` only when you want the wrapper itself to hide XMLUI's value plumbing and present a simpler `value` / `onChange` / `registerApi` interface to the render component.
+
+## When to use it
+
+- Use `wrapComponent` for most wrappers, including simple visual components and many stateful ones.
+- Use it when the native React component already works with XMLUI-style props such as `value`, `initialValue`, `updateState`, and `registerComponentApi`.
+- Use it when `customRender` is enough to adapt prop names, layout, or callback wiring.
+- Built-in `Slider` is a good counterexample to the old "stateful means wrapCompound" rule: it is stateful, but it still uses `wrapComponent`.
 
 ## Architecture
 
-```
- SETUP (once, at registration time)
- ===================================
+```text
+SETUP
 
- Avatar.tsx                         wrapComponent.tsx
- ──────────                         ────────────────
- AvatarMd = createMetadata(...)     mergeWithMetadata(metadata, config)
-       │                                │
-       ▼                                ▼
- wrapComponent(                     auto-classifies props/events:
-   "Avatar",        ──────────►       booleanSet, numberSet, stringSet
-   AvatarNative,                      resourceUrlSet, eventMap
-   AvatarMd                           renameMap, excludeSet
- )                                      │
-       │                                ▼
-       ▼                            createComponentRenderer(type, metadata, renderFn)
- avatarComponentRenderer                │
-       │                                ▼
-       ▼                            registers renderFn with the engine
- registered with XMLUI engine
-
-
- RENDER (every time engine evaluates <Avatar .../>)
- ==================================================
-
- XMLUI markup              engine                    wrapComponent's renderFn
- ────────────              ──────                    ───────────────────────
- <Avatar                   parses node,              receives context:
-   url="pic.jpg"    ──►    creates context    ──►      { node, extractValue,
-   name="Jon"              with extractValue,            lookupEventHandler,
-   onClick="..." />        lookupEventHandler            className, ... }
-                                                           │
-                           ┌───────────────────────────────┘
-                           ▼
-                    builds props object:
-                    ┌──────────────────────────────────────────────┐
-                    │ 1. className ← engine CSS                    │
-                    │ 2. events ← lookupEventHandler + auto-trace  │
-                    │    onClick = (...args) => {                  │
-                    │      pushTrace()                             │
-                    │      handler(...args)                        │
-                    │      pushXsLog(semantic trace)               │
-                    │      popTrace()                              │
-                    │    }                                         │
-                    │ 3. resource URLs ← extractResourceUrl        │
-                    │ 4. everything else ← extractValue            │
-                    │    (typed: asBoolean, asNumber, asString,    │
-                    │     or generic extractValue for unknowns)    │
-                    └──────────────────────────────────────────────┘
-                           │
-                           ▼
-                    <AvatarNative {...props} />
-                    (plain React component, no XMLUI imports)
+  metadata + config
+          |
+          v
+  mergeWithMetadata
+          |
+          v
+  wrapComponent(...)
+          |
+          v
+  createComponentRenderer(...)
+          |
+          v
+  registered with the XMLUI engine
 ```
 
-**What you get for free:**
+```text
+RENDER
 
-- **Prop forwarding.** Every prop in XMLUI markup reaches the React component via `extractValue()`, even if the metadata doesn't declare it. New props on the React component "just work" without editing the wrapper.
-- **Type-safe extraction.** Props declared in metadata with `valueType: "boolean"` or `"number"` get the correct `extractValue` variant automatically, via `mergeWithMetadata`.
-- **Event auto-tracing.** Events declared in metadata get `pushTrace()`/`popTrace()` wrapping and semantic trace emission -- `value:change` for `didChange`, `focus:change` for `gotFocus`/`lostFocus`.
-- **Resource URL resolution.** Props marked `isResourceUrl: true` in metadata are resolved via `extractResourceUrl` instead of `extractValue`.
+  XMLUI node + renderer context
+              |
+              v
+       build props object
+        |      |      |
+        |      |      +--> templates / renderers
+        |      +---------> resource URL resolution
+        +----------------> events + semantic tracing
+              |
+              v
+   forward remaining props via metadata
+              |
+              v
+   render Component or call customRender
+```
+
+## What you get for free
+
+- **Metadata-driven extraction.** `valueType: "boolean"`, `"number"`, and `"string"` automatically select the right extractor.
+- **Event wiring and tracing.** Events declared in metadata are looked up through XMLUI and traced semantically in verbose mode.
+- **Resource URL resolution.** Props marked with `isResourceUrl: true` are resolved through `extractResourceUrl`.
+- **Template handling.** `ComponentDef` props can become either static React nodes or render-prop callbacks.
+- **Generic forwarding.** Props that are not specially handled still flow through `extractValue()`.
+- **Escape hatch.** `customRender` lets you keep the auto-extraction pipeline while taking full control over the final JSX.
+
+## Stateful does not imply `wrapCompound`
+
+`wrapComponent` auto-detects stateful components when metadata declares `initialValue` or `didChange`. In that mode it can pass `value`, `initialValue`, and `updateState` through to the native component.
+
+That is why built-in `Slider` still uses `wrapComponent`: the React component already understands XMLUI's state contract, and the wrapper only needs `customRender` to adapt a few prop names and callbacks. `wrapCompound` is for a different shape of render component, not for "all components with changing values".
 
 ## The role of `mergeWithMetadata`
 
-Both `wrapComponent` and `wrapCompound` call `mergeWithMetadata` at setup time. It reads `valueType` annotations and event declarations from the metadata and auto-classifies them into `booleanSet`, `numberSet`, `stringSet`, `eventMap`, etc. This means the wrapper config only needs to specify exceptions (renames, callbacks, custom parsing) -- everything else is inferred from metadata.
+Both wrapper functions start by calling `mergeWithMetadata`. It reads metadata and combines it with any explicit config so the wrapper can infer most of the boring plumbing:
 
-On day one you can wrap a component with empty metadata -- every prop forwards as a raw string via `extractValue()`. As you add `valueType: "boolean"` or event declarations to the metadata, `mergeWithMetadata` picks them up automatically. The wrapper config never grows -- only the metadata does.
+- boolean, number, and string prop extraction
+- event name to React prop mapping
+- callback props resolved via `lookupSyncCallback`
+- template props and render-prop templates
+- prop renames and exclusions
 
-See the [wrapCompound](/docs/guides/wrap-component/wrap-compound-fn) section for a detailed before/after example showing how much boilerplate `mergeWithMetadata` eliminates.
+The config is meant for exceptions. As metadata gets richer, the wrapper usually gets smaller.
+
+See [wrapCompound](/docs/guides/wrap-component/wrap-compound-fn) for the specialization that adds a `StateWrapper` and a simplified render-component interface.
 
 ## Example: Avatar
 
-Avatar is a clean example -- no state, just props and events. The metadata declares `url` as a resource URL and two events (`click`, `contextMenu`). The `wrapComponent` call needs zero config because everything is inferred from metadata.
+Avatar is the cleanest `wrapComponent` example because nothing about it is unusual. The metadata declares typed props, a resource URL, and a couple of events. The wrapper itself is almost empty.
 
 ```typescript
-// Avatar.tsx — exports avatarComponentRenderer (registered with engine)
-
 import { wrapComponent } from "../../components-core/wrapComponent";
-import { Avatar } from "./AvatarNative";     // plain React component
+import { Avatar } from "./AvatarNative";
 import { createMetadata, dClick, dContextMenu } from "../metadata-helpers";
 
 const COMP = "Avatar";
 
-// Metadata → consumed by wrapComponent, docs site, and IDE plugins.
 export const AvatarMd = createMetadata({
   status: "stable",
-  description: "Avatar displays a user's profile picture...",
+  description: "Avatar displays a user's profile picture.",
   props: {
-    size:  { valueType: "string", defaultValue: "md" },  // → stringSet
-    name:  { valueType: "string" },                       // → stringSet
-    url:   { valueType: "string", isResourceUrl: true },  // → resourceUrlSet
+    size: { valueType: "string", defaultValue: "md" },
+    name: { valueType: "string" },
+    url: { valueType: "string", isResourceUrl: true },
   },
   events: {
-    click: dClick(COMP),              // → eventMap: onClick
-    contextMenu: dContextMenu(COMP),  // → eventMap: onContextMenu
+    click: dClick(COMP),
+    contextMenu: dContextMenu(COMP),
   },
 });
 
-// Zero config — mergeWithMetadata infers everything from AvatarMd.
 export const avatarComponentRenderer = wrapComponent(
-  COMP,        // XMLUI component name
-  Avatar,      // plain React component
-  AvatarMd,    // metadata
+  COMP,
+  Avatar,
+  AvatarMd,
 );
 ```
