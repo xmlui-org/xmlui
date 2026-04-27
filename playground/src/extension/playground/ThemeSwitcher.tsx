@@ -1,5 +1,4 @@
 import { usePlayground } from "../hooks/usePlayground";
-import { MdOutlinePalette } from "react-icons/md";
 import { activeThemeChanged } from "../state/store";
 import { forwardRef } from "react";
 import { Button, DropdownMenu, Icon, MenuItem, Text, Theme, Tooltip, useThemes } from "xmlui";
@@ -12,7 +11,7 @@ export const ThemeSwitcher = forwardRef<HTMLButtonElement>(() => {
   return (
     <Tooltip text="Change theme">
       <DropdownMenu
-        triggerTemplate={<Button variant="ghost" size="sm" icon={<MdOutlinePalette />} />}
+        triggerTemplate={<Button variant="ghost" size="sm" icon={<Icon name="palette" />} />}
       >
         <Text className={styles.sectionTitle} variant="strong">
           Themes

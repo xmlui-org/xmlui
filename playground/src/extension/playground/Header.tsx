@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import classnames from "classnames";
-import { RxOpenInNewWindow, RxDownload, RxShare2 } from "react-icons/rx";
-import { LiaUndoAltSolid } from "react-icons/lia";
 import { usePlayground } from "../hooks/usePlayground";
 import { resetApp, toneChanged } from "../state/store";
 import { handleDownloadZip } from "../utils/helpers";
@@ -11,7 +9,7 @@ import { Box } from "./Box";
 import ConfirmationDialog from "./ConfirmationDialog";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { CodeSelector } from "./CodeSelector";
-import { Button, Text, Logo, Tooltip } from "xmlui";
+import { Button, Icon, Text, Logo, Tooltip } from "xmlui";
 import { ToneSwitch, ContentSeparator } from "xmlui";
 import { useToast } from "../hooks/useToast";
 
@@ -96,7 +94,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
               {!standalone && (
                 <Tooltip text="View and edit in new full-width window">
                   <Button variant="ghost" onClick={() => openStandaloneApp(false)}>
-                    <RxOpenInNewWindow />
+                    <Icon name="new-window" />
                   </Button>
                 </Tooltip>
               )}
@@ -123,7 +121,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                     }
                   }}
                 >
-                  <LiaUndoAltSolid height={24} width={24} />
+                  <Icon name="refresh" />
                 </Button>
               </Tooltip>
             </>
@@ -134,17 +132,17 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
 
               <Tooltip text="Share this app">
                 <Button variant="ghost" onClick={() => share()}>
-                  <RxShare2 />
+                  <Icon name="share" />
                 </Button>
               </Tooltip>
               <Tooltip text="Preview in fullscreen">
                 <Button variant="ghost" onClick={() => openStandaloneApp()}>
-                  <RxOpenInNewWindow height={24} width={24} />
+                  <Icon name="new-window" />
                 </Button>
               </Tooltip>
               <Tooltip text="Download app">
                 <Button variant="ghost" onClick={() => download()}>
-                  <RxDownload height={24} width={24} />
+                  <Icon name="download" />
                 </Button>
               </Tooltip>
 
