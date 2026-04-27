@@ -53,6 +53,7 @@ interface SimpleSelectProps {
   scrollIndicators?: boolean;
   validationIcon?: string | null;
   validationStatus: ValidationStatus;
+  variant?: "default" | "outlined";
   invalidMessages: string[];
   finalValidationIconSuccess: string;
   finalValidationIconError: string;
@@ -91,6 +92,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
       scrollIndicators = true,
       validationIcon,
       validationStatus,
+      variant,
       invalidMessages,
       finalValidationIconSuccess,
       finalValidationIconError,
@@ -253,6 +255,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
             [styles.error]: validationStatus === "error",
             [styles.warning]: validationStatus === "warning",
             [styles.valid]: validationStatus === "valid",
+            [styles.outlined]: variant === "outlined",
           })}
           onClick={(event) => {
             // Prevent event propagation to parent elements (e.g., DropdownMenu)

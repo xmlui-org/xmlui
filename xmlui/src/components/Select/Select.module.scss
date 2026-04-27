@@ -197,6 +197,29 @@ $minHeight-item-Select: createThemeVar("minHeight-item-#{$componentName}");
       @include variant("success");
     }
 
+    // `variant="outlined"` is intentionally narrow: it rebinds only the border color
+    // (and its hover/focus states) so the input visually composes with an outlined
+    // Button. Padding, background, typography and validation styling are unchanged.
+    // Validation classes (`.error` / `.warning` / `.valid`) take precedence over
+    // `.outlined` because they appear later in the rule list.
+    &.outlined {
+      border-color: createThemeVar("Input:borderColor-#{$componentName}--outlined");
+
+      &:not(:disabled) {
+        &:hover {
+          border-color: createThemeVar(
+            "Input:borderColor-#{$componentName}--outlined--hover"
+          );
+        }
+
+        &:focus-visible {
+          border-color: createThemeVar(
+            "Input:borderColor-#{$componentName}--outlined--focus"
+          );
+        }
+      }
+    }
+
     &.disabled {
       cursor: not-allowed;
       background-color: $backgroundColor-Select--disabled;

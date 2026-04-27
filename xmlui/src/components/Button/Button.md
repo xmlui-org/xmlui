@@ -97,6 +97,8 @@
 </App>
 ```
 
+> The `outlined` border color of a `primary` Button resolves to the shared `borderColor-outlined` theme token. Form inputs that opt into `variant="outlined"` (for example `Select variant="outlined"`) read from the same token, so an outlined Button and an outlined Select sitting next to each other always share the same border color.
+
 %-PROP-END
 
 %-PROP-START themeColor

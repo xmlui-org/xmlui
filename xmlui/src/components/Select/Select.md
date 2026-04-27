@@ -125,6 +125,26 @@ If your data uses different field names, set `valueField` and `labelField` accor
 
 %-PROP-END
 
+%-PROP-START variant
+
+Use `variant="outlined"` when you want the `Select` to share its border color with an outlined `Button` placed alongside. Both components resolve to the same `borderColor-outlined` theme token, so the borders stay in sync even when the theme changes.
+
+```xmlui-pg copy display name="Example: matched border with outlined Button" height="120px"
+<App>
+  <HStack>
+    <Select variant="outlined">
+      <Option value="all" label="All customers"/>
+      <Option value="active" label="Active"/>
+    </Select>
+    <Button icon="plus" label="New Customer" variant="outlined" />
+  </HStack>
+</App>
+```
+
+The `outlined` variant only rebinds the border color (and its hover/focus states); padding, background, and typography are unchanged. Validation states (`error` / `warning` / `valid`) take precedence over the variant.
+
+%-PROP-END
+
 %-PROP-START data
 
 Provide an array of objects to populate the option list. When `data` is set, `Option` children are not required. Each item in the array is mapped to an option using `valueField` (default: `"value"`) and `labelField` (default: `"label"`).

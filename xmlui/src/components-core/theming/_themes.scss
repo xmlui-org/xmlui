@@ -870,6 +870,13 @@ $color-error: createVar(color-error);
 
 $borderColor: createVar(borderColor);
 
+// Semantic "outlined" border color tokens — shared between outlined Button variants
+// and the `variant="outlined"` flavour of form inputs (Select, TextBox, ...).
+$borderColor-outlined: createVar(borderColor-outlined);
+$borderColor-outlined--hover: createVar(borderColor-outlined--hover);
+$borderColor-outlined--active: createVar(borderColor-outlined--active);
+$borderColor-outlined--focus: createVar(borderColor-outlined--focus);
+
 $maxWidth-content: createVar(maxWidth-content);
 $direction: createVar(direction);
 
