@@ -2,7 +2,7 @@ import { createContext, useState, type ReactNode } from "react";
 import { noop } from "lodash-es";
 import * as RadixToast from "@radix-ui/react-toast";
 import styles from "./Toast.module.scss";
-import { MdOutlineClose } from "react-icons/md";
+import { Icon } from "xmlui";
 import classnames from "classnames";
 
 type ToastMessage = {
@@ -48,7 +48,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
           })}
         >
           <RadixToast.Close className={styles.ToastClose}>
-            <MdOutlineClose />
+            <Icon name="close" />
           </RadixToast.Close>
           {toastMessage?.title && (
             <RadixToast.Title className={styles.ToastTitle}>{toastMessage?.title}</RadixToast.Title>
