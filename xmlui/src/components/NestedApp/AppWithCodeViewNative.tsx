@@ -71,6 +71,18 @@ export function AppWithCodeViewNative({
   const { activeThemeTone, activeThemeId } = useTheme();
   const { themes: allThemes } = useThemes();
 
+  // Forward the parent app's registered themes and active theme into the nested
+  // playground so playgrounds inherit the host's look-and-feel by default.
+  // Precedence for the active theme:
+  //   1. explicit `activeTheme` prop (caller override),
+  //   2. playground's own `config.defaultTheme` (author's choice),
+  //   3. host app's `activeThemeId` (fallback).
+  const effectiveConfig = {
+    ...(config || {}),
+    themes: [...((config?.themes as any[]) || []), ...(allThemes || [])],
+  };
+  const effectiveActiveTheme = activeTheme || config?.defaultTheme || activeThemeId;
+
   const safePopOutUrl = withoutTrailingSlash(
     popOutUrl || appContext?.appGlobals?.popOutUrl || "https://playground.xmlui.org/#/playground",
   );
@@ -184,9 +196,9 @@ export function AppWithCodeViewNative({
               app={app}
               api={api}
               components={components}
-              config={config}
+              config={effectiveConfig}
               activeTone={activeTone}
-              activeTheme={activeTheme}
+              activeTheme={effectiveActiveTheme}
               refreshVersion={refreshVersion}
               withSplashScreen={withSplashScreen}
               immediate={immediate}
@@ -204,9 +216,9 @@ export function AppWithCodeViewNative({
         app={app}
         api={api}
         components={components}
-        config={config}
+        config={effectiveConfig}
         activeTone={activeTone}
-        activeTheme={activeTheme}
+        activeTheme={effectiveActiveTheme}
         refreshVersion={refreshVersion}
         withSplashScreen={withSplashScreen}
         immediate={immediate}
