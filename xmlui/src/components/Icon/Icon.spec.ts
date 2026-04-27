@@ -273,7 +273,7 @@ test.describe("click Event", () => {
 // =============================================================================
 
 test.describe("Rendering Precision", () => {
-  test("pool icon wrapper uses inline-flex for pixel-aligned rendering", async ({
+  test("pool icon wrapper uses inline-block for rendering", async ({
     initTestBed,
     createIconDriver,
   }) => {
@@ -283,7 +283,7 @@ test.describe("Rendering Precision", () => {
       const wrapper = el.closest("span");
       return wrapper ? window.getComputedStyle(wrapper).display : null;
     });
-    expect(wrapperDisplay).toBe("inline-flex");
+    expect(wrapperDisplay).toBe("inline-block");
   });
 
   test("icon preserves source stroke-width attribute", async ({
@@ -340,8 +340,8 @@ test.describe("Accessibility", () => {
     await initTestBed(`<Icon testId="icon" name="home"/>`);
     const icon = await createIconDriver("icon");
     const display = await icon.svgIcon.evaluate((el) => window.getComputedStyle(el).display);
-    // SVG elements without explicit width/height attributes render as block
-    expect(display).toBe("block");
+    // SVG icons have display: inline-block applied via the base CSS class
+    expect(display).toBe("inline-block");
   });
 
   test("icon has correct vertical alignment", async ({ initTestBed, createIconDriver }) => {
