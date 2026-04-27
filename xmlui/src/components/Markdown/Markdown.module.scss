@@ -463,16 +463,20 @@ $marginBottom-Details-markdown: createThemeVar("marginBottom-Details-markdown");
       padding: 0.5rem;
       display: flex;
       align-items: flex-start;
-
-      & > :first-child {
-        // Center icon with first line of text (baseline alignment)
-        margin-top: 0.35em;
-      }
     }
 
     .admonitionIcon {
-      font-size: $size-icon-Admonition-markdown;
-      line-height: 1;
+      // Match the height of one text line so the icon centers against the first line.
+      // Don't override font-size here so 1lh resolves against the inherited text line-height.
+      height: 1lh;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      & > * {
+        font-size: $size-icon-Admonition-markdown;
+        line-height: 1;
+      }
     }
 
     .admonitionContent {
