@@ -339,7 +339,16 @@ function ThemeProvider({
       foundTheme = themes.find((theme) => theme.id === activeThemeId);
     }
     if (!foundTheme) {
-      throw new Error(`Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`);
+      const fallbackId = availableThemeIds[0];
+      foundTheme = themes.find((theme) => theme.id === fallbackId);
+      console.error(
+        `[XMLUI] Unknown theme "${activeThemeId}". Falling back to "${fallbackId}". Available themes: ${availableThemeIds.join(", ")}.`,
+      );
+      if (!foundTheme) {
+        throw new Error(
+          `Theme "${activeThemeId}" not found and no fallback themes are available.`,
+        );
+      }
     }
     return foundTheme;
   }, [activeThemeId, availableThemeIds, themes]);
