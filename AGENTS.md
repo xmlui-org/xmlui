@@ -109,6 +109,7 @@ Use the prompt files in `.github/prompts/` for step-by-step workflows. Invoke wi
 | QA review a component | `#qa-review` | Auditing an existing component against conventions, accessibility, and test coverage |
 | Review and fix a component | `#review-component` | Auditing a component with the QA checklist and applying fixes, including Native→React rename |
 | Add E2E tests | `#add-e2e-tests` | Adding or expanding Playwright tests for an under-tested component |
+| Add website example tests | `#add-website-example-tests` | Creating a `@website`-tagged spec file in `tests-e2e/` from a docs markdown file |
 | Refactor core code | `#refactor-core` | Restructuring framework internals in `components-core/` |
 | Write component documentation | `#write-component-docs` | Writing or updating hand-written description files for doc generation |
 | Add a new stereotype task | `#add-stereotype` | Creating a new prompt file for a repeatable task pattern |

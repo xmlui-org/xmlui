@@ -18,6 +18,5 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "tests", "index.ts"],
-  "exclude": ["ests"]
+  "include": ["src", "tests", "tests-e2e", "index.ts"],
 }
