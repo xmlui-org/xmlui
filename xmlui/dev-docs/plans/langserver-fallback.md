@@ -2,7 +2,7 @@
 
 ## Status
 
-**Not implemented.** The stub exists in [`tools/vscode/src/extension.ts:50-58`](../../tools/vscode/src/extension.ts) — `localLangServPath` is hardcoded to `null`, so the bundled server is always used.
+**Implemented.** See [`tools/vscode/src/extension.ts`](../../tools/vscode/src/extension.ts) and the `XMLUILanguageService.localServerPath` setting in [`tools/vscode/package.json`](../../tools/vscode/package.json). Resolution order: explicit config → workspace `node_modules` (walking up parent dirs to support monorepos) → bundled. Changes to the config setting trigger an automatic client restart.
 
 ## Goal
 

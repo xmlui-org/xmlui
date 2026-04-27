@@ -39,6 +39,12 @@
           ],
           "default": "off",
           "description": "Traces the communication between VS Code and the language server."
+        },
+        "XMLUILanguageService.localServerPath": {
+          "scope": "machine-overridable",
+          "type": "string",
+          "default": "",
+          "description": "Absolute path to a local xmlui language server script (e.g. /path/to/node_modules/xmlui/dist/nodejs/server.js). When set, the extension uses this server instead of the bundled one. Leave empty to auto-detect a workspace install or fall back to the bundled server."
         }
       }
     },
