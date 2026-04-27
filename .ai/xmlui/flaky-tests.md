@@ -6,6 +6,8 @@ The following E2E tests are often flaky (~8 out of 10):
 ion theme variables
 - xmlui/src/components/AutoComplete/AutoComplete.spec.ts:1235:3 › Validation Feedback › sh
 ows valid icon in concise mode when valid
+- xmlui/src/components/DataSource/DataSource.spec.ts:146:3 › Basic Functionality › shows 
+unknown error notification 
 - xmlui/src/components/IncludeMarkup/IncludeMarkup.spec.ts:118:3 › Basic Functionality ›
  fires didFail on non-2xx HTTP status
 - xmlui/src/components/Table/Table.spec.ts:4195:3 › Column width theme variables › column 

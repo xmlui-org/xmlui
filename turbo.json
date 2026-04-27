@@ -10,6 +10,7 @@
     },
     "build:xmlui": {
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
+      "dependsOn": ["check:metadata-purity"],
       "outputs": ["dist/lib/**"]
     },
     "build:xmlui-standalone": {
@@ -29,6 +30,15 @@
       "dependsOn": ["build:xmlui-metadata"],
       "inputs": ["scripts/**"],
       "outputs": ["src/language-server/xmlui-metadata-generated.js"]
+    },
+    "check:metadata-purity": {
+      "inputs": [
+        "src/components/metadata-helpers.ts",
+        "src/components/abstractions.ts",
+        "src/components/FormItem/ItemWithLabel.defaults.ts",
+        "scripts/check-metadata-purity.mjs"
+      ],
+      "outputs": []
     },
     "build:extension": {
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],

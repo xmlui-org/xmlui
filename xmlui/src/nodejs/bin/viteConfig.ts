@@ -24,20 +24,27 @@ logger.warn = (msg, options) => {
 const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
 
 /**
- * Ensures the canonical CSS @layer cascade order is established before any other
- * stylesheet is parsed by the browser. Vite 8 / Rolldown can split CSS into
- * per-module chunks (e.g. one whose only content is `@layer components { ... }`)
- * and may emit them with `<link>` tags that load before the main entry CSS.
- * Without this guard the browser would derive the layer order from those chunks
- * and end up with `components` ranked LOWER than `base`, inverting the cascade
- * (the CSS reset would then beat component styles, leaving every Button etc.
- * with `background-color: rgba(0,0,0,0)`).
+ * Defence-in-depth: ensures the canonical CSS `@layer` cascade order is
+ * established before any other stylesheet is parsed by the browser.
+ *
+ * The original cause of the inverted cascade (a stray per-module CSS chunk
+ * emitted because `metadata-helpers.ts` transitively imported a `.tsx`
+ * component that imported a `.module.scss`) is fixed at the source by the
+ * `xmlui/scripts/check-metadata-purity.mjs` guard. This plugin remains in
+ * place to protect against:
+ *
+ *   1. Future changes that reintroduce multi-chunk CSS via a new accidental
+ *      import path that escapes the source-graph guard.
+ *   2. Library consumers that load our emitted `.css` assets directly
+ *      without going through an xmlui-controlled `index.html`.
  *
  * The plugin both:
  *   1. Injects an inline <style> block with the layer-order declaration as the
  *      very first element of <head> (transformIndexHtml).
  *   2. Prepends the same declaration to every emitted CSS asset, so it remains
  *      effective in builds that don't go through index.html (e.g. lib/UMD).
+ *
+ * See `xmlui/dev-docs/plans/css-layer-order-rootcause.md`.
  */
 function cssLayerOrderPlugin(): Plugin {
   return {
