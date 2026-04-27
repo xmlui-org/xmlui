@@ -2,11 +2,15 @@
     <Stack horizontalAlignment="center" marginTop="$space-6">
       <Text>The UI button shows a live XMLUI app. Try it! Then switch to XML to see the code.</Text>
     </Stack>
-    <Theme themeId="xmlui-landing-theme"
+    <Theme themeId="xmlui-hero-theme"
            minHeight-Button="0">
     <Markdown>
         <![CDATA[
 ```xmlui-pg splitView height="534px" immediate withSplashScreen
+---config
+{
+  "defaultTheme": "xmlui-hero-theme"
+}
 ---app display
 <App layout="condensed-sticky">
     <AppHeader>

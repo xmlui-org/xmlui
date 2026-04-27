@@ -43,16 +43,16 @@ export const ToneSwitchMd = createMetadata({
     [`color-${COMP}-light`]: "$color-text-primary",
     [`backgroundColor-${COMP}-dark`]: "$color-primary-500",
     [`color-${COMP}-dark`]: "$color-surface-0",
-    [`borderColor-${COMP}`]: "$color-surface-200",
-    [`borderColor-${COMP}--hover`]: "$color-surface-300",
+    [`borderColor-${COMP}`]: "$color-surface-300",
+    [`borderColor-${COMP}--hover`]: "$color-surface-400",
     [`backgroundColor-indicator-${COMP}`]: "white",
     [`boxShadow-indicator-${COMP}`]: "0 2px 4px rgba(0, 0, 0, 0.1)",
 
     dark: {
       [`backgroundColor-${COMP}-light`]: "$color-surface-700",
       [`color-${COMP}-light`]: "$color-text-primary",
-      [`borderColor-${COMP}`]: "$color-surface-600",
-      [`borderColor-${COMP}--hover`]: "$color-surface-500",
+      [`borderColor-${COMP}`]: "$color-surface-700",
+      [`borderColor-${COMP}--hover`]: "$color-surface-600",
     },
   },
 });

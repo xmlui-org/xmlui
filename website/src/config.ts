@@ -13,6 +13,7 @@ import {
 import type { StandaloneAppDescription } from "xmlui";
 import XmluiLandingTheme from "./themes/landing-theme";
 import XmluiWebSiteTheme from "./themes/website-theme";
+import XmluiHeroTheme from "./themes/hero-theme";
 import EarthtoneTheme from "./themes/earthtone";
 import XmluiGreenTheme from "./themes/xmlui-green-on-default";
 import XmluiOrangeTheme from "./themes/xmlui-orange-on-default";
@@ -24,6 +25,7 @@ const App: StandaloneAppDescription = {
   themes: [
     XmluiLandingTheme,
     XmluiWebSiteTheme,
+    XmluiHeroTheme,
     EarthtoneTheme,
     XmluiGreenTheme,
     XmluiOrangeTheme,
