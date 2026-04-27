@@ -128,11 +128,17 @@ $themeVars: t.appendThemeVarWithDefault($themeVars, "paddingBottom-level4-#{$com
     .groupContentInner {
       will-change: opacity;
       opacity: 0;
+      /* Hide from browser find-in-page (Ctrl+F) and assistive tech when collapsed.
+         Delayed so the collapse animation can finish before content is hidden. */
+      visibility: hidden;
+      transition: opacity $time ease-out, visibility 0s linear $time;
     }
     &.expanded {
       .groupContentInner {
         opacity: 1;
         overflow: hidden;
+        visibility: visible;
+        transition: opacity $time ease-out, visibility 0s linear 0s;
       }
       grid-template-rows: 1fr;
     }
