@@ -80,7 +80,7 @@ export const Icon = memo(forwardRef(function Icon(
   }
 
   return (
-    <span ref={ref} style={{ display: "inline-flex" }}>
+    <span ref={ref} style={{ display: "inline-block" }}>
       {renderedIcon}
     </span>
   );
