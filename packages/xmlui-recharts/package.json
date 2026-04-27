@@ -6,9 +6,7 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "exports": {
-    ".": "./src/index.tsx"
-  },
+  "exports": "./src/index.tsx",
   "scripts": {
     "start": "xmlui start",
     "build:extension": "xmlui build-lib",

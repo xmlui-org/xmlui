@@ -5,9 +5,7 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "exports": {
-    ".": "./src/index.tsx"
-  },
+  "exports": "./src/index.tsx",
   "scripts": {
     "postinstall": "node scripts/setup-wasm.js",
     "prestart": "node scripts/setup-wasm.js",

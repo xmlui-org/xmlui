@@ -3,9 +3,7 @@
   "version": "0.1.15",
   "type": "module",
   "sideEffects": false,
-  "exports": {
-    ".": "./src/index.tsx"
-  },
+  "exports": "./src/index.tsx",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",

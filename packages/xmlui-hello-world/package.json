@@ -8,9 +8,7 @@
   "description": "",
   "author": "",
   "license": "ISC",
-  "exports": {
-    ".": "./src/index.tsx"
-  },
+  "exports": "./src/index.tsx",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
