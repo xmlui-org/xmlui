@@ -6,6 +6,8 @@ The following E2E tests are often flaky (~8 out of 10):
 ion theme variables
 - xmlui/src/components/AutoComplete/AutoComplete.spec.ts:1235:3 › Validation Feedback › sh
 ows valid icon in concise mode when valid
+- xmlui/src/components/IncludeMarkup/IncludeMarkup.spec.ts:118:3 › Basic Functionality ›
+ fires didFail on non-2xx HTTP status
 - xmlui/src/components/Table/Table.spec.ts:4195:3 › Column width theme variables › column 
 width theme variable with rem value resolves to correct pixel size
 - xmlui/src/components/RadioGroup/RadioGroup.spec.ts:1003:3 › Keyboard Navigation › sequential ArrowDown visits all options in order

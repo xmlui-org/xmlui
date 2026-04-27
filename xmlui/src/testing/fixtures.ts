@@ -325,7 +325,13 @@ export const test = baseTest.extend<TestDriverExtenderProps, WorkerFixtures>({
           </Fragment>
         `;
 
-      const { errors, component } = xmlUiMarkupToComponent(markup);
+      const { errors, warnings, component } = xmlUiMarkupToComponent(markup);
+
+      if (warnings.length > 0) {
+        console.group(`[xmlui] Warnings in markup:`);
+        warnings.forEach((msg) => console.warn(msg));
+        console.groupEnd();
+      }
 
       if (errors.length > 0) {
         const errText = errors

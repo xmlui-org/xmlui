@@ -21,6 +21,7 @@ export type ParserResult = {
   component: null | ComponentDef | CompoundComponentDef;
   errors: ErrorForDisplay[];
   erroneousCompoundComponentName?: string;
+  warnings: string[];
 };
 const COLOR_DANGER_100 = "hsl(356, 100%, 91%)";
 const COLOR_DANGER_300 = "hsl(356, 100%, 70%)";
@@ -46,12 +47,14 @@ export function xmlUiMarkupToComponent(
       component: null,
       errors: errorsToDisplay as ErrorForDisplay[],
       erroneousCompoundComponentName,
+      warnings: [],
     };
   }
 
   try {
-    const component = nodeToComponentDef(node, getText, fileId, preResolvedImports);
-    const transformResult = { component, errors: [] };
+    const warnings: string[] = [];
+    const component = nodeToComponentDef(node, getText, fileId, preResolvedImports, warnings, cursor);
+    const transformResult = { component, errors: [], warnings };
     return transformResult;
   } catch (e) {
     const erroneousCompoundComponentName = getCompoundCompName(node, getText);
@@ -88,6 +91,7 @@ export function xmlUiMarkupToComponent(
         component: null,
         erroneousCompoundComponentName,
         errors: [errForDisplay],
+        warnings: [],
       };
     } else {
       throw e;

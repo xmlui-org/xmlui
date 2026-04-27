@@ -3,11 +3,13 @@ import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractio
 import { createXmlUiParser } from "../../../src/parsers/xmlui-parser/parser";
 import type { GetText , ParseResult } from "../../../src/parsers/xmlui-parser/parser";
 import { toDbgString } from "../../../src/parsers/xmlui-parser/utils";
+import { DocumentCursor } from "../../../src/language-server/base/text-document";
 
 export function transformSource(
   source: string,
   fileId?: number,
   printRes: boolean = false,
+  warnings?: string[],
 ): ComponentDef | CompoundComponentDef | undefined {
   const { getText, parse } = createXmlUiParser(source);
   const { node, errors } = parse();
@@ -21,7 +23,8 @@ export function transformSource(
     // return {errors}
     throw new Error(`${errors[0].code}: ${errors[0].message}`);
   }
-  return nodeToComponentDef(node, getText, fileId ?? 0);
+  const cursor = new DocumentCursor(source);
+  return nodeToComponentDef(node, getText, fileId ?? 0, undefined, warnings, cursor);
 }
 
 export function parseSource(
