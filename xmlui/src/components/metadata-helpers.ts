@@ -7,7 +7,7 @@ import type {
   PropertyValueType,
 } from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
-import { defaultProps } from "./FormItem/ItemWithLabel";
+import { defaultProps } from "./FormItem/ItemWithLabel.defaults";
 
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,

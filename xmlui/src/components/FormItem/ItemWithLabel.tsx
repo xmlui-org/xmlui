@@ -13,6 +13,9 @@ import type { LayoutContext } from "../../abstractions/RendererDefs";
 import { ThemedRadioGroup as RadioGroup } from "../RadioGroup/RadioGroup";
 import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
 import { useFormContextPart } from "../Form/FormContext";
+import { defaultProps } from "./ItemWithLabel.defaults";
+
+export { defaultProps } from "./ItemWithLabel.defaults";
 
 // Component part names
 
@@ -41,32 +44,6 @@ type ItemWithLabelProps = {
   requireLabelMode?: RequireLabelMode;
   direction?: "rtl" | "ltr";
   compactInlineLabel?: boolean;
-};
-export const defaultProps: Pick<
-  ItemWithLabelProps,
-  | "labelBreak"
-  | "enabled"
-  | "labelPosition"
-  | "required"
-  | "validationInProgress"
-  | "shrinkToLabel"
-  | "cloneStyle"
-  | "requireLabelMode"
-  | "isInputTemplateUsed"
-  | "direction"
-  | "compactInlineLabel"
-> = {
-  labelBreak: true,
-  enabled: true,
-  labelPosition: "top",
-  required: false,
-  validationInProgress: false,
-  shrinkToLabel: false,
-  cloneStyle: false,
-  requireLabelMode: "markRequired",
-  isInputTemplateUsed: false,
-  direction: "ltr",
-  compactInlineLabel: false,
 };
 
 const numberRegex = /^[0-9]+$/;
