@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "ignoreDeprecations": "6.0",
     "target": "es2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -19,9 +18,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@components/*": ["../ui-engine/src/components/*"],
-      "utils": ["./utils/index.ts"]
-    }
+      "utils": ["./utils/index.ts"],
+    },
   },
-  "include": ["src", "build", "index.ts", "utils/index.ts"]
+  "include": ["src", "index.ts", "extensions.ts", "utils"],
 }
