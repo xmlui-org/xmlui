@@ -13,6 +13,13 @@ import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
 import { mergeProps } from "./utils/mergeProps";
 import { layoutOptionKeys } from "./descriptorHelper";
+import {
+  CompoundDepthContext,
+  CompoundRecursionError,
+  DEFAULT_MAX_COMPOUND_DEPTH,
+  extractMinimalCycle,
+  useCompoundDepth,
+} from "./CompoundComponentDepthContext";
 
 // Tracks component types that have already emitted the layout-forward warning
 // so the warning fires only once per type (development builds only).
@@ -55,6 +62,29 @@ export const CompoundComponent = forwardRef(
     }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,
   ) => {
+    // --- Defence-in-depth: cap nested UDC rendering before the browser locks
+    // up on unbounded recursion (a UDC referencing itself or forming a cycle
+    // with another UDC without a terminating `when`). The configured limit
+    // can be overridden by the runtime via `appGlobals.maxCompoundDepth`.
+    const parentDepthInfo = useCompoundDepth();
+    const myType = node?.type ?? compound?.name ?? "<anonymous>";
+    const maxDepth =
+      typeof appContext?.appGlobals?.maxCompoundDepth === "number"
+        ? appContext.appGlobals.maxCompoundDepth
+        : DEFAULT_MAX_COMPOUND_DEPTH;
+    const nextDepth = parentDepthInfo.depth + 1;
+    if (nextDepth > maxDepth) {
+      // Extract the minimal cycle from the full chain so the message is short
+      // and readable (e.g. "MyButton → MyText → MyButton") rather than 256
+      // repeated entries.
+      const fullChain = [...parentDepthInfo.stack, myType];
+      throw new CompoundRecursionError(extractMinimalCycle(fullChain));
+    }
+    const nextDepthInfo = useMemo(
+      () => ({ stack: [...parentDepthInfo.stack, myType], depth: nextDepth }),
+      [parentDepthInfo.stack, myType, nextDepth],
+    );
+
     // --- Extract property values (resolve binding expressions)
     const resolvedPropsInner = useMemo(() => {
       const resolvedProps: any = {};
@@ -199,12 +229,20 @@ export const CompoundComponent = forwardRef(
     }
 
     if (forwardedRef && ret && isValidElement(ret)) {
-      return React.cloneElement(ret, {
-        ref: composeRefs(forwardedRef, (ret as any).ref),
-        ...mergeProps(ret.props, restProps),
-      } as any);
+      return (
+        <CompoundDepthContext.Provider value={nextDepthInfo}>
+          {React.cloneElement(ret, {
+            ref: composeRefs(forwardedRef, (ret as any).ref),
+            ...mergeProps(ret.props, restProps),
+          } as any)}
+        </CompoundDepthContext.Provider>
+      );
     }
-    return React.isValidElement(ret) ? ret : <>{ret}</>;
+    return (
+      <CompoundDepthContext.Provider value={nextDepthInfo}>
+        {React.isValidElement(ret) ? ret : <>{ret}</>}
+      </CompoundDepthContext.Provider>
+    );
   },
 );
 

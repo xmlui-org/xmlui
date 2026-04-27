@@ -59,6 +59,10 @@ import {
 } from "./Splitter/Splitter";
 import { queueComponentRenderer } from "./Queue/Queue";
 import { CompoundComponent } from "../components-core/CompoundComponent";
+import {
+  collectUnconditionalRefs,
+  findUdcCycles,
+} from "../components-core/udcCycleDetection";
 import { dynamicHeightListComponentRenderer } from "./List/List";
 import { tileGridComponentRenderer } from "./TileGrid/TileGrid";
 import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
@@ -341,6 +345,16 @@ export class ComponentRegistry {
 
   // --- The pool of available behaviors
   private behaviors: Behavior[] = [];
+
+  // --- Per-namespace static reference graph of registered user-defined
+  // components. Maps UDC name → set of unconditional component-type names it
+  // references in its body. Used by `detectAndWarnUdcCycles` to surface
+  // structural cycles among UDCs at registration time.
+  private udcRefGraph = new Map<string, Map<string, Set<string>>>();
+
+  // --- Cycle keys we have already warned about, so the same cycle isn't
+  // reported repeatedly when more UDCs are registered later.
+  private warnedUdcCycleKeys = new Set<string>();
 
   /**
    * The component constructor registers all xmlui core components, so each
@@ -1028,6 +1042,39 @@ export class ComponentRegistry {
     };
 
     this.registerComponentRenderer(component, namespace);
+
+    // --- Update the per-namespace UDC reference graph and warn on any newly
+    // discovered structural cycles. This is the decidable static sub-case of
+    // the recursion problem; runtime depth limiting catches the rest.
+    this.recordUdcReferences(namespace, compoundComponentDef);
+  }
+
+  // --- Track this UDC's static, unconditional component-type references and
+  // re-run cycle detection over the namespace's reference graph.
+  private recordUdcReferences(
+    namespace: string,
+    compoundComponentDef: CompoundComponentDef,
+  ) {
+    let graph = this.udcRefGraph.get(namespace);
+    if (!graph) {
+      graph = new Map();
+      this.udcRefGraph.set(namespace, graph);
+    }
+    graph.set(compoundComponentDef.name, collectUnconditionalRefs(compoundComponentDef.component));
+
+    const cycles = findUdcCycles(graph);
+    for (const cycle of cycles) {
+      const key = `${namespace}::${cycle.join("→")}`;
+      if (this.warnedUdcCycleKeys.has(key)) continue;
+      this.warnedUdcCycleKeys.add(key);
+      console.warn(
+        `[XMLUI] Detected unconditional structural cycle among compound components: ${cycle.join(
+          " → ",
+        )}. ` +
+          `This will recurse indefinitely at render time and will be aborted by the depth limit. ` +
+          `Add a \`when\` condition to break the cycle, or restructure the components.`,
+      );
+    }
   }
 
   // --- Registers an action function using its definition
