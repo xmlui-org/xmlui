@@ -1,7 +1,8 @@
 # Plan: Unified Outlined Border Style Across Components
 
-**Date:** 2026-04-27  
-**Status:** Proposal
+**Date:** 2026-04-27
+**Status:** Phase 1 implemented (foundation tokens + `Button` rewire + `Select variant="outlined"`).
+TextBox / AutoComplete / MultiSelect / NumberBox / DatePicker / TimePicker / Slider follow-up still pending.
 
 ---
 

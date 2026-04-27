@@ -303,6 +303,14 @@ export const RootThemeDefinition: ThemeDefinition = {
     borderColor: "rgb(from $color-surface-900 r g b / 0.1)",
     "borderColor--disabled": $colorSurface200,
 
+    // --- Semantic outlined-border colors. These are the single entry point that any
+    // component using an "outlined" visual treatment should reference, so e.g. an
+    // outlined Button and a Select with `variant="outlined"` always match.
+    "borderColor-outlined": "$color-primary-600",
+    "borderColor-outlined--hover": "$color-primary-500",
+    "borderColor-outlined--active": "$color-primary-700",
+    "borderColor-outlined--focus": "$color-primary-600",
+
     // --- Text colors
     "textColor-secondary": $colorSurface600,
 

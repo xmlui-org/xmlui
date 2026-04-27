@@ -52,7 +52,10 @@ export const defaultProps = {
   labelBreak: false,
   clearable: false,
   modal: false,
+  variant: "default" as SelectVariant,
 };
+
+export type SelectVariant = "default" | "outlined";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
@@ -77,6 +80,10 @@ interface SelectProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onFocu
 
   // Validation
   validationStatus?: ValidationStatus;
+
+  // Visual variant — `outlined` swaps the default border color for the shared
+  // `borderColor-outlined` token so the input matches an outlined Button.
+  variant?: SelectVariant;
 
   // Event handlers
   onDidChange?: (newValue: ValueType) => void;
@@ -276,6 +283,9 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
 
     // Validation
     validationStatus = defaultProps.validationStatus,
+
+    // Visual variant
+    variant = defaultProps.variant,
 
     // Event handlers
     onDidChange = noop,
@@ -812,6 +822,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
             valueRenderer={valueRenderer}
             scrollIndicators={scrollIndicators}
             validationStatus={validationStatus}
+            variant={variant}
             invalidMessages={invalidMessages}
             finalValidationIconSuccess={finalValidationIconSuccess}
             finalValidationIconError={finalValidationIconError}
@@ -848,6 +859,7 @@ export const Select = memo(forwardRef<HTMLDivElement, SelectProps>(function Sele
                     className,
                     styles[validationStatus],
                     {
+                      [styles.outlined]: variant === "outlined",
                       [styles.disabled]: !enabled,
                       [styles.multi]: multiSelect,
                     },

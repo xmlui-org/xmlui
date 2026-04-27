@@ -74,6 +74,21 @@ export const SelectMd = createMetadata({
       ...dValidationStatus(),
       defaultValue: defaultProps.validationStatus,
     },
+    variant: d(
+      "Controls the visual border treatment. `outlined` matches the border color of an outlined Button, " +
+        "so that a Select can be visually composed next to one. Only the border color (and its hover/focus " +
+        "states) is affected; padding, background, and typography are unchanged.",
+      [
+        { value: "default", description: "Standard input border using the surface color." },
+        {
+          value: "outlined",
+          description:
+            "Accent border using the shared `borderColor-outlined` token, matching outlined Buttons.",
+        },
+      ],
+      "string",
+      defaultProps.variant,
+    ),
     data: d(
       "The data array to populate the option list from. When provided, `Option` children are not needed — " +
         "the component builds options from this array using `valueField` and `labelField`. " +
@@ -238,6 +253,12 @@ export const SelectMd = createMetadata({
     [`minHeight-${COMP}`]: "2.5rem",
     [`minHeight-item-${COMP}`]: "$space-7",
     [`minWidth-${COMP}`]: "$space-16",
+
+    // --- `variant="outlined"` overrides. Only border color is rebound, so the input keeps
+    // its standard background, padding and typography.
+    [`borderColor-${COMP}--outlined`]: "$borderColor-outlined",
+    [`borderColor-${COMP}--outlined--hover`]: "$borderColor-outlined--hover",
+    [`borderColor-${COMP}--outlined--focus`]: "$borderColor-outlined--focus",
   },
 });
 
@@ -291,6 +312,7 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
     "valueField",
     "labelField",
   ],
+  strings: ["variant"],
   events: [],
   customRender(
     _props,
@@ -336,6 +358,7 @@ export const selectComponentRenderer = wrapComponent(COMP, Select, SelectMd, {
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
         validationStatus={extractValue(node.props.validationStatus)}
+        variant={extractValue.asOptionalString(node.props.variant) as any}
         onDidChange={lookupEventHandler("didChange")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
