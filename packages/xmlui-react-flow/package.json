@@ -3,14 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
+  },
   "dependencies": {
     "@xyflow/react": "^12.6.0"
   },
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-react-flow.mjs",
+          "require": "./dist/xmlui-react-flow.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

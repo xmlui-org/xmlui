@@ -3,13 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/xmlui-grid-layout.js",
-  "module": "dist/xmlui-grid-layout.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-grid-layout.mjs",
-      "require": "./dist/xmlui-grid-layout.js"
-    }
+  "sideEffects": false,
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "react-grid-layout": "^1.5.0"
@@ -17,7 +16,17 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-grid-layout.mjs",
+          "require": "./dist/xmlui-grid-layout.js"
+        }
+      }
+    }
   }
 }

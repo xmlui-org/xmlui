@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "description": "Static file server for previewing XMLUI SSG applications with SPA fallback and resource 404 handling",
-  "main": "src/index.js",
+  "exports": "./src/index.js",
   "bin": {
     "preview-ssg": "bin/preview-ssg.js"
   },

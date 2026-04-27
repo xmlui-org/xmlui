@@ -4,13 +4,15 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "main": "dist/xmlui-calendar.js",
-  "module": "dist/xmlui-calendar.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-calendar.mjs",
-      "require": "./dist/xmlui-calendar.js"
-    }
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "react-big-calendar": "^1.19.4",
@@ -20,11 +22,20 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
-  },
   "files": [
     "dist"
-  ]
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-calendar.mjs",
+          "require": "./dist/xmlui-calendar.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
+  }
 }

@@ -1,15 +1,20 @@
 {
   "name": "xmlui-docs-blocks",
   "version": "0.0.6",
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
   "scripts": {
     "start": "xmlui start",
     "preview": "xmlui preview",
     "build:extension": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
     "build:demo": "xmlui build",
-    "build:meta": "xmlui build-lib --mode=metadata"
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "@shikijs/langs": "3.4.2",
@@ -24,22 +29,23 @@
     "@types/js-yaml": "4.0.9",
     "xmlui": "*"
   },
-  "main": "./dist/xmlui-docs-blocks.js",
-  "module": "./dist/xmlui-docs-blocks.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-docs-blocks.mjs",
-      "require": "./dist/xmlui-docs-blocks.js"
-    },
-    "./*.css": {
-      "import": "./dist/*.css",
-      "require": "./dist/*.css"
-    }
-  },
   "files": [
     "dist"
   ],
   "engines": {
     "node": ">=18.0.0"
+  },
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-docs-blocks.mjs",
+          "require": "./dist/xmlui-docs-blocks.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

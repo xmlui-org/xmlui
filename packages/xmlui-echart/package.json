@@ -4,13 +4,15 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "main": "dist/xmlui-echart.js",
-  "module": "dist/xmlui-echart.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-echart.mjs",
-      "require": "./dist/xmlui-echart.js"
-    }
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "echarts": "^5.6.0",
@@ -20,8 +22,20 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-echart.mjs",
+          "require": "./dist/xmlui-echart.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

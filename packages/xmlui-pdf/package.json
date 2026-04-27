@@ -1,8 +1,11 @@
 {
   "name": "xmlui-pdf",
   "version": "0.1.12",
-  "sideEffects": false,
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
   "scripts": {
     "postinstall": "node scripts/setup-wasm.js",
     "prestart": "node scripts/setup-wasm.js",
@@ -15,7 +18,9 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "test:e2e": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts",
-    "test:e2e:dev": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts --workers=1 --reporter=line"
+    "test:e2e:dev": "cd ../.. && playwright test packages/xmlui-pdf/src/Pdf.spec.ts --workers=1 --reporter=line",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "pdf-lib": "1.17.1",
@@ -27,22 +32,23 @@
     "vitest": "^4.0.16",
     "xmlui": "*"
   },
-  "main": "./dist/xmlui-pdf.js",
-  "module": "./dist/xmlui-pdf.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-pdf.mjs",
-      "require": "./dist/xmlui-pdf.js"
-    },
-    "./*.css": {
-      "import": "./dist/*.css",
-      "require": "./dist/*.css"
-    }
-  },
   "files": [
     "dist"
   ],
   "engines": {
     "node": ">=18.0.0"
+  },
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-pdf.mjs",
+          "require": "./dist/xmlui-pdf.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

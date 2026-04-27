@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/xmlui-gauge.js",
-  "module": "dist/xmlui-gauge.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-gauge.mjs",
-      "require": "./dist/xmlui-gauge.js"
-    }
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
   "dependencies": {
     "smart-webcomponents-react": "^25.0.0",
@@ -18,8 +20,20 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-gauge.mjs",
+          "require": "./dist/xmlui-gauge.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
   }
 }

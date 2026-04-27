@@ -45,6 +45,12 @@
       "dependsOn": ["^build:extension"],
       "outputs": ["dist/**"]
     },
+    "prepublishOnly": {
+      "cache": false
+    },
+    "postpublish": {
+      "cache": false
+    },
     "build:meta": {
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["dist/**"]

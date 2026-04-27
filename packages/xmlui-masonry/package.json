@@ -3,20 +3,28 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "main": "dist/xmlui-masonry.js",
-  "module": "dist/xmlui-masonry.mjs",
-  "exports": {
-    ".": {
-      "import": "./dist/xmlui-masonry.mjs",
-      "require": "./dist/xmlui-masonry.js"
-    }
+  "sideEffects": false,
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "build:extension": "xmlui build-lib",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
   },
-  "dependencies": {},
   "devDependencies": {
     "xmlui": "*"
   },
-  "scripts": {
-    "build:extension": "xmlui build-lib",
-    "build:meta": "xmlui build-lib --mode=metadata"
+  "files": [
+    "dist"
+  ],
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-masonry.mjs",
+          "require": "./dist/xmlui-masonry.js"
+        }
+      }
+    }
   }
 }
