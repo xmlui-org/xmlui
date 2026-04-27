@@ -35,7 +35,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-echart.mjs",
-          "default": "./dist/xmlui-echart.mjs"
+          "require": "./dist/xmlui-echart.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

@@ -48,7 +48,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-pdf.mjs",
-          "default": "./dist/xmlui-pdf.mjs"
+          "require": "./dist/xmlui-pdf.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

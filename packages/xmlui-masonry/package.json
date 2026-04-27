@@ -27,7 +27,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-masonry.mjs",
-          "default": "./dist/xmlui-masonry.mjs"
+          "require": "./dist/xmlui-masonry.js"
         }
       }
     }

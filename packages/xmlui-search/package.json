@@ -41,7 +41,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-search.mjs",
-          "default": "./dist/xmlui-search.mjs"
+          "require": "./dist/xmlui-search.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

@@ -36,7 +36,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-animations.mjs",
-          "default": "./dist/xmlui-animations.mjs"
+          "require": "./dist/xmlui-animations.js"
         }
       }
     }

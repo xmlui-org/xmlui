@@ -34,7 +34,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-recharts.mjs",
-          "default": "./dist/xmlui-recharts.mjs"
+          "require": "./dist/xmlui-recharts.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

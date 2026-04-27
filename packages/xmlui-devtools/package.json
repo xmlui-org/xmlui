@@ -44,7 +44,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-devtools.mjs",
-          "default": "./dist/xmlui-devtools.mjs"
+          "require": "./dist/xmlui-devtools.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

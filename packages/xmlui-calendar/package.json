@@ -32,7 +32,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-calendar.mjs",
-          "default": "./dist/xmlui-calendar.mjs"
+          "require": "./dist/xmlui-calendar.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

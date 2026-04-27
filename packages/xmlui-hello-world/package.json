@@ -38,7 +38,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-hello-world.mjs",
-          "default": "./dist/xmlui-hello-world.mjs"
+          "require": "./dist/xmlui-hello-world.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

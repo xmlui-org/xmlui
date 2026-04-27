@@ -29,7 +29,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-grid-layout.mjs",
-          "default": "./dist/xmlui-grid-layout.mjs"
+          "require": "./dist/xmlui-grid-layout.js"
         }
       }
     }

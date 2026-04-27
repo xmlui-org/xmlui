@@ -33,7 +33,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-gauge.mjs",
-          "default": "./dist/xmlui-gauge.mjs"
+          "require": "./dist/xmlui-gauge.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

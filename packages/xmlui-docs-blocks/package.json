@@ -45,7 +45,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-docs-blocks.mjs",
-          "default": "./dist/xmlui-docs-blocks.mjs"
+          "require": "./dist/xmlui-docs-blocks.js"
         },
         "./*.css": {
           "import": "./dist/*.css"

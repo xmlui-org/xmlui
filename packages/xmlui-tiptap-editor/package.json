@@ -41,7 +41,7 @@
       "exports": {
         ".": {
           "import": "./dist/xmlui-tiptap-editor.mjs",
-          "default": "./dist/xmlui-tiptap-editor.mjs"
+          "require": "./dist/xmlui-tiptap-editor.js"
         }
       }
     }
