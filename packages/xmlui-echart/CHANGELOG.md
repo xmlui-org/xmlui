@@ -1,5 +1,11 @@
 # xmlui-echart
 
+## 0.1.3
+
+### Patch Changes
+
+- dfef575: Remove the displayWhen behavior
+
 ## 0.1.2
 
 ### Patch Changes
