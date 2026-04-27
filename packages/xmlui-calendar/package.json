@@ -7,7 +7,6 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -30,7 +29,6 @@
   ],
   "clean-package": {
     "replace": {
-      "main": "./dist/xmlui-calendar.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-calendar.mjs",

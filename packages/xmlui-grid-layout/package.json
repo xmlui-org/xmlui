@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -27,7 +26,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-grid-layout.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-grid-layout.mjs",

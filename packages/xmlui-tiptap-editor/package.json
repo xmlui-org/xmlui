@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -39,7 +38,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-tiptap-editor.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-tiptap-editor.mjs",

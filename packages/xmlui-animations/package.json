@@ -3,7 +3,6 @@
   "version": "0.1.15",
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -34,7 +33,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-animations.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-animations.mjs",

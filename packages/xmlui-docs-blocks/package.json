@@ -5,7 +5,6 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -43,7 +42,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-docs-blocks.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-docs-blocks.mjs",

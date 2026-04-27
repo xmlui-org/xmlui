@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -25,7 +24,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-masonry.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-masonry.mjs",

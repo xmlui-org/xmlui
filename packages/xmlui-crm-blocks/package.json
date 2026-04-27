@@ -8,7 +8,6 @@
   "description": "CRM-focused custom component blocks for XMLUI",
   "author": "",
   "license": "ISC",
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -36,7 +35,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-crm-blocks.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-crm-blocks.mjs",

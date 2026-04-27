@@ -2,11 +2,12 @@
   "name": "xmlui-search",
   "version": "0.1.11",
   "type": "module",
-  "sideEffects": ["**/*.css"],
+  "sideEffects": [
+    "**/*.css"
+  ],
   "description": "",
   "author": "",
   "license": "ISC",
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -33,9 +34,10 @@
     "node": ">=18.0.0"
   },
   "clean-package": {
-    "remove": ["module"],
+    "remove": [
+      "module"
+    ],
     "replace": {
-      "main": "./dist/xmlui-search.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-search.mjs",

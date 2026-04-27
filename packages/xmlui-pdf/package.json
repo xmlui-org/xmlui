@@ -5,7 +5,6 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -46,7 +45,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-pdf.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-pdf.mjs",

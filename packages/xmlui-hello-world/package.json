@@ -8,7 +8,6 @@
   "description": "",
   "author": "",
   "license": "ISC",
-  "main": "./src/index.tsx",
   "exports": {
     ".": "./src/index.tsx"
   },
@@ -36,7 +35,6 @@
       "module"
     ],
     "replace": {
-      "main": "./dist/xmlui-hello-world.js",
       "exports": {
         ".": {
           "import": "./dist/xmlui-hello-world.mjs",
