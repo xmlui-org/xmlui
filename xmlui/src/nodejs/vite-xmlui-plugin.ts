@@ -92,7 +92,7 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
             }
           }
 
-          let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+          let { component, errors, warnings, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
             code,
             fileId,
             codeBehind,
@@ -100,11 +100,15 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
           if (errors.length > 0) {
             component = errReportComponent(errors, id, erroneousCompoundComponentName);
           }
+          if (warnings.length > 0) {
+            warnings.forEach((msg) => this.warn(`[xmlui] ${msg}`));
+          }
           const file = {
             component,
             src: code,
             ...codeBehind,
             file: fileId,
+            warnings,
           };
 
           return {

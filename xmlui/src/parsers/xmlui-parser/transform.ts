@@ -9,6 +9,7 @@ import { CharacterCodes } from "./CharacterCodes";
 import type { GetText } from "./parser";
 import type { ParsedEventValue } from "../../abstractions/scripting/Compilation";
 import { DIAGS_TRANSFORM, TransformDiag, type TransformDiagPositionless } from "./diagnostics";
+import type { DocumentCursor } from "../../language-server/base/text-document";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -50,6 +51,8 @@ export function nodeToComponentDef(
   originalGetText: GetText,
   fileId: string | number,
   preResolvedImports?: CollectedDeclarations,
+  warnings?: string[],
+  cursor?: DocumentCursor,
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
@@ -59,6 +62,7 @@ export function nodeToComponentDef(
   const preppedElement = prepNode(element);
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
+  const seenUids = new Set<string>();
   return transformTopLvlElement(usesStack, preppedElement);
 
   function transformTopLvlElement(
@@ -432,9 +436,29 @@ export function nodeToComponentDef(
 
     // --- Recognize special attributes by component definition type
     switch (name) {
-      case "id":
+      case "id": {
+        if (seenUids.has(value)) {
+          let location: string;
+          if (cursor) {
+            const { line, character } = cursor.positionAt(attr.pos);
+            location = `line ${line + 1}, column ${character + 1}`;
+          } else {
+            location = `position ${attr.pos}`;
+          }
+          const msg =
+            `Duplicate component id "${value}" detected at ${location}. ` +
+            `Component ids must be unique within the same markup.`;
+          if (warnings) {
+            warnings.push(msg);
+          } else {
+            console.warn(`[xmlui] ${msg}`);
+          }
+        } else {
+          seenUids.add(value);
+        }
         comp.uid = value;
         return;
+      }
       case "testId":
         comp.testId = value;
         return;

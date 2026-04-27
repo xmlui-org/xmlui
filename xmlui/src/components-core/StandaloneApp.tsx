@@ -423,11 +423,16 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
     }
   }
 
-  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+  let { component, errors, warnings, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
     code,
     fileId,
     codeBehind,
   );
+  if (warnings.length > 0) {
+    console.group(`[xmlui] Warnings in '${fileId}':`);
+    warnings.forEach((msg) => console.warn(msg));
+    console.groupEnd();
+  }
   if (errors.length > 0) {
     const compName =
       erroneousCompoundComponentName ??
@@ -1088,6 +1093,18 @@ function useStandalone(
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
+
+        // --- Display any duplicate-id or other parser warnings collected during
+        // --- the Vite transform phase. Each runtime module may carry a `warnings`
+        // --- array that was serialized by vite-xmlui-plugin.
+        Object.entries(runtime || {}).forEach(([key, module]: [string, any]) => {
+          const moduleWarnings: string[] = (module?.default ?? module)?.warnings ?? [];
+          if (moduleWarnings.length > 0) {
+            console.group(`[xmlui] Warnings in '${key}':`);
+            moduleWarnings.forEach((msg) => console.warn(msg));
+            console.groupEnd();
+          }
+        });
 
         // --- Transform Globals.xs variables into <global> tags for dependency support.
         // Normalize: Vite builds export the module under `.default`; test fixtures expose vars at top level.
