@@ -36,9 +36,6 @@
     "node": ">=18.0.0"
   },
   "clean-package": {
-    "remove": [
-      "module"
-    ],
     "replace": {
       "exports": {
         ".": {

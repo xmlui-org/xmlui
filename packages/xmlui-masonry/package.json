@@ -18,9 +18,6 @@
     "dist"
   ],
   "clean-package": {
-    "remove": [
-      "module"
-    ],
     "replace": {
       "exports": {
         ".": {
