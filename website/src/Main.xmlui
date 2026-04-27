@@ -7,6 +7,18 @@
         noScrollbarGutters="false"
         var.appTitle="{
             (pathname === '/') ? 'Home':
+            pathname === '/docs/reference/extensions' ? 'Extensions | XMLUI Documentation':
+            pathname.startsWith('/docs/reference/extensions/') ? (
+                pathname.split('/').length > 5 && pathname.split('/')[5] && pathname.split('/')[5] !== '_overview' && pathname.split('/')[5] !== 'overview' ?
+                    pathname.split('/')[5] + ' | XMLUI Documentation' :
+                    pathname.split('/')[4].split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ') + ' | XMLUI Documentation'
+            ):
+            pathname === '/docs/reference/components' ? 'Components | XMLUI Documentation':
+            pathname.startsWith('/docs/reference/components/') ? (pathname.split('/')[4] === '_overview' ? 'Components | XMLUI Documentation' : pathname.split('/')[4] + ' | XMLUI Documentation'):
+            pathname === '/docs/learn' || pathname === '/docs' || pathname === '/docs/reactive-intro' || pathname === '/docs/components-intro' || pathname === '/docs/themes-intro' ? 'Learn XMLUI | XMLUI Documentation':
+            pathname.startsWith('/docs/guides') ? 'Guides | XMLUI Documentation':
+            pathname === '/docs/tutorial' || pathname.startsWith('/docs/tutorial-') ? 'Tutorial | XMLUI Documentation':
+            pathname.startsWith('/docs/howto') ? 'How To | XMLUI Documentation':
             pathname.startsWith('/docs') ? 'Documentation':
             pathname.startsWith('/blog') ? 'Blog':
             pathname.startsWith('/get-started') ? 'Get Started':
@@ -15,7 +27,10 @@
             'Home'
         }"
     >
-        <PageMetaTitle value="{appTitle}" />
+        <PageMetaTitle
+            value="{appTitle}"
+            noSuffix="{appTitle.includes(' | ')}"
+        />
         <AppHeader>
             <property name="logoTemplate">
                 <Link to="/" height="100%">
