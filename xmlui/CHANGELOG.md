@@ -1,5 +1,52 @@
 # xmlui
 
+## 0.12.22
+
+### Patch Changes
+
+- 39b3cda: fix: icon positioning in button component
+- b6c5ea0: Handle user-defined component recursion
+- 107bd72: Fix root cause of CSS `@layer` order regression: `metadata-helpers.ts` no longer transitively imports a React component (`ItemWithLabel.tsx`) and its SCSS module. The shared `defaultProps` constant was extracted into a new leaf module `ItemWithLabel.defaults.ts` with no React/SCSS dependencies, eliminating the stray per-module CSS chunk that inverted the cascade in production builds.
+
+  Adds `npm run check:metadata-purity` (a build-time guard that fails CI if any `.tsx` or `.module.scss` becomes reachable from `metadata-helpers.ts`) and `npm run check:css-chunks` (a build-output inspector that flags suspicious per-module CSS chunks and missing layer-order declarations in produced `dist/` directories). The existing `cssLayerOrderPlugin` is retained as defence-in-depth.
+
+- 9e9ba66: Fix: reactive variable names cannot start with "$"
+- 92cd77d: feat: add Stepper and Step components
+- b62b4bd: Fix React warnings visible in the website
+- dfef575: Remove the displayWhen behavior
+- fa94885: Fix CSS @layer cascade order being inverted under Vite 8 / Rolldown. Per-module CSS chunks (e.g. one containing only `@layer components { ... }`) could be loaded before the main entry CSS, causing the browser to derive a wrong layer order in which `components` ranked lower than `base`. This made the CSS reset (transparent background on `button`) override component styles like `Button` solid-primary background. The xmlui build pipeline now declares the canonical layer order (`reset, base, components, themes, dynamic`) inline at the top of every generated `index.html` and prepends it to every emitted CSS asset, guaranteeing a deterministic cascade regardless of chunk load order.
+- 49c058a: Improve goto-definition in the language server: resolve components by their declared `name` attribute (falling back to filename), scope candidates to the same XMLUI project as the requesting document, and position the cursor on the `<Component>` tag name instead of the start of the file.
+- 2e6e24b: Display warning with duplicated component IDs
+- 562743c: upgrade to vite 8
+- e57d50a: Fix subtle issues in the playground
+- af81fb8: Preserve form field values across FormItem unmount/remount
+- 46d9398: fix: wire FormItem label htmlFor to the underlying input id across all input components
+- 3c094f8: fix: enhance FormItem to support nested items with proper label width and spacing
+- 21d76fd: Select now supports data-bound options
+- 36fd1f3: Stabilize a few flaky E2E tests:
+  - `Option.spec.ts › handles boolean values correctly`: select the option directly with an exact accessibility-name match instead of going through the substring-matching `selectLabel` helper.
+  - `MessageListener.spec.ts › doesn't disrupt HStack layout gaps`: bump the layout-stabilization poll timeout from 5s to 10s to absorb CI load.
+  - `Select.spec.ts › simple Select with groupBy can select options`: scope the post-selection assertion to the first matching `Carrot` element so it is unambiguous when the dropdown is still closing.
+  - `datasource-responseHeaders.spec.ts › responseHeaders updated on refetch`: wait for the initial header counter to stabilize before triggering a refetch, then assert the post-refetch counter strictly increases instead of expecting a hard `+1` (React StrictMode and effect re-runs can cause additional intermediate refetches under load).
+  - `TooltipContent.spec.ts` (recharts): swallow the occasional `Element is not visible` thrown by `pieSector.hover()` inside a poll loop so the loop can retry, instead of failing the test on the first pre-paint hover.
+  - `Pdf.spec.ts`: serve a small local PDF from the test bed instead of fetching `https://www.w3.org/.../table1.pdf`, so the tests no longer depend on external network availability.
+- aac0959: Introduce the shared semantic theme tokens `borderColor-outlined`,
+  `borderColor-outlined--hover`, `borderColor-outlined--active` and
+  `borderColor-outlined--focus` and add a `variant="outlined"` flavour to
+  `Select`. An outlined `Button` (with the default `primary` theme color) and a
+  `Select` declared with `variant="outlined"` now resolve to the same border
+  color, so they always visually match — and overriding `borderColor-outlined`
+  in a custom theme updates both at once.
+
+  The outlined variant on form inputs is intentionally narrow: it only rebinds
+  the border color (and its hover/focus states); padding, background and
+  typography are unchanged. Existing markup is unaffected because `variant` is
+  a new opt-in prop and Button's resolved colors are preserved by the new token
+  defaults.
+
+- 562743c: Upgrade from Vite 7 to Vite 8 (Rolldown/Oxc). Migrates build config from rollupOptions to rolldownOptions, removes deprecated esbuild transform options, adds moduleType to vite-xmlui-plugin transform output for Rolldown compatibility, and updates server.ws to server.hot API. Bumps @vitejs/plugin-react to v6, vite-plugin-svgr to v5, vite-plugin-lib-inject-css to v2.
+- 03a0d43: fix: Checkbox/Switch labelPosition=start/end snug against control
+
 ## 0.12.21
 
 ### Patch Changes
@@ -303,7 +350,6 @@
 - 4e33e2b: Fix Tree collapseNode to mark the node unloaded
 - 5978efa: Allow Tree.replaceNode to change the node ID
 - 916d0db: Improve inspector trace logging with additional event data
-
   - Add emitEvent logging to capture component event emissions with arguments
   - Include eventArgs in handler:start trace events for better debugging
   - Use getCurrentTrace() consistently in NavigateAction and ComponentAdapter
@@ -319,7 +365,6 @@
 ### Minor Changes
 
 - 19e04b3: Add inspector logging infrastructure for debugging XMLUI applications
-
   - New `xsVerbose` app global enables detailed event tracing
   - Logs handler execution, state changes, API calls, and user interactions
   - Trace IDs correlate related events across async boundaries
@@ -329,7 +374,6 @@
 ### Patch Changes
 
 - d8d3613: - when using `parseAs`, remember the filename(s) and report them in the input box
-
   - mechanism to access header: getFields
   - display parse errors
   - acceptsFileType should influence the system filepicker
@@ -399,7 +443,6 @@
 - 4e0379f: Add ScrollViewer component
 - 498abc1: Document and improve ContextMenu
 - 62d88a4: - Columns with bindTo are now sortable by default
-
   - Use canSort="false" to disable sorting on individual columns
   - Use config.json with { "appGlobals": { "columnCanSortDefault": false } } to revert to the old default
 
