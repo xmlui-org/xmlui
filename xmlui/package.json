@@ -138,10 +138,20 @@
   "bin": {
     "xmlui": "./src/nodejs/bin/bootstrap.js"
   },
+  "exports": {
+    ".": "./src/index.ts",
+    "./parser": "./src/parsers/xmlui-parser/index.ts",
+    "./*.css": "./dist/lib/*.css",
+    "./index.scss": "./src/index.scss",
+    "./themes.scss": "./src/components-core/theming/_themes.scss",
+    "./vite-xmlui-plugin": "./src/nodejs/vite-xmlui-plugin.ts",
+    "./nodejs": "./src/nodejs/index.ts",
+    "./language-server": "./src/language-server/server.ts",
+    "./syntax/monaco": "./src/syntax/monaco/index.ts",
+    "./syntax/textmate": "./src/syntax/textMate/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
   "clean-package": {
-    "remove": [
-      "module"
-    ],
     "replace": {
       "bin": {
         "xmlui": "dist/nodejs/bin/index.mjs"
@@ -187,19 +197,6 @@
         }
       }
     }
-  },
-  "exports": {
-    ".": "./src/index.ts",
-    "./parser": "./src/parsers/xmlui-parser/index.ts",
-    "./*.css": "./dist/lib/*.css",
-    "./index.scss": "./src/index.scss",
-    "./themes.scss": "./src/components-core/theming/_themes.scss",
-    "./vite-xmlui-plugin": "./src/nodejs/vite-xmlui-plugin.ts",
-    "./nodejs": "./src/nodejs/index.ts",
-    "./language-server": "./src/language-server/server.ts",
-    "./syntax/monaco": "./src/syntax/monaco/index.ts",
-    "./syntax/textmate": "./src/syntax/textMate/index.ts",
-    "./testing": "./src/testing/index.ts"
   },
   "browserslist": {
     "production": [
