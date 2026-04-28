@@ -4,6 +4,8 @@ The following E2E tests are often flaky (~8 out of 10):
 
 - xmlui/src/components/Accordion/Accordion.spec.ts:92:1 › applies border-side and combinat
 ion theme variables
+- xmlui/src/components/Accordion/Accordion.spec.ts:28:1 › component renders custom header wi
+th headerTemplate prop
 - xmlui/src/components/AutoComplete/AutoComplete.spec.ts:1235:3 › Validation Feedback › sh
 ows valid icon in concise mode when valid
 - xmlui/src/components/DataSource/DataSource.spec.ts:146:3 › Basic Functionality › shows 
