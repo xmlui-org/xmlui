@@ -1,4 +1,20 @@
 /**
+ * Error thrown when an expression attempts to access a banned DOM API while
+ * `App.appGlobals.strictDomSandbox` is `true`.
+ */
+export class BannedApiError extends Error {
+  constructor(
+    public readonly api: string,
+    public readonly helpText?: string,
+  ) {
+    super(
+      `DOM API '${api}' is not allowed in XMLUI expressions.${helpText ? ` ${helpText}` : ""}`,
+    );
+    this.name = "BannedApiError";
+  }
+}
+
+/**
  * Checks if the specified function object is banned from running.
  * @param func Function to check
  * @return Information about the banned state, including a helper text

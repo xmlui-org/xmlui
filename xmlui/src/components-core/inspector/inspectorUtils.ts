@@ -183,6 +183,16 @@ export interface XsLogEntry {
   perfTs?: number;
   startPerfTs?: number;
   traceId?: string;
+  /**
+   * Event kind. Well-known values:
+   * - `"interaction"` — user interaction (click, input, etc.)
+   * - `"navigate"` — route navigation
+   * - `"api:start"` / `"api:complete"` — HTTP request lifecycle
+   * - `"handler:start"` / `"handler:complete"` / `"handler:error"` — event handler lifecycle
+   * - `"state:change"` — container state mutation
+   * - `"sandbox:warn"` — a banned DOM API was accessed while `strictDomSandbox` is `false`;
+   *   the access was allowed but flagged. Contains `api` and optionally `help` fields.
+   */
   kind?: string;
   eventName?: string;
   componentType?: string;
