@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.12.23
+
+### Patch Changes
+
+- 7acf59e: Fix: Default Ctrl+F search finds hidden NavLinks in NavPanel
+- 826e360: Fix dev-server dep scanner failing on `.xmlui` files. The scanner runs in its own Rolldown pipeline that does not inherit Vite's main `plugins` array, so the xmlui transform never ran and the scan crashed with `[PARSE_ERROR] Unexpected token` / `Unexpected JSX expression` for every `.xmlui` source picked up via `import.meta.glob('/src/**')`. The xmlui plugin is now also registered under `optimizeDeps.rolldownOptions.plugins`, so the scanner can transform XML markup before parsing.
+- 7acf59e: NavGroup: hide collapsed children from browser find-in-page (Ctrl+F) and assistive tech by toggling `visibility: hidden` on the collapsed content (with a delayed transition so the collapse animation still plays). Previously, NavLink labels inside a collapsed NavGroup remained discoverable via Ctrl+F because they were only faded out (`opacity: 0`).
+- ed53f00: Fix standalone bundle regression where loading `Main.xmlui` without a `config.json` file crashed with "Cannot read properties of undefined (reading 'defaultTheme')". The standalone bootstrap now tolerates a missing config file, restoring the script-tag drop-in pattern (`<script src="xmlui-standalone.umd.js"></script>` + `Main.xmlui`) that worked in 0.12.15.
+- 0e3b85f: fix: improve theme fallback logic in ThemeProvider
+
 ## 0.12.22
 
 ### Patch Changes
