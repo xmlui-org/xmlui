@@ -1427,7 +1427,7 @@ function useStandalone(
           !builtInThemes.find((theme) => theme.id === defaultThemeProp) &&
           !themes.find((theme) => theme.id === defaultThemeProp)
         ) {
-          defaultThemeIsUrl = defaultThemeProp === config.defaultTheme;
+          defaultThemeIsUrl = defaultThemeProp === config?.defaultTheme;
           const themeUrl = toThemeUrl(defaultThemeProp);
           themes.push(await loadThemeFile(themeUrl));
         }
@@ -1562,7 +1562,7 @@ function useStandalone(
       }
       // --- Let's check for errors to display
 
-      let defaultTheme = config.defaultTheme;
+      let defaultTheme = config?.defaultTheme;
       if (defaultThemeIsUrl) {
         const themeId = themes.at(-1)?.id;
         if (typeof themeId === "string") {
