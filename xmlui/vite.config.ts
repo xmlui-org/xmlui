@@ -101,6 +101,15 @@ export default ({ mode = "lib" }) => {
         },
         formats: ["es"] as any,
       };
+      // Remap the three mode-detection env vars to opaque identifiers so Rolldown
+      // cannot statically evaluate (and tree-shake) the branches in StandaloneApp.
+      // The consuming app's bundler (xmlui start / xmlui build) replaces these
+      // identifiers at its own build/serve time via the defines in start.ts / build.ts.
+      define = {
+        "import.meta.env.VITE_DEV_MODE": "__XMLUI_DEV_MODE__",
+        "import.meta.env.VITE_BUILD_MODE": "__XMLUI_BUILD_MODE__",
+        "import.meta.env.VITE_STANDALONE": "__XMLUI_STANDALONE__",
+      };
     }
   }
 

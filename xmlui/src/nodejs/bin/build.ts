@@ -106,6 +106,10 @@ export const build = async ({
       "import.meta.env.VITE_BUILD_MODE": JSON.stringify(buildMode),
       "import.meta.env.VITE_DEV_MODE": false,
       "import.meta.env.VITE_MOCK_ENABLED": withMock,
+      // Pre-built lib replacements (see vite.config.ts lib build for context).
+      "__XMLUI_BUILD_MODE__": JSON.stringify(buildMode),
+      "__XMLUI_DEV_MODE__": "false",
+      "__XMLUI_STANDALONE__": "false",
       "import.meta.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION),
 
       "import.meta.env.VITE_USED_COMPONENTS_App": JSON.stringify(

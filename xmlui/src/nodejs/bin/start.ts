@@ -45,6 +45,11 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
         "import.meta.env.VITE_MOCK_ENABLED": withMock,
         "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
         "import.meta.env.VITE_USER_COMPONENTS_Inspect": '"true"',
+        // Pre-built lib replacements: the lib build remaps import.meta.env.VITE_* to
+        // these opaque identifiers so they survive Rolldown's static analysis.
+        __XMLUI_BUILD_MODE__: '"ALL"',
+        __XMLUI_DEV_MODE__: "true",
+        __XMLUI_STANDALONE__: "false",
       },
     } as InlineConfig);
 
