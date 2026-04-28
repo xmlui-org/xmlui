@@ -9,11 +9,14 @@
                 borderRadius="$space-2"
             >
                 <VStack gap="$space-0_5">
-                    <Text variant="info">
-                        {$item.author}
-                            •
-                            {formatDate($item.date, "d MMM yyyy")}
-                    </Text>
+                    <HStack verticalAlignment="center" gap="$space-3">
+                        <Text variant="info">
+                            {$item.author}
+                                •
+                                {formatDate($item.date, "d MMM yyyy")}
+                        </Text>
+                        <ReadingTime content="{appGlobals.prefetchedContent['/blog/' + $item.slug + '.md']}" />
+                    </HStack>
                     <H2 variant="title" showAnchor="false">
                         {$item.title}
                     </H2>
