@@ -6,6 +6,7 @@ import { existsSync } from "fs";
 import { glob } from "glob";
 import type { InlineConfig } from "vite";
 import { build as viteBuild } from "vite";
+import { createXmluiAppDefines } from "./xmluiEnv";
 import { getViteConfig } from "./viteConfig";
 import * as fs from "node:fs";
 import { pathToFileURL } from "node:url";
@@ -103,10 +104,13 @@ export const build = async ({
       flatDistUiPrefix,
     })),
     define: {
-      "import.meta.env.VITE_BUILD_MODE": JSON.stringify(buildMode),
-      "import.meta.env.VITE_DEV_MODE": false,
-      "import.meta.env.VITE_MOCK_ENABLED": withMock,
-      "import.meta.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION),
+      ...createXmluiAppDefines({
+        buildMode,
+        devMode: false,
+        standalone: false,
+        mockEnabled: withMock,
+        appVersion: process.env.VITE_APP_VERSION,
+      }),
 
       "import.meta.env.VITE_USED_COMPONENTS_App": JSON.stringify(
         process.env.VITE_USED_COMPONENTS_App,

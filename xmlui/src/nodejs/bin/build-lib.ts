@@ -34,9 +34,8 @@ export const buildLib = async ({
       extensions: [".js", ".ts", ".jsx", ".tsx", ".json", ".xmlui", ".xmlui.xs", ".xs"],
     },
     define: {
-      "process.env": {
-        NODE_ENV: env.NODE_ENV,
-      },
+      "process.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
+      "import.meta.env.NODE_ENV": JSON.stringify(env.NODE_ENV),
     },
     build: {
       emptyOutDir: false,
