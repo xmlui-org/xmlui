@@ -1,0 +1,143 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "Share";
+
+$backgroundColor-Share: createThemeVar("backgroundColor-#{$component}");
+$backgroundColor-Share-hover: createThemeVar("backgroundColor-#{$component}--hover");
+$borderColor-Share: createThemeVar("borderColor-#{$component}");
+$borderRadius-Share: createThemeVar("borderRadius-#{$component}");
+$color-Share: createThemeVar("color-#{$component}");
+$fontFamily-Share: createThemeVar("fontFamily-#{$component}");
+$fontSize-Share: createThemeVar("fontSize-#{$component}");
+$paddingHorizontal-Share-trigger: createThemeVar("paddingHorizontal-#{$component}-trigger");
+$paddingVertical-Share-trigger: createThemeVar("paddingVertical-#{$component}-trigger");
+
+$backgroundColor-ShareMenu: createThemeVar("backgroundColor-#{$component}Menu");
+$backgroundColor-ShareItem-hover: createThemeVar("backgroundColor-#{$component}Item--hover");
+$borderColor-ShareMenu: createThemeVar("borderColor-#{$component}Menu");
+$boxShadow-ShareMenu: createThemeVar("boxShadow-#{$component}Menu");
+$color-ShareItem-secondary: createThemeVar("color-#{$component}Item-secondary");
+$fontSize-ShareItem-secondary: createThemeVar("fontSize-#{$component}Item-secondary");
+$gap-ShareMenu: createThemeVar("gap-#{$component}Menu");
+$minWidth-ShareMenu: createThemeVar("minWidth-#{$component}Menu");
+$paddingHorizontal-ShareMenu: createThemeVar("paddingHorizontal-#{$component}Menu");
+$paddingVertical-ShareMenu: createThemeVar("paddingVertical-#{$component}Menu");
+$paddingHorizontal-ShareItem: createThemeVar("paddingHorizontal-#{$component}Item");
+$paddingVertical-ShareItem: createThemeVar("paddingVertical-#{$component}Item");
+
+@layer components {
+  .root {
+    position: relative;
+    display: inline-block;
+    font-family: $fontFamily-Share;
+  }
+
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: $backgroundColor-Share;
+    color: $color-Share;
+    border: 1px solid $borderColor-Share;
+    border-radius: $borderRadius-Share;
+    padding: $paddingVertical-Share-trigger $paddingHorizontal-Share-trigger;
+    font-family: inherit;
+    font-size: $fontSize-Share;
+    cursor: pointer;
+    line-height: 1;
+
+    &:hover {
+      background-color: $backgroundColor-Share-hover;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--xmlui-color-primary, #0066cc);
+      outline-offset: 2px;
+    }
+  }
+
+  .triggerIcon {
+    width: 1em;
+    height: 1em;
+    transition: transform 0.15s ease;
+  }
+
+  .triggerIconOpen {
+    transform: rotate(180deg);
+  }
+
+  .menu {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    z-index: 50;
+    min-width: $minWidth-ShareMenu;
+    background-color: $backgroundColor-ShareMenu;
+    border: 1px solid $borderColor-ShareMenu;
+    border-radius: $borderRadius-Share;
+    box-shadow: $boxShadow-ShareMenu;
+    padding: $paddingVertical-ShareMenu $paddingHorizontal-ShareMenu;
+    display: flex;
+    flex-direction: column;
+    gap: $gap-ShareMenu;
+  }
+
+  .item {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.125rem;
+    padding: $paddingVertical-ShareItem $paddingHorizontal-ShareItem;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    border-radius: calc(#{$borderRadius-Share} / 2);
+
+    &:hover,
+    &:focus-visible {
+      background-color: $backgroundColor-ShareItem-hover;
+      outline: none;
+    }
+  }
+
+  .itemHeader {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+    font-size: $fontSize-Share;
+  }
+
+  .itemHeaderIcon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
+    color: currentColor;
+  }
+
+  .itemHeaderTrailingIcon {
+    width: 0.85em;
+    height: 0.85em;
+    flex-shrink: 0;
+    margin-left: auto;
+    color: currentColor;
+  }
+
+  .itemSecondary {
+    color: $color-ShareItem-secondary;
+    font-size: $fontSize-ShareItem-secondary;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

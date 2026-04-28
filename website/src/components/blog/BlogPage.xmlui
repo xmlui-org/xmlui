@@ -28,9 +28,19 @@
             <HStack gap="$space-5">
                 <VStack width="*" gap="$space-2">
                     <VStack gap="$space-0_5">
-                        <H1 showAnchor="false">
-                            {$props.post.title}
-                        </H1>
+                        <HStack
+                            verticalAlignment="start"
+                            horizontalAlignment="space-between"
+                            gap="$space-3"
+                        >
+                            <H1 showAnchor="false" width="*">
+                                {$props.post.title}
+                            </H1>
+                            <Share
+                                pageTitle="{$props.post.title}"
+                                markdownContent="{markdownContent()}"
+                            />
+                        </HStack>
                         <H3 variant="blogPostDescription">
                             {$props.post.description}
                         </H3>
