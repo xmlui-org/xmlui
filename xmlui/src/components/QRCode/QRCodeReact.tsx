@@ -1,6 +1,7 @@
 import type { ForwardedRef } from "react";
 import { forwardRef, memo, useMemo } from "react";
 import classnames from "classnames";
+// @ts-expect-error — react-qr-code types declare a default export but the CJS bundle uses a named export
 import { QRCode as QRCodeLib } from "react-qr-code";
 
 import styles from "./QRCode.module.scss";

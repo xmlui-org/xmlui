@@ -67,7 +67,7 @@ export const CompoundComponent = forwardRef(
     // with another UDC without a terminating `when`). The configured limit
     // can be overridden by the runtime via `appGlobals.maxCompoundDepth`.
     const parentDepthInfo = useCompoundDepth();
-    const myType = node?.type ?? compound?.name ?? "<anonymous>";
+    const myType = node?.type ?? compound?.type ?? "<anonymous>";
     const maxDepth =
       typeof appContext?.appGlobals?.maxCompoundDepth === "number"
         ? appContext.appGlobals.maxCompoundDepth
