@@ -5,7 +5,6 @@ Use dataAfterSubmit to clear or reset form fields, and completedNotificationMess
 A support ticket form should clear its fields after the user submits successfully so they can immediately start a new ticket. `dataAfterSubmit="clear"` does this automatically on a successful submit — no manual reset logic required.
 
 ```xmlui-pg copy display name="Support ticket form with auto-clear"
----app display
 <App>
   <Form
     data="{{ subject: '', description: '', priority: 'normal' }}"
@@ -15,11 +14,11 @@ A support ticket form should clear its fields after the user submits successfull
     saveLabel="Submit ticket"
   >
     <TextBox label="Subject" bindTo="subject" required="true" />
-    <Select
-      label="Priority"
-      bindTo="priority"
-      data="{['low', 'normal', 'high']}"
-    />
+    <Select label="Priority" bindTo="priority">
+      <Items data="{['low', 'normal', 'high']}">
+        <Option value="{$item}" label="{$item}" />
+      </Items>
+    </Select>
     <TextArea label="Description" bindTo="description" required="true" />
   </Form>
 </App>
