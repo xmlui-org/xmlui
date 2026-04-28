@@ -1,5 +1,6 @@
 import type { InlineConfig } from "vite";
 import { createServer } from "vite";
+import { createXmluiAppDefines } from "./xmluiEnv";
 import { getViteConfig } from "./viteConfig";
 
 type XmlUiStartOptions = {
@@ -39,17 +40,14 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
       },
       define: {
         ...viteConfig.define,
-        "import.meta.env.VITE_BUILD_MODE": '"ALL"',
-        "import.meta.env.VITE_DEV_MODE": true,
-        "import.meta.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
-        "import.meta.env.VITE_MOCK_ENABLED": withMock,
-        "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
-        "import.meta.env.VITE_USER_COMPONENTS_Inspect": '"true"',
-        // Pre-built lib replacements: the lib build remaps import.meta.env.VITE_* to
-        // these opaque identifiers so they survive Rolldown's static analysis.
-        __XMLUI_BUILD_MODE__: '"ALL"',
-        __XMLUI_DEV_MODE__: "true",
-        __XMLUI_STANDALONE__: "false",
+        ...createXmluiAppDefines({
+          buildMode: "ALL",
+          devMode: true,
+          standalone: false,
+          mockEnabled: withMock,
+          includeAllComponents: true,
+          inspectUserComponents: true,
+        }),
       },
     } as InlineConfig);
 

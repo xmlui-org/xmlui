@@ -9,6 +9,7 @@ import { default as ViteXmlui } from "./src/nodejs/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
+import { createXmluiLibPreserveDefines } from "./src/nodejs/bin/xmluiEnv";
 // @ts-ignore
 import * as packageJson from "./package.json";
 
@@ -16,6 +17,7 @@ export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
   let define;
+  const xmluiVersion = `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`;
   let distSubDirName = "";
   switch (mode) {
     case "standalone": {
@@ -35,9 +37,7 @@ export default ({ mode = "lib" }) => {
         "import.meta.env.VITE_USED_COMPONENTS_TableEditor": JSON.stringify("false"),
         // "import.meta.env.VITE_USED_COMPONENTS_Charts": JSON.stringify("false"),
         // "import.meta.env.VITE_USER_COMPONENTS_Inspect": JSON.stringify("false"),
-        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(
-          `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
-        ),
+        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
       };
       break;
     }
@@ -101,14 +101,11 @@ export default ({ mode = "lib" }) => {
         },
         formats: ["es"] as any,
       };
-      // Remap the three mode-detection env vars to opaque identifiers so Rolldown
-      // cannot statically evaluate (and tree-shake) the branches in StandaloneApp.
-      // The consuming app's bundler (xmlui start / xmlui build) replaces these
-      // identifiers at its own build/serve time via the defines in start.ts / build.ts.
+      // Preserve only the XMLUI app-mode flags that must survive the framework lib build.
+      // They are replaced later by xmlui start / xmlui build / xmlui ssg.
       define = {
-        "import.meta.env.VITE_DEV_MODE": "__XMLUI_DEV_MODE__",
-        "import.meta.env.VITE_BUILD_MODE": "__XMLUI_BUILD_MODE__",
-        "import.meta.env.VITE_STANDALONE": "__XMLUI_STANDALONE__",
+        ...createXmluiLibPreserveDefines(),
+        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
       };
     }
   }
