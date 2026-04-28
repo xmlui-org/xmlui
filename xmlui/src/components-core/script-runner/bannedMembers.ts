@@ -15,33 +15,166 @@
  */
 
 // =============================================================================
-// DENYLIST SETS  (empty in Step 0 — populated by Steps 1.x)
+// DENYLIST SETS  (populated by Steps 1.3 – 1.9 in dom-api-hardening.md)
 // =============================================================================
 
 /** Banned property keys on `globalThis` / `window`. */
-export const BANNED_GLOBAL_KEYS = new Set<string>([]);
+export const BANNED_GLOBAL_KEYS = new Set<string>([
+  // Step 1.3 — DOM mutation: observers and Range/Selection constructors
+  "MutationObserver",
+  "ResizeObserver",
+  "IntersectionObserver",
+  "PerformanceObserver",
+  "Range",
+  "Selection",
+  "getSelection",
+  // Step 1.4 — background execution and concurrency
+  "Worker",
+  "SharedWorker",
+  "MessageChannel",
+  "MessagePort",
+  "BroadcastChannel",
+  "SharedArrayBuffer",
+  "Atomics",
+  // Step 1.5 — storage and persistence (raw path)
+  "localStorage",
+  "sessionStorage",
+  "indexedDB",
+  "caches",
+  "cookieStore",
+  "PushManager",
+  "PeriodicSyncManager",
+  "BackgroundFetchManager",
+  // Step 1.6 — sensors and user-environment
+  "Notification",
+  // Step 1.7 — navigation and window management
+  "open",
+  "close",
+  "stop",
+  "print",
+  "focus",
+  "blur",
+  "history",
+  "location",
+  // Step 1.8 — direct network constructors
+  "XMLHttpRequest",
+  "EventSource",
+  "WebSocket",
+  // Step 1.9 — crypto, performance, and devtools surface
+  "crypto",
+  "performance",
+  "console",
+]);
 
 /** Migration hints for banned global keys. */
-export const BANNED_GLOBAL_HELP = new Map<string, string>();
+export const BANNED_GLOBAL_HELP = new Map<string, string>([
+  ["localStorage", "Use AppState.get/set() for persistent key-value storage."],
+  ["sessionStorage", "Use AppState.get/set() for session-scoped storage."],
+  ["location", "Use navigate() instead of window.location."],
+  ["history", "Use navigate() to control the browser history."],
+  ["open", "Use App.openExternal() to open URLs in a new tab."],
+  ["console", "Use Log.*() functions for tracing."],
+  ["crypto", "Use App.randomBytes() for random data (available in Phase 2.4)."],
+  ["performance", "Use App.now() / App.mark() (available in Phase 2.5)."],
+  ["XMLHttpRequest", "Use DataSource or APICall for network requests."],
+  ["WebSocket", "Use the WebSocket component for real-time connections."],
+  ["EventSource", "Use the EventSource component for server-sent events."],
+]);
 
 /** Banned property keys on `document`. */
-export const BANNED_DOCUMENT_KEYS = new Set<string>([]);
+export const BANNED_DOCUMENT_KEYS = new Set<string>([
+  // Step 1.3 — document roots
+  "body",
+  "documentElement",
+  "head",
+  // Step 1.3 — document queries
+  "querySelector",
+  "querySelectorAll",
+  "getElementById",
+  "getElementsByClassName",
+  "getElementsByTagName",
+  "getElementsByName",
+  // Step 1.3 — document factories
+  "createElement",
+  "createElementNS",
+  "createTextNode",
+  "createDocumentFragment",
+  "createRange",
+  // Step 1.3 — document side effects
+  "write",
+  "writeln",
+  "execCommand",
+  "domain",
+  "cookie",
+  // Step 1.7 — page-identity setters
+  "title",
+]);
 
 /** Migration hints for banned document keys. */
-export const BANNED_DOCUMENT_HELP = new Map<string, string>();
+export const BANNED_DOCUMENT_HELP = new Map<string, string>([
+  ["cookie", "Use AppState.get/set() for persistent storage."],
+  ["title", "Set the page title via the Page component's title prop."],
+  [
+    "body",
+    "Use XMLUI component props to modify the DOM through React instead of direct access.",
+  ],
+]);
 
 /** Banned property keys on `navigator`. */
-export const BANNED_NAVIGATOR_KEYS = new Set<string>([]);
+export const BANNED_NAVIGATOR_KEYS = new Set<string>([
+  // Step 1.4 — background execution
+  "serviceWorker",
+  // Step 1.5 — storage
+  "storage",
+  // Step 1.6 — sensors and user-environment
+  "geolocation",
+  "mediaDevices",
+  "clipboard",
+  "permissions",
+  "bluetooth",
+  "usb",
+  "serial",
+  "hid",
+  "credentials",
+  "locks",
+  // Step 1.8 — network
+  "sendBeacon",
+]);
 
 /** Migration hints for banned navigator keys. */
-export const BANNED_NAVIGATOR_HELP = new Map<string, string>();
+export const BANNED_NAVIGATOR_HELP = new Map<string, string>([
+  ["clipboard", "Use Clipboard.copy() for writing to the clipboard (available in Phase 2.2)."],
+  ["geolocation", "Use the Geolocation component (planned)."],
+  ["sendBeacon", "Use APICall for fire-and-forget HTTP requests."],
+]);
 
 /**
  * Banned setter/method keys on `Element` instances (DOM mutation outside React).
- * Checked only on the write path and on method calls — not on reads, because
- * reading e.g. `el.innerHTML` is safe; it is the assignment that is dangerous.
+ * Checked on both read and write paths to prevent constructing a mutation
+ * pipeline through a captured element reference.
  */
-export const BANNED_ELEMENT_SETTER_KEYS = new Set<string>([]);
+export const BANNED_ELEMENT_SETTER_KEYS = new Set<string>([
+  // Step 1.3 — element setters
+  "innerHTML",
+  "outerHTML",
+  // Step 1.3 — element methods that mutate via raw HTML
+  "insertAdjacentHTML",
+  "insertAdjacentElement",
+  "insertAdjacentText",
+  "setAttribute",
+  "removeAttribute",
+  "setAttributeNS",
+  // Step 1.3 — node mutation methods
+  "appendChild",
+  "insertBefore",
+  "replaceChild",
+  "removeChild",
+  "replaceWith",
+  "before",
+  "after",
+  "prepend",
+  "append",
+]);
 
 // =============================================================================
 // RESULT TYPE

@@ -45,6 +45,31 @@ const bannedFunctions: BannedFunctionInfo[] = [
   { func: globalThis.setImmediate },
   { func: globalThis.setInterval },
   { func: globalThis.setTimeout, help: "Use 'delay'" },
+  // --- Step 1.1: code-injection constructors
+  { func: globalThis.Function, help: "Dynamic code execution is not allowed." },
+  // --- Step 1.1: WebAssembly
+  ...(typeof WebAssembly !== "undefined"
+    ? [
+        {
+          func: WebAssembly.compile as (...args: any[]) => any,
+          help: "WebAssembly execution is not allowed.",
+        },
+        {
+          func: WebAssembly.instantiate as (...args: any[]) => any,
+          help: "WebAssembly execution is not allowed.",
+        },
+        {
+          func: WebAssembly.compileStreaming as (...args: any[]) => any,
+          help: "WebAssembly execution is not allowed.",
+        },
+        {
+          func: WebAssembly.instantiateStreaming as (...args: any[]) => any,
+          help: "WebAssembly execution is not allowed.",
+        },
+        { func: WebAssembly.Module as unknown as (...args: any[]) => any },
+        { func: WebAssembly.Instance as unknown as (...args: any[]) => any },
+      ]
+    : []),
 ];
 
 type BannedFunctionInfo = {

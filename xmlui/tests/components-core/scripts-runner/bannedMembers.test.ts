@@ -50,11 +50,13 @@ function removeTestGlobalEntry(): void {
 
 describe("isBannedMember — pure function", () => {
   describe("empty denylists (Step 0 baseline)", () => {
-    it("never bans any access when all sets are empty", () => {
-      // A selection of common globals that would be banned in later steps.
-      for (const key of ["localStorage", "sessionStorage", "document", "fetch", "WebSocket"]) {
-        expect(isBannedMember(globalThis, key).banned).toBe(false);
-      }
+    it("never bans member access on arbitrary (non-global) objects", () => {
+      // A selection of common globals that are now banned at the global level.
+      // Confirm the ban does NOT fire for identically-named keys on plain objects.
+      const obj = { localStorage: 1, WebSocket: 2, fetch: 3 };
+      expect(isBannedMember(obj, "localStorage").banned).toBe(false);
+      expect(isBannedMember(obj, "WebSocket").banned).toBe(false);
+      expect(isBannedMember(obj, "fetch").banned).toBe(false);
     });
 
     it("never bans member access on arbitrary objects", () => {
@@ -120,7 +122,8 @@ describe("isBannedMember — pure function", () => {
 
     it("does not ban an unlisted key on document", () => {
       if (typeof document === "undefined") return;
-      expect(isBannedMember(document, "title").banned).toBe(false);
+      // 'baseURI' is a safe, read-only property not in any denylist.
+      expect(isBannedMember(document, "baseURI").banned).toBe(false);
     });
   });
 
