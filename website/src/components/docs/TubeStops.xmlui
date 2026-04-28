@@ -9,7 +9,7 @@
 
   <Text variant="strong">{$props.line}</Text>
 
-  <Table data="{stops}">
+  <Table data="{stops}" width="98%">
     <Column width="3*" bindTo="name" />
     <Column bindTo="zone" />
     <Column bindTo="wifi" >

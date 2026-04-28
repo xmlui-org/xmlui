@@ -165,7 +165,9 @@ This pattern works well for components that handle both adding and editing:
   >
     <Form
       data="{$props.mode === 'edit' ? productDetails.value : $props.initialData}"
-      submitUrl="{$props.mode === 'edit' ? '/api/products/' + $props.productId : '/api/products'}"
+      submitUrl="{$props.mode === 'edit' 
+        ? '/api/products/' + $props.productId 
+        : '/api/products'}"
       submitMethod="{$props.mode === 'edit' ? 'put' : 'post'}"
       onSuccess="{emitEvent('saved', $result)}"
     >

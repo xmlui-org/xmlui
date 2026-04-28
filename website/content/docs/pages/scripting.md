@@ -241,7 +241,9 @@ At **component scope** (in markup attributes or code-behind top-level), `var.nam
   <Text value="Count: {count}" />
 
   <Button onClick="let doubled = count * 2; count = doubled" label="Double" />
-  <!-- doubled is a handler-local variable; it cannot be used outside this handler -->
+  <!-- 
+    doubled is a handler-local variable; it cannot be used outside this handler 
+  -->
 </App>
 ```
 
