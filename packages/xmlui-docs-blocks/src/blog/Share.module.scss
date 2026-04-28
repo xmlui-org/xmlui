@@ -38,6 +38,11 @@ $paddingVertical-ShareItem: createThemeVar("paddingVertical-#{$component}Item");
     font-family: $fontFamily-Share;
   }
 
+  .triggerGroup {
+    display: inline-flex;
+    align-items: stretch;
+  }
+
   .trigger {
     display: inline-flex;
     align-items: center;
@@ -45,7 +50,6 @@ $paddingVertical-ShareItem: createThemeVar("paddingVertical-#{$component}Item");
     background-color: $backgroundColor-Share;
     color: $color-Share;
     border: 1px solid $borderColor-Share;
-    border-radius: $borderRadius-Share;
     padding: $paddingVertical-Share-trigger $paddingHorizontal-Share-trigger;
     font-family: inherit;
     font-size: $fontSize-Share;
@@ -59,7 +63,27 @@ $paddingVertical-ShareItem: createThemeVar("paddingVertical-#{$component}Item");
     &:focus-visible {
       outline: 2px solid var(--xmlui-color-primary, #0066cc);
       outline-offset: 2px;
+      z-index: 1;
     }
+  }
+
+  .triggerPrimary {
+    border-top-left-radius: $borderRadius-Share;
+    border-bottom-left-radius: $borderRadius-Share;
+    border-right: none;
+  }
+
+  .triggerToggle {
+    border-top-right-radius: $borderRadius-Share;
+    border-bottom-right-radius: $borderRadius-Share;
+    padding-left: $paddingHorizontal-Share-trigger;
+    padding-right: $paddingHorizontal-Share-trigger;
+  }
+
+  .triggerLeadingIcon {
+    width: 1em;
+    height: 1em;
+    flex-shrink: 0;
   }
 
   .triggerIcon {

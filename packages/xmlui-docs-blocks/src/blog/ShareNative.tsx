@@ -1,10 +1,12 @@
 import type { CSSProperties, ReactNode } from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import classnames from "classnames";
+import { Icon } from "xmlui";
 import styles from "./Share.module.scss";
 
 export const defaultProps = {
-  label: "Copy & share",
+  label: "Copy page",
+  toggleAriaLabel: "Open share menu",
   copyLabel: "Copy page",
   copyDescription: "Copy page as markdown for LLMs",
   copiedLabel: "Copied!",
@@ -25,6 +27,7 @@ export const defaultProps = {
 
 type Props = {
   label?: string;
+  toggleAriaLabel?: string;
   pageUrl?: string;
   pageTitle?: string;
   markdownContent?: string;
@@ -63,70 +66,19 @@ function buildLlmPrompt(url: string): string {
 }
 
 const ChevronDownIcon = (props: { className?: string }) => (
-  <svg
-    className={props.className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
+  <Icon name="chevrondown" className={props.className} aria-hidden />
 );
 
 const CopyIcon = (props: { className?: string }) => (
-  <svg
-    className={props.className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-  </svg>
+  <Icon name="copy" className={props.className} aria-hidden />
 );
 
 const ExternalLinkIcon = (props: { className?: string }) => (
-  <svg
-    className={props.className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-    <polyline points="15 3 21 3 21 9" />
-    <line x1="10" y1="14" x2="21" y2="3" />
-  </svg>
+  <Icon name="hyperlink" className={props.className} aria-hidden />
 );
 
 const ShareIcon = (props: { className?: string }) => (
-  <svg
-    className={props.className}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <circle cx="18" cy="5" r="3" />
-    <circle cx="6" cy="12" r="3" />
-    <circle cx="18" cy="19" r="3" />
-    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-  </svg>
+  <Icon name="share" className={props.className} aria-hidden />
 );
 
 type ShareItem = {
@@ -136,11 +88,11 @@ type ShareItem = {
   icon: ReactNode;
   trailingIcon?: ReactNode;
   onSelect: () => void | Promise<void>;
-  testId: string;
 };
 
 export const Share = memo(function Share({
   label = defaultProps.label,
+  toggleAriaLabel = defaultProps.toggleAriaLabel,
   pageUrl,
   pageTitle,
   markdownContent,
@@ -258,7 +210,6 @@ export const Share = memo(function Share({
         description: copyDescription,
         icon: <CopyIcon className={styles.itemHeaderIcon} />,
         onSelect: handleCopy,
-        testId: "share-copy",
       });
     }
     if (showChatGpt) {
@@ -269,7 +220,6 @@ export const Share = memo(function Share({
         icon: null,
         trailingIcon: <ExternalLinkIcon className={styles.itemHeaderTrailingIcon} />,
         onSelect: handleOpenInChatGpt,
-        testId: "share-chatgpt",
       });
     }
     if (showClaude) {
@@ -280,7 +230,6 @@ export const Share = memo(function Share({
         icon: null,
         trailingIcon: <ExternalLinkIcon className={styles.itemHeaderTrailingIcon} />,
         onSelect: handleOpenInClaude,
-        testId: "share-claude",
       });
     }
     if (showTwitter) {
@@ -291,7 +240,6 @@ export const Share = memo(function Share({
         icon: null,
         trailingIcon: <ShareIcon className={styles.itemHeaderTrailingIcon} />,
         onSelect: handleShareInTwitter,
-        testId: "share-twitter",
       });
     }
     if (showLinkedIn) {
@@ -302,7 +250,6 @@ export const Share = memo(function Share({
         icon: null,
         trailingIcon: <ShareIcon className={styles.itemHeaderTrailingIcon} />,
         onSelect: handleShareInLinkedIn,
-        testId: "share-linkedin",
       });
     }
     return list;
@@ -339,21 +286,30 @@ export const Share = memo(function Share({
       style={style}
       ref={rootRef}
     >
-      <button
-        type="button"
-        className={styles.trigger}
-        onClick={() => setOpen((v) => !v)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        data-testid="share-trigger"
-      >
-        <span>{label}</span>
-        <ChevronDownIcon
-          className={classnames(styles.triggerIcon, open && styles.triggerIconOpen)}
-        />
-      </button>
+      <div className={styles.triggerGroup}>
+        <button
+          type="button"
+          className={classnames(styles.trigger, styles.triggerPrimary)}
+          onClick={handleCopy}
+        >
+          <CopyIcon className={styles.triggerLeadingIcon} />
+          <span>{copied ? copiedLabel : label}</span>
+        </button>
+        <button
+          type="button"
+          className={classnames(styles.trigger, styles.triggerToggle)}
+          onClick={() => setOpen((v) => !v)}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={toggleAriaLabel}
+        >
+          <ChevronDownIcon
+            className={classnames(styles.triggerIcon, open && styles.triggerIconOpen)}
+          />
+        </button>
+      </div>
       {open && (
-        <div role="menu" className={styles.menu} data-testid="share-menu">
+        <div role="menu" className={styles.menu}>
           {items.map((item) => (
             <button
               key={item.key}
@@ -361,7 +317,6 @@ export const Share = memo(function Share({
               type="button"
               className={styles.item}
               onClick={() => item.onSelect()}
-              data-testid={item.testId}
             >
               <span className={styles.itemHeader}>
                 {item.icon}

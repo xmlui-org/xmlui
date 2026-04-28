@@ -13,9 +13,16 @@ export const ShareMd: ComponentMetadata = createMetadata({
     `documentation pages.`,
   props: {
     label: {
-      description: "Label of the dropdown trigger button.",
+      description:
+        "Label shown on the primary (left) split-button. Clicking the primary " +
+        "button copies the page; clicking the chevron opens the share menu.",
       valueType: "string",
       defaultValue: defaultProps.label,
+    },
+    toggleAriaLabel: {
+      description: "Accessible label for the chevron toggle button.",
+      valueType: "string",
+      defaultValue: defaultProps.toggleAriaLabel,
     },
     pageUrl: {
       description:
