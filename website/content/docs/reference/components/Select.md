@@ -455,6 +455,35 @@ In the template definition, you can use the `$item` context property to access t
 </App>
 ```
 
+### `variant` [#variant]
+
+> [!DEF]  default: **"default"**
+
+Controls the visual border treatment. `outlined` matches the border color of an outlined Button, so that a Select can be visually composed next to one. Only the border color (and its hover/focus states) is affected; padding, background, and typography are unchanged.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `default` | Standard input border using the surface color. **(default)** |
+| `outlined` | Accent border using the shared `borderColor-outlined` token, matching outlined Buttons. |
+
+Use `variant="outlined"` when you want the `Select` to share its border color with an outlined `Button` placed alongside. Both components resolve to the same `borderColor-outlined` theme token, so the borders stay in sync even when the theme changes.
+
+```xmlui-pg copy display name="Example: matched border with outlined Button" height="120px"
+<App>
+  <HStack>
+    <Select variant="outlined">
+      <Option value="all" label="All customers"/>
+      <Option value="active" label="Active"/>
+    </Select>
+    <Button icon="plus" label="New Customer" variant="outlined" />
+  </HStack>
+</App>
+```
+
+The `outlined` variant only rebinds the border color (and its hover/focus states); padding, background, and typography are unchanged. Validation states (`error` / `warning` / `valid`) take precedence over the variant.
+
 ### `verboseValidationFeedback` [#verbosevalidationfeedback]
 
 Enables a concise validation summary (icon) in input components.
@@ -612,6 +641,12 @@ The component has some parts that can be styled through layout properties and th
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--error--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--hover | *none* | *none* |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined | $borderColor-outlined | $borderColor-outlined |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined | $borderColor-outlined | $borderColor-outlined |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--focus | $borderColor-outlined--focus | $borderColor-outlined--focus |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--focus | $borderColor-outlined--focus | $borderColor-outlined--focus |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--hover | $borderColor-outlined--hover | $borderColor-outlined--hover |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Select--outlined--hover | $borderColor-outlined--hover | $borderColor-outlined--hover |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--success--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Select--warning | *none* | *none* |

@@ -1,5 +1,129 @@
 [
   {
+    "tag_name": "xmlui@0.12.23",
+    "published_at": "2026-04-28T06:20:34Z",
+    "changes": [
+      {
+        "description": "Fix: Default Ctrl+F search finds hidden NavLinks in NavPanel",
+        "commit_sha": "7acf59e"
+      },
+      {
+        "description": "Fix dev-server dep scanner failing on `.xmlui` files. The scanner runs in its own Rolldown pipeline that does not inherit Vite's main `plugins` array, so the xmlui transform never ran and the scan crashed with `[PARSE_ERROR] Unexpected token` / `Unexpected JSX expression` for every `.xmlui` source picked up via `import.meta.glob('/src/**')`. The xmlui plugin is now also registered under `optimizeDeps.rolldownOptions.plugins`, so the scanner can transform XML markup before parsing.",
+        "commit_sha": "826e360"
+      },
+      {
+        "description": "NavGroup: hide collapsed children from browser find-in-page (Ctrl+F) and assistive tech by toggling `visibility: hidden` on the collapsed content (with a delayed transition so the collapse animation still plays). Previously, NavLink labels inside a collapsed NavGroup remained discoverable via Ctrl+F because they were only faded out (`opacity: 0`).",
+        "commit_sha": "7acf59e"
+      },
+      {
+        "description": "Fix standalone bundle regression where loading `Main.xmlui` without a `config.json` file crashed with \"Cannot read properties of undefined (reading 'defaultTheme')\". The standalone bootstrap now tolerates a missing config file, restoring the script-tag drop-in pattern (`<script src=\"xmlui-standalone.umd.js\"></script>` + `Main.xmlui`) that worked in 0.12.15.",
+        "commit_sha": "ed53f00"
+      },
+      {
+        "description": "fix: improve theme fallback logic in ThemeProvider",
+        "commit_sha": "0e3b85f"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.23.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.23/xmlui-0.12.23.js"
+      }
+    ]
+  },
+  {
+    "tag_name": "xmlui@0.12.22",
+    "published_at": "2026-04-27T15:02:09Z",
+    "changes": [
+      {
+        "description": "fix: icon positioning in button component",
+        "commit_sha": "39b3cda"
+      },
+      {
+        "description": "Handle user-defined component recursion",
+        "commit_sha": "b6c5ea0"
+      },
+      {
+        "description": "Fix root cause of CSS `@layer` order regression: `metadata-helpers.ts` no longer transitively imports a React component (`ItemWithLabel.tsx`) and its SCSS module. The shared `defaultProps` constant was extracted into a new leaf module `ItemWithLabel.defaults.ts` with no React/SCSS dependencies, eliminating the stray per-module CSS chunk that inverted the cascade in production builds.",
+        "commit_sha": "107bd72"
+      },
+      {
+        "description": "Fix: reactive variable names cannot start with \"$\"",
+        "commit_sha": "9e9ba66"
+      },
+      {
+        "description": "feat: add Stepper and Step components",
+        "commit_sha": "92cd77d"
+      },
+      {
+        "description": "Fix React warnings visible in the website",
+        "commit_sha": "b62b4bd"
+      },
+      {
+        "description": "Remove the displayWhen behavior",
+        "commit_sha": "dfef575"
+      },
+      {
+        "description": "Fix CSS @layer cascade order being inverted under Vite 8 / Rolldown. Per-module CSS chunks (e.g. one containing only `@layer components { ... }`) could be loaded before the main entry CSS, causing the browser to derive a wrong layer order in which `components` ranked lower than `base`. This made the CSS reset (transparent background on `button`) override component styles like `Button` solid-primary background. The xmlui build pipeline now declares the canonical layer order (`reset, base, components, themes, dynamic`) inline at the top of every generated `index.html` and prepends it to every emitted CSS asset, guaranteeing a deterministic cascade regardless of chunk load order.",
+        "commit_sha": "fa94885"
+      },
+      {
+        "description": "Improve goto-definition in the language server: resolve components by their declared `name` attribute (falling back to filename), scope candidates to the same XMLUI project as the requesting document, and position the cursor on the `<Component>` tag name instead of the start of the file.",
+        "commit_sha": "49c058a"
+      },
+      {
+        "description": "Display warning with duplicated component IDs",
+        "commit_sha": "2e6e24b"
+      },
+      {
+        "description": "upgrade to vite 8",
+        "commit_sha": "562743c"
+      },
+      {
+        "description": "Fix subtle issues in the playground",
+        "commit_sha": "e57d50a"
+      },
+      {
+        "description": "Preserve form field values across FormItem unmount/remount",
+        "commit_sha": "af81fb8"
+      },
+      {
+        "description": "fix: wire FormItem label htmlFor to the underlying input id across all input components",
+        "commit_sha": "46d9398"
+      },
+      {
+        "description": "fix: enhance FormItem to support nested items with proper label width and spacing",
+        "commit_sha": "3c094f8"
+      },
+      {
+        "description": "Select now supports data-bound options",
+        "commit_sha": "21d76fd"
+      },
+      {
+        "description": "Stabilize a few flaky E2E tests:",
+        "commit_sha": "36fd1f3"
+      },
+      {
+        "description": "Introduce the shared semantic theme tokens `borderColor-outlined`,",
+        "commit_sha": "aac0959"
+      },
+      {
+        "description": "Upgrade from Vite 7 to Vite 8 (Rolldown/Oxc). Migrates build config from rollupOptions to rolldownOptions, removes deprecated esbuild transform options, adds moduleType to vite-xmlui-plugin transform output for Rolldown compatibility, and updates server.ws to server.hot API. Bumps @vitejs/plugin-react to v6, vite-plugin-svgr to v5, vite-plugin-lib-inject-css to v2.",
+        "commit_sha": "562743c"
+      },
+      {
+        "description": "fix: Checkbox/Switch labelPosition=start/end snug against control",
+        "commit_sha": "03a0d43"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.22.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.22/xmlui-0.12.22.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.21",
     "published_at": "2026-04-21T09:16:01Z",
     "changes": [
@@ -352,110 +476,6 @@
       {
         "name": "xmlui-0.12.14.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.14/xmlui-0.12.14.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.13",
-    "published_at": "2026-03-25T17:28:50Z",
-    "changes": [
-      {
-        "description": "feat: add cancelButtonLabel prop to APICall for confirm dialog",
-        "commit_sha": "d19a909"
-      },
-      {
-        "description": "feat: xmlui-search - spotlight mode, filter by categories, suggested keywords",
-        "commit_sha": "61308b2"
-      },
-      {
-        "description": "Fix reactive expressions in component properties not updating when they call functions that depend on changed variables",
-        "commit_sha": "c4fc0be"
-      },
-      {
-        "description": "Add pathname global",
-        "commit_sha": "4127490"
-      },
-      {
-        "description": "fix: responsive table glitch",
-        "commit_sha": "f6921ed"
-      },
-      {
-        "description": "Markdown in fenced code block should not replace \"@{}\"",
-        "commit_sha": "ed962d1"
-      },
-      {
-        "description": "Fixed a bug where setting the regex property to a valid regular expression also tested the input if it was empty.",
-        "commit_sha": "333bce7"
-      },
-      {
-        "description": "Fix AppHeader theming",
-        "commit_sha": "4127490"
-      },
-      {
-        "description": "Fix responsive CSS generation",
-        "commit_sha": "b133970"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.13.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.13/xmlui-0.12.13.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.12",
-    "published_at": "2026-03-23T15:29:46Z",
-    "changes": [
-      {
-        "description": "Fix tab-out issue with PasswordInput",
-        "commit_sha": "44546ae"
-      },
-      {
-        "description": "expose a discoverRoute function which enables detecing the possible static and dynamic routes for an xmlui project",
-        "commit_sha": "0a4c214"
-      },
-      {
-        "description": "Ignore scrollStyle and showScrollerFade on mobile devices",
-        "commit_sha": "6dda27c"
-      },
-      {
-        "description": "Wire Inspector icon color through theme system so it responds to theme changes",
-        "commit_sha": "d65101f"
-      },
-      {
-        "description": "Experiment with persisting unsubmitted Form data",
-        "commit_sha": "82f5ad4"
-      },
-      {
-        "description": "Move Blog component from xmlui core to xmlui-docs-blocks extension package",
-        "commit_sha": "fffde0d"
-      },
-      {
-        "description": "Fix DataSource reactivity through variables",
-        "commit_sha": "c9871a9"
-      },
-      {
-        "description": "Improve component property name linting with responsive properties and behavior properties",
-        "commit_sha": "7e0dab5"
-      },
-      {
-        "description": "Fix Select regression in Form (versus FormItem type=\"select\")",
-        "commit_sha": "894a635"
-      },
-      {
-        "description": "Move Carousel to xmlui-website-blocks extension",
-        "commit_sha": "77254bc"
-      },
-      {
-        "description": "Upgrade lodash-es from 4.17.21 to 4.17.23 to fix CVE-2025-13465 (moderate severity vulnerability).",
-        "commit_sha": "679b397"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.12.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.12/xmlui-0.12.12.js"
       }
     ]
   }

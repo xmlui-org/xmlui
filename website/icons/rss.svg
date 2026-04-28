@@ -1,1 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16"><path fill="currentColor" d="M2 12.667a1.333 1.333 0 1 1 2.666 0 1.333 1.333 0 0 1-2.666 0m6 .666A5.334 5.334 0 0 0 2.667 8a.667.667 0 0 1 0-1.333 6.667 6.667 0 0 1 6.666 6.666.667.667 0 1 1-1.333 0m4.667 0a10 10 0 0 0-10-10 .667.667 0 1 1 0-1.333A11.333 11.333 0 0 1 14 13.333a.667.667 0 0 1-1.333 0"/></svg>
+<!-- @license lucide-static v1.11.0 - ISC -->
+<svg
+  class="lucide lucide-rss"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M4 11a9 9 0 0 1 9 9" />
+  <path d="M4 4a16 16 0 0 1 16 16" />
+  <circle cx="5" cy="19" r="1" />
+</svg>

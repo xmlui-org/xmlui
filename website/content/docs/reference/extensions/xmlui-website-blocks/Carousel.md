@@ -84,7 +84,11 @@ The duration of the transition between slides.
 
 ### `displayDidChange`
 
-This event is fired when the displayed content of the CarouselNew changes.
+This event fires when the active slide of the Carousel changes.
+
+**Signature**: `displayDidChange(activeSlide: number): void`
+
+- `activeSlide`: The index of the currently active slide.
 
 ## Exposed Methods
 
@@ -126,45 +130,24 @@ This method scrolls the carousel to the specified slide index.
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-active-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-active-CarouselNew | $color-primary | $color-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-CarouselNew | $color-primary | $color-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-disabled-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-disabled-CarouselNew | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-hover-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-hover-CarouselNew | $color-primary | $color-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-active-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-active-CarouselNew | $color-primary | $color-primary |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-CarouselNew | $color-surface-200 | $color-surface-200 |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-Carousel | *none* | *none* |
-| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-CarouselNew | $color-surface-200 | $color-surface-200 |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-control-Carousel | *none* | *none* |
-| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-control-CarouselNew | 50% | 50% |
-| [height](/docs/styles-and-themes/common-units/#size-values)-Carousel | *none* | *none* |
-| [height](/docs/styles-and-themes/common-units/#size-values)-CarouselNew | 100% | 100% |
-| [height](/docs/styles-and-themes/common-units/#size-values)-control-Carousel | *none* | *none* |
-| [height](/docs/styles-and-themes/common-units/#size-values)-control-CarouselNew | 36px | 36px |
-| [height](/docs/styles-and-themes/common-units/#size-values)-indicator-Carousel | *none* | *none* |
-| [height](/docs/styles-and-themes/common-units/#size-values)-indicator-CarouselNew | 6px | 6px |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-active-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-active-CarouselNew | $color-primary | $color-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-CarouselNew | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-disabled-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-disabled-CarouselNew | $textColor-disabled | $textColor-disabled |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-hover-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-control-hover-CarouselNew | $textColor | $textColor |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-active-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-active-CarouselNew | $color-primary | $color-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-CarouselNew | $color-primary | $color-primary |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-Carousel | *none* | *none* |
-| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-CarouselNew | $color-primary | $color-primary |
-| [width](/docs/styles-and-themes/common-units/#size-values)-Carousel | *none* | *none* |
-| [width](/docs/styles-and-themes/common-units/#size-values)-CarouselNew | 100% | 100% |
-| [width](/docs/styles-and-themes/common-units/#size-values)-control-Carousel | *none* | *none* |
-| [width](/docs/styles-and-themes/common-units/#size-values)-control-CarouselNew | 36px | 36px |
-| [width](/docs/styles-and-themes/common-units/#size-values)-indicator-Carousel | *none* | *none* |
-| [width](/docs/styles-and-themes/common-units/#size-values)-indicator-CarouselNew | 25px | 25px |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-active-Carousel | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-Carousel | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-disabled-Carousel | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-control-hover-Carousel | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-active-Carousel | $color-primary | $color-primary |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-Carousel | $color-surface-200 | $color-surface-200 |
+| [backgroundColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-Carousel | $color-surface-200 | $color-surface-200 |
+| [borderRadius](/docs/styles-and-themes/common-units/#border-rounding)-control-Carousel | 50% | 50% |
+| [height](/docs/styles-and-themes/common-units/#size-values)-Carousel | 100% | 100% |
+| [height](/docs/styles-and-themes/common-units/#size-values)-control-Carousel | 36px | 36px |
+| [height](/docs/styles-and-themes/common-units/#size-values)-indicator-Carousel | 6px | 6px |
+| [textColor](/docs/styles-and-themes/common-units/#color)-control-active-Carousel | $color-primary | $color-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-control-Carousel | $textColor | $textColor |
+| [textColor](/docs/styles-and-themes/common-units/#color)-control-disabled-Carousel | $textColor-disabled | $textColor-disabled |
+| [textColor](/docs/styles-and-themes/common-units/#color)-control-hover-Carousel | $textColor | $textColor |
+| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-active-Carousel | $color-primary | $color-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-Carousel | $color-primary | $color-primary |
+| [textColor](/docs/styles-and-themes/common-units/#color)-indicator-hover-Carousel | $color-primary | $color-primary |
+| [width](/docs/styles-and-themes/common-units/#size-values)-Carousel | 100% | 100% |
+| [width](/docs/styles-and-themes/common-units/#size-values)-control-Carousel | 36px | 36px |
+| [width](/docs/styles-and-themes/common-units/#size-values)-indicator-Carousel | 25px | 25px |

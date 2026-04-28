@@ -1,4 +1,4 @@
-import { MasonryMd } from "../src/MasonryWrapped";
+import { MasonryMd } from "../src/Masonry";
 
 export const componentMetadata = {
   name: "Masonry",
