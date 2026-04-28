@@ -1,5 +1,17 @@
 # xmlui-website
 
+## 0.0.21
+
+### Patch Changes
+
+- cfa46e7: Refactor Button component styles and tests
+- 6b0998c: feat: add ReadingTime component to display estimated reading duration
+- Updated dependencies [cfa46e7]
+- Updated dependencies [ba102d8]
+- Updated dependencies [6b0998c]
+  - xmlui@0.12.24
+  - xmlui-docs-blocks@0.0.7
+
 ## 0.0.20
 
 ### Patch Changes
