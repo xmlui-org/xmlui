@@ -255,16 +255,12 @@
                         to="/docs/guides/playground-and-codefence"
                     />
                     <NavLink
-                        icon="globals"
-                        label="Local Persistence"
-                        to="/docs/guides/local-persistence"
-                    />
-                    <NavLink
                         icon="deploy"
                         label="Hosted Deployment"
                         to="/docs/guides/hosted-deployment"
                     />
                     <NavGroup
+                        icon="braces"
                         label="Wrapping and Theming"
                         to="/docs/guides/wrap-component"
                     >
@@ -1476,13 +1472,6 @@
             <Page url="/docs/guides/refactoring">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/refactoring.md']}"
-                />
-            </Page>
-            <Page
-                url="/docs/guides/local-persistence"
-            >
-                <DocumentPage
-                    content="{appGlobals.docsContent['pages/local-persistence.md']}"
                 />
             </Page>
             <Page

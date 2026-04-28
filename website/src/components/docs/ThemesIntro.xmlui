@@ -114,7 +114,8 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
 ```xmlui
 <Theme
   themeId="earthtone"
-  backgroundColor-Card="$color-secondary-100"
+  backgroundColor-Card=
+    "$color-secondary-100"
   fontFamily="serif"
   border-Badge="2px solid black"
   textColor-Badge="black"
@@ -155,7 +156,8 @@ To see how our `TubeStops` component looks with `earthtone` vs the default, we c
 ```xmlui
 <Theme
   themeId="xmlui"
-  backgroundColor-Card="$color-warning-200"
+  backgroundColor-Card=
+    "$color-warning-200"
   fontFamily="monaco"
   border-Badge="none"
   textColor-Badge="$color-warn-900"
