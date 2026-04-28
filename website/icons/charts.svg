@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="icon icon-tabler icons-tabler-outline icon-tabler-chart-histogram" viewBox="0 0 24 24"><path stroke="none" d="M0 0h24v24H0z"/><path d="M3 3v18h18m-1-3v3m-4-5v5m-4-8v8m-4-5v5"/><path d="M3 11c6 0 5-5 9-5s3 5 9 5"/></svg>
+<!-- @license lucide-static v1.11.0 - ISC -->
+<svg
+  class="lucide lucide-chart-spline"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M3 3v16a2 2 0 0 0 2 2h16" />
+  <path d="M7 16c.5-2 1.5-7 4-7 2 0 2 3 4 3 2.5 0 4.5-5 5-7" />
+</svg>
