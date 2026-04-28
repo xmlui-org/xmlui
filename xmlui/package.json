@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.12.22",
+  "version": "0.12.23",
   "sideEffects": [
     "**/*.css"
   ],
