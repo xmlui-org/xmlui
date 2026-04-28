@@ -15,7 +15,11 @@ import type { AppState } from "../components-core/rendering/appState";
 import type { PubSubService } from "../components-core/pubsub/PubSubService";
 import type { ButtonThemeColor } from "../components/abstractions";
 import type { LogNamespace } from "../components-core/appContext/log";
-import type { AppUtilsNamespace, ClipboardNamespace } from "../components-core/appContext/app-utils";
+import type {
+  AppUtilsNamespace,
+  ClipboardNamespace,
+  AppEnvironment,
+} from "../components-core/appContext/app-utils";
 
 // This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
@@ -336,7 +340,12 @@ export type AppContextObject = {
   // the banned `crypto.getRandomValues`.
   // App.now() — high-resolution timestamp. Sanctioned replacement for `performance.now()`.
   // App.mark(label) / App.measure(label, from, to?) — trace-aware timing helpers.
-  App: typeof AppUtilsNamespace;
+  // App.fetch(input, init?) — managed fetch with CSRF and allowedOrigins enforcement.
+  // App.environment — curated environment snapshot (isMobile, prefersDark, etc.).
+  App: typeof AppUtilsNamespace & {
+    fetch: (input: string | URL, init?: RequestInit) => Promise<Response>;
+    environment: AppEnvironment;
+  };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the
   // banned `navigator.clipboard.writeText`.

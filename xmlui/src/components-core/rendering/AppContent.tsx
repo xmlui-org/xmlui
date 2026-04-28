@@ -30,7 +30,7 @@ import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
-import { AppUtilsNamespace, ClipboardNamespace } from "../appContext/app-utils";
+import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -1062,7 +1062,11 @@ export function AppContent({
 
       // --- Phase 2 managed replacement globals
       Log,
-      App: AppUtilsNamespace,
+      App: {
+        ...AppUtilsNamespace,
+        fetch: createAppFetch(appGlobals),
+        environment: getAppEnvironment(),
+      },
       Clipboard: ClipboardNamespace,
 
       // --- PubSub messaging

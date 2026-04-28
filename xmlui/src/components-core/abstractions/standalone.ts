@@ -52,6 +52,13 @@ export type StandaloneAppDescription = {
    *   trace entry is emitted — nothing reaches the browser console. Useful in production
    *   deployments where trace data is exported to a server sink. This flag does NOT re-enable
    *   direct `console` access from expressions; that is governed by `strictDomSandbox`.
+   * - `allowedOrigins` (string[], default `undefined`) — when set, `App.fetch()` rejects any
+   *   request whose target origin is not in this list before reaching the network. Origins
+   *   must be fully-qualified (e.g. `"https://api.example.com"`). Same-origin requests are
+   *   always permitted regardless of this list.
+   * - `withXSRFToken` (boolean, default `true`) — when `true`, `App.fetch()` automatically
+   *   injects the `X-XSRF-TOKEN` header from the `XSRF-TOKEN` cookie for same-origin
+   *   requests. Set to `false` to disable this behaviour.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

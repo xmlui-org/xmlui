@@ -409,7 +409,7 @@ describe("Safe globals are NOT banned", () => {
     "Number",
     "Boolean",
     "Promise",
-    "fetch",
+    // NOTE: `fetch` was safe in Phase 1 but is banned in Phase 3 (Step 3.2); see phase3-globals.test.ts
     "encodeURIComponent",
     "decodeURIComponent",
     "parseInt",

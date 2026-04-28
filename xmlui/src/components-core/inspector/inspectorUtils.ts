@@ -197,7 +197,10 @@ export interface XsLogEntry {
    * - `"app:randomBytes"` — App.randomBytes(n) called. Contains `n: number`.
    * - `"app:mark"` — App.mark(label). Contains `label: string`, `perfTs: number`.
    * - `"app:measure"` — App.measure(label, from, to?). Contains `duration: number`.
+   * - `"app:fetch"` — App.fetch(url) called. Contains `url: string`, `method: string`.
    * - `"clipboard:copy"` — Clipboard.copy(text). Contains `length: number`.
+   * - `"ws:connect"` | `"ws:message"` | `"ws:error"` | `"ws:close"` — WebSocket lifecycle.
+   * - `"eventsource:connect"` | `"eventsource:message"` | `"eventsource:error"` | `"eventsource:close"` — EventSource lifecycle.
    */
   kind?: string;
   eventName?: string;

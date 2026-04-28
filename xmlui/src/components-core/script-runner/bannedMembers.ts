@@ -64,6 +64,8 @@ export const BANNED_GLOBAL_KEYS = new Set<string>([
   "crypto",
   "performance",
   "console",
+  // Step 3.2 — raw fetch (replaced by App.fetch)
+  "fetch",
 ]);
 
 /** Migration hints for banned global keys. */
@@ -79,6 +81,7 @@ export const BANNED_GLOBAL_HELP = new Map<string, string>([
   ["XMLHttpRequest", "Use DataSource or APICall for network requests."],
   ["WebSocket", "Use the WebSocket component for real-time connections."],
   ["EventSource", "Use the EventSource component for server-sent events."],
+  ["fetch", "Use App.fetch() for managed HTTP requests with CSRF protection and origin allowlist support."],
 ]);
 
 /** Banned property keys on `document`. */
@@ -139,6 +142,27 @@ export const BANNED_NAVIGATOR_KEYS = new Set<string>([
   "locks",
   // Step 1.8 — network
   "sendBeacon",
+]);
+
+/** Banned property keys on `navigator` for fingerprinting surface (Step 3.4). */
+export const BANNED_NAVIGATOR_FINGERPRINT_KEYS = new Set<string>([
+  // Step 3.4 — environment probing (raw path); replaced by App.environment
+  "userAgent",
+  "userAgentData",
+  "platform",
+  "hardwareConcurrency",
+  "deviceMemory",
+  "connection",
+]);
+
+/** Migration hints for banned navigator fingerprinting keys. */
+export const BANNED_NAVIGATOR_FINGERPRINT_HELP = new Map<string, string>([
+  ["userAgent", "Use App.environment.isMobile for device detection."],
+  ["userAgentData", "Use App.environment.isMobile for device detection."],
+  ["platform", "Use App.environment for curated environment properties."],
+  ["hardwareConcurrency", "Hardware fingerprinting is not permitted from expressions."],
+  ["deviceMemory", "Hardware fingerprinting is not permitted from expressions."],
+  ["connection", "Use App.environment for curated environment properties."],
 ]);
 
 /** Migration hints for banned navigator keys. */
@@ -239,6 +263,13 @@ export function isBannedMember(receiver: unknown, key: string | symbol): BannedM
         banned: true,
         api: `navigator.${key}`,
         help: BANNED_NAVIGATOR_HELP.get(key),
+      };
+    }
+    if (BANNED_NAVIGATOR_FINGERPRINT_KEYS.has(key)) {
+      return {
+        banned: true,
+        api: `navigator.${key}`,
+        help: BANNED_NAVIGATOR_FINGERPRINT_HELP.get(key),
       };
     }
   }
