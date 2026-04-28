@@ -127,7 +127,7 @@ export const ShareMd: ComponentMetadata = createMetadata({
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`color-${COMP}`]: "$textColor-primary",
     [`fontFamily-${COMP}`]: "$fontFamily",
-    [`fontSize-${COMP}`]: "$fontSize-small",
+    [`fontSize-${COMP}`]: "$fontSize",
     [`paddingHorizontal-${COMP}-trigger`]: "$space-3",
     [`paddingVertical-${COMP}-trigger`]: "$space-2",
     [`backgroundColor-${COMP}Menu`]: "$color-surface-raised",
