@@ -226,3 +226,168 @@ test.describe("Breadcrumbs", () => {
     });
   });
 });
+
+// =============================================================================
+// ReadingTime
+// =============================================================================
+
+test.describe("ReadingTime", () => {
+  test.describe("Basic Functionality", () => {
+    test("renders nothing when 'content' is missing", async ({ initTestBed, page }) => {
+      await initTestBed(`<ReadingTime />`, EXT);
+      await expect(page.locator(".xmlui-reading-time")).toHaveCount(0);
+    });
+
+    test("renders nothing when 'content' is empty", async ({ initTestBed, page }) => {
+      await initTestBed(`<ReadingTime content="" />`, EXT);
+      await expect(page.locator(".xmlui-reading-time")).toHaveCount(0);
+    });
+
+    test("renders nothing when 'content' is whitespace-only", async ({ initTestBed, page }) => {
+      await initTestBed(`<ReadingTime content="   \n\t  " />`, EXT);
+      await expect(page.locator(".xmlui-reading-time")).toHaveCount(0);
+    });
+
+    test("renders 'X min read' caption with computed minutes", async ({ initTestBed, page }) => {
+      // 200 words at 200 wpm = exactly 1 min
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="200" />`,
+        EXT,
+      );
+      await expect(page.getByText("1 min read")).toBeVisible();
+    });
+
+    test("computes minutes for content longer than one minute", async ({ initTestBed, page }) => {
+      // 600 words at 200 wpm = 3 min
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(600)}" wordsPerMinute="200" />`,
+        EXT,
+      );
+      await expect(page.getByText("3 min read")).toBeVisible();
+    });
+
+    test("rounds partial minutes up", async ({ initTestBed, page }) => {
+      // 250 words at 200 wpm = 1.25 → ceil → 2 min
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(250)}" wordsPerMinute="200" />`,
+        EXT,
+      );
+      await expect(page.getByText("2 min read")).toBeVisible();
+    });
+
+    test("returns at least 1 min for very short content", async ({ initTestBed, page }) => {
+      // 5 words at 200 wpm = 0.025 → ceil → 1 min (min floor)
+      await initTestBed(
+        `<ReadingTime content="just a handful of words" wordsPerMinute="200" />`,
+        EXT,
+      );
+      await expect(page.getByText("1 min read")).toBeVisible();
+    });
+
+    test("uses 'wordsPerMinute' to scale the duration", async ({ initTestBed, page }) => {
+      // 200 words at 100 wpm = 2 min
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="100" />`,
+        EXT,
+      );
+      await expect(page.getByText("2 min read")).toBeVisible();
+    });
+
+    test("uses default 'wordsPerMinute' (265) when not specified", async ({
+      initTestBed,
+      page,
+    }) => {
+      // 530 words / 265 wpm = 2 min exactly
+      await initTestBed(`<ReadingTime content="{'word '.repeat(530)}" />`, EXT);
+      await expect(page.getByText("2 min read")).toBeVisible();
+    });
+
+    test("renders custom 'label' suffix instead of default", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="200" label="minute olvasás" />`,
+        EXT,
+      );
+      await expect(page.getByText("1 minute olvasás")).toBeVisible();
+    });
+
+    test("strips fenced code blocks from word count", async ({ initTestBed, page }) => {
+      // 50 plain words + a fenced code block with 1000 "code" words.
+      // With stripping at 50 wpm, only the 50 plain words count → 1 min read.
+      // Without stripping it would be 21 min read.
+      await initTestBed(
+        `<ReadingTime
+          content="{'word '.repeat(50) + '\\n' + '\\u0060\\u0060\\u0060\\n' + 'code '.repeat(1000) + '\\n\\u0060\\u0060\\u0060'}"
+          wordsPerMinute="50" />`,
+        EXT,
+      );
+      await expect(page.getByText("1 min read")).toBeVisible();
+    });
+
+    test("strips inline code from word count", async ({ initTestBed, page }) => {
+      // 100 plain words + many "code" words inside backtick spans.
+      // At 100 wpm, plain words alone = 1 min; including the 1000 code words would be 11 min.
+      await initTestBed(
+        `<ReadingTime
+          content="{'word '.repeat(100) + ' \\u0060' + 'code '.repeat(1000) + '\\u0060'}"
+          wordsPerMinute="100" />`,
+        EXT,
+      );
+      await expect(page.getByText("1 min read")).toBeVisible();
+    });
+
+    test("counts the link text but not the URL in markdown links", async ({
+      initTestBed,
+      page,
+    }) => {
+      // 100 "word" tokens + a markdown link [link text here](https://example.com/path/to/very/long/url).
+      // The 4-word label is preserved while the URL is stripped, so total ≈ 104 words → 2 min @ 50 wpm.
+      // (If the URL were counted, the path tokens would push the total well past 2 min.)
+      await initTestBed(
+        `<ReadingTime
+          content="{'word '.repeat(100) + ' [link text here](https://example.com/path/to/very/long/url)'}"
+          wordsPerMinute="50" />`,
+        EXT,
+      );
+      await expect(page.getByText("3 min read")).toBeVisible();
+    });
+
+    test("renders the clock icon with aria-hidden", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="200" />`,
+        EXT,
+      );
+      const icon = page.locator(".xmlui-reading-time svg");
+      await expect(icon).toHaveAttribute("aria-hidden", "true");
+    });
+  });
+
+  test.describe("Accessibility", () => {
+    test("exposes the duration via aria-label", async ({ initTestBed, page }) => {
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(600)}" wordsPerMinute="200" />`,
+        EXT,
+      );
+      await expect(page.getByLabel("3 min read")).toBeVisible();
+    });
+  });
+
+  test.describe("Theme Variables", () => {
+    test("applies 'color-ReadingTime' to the caption", async ({ initTestBed, page }) => {
+      const EXPECTED = "rgb(255, 0, 0)";
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="200" />`,
+        { ...EXT, testThemeVars: { "color-ReadingTime": EXPECTED } },
+      );
+      await expect(page.locator(".xmlui-reading-time")).toHaveCSS("color", EXPECTED);
+    });
+
+    test("applies 'fontSize-ReadingTime' to the caption", async ({ initTestBed, page }) => {
+      const EXPECTED = "20px";
+      await initTestBed(
+        `<ReadingTime content="{'word '.repeat(200)}" wordsPerMinute="200" />`,
+        { ...EXT, testThemeVars: { "fontSize-ReadingTime": EXPECTED } },
+      );
+      await expect(page.locator(".xmlui-reading-time")).toHaveCSS("font-size", EXPECTED);
+    });
+  });
+});

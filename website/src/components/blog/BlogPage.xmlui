@@ -35,11 +35,14 @@
                             {$props.post.description}
                         </H3>
                     </VStack>
-                    <Text variant="info">
-                        {$props.post.author}
-                    •
-                    {formatDate($props.post.date, "d MMM yyyy")}
-                    </Text>
+                    <HStack verticalAlignment="center" gap="$space-3">
+                        <Text variant="info">
+                            {$props.post.author}
+                        •
+                        {formatDate($props.post.date, "d MMM yyyy")}
+                        </Text>
+                        <ReadingTime content="{markdownContent()}" />
+                    </HStack>
                     <HStack
                         when="{showTags() && $props.post.tags && $props.post.tags.length > 0}"
                         gap="$space-1_5"

@@ -20,6 +20,7 @@ import { twoColumnCodeRenderer } from "./docs/TwoColumnCode";
 import { pageNotFoundRenderer } from "./docs/PageNotFound";
 import { releaseListRenderer } from "./docs/ReleaseList";
 import { blogComponentRenderer } from "./blog/Blog";
+import { readingTimeRenderer } from "./blog/ReadingTime";
 import {
   findNavItem,
   getNavGroup,
@@ -50,6 +51,7 @@ export default {
     pageNotFoundRenderer,
     releaseListRenderer,
     blogComponentRenderer,
+    readingTimeRenderer,
   ],
   functions: {
     findNavItem,
