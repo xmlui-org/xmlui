@@ -512,6 +512,40 @@ test("relative size test", async ({ initTestBed, page }) => {
   expect(heightMd).toBeLessThanOrEqual(heightLg);
 });
 
+// Regression test for #3280: a global min-height was masking size differences
+// for buttons with text labels (whose intrinsic height is below the min).
+test("size affects rendered height for label-only buttons", async ({ initTestBed, page }) => {
+  const components = sizeValues
+    .map((size) => `<Button testId="${size}" size="${size}" label="${size}" />`)
+    .join("\n");
+
+  await initTestBed(`<Fragment>${components}</Fragment>`);
+  const { height: heightXs } = await getBounds(page.getByTestId("xs"));
+  const { height: heightSm } = await getBounds(page.getByTestId("sm"));
+  const { height: heightMd } = await getBounds(page.getByTestId("md"));
+  const { height: heightLg } = await getBounds(page.getByTestId("lg"));
+
+  expect(heightXs).toBeLessThan(heightSm);
+  expect(heightSm).toBeLessThan(heightMd);
+  expect(heightMd).toBeLessThan(heightLg);
+});
+
+test("size affects rendered height for icon+label buttons", async ({ initTestBed, page }) => {
+  const components = sizeValues
+    .map((size) => `<Button testId="${size}" size="${size}" icon="drive" label="${size}" />`)
+    .join("\n");
+
+  await initTestBed(`<Fragment>${components}</Fragment>`);
+  const { height: heightXs } = await getBounds(page.getByTestId("xs"));
+  const { height: heightSm } = await getBounds(page.getByTestId("sm"));
+  const { height: heightMd } = await getBounds(page.getByTestId("md"));
+  const { height: heightLg } = await getBounds(page.getByTestId("lg"));
+
+  expect(heightXs).toBeLessThan(heightSm);
+  expect(heightSm).toBeLessThan(heightMd);
+  expect(heightMd).toBeLessThan(heightLg);
+});
+
 test("testState initializes to default value", async ({ initTestBed }) => {
   const getState = (await initTestBed(`<Fragment />`)).testStateDriver.testState;
   await expect.poll(getState).toEqual(null);
