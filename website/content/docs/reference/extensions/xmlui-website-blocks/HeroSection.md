@@ -30,17 +30,23 @@ Additional CSS class names to apply to the hero section
 
 Horizontal alignment of the content within its area
 
+Available values: `start`, `center` **(default)**, `end`
+
 ### `contentPlacement`
 
 > [!DEF]  default: **"bottom"**
 
 Position of the content area relative to the header
 
+Available values: `left`, `right`, `bottom` **(default)**
+
 ### `contentTone`
 
 > [!DEF]  default: **"dark"**
 
 The tone for the content section, affecting text colors
+
+Available values: `light`, `dark` **(default)**, `reverse`
 
 ### `contentWidth`
 
@@ -76,11 +82,15 @@ Gap between header and content sections
 
 Alignment of the header content
 
+Available values: `start`, `center` **(default)**, `end`
+
 ### `headerTone`
 
 > [!DEF]  default: **"dark"**
 
 The tone for the header section, affecting text colors
+
+Available values: `light`, `dark` **(default)**, `reverse`
 
 ### `headerWidth`
 

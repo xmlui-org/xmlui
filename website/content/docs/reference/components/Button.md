@@ -249,6 +249,8 @@ Available values:
 </App>
 ```
 
+> The `outlined` border color of a `primary` Button resolves to the shared `borderColor-outlined` theme token. Form inputs that opt into `variant="outlined"` (for example `Select variant="outlined"`) read from the same token, so an outlined Button and an outlined Select sitting next to each other always share the same border color.
+
 ## Events [#events]
 
 ### `click` [#click]
@@ -381,9 +383,9 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-attention-solid--active | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-attention-solid--hover | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary | $color-primary-500 | $color-primary-500 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined | $color-primary-600 | $color-primary-600 |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined--active | *none* | *none* |
-| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined--hover | $color-primary-500 | $color-primary-500 |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined | $borderColor-outlined | $borderColor-outlined |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined--active | $borderColor-outlined--active | $borderColor-outlined--active |
+| [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-outlined--hover | $borderColor-outlined--hover | $borderColor-outlined--hover |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-solid | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-solid--active | *none* | *none* |
 | [borderColor](/docs/styles-and-themes/common-units/#color)-Button-primary-solid--hover | *none* | *none* |
@@ -469,7 +471,6 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 | [gap](/docs/styles-and-themes/common-units/#size)-Button-vertical | $space-1 | $space-1 |
 | [height](/docs/styles-and-themes/common-units/#size-values)-Button | fit-content | fit-content |
 | [height](/docs/styles-and-themes/common-units/#size-values)-Button-vertical | fit-content | fit-content |
-| [minHeight](/docs/styles-and-themes/common-units/#size-values)-Button | 2.5rem | 2.5rem |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button--focus | $outlineColor--focus | $outlineColor--focus |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button-attention-ghost--focus | *none* | *none* |
 | [outlineColor](/docs/styles-and-themes/common-units/#color)-Button-attention-outlined--focus | *none* | *none* |

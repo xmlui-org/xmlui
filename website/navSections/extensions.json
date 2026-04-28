@@ -160,6 +160,14 @@
               "to": "/docs/reference/extensions/xmlui-website-blocks/_overview"
             },
             {
+              "label": "Backdrop",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Backdrop"
+            },
+            {
+              "label": "Breakout",
+              "to": "/docs/reference/extensions/xmlui-website-blocks/Breakout"
+            },
+            {
               "label": "Carousel",
               "to": "/docs/reference/extensions/xmlui-website-blocks/Carousel"
             },
