@@ -160,19 +160,19 @@ test.describe("Share", () => {
       initTestBed,
       page,
     }) => {
-      await initTestBed(`<Share copyLabel="Másolás" />`, EXT);
+      await initTestBed(`<Share copyLabel="Copy this page" />`, EXT);
       await page.getByRole("button", { name: "Open share menu" }).click();
-      await expect(page.getByRole("menuitem", { name: /Másolás/ })).toBeVisible();
+      await expect(page.getByRole("menuitem", { name: /Copy this page/ })).toBeVisible();
     });
 
     test("custom 'chatGptLabel' is shown for the ChatGPT item", async ({
       initTestBed,
       page,
     }) => {
-      await initTestBed(`<Share chatGptLabel="GPT-vel megnyitás" />`, EXT);
+      await initTestBed(`<Share chatGptLabel="Open with GPT" />`, EXT);
       await page.getByRole("button", { name: "Open share menu" }).click();
       await expect(
-        page.getByRole("menuitem", { name: /GPT-vel megnyitás/ }),
+        page.getByRole("menuitem", { name: /Open with GPT/ }),
       ).toBeVisible();
     });
 
@@ -195,13 +195,13 @@ test.describe("Share", () => {
       page,
     }) => {
       await initTestBed(
-        `<Share markdownContent="hi" copiedLabel="Vágólapra másolva" />`,
+        `<Share markdownContent="hi" copiedLabel="Copied to clipboard" />`,
         EXT,
       );
       await page.getByRole("button", { name: "Open share menu" }).click();
       await page.getByRole("menuitem", { name: /Copy page/ }).click();
       await expect(
-        page.getByRole("menuitem", { name: /Vágólapra másolva/ }),
+        page.getByRole("menuitem", { name: /Copied to clipboard/ }),
       ).toBeVisible();
     });
 
