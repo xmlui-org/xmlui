@@ -29,6 +29,8 @@ import { miscellaneousUtils } from "../appContext/misc-utils";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
+import { createLog } from "../appContext/log";
+import { AppUtilsNamespace, ClipboardNamespace } from "../appContext/app-utils";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -942,6 +944,10 @@ export function AppContent({
   // --- Create AppState object with global state management functions
   const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
 
+  // --- Phase 2 managed replacement globals
+  const silentConsole = appGlobals?.silentConsole === true;
+  const Log = useMemo(() => createLog(silentConsole), [silentConsole]);
+
   // --- Wrap toast to log calls to _xsLogs for test trace capture
   const tracedToast = useMemo(() => {
     function logToast(type: string, message: unknown) {
@@ -1054,6 +1060,11 @@ export function AppContent({
       // --- AppState global state management
       AppState,
 
+      // --- Phase 2 managed replacement globals
+      Log,
+      App: AppUtilsNamespace,
+      Clipboard: ClipboardNamespace,
+
       // --- PubSub messaging
       pubSubService,
       publishTopic: pubSubService.publishTopic,
@@ -1085,6 +1096,7 @@ export function AppContent({
     scrollBookmarkIntoView,
     root,
     AppState,
+    Log,
     pubSubService,
     storageTimestamp,
   ]);

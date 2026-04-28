@@ -192,6 +192,12 @@ export interface XsLogEntry {
    * - `"state:change"` — container state mutation
    * - `"sandbox:warn"` — a banned DOM API was accessed while `strictDomSandbox` is `false`;
    *   the access was allowed but flagged. Contains `api` and optionally `help` fields.
+   * - `"log:debug"` | `"log:info"` | `"log:warn"` | `"log:error"` — Log.* calls from
+   *   expressions. Contains `args: unknown[]`.
+   * - `"app:randomBytes"` — App.randomBytes(n) called. Contains `n: number`.
+   * - `"app:mark"` — App.mark(label). Contains `label: string`, `perfTs: number`.
+   * - `"app:measure"` — App.measure(label, from, to?). Contains `duration: number`.
+   * - `"clipboard:copy"` — Clipboard.copy(text). Contains `length: number`.
    */
   kind?: string;
   eventName?: string;

@@ -46,6 +46,12 @@ export type StandaloneAppDescription = {
    *   (the rollout warn phase default), the access proceeds but a `console.warn` is
    *   emitted and a `"sandbox:warn"` Inspector trace entry is pushed so teams can audit
    *   usages before flipping to `true`. See `dev-docs/plans/dom-api-hardening.md`.
+   * - `silentConsole` (boolean, default `false`) — controls whether `Log.*` calls mirror
+   *   to the native `console.*` in addition to the Inspector trace. When `false` (default),
+   *   `Log.info("x")` writes both to the trace and to `console.info`. When `true`, only the
+   *   trace entry is emitted — nothing reaches the browser console. Useful in production
+   *   deployments where trace data is exported to a server sink. This flag does NOT re-enable
+   *   direct `console` access from expressions; that is governed by `strictDomSandbox`.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
