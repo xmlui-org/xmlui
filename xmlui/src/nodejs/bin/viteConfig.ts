@@ -87,12 +87,19 @@ export async function getViteConfig({
     // console.error(e);
   }
 
+  // Single instance shared by the main pipeline and the dep-scanner pipeline.
+  // The dep scanner runs a separate Rolldown build that only sees plugins
+  // listed under `optimizeDeps.rolldownOptions.plugins`. Without this, .xmlui
+  // files reached via `import.meta.glob('/src/**')` are not transformed by the
+  // xmlui plugin during scanning and Rolldown's parser fails on the XML markup.
+  const xmluiPlugin = ViteXmlui({}) as Plugin;
+
   return defineConfig({
     plugins: [
       react(),
       svgr(),
       ViteYaml(),
-      ViteXmlui({}) as Plugin,
+      xmluiPlugin,
       cssLayerOrderPlugin(),
       ...(overrides.plugins || []),
     ] as Plugin[],
@@ -136,6 +143,10 @@ export async function getViteConfig({
     optimizeDeps: {
       extensions: [".xmlui", ".xmlui.xs", ".xs"],
       rolldownOptions: {
+        // Run the xmlui transform inside the dep-scanner's Rolldown pipeline.
+        // The scanner does NOT inherit the main `plugins` list, so without this
+        // it would try to parse raw XML markup as JS/JSX and fail.
+        plugins: [xmluiPlugin],
         // Tell Rolldown's dep scanner to treat these extensions as JS modules.
         // Without this, Rolldown auto-detects the content type of .xmlui files,
         // sees XML opening tags like <Theme and incorrectly classifies them as JSX,
