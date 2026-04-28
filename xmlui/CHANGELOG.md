@@ -1,5 +1,12 @@
 # xmlui
 
+## 0.12.24
+
+### Patch Changes
+
+- cfa46e7: Refactor Button component styles and tests
+- ba102d8: fix: vite builds failing to detect they are in vite mode, not in standalone mode, breaking the `xmlui start` and other commands for websites using vite.
+
 ## 0.12.23
 
 ### Patch Changes
