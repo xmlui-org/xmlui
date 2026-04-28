@@ -182,7 +182,7 @@ export class StyleRegistry {
     const orderedLayers = ["reset", "base", "components", "themes", "dynamic"];
     const cssByLayer = new Map<string, string>();
 
-    Array.from(this.cache.values()).forEach((entry) => {
+    Array.from(this.cache.values()).reverse().forEach((entry) => {
       const current = cssByLayer.get(entry.layer) || "";
       cssByLayer.set(entry.layer, `${current}${entry.css}`);
     });

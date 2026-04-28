@@ -163,7 +163,6 @@ $transition-Button: createThemeVar('transition-#{$component}');
   .button {
     width: createThemeVar("width-Button");
     height: createThemeVar("height-Button");
-    min-height: createThemeVar("minHeight-Button");
     line-height: normal;
     min-width: 0;
     padding: 0;

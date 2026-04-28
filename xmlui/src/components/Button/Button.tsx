@@ -135,7 +135,6 @@ export const ButtonMd = createMetadata({
     [`width-${COMP}-vertical`]: "fit-content",
     [`height-${COMP}-vertical`]: "fit-content",
     [`gap-${COMP}-vertical`]: "$space-1",
-    [`minHeight-${COMP}`]: "2.5rem",
     [`borderRadius-${COMP}`]: "$borderRadius",
     [`fontSize-${COMP}`]: "$fontSize-sm",
     [`fontWeight-${COMP}`]: "$fontWeight-medium",
