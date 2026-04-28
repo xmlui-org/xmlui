@@ -765,7 +765,7 @@ const Blockquote = ({ children, style }: BlockquoteProps) => {
       tip: <ThemedIcon name="admonition_tip" />,
       card: null,
       feat: <ThemedIcon name="star" size="$space-2_5" />,
-      def: <ThemedIcon name="definition" />,
+      def: <ThemedIcon name="definition" size="$space-3" />,
     };
 
     // Render adornment blockquote with the updated structure
