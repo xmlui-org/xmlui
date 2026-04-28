@@ -5,7 +5,6 @@ Use FileInput to include a file picker in a form, or use FileUploadDropZone for 
 A support ticket form has standard text fields plus an optional attachment. Adding `<FileInput>` as a direct child of the form places a file picker inline with the other fields. The file is included in the form data under its `bindTo` name when the form submits.
 
 ```xmlui-pg copy display name="Support ticket form with file attachment"
----app display
 <App>
   <Form
     data="{{ subject: '', description: '' }}"
