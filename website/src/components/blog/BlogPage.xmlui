@@ -17,30 +17,27 @@
             width="100%"
             marginTop="$space-4"
         >
-            <Theme
-                textColor-Link="$color-primary-500"
-                textColor-Link--hover="$color-primary-400"
-            >
-                <Link to="/blog" noIndicator>
-                    ← Go to all posts
-                </Link>
-            </Theme>
+            <HStack verticalAlignment="center" gap="$space-3">
+                <Theme
+                    textColor-Link="$color-primary-500"
+                    textColor-Link--hover="$color-primary-400"
+                >
+                    <Link to="/blog" noIndicator>
+                        ← Go to all posts
+                    </Link>
+                </Theme>
+                <SpaceFiller />
+                <Share
+                    pageTitle="{$props.post.title}"
+                    markdownContent="{markdownContent()}"
+                />
+            </HStack>
             <HStack gap="$space-5">
-                <VStack width="*" gap="$space-2">
-                    <VStack gap="$space-0_5">
-                        <HStack
-                            verticalAlignment="start"
-                            horizontalAlignment="space-between"
-                            gap="$space-3"
-                        >
-                            <H1 showAnchor="false" width="*">
-                                {$props.post.title}
-                            </H1>
-                            <Share
-                                pageTitle="{$props.post.title}"
-                                markdownContent="{markdownContent()}"
-                            />
-                        </HStack>
+                <VStack width="*" gap="$space-4">
+                    <VStack gap="$space-2">
+                        <H1 showAnchor="false">
+                            {$props.post.title}
+                        </H1>
                         <H3 variant="blogPostDescription">
                             {$props.post.description}
                         </H3>
