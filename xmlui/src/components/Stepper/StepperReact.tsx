@@ -12,6 +12,7 @@ import React, {
 import classnames from "classnames";
 
 import styles from "./Stepper.module.scss";
+import Icon from "../Icon/IconReact";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { useEvent } from "../../components-core/utils/misc";
@@ -175,12 +176,22 @@ export const Stepper = memo(
     // --- Rendering helpers (horizontal mode)
     const renderIcon = useCallback(
       (
-        item: { completed?: boolean; error?: boolean },
+        item: { completed?: boolean; error?: boolean; icon?: string },
         index: number,
         isActive: boolean,
       ) => {
         const completed = !!item.completed;
         const error = !!item.error;
+        let content: React.ReactNode;
+        if (error) {
+          content = <Icon name="error" size="sm" />;
+        } else if (completed) {
+          content = <Icon name="checkmark" size="sm" />;
+        } else if (item.icon) {
+          content = <Icon name={item.icon} size="sm" />;
+        } else {
+          content = index + 1;
+        }
         return (
           <span
             className={classnames(styles.iconCircle, {
@@ -190,7 +201,7 @@ export const Stepper = memo(
             })}
             aria-hidden="true"
           >
-            {error ? "!" : completed ? "✓" : index + 1}
+            {content}
           </span>
         );
       },

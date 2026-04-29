@@ -24,6 +24,20 @@ export const StepMd = createMetadata({
         "Optional icon name to display in the step indicator instead of the step number.",
       valueType: "string",
     },
+    error: {
+      description:
+        "When `true`, the step header is rendered in the error state (red icon and label, " +
+        "with an `!` glyph in place of the step number).",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    completed: {
+      description:
+        "When `true`, the step header is rendered in the completed state (a checkmark glyph " +
+        "and the completed color). Ignored when `error` is also `true`.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
   },
   events: {
     activated: {

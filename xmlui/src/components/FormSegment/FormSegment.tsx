@@ -57,6 +57,14 @@ export const FormSegmentMd = createMetadata({
         "and `false` when all fields are valid. This is the counterpart of `isValid`.",
       signature: "hasIssues: boolean",
     },
+    isDirty: {
+      description:
+        "This property returns `true` when at least one field in this segment has been " +
+        "modified by the user (touched), and `false` when no field has been changed yet. " +
+        "Useful for showing validation feedback only after the user has interacted with " +
+        "the segment.",
+      signature: "isDirty: boolean",
+    },
   },
 });
 
