@@ -1246,7 +1246,15 @@
                 <HomePage />
             </Page>
             <Page url="/get-started">
-                <GetStartedPage />
+                <CHStack width="100%" gap="0" padding="0">
+                    <VStack
+                        width="100%"
+                        maxWidth="$maxWidth-content-GetStartedPage"
+                        maxWidth-md="$maxWidth-md-content-GetStartedPage"
+                    >
+                        <Markdown content="{appGlobals.prefetchedContent['/pages/get-started.md']}" />
+                    </VStack>
+                </CHStack>
             </Page>
             <Page url="/news">
                 <NewsAndReviews />
