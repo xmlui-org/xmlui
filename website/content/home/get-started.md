@@ -175,8 +175,8 @@ args = ["mcp"]
 
 ## What's next
 
-- `xmlui trace` enables Inspector tracing in any existing app.
-- `xmlui build` produces an optimized standalone bundle of just the components your app uses.
+- `xmlui distill-trace` turns an exported Inspector trace into structured JSON that Claude can analyze.
+- `xmlui configure-claude --scope project` writes a committable `.mcp.json` for repo-shared setup.
 - `xmlui list-demos` shows the other starter apps you can scaffold with `xmlui new`.
 
 ### More demo apps
