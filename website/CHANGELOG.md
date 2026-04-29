@@ -1,5 +1,16 @@
 # xmlui-website
 
+## 0.0.22
+
+### Patch Changes
+
+- d9f40c1: feat: add Share component for blog posts
+- Updated dependencies [81e9ef8]
+- Updated dependencies [d9f40c1]
+- Updated dependencies [a82544d]
+  - xmlui@0.12.25
+  - xmlui-docs-blocks@0.0.8
+
 ## 0.0.21
 
 ### Patch Changes
