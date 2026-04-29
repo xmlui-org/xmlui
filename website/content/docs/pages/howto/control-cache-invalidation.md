@@ -55,13 +55,7 @@ By default, when an `APICall` executes successfully, it invalidates ALL DataSour
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "
-    $state.users = [
-      { id: '1', name: 'Alice', role: 'viewer' },
-      { id: '2', name: 'Bob', role: 'viewer' }
-    ];
-    $state.stats = { totalRequests: 42, lastUpdate: 0 };
-  ",
+  "initialize": "$state.users = [{ id: '1', name: 'Alice', role: 'viewer' }, { id: '2', name: 'Bob', role: 'viewer' }]; $state.stats = { totalRequests: 42, lastUpdate: 0 };",
   "operations": {
     "get-users": {
       "url": "/users",
@@ -71,21 +65,13 @@ By default, when an `APICall` executes successfully, it invalidates ALL DataSour
     "get-stats": {
       "url": "/stats",
       "method": "get",
-      "handler": "
-        $state.stats.lastUpdate++;
-        return { ...$state.stats };
-      "
+      "handler": "$state.stats.lastUpdate++; return { ...$state.stats };"
     },
     "update-user": {
       "url": "/users/:id",
       "method": "put",
       "pathParamTypes": { "id": "string" },
-      "handler": "
-        const user = $state.users.find(u => u.id === $pathParams.id);
-        if (user) {
-          user.role = 'admin';
-        }
-      "
+      "handler": "const user = $state.users.find(u => u.id === $pathParams.id); if (user) { user.role = 'admin'; }"
     }
   }
 }

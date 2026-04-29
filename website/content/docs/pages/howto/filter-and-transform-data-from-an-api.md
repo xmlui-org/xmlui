@@ -73,12 +73,7 @@ APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather 
 ---api display
 {
   "apiUrl": "/api",
-  "initialize": "$state.people = [
-    { id: 1, name: 'Alice', active: true,  group: 'A' },
-    { id: 2, name: 'Bob',   active: false, group: 'B' },
-    { id: 3, name: 'Carol', active: true,  group: 'A' },
-    { id: 4, name: 'Dave',  active: true,  group: 'B' }
-  ]",
+  "initialize": "$state.people = [{ id: 1, name: 'Alice', active: true, group: 'A' }, { id: 2, name: 'Bob', active: false, group: 'B' }, { id: 3, name: 'Carol', active: true, group: 'A' }, { id: 4, name: 'Dave', active: true, group: 'B' }]",
   "operations": {
     "get-people": {
       "url": "/people",
