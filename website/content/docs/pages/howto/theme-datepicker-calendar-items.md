@@ -4,26 +4,33 @@ Style calendar grid, selected day, disabled dates, range highlights, and menu vi
 
 DatePicker shares the same trigger-input variables as TextBox and Select (`borderColor-DatePicker`, `borderRadius-DatePicker`, etc.) and adds a calendar-specific layer for the dropdown popup. The calendar item vars — `backgroundColor-item-DatePicker--active` for the selected day and `backgroundColor-item-DatePicker--hover` for hovered cells — control the visual state of individual day cells.
 
-```xmlui-pg copy display name="DatePicker calendar item theming"
+```xmlui-pg copy display name="DatePicker calendar item theming" height="570px"
 ---app display
 <App>
-  <Theme
-    borderRadius-DatePicker="6px"
-    borderColor-DatePicker="$color-primary-300"
-    borderColor-DatePicker--hover="$color-primary-500"
-    outlineColor-DatePicker--focus="$color-primary-300"
-    backgroundColor-menu-DatePicker="white"
-    boxShadow-menu-DatePicker="0 8px 24px rgba(0,0,0,0.12)"
-    borderRadius-menu-DatePicker="8px"
-    backgroundColor-item-DatePicker--active="$color-primary-500"
-    textColor-value-DatePicker="white"
-    backgroundColor-item-DatePicker--hover="$color-primary-50"
-    borderColor-selectedItem-DatePicker="$color-primary-500"
-  >
-    <VStack>
+  <HStack gap="$space-8" alignItems="flex-start">
+    <VStack flex="1">
+      <Text variant="strong">Default</Text>
       <DatePicker label="Pick a date" />
     </VStack>
-  </Theme>
+    <VStack flex="1">
+      <Text variant="strong">Themed</Text>
+      <Theme
+        borderRadius-DatePicker="12px"
+        borderColor-DatePicker="$color-primary-300"
+        borderColor-DatePicker--hover="$color-primary-500"
+        outlineColor-DatePicker--focus="$color-primary-300"
+        backgroundColor-menu-DatePicker="lightyellow"
+        boxShadow-menu-DatePicker="0 8px 24px rgba(0,0,0,0.12)"
+        borderRadius-menu-DatePicker="8px"
+        backgroundColor-item-DatePicker--active="$color-primary-500"
+        textColor-value-DatePicker="white"
+        backgroundColor-item-DatePicker--hover="$color-primary-50"
+        borderColor-selectedItem-DatePicker="$color-primary-500"
+      >
+        <DatePicker label="Pick a date" />
+      </Theme>
+    </VStack>
+  </HStack>
 </App>
 ```
 

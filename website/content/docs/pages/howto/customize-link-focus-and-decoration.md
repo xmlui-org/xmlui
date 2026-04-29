@@ -25,7 +25,7 @@ Link theming covers three areas: text decoration (underline style, color, and th
   >
     <VStack>
       <Link to="https://example.com" label="External link with underline" />
-      <Link to="https://example.com" label="Link with icon" icon="external" />
+      <Link to="https://example.com" label="Link with icon" icon="link" />
       <Text>Inline <Link label="link inside text" to="/docs" /> looks correct.</Text>
     </VStack>
   </Theme>
@@ -34,7 +34,7 @@ Link theming covers three areas: text decoration (underline style, color, and th
 
 ## Key points
 
-**`textDecorationLine-Link`, `textDecorationColor-Link`, and `textDecorationThickness-Link` form the underline**: All three must be set together for a visible underline. `textUnderlineOffset-Link` lifts the line away from the baseline. Use `textDecorationStyle-Link` (`solid`, `dashed`, `dotted`, `wavy`) for decorative effects.
+**Three vars form the underline**: `textDecorationLine-Link`, `textDecorationColor-Link`, and `textDecorationThickness-Link` must all be set together for a visible underline. `textUnderlineOffset-Link` lifts the line away from the baseline. Use `textDecorationStyle-Link` (`solid`, `dashed`, `dotted`, `wavy`) for decorative effects.
 
 **`textDecorationColor-Link--hover` changes the underline color on hover independently**: Set this separately from `textColor-Link--hover` so the underline color can shift without changing the label text color. `textDecorationColor-Link--active` applies the same way on click.
 

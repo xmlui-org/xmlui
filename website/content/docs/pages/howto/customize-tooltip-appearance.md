@@ -2,7 +2,7 @@
 
 Adjust animation, arrow, typography, and background via Tooltip theme vars.
 
-Tooltip exposes variables for its background, text, border, padding, arrow SVG fill and stroke, and slide-in animation timing. The arrow automatically points in the correct direction based on placement — style it with `fill-arrow-Tooltip` (matching `backgroundColor-Tooltip`) and `stroke-arrow-Tooltip` (matching `borderColor-Tooltip`) so the arrow blends seamlessly with the container.
+Tooltip exposes variables for its background, text, border, padding, arrow SVG fill and stroke, and slide-in animation timing. The arrow is hidden by default — enable it per-trigger with `showArrow` in `tooltipOptions` (e.g. `tooltipOptions="top; showArrow"`). Style it with `fill-arrow-Tooltip` (matching `backgroundColor-Tooltip`) and `stroke-arrow-Tooltip` (matching `borderColor-Tooltip`) so the arrow blends seamlessly with the container.
 
 ```xmlui-pg copy display name="Custom Tooltip appearance"
 ---app display
@@ -21,20 +21,25 @@ Tooltip exposes variables for its background, text, border, padding, arrow SVG f
   >
     <HStack gap="16px" padding="24px">
       <Button 
-        label="Hover me (top)" 
-        tooltip="Appears above" 
-        tooltipOptions="top"
+        label="Top with arrow" 
+        tooltip="Appears above with arrow" 
+        tooltipOptions="top; showArrow"
       />
       <Button 
-        label="Hover me (right)" 
-        tooltip="Appears to the right" 
-        tooltipOptions="right"
+        label="Right with arrow" 
+        tooltip="Appears to the right with arrow" 
+        tooltipOptions="right; showArrow"
+      />
+      <Button 
+        label="Bottom no arrow" 
+        tooltip="Appears below, no arrow" 
+        tooltipOptions="bottom"
       />
       <SpaceFiller />
       <Button 
-        label="Hover me (left)" 
-        tooltip="Appears to the left"
-        tooltipOptions="left"
+        label="Left with arrow" 
+        tooltip="Appears to the left with arrow"
+        tooltipOptions="left; showArrow"
       />
     </HStack>
   </Theme>
@@ -43,7 +48,7 @@ Tooltip exposes variables for its background, text, border, padding, arrow SVG f
 
 ## Key points
 
-**`backgroundColor-Tooltip` and `fill-arrow-Tooltip` must match**: The arrow is an SVG shape filled independently of the tooltip container. Set both to the same color so the arrow appears seamless. Similarly, `borderColor-Tooltip` and `stroke-arrow-Tooltip` should match for a bordered tooltip.
+**`showArrow` in `tooltipOptions` must be set to see the arrow**: The arrow is hidden by default. Add `showArrow` to the `tooltipOptions` string (e.g. `"top; showArrow"`) to enable it per-trigger. Once visible, `fill-arrow-Tooltip` and `backgroundColor-Tooltip` must match so the arrow appears seamless. Similarly, `borderColor-Tooltip` and `stroke-arrow-Tooltip` should match for a bordered tooltip.
 
 **`strokeWidth-arrow-Tooltip` controls arrow border thickness**: When you set a visible `stroke-arrow-Tooltip` color, `strokeWidth-arrow-Tooltip` determines how thick that stroke is. Set it to `"0"` to eliminate the arrow border entirely.
 

@@ -68,4 +68,4 @@ Markdown admonitions are styled callout boxes rendered from the `> [!VARIANT]` s
 
 - [Override a component's theme vars](/docs/howto/override-a-components-theme-vars) — how `<Theme>` scoping works
 - [Render a Markdown file as a page](/docs/howto/render-a-markdown-file-as-a-page) — authoring Markdown content in XMLUI
-- [Style Card and NoResult placeholders](/docs/howto/style-card-and-noresult-placeholders) — Card-level container theming
+- [Style Card appearance](/docs/howto/style-card-appearance) — Card-level container theming
