@@ -4,17 +4,17 @@
 // to ensure extensions are loaded in the browser context where Vite can handle SCSS
 
 export const extensionRegistry: Record<string, () => Promise<any>> = {
-  "xmlui-recharts": () => import("../../../../packages/xmlui-recharts/src/index"),
-  "xmlui-pdf": () => import("../../../../packages/xmlui-pdf/src/index"),
-  "xmlui-search": () => import("../../../../packages/xmlui-search/src/index"),
-  "xmlui-website-blocks": () => import("../../../../packages/xmlui-website-blocks/src/index"),
-  "xmlui-animations": () => import("../../../../packages/xmlui-animations/src/index"),
-  "xmlui-docs-blocks": () => import("../../../../packages/xmlui-docs-blocks/src/index"),
-  "xmlui-echart": () => import("../../../../packages/xmlui-echart/src/index"),
-  "xmlui-gauge": () => import("../../../../packages/xmlui-gauge/src/index"),
-  "xmlui-masonry": () => import("../../../../packages/xmlui-masonry/src/index"),
-  "xmlui-tiptap-editor": () => import("../../../../packages/xmlui-tiptap-editor/src/index"),
-  "xmlui-crm-blocks": () => import("../../../../packages/xmlui-crm-blocks/src/index"),
+  "xmlui-recharts": () => import("xmlui-recharts"),
+  "xmlui-pdf": () => import("xmlui-pdf"),
+  "xmlui-search": () => import("xmlui-search"),
+  "xmlui-website-blocks": () => import("xmlui-website-blocks"),
+  "xmlui-animations": () => import("xmlui-animations"),
+  "xmlui-docs-blocks": () => import("xmlui-docs-blocks"),
+  "xmlui-echart": () => import("xmlui-echart"),
+  "xmlui-gauge": () => import("xmlui-gauge"),
+  "xmlui-masonry": () => import("xmlui-masonry"),
+  "xmlui-tiptap-editor": () => import("xmlui-tiptap-editor"),
+  "xmlui-crm-blocks": () => import("xmlui-crm-blocks"),
   // Add more extensions here as needed:
-  // "xmlui-spreadsheet": () => import("../../../../packages/xmlui-spreadsheet/src/index"),
+  // "xmlui-spreadsheet": () => import("xmlui-spreadsheet"),
 };
