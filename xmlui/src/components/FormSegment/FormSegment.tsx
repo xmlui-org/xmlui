@@ -15,6 +15,13 @@ export const FormSegmentMd = createMetadata({
     'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
     "transposed from the segment.",
   props: {
+    label: {
+      description:
+        "An optional human-readable label for this segment. `StepperForm` uses this label " +
+        "as the corresponding step's title; on its own, `FormSegment` does not render the " +
+        "label (it is metadata only).",
+      valueType: "string",
+    },
     orientation: {
       description:
         'Stack orientation for the implicit layout container. Use "vertical" (default) for a VStack ' +
