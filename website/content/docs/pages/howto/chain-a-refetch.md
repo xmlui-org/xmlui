@@ -1,10 +1,10 @@
 # Chain a DataSource refetch
 
-Call `.then()` on `APICall.execute()` to trigger a DataSource refetch after a mutation completes.
+Use `APICall`'s `onSuccess` event to trigger a DataSource refetch after a mutation completes.
 
-When a user action changes server data — liking a post, adding a comment — the displayed list needs to reflect the change. Because `execute()` returns a Promise, you can chain `.then(() => dataSource.refetch())` to re-fetch the list as soon as the write succeeds — without relying on blanket cache invalidation.
+When a user action changes server data — liking a post, adding a comment — the displayed list needs to reflect the change. Put `dataSource.refetch()` in the mutation's `onSuccess` handler so the refresh happens only after the write succeeds — without relying on blanket cache invalidation.
 
-```xmlui-pg copy display {54} name="Click the Like button"
+```xmlui-pg copy display name="Click the Like button"
 ---comp display
 <Component name="SocialButton">
   <Button
@@ -13,24 +13,35 @@ When a user action changes server data — liking a post, adding a comment — t
     variant="outlined"
     themeColor="{$props.themeColor || 'secondary'}"
     size="xs"
-    onClick="{emitEvent('click')}" />
+    onClick="emitEvent('click')" />
 </Component>
----app display
+---app display {46}
 <App>
   <APICall
     id="favoritePost"
     method="post"
     url="/api/posts/{$param}/favorite"
-    invalidates="{[]}" />
+    invalidates="{[]}"
+    onSuccess="timelineData.refetch()" />
   <APICall
     id="unfavoritePost"
     method="post"
     url="/api/posts/{$param}/unfavorite"
-    invalidates="{[]}" />
+    invalidates="{[]}"
+    onSuccess="timelineData.refetch()" />
   <DataSource
     id="timelineData"
     url="/api/timeline"
     method="GET" />
+  <script>
+    function toggleFavorite(post) {
+      if (post.favourited) {
+        unfavoritePost.execute(post.id);
+      } else {
+        favoritePost.execute(post.id);
+      }
+    }
+  </script>
   <VStack>
     <H3>Social Media Timeline</H3>
     <Items data="{timelineData}">
@@ -50,15 +61,8 @@ When a user action changes server data — liking a post, adding a comment — t
             <HStack verticalAlignment="center">
               <SocialButton
                 icon='like'
-                themeColor="{$item.favourited ? 'attention' : 'secondary'}"
-                onClick="() => {
-                  if ($item.favourited) {
-                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
-                  } else {
-                    favoritePost.execute($item.id).then(() => timelineData.refetch());
-                  }
-                }
-                " />
+                onClick="toggleFavorite($item)"
+                themeColor="{$item.favourited ? 'attention' : 'secondary'}" />
               <Text variant="caption">{$item.favourites_count}</Text>
             </HStack>
           </HStack>
@@ -75,7 +79,7 @@ When a user action changes server data — liking a post, adding a comment — t
     "get-timeline": {
       "url": "/timeline",
       "method": "get",
-      "handler": "return $state.posts"
+      "handler": "return $state.posts.map(post => ({ ...post }))"
     },
     "favorite-post": {
       "url": "/posts/:id/favorite",
@@ -99,7 +103,7 @@ When a user action changes server data — liking a post, adding a comment — t
 
 ## Key points
 
-**`execute()` returns a response from the backend**: you can run code after the API call succeeds — such as refetching a DataSource, showing a toast, or navigating to another page.
+**`onSuccess` runs after the backend responds**: put follow-up work there when it must happen after a successful API call, such as refetching a DataSource, showing a toast, or navigating to another page.
 
 **`refetch()` re-issues the DataSource's request**: Calling `timelineData.refetch()` re-sends the original query and updates every element bound to that DataSource when the fresh data arrives.
 
