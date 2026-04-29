@@ -139,15 +139,21 @@ export function AppContent({
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
   // because we can await the async handler. Cannot work with Link clicks due to React Router limitations.
   // didNavigate fires for all navigation types (see useEffect below)
+  //
+  // Phase 2 hardening (Step 2.3): the only sanctioned way to open an external
+  // tab from XMLUI markup. When `options.target === "_blank"`, navigate uses
+  // `window.open(url, "_blank", "noopener,noreferrer")` — never bare
+  // `window.open` — and emits a `kind: "navigate"` trace entry.
   const navigate = useCallback(
     async (to: any, options?: any) => {
       const { onWillNavigate } = navigationHandlers;
 
       // Extract queryParams if exists in options (for NavigateAction compatibility)
       const queryParams = options?.queryParams;
+      const target = options?.target;
 
-      // Remove queryParams from options before passing to navigateRouter
-      const { queryParams: _, ...navigateOptions } = options || {};
+      // Remove queryParams + target from options before passing to navigateRouter
+      const { queryParams: _qp, target: _t, ...navigateOptions } = options || {};
 
       // Call willNavigate handler if defined (only for programmatic navigation)
       if (onWillNavigate) {
@@ -157,6 +163,30 @@ export function AppContent({
           return;
         }
       }
+
+      // Step 2.3: target="_blank" opens an external tab via the audited helper.
+      // Forces noopener,noreferrer so the new tab cannot reach back to window.opener.
+      if (target === "_blank") {
+        const href = typeof to === "string" ? to : (to?.pathname ?? "") + (to?.search ?? "") + (to?.hash ?? "");
+        pushXsLog({
+          kind: "navigate",
+          ts: Date.now(),
+          to: href,
+          target: "_blank",
+        });
+        if (typeof window !== "undefined") {
+          window.open(href, "_blank", "noopener,noreferrer");
+        }
+        return;
+      }
+
+      // Trace same-tab navigation as well so all routing flows are auditable.
+      pushXsLog({
+        kind: "navigate",
+        ts: Date.now(),
+        to: typeof to === "string" ? to : (to?.pathname ?? ""),
+        target: target ?? "_self",
+      });
 
       // Perform the actual navigation
       navigateRouter(to, navigateOptions);
@@ -942,7 +972,13 @@ export function AppContent({
   }, [xsVerbose, xsLogMax]);
 
   // --- Create AppState object with global state management functions
-  const AppState = useMemo(() => createAppState(appStateContextValue), [appStateContextValue]);
+  const appStateKeys = Array.isArray(appGlobals?.appStateKeys)
+    ? (appGlobals?.appStateKeys as string[])
+    : undefined;
+  const AppState = useMemo(
+    () => createAppState(appStateContextValue, { allowedKeys: appStateKeys }),
+    [appStateContextValue, appStateKeys],
+  );
 
   // --- Phase 2 managed replacement globals
   const silentConsole = appGlobals?.silentConsole === true;

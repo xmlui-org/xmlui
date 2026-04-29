@@ -110,7 +110,7 @@ export function AppWithCodeViewNative({
       },
     };
     const appQueryString = await createQueryString(JSON.stringify(data));
-    window.open(`${safePopOutUrl}/#${appQueryString}`, "_blank");
+    window.open(`${safePopOutUrl}/#${appQueryString}`, "_blank", "noopener,noreferrer");
   }, [allThemes, app, components, title, activeTheme, api, activeThemeId, activeTone, activeThemeTone, safePopOutUrl]);
 
   if (withFrame) {

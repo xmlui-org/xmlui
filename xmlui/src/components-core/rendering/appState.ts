@@ -22,6 +22,31 @@ export type AppState = {
 };
 
 /**
+ * Options accepted by `createAppState`.
+ *
+ * - `allowedKeys` — when set, AppState rejects any access whose top-level
+ *   bucket name is not in the list. This implements the
+ *   `App.appGlobals.appStateKeys` schema described in
+ *   `dev-docs/plans/dom-api-hardening.md` (Step 2.1).
+ */
+export type AppStateOptions = {
+  allowedKeys?: readonly string[];
+};
+
+/**
+ * Thrown when an AppState method is called with a bucket name that is not in
+ * the configured `appStateKeys` schema. Surfaces to the caller through the
+ * normal error-handling pipeline rather than being swallowed by AppState's
+ * defensive try/catch blocks.
+ */
+export class AppStateSchemaError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AppStateSchemaError";
+  }
+}
+
+/**
  * Recursively freezes an object and all its nested properties
  */
 function deepFreeze<T>(obj: T): T {
@@ -44,7 +69,28 @@ function deepFreeze<T>(obj: T): T {
 /**
  * Creates an AppState object that provides global state management methods
  */
-export function createAppState(appStateContext: IAppStateContext): AppState {
+export function createAppState(
+  appStateContext: IAppStateContext,
+  options: AppStateOptions = {},
+): AppState {
+  const allowedKeys = options.allowedKeys;
+  const allowedSet = allowedKeys ? new Set(allowedKeys) : null;
+
+  /**
+   * Validate the top-level bucket name against the configured key schema.
+   * No-op when `allowedKeys` is undefined.
+   */
+  function assertAllowedBucket(bucket: string): void {
+    if (!allowedSet) return;
+    const topLevel = String(bucket).split(".")[0];
+    if (!allowedSet.has(topLevel)) {
+      throw new AppStateSchemaError(
+        `[AppState] Bucket '${topLevel}' is not declared in App.appGlobals.appStateKeys. ` +
+          `Allowed buckets: ${[...allowedSet].sort().join(", ") || "(none)"}.`,
+      );
+    }
+  }
+
   // Don't destructure - always access the latest state from context
   /**
    * Helper to get current value from a bucket path
@@ -119,10 +165,12 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     define(bucket: string, initialState: any): any {
       try {
+        assertAllowedBucket(bucket);
         setBucketValue(bucket, initialState);
         const result = deepFreeze(cloneDeep(initialState));
         return result;
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in define('${bucket}'):`, error);
         return undefined;
       }
@@ -135,6 +183,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     get(bucket: string, path?: string): any {
       try {
+        assertAllowedBucket(bucket);
         const bucketValue = getBucketValue(bucket);
         if (bucketValue === undefined) return undefined;
         
@@ -157,6 +206,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         }
         return value;
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in get('${bucket}', '${path}'):`, error);
         return undefined;
       }
@@ -170,6 +220,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     set(bucket: string, pathOrValue: string | any, value?: any): any {
       try {
+        assertAllowedBucket(bucket);
         // Two-argument form: set(bucket, value) - replace entire bucket
         if (value === undefined) {
           setBucketValue(bucket, pathOrValue);
@@ -183,6 +234,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, clonedValue);
         return deepFreeze(cloneDeep(value));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in set('${bucket}'):`, error);
         return undefined;
       }
@@ -196,6 +248,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     async update(bucket: string, pathOrUpdater: string | Function | any, updater?: Function): Promise<any> {
       try {
+        assertAllowedBucket(bucket);
         const bucketValue = getBucketValue(bucket);
         
         // Three-argument form: update(bucket, path, updater) - update nested property
@@ -239,6 +292,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
           return deepFreeze(cloneDeep(merged));
         }
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in update('${bucket}'):`, error);
         return undefined;
       }
@@ -251,6 +305,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     async updateWith(bucket: string, updater: (prev: any) => any): Promise<any> {
       try {
+        assertAllowedBucket(bucket);
         const bucketValue = getBucketValue(bucket);
         const result = updater(bucketValue);
         // Await the result in case the updater returns a promise
@@ -262,6 +317,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         }
         return newValue;
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in updateWith('${bucket}'):`, error);
         return undefined;
       }
@@ -272,6 +328,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     remove(bucket: string, value: any): void {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) return;
 
@@ -281,6 +338,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
           setBucketValue(bucket, newArray);
         }
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in remove('${bucket}'):`, error);
       }
     },
@@ -290,6 +348,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     async removeBy(bucket: string, predicate: (item: any) => boolean | Promise<boolean>): Promise<void> {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) return;
 
@@ -310,6 +369,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
           setBucketValue(bucket, newArray);
         }
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in removeBy('${bucket}'):`, error);
       }
     },
@@ -319,6 +379,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     removeAt(bucket: string, index: number): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) return undefined;
 
@@ -335,6 +396,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(removedItem));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in removeAt('${bucket}', ${index}):`, error);
         return undefined;
       }
@@ -345,6 +407,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     append(bucket: string, value: any): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) {
           return undefined;
@@ -353,6 +416,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(newArray));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in append('${bucket}'):`, error);
         return undefined;
       }
@@ -370,6 +434,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     pop(bucket: string): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array || array.length === 0) {
           return undefined;
@@ -380,6 +445,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(poppedItem));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in pop('${bucket}'):`, error);
         return undefined;
       }
@@ -390,6 +456,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     shift(bucket: string): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array || array.length === 0) {
           return undefined;
@@ -400,6 +467,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(shiftedItem));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in shift('${bucket}'):`, error);
         return undefined;
       }
@@ -410,6 +478,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     unshift(bucket: string, value: any): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) {
           return undefined;
@@ -418,6 +487,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(newArray));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in unshift('${bucket}'):`, error);
         return undefined;
       }
@@ -428,6 +498,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
      */
     insertAt(bucket: string, index: number, value: any): any {
       try {
+        assertAllowedBucket(bucket);
         const array = getArrayFromBucket(bucket);
         if (!array) {
           return undefined;
@@ -447,6 +518,7 @@ export function createAppState(appStateContext: IAppStateContext): AppState {
         setBucketValue(bucket, newArray);
         return deepFreeze(cloneDeep(newArray));
       } catch (error) {
+        if (error instanceof AppStateSchemaError) throw error;
         console.warn(`[AppState] Error in insertAt('${bucket}', ${index}):`, error);
         return undefined;
       }

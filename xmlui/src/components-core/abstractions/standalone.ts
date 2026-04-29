@@ -59,6 +59,12 @@ export type StandaloneAppDescription = {
    * - `withXSRFToken` (boolean, default `true`) — when `true`, `App.fetch()` automatically
    *   injects the `X-XSRF-TOKEN` header from the `XSRF-TOKEN` cookie for same-origin
    *   requests. Set to `false` to disable this behaviour.
+   * - `appStateKeys` (string[], default `undefined`) — when set, `AppState` rejects any
+   *   call whose top-level bucket name is not in the list, throwing
+   *   `AppStateSchemaError`. When unset, AppState is permissive — any bucket name is
+   *   accepted. Use this in production to lock the global state surface to a declared
+   *   schema and prevent accidental key sprawl. See
+   *   `dev-docs/plans/dom-api-hardening.md` Step 2.1.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

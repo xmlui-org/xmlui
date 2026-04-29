@@ -199,6 +199,9 @@ export interface XsLogEntry {
    * - `"app:measure"` — App.measure(label, from, to?). Contains `duration: number`.
    * - `"app:fetch"` — App.fetch(url) called. Contains `url: string`, `method: string`.
    * - `"clipboard:copy"` — Clipboard.copy(text). Contains `length: number`.
+   * - `"navigate"` — navigate(to, options) call. Contains `to: string`,
+   *   `target: "_self" | "_blank"`. Emitted whether navigation goes through the
+   *   router or opens an external tab.
    * - `"ws:connect"` | `"ws:message"` | `"ws:error"` | `"ws:close"` — WebSocket lifecycle.
    * - `"eventsource:connect"` | `"eventsource:message"` | `"eventsource:error"` | `"eventsource:close"` — EventSource lifecycle.
    */

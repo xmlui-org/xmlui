@@ -132,10 +132,10 @@ Note: `min` and `max` are NOT in AppContext. Use JavaScript's `Math.min(...arr)`
 
 | Name | Signature / Type | Description |
 |---|---|---|
-| `navigate` | `(url, options?) → void` | Navigate to path. `options.queryParams` appended as `?k=v`. |
+| `navigate` | `(url, options?) => void` | Navigate to path. `options.queryParams` appended as `?k=v`. `options.target: "_blank"` opens via `window.open(href, "_blank", "noopener,noreferrer")` and skips the router; default `"_self"` calls the router. Every call emits a `kind: "navigate"` trace entry. |
 | `pathname` | `string \| undefined` | Current URL pathname. |
 | `routerBaseName` | `string` | Router base path. |
-| `setNavigationHandlers` | `(onWillNavigate?, onDidNavigate?) → void` | Register navigation lifecycle hooks (used by `App` component). |
+| `setNavigationHandlers` | `(onWillNavigate?, onDidNavigate?) => void` | Register navigation lifecycle hooks (used by `App` component). |
 
 ---
 
@@ -251,6 +251,31 @@ accesses the `theme.tone` sub-path via lodash `get`.
 | `AppState` | `AppState` | Global mutable state object for cross-component data sharing |
 
 `AppState` supports nested paths and array operations for state mutations. Changes are reactive.
+
+**Schema validation (DOM-API hardening Step 2.1):** if `App.appGlobals.appStateKeys` is set to an array of allowed top-level bucket names, every `AppState` method (`define`/`get`/`set`/`update`/`updateWith`/`remove`/`removeBy`/`removeAt`/`append`/`push`/`pop`/`shift`/`unshift`/`insertAt`) calls `assertAllowedBucket()`; passing an undeclared bucket throws `AppStateSchemaError` (top-level segment of dotted paths is checked). When `appStateKeys` is unset, AppState is fully permissive (legacy behaviour).
+
+---
+
+### Sandbox-Sanctioned Replacement Globals
+
+When the DOM sandbox blocks a raw browser API (see `expression-eval.md` § 2a), these XMLUI globals are the managed alternatives. All emit dedicated trace entries.
+
+| Global | Replaces | Trace kind |
+|---|---|---|
+| `Log.debug` / `Log.info` / `Log.warn` / `Log.error` | `console.*` | `log:debug` / `log:info` / `log:warn` / `log:error` |
+| `App.fetch(url, init?)` | `fetch` / `XMLHttpRequest` | `app:fetch` |
+| `App.randomBytes(n)` | `crypto.getRandomValues` | `app:randomBytes` |
+| `App.now()` / `App.mark(name)` / `App.measure(name, start?, end?)` | `performance.now` / `mark` / `measure` | `app:mark` / `app:measure` |
+| `App.environment` | `navigator.userAgent`, `platform`, `connection`, etc. | (read-only object) |
+| `Clipboard.copy(text)` | `navigator.clipboard.writeText` | `clipboard:copy` |
+| `<WebSocket>` component | `WebSocket` constructor | `ws:connect` / `ws:message` / `ws:error` / `ws:close` |
+| `<EventSource>` component | `EventSource` constructor | `eventsource:connect` / `eventsource:message` / `eventsource:error` / `eventsource:close` |
+
+**App-level configuration (in `App.appGlobals` or `config.json`):**
+- `allowedOrigins: string[]` — origin allowlist for `App.fetch` (same-origin always allowed).
+- `appStateKeys: string[]` — declared `AppState` buckets (omit for permissive mode).
+- `strictDomSandbox: boolean` — `false` (default) emits `sandbox:warn` traces; `true` throws `BannedApiError`.
+- `silentConsole: boolean` — when `true`, `Log.*` skips the underlying `console.*` mirror.
 
 ---
 

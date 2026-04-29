@@ -30,7 +30,7 @@ All member access, computed member access, and function invocations use optional
 
 ### 2. Banned globalThis Functions
 
-12 functions on `globalThis` are blocked at runtime via `isBannedFunction()`:
+18+ functions on `globalThis` are blocked at runtime via `isBannedFunction()`:
 
 | Banned function | Help text |
 |----------------|-----------|
@@ -46,10 +46,42 @@ All member access, computed member access, and function invocations use optional
 | `requestIdleCallback` | — |
 | `cancelIdleCallback` | — |
 | `queueMicrotask` | — |
+| `Function` (constructor) | `"Dynamic code execution is not allowed."` |
+| `WebAssembly.compile` / `instantiate` / `compileStreaming` / `instantiateStreaming` | `"WebAssembly execution is not allowed."` |
+| `WebAssembly.Module` / `WebAssembly.Instance` constructors | — |
 
 Error: `"Function {name} is not allowed to call. {help}"`
 
-Source: `bannedFunctions.ts`
+Source: `bannedFunctions.ts`. The `debugger` statement is rejected at parse time (W046).
+
+### 2a. Banned Member Access (DOM Sandbox)
+
+A second guard, `isBannedMember(receiver, key)` in `bannedMembers.ts`, runs on every identifier read, member read, computed-member access, and assignment via `eval-tree-common.ts` (`evalIdentifier`, `evalMemberAccessCore`, `evalCalculatedMemberAccessCore`, `evalAssignmentCore`). Denylists cover ~99 entries:
+
+- **Globals** (47): `window`, `document`, `navigator`, `localStorage`, `sessionStorage`, `indexedDB`, `caches`, `cookieStore`, `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, `Worker`, `SharedWorker`, `MessageChannel`, `BroadcastChannel`, `Atomics`, `SharedArrayBuffer`, `crypto`, `console`, `MutationObserver`, `ResizeObserver`, `IntersectionObserver`, `PerformanceObserver`, `Notification`, `PushManager`, etc.
+- **`document.*`** (21): `body`, `head`, `documentElement`, `cookie`, `domain`, `title` setter, `write`, `writeln`, `execCommand`, `createElement`, `querySelector`, `getElementById`, etc.
+- **`navigator.*`** (13): `clipboard`, `geolocation`, `mediaDevices`, `permissions`, `serviceWorker`, `sendBeacon`, `bluetooth`, `usb`, `serial`, `hid`, `credentials`, `locks`, `share`.
+- **DOM-mutation setters** (18) on `Element`/`Node`: `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `appendChild`, `insertBefore`, `replaceChild`, `removeChild`, `replaceWith`, `before`, `after`, `prepend`, `append`, `setAttribute`, `removeAttribute`, etc.
+
+**Modes** (controlled by `App.appGlobals.strictDomSandbox`, default `false`):
+- `false` — emits a `sandbox:warn` trace entry but allows the access.
+- `true` — throws `BannedApiError`.
+
+**Sanctioned replacements** wired into the global expression scope:
+
+| Banned API | Replacement |
+|---|---|
+| `console.*` | `Log.debug` / `Log.info` / `Log.warn` / `Log.error` |
+| `crypto.getRandomValues` | `App.randomBytes(n)` |
+| `performance.now` / `mark` / `measure` | `App.now()` / `App.mark(name)` / `App.measure(...)` |
+| `fetch` / `XMLHttpRequest` | `App.fetch(url, init?)` (CSRF, `appGlobals.allowedOrigins` allowlist, `app:fetch` trace) |
+| `WebSocket` / `EventSource` | `<WebSocket>` / `<EventSource>` components |
+| `navigator.userAgent`, `platform`, `connection`, etc. | `App.environment` (curated, fingerprint-safe) |
+| `navigator.clipboard.writeText` | `Clipboard.copy(text)` |
+| `window.open`, `window.location.href = …` | `navigate(to, { target: "_blank" \| "_self" })` (`_blank` uses `noopener,noreferrer`) |
+| Raw global mutable state | `AppState` with `App.appGlobals.appStateKeys` schema (undeclared bucket throws `AppStateSchemaError`) |
+
+See `dev-docs/managed-react.md` Appendix A and `dev-docs/plans/dom-api-hardening.md` for the full plan and rollout history.
 
 ### 3. `new` Operator — Only 4 Constructors Allowed
 
@@ -273,7 +305,8 @@ Special files:
 | `components-core/script-runner/process-statement-sync.ts` | Sync statement processor (queue-based) |
 | `components-core/script-runner/process-statement-async.ts` | Async statement processor |
 | `components-core/script-runner/process-statement-common.ts` | Shared statement logic |
-| `components-core/script-runner/bannedFunctions.ts` | 12 banned globalThis functions |
+| `components-core/script-runner/bannedFunctions.ts` | 18+ banned globalThis functions + `BannedApiError` |
+| `components-core/script-runner/bannedMembers.ts` | Property-access guard `isBannedMember` (~99 denylist entries) |
 | `components-core/script-runner/asyncProxy.ts` | 8 array method async proxies |
 | `components-core/script-runner/visitors.ts` | Dependency collection for reactivity |
 | `components-core/script-runner/simplify-expression.ts` | Constant folding / expression optimization |

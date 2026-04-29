@@ -144,11 +144,12 @@ The explicit `?.` operator still works and is recognized by the parser, but it's
 
 ### 2. Banned Global Functions
 
-XMLUI blocks 12 `globalThis` functions at runtime. Calling any of them throws an error:
+XMLUI blocks `globalThis` functions at runtime via `isBannedFunction()`, which compares the
+resolved function reference against a denylist. The full list:
 
 | Function | Why banned | Alternative |
 |----------|-----------|-------------|
-| `eval` | Security risk | — |
+| `eval` | Code injection risk | — |
 | `setTimeout` | Uncontrolled side effects | `delay()` global function |
 | `setInterval` | Uncontrolled side effects | — |
 | `setImmediate` | Uncontrolled side effects | — |
@@ -160,8 +161,61 @@ XMLUI blocks 12 `globalThis` functions at runtime. Calling any of them throws an
 | `requestIdleCallback` | Uncontrolled side effects | — |
 | `cancelIdleCallback` | Paired with banned function | — |
 | `queueMicrotask` | Uncontrolled side effects | — |
+| `Function` (constructor) | Dynamic code execution | — |
+| `WebAssembly.compile` / `instantiate` / `compileStreaming` / `instantiateStreaming` | Code injection | — |
+| `WebAssembly.Module` / `WebAssembly.Instance` constructors | Code injection | — |
 
-The check happens at invocation time via `isBannedFunction()`, which compares the resolved function object against the banned list.
+The `debugger` statement is rejected at parse time (error W046).
+
+### 2a. DOM API Sandbox (Property-Access Guard)
+
+A second guard, `isBannedMember(receiver, key)` in `bannedMembers.ts`, runs on **every**
+identifier read, member read, computed-member access, and assignment inside the evaluators
+(`evalIdentifier`, `evalMemberAccessCore`, `evalCalculatedMemberAccessCore`,
+`evalAssignmentCore` in `eval-tree-common.ts`). About 99 denylist entries in three groups:
+
+**Globals (~47):** `window`, `document`, `navigator`, `localStorage`, `sessionStorage`,
+`indexedDB`, `caches`, `cookieStore`, `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`,
+`Worker`, `SharedWorker`, `MessageChannel`, `BroadcastChannel`, `Atomics`,
+`SharedArrayBuffer`, `crypto`, `console`, `MutationObserver`, `ResizeObserver`,
+`IntersectionObserver`, `PerformanceObserver`, `Notification`, `PushManager`, and more.
+
+**`document.*` (~21):** `body`, `head`, `documentElement`, `cookie`, `domain`, `title`,
+`write`, `writeln`, `execCommand`, `createElement`, `querySelector`, `getElementById`,
+and related DOM-query methods.
+
+**`navigator.*` (~13):** `clipboard`, `geolocation`, `mediaDevices`, `permissions`,
+`serviceWorker`, `sendBeacon`, `bluetooth`, `usb`, `serial`, `hid`, `credentials`,
+`locks`, `share`.
+
+**DOM-mutation setters on `Element`/`Node` (~18):** `innerHTML`, `outerHTML`,
+`insertAdjacentHTML`, `appendChild`, `insertBefore`, `replaceChild`, `removeChild`,
+`replaceWith`, `before`, `after`, `prepend`, `append`, `setAttribute`, `removeAttribute`, etc.
+
+**Mode** (controlled by `App.appGlobals.strictDomSandbox`, default `false`):
+
+| `strictDomSandbox` | Effect |
+|--------------------|--------|
+| `false` (default) | Blocked access emits a `sandbox:warn` trace entry and still executes. |
+| `true` | Blocked access throws `BannedApiError` immediately. |
+
+**Sanctioned replacements** for the common use-cases:
+
+| Blocked | XMLUI replacement | Trace kind |
+|---------|------------------|------------|
+| `console.*` | `Log.debug / .info / .warn / .error` | `log:debug` etc. |
+| `crypto.getRandomValues` | `App.randomBytes(n)` | `app:randomBytes` |
+| `performance.now` / `mark` / `measure` | `App.now()` / `App.mark(name)` / `App.measure(...)` | `app:mark` / `app:measure` |
+| `fetch` / `XMLHttpRequest` | `App.fetch(url, init?)` — enforces `appGlobals.allowedOrigins` | `app:fetch` |
+| `WebSocket` constructor | `<WebSocket>` component | `ws:*` |
+| `EventSource` constructor | `<EventSource>` component | `eventsource:*` |
+| `navigator.userAgent` / `platform` / etc. | `App.environment` (curated object) | — |
+| `navigator.clipboard.writeText` | `Clipboard.copy(text)` | `clipboard:copy` |
+| `window.open(url, "_blank")` | `navigate(to, { target: "_blank" })` | `navigate` |
+| Raw global state | `AppState` (with optional `appGlobals.appStateKeys` schema) | state-change trace |
+
+See [15-app-context.md](15-app-context.md) and
+[managed-react.md](../managed-react.md) Appendix A for the full hardening plan.
 
 ### 3. The `new` Operator — Only 4 Constructors
 
@@ -397,7 +451,17 @@ Before evaluation, `simplify-expression.ts` performs optional constant folding:
 
 3. **`var` means reactive.** It's not JavaScript `var`. Use `let`/`const` for local variables inside functions; use `var` only at component level for reactive state.
 
-4. **12 functions are banned.** Most notably `setTimeout` (use `delay()`) and `eval`. The engine blocks them at runtime, not parse time.
+4. **18+ functions and constructors are banned.** Most notably `setTimeout` (use `delay()`),
+   `eval`, `Function`, and `WebAssembly.*`. Banned at runtime, not parse time. The `debugger`
+   statement is also rejected at parse time (W046).
+
+4a. **A property-access guard blocks the browser DOM surface.** ~99 denylist entries covering
+   `window`, `document`, `navigator`, `localStorage`, `crypto`, `console`, and DOM-mutation
+   setters are checked on every identifier read and member access. Use the sanctioned
+   replacements (`Log.*`, `App.fetch`, `App.randomBytes`, `App.now`/`mark`/`measure`,
+   `App.environment`, `Clipboard.copy`, `navigate({target:"_blank"})`,
+   `<WebSocket>`, `<EventSource>`) instead. Set `appGlobals.strictDomSandbox: true` to
+   throw on violations (default is warn-mode trace).
 
 5. **`new` is restricted to 4 types.** `String`, `Date`, `Blob`, `Error`. Use literals for arrays and objects.
 

@@ -41,23 +41,34 @@ because that is what a "managed framework" actually has to deliver.
 
 ## 2. Findings From the Original Report (Carried Forward)
 
-These remain accurate and are reproduced verbatim in spirit — see the source
-gist for the full discussion.
+These remain accurate where unchanged; rows updated by the
+[DOM API hardening work](plans/dom-api-hardening.md) are flagged with
+*(updated 2026-04)*.
 
 | Property | Verdict | Evidence |
 |---|---|---|
-| No code injection via `eval()` | **Strong** | Custom AST interpreter; `eval`, `Function`, timers banned in [bannedFunctions.ts](../src/components-core/script-runner/bannedFunctions.ts) |
+| No code injection via `eval()` | **Strong** *(updated 2026-04)* | Custom AST interpreter; `eval`, `Function`, timers, **and `WebAssembly.compile`/`instantiate` plus the `WebAssembly.Module` and `WebAssembly.Instance` constructors** banned in [bannedFunctions.ts](../src/components-core/script-runner/bannedFunctions.ts). The `debugger` statement is rejected at parse time (W046). |
 | No timer-based attacks | **Strong** | `setTimeout`, `setInterval`, `setImmediate`, `requestAnimationFrame`, `requestIdleCallback`, `queueMicrotask` all banned |
-| No XSS in default text rendering | **Strong** | All values flow through React JSX escaping; `valueExtractor.asDisplayText()` does not interpolate HTML |
-| Centralized HTTP with CSRF | **Moderate** | `RestApiProxy` adds XSRF + transaction headers; `IncludeMarkup`, `DataLoader`, and inline `fetch()` bypass it |
+| No XSS in default text rendering | **Strong** *(updated 2026-04)* | All values flow through React JSX escaping; `valueExtractor.asDisplayText()` does not interpolate HTML. **In addition, `innerHTML`/`outerHTML`/`insertAdjacentHTML`/`document.write`/`createElement` and the full DOM-mutation surface are now blocked at the property-access guard in [bannedMembers.ts](../src/components-core/script-runner/bannedMembers.ts), so an expression cannot bypass React's escaping path.** |
+| Centralized HTTP with CSRF | **Strong** *(updated 2026-04 — was Moderate)* | `RestApiProxy` adds XSRF + transaction headers. **Raw `fetch`, `XMLHttpRequest`, `WebSocket`, `EventSource`, and `navigator.sendBeacon` are now banned (Step 1.8); the sanctioned `App.fetch()` global delegates to `RestApiProxy`, honours `appGlobals.allowedOrigins`, and emits an `app:fetch` trace entry (Step 3.2). `<WebSocket>` and `<EventSource>` components provide managed lifecycle for streaming connections (Step 3.3).** |
 | Fetch lifecycle management | **Strong** | React Query + `AbortController` cancels stale requests on key change / unmount |
-| Observable by construction | **Strong** | Inspector / `pushXsLog` capture every state change, navigation, and API call |
-| DOM API access | **Weak** | `window`, `document`, `localStorage` reachable from expressions via `globalThis` |
-| Network origin restrictions | **Absent** | No allowlist; relies entirely on browser CORS |
+| Observable by construction | **Strong** *(updated 2026-04)* | Inspector / `pushXsLog` capture every state change, navigation, and API call. **New trace kinds: `sandbox:warn`, `log:debug`/`info`/`warn`/`error`, `app:randomBytes`, `app:mark`/`measure`, `app:fetch`, `clipboard:copy`, `navigate`, `ws:connect`/`message`/`error`/`close`, `eventsource:*` — every Phase 1 ban produces an audit entry in warn mode, and every Phase 2/3 managed primitive emits its own kind.** |
+| DOM API access | **Strong** *(updated 2026-04 — was Weak)* | A property-access guard (`isBannedMember`) in [eval-tree-common.ts](../src/components-core/script-runner/eval-tree-common.ts) is invoked on every identifier read, member read, member write, and computed-member access. The denylists in [bannedMembers.ts](../src/components-core/script-runner/bannedMembers.ts) cover **47 globals**, **21 `document` keys**, **13 `navigator` keys**, and **18 element-setter / mutation keys** — spanning DOM mutation, observers, concurrency primitives, storage, sensors, navigation, network constructors, crypto, performance, and `console`. Default mode (`strictDomSandbox: false`) emits `sandbox:warn` traces; opt-in `true` throws `BannedApiError`. Sanctioned replacements `Log.*`, `App.randomBytes`, `App.now`/`mark`/`measure`, `App.fetch`, `App.environment`, `Clipboard.copy`, `navigate({target:"_blank"})`, `<WebSocket>`/`<EventSource>` are wired into the global expression scope. |
+| Network origin restrictions | **Available** *(updated 2026-04 — was Absent)* | `App.appGlobals.allowedOrigins: string[]` honoured by `App.fetch()`; cross-origin requests are rejected before reaching the network. Same-origin requests are always permitted. Streaming components honour the same allowlist. |
 | Reactive cycle detection | **Absent** | No static cycle analysis on var ↔ DataSource graph |
 | XSS protection in Markdown | **Absent** | `rehype-raw` passes raw HTML through; no DOMPurify |
 
-This part of the assessment is unchanged.
+The DOM API access row is the headline change: the verdict moved from **Weak**
+to **Strong** through the full execution of the
+[DOM API hardening plan](plans/dom-api-hardening.md). **As of 2026-04, every
+step of Phases 1, 2, and 3 has shipped — Steps 0, 1.1–1.9, 2.1–2.6, 3.2,
+3.3, and 3.4 are all implemented, tested, and wired into the global expression
+scope.** The two original "unfinished business" items have closed: Step 2.1
+adds `appStateKeys` schema validation to `AppState` (any undeclared bucket
+throws `AppStateSchemaError`), and Step 2.3 hardens `navigate()` so
+`target: "_blank"` is the only sanctioned way to open an external tab and
+uses `window.open(href, "_blank", "noopener,noreferrer")` internally with a
+`kind: "navigate"` trace entry.
 
 ---
 
@@ -488,13 +499,13 @@ Combining the original report with the new dimensions:
 
 | Dimension | Today | Path to "Managed" |
 |---|---|---|
-| Code injection (`eval`) | **Strong** | Keep banned list maintained |
-| XSS (default rendering) | **Strong** | Sanitize Markdown |
-| HTTP centralisation | **Moderate** | Ban `fetch` in expressions; allowlist origins |
+| Code injection (`eval`) | **Strong** | Keep banned list maintained; **`Function`, `WebAssembly.*`, and `debugger` now covered (2026-04)** |
+| XSS (default rendering) | **Strong** | Sanitize Markdown; **DOM-mutation surface now banned at the property-access guard (2026-04)** |
+| HTTP centralisation | **Strong** *(was Moderate)* | `App.fetch` Gate + `allowedOrigins` allowlist shipped 2026-04; raw `fetch`, `XHR`, `WebSocket`, `EventSource`, `sendBeacon` all banned. |
 | Fetch lifecycle | **Strong** | — |
 | Reactive cycle detection | **Absent** | Build a static AST analyzer |
-| Observability | **Strong** | Add server sink + redaction |
-| DOM API isolation | **Weak** | Restrict `globalThis` access |
+| Observability | **Strong** | Add server sink + redaction; **trace kind union extended with sandbox/log/app/clipboard/navigate/ws/eventsource kinds (2026-04)** |
+| DOM API isolation | **Strong** *(was Weak)* | Property-access guard + 99-entry denylist + sanctioned replacement globals + `App.fetch` Gate + `<WebSocket>`/`<EventSource>` components + `App.environment` shipped 2026-04. **Phase 1, 2, and 3 of the hardening plan are all complete.** |
 | **Accessibility** | **Documented only** | Parse-time linter; framework focus / live-region primitives; theme contrast checker |
 | **Type contracts** | **Metadata, not verified** | Parse-time prop validation against metadata |
 | **Resource lifecycle** | **Strong for framework, asymmetric for user code** | Sandbox-safe lifecycle vocabulary for UDCs |
@@ -520,21 +531,33 @@ The original report's refined pitch stands, with three additions:
 >
 > - Usable without writing React or CSS *(today)*
 > - Observable and traceable by construction *(today)*
-> - No code injection — custom interpreter with banned-function enforcement *(today)*
+> - No code injection — custom interpreter with banned-function enforcement,
+>   covering `eval`, `Function`, timers, `WebAssembly`, and `debugger` *(today, as of 2026-04)*
 > - No XSS in standard rendering paths *(today, with Markdown caveat)*
-> - Controlled network surface *(today, with `fetch()` gap)*
+> - **Sandboxed DOM surface — a 99-entry property-access denylist blocks
+>   `window`/`document`/`navigator`/`localStorage`/`crypto`/`console` and the
+>   DOM-mutation methods at every read, write, and call site, with sanctioned
+>   replacements (`Log.*`, `App.randomBytes`, `App.now`/`mark`/`measure`,
+>   `App.fetch` + `allowedOrigins`, `App.environment`, `Clipboard.copy`,
+>   `navigate({target:"_blank"})` with forced `noopener,noreferrer`,
+>   `<WebSocket>`/`<EventSource>` components, and `AppState` with
+>   `appStateKeys` schema validation) for the legitimate use cases** *(today, as of 2026-04 — all of Phases 1, 2, and 3 of the hardening plan)*
+> - Controlled network surface — raw `fetch`/`XHR`/`WebSocket` banned;
+>   `App.fetch` enforces CSRF + origin allowlist *(today, as of 2026-04)*
 > - **Verified component contracts — props and events checked against metadata at parse time** *(achievable; metadata exists)*
 > - **Accessible by construction — interactive components without an accessible name fail to compile** *(achievable; small primitive set + linter)*
 > - **Cooperative cancellation and structured errors in user code** *(achievable; runtime work)*
 > - No infinite render loops — static cycle detection *(achievable, not yet implemented)*
-> - Declarative origin policy *(achievable, not yet implemented)*
 
 The original report identified three gaps to close (`fetch`, cycles, Markdown
-sanitization) for the security pitch. The broader managed pitch adds three
-more high-leverage gaps: **metadata-driven parse-time prop validation**,
-**accessibility linting**, and **structured cancellation tokens for user
-handlers**. None require new architecture — each plugs into a substrate that
-already exists (metadata, LSP, async statement queue).
+sanitization) for the security pitch. **Two of those three have shipped:
+`fetch` is now gated through `App.fetch` with origin allowlist (2026-04);
+Markdown sanitization remains the only original-report security gap still
+open.** The broader managed pitch adds three more high-leverage gaps:
+**metadata-driven parse-time prop validation**, **accessibility linting**, and
+**structured cancellation tokens for user handlers**. None require new
+architecture — each plugs into a substrate that already exists (metadata,
+LSP, async statement queue).
 
 ---
 
@@ -569,6 +592,21 @@ the natural hinge.
 The original assessment graded XMLUI on the security half of the managed-
 language bargain. That grade was, fairly, **strong with named gaps**.
 
+**As of April 2026, the largest of those named gaps — DOM API isolation — is
+closed end-to-end.** The script-runner sandbox now matches the rigor of the
+existing timer ban: 99 denylist entries spanning DOM mutation, observers,
+concurrency, storage, sensors, navigation, network constructors, and crypto
+are checked at every member access; sanctioned replacements (`Log.*`,
+`App.randomBytes`, `App.now`/`mark`/`measure`, `App.fetch` with origin
+allowlist, `App.environment`, `Clipboard.copy`, `navigate({target:"_blank"})`
+with forced `noopener,noreferrer`, `<WebSocket>`/`<EventSource>` components,
+and `AppState` with `appStateKeys` schema validation) are wired into the global
+expression scope; and every blocked or replaced access produces a structured
+trace entry. **All of Phases 1, 2, and 3 of the
+[DOM API hardening plan](plans/dom-api-hardening.md) are complete.** Of the
+original report's three security gaps (`fetch`, cycles, Markdown), only the
+Markdown sanitization gap remains.
+
 Widening to the full bundle — accessibility, type contracts, lifecycle,
 exception model, concurrency, theming sandbox, forms, routing, i18n,
 versioning, build-time validation, UDC isolation, audit, determinism — the
@@ -576,7 +614,8 @@ verdict is consistent: XMLUI has the right *substrate* almost everywhere
 (metadata, single coercion point, single HTTP chokepoint, async statement
 queue, trace pipeline, CSS Modules, ErrorBoundary on every component) and
 falls short almost everywhere on *enforcement*. It is a framework optimised
-for safe behaviour by convention, not by construction.
+for safe behaviour by convention, not by construction — except now, on the
+DOM-access dimension, where it is safe by construction.
 
 The good news is that the substrate makes "by construction" reachable
 without re-architecting. The same metadata that drives completions can drive
@@ -591,6 +630,40 @@ substrate.
 ---
 
 ## Appendix A. Hardening DOM API Access — A Concrete Ban List
+
+> **✅ Status (2026-04, fully complete):** the entire hardening plan has shipped.
+> See [`plans/dom-api-hardening.md`](plans/dom-api-hardening.md) for the
+> executed step-by-step plan. **All of Phases 1, 2, and 3 are implemented and
+> tested:**
+>
+> - **Phase 1 (Ban) — ✅ shipped:** Steps 0 + 1.1–1.9 — property-access guard
+>   `isBannedMember` + `BannedApiError` + `sandboxWarnLogger` callback in
+>   [bannedMembers.ts](../src/components-core/script-runner/bannedMembers.ts),
+>   invoked from `evalIdentifier`, `evalMemberAccessCore`,
+>   `evalCalculatedMemberAccessCore`, and `evalAssignmentCore` in
+>   [eval-tree-common.ts](../src/components-core/script-runner/eval-tree-common.ts).
+>   Covers Function/WebAssembly/debugger, DOM mutation, concurrency, storage,
+>   sensors, navigation, network constructors, crypto/performance/console.
+> - **Phase 2 (Replace) — ✅ shipped:** Steps 2.1–2.6 — `AppState` with
+>   `appStateKeys` schema (`AppStateSchemaError` thrown on undeclared bucket
+>   access); `Clipboard.copy`; `navigate({target:"_blank"})` with forced
+>   `noopener,noreferrer` and `kind:"navigate"` trace; `App.randomBytes`;
+>   `App.now`/`mark`/`measure`; `Log.*` with `silentConsole` switch.
+> - **Phase 3 (Gate) — ✅ shipped:** Steps 3.2–3.4 — `App.fetch` with
+>   `allowedOrigins` allowlist; `<WebSocket>` and `<EventSource>` components
+>   with managed lifecycle; `App.environment` curated environment-probe
+>   surface.
+>
+> The per-section recommendations in §A.3 (Networking, Storage, Navigation,
+> DOM Mutation, Concurrency, Sensors, Crypto, DevTools/Console) are all
+> realised; the property-access guard sketched in §A.4 is the
+> [`isBannedMember`](../src/components-core/script-runner/bannedMembers.ts)
+> implementation; the migration plan in §A.6 has reached **Phase 2 (opt-in
+> enforcement)** \— `strictDomSandbox: false` (warn) is the default,
+> `strictDomSandbox: true` flips to throw.
+>
+> The original problem statement and threat-model discussion below are
+> retained for historical reference.
 
 The original report grades **DOM API access** as **Weak**: although `eval` and
 the timer family are blocked, expressions can still reach `window`, `document`,
