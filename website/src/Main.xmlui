@@ -1081,8 +1081,13 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Style Card and NoResult placeholders"
-                            to="/docs/howto/style-card-and-noresult-placeholders"
+                            label="Style Card appearance"
+                            to="/docs/howto/style-card-appearance"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Style NoResult placeholder"
+                            to="/docs/howto/style-noresult-placeholder"
                         />
                     </NavGroup>
 
@@ -2378,9 +2383,14 @@
                     content="{appGlobals.docsContent['pages/howto/theme-badge-colors-and-sizes.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/style-card-and-noresult-placeholders">
+            <Page url="/docs/howto/style-card-appearance">
                 <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/style-card-and-noresult-placeholders.md']}"
+                    content="{appGlobals.docsContent['pages/howto/style-card-appearance.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/style-noresult-placeholder">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/style-noresult-placeholder.md']}"
                 />
             </Page>
 

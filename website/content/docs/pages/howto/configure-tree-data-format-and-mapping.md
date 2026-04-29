@@ -7,56 +7,46 @@ Tree supports two data shapes: flat arrays where each node references its parent
 ```xmlui-pg copy display name="Tree flat vs hierarchy data format"
 ---app display
 <App>
-  <variable name="mode" value="flat" />
-  <HStack marginBottom="$space-3">
-    <Button 
-      label="Flat format" 
-      variant="{mode === 'flat' ? 'solid' : 'outlined'}" 
-      onClick="mode = 'flat'" 
-    />
-    <Button 
-      label="Hierarchy format" 
-      variant="{mode === 'hierarchy' ? 'solid' : 'outlined'}" 
-      onClick="mode = 'hierarchy'" 
-    />
+  <HStack gap="$space-6" alignItems="flex-start">
+    <VStack flex="1">
+      <Text variant="strong">Flat format</Text>
+      <Text variant="secondary" size="sm">Each node references its parent by ID</Text>
+      <Tree
+        dataFormat="flat"
+        idField="id"
+        nameField="name"
+        parentIdField="parentId"
+        defaultExpanded="all"
+        data="{[
+          { id: 1, name: 'Electronics', parentId: null },
+          { id: 2, name: 'Phones', parentId: 1 },
+          { id: 3, name: 'Laptops', parentId: 1 },
+          { id: 4, name: 'iPhone', parentId: 2 },
+          { id: 5, name: 'Pixel', parentId: 2 }
+        ]}"
+      />
+    </VStack>
+    <VStack flex="1">
+      <Text variant="strong">Hierarchy format</Text>
+      <Text variant="secondary" size="sm">Each node embeds its children inline</Text>
+      <Tree
+        dataFormat="hierarchy"
+        idField="key"
+        nameField="title"
+        childrenField="items"
+        defaultExpanded="all"
+        data="{[
+          { key: 1, title: 'Electronics', items: [
+              { key: 2, title: 'Phones', items: [
+                  { key: 4, title: 'iPhone', items: [] },
+                  { key: 5, title: 'Pixel', items: [] }
+              ]},
+              { key: 3, title: 'Laptops', items: [] }
+          ]}
+        ]}"
+      />
+    </VStack>
   </HStack>
-
-  <!-- Flat format: nodes reference parent by parentId -->
-  <Tree
-    when="{mode === 'flat'}"
-    dataFormat="flat"
-    idField="id"
-    nameField="name"
-    parentIdField="parentId"
-    defaultExpanded="all"
-    data="{[
-      { id: 1, name: 'Electronics', parentId: null },
-      { id: 2, name: 'Phones', parentId: 1 },
-      { id: 3, name: 'Laptops', parentId: 1 },
-      { id: 4, name: 'iPhone', parentId: 2 },
-      { id: 5, name: 'Pixel', parentId: 2 }
-    ]}"
-  />
-
-  <!-- Hierarchy format: nodes embed their children inline -->
-  <Tree
-    when="{mode === 'hierarchy'}"
-    dataFormat="hierarchy"
-    idField="key"
-    nameField="title"
-    childrenField="items"
-    defaultExpanded="all"
-    data="{[
-      { key: 1, title: 'Electronics', items: [
-          { key: 2, title: 'Phones', items: [
-              { key: 4, title: 'iPhone', items: [] },
-              { key: 5, title: 'Pixel', items: [] }
-          ]},
-          { key: 3, title: 'Laptops', items: [] }
-      ]}
-    ]}"
-    backgroundColor="lightgreen"
-  />
 </App>
 ```
 

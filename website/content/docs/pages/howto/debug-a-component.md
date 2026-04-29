@@ -2,9 +2,9 @@
 
 Inspect component state and data at runtime using `JSON.stringify`, `console.log`, and reactive `Fragment` watchers.
 
-Debugging XMLUI components is different from debugging plain JavaScript — you cannot set breakpoints in markup. Instead, use three complementary techniques: render a data snapshot directly in the UI with `JSON.stringify`, log values to the browser console from event handlers, or attach a side-effect function to a `Fragment` so it fires every time a reactive value changes. These approaches let you inspect props, `DataSource` payloads, and variables without leaving XMLUI.
+Debugging XMLUI components is different from debugging plain JavaScript — you cannot set breakpoints in markup. Instead, use three complementary techniques: render a data snapshot directly in the UI with `JSON.stringify`, log values to the browser console from event handlers, or attach a side-effect function to a `Fragment` so it fires automatically every time a reactive value changes — no button click required. These approaches let you inspect props, `DataSource` payloads, and variables without leaving XMLUI.
 
-```xmlui-pg
+```xmlui-pg name="Debug a component"
 ---app
 <App>
   <Test />
@@ -12,12 +12,7 @@ Debugging XMLUI components is different from debugging plain JavaScript — you 
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.user_data = {
-      id: 42,
-      name: 'John Doe',
-      preferences: { theme: 'dark', notifications: true },
-      recentItems: ['item1', 'item2', 'item3']
-    }",
+  "initialize": "$state.user_data = { id: 42, name: 'John Doe', preferences: { theme: 'dark', notifications: true }, recentItems: ['item1', 'item2', 'item3'] }",
   "operations": {
     "get_user_data": {
       "url": "/user_data",
@@ -28,7 +23,8 @@ Debugging XMLUI components is different from debugging plain JavaScript — you 
 }
 ---comp display
 <Component name="Test"
-  var.counter = "{1}"
+  var.counter="{1}"
+  var.watchLog="{['(watching for changes…)']}"
 >
 
   <DataSource
@@ -37,10 +33,13 @@ Debugging XMLUI components is different from debugging plain JavaScript — you 
   />
 
   <script>
-    // can customize here
     function debug(msg, data) {
       console.log(msg, data)
     };
+    // Called reactively by the Fragment — no button click needed
+    function watchCounter(value) {
+      watchLog = [...watchLog.slice(-4), 'counter changed → ' + value];
+    }
   </script>
 
   <Text>Method 1: JSON.stringify with preserveLinebreaks</Text>
@@ -49,16 +48,21 @@ Debugging XMLUI components is different from debugging plain JavaScript — you 
     {JSON.stringify(userData.value, null, 2)}
   </Text>
 
-  <Text>Method 2: Console.log in handler</Text>
+  <Text>Method 2: Console.log in handler (fires on button click only)</Text>
 
   <Button
     label="Log to console"
     onClick="console.log(userData);console.log(userData.value)"
   />
 
-  <Text>Method 3: Use Fragment and custom debug function to watch changes</Text>
+  <Text>
+    Method 3: Fragment watcher — fires automatically on every change, 
+    no click required
+  </Text>
 
-  <Fragment when="{debug('counter', counter)}" />
+  <Fragment when="{watchCounter(counter)}" />
+
+  <Text preserveLinebreaks="true">{watchLog.join('\n')}</Text>
 
   <Button
     label="Update counter"
@@ -74,7 +78,7 @@ Debugging XMLUI components is different from debugging plain JavaScript — you 
 
 **`console.log` in handlers dumps to DevTools**: Call `console.log(dataSource)` or `console.log(dataSource.value)` inside `onClick` or other event handlers to inspect the full reactive wrapper or the raw payload in the browser console.
 
-**`Fragment` with a side-effect function watches changes**: `<Fragment when="{debug('counter', counter)}" />` calls `debug()` every time `counter` changes, because the expression re-evaluates reactively. The function can log, validate, or alert — and because it returns `undefined` (falsy), the `Fragment` renders nothing.
+**`Fragment` with a side-effect function watches changes reactively**: Unlike Method 2, which requires a button click, `<Fragment when="{watchCounter(counter)}" />` calls `watchCounter()` automatically every time `counter` changes. The function appends to a visible `watchLog` var so the change history appears on screen in real time — no console required. Because the expression returns `undefined` (falsy), the `Fragment` itself renders nothing.
 
 **Custom `<script>` helpers keep debug code reusable**: Define a `debug()` function in a `<script>` block and call it from `when` expressions or handlers. Remove the script block when you ship — clean separation between debug and production code.
 

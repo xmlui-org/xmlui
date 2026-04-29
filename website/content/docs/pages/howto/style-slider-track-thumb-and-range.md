@@ -7,25 +7,33 @@ Slider theming splits into three named regions: `track` (the background bar), `r
 ```xmlui-pg copy display name="Slider track, thumb, and range theming"
 ---app display
 <App>
-  <Theme
-    backgroundColor-track-Slider="$color-surface-200"
-    backgroundColor-range-Slider="$color-primary-500"
-    backgroundColor-thumb-Slider="white"
-    borderColor-thumb-Slider="$color-primary-500"
-    borderWidth-thumb-Slider="2px"
-    borderStyle-thumb-Slider="solid"
-    boxShadow-thumb-Slider="0 1px 4px rgba(0,0,0,0.2)"
-    backgroundColor-thumb-Slider--hover="$color-primary-50"
-    boxShadow-thumb-Slider--hover="0 0 0 6px $color-primary-100"
-    boxShadow-thumb-Slider--focus="0 0 0 6px $color-primary-200"
-    backgroundColor-range-Slider--disabled="$color-surface-300"
-    backgroundColor-track-Slider--disabled="$color-surface-100"
-  >
-    <VStack>
+  <HStack gap="$space-8" alignItems="flex-start">
+    <VStack flex="1">
+      <Text variant="strong">Default</Text>
       <Slider label="Volume" min="0" max="100" value="60" />
       <Slider label="Disabled" min="0" max="100" value="40" enabled="false" />
     </VStack>
-  </Theme>
+    <VStack flex="1">
+      <Text variant="strong">Themed</Text>
+      <Theme
+        backgroundColor-track-Slider="$color-surface-200"
+        backgroundColor-range-Slider="$color-success-500"
+        backgroundColor-thumb-Slider="white"
+        borderColor-thumb-Slider="$color-success-500"
+        borderWidth-thumb-Slider="2px"
+        borderStyle-thumb-Slider="solid"
+        boxShadow-thumb-Slider="0 1px 4px rgba(0,0,0,0.2)"
+        backgroundColor-thumb-Slider--hover="$color-success-50"
+        boxShadow-thumb-Slider--hover="0 0 0 6px $color-success-100"
+        boxShadow-thumb-Slider--focus="0 0 0 6px $color-success-200"
+        backgroundColor-range-Slider--disabled="$color-surface-300"
+        backgroundColor-track-Slider--disabled="$color-surface-100"
+      >
+        <Slider label="Volume" min="0" max="100" value="60" />
+        <Slider label="Disabled" min="0" max="100" value="40" enabled="false" />
+      </Theme>
+    </VStack>
+  </HStack>
 </App>
 ```
 
