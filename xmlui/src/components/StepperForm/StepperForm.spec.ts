@@ -198,6 +198,74 @@ test.describe("form integration", () => {
 });
 
 // =============================================================================
+// FORWARDED STEPPER PROPS
+// =============================================================================
+
+test.describe("forwarded Stepper props", () => {
+  test("stepperOrientation=horizontal renders the role='list' header strip", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    // Default is horizontal: a horizontal Stepper renders the listed step headers.
+    await expect(page.getByRole("list")).toBeVisible();
+    await expect(page.getByRole("listitem")).toHaveCount(2);
+  });
+
+  test("stepperOrientation=vertical omits the horizontal header strip", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}" stepperOrientation="vertical">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    await expect(page.getByRole("list")).toHaveCount(0);
+    // Both labels are still rendered as per-step headers.
+    await expect(page.getByText("Alpha", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Beta", { exact: true }).first()).toBeVisible();
+  });
+
+  test("stepperNonLinear=true makes step headers clickable", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}" stepperNonLinear="true">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    // Both step headers are rendered as <button> elements when stepperNonLinear is true.
+    const headerButtons = page.getByRole("listitem").locator("button");
+    await expect(headerButtons).toHaveCount(2);
+    // Clicking the second header activates the second step.
+    await headerButtons.nth(1).click();
+    await expect(page.getByText("Beta body")).toBeVisible();
+    await expect(page.getByText("Alpha body")).not.toBeVisible();
+  });
+
+  test("stepperStackedLabel=true stacks icon+label vertically in horizontal mode", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <StepperForm data="{{ name: '' }}" stepperStackedLabel="true">
+        <FormSegment label="Alpha"><Text>Alpha body</Text></FormSegment>
+        <FormSegment label="Beta"><Text>Beta body</Text></FormSegment>
+      </StepperForm>
+    `);
+    const headerItem = page.getByRole("listitem").first();
+    const inner = headerItem.locator("> *").first();
+    await expect(inner).toHaveCSS("flex-direction", "column");
+  });
+});
+
+// =============================================================================
 // FORWARDED FORM APIs
 // =============================================================================
 
