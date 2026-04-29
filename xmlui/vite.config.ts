@@ -9,7 +9,6 @@ import { default as ViteXmlui } from "./src/nodejs/vite-xmlui-plugin";
 import dts from "vite-plugin-dts";
 import { libInjectCss } from "vite-plugin-lib-inject-css";
 import copy from "rollup-plugin-copy";
-import { createXmluiLibPreserveDefines } from "./src/nodejs/bin/xmluiEnv";
 // @ts-ignore
 import * as packageJson from "./package.json";
 
@@ -104,7 +103,6 @@ export default ({ mode = "lib" }) => {
       // Preserve only the XMLUI app-mode flags that must survive the framework lib build.
       // They are replaced later by xmlui start / xmlui build / xmlui ssg.
       define = {
-        ...createXmluiLibPreserveDefines(),
         "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
       };
     }
