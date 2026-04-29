@@ -22,20 +22,7 @@ A `Select` rendered before its data arrives has no items to select, so setting `
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.users_initial_value = [
-        {
-          id: 1,
-          username: 'Coder Gal',
-        },
-        {
-          id: 2,
-          username: 'Tech Ninja',
-        },
-        {
-          id: 3,
-          username: 'Design Diva',
-        },
-      ]",
+  "initialize": "$state.users_initial_value = [{ id: 1, username: 'Coder Gal' }, { id: 2, username: 'Tech Ninja' }, { id: 3, username: 'Design Diva' }]",
   "operations": {
     "get_users_initial_value": {
       "url": "/users_initial_value",
