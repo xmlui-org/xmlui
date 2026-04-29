@@ -1,5 +1,11 @@
 # xmlui-docs-blocks
 
+## 0.0.8
+
+### Patch Changes
+
+- d9f40c1: feat: add Share component for blog posts
+
 ## 0.0.7
 
 ### Patch Changes
