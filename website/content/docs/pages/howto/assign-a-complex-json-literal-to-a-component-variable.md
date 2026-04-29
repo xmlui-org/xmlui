@@ -4,7 +4,7 @@ Initialize a component variable with a structured object literal by using double
 
 A single `{expression}` in an attribute value is reserved for reactive expressions. To assign a literal object or array — rather than a bound variable — wrap it in double curly braces: `var.config="{{ key: 'value', items: [...] }}"`. The outer `""` delimit the attribute, the outer `{{` and `}}` signal a literal, and the content is a plain JavaScript object expression.
 
-```xmlui-pg
+```xmlui-pg name="Assign a complex JSON literal to a variable"
 ---app
 <App>
   <Test />
