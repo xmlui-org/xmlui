@@ -37,7 +37,6 @@ APIs often return wrapper objects (`{ status, data: { items: [...] } }`) rather 
 
   <script>
     function transformPeople (data) {
-      console.log(data);
       const items = data.people;
       const itemMap = {
         A: 'Austin',
