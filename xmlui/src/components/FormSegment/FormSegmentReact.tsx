@@ -124,6 +124,9 @@ export const FormSegmentNative = memo(forwardRef(function FormSegmentNative(
   // Subscribe to the enclosing form's validation results.
   const validationResults = useFormContextPart((v) => v?.validationResults);
 
+  // Subscribe to the enclosing form's per-field interaction flags (dirty/touched/etc.).
+  const interactionFlags = useFormContextPart((v) => v?.interactionFlags);
+
   // $segmentData: current values for this segment's fields only.
   const $segmentData = useMemo(() => {
     const result: Record<string, any> = {};
@@ -174,15 +177,25 @@ export const FormSegmentNative = memo(forwardRef(function FormSegmentNative(
     return Object.keys($segmentValidationIssues).length > 0;
   }, [$segmentValidationIssues]);
 
+  // isDirty: true when at least one field in this segment has been modified by the user.
+  const isDirty = useMemo(() => {
+    if (!interactionFlags) return false;
+    for (const field of fields) {
+      if (interactionFlags[field]?.isDirty) return true;
+    }
+    return false;
+  }, [fields, interactionFlags]);
+
   // Register APIs if the callback is provided
   useEffect(() => {
     if (registerComponentApi) {
       registerComponentApi({
         isValid,
         hasIssues,
+        isDirty,
       });
     }
-  }, [isValid, hasIssues, registerComponentApi]);
+  }, [isValid, hasIssues, isDirty, registerComponentApi]);
 
   // Build a Fragment node that injects the segment-scoped vars into the children subtree.
   const nodeWithVars = useMemo(

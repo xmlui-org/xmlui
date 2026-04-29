@@ -3,6 +3,7 @@ import React, { forwardRef, memo, useEffect, useId } from "react";
 import classnames from "classnames";
 
 import styles from "./Stepper.module.scss";
+import Icon from "../Icon/IconReact";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useStepperContext } from "./StepperContext";
 
@@ -10,6 +11,8 @@ type Props = Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> & {
   label?: string;
   description?: string;
   icon?: string;
+  error?: boolean;
+  completed?: boolean;
   classes?: Record<string, string>;
   activated?: () => void;
   children?: ReactNode;
@@ -21,6 +24,8 @@ export const Step = memo(
       label,
       description,
       icon,
+      error = false,
+      completed = false,
       className,
       classes,
       style,
@@ -47,8 +52,10 @@ export const Step = memo(
         label,
         description,
         icon,
+        error,
+        completed,
       });
-    }, [register, innerId, label, description, icon]);
+    }, [register, innerId, label, description, icon, error, completed]);
 
     useEffect(() => {
       return () => {
@@ -85,14 +92,29 @@ export const Step = memo(
     const index = items.findIndex((s) => s.innerId === innerId);
     const isLast = index === items.length - 1;
 
+    const showError = !!error;
+    const showCompleted = !!completed && !showError;
+    const fallbackIcon = index >= 0 ? index + 1 : "";
+    const iconContent: ReactNode = showError ? (
+      <Icon name="error" size="sm" />
+    ) : showCompleted ? (
+      <Icon name="checkmark" size="sm" />
+    ) : icon ? (
+      <Icon name={icon} size="sm" />
+    ) : (
+      fallbackIcon
+    );
+
     const iconEl = (
       <span
         className={classnames(styles.iconCircle, {
-          [styles.active]: isActive,
+          [styles.active]: isActive && !showCompleted && !showError,
+          [styles.completed]: showCompleted,
+          [styles.error]: showError,
         })}
         aria-hidden="true"
       >
-        {icon ? icon : index >= 0 ? index + 1 : ""}
+        {iconContent}
       </span>
     );
 
@@ -102,7 +124,9 @@ export const Step = memo(
           {label && (
             <span
               className={classnames(styles.label, {
-                [styles.active]: isActive,
+                [styles.active]: isActive && !showCompleted && !showError,
+                [styles.completed]: showCompleted,
+                [styles.error]: showError,
               })}
             >
               {label}
