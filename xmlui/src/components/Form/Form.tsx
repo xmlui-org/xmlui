@@ -222,6 +222,18 @@ export const FormMd = createMetadata({
         data: "The current form data being submitted.",
       },
     },
+    submitFailed: {
+      description:
+        `The form infrastructure fires this event when a submit attempt is rejected because ` +
+        `at least one field failed validation. \`willSubmit\` and \`submit\` are NOT fired in ` +
+        `this case; \`submitFailed\` is the only signal available to react to a failed submit.`,
+      signature: "submitFailed(validationResult: { isValid: boolean, errors: any[], warnings: any[], validationResults: Record<string, any>, data: Record<string, any> }): void",
+      parameters: {
+        validationResult:
+          "The validation result of the failed submit, including the per-field validation results.",
+      },
+      isInternal: true,
+    },
     success: {
       description: "The form infrastructure fires this event when the form is submitted successfully.",
       signature: "success(response: any): void",
