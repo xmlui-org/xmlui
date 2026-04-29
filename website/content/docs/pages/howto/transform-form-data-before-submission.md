@@ -1,17 +1,16 @@
 # Transform form data before submission
 
-Return a modified object from onWillSubmit to reshape the form payload — computing derived fields, normalizing values, or stripping helper fields — before the data reaches onSubmit or the server.
+Return a modified object from onWillSubmit to reshape the form payload (computing derived fields, normalizing values, or stripping helper fields) before the data reaches onSubmit or the server.
 
 When `onWillSubmit` returns a plain object, that object is what `onSubmit` receives and what is sent to `submitUrl`. This lets you keep the form data model simple for the user while sending a different, cleaner shape to the API.
 
 ```xmlui-pg copy display name="Form data transformation on submit"
----app display
 <App>
   <Form
     data="{{ firstName: '', lastName: '', rawPhone: '', isMember: false }}"
     onWillSubmit="(data, allData) => ({
       fullName: (data.firstName + ' ' + data.lastName).trim(),
-      phone: data.rawPhone.replace(/\D/g, ''),
+      phone: data.rawPhone.split('').filter(ch => ch >= '0' && ch <= '9').join(''),
       tier: data.isMember ? 'member' : 'guest'
     })"
     onSubmit="(data) => toast.success(JSON.stringify(data))"
@@ -35,7 +34,7 @@ When `onWillSubmit` returns a plain object, that object is what `onSubmit` recei
 <Form
   onWillSubmit="(data) => ({
     fullName: data.firstName + ' ' + data.lastName,
-    phone: data.rawPhone.replace(/\D/g, '')
+    phone: data.rawPhone.split('').filter(ch => ch >= '0' && ch <= '9').join('')
   })"
   onSubmit="(data) => api.register(data)"
 >
@@ -75,19 +74,6 @@ When `onWillSubmit` returns a plain object, that object is what `onSubmit` recei
 </Form>
 ```
 
-**`onWillSubmit` with API calls**: If the transformation needs an API call (e.g. geocoding an address, uploading a file and getting back a URL), call the async function directly. XMLUI automatically recognizes promises and waits for them:
-
-```xmlui
-<Form
-  onWillSubmit="(data) => {
-    const coords = geocode(data.address);
-    return { ...data, ...coords };
-  }"
->
-  <TextBox bindTo="address" label="Address" />
-</Form>
-```
-
 **Returning nothing or `null` proceeds with unmodified data**: If your handler conditionally transforms data, simply return nothing (or `null`) in the branches where the original data is fine:
 
 ```xmlui
@@ -101,19 +87,27 @@ When `onWillSubmit` returns a plain object, that object is what `onSubmit` recei
 >
 ```
 
-**Returning `false` cancels submission**: If the transformed data is still invalid (e.g. a geocoding lookup fails), return `false` to abort. The form stays open with its current values:
+**Returning `false` cancels submission**: If a local check shows that the form should not be submitted yet, return `false` to abort. The form stays open with its current values:
 
 ```xmlui
 <Form
   onWillSubmit="(data) => {
-    const coords = geocode(data.address);
-    if (!coords) {
-      toast.error('Address could not be located.');
+    if (data.accountType === 'business' && !data.vatNumber) {
+      toast.error('Enter a VAT number for business accounts.');
       return false;
     }
-    return { ...data, ...coords };
+    return {
+      ...data,
+      vatNumber: data.vatNumber?.toUpperCase()
+    };
   }"
 >
+  <Select bindTo="accountType" label="Account type">
+    <Option value="personal" label="Personal" />
+    <Option value="business" label="Business" />
+  </Select>
+  <TextBox bindTo="vatNumber" label="VAT number" />
+</Form>
 ```
 
 ---
@@ -121,4 +115,4 @@ When `onWillSubmit` returns a plain object, that object is what `onSubmit` recei
 **See also**
 - [Form component](/docs/reference/components/Form) — `onWillSubmit` full return-value reference, `onSubmit`, `submitUrl`
 - [Validate dependent fields together](/docs/howto/validate-dependent-fields-together) — using `onWillSubmit` to cancel submission
-- [Submit a form with file uploads](/docs/howto/submit-a-form-with-file-uploads) — combining `noSubmit` with async upload in `onWillSubmit`
+- [Submit a form with file uploads](/docs/howto/submit-a-form-with-file-uploads) — combining `noSubmit` with upload handling in `onWillSubmit`

@@ -4,7 +4,11 @@ import type {
   ComponentMetadata,
 } from "../../abstractions/ComponentDefs";
 import type { StandaloneAppDescription } from "../../components-core/abstractions/standalone";
-import { layoutOptionKeys, behaviorPropKeys } from "../../components-core/descriptorHelper";
+import {
+  layoutOptionKeys,
+  behaviorPropKeys,
+  behaviorEventKeys,
+} from "../../components-core/descriptorHelper";
 import { viewportSizeMd } from "../../components/abstractions";
 import type {
   ComponentMetadataProvider,
@@ -209,6 +213,7 @@ const implicitPropNames = layoutOptionKeys;
  * These are implicitly valid on any component.
  */
 const behaviorPropNames = new Set<string>(behaviorPropKeys);
+const behaviorEventNames = new Set<string>(behaviorEventKeys);
 
 /**
  * Checks if a property is a valid layout property variant.
@@ -244,7 +249,7 @@ function lintAttrs(
       !behaviorPropNames.has(name),
   );
   const invalidEvents = Object.keys(component.events ?? {}).filter(
-    (event) => !metadataForCurrentComponent.getEvent(event),
+    (event) => !metadataForCurrentComponent.getEvent(event) && !behaviorEventNames.has(event),
   );
   const invalidApis = Object.keys(component.api ?? {}).filter(
     (api) => !metadataForCurrentComponent.getApi(api),

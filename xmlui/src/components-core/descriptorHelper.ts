@@ -125,13 +125,20 @@ export const behaviorPropKeys: readonly string[] = [
   // TooltipBehavior — triggerProps: tooltip, tooltipMarkdown
   "tooltip", "tooltipMarkdown", "tooltipOptions",
   // ValidationBehavior — triggerProps: bindTo
+  "requiredInvalidMessage",
   "minLength", "maxLength", "lengthInvalidMessage", "lengthInvalidSeverity",
   "minValue", "maxValue", "rangeInvalidMessage", "rangeInvalidSeverity",
   "pattern", "patternInvalidMessage", "patternInvalidSeverity",
   "regex", "regexInvalidMessage", "regexInvalidSeverity",
-  "validationMode", "verboseValidationFeedback",
+  "validationMode", "customValidationsDebounce", "validationDisplayDelay",
+  "verboseValidationFeedback",
   // VariantBehavior — triggerProps: variant
   "variant",
   // EXPERIMENTAL: universal prop to bypass event propagation stop for specific events
   "bubbleEvents",
+];
+
+export const behaviorEventKeys: readonly string[] = [
+  // ValidationBehavior
+  "validate",
 ];
