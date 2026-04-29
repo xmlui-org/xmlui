@@ -5,7 +5,7 @@ Use persist on Form to auto-save in-progress input to localStorage so unsaved dr
 A blog post editor can take a long time to fill in. If the user accidentally refreshes the page or their browser crashes, all their unsaved text is gone. Setting `persist="true"` on the form silently snapshots the current field values to localStorage on every change and restores them on the next visit.
 
 ```xmlui-pg copy display name="Blog post editor with draft persistence"
----app display
+---app display /persist="true"/
 <App>
   <Button 
     variant="outlined" 
@@ -23,11 +23,11 @@ A blog post editor can take a long time to fill in. If the user accidentally ref
     saveLabel="Publish"
   >
     <TextBox label="Title" bindTo="title" required="true" />
-    <Select
-      label="Category"
-      bindTo="category"
-      data="{['general', 'tech', 'design']}"
-    />
+    <Select label="Category" bindTo="category">
+      <Items data="{['general', 'tech', 'design']}">
+        <Option value="{$item}" label="{$item}" />
+      </Items>
+    </Select>
     <TextArea label="Body" bindTo="body" required="true" />
   </Form>
 </App>

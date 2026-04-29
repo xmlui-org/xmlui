@@ -5,7 +5,6 @@ Attach an onValidate handler to an input component to show a custom error messag
 Built-in validators (`required`, `minLength`, `pattern`, etc.) cover most constraints, but sometimes a rule is hard to express declaratively — for example "must not start with a number", "must be all uppercase", or "must be a valid IBAN". `onValidate` lets you write that check as a function. Returning a non-empty string displays it as an error; returning `null` clears any existing error.
 
 ```xmlui-pg copy display name="Inline custom field validation"
----app display
 <App>
   <Form
     data="{{ username: '', promoCode: '' }}"
@@ -87,40 +86,9 @@ Built-in validators (`required`, `minLength`, `pattern`, etc.) cover most constr
 />
 ```
 
-**`customValidationsDebounce` delays `onValidate` without affecting built-ins**: When `onValidate` makes an API call, add `customValidationsDebounce` (milliseconds) so it fires only after the user pauses typing. Built-in validators are unaffected and still run immediately:
-
-```xmlui
-<TextBox
-  bindTo="username"
-  required="true"
-  minLength="3"
-  customValidationsDebounce="400"
-  onValidate="async (v) => {
-    const { taken } = await checkUsername(v);
-    return taken ? 'Already in use.' : null;
-  }"
-/>
-```
-
-**`onValidate` can be `async`**: Return a `Promise<string | null>`. The form waits for the promise before deciding whether to submit:
-
-```xmlui
-<TextBox
-  bindTo="email"
-  pattern="email"
-  customValidationsDebounce="500"
-  onValidate="async (v) => {
-    if (!v) return null;
-    const exists = await api.emailExists(v);
-    return exists ? 'Already registered.' : null;
-  }"
-/>
-```
-
 ---
 
 **See also**
-- [TextBox component](/docs/reference/components/TextBox) — `onValidate`, `validationMode`, `customValidationsDebounce`, and built-in validators
-- [Add an async uniqueness check](/docs/howto/add-an-async-uniqueness-check) — async `onValidate` with debounce
+- [TextBox component](/docs/reference/components/TextBox) — `onValidate`, `validationMode`, and built-in validators
 - [Show validation on blur, not on type](/docs/howto/show-validation-on-blur-not-on-type) — controlling when errors appear
 - [Validate dependent fields together](/docs/howto/validate-dependent-fields-together) — cross-field validation with `onWillSubmit`

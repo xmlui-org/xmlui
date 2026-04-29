@@ -186,7 +186,7 @@ export const FormMd = createMetadata({
         "When `persist` is enabled and the user cancels the form, this property controls " +
         "whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.keepOnCancel,
     },
     dataAfterSubmit: {
       description:
@@ -196,7 +196,7 @@ export const FormMd = createMetadata({
         "`\"clear\"` empties the form as if no `data` property were set.",
       availableValues: ["keep", "reset", "clear"],
       valueType: "string",
-      defaultValue: "keep",
+      defaultValue: defaultProps.dataAfterSubmit,
     },
   },
   events: {
