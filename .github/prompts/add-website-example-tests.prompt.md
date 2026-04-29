@@ -110,3 +110,14 @@ Check for TypeScript errors in the new file. Confirm:
 - Example names in `extractXmluiExample` match the markdown exactly (copy-paste, do not paraphrase)
 - Import paths use `../src/testing/...` (one level up from `tests-e2e/`)
 - The markdown path uses `../../website/content/...` (two levels up)
+
+## Step 6 — Run and fix the tests
+
+Run the newly created spec file and fix any failures before finishing.
+
+**Common failures to watch for:**
+- **Strict-mode violations** (`resolved to N elements`): `getByText('X')` matches a substring in other visible text. Use `{ exact: true }` or a more specific locator such as `page.getByText('X', { exact: true })` or `page.locator('…').getByText('X')`.
+- **Locator not found**: the rendered text differs from the data in the markdown (e.g. truncation, formatting). Inspect the page snapshot in the error output to find the actual text.
+- **Timing issues**: if an assertion fails intermittently, wrap it in `expect.poll()` rather than adding `waitForTimeout()`.
+
+Re-run the tests after each fix until all pass.
