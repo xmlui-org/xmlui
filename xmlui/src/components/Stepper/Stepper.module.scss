@@ -251,6 +251,11 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
     align-self: flex-start;
   }
 
+  // In stackedLabel vertical mode the icon stays at the left edge so the connector line
+  // remains centered under it; the label sits below the icon, horizontally centered on
+  // the icon's column. The labelBlock is constrained to the icon's width with
+  // `text-align: center`, so longer labels overflow symmetrically left and right of the
+  // icon column instead of pushing only to the right.
   .vertical.stackedLabel .verticalHeader {
     flex-direction: column;
     align-items: flex-start;
@@ -258,7 +263,15 @@ $padding-content-Stepper: createThemeVar("padding-content-Stepper");
   }
 
   .vertical.stackedLabel .labelBlock {
-    align-items: flex-start;
+    width: $size-icon-Stepper;
+    align-items: center;
+    text-align: center;
+    overflow: visible;
+  }
+
+  .vertical.stackedLabel .label,
+  .vertical.stackedLabel .description {
+    white-space: nowrap;
   }
 
   .vertical .verticalHeader.clickable {

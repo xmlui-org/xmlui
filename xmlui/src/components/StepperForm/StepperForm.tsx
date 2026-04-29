@@ -37,6 +37,31 @@ export const StepperFormMd = createMetadata({
       valueType: "string",
       defaultValue: "Submit",
     },
+    stepperOrientation: {
+      description:
+        "Layout orientation of the inner `Stepper`. In `horizontal` mode the step " +
+        "headers are laid out in a row above a shared content area; only the active " +
+        "step's content is shown. In `vertical` mode each step renders its own header " +
+        "with the active step's content expanding beneath it.",
+      availableValues: ["horizontal", "vertical"],
+      valueType: "string",
+      defaultValue: "horizontal",
+    },
+    stepperStackedLabel: {
+      description:
+        "When `true`, step labels in the inner `Stepper` are placed below the step icons " +
+        "instead of next to them. Works in both horizontal and vertical orientations.",
+      valueType: "boolean",
+      defaultValue: false,
+    },
+    stepperNonLinear: {
+      description:
+        "When `true`, step headers in the inner `Stepper` become clickable so users can " +
+        "jump to any step. Default is `false` (linear navigation via the auto-generated " +
+        "Back/Next buttons).",
+      valueType: "boolean",
+      defaultValue: false,
+    },
     itemLabelPosition: {
       description:
         `This property sets the position of the item labels within the form. ` +
@@ -274,6 +299,16 @@ const FORWARDED_FORM_PROPS = [
   "dataAfterSubmit",
 ] as const;
 
+// Stepper props that StepperForm forwards to the inner Stepper. The keys are the
+// StepperForm prop names (prefixed with `stepper`) and the values are the Stepper's
+// own prop names. `activeStep` is owned by the auto-generated Back/Next buttons
+// (which call `stepper.next()`/`prev()`), so it is intentionally not forwarded here.
+const FORWARDED_STEPPER_PROPS: Record<string, string> = {
+  stepperOrientation: "orientation",
+  stepperStackedLabel: "stackedLabel",
+  stepperNonLinear: "nonLinear",
+};
+
 export const stepperFormComponentRenderer = wrapComponent(
   COMP,
   () => null,
@@ -302,6 +337,12 @@ export const stepperFormComponentRenderer = wrapComponent(
         if (v !== undefined) formProps[key] = v;
       }
 
+      const stepperProps: Record<string, unknown> = {};
+      for (const [stepperFormKey, stepperKey] of Object.entries(FORWARDED_STEPPER_PROPS)) {
+        const v = node.props?.[stepperFormKey];
+        if (v !== undefined) stepperProps[stepperKey] = v;
+      }
+
       const synthetic: ComponentDef = {
         type: "Form",
         uid: node.uid,
@@ -311,6 +352,7 @@ export const stepperFormComponentRenderer = wrapComponent(
           {
             type: "Stepper",
             uid: STEPPER_UID,
+            props: stepperProps,
             children: stepNodes,
           } as ComponentDef,
         ],
