@@ -18,9 +18,9 @@ export type XmluiAppDefineOptions = XmluiRuntimeFlags & {
 };
 
 export const XMLUI_PRESERVED_DEFINE_KEYS = {
-  buildMode: "import.meta.__XMLUI_BUILD_MODE__",
-  devMode: "import.meta.__XMLUI_DEV_MODE__",
-  standalone: "import.meta.__XMLUI_STANDALONE__",
+  buildMode: "globalThis.__XMLUI_BUILD_MODE__",
+  devMode: "globalThis.__XMLUI_DEV_MODE__",
+  standalone: "globalThis.__XMLUI_STANDALONE__",
 } as const;
 
 export const XMLUI_RUNTIME_ENV_KEYS = {
