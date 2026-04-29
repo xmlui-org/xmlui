@@ -20,11 +20,13 @@ When a user action changes server data — liking a post, adding a comment — t
   <APICall
     id="favoritePost"
     method="post"
-    url="/api/posts/{$param}/favorite" />
+    url="/api/posts/{$param}/favorite"
+    invalidates="{[]}" />
   <APICall
     id="unfavoritePost"
     method="post"
-    url="/api/posts/{$param}/unfavorite" />
+    url="/api/posts/{$param}/unfavorite"
+    invalidates="{[]}" />
   <DataSource
     id="timelineData"
     url="/api/timeline"
@@ -51,11 +53,9 @@ When a user action changes server data — liking a post, adding a comment — t
                 themeColor="{$item.favourited ? 'attention' : 'secondary'}"
                 onClick="() => {
                   if ($item.favourited) {
-                    unfavoritePost.execute($item.id)
-                    timelineData.refetch();
+                    unfavoritePost.execute($item.id).then(() => timelineData.refetch());
                   } else {
-                    favoritePost.execute($item.id)
-                    timelineData.refetch();
+                    favoritePost.execute($item.id).then(() => timelineData.refetch());
                   }
                 }
                 " />
@@ -70,26 +70,7 @@ When a user action changes server data — liking a post, adding a comment — t
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.posts = [
-    {
-      id: '1',
-      content: 'This is a great post about XMLUI!',
-      author: 'John Developer',
-      favourited: false,
-      favourites_count: 5,
-      replies_count: 2,
-      reblogs_count: 1
-    },
-    {
-      id: '2',
-      content: 'Learning how to chain API calls is so useful.',
-      author: 'Jane Designer',
-      favourited: true,
-      favourites_count: 12,
-      replies_count: 4,
-      reblogs_count: 3
-    }
-  ]",
+  "initialize": "$state.posts = [{ id: '1', content: 'This is a great post about XMLUI!', author: 'John Developer', favourited: false, favourites_count: 5, replies_count: 2, reblogs_count: 1 }, { id: '2', content: 'Learning how to chain API calls is so useful.', author: 'Jane Designer', favourited: true, favourites_count: 12, replies_count: 4, reblogs_count: 3 }]",
   "operations": {
     "get-timeline": {
       "url": "/timeline",
@@ -102,13 +83,7 @@ When a user action changes server data — liking a post, adding a comment — t
       "pathParamTypes": {
         "id": "string"
       },
-      "handler": "
-        const post = $state.posts.find(p => p.id === $pathParams.id);
-        if (post) {
-          post.favourited = true;
-          post.favourites_count += 1;
-        }
-      "
+      "handler": "const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = true; post.favourites_count += 1; }"
     },
     "unfavorite-post": {
       "url": "/posts/:id/unfavorite",
@@ -116,13 +91,7 @@ When a user action changes server data — liking a post, adding a comment — t
       "pathParamTypes": {
         "id": "string"
       },
-      "handler": "
-        const post = $state.posts.find(p => p.id === $pathParams.id);
-        if (post) {
-          post.favourited = false;
-          post.favourites_count -= 1;
-        }
-      "
+      "handler": "const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = false; post.favourites_count -= 1; }"
     }
   }
 }
