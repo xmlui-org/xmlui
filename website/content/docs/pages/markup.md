@@ -135,7 +135,7 @@ In this example, `items` starts reactive (`apiResult.value ?? []`) and then gets
   />
   <Button
     label="Add active item"
-    onClick="addItem.execute().then(() => apiResult.refetch())"
+    onClick="addItem.execute()"
   />
 
   <Items data="{items}">
@@ -192,7 +192,7 @@ If you need the variable to stay reactive while also supporting local overrides,
   />
   <Button
     label="Add active item"
-    onClick="addItem.execute().then(() => apiResult.refetch())"
+    onClick="addItem.execute()"
   />
 
   <Items
