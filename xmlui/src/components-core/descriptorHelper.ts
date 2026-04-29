@@ -125,6 +125,7 @@ export const behaviorPropKeys: readonly string[] = [
   // TooltipBehavior — triggerProps: tooltip, tooltipMarkdown
   "tooltip", "tooltipMarkdown", "tooltipOptions",
   // ValidationBehavior — triggerProps: bindTo
+  "requiredInvalidMessage",
   "minLength", "maxLength", "lengthInvalidMessage", "lengthInvalidSeverity",
   "minValue", "maxValue", "rangeInvalidMessage", "rangeInvalidSeverity",
   "pattern", "patternInvalidMessage", "patternInvalidSeverity",

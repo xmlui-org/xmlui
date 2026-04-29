@@ -16,6 +16,11 @@ export const validationBehavior: Behavior = {
         valueType: "boolean",
         description: "Whether this field is required.",
       },
+      requiredInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when the field is required but empty.",
+      },
       minLength: {
         valueType: "number",
         description: "Minimum length for string inputs.",
