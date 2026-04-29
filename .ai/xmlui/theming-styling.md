@@ -23,7 +23,7 @@ XMLUI theming converts declarative theme definitions (TypeScript/JSON) into CSS 
 | `components-core/theming/parse-layout-props.ts` | Theme variable name parser (property, part, breakpoint, state) |
 | `components-core/theming/StyleContext.tsx` | `useStyles()` — hash-based CSS injection with `@layer` |
 | `components-core/theming/component-layout-resolver.ts` | Component-level layout resolution |
-| `components-core/parts/index.ts` | Part constants and `partClassName()` |
+| `components-core/parts/index.ts` | Part constants (e.g. `PART_LABEL`) |
 
 ## ThemeDefinition Interface
 
@@ -240,7 +240,7 @@ return <div className={classnames(themeClassName, styles.component)}>{children}<
 
 - Parts target sub-elements of a component
 - Declared in metadata: `parts: { label: { ... }, input: { ... } }`
-- Applied in native via `partClassName(PART_LABEL)` → sets `data-part-id` attribute
+- Applied in native via `<Part partId={PART_LABEL}>` (from `components/Part/Part`) → sets `data-part-id` attribute
 - Theme variables for parts: `color-label-Input`, `backgroundColor-input-Input`
 - Layout properties for parts: `color-label-Input="$color-primary-600"`
 - `defaultPart` in metadata: specifies which part gets default layout properties
