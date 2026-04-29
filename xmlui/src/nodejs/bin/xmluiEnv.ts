@@ -18,15 +18,12 @@ export type XmluiAppDefineOptions = XmluiRuntimeFlags & {
 };
 
 export const XMLUI_PRESERVED_DEFINE_KEYS = {
-  buildMode: "import.meta.__XMLUI_BUILD_MODE__",
-  devMode: "import.meta.__XMLUI_DEV_MODE__",
-  standalone: "import.meta.__XMLUI_STANDALONE__",
+  buildMode: "globalThis.__XMLUI_CONST_BUILD_MODE__",
+  devMode: "globalThis.__XMLUI_CONST_DEV_MODE__",
+  standalone: "globalThis.__XMLUI_CONST_STANDALONE__",
 } as const;
 
 export const XMLUI_RUNTIME_ENV_KEYS = {
-  buildMode: "import.meta.env.VITE_BUILD_MODE",
-  devMode: "import.meta.env.VITE_DEV_MODE",
-  standalone: "import.meta.env.VITE_STANDALONE",
   mockEnabled: "import.meta.env.VITE_MOCK_ENABLED",
   mockWorkerLocation: "import.meta.env.VITE_MOCK_WORKER_LOCATION",
   includeAllComponents: "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS",
@@ -65,10 +62,6 @@ export function toDefineString(value: string | undefined | null): string {
 
 export function createXmluiModeDefines(flags: XmluiRuntimeFlags): Record<string, string | boolean> {
   return {
-    [XMLUI_RUNTIME_ENV_KEYS.buildMode]: JSON.stringify(flags.buildMode),
-    [XMLUI_RUNTIME_ENV_KEYS.devMode]: flags.devMode,
-    [XMLUI_RUNTIME_ENV_KEYS.standalone]: flags.standalone,
-
     [XMLUI_PRESERVED_DEFINE_KEYS.buildMode]: JSON.stringify(flags.buildMode),
     [XMLUI_PRESERVED_DEFINE_KEYS.devMode]: String(flags.devMode),
     [XMLUI_PRESERVED_DEFINE_KEYS.standalone]: String(flags.standalone),
@@ -110,13 +103,5 @@ export function createXmluiAppDefines(
         }
       : {}),
     ...additionalDefines,
-  };
-}
-
-export function createXmluiLibPreserveDefines(): Record<string, string> {
-  return {
-    [XMLUI_RUNTIME_ENV_KEYS.devMode]: XMLUI_PRESERVED_DEFINE_KEYS.devMode,
-    [XMLUI_RUNTIME_ENV_KEYS.buildMode]: XMLUI_PRESERVED_DEFINE_KEYS.buildMode,
-    [XMLUI_RUNTIME_ENV_KEYS.standalone]: XMLUI_PRESERVED_DEFINE_KEYS.standalone,
   };
 }
