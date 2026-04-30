@@ -164,20 +164,26 @@ goes through the framework:
 
 **What is uneven.**
 
-- **`displayWhen` keeps subscriptions alive** (already noted in the original
-  report). Polling DataSources, registered handlers, and timers continue.
-- **No user-level lifecycle hook.** Because user expressions cannot create
-  timers (they are banned), they also cannot register cleanup. This is safe
-  but asymmetric: the moment a user component genuinely needs a long-lived
-  side effect (a WebSocket, an `EventSource`), the only escape is a custom
-  React component, which exits the managed surface.
+- **No user-level lifecycle hook.** User expressions cannot create timers
+  (they are banned), so they also cannot register cleanup. This is safe but
+  asymmetric: any long-lived side effect a user component needs must be
+  expressed through a framework-provided component (e.g.
+  [`WebSocket`](../src/components/WebSocket/WebSocketReact.tsx),
+  [`EventSource`](../src/components/EventSource/EventSourceReact.tsx),
+  `Timer`, `DataSource`) rather than written inline. The DOM-API hardening
+  pass closed this gap for the most common long-lived resources by adding
+  declarative wrappers whose `useEffect` teardown closes the underlying
+  socket or stream on unmount; anything *outside* that vocabulary still
+  forces a drop into a custom React component.
 - **No finalizer-equivalent for state containers.** Containers are torn down
   by React unmount; there is no opportunity to "flush" pending writes to a
   store before disposal.
 
-**Verdict.** Cleanup is strong for everything XMLUI itself owns. The gap is
-that XMLUI has no first-class, sandbox-safe lifecycle vocabulary for user
-code — so any non-trivial side effect forces a drop into raw React.
+**Verdict.** Cleanup is strong for everything XMLUI itself owns, and the
+managed vocabulary now covers WebSockets and Server-Sent Events alongside
+HTTP, timers, and queries. The remaining gap is the absence of a generic,
+sandbox-safe lifecycle primitive for user code — any side effect that does
+not have a dedicated component still forces a drop into raw React.
 
 ---
 
