@@ -1,8 +1,8 @@
 # Add breadcrumb navigation
 
-Build a breadcrumb trail from the current URL so users can navigate back to any parent page.
+Build a breadcrumb trail so users can navigate back to any parent page.
 
-XMLUI exposes the current path as `$pathname` and route parameters as `$routeParams`. Split the pathname into segments, construct a `Link` for each one, and separate them with a text divider to create a breadcrumb bar that updates reactively whenever the route changes.
+Each page composes its own breadcrumb bar: ancestor pages are `Link` components pointing to their respective routes, separated by a `Text` divider, with the current page shown as plain text. For dynamic route segments, use `$routeParams` to display the matched value — no hard-coded label needed.
 
 ```xmlui-pg copy display name="Breadcrumb bar from route segments" height="350px"
 ---app display
@@ -62,8 +62,6 @@ XMLUI exposes the current path as `$pathname` and route parameters as `$routePar
 ```
 
 ## Key points
-
-**`$pathname` gives the current URL path as a string**: It contains the full path (e.g. `"/projects/alpha"`) and updates reactively on every navigation. Use it when you need to derive breadcrumb segments dynamically.
 
 **`$routeParams` exposes named route parameters**: A route pattern like `/projects/:slug` makes `$routeParams.slug` available. Use it to display the current entity name in the last breadcrumb segment instead of a generic label.
 

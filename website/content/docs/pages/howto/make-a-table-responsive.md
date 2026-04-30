@@ -4,7 +4,7 @@ Use `when-sm`, `when-md`, and `when-lg` on `Column` to progressively hide less i
 
 A wide table with many columns becomes unreadable on a phone. Rather than building a separate mobile layout, apply `when-*` breakpoint attributes directly on each `Column`. Columns marked `when-sm` appear only on screens 576 px and wider; `when-md` requires 768 px; `when-lg` requires 992 px. Columns with no `when-*` attribute are always visible, making them the essential "anchor" columns for every breakpoint.
 
-```xmlui-pg
+```xmlui-pg name="Make a Table responsive"
 ---app
 <App>
   <ResponsiveTable />
@@ -64,7 +64,7 @@ A wide table with many columns becomes unreadable on a phone. Rather than buildi
       <Column header="Status" bindTo="status" when-md width="80px">
         <Badge
           value="{$item.status}"
-          color="{status === 'active' ? 'green' : 'gray'}"
+          color="{$item.status === 'active' ? 'lightgreen' : 'white'}"
           variant="pill"
         />
       </Column>
@@ -84,7 +84,10 @@ A wide table with many columns becomes unreadable on a phone. Rather than buildi
     </VStack>
   </VStack>
 </Component>
+---desc
+To test the responsive behaviour, open the example in the full-screen playground (the expand icon in the top-right corner of the playground), then resize the browser window. The `Current:` badge updates in real time as you cross each breakpoint.
 ```
+
 
 ## Key points
 
