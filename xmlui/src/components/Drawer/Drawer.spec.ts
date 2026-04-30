@@ -317,6 +317,127 @@ test.describe("Header Template", () => {
 });
 
 // =============================================================================
+// CLOSE BUTTON CLEARANCE TESTS
+// =============================================================================
+//
+// Regression suite for the bug where the floating close button overlapped the
+// first row of body content (e.g. a heading or TextBox label) when no
+// `headerTemplate` was provided. With no header, the body became the first
+// element with only `margin-top: gap-Drawer` of clearance, which was less than
+// the close button's vertical extent. The fix gives the body its own
+// `padding-top` (large enough to clear the close button) and zeros the
+// margin-top in this case.
+
+test.describe("Close Button Clearance", () => {
+  test("close button does not visually overlap first body content when no headerTemplate", async ({
+    page,
+    initTestBed,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer" position="right">
+          <Text testId="firstContent">Billing Address</Text>
+          <Text>Other content</Text>
+        </Drawer>
+      </Fragment>
+    `);
+
+    await page.getByTestId("openBtn").click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog).toBeVisible();
+    // Wait for the slide-in animation to settle so bounding boxes are stable.
+    await expect(dialog).toHaveAttribute("data-state", "open");
+
+    const closeButton = page.getByRole("button", { name: "Close" });
+    const firstContent = page.getByTestId("firstContent");
+    await expect(closeButton).toBeVisible();
+    await expect(firstContent).toBeVisible();
+
+    const closeBox = await closeButton.boundingBox();
+    const contentBox = await firstContent.boundingBox();
+    expect(closeBox).not.toBeNull();
+    expect(contentBox).not.toBeNull();
+    // The first body content's top edge must sit at or below the close
+    // button's bottom edge — i.e. they cannot occupy the same vertical band.
+    // Allow a 1px tolerance for sub-pixel rounding.
+    expect(contentBox!.y).toBeGreaterThanOrEqual(closeBox!.y + closeBox!.height - 1);
+  });
+
+  test("body has zero margin-top and non-zero padding-top when no headerTemplate", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Set known pixel values for the inputs of the body's padding-top
+    // formula (top-closeButton-Drawer + paddingTop-Drawer + space-2). With
+    // these inputs the body's padding-top must be at least
+    // `top-closeButton + paddingTop` (= 30px); we don't assert an exact
+    // value because `space-2` is derived from `space-base` and resolved
+    // against the document font-size at runtime.
+    await initTestBed(
+      `
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer">
+          <Text testId="bodyContent">Body</Text>
+        </Drawer>
+      </Fragment>
+      `,
+      {
+        testThemeVars: {
+          "paddingTop-Drawer": "20px",
+          "top-closeButton-Drawer": "10px",
+        },
+      },
+    );
+
+    await page.getByTestId("openBtn").click();
+    const body = page.getByTestId("bodyContent").locator("..");
+    await expect(body).toBeVisible();
+
+    // Margin-top must be zero — the gap-driven spacing only applies when a
+    // header is rendered above the body.
+    await expect(body).toHaveCSS("margin-top", "0px");
+
+    // Padding-top must clear the close button area: top-closeButton (10) +
+    // paddingTop (20) + space-2 (>0). 30px is the strict lower bound.
+    const paddingTop = await body.evaluate((el) =>
+      parseFloat(getComputedStyle(el as HTMLElement).paddingTop),
+    );
+    expect(paddingTop).toBeGreaterThanOrEqual(30);
+  });
+
+  test("body keeps gap-driven margin-top and zero padding-top when headerTemplate is present", async ({
+    page,
+    initTestBed,
+  }) => {
+    // Sanity: the fix must not affect drawers that DO supply a
+    // headerTemplate. The header owns the top padding and the body retains
+    // its original `margin-top: gap-Drawer; padding-top: 0` layout.
+    await initTestBed(
+      `
+      <Fragment>
+        <Button testId="openBtn" onClick="drawer.open()">Open</Button>
+        <Drawer id="drawer">
+          <property name="headerTemplate">
+            <Text testId="headerContent">Header</Text>
+          </property>
+          <Text testId="bodyContent">Body</Text>
+        </Drawer>
+      </Fragment>
+      `,
+      { testThemeVars: { "gap-Drawer": "20px" } },
+    );
+
+    await page.getByTestId("openBtn").click();
+    const body = page.getByTestId("bodyContent").locator("..");
+    await expect(body).toBeVisible();
+    await expect(body).toHaveCSS("padding-top", "0px");
+    await expect(body).toHaveCSS("margin-top", "20px");
+  });
+});
+
+// =============================================================================
 // EVENTS TESTS
 // =============================================================================
 
