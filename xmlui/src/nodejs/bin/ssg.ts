@@ -590,7 +590,7 @@ async function runDebugSsgServer() {
     define: {
       ...viteConfig.define,
       ...createXmluiAppDefines({
-        buildMode: "ALL",
+        buildMode: "INLINE_ALL",
         mockEnabled: true,
         includeAllComponents: true,
         inspectUserComponents: true,

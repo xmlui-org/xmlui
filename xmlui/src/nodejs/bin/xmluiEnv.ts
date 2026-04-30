@@ -1,4 +1,4 @@
-type XmluiBuildMode = "CONFIG_ONLY" | "INLINE_ALL" | "ALL";
+type XmluiBuildMode = "CONFIG_ONLY" | "INLINE_ALL";
 
 type XmluiBooleanLike = boolean | string | undefined | null;
 
@@ -9,7 +9,6 @@ type XmluiAppDefineOptions = {
   includeAllComponents?: XmluiBooleanLike;
   inspectUserComponents?: XmluiBooleanLike;
   appVersion?: string;
-  additionalDefines?: Record<string, string | boolean | number | undefined>;
 };
 
 // All application-level env vars that the xmlui CLI sets at app-build time.
@@ -36,10 +35,10 @@ function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boole
   if (normalized === "") {
     return fallback;
   }
-  if (["true", "1", "yes", "on"].includes(normalized)) {
+  if (["true", "1"].includes(normalized)) {
     return true;
   }
-  if (["false", "0", "no", "off"].includes(normalized)) {
+  if (["false", "0"].includes(normalized)) {
     return false;
   }
   return fallback;
@@ -55,7 +54,6 @@ export function createXmluiAppDefines(
     includeAllComponents,
     inspectUserComponents,
     appVersion,
-    additionalDefines,
   } = options;
 
   return {
@@ -77,6 +75,5 @@ export function createXmluiAppDefines(
           [XMLUI_APP_DEFINE_KEYS.appVersion]: JSON.stringify(appVersion),
         }
       : {}),
-    ...additionalDefines,
   };
 }

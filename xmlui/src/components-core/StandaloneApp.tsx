@@ -882,7 +882,8 @@ function useStandalone(
     // --- we must have the app definition available.
     if (
       (import.meta.env.VITE_XMLUI_DEV_MODE ||
-        import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL") &&
+        import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL" ||
+        import.meta.env.VITE_XMLUI_BUILD_MODE == null) &&
       import.meta.env.MODE !== "standalone"
     ) {
       if (!appDef) {
@@ -1089,7 +1090,8 @@ function useStandalone(
       // --- we must have the app definition available.
       if (
         (import.meta.env.VITE_XMLUI_DEV_MODE ||
-          import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL") &&
+          import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL" ||
+          import.meta.env.VITE_XMLUI_BUILD_MODE == null) &&
         import.meta.env.MODE !== "standalone"
       ) {
         if (!appDef) {

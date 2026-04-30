@@ -74,7 +74,7 @@ export function removeLeadingSlashForPath(path: string): string {
 }
 
 type UEBuildOptions = {
-  buildMode?: "CONFIG_ONLY" | "INLINE_ALL" | "ALL";
+  buildMode?: "CONFIG_ONLY" | "INLINE_ALL";
   flatDist?: boolean;
   withMock?: boolean;
   withHostingMetaFiles?: boolean;
@@ -300,32 +300,6 @@ export const build = async ({
       path.join(process.cwd(), distPath, "config.json"),
       JSON.stringify(configJson, null, 4),
     );
-  } else if (buildMode === "ALL") {
-    // const componentPaths: string[] = [];
-    //   const components = await getExportedJsObjects<CompoundComponentDef>("/src/components/**.*");
-    //   if (components) {
-    //     for (const component of components) {
-    //       if (!existsSync(`${process.cwd()}${componentsFolderPath}`)) {
-    //         await mkdir(`${process.cwd()}${componentsFolderPath}`, { recursive: true });
-    //       }
-    //       await writeFile(
-    //           `${process.cwd()}${componentsFolderPath}/${getComponentFileName(component)}.json`,
-    //           JSON.stringify(component, null, 4)
-    //       );
-    //       componentPaths.push(removeLeadingSlashForPath(`${componentsFolder}/${getComponentFileName(component)}.json`));
-    //     }
-    //   }
-    //
-    // await writeFile(
-    //   `${process.cwd()}${distPath}/${getEntrypointFileName()}.json`,
-    //   JSON.stringify(appDef.entryPoint, null, 4)
-    // );
-    //
-    // configJson = {
-    //   ...configJson,
-    //   entryPoint: `${getEntrypointFileName()}.json`,
-    //   components: componentPaths,
-    // };
   }
 
   //TODO temp, we should enforce user(who writes the metadata)-added-resources to be put in the resources folder
