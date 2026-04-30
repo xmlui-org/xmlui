@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §3 "Accessibility"](../managed-react.md) and the §17 scorecard row **"Accessibility — Documented only."**
+**Source:** [`managed-react.md` §3 "Accessibility"](./managed-react.md) and the §17 scorecard row **"Accessibility — Documented only."**
 
 ---
 
@@ -53,7 +53,7 @@ without touching call sites.
 ## Conventions
 
 - **Source of truth for component metadata:** the same registry the
-  [verified-type-contracts plan](./verified-type-contracts.md) consumes.
+  [verified-type-contracts plan](./01-verified-type-contracts.md) consumes.
   Accessibility rules read metadata to know which components are
   "interactive" (`role: "button" | "link" | "switch" | …`) and which
   props provide accessible names (`label`, `aria-label`, `title`).
@@ -648,7 +648,7 @@ Steps 1.3, 4.1.
   [`.ai/xmlui/accessibility.md`](../../../.ai/xmlui/accessibility.md)
   from "convention reference" to "enforced contract", linking each
   pattern to the rule that enforces it.
-- Updates [`managed-react.md` §3](../managed-react.md) to mark the
+- Updates [`managed-react.md` §3](./managed-react.md) to mark the
   asymmetry resolved.
 - Updates the §17 scorecard row from
   *"Documented only"* to
@@ -660,7 +660,7 @@ Steps 1.3, 4.1.
 
 - `xmlui/dev-docs/guide/28-accessibility.md` (new)
 - `.ai/xmlui/accessibility.md` (revise to "enforced contract")
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -771,7 +771,7 @@ alternative noted for future revisitation.
   enforcement requires per-component minimum-size constraints
   cross-referenced with theme spacing variables. Address in a future
   "spacing contracts" plan that builds on
-  [verified-type-contracts](./verified-type-contracts.md).
+  [verified-type-contracts](./01-verified-type-contracts.md).
 - **Reading-order verification.** Visual order vs DOM order checks
   require a layout-aware analyzer (Flexbox `order`, CSS Grid
   reordering). Out of scope for a markup-level linter.

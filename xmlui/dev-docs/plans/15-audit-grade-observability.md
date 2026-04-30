@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §15 "Logging, Tracing, and Audit"](../managed-react.md) and the §17 scorecard row **"Audit logging — Browser only, unredacted."**
+**Source:** [`managed-react.md` §15 "Logging, Tracing, and Audit"](./managed-react.md) and the §17 scorecard row **"Audit logging — Browser only, unredacted."**
 
 ---
 
@@ -394,7 +394,7 @@ Step 1.1.
 #### Dependencies
 
 Step 0; alignment with the
-[verified-type-contracts](./verified-type-contracts.md) plan
+[verified-type-contracts](./01-verified-type-contracts.md) plan
 (both extend `PropertyDef`).
 
 ---
@@ -717,7 +717,7 @@ Step 1.1.
   [`inspector-debugging.md`](../../../.ai/xmlui/inspector-debugging.md)
   with the redaction policy, sinks, sampling, and correlation
   surfaces.
-- Updates [`managed-react.md` §15](../managed-react.md):
+- Updates [`managed-react.md` §15](./managed-react.md):
   - Mark *"Browser-only"* as resolved (Phase 4 OTLP exporter).
   - Mark *"No PII redaction"* as resolved (Phase 2 redactor +
     metadata defaults).
@@ -733,7 +733,7 @@ Step 1.1.
 
 - `xmlui/dev-docs/guide/38-audit-logging.md` (new)
 - `.ai/xmlui/inspector-debugging.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §14 "Sandboxing of User-Defined Components"](../managed-react.md) and the §17 scorecard row **"UDC sandboxing — Absent."**
+**Source:** [`managed-react.md` §14 "Sandboxing of User-Defined Components"](./managed-react.md) and the §17 scorecard row **"UDC sandboxing — Absent."**
 
 ---
 
@@ -29,13 +29,13 @@ pack), the application has no contract to enforce.
 The other §17 plans address adjacent problems but do not close
 this one:
 
-- [verified-type-contracts](./verified-type-contracts.md) checks
+- [verified-type-contracts](./01-verified-type-contracts.md) checks
   *value types* on declared props — but UDCs do not declare prop
   types today.
-- [build-validation-analyzers](./build-validation-analyzers.md)
+- [build-validation-analyzers](./13-build-validation-analyzers.md)
   catches *unknown* identifiers — but everything is "known"
   inside a UDC because scope is fully open.
-- [structured-exception-model](./structured-exception-model.md)
+- [structured-exception-model](./07-structured-exception-model.md)
   catches *thrown* errors crossing boundaries — but a UDC has no
   boundary to cross.
 
@@ -87,7 +87,7 @@ boolean` (see Step 0).
 - **Source of truth for the managed primitives that capabilities
   govern:**
   [`bannedMembers.ts`](../../src/components-core/script-runner/bannedMembers.ts)
-  and [`managed-react.md` §1 / §15](../managed-react.md) — the
+  and [`managed-react.md` §1 / §15](./managed-react.md) — the
   sanctioned replacements `App.fetch`, `App.randomBytes`,
   `Clipboard.copy`, `navigate`, `<WebSocket>`, `<EventSource>`,
   `Log.*`. The capability set is a closed enum derived from
@@ -100,7 +100,7 @@ boolean` (see Step 0).
   contract / scope / capability violations. Shape:
   `{ kind: "udc", code: UdcDiagCode, severity, udc, … }`.
 - **New analyzer rule prefix `udc-*`** integrated with
-  [build-validation-analyzers](./build-validation-analyzers.md)
+  [build-validation-analyzers](./13-build-validation-analyzers.md)
   Phase 4 surfaces (LSP, Vite, CLI) — same suppression syntax,
   same severity escalation under `--strict`.
 - **Diagnostic codes** (open union `UdcDiagCode`):
@@ -224,7 +224,7 @@ dependencies.
   union and document the new appGlobals key in
   [`standalone.ts`](../../src/components-core/abstractions/standalone.ts).
 - Reserve the `udc-*` diagnostic prefix in the
-  [build-validation-analyzers](./build-validation-analyzers.md)
+  [build-validation-analyzers](./13-build-validation-analyzers.md)
   `BuildDiagnosticCode` union so analyzer rules can extend it.
 
 ### Files
@@ -288,7 +288,7 @@ for the shared diagnostic prefix).
   strict `error`) fires when the implementation references
   `$props.foo` and `foo` is not in the declared `<Prop>` list.
 - Declared `type` integrates with
-  [verified-type-contracts](./verified-type-contracts.md): the
+  [verified-type-contracts](./01-verified-type-contracts.md): the
   type string is checked at the parent boundary at every
   instantiation (the parent passes a value of the wrong type →
   `prop-shape-mismatch` diagnostic from that plan; declared
@@ -389,7 +389,7 @@ Step 1.1.
   - Default severity: `info` (today's leaks become visible
     without breaking).
   - Strict severity: `error` (the read fails with `UdcScopeError`
-    — see [structured-exception-model](./structured-exception-model.md)
+    — see [structured-exception-model](./07-structured-exception-model.md)
     for the error class shape).
 - Implementation hook: the existing parent-scope fallback in
   the script runner consults `UdcScopeGate.canRead(identifier)`
@@ -499,7 +499,7 @@ Step 1.1; Step 2.1.
 - Missing capability:
   - Default severity `warn`; strict severity `error` (call
     fails with `UdcCapabilityError`, see
-    [structured-exception-model](./structured-exception-model.md)).
+    [structured-exception-model](./07-structured-exception-model.md)).
   - Diagnostic `udc-capability-missing`.
 - Declaring a capability the UDC does not actually use:
   diagnostic `udc-capability-undeclared` (severity `info`;
@@ -750,7 +750,7 @@ Phase 1; Phase 3.
   [`user-defined-components.md`](../../../.ai/xmlui/user-defined-components.md)
   with the declared contract syntax, scope gate, capability
   enum, trust modes, and manifest format.
-- Updates [`managed-react.md` §14](../managed-react.md):
+- Updates [`managed-react.md` §14](./managed-react.md):
   - Mark *"No isolation boundary"* as resolved (delegated to
     Phase 2 scope enforcement).
   - Mark *"No capability declaration"* as resolved (delegated to
@@ -767,7 +767,7 @@ Phase 1; Phase 3.
 
 - `xmlui/dev-docs/guide/37-udc-sandbox.md` (new)
 - `.ai/xmlui/user-defined-components.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -968,7 +968,7 @@ alternative noted for future revisitation.
   shared-memory) and not the §14 scope.
 - **Resource quotas** (memory, CPU time, fetch concurrency).
   Cooperative-concurrency
-  ([cooperative-concurrency](./cooperative-concurrency.md))
+  ([cooperative-concurrency](./06-cooperative-concurrency.md))
   ships handler-level concurrency policies; per-UDC resource
   quotas are a separate plan.
 - **Cryptographic manifest signing.** The data shape supports
@@ -976,7 +976,7 @@ alternative noted for future revisitation.
   package distribution.
 - **DOM-level sandboxing** of UDCs (e.g. shadow-DOM
   isolation). Today's
-  [theming sandbox](./sealed-theming-sandbox.md) covers style
+  [theming sandbox](./08-sealed-theming-sandbox.md) covers style
   bleed; structural DOM bleed remains the responsibility of the
   UDC author. A future plan could introduce
   `<Component shadowRoot />` for opt-in shadow encapsulation.
@@ -992,5 +992,5 @@ alternative noted for future revisitation.
 - **Auto-fix codemods** for declarations. `xmlui udc declare`
   produces declarations once; ongoing maintenance is manual.
   Auto-fix matches the
-  [build-validation-analyzers](./build-validation-analyzers.md)
+  [build-validation-analyzers](./13-build-validation-analyzers.md)
   out-of-scope rationale.

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §9 "Form Infrastructure as a Safety Surface"](../managed-react.md) and the §17 scorecard row **"Forms validation — State strong, validators absent."**
+**Source:** [`managed-react.md` §9 "Form Infrastructure as a Safety Surface"](./managed-react.md) and the §17 scorecard row **"Forms validation — State strong, validators absent."**
 
 ---
 
@@ -46,7 +46,7 @@ This plan delivers those five pieces in priority order:
 4. **Submission guard + cancellation integration** — Form-level
    `submitPolicy` (`single-flight | queue | drop-while-running`)
    built on the
-   [cooperative-concurrency plan](./cooperative-concurrency.md)
+   [cooperative-concurrency plan](./06-cooperative-concurrency.md)
    `handlerPolicy` primitive; `$cancel` propagates into the submit
    handler.
 5. **CSRF / idempotency surface** — `<Form csrfToken="..."
@@ -389,7 +389,7 @@ Step 1.2.
 
 - Async validators (already supported via the `validate` handler
   prop) integrate with the
-  [cooperative-concurrency plan](./cooperative-concurrency.md)
+  [cooperative-concurrency plan](./06-cooperative-concurrency.md)
   `$cancel` token. When a field is re-edited before the previous
   async validation resolves, the in-flight one is cancelled.
 - The validator entry's `fn` receives `ctx.signal: AbortSignal`
@@ -492,7 +492,7 @@ Step 1.2.
 - When `<Form>`'s submit handler (whether `<APICall>`-driven via
   `submitUrl`/`submitMethod` or a user-written handler) rejects
   with an
-  [`AppError`](./structured-exception-model.md) whose
+  [`AppError`](./07-structured-exception-model.md) whose
   `category === "validation"` and whose `data` carries an
   `invalidParams` array (RFC 7807), the form maps each entry to
   the matching `<FormItem>` automatically.
@@ -551,7 +551,7 @@ Step 1.1; structured-exception-model plan (the `AppError` carrier).
 - The default submit `<Button>` (rendered by `<Form>` when
   `<FormItem>`s do not provide their own) reads `Form.isBusy` and
   applies the cooperative-concurrency
-  [`busyOnClick`](./cooperative-concurrency.md) behaviour
+  [`busyOnClick`](./06-cooperative-concurrency.md) behaviour
   automatically.
 - `Form.cancel()` API and `$cancel` token threaded into the submit
   handler — same shape as the cooperative-concurrency primitive.
@@ -654,7 +654,7 @@ Step 0.
   [`form-infrastructure.md`](../../../.ai/xmlui/form-infrastructure.md)
   with the registry, cross-field validators, server-error
   mapping, submit policy, and CSRF surface.
-- Updates [`managed-react.md` §9](../managed-react.md):
+- Updates [`managed-react.md` §9](./managed-react.md):
   - Mark "No built-in validators" as outdated; cite the registry.
   - Mark "No server-validation contract" as resolved; cite the
     `invalid-params` mapping.
@@ -672,7 +672,7 @@ Step 0.
 
 - `xmlui/dev-docs/guide/32-forms-validation.md` (new)
 - `.ai/xmlui/form-infrastructure.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -801,7 +801,7 @@ alternative noted for future revisitation.
    stringly-typed in the validator name.** `length(5,10)` would
    require a parser inside the registry; `validatorParams="{{ min:
    5, max: 10 }}"` is plain markup with a typed object. Same
-   pattern the [structured-exception-model](./structured-exception-model.md)
+   pattern the [structured-exception-model](./07-structured-exception-model.md)
    plan uses for `<RetryPolicy maxAttempts>`.
 
 4. **Cross-field validators are a separate `<FormValidator>` child,
@@ -831,7 +831,7 @@ alternative noted for future revisitation.
    Alternative considered: a global `App.appGlobals.csrfToken` —
    rejected because it leaks the token to every request, including
    ones to third-party origins (the
-   [DOM-API hardening plan](./dom-api-hardening.md) `allowedOrigins`
+   [DOM-API hardening plan](./17-dom-api-hardening.md) `allowedOrigins`
    list mitigates but does not eliminate the leak).
 
 8. **`idempotencyKey` is per-submit-attempt, not per-retry.** Retry
@@ -875,4 +875,4 @@ alternative noted for future revisitation.
   §17). The validator registry's `defaultMessage` accepts a
   translation key in the future without API change.
 - **Theming of validation feedback.** Owned by the
-  [sealed-theming-sandbox plan](./sealed-theming-sandbox.md).
+  [sealed-theming-sandbox plan](./08-sealed-theming-sandbox.md).

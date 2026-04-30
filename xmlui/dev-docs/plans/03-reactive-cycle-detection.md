@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §17 row "Reactive cycle detection"](../managed-react.md)
+**Source:** [`managed-react.md` §17 row "Reactive cycle detection"](./managed-react.md)
 
 ---
 
@@ -596,7 +596,7 @@ These steps polish the rollout into a default-on guarantee.
 
 ### Scope
 
-- Update [managed-react.md](../managed-react.md) §17 row to **Strong**.
+- Update [managed-react.md](./managed-react.md) §17 row to **Strong**.
 - Update [.ai/xmlui/expression-eval.md](../../../.ai/xmlui/expression-eval.md)
   with a new `## Reactive cycle detection` section pointing at this plan
   and the new diagnostic kinds.

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §10 "Routing and Input Validation at the URL Boundary"](../managed-react.md) and the §17 scorecard row **"Routing input — Convenient, undefended."**
+**Source:** [`managed-react.md` §10 "Routing and Input Validation at the URL Boundary"](./managed-react.md) and the §17 scorecard row **"Routing input — Convenient, undefended."**
 
 ---
 
@@ -33,12 +33,12 @@ priority order:
 1. **Typed route constraints** — `<Page url="/user/:id:int">` with
    a constraint vocabulary (`int`, `uuid`, `slug`, `enum(...)`,
    custom validators from the
-   [forms-validation plan's](./forms-validation-discipline.md)
+   [forms-validation plan's](./09-forms-validation-discipline.md)
    registry); non-matching URLs route to `fallbackPath` instead of
    crashing in user code.
 2. **Coerced `$routeParams`** — `:id:int` produces a `number` in
    `$routeParams`, not a string. Same coercion table as the
-   [verified-type-contracts](./verified-type-contracts.md) plan.
+   [verified-type-contracts](./01-verified-type-contracts.md) plan.
 3. **Defensive `willNavigate`** — guard runs on *all* navigations
    including back/forward and direct entry; bypass-only loop-
    prevention; `<Page guard>` per-page guards in addition to the
@@ -70,18 +70,18 @@ Every step lands behind `App.appGlobals.strictRouting: boolean`
   bypassed.
 - **Existing infrastructure to reuse — do not reinvent:**
   - The
-    [verified-type-contracts](./verified-type-contracts.md)
+    [verified-type-contracts](./01-verified-type-contracts.md)
     plan's coercion rule table (`int`, `number`, `uuid`,
     `length`, `color`, …) is exactly the vocabulary route
     constraints need. Single chokepoint by construction.
   - The
-    [forms-validation plan's](./forms-validation-discipline.md)
+    [forms-validation plan's](./09-forms-validation-discipline.md)
     `App.registerValidator()` registry is the same registry
     custom route constraints draw from. A validator named
     `employeeId` works in both `<FormItem validator>` and
     `<Page url="/emp/:id:employeeId">`.
   - The
-    [structured-exception-model](./structured-exception-model.md)
+    [structured-exception-model](./07-structured-exception-model.md)
     plan's `AppError` is the type a constraint-rejection produces:
     `category: "not-found"` for unknown routes,
     `category: "validation"` for failed constraints.
@@ -102,7 +102,7 @@ Every step lands behind `App.appGlobals.strictRouting: boolean`
   `routingDiagnostic?` field. Constraint rejections in non-strict
   mode warn and route to `fallbackPath`; in strict mode they
   additionally raise an `AppError` (`category: "validation"`)
-  visible via the [`<App onError>` channel](./structured-exception-model.md).
+  visible via the [`<App onError>` channel](./07-structured-exception-model.md).
 - **Test layout:** unit tests under
   `xmlui/tests/components-core/routing/`; one spec per step.
   End-to-end tests under `xmlui/tests-e2e/routing/`.
@@ -295,7 +295,7 @@ table).
 #### Scope
 
 - A constraint name that is not a built-in is looked up in the
-  [forms-validation registry](./forms-validation-discipline.md):
+  [forms-validation registry](./09-forms-validation-discipline.md):
 
   ```xmlui
   <App
@@ -608,7 +608,7 @@ Step 0; Step 1.1 (to share the route compilation pipeline).
 - Updates [`routing.md`](../../../.ai/xmlui/routing.md) with the
   constraint vocabulary, custom constraints, guard contract,
   canonicalisation, and the four `RoutingDiagnosticCode`s.
-- Updates [`managed-react.md` §10](../managed-react.md):
+- Updates [`managed-react.md` §10](./managed-react.md):
   - Mark "No type or constraint syntax on route segments" as
     resolved.
   - Mark "`willNavigate` is bypassable" as resolved.
@@ -623,7 +623,7 @@ Step 0; Step 1.1 (to share the route compilation pipeline).
 
 - `xmlui/dev-docs/guide/33-routing.md` (new)
 - `.ai/xmlui/routing.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -800,7 +800,7 @@ alternative noted for future revisitation.
 - **Nested route layouts beyond what `<Pages>` already supports.**
   Layout composition is not a *defence* concern.
 - **Route-level rate limiting.** A backend concern; the
-  [DOM-API hardening plan's](./dom-api-hardening.md)
+  [DOM-API hardening plan's](./17-dom-api-hardening.md)
   `App.fetch` Gate is the choke-point for outbound throttling.
 - **Breadcrumbs / route metadata.** Composition feature; can be
   added later as a `<Page title>` / `<Page breadcrumb>` extension

@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §8 "Styling and Theming Sandbox"](../managed-react.md) and the §17 scorecard row **"Theming sandbox — Mostly scoped."**
+**Source:** [`managed-react.md` §8 "Styling and Theming Sandbox"](./managed-react.md) and the §17 scorecard row **"Theming sandbox — Mostly scoped."**
 
 ---
 
@@ -34,7 +34,7 @@ porous in two places:
 
 The third gap §8 names — *"Themes can only override known variables"* —
 is already covered by the in-flight
-[themevars-namespace](./themevars-namespace.md) plan; this plan does not
+[themevars-namespace](./02-themevars-namespace.md) plan; this plan does not
 duplicate it.
 
 The work is split into small, independently shippable, independently
@@ -65,7 +65,7 @@ without touching call sites.
   re-parse.
 - **Source of truth for theme variable declarations:** the `themeVars`
   metadata block on each component (the same registry the
-  [verified-type-contracts plan](./verified-type-contracts.md) consumes
+  [verified-type-contracts plan](./01-verified-type-contracts.md) consumes
   for prop validation). Today the block carries `name` and
   `description`; this plan adds `valueType`.
 - **Source of truth for inline-style props:** the
@@ -207,7 +207,7 @@ None.
 The theme variable declaration today carries `name` and `description`.
 This phase adds `valueType` so values can be validated structurally —
 the same vocabulary the
-[verified-type-contracts plan](./verified-type-contracts.md) introduces
+[verified-type-contracts plan](./01-verified-type-contracts.md) introduces
 for props.
 
 ### Step 1.1 — Extend Theme Variable Metadata
@@ -466,7 +466,7 @@ Step 2.1.
   [`.ai/xmlui/theming-styling.md`](../../../.ai/xmlui/theming-styling.md)
   with the typed-variable vocabulary and the inline-style
   restriction list.
-- Updates [`managed-react.md` §8](../managed-react.md) to mark the
+- Updates [`managed-react.md` §8](./managed-react.md) to mark the
   asymmetry resolved.
 - Updates the §17 scorecard row from
   *"Mostly scoped"* to
@@ -478,7 +478,7 @@ Step 2.1.
 
 - `xmlui/dev-docs/guide/31-theming-sandbox.md` (new)
 - `.ai/xmlui/theming-styling.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -593,7 +593,7 @@ alternative noted for future revisitation.
    pay the cost of re-validating on every theme switch. Strict mode
    in production keeps the validator on for apps that opt in.
    Same model as the
-   [enforced-accessibility plan](./enforced-accessibility.md)
+   [enforced-accessibility plan](./05-enforced-accessibility.md)
    contrast checker.
 
 4. **`position: fixed | sticky` is structurally banned in the
@@ -602,7 +602,7 @@ alternative noted for future revisitation.
    declaration internally; user markup expresses the *intent*
    (a modal) rather than the *mechanism* (fixed positioning). This
    is the same "managed component for the legitimate case" pattern
-   the [DOM-API hardening plan](./dom-api-hardening.md) used for
+   the [DOM-API hardening plan](./17-dom-api-hardening.md) used for
    WebSocket/EventSource.
 
 5. **`!important` and inline `url()` are gated by
@@ -619,7 +619,7 @@ alternative noted for future revisitation.
    be raised explicitly.
 
 7. **No third-party namespace mechanism in this plan.** Already
-   covered by [themevars-namespace](./themevars-namespace.md).
+   covered by [themevars-namespace](./02-themevars-namespace.md).
    This plan exclusively addresses §8's first two gaps.
 
 8. **`strictTheming` default flip waits for a major.** Same
@@ -642,8 +642,8 @@ alternative noted for future revisitation.
   script is a separate feature request; outside this plan's
   validation surface.
 - **Accessibility colour-contrast verification.** Owned by the
-  [enforced-accessibility plan](./enforced-accessibility.md)
+  [enforced-accessibility plan](./05-enforced-accessibility.md)
   Step 3.1; this plan only validates *structural* correctness of
   values, not their *semantic* relationship to other variables.
 - **Third-party theme-variable namespacing.** Owned by
-  [themevars-namespace](./themevars-namespace.md).
+  [themevars-namespace](./02-themevars-namespace.md).

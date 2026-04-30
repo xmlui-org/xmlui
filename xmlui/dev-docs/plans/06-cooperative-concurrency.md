@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §7 "Concurrency and Cancellation"](../managed-react.md) and the §17 scorecard row **"Concurrency / cancellation — Predictable, uncoordinated."**
+**Source:** [`managed-react.md` §7 "Concurrency and Cancellation"](./managed-react.md) and the §17 scorecard row **"Concurrency / cancellation — Predictable, uncoordinated."**
 
 ---
 
@@ -224,7 +224,7 @@ and react to the four cancellation reasons.
   create a fresh token per handler invocation; expose it as
   `evalContext.$cancel`. The token aborts on:
   - The component's `onUnmount`
-    ([managed-lifecycle-vocabulary plan](./managed-lifecycle-vocabulary.md)
+    ([managed-lifecycle-vocabulary plan](./04-managed-lifecycle-vocabulary.md)
     Step 1.1 wiring; until that ships, fall back to the existing
     `event-handler-cache` eviction).
   - Explicit `App.cancel(handlerName?)` (Step 1.3).
@@ -568,7 +568,7 @@ Step 1.1.
 
 - New `xmlui/dev-docs/guide/29-concurrency.md` chapter and matching
   `.ai/xmlui/concurrency.md` reference.
-- Updates [`managed-react.md` §7](../managed-react.md) to mark the
+- Updates [`managed-react.md` §7](./managed-react.md) to mark the
   asymmetry resolved.
 - Updates the §17 scorecard row from
   *"Predictable, uncoordinated"* to
@@ -580,7 +580,7 @@ Step 1.1.
 
 - `xmlui/dev-docs/guide/29-concurrency.md` (new)
 - `.ai/xmlui/concurrency.md` (new)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -721,7 +721,7 @@ alternative noted for future revisitation.
   separate plan that depends on the existing sandbox boundary.
 - **Backpressure on `<DataSource>` polling.** DataSource refetch
   storms are addressed by the
-  [reactive-cycle-detection plan](./reactive-cycle-detection.md);
+  [reactive-cycle-detection plan](./03-reactive-cycle-detection.md);
   rate-limiting individual loaders is a separate concern.
 - **Distributed cancellation across `<NestedApp>`.** Nested apps
   have independent dispatchers; cross-app cancellation requires a

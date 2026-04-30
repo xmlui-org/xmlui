@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §12 "Versioning and Backward Compatibility"](../managed-react.md) and the §17 scorecard row **"Versioning — Mechanism present, unenforced."**
+**Source:** [`managed-react.md` §12 "Versioning and Backward Compatibility"](./managed-react.md) and the §17 scorecard row **"Versioning — Mechanism present, unenforced."**
 
 ---
 
@@ -36,9 +36,9 @@ order:
    `defaultValueChangedIn` (with the old default preserved as
    an opt-in alias), `valueAliases` (with deprecation), and
    prop-rename helpers (used by the
-   [forms-validation plan](./forms-validation-discipline.md)
+   [forms-validation plan](./09-forms-validation-discipline.md)
    `pattern → validator` rename and the
-   [routing plan](./defended-routing.md) for
+   [routing plan](./10-defended-routing.md) for
    `<Page url>` constraint syntax).
 4. **API surface diff at build time** — a script that diffs the
    exported metadata of two versions and produces a JSON report
@@ -67,7 +67,7 @@ Every step lands behind `App.appGlobals.strictVersioning: boolean`
   Diagnostics added here flow through that existing pipeline.
 - **Source of truth for parse-time validation:** the same
   validator the
-  [verified-type-contracts plan](./verified-type-contracts.md)
+  [verified-type-contracts plan](./01-verified-type-contracts.md)
   introduces. Deprecation diagnostics piggyback on the same
   `TypeContractDiagnostic` traversal — one walk, multiple rule
   families.
@@ -77,10 +77,10 @@ Every step lands behind `App.appGlobals.strictVersioning: boolean`
   Deprecation badges render automatically from the same fields.
 - **Existing infrastructure to reuse — do not reinvent:**
   - The
-    [verified-type-contracts](./verified-type-contracts.md) plan's
+    [verified-type-contracts](./01-verified-type-contracts.md) plan's
     diagnostic traversal — deprecation is one more rule code.
   - The
-    [structured-exception-model](./structured-exception-model.md)
+    [structured-exception-model](./07-structured-exception-model.md)
     `AppError` — `category: "internal"` for "removed prop still
     used in markup at runtime" under strict mode.
   - The Changesets CLI (already in repo) — the build-time diff
@@ -417,7 +417,7 @@ Step 1.1.
 #### Acceptance
 
 - The
-  [verified-type-contracts plan](./verified-type-contracts.md)
+  [verified-type-contracts plan](./01-verified-type-contracts.md)
   enum coercion table understands `valueAliases` (delegates back
   to this module).
 
@@ -435,7 +435,7 @@ Step 2.1; verified-type-contracts plan Step 1.2.
 
 - A prop's default value sometimes changes between versions
   (e.g. `<Form submitPolicy>` defaults to `"single-flight"` in
-  the [forms-validation plan](./forms-validation-discipline.md)
+  the [forms-validation plan](./09-forms-validation-discipline.md)
   Step 4.1). Extend `PropertyDef`:
 
   ```ts
@@ -504,7 +504,7 @@ Step 2.1.
   - If markup uses both names, the new name wins and an
     additional `info` diagnostic flags the conflict.
 - The
-  [forms-validation plan](./forms-validation-discipline.md)
+  [forms-validation plan](./09-forms-validation-discipline.md)
   `pattern → validator` rename moves to this mechanism (its
   Step 1.2 currently spells the alias inline; this plan
   centralises it).
@@ -730,7 +730,7 @@ Step 1.2.
 - New `xmlui/dev-docs/guide/35-versioning.md` chapter.
 - Updates `.ai/xmlui/component-architecture.md` with the new
   metadata fields.
-- Updates [`managed-react.md` §12](../managed-react.md):
+- Updates [`managed-react.md` §12](./managed-react.md):
   - Mark "Deprecation is metadata-only" as resolved.
   - Mark "No prop-level deprecation channel" as resolved.
   - Mark "No API surface diff at build time" as resolved.
@@ -746,7 +746,7 @@ Step 1.2.
 
 - `xmlui/dev-docs/guide/35-versioning.md` (new)
 - `.ai/xmlui/component-architecture.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -938,8 +938,8 @@ alternative noted for future revisitation.
   Future tooling plan; the diagnostics + replacement text are
   the prerequisite this plan delivers.
 - **Theme variable deprecation.** The
-  [theming-sandbox plan](./sealed-theming-sandbox.md) and
-  [themevars-namespace plan](./themevars-namespace.md) own theme
+  [theming-sandbox plan](./08-sealed-theming-sandbox.md) and
+  [themevars-namespace plan](./02-themevars-namespace.md) own theme
   variable lifecycle; this plan addresses component / prop /
   event / method only.
 - **Per-page version pinning** (e.g. "this page renders against

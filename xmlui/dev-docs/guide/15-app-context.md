@@ -126,7 +126,7 @@ same-tab — emits a `kind: "navigate"` trace entry.
 
 This is the sanctioned replacement for `window.open()` and direct
 `window.location` mutation — both of which the DOM sandbox blocks. See
-[managed-react.md Appendix A](../managed-react.md) for the full hardening
+[managed-react.md Appendix A](../plans/managed-react.md) for the full hardening
 plan.
 
 Note: `$pathname`, `$routeParams`, and `$queryParams` (the `$`-prefixed variables) come from
@@ -415,7 +415,7 @@ Don't confuse `appGlobals` with extension functions. Extension functions (added 
 ### DOM-Sandbox Configuration Keys
 
 Three `appGlobals` keys configure the script-runner sandbox (see
-[managed-react.md Appendix A](../managed-react.md)):
+[managed-react.md Appendix A](../plans/managed-react.md)):
 
 | Key | Type | Default | Effect |
 |---|---|---|---|

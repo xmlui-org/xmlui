@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §5 "Resource Lifecycle and Cleanup"](../managed-react.md) and the §17 scorecard row **"Resource lifecycle — Strong for framework, asymmetric for user code."**
+**Source:** [`managed-react.md` §5 "Resource Lifecycle and Cleanup"](./managed-react.md) and the §17 scorecard row **"Resource lifecycle — Strong for framework, asymmetric for user code."**
 
 ---
 
@@ -499,7 +499,7 @@ Step 1.1 (dispatcher).
 
 - New `xmlui/dev-docs/guide/26-lifecycle.md` chapter and matching
   `.ai/xmlui/lifecycle.md` reference.
-- Updates [`managed-react.md` §5](../managed-react.md) to mark the
+- Updates [`managed-react.md` §5](./managed-react.md) to mark the
   asymmetry resolved (or scoped to "no generic free-form effect"
   depending on what shipped).
 - Updates the §17 scorecard row from
@@ -513,7 +513,7 @@ Step 1.1 (dispatcher).
 
 - `xmlui/dev-docs/guide/26-lifecycle.md` (new)
 - `.ai/xmlui/lifecycle.md` (new)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Tests

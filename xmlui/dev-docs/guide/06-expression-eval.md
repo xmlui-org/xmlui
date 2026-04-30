@@ -215,7 +215,7 @@ and related DOM-query methods.
 | Raw global state | `AppState` (with optional `appGlobals.appStateKeys` schema) | state-change trace |
 
 See [15-app-context.md](15-app-context.md) and
-[managed-react.md](../managed-react.md) Appendix A for the full hardening plan.
+[managed-react.md](../plans/managed-react.md) Appendix A for the full hardening plan.
 
 ### 3. The `new` Operator — Only 4 Constructors
 

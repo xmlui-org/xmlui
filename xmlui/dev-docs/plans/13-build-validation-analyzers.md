@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §13 "Build-Time Validation and Tooling"](../managed-react.md) and the §17 scorecard row **"Build-time validation — Parse only."**
+**Source:** [`managed-react.md` §13 "Build-Time Validation and Tooling"](./managed-react.md) and the §17 scorecard row **"Build-time validation — Parse only."**
 
 ---
 
@@ -25,15 +25,15 @@ and have the information needed.
 
 The other §17 plans cover the **rule families**:
 
-- [verified-type-contracts](./verified-type-contracts.md) — prop
+- [verified-type-contracts](./01-verified-type-contracts.md) — prop
   *value type* diagnostics.
-- [enforced-versioning](./enforced-versioning.md) — deprecation /
+- [enforced-versioning](./12-enforced-versioning.md) — deprecation /
   removal diagnostics.
-- [reactive-cycle-detection](./reactive-cycle-detection.md) —
+- [reactive-cycle-detection](./03-reactive-cycle-detection.md) —
   cycles in expression dependency graphs.
-- [enforced-accessibility](./enforced-accessibility.md) — a11y
+- [enforced-accessibility](./05-enforced-accessibility.md) — a11y
   diagnostics from metadata.
-- [structured-exception-model](./structured-exception-model.md) —
+- [structured-exception-model](./07-structured-exception-model.md) —
   error-handling diagnostics.
 
 This plan delivers the **delivery vehicle**: the
@@ -88,20 +88,20 @@ analyzer surface — `xmlui check --strict` flips `info` →
   identifier checks walk the `Component` nodes it produces.
 - **Existing infrastructure to reuse — do not reinvent:**
   - The
-    [verified-type-contracts](./verified-type-contracts.md) plan
+    [verified-type-contracts](./01-verified-type-contracts.md) plan
     Step 2.1 introduces the parse-time validator walk; this plan
     is the framework that walk plugs into. The two plans are
     designed to land together — verified-type-contracts owns the
     *value-type* rules; this plan owns the *identifier* rules and
     the shared pipeline.
   - The
-    [reactive-cycle-detection](./reactive-cycle-detection.md)
+    [reactive-cycle-detection](./03-reactive-cycle-detection.md)
     plan owns cycle detection on the dependency graph the
     container builds at runtime; the analyzer surface here lets
     it produce the same diagnostics at parse time when the AST
     suffices.
   - The
-    [enforced-versioning](./enforced-versioning.md) plan
+    [enforced-versioning](./12-enforced-versioning.md) plan
     Step 1.2 hooks deprecation diagnostics into this same walk.
   - The LSP infrastructure documented in
     [`language-server.md`](../../../.ai/xmlui/language-server.md)
@@ -136,7 +136,7 @@ analyzer surface — `xmlui check --strict` flips `info` →
   suppresses the next line; `<!-- xmlui-disable id-unused-var -->`
   / `<!-- xmlui-enable id-unused-var -->` toggle a region. No
   blanket "disable everything" form (matches the
-  [reactive-cycle-detection](./reactive-cycle-detection.md)
+  [reactive-cycle-detection](./03-reactive-cycle-detection.md)
   philosophy of single-rule suppression).
 - **Reporting mode:** new trace `kind: "build"` in the runtime
   Inspector for echoes from the parse-time validator (the
@@ -356,7 +356,7 @@ Step 1.1.
 #### Acceptance
 
 - Both rules require the
-  [verified-type-contracts](./verified-type-contracts.md) plan's
+  [verified-type-contracts](./01-verified-type-contracts.md) plan's
   ref-tracking surface (Step 1.4 there) — the analyzer needs to
   know which component a ref points at.
 
@@ -709,7 +709,7 @@ Step 4.3.
 - Updates
   [`language-server.md`](../../../.ai/xmlui/language-server.md)
   with the new rule families and the LSP diagnostic flow.
-- Updates [`managed-react.md` §13](../managed-react.md):
+- Updates [`managed-react.md` §13](./managed-react.md):
   - Mark "No type checking against component metadata at parse
     time" as resolved (delegated to verified-type-contracts +
     this plan).
@@ -730,7 +730,7 @@ Step 4.3.
 
 - `xmlui/dev-docs/guide/36-build-validation.md` (new)
 - `.ai/xmlui/language-server.md`
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -868,7 +868,7 @@ alternative noted for future revisitation.
 4. **Suppression is single-rule only, no blanket disable.**
    `<!-- xmlui-disable -->` (no code) is intentionally not
    supported. Same philosophy as the
-   [reactive-cycle-detection](./reactive-cycle-detection.md)
+   [reactive-cycle-detection](./03-reactive-cycle-detection.md)
    plan — suppression should require deliberate per-rule choice.
 
 5. **Identifier rules use Levenshtein for suggestions.** Cheap,
@@ -915,14 +915,14 @@ alternative noted for future revisitation.
 - **Auto-fix codemods.** Suggestions are surfaced; mechanical
   rewriting (`xmlui check --fix`) is a separate tooling effort.
   The
-  [reactive-cycle-detection](./reactive-cycle-detection.md)
+  [reactive-cycle-detection](./03-reactive-cycle-detection.md)
   plan also explicitly excludes `--fix`; the same rationale
   applies (auto-fix on identifier typos is rarely safe — the
   Levenshtein closest match may not be the right one).
 - **Type inference for expressions.** The analyzer checks
   *identifier presence*, not *value-type compatibility* across
   expressions. Value-type checks belong to the
-  [verified-type-contracts](./verified-type-contracts.md) plan
+  [verified-type-contracts](./01-verified-type-contracts.md) plan
   at the prop boundary; full expression-level type inference is
   a much larger effort and not §13's scope.
 - **Performance budgets** (e.g. "this component renders > N
@@ -937,12 +937,12 @@ alternative noted for future revisitation.
   component). Too expensive for the LSP latency budget; the
   cross-binding rules in Phase 3 cover the high-value cases.
 - **Lint of theme files / SCSS modules.** Owned by the
-  [sealed-theming-sandbox plan](./sealed-theming-sandbox.md)
+  [sealed-theming-sandbox plan](./08-sealed-theming-sandbox.md)
   Step 5.1 (physical-CSS lint).
 - **Lint of changeset metadata.** Owned by the
-  [enforced-versioning plan](./enforced-versioning.md) Step 3.2
+  [enforced-versioning plan](./12-enforced-versioning.md) Step 3.2
   (release guard).
 - **JSON / YAML / `config.json` validation.** Outside the
   `.xmlui` markup + expression scope; the
-  [verified-type-contracts](./verified-type-contracts.md) plan's
+  [verified-type-contracts](./01-verified-type-contracts.md) plan's
   config-validation surface (its Step 3.x) covers this.

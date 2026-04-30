@@ -42,7 +42,7 @@ because that is what a "managed framework" actually has to deliver.
 ## 2. Findings From the Original Report (Carried Forward)
 
 These remain accurate where unchanged; rows updated by the
-[DOM API hardening work](plans/dom-api-hardening.md) are flagged with
+[DOM API hardening work](plans/17-dom-api-hardening.md) are flagged with
 *(updated 2026-04)*.
 
 | Property | Verdict | Evidence |
@@ -60,7 +60,7 @@ These remain accurate where unchanged; rows updated by the
 
 The DOM API access row is the headline change: the verdict moved from **Weak**
 to **Strong** through the full execution of the
-[DOM API hardening plan](plans/dom-api-hardening.md). **As of 2026-04, every
+[DOM API hardening plan](plans/17-dom-api-hardening.md). **As of 2026-04, every
 step of Phases 1, 2, and 3 has shipped — Steps 0, 1.1–1.9, 2.1–2.6, 3.2,
 3.3, and 3.4 are all implemented, tested, and wired into the global expression
 scope.** The two original "unfinished business" items have closed: Step 2.1
@@ -609,7 +609,7 @@ with forced `noopener,noreferrer`, `<WebSocket>`/`<EventSource>` components,
 and `AppState` with `appStateKeys` schema validation) are wired into the global
 expression scope; and every blocked or replaced access produces a structured
 trace entry. **All of Phases 1, 2, and 3 of the
-[DOM API hardening plan](plans/dom-api-hardening.md) are complete.** Of the
+[DOM API hardening plan](plans/17-dom-api-hardening.md) are complete.** Of the
 original report's three security gaps (`fetch`, cycles, Markdown), only the
 Markdown sanitization gap remains.
 
@@ -638,7 +638,7 @@ substrate.
 ## Appendix A. Hardening DOM API Access — A Concrete Ban List
 
 > **✅ Status (2026-04, fully complete):** the entire hardening plan has shipped.
-> See [`plans/dom-api-hardening.md`](plans/dom-api-hardening.md) for the
+> See [`plans/17-dom-api-hardening.md`](plans/17-dom-api-hardening.md) for the
 > executed step-by-step plan. **All of Phases 1, 2, and 3 are implemented and
 > tested:**
 >

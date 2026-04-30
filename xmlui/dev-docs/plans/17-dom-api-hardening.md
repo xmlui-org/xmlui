@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-28
 **Status:** Proposal
-**Source:** [`managed-react.md` Appendix A](../managed-react.md)
+**Source:** [`managed-react.md` Appendix A](./managed-react.md)
 
 ---
 

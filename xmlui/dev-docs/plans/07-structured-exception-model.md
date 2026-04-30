@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §6 "Exception Safety and Error Propagation"](../managed-react.md) and the §17 scorecard row **"Exception model — Contained, not structured."**
+**Source:** [`managed-react.md` §6 "Exception Safety and Error Propagation"](./managed-react.md) and the §17 scorecard row **"Exception model — Contained, not structured."**
 
 ---
 
@@ -72,7 +72,7 @@ without touching call sites.
 - **Existing infrastructure to reuse — do not reinvent:**
   - `RestApiProxy`'s
     [`AbortController`](../../src/components-core/RestApiProxy.ts) and
-    the [cooperative-concurrency `$cancel` token](./cooperative-concurrency.md)
+    the [cooperative-concurrency `$cancel` token](./06-cooperative-concurrency.md)
     are the foundation for `<RetryPolicy>`'s timeout/abort behaviour.
   - The `LOADER_ERROR` action already attaches `$error` to a
     container; `<Fallback>` reads the same shape and renders an
@@ -451,7 +451,7 @@ that composes with `DataSource`, `APICall`, `<WebSocket>`, and
   child must be one of: `DataSource`, `APICall`, `WebSocket`,
   `EventSource`. Other children produce a parse-time
   `unknown-retry-target` warn (via the
-  [verified-type-contracts plan](./verified-type-contracts.md)
+  [verified-type-contracts plan](./01-verified-type-contracts.md)
   surfaces).
 - Props mirror `RetryPolicySpec`:
   `<RetryPolicy attempts="3" backoff="exponential" delayMs="500"
@@ -502,7 +502,7 @@ that composes with `DataSource`, `APICall`, `<WebSocket>`, and
 #### Dependencies
 
 Step 1.2 (loader categorisation),
-[cooperative-concurrency](./cooperative-concurrency.md) Step 1.1
+[cooperative-concurrency](./06-cooperative-concurrency.md) Step 1.1
 (`$cancel` token).
 
 ---
@@ -608,7 +608,7 @@ preservation).
 
 - New `xmlui/dev-docs/guide/30-errors.md` chapter and matching
   `.ai/xmlui/errors.md` reference.
-- Updates [`managed-react.md` §6](../managed-react.md) to mark the
+- Updates [`managed-react.md` §6](./managed-react.md) to mark the
   asymmetry resolved.
 - Updates the §17 scorecard row from
   *"Contained, not structured"* to
@@ -620,7 +620,7 @@ preservation).
 
 - `xmlui/dev-docs/guide/30-errors.md` (new)
 - `.ai/xmlui/errors.md` (new)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -731,16 +731,16 @@ alternative noted for future revisitation.
    `signError(new Error("x"))` call sites compile and run unchanged;
    the wrapper produces an `AppError` with `code: "unknown"`,
    `category: "internal"`. This is the same backward-compat strategy
-   the [verified-type-contracts plan](./verified-type-contracts.md)
+   the [verified-type-contracts plan](./01-verified-type-contracts.md)
    uses for `valueType` widening.
 
 4. **`<RetryPolicy>` wraps known children only.** The four eligible
    child types (`DataSource`, `APICall`, `<WebSocket>`,
    `<EventSource>`) cover every framework-managed long-lived resource
-   from the [DOM-API hardening plan](./dom-api-hardening.md). A
+   from the [DOM-API hardening plan](./17-dom-api-hardening.md). A
    generic "wrap anything" mode is rejected because it would re-open
    the door to ad-hoc effect logic that the
-   [managed-lifecycle-vocabulary plan](./managed-lifecycle-vocabulary.md)
+   [managed-lifecycle-vocabulary plan](./04-managed-lifecycle-vocabulary.md)
    deliberately closes.
 
 5. **`<Fallback>` is a separate component, not a prop on every

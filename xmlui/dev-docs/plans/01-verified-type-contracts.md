@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §4 "Type Safety and Metadata Contracts"](../managed-react.md) and the §17 scorecard row **"Type contracts — Metadata, not verified."**
+**Source:** [`managed-react.md` §4 "Type Safety and Metadata Contracts"](./managed-react.md) and the §17 scorecard row **"Type contracts — Metadata, not verified."**
 
 ---
 
@@ -570,7 +570,7 @@ Step 4.1.
 
 - New `xmlui/dev-docs/guide/27-type-contracts.md` chapter and matching
   `.ai/xmlui/type-contracts.md` reference.
-- Updates [`managed-react.md` §4](../managed-react.md) to mark the
+- Updates [`managed-react.md` §4](./managed-react.md) to mark the
   asymmetry resolved.
 - Updates the §17 scorecard row from
   *"Metadata, not verified"* to
@@ -582,7 +582,7 @@ Step 4.1.
 
 - `xmlui/dev-docs/guide/27-type-contracts.md` (new)
 - `.ai/xmlui/type-contracts.md` (new)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -689,4 +689,4 @@ alternative noted for future revisitation.
   slot-type vocabulary that does not exist yet; address in a future
   "slot contracts" plan.
 - **Theme variable verification.** Theme variables are a separate
-  contract (see [`themevars-namespace.md`](./themevars-namespace.md)).
+  contract (see [`02-themevars-namespace.md`](./02-themevars-namespace.md)).

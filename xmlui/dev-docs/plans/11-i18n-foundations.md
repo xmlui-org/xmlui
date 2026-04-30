@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §11 "Internationalization and Localization"](../managed-react.md) and the §17 scorecard row **"i18n — Dates only."**
+**Source:** [`managed-react.md` §11 "Internationalization and Localization"](./managed-react.md) and the §17 scorecard row **"i18n — Dates only."**
 
 ---
 
@@ -84,17 +84,17 @@ Every step lands behind `App.appGlobals.strictI18n: boolean`
     `locale` field already exists and is read by date formatters;
     this plan extends it without renaming.
   - The
-    [verified-type-contracts](./verified-type-contracts.md) plan's
+    [verified-type-contracts](./01-verified-type-contracts.md) plan's
     `locale` value type (BCP-47 string with regex check) is the
     type for the new `<App locale>` prop and any related
     metadata.
   - The
-    [forms-validation plan](./forms-validation-discipline.md)'s
+    [forms-validation plan](./09-forms-validation-discipline.md)'s
     validator registry stores `defaultMessage` strings; this plan
     promotes `defaultMessage` to a translation key when
     `App.translate()` is available.
   - The
-    [theming-sandbox plan](./sealed-theming-sandbox.md)'s
+    [theming-sandbox plan](./08-sealed-theming-sandbox.md)'s
     `valueType` vocabulary gains `locale` for theme-variable
     typing of locale-bearing values (rare but valid).
 - **New module location:**
@@ -109,7 +109,7 @@ Every step lands behind `App.appGlobals.strictI18n: boolean`
 - **Reporting mode:** new trace `kind: "i18n"`. Non-strict mode
   emits warns; strict mode upgrades `missing-key` and
   `missing-bundle` to errors and surfaces an
-  [`AppError`](./structured-exception-model.md)
+  [`AppError`](./07-structured-exception-model.md)
   with `category: "internal"` for `icu-parse-error`.
 - **Test layout:** unit tests under
   `xmlui/tests/components-core/i18n/`; one spec per step.
@@ -565,7 +565,7 @@ Step 1.1.
 - All built-in component SCSS modules audited and converted to
   CSS logical properties (`margin-inline-start` instead of
   `margin-left`, etc.). The
-  [theming-sandbox plan](./sealed-theming-sandbox.md) Step 2.1's
+  [theming-sandbox plan](./08-sealed-theming-sandbox.md) Step 2.1's
   layout-prop allowlist is extended: `paddingLeft` /
   `paddingRight` map to `padding-inline-start` /
   `padding-inline-end` when `App.direction === "rtl"`. Authors who
@@ -623,7 +623,7 @@ Step 1.1; theming-sandbox plan Step 2.1.
     select example,
   - Formatter API reference,
   - RTL contract and migration notes.
-- Updates [`managed-react.md` §11](../managed-react.md):
+- Updates [`managed-react.md` §11](./managed-react.md):
   - Mark "No string externalization" as resolved.
   - Mark "No pluralization or gender support" as resolved.
   - Mark "No locale-aware sorting or collation helpers" as
@@ -640,7 +640,7 @@ Step 1.1; theming-sandbox plan Step 2.1.
 
 - `xmlui/dev-docs/guide/34-i18n.md` (new)
 - `.ai/xmlui/i18n.md` (new)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -810,7 +810,7 @@ alternative noted for future revisitation.
 9. **Bundle loading blocks first paint of components that call
    `App.translate`.** Otherwise a flash of message keys appears.
    Apps with large bundles can use the
-   [cooperative-concurrency plan](./cooperative-concurrency.md)'s
+   [cooperative-concurrency plan](./06-cooperative-concurrency.md)'s
    `handlerTimeoutMs` to bound the wait. Alternative considered:
    show keys until bundles load — rejected as a worse user
    experience.
@@ -844,6 +844,6 @@ alternative noted for future revisitation.
   added to the formatter surface later if demand surfaces.
 - **Locale-specific theme variations** (e.g. different default
   fonts for CJK locales). Owned by the
-  [sealed-theming-sandbox plan](./sealed-theming-sandbox.md);
+  [sealed-theming-sandbox plan](./08-sealed-theming-sandbox.md);
   this plan only ensures the locale value is reactively
   available.

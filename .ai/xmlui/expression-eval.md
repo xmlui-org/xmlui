@@ -81,7 +81,7 @@ A second guard, `isBannedMember(receiver, key)` in `bannedMembers.ts`, runs on e
 | `window.open`, `window.location.href = …` | `navigate(to, { target: "_blank" \| "_self" })` (`_blank` uses `noopener,noreferrer`) |
 | Raw global mutable state | `AppState` with `App.appGlobals.appStateKeys` schema (undeclared bucket throws `AppStateSchemaError`) |
 
-See `dev-docs/managed-react.md` Appendix A and `dev-docs/plans/dom-api-hardening.md` for the full plan and rollout history.
+See `dev-docs/plans/managed-react.md` Appendix A and `dev-docs/plans/17-dom-api-hardening.md` for the full plan and rollout history.
 
 ### 3. `new` Operator — Only 4 Constructors Allowed
 

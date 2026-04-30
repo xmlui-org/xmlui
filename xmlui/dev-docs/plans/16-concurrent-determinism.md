@@ -2,7 +2,7 @@
 
 **Date:** 2026-04-30
 **Status:** Proposal
-**Source:** [`managed-react.md` §16 "Determinism and Reproducibility"](../managed-react.md) and the §17 scorecard row **"Determinism — Visual, not concurrent."**
+**Source:** [`managed-react.md` §16 "Determinism and Reproducibility"](./managed-react.md) and the §17 scorecard row **"Determinism — Visual, not concurrent."**
 
 ---
 
@@ -21,7 +21,7 @@ clicks on two buttons, a `<DataSource>` reload landing while a
 form is submitting, a `setInterval` firing during route
 navigation — none of these have a published ordering guarantee.
 The `cooperative-concurrency`
-([cooperative-concurrency.md](./cooperative-concurrency.md))
+([06-cooperative-concurrency.md](./06-cooperative-concurrency.md))
 plan ships *handler-level* `handlerPolicy` controls
 (`single-flight | queue | drop-while-running`); this plan ships
 the **system-level** ordering and reproducibility contract that
@@ -48,7 +48,7 @@ This plan delivers four pieces:
    today's behaviour.
 3. **Replay-from-trace harness** — given a captured
    `XsLogEntry` stream from
-   [audit-grade-observability](./audit-grade-observability.md),
+   [audit-grade-observability](./15-audit-grade-observability.md),
    the harness re-executes the same sequence of inputs and
    asserts the same sequence of state diffs and renders. This
    is what makes "deterministic" *testable*.
@@ -80,30 +80,30 @@ boolean` (see Step 0). Strict mode flips:
   the action invoker's enqueue point.
 - **Source of truth for trace context:** the `traceId` /
   `spanId` shape introduced by
-  [audit-grade-observability](./audit-grade-observability.md)
+  [audit-grade-observability](./15-audit-grade-observability.md)
   Phase 1. The scheduler partitions its queues by `traceId` so
   two independent user interactions never serialise against
   each other.
 - **Cross-plan composition:**
   - The
-    [cooperative-concurrency](./cooperative-concurrency.md) plan
+    [cooperative-concurrency](./06-cooperative-concurrency.md) plan
     ships per-handler `handlerPolicy`. This plan ships the
     *underlying* scheduler those policies run on; the policies
     in that plan compose with the FIFO scheduler here without
     any change to their public surface.
   - The
-    [structured-exception-model](./structured-exception-model.md)
+    [structured-exception-model](./07-structured-exception-model.md)
     plan ships `AppError` propagation. The scheduler's
     error-rethrow path uses that contract; an error in handler
     *N* of a queued chain does not silently skip handlers
     *N+1…M* without raising the chain-level error.
   - The
-    [reactive-cycle-detection](./reactive-cycle-detection.md)
+    [reactive-cycle-detection](./03-reactive-cycle-detection.md)
     plan ships cycle detection on the dependency graph. The
     scheduler's "did this handler chain converge?" check
     leverages the same fixpoint detector.
   - The
-    [audit-grade-observability](./audit-grade-observability.md)
+    [audit-grade-observability](./15-audit-grade-observability.md)
     plan provides the `traceId` partitioning and the trace
     capture format that the replay harness consumes.
 - **New module location:**
@@ -270,7 +270,7 @@ None.
 #### Files
 
 - `xmlui/dev-docs/guide/39-determinism.md` (new)
-- `xmlui/dev-docs/managed-react.md` (cross-link from §16)
+- `xmlui/dev-docs/plans/managed-react.md` (cross-link from §16)
 
 #### Tests
 
@@ -352,7 +352,7 @@ Step 1.1.
   (`<App scheduler maxQueuedPerTrace="64">`) without
   converging fires `determinism-convergence-failed` (severity
   `warn`; strict `error`); the chain is force-cancelled per
-  the [cooperative-concurrency](./cooperative-concurrency.md)
+  the [cooperative-concurrency](./06-cooperative-concurrency.md)
   `$cancel` contract.
 
 #### Files
@@ -381,7 +381,7 @@ Step 1.1.
 #### Dependencies
 
 Step 0; alignment with
-[cooperative-concurrency](./cooperative-concurrency.md)
+[cooperative-concurrency](./06-cooperative-concurrency.md)
 (`$cancel` contract).
 
 ---
@@ -440,7 +440,7 @@ Step 2.1.
   ([theming-styling.md](../../../.ai/xmlui/theming-styling.md))
   routes every numeric token through this helper.
 - A `determinism-floating-point-token` analyzer rule (rides on
-  the [build-validation-analyzers](./build-validation-analyzers.md)
+  the [build-validation-analyzers](./13-build-validation-analyzers.md)
   pipeline; severity `info`; strict `warn`) catches markup that
   bypasses the helper (`style="margin: {0.1 + 0.2}rem"` —
   produces a trailing-precision warning).
@@ -466,7 +466,7 @@ Step 2.1.
 #### Dependencies
 
 Step 0; alignment with
-[build-validation-analyzers](./build-validation-analyzers.md).
+[build-validation-analyzers](./13-build-validation-analyzers.md).
 
 ---
 
@@ -519,7 +519,7 @@ Step 0.
 #### Scope
 
 - `replay(input)` takes an `XsLogEntry` array (captured by
-  [audit-grade-observability](./audit-grade-observability.md)
+  [audit-grade-observability](./15-audit-grade-observability.md)
   Phase 4 OTLP sink, or by the inspector's "Save trace"
   button) plus an optional initial snapshot, and re-executes
   the input events (`click`, `change`, `navigate`,
@@ -535,7 +535,7 @@ Step 0.
   weren't recorded are an error.
 - New CLI subcommand `xmlui replay <trace-file>` runs the
   harness against a project; integration with the
-  [build-validation-analyzers](./build-validation-analyzers.md)
+  [build-validation-analyzers](./13-build-validation-analyzers.md)
   CI surface so PRs can include "regression replay" steps.
 
 #### Files
@@ -559,7 +559,7 @@ Step 0.
 #### Dependencies
 
 Steps 1.1, 2.1, 3.1, 3.2; alignment with
-[audit-grade-observability](./audit-grade-observability.md)
+[audit-grade-observability](./15-audit-grade-observability.md)
 (trace capture format).
 
 ---
@@ -611,7 +611,7 @@ Step 4.1.
 - Step 1.1 already shipped the happens-before chapter; this
   step extends it with the scheduler reference, the floating-
   point and iteration-order audits, and the replay harness.
-- Updates [`managed-react.md` §16](../managed-react.md):
+- Updates [`managed-react.md` §16](./managed-react.md):
   - Mark *"Async handler interleaving"* as resolved
     (Phase 2 FIFO scheduler).
   - Mark *"Floating-point in spacing tokens"* as resolved
@@ -627,7 +627,7 @@ Step 4.1.
 #### Files
 
 - `xmlui/dev-docs/guide/39-determinism.md` (extend)
-- `xmlui/dev-docs/managed-react.md`
+- `xmlui/dev-docs/plans/managed-react.md`
 - `AGENTS.md`
 
 #### Acceptance
@@ -763,7 +763,7 @@ alternative noted for future revisitation.
 
 5. **Replay mocks at the `App.fetch` boundary, not at
    `XMLHttpRequest`.** Since
-   [managed-react.md §1 (2026-04)](../managed-react.md) bans
+   [managed-react.md §1 (2026-04)](./managed-react.md) bans
    raw `fetch`/`XHR`/`WebSocket`/`EventSource`, mocking at
    `App.fetch` covers all sanctioned outbound HTTP. Alternative
    considered: mock at the network layer — rejected as
@@ -835,7 +835,7 @@ alternative noted for future revisitation.
 - **Auto-fix codemods** for `determinism-floating-point-token`
   / `determinism-iteration-order-symbol`. Authors fix
   manually; matches the
-  [build-validation-analyzers](./build-validation-analyzers.md)
+  [build-validation-analyzers](./13-build-validation-analyzers.md)
   rationale.
 - **Visual regression testing** as part of replay. Replay
   asserts on the *trace stream* (state diffs, handler order),
