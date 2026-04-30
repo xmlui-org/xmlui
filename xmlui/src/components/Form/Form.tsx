@@ -186,7 +186,7 @@ export const FormMd = createMetadata({
         "When `persist` is enabled and the user cancels the form, this property controls " +
         "whether the temporarily saved data is kept (`true`) or cleared (`false`, the default).",
       valueType: "boolean",
-      defaultValue: false,
+      defaultValue: defaultProps.keepOnCancel,
     },
     dataAfterSubmit: {
       description:
@@ -196,7 +196,7 @@ export const FormMd = createMetadata({
         "`\"clear\"` empties the form as if no `data` property were set.",
       availableValues: ["keep", "reset", "clear"],
       valueType: "string",
-      defaultValue: "keep",
+      defaultValue: defaultProps.dataAfterSubmit,
     },
   },
   events: {
@@ -221,6 +221,18 @@ export const FormMd = createMetadata({
       parameters: {
         data: "The current form data being submitted.",
       },
+    },
+    submitFailed: {
+      description:
+        `The form infrastructure fires this event when a submit attempt is rejected because ` +
+        `at least one field failed validation. \`willSubmit\` and \`submit\` are NOT fired in ` +
+        `this case; \`submitFailed\` is the only signal available to react to a failed submit.`,
+      signature: "submitFailed(validationResult: { isValid: boolean, errors: any[], warnings: any[], validationResults: Record<string, any>, data: Record<string, any> }): void",
+      parameters: {
+        validationResult:
+          "The validation result of the failed submit, including the per-field validation results.",
+      },
+      isInternal: true,
     },
     success: {
       description: "The form infrastructure fires this event when the form is submitted successfully.",

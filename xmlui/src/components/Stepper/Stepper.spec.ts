@@ -691,15 +691,31 @@ test.describe("Step", () => {
     await expect(page.getByText("Secondary text")).toBeVisible();
   });
 
-  test("icon string renders inside the vertical indicator", async ({ initTestBed, page }) => {
+  test("icon name renders the registered xmlui icon inside the vertical indicator", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(`
       <Stepper orientation="vertical">
-        <Step label="A" icon="★"><Text>A body</Text></Step>
+        <Step label="A" icon="star"><Text>A body</Text></Step>
         <Step label="B"><Text>B body</Text></Step>
       </Stepper>
     `);
-    // In vertical mode, Step renders its own icon
-    await expect(page.getByText("★")).toBeVisible();
+    // The Step header renders <Icon name="star" /> which surfaces a data-icon-name attribute.
+    await expect(page.locator('[data-icon-name="star"]')).toBeVisible();
+  });
+
+  test("icon name renders the registered xmlui icon in horizontal mode", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Stepper>
+        <Step label="A" icon="star">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `);
+    await expect(page.locator('[data-icon-name="star"]')).toBeVisible();
   });
 
   test("Step without label/description still renders (no crash)", async ({
@@ -726,6 +742,172 @@ test.describe("Step", () => {
     `);
     await expect(page.getByRole("tabpanel")).toBeVisible();
     await expect(page.getByRole("tabpanel")).toContainText("A body");
+  });
+});
+
+// =============================================================================
+// STEP error / completed STATES
+// =============================================================================
+
+test.describe("Step error / completed states", () => {
+  test("error=true shows the error icon in horizontal mode", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stepper>
+        <Step label="A" error="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `);
+    const headerItems = page.getByRole("listitem");
+    await expect(headerItems.nth(0).locator('[data-icon-name="error"]')).toBeVisible();
+    // The non-error step keeps the numeric indicator (no error icon).
+    await expect(headerItems.nth(1).locator('[data-icon-name="error"]')).toHaveCount(0);
+  });
+
+  test("completed=true shows the checkmark icon in horizontal mode", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Stepper activeStep="{1}">
+        <Step label="A" completed="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `);
+    const headerItems = page.getByRole("listitem");
+    await expect(headerItems.nth(0).locator('[data-icon-name="checkmark"]')).toBeVisible();
+    await expect(headerItems.nth(1).locator('[data-icon-name="checkmark"]')).toHaveCount(0);
+  });
+
+  test("error=true wins over completed=true when both are set", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Stepper>
+        <Step label="A" error="true" completed="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `);
+    const firstHeader = page.getByRole("listitem").nth(0);
+    await expect(firstHeader.locator('[data-icon-name="error"]')).toBeVisible();
+    await expect(firstHeader.locator('[data-icon-name="checkmark"]')).toHaveCount(0);
+  });
+
+  test("error=true shows the error icon in vertical mode", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Stepper orientation="vertical">
+        <Step label="A" error="true"><Text>A body</Text></Step>
+        <Step label="B"><Text>B body</Text></Step>
+      </Stepper>
+    `);
+    await expect(page.locator('[data-icon-name="error"]')).toBeVisible();
+  });
+
+  test("completed=true shows the checkmark icon in vertical mode", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Stepper orientation="vertical" activeStep="{1}">
+        <Step label="A" completed="true"><Text>A body</Text></Step>
+        <Step label="B"><Text>B body</Text></Step>
+      </Stepper>
+    `);
+    await expect(page.locator('[data-icon-name="checkmark"]')).toBeVisible();
+  });
+
+  test("error toggles reactively from a binding", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.bad="{false}">
+        <Stepper>
+          <Step label="A" error="{bad}">A body</Step>
+          <Step label="B">B body</Step>
+        </Stepper>
+        <Button testId="trigger" onClick="bad = true" />
+      </Fragment>
+    `);
+    // Initially no error icon.
+    await expect(page.locator('[data-icon-name="error"]')).toHaveCount(0);
+    await page.getByTestId("trigger").click();
+    await expect(page.locator('[data-icon-name="error"]')).toBeVisible();
+  });
+
+  test("error theme color applies to the icon background", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Stepper>
+        <Step label="A" error="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-icon-Stepper--error": "rgb(220, 38, 38)",
+        },
+      },
+    );
+    const errorCircle = page.getByRole("listitem").nth(0).locator("span").first();
+    await expect(errorCircle).toHaveCSS("background-color", "rgb(220, 38, 38)");
+  });
+
+  test("error theme color applies to the label", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Stepper>
+        <Step label="Personal" error="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `,
+      {
+        testThemeVars: {
+          "textColor-label-Stepper--error": "rgb(180, 0, 0)",
+        },
+      },
+    );
+    await expect(page.getByText("Personal")).toHaveCSS("color", "rgb(180, 0, 0)");
+  });
+
+  test("completed connector reflects the completed state", async ({ initTestBed, page }) => {
+    await initTestBed(
+      `
+      <Stepper>
+        <Step label="A" completed="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `,
+      {
+        testThemeVars: {
+          "borderColor-connector-Stepper--completed": "rgb(10, 200, 10)",
+        },
+      },
+    );
+    // The connector after the completed step picks up the completed border color.
+    const connector = page.getByRole("list").locator('div[aria-hidden="true"]').first();
+    await expect(connector).toHaveCSS("border-top-color", "rgb(10, 200, 10)");
+  });
+
+  test("active styling is suppressed when the active step is in error", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Theme: pick distinct error and active backgrounds. Verify the active
+    // step renders with the error background, not the active background.
+    await initTestBed(
+      `
+      <Stepper activeStep="{0}">
+        <Step label="A" error="true">A body</Step>
+        <Step label="B">B body</Step>
+      </Stepper>
+    `,
+      {
+        testThemeVars: {
+          "backgroundColor-icon-Stepper--active": "rgb(0, 0, 200)",
+          "backgroundColor-icon-Stepper--error": "rgb(200, 0, 0)",
+        },
+      },
+    );
+    const activeErrorCircle = page.getByRole("listitem").nth(0).locator("span").first();
+    await expect(activeErrorCircle).toHaveCSS("background-color", "rgb(200, 0, 0)");
   });
 });
 

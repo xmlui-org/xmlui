@@ -17,17 +17,24 @@
             width="100%"
             marginTop="$space-4"
         >
-            <Theme
-                textColor-Link="$color-primary-500"
-                textColor-Link--hover="$color-primary-400"
-            >
-                <Link to="/blog" noIndicator>
-                    ← Go to all posts
-                </Link>
-            </Theme>
+            <HStack verticalAlignment="center" gap="$space-3">
+                <Theme
+                    textColor-Link="$color-primary-500"
+                    textColor-Link--hover="$color-primary-400"
+                >
+                    <Link to="/blog" noIndicator>
+                        ← Go to all posts
+                    </Link>
+                </Theme>
+                <SpaceFiller />
+                <Share
+                    pageTitle="{$props.post.title}"
+                    markdownContent="{markdownContent()}"
+                />
+            </HStack>
             <HStack gap="$space-5">
-                <VStack width="*" gap="$space-2">
-                    <VStack gap="$space-0_5">
+                <VStack width="*" gap="$space-4">
+                    <VStack gap="$space-2">
                         <H1 showAnchor="false">
                             {$props.post.title}
                         </H1>
@@ -35,11 +42,14 @@
                             {$props.post.description}
                         </H3>
                     </VStack>
-                    <Text variant="info">
-                        {$props.post.author}
-                    •
-                    {formatDate($props.post.date, "d MMM yyyy")}
-                    </Text>
+                    <HStack verticalAlignment="center" gap="$space-3">
+                        <Text variant="info">
+                            {$props.post.author}
+                        •
+                        {formatDate($props.post.date, "d MMM yyyy")}
+                        </Text>
+                        <ReadingTime content="{markdownContent()}" />
+                    </HStack>
                     <HStack
                         when="{showTags() && $props.post.tags && $props.post.tags.length > 0}"
                         gap="$space-1_5"

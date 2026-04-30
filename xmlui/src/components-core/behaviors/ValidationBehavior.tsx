@@ -16,6 +16,11 @@ export const validationBehavior: Behavior = {
         valueType: "boolean",
         description: "Whether this field is required.",
       },
+      requiredInvalidMessage: {
+        valueType: "string",
+        description:
+          "Custom error message to display when the field is required but empty.",
+      },
       minLength: {
         valueType: "number",
         description: "Minimum length for string inputs.",
@@ -85,10 +90,24 @@ export const validationBehavior: Behavior = {
         description:
           "The mode to use for validating the input (e.g., 'onChange', 'onBlur', 'onSubmit').",
       },
+      customValidationsDebounce: {
+        valueType: "number",
+        description:
+          "The number of milliseconds to wait after a value change before running custom validation.",
+      },
+      validationDisplayDelay: {
+        valueType: "number",
+        description:
+          "The number of milliseconds a slow custom validation can run before its result is shown without waiting for blur.",
+      },
       verboseValidationFeedback: {
         valueType: "boolean",
         description:
           "Whether to display verbose validation feedback (e.g., show all validation errors instead of just the first one).",
+      },
+      validate: {
+        valueType: "string",
+        description: "Custom field validation handler.",
       },
     },
     condition: {

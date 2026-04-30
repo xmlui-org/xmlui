@@ -1,0 +1,35 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$component: "ReadingTime";
+
+$gap-ReadingTime: createThemeVar("gap-#{$component}");
+$color-ReadingTime: createThemeVar("color-#{$component}");
+$fontSize-ReadingTime: createThemeVar("fontSize-#{$component}");
+$size-icon-ReadingTime: createThemeVar("size-icon-#{$component}");
+
+@layer components {
+  .root {
+    display: inline-flex;
+    align-items: center;
+    gap: $gap-ReadingTime;
+    color: $color-ReadingTime;
+    font-size: $fontSize-ReadingTime;
+    line-height: 1;
+  }
+
+  .icon {
+    flex-shrink: 0;
+    width: $size-icon-ReadingTime;
+    height: $size-icon-ReadingTime;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

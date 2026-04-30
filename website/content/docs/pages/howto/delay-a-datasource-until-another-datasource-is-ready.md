@@ -8,15 +8,7 @@ When a dropdown needs data from two endpoints — users and departments — and 
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.users_for_ds_dependency =
-    [
-      { id: 1, name: 'Alice', departmentId: 1 },
-      { id: 2, name: 'Bob', departmentId: 2 }
-      ];
-    $state.departments_with_ds_dependency = [
-      { id: 1, name: 'Engineering' },
-      { id: 2, name: 'Marketing' }
-    ]",
+  "initialize": "$state.users_for_ds_dependency = [{ id: 1, name: 'Alice', departmentId: 1 }, { id: 2, name: 'Bob', departmentId: 2 }]; $state.departments_with_ds_dependency = [{ id: 1, name: 'Engineering' }, { id: 2, name: 'Marketing' }]",
   "operations": {
     "get_users_for_ds_dependency": {
       "url": "/users_for_ds_dependency",
@@ -31,33 +23,38 @@ When a dropdown needs data from two endpoints — users and departments — and 
   }
 }
 ---app display /selectedId/ /nonce/
-<App var.selectedId="" var.nonce="{0}">
+<App var.selectedId="" var.nonce="{0}" var.userOptions="{[]}">
   <DataSource
     id="users_for_ds_dependency"
-    url="/api/users_for_ds_dependency?nonce"
+    url="/api/users_for_ds_dependency?nonce={nonce}"
     inProgressNotificationMessage="Loading users..."
     when="{ nonce > 0 }"
-    />
+  />
 
   <DataSource
     id="departments_with_ds_dependency"
     url="/api/departments_with_ds_dependency"
     when="{ users_for_ds_dependency.loaded }"
     inProgressNotificationMessage="Loading departments..."
+    onLoaded="(departments) => {
+      userOptions = users_for_ds_dependency.value.map(user => {
+        const department = departments.find(d => d.id === user.departmentId);
+        return {
+          id: user.id,
+          label: user.name + ' (' + department.name + ')'
+        };
+      });
+    }"
   />
 
   <Select
-    id="usersForDsDepencency"
-    data="{users_for_ds_dependency}"
-    when="{departments_with_ds_dependency.loaded}"
+    id="usersForDsDependency"
+    label="User"
+    when="{userOptions.length > 0}"
     onDidChange="(newVal) => selectedId = newVal"
   >
-    <Items data="{users_for_ds_dependency}">
-      <Option
-        value="{$item.id}"
-        label="{$item.name} ({departments_with_ds_dependency.value
-          .find(d => d.id === $item.departmentId)?.name})"
-     />
+    <Items data="{userOptions}">
+      <Option value="{$item.id}" label="{$item.label}" />
     </Items>
   </Select>
 
@@ -68,6 +65,8 @@ When a dropdown needs data from two endpoints — users and departments — and 
 ## Key points
 
 **`when` prevents the DataSource from fetching until the condition is truthy**: In the example, `when="{users_for_ds_dependency.loaded}"` ensures the departments request doesn't fire until users have arrived.
+
+**Build the Select options after both responses are available**: The departments DataSource uses `onLoaded` to combine `users_for_ds_dependency.value` with the department response and store the ready-to-render options in `userOptions`. The `Select` then renders only from `<Items data="{userOptions}">`, so it has one clear source for its options and each option already has a resolved label.
 
 **You can chain multiple DataSources**: DataSource A's `when` can reference DataSource B's `loaded`, and DataSource C can wait for both. This creates a sequential loading pipeline.
 

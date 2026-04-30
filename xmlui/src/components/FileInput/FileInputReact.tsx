@@ -214,7 +214,7 @@ export const FileInput = memo(forwardRef(function FileInput(
       if (!parseAs) {
         loggerService.log(["[FileInput] No parseAs specified, passing files through"]);
         updateState({ value: acceptedFiles });
-        onDidChange(acceptedFiles);
+        onDidChange?.(acceptedFiles);
         return;
       }
 
@@ -347,7 +347,7 @@ export const FileInput = memo(forwardRef(function FileInput(
       loggerService.log(["[FileInput] Calling updateState with parseAsResult"]);
       updateState({ value: parseAsResult });
       loggerService.log(["[FileInput] Calling onDidChange with parseAsResult"]);
-      onDidChange(parseAsResult);
+      onDidChange?.(parseAsResult);
 
       loggerService.log(["[FileInput] onDrop completed"]);
 

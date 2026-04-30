@@ -472,12 +472,15 @@ parts: {
 ### Applying parts in native code
 
 ```typescript
-import { partClassName, PART_LABEL } from "../../components-core/parts";
+import { PART_LABEL } from "../../components-core/parts";
+import { Part } from "../Part/Part";
 
-<label className={partClassName(PART_LABEL)}>...</label>
+<Part partId={PART_LABEL}>
+  <label>...</label>
+</Part>
 ```
 
-`partClassName()` applies a `data-part-id` attribute used for CSS targeting.
+The `Part` component wraps a native element and applies the `data-part-id` attribute used for CSS targeting.
 
 ### Theme variables for parts
 

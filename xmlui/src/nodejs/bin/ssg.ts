@@ -15,6 +15,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "./build";
 import { getViteConfig } from "./viteConfig";
+import { createXmluiAppDefines } from "./xmluiEnv";
 import { parse } from "node-html-parser";
 import { discoverRoutes } from "../discoverRoutes";
 import { XMLUI_SSG_DATA_ATTRIBUTES } from "../../components-core/rendering/ssgEnv";
@@ -133,7 +134,9 @@ function mergeAttributesIntoElement(
     return;
   }
 
-  const attributeSource = parse(`<${selector} ${attributesMarkup}></${selector}>`).querySelector(selector);
+  const attributeSource = parse(`<${selector} ${attributesMarkup}></${selector}>`).querySelector(
+    selector,
+  );
 
   if (!attributeSource) {
     return;
@@ -586,12 +589,14 @@ async function runDebugSsgServer() {
     },
     define: {
       ...viteConfig.define,
-      "import.meta.env.VITE_BUILD_MODE": '"ALL"',
-      "import.meta.env.VITE_DEV_MODE": true,
-      "import.meta.env.VITE_STANDALONE": process.env.VITE_STANDALONE,
-      "import.meta.env.VITE_MOCK_ENABLED": true,
-      "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS": '"true"',
-      "import.meta.env.VITE_USER_COMPONENTS_Inspect": '"true"',
+      ...createXmluiAppDefines({
+        buildMode: "ALL",
+        devMode: true,
+        standalone: false,
+        mockEnabled: true,
+        includeAllComponents: true,
+        inspectUserComponents: true,
+      }),
     },
     plugins: [...basePlugins, ssgDebugPlugin],
   } as InlineConfig);
@@ -727,9 +732,12 @@ export const ssg = async ({
       },
       define: {
         ...viteConfig.define,
-        "import.meta.env.VITE_BUILD_MODE": JSON.stringify("INLINE_ALL"),
-        "import.meta.env.VITE_DEV_MODE": false,
-        "import.meta.env.VITE_MOCK_ENABLED": false,
+        ...createXmluiAppDefines({
+          buildMode: "INLINE_ALL",
+          devMode: false,
+          standalone: false,
+          mockEnabled: false,
+        }),
         "import.meta.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
       },
       build: {

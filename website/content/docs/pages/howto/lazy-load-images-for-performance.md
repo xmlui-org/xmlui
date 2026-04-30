@@ -15,58 +15,24 @@ When a page contains many images, loading them all at once slows down the initia
       </Text>
 
       <HStack wrapContent>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/a/400/300"
-            alt="Photo A"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Alice</Text>
-        </Card>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/b/400/300"
-            alt="Photo B"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Bob</Text>
-        </Card>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/c/400/300"
-            alt="Photo C"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Charlie</Text>
-        </Card>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/d/400/300"
-            alt="Photo D"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Diana</Text>
-        </Card>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/e/400/300"
-            alt="Photo E"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Eve</Text>
-        </Card>
-        <Card width="220px">
-          <Image
-            src="https://picsum.photos/seed/f/400/300"
-            alt="Photo F"
-            aspectRatio="4/3"
-            lazyLoad="{true}" />
-          <Text variant="strong">Frank</Text>
-        </Card>
+        <Items data="{ Array.from({ length: 200 }).map((_, i) => i + 1) }">
+          <Card width="220px">
+            <Image
+              src="{ 'https://picsum.photos/seed/' + $item + '/400/300' }"
+              alt="{ 'Photo ' + $item }"
+              aspectRatio="4/3"
+              lazyLoad="{true}" />
+            <Text variant="strong">{ 'Photo ' + $item }</Text>
+          </Card>
+        </Items>
       </HStack>
     </VStack>
   </ScrollViewer>
 </App>
+---desc
+Open **DevTools → Network tab**, filter by **Img**, then reload the page.
+Only the images visible in the initial viewport are fetched at load time.
+As you scroll down, new image requests appear in the Network tab — confirming that lazy loading is active and offscreen images are deferred until they near the viewport.
 ```
 
 ## Key points

@@ -19,7 +19,7 @@ A mixed content row has several short tags followed by one element that must alw
 
 ## Key points
 
-**`width="100%"` forces the break**: A `SpaceFiller` without an explicit width grows to fill remaining space on the current row — if that remaining width is non-zero, following siblings may still fit on that row. Setting `width="100%"` ensures the `SpaceFiller` consumes the full container width, guaranteeing the next sibling wraps:
+**`SpaceFiller` forces the break**: It grows to fill the remaining row space, consuming the full container width and forcing the next sibling to wrap to a new line:
 
 ```xmlui
 <HStack wrapContent>
@@ -48,7 +48,7 @@ A mixed content row has several short tags followed by one element that must alw
 </App>
 ```
 
-**Combine with star-sized children**: Use `SpaceFiller width="100%"` to break a row and then rely on `width="*"` children on the next row to divide that row's space equally:
+**Combine with star-sized children**: Use `SpaceFiller` to break a row and then rely on `width="*"` children on the next row to divide that row's space equally:
 
 ```xmlui-pg copy display name="Row break then equal-width row"
 ---app display

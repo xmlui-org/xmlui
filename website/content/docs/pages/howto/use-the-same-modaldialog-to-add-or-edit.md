@@ -73,10 +73,7 @@ Maintaining two separate dialogs for create and update leads to duplicated marku
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.products = [
-    { id: 1, name: 'Laptop Pro', price: 1299 },
-    { id: 2, name: 'Wireless Mouse', price: 29 }
-  ]",
+  "initialize": "$state.products = [{ id: 1, name: 'Laptop Pro', price: 1299 }, { id: 2, name: 'Wireless Mouse', price: 29 }];",
   "operations": {
     "get-products": {
       "url": "/products",
@@ -94,14 +91,7 @@ Maintaining two separate dialogs for create and update leads to duplicated marku
     "insert-product": {
       "url": "/products",
       "method": "post",
-      "handler": "
-        const newId = $state.products.length > 0 ? Math.max(...$state.products.map(p => p.id)) + 1 : 1;
-        $state.products.push({
-          id: newId,
-          name: $requestBody.name,
-          price: Number($requestBody.price)
-        });
-      "
+      "handler": "const newId = $state.products.length > 0 ? Math.max(...$state.products.map(p => p.id)) + 1 : 1; $state.products.push({ id: newId, name: $requestBody.name, price: Number($requestBody.price) });"
     },
     "update-product": {
       "url": "/products/:id",
@@ -109,13 +99,7 @@ Maintaining two separate dialogs for create and update leads to duplicated marku
       "pathParamTypes": {
         "id": "integer"
       },
-      "handler": "
-        const oldItem = $state.products.find(p => p.id === $pathParams.id);
-        if (oldItem) {
-          oldItem.name = $requestBody.name;
-          oldItem.price = Number($requestBody.price);
-        }
-      "
+      "handler": "const oldItem = $state.products.find(p => p.id === $pathParams.id); if (oldItem) { oldItem.name = $requestBody.name; oldItem.price = Number($requestBody.price); }"
     },
     "delete-product": {
       "url": "/products/:id",

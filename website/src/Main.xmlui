@@ -993,11 +993,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Build a batch-processing queue"
-                            to="/docs/howto/build-a-batch-processing-queue"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
                         />
@@ -1071,18 +1066,18 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Define custom Text variants in a theme"
-                            to="/docs/howto/define-custom-text-variants-in-a-theme"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Theme Badge colors and sizes"
                             to="/docs/howto/theme-badge-colors-and-sizes"
                         />
                         <NavLink
                             icon="article"
-                            label="Style Card and NoResult placeholders"
-                            to="/docs/howto/style-card-and-noresult-placeholders"
+                            label="Style Card appearance"
+                            to="/docs/howto/style-card-appearance"
+                        />
+                        <NavLink
+                            icon="article"
+                            label="Style NoResult placeholder"
+                            to="/docs/howto/style-noresult-placeholder"
                         />
                     </NavGroup>
 
@@ -2301,12 +2296,6 @@
                     content="{appGlobals.docsContent['pages/howto/receive-postmessage-from-an-iframe.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/build-a-batch-processing-queue">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-a-batch-processing-queue.md']}"
-                />
-            </Page>
-
             <!-- New how-to articles: Advanced Theming -->
             <Page url="/docs/howto/theme-button-variant-color-combos">
                 <DocumentPageNoTOC
@@ -2368,19 +2357,19 @@
                     content="{appGlobals.docsContent['pages/howto/style-slider-track-thumb-and-range.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/define-custom-text-variants-in-a-theme">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/define-custom-text-variants-in-a-theme.md']}"
-                />
-            </Page>
             <Page url="/docs/howto/theme-badge-colors-and-sizes">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/theme-badge-colors-and-sizes.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/style-card-and-noresult-placeholders">
+            <Page url="/docs/howto/style-card-appearance">
                 <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/style-card-and-noresult-placeholders.md']}"
+                    content="{appGlobals.docsContent['pages/howto/style-card-appearance.md']}"
+                />
+            </Page>
+            <Page url="/docs/howto/style-noresult-placeholder">
+                <DocumentPageNoTOC
+                    content="{appGlobals.docsContent['pages/howto/style-noresult-placeholder.md']}"
                 />
             </Page>
 

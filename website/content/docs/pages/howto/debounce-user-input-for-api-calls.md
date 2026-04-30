@@ -67,31 +67,12 @@ Use `debounce` to delay function execution until user input pauses, reducing unn
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.products = [
-    { id: 1, name: 'Laptop', price: 999, category: 'Electronics' },
-    { id: 2, name: 'Mouse', price: 29, category: 'Electronics' },
-    { id: 3, name: 'Keyboard', price: 79, category: 'Electronics' },
-    { id: 4, name: 'Monitor', price: 299, category: 'Electronics' },
-    { id: 5, name: 'Desk Chair', price: 199, category: 'Furniture' },
-    { id: 6, name: 'Desk Lamp', price: 49, category: 'Furniture' }
-  ]",
+  "initialize": "$state.products = [{ id: 1, name: 'Laptop', price: 999, category: 'Electronics' }, { id: 2, name: 'Mouse', price: 29, category: 'Electronics' }, { id: 3, name: 'Keyboard', price: 79, category: 'Electronics' }, { id: 4, name: 'Monitor', price: 299, category: 'Electronics' }, { id: 5, name: 'Desk Chair', price: 199, category: 'Furniture' }, { id: 6, name: 'Desk Lamp', price: 49, category: 'Furniture' }]",
   "operations": {
     "post-search": {
       "url": "/search",
       "method": "post",
-      "handler": "
-        delay(800);
-        const query = ($requestBody.query || '').toLowerCase();
-        const filtered = $state.products.filter(p =>
-          p.name.toLowerCase().includes(query) ||
-          p.category.toLowerCase().includes(query)
-        );
-        return {
-          status: 'ok',
-          query: query,
-          results: filtered
-        };
-      "
+      "handler": "delay(800); const query = ($requestBody.query || '').toLowerCase(); const filtered = $state.products.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)); return { status: 'ok', query: query, results: filtered };"
     }
   }
 }
@@ -109,19 +90,7 @@ onDidChange="e => debounce(500, (val) => handleSearch(val), e)"
 onDidChange="e => debounce(500, () => handleSearch(e))"
 ```
 
-**Use the same function reference**: Each unique function source gets its own timer. Keep the function structure consistent:
-
-```ts
-// ✅ Correct - single timer
-debounce(500, (val) => console.log('Value:', val), e)
-
-// ❌ Wrong - creates different timers
-if (condition) {
-  debounce(500, (val) => console.log('A:', val), e);
-} else {
-  debounce(500, (val) => console.log('B:', val), e);
-}
-```
+**`pluralize(count, singular, plural)` formats counts naturally**: The helper returns `"1 result"` or `"3 results"` automatically. Use it anywhere you display a count next to a label.
 
 **Common use cases**:
 - Search inputs — wait for typing to stop

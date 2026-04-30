@@ -1,5 +1,19 @@
 # xmlui
 
+## 0.12.25
+
+### Patch Changes
+
+- 81e9ef8: fix: xmlui start command encountering blocking error by fetching Main.xmlui even in vite development mode
+- a82544d: feat: add isDirty state to FormSegment and enhance Step component with error and completed states
+
+## 0.12.24
+
+### Patch Changes
+
+- cfa46e7: Refactor Button component styles and tests
+- ba102d8: fix: vite builds failing to detect they are in vite mode, not in standalone mode, breaking the `xmlui start` and other commands for websites using vite.
+
 ## 0.12.23
 
 ### Patch Changes

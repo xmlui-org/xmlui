@@ -4,7 +4,11 @@ Control content and summary styles and expand/collapse animation with Expandable
 
 ExpandableItem has two styleable regions: the `summary` (the always-visible clickable header) and the `content` (the collapsible body). The animation that slides the content open is driven by `animationDuration-content-ExpandableItem` and `animation-content-ExpandableItem` (the CSS timing function). Summary hover and active backgrounds are independently controllable.
 
-```xmlui-pg copy display name="ExpandableItem transition and style theming"
+The three examples below show the same summary styling with three different animation speeds — click any header to see the difference.
+
+**Fast / snappy** (`0.15s` with an overshoot easing):
+
+```xmlui-pg copy display name="ExpandableItem snappy animation"
 ---app display
 <App>
   <Theme
@@ -17,28 +21,94 @@ ExpandableItem has two styleable regions: the `summary` (the always-visible clic
     paddingVertical-summary-ExpandableItem="12px"
     paddingHorizontal-summary-ExpandableItem="16px"
     border-summary-ExpandableItem="1px solid $color-surface-200"
-    animationDuration-content-ExpandableItem="0.3s"
+    animationDuration-content-ExpandableItem="0.15s"
     animation-content-ExpandableItem="cubic-bezier(0.16, 1, 0.3, 1)"
     paddingVertical-content-ExpandableItem="12px"
     paddingHorizontal-content-ExpandableItem="16px"
   >
     <VStack>
-      <ExpandableItem label="What is XMLUI?">
+      <ExpandableItem summary="What is XMLUI?">
         <Text>
-          XMLUI is a declarative, reactive frontend framework for 
-          building web apps with XML markup.
-      </Text>
-      </ExpandableItem>
-      <ExpandableItem label="How does theming work?">
-        <Text>
-          Theming uses CSS custom properties scoped with a 
-          Theme wrapper component.
+          XMLUI is a declarative, reactive frontend framework for building web 
+          apps with XML markup.
         </Text>
       </ExpandableItem>
-      <ExpandableItem label="Can I nest ExpandableItems?">
+      <ExpandableItem summary="How does theming work?">
         <Text>
-          Yes — nest them inside the content slot for 
-          accordion-style layouts.
+          Theming uses CSS custom properties scoped with a Theme wrapper component.
+        </Text>
+      </ExpandableItem>
+    </VStack>
+  </Theme>
+</App>
+```
+
+**Relaxed / slow** (`0.5s` with a smooth ease-out):
+
+```xmlui-pg copy display name="ExpandableItem relaxed animation"
+---app display
+<App>
+  <Theme
+    borderRadius-ExpandableItem="8px"
+    backgroundColor-summary-ExpandableItem="$color-surface-50"
+    backgroundColor-summary-ExpandableItem--hover="$color-primary-50"
+    backgroundColor-summary-ExpandableItem--active="$color-primary-100"
+    textColor-summary-ExpandableItem="$color-surface-700"
+    fontWeight-summary-ExpandableItem="600"
+    paddingVertical-summary-ExpandableItem="12px"
+    paddingHorizontal-summary-ExpandableItem="16px"
+    border-summary-ExpandableItem="1px solid $color-surface-200"
+    animationDuration-content-ExpandableItem="0.5s"
+    animation-content-ExpandableItem="cubic-bezier(0, 0, 0.2, 1)"
+    paddingVertical-content-ExpandableItem="12px"
+    paddingHorizontal-content-ExpandableItem="16px"
+  >
+    <VStack>
+      <ExpandableItem summary="What is XMLUI?">
+        <Text>
+          XMLUI is a declarative, reactive frontend framework for building web 
+          apps with XML markup.
+        </Text>
+      </ExpandableItem>
+      <ExpandableItem summary="How does theming work?">
+        <Text>
+          Theming uses CSS custom properties scoped with a Theme wrapper component.
+        </Text>
+      </ExpandableItem>
+    </VStack>
+  </Theme>
+</App>
+```
+
+**No animation** (`0s` — instant open/close):
+
+```xmlui-pg copy display name="ExpandableItem no animation"
+---app display
+<App>
+  <Theme
+    borderRadius-ExpandableItem="8px"
+    backgroundColor-summary-ExpandableItem="$color-surface-50"
+    backgroundColor-summary-ExpandableItem--hover="$color-primary-50"
+    backgroundColor-summary-ExpandableItem--active="$color-primary-100"
+    textColor-summary-ExpandableItem="$color-surface-700"
+    fontWeight-summary-ExpandableItem="600"
+    paddingVertical-summary-ExpandableItem="12px"
+    paddingHorizontal-summary-ExpandableItem="16px"
+    border-summary-ExpandableItem="1px solid $color-surface-200"
+    animationDuration-content-ExpandableItem="0s"
+    paddingVertical-content-ExpandableItem="12px"
+    paddingHorizontal-content-ExpandableItem="16px"
+  >
+    <VStack>
+      <ExpandableItem summary="What is XMLUI?">
+        <Text>
+          XMLUI is a declarative, reactive frontend framework for building web 
+          apps with XML markup.
+        </Text>
+      </ExpandableItem>
+      <ExpandableItem summary="How does theming work?">
+        <Text>
+          Theming uses CSS custom properties scoped with a Theme wrapper component.
         </Text>
       </ExpandableItem>
     </VStack>

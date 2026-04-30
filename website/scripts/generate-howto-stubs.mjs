@@ -128,7 +128,8 @@ const articles = [
   ["style-slider-track-thumb-and-range", "Style Slider track, thumb, and range", "Override track color, thumb size, and range fill for normal, hover, and disabled states."],
   ["define-custom-text-variants-in-a-theme", "Define custom Text variants in a theme", "Use the cssProperty-Text-variantName pattern to create reusable branded text styles."],
   ["theme-badge-colors-and-sizes", "Theme Badge colors and sizes", "Customize background, text, border-radius, and padding per Badge variant."],
-  ["style-card-and-noresult-placeholders", "Style Card and NoResult placeholders", "Override Card and NoResult theme vars for consistent empty and container styling."],
+  ["style-card-appearance", "Style Card appearance", "Override Card theme vars for elevation, hover state, padding, and section spacing."],
+  ["style-noresult-placeholder", "Style NoResult placeholder", "Override NoResult theme vars for icon size, gap, background, and padding."],
 
   // Group 15: Complex Property Patterns
   ["configure-tree-data-format-and-mapping", "Configure Tree data format and mapping", "Choose between flat vs hierarchy dataFormat, map fields with idField, labelField, parentField, and more."],

@@ -1,5 +1,17 @@
 # xmlui-docs-blocks
 
+## 0.0.8
+
+### Patch Changes
+
+- d9f40c1: feat: add Share component for blog posts
+
+## 0.0.7
+
+### Patch Changes
+
+- 6b0998c: feat: add ReadingTime component to display estimated reading duration
+
 ## 0.0.6
 
 ### Patch Changes

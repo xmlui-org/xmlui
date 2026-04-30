@@ -4,7 +4,7 @@ Extract a deeply nested value into a named local variable so you can reference i
 
 When a deeply nested path like `weatherData.value.current_condition[0]` appears in multiple expressions, repeating it in full on every binding is noisy and error-prone. Adding `var.condition="{ weatherData.value.current_condition[0] }"` to any containing element declares a reactive local variable that evaluates once and can be referenced by the shorter name `condition` everywhere inside that element.
 
-```xmlui-pg
+```xmlui-pg name="Use accessors to simplify complex expressions"
 ---app display {9-10, 13, 22, 26, 29}
 <App>
   <!-- Fetch weather data from API -->
@@ -42,17 +42,7 @@ When a deeply nested path like `weatherData.value.current_condition[0]` appears 
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.weatherData = {
-    current_condition: [
-      {
-        temp_F: '72',
-        temp_C: '22',
-        weatherDesc: [{ value: 'Partly cloudy' }],
-        windspeedMiles: '12',
-        humidity: '65'
-      }
-    ],
-  }",
+  "initialize": "$state.weatherData = { current_condition: [{ temp_F: '72', temp_C: '22', weatherDesc: [{ value: 'Partly cloudy' }], windspeedMiles: '12', humidity: '65' }] }",
   "operations": {
     "get-weather": {
       "url": "/weather",

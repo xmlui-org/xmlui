@@ -77,8 +77,3 @@ type ExtractedExample = {
   components?: string[];
   apiInterceptor?: ApiInterceptorDefinition;
 };
-
-type NamedExtractedExample = {
-  name: string;
-  example: ExtractedExample;
-};

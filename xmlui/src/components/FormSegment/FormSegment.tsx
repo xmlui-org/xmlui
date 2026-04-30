@@ -15,6 +15,13 @@ export const FormSegmentMd = createMetadata({
     'wrapped in a VStack (or HStack if `orientation="horizontal"`) with layout properties ' +
     "transposed from the segment.",
   props: {
+    label: {
+      description:
+        "An optional human-readable label for this segment. `StepperForm` uses this label " +
+        "as the corresponding step's title; on its own, `FormSegment` does not render the " +
+        "label (it is metadata only).",
+      valueType: "string",
+    },
     orientation: {
       description:
         'Stack orientation for the implicit layout container. Use "vertical" (default) for a VStack ' +
@@ -56,6 +63,14 @@ export const FormSegmentMd = createMetadata({
         "This property returns `true` when any field in this segment has a validation issue, " +
         "and `false` when all fields are valid. This is the counterpart of `isValid`.",
       signature: "hasIssues: boolean",
+    },
+    isDirty: {
+      description:
+        "This property returns `true` when at least one field in this segment has been " +
+        "modified by the user (touched), and `false` when no field has been changed yet. " +
+        "Useful for showing validation feedback only after the user has interacted with " +
+        "the segment.",
+      signature: "isDirty: boolean",
     },
   },
 });

@@ -568,6 +568,191 @@ test.describe("APIs: isValid and hasIssues", () => {
 });
 
 // =============================================================================
+// API: isDirty
+// =============================================================================
+
+test.describe("API: isDirty", () => {
+  test("returns false initially when no field has been touched", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" required="true" />
+          <FormItem label="Email" bindTo="email" required="true" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("returns false initially even when the form has initial data", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form data="{{ name: 'Alice' }}" hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" required="true" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("returns true after a segment field has been changed", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    const formItem = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(formItem.input);
+    await input.field.fill("Bob");
+
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("stays true across successive value changes on the same field", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    const formItem = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(formItem.input);
+
+    await input.field.fill("Bob");
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+
+    await input.field.fill("Alice");
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("only reflects fields inside the segment", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" testId="nameField" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+        <FormItem label="Email" bindTo="email" testId="emailField" />
+      </Form>
+    `);
+    // Touching a field outside the segment does NOT make the segment dirty.
+    const emailItem = await createFormItemDriver("emailField");
+    const emailInput = await createTextBoxDriver(emailItem.input);
+    await emailInput.field.fill("alice@example.com");
+
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+
+  test("returns true when any one of multiple segment fields has been changed", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="First" bindTo="first" testId="firstField" />
+          <FormItem label="Last" bindTo="last" testId="lastField" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    // Touch only one of the two fields in the segment.
+    const lastItem = await createFormItemDriver("lastField");
+    const lastInput = await createTextBoxDriver(lastItem.input);
+    await lastInput.field.fill("Smith");
+
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(true);
+  });
+
+  test("isDirty is independent across two segments", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="segA">
+          <FormItem label="A" bindTo="a" testId="aField" />
+        </FormSegment>
+        <FormSegment id="segB">
+          <FormItem label="B" bindTo="b" testId="bField" />
+        </FormSegment>
+        <Button testId="btn" label="Check" onClick="testState = { a: segA.isDirty, b: segB.isDirty }" />
+      </Form>
+    `);
+    // Only touch the "a" field — segA should be dirty, segB should not.
+    const aItem = await createFormItemDriver("aField");
+    const aInput = await createTextBoxDriver(aItem.input);
+    await aInput.field.fill("hello");
+
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toEqual({ a: true, b: false });
+  });
+
+  test("focus and blur alone do not mark the segment dirty", async ({
+    initTestBed,
+    page,
+    createFormItemDriver,
+    createTextBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <Form hideButtonRow="true">
+        <FormSegment id="seg1">
+          <FormItem label="Name" bindTo="name" required="true" testId="nameField" />
+          <Button testId="btn" label="Check" onClick="testState = seg1.isDirty" />
+        </FormSegment>
+      </Form>
+    `);
+    // Touching focus/blur should fire validation but not flip isDirty.
+    const formItem = await createFormItemDriver("nameField");
+    const input = await createTextBoxDriver(formItem.input);
+    await input.field.focus();
+    await input.field.blur();
+
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toBe(false);
+  });
+});
+
+// =============================================================================
 // CONTEXT VARIABLE SCOPING
 // =============================================================================
 

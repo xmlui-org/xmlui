@@ -23,6 +23,7 @@ By default, `Tree` renders the full data set up front. Setting `dynamic: true` o
           { id: 'm1', parentId: 'marketing', name: 'Frank Brown' }
         ]
       };
+      delay(800);
       return byDept[node.id] || [];
     }
   </script>

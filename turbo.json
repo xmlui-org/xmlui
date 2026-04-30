@@ -111,7 +111,19 @@
       "outputs": ["dist/**"]
     },
     "xmlui#build:xmlui-test-bed": {
-      "dependsOn": ["build:extension"],
+      "dependsOn": [
+        "xmlui-animations#build:extension",
+        "xmlui-crm-blocks#build:extension",
+        "xmlui-docs-blocks#build:extension",
+        "xmlui-echart#build:extension",
+        "xmlui-gauge#build:extension",
+        "xmlui-masonry#build:extension",
+        "xmlui-pdf#build:extension",
+        "xmlui-recharts#build:extension",
+        "xmlui-search#build:extension",
+        "xmlui-tiptap-editor#build:extension",
+        "xmlui-website-blocks#build:extension"
+      ],
       "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
       "outputs": ["src/testing/infrastructure/dist/**"]
     },

@@ -6,7 +6,7 @@ class LoggerService {
   private isDev: boolean;
 
   private constructor() {
-    this.isDev = import.meta.env.DEV || !!import.meta.env.VITE_DEV_MODE;
+    this.isDev = import.meta.env.DEV || !!globalThis.__XMLUI_CONST_BUILD_MODE__;
   }
 
   public static getInstance(): LoggerService {

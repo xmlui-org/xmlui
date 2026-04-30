@@ -16,6 +16,7 @@ export default ({ mode = "lib" }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
   let define;
+  const xmluiVersion = `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`;
   let distSubDirName = "";
   switch (mode) {
     case "standalone": {
@@ -35,9 +36,7 @@ export default ({ mode = "lib" }) => {
         "import.meta.env.VITE_USED_COMPONENTS_TableEditor": JSON.stringify("false"),
         // "import.meta.env.VITE_USED_COMPONENTS_Charts": JSON.stringify("false"),
         // "import.meta.env.VITE_USER_COMPONENTS_Inspect": JSON.stringify("false"),
-        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(
-          `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
-        ),
+        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
       };
       break;
     }
@@ -100,6 +99,11 @@ export default ({ mode = "lib" }) => {
           testing: path.resolve("src", "testing", "index.ts"),
         },
         formats: ["es"] as any,
+      };
+      // Preserve only the XMLUI app-mode flags that must survive the framework lib build.
+      // They are replaced later by xmlui start / xmlui build / xmlui ssg.
+      define = {
+        "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
       };
     }
   }

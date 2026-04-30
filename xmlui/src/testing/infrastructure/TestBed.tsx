@@ -1,12 +1,8 @@
-// import { StandaloneApp } from "";
-// import type { StandaloneAppDescription } from "xmlui";
 import { useState, useEffect } from "react";
-import StandaloneApp from "../../../src/components-core/StandaloneApp";
-import type { StandaloneAppDescription } from "../../../src/components-core/abstractions/standalone";
-import StandaloneExtensionManager from "../../../src/components-core/StandaloneExtensionManager";
-import { StyleProvider } from "../../../src/components-core/theming/StyleContext";
-import type { StyleRegistry } from "../../../src/components-core/theming/StyleRegistry";
 import { extensionRegistry } from "./extension-registry";
+import { StandaloneApp, StyleProvider, StandaloneExtensionManager } from "xmlui";
+import type { StyleRegistry } from "xmlui";
+
 import "xmlui/index.scss";
 
 declare global {
@@ -24,7 +20,7 @@ function TestBed({ styleRegistry }: { styleRegistry?: StyleRegistry }) {
   useEffect(() => {
     const loadExtensions = async () => {
       const manager = new StandaloneExtensionManager();
-      
+
       const extensionIds = window.TEST_EXTENSION_IDS;
       if (extensionIds && extensionIds.length > 0) {
         try {
@@ -32,9 +28,11 @@ function TestBed({ styleRegistry }: { styleRegistry?: StyleRegistry }) {
           for (const extensionId of extensionIds) {
             const importFn = extensionRegistry[extensionId];
             if (!importFn) {
-              throw new Error(`Unknown extension ID: ${extensionId}. Available: ${Object.keys(extensionRegistry).join(", ")}`);
+              throw new Error(
+                `Unknown extension ID: ${extensionId}. Available: ${Object.keys(extensionRegistry).join(", ")}`,
+              );
             }
-            
+
             const extensionModule = await importFn();
             if (extensionModule.default) {
               manager.registerExtension(extensionModule.default);
@@ -47,21 +45,21 @@ function TestBed({ styleRegistry }: { styleRegistry?: StyleRegistry }) {
           setError(`Failed to load extensions: ${error}`);
         }
       }
-      
+
       setExtensionManager(manager);
     };
-    
+
     void loadExtensions();
   }, []);
 
   if (!window.TEST_ENV) {
     return <div>Missing test env</div>;
   }
-  
+
   if (error) {
     return <div>Error: {error}</div>;
   }
-  
+
   if (!extensionManager) {
     return <div>Loading...</div>;
   }
@@ -70,13 +68,13 @@ function TestBed({ styleRegistry }: { styleRegistry?: StyleRegistry }) {
   // This avoids unnecessary MSW service worker setup for the ~98% of tests
   // that don't use apiInterceptor.
   const hasApiInterceptor = !!window.TEST_ENV?.apiInterceptor;
-  
+
   const app = (
-    <StandaloneApp 
-      appDef={window.TEST_ENV} 
-      runtime={window.TEST_RUNTIME} 
-      extensionManager={extensionManager} 
-      decorateComponentsWithTestId={true} 
+    <StandaloneApp
+      appDef={window.TEST_ENV}
+      runtime={window.TEST_RUNTIME}
+      extensionManager={extensionManager}
+      decorateComponentsWithTestId={true}
       waitForApiInterceptor={hasApiInterceptor}
     />
   );

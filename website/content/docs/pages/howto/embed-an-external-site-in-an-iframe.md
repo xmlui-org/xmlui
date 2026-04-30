@@ -7,7 +7,7 @@ Use `IFrame` with `sandbox` and `allow` for secure third-party embeds.
 ```xmlui-pg copy display name="Embedded web page"
 ---app display
 <App>
-  <variable name="url" value="https://en.wikipedia.org/wiki/Main_Page" />
+  <variable name="url" value="https://example.com" />
 
   <HStack marginBottom="$space-2" verticalAlignment="center">
     <TextBox

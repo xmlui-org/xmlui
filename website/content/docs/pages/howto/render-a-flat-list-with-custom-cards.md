@@ -1,6 +1,6 @@
 # Render a flat list with custom cards
 
-Replace the default plain rows with richly styled Card items by placing your layout directly inside `List`.
+Replace the default plain rows with styled Card items by placing your layout directly inside `List`.
 
 Any component placed as a direct child of `List` becomes the item template — rendered once per data item with full access to the row's data via `$item`. Wrapping each row in a `Card` gives it its own bordered container and removes the default hover-highlight row chrome.
 

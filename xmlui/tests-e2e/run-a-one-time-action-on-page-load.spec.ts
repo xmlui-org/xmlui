@@ -1,0 +1,31 @@
+import * as path from "path";
+import { fileURLToPath } from "url";
+import { expect, test } from "../src/testing/fixtures";
+import { getExampleSource, extractXmluiExample } from "../src/testing/website-example-utils";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const markdown = getExampleSource(
+  path.join(__dirname, "../../website/content/docs/pages/howto/run-a-one-time-action-on-page-load.md"),
+);
+
+test.describe("One-time page load action", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "One-time page load action");
+
+  test("initial state shows Dashboard heading and Initializing text", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.getByText("Dashboard")).toBeVisible();
+    await expect(page.getByText("Welcome! The page has loaded.")).toBeVisible();
+    await expect(page.getByText("Initializing…")).toBeVisible();
+  });
+
+  test("after the timer fires the initialized card appears", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect.poll(() => page.getByText("Page fully initialized at").isVisible()).toBe(true);
+  });
+
+  test("Initializing text disappears after the timer fires", async ({ initTestBed, page }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect.poll(() => page.getByText("Initializing…").isVisible()).toBe(false);
+  });
+});
