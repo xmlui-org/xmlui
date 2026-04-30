@@ -2,13 +2,9 @@ type XmluiBuildMode = "CONFIG_ONLY" | "INLINE_ALL" | "ALL";
 
 type XmluiBooleanLike = boolean | string | undefined | null;
 
-type XmluiRuntimeFlags = {
+type XmluiAppDefineOptions = {
   buildMode: XmluiBuildMode;
   devMode: boolean;
-  standalone: boolean;
-};
-
-type XmluiAppDefineOptions = XmluiRuntimeFlags & {
   mockEnabled?: XmluiBooleanLike;
   mockWorkerLocation?: string;
   includeAllComponents?: XmluiBooleanLike;
@@ -17,13 +13,12 @@ type XmluiAppDefineOptions = XmluiRuntimeFlags & {
   additionalDefines?: Record<string, string | boolean | number | undefined>;
 };
 
-const XMLUI_PRESERVED_DEFINE_KEYS = {
-  buildMode: "globalThis.__XMLUI_CONST_BUILD_MODE__",
-  devMode: "globalThis.__XMLUI_CONST_DEV_MODE__",
-  standalone: "globalThis.__XMLUI_CONST_STANDALONE__",
-} as const;
-
-const XMLUI_RUNTIME_ENV_KEYS = {
+// All application-level env vars that the xmlui CLI sets at app-build time.
+// These map 1-to-1 to import.meta.env references that are preserved as
+// pass-throughs in the framework lib build (vite build --mode lib).
+const XMLUI_APP_DEFINE_KEYS = {
+  buildMode: "import.meta.env.VITE_XMLUI_BUILD_MODE",
+  devMode: "import.meta.env.VITE_XMLUI_DEV_MODE",
   mockEnabled: "import.meta.env.VITE_MOCK_ENABLED",
   mockWorkerLocation: "import.meta.env.VITE_MOCK_WORKER_LOCATION",
   includeAllComponents: "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS",
@@ -52,21 +47,12 @@ function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boole
   return fallback;
 }
 
-export function createXmluiModeDefines(flags: XmluiRuntimeFlags): Record<string, string | boolean> {
-  return {
-    [XMLUI_PRESERVED_DEFINE_KEYS.buildMode]: JSON.stringify(flags.buildMode),
-    [XMLUI_PRESERVED_DEFINE_KEYS.devMode]: String(flags.devMode),
-    [XMLUI_PRESERVED_DEFINE_KEYS.standalone]: String(flags.standalone),
-  };
-}
-
 export function createXmluiAppDefines(
   options: XmluiAppDefineOptions,
 ): Record<string, string | boolean | number | undefined> {
   const {
     buildMode,
     devMode,
-    standalone,
     mockEnabled,
     mockWorkerLocation,
     includeAllComponents,
@@ -76,22 +62,23 @@ export function createXmluiAppDefines(
   } = options;
 
   return {
-    ...createXmluiModeDefines({ buildMode, devMode, standalone }),
-    [XMLUI_RUNTIME_ENV_KEYS.mockEnabled]: normalizeXmluiBoolean(mockEnabled, false),
+    [XMLUI_APP_DEFINE_KEYS.buildMode]: JSON.stringify(buildMode),
+    [XMLUI_APP_DEFINE_KEYS.devMode]: String(devMode),
+    [XMLUI_APP_DEFINE_KEYS.mockEnabled]: normalizeXmluiBoolean(mockEnabled, false),
     ...(mockWorkerLocation
       ? {
-          [XMLUI_RUNTIME_ENV_KEYS.mockWorkerLocation]: JSON.stringify(mockWorkerLocation),
+          [XMLUI_APP_DEFINE_KEYS.mockWorkerLocation]: JSON.stringify(mockWorkerLocation),
         }
       : {}),
-    [XMLUI_RUNTIME_ENV_KEYS.includeAllComponents]: JSON.stringify(
+    [XMLUI_APP_DEFINE_KEYS.includeAllComponents]: JSON.stringify(
       String(normalizeXmluiBoolean(includeAllComponents, false)),
     ),
-    [XMLUI_RUNTIME_ENV_KEYS.inspectUserComponents]: JSON.stringify(
+    [XMLUI_APP_DEFINE_KEYS.inspectUserComponents]: JSON.stringify(
       String(normalizeXmluiBoolean(inspectUserComponents, false)),
     ),
     ...(appVersion !== undefined
       ? {
-          [XMLUI_RUNTIME_ENV_KEYS.appVersion]: JSON.stringify(appVersion),
+          [XMLUI_APP_DEFINE_KEYS.appVersion]: JSON.stringify(appVersion),
         }
       : {}),
     ...additionalDefines,

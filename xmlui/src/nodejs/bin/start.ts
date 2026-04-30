@@ -43,7 +43,6 @@ export const start = async ({ port, withMock = true, proxy }: XmlUiStartOptions)
         ...createXmluiAppDefines({
           buildMode: "ALL",
           devMode: true,
-          standalone: false,
           mockEnabled: withMock,
           includeAllComponents: true,
           inspectUserComponents: true,

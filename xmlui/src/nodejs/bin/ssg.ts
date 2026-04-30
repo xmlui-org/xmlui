@@ -592,7 +592,6 @@ async function runDebugSsgServer() {
       ...createXmluiAppDefines({
         buildMode: "ALL",
         devMode: true,
-        standalone: false,
         mockEnabled: true,
         includeAllComponents: true,
         inspectUserComponents: true,
@@ -735,7 +734,6 @@ export const ssg = async ({
         ...createXmluiAppDefines({
           buildMode: "INLINE_ALL",
           devMode: false,
-          standalone: false,
           mockEnabled: false,
         }),
         "import.meta.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),
