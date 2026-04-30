@@ -7,7 +7,7 @@ interface ImportMetaEnv {
   readonly VITE_XMLUI_VERSION: string;
   // Application-level: mode flags set by xmlui CLI or app's Vite config
   readonly VITE_XMLUI_BUILD_MODE: string;
-  readonly VITE_XMLUI_DEV_MODE: string;
+  readonly VITE_XMLUI_DEV_MODE: boolean;
   // Application-level: runtime flags
   readonly VITE_MOCK_ENABLED: boolean | string;
   readonly VITE_MOCK_WORKER_LOCATION: string;

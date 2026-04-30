@@ -109,8 +109,8 @@ export default ({ mode = "lib" }) => {
         // --- framework-level ---
         "import.meta.env.VITE_XMLUI_VERSION": JSON.stringify(xmluiVersion),
         // --- application-level: mode flags ---
+        "import.meta.env.VITE_XMLUI_DEV_MODE": "import.meta.env.DEV",
         "import.meta.env.VITE_XMLUI_BUILD_MODE": "import.meta.env.VITE_XMLUI_BUILD_MODE",
-        "import.meta.env.VITE_XMLUI_DEV_MODE": "import.meta.env.VITE_XMLUI_DEV_MODE",
         // --- application-level: runtime flags ---
         "import.meta.env.VITE_MOCK_ENABLED": "import.meta.env.VITE_MOCK_ENABLED",
         "import.meta.env.VITE_MOCK_WORKER_LOCATION": "import.meta.env.VITE_MOCK_WORKER_LOCATION",

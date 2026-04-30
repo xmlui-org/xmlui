@@ -106,7 +106,6 @@ export const build = async ({
     define: {
       ...createXmluiAppDefines({
         buildMode,
-        devMode: false,
         mockEnabled: withMock,
         appVersion: process.env.VITE_APP_VERSION,
       }),
