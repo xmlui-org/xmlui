@@ -1,5 +1,15 @@
 # xmlui
 
+## 0.12.26
+
+### Patch Changes
+
+- cf45ffa: fix: DatePicker - set line-height to normal for improved layout
+- b230d80: fix: vite-xmlui-plugin works without extra config or env vars
+- c28814d: feat: add forwarded props for Stepper configuration in StepperForm component
+- 67cc308: feat: implement TabsForm component with integrated form functionality and validation handling
+- 292c69f: fix: adjust drawer body layout to prevent overlap with close button when no headerTemplate is provided
+
 ## 0.12.25
 
 ### Patch Changes
