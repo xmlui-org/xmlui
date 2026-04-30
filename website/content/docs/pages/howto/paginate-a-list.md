@@ -1,9 +1,8 @@
 # Paginate a List
 
-XMLUI provides a `Pagination` component that can be used to display visual controls for the pagination feature, no matter whether it is handled inside or outside of a layout component requiring that feature.
+When a dataset is too large to display all at once, pagination lets users move through it in fixed-size pages. XMLUI has two paths depending on which component you're working with.
 
-The [`Table`](/docs/reference/components/Table) component provides out-of-the-box support for pagination,
-so you can access pagination options via the following properties: `isPaginated`, `pageSize`, `pageSizeOptions`, `paginationControlsLocation`.
+If you're using a [`Table`](/docs/reference/components/Table), pagination is built in — just set `isPaginated` and the component handles page state for you:
 
 ```xmlui noHeader copy
 <Table
@@ -17,9 +16,7 @@ so you can access pagination options via the following properties: `isPaginated`
 </Table>
 ```
 
-Other components, such as the `List`, can be hooked up with pagination using a `DataSource` combined with the `Pagination` component. This pattern works as a more generic solution where either the component does not have pagination implemented in the component itself, or you wish to use custom pagination logic.
-
-In this case the `DataSource` component does the heavy lifting by querying the page index, the previous and next page IDs. This can be done using variables and query parameters.
+For components like `List` that don't have pagination built in, wire a `DataSource` and a `Pagination` component together through reactive variables. The `Pagination` component reports page changes; you update the offset variables; `DataSource` re-fetches automatically with the new query parameters.
 
 ```xmlui-pg name="Paginate a list" height="560px"
 ---app display

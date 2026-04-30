@@ -6,7 +6,13 @@ Setting `rowsSelectable` on `Table` adds a selection checkbox to each row. By de
 
 ```xmlui-pg copy display name="Multi-row selection with bulk actions"
 ---app display /selectedCount/ /lastAction/
-<App var.selectedCount="{0}" var.lastAction="">
+<App var.selectedCount="{0}" var.lastAction="" var.employees="{[
+  { id: 1, name: 'Alice Johnson', department: 'Engineering', status: 'Active' },
+  { id: 2, name: 'Bob Martinez', department: 'Marketing', status: 'Active' },
+  { id: 3, name: 'Carol Chen', department: 'Design', status: 'On Leave' },
+  { id: 4, name: 'David Kim', department: 'Engineering', status: 'Active' },
+  { id: 5, name: 'Eva Novak', department: 'Sales', status: 'Active' }
+]}">
   <HStack gap="$space-2" padding="$space-2">
     <Text variant="strong">{selectedCount} selected</Text>
     <SpaceFiller />
@@ -22,8 +28,12 @@ Setting `rowsSelectable` on `Table` adds a selection checkbox to each row. By de
       size="sm"
       variant="outlined"
       enabled="{selectedCount > 0}"
-      onClick="lastAction = 'Deleted ' + selectedCount + 
-        ' item(s)'; empTable.clearSelection()"
+      onClick="() => {
+        const ids = empTable.getSelectedItems().map(i => i.id);
+        lastAction = 'Deleted ' + ids.length + ' item(s)';
+        employees = employees.filter(e => ids.indexOf(e.id) === -1);
+        empTable.clearSelection();
+      }"
     />
   </HStack>
 
@@ -31,13 +41,7 @@ Setting `rowsSelectable` on `Table` adds a selection checkbox to each row. By de
     id="empTable"
     rowsSelectable
     alwaysShowSelectionCheckboxes
-    data="{[
-      { id: 1, name: 'Alice Johnson', department: 'Engineering', status: 'Active' },
-      { id: 2, name: 'Bob Martinez', department: 'Marketing', status: 'Active' },
-      { id: 3, name: 'Carol Chen', department: 'Design', status: 'On Leave' },
-      { id: 4, name: 'David Kim', department: 'Engineering', status: 'Active' },
-      { id: 5, name: 'Eva Novak', department: 'Sales', status: 'Active' }
-    ]}"
+    data="{employees}"
     width="100%"
     onSelectionDidChange="(items) => selectedCount = items.length"
   >

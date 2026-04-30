@@ -1,8 +1,8 @@
-# Show a notification while data loads
+# Hide an element until its DataSource is ready
 
-Use the DataSource's `loaded` and `inProgress` properties to conditionally render content or a placeholder while data is being fetched.
+Use the DataSource's `loaded` and `inProgress` properties to conditionally render content and disable controls while data is being fetched.
 
-When a DataSource fetches from a slow endpoint, the UI should show a meaningful placeholder — a spinner, a skeleton card, or simply nothing — until data arrives. Bind visibility to `loaded` or `inProgress` to control what users see during the wait.
+When a DataSource fetches from a slow endpoint, hide result content until data arrives and prevent the user from triggering another fetch while one is already running. Bind `when` to `loaded` and `enabled` to `!inProgress` to keep the UI consistent during the wait.
 
 ```xmlui-pg copy display name="Show content only after the DataSource loads"
 ---app
