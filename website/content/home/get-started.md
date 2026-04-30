@@ -140,7 +140,7 @@ The default layout isn't great. Ask Claude:
 
 > Center the input box and button as a group, and center the radio group on a new row.
 
-Expect Claude to use the MCP tools (esp. `xmlui_list_howto` and `xmlui_search_howto`) to find a documented how-to that provably works, edit `Main.xmlui`, and tell you to refresh. Don't be afraid to challenge Claude to cite evidence. If the answer is wrong, screenshot the broken layout, paste it into Claude, and ask it to look harder.
+Expect Claude to use the MCP tools, especially `xmlui_search_howto`, with `xmlui_search` as a general fallback, to find a documented how-to that provably works, edit `Main.xmlui`, and tell you to refresh. Don't be afraid to challenge Claude to cite evidence. If the answer is wrong, screenshot the broken layout, paste it into Claude, and ask it to look harder.
 
 ### Add a feature
 
