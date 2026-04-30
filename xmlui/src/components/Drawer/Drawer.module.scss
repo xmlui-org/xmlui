@@ -186,6 +186,15 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
   margin-top: $gap-Drawer;
 }
 
+// When the drawer renders without a headerTemplate, the body becomes the first
+// element. The floating close button sits at top:$top-closeButton-Drawer with a
+// ~1.5rem button area, so without explicit clearance it overlaps the first row
+// of body content (e.g. a TextBox label).
+.bodyNoHeader {
+  margin-top: 0;
+  padding-top: calc(#{$top-closeButton-Drawer} + #{$paddingTop-Drawer} + t.$space-3);
+}
+
 // Close button (×) - floats at top-right
 .closeButton {
   position: absolute;
@@ -196,6 +205,9 @@ $right-closeButton-Drawer: createThemeVar("right-closeButton-#{$component}");
   align-items: center;
   justify-content: center;
   padding: 0.25rem;
+  // Reset inherited line-height so the button height equals icon + padding
+  // (the bodyNoHeader top-padding formula assumes this predictable size).
+  line-height: 1;
   border: 0;
   border-radius: t.$borderRadius;
   background-color: transparent;
