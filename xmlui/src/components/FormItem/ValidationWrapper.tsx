@@ -174,7 +174,7 @@ export function ValidationWrapper({
   }
   
   return (
-    <div {...validationAttributes}>
+    <div {...validationAttributes} className={styles.validationWrapper}>
       {cloneElement(children, childProps)}
     </div>
   );
