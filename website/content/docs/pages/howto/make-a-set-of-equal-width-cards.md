@@ -4,7 +4,7 @@ Use HStack with wrapContent and width="*" star sizing to divide available row sp
 
 A dashboard header row shows four summary stat cards — outstanding amount, paid this year, draft invoices, sent invoices. All four must share the available width equally and reflow gracefully when the window is narrow. `HStack` with `wrapContent` and `width="*"` star sizing divides the row space proportionally without any arithmetic.
 
-```xmlui-pg copy display name="Equal-width stat cards with FlowLayout"
+```xmlui-pg copy display name="Equal-width stat cards with HStack wrapContent"
 ---app display
 <App var.stats="{{
     outstanding: 3502.90,

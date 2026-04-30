@@ -1,10 +1,10 @@
 # Show a slide-in settings drawer
 
-Use `Drawer` with `position="right"` for a non-blocking side panel.
+Use `Drawer` with `position="left"` for a non-blocking side panel.
 
 A drawer slides in from the edge of the viewport and sits on top of the main content without replacing it. This makes it perfect for settings panels, filter menus, or detail views where the user may want to glance at the page behind it. Open and close it programmatically with `open()` and `close()`.
 
-```xmlui-pg copy display name="Settings drawer" height="350px"
+```xmlui-pg copy display name="Settings drawer"
 ---app display
 <App>
   <Drawer

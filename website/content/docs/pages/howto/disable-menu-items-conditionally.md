@@ -47,6 +47,10 @@ When an action does not apply to the current context — nothing is selected, th
     </DropdownMenu>
   </HStack>
 
+  <Text variant="caption" marginBottom="$space-2">
+    Click a task to select it, then open Actions to act on it.
+  </Text>
+
   <Items data="{tasks}">
     <Card
       orientation="horizontal"

@@ -2,7 +2,7 @@
 
 Call the global `toast()` function from event handlers to display success, error, or informational messages.
 
-The `toast()` function pops up a small, auto-dismissing notification banner without interrupting the user's workflow. Call `toast("message")` for a neutral message, or use the convenience methods `toast.success()`, `toast.error()`, and `toast.loading()` for pre-styled variants. Each call returns a toast ID you can use to dismiss it programmatically.
+The `toast()` function pops up a small, auto-dismissing notification banner without interrupting the user's workflow. Unlike the browser's built-in `alert()`, which freezes the page and blocks all interaction until the user clicks OK, toasts are non-blocking — the page stays fully interactive while the message is visible. Multiple toasts can stack simultaneously, and each variant (`success`, `error`, `loading`) carries distinct styling so the user can read the severity at a glance. Call `toast("message")` for a neutral message, or use the convenience methods `toast.success()`, `toast.error()`, and `toast.loading()` for pre-styled variants. Each call returns a toast ID you can use to dismiss it programmatically.
 
 ```xmlui-pg copy display name="Trigger different toast styles"
 ---app display
