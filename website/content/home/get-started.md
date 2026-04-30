@@ -37,7 +37,7 @@ Other platforms: replace `xmlui-macos-arm64.tar.gz` with `xmlui-macos-intel.tar.
 
 ### Register the MCP server
 
-For Claude Code today:
+For Claude Code:
 
 ```bash
 xmlui configure-claude
@@ -86,7 +86,7 @@ Expand-Archive .\xmlui-windows-amd64.zip -DestinationPath .\xmlui-expand -Force
 
 ### Register the MCP server
 
-For Claude Code today:
+For Claude Code:
 
 ```powershell
 xmlui configure-claude
