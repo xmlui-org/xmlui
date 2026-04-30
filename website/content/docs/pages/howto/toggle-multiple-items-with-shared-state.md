@@ -69,8 +69,6 @@ When multiple checkboxes share a single array of selected (or hidden) items, dec
 </Component>
 ```
 
-The key points:
-
 ## Key points
 
 **`global.name` on `App` makes a variable accessible everywhere**: Any descendant component, including custom components, can read and write `hiddenCategories` directly — no prop drilling or callback props needed. This differs from `var.name`, which is scoped to the subtree of the declaring element.
