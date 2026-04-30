@@ -1,5 +1,6 @@
 import { expect, test } from "../../testing/fixtures";
 import { format } from "date-fns";
+import { getBounds } from "../../testing/component-test-helpers";
 
 // =============================================================================
 // BASIC FUNCTIONALITY TESTS
@@ -632,6 +633,53 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   const input = page.getByTestId("test").locator('[data-part-id="labeledItem"]');
   const { width } = await input.boundingBox();
   expect(width).toBe(200);
+});
+
+// Regression test for height alignment with sibling input components.
+// Bug: DatePicker rendered taller than TextBox/Select/NumberBox/AutoComplete
+// because PR #3280 added `line-height: normal` to other inputs but missed
+// DatePicker, letting its button trigger inherit the page's larger line-height
+// and inflate beyond the shared 2.5rem min-height.
+test("height matches sibling input components", async ({ page, initTestBed }) => {
+  await initTestBed(`
+    <Fragment>
+      <DatePicker testId="datePicker" />
+      <TextBox testId="textBox" />
+      <Select testId="select" />
+      <NumberBox testId="numberBox" />
+      <AutoComplete testId="autoComplete" />
+    </Fragment>
+  `);
+
+  await expect(page.getByTestId("datePicker")).toBeVisible();
+  await expect(page.getByTestId("textBox")).toBeVisible();
+  await expect(page.getByTestId("select")).toBeVisible();
+  await expect(page.getByTestId("numberBox")).toBeVisible();
+  await expect(page.getByTestId("autoComplete")).toBeVisible();
+
+  const { height: datePickerHeight } = await getBounds(page.getByTestId("datePicker"));
+  const { height: textBoxHeight } = await getBounds(page.getByTestId("textBox"));
+  const { height: selectHeight } = await getBounds(page.getByTestId("select"));
+  const { height: numberBoxHeight } = await getBounds(page.getByTestId("numberBox"));
+  const { height: autoCompleteHeight } = await getBounds(page.getByTestId("autoComplete"));
+
+  expect(datePickerHeight).toBe(textBoxHeight);
+  expect(datePickerHeight).toBe(selectHeight);
+  expect(datePickerHeight).toBe(numberBoxHeight);
+  expect(datePickerHeight).toBe(autoCompleteHeight);
+});
+
+test("uses line-height normal to prevent height inflation", async ({ page, initTestBed }) => {
+  // Render inside a parent with a larger inherited line-height to prove the
+  // DatePicker resets it. Without `line-height: normal` on `.datePicker`, the
+  // button trigger inherits 2 from the parent and grows past min-height.
+  await initTestBed(`
+    <Stack style="line-height: 2;">
+      <DatePicker testId="datePicker" />
+    </Stack>
+  `);
+
+  await expect(page.getByTestId("datePicker")).toHaveCSS("line-height", "normal");
 });
 
 // =============================================================================
