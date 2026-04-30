@@ -1,4 +1,10 @@
+---
+draft: true
+---
+
 # Add drag-and-drop reordering to a list
+
+> TODO: Rework this when drag'n'drop is supported in XMLUI
 
 Let users reorder list items with move-up and move-down buttons embedded in each row template.
 
