@@ -12,35 +12,34 @@ const markdown = getExampleSource(
 test.describe("Buffered task editing", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "Buffered task editing");
 
-  test.fixme("focus then blur writes PUT to the log", async ({ initTestBed, page }) => {
+  async function initExample(initTestBed: any, page: any) {
     await initTestBed(app, { components, apiInterceptor });
-    await page.locator('input[type="text"]').first().click();
-    await page.getByRole("heading", { name: "Todo list" }).click();
-    await expect(page.locator("textarea")).toContainText("PUT");
+    const firstTask = page.getByRole("textbox").first();
+    await expect(firstTask).toHaveValue("Review pull requests");
+    return firstTask;
+  }
+
+  test("focus shows which row is being edited", async ({ initTestBed, page }) => {
+    const firstTask = await initExample(initTestBed, page);
+    await firstTask.click();
+    await expect(page.getByText("Editing", { exact: true })).toBeVisible();
   });
 
-  test.fixme("editing text commits updated value on blur", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
-    await page.locator('input[type="text"]').first().click();
-    await page.locator('input[type="text"]').first().fill("Merge feature branch");
+  test("editing text commits one PUT on blur", async ({ initTestBed, page }) => {
+    const firstTask = await initExample(initTestBed, page);
+    await firstTask.click();
+    await firstTask.fill("Merge feature branch");
     await page.getByRole("heading", { name: "Todo list" }).click();
-    await expect(page.locator("textarea")).toContainText("Merge feature branch");
+    await expect(page.getByText("Last PUT /api/tasks/1: Merge feature branch")).toBeVisible();
+    await expect(page.getByText("Saved", { exact: true })).toBeVisible();
   });
 
-  test.fixme("clearing a field does not write a PUT entry", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
-    await page.locator('input[type="text"]').first().click();
-    await page.locator('input[type="text"]').first().fill("");
+  test("clearing a field does not write a PUT", async ({ initTestBed, page }) => {
+    const firstTask = await initExample(initTestBed, page);
+    await firstTask.click();
+    await firstTask.fill("");
     await page.getByRole("heading", { name: "Todo list" }).click();
-    await expect(page.locator("textarea")).not.toContainText("PUT");
-  });
-
-  test.fixme("Clear button empties the log", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
-    await page.locator('input[type="text"]').first().click();
-    await page.getByRole("heading", { name: "Todo list" }).click();
-    await expect(page.locator("textarea")).toContainText("PUT");
-    await page.getByRole("button", { name: "Clear" }).click();
-    await expect(page.locator("textarea")).toBeEmpty();
+    await expect(page.getByText("Last PUT")).not.toBeVisible();
+    await expect(page.getByText("Focus a task, change its text, then click outside the field.")).toBeVisible();
   });
 });
