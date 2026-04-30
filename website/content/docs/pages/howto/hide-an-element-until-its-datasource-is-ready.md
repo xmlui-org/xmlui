@@ -25,11 +25,7 @@ When a DataSource fetches from a slow endpoint, hide result content until data a
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.fruits = [
-    { id: 1, name: 'Orange' },
-    { id: 2, name: 'Apple' },
-    { id: 3, name: 'Pear' },
-  ]",
+  "initialize": "$state.fruits = [{ id: 1, name: 'Orange' }, { id: 2, name: 'Apple' }, { id: 3, name: 'Pear' }]",
   "operations": {
     "get-fruits": {
       "url": "/fruits",
