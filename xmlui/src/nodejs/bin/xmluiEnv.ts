@@ -2,13 +2,13 @@ type XmluiBuildMode = "CONFIG_ONLY" | "INLINE_ALL" | "ALL";
 
 type XmluiBooleanLike = boolean | string | undefined | null;
 
-export type XmluiRuntimeFlags = {
+type XmluiRuntimeFlags = {
   buildMode: XmluiBuildMode;
   devMode: boolean;
   standalone: boolean;
 };
 
-export type XmluiAppDefineOptions = XmluiRuntimeFlags & {
+type XmluiAppDefineOptions = XmluiRuntimeFlags & {
   mockEnabled?: XmluiBooleanLike;
   mockWorkerLocation?: string;
   includeAllComponents?: XmluiBooleanLike;
@@ -17,13 +17,13 @@ export type XmluiAppDefineOptions = XmluiRuntimeFlags & {
   additionalDefines?: Record<string, string | boolean | number | undefined>;
 };
 
-export const XMLUI_PRESERVED_DEFINE_KEYS = {
+const XMLUI_PRESERVED_DEFINE_KEYS = {
   buildMode: "globalThis.__XMLUI_CONST_BUILD_MODE__",
   devMode: "globalThis.__XMLUI_CONST_DEV_MODE__",
   standalone: "globalThis.__XMLUI_CONST_STANDALONE__",
 } as const;
 
-export const XMLUI_RUNTIME_ENV_KEYS = {
+const XMLUI_RUNTIME_ENV_KEYS = {
   mockEnabled: "import.meta.env.VITE_MOCK_ENABLED",
   mockWorkerLocation: "import.meta.env.VITE_MOCK_WORKER_LOCATION",
   includeAllComponents: "import.meta.env.VITE_INCLUDE_ALL_COMPONENTS",
@@ -31,7 +31,7 @@ export const XMLUI_RUNTIME_ENV_KEYS = {
   appVersion: "import.meta.env.VITE_APP_VERSION",
 } as const;
 
-export function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boolean {
+function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false): boolean {
   if (typeof value === "boolean") {
     return value;
   }
@@ -50,14 +50,6 @@ export function normalizeXmluiBoolean(value: XmluiBooleanLike, fallback = false)
     return false;
   }
   return fallback;
-}
-
-export function toDefineBoolean(value: XmluiBooleanLike, fallback = false): boolean {
-  return normalizeXmluiBoolean(value, fallback);
-}
-
-export function toDefineString(value: string | undefined | null): string {
-  return JSON.stringify(value ?? "");
 }
 
 export function createXmluiModeDefines(flags: XmluiRuntimeFlags): Record<string, string | boolean> {
@@ -85,7 +77,7 @@ export function createXmluiAppDefines(
 
   return {
     ...createXmluiModeDefines({ buildMode, devMode, standalone }),
-    [XMLUI_RUNTIME_ENV_KEYS.mockEnabled]: toDefineBoolean(mockEnabled, false),
+    [XMLUI_RUNTIME_ENV_KEYS.mockEnabled]: normalizeXmluiBoolean(mockEnabled, false),
     ...(mockWorkerLocation
       ? {
           [XMLUI_RUNTIME_ENV_KEYS.mockWorkerLocation]: JSON.stringify(mockWorkerLocation),
