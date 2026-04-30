@@ -18,7 +18,7 @@ test.describe("Vertical NavGroup defaults", { tag: "@website" }, () => {
     "Vertical NavGroup defaults",
   );
 
-  test("initial state shows the expanded nested navigation baseline", async ({
+  test("initial state shows top-level links with nested groups collapsed", async ({
     initTestBed,
     page,
   }) => {
@@ -26,19 +26,21 @@ test.describe("Vertical NavGroup defaults", { tag: "@website" }, () => {
 
     await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
     await expect(page.getByText("Products", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Overview" })).toBeVisible();
-    await expect(page.getByText("Catalog", { exact: true })).toBeVisible();
-    await expect(page.getByText("Accessories", { exact: true })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Chargers" })).toBeVisible();
+    await expect(page.getByText("Reports", { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Overview" })).not.toBeVisible();
+    await expect(page.getByText("Catalog", { exact: true })).not.toBeVisible();
   });
 
-  test("clicking a vertical group collapses its child links", async ({ initTestBed, page }) => {
+  test("clicking a collapsed vertical group expands its child links", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(app, { components, apiInterceptor });
 
     await page.getByText("Products", { exact: true }).click();
 
-    await expect(page.getByRole("link", { name: "Overview" })).not.toBeVisible();
-    await expect(page.getByText("Catalog", { exact: true })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Overview" })).toBeVisible();
+    await expect(page.getByText("Catalog", { exact: true })).toBeVisible();
   });
 });
 
@@ -48,17 +50,18 @@ test.describe("Vertical NavGroup with progressive padding", { tag: "@website" },
     "Vertical NavGroup with progressive padding",
   );
 
-  test("initial state shows all progressively nested navigation levels", async ({
+  test("expanding nested groups shows all progressively nested navigation levels", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
+    await page.getByText("Products", { exact: true }).click();
+    await page.getByText("Catalog", { exact: true }).click();
+    await page.getByText("Accessories", { exact: true }).click();
+
     await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
-    await expect(page.getByText("Products", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Overview" })).toBeVisible();
-    await expect(page.getByText("Catalog", { exact: true })).toBeVisible();
-    await expect(page.getByText("Accessories", { exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Adapters" })).toBeVisible();
   });
 
@@ -67,6 +70,9 @@ test.describe("Vertical NavGroup with progressive padding", { tag: "@website" },
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
+
+    await page.getByText("Products", { exact: true }).click();
+    await page.getByText("Catalog", { exact: true }).click();
 
     const productsBox = await page.getByText("Products", { exact: true }).boundingBox();
     const catalogBox = await page.getByText("Catalog", { exact: true }).boundingBox();
@@ -95,14 +101,16 @@ test.describe("Horizontal NavGroup dropdown theming", { tag: "@website" }, () =>
     await expect(page.getByText("Home", { exact: true })).toBeVisible();
     await expect(page.getByText("Products", { exact: true })).toBeVisible();
     await expect(page.getByText("Reports", { exact: true })).toBeVisible();
-    await expect(page.getByText("Overview", { exact: true })).toBeVisible();
-    await expect(page.getByRole("menuitem", { name: "Electronics" })).toBeVisible();
     await expect(page.getByText("Content area")).toBeVisible();
+    await expect(page.getByText("Overview", { exact: true })).not.toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Electronics" })).not.toBeVisible();
   });
 
   test("clicking a dropdown item navigates from the overlay", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
 
+    await page.getByText("Products", { exact: true }).click();
+    await page.getByRole("menuitem", { name: "Catalog" }).hover();
     await page.getByRole("menuitem", { name: "Accessories" }).click();
 
     await expect.poll(() => page.url()).toContain("#/products/accessories");
