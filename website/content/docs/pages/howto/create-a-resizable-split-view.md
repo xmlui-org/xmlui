@@ -7,7 +7,7 @@ A notes app shows a list on the left and the selected note on the right. The use
 ```xmlui-pg copy display name="Resizable notes split view" height="450px"
 ---app display
 <App scrollWholePage="false">
-  <Splitter
+  <HSplitter
     height="100%"
     initialPrimarySize="220px"
     minPrimarySize="140px"
@@ -27,35 +27,38 @@ A notes app shows a list on the left and the selected note on the right. The use
         story points, and commit to a realistic scope for the two-week cycle.
       </Text>
     </VStack>
-  </Splitter>
+  </HSplitter>
 </App>
 ```
 
 ## Key points
 
-**`Splitter` orientation**: `Splitter` defaults to a horizontal (side-by-side) split. Use `orientation="vertical"` for a top-and-bottom split. The shorthands `HSplitter` and `VSplitter` set orientation for you:
+**`Splitter` orientation**: `Splitter` defaults to `orientation="vertical"`, which creates a top-and-bottom split. For a side-by-side split, set `orientation="horizontal"` or use the `HSplitter` shorthand. Use `VSplitter` when you want the vertical top-and-bottom shorthand:
 
 ```xmlui
 <!-- side-by-side -->
-<Splitter>…</Splitter>
+<HSplitter>…</HSplitter>
+
+<!-- side-by-side without the shorthand -->
+<Splitter orientation="horizontal">…</Splitter>
 
 <!-- top and bottom -->
-<Splitter orientation="vertical">…</Splitter>
+<Splitter>…</Splitter>
 ```
 
-**`initialPrimarySize`**: Sets the starting width (or height for vertical splits) of the first child panel. Accepts `px`, `%`, or viewport units.
+**`initialPrimarySize`**: Sets the starting size of the first child panel. In `HSplitter` or `orientation="horizontal"` it controls width; in `VSplitter` or `orientation="vertical"` it controls height. Accepts `px`, `%`, or viewport units.
 
 **`minPrimarySize` / `maxPrimarySize`**: Clamp the draggable range so neither panel collapses to zero:
 
 ```xmlui
-<Splitter
+<HSplitter
   initialPrimarySize="240px"
   minPrimarySize="160px"
   maxPrimarySize="60%"
 >
   <VStack>…</VStack>   <!-- left/primary panel -->
   <VStack>…</VStack>   <!-- right/secondary panel -->
-</Splitter>
+</HSplitter>
 ```
 
 **Negative `maxPrimarySize`**: A negative value calculates from the trailing edge rather than the leading edge. `maxPrimarySize="-200px"` means the primary panel can grow until only 200 px remain for the secondary panel — without needing to know the total container width:
