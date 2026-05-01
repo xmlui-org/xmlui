@@ -881,8 +881,9 @@ function useStandalone(
     // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
     // --- we must have the app definition available.
     if (
-      (globalThis.__XMLUI_CONST_BUILD_MODE__ ||
-        globalThis.__XMLUI_CONST_BUILD_MODE__ === "INLINE_ALL") &&
+      (import.meta.env.VITE_XMLUI_DEV_MODE ||
+        import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL" ||
+        import.meta.env.VITE_XMLUI_BUILD_MODE == null) &&
       import.meta.env.MODE !== "standalone"
     ) {
       if (!appDef) {
@@ -1088,8 +1089,9 @@ function useStandalone(
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
-        (globalThis.__XMLUI_CONST_BUILD_MODE__ ||
-          globalThis.__XMLUI_CONST_BUILD_MODE__ === "INLINE_ALL") &&
+        (import.meta.env.VITE_XMLUI_DEV_MODE ||
+          import.meta.env.VITE_XMLUI_BUILD_MODE === "INLINE_ALL" ||
+          import.meta.env.VITE_XMLUI_BUILD_MODE == null) &&
         import.meta.env.MODE !== "standalone"
       ) {
         if (!appDef) {
@@ -1182,7 +1184,7 @@ function useStandalone(
       // --- In standalone mode, we must fetch the XMLUI app's source files,
       // --- compile them, and prepare the app's definition for the rendering
       // --- engine.
-      if (globalThis.__XMLUI_CONST_BUILD_MODE__ === "CONFIG_ONLY") {
+      if (import.meta.env.VITE_XMLUI_BUILD_MODE === "CONFIG_ONLY") {
         // --- In config-only mode, we override the pre-compiled app definition
         // --- with elements from the configuration file. Note that we do not
         // --- check whether the config file's content is semantically valid.

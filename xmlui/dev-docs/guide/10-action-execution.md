@@ -91,15 +91,25 @@ This design has profound consequences:
 
 ### The `bubbleEvents` escape hatch
 
-The default behavior — stop propagation and prevent default for every handled event — is correct for most components but problematic for nested interactive elements. The experimental `bubbleEvents` prop allows selective bypass:
+The default behavior — stop propagation and prevent default for every handled event — applies unconditionally, even when the handler expression evaluates to `undefined` at runtime. This makes it impossible to conditionally ignore an event based on runtime state without duplicating markup:
 
 ```xmlui
-<Card bubbleEvents={["click"]} onClick="handleCardClick()">
-  <Button onClick="handleButtonClick()">Nested</Button>
-</Card>
+<!-- stopPropagation fires regardless — parent never sees the click -->
+<Link onClick="{selectMode ? handleSelect() : undefined}">...</Link>
 ```
 
-When `bubbleEvents` includes the event name, the framework skips both `stopPropagation()` and `preventDefault()` for that event, allowing the DOM event to bubble normally.
+The experimental `bubbleEvents` prop allows selective bypass: when the event name is listed, the framework skips both `stopPropagation()` and `preventDefault()`, letting the event bubble to a parent handler instead.
+
+```xmlui
+<Link
+  bubbleEvents="{selectMode ? ['click'] : []}"
+  onClick="{selectMode ? handleSelect() : undefined}"
+>
+  ...
+</Link>
+```
+
+Use this when a component should **either** handle an event **or** pass it to the parent — not both — depending on runtime conditions. Without `bubbleEvents`, the only alternative is duplicating the markup: one version with the handler, one without.
 
 ### Statement-by-statement execution with async state synchronization
 
@@ -456,7 +466,7 @@ Or directly in script expressions:
 - **Mouse event handlers are fire-and-forget.** The `Promise` returned by the handler is never awaited. Errors become unhandled promise rejections. Return values are discarded.
 - **State changes are visible between statements.** The scripting engine dispatches state mutations and awaits React's commit after each statement. The next statement sees the updated state — unlike raw React where `setState` batches.
 - **Form handlers are the exception** — `onWillSubmit`, `onSubmit`, and `onSuccess` are awaited, and their return values control the submission flow. `onWillSubmit` returning `false` cancels; returning an object replaces the submitted data.
-- **`bubbleEvents` is the escape hatch for nested interactive elements.** Use it when a parent and child both need to handle the same event type, and the default `stopPropagation` would block the parent.
+- **`bubbleEvents` is the escape hatch for conditional event pass-through.** Use it when a component should either handle an event or let the parent handle it based on runtime state — without `bubbleEvents`, `stopPropagation` fires unconditionally even when the handler returns `undefined`.
 
 ### Actions
 

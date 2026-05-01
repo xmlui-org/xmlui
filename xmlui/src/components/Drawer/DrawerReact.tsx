@@ -240,7 +240,9 @@ export const DrawerNative = memo(forwardRef<HTMLDivElement, DrawerProps>(functio
             </div>
           )}
           <ThemeContext.Provider value={childTheme}>
-            <div className={styles.body}>
+            <div className={classnames(styles.body, {
+              [styles.bodyNoHeader]: !headerTemplate,
+            })}>
               {children}
             </div>
           </ThemeContext.Provider>

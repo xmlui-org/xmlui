@@ -6,7 +6,7 @@ When the selected section is stored in a variable — loaded from a URL paramete
 
 ```xmlui-pg copy display name="Settings tree with pre-selected node"
 ---app display /selectedSection/
-<App var.selectedSection="'security'">
+<App var.selectedSection="security">
   <HSplitter initialPrimarySize="200px" minPrimarySize="150px" maxPrimarySize="-160px">
     <Tree
       data="{[
@@ -19,7 +19,7 @@ When the selected section is stored in a variable — loaded from a URL paramete
       ]}"
       selectedValue="{selectedSection}"
       autoExpandToSelection="{true}"
-      onSelectionDidChange="({ selectedNode }) => selectedSection = selectedNode?.id ?? null"
+      onSelectionDidChange="({ newNode }) => selectedSection = newNode?.id ?? null"
     />
     <VStack padding="$space-3">
       <Text fontWeight="bold">{selectedSection ?? '(nothing selected)'}</Text>
@@ -37,7 +37,7 @@ When the selected section is stored in a variable — loaded from a URL paramete
 
 **`defaultExpanded` controls which nodes are open on load independent of selection**: Use `"none"` to collapse everything, `"all"` to open the full tree, `"first-level"` to open root nodes only, or pass an array of specific IDs. `autoExpandToSelection` adds to this — it never collapses what `defaultExpanded` opened.
 
-**`onSelectionDidChange` receives `{ selectedNode, previousNode }`**: The event delivers the full node object, so you can access `selectedNode.id`, `selectedNode.name`, and any custom fields from your source data. Assign the new ID back to your variable to keep `selectedValue` in sync when the user changes the selection manually.
+**`onSelectionDidChange` receives `{ newNode, previousNode }`**: The event delivers the newly selected node object, so you can access `newNode.id`, `newNode.name`, and any custom fields from your source data. Assign the new ID back to your variable to keep `selectedValue` in sync when the user changes the selection manually.
 
 **`selectNode(id)` and `scrollIntoView(id)` for programmatic control**: Call these Tree API methods (e.g. `treeRef.selectNode('security')`) from a button or script to change the selection without user interaction. Pair `scrollIntoView` with `selectNode` to ensure the freshly selected node scrolls into the visible area of a long tree.
 

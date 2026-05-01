@@ -274,6 +274,7 @@ type Props = {
   swapCancelAndSave?: boolean;
   onWillSubmit?: OnWillSubmit;
   onSubmit?: OnSubmit;
+  onSubmitFailed?: (validationResult: any) => void;
   onCancel?: OnCancel;
   onReset?: OnReset;
   onSuccess?: OnSuccess;
@@ -387,6 +388,7 @@ const Form = memo(forwardRef(function (
     swapCancelAndSave,
     onWillSubmit,
     onSubmit,
+    onSubmitFailed,
     onCancel,
     onReset,
     onSuccess,
@@ -550,6 +552,16 @@ const Form = memo(forwardRef(function (
     const validationResult = doValidate();
 
     if (!validationResult.isValid) {
+      // Notify any listeners that a submit attempt was rejected. This is the only signal
+      // available to consumers (e.g., wrappers like TabsForm) that wish to react to a
+      // failed submit, since neither `willSubmit` nor `submit` fires when validation fails.
+      try {
+        await onSubmitFailed?.(validationResult);
+      } catch (err) {
+        // Don't let a misbehaving listener break the form's failure path.
+        console.error("Form submitFailed handler threw:", err);
+      }
+
       // Emit validation:error trace event when xsVerbose is enabled
       if (typeof window !== "undefined" && (window as any).__xsVerbose) {
         const { pushXsLog, createLogEntry, pushTrace, popTrace } = (window as any).__xsTraceHelpers || {};
@@ -1008,6 +1020,11 @@ export const FormWithContextVar = forwardRef(function (
           defaultHandler: submitUrl
             ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs, inProgressNotificationMessage: "${inProgressNotificationMessage}", completedNotificationMessage: "${completedNotificationMessage}", errorNotificationMessage: "${errorNotificationMessage}" })`
             : undefined,
+          context: {
+            $data,
+          },
+        })}
+        onSubmitFailed={lookupEventHandler("submitFailed", {
           context: {
             $data,
           },

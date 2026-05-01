@@ -84,7 +84,11 @@ Your brand guidelines specify a `pageTitle` style (large, bold, coloured), a `se
 
 **Scoping**: Variants are resolved from the closest enclosing `<Theme>`. A deeply nested `<Theme>` can redefine the same variant name with different values — useful for sections that need a different typographic palette.
 
-**Reuse across the app**: Once defined, the variant name can be used on any `<Text>` within the theme scope. No additional CSS files or custom components are needed — the theme variables are the single source of truth for your branded typography.
+**Hover state is supported for interactive variants**: Add `textColor-Text-myVariant--hover` (double dash before `hover`) to make a variant respond to cursor entry — useful for clickable badge-style text or inline labels.
+
+**Define in `config.json` for app-wide reuse**: Add the same vars to the `themeVars` object in your `config.json` theme file to make them available throughout the entire app without a `<Theme>` wrapper at every use site.
+
+**Custom variants coexist with built-in variants**: Defining `textColor-Text-pageTitle` does not affect `textColor-Text-caption` or any other built-in variant. Each variant's vars are namespaced by variant name and are completely independent.
 
 ---
 

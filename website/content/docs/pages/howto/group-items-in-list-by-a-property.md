@@ -20,11 +20,11 @@ Setting `groupBy` on a `List` divides rows into named sections without you needi
     <property name="groupHeaderTemplate">
       <HStack verticalAlignment="center">
         <Text fontWeight="bold">{$group.key}</Text>
-        <Badge value="{$group.count}" />
+        <Badge value="{$group.items.length}" />
       </HStack>
     </property>
     <property name="groupFooterTemplate">
-      <Text variant="secondary">{$group.count} team members</Text>
+      <Text variant="secondary">{$group.items.length} team members</Text>
     </property>
     <HStack verticalAlignment="center">
       <Text>{$item.name}</Text>
@@ -39,7 +39,7 @@ Setting `groupBy` on a `List` divides rows into named sections without you needi
 
 **`groupBy` takes the name of the data property to group by**: Setting `groupBy="department"` splits rows into sections using each item's `department` value as the section key. Items in the same group are rendered together in the order they appear in the source array.
 
-**`$group` context in header and footer templates**: Both `groupHeaderTemplate` and `groupFooterTemplate` receive `$group.key` (the group value), `$group.count` (number of items in the group), `$group.index` (0-based group position), and `$group.items` (the full array of items in that group).
+**`$group` context in header and footer templates**: Both `groupHeaderTemplate` and `groupFooterTemplate` receive `$group.key` (the group value), `$group.id` (the internal group identifier), and `$group.items` (the full array of items in that group). Use `$group.items.length` when you need the number of items in the group.
 
 **`groupFooterTemplate` appears after the last item in each group**: It is not a global list footer — it renders once per group, immediately after the group's last row. Use it for per-group aggregates like a member count, a subtotal, or a "load more" action.
 

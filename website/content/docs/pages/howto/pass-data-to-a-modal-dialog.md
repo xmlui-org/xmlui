@@ -4,33 +4,41 @@ Click a list item or table row to open a dialog pre-populated with that row's da
 
 Give `ModalDialog` an `id` and call `dialogId.open(data)` from any event handler. The value passed to `open()` becomes available inside the dialog as `$param`, so any attribute or expression in the dialog content can reference it directly.
 
-```xmlui-pg name="Click on a team member to edit details" height="500px"
----api
-{
-  "apiUrl": "/api",
-  "initialize": "$state.team_members = [
-    { id: 1, name: 'Sarah Chen', role: 'Product Manager', email: 'sarah@company.com', avatar: 'https://i.pravatar.cc/100?u=sarah', department: 'Product', startDate: '2022-03-15' },
-    { id: 2, name: 'Marcus Johnson', role: 'Senior Developer', email: 'marcus@company.com', avatar: 'https://i.pravatar.cc/100?u=marcus', department: 'Engineering', startDate: '2021-08-20' },
-    { id: 3, name: 'Elena Rodriguez', role: 'UX Designer', email: 'elena@company.com', avatar: 'https://i.pravatar.cc/100?u=elena', department: 'Design', startDate: '2023-01-10' }
-  ]",
-  "operations": {
-    "get_team_members": {
-      "url": "/team_members",
-      "method": "get",
-      "handler": "return $state.team_members"
-    }
-  }
-}
+```xmlui-pg copy display name="Click on a team member to edit details" height="500px"
 ---app display /memberDetailsDialog/
-<App>
-  <DataSource
-    id="team_members"
-    url="/api/team_members"
-  />
-
-  <ModalDialog id="memberDetailsDialog" title="Team Member Details">
-      <VStack>
-      <!-- Avatar and Basic Info -->
+<App
+  var.teamMembers="{[
+    {
+      id: 1,
+      name: 'Sarah Chen',
+      role: 'Product Manager',
+      email: 'sarah@company.com',
+      avatar: 'https://i.pravatar.cc/100?u=sarah',
+      department: 'Product',
+      startDate: '2022-03-15'
+    },
+    {
+      id: 2,
+      name: 'Marcus Johnson',
+      role: 'Senior Developer',
+      email: 'marcus@company.com',
+      avatar: 'https://i.pravatar.cc/100?u=marcus',
+      department: 'Engineering',
+      startDate: '2021-08-20'
+    },
+    {
+      id: 3,
+      name: 'Elena Rodriguez',
+      role: 'UX Designer',
+      email: 'elena@company.com',
+      avatar: 'https://i.pravatar.cc/100?u=elena',
+      department: 'Design',
+      startDate: '2023-01-10'
+    }
+  ]}"
+>
+  <ModalDialog id="memberDetailsDialog" title="{$param.name}">
+    <VStack>
       <HStack>
         <Avatar
           url="{$param.avatar}"
@@ -44,23 +52,21 @@ Give `ModalDialog` an `id` and call `dialogId.open(data)` from any event handler
         </VStack>
       </HStack>
 
-      <!-- Details Card -->
       <Card gap="0">
-          <HStack>
-            <Text variant="strong">Department:</Text>
-            <Text>{$param.department}</Text>
-          </HStack>
-          <HStack>
-            <Text variant="strong">Start Date:</Text>
-            <Text>{$param.startDate}</Text>
-          </HStack>
-          <HStack>
-            <Text variant="strong">Employee ID:</Text>
-            <Text>#{$param.id}</Text>
-          </HStack>
+        <HStack>
+          <Text variant="strong">Department:</Text>
+          <Text>{$param.department}</Text>
+        </HStack>
+        <HStack>
+          <Text variant="strong">Start Date:</Text>
+          <Text>{$param.startDate}</Text>
+        </HStack>
+        <HStack>
+          <Text variant="strong">Employee ID:</Text>
+          <Text>#{$param.id}</Text>
+        </HStack>
       </Card>
 
-      <!-- Actions -->
       <HStack>
         <Button
           label="Send Email"
@@ -80,23 +86,22 @@ Give `ModalDialog` an `id` and call `dialogId.open(data)` from any event handler
   <H3>Team Directory</H3>
 
   <VStack>
-    <Items data="{team_members}">
+    <Items data="{teamMembers}">
       <Card
         orientation="horizontal"
         onClick="memberDetailsDialog.open($item)">
-          <Avatar
-            url="{$item.avatar}"
-            size="sm"
-            name="{$item.name}"
-          />
-          <VStack gap="0">
-            <Text variant="strong">{$item.name}</Text>
-            <Text variant="caption">{$item.role} - {$item.department}</Text>
-          </VStack>
+        <Avatar
+          url="{$item.avatar}"
+          size="sm"
+          name="{$item.name}"
+        />
+        <VStack gap="0">
+          <Text variant="strong">{$item.name}</Text>
+          <Text variant="caption">{$item.role} - {$item.department}</Text>
+        </VStack>
       </Card>
     </Items>
   </VStack>
-
 </App>
 ```
 
@@ -104,7 +109,7 @@ Give `ModalDialog` an `id` and call `dialogId.open(data)` from any event handler
 
 **`dialogId.open(data)` passes any value into the dialog**: Call it from an `onClick` or any other event handler, typically passing `$item` for the current list or table row. The dialog opens and the value becomes immediately available inside it.
 
-**`$param` holds the first argument**: Inside the dialog, read any field with `$param.fieldName` — in expressions, attributes, or script blocks. For multiple arguments, use `$params[0]`, `$params[1]`, etc.
+**`$param` holds the first argument**: Inside the dialog, read any field with `$param.fieldName` -- in expressions, attributes, or script blocks. For multiple arguments, use `$params[0]`, `$params[1]`, etc.
 
 **The dialog re-evaluates each time `open()` is called**: Clicking a different card shows that card's data without resetting a shared variable. The dialog always reflects whatever was last passed to `open()`.
 
@@ -116,6 +121,6 @@ Give `ModalDialog` an `id` and call `dialogId.open(data)` from any event handler
 
 ## See also
 
-- [Build a fullscreen modal dialog](/docs/howto/build-a-fullscreen-modal-dialog) — use fullscreen mode for complex details views
-- [Keep a ModalDialog reopenable with onClose](/docs/howto/use-modal-dialog-onclose) — reset the controlling variable so `when`-gated dialogs can reopen
-- [Add row actions with a context menu](/docs/howto/add-row-actions-with-a-context-menu) — show per-row actions without opening a dialog
+- [Build a fullscreen modal dialog](/docs/howto/build-a-fullscreen-modal-dialog) -- use fullscreen mode for complex details views
+- [Keep a ModalDialog reopenable with onClose](/docs/howto/use-modal-dialog-onclose) -- reset the controlling variable so `when`-gated dialogs can reopen
+- [Add row actions with a context menu](/docs/howto/add-row-actions-with-a-context-menu) -- show per-row actions without opening a dialog

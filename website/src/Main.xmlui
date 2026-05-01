@@ -993,11 +993,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Build a batch-processing queue"
-                            to="/docs/howto/build-a-batch-processing-queue"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
                         />
@@ -1068,11 +1063,6 @@
                             icon="article"
                             label="Style Slider track, thumb, and range"
                             to="/docs/howto/style-slider-track-thumb-and-range"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Define custom Text variants in a theme"
-                            to="/docs/howto/define-custom-text-variants-in-a-theme"
                         />
                         <NavLink
                             icon="article"
@@ -2314,12 +2304,6 @@
                     content="{appGlobals.docsContent['pages/howto/receive-postmessage-from-an-iframe.md']}"
                 />
             </Page>
-            <Page url="/docs/howto/build-a-batch-processing-queue">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/build-a-batch-processing-queue.md']}"
-                />
-            </Page>
-
             <!-- New how-to articles: Advanced Theming -->
             <Page url="/docs/howto/theme-button-variant-color-combos">
                 <DocumentPageNoTOC
@@ -2379,11 +2363,6 @@
             <Page url="/docs/howto/style-slider-track-thumb-and-range">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/style-slider-track-thumb-and-range.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/define-custom-text-variants-in-a-theme">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/define-custom-text-variants-in-a-theme.md']}"
                 />
             </Page>
             <Page url="/docs/howto/theme-badge-colors-and-sizes">

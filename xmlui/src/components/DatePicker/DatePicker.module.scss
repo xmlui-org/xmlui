@@ -159,6 +159,7 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     width: 100%;
     min-height: $minHeight;
     height: max-content;
+    line-height: normal;
     border-width: 1px;
     border-style: solid;
     transition: background-color ease-in 0.1s;

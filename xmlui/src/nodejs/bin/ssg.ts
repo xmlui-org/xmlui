@@ -590,9 +590,7 @@ async function runDebugSsgServer() {
     define: {
       ...viteConfig.define,
       ...createXmluiAppDefines({
-        buildMode: "ALL",
-        devMode: true,
-        standalone: false,
+        buildMode: "INLINE_ALL",
         mockEnabled: true,
         includeAllComponents: true,
         inspectUserComponents: true,
@@ -734,8 +732,6 @@ export const ssg = async ({
         ...viteConfig.define,
         ...createXmluiAppDefines({
           buildMode: "INLINE_ALL",
-          devMode: false,
-          standalone: false,
           mockEnabled: false,
         }),
         "import.meta.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV || "production"),

@@ -141,6 +141,7 @@ import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { stepperComponentRenderer } from "./Stepper/Stepper";
 import { stepComponentRenderer } from "./Stepper/Step";
 import { stepperFormComponentRenderer } from "./StepperForm/StepperForm";
+import { tabsFormComponentRenderer } from "./TabsForm/TabsForm";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { ratingInputComponentRenderer } from "./RatingInput/RatingInput";
@@ -601,6 +602,9 @@ export class ComponentRegistry {
       this.registerCoreComponent(stepperComponentRenderer);
       if (import.meta.env.VITE_USED_COMPONENTS_StepperForm !== "false") {
         this.registerCoreComponent(stepperFormComponentRenderer);
+      }
+      if (import.meta.env.VITE_USED_COMPONENTS_TabsForm !== "false") {
+        this.registerCoreComponent(tabsFormComponentRenderer);
       }
       this.registerCoreComponent(bookmarkComponentRenderer);
       this.registerCoreComponent(tableOfContentsRenderer);
