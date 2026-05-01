@@ -1,6 +1,6 @@
 # Get Started
 
-Get a running XMLUI app, an AI assistant that knows the XMLUI docs, and a built-in Inspector for debugging — in under 5 minutes.
+Get a running XMLUI app, an AI assistant (Claude Code or Codex) that knows the XMLUI docs, and a built-in Inspector for debugging — in under 5 minutes.
 
 ## Choose your platform
 
@@ -54,13 +54,21 @@ claude mcp add --scope user xmlui xmlui mcp
 
 This adds an `xmlui` server entry to `~/.claude.json` at user scope, so Claude Code can call the XMLUI MCP tools in any project. **Restart Claude Code** so it picks up the new server.
 
-To confirm, ask Claude Code: *"What XMLUI MCP tools do you have?"* You should see a list of about a dozen `xmlui_*` tools.
+For Codex:
+
+```bash
+codex mcp add xmlui -- xmlui mcp
+```
+
+This adds an `[mcp_servers.xmlui]` entry to `~/.codex/config.toml` at user scope, so Codex can call the XMLUI MCP tools in any project. **Restart Codex** so it picks up the new server.
+
+To confirm, ask your assistant: *"What XMLUI MCP tools do you have?"* You should see a list of about a dozen `xmlui_*` tools.
 
 ## Troubleshooting
 
-- **Claude doesn't see XMLUI tools.** Run `xmlui doctor`. It lists every place an `xmlui` MCP server is registered, validates the binary path, and runs `--version`. If it reports duplicates across scopes, remove all but one.
+- **Your assistant doesn't see XMLUI tools.** Run `xmlui doctor`. It lists every place an `xmlui` MCP server is registered (across both Claude and Codex), validates the binary path, and runs `--version`. If it reports duplicates within one assistant's scopes, remove all but one.
 - **Update.** Re-run the install command.
-- **Uninstall.** Remove the `xmlui` MCP server entry from Claude Code, then delete the binary from `/usr/local/bin/xmlui` or `~/.local/bin/xmlui`.
+- **Uninstall.** Remove the `xmlui` MCP server entry (`claude mcp remove xmlui` and/or `codex mcp remove xmlui`), then delete the binary from `/usr/local/bin/xmlui` or `~/.local/bin/xmlui`.
 
 </details>
 
@@ -101,15 +109,23 @@ For Claude Code:
 claude mcp add --scope user xmlui xmlui mcp
 ```
 
-This writes the same `xmlui` MCP server entry into `~/.claude.json`. **Restart Claude Code** so it picks up the new server.
+This writes the `xmlui` MCP server entry into `~/.claude.json`. **Restart Claude Code** so it picks up the new server.
 
-To confirm, ask Claude Code: *"What XMLUI MCP tools do you have?"* You should see a list of about a dozen `xmlui_*` tools.
+For Codex:
+
+```powershell
+codex mcp add xmlui -- xmlui mcp
+```
+
+This writes the `[mcp_servers.xmlui]` entry into `~/.codex/config.toml`. **Restart Codex** so it picks up the new server.
+
+To confirm, ask your assistant: *"What XMLUI MCP tools do you have?"* You should see a list of about a dozen `xmlui_*` tools.
 
 ## Troubleshooting
 
-- **Claude doesn't see XMLUI tools.** Run `xmlui doctor`. It lists every place an `xmlui` MCP server is registered, validates the binary path, and runs `--version`. If it reports duplicates across scopes, remove all but one.
+- **Your assistant doesn't see XMLUI tools.** Run `xmlui doctor`. It lists every place an `xmlui` MCP server is registered (across both Claude and Codex), validates the binary path, and runs `--version`. If it reports duplicates within one assistant's scopes, remove all but one.
 - **Update.** Re-run the install command.
-- **Uninstall.** Remove the `xmlui` MCP server entry from Claude Code, then delete the binary from `~/bin/xmlui.exe`.
+- **Uninstall.** Remove the `xmlui` MCP server entry (`claude mcp remove xmlui` and/or `codex mcp remove xmlui`), then delete the binary from `~/bin/xmlui.exe`.
 
 </details>
 
@@ -121,45 +137,45 @@ cd xmlui-weather
 xmlui run
 ```
 
-The dev server opens the app in your default browser. The app includes the **Inspector** (magnifying-glass icon, top right), which records traces of everything your app does so you (and Claude or Codex) can see what's going on.
+The dev server opens the app in your default browser. The app includes the **Inspector** (magnifying-glass icon, top right), which records traces of everything your app does so you and your assistant can see what's going on.
 
-## Use Claude Code to fix and extend the xmlui-weather app
+Before you start asking your assistant (Claude Code or Codex) for help with the app, make sure it's working in the `xmlui-weather` directory. If needed, ask it to switch to that directory.
 
-Before you start asking Claude for help with the app, make sure you are in the `xmlui-weather` directory and open Claude Code there.
+## Install, trace, fix, and extend the xmlui-weather app
 
-### Verify Claude can see the MCP tools
+### Verify your assistant can see the MCP tools
 
-In Claude Code:
+In Claude Code or Codex:
 
 > What XMLUI MCP tools are available to you?
 
-Claude should enumerate `xmlui_search`, `xmlui_component_docs`, `xmlui_examples`, `xmlui_list_howto`, `xmlui_distill_trace`, and others. If it doesn't, run `xmlui doctor` to diagnose.
+The assistant should enumerate `xmlui_search`, `xmlui_component_docs`, `xmlui_examples`, `xmlui_list_howto`, `xmlui_distill_trace`, and others. If it doesn't, run `xmlui doctor` to diagnose.
 
 ### Drive the app, capture a trace, distill and analyze
 
 The app loads with weather for Santa Rosa, CA. Open the Inspector and expand the Startup phase to see the distilled view of what happened.
 
-Now switch to a different city, then open the Inspector again, click **Export**, and tell Claude:
+Now switch to a different city, then open the Inspector again, click **Export**, and tell your assistant:
 
 > Distill and analyze the trace.
 
-Claude calls the `xmlui_distill_trace` tool, which returns a structured per-step summary of every interaction, API call, and value change. Claude narrates the result back to you.
+Your assistant calls the `xmlui_distill_trace` tool, which returns a structured per-step summary of every interaction, API call, and value change. The assistant narrates the result back to you.
 
 ### Fix the layout
 
-The default layout isn't great. Ask Claude:
+The default layout isn't great. Ask your assistant:
 
 > Center the input box and button as a group, and center the radio group on a new row.
 
-Expect Claude to use the MCP tools, especially `xmlui_search_howto`, with `xmlui_search` as a general fallback, to find a documented solution, edit `Main.xmlui`, and tell you to refresh. Don't be afraid to challenge Claude to cite evidence. If the answer is wrong, screenshot the broken layout, paste it into Claude, and ask it to look harder.
+Expect it to use the MCP tools, especially `xmlui_search_howto`, with `xmlui_search` as a general fallback, to find a documented how-to that provably works, edit `Main.xmlui`, and tell you to refresh. Don't be afraid to challenge it to cite evidence. If the answer is wrong, screenshot the broken layout, paste it into the chat, and ask it to look harder.
 
 ### Add a feature
 
-Ask Claude:
+Ask your assistant:
 
 > Add three tables that report hourly temperatures for three user-specifiable cities.
 
-Same pattern: Claude searches the docs via the MCP tools, edits the app, you refresh. If something breaks, export a trace and ask Claude to distill it.
+Same pattern: the assistant searches the docs via the MCP tools, edits the app, you refresh. If something breaks, export a trace and ask it to distill it.
 
 ## General troubleshooting
 
