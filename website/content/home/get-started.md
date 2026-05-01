@@ -121,11 +121,11 @@ cd xmlui-weather
 xmlui run
 ```
 
-The dev server opens the app in your default browser. The app includes the **Inspector** (magnifying-glass icon, top right), which records traces of everything your app does so you and Claude can see what's going on.
+The dev server opens the app in your default browser. The app includes the **Inspector** (magnifying-glass icon, top right), which records traces of everything your app does so you (and Claude or Codex) can see what's going on.
+
+## Use Claude Code to fix and extend the xmlui-weather app
 
 Before you start asking Claude for help with the app, make sure you are in the `xmlui-weather` directory and open Claude Code there.
-
-## Install, trace, fix, and extend the xmlui-weather app
 
 ### Verify Claude can see the MCP tools
 
