@@ -68,7 +68,7 @@ export const buildLib = async ({
           globals: {
             react: "React",
             "react-dom": "ReactDOM",
-            jsx: "react/jsx-runtime",
+            "react/jsx-runtime": "jsxRuntime",
           },
         },
       },
