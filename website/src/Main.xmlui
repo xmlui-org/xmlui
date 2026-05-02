@@ -1634,11 +1634,6 @@
                     content="{appGlobals.docsContent['pages/wrap-component/extension-packaging.md']}"
                 />
             </Page>
-            <Page url="/docs/build-editor-component">
-                <DocumentPage
-                    content="{appGlobals.docsContent['pages/build-editor-component.md']}"
-                />
-            </Page>
             <Page
                 url="/docs/howto/expose-a-method-from-a-component"
             >
