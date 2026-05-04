@@ -18,5 +18,4 @@ Use the sidebar to open any guide:
 - **Modal Dialogs** — Dialogs and overlays
 - **User-defined Components** — Custom components
 - **Refactoring** — Refactoring tips
-- **Build a HelloWorld Component** — Step-by-step component build
 - **Hosted Deployment** — Deploying your app

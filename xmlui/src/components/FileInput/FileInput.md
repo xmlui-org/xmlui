@@ -125,7 +125,7 @@ When `parseAs` is set, `acceptsFileType` is automatically inferred (`.csv` or `.
     parseAs="csv"
     onDidChange="result => products = result.parsedData[0]?.data || []"
   />
-  <Text>{ products }</Text>
+  <Text value="{products.length} products loaded" when="{products.length > 0}" />
   <List data="{products}" when="{products.length > 0}">
     <Text value="{$item.name}: ${$item.price}" />
   </List>

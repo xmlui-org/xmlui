@@ -25,6 +25,18 @@ xmlui build-lib
 
 This produces a self-contained UMD `.js` file that externalizes React and the XMLUI runtime (already loaded by the host app). The bundle includes only the extension's own dependencies.
 
+## What `xmlui build-lib` does
+
+The implementation is ~80 lines of Vite/Rolldown config — see [`xmlui/src/nodejs/bin/build-lib.ts`](https://github.com/xmlui-org/xmlui/blob/main/xmlui/src/nodejs/bin/build-lib.ts). Reading it answers the toolchain questions that come up when wrapping your first component:
+
+- **Entry point** is hardcoded to `src/index.tsx`.
+- **Externals**: `react`, `react-dom`, `xmlui`, and `react/jsx-runtime` are not bundled — the host app already provides them.
+- **Auto-register footer**: the UMD bundle ends with `window.xmlui.standalone.registerExtension(...)`, which is why a `<script>` tag alone is enough.
+- **Watch mode** (`xmlui build-lib --watch`) emits ES with inline sourcemaps and rebuilds on change.
+- **Override hooks**: a `vite.config-overrides.ts` next to your `package.json` can supply additional Vite plugins or a custom logger.
+
+The build runs in your extension's own working directory and reads `package.json` for the bundle name (`${npm_package_name}.js` for UMD, `.mjs` for ES).
+
 ## Loading an extension
 
 In `index.html`, add a script tag:

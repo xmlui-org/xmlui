@@ -1,6 +1,5 @@
 import { startApp } from "xmlui";
 import search from "xmlui-search";
-import helloWorld from "xmlui-hello-world";
 import websiteBlocks from "xmlui-website-blocks";
 import docsBlocks from "xmlui-docs-blocks";
 import echart from "xmlui-echart";
@@ -13,7 +12,6 @@ import tiptap from "xmlui-tiptap-editor";
 export const runtime = import.meta.glob(`/src/**`, { eager: true });
 const usedExtensions = [
     search,
-    helloWorld,
     websiteBlocks,
     docsBlocks,
     echart,

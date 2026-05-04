@@ -3,17 +3,21 @@
 
 interface ImportMetaEnv {
   readonly NODE_ENV: string;
-  readonly VITE_BUILD_MODE: string;
-  readonly VITE_DEV_MODE: boolean | string;
-  readonly VITE_STANDALONE: string;
+  // Framework-level: baked in at lib-build time
+  readonly VITE_XMLUI_VERSION: string;
+  // Application-level: mode flags set by xmlui CLI or app's Vite config
+  readonly VITE_XMLUI_BUILD_MODE: string;
+  readonly VITE_XMLUI_DEV_MODE: boolean;
+  // Application-level: runtime flags
   readonly VITE_MOCK_ENABLED: boolean | string;
   readonly VITE_MOCK_WORKER_LOCATION: string;
   readonly VITE_APP_VERSION: string;
-  readonly VITE_XMLUI_VERSION: string;
   readonly VITE_INCLUDE_ALL_COMPONENTS: string;
   readonly VITE_INCLUDE_HTML_COMPONENTS: string;
   readonly VITE_INCLUDE_REST_COMPONENTS: string;
   readonly VITE_USER_COMPONENTS_Inspect: string;
+  // Application-level: component tree-shaking flags
+  readonly VITE_USED_COMPONENTS_AccordionItem: string;
   readonly VITE_USED_COMPONENTS_App: string;
   readonly VITE_USED_COMPONENTS_AppHeader: string;
   readonly VITE_USED_COMPONENTS_Avatar: string;
@@ -59,18 +63,21 @@ interface ImportMetaEnv {
   readonly VITE_USED_COMPONENTS_SimpleTooltip: string;
   readonly VITE_USED_COMPONENTS_SpaceFiller: string;
   readonly VITE_USED_COMPONENTS_Stack: string;
+  readonly VITE_USED_COMPONENTS_Step: string;
+  readonly VITE_USED_COMPONENTS_StepperForm: string;
   readonly VITE_USED_COMPONENTS_StickyBox: string;
   readonly VITE_USED_COMPONENTS_StickySection: string;
   readonly VITE_USED_COMPONENTS_Switch: string;
   readonly VITE_USED_COMPONENTS_Table: string;
+  readonly VITE_USED_COMPONENTS_TableEditor: string;
   readonly VITE_USED_COMPONENTS_TabItem: string;
+  readonly VITE_USED_COMPONENTS_TabsForm: string;
   readonly VITE_USED_COMPONENTS_Textarea: string;
   readonly VITE_USED_COMPONENTS_Text: string;
   readonly VITE_USED_COMPONENTS_TileGrid: string;
   readonly VITE_USED_COMPONENTS_Tree: string;
   readonly VITE_USED_COMPONENTS_TreeDisplay: string;
   readonly VITE_USED_COMPONENTS_XmluiCodeHightlighter: string;
-  readonly VITE_USED_COMPONENTS_TableEditor: string;
 }
 
 interface ImportMeta {
