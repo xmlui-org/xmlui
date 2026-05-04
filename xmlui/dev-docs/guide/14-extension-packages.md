@@ -21,6 +21,7 @@ export interface Extension {
   components?: ComponentExtension[];  // Component renderer defs
   themes?: ThemeDefinition[];         // Custom theme files
   functions?: Record<string, (...args: any[]) => any>; // Global utility functions
+  themeNamespacePrefix?: string;      // PascalCase prefix for theme-variable namespacing (plan #02)
 }
 ```
 
@@ -32,12 +33,60 @@ import { myWidgetRenderer } from "./MyWidget";
 
 export default {
   namespace: "XMLUIExtensions",
+  themeNamespacePrefix: "MyWidget",   // see "Theme variable namespacing" below
   components: [myWidgetRenderer],
 };
 ```
 
 That's the complete public surface. The rest of the system is scaffolding that gets the extension
 loaded and its components registered in the framework's component pool.
+
+### Theme variable namespacing — `themeNamespacePrefix` (Wave 0, plan #02)
+
+Extension packages **must** declare a PascalCase `themeNamespacePrefix` so the CSS variables they produce are unambiguously scoped under a per-package segment:
+
+```
+--xmlui-backgroundColor-Animations_Button
+                          ↑ prefix     ↑ component name
+```
+
+- The separator between prefix and `ComponentName` is `_` (not `-`), to avoid ambiguity with the existing `-`-delimited segment convention.
+- Core components leave this field `undefined` (no prefix, no `_`).
+- Third-party packages must pick a prefix that does not collide with the canonical first-party table in [`components-core/themevars/prefix-registry.ts`](../../src/components-core/themevars/prefix-registry.ts).
+
+Canonical first-party prefixes:
+
+| npm package | Prefix |
+|---|---|
+| `xmlui-animations` | `Animations` |
+| `xmlui-calendar` | `Calendar` |
+| `xmlui-crm-blocks` | `Crm` |
+| `xmlui-devtools` | `Devtools` |
+| `xmlui-docs-blocks` | `Docs` |
+| `xmlui-echart` | `Echart` |
+| `xmlui-gauge` | `Gauge` |
+| `xmlui-grid-layout` | `GridLayout` |
+| `xmlui-masonry` | `Masonry` |
+| `xmlui-pdf` | `Pdf` |
+| `xmlui-react-flow` | `ReactFlow` |
+| `xmlui-recharts` | `Recharts` |
+| `xmlui-search` | `Search` |
+| `xmlui-spreadsheet` | `Spreadsheet` |
+| `xmlui-tiptap-editor` | `Tiptap` |
+| `xmlui-website-blocks` | `Websites` |
+
+The build-time analyzer rule `theming-missing-prefix` (plan #13 / plan #02 Phase 1) flags variables in extension packages that omit the prefix once `strictBuildValidation` is enabled.
+
+The `components-core/themevars` barrel exposes helpers used by the analyzer and the LSP:
+
+```ts
+import {
+  BUILTIN_THEME_PREFIX_REGISTRY,
+  getPrefixByPackage,
+  getEntryByPrefix,
+  hasCorrectPrefix,
+} from "@xmlui/.../themevars";
+```
 
 ---
 

@@ -336,6 +336,84 @@ Before marking a component as complete, verify:
 | [Accessible color matrix](https://toolness.github.io/accessible-color-matrix/) | Verify theme palette contrast ratios before committing |
 | VoiceOver (macOS), NVDA / JAWS (Windows) | Manual end-to-end verification of role announcements and focus flow |
 
+---
+
+## Accessibility Linter (plan #05, Wave 1)
+
+XMLUI ships a build-time accessibility linter at [xmlui/src/components-core/accessibility/](../../src/components-core/accessibility/index.ts). It is the runtime/CLI surface for the long-running accessibility plan (plan #05). Phase 1 implements seven rules; runtime ARIA injection and full enforcement land in later waves.
+
+### Public API
+
+The barrel exports the linter entry point and diagnostic types:
+
+```ts
+import {
+  lintComponentDef,
+  type A11yDiagnostic,
+  type A11yCode,
+  type LintOptions,
+} from "@xmlui/.../accessibility";
+
+const diagnostics: A11yDiagnostic[] = lintComponentDef(componentDef, options);
+```
+
+Each `A11yDiagnostic` carries `code`, `severity` (`"error" | "warn"`), `componentName`, optional source `range` and `uri`, a human-readable `message`, and an optional `fix` quick-fix hint.
+
+### Phase 1 rules
+
+| Code | Default severity | Detects |
+|---|---|---|
+| `missing-accessible-name` | warn | Interactive element with no accessible name |
+| `icon-only-button-no-label` | warn | `<Button icon="...">` without `label` or `aria-label` |
+| `modal-no-title` | warn | `<Modal>` without a `title` prop or `<ModalTitle>` slot |
+| `form-input-no-label` | warn | Form input outside `<FormItem>` and without a `<Label>` |
+| `duplicate-landmark` | warn | More than one component with the same landmark role on a page |
+| `redundant-aria-role` | info | Explicit ARIA role duplicates the element's implicit role |
+| `missing-skip-link` | info (stub) | App/Page with NavPanel but no SkipLink sibling |
+
+The remaining `A11yCode` values (`color-contrast-low`, `interactive-not-keyboard-reachable`, `live-region-missing`) are reserved for later phases.
+
+### Strict mode toggle
+
+The linter is gated by `App.appGlobals.strictAccessibility: boolean` (default `false`):
+
+- **`false` (default)**: findings are reported as `warn` only; the build does not fail.
+- **`true`**: warn-level findings escalate to `error`, causing the Vite build to fail. The flag flips to `true` in the next major release.
+
+When `strictAccessibility` is truthy at runtime, findings also emit `kind:"a11y"` entries into the Inspector trace (see [19-inspector-debugging.md](19-inspector-debugging.md)).
+
+### Component `a11y` metadata block
+
+The linter relies on a new optional `a11y` block on `ComponentMetadata` (see `xmlui/src/abstractions/ComponentDefs.ts`):
+
+```ts
+a11y?: {
+  role?: "button" | "link" | "switch" | "checkbox" | "menuitem" | "tab"
+       | "option" | "dialog" | "form-input" | "landmark" | "heading"
+       | "list" | "image" | "decorative";
+  accessibleNameProps?: readonly string[];   // e.g. ["label", "aria-label", "title"]
+  requiresAccessibleName?: boolean;          // defaults true for interactive roles
+  landmark?: "main" | "navigation" | "banner"
+           | "contentinfo" | "complementary" | "search";
+};
+```
+
+This block is purely advisory at runtime — it changes no behaviour. When authoring a new component or extending an existing one, populate it so:
+
+- `role` lets the linter know whether the component needs an accessible name.
+- `accessibleNameProps` tells the linter which prop names satisfy the requirement.
+- `requiresAccessibleName: false` opts a non-interactive use out of the check.
+- `landmark` enables the `duplicate-landmark` rule.
+
+### How to extend the linter
+
+1. Add a new `A11yCode` to `xmlui/src/components-core/accessibility/diagnostics.ts`.
+2. Implement the rule in `linter.ts` next to the Phase 1 rules.
+3. Decide its default severity. If it should escalate under `strictAccessibility`, add it to the strict-mode escalation list.
+4. Add tests in `xmlui/tests/components-core/accessibility/`.
+
+---
+
 <!-- DIAGRAM: Accessibility tree showing XMLUI component → ARIA role → screen reader announcement path -->
 
 ```mermaid

@@ -102,6 +102,10 @@ The `kind` field is the key to understanding what an entry represents.
 | `"clipboard:copy"` | A `Clipboard.copy(text)` call. |
 | `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | Lifecycle event from a managed `<WebSocket>` component. |
 | `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | Lifecycle event from a managed `<EventSource>` component. |
+| `"build"` | Build-time validation diagnostic echoed at runtime by the analyzer pipeline (plan #13). Payload: `code, severity, file, line, column, message`, optional `data`, `suggestions`. |
+| `"errors"` | Structured error event from the exception pipeline (plan #07). Payload: `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId`. |
+| `"audit"` | Audit-pipeline self-diagnostic emitted when the audit subsystem encounters a structural problem — redaction gap, sink failure, buffer overflow (plan #15). Payload: `code: AuditDiagCode`, `severity`, `message`, optional `data`. |
+| `"a11y"` | Accessibility linter finding emitted at runtime when `App.appGlobals.strictAccessibility` is truthy (plan #05). Payload: `code: A11yCode`, `severity`, `componentName`, `message`, optional `fix`. |
 
 When you see `"handler:start"` followed by `"api:start"` followed by `"api:complete"` followed by `"state:changes"` followed by `"handler:complete"`, all with the same `traceId`, you are looking at one complete user interaction.
 

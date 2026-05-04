@@ -124,6 +124,17 @@ property[-partNameOrScreenSize][-ComponentName][-variantName][--stateName]
 - `borderColor-Input--focus` — property + component + state
 - `backgroundColor-Button-primary-solid--hover` — full pattern
 
+### Extension-package prefix (Wave 0, plan #02)
+
+Components shipped from an extension package must prefix their `ComponentName` segment with the package's PascalCase token, separated by `_`:
+
+```
+--xmlui-backgroundColor-Animations_Button   ← xmlui-animations
+--xmlui-backgroundColor-Pdf_Viewer          ← xmlui-pdf
+```
+
+Core components leave the prefix off. The prefix for each first-party package is declared via `Extension.themeNamespacePrefix` (see `extension-packages.md`) and registered canonically in [`components-core/themevars/prefix-registry.ts`](../../xmlui/src/components-core/themevars/prefix-registry.ts). The build-time analyzer rule `theming-missing-prefix` (plan #13) flags violations once `strictBuildValidation` is enabled.
+
 ## SCSS Module Boilerplate
 
 Every visual component follows this pattern:

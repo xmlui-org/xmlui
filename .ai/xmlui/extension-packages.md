@@ -22,10 +22,24 @@ export interface Extension {
   components?: ComponentExtension[];                    // Renderer defs for native or compound components
   themes?: ThemeDefinition[];                           // Custom theme definitions
   functions?: Record<string, (...args: any[]) => any>; // Global functions available in expressions
+  themeNamespacePrefix?: string;                        // PascalCase prefix for theme-variable namespacing (plan #02)
 }
 ```
 
 All fields are optional. Minimal extension: `export default { components: [myRenderer] };`
+
+### `themeNamespacePrefix` (Wave 0, plan #02)
+
+Extension packages **must** declare a PascalCase `themeNamespacePrefix` so the CSS variables they produce are unambiguously scoped:
+
+```
+--xmlui-backgroundColor-Animations_Button
+                          ↑ prefix     ↑ component name
+```
+
+Core components leave this field `undefined` (no prefix, no `_` separator). Canonical prefixes for first-party packages are listed in [`components-core/themevars/prefix-registry.ts`](../../xmlui/src/components-core/themevars/prefix-registry.ts) — e.g. `xmlui-animations` → `Animations`, `xmlui-pdf` → `Pdf`, `xmlui-tiptap-editor` → `Tiptap`. Third-party packages must pick a prefix that does not collide with that table.
+
+The build-time analyzer rule `theming-missing-prefix` (plan #13 / plan #02 Phase 1) flags variables in extension packages that omit the prefix once `strictBuildValidation` is enabled.
 
 ---
 
