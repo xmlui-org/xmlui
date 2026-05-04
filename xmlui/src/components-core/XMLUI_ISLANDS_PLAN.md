@@ -98,19 +98,11 @@ console error, or hydration mismatch as a failure even if exit code is 0.
 
 | ID | App | Command (from repo root) | What to inspect |
 |----|-----|--------------------------|-----------------|
-| **U** | Unit tests | `npm test -w xmlui` | All green |
-| **E** | E2E (smoke subset) | `npm run -w xmlui test:e2e -- --grep "@smoke"` (or full E2E for risky steps) | All green; no new flakes |
+| **E** | E2E (smoke subset) | `npm run test-smoke` (or full test for risky steps `npm run test`) | All green; no new flakes |
 | **W-DEV** | Website (Vite dev) | `npm run -w website start` | Loads at `http://localhost:5173`; nav between Docs / Blog / a few component pages; check theme toggle |
-| **W-BUILD** | Website (built) | `npm run -w website build` | Build succeeds; bundle size sane |
 | **W-SSG** | Website SSG | `npm run -w website build-ssg && npm run -w website preview-ssg` | (1) Build completes without errors, (2) `dist-ssg/index.html` and `dist-ssg/docs/index.html` exist and contain pre-rendered XMLUI markup (NOT just an empty `<div id="root">`), (3) preview at `http://localhost:3000` shows content **before** JS hydration (disable JS in DevTools, reload), (4) re-enable JS, navigate around — no hydration warnings in console, search and links work |
-| **PG** | Playground | `npm run -w playground start` | Loads, can edit and run sample apps |
-| **TB** | XMLUI test-bed | `npm run -w xmlui start-test-bed` | Loads the in-repo test-bed app |
-| **DEMO-A** | xmlui-animations demo | `npm start -w packages/xmlui-animations` | Loads; animations render |
-| **DEMO-D** | xmlui-devtools demo | `npm start -w packages/xmlui-devtools` | Loads; devtools panel renders |
-| **DEMO-P** | xmlui-pdf demo | `npm start -w packages/xmlui-pdf` | Loads; PDF rendering works |
-| **STD** | Standalone UMD | `npm run -w xmlui build:xmlui-standalone`, then open any standalone fixture (or `temp-islands/index.html` swapped to use the local UMD via `<script>`) | UMD bundle loads; classic standalone app boots |
-| **ISL-CSR** | Islands client-render | `cd temp-islands && npm start` | Both islands render in their own shadow roots; click events work; counters / state independent |
-| **ISL-SSG** | Islands SSG | `cd temp-islands && xmlui island ssg && npx preview-ssg ./dist-ssg` (commands added in step 5) | (1) Pre-rendered island markup visible with JS disabled, (2) hydrates without warnings, (3) interactive after hydration |
+| **STD** | Standalone UMD | `npm run -w xmlui build:xmlui-standalone`, coppy the resulting umd file into a standalone project (which shall be created) then open it with a web server | UMD bundle loads; classic standalone app boots |
+| **ISL** | Islands UMD | `npm run -w xmlui build:xmlui-islands`, coppy the resulting umd file and source-map into the temp-islands folder, then open it with a web server | Both islands render in their own shadow roots; click events work; counters / state independent |
 
 **The single most important regression check is W-SSG**, because its failures
 are silent (`xmlui ssg` exits 0 even when nothing was pre-rendered). A reusable
@@ -134,14 +126,6 @@ node -e '
 ' website/dist-ssg
 ```
 
-For a deeper check, also verify a deep page:
-
-```bash
-ls website/dist-ssg/docs/components/Button/index.html && \
-  grep -c '</' website/dist-ssg/docs/components/Button/index.html
-# Expect a large tag count (hundreds), not single digits.
-```
-
 ---
 
 ## 3. Incremental steps
@@ -161,7 +145,7 @@ run, and what could regress.
 **Modify**: `xmlui/src/index.ts` — re-export `startIslands` so
 `temp-islands/index.ts`'s existing import resolves.
 
-**Smoke**: `U`, `ISL-CSR` (just verifies the banner + tagged markers in DOM).
+**Smoke**: `E`, `ISL-CSR` (just verifies the banner + tagged markers in DOM).
 
 **Risk**: zero. Pure additive export.
 
@@ -184,7 +168,7 @@ mounted on a Shadow DOM.
 marker. Track roots in a module-level `WeakMap<HTMLElement, Root>` so
 re-invocations unmount the previous root before remounting.
 
-**Smoke**: `U`, `ISL-CSR`, plus a quick visual on **DEMO-D** (because
+**Smoke**: `U`, `ISL`, plus a quick visual on **DEMO-D** (because
 `NestedApp` uses the same shadow-DOM path and devtools demo is the easiest
 manual repro for portal/style issues).
 
@@ -211,8 +195,7 @@ need each app rooted at its own folder.
 4. `startApp` does not pass `basePath` → empty-string default reproduces
    today's behavior exactly.
 
-**Smoke**: **U**, **W-DEV**, **W-BUILD**, **W-SSG**, **PG**, **TB**, **STD**,
-**DEMO-A**, **DEMO-D**, **DEMO-P** — i.e. **the full matrix minus islands**.
+**Smoke**: **the full matrix minus islands**.
 Justification: this is the first step that edits shared code paths; if any
 fetch site is missed the SSG output silently regresses (the original failure
 mode you described). W-SSG plus the verification snippet from §2 catches it.
@@ -221,13 +204,15 @@ Also, manually exercise `<StandaloneApp basePath="./bio" />` from a temporary
 test page or a Vitest fixture to confirm the new code path works in isolation
 before any island wiring.
 
+Note that there's a window.__PUBLIC_PATH option, which could interfere with this feature. It should be independent of that.
+
 **Risk**: high. Mitigations: funnel through one helper; add a Vitest unit test
 that asserts every known fetch site composes URLs through that helper
 (grep-based test).
 
 ---
 
-### Step 4 — Wire islands to load real apps (CSR only)
+### Step 4 — Wire islands to load real apps (ISL only)
 
 Combine steps 2 + 3.
 
@@ -250,10 +235,10 @@ host page would make every island react to the same URL). Implementation:
 thread `routerMode` into `AppWrapper.tsx` (today only `useHashBasedRouting`
 exists; add `useMemoryRouter` as a peer).
 
-**Smoke**: **U**, **ISL-CSR**, plus **W-SSG** again (because router-mode
+**Smoke**: **E**, **ISL**, plus **W-SSG** again (because router-mode
 plumbing edits `AppWrapper.tsx`, which the SSG path uses via `StaticRouter`).
 
-**Verify in ISL-CSR**:
+**Verify in ISL**:
 - Both islands render their real `Main.xmlui` content.
 - A counter/state change in one island does not affect the other.
 - Switching theme tone in one island does not affect the host or the other.
