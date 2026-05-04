@@ -240,13 +240,22 @@ This throws a `ThrowStatementError` which bubbles up through the handler catch b
 an error to the user:
 
 ```ts
-function signError(error: Error | string) {
-  const message = typeof error === "string" ? error : error.message;
-  toast.error(message);          // Red toast
-  console.error("[xmlui]", message);  // Console (Playwright captures this)
-  pushXsLog({ kind: "error:runtime", ... });
+function signError(error: Error | AppError | string | unknown) {
+  const appError = AppError.from(error);              // normalize via plan #07
+  const message = appError.message;
+  toast.error(message);                               // Red toast
+  console.error("[xmlui]", message);                  // Console (Playwright captures this)
+  pushXsLog({
+    kind: "error:runtime",
+    error: {
+      message,
+      stack: appError.cause instanceof Error ? appError.cause.stack : undefined,
+    },
+  });
 }
 ```
+
+> **Wave 1 update (plan #07).** `signError` now accepts any thrown value (`Error | AppError | string | unknown`) and normalizes it through [`AppError.from()`](#apperror--structured-exception-type-plan-07-wave-01). `ErrorBoundary.componentDidCatch` does the same and includes the resulting `category` field in the `kind:"error:boundary"` trace entry.
 
 You can call it directly in event handlers:
 
@@ -411,9 +420,10 @@ All error domains write to the trace system via `pushXsLog()`:
 
 | Event | `kind` | Contents |
 |---|---|---|
-| React render crash | `"error:boundary"` | message, stack, component stack, boundary location |
+| React render crash | `"error:boundary"` | message, stack, component stack, boundary location, `category` (from `AppError.from`) |
 | `signError()` call | `"error:runtime"` | message, stack |
 | Handler failure | `"error:handler"` | uid, eventName, error details |
+| Structured error pipeline | `"errors"` | `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` (plan #07) |
 
 `pushXsLog()` is a complete noop when `window._xsVerbose` is not set (the default). There is
 no performance cost for trace calls in production.
@@ -423,6 +433,83 @@ To enable verbose tracing in a browser:
 window._xsVerbose = true;
 // Then reproduce the error — logs appear in window._xsLogs
 ```
+
+---
+
+## AppError — Structured Exception Type (plan #07, Wave 0/1)
+
+`AppError` is the canonical structured exception class introduced by plan #07. It lives at [xmlui/src/components-core/errors/](../../src/components-core/errors/index.ts) and replaces bare `Error` / string throws at every XMLUI error boundary site (`ErrorBoundary`, `event-handlers`, `LOADER_ERROR`).
+
+### Construction
+
+```ts
+import { AppError, type ErrorCategory, type AppErrorInit } from "@xmlui/.../errors";
+
+throw new AppError({
+  code: "ORDER_LOCKED",
+  category: "conflict",          // governs default retryability
+  message: "This order is locked by another user",
+  correlationId: response.headers.get(appGlobals.errorCorrelationIdHeader) ?? undefined,
+  data: { orderId: "42" },
+  cause: originalError,
+});
+```
+
+### Categories
+
+`ErrorCategory` is one of:
+
+| Category | Default `retryable` | Typical source |
+|---|---|---|
+| `network` | `true` | DNS, TCP, timeout |
+| `validation` | `false` | 400, 422 |
+| `authorization` | `false` | 401, 403 |
+| `not-found` | `false` | 404 |
+| `conflict` | `true` | 409 |
+| `rate-limit` | `true` | 429 |
+| `server` | `true` | 5xx |
+| `internal` | `false` | framework / coding bug |
+| `user-cancelled` | `false` | explicit cancellation |
+
+Override per-instance via `AppErrorInit.retryable`.
+
+### Normalization
+
+`AppError.from(unknown)` is the canonical normalizer:
+
+- An existing `AppError` is returned unchanged (no double-wrapping).
+- A plain `Error` is wrapped with `category: "internal"`, `code: "unknown"`, and the original error attached as `cause`.
+- A string becomes the `message`; anything else is `String()`-ified.
+
+`signError()` (in [AppContent.tsx](../../src/components-core/rendering/AppContent.tsx)) and `ErrorBoundary.componentDidCatch` (in [ErrorBoundary.tsx](../../src/components-core/rendering/ErrorBoundary.tsx)) both call `AppError.from(...)` on the incoming value.
+
+### Serialization
+
+`appError.toJSON()` returns a JSON-safe object with `name`, `code`, `category`, `retryable`, `message`, optional `correlationId`, optional `data`, and a recursive `cause` walk. Use it for trace entries and server-side logs.
+
+### Other exports from `components-core/errors`
+
+| Symbol | Purpose |
+|---|---|
+| `RetryPolicySpec` | Spec for retry behaviour (max attempts, backoff). Stub today; consumed by `executeWithPolicy` in later phases. |
+| `CircuitBreakerSpec` | Spec for circuit-breaker behaviour. Stub today. |
+| `executeWithPolicy(...)` | Stub helper that will execute a callable under a `RetryPolicySpec` / `CircuitBreakerSpec` once Phase 2 lands. |
+| `ErrorDiagnostic` | Runtime diagnostic shape consumed by the `kind:"errors"` Inspector trace. |
+| `ErrorDiagnosticCode` | Code union for the runtime diagnostic. |
+| `ErrorSource` | Source classifier (`boundary`, `handler`, `loader`, `script`, …). |
+
+### App globals
+
+Two `App.appGlobals` entries govern the rollout (see [15-app-context.md](15-app-context.md)):
+
+- `strictErrors: boolean` (default `false`) — when `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint to use `AppError`. Flips to `true` in the next major release.
+- `errorCorrelationIdHeader: string` (default `"X-Correlation-Id"`) — the HTTP response header from which `AppError.correlationId` is read on fetch failures.
+
+### When to throw `AppError` from your code
+
+- **Always** at the boundary between an HTTP response and your application logic (translate status codes into categories there).
+- **Always** when you intentionally throw from script — it produces a structured trace entry that doesn't trip the `strictErrors` migration warning.
+- **Don't** wrap exceptions you don't understand — let `AppError.from()` do the normalization at the boundary site.
 
 ---
 
@@ -438,6 +525,7 @@ window._xsVerbose = true;
 | [xmlui/src/components-core/rendering/reducer.ts](../../xmlui/src/components-core/rendering/reducer.ts) | `LOADER_ERROR` reducer case |
 | [xmlui/src/components-core/loader/DataLoader.tsx](../../xmlui/src/components-core/loader/DataLoader.tsx) | Loader error path, `$error` creation, toast handling |
 | [xmlui/src/components-core/utils/EngineError.ts](../../xmlui/src/components-core/utils/EngineError.ts) | Custom error type hierarchy |
+| [xmlui/src/components-core/errors/](../../xmlui/src/components-core/errors/) | `AppError`, retry/circuit-breaker types, `ErrorDiagnostic` (plan #07) |
 | [xmlui/src/components-core/xmlui-parser.ts](../../xmlui/src/components-core/xmlui-parser.ts) | `errReport*` fallback component factories |
 | [xmlui/src/components-core/inspector/inspectorUtils.ts](../../xmlui/src/components-core/inspector/inspectorUtils.ts) | `pushXsLog()` |
 

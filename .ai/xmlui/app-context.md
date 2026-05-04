@@ -277,6 +277,14 @@ When the DOM sandbox blocks a raw browser API (see `expression-eval.md` § 2a), 
 - `strictDomSandbox: boolean` — `false` (default) emits `sandbox:warn` traces; `true` throws `BannedApiError`.
 - `silentConsole: boolean` — when `true`, `Log.*` skips the underlying `console.*` mirror.
 
+**Wave 0/1 strict-mode toggles** (rolled out behind feature flags; flip to `true` in the next major release):
+
+- `strictBuildValidation: boolean` (default `false`) — escalates analyzer diagnostics one severity step (info → warn → error); `xmlui check` exits non-zero on any `error`-severity finding. See plan #13.
+- `strictAccessibility: boolean` (default `false`) — escalates `warn`-level a11y linter findings (`icon-only-button-no-label`, `modal-no-title`, `missing-accessible-name`, `form-input-no-label`, …) to `error`, failing the Vite build. See plan #05.
+- `strictErrors: boolean` (default `false`) — when `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint to use `AppError`. See plan #07.
+- `errorCorrelationIdHeader: string` (default `"X-Correlation-Id"`) — HTTP response header from which `AppError.correlationId` is read on fetch failures.
+- `strictAuditLogging: boolean` (default `false`) — when `true`, the default redaction policy blocks on un-redacted PII fields and the sink behaviour changes from "drop on backpressure" to "bounded buffer then drop with `audit-loss` diagnostic". See plan #15.
+
 ---
 
 ### PubSub Messaging

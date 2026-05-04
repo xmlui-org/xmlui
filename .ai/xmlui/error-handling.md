@@ -126,14 +126,17 @@ try {
 
 ```ts
 // xmlui/src/components-core/rendering/AppContent.tsx
-function signError(error: Error | string) {
-  const message = typeof error === "string" ? error : error.message || "Something went wrong";
-
-  toast.error(message);         // Red toast notification
-  console.error("[xmlui]", message);  // Console (for Playwright capture)
+function signError(error: Error | AppError | string | unknown) {
+  const appError = AppError.from(error);              // normalize via plan #07
+  const message = appError.message || "Something went wrong";
+  toast.error(message);                               // Red toast notification
+  console.error("[xmlui]", message);                  // Console (for Playwright capture)
   pushXsLog({
     kind: "error:runtime",
-    error: { message, stack: error instanceof Error ? error.stack : undefined },
+    error: {
+      message,
+      stack: appError.cause instanceof Error ? appError.cause.stack : undefined,
+    },
   });
 }
 ```
@@ -141,6 +144,8 @@ function signError(error: Error | string) {
 `signError()` is available in markup expressions and event handlers as a global function.
 It always shows a toast, logs to console (prefixed `[xmlui]` for test capture), and records
 to the trace system.
+
+**Wave 1 update (plan #07)**: `signError` now accepts `Error | AppError | string | unknown` and normalizes every input through `AppError.from()`. `ErrorBoundary.componentDidCatch` does the same and includes the resulting `category` field in the boundary trace entry. See the AppError section below.
 
 ---
 
@@ -233,13 +238,48 @@ abstract class EngineError extends Error {
 
 ---
 
+## AppError — Structured Exception Type (plan #07, Wave 0/1)
+
+`AppError` is the canonical structured exception class. It lives in `xmlui/src/components-core/errors/` and is exported from that module's barrel.
+
+```ts
+import { AppError, type ErrorCategory, type AppErrorInit } from "@xmlui/.../errors";
+
+throw new AppError({
+  code: "ORDER_LOCKED",
+  category: "conflict",          // governs default retryability
+  message: "This order is locked by another user",
+  correlationId: response.headers.get("X-Correlation-Id") ?? undefined,
+  data: { orderId: "42" },
+});
+```
+
+**Categories** (`ErrorCategory`): `network`, `validation`, `authorization`, `not-found`, `conflict`, `rate-limit`, `server`, `internal`, `user-cancelled`. Each has a default `retryable` flag overridable via `AppErrorInit.retryable`.
+
+**Static normalizer**: `AppError.from(unknown)` returns the value unchanged when it is already an `AppError`, wraps a plain `Error` with `category:"internal"` / `code:"unknown"`, and stringifies anything else. Use this at every error boundary site.
+
+**Serialization**: `toJSON()` returns a plain JSON-safe object with `name`, `code`, `category`, `retryable`, `message`, optional `correlationId`, optional `data`, and a `cause` walk. Suitable for trace entries and server-side logs.
+
+**Other exports**:
+
+- `RetryPolicySpec` / `CircuitBreakerSpec` / `executeWithPolicy` — types and stub helper for the policy phase (full implementation lands in later waves).
+- `ErrorDiagnostic` / `ErrorDiagnosticCode` / `ErrorSource` — the runtime diagnostic shape consumed by the `kind:"errors"` Inspector trace.
+
+**App globals** (see `app-context.md`):
+
+- `strictErrors: boolean` (default `false`) — when `true`, throwing a plain `Error` from script logs a `kind:"errors"` warn diagnostic with a migration hint. Flips to `true` in the next major release.
+- `errorCorrelationIdHeader: string` (default `"X-Correlation-Id"`) — the response header from which `AppError.correlationId` is read on fetch failures.
+
+---
+
 ## Inspector Trace Entries for Errors
 
 | `kind` field | Created By | Contents |
 |---|---|---|
-| `"error:boundary"` | `ErrorBoundary.componentDidCatch` | `error.message`, `stack`, `componentStack`, `location` |
+| `"error:boundary"` | `ErrorBoundary.componentDidCatch` | `error.message`, `stack`, `componentStack`, `location`, `category` (from `AppError.from`) |
 | `"error:runtime"` | `signError()` | `error.message`, `stack` |
 | `"error:handler"` | `handlerLogger.logHandlerError` | `uid`, `eventName`, error details |
+| `"errors"` | structured error pipeline (plan #07) | `code: ErrorDiagnosticCode`, `source`, `severity`, `message`, optional `componentUid`, `correlationId` |
 
 `pushXsLog()` is a **noop** when `window._xsVerbose` is off (the default in production).
 Zero performance impact unless verbose mode is enabled.
@@ -270,6 +310,7 @@ On startup, errors in component discovery, parsing, or module loading:
 | `xmlui/src/components-core/rendering/reducer.ts` | `LOADER_ERROR` reducer case |
 | `xmlui/src/components-core/loader/DataLoader.tsx` | Loader error path + `$error` creation |
 | `xmlui/src/components-core/utils/EngineError.ts` | Custom error type hierarchy |
+| `xmlui/src/components-core/errors/` | `AppError`, retry/circuit-breaker types, `ErrorDiagnostic` (plan #07) |
 | `xmlui/src/components-core/xmlui-parser.ts` | `errReport*` fallback component factories |
 | `xmlui/src/components-core/StandaloneApp.tsx` | Bootstrap error collection and handling |
 | `xmlui/src/components-core/inspector/inspectorUtils.ts` | `pushXsLog()` implementation |

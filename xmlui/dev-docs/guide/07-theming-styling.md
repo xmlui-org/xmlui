@@ -213,6 +213,20 @@ property[-partNameOrScreenSize][-ComponentName][-variantName][--stateName]
 - `--` introduces state names only — structural segments use single `-`
 - Screen size tokens (`sm`, `md`, etc.) in the part position generate responsive `@media` rules, not named parts
 
+### Extension-package prefix (Wave 0, plan #02)
+
+Components shipped from an extension package must prefix the `ComponentName` segment with the package's PascalCase token, separated by `_`:
+
+```
+--xmlui-backgroundColor-Animations_Button     ← xmlui-animations
+--xmlui-backgroundColor-Pdf_Viewer            ← xmlui-pdf
+--xmlui-backgroundColor-Tiptap_Toolbar        ← xmlui-tiptap-editor
+```
+
+The separator is `_` (not `-`) to avoid colliding with the existing `-`-delimited segment convention. Core components leave the prefix off. Each first-party package's canonical prefix lives in [`components-core/themevars/prefix-registry.ts`](../../src/components-core/themevars/prefix-registry.ts) and is declared at the package level via `Extension.themeNamespacePrefix` (see [14-extension-packages.md](14-extension-packages.md)).
+
+The build-time analyzer rule `theming-missing-prefix` (plan #13 / plan #02 Phase 1) is registered in [`components-core/analyzer/rules/theming-missing-prefix.ts`](../../src/components-core/analyzer/rules/theming-missing-prefix.ts). It flags theme variable references that do not follow the `PackagePrefix_ComponentName-token-name` convention once `strictBuildValidation` is enabled.
+
 ---
 
 ## SCSS Module Integration

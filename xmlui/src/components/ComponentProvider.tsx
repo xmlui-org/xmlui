@@ -885,6 +885,21 @@ export class ComponentRegistry {
   }
 
   /**
+   * Return all component names registered in the registry (across all namespaces).
+   * The returned array contains unqualified names (no namespace prefix).
+   * Used by analyzer rules for Levenshtein-based suggestions.
+   */
+  getComponentNames(): readonly string[] {
+    const names: string[] = [];
+    for (const ns of this.pool.values()) {
+      for (const name of ns.keys()) {
+        names.push(name);
+      }
+    }
+    return names;
+  }
+
+  /**
    * This method retrieves the registry entry of a component registered
    * with the specified key.
    * @param componentName The unique ID of the component

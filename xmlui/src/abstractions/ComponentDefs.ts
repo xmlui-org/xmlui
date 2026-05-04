@@ -380,6 +380,65 @@ export type ComponentMetadata<
   // Wrapper authors set this to a human-readable string describing the component's
   // purpose (e.g., "Loading" for Spinner, "Toggle color mode" for ToneChangerButton).
   defaultAriaLabel?: string;
+
+  /**
+   * Accessibility metadata for the component.
+   *
+   * Used by the a11y linter (`components-core/accessibility/linter.ts`) to determine:
+   *   - What ARIA role the component maps to (`role`).
+   *   - Which props provide an accessible name (`accessibleNameProps`).
+   *   - Whether an accessible name is required (`requiresAccessibleName`).
+   *   - Which landmark region the component represents (`landmark`).
+   *
+   * This field is purely advisory — no runtime behaviour changes.
+   */
+  a11y?: {
+    /**
+     * The ARIA role this component maps to.
+     * Interactive roles (`button`, `link`, `switch`, `checkbox`, `menuitem`,
+     * `tab`, `option`) require an accessible name by default.
+     * Structural roles (`landmark`, `heading`, `list`, `image`) may or may
+     * not require one. `decorative` suppresses the accessible-name requirement.
+     */
+    readonly role?:
+      | "button"
+      | "link"
+      | "switch"
+      | "checkbox"
+      | "menuitem"
+      | "tab"
+      | "option"
+      | "dialog"
+      | "form-input"
+      | "landmark"
+      | "heading"
+      | "list"
+      | "image"
+      | "decorative";
+    /**
+     * Prop names that provide an accessible name for this component.
+     * The linter checks that at least one is present and non-empty.
+     * Typical values: `["label", "aria-label", "title"]`.
+     */
+    readonly accessibleNameProps?: readonly string[];
+    /**
+     * When `true` (default for interactive roles), the linter emits
+     * `missing-accessible-name` if none of `accessibleNameProps` is set.
+     * Set to `false` for components where an accessible name is optional.
+     */
+    readonly requiresAccessibleName?: boolean;
+    /**
+     * The HTML landmark region this component represents.
+     * Used to detect `duplicate-landmark` (e.g., two `<main>` on the same page).
+     */
+    readonly landmark?:
+      | "main"
+      | "navigation"
+      | "banner"
+      | "contentinfo"
+      | "complementary"
+      | "search";
+  };
 };
 
 export interface ParentRenderContext {
