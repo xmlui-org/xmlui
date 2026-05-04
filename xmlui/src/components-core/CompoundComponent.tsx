@@ -155,15 +155,34 @@ export const CompoundComponent = forwardRef(
 
     const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
 
+    // Items-loop context variables that must propagate through the UDC boundary.
+    // The UDC container uses `uses: globalKeys` which blocks local context vars,
+    // so $item/$itemIndex/$isFirst/$isLast would otherwise be invisible inside the
+    // UDC template and break FormBindingBehavior path resolution (bindTo inside UDC).
+    const PROPAGATED_CONTEXT_VARS = ["$item", "$itemIndex", "$isFirst", "$isLast"] as const;
+    const propagatedContextVars = useMemo(() => {
+      if (!contextVars) return undefined;
+      const result: Record<string, any> = {};
+      let hasAny = false;
+      for (const key of PROPAGATED_CONTEXT_VARS) {
+        if (key in contextVars) {
+          result[key] = contextVars[key];
+          hasAny = true;
+        }
+      }
+      return hasAny ? result : undefined;
+    }, [contextVars]);
+
     const vars = useMemo(() => {
       return {
         $props: resolvedProps,
+        ...propagatedContextVars,
         ...containerNode.vars,
         emitEvent,
         hasEventHandler,
         updateState,
       };
-    }, [containerNode.vars, emitEvent, hasEventHandler, resolvedProps, updateState]);
+    }, [containerNode.vars, emitEvent, hasEventHandler, propagatedContextVars, resolvedProps, updateState]);
     const stableVars = useShallowCompareMemoize(vars);
 
     // --- Inject implicit variable into the container of the compound component
