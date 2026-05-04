@@ -1,7 +1,7 @@
 import { preview as vitePreview } from "vite";
 import { getViteConfig } from "./viteConfig";
 
-export const preview = async ({proxy}) => {
+export const preview = async ({ port, proxy }: { port?: number; proxy?: string }) => {
   try {
     let proxyDef;
     if (proxy) {
@@ -17,12 +17,16 @@ export const preview = async ({proxy}) => {
         };
       }
     }
-    const server = await vitePreview({ ...getViteConfig(),
+    const server = await vitePreview({
+      ...(await getViteConfig()),
       server: {
         proxy: proxyDef,
       },
+      preview: {
+        port,
+      },
     });
-    
+
     if (!server.httpServer) {
       throw new Error("HTTP server not available");
     }
