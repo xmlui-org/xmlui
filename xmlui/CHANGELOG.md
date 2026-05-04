@@ -4,6 +4,8 @@
 
 ### Patch Changes
 
+- 2a615fe: fix: add validationWrapper class to ensure proper flex distribution in horizontal Stack
+- 3e7c7d5: Fix bindTo used within user-defined components accessed from a Form/FormItem
 - cf45ffa: fix: DatePicker - set line-height to normal for improved layout
 - b230d80: fix: vite-xmlui-plugin works without extra config or env vars
 - c28814d: feat: add forwarded props for Stepper configuration in StepperForm component

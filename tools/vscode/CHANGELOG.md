@@ -4,6 +4,8 @@
 
 ### Patch Changes
 
+- Updated dependencies [2a615fe]
+- Updated dependencies [3e7c7d5]
 - Updated dependencies [cf45ffa]
 - Updated dependencies [b230d80]
 - Updated dependencies [c28814d]
@@ -1320,7 +1322,6 @@
 
 ### Patch Changes
 
-- 42416ba: test change for CI #2
 - Updated dependencies [42416ba]
   - xmlui@0.9.41
 
