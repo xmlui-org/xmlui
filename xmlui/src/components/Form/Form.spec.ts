@@ -4801,3 +4801,62 @@ test.describe("Value preservation across unmount/remount", () => {
     expect(result).toEqual({ name: "John", email: "john@example.com" });
   });
 });
+
+// --- FormItem type="items" with UDC children
+
+test(`bindTo inside a UDC rendered inside FormItem type='items' reads item data`, async ({
+  initTestBed,
+  page,
+}) => {
+  await initTestBed(
+    `<Form data="{{ addresses: [
+        { street: '123 Main St', city: 'Rome' },
+        { street: '456 Oak Ave', city: 'Milan' }
+      ] }}">
+      <FormItem bindTo="addresses" type="items">
+        <AddressFields />
+      </FormItem>
+    </Form>`,
+    {
+      components: [
+        `<Component name="AddressFields">
+          <TextBox bindTo="street" placeholder="Street" />
+          <TextBox bindTo="city" placeholder="City" />
+        </Component>`,
+      ],
+    },
+  );
+
+  const inputs = page.locator('[data-part-id="input"]');
+  await expect(inputs.nth(0)).toHaveValue("123 Main St");
+  await expect(inputs.nth(1)).toHaveValue("Rome");
+  await expect(inputs.nth(2)).toHaveValue("456 Oak Ave");
+  await expect(inputs.nth(3)).toHaveValue("Milan");
+});
+
+test(`submit with UDC bindTo inside FormItem type='items' collects correct data`, async ({
+  initTestBed,
+  createFormDriver,
+}) => {
+  const { testStateDriver } = await initTestBed(
+    `<Form onSubmit="data => testState = data" testId="form"
+          data="{{ items: [{ name: 'Alice' }, { name: 'Bob' }] }}">
+      <FormItem bindTo="items" type="items">
+        <NameField />
+      </FormItem>
+    </Form>`,
+    {
+      components: [
+        `<Component name="NameField">
+          <TextBox bindTo="name" />
+        </Component>`,
+      ],
+    },
+  );
+
+  const driver = await createFormDriver("form");
+  await driver.submitForm();
+  await expect.poll(testStateDriver.testState).toStrictEqual({
+    items: [{ name: "Alice" }, { name: "Bob" }],
+  });
+});
