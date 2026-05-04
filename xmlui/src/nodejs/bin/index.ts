@@ -74,6 +74,7 @@ interface StartArgs {
 }
 
 interface PreviewArgs {
+  port?: number;
   proxy?: string;
 }
 
@@ -180,14 +181,19 @@ async function run() {
       "preview",
       "Preview build",
       (yargs) => {
-        return yargs.option("proxy", {
-          type: "string",
-          description: "Proxy target",
-        });
+        return yargs
+          .option("port", {
+            type: "number",
+            description: "Port number",
+          })
+          .option("proxy", {
+            type: "string",
+            description: "Proxy target",
+          });
       },
       async (argv) => {
-        const { proxy } = argv;
-        await preview({ proxy });
+        const { port, proxy } = argv;
+        await preview({ port, proxy });
       },
     )
     .command<ZipDistArgs>(
