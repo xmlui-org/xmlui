@@ -4,6 +4,7 @@ import { get } from "lodash-es";
 import toast from "react-hot-toast";
 
 import { version } from "../../../package.json";
+import { AppError } from "../errors/app-error";
 
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
@@ -1151,8 +1152,9 @@ export function AppContent({
 }
 
 // --- We pass this funtion to the global app context
-function signError(error: Error | string) {
-  const message = typeof error === "string" ? error : error.message || "Something went wrong";
+function signError(error: Error | AppError | string | unknown) {
+  const appError = AppError.from(error);
+  const message = appError.message || "Something went wrong";
   toast.error(message);
   // Always log to console so Playwright page.on('console') can capture it
   console.error("[xmlui]", message);
@@ -1164,7 +1166,7 @@ function signError(error: Error | string) {
     kind: "error:runtime",
     error: {
       message,
-      stack: error instanceof Error ? error.stack : undefined,
+      stack: appError.cause instanceof Error ? appError.cause.stack : undefined,
     },
   });
 }

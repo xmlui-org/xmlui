@@ -54,6 +54,7 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
   for (const fileEntry of input.files) {
     const ctx: RuleContext = {
       file: fileEntry.file,
+      source: fileEntry.source,
       markupAst: fileEntry.markupAst,
       exprAst: fileEntry.exprAst,
       componentRegistry: input.componentRegistry,

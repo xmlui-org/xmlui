@@ -214,6 +214,10 @@ export interface XsLogEntry {
    * - `"audit"` — audit-pipeline self-diagnostic; produced when the audit subsystem
    *   encounters a structural problem (redaction gap, sink failure, buffer overflow, etc.)
    *   (plan #15). Contains `code: AuditDiagCode`, `severity`, `message`, optional `data`.
+   * - `"a11y"` — accessibility linter finding emitted at runtime when
+   *   `App.appGlobals.strictAccessibility` is truthy; produced by the accessibility
+   *   module (plan #05). Contains `code: A11yCode`, `severity`, `componentName`,
+   *   `message`, and optional `fix`.
    */
   kind?: string;
   eventName?: string;

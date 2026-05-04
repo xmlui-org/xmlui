@@ -4,6 +4,7 @@ import styles from "./ErrorBoundary.module.scss";
 
 import type { ComponentLike } from "../../abstractions/ComponentDefs";
 import { pushXsLog } from "../inspector/inspectorUtils";
+import { AppError } from "../errors/app-error";
 
 // --- The properties of the ErrorBoundary component
 interface Props {
@@ -54,6 +55,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
    */
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo, this.props.location);
+    const appError = AppError.from(error);
 
     // Trace the error — pushXsLog is a noop when xsVerbose is off
     pushXsLog({
@@ -61,8 +63,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
       perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
       traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
       kind: "error:boundary",
-      error: { message: error.message },
-      stack: error.stack,
+      error: { message: appError.message, category: appError.category },
+      stack: appError.cause instanceof Error ? appError.cause.stack : undefined,
       componentStack: errorInfo.componentStack,
       location: this.props.location,
     });

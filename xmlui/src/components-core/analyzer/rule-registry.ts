@@ -15,6 +15,8 @@ import type { ComponentRegistry } from "../../components/ComponentProvider";
 export interface RuleContext {
   /** Workspace-relative or absolute path of the source file being analyzed. */
   file: string;
+  /** Raw source text of the file (used for offset → line/col conversion). */
+  source: string;
   /**
    * Parsed markup AST of the file, if available.
    * Typed as `unknown` here; rule implementations cast to the concrete AST type

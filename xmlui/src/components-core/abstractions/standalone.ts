@@ -81,6 +81,11 @@ export type StandaloneAppDescription = {
    *   from "drop on backpressure" to "bounded buffer then drop with `audit-loss`
    *   diagnostic". Flips to `true` in the next major release. See
    *   `dev-docs/plans/15-audit-grade-observability.md`.
+   * - `strictAccessibility` (boolean, default `false`) — when `true`, accessibility
+   *   linter findings (`icon-only-button-no-label`, `modal-no-title`,
+   *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to
+   *   `error`, causing the Vite build to fail if any are present. In non-strict mode
+   *   they are warnings only. See `dev-docs/plans/05-enforced-accessibility.md`.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
