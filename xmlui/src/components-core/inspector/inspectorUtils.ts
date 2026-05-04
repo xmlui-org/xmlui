@@ -204,6 +204,16 @@ export interface XsLogEntry {
    *   router or opens an external tab.
    * - `"ws:connect"` | `"ws:message"` | `"ws:error"` | `"ws:close"` — WebSocket lifecycle.
    * - `"eventsource:connect"` | `"eventsource:message"` | `"eventsource:error"` | `"eventsource:close"` — EventSource lifecycle.
+   * - `"build"` — build-time validation diagnostic echoed at runtime; produced by the
+   *   analyzer pipeline (plan #13). Contains `code: string`, `severity`, `file`, `line`,
+   *   `column`, `message`, and optional `data` / `suggestions`.
+   * - `"errors"` — structured error event; produced when the error pipeline encounters a
+   *   noteworthy condition (unhandled error, retry exhausted, circuit open, etc.) (plan #07).
+   *   Contains `code: ErrorDiagnosticCode`, `source: ErrorSource`, `severity`, `message`,
+   *   and optionally `componentUid`, `correlationId`.
+   * - `"audit"` — audit-pipeline self-diagnostic; produced when the audit subsystem
+   *   encounters a structural problem (redaction gap, sink failure, buffer overflow, etc.)
+   *   (plan #15). Contains `code: AuditDiagCode`, `severity`, `message`, optional `data`.
    */
   kind?: string;
   eventName?: string;
