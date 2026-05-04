@@ -1,0 +1,3 @@
+<Component name="MyComp">
+  <Badge backgroundColor="$color-secondary">STANDALONE ENTRYPOINT</Badge>
+</Component>

@@ -1,0 +1,10 @@
+<Card>
+  <Markdown>
+    # XMLUI markdown, on my own island
+  </Markdown>
+  <Form>
+    <FormItem bindTo="name" placeholder="Your name"/>
+    <FormItem bindTo="email" placeholder="example@something.com"/>
+  </Form>
+  <MyComp/>
+</Card>
