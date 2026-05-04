@@ -277,6 +277,12 @@ export default ({ mode = "lib" }) => {
       alias: {
         lodash: "lodash-es",
       },
+      // In metadata mode the CJS output is loaded by Node.js scripts (generate-docs, etc.).
+      // Without this override Vite applies browser resolve conditions and picks the DOM-
+      // based export of packages like `decode-named-character-reference` (index.dom.js)
+      // which calls `document.createElement` at module level and crashes in Node.js.
+      // Using node conditions makes Rollup select the Node.js-compatible "default" export.
+      conditions: mode === "metadata" ? ["node", "module", "default"] : undefined,
     },
     define,
     css: {

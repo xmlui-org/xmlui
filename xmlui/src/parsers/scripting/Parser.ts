@@ -307,6 +307,13 @@ export class Parser {
           this._hasNonImportStatement = true;
           return this.parseFunctionDeclaration();
         default:
+          // Check for 'debugger' — banned at parse time
+          if (startToken.type === TokenType.Identifier && startToken.text === "debugger") {
+            this._hasNonImportStatement = true;
+            this._lexer.get(); // consume the token
+            this.reportError("W046", startToken);
+            return null;
+          }
           // Check for async function (contextual keyword)
           if (startToken.type === TokenType.Identifier && startToken.text === "async") {
             const nextToken = this._lexer.ahead(1);

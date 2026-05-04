@@ -76,6 +76,14 @@ interface XsLogEntry {
 | `"method:call"` | state-layers | Component API method invoked |
 | `"value:change"` | variable-logging | User var changed |
 | `"native:*"` | Any | Native DOM events (prefix preserved) |
+| `"sandbox:warn"` | bannedMembers `sandboxWarnLogger` | Banned DOM API access in non-strict mode (default) |
+| `"log:debug"` / `"log:info"` / `"log:warn"` / `"log:error"` | `Log.*` global | User-emitted log via sanctioned `Log` API (replaces `console.*`) |
+| `"app:fetch"` | `App.fetch` global | HTTP request via the gated fetch wrapper (origin allowlist applied) |
+| `"app:randomBytes"` | `App.randomBytes` global | Entropy use via the gated `crypto.getRandomValues` wrapper |
+| `"app:mark"` / `"app:measure"` | `App.mark` / `App.measure` globals | User performance marks/measures |
+| `"clipboard:copy"` | `Clipboard.copy` global | Clipboard write via sanctioned wrapper |
+| `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | `<WebSocket>` component | Managed WebSocket lifecycle |
+| `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | `<EventSource>` component | Managed SSE lifecycle |
 
 ---
 

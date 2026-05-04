@@ -94,6 +94,14 @@ The `kind` field is the key to understanding what an entry represents.
 | `"modal:cancel"` | The user clicked cancel |
 | `"method:call"` | A component API method was called programmatically |
 | `"value:change"` | A user-declared variable changed value |
+| `"sandbox:warn"` | A banned DOM API was accessed while `App.appGlobals.strictDomSandbox` is `false` (the access still executes; in `true` mode it throws `BannedApiError` instead). |
+| `"log:debug"` / `"log:info"` / `"log:warn"` / `"log:error"` | A `Log.*` call (the sanctioned replacement for `console.*`). |
+| `"app:fetch"` | An `App.fetch(url, init?)` call \u2014 the sanctioned, origin-allowlisted replacement for `fetch`/`XMLHttpRequest`. |
+| `"app:randomBytes"` | An `App.randomBytes(n)` call \u2014 the sanctioned replacement for `crypto.getRandomValues`. |
+| `"app:mark"` / `"app:measure"` | An `App.mark(name)` or `App.measure(\u2026)` call. |
+| `"clipboard:copy"` | A `Clipboard.copy(text)` call. |
+| `"ws:connect"` / `"ws:message"` / `"ws:error"` / `"ws:close"` | Lifecycle event from a managed `<WebSocket>` component. |
+| `"eventsource:connect"` / `"eventsource:message"` / `"eventsource:error"` / `"eventsource:close"` | Lifecycle event from a managed `<EventSource>` component. |
 
 When you see `"handler:start"` followed by `"api:start"` followed by `"api:complete"` followed by `"state:changes"` followed by `"handler:complete"`, all with the same `traceId`, you are looking at one complete user interaction.
 

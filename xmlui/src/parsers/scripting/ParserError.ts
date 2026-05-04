@@ -66,6 +66,7 @@ export const ErrorCodes = {
   reactiveVarInImportedModule: "W043",
   constLetInImportedModule: "W044",
   invalidStatementInImportedModule: "W045",
+  debuggerNotAllowed: "W046",
 } as const;
 
 export type ErrorCodes = (typeof ErrorCodes)[keyof typeof ErrorCodes];
@@ -123,4 +124,5 @@ export const errorMessages: ErrorText = {
     "const/let variable declarations are not allowed in imported modules. Found: '{0}'",
   [ErrorCodes.invalidStatementInImportedModule]:
     "Only function declarations are allowed in imported modules. Found: {0}",
+  [ErrorCodes.debuggerNotAllowed]: "'debugger' is not allowed in XMLUI expressions",
 };

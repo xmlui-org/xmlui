@@ -18,6 +18,40 @@ import {
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { BannedApiError } from "./bannedFunctions";
+import { isBannedMember, type BannedMemberResult } from "./bannedMembers";
+
+// =============================================================================
+// DOM SANDBOX GUARD
+// =============================================================================
+
+/**
+ * Handles a banned-member check result.
+ *
+ * - In **strict mode** (`strictDomSandbox === true`): throws `BannedApiError`.
+ * - In **warn mode** (default): emits `console.warn` so the access is visible
+ *   in DevTools, and also pushes a `"sandbox:warn"` trace entry so it appears
+ *   in the Inspector when verbose logging is active.
+ *
+ * Call this immediately after `isBannedMember()` returns `{ banned: true }`.
+ * When `result.banned` is `false`, this function is a no-op.
+ */
+function handleMemberBan(
+  result: BannedMemberResult,
+  strict: boolean,
+  warnLogger?: EvalTreeOptions["sandboxWarnLogger"],
+): void {
+  if (!result.banned) return;
+  const msg = `DOM API access to '${result.api}' is not allowed in XMLUI expressions.${
+    result.help ? ` ${result.help}` : ""
+  }`;
+  if (strict) {
+    throw new BannedApiError(result.api ?? "unknown", result.help);
+  }
+  // Warn mode: surface in DevTools and optionally in the Inspector trace.
+  console.warn(`[XMLUI sandbox] ${msg}`);
+  warnLogger?.({ api: result.api, help: result.help, text: msg });
+}
 
 // --- Get the cached expression value
 export function getExprValue(expr: Expression, thread: LogicalThread): any {
@@ -128,6 +162,11 @@ export function evalIdentifier(
   const idScope = getIdentifierScope(expr, evalContext, thread);
   const valueScope = idScope.scope;
   let valueIndex: string | number = expr.name;
+  // --- Check whether this global identifier is on the banned list.
+  if (idScope.type === "global") {
+    const banResult = isBannedMember(valueScope, valueIndex as string);
+    handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
+  }
   value = valueScope[valueIndex];
   const newValue: ValueResult = {
     valueScope,
@@ -167,6 +206,9 @@ export function evalMemberAccessCore(
   thread: LogicalThread,
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
+  // --- Check banned member access (read path).
+  const banResult = isBannedMember(parentObj, expr.member);
+  handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
   const value =
     expr.opt || evalContext.options?.defaultToOptionalMemberAccess
       ? parentObj?.[expr.member]
@@ -195,6 +237,9 @@ export function evalCalculatedMemberAccessCore(
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
   const memberObj = getExprValue(expr.member, thread)?.value;
+  // --- Check banned member access (calculated read path).
+  const banResult = isBannedMember(parentObj, memberObj);
+  handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? parentObj?.[memberObj]
     : parentObj[memberObj];
@@ -388,6 +433,10 @@ export function evalAssignmentCore(
   if (leftScope === globalThis && !(leftIndex in leftScope)) {
     throw new Error(`Left value variable (${leftIndex}) not found in the scope.`);
   }
+
+  // --- Check banned member access (write path).
+  const writeBanResult = isBannedMember(leftScope, leftIndex as string);
+  handleMemberBan(writeBanResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
 
   thisStack.pop();
   switch (expr.op) {

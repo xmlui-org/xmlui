@@ -183,6 +183,28 @@ export interface XsLogEntry {
   perfTs?: number;
   startPerfTs?: number;
   traceId?: string;
+  /**
+   * Event kind. Well-known values:
+   * - `"interaction"` — user interaction (click, input, etc.)
+   * - `"navigate"` — route navigation
+   * - `"api:start"` / `"api:complete"` — HTTP request lifecycle
+   * - `"handler:start"` / `"handler:complete"` / `"handler:error"` — event handler lifecycle
+   * - `"state:change"` — container state mutation
+   * - `"sandbox:warn"` — a banned DOM API was accessed while `strictDomSandbox` is `false`;
+   *   the access was allowed but flagged. Contains `api` and optionally `help` fields.
+   * - `"log:debug"` | `"log:info"` | `"log:warn"` | `"log:error"` — Log.* calls from
+   *   expressions. Contains `args: unknown[]`.
+   * - `"app:randomBytes"` — App.randomBytes(n) called. Contains `n: number`.
+   * - `"app:mark"` — App.mark(label). Contains `label: string`, `perfTs: number`.
+   * - `"app:measure"` — App.measure(label, from, to?). Contains `duration: number`.
+   * - `"app:fetch"` — App.fetch(url) called. Contains `url: string`, `method: string`.
+   * - `"clipboard:copy"` — Clipboard.copy(text). Contains `length: number`.
+   * - `"navigate"` — navigate(to, options) call. Contains `to: string`,
+   *   `target: "_self" | "_blank"`. Emitted whether navigation goes through the
+   *   router or opens an external tab.
+   * - `"ws:connect"` | `"ws:message"` | `"ws:error"` | `"ws:close"` — WebSocket lifecycle.
+   * - `"eventsource:connect"` | `"eventsource:message"` | `"eventsource:error"` | `"eventsource:close"` — EventSource lifecycle.
+   */
   kind?: string;
   eventName?: string;
   componentType?: string;

@@ -32,7 +32,7 @@ import { processStatementQueueAsync } from "../script-runner/process-statement-a
 import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
-import { getCurrentTrace } from "../inspector/inspectorUtils";
+import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import type { HandlerLoggerContext } from "../inspector/handler-logging";
 import { ContainerActionKind } from "../rendering/containers";
 import { delay, generatedId, useEvent } from "../utils/misc";
@@ -201,6 +201,9 @@ export function createEventHandlers(config: EventHandlerConfig) {
             typeof appContext.appGlobals?.defaultToOptionalMemberAccess === "boolean"
               ? appContext.appGlobals.defaultToOptionalMemberAccess
               : true,
+          strictDomSandbox: appContext.appGlobals?.strictDomSandbox === true,
+          sandboxWarnLogger: (entry) =>
+            pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
         },
       };
 

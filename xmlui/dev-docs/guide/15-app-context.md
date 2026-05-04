@@ -113,6 +113,22 @@ Four navigation-related values are always available:
 (`navigate("/search", { queryParams: { q: "hello" } })`), and replace mode
 (`navigate("/login", { replace: true })`).
 
+The `target: "_blank"` option opens the URL in a new tab via
+`window.open(href, "_blank", "noopener,noreferrer")` and skips the router
+(default `"_self"` calls the router). Every call — whether new tab or
+same-tab — emits a `kind: "navigate"` trace entry.
+
+```xml
+<Button onClick="navigate('https://example.com/help', { target: '_blank' })">
+  Open help in new tab
+</Button>
+```
+
+This is the sanctioned replacement for `window.open()` and direct
+`window.location` mutation — both of which the DOM sandbox blocks. See
+[managed-react.md Appendix A](../plans/managed-react.md) for the full hardening
+plan.
+
 Note: `$pathname`, `$routeParams`, and `$queryParams` (the `$`-prefixed variables) come from
 the routing state layer (Layer 6), not from AppContext. They are reactive in the same way but
 are a distinct injection path.
@@ -395,6 +411,37 @@ calling functions:
 
 Don't confuse `appGlobals` with extension functions. Extension functions (added via
 `Extension.functions`) become callable directly — `myExtFunction(x)` — not via `appGlobals`.
+
+### DOM-Sandbox Configuration Keys
+
+Three `appGlobals` keys configure the script-runner sandbox (see
+[managed-react.md Appendix A](../plans/managed-react.md)):
+
+| Key | Type | Default | Effect |
+|---|---|---|---|
+| `strictDomSandbox` | `boolean` | `false` | When `true`, banned DOM-API access throws `BannedApiError`. Default mode emits a `sandbox:warn` trace and lets the access through. |
+| `allowedOrigins` | `string[]` | `[]` | Origin allowlist consulted by `App.fetch`. Same-origin is always allowed; cross-origin requests are rejected before the network call. |
+| `appStateKeys` | `string[]` | unset (permissive) | Schema for `AppState` bucket names. When set, any `AppState` method called with a bucket whose top-level segment is not in the list throws `AppStateSchemaError`. |
+| `silentConsole` | `boolean` | `false` | When `true`, `Log.*` calls do not mirror to the underlying `console.*`. The trace entry is always emitted. |
+
+### Sandbox-Sanctioned Replacement Globals
+
+These globals are wired into every expression scope as the managed alternatives
+to the DOM APIs blocked by `bannedMembers.ts`. Each emits a dedicated trace
+entry so the inspector can audit them.
+
+| Global | Replaces | Trace kind |
+|---|---|---|
+| `Log.debug(...)` / `Log.info(...)` / `Log.warn(...)` / `Log.error(...)` | `console.*` | `log:debug` / `log:info` / `log:warn` / `log:error` |
+| `App.fetch(url, init?)` | `fetch`, `XMLHttpRequest` | `app:fetch` |
+| `App.randomBytes(n)` | `crypto.getRandomValues` | `app:randomBytes` |
+| `App.now()` / `App.mark(name)` / `App.measure(name, start?, end?)` | `performance.now`, `performance.mark`, `performance.measure` | `app:mark` / `app:measure` |
+| `App.environment` | `navigator.userAgent`, `platform`, `connection`, etc. | (read-only object — no trace) |
+| `Clipboard.copy(text)` | `navigator.clipboard.writeText` | `clipboard:copy` |
+| `<WebSocket>` component | `WebSocket` constructor | `ws:connect` / `ws:message` / `ws:error` / `ws:close` |
+| `<EventSource>` component | `EventSource` constructor | `eventsource:connect` / `eventsource:message` / `eventsource:error` / `eventsource:close` |
+| `navigate(to, { target: "_blank" })` | `window.open(url, "_blank")` | `navigate` (with `target: "_blank"` field) |
+| `AppState` (with `appStateKeys` schema) | Raw global mutable state | (state-change trace via container reducer) |
 
 ---
 

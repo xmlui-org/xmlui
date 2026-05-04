@@ -83,6 +83,24 @@ class CancellationToken {
 // Evaluation options to use with binding tree evaluation
 export type EvalTreeOptions = {
   defaultToOptionalMemberAccess?: boolean;
+  /**
+   * When `true`, any expression that accesses a banned DOM API throws a
+   * `BannedApiError` immediately. When `false` (the default), the access
+   * still proceeds but emits a `console.warn` and a `"sandbox:warn"` trace
+   * entry so teams can audit and migrate before the default flips.
+   *
+   * Set via `App.appGlobals.strictDomSandbox` in config.json or the App
+   * component; the event-handler pipeline propagates it into this option.
+   */
+  strictDomSandbox?: boolean;
+  /**
+   * Optional callback invoked in warn mode (i.e. when `strictDomSandbox` is
+   * `false`) every time a banned DOM API is accessed. The event-handler
+   * pipeline wires this to `pushXsLog` so the access appears in the Inspector
+   * trace without the eval-tree taking a direct compile-time dependency on the
+   * inspector module.
+   */
+  sandboxWarnLogger?: (entry: { api?: string; help?: string; text: string }) => void;
 };
 
 // This function gets an object to pass as an implicit context when invoking a function on "objectWithFunction"

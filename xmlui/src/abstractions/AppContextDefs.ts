@@ -14,6 +14,12 @@ import type { IApiInterceptor } from "../components-core/interception/abstractio
 import type { AppState } from "../components-core/rendering/appState";
 import type { PubSubService } from "../components-core/pubsub/PubSubService";
 import type { ButtonThemeColor } from "../components/abstractions";
+import type { LogNamespace } from "../components-core/appContext/log";
+import type {
+  AppUtilsNamespace,
+  ClipboardNamespace,
+  AppEnvironment,
+} from "../components-core/appContext/app-utils";
 
 // This interface defines the properties and services of an app context that the
 // application components can use when implementing their behavior.
@@ -321,6 +327,29 @@ export type AppContextObject = {
   // This object provides methods for managing global application state with support for
   // nested paths, array operations, and immutable state updates.
   AppState: AppState;
+
+  // ==============================================================================================
+  // Managed Replacement Globals (Phase 2 — dom-api-hardening.md)
+
+  // Log.debug/info/warn/error — sanctioned replacement for the banned `console.*` APIs.
+  // Each call emits a 'log:<level>' Inspector trace entry. When appGlobals.silentConsole
+  // is false (default), the call also mirrors to native console.*.
+  Log: LogNamespace;
+
+  // App.randomBytes(n) — returns n random bytes (1–1024). Sanctioned replacement for
+  // the banned `crypto.getRandomValues`.
+  // App.now() — high-resolution timestamp. Sanctioned replacement for `performance.now()`.
+  // App.mark(label) / App.measure(label, from, to?) — trace-aware timing helpers.
+  // App.fetch(input, init?) — managed fetch with CSRF and allowedOrigins enforcement.
+  // App.environment — curated environment snapshot (isMobile, prefersDark, etc.).
+  App: typeof AppUtilsNamespace & {
+    fetch: (input: string | URL, init?: RequestInit) => Promise<Response>;
+    environment: AppEnvironment;
+  };
+
+  // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the
+  // banned `navigator.clipboard.writeText`.
+  Clipboard: typeof ClipboardNamespace;
 
   // ==============================================================================================
   // PubSub Messaging

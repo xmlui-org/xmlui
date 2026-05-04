@@ -14,6 +14,10 @@ unknown error notification
 ired' validation shows error when isDirty and losing focus
 - xmlui/src/components/IncludeMarkup/IncludeMarkup.spec.ts:118:3 › Basic Functionality ›
  fires didFail on non-2xx HTTP status
+- xmlui/src/components/IncludeMarkup/IncludeMarkup.spec.ts:145:3 › Basic Functional
+ity › re-fetches when url prop changes
+- xmlui/src/components/MessageListener/MessageListener.spec.ts:126:3 › Basic Functi
+onality › doesn't disrupt HStack layout gaps
 - xmlui/src/components/RadioGroup/RadioGroup.spec.ts:1003:3 › Keyboard Navigation › seque
 ntial ArrowDown visits all options in order
 - xmlui/src/components/Table/Table.spec.ts:4195:3 › Column width theme variables › column 

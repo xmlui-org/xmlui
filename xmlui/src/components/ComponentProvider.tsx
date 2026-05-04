@@ -34,6 +34,8 @@ import {
 import { textComponentRenderer } from "./Text/Text";
 import { fragmentComponentRenderer } from "./Fragment/Fragment";
 import { messageListenerComponentRenderer } from "./MessageListener/MessageListener";
+import { webSocketComponentRenderer } from "./WebSocket/WebSocket";
+import { eventSourceComponentRenderer } from "./EventSource/EventSource";
 import { tableComponentRenderer } from "./Table/Table";
 import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
 import { stickySectionComponentRenderer } from "./StickySection/StickySection";
@@ -462,6 +464,12 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_MessageListener !== "false") {
       this.registerCoreComponent(messageListenerComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_WebSocket !== "false") {
+      this.registerCoreComponent(webSocketComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_EventSource !== "false") {
+      this.registerCoreComponent(eventSourceComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);
