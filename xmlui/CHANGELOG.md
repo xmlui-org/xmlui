@@ -1,5 +1,31 @@
 # xmlui
 
+## 0.12.27
+
+### Patch Changes
+
+- 2a615fe: fix: add validationWrapper class to ensure proper flex distribution in horizontal Stack
+- 3e7c7d5: Fix bindTo used within user-defined components accessed from a Form/FormItem
+- 2bd9d49: Add audit-grade observability skeleton (plan #15 Step 0): `components-core/audit/` module with `AuditPolicy`, `RedactionRule`, `SamplingRule`, `RetentionRule`, `SinkConfig`, pass-through `redact`/`sample` stubs, W3C `TraceContext` correlation stubs, and no-op sink factories; `strictAuditLogging` appGlobals key documented; `kind:"audit"` registered in the Inspector trace.
+- 2bd9d49: Add build-validation analyzer skeleton (plan #13 Step 0): `components-core/analyzer/` module with `BuildDiagnostic` type, rule registry, walker, and suppression-comment support; `strictBuildValidation` appGlobals key documented; `kind:"build"` registered in the Inspector trace.
+- 2bd9d49: Add structured exception model skeleton (plan #07 Step 0): `components-core/errors/` module with `AppError` class, `RetryPolicySpec`/`CircuitBreakerSpec` types, `ErrorDiagnostic` type; `strictErrors` and `errorCorrelationIdHeader` appGlobals keys documented; `kind:"errors"` registered in the Inspector trace.
+- 2bd9d49: Add theme-variable namespace prefix registry (plan #02 Step 0): `components-core/themevars/` module with canonical `PackagePrefix` table for all first-party extension packages; `themeNamespacePrefix` field added to the `Extension` interface.
+- 2bd9d49: Wave 1 — Accessibility module Phase 1: linter + ComponentMetadata a11y block
+
+  Adds `components-core/accessibility/` with `A11yDiagnostic` type, `A11yCode` union, and `lintComponentDef()` implementing seven Phase 1 rules: `missing-accessible-name`, `icon-only-button-no-label`, `modal-no-title`, `form-input-no-label`, `duplicate-landmark`, `redundant-aria-role`, and `missing-skip-link` (stub). Adds the `a11y` block to `ComponentMetadata` for ARIA role, accessible name prop declarations, and landmark metadata. Documents `"a11y"` XsLog kind in `inspectorUtils.ts` and `strictAccessibility` global in `standalone.ts`. See `dev-docs/plans/05-enforced-accessibility.md`.
+
+- 2bd9d49: Wave 1 — Build-validation analyzer: identifier + expression + cross-binding rules
+
+  Adds Phase 1 analyzer rules (`id-unknown-component`, `id-unknown-prop`, `id-unknown-event`) that validate component tags, attribute names, and event handlers against the component registry and component metadata. Adds Phase 2 expression rules (`expr-dead-conditional`, `expr-handler-no-value`) that detect literal/tautological conditions and bare identifier event handlers. Adds Phase 3 stubs (`id-undefined-component-ref`, `id-undefined-form-ref`) for cross-binding validation. Adds `_utils.ts` with shared helpers (Levenshtein distance, closest-match, walkComponentDef, framework/behavior prop allow-lists). Adds `getComponentNames()` to `ComponentRegistry`. See `dev-docs/plans/13-build-validation-analyzers.md`.
+
+- 2bd9d49: Wave 1 — Exception model Phase 1: AppError integration in signError and ErrorBoundary
+
+  Updates `signError()` in `AppContent.tsx` to accept `Error | AppError | string | unknown` and normalize via `AppError.from()`. Updates `ErrorBoundary.componentDidCatch()` to normalize the caught error through `AppError.from()` and include the `category` field in the trace log. See `dev-docs/plans/07-structured-exception-model.md`.
+
+- 2bd9d49: Wave 1 — Themevars Phase 1: theming-missing-prefix analyzer rule stub
+
+  Registers the `theming-missing-prefix` analyzer rule (stub) for detecting CSS variable references that do not follow the `PackagePrefix_ComponentName-token-name` convention. Full implementation pending `dev-docs/plans/02-themed-css-variable-prefix-convention.md` Step 1.
+
 ## 0.12.26
 
 ### Patch Changes
