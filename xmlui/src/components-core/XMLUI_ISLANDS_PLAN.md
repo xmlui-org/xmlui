@@ -2,8 +2,11 @@
 
 > Goal: allow a host (non-XMLUI) web page to embed multiple, independent XMLUI
 > apps by placing `<div data-xmlui-src="./folder">` markers in its HTML. Each
-> island is fully isolated (state, styles, themes), supports SSG pre-rendering,
-> and ideally also works without a build step (CDN script tag).
+> island is fully isolated (state, styles, themes). The primary delivery target
+> is a CDN script tag — no build step required on the host site. Islands are
+> designed for traditional server-rendered settings (ASP.NET, Django, Rails,
+> any CMS) where the server controls the HTML and a client-side bundle
+> activates the islands.
 
 This plan is incremental: every step ends in a runnable / testable state and
 includes a concrete **manual smoke matrix** that catches regressions the unit
@@ -37,11 +40,14 @@ These existing pieces will be **reused**, not duplicated:
 - Existing in-page shadow-DOM example: [NestedAppReact.tsx](xmlui/src/components/NestedApp/NestedAppReact.tsx#L150).
 - `xmlui-standalone` build mode in [xmlui/vite.config.ts](xmlui/vite.config.ts#L21) and
   the script `build:xmlui-standalone` in [xmlui/package.json](xmlui/package.json#L13).
-- Existing SSG pipeline: [xmlui/src/nodejs/bin/ssg.ts](xmlui/src/nodejs/bin/ssg.ts)
-  — `renderPath()`, `applyRenderToShell()`, `getSsgEntrySource()`. Uses
-  `react-dom/server`, `StaticRouter`, a temporary entry that calls
-  `import.meta.glob('./src/**', { eager: true })`.
-- Static preview server: [tools/preview-ssg](tools/preview-ssg).
+  The island build follows the same pattern — CI-only, not a user-facing command.
+- Existing SSG pipeline: [xmlui/src/nodejs/bin/ssg.ts](xmlui/src/nodejs/bin/ssg.ts).
+  Islands do not add to or depend on this pipeline. It is listed here only
+  because island build changes to shared files (e.g. `vite.config.ts`,
+  `AppWrapper.tsx`) could accidentally break it — the W-SSG smoke check guards
+  against that.
+- Static preview server: [tools/preview-ssg](tools/preview-ssg) — is a
+  general static file server useful for testing multi page applications. For the islands client, `npx serve -s` is prefered.
 
 The new code must touch these files non-invasively (additive APIs and a new
 build mode); existing `startApp` callers must not change behavior.
@@ -54,9 +60,11 @@ An *island* is a standalone XMLUI app instance mounted into an arbitrary host
 DOM element. The contract:
 
 - Host page contains zero or more `<div data-xmlui-src="<folder>"></div>`
-  elements. The folder path is resolved relative to the host page URL.
+  elements. The folder path is resolved relative to the host page URL. The host
+  page is produced by a server (or a CMS); it is not an XMLUI SSG output.
 - The framework provides a UMD bundle (`xmlui-island.umd.js`) that exposes a
-  global function `startIslands(options?)`.
+  global function `startIslands(options?)`. The host page loads it with a plain
+  `<script>` tag — no build step, no bundler.
 - For each marker div, the framework:
   1. Fetches `Main.xmlui` (and the usual standalone resources: `config.json`,
      `Main.xmlui.xs`, `Globals.xs`, `themes/*.json`, `components/*`,
@@ -64,10 +72,13 @@ DOM element. The contract:
   2. Attaches an open Shadow DOM to the marker div.
   3. Renders an isolated `<StandaloneApp>` inside the shadow root with its own
      `StyleRegistry` and `StyleInjectionTargetContext`.
-  4. Optionally hydrates pre-rendered SSG markup that was written into the
-     marker by the SSG step.
 - Multiple islands on the same host page share neither React state, theme
   state, query cache, nor injected styles.
+
+The `xmlui-island.umd.js` bundle is built in CI alongside
+`xmlui-standalone.umd.js`, via a new `build:xmlui-island` script in
+`xmlui/package.json` and a new `case "island"` arm in `xmlui/vite.config.ts`.
+This is not a user-facing CLI command.
 
 ### Why Shadow DOM (and not just CSS scoping)
 
@@ -81,10 +92,20 @@ DOM element. The contract:
 
 - Shadow DOM blocks form auto-fill / extensions for some sites and breaks
   CSS `@font-face` resolution from external stylesheets — mitigations
-  documented in step 8.
-- React's HMR + shadow root works in dev but the island bundle is UMD-only.
+  documented in step 6.
 - Hash-based routing is undesirable for embedded apps; islands default to
   memory routing.
+
+### Relationship to the website SSG pipeline
+
+The XMLUI website uses its own SSG pipeline (`xmlui ssg`). **Islands are
+orthogonal to that pipeline.** Islands render purely client-side; the host
+server is responsible for its own HTML. Islands do not produce, consume, or
+extend the SSG output.
+
+The only risk islands pose to the website SSG is at build time: edits to shared
+files (`vite.config.ts`, `AppWrapper.tsx`, `StandaloneApp.tsx`) could silently
+break the SSG build **SPECIALLY WITH CHANGES TO THEMING**. The W-SSG smoke check guards against that regression.
 
 ---
 
@@ -100,9 +121,9 @@ console error, or hydration mismatch as a failure even if exit code is 0.
 |----|-----|--------------------------|-----------------|
 | **E** | E2E (smoke subset) | `npm run test-smoke` (or full test for risky steps `npm run test`) | All green; no new flakes |
 | **W-DEV** | Website (Vite dev) | `npm run -w website start` | Loads at `http://localhost:5173`; nav between Docs / Blog / a few component pages; check theme toggle |
-| **W-SSG** | Website SSG | `npm run -w website build-ssg && npm run -w website preview-ssg` | (1) Build completes without errors, (2) `dist-ssg/index.html` and `dist-ssg/docs/index.html` exist and contain pre-rendered XMLUI markup (NOT just an empty `<div id="root">`), (3) preview at `http://localhost:3000` shows content **before** JS hydration (disable JS in DevTools, reload), (4) re-enable JS, navigate around — no hydration warnings in console, search and links work |
-| **STD** | Standalone UMD | `npm run -w xmlui build:xmlui-standalone`, coppy the resulting umd file into a standalone project (which shall be created) then open it with a web server | UMD bundle loads; classic standalone app boots |
-| **ISL** | Islands UMD | `npm run -w xmlui build:xmlui-islands`, coppy the resulting umd file and source-map into the temp-islands folder, then open it with a web server | Both islands render in their own shadow roots; click events work; counters / state independent |
+| **W-SSG** | Website SSG (regression check) | `npm run -w website build-ssg && npm run -w website preview-ssg` | (1) Build completes without errors, (2) `dist-ssg/index.html` and `dist-ssg/docs/index.html` exist and contain pre-rendered XMLUI markup (NOT just an empty `<div id="root">`), (3) preview at `http://localhost:3000` shows content **before** JS hydration (disable JS in DevTools, reload), (4) re-enable JS, navigate around — no hydration warnings in console, search and links work |
+| **STD** | Standalone UMD | `npm run -w xmlui build:xmlui-standalone`, copy the resulting umd file into a standalone project (which shall be created) then open it with a web server | UMD bundle loads; classic standalone app boots |
+| **ISL** | Islands UMD (CDN mode) | `npm run -w xmlui build:xmlui-island`, copy the resulting umd file and source-map into the temp-islands folder, serve with a static file server | Both islands render in their own shadow roots; click events work; counters / state independent |
 
 **The single most important regression check is W-SSG**, because its failures
 are silent (`xmlui ssg` exits 0 even when nothing was pre-rendered). A reusable
@@ -145,7 +166,7 @@ run, and what could regress.
 **Modify**: `xmlui/src/index.ts` — re-export `startIslands` so
 `temp-islands/index.ts`'s existing import resolves.
 
-**Smoke**: `E`, `ISL-CSR` (just verifies the banner + tagged markers in DOM).
+**Smoke**: `E`, `ISL` (just verifies the banner + tagged markers in DOM).
 
 **Risk**: zero. Pure additive export.
 
@@ -168,7 +189,7 @@ mounted on a Shadow DOM.
 marker. Track roots in a module-level `WeakMap<HTMLElement, Root>` so
 re-invocations unmount the previous root before remounting.
 
-**Smoke**: `U`, `ISL`, plus a quick visual on **DEMO-D** (because
+**Smoke**: `E`, `ISL`, plus a quick visual on **DEMO-D** (because
 `NestedApp` uses the same shadow-DOM path and devtools demo is the easiest
 manual repro for portal/style issues).
 
@@ -196,15 +217,16 @@ need each app rooted at its own folder.
    today's behavior exactly.
 
 **Smoke**: **the full matrix minus islands**.
-Justification: this is the first step that edits shared code paths; if any
-fetch site is missed the SSG output silently regresses (the original failure
-mode you described). W-SSG plus the verification snippet from §2 catches it.
+Justification: this is the first step that edits shared code paths. `StandaloneApp`
+is used by both the islands path and the website's SSG pipeline. If any fetch
+site is missed, the website's SSG build silently regresses (the original
+failure mode). W-SSG plus the verification snippet from §2 catches it.
 
 Also, manually exercise `<StandaloneApp basePath="./bio" />` from a temporary
 test page or a Vitest fixture to confirm the new code path works in isolation
 before any island wiring.
 
-Note that there's a window.__PUBLIC_PATH option, which could interfere with this feature. It should be independent of that.
+Note that there's a `window.__PUBLIC_PATH` option, which could interfere with this feature. It should be independent of that.
 
 **Risk**: high. Mitigations: funnel through one helper; add a Vitest unit test
 that asserts every known fetch site composes URLs through that helper
@@ -235,8 +257,9 @@ host page would make every island react to the same URL). Implementation:
 thread `routerMode` into `AppWrapper.tsx` (today only `useHashBasedRouting`
 exists; add `useMemoryRouter` as a peer).
 
-**Smoke**: **E**, **ISL**, plus **W-SSG** again (because router-mode
-plumbing edits `AppWrapper.tsx`, which the SSG path uses via `StaticRouter`).
+**Smoke**: **E**, **ISL**, plus **W-SSG** (because router-mode plumbing edits
+`AppWrapper.tsx`, which the website's SSG pipeline uses via `StaticRouter` —
+regression check only).
 
 **Verify in ISL**:
 - Both islands render their real `Main.xmlui` content.
@@ -250,108 +273,11 @@ JSON or icon sprite — caught by the verification list above.
 
 ---
 
-### Step 5 — SSG for islands (MVP) — **brought forward to deal with SSG risk early**
+### Step 5 — `xmlui-island` Vite build mode (UMD bundle)
 
-Rationale: SSG bugs are the most expensive to debug and historically slipped
-past tests. Land an MVP SSG path now, while the island stack is still small
-and the diff against the current SSG pipeline is minimal.
-
-**Scope of MVP** (deliberately narrow):
-
-- One CLI command: `xmlui island ssg <hostHtml> [--out dist-ssg]`.
-- Reads the host HTML file, finds every `<div data-xmlui-src="./folder">`.
-- For each folder, invokes the existing
-  [getSsgEntrySource](xmlui/src/nodejs/bin/ssg.ts#L262) machinery on that
-  folder's `src/`. Reuses `renderPath("/")` to obtain
-  `{markup, ssrStyles, ssrHashes, htmlClasses, ...}`.
-- Inserts the markup as the `innerHTML` of the marker div, wrapped in a
-  `<template data-xmlui-island-prerender>` element so the runtime can later
-  move it inside a shadow root (step 6).
-- Emits the per-island SSR styles as
-  `<template data-xmlui-island-styles="<folder>" data-ssr-hashes="...">`
-  next to the marker.
-- Copies the island's source folder verbatim into `dist-ssg/<folder>/` so
-  runtime fetches still resolve.
-- Drops Helmet output (titles/meta) for islands so the host page's `<head>`
-  is not polluted.
-
-**Implementation notes**:
-
-- Refactor `getSsgEntrySource` to take a `srcDir` parameter (today it
-  hard-codes `./src`). The existing single-app `xmlui ssg` keeps its current
-  default; the new island flow passes the marker folder.
-- Run the per-island SSR builds **serially** in one Node process to keep the
-  diff small. Optimize later.
-- Print which markers were processed and their pre-rendered byte length.
-  Fail fast if any island produced `<200` bytes (the silent-regression
-  signature).
-
-**Smoke**:
-- **U**, **W-SSG** (regression check on the existing SSG pipeline — the
-  refactor of `getSsgEntrySource` could break it). Run the §2 verification
-  snippet against `website/dist-ssg`.
-- **ISL-SSG**:
-  1. `cd temp-islands && xmlui island ssg index.html`
-  2. Open `dist-ssg/index.html` in a text editor; both marker divs must
-     contain a `<template data-xmlui-island-prerender>` block with real XMLUI
-     markup. Run an inline check:
-     ```bash
-     grep -c "data-xmlui-island-prerender" temp-islands/dist-ssg/index.html
-     # Expect 2 (one per island marker).
-     ```
-  3. `npx preview-ssg ./dist-ssg` and visit `http://localhost:3000`.
-  4. With JS enabled, both islands hydrate and stay interactive (full
-     "before-hydration paint" check is part of step 6).
-
-**Risk**: high. Mitigations:
-- Keep the existing `xmlui ssg` code path untouched aside from the `srcDir`
-  refactor.
-- New code lives in a new file (`xmlui/src/nodejs/bin/island-ssg.ts`) that
-  imports and reuses helpers from `ssg.ts`.
-
----
-
-### Step 6 — Hydration of SSG output inside Shadow DOM
-
-Now make the SSG output actually paint before hydration.
-
-**Plan**:
-
-1. `IslandRoot` mount logic, in this order:
-   - Read `<template data-xmlui-island-prerender>` and
-     `<template data-xmlui-island-styles>` from the host marker (if present),
-     pull their `.content`.
-   - `attachShadow`, append the styles template content + the prerender
-     template content as the shadow root's children.
-   - Call `ReactDOM.hydrateRoot(shadowRoot.firstElementChild, <App ... />)`
-     instead of `createRoot` when prerender markup was present.
-2. Pass the SSR `StyleRegistry` cache (serialized from the SSR-emitted hashes)
-   into the island's `StyleProvider` so client-side `useStyles` skips
-   re-injecting.
-3. If no prerender template exists, fall back to the step-4 `createRoot` path.
-
-**Smoke**:
-- **U**, **E** (full).
-- **W-SSG** (regression — hydration code lives near shared helpers).
-- **ISL-SSG** with a stricter check: with JS disabled, **island content is
-  visible** (no FOUC); with JS enabled, console has no `Hydration failed`
-  warnings; clicking a button in the prerendered island works.
-- **DEMO-D**: smoke `NestedApp` again because the shadow-root + StyleProvider
-  changes overlap with this code.
-
-**Risk**: high. React hydration into shadow roots produces obscure mismatch
-errors. Mitigations:
-- Add a Playwright spec under `xmlui/tests-e2e/islands/` that asserts initial
-  HTML contains island markup, and post-hydration the page is interactive
-  with no console warnings (use `page.on('console')`).
-- Provide a `STARTISLANDS_DEBUG=1` env flag that logs each step of the
-  template-extraction and hydration path so future debugging is cheap.
-
----
-
-### Step 7 — `xmlui-island` Vite build mode (UMD bundle)
-
-Produce `dist/island/xmlui-island.umd.js` as the script the host page loads.
+Produce `dist/island/xmlui-island.umd.js` — the script a host page loads via
+a `<script>` tag. This is the step that unlocks the primary delivery target
+(CDN/no-build mode). No Vite dev server, no build step on the host site.
 
 **Modify** `xmlui/vite.config.ts`: add a `case "island"` arm mirroring
 `standalone` (entry `src/index-island.ts`, `name: "xmluiIsland"`,
@@ -383,19 +309,19 @@ export default { ...xmluiExports, standalone: Xmlui, startIslands };
 `./island`.
 
 **Smoke**:
-- **U**, **STD** (build the standalone UMD afterward to confirm the
-  standalone arm of `vite.config.ts` was not perturbed).
-- Manual island UMD test: replace `temp-islands/index.ts` with a
-  `<script src=".../xmlui-island.umd.js">` tag and verify both islands
-  render with no Vite dev server.
+- **W-SSG**, **STD** (build the standalone UMD afterward to confirm the
+  standalone arm of `vite.config.ts` was not perturbed by the new `island` arm).
+- **ISL** (CDN mode verification): serve `temp-islands/` with the UMD script
+  tag (no Vite dev server); both islands must render.
 
-**Risk**: low. Build modes are independent.
+**Risk**: low. Build modes are independent; the main regression risk is
+inadvertently touching the `standalone` or `lib` arms of the switch.
 
 ---
 
-### Step 8 — Style/theme isolation hardening
+### Step 6 — Style/theme isolation hardening
 
-Address issues surfaced in steps 2/4/6 that the smoke matrix flagged:
+Address issues surfaced in steps 2 and 4 that the smoke matrix flagged:
 
 1. **Global CSS reset**: `StandaloneApp.tsx` does
    `import "../index.scss"` which lands in `document.head` and would affect
@@ -409,11 +335,11 @@ Address issues surfaced in steps 2/4/6 that the smoke matrix flagged:
    Verify against a Modal-using island.
 
 **Smoke**:
-- **U**, **E** (full).
-- **ISL-CSR** with an aggressive host CSS test:
+- **E** (full).
+- **ISL** with an aggressive host CSS test:
   add `<style>* { color: red !important; box-shadow: 0 0 0 2px lime !important; }</style>`
   to the host head — islands must remain unaffected.
-- **ISL-CSR** with a Modal-using island fixture — modal must portal inside
+- **ISL** with a Modal-using island fixture — modal must portal inside
   the island's shadow root, not the host body.
 - **DEMO-D**, **DEMO-A** — re-verify because they exercise NestedApp /
   shadow-root + animations, which share these code paths.
@@ -422,60 +348,44 @@ Address issues surfaced in steps 2/4/6 that the smoke matrix flagged:
 
 ---
 
-### Step 9 — `tools/preview-ssg` adjustments
-
-Verify it serves `.xmlui` and `.xs` files with a sensible MIME (currently
-neither is in `mimeTypes` in
-[preview-ssg/src/index.js](tools/preview-ssg/src/index.js#L7)). Add
-`"text/xml"` mappings if needed.
-
-**Smoke**: **W-SSG** (existing user), **ISL-SSG** (new user).
-
-**Risk**: trivial.
-
----
-
-### Step 10 — `xmlui island` CLI surface
-
-Wrap step 5's `island-ssg.ts` and add convenience:
-- `xmlui island build` — for each marker folder, run the existing app build
-  pipeline.
-- `xmlui island ssg` — already added in step 5; finalize CLI args.
-- `xmlui island start` — Vite dev server that serves the host HTML and
-  injects the dev-mode `xmlui` entry.
-
-**Smoke**: full matrix — these commands wrap existing `build`/`ssg` flows;
-running W-SSG and STD again confirms no regression.
-
-**Risk**: low.
-
----
-
-### Step 11 — No-build (CDN) mode
-
-Lowest priority. Once steps 1–8 are stable, the no-build mode is automatic:
-the host page adds `<script src=".../xmlui-island.umd.js"></script>` and
-markers work because all source loading is runtime fetch (matching today's
-`xmlui-standalone` model).
-
-**Smoke**: **ISL-CSR** with `temp-islands/index.html` stripped of
-`index.ts`/Vite, served via `npx preview-ssg ./temp-islands`.
-
-**Risk**: low.
-
----
-
-### Step 12 — Tests, docs, changeset
+### Step 7 — Tests, docs, changeset
 
 - Unit tests under `xmlui/tests/components-core/Islands/`: marker discovery,
-  basePath normalization, hydration template extraction.
+  basePath normalization, shadow-root mount lifecycle.
 - Playwright specs under `xmlui/tests-e2e/islands/`:
   - Two-island isolation (state, theme, click events).
   - Host-CSS-leak protection.
-  - SSG hydration round-trip (no console warnings).
   - Modal portal containment.
 - AI doc: `.ai/xmlui/islands.md` summarizing the public API.
 - Changeset: `.changeset/xmlui-islands.md` (`"xmlui": patch`).
+
+**Smoke**: **E** (full), **W-SSG**.
+
+---
+
+### Step 8 — Unify standalone and islands outputs (LOW PRIORITY)
+
+The `xmlui-standalone` and `xmlui-island` bundles are nearly identical: both
+bundle everything, expose React globals, and auto-start on `DOMContentLoaded`.
+The only difference is the entry point (`startApp` vs `startIslands`).
+
+Explore whether a single UMD bundle can cover both use cases, with the mode
+determined at runtime rather than at build time. Options:
+
+- Export both `startApp` and `startIslands` from one bundle; the host page
+  calls whichever it needs.
+- Detect markers at startup: if `[data-xmlui-src]` elements are present,
+  activate islands mode; otherwise fall back to `#root` single-app mode.
+- Keep the bundles separate but extract a shared base bundle to avoid
+  duplicating framework code.
+
+This step is deliberately vague because the right approach depends on what
+emerges from steps 1–8. Treat it as a design spike before committing to an
+implementation.
+
+**Risk**: medium. Unifying entry points touches CI build scripts and the
+public bundle URL contract. Only proceed if the duplication is genuinely
+costly.
 
 ---
 
@@ -500,13 +410,17 @@ export function startIslands(options?: StartIslandsOptions): IslandsHandle;
 
 Bundle artifacts:
 
-- `xmlui/dist/island/xmlui-island.umd.js` (new, via `build:xmlui-island`)
+- `xmlui/dist/island/xmlui-island.umd.js` (new, via `build:xmlui-island` in CI)
 - Existing `xmlui/dist/standalone/xmlui-standalone.umd.js` (unchanged)
 - Existing `xmlui/dist/lib/*` (unchanged)
 
-CLI artifacts:
+Host page usage (no build step required):
 
-- `xmlui island build`, `xmlui island ssg`, `xmlui island start`.
+```html
+<script src="https://cdn.example.com/xmlui-island.umd.js"></script>
+<div data-xmlui-src="./bio"></div>
+<div data-xmlui-src="./checkout-form"></div>
+```
 
 ---
 
@@ -514,18 +428,14 @@ CLI artifacts:
 
 | Step | Deliverable | Smoke rows | Acceptance gate |
 |------|-------------|------------|-----------------|
-| 1 | `startIslands` stub | U, ISL-CSR | Banner + tagged markers |
-| 2 | Per-marker shadow-root mount | U, ISL-CSR, DEMO-D | Placeholder visible, host CSS isolated |
+| 1 | `startIslands` stub | E, ISL | Banner + tagged markers |
+| 2 | Per-marker shadow-root mount | E, ISL, DEMO-D | Placeholder visible, host CSS isolated |
 | 3 | `basePath` plumbing | **Full matrix minus islands** | W-SSG verification snippet passes |
-| 4 | Real island rendering (CSR) | U, ISL-CSR, W-SSG | Two apps run independently |
-| 5 | Islands SSG MVP | U, W-SSG, ISL-SSG | Pre-rendered markup present in `dist-ssg/index.html` |
-| 6 | Shadow-root hydration | U, E (full), W-SSG, ISL-SSG, DEMO-D | No FOUC, no hydration warnings |
-| 7 | `xmlui-island.umd.js` build | U, STD, manual UMD test | UMD script tag works without Vite |
-| 8 | Style/theme isolation hardening | U, E, ISL-CSR (aggressive CSS), DEMO-D, DEMO-A | All visual regression tests pass |
-| 9 | preview-ssg adjustments | W-SSG, ISL-SSG | `.xmlui` served correctly |
-| 10 | `xmlui island` CLI | Full matrix | Single command builds + previews `temp-islands` |
-| 11 | No-build mode | ISL-CSR (no Vite) | CDN script tag suffices |
-| 12 | Tests + docs + changeset | U, E (full) | CI green; docs published |
+| 4 | Real island rendering (CSR) | E, ISL, W-SSG | Two apps run independently |
+| 5 | `xmlui-island.umd.js` build | W-SSG, STD, ISL (CDN mode) | Script tag works, no Vite needed |
+| 6 | Style/theme isolation hardening | E, ISL (aggressive CSS), DEMO-D, DEMO-A | All visual regression tests pass |
+| 7 | Tests + docs + changeset | E (full), W-SSG | CI green; docs published |
+| 8 | Unify standalone + islands (low priority) | STD, ISL | Design spike complete |
 
 Land each step as its own PR (or commit) with a passing smoke gate. **Do not
 proceed until W-SSG passes the verification snippet** — that is the historical
@@ -537,7 +447,10 @@ silent-failure mode.
 
 - Cross-island communication (pub/sub, shared store).
 - Lazy / intersection-observer based island activation.
+- Island-specific SSG pre-rendering: islands render purely client-side. The
+  host server (Django, Rails, etc.) is responsible for its own HTML; XMLUI
+  does not provide tooling to pre-render island content into that HTML.
+- `xmlui island` CLI commands (`island build`, `island ssg`, `island start`):
+  the island bundle is produced in CI only, exactly like `xmlui-standalone`.
+  There is no user-facing `xmlui island` subcommand.
 - SSR streaming.
-- Server-side data fetching during SSG (islands SSG renders only the static
-  shell; data-bound components remain client-rendered after hydration, as in
-  the current `xmlui ssg`).
