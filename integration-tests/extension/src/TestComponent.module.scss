@@ -1,0 +1,25 @@
+@use "xmlui/themes.scss" as t;
+
+$themeVars: ();
+@function createThemeVar($v) {
+  $themeVars: t.appendThemeVar($themeVars, $v) !global;
+  @return t.getThemeVar($themeVars, $v);
+}
+
+$componentName: "TestComponent";
+$backgroundColor: createThemeVar("backgroundColor-#{$componentName}");
+$textColor: createThemeVar("textColor-#{$componentName}");
+
+@layer components {
+  .testComponent {
+    background-color: $backgroundColor;
+    color: $textColor;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-weight: bold;
+  }
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
