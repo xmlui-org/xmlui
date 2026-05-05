@@ -16,8 +16,22 @@ import { ScriptExtractor } from "../parsers/scripting/ScriptExtractor";
 import * as fs from "fs/promises";
 import { errReportComponent, xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { CollectedDeclarations } from "../components-core/script-runner/ScriptingSourceTree";
+import { analyze } from "../components-core/analyzer/walker";
 
-export type PluginOptions = object;
+export type AnalyzeMode = "off" | "warn" | "strict";
+
+export type PluginOptions = {
+  /**
+   * Control the build-time static analyzer.
+   *
+   * - `"off"` — analyzer disabled entirely.
+   * - `"warn"` (default) — analyzer runs; diagnostics are emitted as Vite
+   *   warnings; the build always succeeds.
+   * - `"strict"` — analyzer runs with `strict: true`; error-severity
+   *   diagnostics cause the build to fail.
+   */
+  analyze?: AnalyzeMode;
+};
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);
 const xmluiScriptExtension = new RegExp(`.${codeBehindFileExtension}$`);
@@ -28,6 +42,7 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  */
 export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plugin {
   let projectRoot = "";
+  const analyzeMode: AnalyzeMode = pluginOptions.analyze ?? "warn";
 
   // Helper to normalize Windows paths to use forward slashes
   const normalizePath = (p: string) => p.replace(/\\/g, "/");
@@ -100,6 +115,23 @@ export default function viteXmluiPlugin(pluginOptions: PluginOptions = {}): Plug
         }
         if (warnings.length > 0) {
           warnings.forEach((msg) => this.warn(`[xmlui] ${msg}`));
+        }
+
+        // --- Run static analyzer when not disabled
+        if (analyzeMode !== "off") {
+          try {
+            const strict = analyzeMode === "strict";
+            const analyzerDiags = analyze({ files: [{ file: fileId, source: code }], strict });
+            for (const diag of analyzerDiags) {
+              if (diag.severity === "error" && strict) {
+                this.error(`[xmlui-check] ${diag.code}: ${diag.message}`);
+              } else {
+                this.warn(`[xmlui-check] ${diag.code}: ${diag.message}`);
+              }
+            }
+          } catch (_analyzerErr) {
+            // Analyzer errors must never break the build
+          }
         }
         const file = {
           component,

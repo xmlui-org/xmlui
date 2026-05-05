@@ -9,6 +9,7 @@ import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import AdmZip from "adm-zip";
 import { buildLib } from "./build-lib";
+import { check } from "./check";
 
 process.on("unhandledRejection", (err) => {
   throw err;
@@ -248,6 +249,47 @@ async function run() {
           fallbackFile: getStringArg(fallback, "200"),
           debug: getBoolArg(debug, false),
           contentDir: getStringArg(contentDir, "content"),
+        });
+      },
+    )
+    .command<{ dir?: string; format?: string; strict?: boolean; rule?: string[]; noRule?: string[] }>(
+      "check [dir]",
+      "Run static analyzer on .xmlui files",
+      (yargs) => {
+        return yargs
+          .positional("dir", {
+            type: "string",
+            description: "Directory to scan (default: current directory)",
+          })
+          .option("format", {
+            type: "string",
+            choices: ["gnu", "json"],
+            default: "gnu",
+            description: "Output format",
+          })
+          .option("strict", {
+            type: "boolean",
+            default: false,
+            description: "Treat warn-severity findings as errors",
+          })
+          .option("rule", {
+            type: "string",
+            array: true,
+            description: "Include only findings with this rule code",
+          })
+          .option("no-rule", {
+            type: "string",
+            array: true,
+            description: "Exclude findings with this rule code",
+          });
+      },
+      async (argv) => {
+        await check({
+          dir: argv.dir ?? process.cwd(),
+          format: (argv.format ?? "gnu") as "gnu" | "json",
+          strict: argv.strict ?? false,
+          includeRules: argv.rule ?? [],
+          excludeRules: argv.noRule ?? [],
         });
       },
     )

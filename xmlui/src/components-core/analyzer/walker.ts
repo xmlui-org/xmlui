@@ -32,7 +32,7 @@ export interface AnalyzerInputFile {
 
 export interface AnalyzerInput {
   files: ReadonlyArray<AnalyzerInputFile>;
-  componentRegistry: ComponentRegistry;
+  componentRegistry?: ComponentRegistry;
   /**
    * When `true`, every rule's `strictSeverity` overrides its `defaultSeverity`.
    * Controlled by `App.appGlobals.strictBuildValidation`.
@@ -57,7 +57,7 @@ export function analyze(input: AnalyzerInput): BuildDiagnostic[] {
       source: fileEntry.source,
       markupAst: fileEntry.markupAst,
       exprAst: fileEntry.exprAst,
-      componentRegistry: input.componentRegistry,
+      componentRegistry: input.componentRegistry as ComponentRegistry,
       strict: input.strict,
     };
 

@@ -19,10 +19,17 @@ export type {
 export { defaultAuditPolicy } from "./policy";
 
 export { redact } from "./redactor";
-export { sample } from "./sampler";
+export { sample, sampleEntry, drainTailBuffer } from "./sampler";
 
 export type { TraceContext } from "./correlation";
 export { currentContext, withSpan, injectTraceparent } from "./correlation";
 
 export type { AuditSink } from "./sink";
 export { createOtlpSink, createConsoleSink } from "./sink";
+
+export type { PiiCategory, PiiMatch } from "./heuristics";
+export { detectPii } from "./heuristics";
+
+export { matchesSelector } from "./redactor";
+
+export { BOOT_TRACE_ID } from "./correlation";

@@ -45,6 +45,7 @@ registerRule({
 
     const root = ctx.markupAst as ComponentDef;
     const registry = ctx.componentRegistry;
+    if (!registry) return []; // no registry available in this context
     // Cache the name list lazily — only built once per `run` call.
     let allNames: readonly string[] | undefined;
 

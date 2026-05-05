@@ -248,6 +248,23 @@ export type ComponentPropertyMetadata = {
 
   // Optional message to display if the property is deprecated
   deprecationMessage?: string;
+
+  /**
+   * Audit / PII classification metadata for this property.
+   *
+   * The audit pipeline (plan #15 Phase 2) uses this to apply default redaction
+   * rules before forwarding log entries to sinks.  When a property is marked
+   * `sensitive` or `secret`, the runtime will redact its value unless an
+   * explicit policy overrides the default.
+   *
+   * - `"public"` — no redaction required.
+   * - `"sensitive"` — mild PII (email, name, …); hashed by default.
+   * - `"secret"` — high-sensitivity value (password, token, …); masked by default.
+   */
+  audit?: {
+    classification: "public" | "sensitive" | "secret";
+    defaultRedaction?: "mask" | "drop" | "hash";
+  };
 };
 
 // This type defines the metadata of a component event. It is used to describe the
