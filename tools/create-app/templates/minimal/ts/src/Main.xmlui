@@ -1,0 +1,27 @@
+<App>
+  <AppHeader>
+    <H3>My XMLUI App</H3>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>
+  <Pages>
+    <Page url="/">
+      <VStack padding="1.5rem" gap="1rem">
+        <Markdown>
+          <![CDATA[
+# Welcome to XMLUI!
+
+This is a minimal XMLUI starter app. Edit `src/Main.xmlui` to get started.
+          ]]>
+        </Markdown>
+        <Button
+          label="{('Clicked ' + count + (count === 1 ? ' time' : ' times'))}"
+          var.count="{0}"
+          onClick="count++" />
+      </VStack>
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>

@@ -6,6 +6,7 @@ import prompts from "prompts";
 import checkForUpdate from "update-check";
 import { createApp } from "./create-app";
 import { validateNpmName } from "./helpers/validate-pkg";
+import { TEMPLATE_TYPES, TEMPLATE_DESCRIPTIONS, type TemplateType } from "./templates";
 import packageJson from "./package.json";
 import { isFolderEmpty } from "./helpers/is-folder-empty";
 import fs from "fs";
@@ -37,6 +38,10 @@ const program = new Commander.Command(packageJson.name)
   .option(
     "--use-git",
     `Explicitly tell the CLI to initialize a git repository`
+  )
+  .option(
+    "--template <template>",
+    `Select a starter template (${TEMPLATE_TYPES.join(", ")})`
   )
   .allowUnknownOption()
   .parse(process.argv);
@@ -102,6 +107,37 @@ async function run(): Promise<void> {
     process.exit(1);
   }
 
+  if (program.template !== undefined && !TEMPLATE_TYPES.includes(program.template as TemplateType)) {
+    console.error(
+      `Unknown template: ${red(`"${program.template}"`)}.\nAvailable templates: ${TEMPLATE_TYPES.join(", ")}`
+    );
+    process.exit(1);
+  }
+
+  if (program.template === undefined) {
+    const { template } = await prompts(
+      {
+        onState: onPromptState,
+        type: 'select',
+        name: 'template',
+        message: 'Which starter template would you like to use?',
+        choices: TEMPLATE_TYPES.map((t) => ({
+          title: t,
+          description: TEMPLATE_DESCRIPTIONS[t as TemplateType],
+          value: t,
+        })),
+        initial: 0,
+      },
+      {
+        onCancel: () => {
+          console.error('Exiting.')
+          process.exit(1)
+        },
+      }
+    );
+    program.template = template as TemplateType;
+  }
+
   if (program.useGit === undefined) {
       const { useGit } = await prompts(
           {
@@ -132,7 +168,8 @@ async function run(): Promise<void> {
   await createApp({
     appPath: resolvedProjectPath,
     packageManager,
-    useGit: !!program.useGit
+    useGit: !!program.useGit,
+    template: (program.template ?? 'default') as TemplateType,
   });
 }
 

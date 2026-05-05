@@ -40,7 +40,7 @@ that delivers work on this dimension (see `00-master-plan.md` Section 4).
 |---|---|---|---|---|---|
 | 01 | Type contracts | ⬜ | W3 | — | — |
 | 02 | Themevars namespace | 🔄 | W0 | 2026-05 | W0-4 done: `themeNamespacePrefix` on `Extension`; canonical prefix table in `components-core/themevars/`; W1-5 done: `theming-missing-prefix` stub rule registered; Phases 2+ (lint rule body, migration) in later waves |
-| 03 | Reactive cycle detection | ⬜ | W2 | — | W2-7 = warn-only probe; W6-7 = full enforcement |
+| 03 | Reactive cycle detection | 🔄 | W2 | 2026-05 | W2-7 done: warn-only probe shipped — `components-core/reactive-graph/` (graph, Tarjan SCC, formatCycle, ReactiveCycleError) + `collectComponentDefGraph` walks vars/functions/loaders; AppContent runs analyzer once on mount, emits `kind:"reactive-cycle"` trace + `console.warn` per unique cycle (deduped via `cycleHash`); `appGlobals.strictReactiveGraph` documented (escalates to `console.error`); W6-7 = full enforcement (toasts, LSP, Vite build failure) |
 | 04 | Managed lifecycle vocabulary | ⬜ | W3 | — | — |
 | 05 | Enforced accessibility | 🔄 | W1 | 2026-05 | W1-4 done: `A11yDiagnostic`, `A11yCode`, `lintComponentDef()` in `components-core/accessibility/`; `a11y` block on `ComponentMetadata`; Phase 1 rules active; Phase 2+ (runtime enforcement, ARIA attribute injection) in later waves |
 | 06 | Cooperative concurrency | ⬜ | W3 | — | W3-6 = `$cancel` API probe; W7-1 = runtime |
@@ -50,9 +50,9 @@ that delivers work on this dimension (see `00-master-plan.md` Section 4).
 | 10 | Defended routing | ⬜ | W4 | — | — |
 | 11 | i18n foundations | ⬜ | W4 | — | — |
 | 12 | Enforced versioning | ⬜ | W6 | — | — |
-| 13 | Build-validation analyzers | 🔄 | W0 | 2026-05 | W0-1 done: `BuildDiagnostic`, rule registry, walker, suppression stubs; W1-1/2/3 done: 10 rules active/stubbed (id-unknown-component/prop/event active; expr-dead-conditional/handler-no-value active; 5 stubs); Phase 2+ (scope analysis, AST integration) in later waves |
+| 13 | Build-validation analyzers | 🔄 | W0 | 2026-05 | W0-1 done: `BuildDiagnostic`, rule registry, walker, suppression stubs; W1-1/2/3 done: 10 rules active/stubbed (id-unknown-component/prop/event active; expr-dead-conditional/handler-no-value active; 5 stubs); W2-5 done: LSP diagnostic provider wired through `analyze()`, Vite plugin `analyze: "off"|"warn"|"strict"` option, `xmlui check [dir]` CLI command (GNU/JSON formats, rule include/exclude filters); W2-6 done: `check` script + `xmlui.config.json` + `.github/workflows/check.yml` in create-app template; Phase 2+ (scope analysis, AST integration) in later waves |
 | 14 | UDC sandbox | ⬜ | W5 | — | W5-9 = declared-contract probe; W6-1–3 = enforcement |
-| 15 | Audit-grade observability | 🔄 | W0 | 2026-05 | W0-3 done: `AuditPolicy`, redactor/sampler/correlation/sink stubs in `components-core/audit/`; Phase 1 (correlation IDs) in W2 |
+| 15 | Audit-grade observability | 🔄 | W0 | 2026-05 | W0-3 done: `AuditPolicy`, redactor/sampler/correlation/sink stubs in `components-core/audit/`; W2-1 done: W3C Trace Context (`correlation.ts` with span stack, `BOOT_TRACE_ID`, `injectTraceparent`); RestApiProxy injects `traceparent` for same-origin requests; XsLogEntry stamped with `spanId`/`parentSpanId`; W2-2 done: dot-path PII redactor (wildcards, drop>hash>mask precedence, FNV-1a hash) + content heuristics (JWT/email/CC/SSN/API-key/phone/IPv4) + `audit` field on `ComponentPropertyMetadata`; W2-3 done: head + tail sampling with LRU memoization, `pushXsLog` overflow modes (`drop-oldest`/`drop-newest`/`block`); W2-4 done: OTLP/JSON sink (1s batch, exp-backoff, beacon on unload) + console group sink; W3-5 = component metadata `audit` flag sweep |
 | 16 | Concurrent-state determinism | ⬜ | W4 | — | W4-8 = happens-before contract probe; W7-2 = FIFO scheduler |
 
 ---
