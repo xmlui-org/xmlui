@@ -1,0 +1,56 @@
+<App layout="vertical-sticky">
+  <AppHeader>
+    <H3>My Docs</H3>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>
+  <NavPanel scrollStyle="whenScrolling" showScrollerFade="true">
+    <NavLink label="Introduction" to="/" icon="home" />
+    <NavGroup label="Getting Started" initiallyExpanded="true" icon="bookmark">
+      <NavLink label="Quick Start" to="/quick-start" />
+      <NavLink label="Installation" to="/installation" />
+      <NavLink label="Configuration" to="/configuration" />
+    </NavGroup>
+    <NavGroup label="Guides" icon="document">
+      <NavLink label="Core Concepts" to="/guides/core-concepts" />
+      <NavLink label="Advanced Usage" to="/guides/advanced" />
+    </NavGroup>
+    <NavGroup label="API Reference" icon="code">
+      <NavLink label="Overview" to="/api/overview" />
+      <NavLink label="Endpoints" to="/api/endpoints" />
+    </NavGroup>
+    <NavLink label="Changelog" to="/changelog" icon="list" />
+  </NavPanel>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <Introduction />
+    </Page>
+    <Page url="/quick-start">
+      <QuickStart />
+    </Page>
+    <Page url="/installation">
+      <Installation />
+    </Page>
+    <Page url="/configuration">
+      <Configuration />
+    </Page>
+    <Page url="/guides/core-concepts">
+      <CoreConcepts />
+    </Page>
+    <Page url="/guides/advanced">
+      <AdvancedUsage />
+    </Page>
+    <Page url="/api/overview">
+      <ApiOverview />
+    </Page>
+    <Page url="/api/endpoints">
+      <ApiEndpoints />
+    </Page>
+    <Page url="/changelog">
+      <Changelog />
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>

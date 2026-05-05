@@ -1,0 +1,19 @@
+<Component name="PostCard">
+  <Card>
+    <VStack gap="0.75rem">
+      <Link to="{'/post/' + $props.post.slug}" noIndicator>
+        <H3>{$props.post.title}</H3>
+      </Link>
+      <Text color="$color-surface-500" fontSize="$fontSize-sm">
+        {$props.post.author} · {$props.post.date}
+      </Text>
+      <Text>{$props.post.description}</Text>
+      <HStack gap="0.5rem" when="{$props.post.tags && $props.post.tags.length > 0}">
+        <Items data="{$props.post.tags}">
+          <PostTag>{$item}</PostTag>
+        </Items>
+      </HStack>
+      <Link to="{'/post/' + $props.post.slug}" label="Read more →" />
+    </VStack>
+  </Card>
+</Component>

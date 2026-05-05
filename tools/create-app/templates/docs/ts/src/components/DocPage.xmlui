@@ -1,0 +1,16 @@
+<Component name="DocPage">
+  <HStack gap="3rem" padding="2rem" verticalAlignment="start">
+    <VStack width="*" gap="1rem">
+      <Slot />
+    </VStack>
+    <TableOfContents
+      width="200px"
+      omitH1="true"
+      maxHeadingLevel="3"
+      scrollStyle="whenScrolling"
+      showScrollerFade="true"
+      when-md="true"
+      when="false"
+    />
+  </HStack>
+</Component>

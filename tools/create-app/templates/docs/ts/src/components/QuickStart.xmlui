@@ -1,0 +1,55 @@
+<Component name="QuickStart">
+  <DocPage>
+    <Markdown>
+      <![CDATA[
+# Quick Start
+
+Get your project up and running in under five minutes.
+
+## Prerequisites
+
+- Node.js 18 or later
+- npm, yarn, or pnpm
+
+## Step 1: Install Dependencies
+
+```bash
+npm install
+```
+
+## Step 2: Start the Dev Server
+
+```bash
+npm start
+```
+
+The app will be available at `http://localhost:3000`. Changes to `.xmlui` files
+are reflected immediately without a full page reload.
+
+## Step 3: Build for Production
+
+```bash
+npm run build
+```
+
+The compiled output lands in `dist/`. Serve it from any static host — GitHub Pages,
+Netlify, Vercel, or your own server.
+
+## Step 4: Preview the Production Build
+
+```bash
+npm run preview
+```
+
+Spins up a local server that serves the `dist/` folder exactly as it will appear
+in production.
+
+## Next Steps
+
+- [Installation](/installation) — detailed setup options
+- [Configuration](/configuration) — configure XMLUI for your project
+- [Core Concepts](/guides/core-concepts) — learn how XMLUI works
+      ]]>
+    </Markdown>
+  </DocPage>
+</Component>

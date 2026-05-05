@@ -1,0 +1,89 @@
+<Component name="Installation">
+  <DocPage>
+    <Markdown>
+      <![CDATA[
+# Installation
+
+This page covers different ways to install and set up your project.
+
+## Using create-xmlui-app
+
+The fastest way to start a new project is with the official scaffolding tool:
+
+```bash
+npx create-xmlui-app my-app --template docs
+cd my-app
+npm start
+```
+
+## Manual Installation
+
+If you prefer to set up a project by hand:
+
+### 1. Create a directory
+
+```bash
+mkdir my-docs && cd my-docs
+npm init -y
+```
+
+### 2. Install XMLUI
+
+```bash
+npm install xmlui
+```
+
+### 3. Create the entry point
+
+Create `index.ts`:
+
+```ts
+import { startApp } from "xmlui";
+export const runtime = import.meta.glob(`/src/**`, { eager: true });
+startApp(runtime);
+```
+
+### 4. Create the markup
+
+Create `src/Main.xmlui`:
+
+```xml
+<App>
+  <Pages>
+    <Page url="/">
+      <Text>Hello, XMLUI!</Text>
+    </Page>
+  </Pages>
+</App>
+```
+
+### 5. Start the dev server
+
+```bash
+npx xmlui start
+```
+
+## System Requirements
+
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| Node.js     | 18.x    | 20.x+       |
+| npm         | 9.x     | 10.x+       |
+| Browser     | Chrome 100+, Firefox 100+, Safari 15+ | Latest |
+
+## Troubleshooting
+
+**Port already in use**
+```bash
+npx xmlui start --port 3001
+```
+
+**Missing dependencies**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+      ]]>
+    </Markdown>
+  </DocPage>
+</Component>
