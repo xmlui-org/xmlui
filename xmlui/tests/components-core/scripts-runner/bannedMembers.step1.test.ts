@@ -336,8 +336,8 @@ describe("Eval-tree strict mode — real banned globals throw BannedApiError", (
     expect(() => evalBindingExpression("localStorage", ctx)).toThrow(BannedApiError);
   });
 
-  it("accessing console throws in strict mode", () => {
-    const ctx = strictCtx();
+  it("accessing console throws in strict mode (allowConsole: false)", () => {
+    const ctx = createEvalContext({ localContext: {}, options: { strictDomSandbox: true, allowConsole: false } });
     expect(() => evalBindingExpression("console", ctx)).toThrow(BannedApiError);
   });
 
@@ -382,10 +382,10 @@ describe("Eval-tree warn mode — real banned globals emit console.warn", () => 
     }
   });
 
-  it("accessing console emits console.warn", () => {
+  it("accessing console emits console.warn when allowConsole: false", () => {
     const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
     try {
-      const ctx = warnCtx();
+      const ctx = createEvalContext({ localContext: {}, options: { strictDomSandbox: false, allowConsole: false } });
       expect(() => evalBindingExpression("console", ctx)).not.toThrow();
       expect(warnSpy).toHaveBeenCalled();
     } finally {

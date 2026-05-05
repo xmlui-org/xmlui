@@ -27,7 +27,7 @@ open plan items.
 | HTTP centralisation + CSRF + origin allowlist | ✅ | 2026-04 | `App.fetch` gate via `RestApiProxy`; raw `fetch`/`XHR`/`WebSocket`/`EventSource`/`sendBeacon` banned |
 | Fetch lifecycle | ✅ | 2026-04 | React Query + `AbortController`; stale requests cancelled on key change / unmount |
 | Observability substrate | ✅ | 2026-04 | `pushXsLog` circular buffer + Inspector overlay; all trace `kind` types registered |
-| DOM-API isolation | ✅ | 2026-04 | Property-access guard (`isBannedMember`) + 99-entry denylist + sanctioned `App.*` / `Log.*` / `Clipboard.*` / `<WebSocket>` / `<EventSource>` replacements |
+| DOM-API isolation | ✅ | 2026-04 | Property-access guard (`isBannedMember`) + 99-entry denylist + sanctioned `App.*` / `Log.*` / `Clipboard.*` / `<WebSocket>` / `<EventSource>` replacements. `console` remains in the denylist but is **allowed by default** via `appGlobals.allowConsole` (default `true`); set to `false` to restore sandbox-warn/throw behavior. |
 
 ---
 

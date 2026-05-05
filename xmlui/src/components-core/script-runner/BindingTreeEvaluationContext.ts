@@ -101,6 +101,16 @@ export type EvalTreeOptions = {
    * inspector module.
    */
   sandboxWarnLogger?: (entry: { api?: string; help?: string; text: string }) => void;
+  /**
+   * When `true` (the default), expressions may read and call `console.*`
+   * methods (e.g. `console.log`, `console.warn`) without triggering a sandbox
+   * warning or error. Set to `false` to enforce the ban and migrate call sites
+   * to `Log.*()` functions.
+   *
+   * Default: `true` — console access is **allowed** unless explicitly opted out.
+   * Set via `App.appGlobals.allowConsole` in config.json or the App component.
+   */
+  allowConsole?: boolean;
 };
 
 // This function gets an object to pass as an implicit context when invoking a function on "objectWithFunction"
