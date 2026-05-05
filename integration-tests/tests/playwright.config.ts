@@ -9,9 +9,6 @@ const portViteBuild = 3214;
 const portViteSSG = 3215;
 
 export default defineConfig({
-  testDir: ".",
-  workers: 1,
-  expect: { timeout: 15000 },
   use: { ...devices["Desktop Chrome"], channel: "chromium" },
   webServer: [
     {
@@ -54,6 +51,7 @@ export default defineConfig({
     },
     {
       name: "vite-start",
+      expect: { timeout: 15_000 },
       use: { baseURL: `http://localhost:${portViteStart}` },
     },
   ],

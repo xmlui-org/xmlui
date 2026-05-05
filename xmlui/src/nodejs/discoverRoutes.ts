@@ -47,20 +47,19 @@ export async function discoverRoutes(options: DiscoverRoutesOptions = {}): Promi
 
   if (!pagesComp) {
     const componentFiles = await glob("**/*.xmlui", {
-      cwd: srcDir,
       nodir: true,
     });
 
     for (const file of componentFiles) {
-      const filePath = path.join(srcDir, file);
       try {
-        const content = await readFile(filePath, "utf-8");
-        const result = xmlUiMarkupToComponent(content, filePath);
-        if (result.errors.length === 0 && result?.component && "component" in result.component) {
-          const innerCompDef = result.component.component;
-          const maybePageComp = getPagesComponent(innerCompDef);
+        const content = await readFile(file, "utf-8");
+        const result = xmlUiMarkupToComponent(content, file);
+        if (result.errors.length === 0) {
+          const component =
+            "component" in result.component ? result.component.component : result.component;
+          const maybePageComp = getPagesComponent(component);
           if (maybePageComp) {
-            compDef = innerCompDef;
+            compDef = component;
             pagesComp = maybePageComp;
             break;
           }

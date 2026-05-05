@@ -1,14 +1,14 @@
 <App>
-<NavPanel>
-    <NavLink to="/" label="Home" />
-    <NavLink to="/about" label="About" />
-</NavPanel>
-<Pages fallbackPath="/">
-    <Page url="/">
-        <Home/>
-    </Page>
-    <Page url="/about">
-      <About/>
-    </Page>
+    <NavPanel>
+        <NavLink to="/" label="Home" />
+        <NavLink to="/about" label="About" />
+    </NavPanel>
+    <Pages fallbackPath="/">
+        <Page url="/">
+            <Home/>
+        </Page>
+        <Page url="/about">
+            <About/>
+        </Page>
   </Pages>
 </App>

@@ -14,7 +14,7 @@ test("TestComponent renders via extension", async ({ page }) => {
 
 test("routing to /about works", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("navigation", { name: "About" }).click();
+  await page.getByRole("link", { name: "About" }).click();
   await expect(page.getByRole("heading", { name: "About Page" })).toBeVisible();
-  await expect(page).toHaveURL(/about?\/$/);
+  await expect(page).toHaveURL(/\/about\/?$/);
 });
