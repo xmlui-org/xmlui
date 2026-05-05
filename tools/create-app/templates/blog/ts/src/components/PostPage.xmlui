@@ -1,0 +1,43 @@
+<Component name="PostPage">
+  <script>
+  var post = ($props.posts || []).find(function(p) { return p.slug === $routeParams.slug; });
+  </script>
+
+  <VStack when="{!post}" padding="2rem" gap="1rem" horizontalAlignment="center">
+    <H2>Post not found</H2>
+    <Text>The post you are looking for does not exist.</Text>
+    <Link to="/" label="← Back to all posts" />
+  </VStack>
+
+  <CHStack when="{!!post}">
+    <VStack maxWidth="720px" width="100%" padding="2rem" gap="1.5rem">
+      <Link to="/" noIndicator>← All posts</Link>
+
+      <VStack gap="0.5rem">
+        <H1>{post && post.title}</H1>
+        <Text color="$color-surface-500" fontSize="$fontSize-lg">
+          {post && post.description}
+        </Text>
+      </VStack>
+
+      <HStack gap="1rem" verticalAlignment="center">
+        <Text color="$color-surface-500" fontSize="$fontSize-sm">
+          {post && post.author} · {post && post.date}
+        </Text>
+      </HStack>
+
+      <HStack gap="0.5rem" when="{post && post.tags && post.tags.length > 0}">
+        <Items data="{post ? post.tags : []}">
+          <PostTag>{$item}</PostTag>
+        </Items>
+      </HStack>
+
+      <ContentSeparator />
+
+      <Markdown content="{post ? post.content : ''}" />
+
+      <ContentSeparator />
+      <Link to="/" label="← Back to all posts" />
+    </VStack>
+  </CHStack>
+</Component>

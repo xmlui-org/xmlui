@@ -1,0 +1,14 @@
+<Component name="PostList">
+  <VStack maxWidth="720px" marginHorizontal="auto" padding="2rem" gap="2rem">
+    <VStack gap="0.5rem">
+      <H1>Blog</H1>
+      <Text color="$color-surface-500">
+        {$props.posts.length} {$props.posts.length === 1 ? 'post' : 'posts'}
+      </Text>
+    </VStack>
+    <ContentSeparator />
+    <Items data="{$props.posts}">
+      <PostCard post="{$item}" />
+    </Items>
+  </VStack>
+</Component>

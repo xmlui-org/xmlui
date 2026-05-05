@@ -1,0 +1,16 @@
+{
+  "analyze": "warn",
+  "rules": {
+    "id-unknown-component": "warn",
+    "id-unknown-prop": "warn",
+    "id-unknown-event": "warn",
+    "id-unknown-slot": "warn",
+    "expr-unbound-identifier": "warn",
+    "expr-unused-var": "info",
+    "expr-dead-conditional": "info",
+    "expr-handler-no-value": "warn",
+    "id-undefined-component-ref": "warn",
+    "id-undefined-form-ref": "warn",
+    "theming-missing-prefix": "warn"
+  }
+}

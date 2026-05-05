@@ -1,0 +1,136 @@
+<Component name="ApiEndpoints">
+  <DocPage>
+    <Markdown>
+      <![CDATA[
+# API Reference — Endpoints
+
+## Posts
+
+### List Posts
+
+```
+GET /posts
+```
+
+**Query parameters**
+
+| Parameter | Type    | Default | Description |
+|-----------|---------|---------|-------------|
+| `page`    | integer | 1       | Page number |
+| `perPage` | integer | 20      | Items per page (max 100) |
+| `tag`     | string  | —       | Filter by tag slug |
+
+**Example response**
+
+```json
+{
+  "data": [
+    {
+      "id": "abc123",
+      "title": "Hello World",
+      "slug": "hello-world",
+      "author": "Jane Smith",
+      "tags": ["intro", "news"],
+      "publishedAt": "2025-01-15T10:00:00Z"
+    }
+  ],
+  "meta": { "page": 1, "perPage": 20, "total": 42 }
+}
+```
+
+---
+
+### Get Post
+
+```
+GET /posts/:slug
+```
+
+**Path parameters**
+
+| Parameter | Type   | Description |
+|-----------|--------|-------------|
+| `slug`    | string | Post slug   |
+
+**Example response**
+
+```json
+{
+  "data": {
+    "id": "abc123",
+    "title": "Hello World",
+    "slug": "hello-world",
+    "content": "# Hello World\n\nThis is the full post content...",
+    "author": "Jane Smith",
+    "tags": ["intro", "news"],
+    "publishedAt": "2025-01-15T10:00:00Z"
+  }
+}
+```
+
+---
+
+### Create Post
+
+```
+POST /posts
+```
+
+**Request body**
+
+```json
+{
+  "title": "My New Post",
+  "content": "# My New Post\n\nContent here...",
+  "tags": ["news"]
+}
+```
+
+**Response** — `201 Created`
+
+---
+
+### Update Post
+
+```
+PATCH /posts/:slug
+```
+
+**Request body** — any subset of Post fields.
+
+**Response** — `200 OK` with updated post.
+
+---
+
+### Delete Post
+
+```
+DELETE /posts/:slug
+```
+
+**Response** — `204 No Content`
+
+---
+
+## Tags
+
+### List Tags
+
+```
+GET /tags
+```
+
+**Example response**
+
+```json
+{
+  "data": [
+    { "slug": "news", "label": "News", "count": 12 },
+    { "slug": "tutorial", "label": "Tutorial", "count": 8 }
+  ]
+}
+```
+      ]]>
+    </Markdown>
+  </DocPage>
+</Component>

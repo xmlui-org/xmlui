@@ -1,0 +1,54 @@
+<Component name="Introduction">
+  <DocPage>
+    <Markdown>
+      <![CDATA[
+# Introduction
+
+Welcome to **My Docs** — the documentation site for your project.
+
+This template was built with [XMLUI](https://xmlui.org) and gives you a fully functional
+documentation site out of the box. Edit the pages in `src/components/` to add your own content.
+
+## What You Get
+
+This docs template includes:
+
+- **Sidebar navigation** with collapsible groups and icons
+- **Table of contents** that auto-builds from headings on each page
+- **Markdown support** for all your documentation content
+- **Dark / light mode** toggle in the header
+- **Responsive layout** that works on mobile and desktop
+
+## How It's Structured
+
+```
+src/
+├── Main.xmlui            ← app shell, navigation, routing
+└── components/
+    ├── DocPage.xmlui     ← content wrapper with TOC sidebar
+    ├── Introduction.xmlui
+    ├── QuickStart.xmlui
+    ├── Installation.xmlui
+    ├── Configuration.xmlui
+    ├── CoreConcepts.xmlui
+    ├── AdvancedUsage.xmlui
+    ├── ApiOverview.xmlui
+    ├── ApiEndpoints.xmlui
+    └── Changelog.xmlui
+```
+
+Each page is an XMLUI component that wraps its content in `<DocPage>`.
+The `DocPage` component renders the content alongside a Table of Contents sidebar.
+
+## Getting Started
+
+1. Edit the `<NavPanel>` in `src/Main.xmlui` to update the sidebar links.
+2. Add or remove `<Page>` entries in the `<Pages>` block.
+3. Create a corresponding `.xmlui` file in `src/components/` for each new page.
+4. Replace the placeholder Markdown with your actual documentation.
+
+Head over to the [Quick Start](/quick-start) guide to see the next steps.
+      ]]>
+    </Markdown>
+  </DocPage>
+</Component>

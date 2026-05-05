@@ -1,0 +1,94 @@
+<Component name="Configuration">
+  <DocPage>
+    <Markdown>
+      <![CDATA[
+# Configuration
+
+All configuration lives in `xmlui.config.json` at the root of your project.
+
+## xmlui.config.json
+
+```json
+{
+  "analyze": "warn",
+  "rules": {
+    "id-unknown-component": "warn",
+    "id-unknown-prop": "warn",
+    "id-unknown-event": "warn",
+    "expr-unbound-identifier": "warn"
+  }
+}
+```
+
+## App Configuration
+
+The app's name, version, and resources are set in `src/config.ts`:
+
+```ts
+import type { StandaloneAppDescription } from "xmlui";
+
+const App: StandaloneAppDescription = {
+  name: "My Docs",
+  version: "0.1.0",
+  resources: {
+    logo: "resources/xmlui-logo.svg",
+    favicon: "resources/favicon.ico",
+  },
+};
+
+export default App;
+```
+
+## Theming
+
+XMLUI ships with a powerful theming system. You can override any design token by wrapping
+your app in a `<Theme>` component.
+
+### Changing the primary color
+
+```xml
+<Theme color-primary-500="#6366f1">
+  <App layout="vertical-sticky">
+    ...
+  </App>
+</Theme>
+```
+
+### Dark mode
+
+XMLUI supports automatic dark/light mode detection:
+
+```xml
+<App autoDetectTone="true">
+  ...
+</App>
+```
+
+## Environment Variables
+
+Create a `.env.local` file for local overrides (not committed to git):
+
+```
+VITE_API_BASE_URL=http://localhost:8080
+```
+
+Access them in XMLUI via:
+
+```xml
+<App var.apiBase="{import.meta.env.VITE_API_BASE_URL}">
+  ...
+</App>
+```
+
+## Build Rules
+
+| Rule | Values | Description |
+|------|--------|-------------|
+| `analyze` | `off`, `warn`, `error` | Static analysis level |
+| `id-unknown-component` | `off`, `warn`, `error` | Flag unknown component names |
+| `id-unknown-prop` | `off`, `warn`, `error` | Flag unknown property names |
+| `expr-unbound-identifier` | `off`, `warn`, `error` | Flag undefined variables in expressions |
+      ]]>
+    </Markdown>
+  </DocPage>
+</Component>
