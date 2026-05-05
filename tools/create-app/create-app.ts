@@ -12,13 +12,14 @@ import { installTemplate } from "./templates";
 export async function createApp({
   appPath,
   packageManager,
-  useGit
+  useGit,
+  template
 }: {
   appPath: string;
   packageManager: PackageManager;
   useGit: boolean;
+  template: TemplateType;
 }): Promise<void> {
-  const template: TemplateType = "default";
   const root = path.resolve(appPath);
 
   if (!(await isWriteable(path.dirname(root)))) {
