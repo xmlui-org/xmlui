@@ -52,6 +52,12 @@ export type StandaloneAppDescription = {
    *   trace entry is emitted — nothing reaches the browser console. Useful in production
    *   deployments where trace data is exported to a server sink. This flag does NOT re-enable
    *   direct `console` access from expressions; that is governed by `strictDomSandbox`.
+   * - `allowConsole` (boolean, default `true`) — when `true` (the default), expressions may
+   *   freely access `console.*` methods (e.g. `console.log(msg)`). Set to `false` to enforce
+   *   the sandbox ban and migrate call sites to `Log.*()` functions. Unlike `strictDomSandbox`
+   *   which controls throw-vs-warn for *all* banned APIs, `allowConsole` is a targeted opt-out
+   *   exclusively for `console`. When `false`, a `strictDomSandbox: true` config throws
+   *   `BannedApiError`; without strict mode it emits a `sandbox:warn` trace entry.
    * - `allowedOrigins` (string[], default `undefined`) — when set, `App.fetch()` rejects any
    *   request whose target origin is not in this list before reaching the network. Origins
    *   must be fully-qualified (e.g. `"https://api.example.com"`). Same-origin requests are

@@ -389,3 +389,106 @@ describe("Default behaviour (strictDomSandbox not set)", () => {
     expect(value).toBe("test-value");
   });
 });
+
+// ---------------------------------------------------------------------------
+// 7. allowConsole feature switch
+// ---------------------------------------------------------------------------
+
+describe("allowConsole feature switch", () => {
+  it("allows console access by default (no options set)", () => {
+    // console is in BANNED_GLOBAL_KEYS but handleMemberBan bypasses it when
+    // allowConsole is not explicitly false.
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({ localContext: {} });
+      // In jsdom, window.console is globalThis.console — just accessing it must
+      // not trigger a sandbox warning.
+      const val = evalBindingExpression("console", ctx);
+      expect(val).toBeDefined();
+      // No sandbox warning should have been emitted.
+      const sandboxWarns = warnSpy.mock.calls.filter((args) =>
+        typeof args[0] === "string" && args[0].includes("[XMLUI sandbox]"),
+      );
+      expect(sandboxWarns).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("allows console access when allowConsole: true is explicit", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({ localContext: {}, options: { allowConsole: true } });
+      const val = evalBindingExpression("console", ctx);
+      expect(val).toBeDefined();
+      const sandboxWarns = warnSpy.mock.calls.filter((args) =>
+        typeof args[0] === "string" && args[0].includes("[XMLUI sandbox]"),
+      );
+      expect(sandboxWarns).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("emits a sandbox warning for console when allowConsole: false (warn mode)", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { allowConsole: false, strictDomSandbox: false },
+      });
+      // Access still returns the value (warn mode).
+      const val = evalBindingExpression("console", ctx);
+      expect(val).toBeDefined();
+      // Exactly one [XMLUI sandbox] warning must have been emitted.
+      const sandboxWarns = warnSpy.mock.calls.filter((args) =>
+        typeof args[0] === "string" && args[0].includes("[XMLUI sandbox]"),
+      );
+      expect(sandboxWarns).toHaveLength(1);
+      expect(sandboxWarns[0][0]).toContain("window.console");
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("throws BannedApiError for console when allowConsole: false + strictDomSandbox: true", () => {
+    const ctx = createEvalContext({
+      localContext: {},
+      options: { allowConsole: false, strictDomSandbox: true },
+    });
+    expect(() => evalBindingExpression("console", ctx)).toThrow(BannedApiError);
+  });
+
+  it("member access console.log is allowed by default", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({ localContext: {} });
+      // window.console.log — the isBannedMember check fires on 'console' key.
+      const val = evalBindingExpression("console.log", ctx);
+      expect(typeof val).toBe("function");
+      const sandboxWarns = warnSpy.mock.calls.filter((args) =>
+        typeof args[0] === "string" && args[0].includes("[XMLUI sandbox]"),
+      );
+      expect(sandboxWarns).toHaveLength(0);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+
+  it("member access console.log warns when allowConsole: false", () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      const ctx = createEvalContext({
+        localContext: {},
+        options: { allowConsole: false, strictDomSandbox: false },
+      });
+      evalBindingExpression("console.log", ctx);
+      const sandboxWarns = warnSpy.mock.calls.filter((args) =>
+        typeof args[0] === "string" && args[0].includes("[XMLUI sandbox]"),
+      );
+      expect(sandboxWarns).toHaveLength(1);
+    } finally {
+      warnSpy.mockRestore();
+    }
+  });
+});

@@ -202,6 +202,7 @@ export function createEventHandlers(config: EventHandlerConfig) {
               ? appContext.appGlobals.defaultToOptionalMemberAccess
               : true,
           strictDomSandbox: appContext.appGlobals?.strictDomSandbox === true,
+          allowConsole: appContext.appGlobals?.allowConsole !== false,
           sandboxWarnLogger: (entry) =>
             pushXsLog({ kind: "sandbox:warn", ts: Date.now(), ...entry }),
         },

@@ -32,16 +32,21 @@ import { isBannedMember, type BannedMemberResult } from "./bannedMembers";
  * - In **warn mode** (default): emits `console.warn` so the access is visible
  *   in DevTools, and also pushes a `"sandbox:warn"` trace entry so it appears
  *   in the Inspector when verbose logging is active.
+ * - `console` access is **allowed by default** (`allowConsole !== false`).
+ *   Pass `allowConsole: false` in options to enforce the ban.
  *
  * Call this immediately after `isBannedMember()` returns `{ banned: true }`.
  * When `result.banned` is `false`, this function is a no-op.
  */
 function handleMemberBan(
   result: BannedMemberResult,
-  strict: boolean,
-  warnLogger?: EvalTreeOptions["sandboxWarnLogger"],
+  options?: EvalTreeOptions,
 ): void {
   if (!result.banned) return;
+  // console access is allowed unless the caller explicitly opts out.
+  if (result.api === "window.console" && options?.allowConsole !== false) return;
+  const strict = options?.strictDomSandbox ?? false;
+  const warnLogger = options?.sandboxWarnLogger;
   const msg = `DOM API access to '${result.api}' is not allowed in XMLUI expressions.${
     result.help ? ` ${result.help}` : ""
   }`;
@@ -165,7 +170,7 @@ export function evalIdentifier(
   // --- Check whether this global identifier is on the banned list.
   if (idScope.type === "global") {
     const banResult = isBannedMember(valueScope, valueIndex as string);
-    handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
+    handleMemberBan(banResult, evalContext.options);
   }
   value = valueScope[valueIndex];
   const newValue: ValueResult = {
@@ -208,7 +213,7 @@ export function evalMemberAccessCore(
   const parentObj = getExprValue(expr.obj, thread)?.value;
   // --- Check banned member access (read path).
   const banResult = isBannedMember(parentObj, expr.member);
-  handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
+  handleMemberBan(banResult, evalContext.options);
   const value =
     expr.opt || evalContext.options?.defaultToOptionalMemberAccess
       ? parentObj?.[expr.member]
@@ -239,7 +244,7 @@ export function evalCalculatedMemberAccessCore(
   const memberObj = getExprValue(expr.member, thread)?.value;
   // --- Check banned member access (calculated read path).
   const banResult = isBannedMember(parentObj, memberObj);
-  handleMemberBan(banResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
+  handleMemberBan(banResult, evalContext.options);
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? parentObj?.[memberObj]
     : parentObj[memberObj];
@@ -436,7 +441,7 @@ export function evalAssignmentCore(
 
   // --- Check banned member access (write path).
   const writeBanResult = isBannedMember(leftScope, leftIndex as string);
-  handleMemberBan(writeBanResult, evalContext.options?.strictDomSandbox ?? false, evalContext.options?.sandboxWarnLogger);
+  handleMemberBan(writeBanResult, evalContext.options);
 
   thisStack.pop();
   switch (expr.op) {
