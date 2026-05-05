@@ -32,6 +32,7 @@ registerRule({
 
     const root = ctx.markupAst as ComponentDef;
     const registry = ctx.componentRegistry;
+    if (!registry) return []; // no registry available in this context
     const severity = ctx.strict ? "error" : "warn";
     const diagnostics: BuildDiagnostic[] = [];
 

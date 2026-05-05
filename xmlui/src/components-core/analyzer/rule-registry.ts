@@ -30,7 +30,7 @@ export interface RuleContext {
    */
   exprAst?: unknown;
   /** The merged component registry (core + extensions + in-app UDCs). */
-  componentRegistry: ComponentRegistry;
+  componentRegistry?: ComponentRegistry;
   /** When `true`, every rule's default severity is escalated one step (up to `error`). */
   strict: boolean;
 }

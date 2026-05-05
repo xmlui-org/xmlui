@@ -259,6 +259,11 @@
                         label="Hosted Deployment"
                         to="/docs/guides/hosted-deployment"
                     />
+                    <NavLink
+                        icon="search"
+                        label="Using the Inspector"
+                        to="/docs/guides/inspector"
+                    />
                     <NavGroup
                         icon="braces"
                         label="Wrapping and Theming"

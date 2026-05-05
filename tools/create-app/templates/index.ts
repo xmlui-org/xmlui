@@ -56,6 +56,7 @@ export const installTemplate = async ({ appName, root, packageManager, template,
       preview: "xmlui preview",
       "build-prod": "npm run build -- --prod",
       "release-ci": "npm run build-prod && xmlui zip-dist",
+      check: "xmlui check src --format gnu",
     },
     /**
      * Default dependencies.

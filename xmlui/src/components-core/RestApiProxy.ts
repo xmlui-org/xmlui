@@ -14,6 +14,7 @@ import { randomUUID, readCookie } from "./utils/misc";
 import { GenericBackendError } from "./EngineError";
 import { processStatementQueue } from "./script-runner/process-statement-sync";
 import type { IApiInterceptor } from "./interception/abstractions";
+import { injectTraceparent } from "./audit/correlation";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 
@@ -606,6 +607,16 @@ export default class RestApiProxy {
       const xsrfToken = readCookie("XSRF-TOKEN");
       if (xsrfToken) {
         aggregatedHeaders["X-XSRF-TOKEN"] = xsrfToken;
+      }
+    }
+
+    // Inject W3C traceparent for same-origin requests when a span is active
+    if (isURLSameOrigin(url)) {
+      const traceHeaders = new Headers();
+      injectTraceparent(traceHeaders);
+      const traceparent = traceHeaders.get("traceparent");
+      if (traceparent) {
+        aggregatedHeaders["traceparent"] = traceparent;
       }
     }
 
