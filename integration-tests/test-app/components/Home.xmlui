@@ -1,0 +1,6 @@
+<Component name="Home">
+    <Stack>
+        <Heading level="h1" value="Home Page" />
+        <TestComponent label="hello from home" />
+    </Stack>
+</Component>

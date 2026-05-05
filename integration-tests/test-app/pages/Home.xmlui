@@ -1,4 +1,0 @@
-<Fragment>
-  <TestComponent label="hello from home" />
-  <NavLink label="Go to About" to="/about" />
-</Fragment>

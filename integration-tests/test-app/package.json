@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "xmlui start --port 3211 --withMock false",
+    "start": "xmlui start --withMock false",
     "build": "xmlui build --buildMode=INLINE_ALL --withMock false",
-    "preview": "xmlui preview --port 3211",
+    "preview": "xmlui preview",
     "ssg": "xmlui ssg",
-    "setup:standalone": "node setup-standalone.mjs"
+    "serve": "serve . -s",
+    "setup:standalone": "node scripts/setup-standalone.mjs"
   },
   "dependencies": {
     "xmlui": "*",

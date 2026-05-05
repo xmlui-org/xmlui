@@ -20,11 +20,7 @@ const TestComponentMd = createMetadata({
 });
 
 function TestComponentRender({ label }: { label?: string }) {
-  return (
-    <div className={styles.testComponent} data-testid="test-component">
-      TestComponent: {label}
-    </div>
-  );
+  return <div className={styles.testComponent}>TestComponent: {label}</div>;
 }
 
 export const testComponentRenderer = wrapComponent(COMP, TestComponentRender, TestComponentMd);

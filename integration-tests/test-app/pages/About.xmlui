@@ -1,4 +1,0 @@
-<Fragment>
-  <Heading level="h1" value="About Page" />
-  <NavLink label="Back to Home" to="/" />
-</Fragment>

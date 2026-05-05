@@ -152,8 +152,8 @@
     "xmlui-integration-test-app#setup:standalone": {
       "dependsOn": ["xmlui#build:xmlui-standalone", "xmlui-test-extension#build:extension"],
       "outputs": [
-        "integration-tests/test-app/xmlui-standalone.umd.js",
-        "integration-tests/test-app/xmlui-test-extension.js"
+        "integration-tests/test-app/public/js/xmlui-standalone.umd.js",
+        "integration-tests/test-app/public/js/xmlui-test-extension.js"
       ]
     },
     "xmlui-integration-test-app#build": {

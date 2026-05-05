@@ -1,16 +1,14 @@
 <App>
-  <Pages fallbackPath="/">
+<NavPanel>
+    <NavLink to="/" label="Home" />
+    <NavLink to="/about" label="About" />
+</NavPanel>
+<Pages fallbackPath="/">
     <Page url="/">
-      <Fragment>
-        <TestComponent label="hello from home" />
-        <NavLink label="Go to About" to="/about" />
-      </Fragment>
+        <Home/>
     </Page>
     <Page url="/about">
-      <Fragment>
-        <Heading level="h1" value="About Page" />
-        <NavLink label="Back to Home" to="/" />
-      </Fragment>
+      <About/>
     </Page>
   </Pages>
 </App>
