@@ -10,7 +10,9 @@
     "./tools/create-app",
     "./tools/vscode",
     "./tools/preview-ssg",
-    "./packages/*"
+    "./packages/*",
+    "./integration-tests/extension",
+    "./integration-tests/test-app"
   ],
   "devDependencies": {
     "@changesets/cli": "^2.29.4",
@@ -35,6 +37,7 @@
     "build-extensions": "turbo run build:extension",
     "build-docs": "turbo run build:docs",
     "build-playground": "turbo run build:playground",
-    "generate-docs": "turbo run generate-docs"
+    "generate-docs": "turbo run generate-docs",
+    "test-integration": "turbo run //#test:integration && npx playwright test --config integration-tests/tests/playwright.config.ts; npm run --workspace=xmlui postpublish"
   }
 }

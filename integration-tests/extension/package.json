@@ -1,0 +1,19 @@
+{
+  "name": "xmlui-test-extension",
+  "type": "module",
+  "version": "0.1.0",
+  "sideEffects": ["**/*.css"],
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-test-extension.mjs",
+      "require": "./dist/xmlui-test-extension.js"
+    }
+  },
+  "scripts": {
+    "build:extension": "xmlui build-lib"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "files": ["dist"]
+}

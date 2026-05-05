@@ -1,0 +1,3 @@
+<Component name="About">
+    <Heading level="h1" value="About Page" />
+</Component>

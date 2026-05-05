@@ -143,6 +143,34 @@
       "env": ["PLAYWRIGHT_USE_DEV_SERVER"],
       "dependsOn": ["xmlui#build:xmlui-test-bed", "xmlui#test:unit"],
       "outputs": ["playwright-report/**"]
+    },
+    "xmlui-test-extension#build:extension": {
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.spec.ts", "!**/*.test.ts"],
+      "dependsOn": ["xmlui#build:xmlui"],
+      "outputs": ["dist/**"]
+    },
+    "xmlui-integration-test-app#setup:standalone": {
+      "dependsOn": ["xmlui#build:xmlui-standalone", "xmlui-test-extension#build:extension"],
+      "outputs": [
+        "integration-tests/test-app/public/js/xmlui-standalone.umd.js",
+        "integration-tests/test-app/public/js/xmlui-test-extension.js"
+      ]
+    },
+    "xmlui-integration-test-app#build": {
+      "dependsOn": ["xmlui#prepublishOnly", "xmlui-test-extension#build:extension"],
+      "outputs": ["integration-tests/test-app/dist/**"]
+    },
+    "xmlui-integration-test-app#ssg": {
+      "dependsOn": ["xmlui#prepublishOnly", "xmlui-test-extension#build:extension"],
+      "outputs": ["integration-tests/test-app/dist-ssg/**"]
+    },
+    "//#test:integration": {
+      "cache": false,
+      "dependsOn": [
+        "xmlui-integration-test-app#setup:standalone",
+        "xmlui-integration-test-app#build",
+        "xmlui-integration-test-app#ssg"
+      ]
     }
   }
 }

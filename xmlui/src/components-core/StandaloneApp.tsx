@@ -733,7 +733,7 @@ function resolveRuntime(runtime: Record<string, any>): {
         component: {
           ...compound.component,
           vars: {
-            ...compound.component.vars,
+            ...compound.component?.vars,
             ...componentCodeBehind?.vars,
           },
           functions: componentCodeBehind?.functions,

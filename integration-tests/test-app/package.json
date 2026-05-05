@@ -1,0 +1,19 @@
+{
+  "name": "xmlui-integration-test-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start --withMock false",
+    "build": "xmlui build --buildMode=INLINE_ALL --withMock false",
+    "build-ssg": "xmlui ssg",
+    "preview": "xmlui preview",
+    "preview-ssg": "preview-ssg dist-ssg",
+    "ssg": "xmlui ssg",
+    "serve": "serve . -s",
+    "setup:standalone": "node scripts/setup-standalone.mjs"
+  },
+  "dependencies": {
+    "xmlui": "*",
+    "xmlui-test-extension": "*"
+  }
+}

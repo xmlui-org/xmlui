@@ -273,7 +273,16 @@ import {
   StyleRegistry,
 } from "xmlui";
 
-const runtime = import.meta.glob("./src/**", { eager: true });
+const runtime = import.meta.glob([
+  "./**/*.xmlui",
+  "./**/*.xs",
+  "./**/config.ts",
+  "./**/config.js",
+  "./**/api.ts",
+  "./**/api.js",
+  "./**/themes/**/*.ts",
+  "./**/themes/**/*.js",
+], { eager: true });
 
 const loadedExtensions: any[] = [];
 async function loadExtensions() {
@@ -677,7 +686,7 @@ export const ssg = async ({
   await cp(distPath, outPath, { recursive: true });
 
   const shellHtml = await readFile(builtIndexPath, "utf-8");
-  const routeStore = await discoverRoutes({ srcDir: "src", contentDir });
+  const routeStore = await discoverRoutes({ contentDir });
   const pathsToRender = routeStore.staticRoutes();
   // Collision detection: a discovered page route must not share the base name of the fallback file.
   const fallbackBaseName = fallbackFile.replace(/\.html$/i, "");
