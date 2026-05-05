@@ -223,6 +223,11 @@ export interface XsLogEntry {
    *   `App.appGlobals.strictAccessibility` is truthy; produced by the accessibility
    *   module (plan #05). Contains `code: A11yCode`, `severity`, `componentName`,
    *   `message`, and optional `fix`.
+   * - `"reactive-cycle"` — a reactive dependency cycle detected at app startup by
+   *   the static graph analyzer (plan #03). Contains `severity: "warn" | "error"`,
+   *   `cycle: string[]` (node ids in order, cycle closed implicitly), `nodes` (resolved
+   *   `ReactiveNode[]`), `message` (human-readable diagnostic from `formatCycle`),
+   *   and `cycleId` (stable hash for deduplication within a session).
    */
   kind?: string;
   eventName?: string;

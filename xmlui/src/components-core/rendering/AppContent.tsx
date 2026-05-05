@@ -52,6 +52,12 @@ import {
   popTrace,
   splicePreservingInteractions,
 } from "../inspector/inspectorUtils";
+import {
+  collectComponentDefGraph,
+  findCycles,
+  formatCycle,
+  cycleHash,
+} from "../reactive-graph";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
@@ -389,6 +395,72 @@ export function AppContent({
   useEffect(() => {
     onInit?.();
   }, [onInit]);
+
+  // --- Reactive cycle detection — Plan #03 Phase 1 (warn-only probe).
+  // --- Runs once per AppContent mount, after children have been mounted.
+  // --- Detects cycles in the var/function/loader dependency graph and emits
+  // --- one `kind: "reactive-cycle"` trace entry per unique cycle. In strict
+  // --- mode (`appGlobals.strictReactiveGraph === true`), the entry is logged
+  // --- as a console.error in addition to the trace. Strict-mode toast and
+  // --- LSP/Vite enforcement land in W6.
+  const reportedCyclesRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!rootContainer) return;
+    let hits;
+    try {
+      const graph = collectComponentDefGraph(rootContainer);
+      hits = findCycles(graph);
+    } catch (err) {
+      // Analyzer must never break the app — swallow and stop.
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[xmlui] reactive-graph analyzer failed:", err);
+      }
+      return;
+    }
+    if (!hits || hits.length === 0) return;
+
+    const strict = (appGlobals as any)?.strictReactiveGraph === true;
+    const seen = reportedCyclesRef.current;
+
+    for (const hit of hits) {
+      const id = cycleHash(hit);
+      if (seen.has(id)) continue;
+      seen.add(id);
+
+      const message = formatCycle(hit);
+      const severity = strict ? "error" : (hit.severity ?? "warn");
+
+      // Always make the cycle visible in the dev console so it shows up
+      // even when xsVerbose is off (this is the warn-mode probe).
+      if (typeof console !== "undefined") {
+        if (severity === "error" && console.error) {
+          console.error(`[xmlui]\n${message}`);
+        } else if (console.warn) {
+          console.warn(`[xmlui]\n${message}`);
+        }
+      }
+
+      // And push to the trace pipeline so the Inspector tab can list it.
+      pushXsLog(
+        createLogEntry("reactive-cycle", {
+          severity,
+          cycleId: id,
+          cycle: hit.cycle,
+          nodes: hit.nodes.map((n) => ({
+            id: n.id,
+            kind: n.kind,
+            uri: n.uri,
+            range: n.range,
+          })),
+          message,
+        }),
+        xsLogMax,
+      );
+    }
+    // Intentionally not depending on `appGlobals` — we want one detection per
+    // mount, not per appGlobals identity change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootContainer]);
 
   // useEffect(()=>{
   //   if(isWindowFocused){

@@ -86,6 +86,13 @@ export type StandaloneAppDescription = {
    *   `missing-accessible-name`, `form-input-no-label`) escalate from `warn` to
    *   `error`, causing the Vite build to fail if any are present. In non-strict mode
    *   they are warnings only. See `dev-docs/plans/05-enforced-accessibility.md`.
+   * - `strictReactiveGraph` (boolean, default `false`) — when `true`, every
+   *   detected reactive cycle (var ↔ var, var ↔ DataSource, function-mediated)
+   *   produces a `kind:"reactive-cycle"` error trace entry plus a one-shot toast
+   *   (planned for W6). When `false` (the rollout warn phase default — W2-7), the
+   *   detector still runs at startup and emits a single `kind:"reactive-cycle"`
+   *   warn entry per unique cycle so teams can audit existing apps before the
+   *   strict default flips. See `dev-docs/plans/03-reactive-cycle-detection.md`.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
