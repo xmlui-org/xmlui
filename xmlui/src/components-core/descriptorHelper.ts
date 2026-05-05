@@ -141,4 +141,7 @@ export const behaviorPropKeys: readonly string[] = [
 export const behaviorEventKeys: readonly string[] = [
   // ValidationBehavior
   "validate",
+  // Lifecycle events — valid on any component via ComponentAdapter
+  "init",
+  "cleanup",
 ];

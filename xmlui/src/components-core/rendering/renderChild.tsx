@@ -55,8 +55,10 @@ export function renderChild({
   const shouldCheckWhen =
     !hasInitEvent || node.type === "TextNode" || node.type === "TextNodeCData";
 
+  const whenResolved = resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext);
+
   // --- Render only visible components (skip when check if component has init event)
-  if (shouldCheckWhen && !resolveResponsiveWhen(node.when, node.responsiveWhen, state, appContext)) {
+  if (shouldCheckWhen && !whenResolved) {
     return null;
   }
 
