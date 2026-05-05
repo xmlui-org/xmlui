@@ -12,7 +12,7 @@ The Inspector is **off by default** so production apps pay zero overhead. Turnin
 
 ```json
 {
-  "globals": {
+  "appGlobals": {
     "xsVerbose": true,
     "xsVerboseLogMax": 500
   }

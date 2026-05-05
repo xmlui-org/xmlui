@@ -2513,6 +2513,14 @@
                     content="{appGlobals.docsContent['pages/hosted-deployment.md']}"
                 />
             </Page>
+            <Page
+                url="/docs/guides/inspector"
+            >
+                <DocumentPage
+                    content="{appGlobals.docsContent['pages/inspector.md']}"
+                />
+            </Page>
+
             <Page url="/docs/change-log">
                 <ChangeLog />
             </Page>
