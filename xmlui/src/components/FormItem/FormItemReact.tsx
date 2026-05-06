@@ -530,6 +530,7 @@ export const FormItem = memo(forwardRef(function FormItem({
   return (
     <FormItemContext.Provider value={formItemContextValue}>
       <ItemWithLabel
+        ref={ref}
         id={inputId}
         labelPosition={labelPositionValue}
         label={label}

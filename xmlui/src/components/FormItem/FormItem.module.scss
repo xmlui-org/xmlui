@@ -156,15 +156,13 @@ $textColor-optionalTag-formItem: createThemeVar("textColor-optionalTag-formItem"
     width: 100%;
   }
 
-  // Outer wrapper around a form-bound input. Without these, when the input
-  // sits in a horizontal Stack the wrapper takes its intrinsic content size
-  // and breaks the equal flex distribution we get for the same input outside
-  // a Form (where the LabelBehavior puts ItemWithLabel — which is width:100%
-  // — directly into the flex container).
+  // Outer wrapper around a form-bound input. Use display:contents so the
+  // wrapper does not generate a box and the inner ItemWithLabel becomes the
+  // direct flex child of the surrounding Stack — preserving any width/flex
+  // resolved on the input (e.g. width="*" vs width="$space-40") instead of
+  // the wrapper getting flex-distributed equally with its siblings.
   .validationWrapper {
-    width: 100%;
-    flex-shrink: 1;
-    min-width: 0;
+    display: contents;
   }
 
   // When a FormItem is inside a horizontal Stack, the validation message must not
