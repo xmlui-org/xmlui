@@ -266,7 +266,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
         >
           <div
             className={classnames(styles.selectValue, {
-              [styles.placeholder]: value === undefined,
+              [styles.placeholder]: !selectedOption && !readOnly,
             })}
           >
             {selectedOption
