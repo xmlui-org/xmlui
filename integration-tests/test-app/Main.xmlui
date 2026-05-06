@@ -1,33 +1,14 @@
 <App>
-  <Form
-    data="{{ sector:'', companyName: '', domain: '' }}"
-    savePendingLabel="Checking domain..."
-    submitFeedbackDelay="150"
-    saveLabel="Register"
-    onSubmit="(data) => toast('Registered: ' + data.domain)"
-  >
-    <HStack wrapContent>
-      <Select width="$space-40" label="Sector" bindTo="sector" placeholder="Select sector">
-        <Option value="technology">Technology</Option>
-        <Option value="finance">Finance</Option>
-        <Option value="healthcare">Healthcare</Option>
-      </Select>
-      <TextBox width="*" label="Company name" bindTo="companyName" required="true" />
-    </HStack>
-    <TextBox
-      label="Company domain"
-      bindTo="domain"
-      required="true"
-      customValidationsDebounce="500"
-      validationDisplayDelay="600"
-      onValidate="(value) => {
-        if (!value) return null;
-        delay(1000);
-        return value.startsWith('Q')
-          ? value + ' is already registered. Please choose another.'
-          : null;
-      }"
-      placeholder="e.g. acme.com (domain starting with Q is taken)"
-    />
-  </Form>
+  <NavPanel>
+    <NavLink to="/" label="Home" />
+    <NavLink to="/about" label="About" />
+  </NavPanel>
+  <Pages fallbackPath="/">
+    <Page url="/">
+      <Home />
+    </Page>
+    <Page url="/about">
+      <About />
+    </Page>
+  </Pages>
 </App>
