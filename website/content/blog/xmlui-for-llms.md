@@ -6,19 +6,19 @@ author: "Jon Udell"
 date: "2026-05-06"
 ---
 
-The [Get Started](https://docs.xmlui.org/get-started) page is a five-minute path from nothing to a running XMLUI app, a Claude Code or Codex session that can read the XMLUI docs via the installed MCP server, and an Inspector that exports traces your agent can use to observe and analyze what your app does. Once you have those ingredients in place, here's what can happen next.
+The [Get Started](https://xmlui.org/get-started) page is a five-minute path from nothing to a running XMLUI app, a Claude Code or Codex session that can read the XMLUI docs via the installed MCP server, and an Inspector that exports traces your agent can use to observe and analyze what your app does. Once you have those ingredients in place, here's what can happen next.
 
 ## Two information channels
 
 When an assistant writes XMLUI markup, it needs to know about the framework's patterns and conventions. The [XMLUI MCP server](https://xmlui.org/blog/improving-the-xmlui-mcp-server) is that channel. The assistant calls `xmlui_search_howto` to find working HowTo recipes, `xmlui_component_docs` for API reference, and `xmlui_examples` for usage in real apps. Every answer carries a citation back to a docs URL or a source file, so claims are checkable.
 
-If the running app misbehaves, the assistant needs to find out what went wrong. The assistant will ask you to export a trace that records clicks identified by ARIA label, API calls with URLs, data binds with row counts, event handlers with arguments and return values, and more. These [semantic traces](https://xmlui.org/blog/semantic-trace) describe intentions and outcomes, not low-level DOM activity.
+If the running app misbehaves, the assistant needs to find out what went wrong. It asks you to export a trace that records clicks identified by ARIA label, API calls with URLs, data binds with row counts, event handlers with arguments and return values, and more. These [semantic traces](https://xmlui.org/blog/semantic-trace) describe intentions and outcomes, not low-level DOM activity.
 
 Each channel is useful alone. Together they enable an agent to read the docs, write code that respects XMLUI syntax and conventions, and read a trace to verify the code works or analyze why it doesn't.
 
 ## A turn through the loop
 
-Start the weather demo and ask:
+Start the weather demo and say:
 
 > Add three tables that report hourly temperatures for three user-specifiable cities.
 
@@ -34,6 +34,6 @@ The MCP channel and the Inspector channel pass the same task back and forth: doc
 
 ## What this changes
 
-You don't have to be the bridge between the docs and the running app. The assistant has structured access to both. Of course you can still read the docs and view the Inspector's summary of the trace. But you probably won't need to. You can focus on what your app will do, not how to express your intentions as XMLUI markup. Of course you can read the markup too. It's declarative, concise, and easy to skim.
+You don't have to be the bridge between the docs and the running app. The assistant has structured access to both. Of course you can still read the docs and view the Inspector's summary of the trace. But your focus stays where it belongs: on what your app does, not how to express your intentions as XMLUI markup. And of course you can read the markup too. It's declarative, concise, and easy to skim.
 
-If you haven't set up the pieces yet, the [Get Started](https://docs.xmlui.org/get-started) page has the install commands for macOS, Linux, and Windows, plus the one-liner that registers the MCP server with Claude Code or Codex. When the weather app feels routine, try the same loop on your own app with different components, API calls, layouts, and interactions.
+If you haven't set up the pieces yet, the [Get Started](https://xmlui.org/get-started) page has the install commands for macOS, Linux, and Windows, plus the one-liner that registers the MCP server with Claude Code or Codex. When the weather app feels routine, try the same loop on your own app with different components, API calls, layouts, and interactions.
