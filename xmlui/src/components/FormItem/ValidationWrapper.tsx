@@ -1,5 +1,5 @@
-import type { Dispatch, ReactElement } from "react";
-import { Fragment, cloneElement, useId, useMemo, useContext } from "react";
+import type { Dispatch, MutableRefObject, ReactElement } from "react";
+import { Fragment, cloneElement, forwardRef, useCallback, useEffect, useId, useMemo, useRef, useContext } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 import type {
@@ -15,6 +15,13 @@ import { FormItemContext } from "./FormItemContext";
 import { resolveFormItemId } from "./FormItemUtils";
 import { useShallowCompareMemoize } from "../../components-core/utils/hooks";
 import styles from "./FormItem.module.scss";
+
+// data-* attributes that ComponentDecorator may have placed on the wrapper
+// div via its helper-span fallback. When we additionally forward the ref to
+// the child (so those attributes also land on a layout-box-having element),
+// we must strip them from the wrapper to avoid two elements sharing the
+// same data-testid.
+const TESTID_ATTRS = ["data-testid", "data-inspectId", "data-component-type"] as const;
 
 type ValidationWrapperProps = {
   children: ReactElement;
@@ -57,7 +64,7 @@ function isForcedVerbose(
   return false;
 }
 
-export function ValidationWrapper({
+export const ValidationWrapper = forwardRef<HTMLElement, ValidationWrapperProps>(function ValidationWrapper({
   children,
   bindTo,
   validations: validationsInput,
@@ -71,7 +78,7 @@ export function ValidationWrapper({
   componentType,
   inline,
   isFormItem = false,
-}: ValidationWrapperProps) {
+}, ref) {
   const validations = useShallowCompareMemoize(validationsInput);
   const isInsideForm = useIsInsideForm();
   const defaultId = useId();
@@ -120,8 +127,39 @@ export function ValidationWrapper({
 
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
+  // The ref forwarded by ComponentDecorator carries data-testid/data-inspectId.
+  // For FormItem we want those attributes on the child's actual DOM node
+  // (.itemWithLabel) — which has a real layout box — rather than the outer
+  // wrapper div (which uses display: contents). For non-FormItem inputs
+  // (e.g. a TextBox with bindTo) the existing wrappered-testId behavior is
+  // preserved, so we don't redirect the ref in that case.
+  const childRef = useCallback(
+    (node: HTMLElement | null) => {
+      if (typeof ref === "function") {
+        ref(node);
+      } else if (ref) {
+        (ref as MutableRefObject<HTMLElement | null>).current = node;
+      }
+    },
+    [ref],
+  );
+
+  // The wrapper div may end up with the testId attributes (placed by
+  // ComponentDecorator's helper-span fallback). When we redirect the ref
+  // to the child, we have to strip them from the wrapper to keep a single
+  // element carrying the testId. useEffect runs after the parent
+  // ComponentDecorator's useLayoutEffect, so the attributes are already in
+  // place by the time we remove them.
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!isFormItem) return;
+    const node = wrapperRef.current;
+    if (!node) return;
+    TESTID_ATTRS.forEach((attr) => node.removeAttribute(attr));
+  });
+
   if (!isInsideForm) {
-    return children;
+    return cloneElement(children, { ref: childRef });
   }
 
   const invalidMessages =
@@ -162,20 +200,26 @@ export function ValidationWrapper({
   };
 
   const validationAttributes = {
-    'data-validation-valid': validationResult?.isValid ?? true,
-    'data-validation-partial': validationResult?.partial ?? false,
-    'data-validation-status': validationStatus,
-    'data-validation-shown': isHelperTextShown,
-    'data-validations-evaluated': validationResult?.validations?.length ?? 0,
+    "data-validation-valid": validationResult?.isValid ?? true,
+    "data-validation-partial": validationResult?.partial ?? false,
+    "data-validation-status": validationStatus,
+    "data-validation-shown": isHelperTextShown,
+    "data-validations-evaluated": validationResult?.validations?.length ?? 0,
   };
 
   if (isFormItem) {
     childProps.formItemId = formItemId;
   }
-  
+
+  // Only redirect the ref for FormItem children — they have a wrapping
+  // .itemWithLabel div that can host the testId. For non-FormItem inputs
+  // (TextBox, TextArea, … rendered with a plain bindTo), keep the legacy
+  // behaviour and let ComponentDecorator put the testId on the wrapper.
+  const childRefToPass = isFormItem ? childRef : undefined;
+
   return (
-    <div {...validationAttributes} className={styles.validationWrapper}>
-      {cloneElement(children, childProps)}
+    <div ref={wrapperRef} {...validationAttributes} className={styles.validationWrapper}>
+      {cloneElement(children, { ...childProps, ...(childRefToPass ? { ref: childRefToPass } : {}) })}
     </div>
   );
-}
+});
