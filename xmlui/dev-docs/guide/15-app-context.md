@@ -34,7 +34,7 @@ From markup's perspective, AppContext functions are just "global functions you c
 <Button onClick="navigate('/dashboard')">Dashboard</Button>
 
 <!-- Confirmation dialog -->
-<Button onClick="async () => { if (await confirm('Delete?')) deleteItem() }">Delete</Button>
+<Button onClick="if (confirm('Delete?')) deleteItem()">Delete</Button>
 ```
 
 <!-- DIAGRAM: Layered diagram showing AppContext (outer layer) wrapping all expression evaluation contexts in every component. State layers (parent state, vars, loaders, etc.) and AppContext are combined to form the complete expression scope. -->
@@ -214,12 +214,10 @@ Powered by **react-hot-toast**. `toast()` returns a toast ID you can use to dism
 
 <!-- Loading state that resolves -->
 <Button onClick="
-  async () => {
-    const id = toast.loading('Saving...');
-    await saveData();
-    toast.dismiss(id);
-    toast.success('Saved!');
-  }
+  const id = toast.loading('Saving...');
+  saveData();
+  toast.dismiss(id);
+  toast.success('Saved!');
 ">Save</Button>
 
 <!-- Promise shorthand -->
@@ -232,14 +230,12 @@ Powered by **react-hot-toast**. `toast()` returns a toast ID you can use to dism
 
 ### confirm
 
-Opens a modal confirmation dialog. Returns a `Promise<boolean>`:
+Opens a modal confirmation dialog. Returns a `Promise<boolean>` resolved transparently by the XMLUI async evaluator:
 
 ```xml
 <Button onClick="
-  async () => {
-    if (await confirm('Delete record?', 'This cannot be undone.', 'Delete', 'Cancel')) {
-      deleteRecord(item.id);
-    }
+  if (confirm('Delete record?', 'This cannot be undone.', 'Delete', 'Cancel')) {
+    deleteRecord(item.id);
   }
 ">Delete</Button>
 ```

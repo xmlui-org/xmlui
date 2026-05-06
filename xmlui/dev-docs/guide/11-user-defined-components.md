@@ -282,7 +282,7 @@ var query = "";
 var results = [];
 
 function search() {
-  results = await fetchResults(query);
+  results = fetchResults(query);
   emitEvent('searchCompleted', { query, results });
 }
 ```

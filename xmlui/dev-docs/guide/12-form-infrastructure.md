@@ -220,8 +220,8 @@ Each validator can specify `severity` (`"error"`, `"warning"`) and custom `inval
 The `onValidate` event handler runs after sync validators pass:
 
 ```xml
-<FormItem bindTo="username" onValidate="async (value) => {
-  const exists = await checkExists(value);
+<FormItem bindTo="username" onValidate="(value) => {
+  const exists = checkExists(value);
   return exists ? 'Username taken' : true;
 }" />
 ```
