@@ -2,6 +2,8 @@ import { parseLayoutProperty } from "../../components-core/theming/parse-layout-
 
 const FLOW_LAYOUT_PROPS = new Set(["width", "minWidth", "maxWidth"]);
 
+type ExtractValueWithSize = ((v: any) => any) & { asSize?: (v: any) => any };
+
 /**
  * Extracts responsive variants of width/minWidth/maxWidth from a node's props.
  * Returns a flat map like `{ "width-md": "50%", "maxWidth-lg": "400px" }` with
@@ -9,10 +11,11 @@ const FLOW_LAYOUT_PROPS = new Set(["width", "minWidth", "maxWidth"]);
  */
 export function collectResponsiveWidthProps(
   props: Record<string, any> | undefined,
-  extractValue: (v: any) => any,
+  extractValue: ExtractValueWithSize,
 ): Record<string, any> | undefined {
   if (!props) return undefined;
   let result: Record<string, any> | undefined;
+  const resolve = extractValue.asSize ?? extractValue;
   for (const key of Object.keys(props)) {
     const parsed = parseLayoutProperty(key);
     if (typeof parsed === "string" || parsed.component || parsed.part) continue;
@@ -22,7 +25,7 @@ export function collectResponsiveWidthProps(
       parsed.screenSizes.length > 0
     ) {
       if (!result) result = {};
-      result[key] = extractValue(props[key]);
+      result[key] = resolve(props[key]);
     }
   }
   return result;

@@ -1514,6 +1514,19 @@ test.describe("itemWidth property", () => {
     expect(item2Width).toBeCloseTo(150, 0);
   });
 
+  test("HStack wrapContent respects child width specified as theme variable ($space-*)", async ({ page, initTestBed }) => {
+    await initTestBed(`
+      <HStack testId="stack" width="600px" wrapContent="true" gap="0">
+        <Stack testId="item1" width="$space-40" height="40px" backgroundColor="orange">A</Stack>
+        <Stack testId="item2" width="*" height="40px" backgroundColor="lightgreen">B</Stack>
+      </HStack>
+    `);
+
+    // $space-40 = 10em = 160px (default font-size 16px)
+    const { width: item1Width } = await getBounds(page.getByTestId("item1"));
+    expect(item1Width).toBeCloseTo(160, 0);
+  });
+
   test("Stack with wrapContent and fit-content itemWidth", async ({ page, initTestBed }) => {
     await initTestBed(`
       <Stack testId="stack" orientation="horizontal" width="400px" wrapContent="true" itemWidth="fit-content" gap="$space-2">

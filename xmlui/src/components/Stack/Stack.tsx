@@ -431,9 +431,9 @@ function renderStack({
             if (node.type === "SpaceFiller") {
               return <FlowItemBreak force={true} />;
             }
-            const width = extractValue((node.props as any)?.width);
-            const minWidth = extractValue((node.props as any)?.minWidth);
-            const maxWidth = extractValue((node.props as any)?.maxWidth);
+            const width = extractValue.asSize((node.props as any)?.width);
+            const minWidth = extractValue.asSize((node.props as any)?.minWidth);
+            const maxWidth = extractValue.asSize((node.props as any)?.maxWidth);
             const responsiveWidthProps = collectResponsiveWidthProps(node.props, extractValue);
             return (
               <FlowItemWrapper
