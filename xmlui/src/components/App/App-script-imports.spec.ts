@@ -196,6 +196,95 @@ test.describe("Script Import Error Handling", () => {
 });
 
 // =============================================================================
+// SCRIPT FUNCTION CALLABLE FROM EVENT HANDLERS
+// =============================================================================
+
+test.describe("Script function callable from event handlers", () => {
+  test("function defined in script block is callable from onClick", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <script>
+          function greet() {
+            testState = "called";
+          }
+        </script>
+        <Button testId="btn" onClick="greet()">Click</Button>
+      </App>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toEqual("called");
+  });
+
+  test("function with argument defined in script block is callable from onClick", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <script>
+          function add(a, b) {
+            testState = a + b;
+          }
+        </script>
+        <Button testId="btn" onClick="add(3, 4)">Click</Button>
+      </App>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toEqual(7);
+  });
+
+  test("script function with loop body is callable from onClick", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <script>
+          function sumTo(n) {
+            let sum = 0;
+            for (let i = 1; i <= n; i++) {
+              sum += i;
+            }
+            testState = sum;
+          }
+        </script>
+        <Button testId="btn" onClick="sumTo(10)">Click</Button>
+      </App>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toEqual(55);
+  });
+
+  test("script function using App.now() is callable from onClick", async ({
+    initTestBed,
+    page,
+  }) => {
+    const { testStateDriver } = await initTestBed(`
+      <App>
+        <script>
+          function loop(n) {
+            const start = App.now();
+            let sum = 0;
+            for (let i = 1; i <= n; i++) {
+              sum += i;
+            }
+            const end = App.now();
+            console.info(\`Looped from 1 to \${n} in \${end - start} milliseconds.\`);
+            testState = { sum: sum, elapsed: end - start >= 0 };
+          }
+        </script>
+        <Button testId="btn" onClick="loop(100)">Loop 1-100</Button>
+      </App>
+    `);
+    await page.getByTestId("btn").click();
+    await expect.poll(testStateDriver.testState).toMatchObject({ sum: 5050, elapsed: true });
+  });
+});
+
+// =============================================================================
 // SCRIPT IMPORT WITH LAYOUT TESTS
 // =============================================================================
 

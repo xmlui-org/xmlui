@@ -1306,7 +1306,8 @@ function hoistScriptCollectedFromFragments(component: ComponentDef): void {
   for (const child of component.children) {
     if (child.type === "Fragment" && child.scriptCollected) {
       // Check if the script references context variables (like $item, $itemIndex, etc.)
-      const hasContextVarReferences = child.script?.includes("$");
+      // Use a regex to match $identifier patterns, NOT template literal interpolations like ${...}
+      const hasContextVarReferences = child.script != null && /\$[a-zA-Z_]/.test(child.script);
 
       // Only hoist if there are no context variable references
       // Context variables are component-specific and should remain at the iteration level

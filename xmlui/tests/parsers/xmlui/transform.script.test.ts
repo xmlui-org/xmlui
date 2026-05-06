@@ -441,6 +441,77 @@ var b = 2;
     expect(collected.vars.y[PARSED_MARK_PROP]).equal(true);
   });
 
+  it("Script function is hoisted to parent when parent has component siblings", () => {
+    // Regression test: functions defined in <script> blocks must be accessible
+    // in event handlers (onClick="loop(100)") even when the script is a sibling
+    // of component children, causing the parser to wrap them in a Fragment.
+    const cd = transformSource(`
+      <Stack>
+        <script>
+          function loop(n) {
+            let sum = 0;
+            for (let i = 1; i <= n; i++) {
+              sum += i;
+            }
+          }
+        </script>
+        <Button onClick="loop(100)">Loop 1-100</Button>
+      </Stack>
+    `) as ComponentDef;
+
+    // The Stack must have scriptCollected with the loop function
+    expect(cd.type).equal("Stack");
+    expect(cd.scriptCollected).toBeDefined();
+    expect(cd.scriptCollected?.functions?.loop).toBeDefined();
+    expect((cd.scriptCollected?.functions?.loop as any).type).equal(T_ARROW_EXPRESSION);
+  });
+
+  it("Script function in App with component siblings is hoisted to App", () => {
+    // Same regression test as above but with App as the root element
+    const cd = transformSource(`
+      <App>
+        <script>
+          function loop(n) {
+            let sum = 0;
+            for (let i = 1; i <= n; i++) {
+              sum += i;
+            }
+          }
+        </script>
+        <Button onClick="loop(100)">Loop 1-100</Button>
+      </App>
+    `) as ComponentDef;
+
+    expect(cd.type).equal("App");
+    expect(cd.scriptCollected).toBeDefined();
+    expect(cd.scriptCollected?.functions?.loop).toBeDefined();
+    expect((cd.scriptCollected?.functions?.loop as any).type).equal(T_ARROW_EXPRESSION);
+  });
+
+  it("Script function with template literal is hoisted even though script contains '$'", () => {
+    // Regression: template literal interpolations like `${n}` contain '$' but are NOT
+    // context variable references. Hoisting must not be blocked by them.
+    const cd = transformSource(`
+      <App>
+        <script>
+          function loop(n) {
+            let sum = 0;
+            for (let i = 1; i <= n; i++) {
+              sum += i;
+            }
+            console.info(\`Looped to \${n}\`);
+          }
+        </script>
+        <Button onClick="loop(100)">Loop 1-100</Button>
+      </App>
+    `) as ComponentDef;
+
+    expect(cd.type).equal("App");
+    expect(cd.scriptCollected).toBeDefined();
+    expect(cd.scriptCollected?.functions?.loop).toBeDefined();
+    expect((cd.scriptCollected?.functions?.loop as any).type).equal(T_ARROW_EXPRESSION);
+  });
+
   it("Script collect - nested object destructuring", () => {
     const cd = transformSource(`
       <Stack>
