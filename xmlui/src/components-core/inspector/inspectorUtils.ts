@@ -240,6 +240,15 @@ export interface XsLogEntry {
    *   `reason: LifecycleViolationReason` (warn/error entries), and optional
    *   `error: { message, stack? }`. Severity escalates from `warn` to `error`
    *   when `App.appGlobals.strictLifecycle` is truthy.
+   * - `"concurrency"` — handler-concurrency event or diagnostic emitted by the
+   *   handler-coordinator surface (plan #06). Contains
+   *   `code: ConcurrencyCode` (one of `concurrency-handler-cancelled`,
+   *   `concurrency-handler-timeout`, `concurrency-handler-dropped`,
+   *   `concurrency-handler-superseded`, `concurrency-transactional-conflict`),
+   *   `severity: "info" | "warn" | "error"`, optional `componentUid` /
+   *   `eventName`, and `message`. W3-6 ships only the API surface (token
+   *   types + coordinator stub); the dispatcher wiring that emits these
+   *   entries lands in W7-1.
    */
   kind?: string;
   eventName?: string;

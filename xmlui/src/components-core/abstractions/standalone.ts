@@ -122,6 +122,24 @@ export type StandaloneAppDescription = {
    *   container `onBeforeDispose` handlers (Phase 3 of plan #04). Exceeding
    *   the budget emits a `kind:"lifecycle"` violation with
    *   `reason:"timeout"` and lets the unmount proceed.
+   * - `strictConcurrency` (boolean, default `false`) — when `true`, the
+   *   handler-coordinator (plan #06) refuses unknown `handlerPolicy` values
+   *   at build time and escalates concurrency-policy mismatches (e.g. a
+   *   `single-flight` handler invoked while a previous run is still in
+   *   flight under `parallel` ancestry) from `warn` to `error`. When
+   *   `false` (the W3-6 rollout default — risk-probe phase) the public API
+   *   surface (`$cancel`, `HandlerPolicy`, `createHandlerCoordinator`) is
+   *   available but enforcement is best-effort: handlers that don't read
+   *   `$cancel` and don't declare a non-default policy see no behavioural
+   *   change. Flips to `true` once the W7-1 coordinator runtime ships. See
+   *   `dev-docs/plans/06-handler-concurrency-and-cancellation.md`.
+   * - `defaultHandlerTimeoutMs` (number, default `30000`) — millisecond
+   *   budget after which an in-flight event handler is automatically
+   *   cancelled with `CancellationReason="timeout"` and a
+   *   `kind:"concurrency"` `code:"concurrency-handler-timeout"` trace
+   *   entry. Per-invocation `timeoutMs` overrides this default. The W3-6
+   *   risk-probe ships the configuration surface only; the dispatcher
+   *   wiring that enforces the budget lands in W7-1.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
