@@ -261,12 +261,10 @@ You can call it directly in event handlers:
 
 ```xml
 <Button onClick="
-  async () => {
-    try {
-      await submitForm();
-    } catch (e) {
-      signError('Submission failed: ' + e.message);
-    }
+  try {
+    submitForm();
+  } catch (e) {
+    signError('Submission failed: ' + e.message);
   }
 ">Submit</Button>
 ```
