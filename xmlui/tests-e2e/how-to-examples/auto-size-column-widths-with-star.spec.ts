@@ -51,4 +51,57 @@ test.describe("Star-sized column widths", { tag: "@website" }, () => {
     await expect(page.getByText("10%")).toBeVisible();
     await expect(page.getByText("40%")).toBeVisible();
   });
+
+  test("initial state shows the Medium width preset selected and matching caption", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.getByRole("button", { name: "Narrow (600px)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Medium (900px)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Wide (1200px)" })).toBeVisible();
+    await expect(page.getByText("Currently: 900px")).toBeVisible();
+  });
+
+  test("clicking Narrow updates the width caption and keeps all data rendered", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await page.getByRole("button", { name: "Narrow (600px)" }).click();
+
+    await expect(page.getByText("Currently: 600px")).toBeVisible();
+    await expect(page.getByText("Currently: 900px")).not.toBeVisible();
+    await expect(page.getByText("PRJ-001")).toBeVisible();
+    await expect(page.getByText("Landing Page Redesign")).toBeVisible();
+  });
+
+  test("clicking Wide updates the width caption and keeps all data rendered", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await page.getByRole("button", { name: "Wide (1200px)" }).click();
+
+    await expect(page.getByText("Currently: 1200px")).toBeVisible();
+    await expect(page.getByText("Currently: 900px")).not.toBeVisible();
+    await expect(page.getByText("PRJ-004")).toBeVisible();
+    await expect(page.getByText("Database Migration")).toBeVisible();
+  });
+
+  test("cycling through the presets returns to Medium and updates the caption each time", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+
+    await page.getByRole("button", { name: "Narrow (600px)" }).click();
+    await expect(page.getByText("Currently: 600px")).toBeVisible();
+
+    await page.getByRole("button", { name: "Wide (1200px)" }).click();
+    await expect(page.getByText("Currently: 1200px")).toBeVisible();
+
+    await page.getByRole("button", { name: "Medium (900px)" }).click();
+    await expect(page.getByText("Currently: 900px")).toBeVisible();
+  });
 });

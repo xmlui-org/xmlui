@@ -1,46 +1,51 @@
 # Run a one-time action on page load
 
-Use a `Timer` with `once="true"` to execute initialization logic exactly once as soon as the app renders.
+Use `onInit` on `App` (or any component) to run initialization logic exactly once when the page mounts.
 
-A `Timer` with `once="true"` fires its `onTick` handler a single time, then stops automatically. Setting `initialDelay` adds a short pause before the first (and only) tick, letting the rest of the UI settle before the action runs. For data-driven initialization, you can alternatively react to a `DataSource` finishing its first load.
+`onInit` is a built-in lifecycle event available on every xmlui component. The handler runs the first time the component is rendered, then never again — no guard variable, no `Timer`, no helper. For setup that should fire as soon as the app starts, attach `onInit` to `<App>`.
 
 ```xmlui-pg copy display name="One-time page load action"
----app display /shown/ /delayedMessage/
-<App var.shown="{false}" var.delayedMessage="">
-  <Timer once="true" initialDelay="{500}" onTick="() => {
-    shown = true;
-    delayedMessage = 'Page fully initialized at ' + new Date().toLocaleTimeString();
-  }" />
-
+---app display /onInit/
+<App
+  var.loadedAt=""
+  onInit="loadedAt = new Date().toLocaleTimeString()"
+>
   <VStack padding="$space-4" gap="$space-3">
     <Text variant="h5">Dashboard</Text>
     <Text>Welcome! The page has loaded.</Text>
 
-    <Card when="{shown}" padding="$space-3">
+    <Card when="{loadedAt}" padding="$space-3">
       <HStack gap="$space-2">
         <Icon name="check" />
-        <Text variant="strong">{delayedMessage}</Text>
+        <Text variant="strong">Page initialized at {loadedAt}</Text>
       </HStack>
     </Card>
-    <Text variant="subtle" when="{!shown}">Initializing…</Text>
   </VStack>
 </App>
 ```
 
 ## Key points
 
-**`once="true"` fires exactly once, then stops**: The timer invokes `onTick` a single time and automatically disables itself. No guard variable is needed to prevent duplicate invocations.
+**`onInit` runs exactly once when the component mounts**: The handler fires the first time the component is rendered. xmlui guarantees a single invocation — no guard variable is needed.
 
-**`initialDelay` sets a startup pause**: The first (and only) tick fires after the specified number of milliseconds. A small delay such as 500 ms lets the initial render and any synchronous data fetches complete before the action runs.
+**`onInit` is available on every component**: It's a core lifecycle event, not specific to `App`. Attach it to a `Card`, `VStack`, `Form`, or any other component when the action should fire as that subtree mounts. See [Core properties › onInit and onCleanup](/docs/guides/core-properties#oninit-and-oncleanup) for the full lifecycle treatment, including how `when` transitions can re-fire `onInit` on remount.
 
-**Toggle `enabled` to re-run if needed**: Setting the timer's `enabled` prop back to `false` and then to `true` resets it, causing `onTick` to fire once more. This is useful for retrying initialization on demand.
+**Pair with `onCleanup` for setup/teardown**: When the init action allocates a resource (e.g., starts an interval, subscribes to a channel), use `onCleanup` on the same component to release it when the component unmounts.
 
-**DataSource `onLoaded` is an alternative for data-driven init**: When the one-time action depends on fetched data, attach it to the `DataSource` component's `onLoaded` event instead — it fires after the initial fetch completes and receives the loaded data directly.
+**`Timer once="true"` for a delayed one-time action**: When init must run after a known delay — e.g., to defer non-critical setup until the rest of the UI has settled — use a `Timer` with `once="true"` and `initialDelay`:
+
+```xmlui
+<Timer once="true" initialDelay="{500}" onTick="() => runDelayedInit()" />
+```
+
+For "as soon as the page loads," prefer `onInit`. The `Timer` form is for cases where the delay itself is the point.
+
+**`DataSource onLoaded` for data-driven init**: When the one-time action depends on fetched data, attach it to a `DataSource`'s `onLoaded` event instead — it fires after the initial fetch completes and receives the loaded data directly.
 
 ---
 
 ## See also
 
+- [Core properties › onInit and onCleanup](/docs/guides/core-properties#oninit-and-oncleanup) — full reference for the lifecycle events
 - [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — compute values reactively without imperative initialization
 - [React to value changes with debounce](/docs/howto/debounce-with-changelistener) — run side-effects after a value settles
-- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) — run an action at most once per time interval

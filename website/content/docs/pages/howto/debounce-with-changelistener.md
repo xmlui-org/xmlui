@@ -8,7 +8,7 @@ Use rate limiting when a value can change faster than your app should react to i
 
 `ChangeListener` is useful when the watched value is shared, derived, or updated from multiple places. For a single `TextBox` whose handler immediately calls an API, the global `debounce()` helper is usually simpler. See [Debounce user input for API calls](/docs/howto/debounce-user-input-for-api-calls) for that event-handler pattern.
 
-The example below watches `searchTerm`. The API call runs only after the value has stayed unchanged for 500 ms, regardless of what updated `searchTerm`.
+The example below watches `searchTerm`. The API call runs only after the value has stayed unchanged for 100 ms, regardless of what updated `searchTerm`.
 
 ```xmlui-pg copy display name="Debounced value listener" height="400px"
 ---app display /ChangeListener/ /debounceWaitInMs/
@@ -28,7 +28,7 @@ The example below watches `searchTerm`. The API call runs only after the value h
 
   <ChangeListener
     listenTo="{searchTerm}"
-    debounceWaitInMs="500"
+    debounceWaitInMs="100"
     onDidChange="({newValue}) => {
       results = [];
       if (!newValue) {
@@ -130,5 +130,4 @@ Laptop, Mouse, Keyboard, Monitor, Desk Chair, Desk Lamp
 ## See also
 
 - [Debounce user input for API calls](/docs/howto/debounce-user-input-for-api-calls) - use the global `debounce()` helper directly inside an event handler
-- [Throttle rapid value updates](/docs/howto/throttle-rapid-value-updates) - use `throttleWaitInMs` when intermediate updates matter
 - [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) - compute values reactively without a side effect

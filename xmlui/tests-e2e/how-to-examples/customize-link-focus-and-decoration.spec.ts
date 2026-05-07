@@ -12,17 +12,16 @@ const markdown = getExampleSource(
 test.describe("Custom Link focus and decoration", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "Custom Link focus and decoration");
 
-  test("initial state shows all three links", async ({ initTestBed, page }) => {
+  test("initial state shows the standalone and icon links", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByRole("link", { name: "External link with underline" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "External link (opens in new tab)" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Link with icon" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "link inside text" })).toBeVisible();
   });
 
-  test("inline text contains the link in a sentence", async ({ initTestBed, page }) => {
+  test("external link uses target=_blank to open in a new tab", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByText("Inline")).toBeVisible();
-    await expect(page.getByText("looks correct.")).toBeVisible();
-    await expect(page.getByRole("link", { name: "link inside text" })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "External link (opens in new tab)" }),
+    ).toHaveAttribute("target", "_blank");
   });
 });

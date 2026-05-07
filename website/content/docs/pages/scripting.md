@@ -175,6 +175,32 @@ function transformStops(stops) {
 
 > [!INFO] The `Globals.xs` file is special. All variables and functions declared there are [global variables](/docs/guides/markup#global-variables) visible to all components. `Main.xmlui.xs` declarations are local to the Main component, just like any other code-behind file.
 
+### Globals.xs vs other code-behind files
+
+The two kinds of `.xs` file look identical syntactically — top-level `var` and `function` declarations — but their reach is different:
+
+| File | Reach of declarations | Reactivity |
+|---|---|---|
+| `Globals.xs` | Global. Visible from every component, including user-defined ones. Equivalent to `global.` declarations on the App root. | `var` is reactive — assignments re-render every consumer |
+| `Main.xmlui.xs` | Local to the Main (App) component. Not visible inside user-defined components unless passed as a prop. | `var` is reactive within Main's scope |
+| `<ComponentName>.xmlui.xs` | Local to that component. | `var` is reactive within that component's scope |
+
+`Globals.xs` is the practical place to use top-level `var` for app-wide reactive state. A current-user store, a feature-flag map, or a derived utility constant goes here:
+
+```js
+// Globals.xs
+var currentUser = { id: null, name: 'Guest' };
+var featureFlags = { betaSearch: false, darkMode: true };
+
+function isAdmin(user) {
+  return user.role === 'admin';
+}
+```
+
+Any component can read `currentUser`, write to it (`currentUser = newValue` in a handler triggers re-renders everywhere it's read), or call `isAdmin(...)` — no prop-threading.
+
+By contrast, declaring `var` in `Main.xmlui.xs` is equivalent to writing `var.foo` on the App root in markup: the variable is real and reactive, but it's a *Main-local* variable, invisible to user-defined components unless passed as a prop. See [Scoping › Variables](/docs/guides/scoping#variables) for how local-vs-global visibility works in detail.
+
 ## index.html vs code-behind
 
 You can use either or both of these strategies in an XMLUI app. Use `index.html` if:
@@ -231,21 +257,52 @@ In standard JavaScript, reading a property on `null` or `undefined` throws a `Ty
 
 This makes bindings resilient while data is loading, but it also means null-reference mistakes won't produce the instant red error you'd see in a browser console. Use `??` or explicit `when` guards to handle genuinely missing data intentionally.
 
-### `var` is reactive; `let` and `const` are not
+### Where to use `var`, `let`, and `const`
 
-At **component scope** (in markup attributes or code-behind top-level), `var.name` declares a reactive variable that re-evaluates its initializer expression whenever dependencies change. `let` and `const` are non-reactive and are only available inside event handlers, where they act as ordinary local variables:
+Each keyword has a single legitimate scope. Mixing them up is one of the most common XMLUI scripting mistakes.
+
+| Where you're writing | Use | Don't use |
+|---|---|---|
+| Markup attribute on a component | `var.x="..."`, `global.x="..."`, `<variable>`, `<global>` | `let.x` and `const.x` don't exist |
+| Top level of `Globals.xs`, `Main.xmlui.xs`, or `<Component>.xmlui.xs` | `var x = ...`, `function f() {…}` | `let`, `const`, `class`, control flow, plain expressions — all compile errors |
+| Top level of a `<script>` block in markup | `var x = ...`, `function f() {…}` | same as `.xmlui.xs` |
+| Inside a function body (event handler, code-behind function, `<script>` function) | `let x = ...`, `const x = ...` | `var x = ...` works syntactically but isn't the documented pattern — prefer `let`/`const` |
+
+The mental model is:
+
+- **`var` lives at component level** — markup attributes, `.xmlui.xs` top-level, `<script>` block top-level. It declares **reactive state** that the rest of the app can observe.
+- **`let` and `const` live at function level** — handler bodies, function bodies. They declare **ordinary non-reactive locals** that vanish when the function returns.
 
 ```xmlui
-<App var.count="{0}">
-  <!-- count is reactive: Text updates automatically -->
+<App var.count="{0}">                            <!-- ✓ component-level var, reactive -->
   <Text value="Count: {count}" />
 
-  <Button onClick="let doubled = count * 2; count = doubled" label="Double" />
-  <!-- 
-    doubled is a handler-local variable; it cannot be used outside this handler 
-  -->
+  <Button onClick="
+    let doubled = count * 2;                     // ✓ handler-level let, non-reactive
+    const message = `Doubled to ${doubled}`;     // ✓ handler-level const, non-reactive
+    count = doubled;                             // ✓ writing to the reactive var
+    toast(message);
+  " label="Double" />
 </App>
 ```
+
+```js
+// Globals.xs
+var currentUser = { name: 'Guest' };             // ✓ top-level var, becomes a global
+
+function login(name) {
+  let timestamp = Date.now();                    // ✓ inside fn body, let is fine
+  currentUser = { name, loggedInAt: timestamp };
+}
+
+const MAX_RETRIES = 3;                           // ✗ top-level const — compile error
+```
+
+**Common mistakes:**
+
+- **Writing `let` or `const` at the top level of a `.xmlui.xs` file** is a compile error. Use `var` for reactive top-level state, or move the constant inside a function body.
+- **Writing `var x = ...` inside a handler body** is unusual — the documented pattern uses `let` and `const` there because handler-local declarations are non-reactive by nature.
+- **Writing `var.x` inside a handler body** is wrong — that's markup-attribute syntax, not script syntax. Inside a handler, just write `let x` or `const x`.
 
 A subtlety: `var.x="{expr}"` is reactive only until you **explicitly assign** to `x` in a handler. After the first write, `x` holds the assigned value and the initializer expression stops re-evaluating. See [When does a variable stop following its initial value?](/docs/guides/markup#when-does-a-variable-stop-following-its-initial-value) for details.
 

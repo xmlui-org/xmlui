@@ -87,16 +87,27 @@ A project dashboard often renders the same task-card layout in several places �
 { $props.priority ?? 'normal' }     <!-- falls back when priority is absent -->
 ```
 
-**Scope isolation**: Variables or element IDs declared in the parent are invisible inside `TaskCard`. If the component needs a value from the parent, it must be passed explicitly as a prop:
+**Scope isolation, with globals as an escape hatch**: Local variables (declared with `var.`) and element IDs in the parent are invisible inside `TaskCard` by default. There are two ways to get values across that boundary:
+
+*Pass via props* for component-specific data — the card receives only what it needs and is reusable in different contexts:
 
 ```xmlui
-<!-- parent -->
 <App var.currentUser="Alice">
   <TaskCard assignee="{currentUser}" title="Fix bug" />
 </App>
-
 <!-- inside TaskCard: $props.assignee works, currentUser does not -->
 ```
+
+*Use a global* for app-wide values that many components share — current user, theme mode, feature flags, derived utilities. Globals are declared with `global.` on the root of `Main.xmlui`, or as top-level declarations in a `Globals.xs` code-behind file. They are visible from every component without prop-threading:
+
+```xmlui
+<App global.currentUser="Alice">
+  <TaskCard title="Fix bug" />
+</App>
+<!-- inside TaskCard: { currentUser } reads the global directly — no $props needed -->
+```
+
+Prefer props when the same component is rendered with different data in different places. Prefer globals when every consumer reads the same singleton value and prop-threading would only create boilerplate. See [Scoping › Global variables](/docs/guides/scoping#global-variables) and [Scripting › Code-Behind files](/docs/guides/scripting#code-behind-files) for details on globals and `Globals.xs`.
 
 **`id` is reserved — never use it as a prop name**: The `id` attribute is special in XMLUI: it registers a named reference that parent built-in components can use to call the component's API. If you pass `id="{$item.id}"` to a user-defined component, XMLUI captures it as the component reference, not as `$props.id`. Use a descriptive name instead:
 
@@ -109,3 +120,11 @@ A project dashboard often renders the same task-card layout in several places �
 ```
 
 **Why extract**: Once `TaskCard.xmlui` exists, adding a status icon, changing the priority color, or tweaking padding is a one-file change that takes effect everywhere the component is used.
+
+---
+
+**See also**
+
+- [User-defined components](/docs/guides/user-defined-components) — fuller treatment of the reusable-component story, including slots and template properties
+- [Scoping](/docs/guides/scoping) — how variables and IDs flow across component boundaries, with rules for globals
+- [Scripting › Code-Behind files](/docs/guides/scripting#code-behind-files) — pairing a `.xmlui.xs` file with the component for shared helper functions

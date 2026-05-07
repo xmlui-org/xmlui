@@ -2,6 +2,8 @@
 
 XMLUI implements client-side routing with URLs bound to UI views. You can use two different  routing mechanisms: **hash** and **standard**. Both store the current location in the browser's address bar and work with the browser's history stack. However, they differ in the URLs they send to the backend server.
 
+> **Embedded contexts use `MemoryRouter`.** When XMLUI runs inside the docs site's playground or any other embedded preview, the engine substitutes `MemoryRouter` so the example doesn't fight with the host page's URL. Your `useHashBasedRouting` setting only applies once the app is deployed standalone — it cannot be demonstrated inside a playground.
+
 ## Hash routing (default)
 
 If you don't have complete control over the server, you may not be able to configure it to retrieve the `index.html` file as a single-page app requires. Hash routing solves this issue. If your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), navigation URLs will look like `myComp.com/accountapp/#/leads/12` or `myComp.com/accountapp/#/list?zip=98005`. Even multiple hash marks may show up (for example, if you navigate to a bookmark: `myComp.com/accountapp/#/leads/12#callhistory`.
@@ -25,7 +27,9 @@ When you navigate to an URL (e.g., refresh the current page), the browser sends 
 
 For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path or query segments, such as `myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
 
-If your web server is not configured this way, you'll receive 404 errors for the latest two (and similar) requests when refreshing the current page. Here's a sample `nginx` configuration.
+If your web server is not configured this way, you'll receive 404 errors for the latest two (and similar) requests when refreshing the current page. Sample configurations follow.
+
+**Nginx**
 
 ``` copy {10}
 events {
@@ -55,6 +59,27 @@ http {
     }
 }
 ```
+
+**Apache** — add to `.htaccess`:
+
+```apacheconf copy
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+```
+
+**Azure Static Web Apps** — add to `staticwebapp.config.json`:
+
+```json copy
+{
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
+}
+```
+
+**Vite dev server** — Vite's dev server already handles SPA fallback, so `useHashBasedRouting: false` works during development without any of the above. Only the production deploy needs the rewrite rule.
 
 
 ## Serving from a subdirectory with proxy
@@ -123,6 +148,8 @@ This subdirectory deployment works with both routing configurations:
 - URLs: `example.com/myapp/contacts`
 - Server sees: `example.com/myapp/contacts`
 - Behavior: 404s redirect to `/myapp/` which loads the app, then client-side routing takes over
+
+The same proxy + `error_page 404` pattern also works for an app served at the root path: use `location /` and drop the `rewrite` line. What makes the SPA fallback work is intercepting the backend's 404 and redirecting to the location root — the prefix rewrite is only needed when you're carving out a subdirectory.
 
 ## Links
 
