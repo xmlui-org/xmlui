@@ -11,6 +11,7 @@ import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
+import { coerceValue, verifyValue } from "../type-contracts/rules/coerce";
 import type { ComponentApi } from "../../abstractions/ApiDefs";
 import type { FnDeps } from "../FnDepsContext";
 
@@ -261,6 +262,49 @@ export function createValueExtractor(
     } catch {
       return undefined;
     }
+  };
+
+  // --- Refined `valueType` helpers (Phase 1 of the type-contract plan).
+  //     Each delegates to the unified `coercionRules` table so the runtime
+  //     coercion and the parse-time verifier cannot drift.
+  extractor.asInteger = (expression?: any, defValue?: number) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return defValue;
+    const failure = verifyValue("integer", value);
+    if (failure) throw new Error(failure.message);
+    return coerceValue("integer", value) as number;
+  };
+
+  extractor.asColor = (expression?: any) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return undefined;
+    const failure = verifyValue("color", value);
+    if (failure) return undefined;
+    return coerceValue("color", value) as string;
+  };
+
+  extractor.asLength = (expression?: any) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return undefined;
+    const failure = verifyValue("length", value);
+    if (failure) return undefined;
+    return coerceValue("length", value) as string;
+  };
+
+  extractor.asUrl = (expression?: any) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return undefined;
+    const failure = verifyValue("url", value);
+    if (failure) return undefined;
+    return coerceValue("url", value) as string;
+  };
+
+  extractor.asIcon = (expression?: any) => {
+    const value = extractor(expression);
+    if (value === undefined || value === null) return undefined;
+    const failure = verifyValue("icon", value);
+    if (failure) return undefined;
+    return coerceValue("icon", value) as string;
   };
 
   // --- Done.

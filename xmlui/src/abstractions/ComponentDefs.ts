@@ -190,7 +190,44 @@ interface Scriptable {
   scriptError?: any;
 }
 
-export type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
+/**
+ * Set of declared types a component property may carry.
+ *
+ * Verified at parse time by the type-contract verifier
+ * (see `dev-docs/plans/01-verified-type-contracts.md`) and at runtime by
+ * the matching `valueExtractor.as*` helper. Verifier and extractor share a
+ * single coercion decision table — the `coercionRules` map exported from
+ * `components-core/type-contracts/rules/coerce.ts` — so a value that
+ * passes verification cannot fail coercion (and vice versa).
+ *
+ * Coarse types (legacy):
+ *   - `"boolean"`        JS truthy/falsy or string `"true"`/`"false"`.
+ *   - `"string"`         Any value coerced via `String(value)`.
+ *   - `"number"`         JS number or numeric string.
+ *   - `"any"`            Opt-out of verification; coerced as-is.
+ *   - `"ComponentDef"`   A nested component definition (template prop).
+ *
+ * Refined types (Phase 1 of the type-contract plan):
+ *   - `"integer"`        Whole-number JS `number` (no fractional part).
+ *   - `"color"`          CSS color literal (named, `#rgb`/`#rrggbb`,
+ *                        `rgb()`/`rgba()`, `hsl()`/`hsla()`) or theme var.
+ *   - `"length"`         CSS length (`<number><unit>`) or theme var or bare number.
+ *   - `"url"`            String parseable as a URL (relative or absolute).
+ *   - `"icon"`           Name of an icon registered in the IconRegistry.
+ *   - `"id-ref"`         Identifier that must resolve to a sibling component's `id`.
+ */
+export type PropertyValueType =
+  | "boolean"
+  | "string"
+  | "number"
+  | "any"
+  | "ComponentDef"
+  | "integer"
+  | "color"
+  | "length"
+  | "url"
+  | "icon"
+  | "id-ref";
 
 // A generic validation function that retrieves either a hint (the validation argument
 // has issues) or undefined (the argument is valid).

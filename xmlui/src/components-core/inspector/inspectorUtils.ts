@@ -228,6 +228,11 @@ export interface XsLogEntry {
    *   `cycle: string[]` (node ids in order, cycle closed implicitly), `nodes` (resolved
    *   `ReactiveNode[]`), `message` (human-readable diagnostic from `formatCycle`),
    *   and `cycleId` (stable hash for deduplication within a session).
+   * - `"type-contract"` — a parse-time type-contract violation surfaced at runtime
+   *   when `App.appGlobals.strictTypeContracts` is truthy; produced by the
+   *   type-contract verifier (plan #01). Contains `code: TypeContractCode`,
+   *   `severity`, `componentName`, optional `propName` / `expected` / `actual`,
+   *   `message`, and optional `suggestion`.
    */
   kind?: string;
   eventName?: string;
