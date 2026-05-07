@@ -22,12 +22,12 @@ test.describe("Share", () => {
       initTestBed,
       page,
     }) => {
-      await initTestBed(
+      const { clipboard } = await initTestBed(
         `<Share markdownContent="# Hello\nThis is the page content." />`,
         EXT,
       );
       await page.getByRole("button", { name: "Copy page" }).click();
-      const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+      const clipboardText = await clipboard.read();
       expect(clipboardText).toBe("# Hello\nThis is the page content.");
       await expect(page.getByRole("menu")).toHaveCount(0);
     });
@@ -180,13 +180,13 @@ test.describe("Share", () => {
       initTestBed,
       page,
     }) => {
-      await initTestBed(
+      const { clipboard } = await initTestBed(
         `<Share markdownContent="# Hello\nThis is the page content." />`,
         EXT,
       );
       await page.getByRole("button", { name: "Open share menu" }).click();
       await page.getByRole("menuitem", { name: /Copy page/ }).click();
-      const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+      const clipboardText = await clipboard.read();
       expect(clipboardText).toBe("# Hello\nThis is the page content.");
     });
 

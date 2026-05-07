@@ -120,7 +120,8 @@ class Clipboard {
    */
   async read() {
     const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
-    return handle.jsonValue();
+    const text = await handle.jsonValue();
+    return text.replace(/\r\n/g, "\n");
   }
 
   /**
