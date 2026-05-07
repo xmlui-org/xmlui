@@ -1,7 +1,3 @@
-<Component name="AdvancedUsage">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Advanced Usage
 
 ## Scripting
@@ -115,7 +111,3 @@ Show or hide content based on screen size using responsive modifiers:
 ```
 
 Available breakpoints: `sm` (≥640px), `md` (≥768px), `lg` (≥1024px), `xl` (≥1280px).
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

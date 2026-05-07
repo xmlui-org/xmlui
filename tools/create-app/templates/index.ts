@@ -5,6 +5,8 @@ import fs from "fs/promises";
 import path from "path";
 import { bold, cyan } from "picocolors";
 import pkg from '../package.json'
+import searchPkg from '../../../packages/xmlui-search/package.json'
+import docsBlocksPkg from '../../../packages/xmlui-docs-blocks/package.json'
 
 import type { InstallTemplateArgs } from "./types";
 
@@ -63,6 +65,12 @@ export const installTemplate = async ({ appName, root, packageManager, template,
      */
     dependencies: {
       "xmlui": pkg.version,
+      ...(template === "docs" || template === "blog"
+        ? {
+            "xmlui-search": searchPkg.version,
+            "xmlui-docs-blocks": docsBlocksPkg.version,
+          }
+        : {}),
     },
   };
 

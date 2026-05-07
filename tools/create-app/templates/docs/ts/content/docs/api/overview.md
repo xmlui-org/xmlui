@@ -1,7 +1,3 @@
-<Component name="ApiOverview">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # API Reference — Overview
 
 This section documents the API exposed by your project. Replace the placeholder content
@@ -74,7 +70,3 @@ Exceeding the limit returns a `429 Too Many Requests` response with a
 | Go | `go get github.com/example/sdk` |
 
 See [Endpoints](/api/endpoints) for the full list of available operations.
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>
