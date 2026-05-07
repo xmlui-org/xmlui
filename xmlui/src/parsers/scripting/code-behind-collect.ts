@@ -37,7 +37,7 @@ export function collectCodeBehindFromSource(
   // --- Parse the module (recursively, including imported modules) in restrictive mode
   const parsedModule = parseScriptModule(moduleName, source);
   if (isModuleErrors(parsedModule)) {
-    return { ...result, moduleErrors: parsedModule };
+    return { ...result, moduleErrors: parsedModule as any };
   }
 
   // --- Collect statements from the module

@@ -1045,8 +1045,8 @@ export function AppContent({
   }, [xsVerbose, xsLogMax]);
 
   // --- Create AppState object with global state management functions
-  const appStateKeys = Array.isArray(appGlobals?.appStateKeys)
-    ? (appGlobals?.appStateKeys as string[])
+  const appStateKeys = Array.isArray((appGlobals as any)?.appStateKeys)
+    ? ((appGlobals as any)?.appStateKeys as string[])
     : undefined;
   const AppState = useMemo(
     () => createAppState(appStateContextValue, { allowedKeys: appStateKeys }),
@@ -1054,7 +1054,7 @@ export function AppContent({
   );
 
   // --- Phase 2 managed replacement globals
-  const silentConsole = appGlobals?.silentConsole === true;
+  const silentConsole = (appGlobals as any)?.silentConsole === true;
   const Log = useMemo(() => createLog(silentConsole), [silentConsole]);
 
   // --- Wrap toast to log calls to _xsLogs for test trace capture

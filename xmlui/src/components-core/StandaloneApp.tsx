@@ -472,7 +472,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     // throw new Error(`Failed to fetch ${response.url}`);
     if (parser.errors.length > 0) {
       return {
-        component: errReportScriptError(parser.errors[0], response.url),
+        component: errReportScriptError(parser.errors[0] as any, response.url),
         file: response.url,
         hasError: true,
       };
