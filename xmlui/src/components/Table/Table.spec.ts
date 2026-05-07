@@ -2841,11 +2841,7 @@ test.describe("Keyboard Shortcuts", () => {
 
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
-
-      // Press the platform-appropriate key: Cmd+A on macOS, Ctrl+A elsewhere
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "selectAll",
@@ -2875,9 +2871,7 @@ test.describe("Keyboard Shortcuts", () => {
       await firstRow.click();
 
       // Press the platform-appropriate key
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
 
       const result = await testStateDriver.testState();
       expect(result.selectedItemsLength).toBeGreaterThanOrEqual(0);
@@ -2903,7 +2897,7 @@ test.describe("Keyboard Shortcuts", () => {
       const input = page.getByTestId("input").getByRole("textbox");
       await input.focus();
       await expect(input).toBeFocused();
-      await page.keyboard.press("Control+A");
+      await page.keyboard.press("ControlOrMeta+A");
 
       // Should not trigger table's selectAll
       await expect.poll(testStateDriver.testState).not.toEqual("selectAll triggered");
@@ -2932,10 +2926,7 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      // Press the platform-appropriate key
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
       await page.waitForTimeout(100);
 
       // Verify that all items are selected in the context
@@ -3017,9 +3008,7 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "copy",
@@ -3046,9 +3035,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
 
       const result = await testStateDriver.testState();
       expect(Array.isArray(result.items)).toBe(true);
@@ -3069,9 +3056,7 @@ test.describe("Keyboard Shortcuts", () => {
         </Table>
       `);
 
-      const isMac = process.platform === "darwin";
-      const cutKey = isMac ? "Meta+X" : "Control+X";
-      await page.keyboard.press(cutKey);
+      await page.keyboard.press("ControlOrMeta+X");
 
       await expect.poll(testStateDriver.testState).toEqual({
         action: "cut",
@@ -3097,9 +3082,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === "darwin";
-      const pasteKey = isMac ? "Meta+V" : "Control+V";
-      await page.keyboard.press(pasteKey);
+      await page.keyboard.press("ControlOrMeta+V");
 
       const result = await testStateDriver.testState();
       expect(result.action).toBe("paste");
@@ -3130,9 +3113,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === "darwin";
-      const pasteKey = isMac ? "Meta+V" : "Control+V";
-      await page.keyboard.press(pasteKey);
+      await page.keyboard.press("ControlOrMeta+V");
 
       // App-level handler must NOT count this as unhandled, because Table
       // called event.preventDefault() and the App handler checks defaultPrevented.
@@ -3217,9 +3198,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
 
       const result = await testStateDriver.testState();
       expect(result.hasSelectedIds).toBe(true);
@@ -3253,9 +3232,7 @@ test.describe("Keyboard Shortcuts", () => {
       const firstRow = page.locator("tbody tr").first();
       await firstRow.click();
 
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
 
       const result = await testStateDriver.testState();
       expect(result.focusedRowData).not.toBeNull();
@@ -3292,9 +3269,7 @@ test.describe("Keyboard Shortcuts", () => {
       await page.waitForTimeout(50);
 
       // Use keyboard shortcut
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
 
       const result = await testStateDriver.testState();
       expect(result.action).toBe("copy");
@@ -3319,9 +3294,7 @@ test.describe("Keyboard Shortcuts", () => {
       `);
 
       // First use a keyboard shortcut (this might not do anything if no onSelectAll handler)
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
       await page.waitForTimeout(50);
 
       // Then try space key for selection
@@ -3353,9 +3326,7 @@ test.describe("Keyboard Shortcuts", () => {
       `);
 
       // CmdOrCtrl+A should be handled by our handler and prevented
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
 
       await expect.poll(testStateDriver.testState).toEqual("handled");
     });
@@ -3382,9 +3353,7 @@ test.describe("Keyboard Shortcuts", () => {
       await expect(table).toBeVisible();
 
       // Press the platform-appropriate key
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
       await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
@@ -3435,9 +3404,7 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === "darwin";
-      const copyKey = isMac ? "Meta+C" : "Control+C";
-      await page.keyboard.press(copyKey);
+      await page.keyboard.press("ControlOrMeta+C");
       await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
@@ -3461,9 +3428,7 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === "darwin";
-      const cutKey = isMac ? "Meta+X" : "Control+X";
-      await page.keyboard.press(cutKey);
+      await page.keyboard.press("ControlOrMeta+X");
       await page.waitForTimeout(100);
 
       // Should NOT have triggered the handler (testState remains null)
@@ -3487,9 +3452,7 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === "darwin";
-      const pasteKey = isMac ? "Meta+V" : "Control+V";
-      await page.keyboard.press(pasteKey);
+      await page.keyboard.press("ControlOrMeta+V");
       await page.waitForTimeout(100);
 
       // Should have triggered the handler
@@ -3515,9 +3478,7 @@ test.describe("Keyboard Shortcuts", () => {
       const table = page.getByTestId("table");
       await expect(table).toBeVisible();
 
-      const isMac = process.platform === "darwin";
-      const selectAllKey = isMac ? "Meta+A" : "Control+A";
-      await page.keyboard.press(selectAllKey);
+      await page.keyboard.press("ControlOrMeta+A");
       await page.waitForTimeout(100);
 
       // Should have triggered the handler
