@@ -317,22 +317,27 @@ Not everything can move. The hot-path render still owns:
 
 ## 16. Implementation order
 
-The work is split into two phases:
-
-- **Phase A — Prepare and verify.** Add the new fields to `ComponentDef` / `CompoundComponentDef` / parsed AST nodes and populate them, **without** changing any render-time consumer. The goal is that all existing unit tests and all existing E2E tests still pass exactly as before, while a new battery of unit tests verifies that the prepared data is correct for a wide range of markup. Phase A is a pure information-gathering pass; rendering does not look at the new fields yet.
-- **Phase B — Switch over consumers, one step at a time.** Each step replaces a render-time computation with a read of the precomputed field, behind a feature flag (e.g., `appGlobals.usePreparedX`). Each step lands its own dedicated unit + E2E tests, then the flag is removed once the green run is stable.
+The work is split into independent **steps**, each of which delivers one optimisation end-to-end: preparation logic, render-time consumer switch-over, and tests. There are **no feature flags** — each step lands the optimisation in a single commit/PR. Steps are ordered so that low-risk wins ship first and the most invasive change (`computedUses` narrowing) ships last.
 
 Mark every step with **(transform-time)** if it can be done by `vite-xmlui-plugin` and survives serialisation, or **(boot-time)** if it must run when `StandaloneApp` initialises (because it depends on the runtime registry / metadata).
 
+### Per-step workflow
+
+For every step below, follow this exact flow:
+
+1. **Implement the change.** Add the new field(s) to `ComponentDef` / `CompoundComponentDef` / parsed AST nodes, populate them in the prep pass, and switch the render-time consumer over to read them. Verify there are no lint or TypeScript errors.
+2. **Add new unit tests** that cover the new prepared structure and the switched-over consumer. Run the new unit tests and confirm they pass.
+3. **Run the full unit test suite** (`npm run test:unit -w xmlui`) and confirm no regressions.
+4. **Add new E2E tests** that exercise the optimisation through real markup (Playwright specs under `xmlui/tests-e2e/`). Run the new E2E tests and confirm they pass.
+5. **Stop and request approval.** The user runs the full E2E suite to check for regressions before the next step is started.
+
 ---
 
-### Phase A — Build the parse/transform preparation
+#### Step 1. Pre-parse all attribute / text expressions + `pure` short-circuit (§3, §3.1) — **transform-time**
 
-Each Phase A step adds preparation logic and unit tests that read back the prepared structure. **No render-time consumer changes.** The existing test suite (`pnpm test` for unit, `pnpm test:e2e` for E2E) must pass unchanged at the end of every step.
+**Prep:** Walk every `comp.props`, `comp.vars`, `comp.globalVars`, `comp.contextVars`, `comp.when`, `comp.responsiveWhen[bp]`, and every `TextNode` text value. Replace strings with `ParsedPropertyValue` objects. Set `pure: true` for values without `{}` segments.
 
-#### A1. Pre-parse all attribute / text expressions (§3) — **transform-time**
-
-Walk every `comp.props`, `comp.vars`, `comp.globalVars`, `comp.contextVars`, `comp.when`, `comp.responsiveWhen[bp]`, and every `TextNode` text value. Replace strings with `ParsedPropertyValue` objects. Set `pure: true` for values without `{}` segments.
+**Switch-over:** Update `valueExtractor` (and `parseAttributeValue` / `parseParameterString` callers) to read `ParsedPropertyValue` directly. When `pure: true`, return `value` verbatim — bypass the parser entirely. When segments are present, evaluate them without re-parsing.
 
 Unit tests:
 
@@ -347,28 +352,19 @@ Unit tests:
 - Parse `<TextNodeCData>` — assert it is **not** parsed (stays opaque).
 - Round-trip through `vite-xmlui-plugin` serialisation: parsed values survive intact (no `Function`/non-serialisable references on parsed AST nodes).
 - Negative: malformed expression (`value="{1 +"`) reports the same parser diagnostic that the runtime would have raised, with original source positions.
+- Mock `Parser.parseExpr()` and assert it is **not** invoked when `valueExtractor` reads a `pure: true` value.
 
 E2E tests:
 
-- All existing tests pass unchanged. (Phase A introduces no rendering behaviour change.)
+- A markup-heavy page (literal props + interpolated props) renders identically to the legacy build.
+- Reactive interpolation: change a variable bound into a `value="Count: {count}"` and assert the rendered text updates.
+- `when` and `when-md` toggle visibility correctly when their backing variables change.
 
-#### A2. Constant folding (§11) — **transform-time**
+#### Step 2. Per-expression dependency lists (§2.4) — **transform-time**
 
-Run `simplifyExpression()` on every parsed expression after A1.
+**Prep:** Walk every parsed expression and store `expr.deps: string[]` plus `parsedValue.deps` aggregated across segments.
 
-Unit tests:
-
-- `{2 + 3}` folds to `{5}`.
-- `{0 + count}` folds to `{count}`.
-- `{1 * count}` folds to `{count}`.
-- `{true ? a : b}` folds to `{a}`.
-- `{false ? a : b}` folds to `{b}`.
-- Folding is idempotent (running twice = running once).
-- Folding does not mutate the original source string stored alongside (for inspector).
-
-#### A3. Per-expression dependency lists (§2.4) — **transform-time**
-
-After A1+A2, walk every parsed expression and store `expr.deps: string[]` plus `parsedValue.deps` aggregated across segments.
+**Switch-over:** Update `valueExtractor` and `useVars` to read `expr.deps` directly instead of calling `collectVariableDependencies`. Only the small reference-tracked set is unioned on demand at runtime.
 
 Unit tests:
 
@@ -380,10 +376,18 @@ Unit tests:
 - `{let r = 1; r + count}` (in event handler) → deps `["count"]`.
 - `{$item.name}` → deps `["$item"]`.
 - Pure literal value → deps `[]`.
+- Mock `collectVariableDependencies` and assert it is **not** invoked when `expr.deps` is present.
 
-#### A4. Identifier classification (§2.3) — **boot-time**
+E2E tests:
 
-Walk every parsed expression in the tree from the root. Maintain a stack of declarations (`vars`, `globalVars`, `functions`, `scriptCollected`, component IDs, recognised context vars per scope, banned names). Tag each `Identifier` AST node with `idScope: { kind, ownerUid?, contextLayer? }`. Marks identifiers as `dynamic` when classification is ambiguous.
+- Reactivity end-to-end: a page with multiple variables and computed expressions reflects updates correctly when each dep mutates.
+- A computed expression depending on three vars updates when each one changes independently.
+
+#### Step 3. Identifier classification (§2.3) — **boot-time**
+
+**Prep:** Walk every parsed expression in the tree from the root. Maintain a stack of declarations (`vars`, `globalVars`, `functions`, `scriptCollected`, component IDs, recognised context vars per scope, banned names). Tag each `Identifier` AST node with `idScope: { kind, ownerUid?, contextLayer? }`. Mark identifiers as `dynamic` when classification is ambiguous.
+
+**Switch-over:** Update `eval-tree-common.getIdentifierScope` to dispatch on `idScope.kind` for tagged identifiers. `dynamic` identifiers fall through to the legacy multi-layer scope walk.
 
 Unit tests:
 
@@ -394,15 +398,22 @@ Unit tests:
 - `Actions` → `appContext`.
 - `navigate`, `toast`, `delay`, `App.fetch` root → `appContext`.
 - `eval`, `setTimeout`, `document` → `banned` (and a parse-time warning is emitted).
-- `let foo` shadowing a parent `vars.foo` only on one branch → `dynamic`.
+- `let foo` shadowing a parent `vars.foo` only on one branch → `dynamic` (legacy scope walk applies).
 - Block-scoped param `(x) => x` → `block`.
 - A name not declared anywhere in the tree → `globalThis`.
 - Compound component template referencing `$props.something` → `contextVar` (`$props`).
-- A change to the parent container's vars invalidates the cached classification (verified by re-classifying the whole tree from scratch on every `prepareComponentDef` call).
 
-#### A5. `requiresContainer` flag + precomputed wrapper (§2.1) — **transform-time** (flag) / **boot-time** (wrapper, since serialisation roundtripping is fine)
+E2E tests:
 
-Set `comp.requiresContainer` based on the same rule as `isContainerLike`. Build `comp.containerized` for nodes that need wrapping.
+- Closures and var-shadowing edge cases (a deeply nested compound component referencing parent IDs and context vars) render and react correctly.
+- Banned identifier (`eval`) emits a warning and renders without crashing.
+- Code-behind functions that reference module-scoped vars resolve correctly.
+
+#### Step 4. `requiresContainer` flag + precomputed wrapper (§2.1) — **transform-time** (flag) / **boot-time** (wrapper)
+
+**Prep:** Set `comp.requiresContainer` based on the same rule as `isContainerLike`. Build `comp.containerized` for nodes that need wrapping.
+
+**Switch-over:** Replace the `isContainerLike(...)` and `getWrappedWithContainer(...)` `useMemo` calls in `ComponentWrapper` with a direct read of `comp.requiresContainer` / `comp.containerized`.
 
 Unit tests:
 
@@ -410,19 +421,25 @@ Unit tests:
 - `<Stack var.count="0">` → `requiresContainer === true`; `containerized.type === "Container"`; original node moved to `children[0]` with `vars` stripped.
 - `<Container>` → `requiresContainer === true`; `containerized` is the node itself (no extra wrap).
 - `<Stack uses="['a']">` → `requiresContainer === true`; explicit container.
-- `<Stack>` with `<DataSource>` child → after A6's loader extraction, `requiresContainer === true`.
 - `<Stack>` with `scriptCollected` from a `<script>` block → `requiresContainer === true`.
 - The shape of `containerized` matches exactly what `getWrappedWithContainer()` produces today (compare for parity).
 
-#### A6. Structural transforms moved to prep (§4) — **boot-time** (`childrenAsTemplate` and `DataSourceRef` need registry + uid map; `childDatasource`, `dataProp` literal, `rawDataProp` are transform-time-safe but rely on knowing which props are loader refs, so are simplest to do all at boot)
+E2E tests:
 
-Apply the four (now five with A6.4) transforms once during preparation:
+- Container-bearing components (`<Stack var.count="0">…`) render and dispatch state correctly.
+- A code-behind-bearing fragment renders with its module-scoped vars accessible.
 
-- A6.1 `transformNodeWithChildrenAsTemplate` (needs descriptor — boot-time)
-- A6.2 `transformNodeWithChildDatasource` (transform-time-safe)
-- A6.3 `transformNodeWithDataSourceRefProp` for prop expressions that are pure single identifiers matching a loader uid (boot-time, needs uid map)
-- A6.4 `transformNodeWithDataProp` for the *literal-string* `data` case (transform-time-safe; the dynamic case stays at runtime)
-- A6.5 `transformNodeWithRawDataProp` (transform-time-safe)
+#### Step 5. Structural transforms moved to prep (§4) — **boot-time**
+
+**Prep:** Apply the five transforms once during preparation:
+
+- 5.1 `transformNodeWithChildrenAsTemplate` (needs descriptor — boot-time)
+- 5.2 `transformNodeWithChildDatasource` (transform-time-safe but bundled with the rest)
+- 5.3 `transformNodeWithDataSourceRefProp` for prop expressions that are pure single identifiers matching a loader uid
+- 5.4 `transformNodeWithDataProp` for the *literal-string* `data` case (the dynamic case stays at runtime)
+- 5.5 `transformNodeWithRawDataProp`
+
+**Switch-over:** Remove the `useMemo` chain at `ComponentWrapper.tsx:48-82` and let it read the already-transformed node directly.
 
 Unit tests:
 
@@ -434,20 +451,37 @@ Unit tests:
 - `<Table raw_data="{...}">` → `data: ...` and `__DATA_RESOLVED: true`.
 - The Fragment + scriptCollected special case is handled (cf. `ComponentWrapper.tsx:172`).
 
-#### A7. apiBound detection (§6) — **boot-time** (needs to know which prop/event values resolve to DataSource/APICall components after A6 has run)
+E2E tests:
 
-Compute `comp.apiBound: { props: string[]; events: string[] } | null`.
+- Data-driven page using a `<DataSource>` child renders rows correctly.
+- A `<Table data="https://...">` literal URL fetches and renders.
+- A dynamic `<Table data="{maybeUrl}">` falls back to the runtime path and updates when `maybeUrl` changes.
+- A `childrenAsTemplate`-bearing component (e.g. `<List>` with row template) renders.
+
+#### Step 6. apiBound detection (§6) — **boot-time**
+
+**Prep:** Compute `comp.apiBound: { props: string[]; events: string[] } | null`.
+
+**Switch-over:** Replace the `useMemo` scan in `ComponentAdapter.tsx:264` with a direct read of `comp.apiBound`. Skip the `ApiBoundComponent` wrap entirely when `apiBound === null`.
 
 Unit tests:
 
 - Component with no API-bound props/events → `apiBound === null`.
-- `<Component data="{ds}">` (after A6.3 rewrite to `DataSourceRef`) → `apiBound.props === ["data"]`.
+- `<Component data="{ds}">` (after Step 5 rewrite to `DataSourceRef`) → `apiBound.props === ["data"]`.
 - `<Button onClick="<APICall .../>">` → `apiBound.events === ["click"]`.
 - `<Button onClick="<FileDownload .../>">` → `apiBound.events === ["click"]`.
 
-#### A8. Layout property classification (§7) — **boot-time** (parse is static, but partitioning depends on `layoutOptionKeys` which is registry-influenced)
+E2E tests:
 
-Compute `comp.layoutPropClassification = { base, extended, regular }`.
+- A page with `<APICall>` events fires the call and updates the UI.
+- A `<DataSource>`-bound component renders and refreshes correctly.
+- A page with no API-bound elements renders without `ApiBoundComponent` overhead (verify via DOM/React tree shape).
+
+#### Step 7. Layout property classification (§7) — **boot-time**
+
+**Prep:** Compute `comp.layoutPropClassification = { base, extended, regular }` by partitioning `comp.props` once.
+
+**Switch-over:** Replace the per-render `Object.keys(safeNode.props)` + `parseLayoutProperty(key)` loop in `ComponentAdapter.tsx:389-417` with iteration over the precomputed slices.
 
 Unit tests:
 
@@ -458,35 +492,39 @@ Unit tests:
 - `label="hello"` → `regular: ["label"]`.
 - Invalid keys (e.g., gibberish) end up in `regular`.
 
-#### A9. Behavior pre-binding (§5) — **boot-time** (needs registered behaviors)
+E2E tests:
 
-Compute `comp.applicableBehaviors: { name, attach: "always"|"never"|"runtime", runtimePropName? }[]`.
+- Themed page with breakpoint-suffixed props renders correctly across viewport sizes.
+- Part-suffixed props (`padding-input-Button`) produce expected styles.
+- A state-suffixed prop (`borderColor-Button--focus`) applies on focus.
+
+#### Step 8. Behavior pre-binding (§5) — **boot-time**
+
+**Prep:** Compute `comp.applicableBehaviors: { name, attach: "always"|"never"|"runtime", runtimePropName? }[]`.
+
+**Switch-over:** ComponentAdapter's behavior loop iterates `comp.applicableBehaviors` instead of the full registered behavior list.
 
 Unit tests:
 
-- `<Button>` with no `tooltip` prop → `tooltipBehavior` is **not** in the list (or is `attach: "never"`).
+- `<Button>` with no `tooltip` prop → `tooltipBehavior` is **not** in the list (or `attach: "never"`).
 - `<Button tooltip="...">` → `tooltipBehavior` is `attach: "always"`.
 - `<NumberBox>` with `validationState` prop → `validationBehavior` is `attach: "runtime"` with `runtimePropName: "validationState"`.
 - Compound (user-defined) component → `applicableBehaviors === []` (never attached).
 - `<DataSource>` (nonVisual) → behaviors guarded by `visual` condition are pruned.
 - The list order matches the registered behavior order (innermost-first stays innermost).
 
-#### A10. `computedUses` for implicit containers (§2.2) — **boot-time** (depends on A4 identifier classification and the uid map)
+E2E tests:
 
-For every implicit container, collect all free identifiers (vars + reachable component IDs) referenced by descendants. Store as `comp.computedUses`.
+- Tooltip on a button shows on hover.
+- Form with a `<NumberBox>` and validation displays validation state correctly.
+- Bookmark on a heading registers and is navigable.
+- A compound component renders without spurious behavior wrappers.
 
-Unit tests:
+#### Step 9. Compound component metadata (§8) — **boot-time**
 
-- `<Stack var.a="0" var.b="0"><Text>{a}</Text></Stack>` — outer container's `computedUses` excludes `b` if no descendant uses `b`.
-- Nested `<Stack var.x="0"><Stack var.y="0"><Text>{x + y}</Text></Stack></Stack>` — inner implicit container's `computedUses` includes `x` (free in inner subtree).
-- Component-id reach: `<TextBox id="t" /><Stack><Text>{t.value}</Text></Stack>` — outer's `computedUses` includes `t`.
-- Deep member access: `{user.profile.name}` contributes only `user` to `computedUses`.
-- An identifier that is shadowed by a child's `var` is not double-counted in the parent's `computedUses` (only what is genuinely free at the parent level).
-- An identifier that resolves to an `appContext` global (`Actions`, `navigate`, etc.) is **not** in `computedUses` (no inheritance from parent state needed).
+**Prep:** Walk the compound component's template + code-behind. Store `derivedProps`, `derivedEvents`, `usesSlots` on `CompoundComponentDef`.
 
-#### A11. Compound component metadata (§8) — **boot-time** (or transform-time if registry-independent)
-
-Walk the compound component's template + code-behind. Store `derivedProps`, `derivedEvents`, `usesSlots`.
+**Switch-over:** Replace the lazy `generateUdComponentMetadata` call with a direct read of the precomputed fields from the registry's `descriptor`.
 
 Unit tests:
 
@@ -497,9 +535,17 @@ Unit tests:
 - `$props` access inside an event handler is also collected.
 - `$props` access inside `.xmlui.xs` code-behind is also collected.
 
-#### A12. Slot pre-bucketing (§9) — **boot-time**, **only for pure-literal slot names**
+E2E tests:
 
-Build `compound.slotMap` and bucket call-site children by slot name. Skip if the slot/property name is an expression.
+- A compound component receives `$props.title` correctly from a parent invocation.
+- A compound component emits a custom event reachable by the parent.
+- Slotted content (default + named) renders in the right place.
+
+#### Step 10. Slot pre-bucketing (§9) — **boot-time**, **only for pure-literal slot names**
+
+**Prep:** Build `compound.slotMap` and bucket call-site children by slot name. Skip if the slot/property name is an expression.
+
+**Switch-over:** Replace `renderChild`'s `Slot` branch runtime walk with a keyed lookup against `compound.slotMap`. Expression-named slots fall back to the legacy path.
 
 Unit tests:
 
@@ -508,9 +554,16 @@ Unit tests:
 - Component definition with `<Slot/>` only (no name) → `slotMap.default` exists.
 - Mixed: `<Slot name="x"/>` and `<Slot/>` → both `slotMap.x` and `slotMap.default` exist.
 
-#### A13. Pre-parse pure-literal `bubbleEvents` / `testId` / `id` (§10) — **transform-time**
+E2E tests:
 
-Only transform values that are `pure: true` after A1.
+- ModalDialog with slotted content renders header, body, footer in the correct positions.
+- A Card with named header/footer slots populates each slot from a parent invocation.
+
+#### Step 11. Pre-parse pure-literal `bubbleEvents` / `testId` / `id` (§10) — **transform-time**
+
+**Prep:** Only transform values that are `pure: true`. `bubbleEvents` literal arrays → `string[]`. `testId` → mark for bypass. `id` with `{}` interpolation → emit parser warning.
+
+**Switch-over:** Replace the per-render `extractParam` calls with the precomputed value when `pure: true`.
 
 Unit tests:
 
@@ -521,9 +574,17 @@ Unit tests:
 - `id="myInput"` → stored as authored.
 - `id="my-{x}"` (interpolation present) → emit a parser warning; runtime fallback path applies.
 
-#### A14. Pre-parse pure-literal keybindings (§12) — **transform-time**
+E2E tests:
 
-Only when `binding` is `pure: true`.
+- Components with literal `testId` are findable via test selectors (regression check across a representative page).
+- A button with literal `bubbleEvents="['click']"` bubbles its click event.
+- A dynamic `testId="btn-{i}"` inside a list still resolves correctly.
+
+#### Step 12. Pre-parse pure-literal keybindings (§12) — **transform-time**
+
+**Prep:** When `<Keyboard binding>` is `pure: true`, run `parseKeyBinding()` at transform and store the resolved `ParsedKeyBinding`.
+
+**Switch-over:** Runtime reads the precomputed `ParsedKeyBinding`. Dynamic bindings fall back to the runtime parse path.
 
 Unit tests:
 
@@ -531,9 +592,16 @@ Unit tests:
 - `<Keyboard binding="{userKey}" />` (dynamic) → not pre-parsed; runtime path applies.
 - Invalid pure-literal binding (e.g. `"???"`) → parser-time error with source position.
 
-#### A15. Pre-parse pure-literal style-typed values (§13) — **boot-time** (needs metadata to know which prop has which `valueType`)
+E2E tests:
 
-Only when the prop is `pure: true` AND its metadata `valueType` is `"size" | "border" | "color"`.
+- A static keybinding fires its handler when the key combo is pressed.
+- A dynamic keybinding (`binding="{userKey}"`) updates when the backing variable changes.
+
+#### Step 13. Pre-parse pure-literal style-typed values (§13) — **boot-time**
+
+**Prep:** When the prop is `pure: true` AND its metadata `valueType` is `"size" | "border" | "color"`, run the corresponding `StyleParser` method at prep and store the result.
+
+**Switch-over:** Layout resolver reads the precomputed value directly for pure literals.
 
 Unit tests:
 
@@ -543,145 +611,60 @@ Unit tests:
 - `border="2px solid #000"` (border) → stored as `BorderNode`.
 - Theme-id sizes (`width="$space-md"`) → stored as `ThemeIdDescriptor`.
 
-#### Phase A exit criteria
+E2E tests:
 
-- All existing unit tests pass.
-- All existing E2E tests pass.
-- All new unit tests above pass.
-- Memory and serialisation footprint of `ComponentDef` measured (record baseline before/after).
-- No render-time consumer reads the new fields yet.
+- A themed page with size/border/color props renders with the correct computed styles (compare against a baseline screenshot).
+- A dynamic size value updates the rendered width when the backing variable changes.
 
----
+#### Step 14. Constant folding (§11) — **transform-time**
 
-### Phase B — Switch render-time consumers to the prepared data
+**Prep:** Run `simplifyExpression()` on every parsed expression after Step 1. Replace the AST in-place.
 
-Each Phase B step replaces a render-time computation with a read from the field populated in Phase A. Each step is feature-flagged (`appGlobals.preparedXyz`) so it can be enabled per app and rolled back if a regression appears. After the flag has been on for a release with no regressions, the flag and the legacy code path are removed.
+**Switch-over:** No consumer change required — the evaluator reads the folded AST transparently. Verify the runtime never re-evaluates trivially-foldable subtrees.
 
-Order is chosen so that low-risk wins ship first:
+Unit tests:
 
-#### B1. Use `pure` short-circuit in `valueExtractor` (§3.1)
+- `{2 + 3}` folds to `{5}`.
+- `{0 + count}` folds to `{count}`.
+- `{1 * count}` folds to `{count}`.
+- `{true ? a : b}` folds to `{a}`.
+- `{false ? a : b}` folds to `{b}`.
+- Folding is idempotent (running twice = running once).
+- Folding does not mutate the original source string stored alongside (for inspector).
 
-Replaces `parseParameterString` / `parseAttributeValue` calls in the hot path.
+E2E tests:
 
-Tests: regression run of value-extraction tests across every component; new unit test asserts no `Parser.parseExpr()` is called when extracting from a pre-parsed pure value (mock the parser and count invocations).
-E2E: all existing pages still render identically. Add a perf-counter test that opens a heavy page (e.g. the Tube Stops sample) and asserts a parse-call drop ≥ 80%.
+- A page with arithmetic-heavy expressions renders the same values as before folding.
+- Reactive expressions that *contain* a foldable subtree (e.g. `{0 + count}`) still update when `count` changes.
 
-#### B2. Use precomputed `expr.deps` in `valueExtractor` and `useVars` (§2.4)
+#### Step 15. `computedUses` for implicit containers (§2.2) — **boot-time** — **MOST INVASIVE, RUN LAST**
 
-Replaces `collectVariableDependencies` calls.
+**Prep:** For every implicit container, walk all expressions inside the subtree (props, `var`, event handlers, `<TextNode>` interpolation, `when`/`responsiveWhen`) and collect free identifiers (including reachable component IDs). Store as `comp.computedUses: string[]`.
 
-Tests: every existing reactivity test still passes (mutate a variable → dependent expressions re-evaluate). New unit test confirms `collectVariableDependencies` is **not** invoked when the AST already carries `deps`.
-E2E: full E2E run of reactive forms / live data pages.
+**Switch-over:** `extractScopedState` uses `comp.computedUses` instead of returning the whole parent state for implicit containers.
 
-#### B3. Use precomputed `idScope` in `eval-tree-common.getIdentifierScope` (§2.3)
+> ⚠️ This step **changes observable state-bubble semantics** for implicit containers. A name not in `computedUses` will no longer bubble through. Document the change in the upgrade notes.
 
-Replaces the multi-layer scope walk for tagged identifiers; `dynamic` identifiers fall through to the legacy walk.
+Unit tests:
 
-Tests: every identifier-resolution edge case (var shadowing, closures, $-prefixed names, banned names) — covered by new and existing unit tests; verify `dynamic` fallback still works.
-E2E: full run of complex apps (Test bed apps with deeply nested compound components and code-behind functions).
+- `<Stack var.a="0" var.b="0"><Text>{a}</Text></Stack>` — outer container's `computedUses` excludes `b` if no descendant uses `b`.
+- Nested `<Stack var.x="0"><Stack var.y="0"><Text>{x + y}</Text></Stack></Stack>` — inner implicit container's `computedUses` includes `x` (free in inner subtree).
+- Component-id reach: `<TextBox id="t" /><Stack><Text>{t.value}</Text></Stack>` — outer's `computedUses` includes `t`.
+- Deep member access: `{user.profile.name}` contributes only `user` to `computedUses`.
+- An identifier shadowed by a child's `var` is not double-counted in the parent's `computedUses` (only what is genuinely free at the parent level).
+- An identifier resolving to an `appContext` global (`Actions`, `navigate`, etc.) is **not** in `computedUses` (no inheritance from parent state needed).
+- Stress test: deeply nested implicit containers (5+ levels) with overlapping var names and component IDs — every level's `computedUses` is correct.
+- Negative test: a name genuinely unused by the subtree is **not** in `computedUses`; assigning to it from inside the subtree (which would have bubbled before) does NOT bubble. Confirm the new semantics with a deliberate test.
 
-#### B4. Use `requiresContainer` + `containerized` in `ComponentWrapper` (§2.1)
+E2E tests:
 
-Replaces `isContainerLike(...)` and `getWrappedWithContainer(...)` `useMemo` calls.
-
-Tests: existing container tests (`StateContainer.spec.tsx`, `Container.spec.tsx`); new unit test mounts a node and asserts the container shape is structurally identical to the legacy code's output.
-E2E: existing tests for components with `vars`, `loaders`, `uses`, code-behind.
-
-#### B5. Use prep-pass results from §4 in `ComponentWrapper` (§4)
-
-Replaces the `useMemo` chain at `ComponentWrapper.tsx:48-82`.
-
-Tests: every existing data-source / `data="..."` test, plus tests for the dynamic-data fallback (the `transformNodeWithDataProp` runtime case).
-E2E: data-driven sample apps (DataSources, Forms with API calls, Tables with DataSourceRef props).
-
-#### B6. Use `apiBound` flag (§6)
-
-Replaces the `useMemo` scan in `ComponentAdapter.tsx:264`.
-
-Tests: one regression test per API-bound case (DataSource prop, APICall event, FileDownload, FileUpload); negative test that nothing extra is wrapped when `apiBound === null`.
-E2E: pages that use `<APICall>` events and DataSource-bound components.
-
-#### B7. Use `layoutPropClassification` (§7)
-
-Replaces the per-render `Object.keys(safeNode.props)` + `parseLayoutProperty(key)` loop.
-
-Tests: regression tests for all part/breakpoint/state-suffixed layout props; verify generated CSS class identical before/after.
-E2E: theming + responsive layout pages render identically across viewport sizes.
-
-#### B8. Use `applicableBehaviors` (§5)
-
-Replaces the per-render iteration over all registered behaviors.
-
-Tests: each behavior (label, animation, tooltip, variant, bookmark, formBinding, validation) — pages exercising each; verify behaviors still attach and order is preserved. Verify compound components still skip behaviors entirely.
-E2E: forms (FormBinding + Validation), tooltips on buttons, bookmarks on headings.
-
-#### B9. Use `compound.derivedProps` / `derivedEvents` / `usesSlots` (§8)
-
-Replaces lazy `generateUdComponentMetadata`.
-
-Tests: user-defined components — each props/events/slots metadata surface is identical to the legacy lazy-derived version.
-E2E: the Tube Stops sample (heavily compound).
-
-#### B10. Use `compound.slotMap` and call-site slot bucket (§9)
-
-Replaces the runtime walk over `parentRenderContext`.
-
-Tests: components with default slot, named slots, multiple slots; expression-named slots fall back to legacy path.
-E2E: ModalDialog with slotted content; Card with named header/footer slots.
-
-#### B11. Use `computedUses` for implicit containers (§2.2)
-
-**Most invasive** — changes which parent state names propagate into an implicit container. Run *last*. Behind a feature flag for an extra release before removing the legacy path.
-
-Tests:
-- New unit tests: each implicit container in a test markup gets the expected narrow `computedUses`.
-- Regression: every existing test that mutates a parent variable and expects a child to update still works.
-- Negative test: a name that is genuinely unused by the subtree is **not** in `computedUses` and assigning to it from inside the subtree (which would have bubbled before) does NOT bubble — confirm the new semantics with a deliberate test, and document the change in the upgrade notes.
-- Stress test: deeply nested implicit containers (5+ levels) with overlapping var names and component IDs.
-
-E2E:
-- Full E2E suite.
-- A focused performance E2E that mutates a variable in a large list and measures re-render count (expect a meaningful drop because narrower `uses` short-circuits more `useMemo`s).
-
-#### B12. Use pre-parsed `bubbleEvents` / `testId` / `id` (§10)
-
-Replaces the per-render `extractParam` calls when the value is `pure`.
-
-Tests: regression on `testId` selectors used by E2E; `bubbleEvents` array passed unchanged.
-E2E: every E2E test relies on `testId` — full run is the regression check.
-
-#### B13. Use pre-parsed `keybinding` (§12)
-
-Replaces `parseKeyBinding()` at runtime for static bindings.
-
-Tests: each `<Keyboard>` binding test in unit + E2E.
-E2E: keyboard shortcut sample.
-
-#### B14. Use pre-parsed style-typed values (§13)
-
-Replaces `StyleParser` invocations in the layout resolver for pure literals.
-
-Tests: every theme variable / size / border parsing unit test still passes.
-E2E: theming sample, responsive sample.
-
-#### B15. Use folded expressions (§11)
-
-Replaces evaluation of trivial-arithmetic expressions with the folded constant.
-
-Tests: golden output of expression evaluation is unchanged for hundreds of expressions across the test markup corpus; folded case observably bypasses `eval-tree-sync`.
-E2E: full run.
-
-#### Phase B exit criteria (per step)
-
-- All unit tests (existing + new) pass with the flag ON.
-- All E2E tests pass with the flag ON.
-- A focused micro-benchmark shows the targeted operation is measurably faster (parse-call count drop, render-count drop, or wall-time drop on a representative page).
-- The flag has been on in CI for ≥ 1 week with no regressions reported.
-- Then: remove the flag and delete the legacy path in a follow-up commit.
+- Existing `StateContainer` flows (variables mutated by descendants update the right ancestors) still work.
+- A large list with per-row variables: mutating one row's var does **not** trigger re-renders of unrelated rows (verify via render-count instrumentation).
+- A form with deeply nested fields: validation state on one field does not invalidate sibling subtrees.
 
 ---
 
-The `__PARSED` marker pattern is already established for events; reuse it for the prop-value parsing introduced in A1 to keep migration mechanical. Tests live alongside existing suites: parser-level unit tests under `xmlui/tests/parsers/`, runtime/integration tests in the `xmlui-test/` package or the relevant component's test file, and E2E tests in the `xmlui-test/tests-e2e` tree.
+The `__PARSED` marker pattern is already established for events; reuse it for the prop-value parsing introduced in Step 1 to keep migration mechanical. Tests live alongside existing suites: parser-level unit tests under `xmlui/tests/parsers/`, runtime/integration tests in the `xmlui-test/` package or the relevant component's test file, and E2E tests in the `xmlui/tests-e2e/` tree.
 
 ---
 
