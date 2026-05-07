@@ -1,46 +1,28 @@
-<App
-  layout="condensed-sticky"
-  var.posts="{[
-    {
-      slug: 'welcome-to-my-blog',
-      title: 'Welcome to My Blog',
-      description: 'The first post on this blog — what to expect and how it was built.',
-      date: '2025-03-01',
-      author: 'Jane Smith',
-      tags: ['news', 'meta'],
-      content: '## Why I Started This Blog\n\nEvery developer needs a place to share ideas, document experiments, and connect with others. This blog is mine.\n\nI built it with [XMLUI](https://xmlui.org) — a declarative UI framework that lets me write apps in markup without wrestling with component boilerplate.\n\n## What to Expect\n\nI plan to write about:\n\n- **XMLUI tips and tricks** — patterns I find useful day to day\n- **Project walkthroughs** — building real apps from scratch\n- **Tooling** — the CLI tools, editors, and workflows that make me productive\n\n## How This Site Works\n\nThe blog is a single XMLUI app with a post listing page and individual post pages. All posts are defined as data in src/Main.xmlui. To add a new post, add an entry to the var.posts array and write the content in Markdown.\n\nFor a larger blog you would swap the inline array for an API call — the PostList and PostPage components stay exactly the same.\n\n## Get in Touch\n\nHave a question or idea? Open an issue on the repo or reach out directly.'
-    },
-    {
-      slug: 'building-a-docs-site-with-xmlui',
-      title: 'Building a Docs Site with XMLUI',
-      description: 'A step-by-step walkthrough of the docs template — navigation, TOC, and Markdown rendering.',
-      date: '2025-03-10',
-      author: 'Jane Smith',
-      tags: ['tutorial', 'xmlui'],
-      content: '## The Docs Template\n\nThe create-xmlui-app tool ships with a docs template that gives you a complete documentation site in minutes:\n\n    npx create-xmlui-app my-docs --template docs\n    cd my-docs && npm start\n\n## What You Get\n\nThe template includes:\n\n- A **sidebar** built with NavPanel and collapsible NavGroup sections\n- A **Table of Contents** sidebar that auto-generates from page headings\n- **Markdown rendering** for all documentation pages\n- A **dark/light mode** toggle\n\n## How the Layout Works\n\nThe vertical-sticky app layout puts the NavPanel on the left and the content area on the right. Inside each content page, an HStack places the Markdown content next to a TableOfContents.\n\n## Adding a New Page\n\n1. Create src/components/MyPage.xmlui as a component wrapping DocPage.\n2. Add a NavLink in the NavPanel section of Main.xmlui.\n3. Add a matching Page element inside Pages.\n\nThat is all it takes.'
-    },
-    {
-      slug: 'theming-in-xmlui',
-      title: 'Theming in XMLUI',
-      description: 'How to customise colours, typography, and spacing with XMLUI theme variables.',
-      date: '2025-03-20',
-      author: 'Alex Johnson',
-      tags: ['theming', 'xmlui', 'css'],
-      content: '## The Theme System\n\nXMLUI uses a token-based theming system. Every component exposes a set of CSS-variable-like theme variables that you can override at any level of the tree.\n\n## Changing the Primary Color\n\nWrap any subtree in a Theme component and set the token you want to override. The color-primary-500 token cascades to buttons, links, and active navigation items automatically.\n\n## Typography\n\nUse fontFamily-base, fontSize-base, and lineHeight-base theme variables to set the global typography for your app.\n\n## Dark Mode\n\nAdd autoDetectTone set to true on the App component to follow the system preference. Or let users switch manually with the ToneChangerButton component in the AppHeader.\n\n## Scoped Themes\n\nThemes are scoped — they only affect descendants. This lets you apply a different look to a single section without touching the rest of the app.\n\n## Finding Token Names\n\nEvery component\'s documentation lists its supported theme variables. You can also inspect the rendered HTML and look for CSS custom properties prefixed with --xmlui-.'
-    }
-  ]}"
->
+<App layout="vertical-full-header">
   <AppHeader>
-    <H3>My Blog</H3>
+    <property name="logoTemplate">
+      <Link to="/" height="100%">
+        <Logo height="$space-8" />
+      </Link>
+    </property>
     <SpaceFiller />
+    <Search
+      data="{appGlobals.staticSearchData}"
+      placeholder="Search posts..."
+      noResultsMessage="No posts match your search."
+      pageSize="8"
+      enableSpellCorrection="true"
+      mode="inline"
+      collapsible="true"
+    />
     <ToneChangerButton />
   </AppHeader>
   <Pages fallbackPath="/">
     <Page url="/">
-      <PostList posts="{posts}" />
+      <PostList posts="{appGlobals.posts}" />
     </Page>
     <Page url="/post/:slug">
-      <PostPage posts="{posts}" />
+      <PostPage posts="{appGlobals.posts}" />
     </Page>
   </Pages>
   <Footer>

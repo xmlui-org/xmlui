@@ -1,10 +1,7 @@
-<Component name="Configuration">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Configuration
 
-All configuration lives in `xmlui.config.json` at the root of your project.
+All configuration lives in `xmlui.config.json` at the root of your project, with
+runtime configuration in `src/config.ts`.
 
 ## xmlui.config.json
 
@@ -22,27 +19,32 @@ All configuration lives in `xmlui.config.json` at the root of your project.
 
 ## App Configuration
 
-The app's name, version, and resources are set in `src/config.ts`:
+The app's global state — including the loaded Markdown content and the search
+index — is set in `src/config.ts`:
 
 ```ts
 import type { StandaloneAppDescription } from "xmlui";
+import { docsContent, staticSearchData } from "./content";
 
 const App: StandaloneAppDescription = {
   name: "My Docs",
-  version: "0.1.0",
-  resources: {
-    logo: "resources/xmlui-logo.svg",
-    favicon: "resources/favicon.ico",
+  appGlobals: {
+    docsContent,
+    staticSearchData,
   },
 };
 
 export default App;
 ```
 
+`docsContent` is a dictionary keyed by Markdown filename (without extension), so a
+file at `content/docs/quick-start.md` is referenced as
+`appGlobals.docsContent['quick-start']`.
+
 ## Theming
 
-XMLUI ships with a powerful theming system. You can override any design token by wrapping
-your app in a `<Theme>` component.
+XMLUI ships with a powerful theming system. You can override any design token by
+wrapping your app in a `<Theme>` component.
 
 ### Changing the primary color
 
@@ -88,7 +90,3 @@ Access them in XMLUI via:
 | `id-unknown-component` | `off`, `warn`, `error` | Flag unknown component names |
 | `id-unknown-prop` | `off`, `warn`, `error` | Flag unknown property names |
 | `expr-unbound-identifier` | `off`, `warn`, `error` | Flag undefined variables in expressions |
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

@@ -1,7 +1,3 @@
-<Component name="ApiEndpoints">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # API Reference — Endpoints
 
 ## Posts
@@ -130,7 +126,3 @@ GET /tags
   ]
 }
 ```
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

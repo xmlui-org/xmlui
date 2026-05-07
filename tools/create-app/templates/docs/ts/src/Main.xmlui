@@ -1,53 +1,69 @@
-<App layout="vertical-sticky">
+<App layout="vertical-full-header">
   <AppHeader>
-    <H3>My Docs</H3>
+    <property name="logoTemplate">
+      <Link to="/" height="100%">
+        <Logo height="$space-8" />
+      </Link>
+    </property>
     <SpaceFiller />
+    <Search
+      data="{appGlobals.staticSearchData}"
+      placeholder="Search the docs..."
+      noResultsMessage="No results found."
+      pageSize="8"
+      enableSpellCorrection="true"
+      mode="inline"
+      collapsible="true"
+    />
     <ToneChangerButton />
   </AppHeader>
   <NavPanel scrollStyle="whenScrolling" showScrollerFade="true">
-    <NavLink label="Introduction" to="/" icon="home" />
-    <NavGroup label="Getting Started" initiallyExpanded="true" icon="bookmark">
-      <NavLink label="Quick Start" to="/quick-start" />
-      <NavLink label="Installation" to="/installation" />
-      <NavLink label="Configuration" to="/configuration" />
+    <NavLink label="Introduction" to="/introduction" icon="home" />
+    <NavGroup label="Getting Started" initiallyExpanded="true" icon="school">
+      <NavLink label="Quick Start" to="/quick-start" icon="bolt" />
+      <NavLink label="Installation" to="/installation" icon="deploy" />
+      <NavLink label="Configuration" to="/configuration" icon="settings" />
     </NavGroup>
-    <NavGroup label="Guides" icon="document">
-      <NavLink label="Core Concepts" to="/guides/core-concepts" />
-      <NavLink label="Advanced Usage" to="/guides/advanced" />
+    <NavGroup label="Guides" icon="article">
+      <NavLink label="Core Concepts" to="/guides/core-concepts" icon="markup" />
+      <NavLink label="Advanced Usage" to="/guides/advanced" icon="refactor" />
     </NavGroup>
-    <NavGroup label="API Reference" icon="code">
-      <NavLink label="Overview" to="/api/overview" />
-      <NavLink label="Endpoints" to="/api/endpoints" />
+    <NavGroup label="API Reference" icon="braces">
+      <NavLink label="Overview" to="/api/overview" icon="eye" />
+      <NavLink label="Endpoints" to="/api/endpoints" icon="file-code" />
     </NavGroup>
     <NavLink label="Changelog" to="/changelog" icon="list" />
   </NavPanel>
-  <Pages fallbackPath="/">
+  <Pages fallbackPath="/introduction">
     <Page url="/">
-      <Introduction />
+      <Redirect to="/introduction" />
+    </Page>
+    <Page url="/introduction">
+      <DocumentPage content="{appGlobals.docsContent['introduction']}" />
     </Page>
     <Page url="/quick-start">
-      <QuickStart />
+      <DocumentPage content="{appGlobals.docsContent['quick-start']}" />
     </Page>
     <Page url="/installation">
-      <Installation />
+      <DocumentPage content="{appGlobals.docsContent['installation']}" />
     </Page>
     <Page url="/configuration">
-      <Configuration />
+      <DocumentPage content="{appGlobals.docsContent['configuration']}" />
     </Page>
     <Page url="/guides/core-concepts">
-      <CoreConcepts />
+      <DocumentPage content="{appGlobals.docsContent['guides/core-concepts']}" />
     </Page>
     <Page url="/guides/advanced">
-      <AdvancedUsage />
+      <DocumentPage content="{appGlobals.docsContent['guides/advanced']}" />
     </Page>
     <Page url="/api/overview">
-      <ApiOverview />
+      <DocumentPage content="{appGlobals.docsContent['api/overview']}" />
     </Page>
     <Page url="/api/endpoints">
-      <ApiEndpoints />
+      <DocumentPage content="{appGlobals.docsContent['api/endpoints']}" />
     </Page>
     <Page url="/changelog">
-      <Changelog />
+      <DocumentPage content="{appGlobals.docsContent['changelog']}" />
     </Page>
   </Pages>
   <Footer>
