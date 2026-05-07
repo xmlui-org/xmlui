@@ -351,7 +351,7 @@ test.describe("Selection", () => {
     const cells = page.getByRole("gridcell");
     await cells.nth(0).click();
     // Ctrl+click second tile to add to selection
-    await cells.nth(1).click({ modifiers: ["Meta"] });
+    await cells.nth(1).click({ modifiers: ["ControlOrMeta"] });
     // Both should be selected
     await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
     await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
@@ -475,7 +475,7 @@ test.describe("hideSelectionCheckboxes property", () => {
     `);
     const cells = page.getByRole("gridcell");
     await cells.nth(0).click();
-    await cells.nth(1).click({ modifiers: ["Meta"] });
+    await cells.nth(1).click({ modifiers: ["ControlOrMeta"] });
     await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
     await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
   });
@@ -519,8 +519,7 @@ test.describe("Keyboard Shortcuts", () => {
     await initTestBed(selectableMarkup);
     // Click first tile to give the grid focus
     await page.getByRole("gridcell").nth(0).click();
-    const isMac = process.platform === "darwin";
-    await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+    await page.keyboard.press("ControlOrMeta+A");
     const cells = page.getByRole("gridcell");
     await expect(cells.nth(0)).toHaveAttribute("aria-selected", "true");
     await expect(cells.nth(1)).toHaveAttribute("aria-selected", "true");
@@ -540,8 +539,7 @@ test.describe("Keyboard Shortcuts", () => {
       </TileGrid>
     `);
     await page.getByRole("gridcell").nth(0).click();
-    const isMac = process.platform === "darwin";
-    await page.keyboard.press(isMac ? "Meta+A" : "Control+A");
+    await page.keyboard.press("ControlOrMeta+A");
     await expect.poll(testStateDriver.testState).toEqual("fired");
   });
 

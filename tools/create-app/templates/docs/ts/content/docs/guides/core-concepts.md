@@ -1,7 +1,3 @@
-<Component name="CoreConcepts">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Core Concepts
 
 Understanding how XMLUI works will help you get the most out of the framework.
@@ -97,7 +93,3 @@ Access route parameters with `$routeParams.slug`.
   </VStack>
 </Component>
 ```
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

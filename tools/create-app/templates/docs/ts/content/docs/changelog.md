@@ -1,7 +1,3 @@
-<Component name="Changelog">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Changelog
 
 All notable changes to this project will be documented here.
@@ -24,8 +20,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial release of the docs template.
 - Sidebar navigation with collapsible `NavGroup` sections.
+- Full-text search across all Markdown content.
 - Auto-generated `TableOfContents` sidebar on each page.
-- Markdown support for all documentation pages.
+- Previous / next links between pages.
 - Dark / light mode toggle.
 - GitHub Actions workflow for XMLUI static analysis.
 
@@ -33,8 +30,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## How to Update This Page
 
-1. Open `src/components/Changelog.xmlui`.
-2. Add a new version section at the top of the Markdown block.
+1. Open `content/docs/changelog.md`.
+2. Add a new version section at the top.
 3. Follow the Keep a Changelog format:
    - **Added** — new features
    - **Changed** — changes in existing functionality
@@ -42,7 +39,3 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
    - **Removed** — removed features
    - **Fixed** — bug fixes
    - **Security** — vulnerability patches
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

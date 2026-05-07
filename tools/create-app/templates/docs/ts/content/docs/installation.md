@@ -1,7 +1,3 @@
-<Component name="Installation">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Installation
 
 This page covers different ways to install and set up your project.
@@ -27,10 +23,10 @@ mkdir my-docs && cd my-docs
 npm init -y
 ```
 
-### 2. Install XMLUI
+### 2. Install XMLUI and the docs packages
 
 ```bash
-npm install xmlui
+npm install xmlui xmlui-search xmlui-docs-blocks
 ```
 
 ### 3. Create the entry point
@@ -39,8 +35,12 @@ Create `index.ts`:
 
 ```ts
 import { startApp } from "xmlui";
+import search from "xmlui-search";
+import docsBlocks from "xmlui-docs-blocks";
+
 export const runtime = import.meta.glob(`/src/**`, { eager: true });
-startApp(runtime);
+const usedExtensions = [search, docsBlocks];
+startApp(runtime, usedExtensions);
 ```
 
 ### 4. Create the markup
@@ -51,13 +51,17 @@ Create `src/Main.xmlui`:
 <App>
   <Pages>
     <Page url="/">
-      <Text>Hello, XMLUI!</Text>
+      <DocumentPage content="{appGlobals.docsContent['introduction']}" />
     </Page>
   </Pages>
 </App>
 ```
 
-### 5. Start the dev server
+### 5. Add some Markdown
+
+Create `content/docs/introduction.md` and write your first page.
+
+### 6. Start the dev server
 
 ```bash
 npx xmlui start
@@ -83,7 +87,3 @@ npx xmlui start --port 3001
 rm -rf node_modules package-lock.json
 npm install
 ```
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>

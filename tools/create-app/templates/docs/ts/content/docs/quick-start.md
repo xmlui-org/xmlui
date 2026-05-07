@@ -1,7 +1,3 @@
-<Component name="QuickStart">
-  <DocPage>
-    <Markdown>
-      <![CDATA[
 # Quick Start
 
 Get your project up and running in under five minutes.
@@ -24,7 +20,7 @@ npm start
 ```
 
 The app will be available at `http://localhost:3000`. Changes to `.xmlui` files
-are reflected immediately without a full page reload.
+and Markdown content are reflected immediately without a full page reload.
 
 ## Step 3: Build for Production
 
@@ -49,7 +45,3 @@ in production.
 - [Installation](/installation) — detailed setup options
 - [Configuration](/configuration) — configure XMLUI for your project
 - [Core Concepts](/guides/core-concepts) — learn how XMLUI works
-      ]]>
-    </Markdown>
-  </DocPage>
-</Component>
