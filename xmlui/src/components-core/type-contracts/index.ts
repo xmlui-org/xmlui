@@ -2,9 +2,9 @@
  * Type-contracts module — public barrel.
  *
  * Exports the `TypeContractDiagnostic` type, the `TypeContractCode` union,
- * the `verifyComponentDef()` function, and the unified `coercionRules`
- * decision table. All consumers (LSP, Vite plugin, `valueExtractor`,
- * tests) import from here.
+ * the `verifyComponentDef()` function, the unified `coercionRules`
+ * decision table, and the Levenshtein suggestion helper. All consumers
+ * (LSP, Vite plugin, `valueExtractor`, tests) import from here.
  *
  * See `dev-docs/plans/01-verified-type-contracts.md`.
  */
@@ -19,3 +19,4 @@ export {
 } from "./rules/coerce";
 export type { CoercionRule, VerifyContext, VerifyFailure } from "./rules/types";
 export { verifyEnum } from "./rules/enum";
+export { findSuggestion, levenshtein } from "./suggestions";
