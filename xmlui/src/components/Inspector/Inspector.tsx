@@ -40,6 +40,7 @@ export const InspectorMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-icon-${COMP}`]: "$color-surface-500",
+    [`backgroundColor-dialog-${COMP}`]: "$color-surface-300",
   },
 });
 

@@ -11,7 +11,7 @@
 
 %-API-START setValue
 
-```xmlui-pg copy {3, 9, 12} display name="Example: setValue"
+```xmlui-pg copy /setValue/ display name="Example: setValue"
 <App>
   <HStack>
     <Button
@@ -190,7 +190,7 @@ Fired when the date value changes. Receives the new date value as a parameter.
 
 > [!INFO] The date value changes when the edited input part (day, month, year) loses focus and contains a valid value.
 
-```xmlui-pg copy {2} display name="Example: didChange" height="180px"
+```xmlui-pg copy {6} display name="Example: didChange" height="180px"
 <App var.selectedDate="No date selected">
   <Text value="{selectedDate}" />
   <DateInput 
@@ -206,7 +206,7 @@ Fired when the date value changes. Receives the new date value as a parameter.
 
 Fired when the date input receives focus.
 
-```xmlui-pg copy {4-5} display name="Example: gotFocus/lostFocus"
+```xmlui-pg copy {7-8} display name="Example: gotFocus/lostFocus"
 <App var.isFocused="{false}">
   <Text value="{isFocused 
     ? 'DateInput focused' : 'DateInput lost focus'}" 

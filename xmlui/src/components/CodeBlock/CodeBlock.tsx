@@ -40,7 +40,7 @@ export const CodeBlockMd = createMetadata({
     dark: {
       "backgroundColor-CodeBlock-header": "$color-surface-200",
       "backgroundColor-CodeBlock": "$color-surface-50",
-      "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-primary-300 r g b / 0.15)",
+      "backgroundColor-CodeBlock-highlightRow": "rgb(from $color-secondary-300 r g b / 0.45)",
       "backgroundColor-CodeBlock-highlightString": "rgb(from $color-primary-300 r g b / 0.5)",
     }
   },
