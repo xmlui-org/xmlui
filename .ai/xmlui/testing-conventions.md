@@ -67,6 +67,35 @@ const { testStateDriver } = await initTestBed(`
 `);
 ```
 
+### Clipboard
+
+`initTestBed` returns a `clipboard` helper that provides a test-safe wrapper around the browser clipboard. It intercepts `navigator.clipboard` so tests work consistently without real browser permissions. Line endings are normalized to `\n` on all platforms (Windows Chromium returns `\r\n` from the real API).
+
+```typescript
+const { clipboard } = await initTestBed(`<ComponentName />`);
+```
+
+| Method | Description |
+|--------|-------------|
+| `clipboard.read()` | Returns the current clipboard text as a string (`\r\n` normalized to `\n`) |
+| `clipboard.write(text)` | Writes `text` to the clipboard |
+| `clipboard.clear()` | Clears the clipboard (writes empty string) |
+| `clipboard.copy(locator)` | Focuses `locator`, selects all text, presses `ControlOrMeta+C` |
+| `clipboard.paste(locator)` | Focuses `locator`, presses `ControlOrMeta+V` |
+
+**Important:** only `writeText` / `readText` are mocked. Calling `navigator.clipboard.write()` or `navigator.clipboard.read()` (the binary variants) throws inside the test bed. Use `clipboard.read()` (not `page.evaluate(() => navigator.clipboard.readText())`) so line-ending normalization is applied.
+
+```typescript
+test("copies content to clipboard", async ({ initTestBed, page }) => {
+  const { clipboard } = await initTestBed(
+    `<Share markdownContent="# Hello\nWorld" />`,
+    EXT,
+  );
+  await page.getByRole("button", { name: "Copy page" }).click();
+  expect(await clipboard.read()).toBe("# Hello\nWorld");
+});
+```
+
 ### Event testing
 
 Capture event results via `testState` context variable + `expect.poll()`:

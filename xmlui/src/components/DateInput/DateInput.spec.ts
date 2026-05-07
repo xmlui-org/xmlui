@@ -1734,7 +1734,7 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     await expect(driver.yearInput).toBeFocused();
 
     // Ctrl+A should jump focus to the first field (month in MM/dd/yyyy)
-    await page.keyboard.press("Control+a");
+    await page.keyboard.press("ControlOrMeta+a");
     await expect(driver.monthInput).toBeFocused();
   });
 
@@ -1751,7 +1751,7 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 
-    await page.keyboard.press("Control+a");
+    await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.press("Backspace");
 
     await expect(driver.monthInput).toHaveValue("");
@@ -1772,7 +1772,7 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     await driver.dayInput.focus();
     await expect(driver.dayInput).toBeFocused();
 
-    await page.keyboard.press("Control+a");
+    await page.keyboard.press("ControlOrMeta+a");
     await page.keyboard.press("Delete");
 
     await expect(driver.monthInput).toHaveValue("");
@@ -1786,7 +1786,7 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     page,
   }) => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
-    await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
+    const { clipboard } = await initTestBed(`<DateInput testId="dateInput" dateFormat="MM/dd/yyyy" initialValue="05/25/2024" />`);
     const driver = await createDateInputDriver("dateInput");
 
     await expect(driver.monthInput).toBeVisible();
@@ -1794,10 +1794,10 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 
-    await page.keyboard.press("Control+a");
-    await page.keyboard.press("Control+c");
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.press("ControlOrMeta+c");
 
-    const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
+    const clipboardText = await clipboard.read();
     expect(clipboardText).toBe("05/25/2024");
   });
 
@@ -1814,7 +1814,7 @@ test.describe("Keyboard behavior: Ctrl+A select all", () => {
     await driver.monthInput.focus();
     await expect(driver.monthInput).toBeFocused();
 
-    await page.keyboard.press("Control+a");
+    await page.keyboard.press("ControlOrMeta+a");
     // Typing a digit after Ctrl+A should not clear all fields
     await page.keyboard.press("3");
 
