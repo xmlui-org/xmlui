@@ -108,6 +108,20 @@ export type StandaloneAppDescription = {
    *   phase default — Wave 3), the verifier still runs but only emits warn-level
    *   diagnostics. Flips to `true` in the next major release. See
    *   `dev-docs/plans/01-verified-type-contracts.md`.
+   * - `strictLifecycle` (boolean, default `false`) — when `true`, lifecycle
+   *   violations (async `onUnmount` handler, throw inside a lifecycle handler,
+   *   exceeded `disposeTimeoutMs`) escalate from `warn` (default rollout phase
+   *   — W3-3) to `error`: a `kind:"lifecycle"` error trace entry plus a
+   *   `console.error` and, in strict mode, a one-shot toast. When `false` the
+   *   universal `onMount`/`onUnmount`/`onError` events still fire and
+   *   violations are still reported, but only as warn-level entries so apps
+   *   can audit existing handlers before the strict default flips. Flips to
+   *   `true` in the next major release. See
+   *   `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
+   * - `disposeTimeoutMs` (number, default `250`) — millisecond budget for
+   *   container `onBeforeDispose` handlers (Phase 3 of plan #04). Exceeding
+   *   the budget emits a `kind:"lifecycle"` violation with
+   *   `reason:"timeout"` and lets the unmount proceed.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

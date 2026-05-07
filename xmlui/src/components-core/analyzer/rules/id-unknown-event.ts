@@ -24,6 +24,7 @@ const FRAMEWORK_EVENTS: ReadonlySet<string> = new Set([
   // Lifecycle events exposed by wrapComponent / container machinery
   "onMount",
   "onUnmount",
+  "onError",
   "onDidChange",
   "onInit",
   // Navigation

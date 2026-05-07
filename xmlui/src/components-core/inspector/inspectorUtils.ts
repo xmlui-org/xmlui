@@ -233,6 +233,13 @@ export interface XsLogEntry {
    *   type-contract verifier (plan #01). Contains `code: TypeContractCode`,
    *   `severity`, `componentName`, optional `propName` / `expected` / `actual`,
    *   `message`, and optional `suggestion`.
+   * - `"lifecycle"` — a lifecycle event or violation (plan #04). Contains
+   *   `severity: "info" | "warn" | "error"`, `phase: "mount" | "unmount" |
+   *   "beforeDispose"`, `componentUid`, optional `componentType` /
+   *   `componentLabel`, optional `durationMs` (info entries), optional
+   *   `reason: LifecycleViolationReason` (warn/error entries), and optional
+   *   `error: { message, stack? }`. Severity escalates from `warn` to `error`
+   *   when `App.appGlobals.strictLifecycle` is truthy.
    */
   kind?: string;
   eventName?: string;
