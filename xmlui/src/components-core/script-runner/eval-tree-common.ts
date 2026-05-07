@@ -17,7 +17,7 @@ import {
   type UnaryExpression,
 } from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import type { BindingTreeEvaluationContext, EvalTreeOptions } from "./BindingTreeEvaluationContext";
 import { BannedApiError } from "./bannedFunctions";
 import { isBannedMember, type BannedMemberResult } from "./bannedMembers";
 

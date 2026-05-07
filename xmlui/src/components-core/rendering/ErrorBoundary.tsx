@@ -63,7 +63,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
       perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
       traceId: typeof window !== "undefined" ? (window as any)._xsCurrentTrace : undefined,
       kind: "error:boundary",
-      error: { message: appError.message, category: appError.category },
+      error: { message: appError.message },
       stack: appError.cause instanceof Error ? appError.cause.stack : undefined,
       componentStack: errorInfo.componentStack,
       location: this.props.location,

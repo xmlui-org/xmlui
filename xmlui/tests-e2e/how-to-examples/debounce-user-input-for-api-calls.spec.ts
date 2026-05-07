@@ -24,7 +24,7 @@ test.describe("Search with debounced API calls", { tag: "@website" }, () => {
   test("typing increments the Changed counter immediately", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("textbox").fill("Lap");
-    await expect.poll(() => page.getByText(/Changed\/Invoked: \d+ \/ \d+/).textContent()).resolves.toMatch(/Changed\/Invoked: [1-9]\d* \/ \d+/);
+    await expect.poll(() => page.getByText(/Changed\/Invoked: \d+ \/ \d+/).textContent()).toMatch(/Changed\/Invoked: [1-9]\d* \/ \d+/);
   });
 
   test("results appear after debounce and API call complete", async ({ initTestBed, page }) => {
