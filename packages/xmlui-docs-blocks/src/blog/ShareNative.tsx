@@ -217,8 +217,7 @@ export const Share = memo(function Share({
         key: "chatgpt",
         label: chatGptLabel,
         description: chatGptDescription,
-        icon: null,
-        trailingIcon: <ExternalLinkIcon className={styles.itemHeaderTrailingIcon} />,
+        icon: <ExternalLinkIcon className={styles.itemHeaderIcon} />,
         onSelect: handleOpenInChatGpt,
       });
     }
@@ -227,8 +226,7 @@ export const Share = memo(function Share({
         key: "claude",
         label: claudeLabel,
         description: claudeDescription,
-        icon: null,
-        trailingIcon: <ExternalLinkIcon className={styles.itemHeaderTrailingIcon} />,
+        icon: <ExternalLinkIcon className={styles.itemHeaderIcon} />,
         onSelect: handleOpenInClaude,
       });
     }
@@ -237,8 +235,7 @@ export const Share = memo(function Share({
         key: "twitter",
         label: twitterLabel,
         description: twitterDescription,
-        icon: null,
-        trailingIcon: <ShareIcon className={styles.itemHeaderTrailingIcon} />,
+        icon: <ShareIcon className={styles.itemHeaderIcon} />,
         onSelect: handleShareInTwitter,
       });
     }
@@ -247,8 +244,7 @@ export const Share = memo(function Share({
         key: "linkedin",
         label: linkedInLabel,
         description: linkedInDescription,
-        icon: null,
-        trailingIcon: <ShareIcon className={styles.itemHeaderTrailingIcon} />,
+        icon: <ShareIcon className={styles.itemHeaderIcon} />,
         onSelect: handleShareInLinkedIn,
       });
     }
@@ -320,8 +316,7 @@ export const Share = memo(function Share({
             >
               <span className={styles.itemHeader}>
                 {item.icon}
-                <span>{item.label}</span>
-                {item.trailingIcon}
+                {item.label}
               </span>
               {item.description && (
                 <span className={styles.itemSecondary}>{item.description}</span>
