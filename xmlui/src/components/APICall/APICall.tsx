@@ -76,6 +76,14 @@ export const APICallMd = createMetadata({
       description:
         "You can optionally define request header values as key-value pairs, where the key is the ID " +
         "of the particular header and the value is that header's corresponding value.",
+      audit: {
+        classification: "secret",
+        defaultRedaction: "mask",
+        fieldPolicies: {
+          Authorization: { classification: "secret", defaultRedaction: "mask" },
+          Cookie: { classification: "secret", defaultRedaction: "drop" },
+        },
+      },
     },
     credentials: {
       description:

@@ -8,14 +8,71 @@
  * Conflict resolution: drop > hash > mask (most aggressive wins).
  * Detected conflicts emit the `audit-policy-conflict` diagnostic but do not
  * throw.
+ *
+ * `buildBaselineRules` converts `ComponentPropertyMetadata.audit` annotations
+ * into `RedactionRule[]` that the redactor uses as the baseline policy layer
+ * (before app-level `<App auditPolicy>` rules are applied).
  */
 
 import type { XsLogEntry } from "../inspector/inspectorUtils";
 import type { AuditPolicy, RedactionRule } from "./policy";
+import type { ComponentPropertyMetadata } from "../../abstractions/ComponentDefs";
 
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
+
+/**
+ * Build a baseline set of `RedactionRule` entries from a component's
+ * `props` metadata record.
+ *
+ * Rules are generated for every prop whose `audit.classification` is
+ * `"sensitive"` or `"secret"`.  For object-typed props that declare
+ * `audit.fieldPolicies`, per-key rules are emitted using the selector
+ * `<propName>.<fieldKey>`; the top-level prop rule is still emitted so
+ * that keys *not* in `fieldPolicies` are also covered by the default mode.
+ *
+ * The rules use the prop name as the selector root.  Call sites (e.g. a
+ * trace entry producer) are responsible for using the same path naming.
+ *
+ * @param propsMetadata — The `props` map from a `ComponentMetadata` object.
+ * @returns A `RedactionRule[]` ready to prepend to an `AuditPolicy.redact` array.
+ */
+export function buildBaselineRules(
+  propsMetadata: Record<string, ComponentPropertyMetadata>,
+): RedactionRule[] {
+  const rules: RedactionRule[] = [];
+
+  for (const [propName, def] of Object.entries(propsMetadata)) {
+    const audit = def.audit;
+    if (!audit || audit.classification === "public") continue;
+
+    const defaultMode = audit.defaultRedaction ?? defaultModeFor(audit.classification);
+
+    // Per-field overrides (for object-typed props like `headers`)
+    if (audit.fieldPolicies && Object.keys(audit.fieldPolicies).length > 0) {
+      for (const [fieldKey, fieldPolicy] of Object.entries(audit.fieldPolicies)) {
+        rules.push({
+          selector: `${propName}.${fieldKey}`,
+          mode: fieldPolicy.defaultRedaction ?? defaultModeFor(fieldPolicy.classification),
+        });
+      }
+    }
+
+    // Top-level fallback rule:
+    // - When fieldPolicies are declared, use `propName.*` so the rule matches any
+    //   immediate child key not covered by a per-key rule without redacting the
+    //   whole object before per-key rules can apply.
+    // - When no fieldPolicies are declared, use `propName` to match the value itself.
+    const fallbackSelector =
+      audit.fieldPolicies && Object.keys(audit.fieldPolicies).length > 0
+        ? `${propName}.*`
+        : propName;
+    rules.push({ selector: fallbackSelector, mode: defaultMode });
+  }
+
+  return rules;
+}
 
 /**
  * Apply all redaction rules in `policy` to `entry`.
@@ -160,5 +217,21 @@ function matchParts(
     return matchParts(sel, si + 1, path, pi + 1);
   }
   return false;
+}
+
+// ---------------------------------------------------------------------------
+// Internal helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Return the canonical default redaction mode for a given PII classification.
+ *
+ * - `"sensitive"` → `"hash"` (pseudonymises; keeps some analytical value)
+ * - `"secret"`    → `"mask"` (completely replaces; no analytical value)
+ */
+function defaultModeFor(
+  classification: "public" | "sensitive" | "secret",
+): "mask" | "drop" | "hash" {
+  return classification === "secret" ? "mask" : "hash";
 }
 

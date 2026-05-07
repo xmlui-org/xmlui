@@ -48,10 +48,23 @@ export const TextBoxMd = createMetadata({
   },
   defaultPart: "input",
   props: {
+    type: {
+      description:
+        "Sets the HTML input type. Use `\"password\"` to hide the entered text and " +
+        "classify the value as a secret in the audit pipeline; `\"email\"` to classify " +
+        "the value as sensitive (PII).",
+      valueType: "string",
+      availableValues: ["text", "password", "search", "email"],
+      defaultValue: "text",
+    },
     placeholder: dPlaceholder(),
     initialValue: {
       ...dInitialValue(),
       defaultValue: defaultProps.initialValue,
+      audit: {
+        classification: "sensitive",
+        defaultRedaction: "hash",
+      },
     },
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
@@ -197,6 +210,16 @@ export const PasswordMd = createMetadata({
   description:
     "`Password` is a specialized [TextBox](/components/TextBox) that enables users " +
     "to input and edit passwords.",
+  props: {
+    ...TextBoxMd.props,
+    initialValue: {
+      ...TextBoxMd.props.initialValue,
+      audit: {
+        classification: "secret",
+        defaultRedaction: "mask",
+      },
+    },
+  },
 });
 
 // Password: same as ThemedTextBox but forces type="password"

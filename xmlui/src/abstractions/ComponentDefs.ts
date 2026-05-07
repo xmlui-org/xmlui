@@ -297,10 +297,28 @@ export type ComponentPropertyMetadata = {
    * - `"public"` — no redaction required.
    * - `"sensitive"` — mild PII (email, name, …); hashed by default.
    * - `"secret"` — high-sensitivity value (password, token, …); masked by default.
+   *
+   * For object-typed properties (e.g. `headers`), `fieldPolicies` overrides
+   * the top-level classification for individual keys (e.g. `Authorization`
+   * vs `Cookie` need different redaction modes).  Keys are matched
+   * case-insensitively.
    */
   audit?: {
     classification: "public" | "sensitive" | "secret";
     defaultRedaction?: "mask" | "drop" | "hash";
+    /**
+     * Per-key policies for object-typed properties.
+     * Each key names a field inside the object; its policy overrides the
+     * top-level `classification` / `defaultRedaction` for that field.
+     * Key matching is case-insensitive.
+     */
+    fieldPolicies?: Record<
+      string,
+      {
+        classification: "public" | "sensitive" | "secret";
+        defaultRedaction?: "mask" | "drop" | "hash";
+      }
+    >;
   };
 };
 
