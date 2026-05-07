@@ -25,6 +25,7 @@ const FRAMEWORK_EVENTS: ReadonlySet<string> = new Set([
   "onMount",
   "onUnmount",
   "onError",
+  "onBeforeDispose",
   "onDidChange",
   "onInit",
   // Navigation

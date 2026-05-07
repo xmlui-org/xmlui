@@ -4,9 +4,8 @@
  * Plan #04 "Managed Lifecycle Vocabulary" — Phases 1–2 ship the
  * universal `onMount` / `onUnmount` / `onError` events on every
  * component (Step 1.1 / 1.2) and the `<Lifecycle>` declarative effect
- * primitive (Step 2.1). The dispatcher and diagnostic helpers in this
- * module support those surfaces and the future `onBeforeDispose` hook
- * (Step 3.1).
+ * primitive (Step 2.1). Phase 3 (Step 3.1) adds `onBeforeDispose` on
+ * container components with async handler support and a timeout budget.
  *
  * See `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
  */
@@ -20,6 +19,7 @@ export {
 
 export {
   createLifecycleDispatcher,
+  fireBeforeDispose,
   reportLifecycleEvent,
   reportLifecycleViolation,
   type LifecycleDispatcher,

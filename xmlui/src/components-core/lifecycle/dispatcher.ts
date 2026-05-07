@@ -108,6 +108,109 @@ function isThenable(value: unknown): value is PromiseLike<unknown> {
   );
 }
 
+/**
+ * Fire a single `onBeforeDispose` handler with a timeout budget.
+ *
+ * - Sync handlers: fire synchronously; success is traced immediately.
+ * - Async handlers: fire and race against `timeoutMs`.  If the handler
+ *   settles before the deadline the success is traced.  If the deadline
+ *   fires first a `reason:"timeout"` violation is emitted and the timeout
+ *   is cleared (the handler is still allowed to settle in the background,
+ *   but its late resolve is ignored).
+ * - Any throw (sync or async) emits a `reason:"throw"` violation.
+ *
+ * The function itself is **synchronous** — React cleanup functions cannot
+ * be `async`.  The async racing is purely fire-and-forget from React's
+ * perspective.  That is intentional: `onBeforeDispose` is a best-effort
+ * "start your flush now" hook, not a blocker on unmounting.
+ *
+ * Called by `ComponentAdapter` for every component that has an
+ * `onBeforeDispose` event handler (Plan #04 Step 3.1).
+ */
+export function fireBeforeDispose(
+  handler: () => unknown | Promise<unknown>,
+  options: {
+    componentUid: string;
+    timeoutMs: number;
+    strict?: boolean;
+    componentType?: string;
+    componentLabel?: string;
+  },
+): void {
+  const start = typeof performance !== "undefined" ? performance.now() : undefined;
+
+  let result: unknown;
+  try {
+    result = handler();
+  } catch (err) {
+    reportLifecycleViolation(
+      {
+        componentUid: options.componentUid,
+        phase: "beforeDispose",
+        reason: "throw",
+        error: err,
+        componentType: options.componentType,
+        componentLabel: options.componentLabel,
+      },
+      { strict: options.strict },
+    );
+    return;
+  }
+
+  if (!isThenable(result)) {
+    // Synchronous handler — trace and return.
+    reportLifecycleEvent({
+      componentUid: options.componentUid,
+      phase: "beforeDispose",
+      durationMs: start !== undefined ? performance.now() - start : undefined,
+      componentType: options.componentType,
+      componentLabel: options.componentLabel,
+    });
+    return;
+  }
+
+  // Async handler — race the promise against the deadline.
+  const timeoutId = setTimeout(() => {
+    reportLifecycleViolation(
+      {
+        componentUid: options.componentUid,
+        phase: "beforeDispose",
+        reason: "timeout",
+        componentType: options.componentType,
+        componentLabel: options.componentLabel,
+      },
+      { strict: options.strict },
+    );
+  }, options.timeoutMs);
+
+  (result as Promise<unknown>).then(
+    () => {
+      clearTimeout(timeoutId);
+      reportLifecycleEvent({
+        componentUid: options.componentUid,
+        phase: "beforeDispose",
+        durationMs: start !== undefined ? performance.now() - start : undefined,
+        componentType: options.componentType,
+        componentLabel: options.componentLabel,
+      });
+    },
+    (err) => {
+      clearTimeout(timeoutId);
+      reportLifecycleViolation(
+        {
+          componentUid: options.componentUid,
+          phase: "beforeDispose",
+          reason: "throw",
+          error: err,
+          componentType: options.componentType,
+          componentLabel: options.componentLabel,
+        },
+        { strict: options.strict },
+      );
+    },
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Trace helpers (used by the adapter and the dispatcher).
 // ---------------------------------------------------------------------------

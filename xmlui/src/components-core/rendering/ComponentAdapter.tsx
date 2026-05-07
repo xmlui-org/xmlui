@@ -16,6 +16,7 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
 import {
+  fireBeforeDispose,
   reportLifecycleEvent,
   reportLifecycleViolation,
   type LifecyclePhase,
@@ -347,6 +348,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         eventNameStr !== "error" &&
         eventNameStr !== "mount" &&
         eventNameStr !== "unmount" &&
+        eventNameStr !== "beforeDispose" &&
         eventNameStr !== "init" &&
         eventNameStr !== "cleanup";
       const handler = lookupAction(action, uid, {
@@ -631,14 +633,19 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     mount?: ((...args: any[]) => any) | null;
     unmount?: ((...args: any[]) => any) | null;
     error?: ((...args: any[]) => any) | null;
+    beforeDispose?: ((...args: any[]) => any) | null;
   }>({});
   lifecycleHandlersRef.current = {
     mount: safeNode.events?.mount ? memoedLookupEventHandler("mount" as any) : null,
     unmount: safeNode.events?.unmount ? memoedLookupEventHandler("unmount" as any) : null,
     error: safeNode.events?.error ? memoedLookupEventHandler("error" as any) : null,
+    beforeDispose: safeNode.events?.beforeDispose
+      ? memoedLookupEventHandler("beforeDispose" as any)
+      : null,
   };
 
   const strictLifecycle = appContext.appGlobals?.strictLifecycle === true;
+  const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
   useEffect(() => {
     const handlers = lifecycleHandlersRef.current;
     const componentType = safeNode.type;
@@ -708,6 +715,20 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     }
 
     return () => {
+      // --- BeforeDispose: fire `onBeforeDispose` with an async budget (Plan #04 Step 3.1).
+      // --- This fires first (before onUnmount) to allow async cleanup before the component
+      // --- is removed. React cannot await the cleanup, so the racing is fire-and-forget.
+      const beforeDisposeHandler = lifecycleHandlersRef.current.beforeDispose;
+      if (beforeDisposeHandler) {
+        fireBeforeDispose(beforeDisposeHandler, {
+          componentUid: uidName,
+          timeoutMs: disposeTimeoutMs,
+          strict: strictLifecycle,
+          componentType,
+          componentLabel,
+        });
+      }
+
       const unmountHandler = lifecycleHandlersRef.current.unmount;
       if (!unmountHandler) return;
       const unmountStart =
