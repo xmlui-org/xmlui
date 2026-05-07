@@ -146,14 +146,8 @@ $paddingVertical-ShareItem: createThemeVar("paddingVertical-#{$component}Item");
     height: 1em;
     flex-shrink: 0;
     color: currentColor;
-  }
-
-  .itemHeaderTrailingIcon {
-    width: 0.85em;
-    height: 0.85em;
-    flex-shrink: 0;
-    margin-left: auto;
-    color: currentColor;
+    position: relative;
+    top: -2px;
   }
 
   .itemSecondary {

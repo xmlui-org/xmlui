@@ -142,6 +142,11 @@ export const ShareMd: ComponentMetadata = createMetadata({
     [`paddingVertical-${COMP}Menu`]: "$space-2",
     [`paddingHorizontal-${COMP}Item`]: "$space-3",
     [`paddingVertical-${COMP}Item`]: "$space-2",
+
+    dark: {
+      [`backgroundColor-${COMP}--hover`]: "$color-surface-200",
+      [`backgroundColor-${COMP}Item--hover`]: "$color-surface-200",
+    }
   },
 });
 
