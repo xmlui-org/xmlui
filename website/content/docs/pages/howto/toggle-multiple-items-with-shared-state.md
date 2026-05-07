@@ -1,8 +1,10 @@
 # Toggle multiple items with shared state
 
-Use a `global` variable to accumulate selections across a list of checkboxes so every part of the UI that reads the selection stays in sync automatically.
+Hold the set of selected (or hidden) items in a single array that every consumer reads and writes, so all UI that depends on it stays in sync automatically.
 
-When multiple checkboxes share a single array of selected (or hidden) items, declare the array with `global.name` on the `App` element. Any descendant — including custom components — can read and write it directly without prop drilling. Because XMLUI reactivity tracks the reference, assigning a new array to the variable immediately updates all expressions that depend on it, with no `DataSource` refetch needed.
+The example below tracks which categories are *hidden*: a `<CategoryFilter>` user-defined component renders one checkbox per category and writes to a shared array; the article list reads from the same array and re-renders whenever it changes. Because the reactive array is the only source of truth, no event bus or callback wiring is needed.
+
+The array is declared as a `global` because at least one of its consumers — the `<CategoryFilter>` user-defined component — sits below a user-defined-component boundary that subtree variables (`var.`) do not cross. If every consumer were a built-in descendant of a common ancestor, `var.hiddenCategories` on that ancestor would be enough. See [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) for the broader subtree-vs-global decision.
 
 ```xmlui-pg copy display name="Toggle categories to filter articles" height="600px"
 ---app display /hiddenCategories/
@@ -71,7 +73,7 @@ When multiple checkboxes share a single array of selected (or hidden) items, dec
 
 ## Key points
 
-**`global.name` on `App` makes a variable accessible everywhere**: Any descendant component, including custom components, can read and write `hiddenCategories` directly — no prop drilling or callback props needed. This differs from `var.name`, which is scoped to the subtree of the declaring element.
+**Why a global, not a subtree variable**: `var.hiddenCategories` on `App` would not be visible inside `<CategoryFilter>` — subtree variables don't cross user-defined-component boundaries. Declaring the array as `global.hiddenCategories` makes it readable and writable from any component, including the filter checkboxes inside the user-defined component. The trigger to switch from subtree sharing to global is exactly this: at least one consumer lives below a user-defined-component boundary.
 
 **Do not refetch after a toggle**: Assigning a new array to `hiddenCategories` triggers XMLUI reactivity immediately — the filtered article list and checkbox states both update in the same render. Refetching a `DataSource` after an optimistic update risks overwriting it with stale server data if the API call hasn't completed yet.
 
@@ -101,6 +103,7 @@ Use `invalidates="{[]}"` on the `APICall` to prevent it from refetching DataSour
 
 ## See also
 
-- [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) — share a simple variable (not an array) between two sibling components
+- [Communicate between sibling components](/docs/howto/communicate-between-sibling-components) — the broader subtree-vs-global decision, with the full set of trade-offs
+- [Scoping](/docs/guides/scoping) — how `var.`, `global.`, and `Globals.xs` differ; why subtree variables don't cross user-defined-component boundaries
 - [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — compute a filtered or derived value reactively from shared state
 - [Buffer a reactive edit](/docs/howto/buffer-a-reactive-edit) — stage individual field edits before committing to state

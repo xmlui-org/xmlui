@@ -54,7 +54,23 @@ XMLUI variables declared on a container element are accessible to every descenda
 
 **Writes from one sibling re-render the other automatically**: When the filter panel sets `selectedTag`, every expression that reads it — including the derived `allSelected` — re-evaluates immediately. No event bus or callback wiring is required.
 
-**Use `global.name` to share across the full App subtree**: Declaring `global.selectedTag` on `App` makes the variable accessible deep in any nested custom component, not just direct children.
+**Choose subtree sharing or global sharing — pick the smallest scope that works**:
+
+*Subtree-shared* (`var.` on a common ancestor, as in the example above) is the right default. The state belongs to *this view* — a filter applied here, a tab selected on this page, a draft being edited in this dialog. Lifecycle is tied to the ancestor: when the ancestor unmounts, the variable is gone. Visible to built-in descendants directly, but **not** to user-defined components nested deeper unless passed as a prop.
+
+*Global* (`global.selectedTag` on App root, or a top-level declaration in `Globals.xs`) is for app-wide state — current user, theme mode, feature flags, anything that should be read from inside arbitrary user-defined components without prop-threading. Lifecycle is the app's lifetime; the value persists across navigation.
+
+The practical trigger to switch from subtree to global: when at least one consumer is a user-defined component nested below the common ancestor. Subtree variables don't cross user-defined-component boundaries; globals do.
+
+**Why not always use globals?** They're appealing because they're simpler — one rule, no scoping ladder. But:
+
+- *Multiple instances couple.* A component used in two places at once shares its global state across both — typing in one instance mutates the other. Subtree vars give each instance its own state.
+- *Names collide.* Globals share a flat namespace; two unrelated features can't both use `selectedTag`. Names grow longer the larger the app gets.
+- *State goes stale across navigation.* Globals persist for the app's lifetime; subtree vars reset when the ancestor unmounts (usually what you want for view-local state).
+- *You can't tell where a name came from.* Subtree scope is bounded — trace upward in a few files. Globals require app-wide grep.
+- *Globals are an API surface.* Renaming one updates every consumer; renaming a subtree var only touches local consumers.
+
+See [Scoping › Global variables](/docs/guides/scoping#global-variables) for the full mechanics.
 
 **`ChangeListener` is the right tool for side-effects, not data sharing**: If sibling B needs to *react with code* (call an API, show a toast) rather than just read a value, attach a `ChangeListener` to the shared variable on sibling B's side. For plain UI synchronization, a shared variable and expression binding is simpler.
 
@@ -62,6 +78,7 @@ XMLUI variables declared on a container element are accessible to every descenda
 
 ## See also
 
+- [Scoping](/docs/guides/scoping) — how subtree variables and globals differ; the rules for `var.`, `global.`, and `Globals.xs`
 - [Derive a value from multiple sources](/docs/howto/derive-a-value-from-multiple-sources) — combine variables into a derived expression
 - [Toggle multiple items with shared state](/docs/howto/toggle-multiple-items-with-shared-state) — use a shared array as a multi-selection filter
 - [React to value changes with debounce](/docs/howto/debounce-with-changelistener) — run side-effects when a shared variable changes

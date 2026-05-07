@@ -1,6 +1,6 @@
 # Style Card appearance
 
-Override Card theme vars for elevation, hover state, padding, and section spacing.
+Override Card theme vars for shadow, hover state, padding, and section spacing.
 
 Card provides a styled surface for grouping related content. It supports hover states (useful when used as a clickable item) and gap control for its internal sections. All variables can be scoped to a specific section by wrapping it in a `<Theme>`.
 
@@ -30,7 +30,7 @@ Card provides a styled surface for grouping related content. It supports hover s
 
 ## Key points
 
-**`boxShadow-Card` is the primary depth cue**: A layered box-shadow value combining a tight ambient shadow with a wider diffuse one creates realistic card elevation without a visible border. Replace it with `borderWidth-Card` + `borderColor-Card` for a flat outlined style.
+**`boxShadow-Card` is the primary depth cue**: A layered box-shadow value combining a tight ambient shadow with a wider diffuse one creates a realistic drop shadow without a visible border. Replace it with `borderWidth-Card` + `borderColor-Card` for a flat outlined style.
 
 **`backgroundColor-Card--hover` enables clickable card affordance**: Setting a hover background makes the card visually respond to cursor entry — pair it with an `onClick` handler on the Card to create interactive summary cards. Without an `onClick`, the hover state has no effect.
 

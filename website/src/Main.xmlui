@@ -634,11 +634,13 @@
                             label="Render a flat list with custom cards"
                             to="/docs/howto/render-a-flat-list-with-custom-cards"
                         />
+                        <!-- Hidden pending xmlui-dnd-list extension (https://github.com/rdhyee/xmlui-dnd-list)
                         <NavLink
                             icon="article"
                             label="Add drag-and-drop reordering to a list"
                             to="/docs/howto/add-drag-and-drop-reordering-to-a-list"
                         />
+                        -->
                         <NavLink
                             icon="article"
                             label="Iterate without a container element"
@@ -671,11 +673,6 @@
                             icon="article"
                             label="Deep-link to a tab or section"
                             to="/docs/howto/deep-link-to-a-tab-or-section"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Switch between hash and history routing"
-                            to="/docs/howto/switch-between-hash-and-history-routing"
                         />
                         <NavLink
                             icon="article"
@@ -909,11 +906,6 @@
                         />
                         <NavLink
                             icon="article"
-                            label="Throttle rapid value updates"
-                            to="/docs/howto/throttle-rapid-value-updates"
-                        />
-                        <NavLink
-                            icon="article"
                             label="Buffer a reactive edit"
                             to="/docs/howto/buffer-a-reactive-edit"
                         />
@@ -995,11 +987,6 @@
                             icon="article"
                             label="Add custom icons to the app"
                             to="/docs/howto/add-custom-icons"
-                        />
-                        <NavLink
-                            icon="article"
-                            label="Debug a component"
-                            to="/docs/howto/debug-a-component"
                         />
                     </NavGroup>
 
@@ -1789,13 +1776,6 @@
                 />
             </Page>
             <Page
-                url="/docs/howto/debug-a-component"
-            >
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/debug-a-component.md']}"
-                />
-            </Page>
-            <Page
                 url="/docs/howto/share-a-modaldialog-across-components"
             >
                 <DocumentPageNoTOC
@@ -2051,11 +2031,13 @@
                     content="{appGlobals.docsContent['pages/howto/render-a-flat-list-with-custom-cards.md']}"
                 />
             </Page>
+            <!-- Hidden pending xmlui-dnd-list extension (https://github.com/rdhyee/xmlui-dnd-list)
             <Page url="/docs/howto/add-drag-and-drop-reordering-to-a-list">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/add-drag-and-drop-reordering-to-a-list.md']}"
                 />
             </Page>
+            -->
             <Page url="/docs/howto/iterate-without-a-container-element">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/iterate-without-a-container-element.md']}"
@@ -2076,11 +2058,6 @@
             <Page url="/docs/howto/deep-link-to-a-tab-or-section">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/deep-link-to-a-tab-or-section.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/switch-between-hash-and-history-routing">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/switch-between-hash-and-history-routing.md']}"
                 />
             </Page>
             <Page url="/docs/howto/navigate-programmatically">
@@ -2236,11 +2213,6 @@
             <Page url="/docs/howto/communicate-between-sibling-components">
                 <DocumentPageNoTOC
                     content="{appGlobals.docsContent['pages/howto/communicate-between-sibling-components.md']}"
-                />
-            </Page>
-            <Page url="/docs/howto/throttle-rapid-value-updates">
-                <DocumentPageNoTOC
-                    content="{appGlobals.docsContent['pages/howto/throttle-rapid-value-updates.md']}"
                 />
             </Page>
 

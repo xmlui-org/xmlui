@@ -4,6 +4,8 @@ Use the Footer slot in App, or SpaceFiller between main content and footer so th
 
 A terms-of-service page has short content that does not fill the viewport height. The page footer must always appear at the bottom of the window, never immediately after the last paragraph. Place a `<Footer>` as a direct child of `<App>` — the framework pins it to the bottom automatically regardless of content height.
 
+The pinned-to-bottom effect is most visible on a tall page. The embedded preview below has a fixed height so the gap between content and footer is small. Click **Open in Playground** (the external-link icon on the code panel) to see the same example at full viewport height — the empty space between the last paragraph and the footer expands to fill the window.
+
 ```xmlui-pg display name="Footer pinned to bottom" height="350px"
 ---app display copy
 <App scrollWholePage="false">

@@ -12,6 +12,22 @@ const markdown = getExampleSource(
   ),
 );
 
+test.describe("Card wrapper with a single Slot", { tag: "@website" }, () => {
+  const { app, components, apiInterceptor } = extractXmluiExample(
+    markdown,
+    "Card wrapper with a single Slot",
+  );
+
+  test("children passed into the component render at the Slot location", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+    await expect(page.getByRole("heading", { name: "Project status" })).toBeVisible();
+    await expect(page.getByText("All on track for the April release.")).toBeVisible();
+  });
+});
+
 test.describe("TaskCard with an actionsTemplate slot", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(
     markdown,

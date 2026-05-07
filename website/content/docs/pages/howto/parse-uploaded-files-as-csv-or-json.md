@@ -52,6 +52,9 @@ When `parseAs` is set to `"csv"` or `"json"`, `FileInput` automatically parses e
   <Text when="{rows.length > 0}" variant="caption">
     Loaded {rows.length} rows from {source} ({kind})
   </Text>
+  <Text when="{rows.length > 0}" variant="caption">
+    Detected columns: {Object.keys(rows[0] || {}).join(', ')}
+  </Text>
   <Table testId="parsedRows" when="{rows.length > 0}" data="{rows}">
     <Column bindTo="name" />
     <Column bindTo="price" />
@@ -62,6 +65,8 @@ When `parseAs` is set to `"csv"` or `"json"`, `FileInput` automatically parses e
 ---desc
 Click to save: [sample-products.csv](/resources/files/sample-products.csv) or [sample-products.json](/resources/files/sample-products.json). Then browse to either file.
 ```
+
+The Table's Columns are bound to the keys in `sample-products.csv` and `sample-products.json` (`name`, `price`, `category`, `inStock`). If you upload a file with different column names, the **Detected columns** line shows what was actually parsed; the table renders one row per record but each cell is empty because the `bindTo` lookups don't match. To preview your own file, update each `bindTo` value to a column name from your file.
 
 ## Key points
 

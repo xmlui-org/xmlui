@@ -6,18 +6,17 @@ Use the `onValidate` event on an input component to enforce any rule that cannot
 
 ```xmlui-pg display copy name="Do custom form validation"
 ---app
-<App>
+<App var.limit="{1000}">
   <Form
-    data="{{ spending: 0 }}"
-    onSubmit="(data) => toast.success('Submitted:' + JSON.stringify(data))"
+    data="{{ total: 0 }}"
+    onSubmit="(data) => toast.success('Submitted: ' + JSON.stringify(data))"
   >
-
     <NumberBox
       label="Requested Amount (limit {limit})"
       bindTo="total"
-      type="integer"
-      onValidate="(value) => value > 0 && value <= limit 
-        ? null 
+      integersOnly="true"
+      onValidate="(value) => value > 0 && value <= limit
+        ? null
         : `Value should be in the 0-${limit} range`;"
     />
   </Form>

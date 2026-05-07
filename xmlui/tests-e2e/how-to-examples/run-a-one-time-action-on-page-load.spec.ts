@@ -12,20 +12,14 @@ const markdown = getExampleSource(
 test.describe("One-time page load action", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "One-time page load action");
 
-  test("initial state shows Dashboard heading and Initializing text", async ({ initTestBed, page }) => {
+  test("page renders the Dashboard heading and welcome text", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await expect(page.getByText("Dashboard")).toBeVisible();
     await expect(page.getByText("Welcome! The page has loaded.")).toBeVisible();
-    await expect(page.getByText("Initializing…")).toBeVisible();
   });
 
-  test("after the timer fires the initialized card appears", async ({ initTestBed, page }) => {
+  test("onInit fires on mount and the initialized card appears", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect.poll(() => page.getByText("Page fully initialized at").isVisible()).toBe(true);
-  });
-
-  test("Initializing text disappears after the timer fires", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
-    await expect.poll(() => page.getByText("Initializing…").isVisible()).toBe(false);
+    await expect(page.getByText(/Page initialized at \d/)).toBeVisible();
   });
 });

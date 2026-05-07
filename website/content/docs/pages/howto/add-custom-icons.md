@@ -31,6 +31,19 @@ In markup, use the name you set in the config without the `icon.` prefix:
 </App>
 ```
 
+## Where to find SVG icons
+
+XMLUI ships with 100+ built-in icons, but you'll often want something specific. Several free libraries publish individual SVG files you can drop straight into a `resources/` folder:
+
+- [Lucide](https://lucide.dev) — clean line icons, ~1500, MIT
+- [Heroicons](https://heroicons.com) — Tailwind Labs, MIT, solid + outline variants
+- [Phosphor](https://phosphoricons.com) — six weights from thin to duotone, MIT
+- [Tabler Icons](https://tabler.io/icons) — very large set (~5500), MIT
+- [Simple Icons](https://simpleicons.org) — brand and company logos, CC0
+- [Iconify](https://iconify.design) — searchable aggregator across many sets
+
+Download the SVG, save it under your `resources/` folder, register it under `resources` in `config.json` with the `icon.` prefix (as shown above), and reference it by name in any component's `icon` prop.
+
 ## Key points
 
 **`icon.` prefix registers the icon**: In `config.json`, add `"icon.myName": "path/to/file.svg"` under `resources`. The part after `icon.` becomes the name you use in markup — `<Icon name="myName" />`.
@@ -39,7 +52,7 @@ In markup, use the name you set in the config without the `icon.` prefix:
 
 **Override built-in icons by reusing the name**: Register `"icon.trash": "resources/custom-trash.svg"` and every component that uses the `trash` icon will render your custom SVG instead of the built-in one.
 
-**SVG files must be standalone**: The file should be a complete `<svg>` element with a `viewBox`. Avoid embedded raster images or external references — they may not render in all contexts.
+**SVG files must be standalone**: The file should be a complete `<svg>` element with a `viewBox`. Avoid embedded raster images or external references — they may not render in all contexts. When pulling icons from third-party libraries, strip hardcoded `width`/`height` so the icon scales with the consuming component's `size` prop, ensure a `viewBox` is present, and use `fill="currentColor"` (or `stroke="currentColor"`) on shape elements so the icon picks up the surrounding text color.
 
 **`size` and `fallback` on `<Icon>`**: Set `size="sm"`, `"md"`, `"lg"`, or an explicit pixel value. Use `fallback="question"` to show a fallback icon when the requested name is not found.
 

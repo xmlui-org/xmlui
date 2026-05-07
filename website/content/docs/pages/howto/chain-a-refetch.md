@@ -4,6 +4,8 @@ Use `APICall`'s `onSuccess` event to trigger a DataSource refetch after a mutati
 
 When a user action changes server data — liking a post, adding a comment — the displayed list needs to reflect the change. Put `dataSource.refetch()` in the mutation's `onSuccess` handler so the refresh happens only after the write succeeds — without relying on blanket cache invalidation.
 
+Click a Like button to watch the chain unfold: the `Posting` badge appears while the `APICall` is in flight, then `Refetching` appears while the `DataSource` re-reads the timeline, then the new count appears.
+
 ```xmlui-pg copy display name="Click the Like button"
 ---comp display
 <Component name="SocialButton">
@@ -15,8 +17,13 @@ When a user action changes server data — liking a post, adding a comment — t
     size="xs"
     onClick="emitEvent('click')" />
 </Component>
----app display {46}
-<App>
+---app display /onSuccess/
+<App
+  var.statusColors="{{
+    Posting: { background: '#f59e0b', label: 'white' },
+    Refetching: { background: '#3b82f6', label: 'white' },
+    Idle: { background: '#9ca3af', label: 'white' }
+  }}">
   <APICall
     id="favoritePost"
     method="post"
@@ -43,7 +50,15 @@ When a user action changes server data — liking a post, adding a comment — t
     }
   </script>
   <VStack>
-    <H3>Social Media Timeline</H3>
+    <HStack verticalAlignment="center" gap="$space-2">
+      <H3>Social Media Timeline</H3>
+      <Badge value="Posting" colorMap="{statusColors}"
+        when="{favoritePost.inProgress || unfavoritePost.inProgress}" />
+      <Badge value="Refetching" colorMap="{statusColors}"
+        when="{timelineData.isRefetching}" />
+      <Badge value="Idle" colorMap="{statusColors}"
+        when="{!favoritePost.inProgress && !unfavoritePost.inProgress && !timelineData.isRefetching}" />
+    </HStack>
     <Items data="{timelineData}">
       <Card>
         <VStack>
@@ -79,7 +94,7 @@ When a user action changes server data — liking a post, adding a comment — t
     "get-timeline": {
       "url": "/timeline",
       "method": "get",
-      "handler": "return $state.posts.map(post => ({ ...post }))"
+      "handler": "delay(200); return $state.posts.map(post => ({ ...post }))"
     },
     "favorite-post": {
       "url": "/posts/:id/favorite",
@@ -87,7 +102,7 @@ When a user action changes server data — liking a post, adding a comment — t
       "pathParamTypes": {
         "id": "string"
       },
-      "handler": "const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = true; post.favourites_count += 1; }"
+      "handler": "delay(800); const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = true; post.favourites_count += 1; }"
     },
     "unfavorite-post": {
       "url": "/posts/:id/unfavorite",
@@ -95,7 +110,7 @@ When a user action changes server data — liking a post, adding a comment — t
       "pathParamTypes": {
         "id": "string"
       },
-      "handler": "const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = false; post.favourites_count -= 1; }"
+      "handler": "delay(800); const post = $state.posts.find(p => p.id === $pathParams.id); if (post) { post.favourited = false; post.favourites_count -= 1; }"
     }
   }
 }
@@ -110,6 +125,8 @@ When a user action changes server data — liking a post, adding a comment — t
 **This pattern gives you surgical control**: Unlike blanket cache invalidation (which refreshes every DataSource), `ds.refetch()` refreshes only the specific DataSource you choose.
 
 **Combine with `invalidates="{[]}"` to prevent double-fetching**: By default a successful APICall invalidates all caches. If you manually refetch, set `invalidates="{[]}"` on the APICall to avoid a redundant second fetch.
+
+**Surface chain progress with `inProgress` and `isRefetching`**: Bind a status indicator to `<APICall>.inProgress` for the write phase and `<DataSource>.isRefetching` for the read phase. The example uses three Badges to show `Posting`, `Refetching`, and `Idle` so the chain is visible without instrumenting the script.
 
 ---
 

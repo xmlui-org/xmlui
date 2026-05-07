@@ -1,6 +1,6 @@
 # Compose components with nesting
 
-Build higher-order components that wrap others while forwarding props and slots.
+Build higher-order components that wrap others while forwarding props.
 
 Rather than placing all Kanban board markup in a single file, build it as three focused layers: `TaskCard` renders one task, `TaskColumn` groups tasks under a labelled column header, and `TaskBoard` owns the full data set and assembles the layout. Each layer has one job, accepts typed props, and is independently readable.
 
@@ -112,7 +112,7 @@ Rather than placing all Kanban board markup in a single file, build it as three 
 </Items>
 ```
 
-**Scope isolation between components**: Variables and IDs declared in `TaskBoard` are invisible inside `TaskColumn` or `TaskCard`. Always pass needed values explicitly as props. Use `<Slot />` only when you need the caller's markup to evaluate in the parent scope:
+**Scope isolation between components**: Variables and IDs declared in `TaskBoard` are invisible inside `TaskColumn` or `TaskCard`. Pass needed values explicitly as props.
 
 ```xmlui
 <!-- TaskBoard's allTasks variable is NOT visible inside TaskColumn -->
