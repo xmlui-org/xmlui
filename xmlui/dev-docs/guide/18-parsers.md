@@ -113,10 +113,10 @@ The scripting parser operates in two modes depending on what it is parsing:
 Lexer.tokenize() → Parser.parseExpr() → Expression AST
 ```
 
-**2. Script module** — for `<script>` blocks and `<script src="...">` imports:
+**2. Script module** — for inline `<script>` blocks and `.xmlui.xs` code-behind files:
 ```
 Lexer.tokenize() → Parser.parseStatements() → Statement[] AST
-→ ModuleValidator (if imported) → ModuleLoader (if has imports)
+→ ModuleValidator (if imported) → ModuleLoader (if script has import statements)
 → ScriptModule { functions, variables, imports }
 ```
 
@@ -126,7 +126,7 @@ The scripting Lexer maintains a **16-token lookahead buffer**. This allows the p
 
 ### Module Loading
 
-When a component has `<script src="helpers.js">`, the framework loads that file as a **module**. The `ModuleLoader` orchestrates the full lifecycle:
+External script logic can be shared across components in two ways: via `import` statements inside a `<script>` block (e.g. `import { fn } from "./helpers.xs"`), or via a convention-based code-behind file (`ComponentName.xmlui.xs`) that the framework auto-discovers alongside the `.xmlui` file. In both cases the `.xs` file is loaded as a **module**. The `ModuleLoader` orchestrates the full lifecycle:
 
 <!-- DIAGRAM: Module loading flow: resolve path → check cache → fetch content → parse → validate → recursively load imports → cache result -->
 
@@ -153,7 +153,7 @@ graph TD
   Circular -->|"no"| Recurse --> Store --> Result
 ```
 
-1. **Path resolution** — converts relative paths to absolute using `ModuleResolver`. Handles both URL-style paths (in standalone mode) and file-system paths (in Vite mode).
+1. **Path resolution** — converts relative `.xs` paths to absolute using `ModuleResolver` (e.g. `"./helpers.xs"` → `"/components/helpers.xs"`). Handles both URL-style paths (in standalone mode) and file-system paths (in Vite mode).
 2. **Cache check** — `ModuleCache` has two tiers: raw content and parsed AST. If the parsed AST is already cached, loading short-circuits here.
 3. **Fetch** — retrieves the file content via an injected fetcher function (browser `fetch` in standalone mode, file system read in Vite mode). The fetcher is injected rather than hardcoded so the same parser works in both environments.
 4. **Parse** — `parseScriptModule()` runs the lexer and parser to produce a `Statement[]` AST.
@@ -186,7 +186,7 @@ The `code-behind-collect.ts` module walks the parsed AST of a code-behind script
 
 The XMLUI style parser is not a full CSS parser. It handles only **CSS property values** — not selectors, not rules, not stylesheets. The scope is narrow: when a component prop like `padding` or `border` is set to a string value, the style parser validates and normalizes it.
 
-The parser also needs to recognize **theme variables** like `xmlui-primary` or `xmlui-spacing-md`. A general-purpose CSS parser would not understand these as special tokens. The XMLUI style lexer specifically recognizes the `xmlui-` prefix and emits a `ThemeId` token, allowing the downstream code to substitute CSS custom properties at the right moment.
+The parser also needs to recognize **theme variables**. In XMLUI markup, theme variables are written with a `$` prefix (e.g. `$borderColor`, `$spacingMd`). A general-purpose CSS parser would not understand these as special tokens. The style lexer detects the `$` prefix and emits a `ThemeId` token; `toCssVar()` then converts it to a CSS custom property at the right moment (e.g. `$borderColor` → `var(--xmlui-borderColor)`).
 
 ### Parse Methods
 
@@ -204,10 +204,10 @@ The `StyleParser` class exposes one method per value type:
 `BorderNode` can hold up to three `ThemeIdDescriptor` objects alongside (or instead of) literal values. This allows a border like:
 
 ```xml
-<Box border="xmlui-border-width solid xmlui-border-color" />
+<Box border="$borderWidth solid $borderColor" />
 ```
 
-to be parsed into a structured node that retains both the theme variable names and any fallback defaults. The theming engine resolves these to `var(--xmlui-border-width)` and `var(--xmlui-border-color)` at runtime.
+to be parsed into a structured node that retains both the theme variable names and any fallback defaults. The theming engine resolves these to `var(--xmlui-borderWidth)` and `var(--xmlui-borderColor)` at runtime.
 
 ### Error Handling
 
