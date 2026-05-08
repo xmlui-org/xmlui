@@ -13,8 +13,9 @@ const PROJECT_ROOT_MARKERS = ["Main.xmlui", "config.json"];
  * Walk up the file system from the directory containing `docUri` until a
  * directory that contains a project root marker (`Main.xmlui` or `config.json`)
  * is found. Returns a URI prefix (ending in `/`) suitable for `startsWith`
- * comparisons against other document URIs. If no marker is found, falls back
- * to the document's own directory.
+ * comparisons against other document URIs. If no marker is found, returns
+ * `null` so the caller can search across all known files instead of
+ * incorrectly scoping to the current file's directory.
  */
 function findProjectRoot(docUri: string): string | null {
   let docPath: string;
@@ -34,8 +35,9 @@ function findProjectRoot(docUri: string): string | null {
     if (parent === dir) break; // reached filesystem root — no marker found
     dir = parent;
   }
-  // Fallback: use the document's own directory (safe degradation)
-  return pathToFileURL(path.dirname(docPath)).toString() + "/";
+  // No marker found — return null so the caller searches all known files
+  // rather than restricting to the current document's directory.
+  return null;
 }
 
 /**
