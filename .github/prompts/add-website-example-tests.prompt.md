@@ -12,15 +12,16 @@ test file in `xmlui/tests-e2e/` that covers every named `xmlui-pg` codefence in 
 
 Read these files to understand the conventions:
 - `xmlui/src/testing/website-example-utils.ts` — `getExampleSource`, `extractXmluiExample`
-- `xmlui/tests-e2e/generate-a-qr-code-from-user-input.spec.ts` — canonical example of the target format
-- `xmlui/tests-e2e/markup.spec.ts` — example with multiple `test.describe` blocks in one file
+- `xmlui/tests-e2e/how-to-examples/add-a-dropdown-menu-to-a-button.spec.ts` — canonical reference spec
+- `xmlui/tests-e2e/how-to-examples/align-items-to-row-ends-with-spacefiller.spec.ts` — example with multiple `test.describe` blocks
 
 ## Step 1 — Locate the markdown file
 
-The markdown files live under:
+The markdown files live anywhere under:
 ```
 website/content/docs/pages/
 ```
+(including subdirectories like `howto/`, `styles-and-themes/`, etc. — but never under `reference/`)
 
 Resolve the full path from the provided filename and read the file.
 
@@ -47,22 +48,29 @@ Do NOT generate fallback names like `"example-1"`. The name must come from the m
 
 Only proceed once every codefence that should be tested has a name.
 
-## Step 3 — Create the spec file
+## Step 3 — Determine the spec file path
 
-Create `xmlui/tests-e2e/<markdown-filename-without-extension>.spec.ts`.
+Spec files mirror the markdown's subdirectory relative to `website/content/docs/pages/`, placed
+under `xmlui/tests-e2e/`, with one renaming convention:
 
-Follow this template exactly:
+| Markdown location | Spec location |
+|-------------------|---------------|
+| `pages/howto/<name>.md` | `tests-e2e/how-to-examples/<name>.spec.ts` |
+| `pages/<name>.md` | `tests-e2e/pages/<name>.spec.ts` |
+| `pages/<subdir>/<name>.md` | `tests-e2e/pages/<subdir>/<name>.spec.ts` |
+
+Create the spec file at the path determined above. Follow this template exactly:
 
 ```typescript
 import * as path from "path";
 import { fileURLToPath } from "url";
-import { expect, test } from "../src/testing/fixtures";
-import { getExampleSource, extractXmluiExample } from "../src/testing/website-example-utils";
+import { expect, test } from "../../src/testing/fixtures";
+import { getExampleSource, extractXmluiExample } from "../../src/testing/website-example-utils";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const markdown = getExampleSource(
-  path.join(__dirname, "../../website/content/docs/pages/<relative-path-from-pages>/<filename>.md"),
+  path.join(__dirname, "../../../website/content/docs/pages/<relative-path-from-pages>/<filename>.md"),
 );
 
 test.describe("<example name>", { tag: "@website" }, () => {
@@ -79,17 +87,28 @@ test.describe("<example name>", { tag: "@website" }, () => {
 // Repeat test.describe for each named codefence in the file
 ```
 
+Import path depth depends on spec location:
+- `tests-e2e/how-to-examples/` → `../../src/testing/...` and `../../../website/...`
+- `tests-e2e/pages/` → `../../src/testing/...` and `../../../website/...`
+- `tests-e2e/pages/<subdir>/` → `../../../src/testing/...` and `../../../../website/...`
+
 Rules:
 - One `test.describe` per named codefence. The describe title = the codefence's `name` value exactly.
 - Every `test.describe` must include `{ tag: "@website" }`.
 - Read the markdown file once at module level with `getExampleSource`; call `extractXmluiExample` inside each describe block.
-- If the markdown file is not directly under `website/content/docs/pages/` but in a subdirectory (e.g. `howto/`), use the correct relative path in `path.join`.
 
 ## Step 4 — Write meaningful tests
 
 For each `test.describe` block, write tests that exercise the example's interactive behaviour.
 
-**For each example, always include:**
+**Classify each example first:**
+
+- **Interactive** — the codefence body contains an event handler attribute (`onClick`, `onChange`,
+  `onSubmit`, etc.) or a `---api` section. Write a full test suite.
+- **Display-only** — no event handlers, no `---api`. Write only an initial-state test and add a
+  comment `// display-only example — no interaction to test` above the describe block.
+
+**For interactive examples, always include:**
 - An "initial state" test — assert the rendered output before any interaction
 - One test per interactive element (button, input, checkbox, radio, select, etc.) that changes visible state
 
@@ -108,8 +127,8 @@ Check for TypeScript errors in the new file. Confirm:
 - `getExampleSource` is called once at the top level, not inside a describe/test callback
 - Every describe block has `{ tag: "@website" }`
 - Example names in `extractXmluiExample` match the markdown exactly (copy-paste, do not paraphrase)
-- Import paths use `../src/testing/...` (one level up from `tests-e2e/`)
-- The markdown path uses `../../website/content/...` (two levels up)
+- Import paths use the correct depth for the spec file's location (see Step 3 path table)
+- Display-only examples have the `// display-only example — no interaction to test` comment
 
 ## Step 6 — Run and fix the tests
 
