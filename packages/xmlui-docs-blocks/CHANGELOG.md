@@ -1,5 +1,12 @@
 # xmlui-docs-blocks
 
+## 0.0.9
+
+### Patch Changes
+
+- 03f4b3f: Adjust icons locations and dark mode hover color for Share button.
+- c26758d: Bump extension package versions
+
 ## 0.0.8
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # create-xmlui-app
 
+## 0.12.27
+
+### Patch Changes
+
+- 6e40145: improve: create-app's docs/blog templates
+- 4e45532: feat: add docs and blog templates to create-xmlui-app
+
 ## 0.12.26
 
 ## 0.12.25

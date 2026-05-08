@@ -1,5 +1,11 @@
 # xmlui-search
 
+## 0.1.12
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.11
 
 ### Patch Changes
