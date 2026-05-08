@@ -7,12 +7,12 @@ DatePicker shares the same trigger-input variables as TextBox and Select (`borde
 ```xmlui-pg copy display name="DatePicker calendar item theming" height="570px"
 ---app display
 <App>
-  <HStack gap="$space-8" alignItems="flex-start">
-    <VStack flex="1">
+  <HStack gap="$space-8">
+    <VStack width="*">
       <Text variant="strong">Default</Text>
       <DatePicker label="Pick a date" />
     </VStack>
-    <VStack flex="1">
+    <VStack width="*">
       <Text variant="strong">Themed</Text>
       <Theme
         borderRadius-DatePicker="12px"

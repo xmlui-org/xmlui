@@ -7,13 +7,13 @@ Slider theming splits into three named regions: `track` (the background bar), `r
 ```xmlui-pg copy display name="Slider track, thumb, and range theming"
 ---app display
 <App>
-  <HStack gap="$space-8" alignItems="flex-start">
-    <VStack flex="1">
+  <HStack gap="$space-8">
+    <VStack width="*">
       <Text variant="strong">Default</Text>
       <Slider label="Volume" min="0" max="100" value="60" />
       <Slider label="Disabled" min="0" max="100" value="40" enabled="false" />
     </VStack>
-    <VStack flex="1">
+    <VStack width="*">
       <Text variant="strong">Themed</Text>
       <Theme
         backgroundColor-track-Slider="$color-surface-200"
