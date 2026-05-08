@@ -20,8 +20,6 @@
     "check:metadata-purity": "node scripts/check-metadata-purity.mjs",
     "check:css-chunks": "node scripts/inspect-css-chunks.mjs",
     "check:example-tests": "node scripts/check-example-tests.mjs",
-    "check:example-tests-interactive": "node scripts/check-example-tests.mjs --interactive-only",
-    "check:example-tests-watch": "node scripts/check-example-tests.mjs --watch",
     "lint": "eslint --ignore-path .gitignore --cache --cache-location ./node_modules/.cache/eslint .",
     "pack:local": "clean-package && npm pack && clean-package restore",
     "prepublishOnly": "clean-package",
