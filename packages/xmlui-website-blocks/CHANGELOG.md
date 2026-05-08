@@ -1,5 +1,11 @@
 # xmlui-website-blocks
 
+## 0.1.6
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.5
 
 ### Patch Changes

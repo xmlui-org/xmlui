@@ -1,5 +1,11 @@
 # xmlui-echart
 
+## 0.1.4
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.3
 
 ### Patch Changes

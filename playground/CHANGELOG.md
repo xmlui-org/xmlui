@@ -1,5 +1,23 @@
 # xmlui-playground
 
+## 0.0.3
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+- Updated dependencies [61f078d]
+- Updated dependencies [5ff51a0]
+- Updated dependencies [f2abca7]
+- Updated dependencies [0b7c318]
+- Updated dependencies [61407a8]
+- Updated dependencies [29947d4]
+- Updated dependencies [69d4762]
+- Updated dependencies [4caecde]
+- Updated dependencies [dbae535]
+- Updated dependencies [c26758d]
+  - xmlui@0.12.27
+  - xmlui-echart@0.1.4
+
 ## 0.0.2
 
 ### Patch Changes
