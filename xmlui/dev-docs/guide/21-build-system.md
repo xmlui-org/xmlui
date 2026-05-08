@@ -62,7 +62,7 @@ This mode provides HMR during development, tree-shaking, code splitting, and opt
 
 ## CLI Commands
 
-The `xmlui` CLI is the unified interface for all build operations. It is installed when you install the `xmlui` npm package, and its entry is at `xmlui/bin/bootstrap.js` (which routes commands through `bin/index.ts`).
+The `xmlui` CLI is the unified interface for all build operations. It is installed when you install the `xmlui` npm package, and its entry is at `xmlui/src/nodejs/bin/bootstrap.js` (which routes commands through `src/nodejs/bin/index.ts`).
 
 ### `xmlui start`
 
@@ -239,7 +239,7 @@ xmlui/dist/
 
 ## The Vite Plugin
 
-`xmlui/bin/vite-xmlui-plugin.ts` is a custom Vite plugin that transforms XMLUI-specific files into standard JavaScript modules during both development (dev server) and production builds.
+`xmlui/src/nodejs/vite-xmlui-plugin.ts` is a custom Vite plugin that transforms XMLUI-specific files into standard JavaScript modules during both development (dev server) and production builds.
 
 ### What It Handles
 
@@ -286,6 +286,8 @@ Extension packages in `packages/` follow the same build conventions as the main 
   }
 }
 ```
+
+> **Note:** The `build-watch` script (`xmlui build-lib --watch`) currently crashes with a `TypeError` due to a `vite-plugin-dts` incompatibility. Watch mode is broken; use a single `build:extension` run or rebuild manually for now.
 
 ### Extension build output
 
@@ -371,7 +373,6 @@ Full task table:
 | `build:extension` | `^build:extension` | Upstream extension packages first |
 | `build:xmlui-all` | all of the above | Full build |
 | `build:docs` | `^build:extension`, `^build:xmlui`, releases, docs summaries | Full docs site build |
-| `build:blog` | `^build:extension`, `^build:xmlui` | Blog build |
 | `build:playground` | `^build:extension`, `^build:xmlui` | Playground build |
 | `xmlui#build:xmlui-test-bed` | `build:extension` | E2E test server |
 | `xmlui-vscode#build` | `^gen:langserver-metadata` | VS Code extension |
@@ -396,13 +397,14 @@ npx turbo build:xmlui-all        # All core + extension builds
 
 ```bash
 cd xmlui
-npm run build:bin                # Build the CLI first
-xmlui build-lib --watch          # Watch library builds
+npm run build:for-node           # Build the CLI first
 
 # In a second terminal:
 cd src/testing/infrastructure
 xmlui start                      # Test bed dev server
 ```
+
+> **Note:** `xmlui build-lib --watch` (watch mode) is currently broken due to a `vite-plugin-dts` incompatibility. Rebuild manually with `npm run build:xmlui` as needed.
 
 ### Developing an extension
 
@@ -446,13 +448,13 @@ npm start
 | File | Role |
 |------|------|
 | `xmlui/vite.config.ts` | All three framework build mode configurations |
-| `xmlui/bin/vite-xmlui-plugin.ts` | `.xmlui` / `.xmlui.xs` → ESM transformer |
-| `xmlui/bin/viteConfig.ts` | Shared Vite configuration utilities |
-| `xmlui/bin/build.ts` | `xmlui build` command implementation |
-| `xmlui/bin/build-lib.ts` | `xmlui build-lib` command implementation |
-| `xmlui/bin/start.ts` | `xmlui start` command implementation |
-| `xmlui/bin/index.ts` | CLI command router |
-| `xmlui/bin/bootstrap.js` | CLI entry point (loads index.ts via tsx) |
+| `xmlui/src/nodejs/vite-xmlui-plugin.ts` | `.xmlui` / `.xmlui.xs` → ESM transformer |
+| `xmlui/src/nodejs/bin/viteConfig.ts` | Shared Vite configuration utilities |
+| `xmlui/src/nodejs/bin/build.ts` | `xmlui build` command implementation |
+| `xmlui/src/nodejs/bin/build-lib.ts` | `xmlui build-lib` command implementation |
+| `xmlui/src/nodejs/bin/start.ts` | `xmlui start` command implementation |
+| `xmlui/src/nodejs/bin/index.ts` | CLI command router |
+| `xmlui/src/nodejs/bin/bootstrap.js` | CLI entry point (loads index.ts via tsx) |
 | `turbo.json` | Monorepo task pipeline with caching |
 | `xmlui/src/index.ts` | Main framework ESM entry point |
 | `xmlui/src/index-standalone.ts` | Standalone UMD entry point |
@@ -470,3 +472,4 @@ npm start
 - **Turborepo manages dependencies:** The `turbo.json` pipeline ensures builds happen in the right order. The `^` prefix enforces upstream ordering; caching skips unchanged packages.
 - **ESM first:** Everything is ES modules now. The CLI additionally ships a CommonJS build for compatibility, but all library code is ESM.
 - **`--prod` is the production shorthand:** `xmlui build --prod` applies all production-appropriate defaults (`INLINE_ALL`, `flatDist`, no mocking, relative roots).
+- **`build:for-node` builds the CLI:** `npm run build:for-node` (from `xmlui/`) compiles the CLI via `tsdown`. Run this before using `xmlui` CLI commands from a source checkout.

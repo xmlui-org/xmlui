@@ -62,7 +62,7 @@ xmlui-repo-root/
 
 ### Package categories
 
-**Core framework** (`xmlui/`): The main `xmlui` npm package. Contains the React-based rendering engine, all ~100 built-in components, the CLI (`bin/`), the XML and scripting parsers, the language server, and the Vite plugin. Everything else depends on this.
+**Core framework** (`xmlui/`): The main `xmlui` npm package. Contains the React-based rendering engine, all ~100 built-in components, the CLI (`src/nodejs/bin/`), the XML and scripting parsers, the language server, and the Vite plugin. Everything else depends on this.
 
 **Docs & web** (`website/`, `blog/`): The documentation website and blog, both built-mode XMLUI applications. They depend on both `xmlui` and the extension packages.
 
@@ -166,15 +166,12 @@ npm run build-extensions        # Build all packages/xmlui-* packages
 # Documentation & web
 npm run build-docs              # Build full documentation site
 npm run build-playground        # Build playground
-npm run build-blog              # Build blog
 npm run generate-docs           # Regenerate docs from component metadata (force, no cache)
 
 # Testing
 npm run test                    # Full test suite: unit + E2E
 npm run test-smoke              # Smoke E2E tests + unit tests
 npm run test-e2e-dev            # Playwright tests using dev server (faster iteration)
-npm run test:e2e                # Playwright tests using pre-built test server
-npm run test:e2e:smoke          # Smoke-only E2E
 
 # Versioning
 npm run changeset:add           # Interactive: add a changeset
@@ -189,7 +186,7 @@ turbo run build:xmlui-all --dry-run     # See execution plan without running
 turbo run build:xmlui-all --force       # Rebuild, ignoring the cache
 turbo run build:xmlui-all --graph       # Output a dependency graph
 turbo run build:xmlui-all --verbosity=3 # Debug cache hits and misses
-turbo run build --filter=xmlui          # Build only the core framework
+turbo run build:xmlui --filter=xmlui    # Build only the core framework
 turbo watch generate-docs-summaries     # Watch mode for docs generation
 ```
 
@@ -304,27 +301,31 @@ npm run build-xmlui       # Build core framework (required before other things w
 
 ```bash
 cd xmlui
-npm run build:bin                  # Build CLI first (always do this first)
+npm run build:for-node             # Build CLI first (always do this first)
 
-# Terminal 1: watch library builds
-xmlui build-lib --watch
+# Terminal 1: rebuild the library
+npm run build:xmlui
 
 # Terminal 2: run the test bed app
 cd src/testing/infrastructure
 xmlui start
 ```
 
+> **Note:** `xmlui build-lib --watch` (watch mode) is currently broken due to a `vite-plugin-dts` incompatibility. Rebuild manually with `npm run build:xmlui` as needed.
+
 ### Working on an extension package
 
 ```bash
 cd packages/xmlui-myextension
 
-# Terminal 1: continuous library rebuilds
-npm run build-watch
+# Terminal 1: build the extension
+npm run build:extension
 
 # Terminal 2: demo app with HMR
 npm start
 ```
+
+> **Note:** `npm run build-watch` (`xmlui build-lib --watch`) is currently broken due to a `vite-plugin-dts` incompatibility. Use a single `build:extension` run instead.
 
 ### Working on the docs site
 
@@ -384,7 +385,7 @@ npm install
 | `.changeset/` | Pending changeset files |
 | `xmlui/package.json` | Core framework package: scripts, deps, exports |
 | `xmlui/vite.config.ts` | Framework Vite build configuration |
-| `xmlui/bin/` | CLI source (`xmlui start`, `xmlui build`, etc.) |
+| `xmlui/src/nodejs/bin/` | CLI source (`xmlui start`, `xmlui build`, etc.) |
 | `tools/vscode/` | VS Code extension source and packaging |
 | `tools/create-app/` | `npm create xmlui-app` scaffolding templates |
 
@@ -397,6 +398,6 @@ npm install
 - **The `^` prefix in `dependsOn` is critical.** It enforces upstream package ordering. Don't remove it to "speed up" a build — downstream packages will get stale inputs.
 - **Changesets are how versions flow to npm.** Every user-facing change needs a `.changeset/*.md` file. Create it manually (don't use the interactive CLI in agents). All XMLUI changes are `patch` unless stated otherwise.
 - **Two release channels.** Beta is automatic on every merge; stable is a manual, reviewed process. Don't publish stable builds without going through the workflow.
-- **Build the CLI before anything else.** `npm run build:bin` (from `xmlui/`) must run first. The `xmlui` CLI command uses the compiled bin output; other build commands break without it.
+- **Build the CLI before anything else.** `npm run build:for-node` (from `xmlui/`) must run first when working from a source checkout. The `xmlui` CLI command uses the compiled bin output; other build commands break without it.
 - **`workspace:*` in deps is replaced on publish.** Extension packages declare `"xmlui": "workspace:*"` during development. This becomes the real version number when `changeset publish` runs.
 - **Turbo's `cache: false` means "always run".** Tasks that fetch external data (GitHub releases) or always need fresh output must opt out of caching explicitly.
