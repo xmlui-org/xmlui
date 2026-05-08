@@ -44,7 +44,7 @@ export const CodeText = forwardRef(function CodeText(
       <pre
         {...variantSpecificProps}
         ref={ref as any}
-        className={classnames(styles.codeText, styles.codefence, className)}
+        className={classnames(styles.codeText, className)}
         style={{
           ...style,
         }}

@@ -33,24 +33,9 @@ $component: "Text";
 
     // --- Styling <pre><code> elements
 
-    // codefence/<pre> elements are block level by default, even in another text element
-    // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/pre
-    .text.codefence {
-      display: block;
-      margin-top: createThemeVar("marginTop-#{$component}-codefence");
-      margin-bottom: createThemeVar("marginBottom-#{$component}-codefence");
-      height: 100%;
-    }
-
-    // For inline code
-    :not(.text.codefence) > &.code,
-    :not(.text.codefence) > &code {
-      @include textVariant("code");
-    }
-
-    // For code blocks using <![CDATA[ + <code> tags
-    &.codefence:has(> .text.code),
-    &.codefence:has(> code) {
+    // For code blocks: the <pre> always wraps a <code> element produced by
+    // react-markdown (or a syntax highlighter via dangerouslySetInnerHTML).
+    &:has(> code) {
       @include textVariant("codefence");
       // TEMP: solution for a demo - need to re-evaluate how to truncate/wrap code blocks
       overflow-x: auto;
@@ -58,15 +43,15 @@ $component: "Text";
     }
 
     // TEMP: experimental - may be removed
-    &.codefence:has(> code > span) {
+    &:has(> code > span) {
       padding-left: 0;
       padding-right: 0;
     }
-    &.codefence > code > span:not([class*="numbered"]) {
-      padding-left: t.$space-3;
+    & > code > span:not([class*="numbered"]) {
+      padding-left: t.$space-5;
     }
 
-    &.codefence > code {
+    & > code {
       font-family: createThemeVar("fontFamily-#{$component}-codefence");
       padding-left: 0;
       display: inline-block;
@@ -76,19 +61,19 @@ $component: "Text";
       background-color: createThemeVar("backgroundColor-#{$component}-codefence");
     }
 
-    &.codefence > code::before {
+    & > code::before {
       counter-reset: listing;
     }
 
-    &.codefence > code > span {
+    & > code > span {
       display: inline-block;
       width: 100%;
     }
-    &.codefence > code > span[class*="numbered"] {
+    & > code > span[class*="numbered"] {
       counter-increment: listing;
     }
 
-    &.codefence > code > span[class*="numbered"]::before {
+    & > code > span[class*="numbered"]::before {
       content: counter(listing);
       display: inline-block;
       width: t.$space-12;
