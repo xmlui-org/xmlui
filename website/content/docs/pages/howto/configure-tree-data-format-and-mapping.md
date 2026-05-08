@@ -7,8 +7,8 @@ Tree supports two data shapes: flat arrays where each node references its parent
 ```xmlui-pg copy display name="Tree flat vs hierarchy data format"
 ---app display
 <App>
-  <HStack gap="$space-6" alignItems="flex-start">
-    <VStack flex="1">
+  <HStack gap="$space-6">
+    <VStack width="*">
       <Text variant="strong">Flat format</Text>
       <Text variant="secondary" size="sm">Each node references its parent by ID</Text>
       <Tree
@@ -26,7 +26,7 @@ Tree supports two data shapes: flat arrays where each node references its parent
         ]}"
       />
     </VStack>
-    <VStack flex="1">
+    <VStack width="*">
       <Text variant="strong">Hierarchy format</Text>
       <Text variant="secondary" size="sm">Each node embeds its children inline</Text>
       <Tree
