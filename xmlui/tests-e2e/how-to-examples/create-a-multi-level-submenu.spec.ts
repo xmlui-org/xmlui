@@ -2,14 +2,12 @@ import * as path from "path";
 import { fileURLToPath } from "url";
 import { expect, test } from "../../src/testing/fixtures";
 import { getExampleSource, extractXmluiExample } from "../../src/testing/website-example-utils";
+import { SKIP_REASON } from "../../src/testing/component-test-helpers";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const markdown = getExampleSource(
-  path.join(
-    __dirname,
-    "../../../website/content/docs/pages/howto/create-a-multi-level-submenu.md",
-  ),
+  path.join(__dirname, "../../../website/content/docs/pages/howto/create-a-multi-level-submenu.md"),
 );
 
 test.describe("Open the menu and hover over submenus", { tag: "@website" }, () => {
@@ -71,7 +69,10 @@ test.describe("Open the menu and hover over submenus", { tag: "@website" }, () =
     await expect(page.getByText("Last action: Inserted 3×3 table")).toBeVisible();
   });
 
-  test("hovering Media submenu reveals image video and embed items", async ({ initTestBed, page }) => {
+  test("hovering Media submenu reveals image video and embed items", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("button", { name: "Insert" }).click();
     await page.getByRole("menuitem", { name: "Media" }).hover();
@@ -84,10 +85,11 @@ test.describe("Open the menu and hover over submenus", { tag: "@website" }, () =
   // open during diagonal mouse movement. Playwright's synthetic hover events
   // don't preserve the hover state long enough to navigate through two
   // nested sub-panels in sequence, so this test is skipped.
-  test("clicking a third-level embed option (YouTube) updates last action", async ({
-    initTestBed,
-    page,
-  }) => {
-    test.skip(true, "3-level SubMenuItem hover navigation not reliably testable via Playwright synthetic pointer events (Radix pointer-grace-zone limitation)");
-  });
+  test.skip(
+    "clicking a third-level embed option (YouTube) updates last action",
+    SKIP_REASON.OTHER(
+      "3-level SubMenuItem hover navigation not reliably testable via Playwright synthetic pointer events (Radix pointer-grace-zone limitation)",
+    ),
+    async ({ initTestBed, page }) => {},
+  );
 });
