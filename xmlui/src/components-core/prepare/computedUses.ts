@@ -1,12 +1,34 @@
+/**
+ * Computes the minimal set of parent-scope state names that each implicit
+ * container actually reads, storing the result in `node.computedUses`.
+ *
+ * Side effects: mutates `node.computedUses` in-place for every node that
+ * acts as a container (has vars/loaders/functions/etc.) and does not already
+ * carry an explicit `uses` list.
+ *
+ * When called: once at transform/boot time, after the full `ComponentDef`
+ * tree has been built and before the reactive graph is wired up.
+ */
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { parseParameterString } from "../script-runner/ParameterParser";
 import { isParsedValue } from "../state/variable-resolution";
+import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
 
-// Walk a plain-object AST tree collecting string-typed Identifier node names.
-// Used as a fallback for event handler ASTs that use string type discriminators.
+/**
+ * Walk a plain-object AST tree collecting Identifier node names.
+ *
+ * This fallback is needed for event handler ASTs that arrive with string-typed
+ * `type` discriminators (e.g. `"Identifier"`, `"ExpressionStatement"`) rather
+ * than the numeric constants the real scripting parser emits. This format
+ * appears when event handler objects are constructed directly (e.g. in tests
+ * or via JSON-serialised ASTs) instead of being produced by the scripting
+ * parser. `collectVariableDependencies` only handles the numeric-discriminator
+ * format, so we fall back to a structural walk for the string-discriminator
+ * case.
+ */
 function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<string> {
   if (node === null || node === undefined || typeof node !== "object") return acc;
   if (Array.isArray(node)) {
@@ -35,17 +57,20 @@ function depsOfValue(value: unknown): string[] {
   try {
     if (value === null || value === undefined) return [];
     if (isParsedValue(value)) {
-      return (collectVariableDependencies((value as any).tree) ?? []).map(rootIdentifier);
+      // isParsedValue narrows to CodeDeclaration, which has a typed .tree field.
+      return (collectVariableDependencies((value as CodeDeclaration).tree) ?? []).map(rootIdentifier);
     }
     if (typeof value === "object") {
-      const obj = value as any;
-      // Real parsed AST: statements array with numeric-type nodes
+      const obj = value as Record<string, unknown>;
+      // Raw event handler AST: has a `statements` array with numeric-type nodes.
+      // Try the fast path first; fall back to structural walk for string-discriminator ASTs.
       if (obj.statements && Array.isArray(obj.statements)) {
         try {
           const deps = collectVariableDependencies(obj.statements) ?? [];
           if (deps.length > 0) return deps.map(rootIdentifier);
         } catch {
-          // fall through to generic walk
+          // collectVariableDependencies failed — AST uses string discriminators,
+          // so fall through to the generic identifier walk.
         }
         return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
       }
@@ -56,7 +81,8 @@ function depsOfValue(value: unknown): string[] {
       const acc = new Set<string>();
       for (const part of params) {
         if (part.type !== "expression") continue;
-        for (const id of collectVariableDependencies(part.value as any) ?? []) {
+        // part.value is Expression — the type parseParameterString returns for expression sections.
+        for (const id of collectVariableDependencies(part.value) ?? []) {
           acc.add(rootIdentifier(id));
         }
       }
@@ -83,21 +109,19 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
   const localDeclared = new Set<string>();
   if (node.vars) for (const k of Object.keys(node.vars)) localDeclared.add(k);
   if (node.functions) for (const k of Object.keys(node.functions)) localDeclared.add(k);
-  if ((node as any).scriptCollected) {
-    const sc = (node as any).scriptCollected;
-    if (typeof sc === "object" && sc !== null) {
-      for (const k of Object.keys(sc)) localDeclared.add(k);
-    }
+  if (node.scriptCollected) {
+    // Code-behind declarations are scoped to this node — treat them as local.
+    const sc = node.scriptCollected;
+    for (const k of Object.keys(sc)) localDeclared.add(k);
   }
   if (node.uid) localDeclared.add(node.uid);
 
   const usedHere = new Set<string>();
-  const addDeps = (set: Set<string>) => { for (const d of set) usedHere.add(d); };
 
-  addDeps(depsOfRecord(node.props as Record<string, unknown> | undefined));
-  addDeps(depsOfRecord(node.vars));
-  addDeps(depsOfRecord(node.events as Record<string, unknown> | undefined));
-  addDeps(depsOfRecord(node.api as Record<string, unknown> | undefined));
+  for (const d of depsOfRecord(node.props as Record<string, unknown> | undefined)) usedHere.add(d);
+  for (const d of depsOfRecord(node.vars)) usedHere.add(d);
+  for (const d of depsOfRecord(node.events as Record<string, unknown> | undefined)) usedHere.add(d);
+  for (const d of depsOfRecord(node.api as Record<string, unknown> | undefined)) usedHere.add(d);
 
   if (node.when !== undefined && node.when !== null && typeof node.when !== "boolean") {
     for (const d of depsOfValue(node.when)) usedHere.add(d);
@@ -110,24 +134,35 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
     }
   }
 
-  const childFree = new Set<string>();
-  const addChildFree = (set: Set<string>) => { for (const d of set) childFree.add(d); };
+  // Collect deps from the entire subtree below this node.
+  // Loaders are recursed as full ComponentDef subtrees because they can carry
+  // their own children (e.g. a DataSource with nested transforms), and any
+  // identifiers they reference must bubble up through the container hierarchy.
+  const childDeps = new Set<string>();
 
   if (node.children) {
-    for (const child of node.children) addChildFree(computeUsesForSubtree(child));
+    for (const child of node.children) {
+      for (const d of computeUsesForSubtree(child)) childDeps.add(d);
+    }
   }
   if (node.loaders) {
-    for (const loader of node.loaders) addChildFree(computeUsesForSubtree(loader));
+    for (const loader of node.loaders) {
+      for (const d of computeUsesForSubtree(loader)) childDeps.add(d);
+    }
   }
   if (node.slots) {
     for (const slotChildren of Object.values(node.slots)) {
-      for (const child of slotChildren) addChildFree(computeUsesForSubtree(child));
+      for (const child of slotChildren) {
+        for (const d of computeUsesForSubtree(child)) childDeps.add(d);
+      }
     }
   }
 
+  // Strip names that are declared at this level — they don't need to be
+  // requested from a parent container.
   const totalFree = new Set<string>();
   for (const d of usedHere) if (!localDeclared.has(d)) totalFree.add(d);
-  for (const d of childFree) if (!localDeclared.has(d)) totalFree.add(d);
+  for (const d of childDeps) if (!localDeclared.has(d)) totalFree.add(d);
 
   const isRegularContainer = !!(
     node.vars ||
@@ -135,7 +170,7 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
     node.functions ||
     node.uses !== undefined ||
     node.contextVars ||
-    (node as any).scriptCollected
+    node.scriptCollected
   );
   const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && totalFree.size > 0;
   const isContainer = isRegularContainer || isImplicitDefault;
