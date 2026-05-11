@@ -20,7 +20,13 @@ When the user clicks the button, `count` increments, and the button label update
 
 XMLUI apps can run in two modes. The choice is made at project creation time, not at runtime.
 
-**Standalone (buildless)** — The app is served as static files. The browser loads `xmlui-standalone.umd.js`, which fetches `Main.xmlui`, discovers components from the `components/` directory, and parses everything at runtime. No build step needed. Deploy by copying files to any static web server.
+**Standalone (buildless)** — The app is served as static files. The browser loads `xmlui-standalone.umd.js`, which fetches `Main.xmlui`, discovers components from the `components/` directory, and parses everything at runtime. No build step needed. Deploy by copying files to any static web server. A special case of this mode is: **Islands** — lets you embed one or more independent XMLUI apps inside an arbitrary host web page (one that is not itself an XMLUI app). Each island is declared with a single HTML attribute:
+
+```html
+<div data-xmlui-src="./checkout-form"></div>
+```
+
+The value is a relative path to a folder containing a standard XMLUI project (`Main.xmlui`, optional `config.json`, `components/`, etc...). The standalone UMD bundle detects these markers on mounts a fully isolated XMLUI application into each one, instead of creating a #root div at the body and starting a standalone app there.
 
 **Vite (built)** — The app uses Vite with the `vite-xmlui-plugin`. All `.xmlui` files are compiled to JavaScript modules at build time. The result is an optimized bundle with no runtime parsing. Used for production sites and when HMR during development is needed. Note: even in this mode, XMLUI expressions (`{...}`) and event handlers are still evaluated at runtime by the scripting engine — the build step eliminates XML parsing overhead, not expression interpretation.
 
@@ -54,13 +60,13 @@ graph TB
 
 Here is what happens from the moment a user opens an XMLUI app to the moment pixels appear on screen, and then what happens when they interact.
 
-| Phase | What happens |
-|-------|--------------|
-| 1. Bootstrap | Components are resolved; provider stack is established |
-| 2. Provider stack | React context providers are layered around the app |
-| 3. Rendering | `renderChild()` recursively builds the React element tree |
-| 4. State composition | `StateContainer` merges 6 layers into a flat state object |
-| 5. Expression evaluation | `{expressions}` are evaluated against composed state |
+| Phase                      | What happens                                                |
+| -------------------------- | ----------------------------------------------------------- |
+| 1. Bootstrap               | Components are resolved; provider stack is established      |
+| 2. Provider stack          | React context providers are layered around the app          |
+| 3. Rendering               | `renderChild()` recursively builds the React element tree   |
+| 4. State composition       | `StateContainer` merges 6 layers into a flat state object   |
+| 5. Expression evaluation   | `{expressions}` are evaluated against composed state        |
 | 6. Interaction & re-render | User event → state mutation → routing → reducer → re-render |
 
 ### Phase 1: Bootstrap
@@ -177,14 +183,14 @@ graph TD
 
 When a node routes through `StateContainer`, the framework composes its state from six layers. Each layer can shadow values from the layer below it.
 
-| Layer | What it contains | Example |
-|-------|-----------------|---------|
-| 1. Parent state | State inherited from the parent container, scoped by the `uses` prop | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
-| 2. Component reducer | Loader results, event progress flags, component state from `updateState` | `DataSource` results, `submitInProgress` flag |
-| 3. Component APIs | Methods registered via `registerComponentApi()` | A TextBox's `value`, `focus()`, `clear()` |
-| 4. Context variables | Iteration variables, routing params, slot properties | `$item`, `$itemIndex` inside an `<Items>` loop; `$pathname`, `$routeParams` in any component |
-| 5. Local variables | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"` |
-| 6. Global variables | App-wide state owned by the root container and passed down | Variables declared at the `<App>` level that are accessible everywhere |
+| Layer                | What it contains                                                                                          | Example                                                                                           |
+| -------------------- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| 1. Parent state      | State inherited from the parent container, scoped by the `uses` prop                                      | A parent's `userData` variable inherited by a child (when `uses="userData"` or `uses` is not set) |
+| 2. Component reducer | Loader results, event progress flags, component state from `updateState`                                  | `DataSource` results, `submitInProgress` flag                                                     |
+| 3. Component APIs    | Methods registered via `registerComponentApi()`                                                           | A TextBox's `value`, `focus()`, `clear()`                                                         |
+| 4. Context variables | Iteration variables, routing params, slot properties                                                      | `$item`, `$itemIndex` inside an `<Items>` loop; `$pathname`, `$routeParams` in any component      |
+| 5. Local variables   | Variables declared with `var.` or `<variable>` tags — resolved in two passes to handle forward references | `var.total="{price * quantity}"`                                                                  |
+| 6. Global variables  | App-wide state owned by the root container and passed down                                                | Variables declared at the `<App>` level that are accessible everywhere                            |
 
 The final merged state is a single flat object available to all expressions within that container's scope.
 
@@ -282,10 +288,10 @@ A **container** is the fundamental unit of state isolation in XMLUI. Every compo
 
 Each container is implemented as two cooperating React components with distinct responsibilities:
 
-- **`StateContainer`** — owns the *data*. It composes the 6-layer state (parent state, reducer state, component APIs, context variables, local variables, routing params) and provides the merged state object to everything below it.
-- **`Container`** — owns the *behaviour*. It receives the composed state from `StateContainer` and is responsible for creating event handlers, caching them, resolving action lookups, and calling `renderChild()` to produce the children.
+- **`StateContainer`** — owns the _data_. It composes the 6-layer state (parent state, reducer state, component APIs, context variables, local variables, routing params) and provides the merged state object to everything below it.
+- **`Container`** — owns the _behaviour_. It receives the composed state from `StateContainer` and is responsible for creating event handlers, caching them, resolving action lookups, and calling `renderChild()` to produce the children.
 
-In other words: `StateContainer` answers *"what is the current state?"*, and `Container` answers *"what do I render and what happens when the user acts?"*.
+In other words: `StateContainer` answers _"what is the current state?"_, and `Container` answers _"what do I render and what happens when the user acts?"_.
 
 **Explicit containers** — Created when a node declares `vars`, `functions`, `uses`, or `loaders`. Gets its own `StateContainer` + `Container` pair with an independent reducer.
 
@@ -309,13 +315,13 @@ Each container has a reducer (created by `createContainerReducer()`) that proces
 
 The key action types are:
 
-| Action | When it fires | What it does |
-|--------|---------------|--------------|
-| `LOADER_LOADED` | DataSource returns data | Updates `state[uid].value`, builds `byId` lookup, sets `loaded: true` |
-| `LOADER_ERROR` | DataSource fails | Sets `error`, marks `loaded: true` |
-| `STATE_PART_CHANGED` | Expression assigns to a variable | Path-based update via immer `setWith()` |
-| `COMPONENT_STATE_CHANGED` | Native component calls `updateState` | Merges new state into `state[uid]` |
-| `EVENT_HANDLER_STARTED` / `COMPLETED` / `ERROR` | Event handler lifecycle | Tracks `${eventName}InProgress` flags |
+| Action                                          | When it fires                        | What it does                                                          |
+| ----------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------- |
+| `LOADER_LOADED`                                 | DataSource returns data              | Updates `state[uid].value`, builds `byId` lookup, sets `loaded: true` |
+| `LOADER_ERROR`                                  | DataSource fails                     | Sets `error`, marks `loaded: true`                                    |
+| `STATE_PART_CHANGED`                            | Expression assigns to a variable     | Path-based update via immer `setWith()`                               |
+| `COMPONENT_STATE_CHANGED`                       | Native component calls `updateState` | Merges new state into `state[uid]`                                    |
+| `EVENT_HANDLER_STARTED` / `COMPLETED` / `ERROR` | Event handler lifecycle              | Tracks `${eventName}InProgress` flags                                 |
 
 ## Global Functions (AppContext)
 
@@ -331,24 +337,24 @@ The key action types are:
 
 A quick-reference table of the most important types and functions mentioned in this document.
 
-| Name | Kind | Role |
-|------|------|------|
-| `StandaloneApp` | React component | App entry point — resolves components, sets up API interception, enters `AppRoot` |
-| `AppRoot` | React component | Wraps the app in `ComponentProvider`, `StyleProvider`, and `AppWrapper` |
-| `AppWrapper` | React component | Adds Router, ThemeProvider, IconProvider, InspectorProvider, and `AppContent` |
-| `ComponentDef` | TypeScript type | Parsed representation of one XML element: `type`, `props`, `events`, `children`, `vars`, `loaders`, `when`, `uses` |
-| `CompoundComponentDef` | TypeScript type | A user-defined component: `name` + template tree + optional `script` |
-| `ComponentRendererDef` | TypeScript type | Registry entry mapping a component type name to its renderer function and metadata |
-| `RendererContext` | TypeScript type | Passed to every renderer function: `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi` |
-| `renderChild()` | Function | Recursive rendering core — evaluates `when`, handles text/slot nodes, delegates to `ComponentWrapper` |
-| `ComponentWrapper` | React component | Transforms node props, then routes to `ContainerWrapper` (stateful) or `ComponentAdapter` (stateless) |
-| `StateContainer` | React component | Composes the 6-layer state and provides it to `Container` |
-| `Container` | React component | Creates event handlers, action lookup, and the stable `renderChild` closure; renders children and loaders |
-| `createContainerReducer()` | Function | Produces the immer-based reducer for a container's state mutations |
-| `statePartChanged()` | Callback | Routes a variable mutation to the owning container via `STATE_PART_CHANGED` dispatch |
-| `AppContextObject` | TypeScript type | The global utilities object: `navigate`, `toast`, `confirm`, `Actions`, date/math/storage helpers |
-| `registerComponentApi()` | Callback | Registers imperative methods (e.g. `focus()`, `clear()`) on a native component so markup can call them |
-| `updateState()` | Callback | Called by a native component to push its internal state (e.g. a TextBox's current value) into the container |
+| Name                       | Kind            | Role                                                                                                                                                 |
+| -------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `StandaloneApp`            | React component | App entry point — resolves components, sets up API interception, enters `AppRoot`                                                                    |
+| `AppRoot`                  | React component | Wraps the app in `ComponentProvider`, `StyleProvider`, and `AppWrapper`                                                                              |
+| `AppWrapper`               | React component | Adds Router, ThemeProvider, IconProvider, InspectorProvider, and `AppContent`                                                                        |
+| `ComponentDef`             | TypeScript type | Parsed representation of one XML element: `type`, `props`, `events`, `children`, `vars`, `loaders`, `when`, `uses`                                   |
+| `CompoundComponentDef`     | TypeScript type | A user-defined component: `name` + template tree + optional `script`                                                                                 |
+| `ComponentRendererDef`     | TypeScript type | Registry entry mapping a component type name to its renderer function and metadata                                                                   |
+| `RendererContext`          | TypeScript type | Passed to every renderer function: `node.props`, `state`, `extractValue`, `renderChild`, `lookupEventHandler`, `updateState`, `registerComponentApi` |
+| `renderChild()`            | Function        | Recursive rendering core — evaluates `when`, handles text/slot nodes, delegates to `ComponentWrapper`                                                |
+| `ComponentWrapper`         | React component | Transforms node props, then routes to `ContainerWrapper` (stateful) or `ComponentAdapter` (stateless)                                                |
+| `StateContainer`           | React component | Composes the 6-layer state and provides it to `Container`                                                                                            |
+| `Container`                | React component | Creates event handlers, action lookup, and the stable `renderChild` closure; renders children and loaders                                            |
+| `createContainerReducer()` | Function        | Produces the immer-based reducer for a container's state mutations                                                                                   |
+| `statePartChanged()`       | Callback        | Routes a variable mutation to the owning container via `STATE_PART_CHANGED` dispatch                                                                 |
+| `AppContextObject`         | TypeScript type | The global utilities object: `navigate`, `toast`, `confirm`, `Actions`, date/math/storage helpers                                                    |
+| `registerComponentApi()`   | Callback        | Registers imperative methods (e.g. `focus()`, `clear()`) on a native component so markup can call them                                               |
+| `updateState()`            | Callback        | Called by a native component to push its internal state (e.g. a TextBox's current value) into the container                                          |
 
 ## Key Takeaways
 
