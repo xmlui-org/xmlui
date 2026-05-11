@@ -625,7 +625,7 @@ export const DatePicker = forwardRef(function DatePicker(
   }
 
   // On mobile, render the calendar inside a Radix Dialog styled as a bottom
-  // sheet (shadcn's responsive Date Picker pattern). Desktop keeps the
+  // sheet Desktop keeps the
   // anchored Popover.
   if (isMobile) {
     return (
