@@ -514,3 +514,122 @@ test.describe("mockData property", () => {
     await expect(page.getByTestId("output")).toHaveText("second");
   });
 });
+
+// =============================================================================
+// onFetch EVENT HANDLER
+// =============================================================================
+
+test.describe("onFetch event", () => {
+  test("handler return value becomes the data", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource id="ds" url="/api/custom" onFetch="() => ({ greeting: 'hello' })" />
+        <Text testId="output" value="{ds.value.greeting}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("hello");
+  });
+
+  test("default fetch is bypassed when onFetch is defined", async ({ initTestBed, page }) => {
+    // The interceptor would return "GET success", but onFetch should win.
+    await initTestBed(
+      `
+      <Fragment>
+        <DataSource id="ds" url="/api/test" onFetch="() => 'from-handler'" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+      `,
+      { apiInterceptor: basicApiInterceptor },
+    );
+
+    await expect(page.getByTestId("output")).toHaveText("from-handler");
+  });
+
+  test("handler can use $url, $method and $queryParams context vars", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/custom"
+          method="get"
+          queryParams="{{ q: 'abc' }}"
+          onFetch="() => $url + '|' + $method + '|' + $queryParams.q" />
+        <Text testId="output" value="{ds.value}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("/api/custom|get|abc");
+  });
+
+  test("fires the onLoaded event with the handler result", async ({ initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DataSource id="ds" url="/api/x"
+        onFetch="() => ({ n: 7 })"
+        onLoaded="(data) => testState = data.n" />
+    `);
+
+    await expect.poll(() => testStateDriver.testState(), { timeout: 2000 }).toBe(7);
+  });
+
+  test("refetch() re-invokes the onFetch handler", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <App var.calls="{0}">
+        <DataSource id="ds" url="/api/cached"
+          onFetch="() => { calls = calls + 1; return calls; }" />
+        <Text testId="output" value="{ds.value}" />
+        <Text testId="calls" value="{calls}" />
+        <Button testId="refetch-btn" label="Refetch" onClick="ds.refetch()" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText("1");
+    await expect(page.getByTestId("calls")).toHaveText("1");
+
+    await page.getByTestId("refetch-btn").click();
+    await expect(page.getByTestId("output")).toHaveText("2");
+    await expect(page.getByTestId("calls")).toHaveText("2");
+  });
+
+  test("two DataSources with the same url share the cached onFetch result", async ({
+    initTestBed,
+    page,
+  }) => {
+    // React Query dedupes by query key (url + queryParams + body). Two
+    // DataSources with identical inputs must call the handler only once and
+    // both surface the same value.
+    await initTestBed(`
+      <App var.calls="{0}">
+        <DataSource id="ds1" url="/api/shared"
+          onFetch="() => { calls = calls + 1; return 'payload-' + calls; }" />
+        <DataSource id="ds2" url="/api/shared"
+          onFetch="() => { calls = calls + 1; return 'payload-' + calls; }" />
+        <Text testId="out1" value="{ds1.value}" />
+        <Text testId="out2" value="{ds2.value}" />
+        <Text testId="calls" value="{calls}" />
+      </App>
+    `);
+
+    await expect(page.getByTestId("out1")).toHaveText("payload-1");
+    await expect(page.getByTestId("out2")).toHaveText("payload-1");
+    await expect(page.getByTestId("calls")).toHaveText("1");
+  });
+
+  test("resultSelector is applied to the onFetch result", async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment>
+        <DataSource
+          id="ds"
+          url="/api/x"
+          resultSelector="items"
+          onFetch="() => ({ items: ['a','b','c'] })" />
+        <Text testId="output" value="{JSON.stringify(ds.value)}" />
+      </Fragment>
+    `);
+
+    await expect(page.getByTestId("output")).toHaveText('["a","b","c"]');
+  });
+});

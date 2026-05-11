@@ -167,6 +167,18 @@ export const DataSourceMd = createMetadata({
         error: "The error object that occurred during the request.",
       },
     },
+    fetch: {
+      description:
+        "When defined, this event handler replaces the default fetch logic. The handler " +
+        "receives the resolved request properties as context variables: `$url`, `$method`, " +
+        "`$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). " +
+        "The return value of the handler becomes the data result. Caching, polling, the " +
+        "`loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` " +
+        "method continue to work normally because the handler runs inside the same query " +
+        "function that powers the default fetch.",
+      signature: "fetch(): any",
+      parameters: {},
+    },
   },
   apis: {
     value: {
