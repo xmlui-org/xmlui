@@ -215,12 +215,18 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .datePickerMenu {
     padding: t.$space-4;
-    overflow-y: auto;
+    overflow: auto;
     height: fit-content;
-    // The trigger's width class is also applied to the popover content, so a
-    // narrow trigger would clip the calendar. Force the dropdown to be at least
-    // as wide as its natural content.
-    min-width: max-content;
+    // `!important` is required because the trigger's dynamic theme class (in a
+    // later @layer) is also applied to the popover content and would otherwise
+    // force the dropdown to inherit the trigger's narrow width. Cap both
+    // dimensions to the viewport space Radix reports so the dropdown never
+    // extends past the screen edge — combined with `overflow: auto`, the
+    // calendar gets an internal scrollbar on small mobile screens (e.g. range
+    // mode where two months stack vertically).
+    width: max-content !important;
+    max-width: var(--radix-popover-content-available-width, 100vw);
+    max-height: var(--radix-popover-content-available-height, 100vh);
     box-shadow: $boxShadow-menu-DatePicker;
     background-color: $backgroundColor-menu-DatePicker;
     border-radius: $borderRadius-menu-DatePicker;
