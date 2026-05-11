@@ -1,0 +1,5 @@
+<Component name="MyComp">
+  <Card>
+    <Text><Text fontWeight="800">MyComp</Text> from checkout-form island</Text>
+  </Card>
+</Component>

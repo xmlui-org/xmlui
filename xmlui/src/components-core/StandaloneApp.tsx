@@ -129,6 +129,12 @@ type StandaloneAppProps = {
   waitForApiInterceptor?: boolean;
   helmetContext?: Record<string, unknown>;
   children?: ReactNode;
+
+  // --- Base path for island mode: the folder containing Main.xmlui and other
+  // --- resources, resolved relative to the host page URL (e.g. "./bio").
+  // --- When set, all file fetches are rooted at this folder instead of the
+  // --- document root, and the app uses an isolated memory router.
+  basePath?: string;
 };
 
 /**
@@ -150,6 +156,7 @@ function StandaloneApp({
   waitForApiInterceptor = false,
   helmetContext,
   children,
+  basePath = "",
 }: StandaloneAppProps) {
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
@@ -158,6 +165,7 @@ function StandaloneApp({
     appDef,
     runtime,
     extensionManager,
+    basePath,
   );
   usePrintVersionNumber(standaloneApp);
 
@@ -279,9 +287,14 @@ function StandaloneApp({
           node={entryPoint!}
           standalone={true}
           debugEnabled={debugEnabled}
+          previewMode={!!basePath}
           // @ts-ignore
           routerBaseName={
-            typeof globalThis.window !== "undefined" ? (globalThis as any).__PUBLIC_PATH || "" : ""
+            basePath
+              ? ""
+              : typeof globalThis.window !== "undefined"
+                ? (globalThis as any).__PUBLIC_PATH || ""
+                : ""
           }
           globalProps={globalProps}
           globalVars={filterGlobalVars(globalVars)}
@@ -868,11 +881,17 @@ function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
   extensionManager?: StandaloneExtensionManager,
+  basePath: string = "",
 ): {
   standaloneApp: StandaloneAppDescription | null;
   projectCompilation?: ProjectCompilation;
   globalVars?: Record<string, any>;
 } {
+  // Prepend basePath to a relative path. Absolute URLs (http/https) are passed through unchanged.
+  const prefixPath = (path: string): string => {
+    if (!basePath || /^https?:\/\//.test(path)) return path;
+    return `${basePath}/${path}`;
+  };
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
     const resolvedRuntime = resolveRuntime(runtime);
@@ -1188,13 +1207,13 @@ function useStandalone(
         // --- In config-only mode, we override the pre-compiled app definition
         // --- with elements from the configuration file. Note that we do not
         // --- check whether the config file's content is semantically valid.
-        const configResponse = await fetchWithoutCache(CONFIG_FILE);
+        const configResponse = await fetchWithoutCache(prefixPath(CONFIG_FILE));
         await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
         const config: StandaloneJsonConfig = await configResponse.json();
 
         const themePromises: Promise<ThemeDefinition>[] = [];
         config.themes?.forEach((theme) => {
-          themePromises.push(loadThemeFile(theme));
+          themePromises.push(loadThemeFile(prefixPath(theme)));
         });
         const themes = await Promise.all(themePromises);
 
@@ -1228,7 +1247,7 @@ function useStandalone(
       // --- Fetch the main file
       const entryPointPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(MAIN_FILE);
+          const resp = await fetchWithoutCache(prefixPath(MAIN_FILE));
           resolve(parseComponentMarkupResponse(resp));
         } catch (e) {
           resolve({
@@ -1242,7 +1261,7 @@ function useStandalone(
       // --- Fetch the optional Globals.xs file containing global variables and functions
       const globalsPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache(GLOBALS_FILE);
+          const resp = await fetchWithoutCache(prefixPath(GLOBALS_FILE));
           const parsedGlobals = await parseCodeBehindResponse(resp);
 
           const globalsXs = parsedGlobals?.codeBehind;
@@ -1265,7 +1284,7 @@ function useStandalone(
       // --- Fetch the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
-        const configResponse = await fetchWithoutCache(CONFIG_FILE);
+        const configResponse = await fetchWithoutCache(prefixPath(CONFIG_FILE));
         await validateResponseIsNotHtml(configResponse); // Validate response is not HTML
         config = await configResponse.json();
       } catch (e) {}
@@ -1277,17 +1296,17 @@ function useStandalone(
         // --- Special case, we have only a single "defaultTheme" in the configuration
         const themeUrl = toThemeUrl(config.defaultTheme);
         defaultThemeIsUrl = themeUrl === config.defaultTheme;
-        const fetchDefaultTheme = loadThemeFile(themeUrl);
+        const fetchDefaultTheme = loadThemeFile(prefixPath(themeUrl));
         themePromises = [fetchDefaultTheme];
       } else {
         // --- In any other case, we fetch all themes defined in the configuration
         themePromises = config?.themes?.map((themePath) => {
-          return loadThemeFile(themePath);
+          return loadThemeFile(prefixPath(themePath));
         });
       }
       // --- Fetch component files according to the configuration
       const componentPromises = config?.components?.map(async (componentPath) => {
-        const value = await fetchWithoutCache(componentPath);
+        const value = await fetchWithoutCache(prefixPath(componentPath));
         if (componentPath.endsWith(`.${componentFileExtension}`)) {
           return await parseComponentMarkupResponse(value);
         } else {
@@ -1319,9 +1338,11 @@ function useStandalone(
         loadedEntryPointCodeBehind = (await new Promise(async (resolve) => {
           try {
             const resp = await fetchWithoutCache(
-              resolvePath(
-                MAIN_FILE,
-                loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE,
+              prefixPath(
+                resolvePath(
+                  MAIN_FILE,
+                  loadedEntryPoint.component.props?.codeBehind || MAIN_CODE_BEHIND_FILE,
+                ),
               ),
             );
             const codeBehind = await parseCodeBehindResponse(resp);
@@ -1338,7 +1359,7 @@ function useStandalone(
         // --- Its declarations are LOCAL to the Main component.
         loadedEntryPointCodeBehind = await (async () => {
           try {
-            const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+            const resp = await fetchWithoutCache(prefixPath(MAIN_CODE_BEHIND_FILE));
             const parsed = await parseCodeBehindResponse(resp);
             if (parsed.hasError) {
               errorComponents.push(parsed.component as ComponentDef);
@@ -1433,7 +1454,7 @@ function useStandalone(
         ) {
           defaultThemeIsUrl = defaultThemeProp === config?.defaultTheme;
           const themeUrl = toThemeUrl(defaultThemeProp);
-          themes.push(await loadThemeFile(themeUrl));
+          themes.push(await loadThemeFile(prefixPath(themeUrl)));
         }
       }
 
@@ -1477,7 +1498,7 @@ function useStandalone(
           try {
             // --- Promises for the component markup files
             const componentPromise = fetchWithoutCache(
-              `components/${componentPath}.${componentFileExtension}`,
+              prefixPath(`components/${componentPath}.${componentFileExtension}`),
             );
 
             // --- Let the promises resolve
@@ -1506,10 +1527,12 @@ function useStandalone(
               componentCodeBehind = (await new Promise(async (resolve) => {
                 try {
                   const codeBehind = await fetchWithoutCache(
-                    resolvePath(
-                      `components/${componentPath}`,
-                      (compWrapper.component as CompoundComponentDef)?.codeBehind ||
-                        `${componentPath}.${codeBehindFileExtension}`,
+                    prefixPath(
+                      resolvePath(
+                        `components/${componentPath}`,
+                        (compWrapper.component as CompoundComponentDef)?.codeBehind ||
+                          `${componentPath}.${codeBehindFileExtension}`,
+                      ),
                     ),
                   );
                   const codeBehindWrapper = await parseCodeBehindResponse(codeBehind);
@@ -1649,7 +1672,7 @@ function useStandalone(
       // DO NOT merge with extractedMainXsGlobals - those are static evaluated values that break reactivity
       setGlobalVars(parsedGlobals);
     })();
-  }, [runtime, standaloneAppDef]);
+  }, [runtime, standaloneAppDef, basePath]);
 
   return { standaloneApp, projectCompilation, globalVars };
 }
