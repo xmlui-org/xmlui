@@ -14,12 +14,18 @@ import type { ValidationStatus } from "../abstractions";
 import { Adornment } from "../Input/InputAdornment";
 import { ConciseValidationFeedback } from "../ConciseValidationFeedback/ConciseValidationFeedback";
 import { Popover, PopoverContent, PopoverPortal, PopoverTrigger } from "@radix-ui/react-popover";
+import * as Dialog from "@radix-ui/react-dialog";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Part } from "../Part/Part";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 import { useFormContextPart } from "../Form/FormContext";
 import { ThemedIcon } from "../Icon/Icon";
 import { useFormItemInputId } from "../FormItem/FormItemContext";
+import { useMediaQuery } from "../../components-core/utils/hooks";
+
+// Below this viewport width, the dropdown switches to a bottom-sheet style
+// dialog with a backdrop — see shadcn's responsive Date Picker pattern.
+const MOBILE_BREAKPOINT_QUERY = "(max-width: 767px)";
 
 const PART_CONCISE_VALIDATION_FEEDBACK = "conciseValidationFeedback";
 
@@ -383,6 +389,7 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const [open, setOpen] = useState(false);
   const { root } = useTheme();
+  const isMobile = useMediaQuery(MOBILE_BREAKPOINT_QUERY);
 
   const handleOnMenuFocus = () => {
     setIsMenuFocused(true);
@@ -497,44 +504,168 @@ export const DatePicker = forwardRef(function DatePicker(
     return mods;
   }, [mode, hoveredDate, selected]);
 
-  return inline ? (
-    <div
-      ref={ref}
-      {...rest}
-      style={style}
-      className={classnames(styles.inlinePickerMenu, classes?.[COMPONENT_PART_KEY], className)}
-      tabIndex={0}
-    >
-      <DayPicker
-        id={id}
-        required={undefined}
-        captionLayout="dropdown"
-        fixedWeeks={mode !== "range"}
-        startMonth={_startDate}
-        endMonth={_endDate}
-        month={inlineMonth}
-        onMonthChange={setInlineMonth}
-        disabled={disabled}
-        weekStartsOn={_weekStartsOn}
-        showWeekNumber={showWeekNumber}
-        showOutsideDays={mode !== "range"}
-        classNames={styles}
-        mode={mode === "single" ? "single" : "range"}
-        selected={selected}
-        onSelect={handleSelect}
-        autoFocus={autoFocus}
-        numberOfMonths={mode === "range" ? 2 : 1}
-        pagedNavigation={mode === "range"}
-        modifiers={modifiers}
-        modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
-        onDayMouseEnter={handleDayMouseEnter}
-        onDayMouseLeave={handleDayMouseLeave}
-        components={{
-          Chevron,
-        }}
-      />
-    </div>
-  ) : (
+  const triggerClassName = classnames(
+    classes?.[COMPONENT_PART_KEY],
+    className,
+    styles.datePicker,
+    {
+      [styles.disabled]: !enabled,
+      [styles.error]: validationStatus === "error",
+      [styles.warning]: validationStatus === "warning",
+      [styles.valid]: validationStatus === "valid",
+    },
+    className,
+  );
+
+  const triggerInner = (
+    <>
+      <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+      <div className={styles.datePickerValue}>
+        {mode === "single" && selected ? (
+          <>{format(selected, dateFormat)}</>
+        ) : mode === "range" && typeof selected === "object" && selected.from ? (
+          selected.to ? (
+            <>
+              {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
+            </>
+          ) : (
+            <>{format(selected.from, dateFormat)}</>
+          )
+        ) : placeholder ? (
+          <span className={styles.placeholder} placeholder={placeholder}>
+            {placeholder}
+          </span>
+        ) : (
+          <span>&nbsp;</span>
+        )}
+      </div>
+      {!finalVerboseValidationFeedback && (
+        <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
+          <ConciseValidationFeedback
+            validationStatus={validationStatus}
+            invalidMessages={invalidMessages}
+            successIcon={finalValidationIconSuccess}
+            errorIcon={finalValidationIconError}
+          />
+        </Part>
+      )}
+      <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+    </>
+  );
+
+  const popupCalendar = (
+    <DayPicker
+      required={undefined}
+      animate
+      fixedWeeks={mode !== "range"}
+      autoFocus={autoFocus}
+      classNames={styles}
+      captionLayout="dropdown"
+      startMonth={_startDate}
+      endMonth={_endDate}
+      defaultMonth={defaultMonth}
+      disabled={disabled}
+      weekStartsOn={_weekStartsOn}
+      showWeekNumber={showWeekNumber}
+      showOutsideDays={mode !== "range"}
+      mode={mode === "single" ? "single" : "range"}
+      selected={selected}
+      onSelect={handleSelect}
+      numberOfMonths={mode === "range" ? 2 : 1}
+      pagedNavigation={mode === "range"}
+      modifiers={modifiers}
+      modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+      onDayMouseEnter={handleDayMouseEnter}
+      onDayMouseLeave={handleDayMouseLeave}
+      components={{
+        Chevron,
+      }}
+    />
+  );
+
+  if (inline) {
+    return (
+      <div
+        ref={ref}
+        {...rest}
+        style={style}
+        className={classnames(styles.inlinePickerMenu, classes?.[COMPONENT_PART_KEY], className)}
+        tabIndex={0}
+      >
+        <DayPicker
+          id={id}
+          required={undefined}
+          captionLayout="dropdown"
+          fixedWeeks={mode !== "range"}
+          startMonth={_startDate}
+          endMonth={_endDate}
+          month={inlineMonth}
+          onMonthChange={setInlineMonth}
+          disabled={disabled}
+          weekStartsOn={_weekStartsOn}
+          showWeekNumber={showWeekNumber}
+          showOutsideDays={mode !== "range"}
+          classNames={styles}
+          mode={mode === "single" ? "single" : "range"}
+          selected={selected}
+          onSelect={handleSelect}
+          autoFocus={autoFocus}
+          numberOfMonths={mode === "range" ? 2 : 1}
+          pagedNavigation={mode === "range"}
+          modifiers={modifiers}
+          modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
+          onDayMouseEnter={handleDayMouseEnter}
+          onDayMouseLeave={handleDayMouseLeave}
+          components={{
+            Chevron,
+          }}
+        />
+      </div>
+    );
+  }
+
+  // On mobile, render the calendar inside a Radix Dialog styled as a bottom
+  // sheet (shadcn's responsive Date Picker pattern). Desktop keeps the
+  // anchored Popover.
+  if (isMobile) {
+    return (
+      <Dialog.Root open={open} onOpenChange={setOpen}>
+        <Dialog.Trigger
+          id={id}
+          ref={composeRefs(setReferenceElement, ref) as any}
+          aria-haspopup={true}
+          disabled={!enabled}
+          style={style}
+          className={triggerClassName}
+          autoFocus={autoFocus}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          {...rest}
+        >
+          {triggerInner}
+        </Dialog.Trigger>
+        <Dialog.Portal container={root}>
+          <Dialog.Overlay className={styles.mobileBackdrop} />
+          <Dialog.Content
+            role="menu"
+            aria-label="Select date"
+            aria-describedby={undefined}
+            className={classnames(contentClassName, styles.datePickerMenu, styles.mobileSheet)}
+            onOpenAutoFocus={(e) => {
+              // Prevent the calendar from stealing focus on open so taps on
+              // dates fire cleanly on mobile (similar to shadcn).
+              e.preventDefault();
+            }}
+          >
+            <Dialog.Title className={styles.srOnly}>Select date</Dialog.Title>
+            {popupCalendar}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }
+
+  return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger
         id={id}
@@ -543,54 +674,13 @@ export const DatePicker = forwardRef(function DatePicker(
         disabled={!enabled}
         style={style}
         aria-expanded={open}
-        className={classnames(
-          classes?.[COMPONENT_PART_KEY],
-          className,
-          styles.datePicker,
-          {
-            [styles.disabled]: !enabled,
-            [styles.error]: validationStatus === "error",
-            [styles.warning]: validationStatus === "warning",
-            [styles.valid]: validationStatus === "valid",
-          },
-          className,
-        )}
+        className={triggerClassName}
         autoFocus={autoFocus}
         onFocus={onFocus}
         onBlur={onBlur}
         {...rest}
       >
-        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-        <div className={styles.datePickerValue}>
-          {mode === "single" && selected ? (
-            <>{format(selected, dateFormat)}</>
-          ) : mode === "range" && typeof selected === "object" && selected.from ? (
-            selected.to ? (
-              <>
-                {format(selected.from, dateFormat)} - {format(selected.to, dateFormat)}
-              </>
-            ) : (
-              <>{format(selected.from, dateFormat)}</>
-            )
-          ) : placeholder ? (
-            <span className={styles.placeholder} placeholder={placeholder}>
-              {placeholder}
-            </span>
-          ) : (
-            <span>&nbsp;</span>
-          )}
-        </div>
-        {!finalVerboseValidationFeedback && (
-          <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
-            <ConciseValidationFeedback
-              validationStatus={validationStatus}
-              invalidMessages={invalidMessages}
-              successIcon={finalValidationIconSuccess}
-              errorIcon={finalValidationIconError}
-            />
-          </Part>
-        )}
-        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        {triggerInner}
       </PopoverTrigger>
       <PopoverPortal container={root}>
         <PopoverContent
@@ -602,33 +692,7 @@ export const DatePicker = forwardRef(function DatePicker(
           onBlur={handleOnMenuBlur}
           onInteractOutside={handleOnMenuBlur}
         >
-          <DayPicker
-            required={undefined}
-            animate
-            fixedWeeks={mode !== "range"}
-            autoFocus={autoFocus}
-            classNames={styles}
-            captionLayout="dropdown"
-            startMonth={_startDate}
-            endMonth={_endDate}
-            defaultMonth={defaultMonth}
-            disabled={disabled}
-            weekStartsOn={_weekStartsOn}
-            showWeekNumber={showWeekNumber}
-            showOutsideDays={mode !== "range"}
-            mode={mode === "single" ? "single" : "range"}
-            selected={selected}
-            onSelect={handleSelect}
-            numberOfMonths={mode === "range" ? 2 : 1}
-            pagedNavigation={mode === "range"}
-            modifiers={modifiers}
-            modifiersClassNames={{ hovered: styles.hovered, singleSelected: styles.singleSelected }}
-            onDayMouseEnter={handleDayMouseEnter}
-            onDayMouseLeave={handleDayMouseLeave}
-            components={{
-              Chevron,
-            }}
-          />
+          {popupCalendar}
         </PopoverContent>
       </PopoverPortal>
     </Popover>
