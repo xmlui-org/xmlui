@@ -21,12 +21,12 @@ describe("Process statements regression", () => {
     expect(thread!.blocks!.length).equal(1);
     expect(thread!.blocks![0].vars.x).equal(5);
 
-    expect(diag.processedStatements).equal(22);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(21);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("regression #2", async () => {

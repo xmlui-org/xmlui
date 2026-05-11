@@ -502,12 +502,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(evalContext.mainThread!.blocks!.length).equal(1);
     expect(evalContext.localContext.x).equal(3);
 
-    expect(diag.processedStatements).equal(7);
-    expect(diag.maxLoops).equal(1);
+    expect(diag.processedStatements).equal(1);
+    expect(diag.maxLoops).equal(0);
     expect(diag.maxBlocks).equal(1);
-    expect(diag.maxQueueLength).equal(2);
+    expect(diag.maxQueueLength).equal(1);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(6);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while statement #2", () => {
@@ -526,12 +526,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(3);
 
-    expect(diag.processedStatements).equal(8);
-    expect(diag.maxLoops).equal(1);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
     expect(diag.maxBlocks).equal(1);
     expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(6);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while statement #3", () => {
@@ -550,12 +550,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(8);
 
-    expect(diag.processedStatements).equal(22);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(4);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(20);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while statement #4", () => {
@@ -574,12 +574,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(18);
 
-    expect(diag.processedStatements).equal(122);
-    expect(diag.maxLoops).equal(2);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(6);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(120);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while with break #1", () => {
@@ -598,12 +598,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(4);
 
-    expect(diag.processedStatements).equal(21);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(4);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(21);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while with break #2", () => {
@@ -622,12 +622,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(5);
 
-    expect(diag.processedStatements).equal(22);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(21);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("while with continue #1", () => {
@@ -646,12 +646,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(18);
 
-    expect(diag.processedStatements).equal(38);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(37);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while statement #1", () => {
@@ -671,12 +671,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(evalContext.mainThread!.blocks!.length).equal(1);
     expect(evalContext.localContext.x).equal(3);
 
-    expect(diag.processedStatements).equal(7);
-    expect(diag.maxLoops).equal(1);
+    expect(diag.processedStatements).equal(1);
+    expect(diag.maxLoops).equal(0);
     expect(diag.maxBlocks).equal(1);
-    expect(diag.maxQueueLength).equal(2);
+    expect(diag.maxQueueLength).equal(1);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(6);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while statement #2", () => {
@@ -696,12 +696,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(evalContext.mainThread!.blocks!.length).equal(1);
     expect(evalContext.localContext.x).equal(1);
 
-    expect(diag.processedStatements).equal(3);
-    expect(diag.maxLoops).equal(1);
+    expect(diag.processedStatements).equal(1);
+    expect(diag.maxLoops).equal(0);
     expect(diag.maxBlocks).equal(1);
-    expect(diag.maxQueueLength).equal(2);
+    expect(diag.maxQueueLength).equal(1);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(2);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while statement #3", () => {
@@ -721,12 +721,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(evalContext.mainThread!.blocks!.length).equal(1);
     expect(evalContext.localContext.x).equal(3);
 
-    expect(diag.processedStatements).equal(13);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(3);
+    expect(diag.processedStatements).equal(1);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(1);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(12);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while statement #4", () => {
@@ -745,12 +745,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(8);
 
-    expect(diag.processedStatements).equal(22);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(4);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(20);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while statement #5", () => {
@@ -769,12 +769,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(18);
 
-    expect(diag.processedStatements).equal(122);
-    expect(diag.maxLoops).equal(2);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(6);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(120);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while with break #1", () => {
@@ -793,12 +793,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.x).equal(4);
 
-    expect(diag.processedStatements).equal(21);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(4);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(21);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("do-while with continue #1", () => {
@@ -817,12 +817,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(18);
 
-    expect(diag.processedStatements).equal(38);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(37);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop #1", () => {
@@ -841,12 +841,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(6);
 
-    expect(diag.processedStatements).equal(16);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(2);
-    expect(diag.maxQueueLength).equal(3);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(14);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop #2", () => {
@@ -865,12 +865,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(6);
 
-    expect(diag.processedStatements).equal(24);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(4);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(22);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop #3", () => {
@@ -889,12 +889,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(1);
 
-    expect(diag.processedStatements).equal(7);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(1);
-    expect(diag.unshiftedItems).equal(7);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop #4", () => {
@@ -913,12 +913,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(18);
 
-    expect(diag.processedStatements).equal(24);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(4);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(22);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop #5", () => {
@@ -937,12 +937,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(6);
 
-    expect(diag.processedStatements).equal(24);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(4);
+    expect(diag.processedStatements).equal(3);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(3);
     expect(diag.clearToLabels).equal(0);
-    expect(diag.unshiftedItems).equal(21);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("for-loop with continue", () => {
@@ -961,12 +961,12 @@ describe("Process statements (sync) (exp)", () => {
     expect(thread.blocks!.length).equal(1);
     expect(thread.blocks![0].vars.y).equal(27);
 
-    expect(diag.processedStatements).equal(60);
-    expect(diag.maxLoops).equal(1);
-    expect(diag.maxBlocks).equal(3);
-    expect(diag.maxQueueLength).equal(5);
-    expect(diag.clearToLabels).equal(4);
-    expect(diag.unshiftedItems).equal(66);
+    expect(diag.processedStatements).equal(2);
+    expect(diag.maxLoops).equal(0);
+    expect(diag.maxBlocks).equal(1);
+    expect(diag.maxQueueLength).equal(2);
+    expect(diag.clearToLabels).equal(0);
+    expect(diag.unshiftedItems).equal(0);
   });
 
   it("Arrow function body #1", () => {

@@ -6,7 +6,6 @@ import {
   T_EMPTY_STATEMENT,
   T_FUNCTION_DECLARATION,
   type FunctionDeclaration,
-  type LoopStatement,
   type Statement,
   type TryStatement,
 } from "./ScriptingSourceTree";
@@ -84,24 +83,6 @@ export function closing(): StatementWithInfo {
     statement: { type: T_EMPTY_STATEMENT, nodeId: createXmlUiTreeNodeId() },
     execInfo: { removeBlockScope: true },
   };
-}
-
-// --- Create a list of body statements according to the specified loop statement and scope
-export function provideLoopBody(
-  loopScope: LoopScope,
-  loopStatement: LoopStatement,
-  breakLabelValue: number | undefined,
-): StatementQueueItem[] {
-  // --- Stay in the loop, add the body and the guard condition
-  const guardStatement = guard(loopStatement);
-  const toUnshift = mapStatementsToQueueItems([{ statement: loopStatement.body }, guardStatement]);
-
-  // --- The next queue label is for "break"
-  loopScope.breakLabel = breakLabelValue ?? -1;
-
-  // --- The guard action's label is for "continue"
-  loopScope.continueLabel = toUnshift[1].label;
-  return toUnshift;
 }
 
 // --- Create a list of body statements according to the specified try statement scope

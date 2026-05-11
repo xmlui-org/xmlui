@@ -17,4 +17,7 @@ export type LoopScope = {
   
   // The depth of try blocks at the start of the loop
   tryBlockDepth: number;
+
+  // Set by break/continue handlers so the native loop executor can detect which signal fired
+  exitSignal?: "break" | "continue";
 };

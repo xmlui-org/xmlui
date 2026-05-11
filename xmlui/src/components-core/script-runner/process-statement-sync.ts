@@ -40,7 +40,6 @@ import {
   innermostBlockScope,
   innermostLoopScope,
   createLoopScope,
-  provideLoopBody,
   releaseLoopScope,
   ensureMainThread,
   innermostTryScope,
@@ -62,44 +61,24 @@ import type {
   QueueInfo,
   StatementQueueItem,
   ProcessOutcome,
+  LoopSignal,
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
 import { createXmlUiTreeNodeId } from "../../parsers/scripting/Parser";
 
 const DEFAULT_SYNC_EVAL_TIMEOUT = 1000;
 
-// --- Helper function to process the entire queue synchronously
-export function processStatementQueue(
-  statements: Statement[],
+// Sentinel to distinguish "return not yet called" from "return called with undefined"
+const RETURN_UNSET: unique symbol = Symbol("RETURN_UNSET");
+
+// --- Inner queue-processing loop, shared by processStatementQueue and executeBodySync.
+// --- Does NOT reset evalContext.startTick so the outer timeout remains accurate.
+function runQueueCore(
+  queue: StatementQueue,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread,
-): QueueInfo {
-  if (!thread) {
-    // --- Create the main thread for the queue
-    thread = ensureMainThread(evalContext);
-  }
-
-  // --- Hoist function declarations to the top scope
-  hoistFunctionDeclarations(thread, statements);
-
-  // --- Set start tick to observe timeout
-  evalContext.startTick = new Date().valueOf();
-
-  // --- Fill the queue with items
-  const queue = new StatementQueue();
-  queue.push(mapStatementsToQueueItems(toStatementItems(statements)));
-
-  // --- Prepare queue diagnostics information
-  const diagInfo: QueueInfo = {
-    processedStatements: 0,
-    maxQueueLength: queue.length,
-    unshiftedItems: 0,
-    clearToLabels: 0,
-    maxBlocks: 0,
-    maxLoops: 0,
-  };
-
-  // --- Consume the queue
+  thread: LogicalThread,
+  diagInfo: QueueInfo,
+): void {
   while (queue.length > 0) {
     // --- Check sync timeout
     const syncTimeout = evalContext.appContext?.appGlobals?.syncExecutionTimeout ?? DEFAULT_SYNC_EVAL_TIMEOUT;
@@ -182,9 +161,114 @@ export function processStatementQueue(
     }
     diagInfo.processedStatements++;
   }
+}
+
+// --- Helper function to process the entire queue synchronously
+export function processStatementQueue(
+  statements: Statement[],
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThread,
+): QueueInfo {
+  if (!thread) {
+    // --- Create the main thread for the queue
+    thread = ensureMainThread(evalContext);
+  }
+
+  // --- Hoist function declarations to the top scope
+  hoistFunctionDeclarations(thread, statements);
+
+  // --- Set start tick to observe timeout
+  evalContext.startTick = new Date().valueOf();
+
+  // --- Fill the queue with items
+  const queue = new StatementQueue();
+  queue.push(mapStatementsToQueueItems(toStatementItems(statements)));
+
+  // --- Prepare queue diagnostics information
+  const diagInfo: QueueInfo = {
+    processedStatements: 0,
+    maxQueueLength: queue.length,
+    unshiftedItems: 0,
+    clearToLabels: 0,
+    maxBlocks: 0,
+    maxLoops: 0,
+  };
+
+  runQueueCore(queue, evalContext, thread, diagInfo);
 
   // --- Done.
   return diagInfo;
+}
+
+/**
+ * Executes a single loop body statement in a sub-queue and returns a LoopSignal if the body
+ * interrupted normal iteration via break/continue/return/throw, or undefined for normal completion.
+ * The outer timeout (evalContext.startTick) is preserved — not reset per body call.
+ */
+export function executeBodySync(
+  bodyStatement: Statement,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+  loopScope: LoopScope,
+): LoopSignal | undefined {
+  // --- Save outer returnValue; mark as "not set" to detect if a return fires inside
+  const savedReturnValue = thread.returnValue;
+  thread.returnValue = RETURN_UNSET as unknown as any;
+
+  // --- Snapshot outer try-scope phases to detect if a throw was captured silently
+  const outerTryCount = thread.tryBlocks?.length ?? 0;
+  const outerTrySnapshots =
+    outerTryCount > 0 ? thread.tryBlocks!.map(ts => ts.processingPhase) : undefined;
+
+  const queue = new StatementQueue();
+  queue.push(mapToItem(bodyStatement));
+  const diagInfo: QueueInfo = {
+    processedStatements: 0,
+    maxQueueLength: queue.length,
+    unshiftedItems: 0,
+    clearToLabels: 0,
+    maxBlocks: 0,
+    maxLoops: 0,
+  };
+
+  try {
+    runQueueCore(queue, evalContext, thread, diagInfo);
+  } catch (err) {
+    thread.returnValue = savedReturnValue;
+    return { kind: "throw", error: err };
+  }
+
+  // --- Detect return (thread.returnValue was overwritten by T_RETURN_STATEMENT)
+  if ((thread.returnValue as unknown) !== RETURN_UNSET) {
+    return { kind: "return" };
+  }
+  thread.returnValue = savedReturnValue;
+
+  // --- Detect throw captured by an outer try/catch (runQueueCore set tryScope.processingPhase="error")
+  if (outerTrySnapshots && thread.tryBlocks) {
+    const count = Math.min(outerTryCount, thread.tryBlocks.length);
+    for (let i = 0; i < count; i++) {
+      const ts = thread.tryBlocks[i];
+      if (outerTrySnapshots[i] !== "error" && ts.processingPhase === "error" && ts.errorToThrow != null) {
+        const errorToRethrow = ts.errorToThrow;
+        (ts as any).processingPhase = outerTrySnapshots[i];
+        ts.errorToThrow = undefined;
+        if (thread.blocks) thread.blocks.length = loopScope.breakBlockDepth;
+        thread.loops?.pop();
+        thread.returnValue = savedReturnValue;
+        throw errorToRethrow;
+      }
+    }
+  }
+
+  // --- Detect break / continue (set by T_BREAK_STATEMENT / T_CONTINUE_STATEMENT)
+  const signal = loopScope.exitSignal;
+  if (signal) {
+    loopScope.exitSignal = undefined;
+    return { kind: signal };
+  }
+
+  return undefined;
 }
 
 /**
@@ -328,34 +412,41 @@ function processStatement(
     }
 
     case T_WHILE_STATEMENT: {
-      // --- Create or get the loop's scope (guard is falsy for the first execution)
-      let loopScope = execInfo.guard ? innermostLoopScope(thread) : createLoopScope(thread);
-
-      // --- Evaluate the loop condition
-      const condition = !!evalBinding(statement.cond, evalContext, thread);
-      if (condition) {
-        toUnshift = provideLoopBody(loopScope!, statement, thread.breakLabelValue);
-      } else {
-        // --- When the condition is not met, we're done.
-        releaseLoopScope(thread);
+      const whileLoopScope = createLoopScope(thread);
+      let whileBroke = false;
+      whileOuter: {
+        while (!!evalBinding(statement.cond, evalContext, thread)) {
+          const whileSignal = executeBodySync(statement.body, evalContext, thread, whileLoopScope);
+          if (whileSignal === undefined || whileSignal.kind === "continue") continue;
+          if (whileSignal.kind === "break") { whileBroke = true; break; }
+          if (whileSignal.kind === "return") {
+            releaseLoopScope(thread);
+            clearToLabel = -1;
+            break whileOuter;
+          }
+          if (whileSignal.kind === "throw") throw whileSignal.error;
+        }
+        if (!whileBroke) releaseLoopScope(thread);
       }
       break;
     }
 
     case T_DO_WHILE_STATEMENT: {
-      if (!execInfo.guard) {
-        // --- First loop execution (do-while is a post-test loop)
-        toUnshift = provideLoopBody(createLoopScope(thread), statement, thread.breakLabelValue);
-        break;
-      }
-
-      // --- Evaluate the loop condition
-      const condition = !!evalBinding(statement.cond, evalContext, thread);
-      if (condition) {
-        toUnshift = provideLoopBody(innermostLoopScope(thread), statement, thread.breakLabelValue);
-      } else {
-        // --- When the condition is not met, we're done.
-        releaseLoopScope(thread);
+      const doWhileLoopScope = createLoopScope(thread);
+      let doWhileBroke = false;
+      doWhileOuter: {
+        do {
+          const doWhileSignal = executeBodySync(statement.body, evalContext, thread, doWhileLoopScope);
+          if (doWhileSignal === undefined || doWhileSignal.kind === "continue") continue;
+          if (doWhileSignal.kind === "break") { doWhileBroke = true; break; }
+          if (doWhileSignal.kind === "return") {
+            releaseLoopScope(thread);
+            clearToLabel = -1;
+            break doWhileOuter;
+          }
+          if (doWhileSignal.kind === "throw") throw doWhileSignal.error;
+        } while (!!evalBinding(statement.cond, evalContext, thread));
+        if (!doWhileBroke) releaseLoopScope(thread);
       }
       break;
     }
@@ -392,6 +483,7 @@ function processStatement(
         const tryScope = innermostTryScope(thread);
         clearToLabel = tryScope.tryLabel;
       } else {
+        loopScope.exitSignal = "continue";
         clearToLabel = loopScope.continueLabel;
         releaseLoopScope(thread, false);
       }
@@ -424,233 +516,162 @@ function processStatement(
         const tryScope = innermostTryScope(thread);
         clearToLabel = tryScope.tryLabel;
       } else {
+        loopScope.exitSignal = "break";
         clearToLabel = loopScope.breakLabel;
         releaseLoopScope(thread);
       }
       break;
     }
 
-    case T_FOR_STATEMENT:
-      if (!execInfo.guard) {
-        // --- Init the loop with a new scope
-        createLoopScope(thread, 1);
-
-        // --- Create a new block for the loop variables
-        thread.blocks ??= [];
-        thread.blocks.push({ vars: {} });
-
-        const guardStatement = guard(statement);
-        if (statement.init) {
-          // --- Unshift the initialization part and the guarded for-loop
-          toUnshift = mapStatementsToQueueItems([{ statement: statement.init }, guardStatement]);
-        } else {
-          // --- No init, unshift only the guard statement
-          toUnshift = mapStatementsToQueueItems([guardStatement]);
-        }
-      } else {
-        // --- Initialization already done. Evaluate the condition
-        if (!statement.cond || evalBinding(statement.cond, evalContext, thread)) {
-          // --- Stay in the loop, inject the body, the update expression, and the loop guard
-          const loopScope = innermostLoopScope(thread);
-
-          if (statement.upd) {
-            const updateStmt: StatementWithInfo = {
-              statement: {
-                type: T_EXPRESSION_STATEMENT,
-                nodeId: createXmlUiTreeNodeId(),
-                expr: statement.upd,
-              },
-            };
-            toUnshift = mapStatementsToQueueItems([
-              { statement: statement.body },
-              updateStmt,
-              { statement, execInfo },
-            ]);
-          } else {
-            toUnshift = mapStatementsToQueueItems([
-              { statement: statement.body },
-              { statement, execInfo },
-            ]);
+    case T_FOR_STATEMENT: {
+      const forLoopScope = createLoopScope(thread, 1);
+      thread.blocks ??= [];
+      thread.blocks.push({ vars: {} });
+      if (statement.init) {
+        const initQueue = new StatementQueue();
+        initQueue.push(mapToItem(statement.init));
+        const initDiag: QueueInfo = {
+          processedStatements: 0, maxQueueLength: 1, unshiftedItems: 0,
+          clearToLabels: 0, maxBlocks: 0, maxLoops: 0,
+        };
+        runQueueCore(initQueue, evalContext, thread, initDiag);
+      }
+      let forBroke = false;
+      forOuter: {
+        while (!statement.cond || !!evalBinding(statement.cond, evalContext, thread)) {
+          const forSignal = executeBodySync(statement.body, evalContext, thread, forLoopScope);
+          if (forSignal === undefined || forSignal.kind === "continue") {
+            if (statement.upd) evalBinding(statement.upd, evalContext, thread);
+            continue;
           }
-          // --- The next queue label is for "break"
-          loopScope.breakLabel = thread.breakLabelValue ?? -1;
-
-          // --- The guard action's label is for "continue"
-          loopScope.continueLabel = toUnshift[1].label;
-        } else {
-          // --- The condition is not met, we're done. Remove the loop's scope from the evaluation context
-          releaseLoopScope(thread);
+          if (forSignal.kind === "break") { forBroke = true; break; }
+          if (forSignal.kind === "return") {
+            releaseLoopScope(thread);
+            clearToLabel = -1;
+            break forOuter;
+          }
+          if (forSignal.kind === "throw") throw forSignal.error;
         }
+        if (!forBroke) releaseLoopScope(thread);
       }
       break;
+    }
 
-    case T_FOR_IN_STATEMENT:
-      if (!execInfo.guard) {
-        // --- Get the object keys
-        const keyedObject = evalBinding(statement.expr, evalContext, thread);
-        if (keyedObject == undefined) {
-          // --- Nothing to do, no object to traverse
-          break;
-        }
-
-        // --- Init the loop with a new scope
-        createLoopScope(thread, 1);
-
-        // --- Create a new block for the loop variables
-        thread.blocks ??= [];
-        thread.blocks.push({ vars: {} });
-
-        toUnshift = mapStatementsToQueueItems([
-          { statement, execInfo: { guard: true, keys: Object.keys(keyedObject), keyIndex: 0 } },
-        ]);
-      } else {
-        // --- Just for the sake of extra safety
-        if (execInfo.keyIndex === undefined || execInfo.keys === undefined) {
-          throw new Error("Keys information expected in for..in loop");
-        }
-
-        // --- Any key left?
-        if (execInfo.keyIndex < execInfo.keys.length) {
-          // --- Set the binding variable to the next key
-          const propValue = execInfo.keys[execInfo.keyIndex++];
+    case T_FOR_IN_STATEMENT: {
+      const keyedObject = evalBinding(statement.expr, evalContext, thread);
+      if (keyedObject == null) break;
+      const forInKeys = Object.keys(keyedObject);
+      const forInLoopScope = createLoopScope(thread, 1);
+      thread.blocks ??= [];
+      thread.blocks.push({ vars: {} });
+      let forInBroke = false;
+      forInOuter: {
+        for (const forInKey of forInKeys) {
+          const forInBlock = innermostBlockScope(thread)!;
+          forInBlock.vars = {};
+          forInBlock.constVars = undefined;
           switch (statement.varB) {
             case "none": {
-              const assigmentExpr: AssignmentExpression = {
+              const assignExpr: AssignmentExpression = {
                 type: T_ASSIGNMENT_EXPRESSION,
-                leftValue: {
-                  type: T_IDENTIFIER,
-                  name: statement.id.name,
-                } as Identifier,
+                leftValue: { type: T_IDENTIFIER, name: statement.id.name } as Identifier,
                 op: "=",
-                expr: {
-                  type: T_LITERAL,
-                  value: propValue,
-                } as Literal,
+                expr: { type: T_LITERAL, value: forInKey } as Literal,
               } as AssignmentExpression;
-              evalBinding(assigmentExpr, evalContext, thread);
+              evalBinding(assignExpr, evalContext, thread);
               break;
             }
-
             case "const":
-            case "let":
-              {
-                // --- Create a new variable in the innermost scope
-                const block = innermostBlockScope(thread);
-                if (!block) {
-                  throw new Error("Missing block scope");
-                }
-                block.vars[statement.id.name] = propValue;
-                if (statement.varB === "const") {
-                  block.constVars ??= new Set<string>();
-                  block.constVars.add(statement.id.name);
-                }
+            case "let": {
+              forInBlock.vars[statement.id.name] = forInKey;
+              if (statement.varB === "const") {
+                forInBlock.constVars ??= new Set<string>();
+                forInBlock.constVars.add(statement.id.name);
               }
               break;
-          }
-
-          // --- Inject the loop body
-          const loopScope = innermostLoopScope(thread);
-          toUnshift = mapStatementsToQueueItems([
-            { statement: statement.body },
-            { statement, execInfo },
-          ]);
-
-          // --- The next queue label is for "break"
-          loopScope.breakLabel = thread.breakLabelValue ?? -1;
-
-          // --- The guard action's label is for "continue"
-          loopScope.continueLabel = toUnshift[1].label;
-        } else {
-          // --- The for..in loop is complete. Remove the loop's scope from the evaluation context
-          releaseLoopScope(thread);
-        }
-      }
-      break;
-
-    case T_FOR_OF_STATEMENT:
-      if (!execInfo.guard) {
-        // --- Get the object keys
-        const iteratorObject = evalBinding(statement.expr, evalContext, thread);
-        if (iteratorObject == null || typeof iteratorObject[Symbol.iterator] !== "function") {
-          // --- The object is not an iterator
-          throw new Error("Object in for..of is not iterable");
-        }
-
-        // --- Init the loop with a new scope
-        createLoopScope(thread, 1);
-
-        // --- Create a new block for the loop variables
-        thread.blocks ??= [];
-        thread.blocks.push({ vars: {} });
-
-        toUnshift = mapStatementsToQueueItems([
-          { statement, execInfo: { guard: true, iterator: iteratorObject[Symbol.iterator]() } },
-        ]);
-      } else {
-        // --- Just for the sake of extra safety
-        if (execInfo.iterator === undefined) {
-          throw new Error("Iterator expected in for..of loop");
-        }
-
-        // --- Any iteration left?
-        const nextIteration = execInfo.iterator.next();
-        if (nextIteration.done) {
-          // --- The for..of loop is complete. Remove the loop's scope from the evaluation context
-          releaseLoopScope(thread);
-          break;
-        }
-
-        // --- Set the binding variable to the next key
-        const propValue = nextIteration.value;
-        switch (statement.varB) {
-          case "none": {
-            const assigmentExpr: AssignmentExpression = {
-              type: T_ASSIGNMENT_EXPRESSION,
-              leftValue: {
-                type: T_IDENTIFIER,
-                name: statement.id.name,
-              } as Identifier,
-              op: "=",
-              expr: {
-                type: T_LITERAL,
-                value: propValue,
-              } as Literal,
-            } as AssignmentExpression;
-            evalBinding(assigmentExpr, evalContext, thread);
-            break;
-          }
-
-          case "const":
-          case "let":
-            {
-              // --- Create a new variable in the innermost scope
-              const block = innermostBlockScope(thread);
-              if (!block) {
-                throw new Error("Missing block scope");
-              }
-              block.vars[statement.id.name] = propValue;
-              if (statement.varB === "const") {
-                block.constVars ??= new Set<string>();
-                block.constVars.add(statement.id.name);
-              }
             }
-            break;
+          }
+          const forInSignal = executeBodySync(statement.body, evalContext, thread, forInLoopScope);
+          if (forInSignal === undefined || forInSignal.kind === "continue") continue;
+          if (forInSignal.kind === "break") { forInBroke = true; break; } // T_BREAK already released loopScope
+          if (forInSignal.kind === "return") {
+            releaseLoopScope(thread);
+            clearToLabel = -1;
+            break forInOuter;
+          }
+          if (forInSignal.kind === "throw") throw forInSignal.error;
         }
-
-        // --- Inject the loop body
-        const loopScope = innermostLoopScope(thread);
-        toUnshift = mapStatementsToQueueItems([
-          { statement: statement.body },
-          { statement, execInfo },
-        ]);
-
-        // --- The next queue label is for "break"
-        loopScope.breakLabel = thread.breakLabelValue ?? -1;
-
-        // --- The guard action's label is for "continue"
-        loopScope.continueLabel = toUnshift[1].label;
+        if (!forInBroke) releaseLoopScope(thread);
       }
       break;
+    }
+
+    case T_FOR_OF_STATEMENT: {
+      // --- Evaluate the iterable once up front
+      const iterableObj = evalBinding(statement.expr, evalContext, thread);
+      if (iterableObj == null || typeof iterableObj[Symbol.iterator] !== "function") {
+        throw new Error("Object in for..of is not iterable");
+      }
+
+      // --- Create loop scope; continueOffset=1 accounts for the loop-variable block pushed below
+      const forOfLoopScope = createLoopScope(thread, 1);
+      thread.blocks ??= [];
+      thread.blocks.push({ vars: {} });
+
+      const forOfIter = iterableObj[Symbol.iterator]();
+
+      // outerBlock label lets us set clearToLabel and exit cleanly when a return fires
+      forOfOuter: {
+        nativeForOf: while (true) {
+          const next = forOfIter.next();
+          if (next.done) {
+            releaseLoopScope(thread);
+            break nativeForOf;
+          }
+
+          // --- Fresh binding for this iteration (mirrors re-declaring let/const each time)
+          const forOfBlock = innermostBlockScope(thread)!;
+          forOfBlock.vars = {};
+          forOfBlock.constVars = undefined;
+
+          // --- Assign the loop variable
+          const forOfValue = next.value;
+          switch (statement.varB) {
+            case "none": {
+              const assignExpr: AssignmentExpression = {
+                type: T_ASSIGNMENT_EXPRESSION,
+                leftValue: { type: T_IDENTIFIER, name: statement.id.name } as Identifier,
+                op: "=",
+                expr: { type: T_LITERAL, value: forOfValue } as Literal,
+              } as AssignmentExpression;
+              evalBinding(assignExpr, evalContext, thread);
+              break;
+            }
+            case "const":
+            case "let": {
+              forOfBlock.vars[statement.id.name] = forOfValue;
+              if (statement.varB === "const") {
+                forOfBlock.constVars ??= new Set<string>();
+                forOfBlock.constVars.add(statement.id.name);
+              }
+              break;
+            }
+          }
+
+          // --- Run the body; handle control-flow signals
+          const forOfSignal = executeBodySync(statement.body, evalContext, thread, forOfLoopScope);
+          if (forOfSignal === undefined || forOfSignal.kind === "continue") continue nativeForOf;
+          if (forOfSignal.kind === "break") break nativeForOf; // T_BREAK already released loopScope
+          if (forOfSignal.kind === "return") {
+            releaseLoopScope(thread);
+            clearToLabel = -1;
+            break forOfOuter;
+          }
+          if (forOfSignal.kind === "throw") throw forOfSignal.error;
+        }
+      }
+      break;
+    }
 
     case T_THROW_STATEMENT: {
       throw new ThrowStatementError(evalBinding(statement.expr, evalContext, thread));
@@ -745,6 +766,7 @@ function processStatement(
               if (loopScope === undefined) {
                 throw new Error("Missing loop scope");
               }
+              loopScope.exitSignal = "break";
               releaseLoopScope(thread);
               clearToLabel = loopScope.breakLabel;
               break;
@@ -754,7 +776,7 @@ function processStatement(
               if (loopScope === undefined) {
                 throw new Error("Missing loop scope");
               }
-
+              loopScope.exitSignal = "continue";
               clearToLabel = loopScope.continueLabel;
               releaseLoopScope(thread, false);
               break;

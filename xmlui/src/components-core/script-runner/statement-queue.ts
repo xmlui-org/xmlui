@@ -70,6 +70,13 @@ export class StatementQueue {
   }
 }
 
+// Signal returned by a loop body executor to communicate control-flow interruptions
+export type LoopSignal =
+  | { kind: "break" }
+  | { kind: "continue" }
+  | { kind: "return" }
+  | { kind: "throw"; error: unknown };
+
 // --- Queue information for test and diagnostics purposes
 export type QueueInfo = {
   processedStatements: number;

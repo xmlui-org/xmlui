@@ -8,7 +8,7 @@ describe("Statement hooks", () => {
   const stmtCases = [
     { src: "let x = 0;", exp: 1 },
     { src: "let x = 0; x++;", exp: 2 },
-    { src: "let x = 0; while (x < 1) { x++ };", exp: 6 },
+    { src: "let x = 0; while (x < 1) { x++ };", exp: 5 },
   ];
 
   stmtCases.forEach((c) => {
