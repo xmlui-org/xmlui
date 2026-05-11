@@ -1456,7 +1456,7 @@ export const Table = memo(forwardRef(function Table(
       if (!tableRef.current) {
         return;
       }
-      const measuredWidth = tableRef.current.clientWidth;
+      const measuredWidth = Math.floor(tableRef.current.getBoundingClientRect().width);
       if (measuredWidth === lastMeasuredWidthRef.current) {
         return;
       }
