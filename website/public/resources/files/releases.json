@@ -1,5 +1,53 @@
 [
   {
+    "tag_name": "xmlui@0.12.27",
+    "published_at": "2026-05-08T05:15:09Z",
+    "changes": [
+      {
+        "description": "Add `allowConsole` appGlobals switch (default `true`). Previously `window.console` access in expressions always produced an `[XMLUI sandbox]` warning; now it is permitted by default. Set `appGlobals.allowConsole: false` to restore the sandboxed behaviour (warn or throw per `strictDomSandbox`).",
+        "commit_sha": "61f078d"
+      },
+      {
+        "description": "fix: strange break when rendering form items in a HStack",
+        "commit_sha": "5ff51a0"
+      },
+      {
+        "description": "fix: Select placeholder does not use the right theme",
+        "commit_sha": "f2abca7"
+      },
+      {
+        "description": "Fix script functions not callable from event handlers when the script contains template literals.",
+        "commit_sha": "0b7c318"
+      },
+      {
+        "description": "feat: add --port option to xmlui preview",
+        "commit_sha": "61407a8"
+      },
+      {
+        "description": "widen the search space `xmlui ssg` uses to find page routes.",
+        "commit_sha": "29947d4"
+      },
+      {
+        "description": "Add reactive cycle detection (warn-only probe — Plan #03 Phase 1). On app",
+        "commit_sha": "69d4762"
+      },
+      {
+        "description": "fix: Select does not respect the explicit width when used with wrapContent",
+        "commit_sha": "4caecde"
+      },
+      {
+        "description": "Tweak color of codeblock row selection in dark mode and Inspector container header background.",
+        "commit_sha": "dbae535"
+      }
+    ],
+    "assets": [
+      {
+        "name": "xmlui-0.12.27.js",
+        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.27/xmlui-0.12.27.js"
+      }
+    ]
+  },
+  {
     "tag_name": "xmlui@0.12.26",
     "published_at": "2026-05-04T09:23:11Z",
     "changes": [
@@ -260,114 +308,6 @@
       {
         "name": "xmlui-0.12.20.js",
         "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.20/xmlui-0.12.20.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.19",
-    "published_at": "2026-04-15T12:15:32Z",
-    "changes": [
-      {
-        "description": "Fix the build issue using multiple vite entry points",
-        "commit_sha": "74e7c88"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.19.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.19/xmlui-0.12.19.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.18",
-    "published_at": "2026-04-15T10:13:55Z",
-    "changes": [
-      {
-        "description": "Fix function dependency tracking in nested containers (Items, List, etc.)",
-        "commit_sha": "f502d2b"
-      },
-      {
-        "description": "Select: Fixed `dropdownHeight` to produce a stable dropdown height regardless of scroll indicator visibility. Added `scrollIndicators` prop (default `true`) to control whether up/down scroll arrows are shown in the dropdown.",
-        "commit_sha": "1039048"
-      },
-      {
-        "description": "fix: bump \"vite-plugin-lib-inject-css\" which introduced css errors in case of multiple chunks in the lib",
-        "commit_sha": "8689e17"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.18.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.18/xmlui-0.12.18.js"
-      }
-    ]
-  },
-  {
-    "tag_name": "xmlui@0.12.17",
-    "published_at": "2026-04-14T10:23:37Z",
-    "changes": [
-      {
-        "description": "Add `mockExecute` event to APICall component",
-        "commit_sha": "4dc14d0"
-      },
-      {
-        "description": "Improve List and Tree performance",
-        "commit_sha": "00457e4"
-      },
-      {
-        "description": "Fix `$param` being undefined in `<variable>` declarations that are direct children of `ModalDialog`",
-        "commit_sha": "d474652"
-      },
-      {
-        "description": "Fix RadioGroup keyboard navigation: arrow keys now correctly select the next/previous option instead of only moving focus without updating the value.",
-        "commit_sha": "f00a826"
-      },
-      {
-        "description": "extened the number of parsing errors which can be displayed before reaching the point where only a single error can be reported without line numbers.",
-        "commit_sha": "55258df"
-      },
-      {
-        "description": "Add new theme variables to Table",
-        "commit_sha": "983bfe3"
-      },
-      {
-        "description": "Fix the itemLabelWidth behavior in Form",
-        "commit_sha": "41e4f0a"
-      },
-      {
-        "description": "Extended List `groupBy` property to accept a function in addition to a string. When a function is provided (e.g., `groupBy=\"{(item) => item.name[0]}\"`), it receives each list item and returns the value used for grouping.",
-        "commit_sha": "b296689"
-      },
-      {
-        "description": "Fix HStack default item widths with input controls",
-        "commit_sha": "80ff0fd"
-      },
-      {
-        "description": "Allow page scrolling while Select's dropdown is open",
-        "commit_sha": "2ac4c4a"
-      },
-      {
-        "description": "Fix Select dropdown blocking page scroll when opened in non-searchable, single-select mode",
-        "commit_sha": "e27fef3"
-      },
-      {
-        "description": "Add gap property to Tabs",
-        "commit_sha": "611cc69"
-      },
-      {
-        "description": "Support object and array destructuring in reactive `var` declarations. `var {a, b} = expr` and `var [a, b] = expr` are now valid in code-behind scripts and markup script blocks. Destructured declarations are expanded into temporary variables to preserve reactive semantics.",
-        "commit_sha": "b45106d"
-      },
-      {
-        "description": "Add \"before\" and \"after\" values to labelPosition",
-        "commit_sha": "9a1d99b"
-      }
-    ],
-    "assets": [
-      {
-        "name": "xmlui-0.12.17.js",
-        "browser_download_url": "https://github.com/xmlui-org/xmlui/releases/download/xmlui%400.12.17/xmlui-0.12.17.js"
       }
     ]
   }

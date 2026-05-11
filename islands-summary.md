@@ -154,11 +154,21 @@ Serve with `npx serve . -p 4173` from inside `temp-islands/`. The `xmlui-standal
 | Each island loads its own `Main.xmlui` / `components/` | ✅                 |
 | Islands do not share router state (MemoryRouter)       | ✅                 |
 | Islands do not modify host `<head>`                    | ✅                 |
-| SSG build                                              | ❌ (not addressed) |
+| SSG build                                              | ✅                 |
 
-## What Does Not Work: SSG
+## How SSG Styling Works
 
-SSG (static site generation) was not addressed in this implementation. The SSG path runs through `viteConfig.ts` (the CLI config used by `xmlui ssg` command), which uses `libInjectCss`. The `cssInjectionRegistry` pattern means SSG gets `null` from `getCSSInjectionAPI()`, so no CSS is injected at all — this is the same no-op behaviour as lib mode, which is probably wrong for SSG. The SSG path will need its own solution, likely using the `?inline` CSS import that is already present in `ThemeReact.tsx` for the `isServer` branch, maybe utilizing the xmlui.css exported from the `xmlui` package's exports field though much more investiagation is needed.
+The root cause of the unstyled no-JS SSG pages was that Vite/rolldown extracts CSS to a separate file (e.g. `internal/chunks/vite-entrypoint.<hash>.css`) but does **not** emit a `<link rel="stylesheet">` tag for it in the built HTML. The CSS only loaded via JS injection at runtime — so with JS disabled the page was styleless.
+
+### Fix (in `xmlui/src/nodejs/bin/ssg.ts`)
+
+After copying the client build to the SSG output directory, `ssg()` now:
+1. Calls `collectCssFiles(outPath)` to find all `.css` files under the output directory.
+2. Injects `<link rel="stylesheet" href="...">` tags into `shellHtml` (the base HTML template used for all rendered pages) immediately before `</head>`.
+
+All generated route pages inherit these links, so the compiled CSS loads from the static file regardless of whether JavaScript runs.
+
+The SSR-injected styles (`<style data-style-registry>` from `StyleRegistry`) and the Helmet-injected base stylesheet (`<style id="xmlui-base-styles">` from `RootClasses`) were already in the HTML — they cover the dynamic CSS-in-JS rules and the SCSS reset/base respectively. The missing piece was the module CSS (`.module.scss` files compiled by Vite), which is now covered by the static `<link>` tag.
 
 ---
 
