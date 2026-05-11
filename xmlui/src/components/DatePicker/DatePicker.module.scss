@@ -217,6 +217,10 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     padding: t.$space-4;
     overflow-y: auto;
     height: fit-content;
+    // The trigger's width class is also applied to the popover content, so a
+    // narrow trigger would clip the calendar. Force the dropdown to be at least
+    // as wide as its natural content.
+    min-width: max-content;
     box-shadow: $boxShadow-menu-DatePicker;
     background-color: $backgroundColor-menu-DatePicker;
     border-radius: $borderRadius-menu-DatePicker;

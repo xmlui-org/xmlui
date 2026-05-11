@@ -635,6 +635,32 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   expect(width).toBe(200);
 });
 
+// Regression test for dropdown content clipping with a narrow trigger.
+// Bug: the dynamic theme class that carries the trigger's width is also
+// applied to the popover content (DatePicker.tsx passes the same className as
+// contentClassName), so a narrow trigger like 150px would shrink the calendar
+// dropdown and clip the day columns. The dropdown must stay at least as wide
+// as its natural calendar content.
+test("dropdown is not clipped by a narrow trigger width", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" width="150px" />`);
+
+  const trigger = page.getByTestId("datePicker");
+  await trigger.click();
+
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+
+  const triggerBox = await trigger.boundingBox();
+  const menuBox = await menu.boundingBox();
+
+  expect(menuBox.width).toBeGreaterThan(triggerBox.width);
+
+  const hasHorizontalOverflow = await menu.evaluate(
+    (el) => el.scrollWidth > el.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+});
+
 // Regression test for height alignment with sibling input components.
 // Bug: DatePicker rendered taller than TextBox/Select/NumberBox/AutoComplete
 // because PR #3280 added `line-height: normal` to other inputs but missed
