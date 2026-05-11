@@ -645,7 +645,9 @@ export const DatePicker = forwardRef(function DatePicker(
           {triggerInner}
         </Dialog.Trigger>
         <Dialog.Portal container={root}>
-          <Dialog.Overlay className={styles.mobileBackdrop} />
+          <Dialog.Overlay
+            className={classnames(contentClassName, styles.mobileBackdrop)}
+          />
           <Dialog.Content
             role="menu"
             aria-label="Select date"
