@@ -133,6 +133,7 @@ import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
 import { dateInputComponentRenderer } from "./DateInput/DateInput";
 import { timeInputComponentRenderer } from "./TimeInput/TimeInput";
 import { timerComponentRenderer } from "./Timer/Timer";
+import { lifecycleComponentRenderer } from "./Lifecycle/Lifecycle";
 import { redirectRenderer } from "./Redirect/Redirect";
 import { tabsComponentRenderer } from "./Tabs/Tabs";
 import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
@@ -470,6 +471,9 @@ export class ComponentRegistry {
     }
     if (import.meta.env.VITE_USED_COMPONENTS_EventSource !== "false") {
       this.registerCoreComponent(eventSourceComponentRenderer);
+    }
+    if (import.meta.env.VITE_USED_COMPONENTS_Lifecycle !== "false") {
+      this.registerCoreComponent(lifecycleComponentRenderer);
     }
     if (import.meta.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerCoreComponent(tableComponentRenderer);

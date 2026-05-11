@@ -33,6 +33,7 @@ import { processStatementQueue } from "../script-runner/process-statement-sync";
 import { isParsedEventValue } from "../rendering/ContainerUtils";
 import { T_ARROW_EXPRESSION_STATEMENT } from "../script-runner/ScriptingSourceTree";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
+import { createCancellationToken } from "../concurrency";
 import type { HandlerLoggerContext } from "../inspector/handler-logging";
 import { ContainerActionKind } from "../rendering/containers";
 import { delay, generatedId, useEvent } from "../utils/misc";
@@ -129,11 +130,20 @@ export function createEventHandlers(config: EventHandlerConfig) {
       };
 
       let changes: Array<any> = [];
+      // --- W3-6 / plan #06 Step 1.1: per-handler `$cancel` token.
+      // Created fresh per invocation, exposed read-only as `$cancel` in the
+      // handler's evaluation context, and aborted in the `finally` below
+      // when the handler completes (success / error / unmount). The W3-6
+      // risk-probe ships only the read surface — the dispatcher-side
+      // triggers (supersede, queue, drop, timeout) land in W7-1.
+      const { token: cancelToken, abort: abortCancelToken } = createCancellationToken();
       const getComponentStateClone = () => {
         changes.length = 0;
         const originalState = stateRef.current;
         const poj = cloneDeep({ ...originalState, ...(options?.context || {}) });
         poj["$this"] = originalState[uid];
+        // --- W3-6: expose `$cancel` as a read-only handler-scope variable.
+        poj["$cancel"] = cancelToken;
 
         // Tag component API objects with their key for reference tracking.
         // When a variable is later assigned one of these objects (e.g. myGlobal = ds),
@@ -445,6 +455,14 @@ export function createEventHandlers(config: EventHandlerConfig) {
       } finally {
         // Clean up trace
         handlerLogger.cleanupTrace(traceId);
+        // --- W3-6: best-effort token disposal. The handler is no longer
+        // running, so any outstanding `$cancel.onAbort` callbacks (e.g.
+        // user-side fetch teardown) must fire. Reason mirrors mount state:
+        // `"unmount"` if the component was disposed mid-flight, otherwise
+        // `"user"`. Only aborts when the token isn't already aborted.
+        if (!cancelToken.aborted) {
+          abortCancelToken(mountedRef.current ? "user" : "unmount");
+        }
       }
     },
   );

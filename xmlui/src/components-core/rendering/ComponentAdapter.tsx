@@ -15,6 +15,13 @@ import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs"
 
 import { extractParam, resolveResponsiveWhen } from "../utils/extractParam";
 import { getCurrentTrace, pushXsLog } from "../inspector/inspectorUtils";
+import {
+  fireBeforeDispose,
+  reportLifecycleEvent,
+  reportLifecycleViolation,
+  type LifecyclePhase,
+} from "../lifecycle";
+
 import { useTheme } from "../theming/ThemeContext";
 import { useStyles } from "../theming/StyleContext";
 import type { StyleObjectType } from "../theming/StyleRegistry";
@@ -51,6 +58,40 @@ import {
 } from "../theming/responsive-layout";
 import { parseLayoutProperty } from "../theming/parse-layout-props";
 import { is } from "immer/dist/internal.js";
+
+/**
+ * Invoke the per-component `onError` handler for a lifecycle phase failure.
+ * The handler receives `{ source, error: { message, stack? } }`. Errors
+ * thrown by the `onError` handler itself are reported as warn-level
+ * lifecycle violations and swallowed; the original error has already been
+ * reported via `reportLifecycleViolation`.
+ */
+function fireOnError(
+  source: LifecyclePhase | "action",
+  error: unknown,
+  handler: ((...args: any[]) => any) | null | undefined,
+): void {
+  if (!handler) return;
+  const payload = {
+    source,
+    error: {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    },
+  };
+  try {
+    const result = handler(payload);
+    if (result && typeof (result as PromiseLike<unknown>).then === "function") {
+      (result as PromiseLike<unknown>).then(undefined, (err) => {
+        // eslint-disable-next-line no-console
+        console.warn("Error inside lifecycle 'onError' handler:", err);
+      });
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("Error inside lifecycle 'onError' handler:", err);
+  }
+}
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -295,18 +336,68 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
       // Read inspector context from ref to avoid changing callback identity
       // when label/type/etc change (which would trigger init/cleanup re-runs)
       const ctx = inspectorContextRef.current;
-      return lookupAction(action, uid, {
+      // --- When an `onError` handler is declared on this component, route
+      // --- action-source throws through it (Plan #04 Step 1.2). The error
+      // --- handler itself, lifecycle handlers, and `init`/`cleanup` are not
+      // --- wrapped (lifecycle phases report through `reportLifecycleViolation`
+      // --- and call `fireOnError` directly).
+      const eventNameStr = eventName as unknown as string;
+      const hasOnError = !!safeNode.events?.error;
+      const wrapForOnError =
+        hasOnError &&
+        eventNameStr !== "error" &&
+        eventNameStr !== "mount" &&
+        eventNameStr !== "unmount" &&
+        eventNameStr !== "beforeDispose" &&
+        eventNameStr !== "init" &&
+        eventNameStr !== "cleanup";
+      const handler = lookupAction(action, uid, {
         eventName,
         componentType: ctx.componentType,
         componentLabel: ctx.componentLabel,
         componentId: ctx.componentId,
         sourceFileId: ctx.sourceFileId,
         sourceRange: ctx.sourceRange,
+        // --- Suppress the global toast when the user opted into `onError`;
+        // --- the wrapper below dispatches the error event itself.
+        ...(wrapForOnError ? { signError: false } : {}),
         ...actionOptions,
       });
+      if (!handler || !wrapForOnError) return handler;
+      return (...args: any[]) => {
+        let result: any;
+        try {
+          result = (handler as (...a: any[]) => any)(...args);
+        } catch (err) {
+          fireOnError("action", err, lookupErrorHandlerRef.current);
+          return undefined;
+        }
+        if (result && typeof (result as PromiseLike<unknown>).then === "function") {
+          return (result as Promise<unknown>).catch((err) => {
+            fireOnError("action", err, lookupErrorHandlerRef.current);
+            return undefined;
+          });
+        }
+        return result;
+      };
     },
     [lookupAction, safeNode.events, uid],
   );
+
+  // --- Stable lookup of the current `onError` handler so the wrapper above
+  // --- can fire it without changing identity each render.
+  const lookupErrorHandlerRef = useRef<((...args: any[]) => any) | null>(null);
+  lookupErrorHandlerRef.current = safeNode.events?.error
+    ? (lookupAction(safeNode.events.error, uid, {
+        eventName: "error",
+        componentType: inspectorContextRef.current.componentType,
+        componentLabel: inspectorContextRef.current.componentLabel,
+        componentId: inspectorContextRef.current.componentId,
+        sourceFileId: inspectorContextRef.current.sourceFileId,
+        sourceRange: inspectorContextRef.current.sourceRange,
+        signError: false,
+      }) as ((...args: any[]) => any) | null) ?? null
+    : null;
 
   // EXPERIMENTAL: extract bubbleEvents prop to allow selective propagation bypass
   const bubbleEvents = safeNode.props.bubbleEvents
@@ -532,6 +623,176 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     // --- Update the previous "when" value for next render
     prevWhenValueRef.current = currentWhenValue;
   }, [currentWhenValue, memoedLookupEventHandler]);
+
+  // --- Universal `onMount` / `onUnmount` / `onError` events (Plan #04 Phase 1).
+  // --- These fire on actual React mount/unmount of the component, regardless
+  // --- of `when` transitions. The handlers themselves are looked up through
+  // --- a ref so the mount/unmount effect can stay on an empty dependency
+  // --- list while still seeing the latest event sources.
+  const lifecycleHandlersRef = useRef<{
+    mount?: ((...args: any[]) => any) | null;
+    unmount?: ((...args: any[]) => any) | null;
+    error?: ((...args: any[]) => any) | null;
+    beforeDispose?: ((...args: any[]) => any) | null;
+  }>({});
+  lifecycleHandlersRef.current = {
+    mount: safeNode.events?.mount ? memoedLookupEventHandler("mount" as any) : null,
+    unmount: safeNode.events?.unmount ? memoedLookupEventHandler("unmount" as any) : null,
+    error: safeNode.events?.error ? memoedLookupEventHandler("error" as any) : null,
+    beforeDispose: safeNode.events?.beforeDispose
+      ? memoedLookupEventHandler("beforeDispose" as any)
+      : null,
+  };
+
+  const strictLifecycle = appContext.appGlobals?.strictLifecycle === true;
+  const disposeTimeoutMs: number = appContext.appGlobals?.disposeTimeoutMs ?? 250;
+  useEffect(() => {
+    const handlers = lifecycleHandlersRef.current;
+    const componentType = safeNode.type;
+    const componentLabel = resolvedLabel;
+    const uidName = uid.description ?? "";
+
+    // --- Mount: fire `onMount`, then dispatch `onError` on throw.
+    if (handlers.mount) {
+      const mountStart =
+        typeof performance !== "undefined" ? performance.now() : undefined;
+      try {
+        const result = handlers.mount();
+        if (
+          result &&
+          typeof (result as PromiseLike<unknown>).then === "function"
+        ) {
+          (result as PromiseLike<unknown>).then(
+            () => {
+              if (mountStart !== undefined) {
+                reportLifecycleEvent({
+                  componentUid: uidName,
+                  phase: "mount",
+                  componentType,
+                  componentLabel,
+                  durationMs: performance.now() - mountStart,
+                });
+              }
+            },
+            (err) => {
+              reportLifecycleViolation(
+                {
+                  componentUid: uidName,
+                  phase: "mount",
+                  reason: "throw",
+                  error: err,
+                  componentType,
+                  componentLabel,
+                },
+                { strict: strictLifecycle },
+              );
+              fireOnError("mount", err, lifecycleHandlersRef.current.error);
+            },
+          );
+        } else if (mountStart !== undefined) {
+          reportLifecycleEvent({
+            componentUid: uidName,
+            phase: "mount",
+            componentType,
+            componentLabel,
+            durationMs: performance.now() - mountStart,
+          });
+        }
+      } catch (err) {
+        reportLifecycleViolation(
+          {
+            componentUid: uidName,
+            phase: "mount",
+            reason: "throw",
+            error: err,
+            componentType,
+            componentLabel,
+          },
+          { strict: strictLifecycle },
+        );
+        fireOnError("mount", err, lifecycleHandlersRef.current.error);
+      }
+    }
+
+    return () => {
+      // --- BeforeDispose: fire `onBeforeDispose` with an async budget (Plan #04 Step 3.1).
+      // --- This fires first (before onUnmount) to allow async cleanup before the component
+      // --- is removed. React cannot await the cleanup, so the racing is fire-and-forget.
+      const beforeDisposeHandler = lifecycleHandlersRef.current.beforeDispose;
+      if (beforeDisposeHandler) {
+        fireBeforeDispose(beforeDisposeHandler, {
+          componentUid: uidName,
+          timeoutMs: disposeTimeoutMs,
+          strict: strictLifecycle,
+          componentType,
+          componentLabel,
+        });
+      }
+
+      const unmountHandler = lifecycleHandlersRef.current.unmount;
+      if (!unmountHandler) return;
+      const unmountStart =
+        typeof performance !== "undefined" ? performance.now() : undefined;
+      try {
+        const result = unmountHandler();
+        if (
+          result &&
+          typeof (result as PromiseLike<unknown>).then === "function"
+        ) {
+          // Synchronous-only contract for `onUnmount` (see plan #04 Step 0).
+          // Do not await — emit a violation and let the unmount commit.
+          reportLifecycleViolation(
+            {
+              componentUid: uidName,
+              phase: "unmount",
+              reason: "async-onUnmount",
+              componentType,
+              componentLabel,
+            },
+            { strict: strictLifecycle },
+          );
+          // Best-effort: still attach an error reporter to the promise so
+          // late rejections do not become silent unhandled rejections.
+          (result as PromiseLike<unknown>).then(undefined, (err) => {
+            reportLifecycleViolation(
+              {
+                componentUid: uidName,
+                phase: "unmount",
+                reason: "throw",
+                error: err,
+                componentType,
+                componentLabel,
+              },
+              { strict: strictLifecycle },
+            );
+          });
+        } else if (unmountStart !== undefined) {
+          reportLifecycleEvent({
+            componentUid: uidName,
+            phase: "unmount",
+            componentType,
+            componentLabel,
+            durationMs: performance.now() - unmountStart,
+          });
+        }
+      } catch (err) {
+        reportLifecycleViolation(
+          {
+            componentUid: uidName,
+            phase: "unmount",
+            reason: "throw",
+            error: err,
+            componentType,
+            componentLabel,
+          },
+          { strict: strictLifecycle },
+        );
+        fireOnError("unmount", err, lifecycleHandlersRef.current.error);
+      }
+    };
+    // --- Empty dep list: fire exactly once on React mount/unmount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // --- Create interaction logger for inspector/debugging
   // --- IMPORTANT: This must be BEFORE the early return to maintain consistent hook order

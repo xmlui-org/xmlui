@@ -7,6 +7,19 @@ afterEach(() => {
   cleanup();
 });
 
+// ResizeObserver is used by @formkit/auto-animate (a transitive dep of the Form
+// component). It is not available in jsdom; stub it globally for all tests.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  vi.stubGlobal(
+    "ResizeObserver",
+    class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    },
+  );
+}
+
 // Mock console methods to reduce noise in test output (optional)
 // Uncomment if needed
 // global.console = {

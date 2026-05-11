@@ -92,6 +92,24 @@ export type ValueExtractor = {
 
   // Get a CSS size value from an expression
   asSize(expression?: any): string;
+
+  // --- Refined `valueType` helpers (Phase 1 of the type-contract plan).
+  //     See `dev-docs/plans/01-verified-type-contracts.md` Phase 1 §1.1.
+
+  /** Get an integer value (throws on non-integer literals). */
+  asInteger(expression?: any, defValue?: number): number | undefined;
+
+  /** Get a CSS color string (returns `undefined` on invalid literals). */
+  asColor(expression?: any): string | undefined;
+
+  /** Get a CSS length string (returns `undefined` on invalid literals). */
+  asLength(expression?: any): string | undefined;
+
+  /** Get a URL string (returns `undefined` on invalid literals). */
+  asUrl(expression?: any): string | undefined;
+
+  /** Get a registered icon name (returns `undefined` on invalid literals). */
+  asIcon(expression?: any): string | undefined;
 };
 
 // This function retrieves an async function for a particular component's specified

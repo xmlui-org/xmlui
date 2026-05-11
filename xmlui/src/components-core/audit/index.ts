@@ -18,7 +18,7 @@ export type {
 } from "./policy";
 export { defaultAuditPolicy } from "./policy";
 
-export { redact } from "./redactor";
+export { redact, buildBaselineRules } from "./redactor";
 export { sample, sampleEntry, drainTailBuffer } from "./sampler";
 
 export type { TraceContext } from "./correlation";

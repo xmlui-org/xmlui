@@ -99,6 +99,47 @@ export type StandaloneAppDescription = {
    *   detector still runs at startup and emits a single `kind:"reactive-cycle"`
    *   warn entry per unique cycle so teams can audit existing apps before the
    *   strict default flips. See `dev-docs/plans/03-reactive-cycle-detection.md`.
+   * - `strictTypeContracts` (boolean, default `false`) — when `true`, parse-time
+   *   prop / event / value-type violations surfaced by the type-contract verifier
+   *   escalate from `warn` to `error`: the LSP reports `DiagnosticSeverity.Error`,
+   *   the Vite plugin fails the build on `unknown-prop`, `wrong-type`,
+   *   `missing-required`, and `value-not-in-enum`, and the runtime emits a
+   *   `kind:"type-contract"` error trace entry. When `false` (the rollout warn
+   *   phase default — Wave 3), the verifier still runs but only emits warn-level
+   *   diagnostics. Flips to `true` in the next major release. See
+   *   `dev-docs/plans/01-verified-type-contracts.md`.
+   * - `strictLifecycle` (boolean, default `false`) — when `true`, lifecycle
+   *   violations (async `onUnmount` handler, throw inside a lifecycle handler,
+   *   exceeded `disposeTimeoutMs`) escalate from `warn` (default rollout phase
+   *   — W3-3) to `error`: a `kind:"lifecycle"` error trace entry plus a
+   *   `console.error` and, in strict mode, a one-shot toast. When `false` the
+   *   universal `onMount`/`onUnmount`/`onError` events still fire and
+   *   violations are still reported, but only as warn-level entries so apps
+   *   can audit existing handlers before the strict default flips. Flips to
+   *   `true` in the next major release. See
+   *   `dev-docs/plans/04-managed-lifecycle-vocabulary.md`.
+   * - `disposeTimeoutMs` (number, default `250`) — millisecond budget for
+   *   container `onBeforeDispose` handlers (Phase 3 of plan #04). Exceeding
+   *   the budget emits a `kind:"lifecycle"` violation with
+   *   `reason:"timeout"` and lets the unmount proceed.
+   * - `strictConcurrency` (boolean, default `false`) — when `true`, the
+   *   handler-coordinator (plan #06) refuses unknown `handlerPolicy` values
+   *   at build time and escalates concurrency-policy mismatches (e.g. a
+   *   `single-flight` handler invoked while a previous run is still in
+   *   flight under `parallel` ancestry) from `warn` to `error`. When
+   *   `false` (the W3-6 rollout default — risk-probe phase) the public API
+   *   surface (`$cancel`, `HandlerPolicy`, `createHandlerCoordinator`) is
+   *   available but enforcement is best-effort: handlers that don't read
+   *   `$cancel` and don't declare a non-default policy see no behavioural
+   *   change. Flips to `true` once the W7-1 coordinator runtime ships. See
+   *   `dev-docs/plans/06-handler-concurrency-and-cancellation.md`.
+   * - `defaultHandlerTimeoutMs` (number, default `30000`) — millisecond
+   *   budget after which an in-flight event handler is automatically
+   *   cancelled with `CancellationReason="timeout"` and a
+   *   `kind:"concurrency"` `code:"concurrency-handler-timeout"` trace
+   *   entry. Per-invocation `timeoutMs` overrides this default. The W3-6
+   *   risk-probe ships the configuration surface only; the dispatcher
+   *   wiring that enforces the budget lands in W7-1.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

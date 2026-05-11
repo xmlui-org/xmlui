@@ -94,7 +94,7 @@ export const ComponentNameMd = createMetadata({
   props: {
     label: {
       description: "...",
-      valueType: "string",    // "boolean" | "string" | "number" | "any" | "ComponentDef"
+      valueType: "string",    // see "Property value types" below
       defaultValue: defaultProps.label,
       isRequired: false,
     },
@@ -325,6 +325,31 @@ if (process.env.VITE_USED_COMPONENTS_ComponentName !== "false") {
 ```
 
 `registerCoreComponent` accepts a `ComponentRendererDef` (returned by `createComponentRenderer`).
+
+## Property value types
+
+`PropertyValueType` (in `xmlui/src/abstractions/ComponentDefs.ts`)
+governs verification (parse-time) and coercion (runtime). The verifier
+and the runtime extractor share a single rule table — see
+`xmlui/src/components-core/type-contracts/rules/coerce.ts` and
+`dev-docs/plans/01-verified-type-contracts.md`.
+
+| `valueType` | Accepts | Runtime helper |
+|---|---|---|
+| `"boolean"` | JS truthy/falsy or string `"true"`/`"false"` | `asBoolean` / `asOptionalBoolean` |
+| `"string"` | Anything coerced via `String(value)` | `asString` / `asOptionalString` |
+| `"number"` | JS number or numeric string | `asNumber` / `asOptionalNumber` |
+| `"any"` | Opt-out of verification | extractor |
+| `"ComponentDef"` | Nested component definition (template prop) | extractor |
+| `"integer"` | Whole-number `number` (no fractional part) or numeric string | `asInteger` |
+| `"color"` | CSS color literal (named, `#rgb`/`#rrggbb`, `rgb()`/`hsl()`), `var(--…)`, or `$token` | `asColor` |
+| `"length"` | Bare number (px), `<number><unit>`, `var(--…)`, `$token`, or `auto`-family keyword | `asLength` |
+| `"url"` | String parseable by `new URL(value, base)` (relative or absolute) | `asUrl` |
+| `"icon"` | Name registered in the active `IconRegistry` | `asIcon` |
+| `"id-ref"` | Identifier resolving to a sibling component's `id` in scope | extractor |
+
+`availableValues` declares a closed enum even when `valueType` is
+`"string"` or `"number"` and is treated as authoritative by the verifier.
 
 ## Implementation Order
 

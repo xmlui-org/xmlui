@@ -228,6 +228,27 @@ export interface XsLogEntry {
    *   `cycle: string[]` (node ids in order, cycle closed implicitly), `nodes` (resolved
    *   `ReactiveNode[]`), `message` (human-readable diagnostic from `formatCycle`),
    *   and `cycleId` (stable hash for deduplication within a session).
+   * - `"type-contract"` — a parse-time type-contract violation surfaced at runtime
+   *   when `App.appGlobals.strictTypeContracts` is truthy; produced by the
+   *   type-contract verifier (plan #01). Contains `code: TypeContractCode`,
+   *   `severity`, `componentName`, optional `propName` / `expected` / `actual`,
+   *   `message`, and optional `suggestion`.
+   * - `"lifecycle"` — a lifecycle event or violation (plan #04). Contains
+   *   `severity: "info" | "warn" | "error"`, `phase: "mount" | "unmount" |
+   *   "beforeDispose"`, `componentUid`, optional `componentType` /
+   *   `componentLabel`, optional `durationMs` (info entries), optional
+   *   `reason: LifecycleViolationReason` (warn/error entries), and optional
+   *   `error: { message, stack? }`. Severity escalates from `warn` to `error`
+   *   when `App.appGlobals.strictLifecycle` is truthy.
+   * - `"concurrency"` — handler-concurrency event or diagnostic emitted by the
+   *   handler-coordinator surface (plan #06). Contains
+   *   `code: ConcurrencyCode` (one of `concurrency-handler-cancelled`,
+   *   `concurrency-handler-timeout`, `concurrency-handler-dropped`,
+   *   `concurrency-handler-superseded`, `concurrency-transactional-conflict`),
+   *   `severity: "info" | "warn" | "error"`, optional `componentUid` /
+   *   `eventName`, and `message`. W3-6 ships only the API surface (token
+   *   types + coordinator stub); the dispatcher wiring that emits these
+   *   entries lands in W7-1.
    */
   kind?: string;
   eventName?: string;

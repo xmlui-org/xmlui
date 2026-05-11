@@ -74,6 +74,10 @@ export const FormMd = createMetadata({
         "This property sets the initial value of the form's data structure. The form infrastructure " +
         "uses this value to set the initial state of form items within the form. If this property is" +
         "not set, the form does not have an initial value.",
+      audit: {
+        classification: "sensitive",
+        defaultRedaction: "hash",
+      },
     },
     cancelLabel: {
       description: "This property defines the label of the Cancel button.",

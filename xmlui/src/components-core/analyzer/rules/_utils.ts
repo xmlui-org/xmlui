@@ -210,6 +210,8 @@ export const BEHAVIOR_PROPS: ReadonlySet<string> = new Set([
   // --- PubSub / Interop (additional widely-used props)
   "onMount",
   "onUnmount",
+  "onError",
+  "onBeforeDispose",
   "onDidChange",
 ]);
 
