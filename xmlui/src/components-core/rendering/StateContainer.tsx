@@ -146,8 +146,20 @@ export const StateContainer = memo(
     // ========================================================================
 
     const stateFromOutside = useShallowCompareMemoize(
-      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
+      useMemo(
+        () => extractScopedState(parentState, node.uses ?? node.computedUses),
+        [node.uses, node.computedUses, parentState],
+      ),
     );
+
+    const renderCountRef = useRef(0);
+    if (process.env.NODE_ENV === "development") {
+      renderCountRef.current += 1;
+      const label = node.uid ?? node.type ?? "anon";
+      console.debug(`[render] ${label} #${renderCountRef.current}`);
+      (globalThis as any).__renderCounts ??= {};
+      (globalThis as any).__renderCounts[label] = renderCountRef.current;
+    }
 
     // ========================================================================
     // LAYER 2: COMPONENT REDUCER STATE
