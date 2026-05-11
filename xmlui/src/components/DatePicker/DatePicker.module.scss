@@ -671,26 +671,37 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
   // edge (semi-circle) and flat on the inward edge so they merge cleanly into
   // the grey middle cells.
 
-  // Start and end render as clean circular day buttons. The cell background
-  // is half transparent / half hover-colour so the grey middle bar appears
-  // to flow out of the circle on the inward side without painting a square
-  // behind the ball itself. The day_button is the visible circle.
+  // Committed range cells form a continuous pill. Start and end paint a
+  // solid selected-colour cell background with a half-circle cap on the
+  // outward edge; middle cells fill with hover-colour. The day_button stays
+  // circular, but since it sits on a same-coloured cell it blends seamlessly
+  // into the cap.
   //
-  // The horizontal box-shadow on range_middle masks sub-pixel anti-aliasing
-  // seams between adjacent same-coloured cells at fractional pixel positions.
+  // The horizontal box-shadow extends each cell's background 1px on the
+  // inward side so adjacent same-coloured cells overlap and mask sub-pixel
+  // anti-aliasing seams. The pending single-click state is handled below
+  // (`.range_start.range_end`) — that cell renders as a plain ball with no
+  // pill backdrop.
 
   .range_start {
-    background: linear-gradient(
-      to right,
-      transparent 50%,
-      $backgroundColor-item-DatePicker--hover 50%
-    );
+    background-color: $backgroundColor-day-DatePicker--selected;
+    // Only extend toward the middle (right) — the left side is the rounded
+    // pill cap; extending past it would protrude past the curve.
+    box-shadow: 1px 0 0 0 $backgroundColor-day-DatePicker--selected;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
 
     .day_button {
       background-color: $backgroundColor-day-DatePicker--selected;
       color: $textColor-day-DatePicker--selected;
       font-weight: t.$fontWeight-bold;
       border-color: transparent;
+    }
+
+    // Override the generic .day_button:hover (which would paint the light
+    // hover-colour and clash with the white text on the blue pill cap).
+    .day_button:not(:disabled):hover {
+      background-color: $backgroundColor-day-DatePicker--selected;
     }
   }
 
@@ -707,14 +718,19 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
       color: var(--rdp-range_middle-color);
       background-color: $backgroundColor-item-DatePicker--hover;
     }
+
+    .day_button:not(:disabled):hover {
+      background-color: $backgroundColor-item-DatePicker--hover;
+    }
   }
 
   .range_end {
-    background: linear-gradient(
-      to right,
-      $backgroundColor-item-DatePicker--hover 50%,
-      transparent 50%
-    );
+    background-color: $backgroundColor-day-DatePicker--selected;
+    // Only extend toward the middle (left) — the right side is the rounded
+    // pill cap.
+    box-shadow: -1px 0 0 0 $backgroundColor-day-DatePicker--selected;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
 
     .day_button {
       background-color: $backgroundColor-day-DatePicker--selected;
@@ -722,13 +738,19 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
       font-weight: t.$fontWeight-bold;
       border-color: transparent;
     }
+
+    .day_button:not(:disabled):hover {
+      background-color: $backgroundColor-day-DatePicker--selected;
+    }
   }
 
-  // Single-day range (or the pending state after the first click in range
-  // mode, where react-day-picker sets {from, to} to the same day). No grey
-  // background behind the ball — render as a plain selected circle.
+  // Pending single-click state (react-day-picker sets {from, to} to the same
+  // day after the first click). Render as a plain selected circle — no pill
+  // backdrop — to distinguish it from a confirmed multi-day range.
   .range_start.range_end {
     background: transparent;
+    box-shadow: none;
+    border-radius: 0;
   }
 
   // --- Range preview on hover (first date selected, hovering over another date)

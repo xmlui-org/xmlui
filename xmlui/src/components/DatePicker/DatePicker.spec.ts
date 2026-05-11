@@ -1060,6 +1060,7 @@ test.describe("Range Mode Features", () => {
       {
         testThemeVars: {
           "backgroundColor-item-DatePicker--hover": "rgb(240, 240, 240)",
+          "backgroundColor-day-DatePicker--selected": "rgb(50, 100, 200)",
         },
       },
     );
@@ -1068,10 +1069,9 @@ test.describe("Range Mode Features", () => {
     await page.getByTestId("datePicker").click();
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Range middle cells use a solid hover-colour background. Range start and
-    // end render as clean circular day buttons; their cell uses a half-and-half
-    // gradient (transparent on the outside, hover-colour on the inside) so the
-    // grey middle bar flows into the inward side of the ball.
+    // Range middle cells use a solid hover-colour background; range_start and
+    // range_end cells paint a solid selected-colour pill cap rounded on the
+    // outward edge.
     const middleDate = page
       .getByRole("grid", { name: "May" })
       .locator("[data-day]")
@@ -1086,8 +1086,10 @@ test.describe("Range Mode Features", () => {
       .getByRole("grid", { name: "May" })
       .locator("[data-day]")
       .filter({ hasText: /^15$/ });
-    await expect(startDate).toHaveCSS("background-image", /linear-gradient/);
-    await expect(endDate).toHaveCSS("background-image", /linear-gradient/);
+    await expect(startDate).toHaveCSS("background-color", "rgb(50, 100, 200)");
+    await expect(endDate).toHaveCSS("background-color", "rgb(50, 100, 200)");
+    await expect(startDate).toHaveCSS("border-top-left-radius", /9999px|499px/);
+    await expect(endDate).toHaveCSS("border-top-right-radius", /9999px|499px/);
   });
 
   test("single selected date in range mode renders as a clean ball", async ({
