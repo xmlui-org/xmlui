@@ -95,10 +95,9 @@ export interface ComponentDefCore {
   uses?: string[];
 
   /**
-   * Автоматично обчислений мінімальний набір імен батьківського стану,
-   * що реально використовуються в піддереві цього вузла.
-   * Заповнюється `computeUsesForTree()` під час transform/boot.
-   * Якщо `uses` визначено явно — `computedUses` ігнорується.
+   * Automatically computed minimal set of parent state names actually used
+   * within this node's subtree. Populated by `computeUsesForTree()` at
+   * transform/boot time. Ignored when `uses` is explicitly defined.
    */
   computedUses?: string[];
 
