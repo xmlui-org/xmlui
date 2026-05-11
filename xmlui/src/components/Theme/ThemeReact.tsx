@@ -26,6 +26,7 @@ import { parseHVar } from "../../components-core/theming/hvar";
 import { THEME_VAR_PREFIX } from "../../components-core/theming/layout-resolver";
 import { useComponentRegistry } from "../ComponentRegistryContext";
 import baseStyles from "../../index.scss?inline";
+import { getCSSInjectionAPI } from "../../components-core/cssInjectionRegistry";
 
 const STYLE_ID = "xmlui-base-styles";
 
@@ -348,6 +349,7 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
     // The SSR part is handled by the render itself.
     if (typeof document !== "undefined") {
       const insideShadowRoot = domRoot instanceof ShadowRoot;
+      const target = insideShadowRoot ? domRoot : document.head;
       let documentElement = insideShadowRoot
         ? domRoot.getElementById("nested-app-root")
         : document.documentElement;
@@ -356,10 +358,21 @@ export function RootClasses({ classNames = EMPTY_ARRAY }: HtmlClassProps) {
         ? domRoot.getElementById("nested-app-portal-root")
         : null;
       portalContainer?.classList.add(...classNames);
+
+      const cssAPI = getCSSInjectionAPI();
+      if (cssAPI) {
+        cssAPI.injectCSS({ target });
+      }
+
       // Clean up when the component unmounts to remove the class if needed.
       return () => {
         documentElement.classList.remove(...classNames);
         portalContainer?.classList.remove(...classNames);
+        // Skip removeCSS for shadow roots: unmounting one island must not strip
+        // styles from all others. Shadow root GC reclaims styles when destroyed.
+        if (cssAPI && !insideShadowRoot) {
+          cssAPI.removeCSS();
+        }
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

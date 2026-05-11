@@ -1,6 +1,14 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
 
+declare module "virtual:css-injected-by-js" {
+  export interface InjectCSSOptions {
+    target?: Element | ShadowRoot;
+  }
+  export function injectCSS(opts?: InjectCSSOptions): void;
+  export function removeCSS(): void;
+}
+
 interface ImportMetaEnv {
   readonly NODE_ENV: string;
   // Framework-level: baked in at lib-build time

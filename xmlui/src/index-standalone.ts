@@ -2,9 +2,13 @@ import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";
 
+import { injectCSS, removeCSS } from "virtual:css-injected-by-js";
+import { registerCSSInjection } from "./components-core/cssInjectionRegistry";
 import { startApp } from "./components-core/StandaloneApp";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import * as xmluiExports from "./index";
+
+registerCSSInjection({ injectCSS, removeCSS });
 
 const Xmlui = new StandaloneExtensionManager();
 
