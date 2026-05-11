@@ -143,47 +143,15 @@ Serve with `npx serve . -p 4173` from inside `temp-islands/`. The `xmlui-standal
 
 ## What Works
 
-| Mode                                                   | Status             |
-| ------------------------------------------------------ | ------------------ |
-| `npm run build:xmlui-standalone`                       | ✅                 |
-| `npm run build:xmlui` (lib)                            | ✅                 |
-| `npm run start` (dev via `viteConfig.ts`)              | ✅                 |
-| Islands render in browser (shadow DOM, per-island CSS) | ✅                 |
-| Host CSS cannot bleed into islands                     | ✅                 |
-| Island CSS cannot leak out to host page                | ✅                 |
-| Each island loads its own `Main.xmlui` / `components/` | ✅                 |
-| Islands do not share router state (MemoryRouter)       | ✅                 |
-| Islands do not modify host `<head>`                    | ✅                 |
-| SSG build                                              | ✅                 |
-
-## How SSG Styling Works
-
-The root cause of the unstyled no-JS SSG pages was that Vite/rolldown extracts CSS to a separate file (e.g. `internal/chunks/vite-entrypoint.<hash>.css`) but does **not** emit a `<link rel="stylesheet">` tag for it in the built HTML. The CSS only loaded via JS injection at runtime — so with JS disabled the page was styleless.
-
-### Fix (in `xmlui/src/nodejs/bin/ssg.ts`)
-
-After copying the client build to the SSG output directory, `ssg()` now:
-1. Calls `collectCssFiles(outPath)` to find all `.css` files under the output directory.
-2. Injects `<link rel="stylesheet" href="...">` tags into `shellHtml` (the base HTML template used for all rendered pages) immediately before `</head>`.
-
-All generated route pages inherit these links, so the compiled CSS loads from the static file regardless of whether JavaScript runs.
-
-The SSR-injected styles (`<style data-style-registry>` from `StyleRegistry`) and the Helmet-injected base stylesheet (`<style id="xmlui-base-styles">` from `RootClasses`) were already in the HTML — they cover the dynamic CSS-in-JS rules and the SCSS reset/base respectively. The missing piece was the module CSS (`.module.scss` files compiled by Vite), which is now covered by the static `<link>` tag.
-
----
-
-## How to Rebuild and Test ssg
-
-building:
-
-```bash
-cd integration-tests/test-app && npm run build-ssg
-```
-
-check if the server is running on port 3000. If not, start it with
-
-```bash
-cd integration-tests/test-app && npm run preview-ssg
-```
-
-The hydrated page looks good, styles applied, but the non-hydrated one appears styleless. You can check, it with screenshots while js is disabled (but only create them when necessary, as they take a lot of context from you).
+| Mode                                                   | Status |
+| ------------------------------------------------------ | ------ |
+| `npm run build:xmlui-standalone`                       | ✅     |
+| `npm run build:xmlui` (lib)                            | ✅     |
+| `npm run start` (dev via `viteConfig.ts`)              | ✅     |
+| Islands render in browser (shadow DOM, per-island CSS) | ✅     |
+| Host CSS cannot bleed into islands                     | ✅     |
+| Island CSS cannot leak out to host page                | ✅     |
+| Each island loads its own `Main.xmlui` / `components/` | ✅     |
+| Islands do not share router state (MemoryRouter)       | ✅     |
+| Islands do not modify host `<head>`                    | ✅     |
+| SSG build                                              | ✅     |

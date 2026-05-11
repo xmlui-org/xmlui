@@ -245,6 +245,7 @@ export default ({ mode = "lib" }) => {
       ViteYaml(),
       ViteXmlui({}),
       cssInjectedByJsPlugin(),
+      dts({ rollupTypes: true }),
     ] as Plugin[];
   } else {
     plugins = [

@@ -40,6 +40,7 @@ type NestedAppProps = {
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
 const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
+export const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
 
 function toSafeFileStem(value: string | undefined, fallback: string): string {
   if (!value) return fallback;
@@ -155,7 +156,7 @@ export const NestedApp = memo(function NestedApp({
       // since we are using shadow DOM, we need to define the layers here
       // to ensure that the styles are applied correctly (the adopted styleheets setting is asynchronous, so the layer order might not be respected if we don't do this)
       // MUST BE IN SYNC WITH THE STYLESHEET ORDER IN index.scss
-      style.innerHTML = "@layer reset, base, components, themes, dynamic;";
+      style.innerHTML = CSS_LAYER_ORDER;
       shadowRef.current.appendChild(style);
 
       // This should run once to prepare the stylesheets
@@ -425,7 +426,9 @@ export const LazyNestedApp = memo(function LazyNestedApp({
   return <NestedApp {...restProps} />;
 });
 
-export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(props: NestedAppProps & { immediate?: boolean }) {
+export const IndexAwareNestedApp = memo(function IndexAwareNestedApp(
+  props: NestedAppProps & { immediate?: boolean },
+) {
   const { indexing } = useIndexerContext();
   if (indexing) {
     return null;

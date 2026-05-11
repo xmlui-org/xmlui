@@ -29,6 +29,10 @@
     <lastmod>2026-05-11</lastmod>
   </url>
   <url>
+    <loc>https://docs.xmlui.org/blog/xmlui-for-llms</loc>
+    <lastmod>2026-05-11</lastmod>
+  </url>
+  <url>
     <loc>https://docs.xmlui.org/blog/xmlui-playground</loc>
     <lastmod>2026-05-11</lastmod>
   </url>
@@ -225,10 +229,6 @@
     <lastmod>2026-05-11</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/docs/howto/add-drag-and-drop-reordering-to-a-list</loc>
-    <lastmod>2026-05-11</lastmod>
-  </url>
-  <url>
     <loc>https://docs.xmlui.org/docs/howto/add-row-actions-with-a-context-menu</loc>
     <lastmod>2026-05-11</lastmod>
   </url>
@@ -382,10 +382,6 @@
   </url>
   <url>
     <loc>https://docs.xmlui.org/docs/howto/debounce-with-changelistener</loc>
-    <lastmod>2026-05-11</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.xmlui.org/docs/howto/debug-a-component</loc>
     <lastmod>2026-05-11</lastmod>
   </url>
   <url>
@@ -709,10 +705,6 @@
     <lastmod>2026-05-11</lastmod>
   </url>
   <url>
-    <loc>https://docs.xmlui.org/docs/howto/switch-between-hash-and-history-routing</loc>
-    <lastmod>2026-05-11</lastmod>
-  </url>
-  <url>
     <loc>https://docs.xmlui.org/docs/howto/sync-tilegrid-selection-across-grids</loc>
     <lastmod>2026-05-11</lastmod>
   </url>
@@ -738,10 +730,6 @@
   </url>
   <url>
     <loc>https://docs.xmlui.org/docs/howto/theme-multi-level-navgroup-nesting</loc>
-    <lastmod>2026-05-11</lastmod>
-  </url>
-  <url>
-    <loc>https://docs.xmlui.org/docs/howto/throttle-rapid-value-updates</loc>
     <lastmod>2026-05-11</lastmod>
   </url>
   <url>

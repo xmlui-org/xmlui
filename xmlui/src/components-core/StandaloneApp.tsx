@@ -25,7 +25,6 @@ import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   codeBehindFileExtension,
   componentFileExtension,
-  moduleFileExtension,
 } from "../parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../parsers/scripting/Parser";
 import {
@@ -107,33 +106,41 @@ type RuntimeProps = {
   src?: string;
 };
 
-// --- The properties of the standalone app
+/** Properties of the standalone app. */
 type StandaloneAppProps = {
-  // --- The standalone app description (the engine renders this definition)
+  /** The standalone app description (the engine renders this definition). */
   appDef?: StandaloneAppDescription;
+
+  /** Global variables passed to the app. */
   appGlobals?: Record<string, any>;
 
-  // --- In E2E tests, we can decorate the components with test IDs
+  /** In E2E tests, components can be decorated with test IDs. */
   decorateComponentsWithTestId?: boolean;
 
-  // --- Debugging can be enabled or disabled
+  /** Whether debugging is enabled. */
   debugEnabled?: boolean;
 
-  // --- The runtime environment of the standalone app (for pre-compiled apps)
+  /** The runtime environment of the standalone app (for pre-compiled apps). */
   runtime?: RuntimeProps;
 
-  // --- The object responsible for managing the standalone components
+  /** The object responsible for managing the standalone components. */
   extensionManager?: StandaloneExtensionManager;
 
-  // --- If true, the app waits for the API interceptor to be ready
+  /** If true, the app waits for the API interceptor to be ready. */
   waitForApiInterceptor?: boolean;
+
+  /** Helmet context for managing document head. */
   helmetContext?: Record<string, unknown>;
+
+  /** Child elements to render inside the app. */
   children?: ReactNode;
 
-  // --- Base path for island mode: the folder containing Main.xmlui and other
-  // --- resources, resolved relative to the host page URL (e.g. "./bio").
-  // --- When set, all file fetches are rooted at this folder instead of the
-  // --- document root, and the app uses an isolated memory router.
+  /**
+   * Base path for island mode: the folder containing Main.xmlui and other
+   * resources, resolved relative to the host page URL (e.g. "./bio").
+   * When set, all file fetches are rooted at this folder instead of the
+   * document root, and the app uses an isolated memory router.
+   */
   basePath?: string;
 };
 
