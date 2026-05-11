@@ -1,4 +1,4 @@
-import React, { type ForwardedRef, forwardRef, memo, useCallback } from "react";
+import { type ForwardedRef, forwardRef, memo, type ReactNode } from "react";
 import type { CSSProperties } from "react";
 import styles from "./CodeBlock.module.scss";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
@@ -18,7 +18,7 @@ import type { Node, Parent } from "unist";
 import classnames from "classnames";
 
 type CodeBlockProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
   textToCopy?: string;
   meta?: CodeHighlighterMeta;
   style?: CSSProperties;

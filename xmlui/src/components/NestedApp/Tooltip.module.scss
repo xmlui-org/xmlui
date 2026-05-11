@@ -10,11 +10,12 @@ $themeVars: ();
 @layer components {
   .TooltipContent {
     border-radius: 4px;
+    border: 0.5px solid t.$borderColor;
     padding: 10px 15px;
     font-family: sans-serif;
     font-size: 15px;
     line-height: 1;
-    background-color: #ffffff;
+    background-color: t.$backgroundColor-primary;
     box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
     user-select: none;
     animation-duration: 400ms;
