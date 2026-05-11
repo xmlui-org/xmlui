@@ -20,6 +20,7 @@ $boxShadow-NestedApp: createThemeVar("boxShadow-#{$component}");
 $backgroundColor-viewControls-NestedApp: createThemeVar(
   "backgroundColor-viewControls-#{$component}"
 );
+$border-viewControls-NestedApp: createThemeVar("border-viewControls-#{$component}");
 $borderRadius-viewControls-NestedApp: createThemeVar("borderRadius-viewControls-#{$component}");
 $padding-viewControls-NestedApp: createThemeVar("padding-viewControls-#{$component}");
 $paddingVertical-viewControls-button-NestedApp: createThemeVar(
@@ -206,6 +207,7 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     align-items: center;
     padding: $padding-viewControls-NestedApp;
     background-color: $backgroundColor-viewControls-NestedApp;
+    border: $border-viewControls-NestedApp;
     border-radius: $borderRadius-viewControls-NestedApp;
   }
 
