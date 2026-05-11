@@ -1,0 +1,17 @@
+<App
+  var.oftenChanges="{0}"
+  var.rarelyChanges="{Array.from({length: 1000}, (_, i) => i + 1)}"
+>
+  <Timer interval="{100}" onTick="oftenChanges++" />
+
+  <VStack>
+    <Text value="Often changes: {oftenChanges}" />
+    <Text value="(open DevTools → Console to see [render] logs)" />
+  </VStack>
+
+  <Select>
+    <Items data="{rarelyChanges}">
+      <Option value="{$item}" label="|{$item}|" />
+    </Items>
+  </Select>
+</App>
