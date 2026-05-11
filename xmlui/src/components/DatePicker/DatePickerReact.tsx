@@ -388,8 +388,28 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [disabledDates, dateFormat]);
 
   const [open, setOpen] = useState(false);
+  // In range mode the dropdown defers commit until the user clicks "Proceed",
+  // so we keep an in-flight pending range during the picker session and only
+  // call `updateState`/`onDidChange` when the user confirms.
+  const [pendingRange, setPendingRange] = useState<DateRange | undefined>();
   const { root } = useTheme();
   const isMobile = useMediaQuery(MOBILE_BREAKPOINT_QUERY);
+
+  // Sync the pending range to the committed value whenever the dropdown opens
+  // (or the selection changes externally while open).
+  useEffect(() => {
+    if (mode !== "range" || inline) return;
+    if (open) {
+      setPendingRange(selected as DateRange | undefined);
+    } else {
+      setPendingRange(undefined);
+    }
+  }, [open, mode, inline, selected]);
+
+  // What the calendar should highlight. In range mode while the dropdown is
+  // open, we show the pending in-flight range; otherwise the committed value.
+  const displayedSelected =
+    mode === "range" && !inline && open ? pendingRange : (selected as any);
 
   const handleOnMenuFocus = () => {
     setIsMenuFocused(true);
@@ -442,35 +462,62 @@ export const DatePicker = forwardRef(function DatePicker(
     }
   }, [selected, mode, inline, defaultMonth]);
 
+  const commitRange = useCallback(
+    (range: DateRange | undefined) => {
+      if (!range || (!range.from && !range.to)) {
+        updateState({ value: undefined });
+        onDidChange("");
+        return;
+      }
+      const formattedRange = {
+        from: range.from ? format(range.from, dateFormat) : "",
+        to: range.to ? format(range.to, dateFormat) : "",
+      };
+      updateState({ value: formattedRange });
+      onDidChange(formattedRange);
+    },
+    [onDidChange, updateState, dateFormat],
+  );
+
   const handleSelect = useCallback(
     (dateOrRange?: Date | DateRange) => {
       if (readOnly) {
         return;
       }
-      if (!dateOrRange) {
-        updateState({ value: undefined });
-        onDidChange("");
-      } else if (mode === "single") {
-        const date = dateOrRange as Date;
-        const formattedDate = format(date, dateFormat);
-        updateState({ value: formattedDate });
-        onDidChange(formattedDate);
-      } else {
-        const range = dateOrRange as DateRange;
-        const formattedRange = {
-          from: range.from ? format(range.from, dateFormat) : "",
-          to: range.to ? format(range.to, dateFormat) : "",
-        };
-        updateState({ value: formattedRange });
-        onDidChange(formattedRange);
-      }
       if (mode === "single") {
+        // Single mode auto-commits on selection and closes the dropdown.
+        // react-day-picker fires onSelect(undefined) when the user clicks the
+        // already-selected day — in that case we keep the value and just close.
+        if (dateOrRange) {
+          const date = dateOrRange as Date;
+          const formattedDate = format(date, dateFormat);
+          updateState({ value: formattedDate });
+          onDidChange(formattedDate);
+        }
         setOpen(false);
+      } else if (inline) {
+        // Inline range mode keeps auto-commit semantics — there is no Proceed
+        // button to confirm against.
+        commitRange(dateOrRange as DateRange | undefined);
+      } else {
+        // Popup range mode defers commit until the user clicks Proceed.
+        setPendingRange(dateOrRange as DateRange | undefined);
       }
       setHoveredDate(undefined);
     },
-    [onDidChange, updateState, mode, dateFormat, readOnly],
+    [onDidChange, updateState, mode, dateFormat, readOnly, inline, commitRange],
   );
+
+  // User confirmed the pending range — commit it and close.
+  const handleProceed = useCallback(() => {
+    commitRange(pendingRange);
+    setOpen(false);
+  }, [commitRange, pendingRange]);
+
+  // User dismissed — drop the pending range without affecting the value.
+  const handleCancel = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   const handleDayMouseEnter = useCallback(
     (date: Date) => {
@@ -488,21 +535,27 @@ export const DatePicker = forwardRef(function DatePicker(
   const modifiers = useMemo(() => {
     const mods: any = {};
 
-    if (mode === "range" && hoveredDate && selected?.from) {
+    // In range mode the in-flight `pendingRange` drives the hover-preview and
+    // single-selected markers while the dropdown is open; otherwise we fall
+    // back to the committed value (used by the inline variant).
+    const activeRange: any =
+      mode === "range" && !inline && open ? pendingRange : (selected as any);
+
+    if (mode === "range" && hoveredDate && activeRange?.from) {
       // Show preview when hovering, even if a range is already selected
       // This allows users to see what the new range would be
-      const start = selected.from < hoveredDate ? selected.from : hoveredDate;
-      const end = selected.from < hoveredDate ? hoveredDate : selected.from;
+      const start = activeRange.from < hoveredDate ? activeRange.from : hoveredDate;
+      const end = activeRange.from < hoveredDate ? hoveredDate : activeRange.from;
       mods.hovered = { from: start, to: end };
     }
 
     // Add background to single selected date in range mode
-    if (mode === "range" && selected?.from && !selected?.to) {
-      mods.singleSelected = selected.from;
+    if (mode === "range" && activeRange?.from && !activeRange?.to) {
+      mods.singleSelected = activeRange.from;
     }
 
     return mods;
-  }, [mode, hoveredDate, selected]);
+  }, [mode, hoveredDate, selected, pendingRange, open, inline]);
 
   const triggerClassName = classnames(
     classes?.[COMPONENT_PART_KEY],
@@ -569,7 +622,7 @@ export const DatePicker = forwardRef(function DatePicker(
       showWeekNumber={showWeekNumber}
       showOutsideDays={mode !== "range"}
       mode={mode === "single" ? "single" : "range"}
-      selected={selected}
+      selected={displayedSelected}
       onSelect={handleSelect}
       numberOfMonths={mode === "range" ? 2 : 1}
       pagedNavigation={mode === "range"}
@@ -582,6 +635,28 @@ export const DatePicker = forwardRef(function DatePicker(
       }}
     />
   );
+
+  // Range mode shows a Cancel/Proceed footer so the user can confirm the
+  // selection before it is committed (matches the shadcn pattern).
+  const popupFooter =
+    mode === "range" ? (
+      <div className={styles.popupFooter}>
+        <button
+          type="button"
+          className={classnames(styles.footerButton, styles.footerButtonSecondary)}
+          onClick={handleCancel}
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          className={classnames(styles.footerButton, styles.footerButtonPrimary)}
+          onClick={handleProceed}
+        >
+          Proceed
+        </button>
+      </div>
+    ) : null;
 
   if (inline) {
     return (
@@ -661,6 +736,7 @@ export const DatePicker = forwardRef(function DatePicker(
           >
             <Dialog.Title className={styles.srOnly}>Select date</Dialog.Title>
             {popupCalendar}
+            {popupFooter}
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
@@ -695,6 +771,7 @@ export const DatePicker = forwardRef(function DatePicker(
           onInteractOutside={handleOnMenuBlur}
         >
           {popupCalendar}
+          {popupFooter}
         </PopoverContent>
       </PopoverPortal>
     </Popover>

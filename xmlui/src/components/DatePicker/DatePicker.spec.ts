@@ -91,6 +91,8 @@ test("component allows date range selection", async ({ page, initTestBed }) => {
 
   await page.getByRole("grid", { name: "May" }).getByLabel("26").click();
   await page.getByRole("grid", { name: "May" }).getByLabel("27").click();
+  // Range mode defers commit until Proceed is pressed.
+  await page.getByRole("button", { name: "Proceed" }).click();
   await expect(page.getByTestId("datePicker")).toHaveText("05/26/2024 - 05/27/2024");
 });
 
@@ -425,7 +427,7 @@ test("component handles disabledDates correctly", async ({ page, initTestBed }) 
   await expect(testDayCell).toBeDisabled();
 });
 
-test("disabled day has lower opacity than enabled day", async ({ page, initTestBed }) => {
+test("disabled day is visually distinct from enabled day", async ({ page, initTestBed }) => {
   const today = new Date();
   const disabledDay = 15;
   const enabledDay = 16;
@@ -438,16 +440,17 @@ test("disabled day has lower opacity than enabled day", async ({ page, initTestB
   );
 
   const grid = page.getByRole("grid", { name: testMonthName });
-  const disabledCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(disabledDay).padStart(2, "0")}"]`);
-  const enabledCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(enabledDay).padStart(2, "0")}"]`);
+  const disabledButton = grid
+    .locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(disabledDay).padStart(2, "0")}"] button`);
+  const enabledButton = grid
+    .locator(`td[data-day="${today.getFullYear()}-${monthStr}-${String(enabledDay).padStart(2, "0")}"] button`);
 
-  const disabledOpacity = await disabledCell.evaluate((el) => window.getComputedStyle(el).opacity);
-  const enabledOpacity = await enabledCell.evaluate((el) => window.getComputedStyle(el).opacity);
+  const disabledBg = await disabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+  const enabledBg = await enabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
 
-  expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity));
-
-  const opacityDifference = parseFloat(enabledOpacity) - parseFloat(disabledOpacity);
-  expect(opacityDifference).toBeGreaterThanOrEqual(0.2);
+  // Disabled day buttons now render as a red filled circle, so their
+  // background colour must differ from regular day buttons.
+  expect(disabledBg).not.toBe(enabledBg);
 });
 
 test("disabled day button has correct cursor style", async ({ page, initTestBed }) => {
@@ -519,13 +522,13 @@ test("disabled date range has visual distinction", async ({ page, initTestBed })
   );
 
   const grid = page.getByRole("grid", { name: testMonthName });
-  const disabledDayInRange = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-15"]`);
-  const enabledDayCell = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-08"]`);
+  const disabledButton = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-15"] button`);
+  const enabledButton = grid.locator(`td[data-day="${today.getFullYear()}-${monthStr}-08"] button`);
 
-  const disabledOpacity = await disabledDayInRange.evaluate((el) => window.getComputedStyle(el).opacity);
-  const enabledOpacity = await enabledDayCell.evaluate((el) => window.getComputedStyle(el).opacity);
+  const disabledBg = await disabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
+  const enabledBg = await enabledButton.evaluate((el) => window.getComputedStyle(el).backgroundColor);
 
-  expect(parseFloat(disabledOpacity)).toBeLessThan(parseFloat(enabledOpacity));
+  expect(disabledBg).not.toBe(enabledBg);
 });
 
 // =============================================================================
@@ -1087,9 +1090,9 @@ test.describe("Range Mode Features", () => {
   test("selected range dates have background styling", async ({ page, initTestBed }) => {
     await initTestBed(
       `
-      <DatePicker 
-        testId="datePicker" 
-        mode="range" 
+      <DatePicker
+        testId="datePicker"
+        mode="range"
         dateFormat="MM/dd/yyyy"
         initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}"
       />
@@ -1104,24 +1107,26 @@ test.describe("Range Mode Features", () => {
     await page.getByTestId("datePicker").click();
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Check that range dates have background color
-    const startDate = page
-      .getByRole("grid", { name: "May" })
-      .locator("[data-day]")
-      .filter({ hasText: /^10$/ });
+    // Range middle cells keep a solid hover-colored background; range_start and
+    // range_end use a half-and-half gradient to form a pill against the
+    // selected-day circles, so their `background-color` is transparent and
+    // the colored portion is on `background-image` instead.
     const middleDate = page
       .getByRole("grid", { name: "May" })
       .locator("[data-day]")
       .filter({ hasText: /^12$/ });
+    await expect(middleDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+
+    const startDate = page
+      .getByRole("grid", { name: "May" })
+      .locator("[data-day]")
+      .filter({ hasText: /^10$/ });
     const endDate = page
       .getByRole("grid", { name: "May" })
       .locator("[data-day]")
       .filter({ hasText: /^15$/ });
-
-    // All dates in range should have the hover background color
-    await expect(startDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
-    await expect(middleDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
-    await expect(endDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(startDate).toHaveCSS("background-image", /linear-gradient/);
+    await expect(endDate).toHaveCSS("background-image", /linear-gradient/);
   });
 
   test("single selected date in range mode has background styling", async ({
@@ -1130,9 +1135,9 @@ test.describe("Range Mode Features", () => {
   }) => {
     await initTestBed(
       `
-      <DatePicker 
-        testId="datePicker" 
-        mode="range" 
+      <DatePicker
+        testId="datePicker"
+        mode="range"
         dateFormat="MM/dd/yyyy"
       />
     `,
@@ -1146,7 +1151,8 @@ test.describe("Range Mode Features", () => {
     await page.getByTestId("datePicker").click();
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Select first date
+    // Select first date — in range mode this puts the picker into the
+    // single-selected state (pending range with only `from`).
     await page
       .getByRole("grid")
       .first()
@@ -1155,7 +1161,8 @@ test.describe("Range Mode Features", () => {
       .first()
       .click();
 
-    // The single selected date should have background
+    // The single-selected day cell carries the .singleSelected modifier which
+    // paints the hover background.
     const selectedDate = page
       .getByRole("grid")
       .first()
@@ -1256,11 +1263,14 @@ test.describe("Range Mode Features", () => {
     await expect(endDateButton).toHaveCSS("border-radius", "100%");
   });
 
-  test("range selection completes after selecting two dates", async ({ page, initTestBed }) => {
+  test("range selection completes after selecting two dates and pressing Proceed", async ({
+    page,
+    initTestBed,
+  }) => {
     await initTestBed(`
-      <DatePicker 
-        testId="datePicker" 
-        mode="range" 
+      <DatePicker
+        testId="datePicker"
+        mode="range"
         dateFormat="MM/dd/yyyy"
       />
     `);
@@ -1270,28 +1280,32 @@ test.describe("Range Mode Features", () => {
 
     const grid = page.getByRole("grid").first();
 
-    // Select first date
+    // Select first date — the dropdown defers the commit until the user
+    // confirms via Proceed.
     await grid.locator("[data-day]").filter({ hasText: /^10$/ }).first().click();
-
-    // Menu should still be open
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Select second date
+    // Select second date — still pending; the menu stays open.
     await grid.locator("[data-day]").filter({ hasText: /^15$/ }).first().click();
-
-    // Menu should still be open (range mode doesn't auto-close)
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Check that the range is displayed in the input
+    // The trigger still shows the (empty) committed value until Proceed.
+    await expect(page.getByTestId("datePicker")).not.toContainText(" - ");
+
+    await page.getByRole("button", { name: "Proceed" }).click();
+
     const datePickerText = await page.getByTestId("datePicker").textContent();
     expect(datePickerText).toContain(" - ");
   });
 
-  test("didChange event fires with range object", async ({ page, initTestBed }) => {
+  test("didChange event fires with range object after Proceed", async ({
+    page,
+    initTestBed,
+  }) => {
     const { testStateDriver } = await initTestBed(`
-      <DatePicker 
-        testId="datePicker" 
-        mode="range" 
+      <DatePicker
+        testId="datePicker"
+        mode="range"
         dateFormat="MM/dd/yyyy"
         onDidChange="(value) => testState = value"
       />
@@ -1300,15 +1314,40 @@ test.describe("Range Mode Features", () => {
     await page.getByTestId("datePicker").click();
     const grid = page.getByRole("grid").first();
 
-    // Select first date
+    // Two date clicks update the pending range; didChange should NOT fire yet.
     await grid.locator("[data-day]").filter({ hasText: /^10$/ }).first().click();
-
-    // Select second date
     await grid.locator("[data-day]").filter({ hasText: /^15$/ }).first().click();
 
-    // Check that didChange was called with a range object
+    // Commit the selection.
+    await page.getByRole("button", { name: "Proceed" }).click();
+
     const state = await testStateDriver.testState();
     expect(state).toHaveProperty("from");
     expect(state).toHaveProperty("to");
+  });
+
+  test("Cancel discards the pending range", async ({ page, initTestBed }) => {
+    const { testStateDriver } = await initTestBed(`
+      <DatePicker
+        testId="datePicker"
+        mode="range"
+        dateFormat="MM/dd/yyyy"
+        initialValue="{{ from: '05/10/2024', to: '05/15/2024' }}"
+        onDidChange="(value) => testState = value"
+      />
+    `);
+
+    await page.getByTestId("datePicker").click();
+    const grid = page.getByRole("grid", { name: "May" });
+
+    // Change the range to 20-25 but cancel before committing.
+    await grid.locator("[data-day]").filter({ hasText: /^20$/ }).first().click();
+    await grid.locator("[data-day]").filter({ hasText: /^25$/ }).first().click();
+    await page.getByRole("button", { name: "Cancel" }).click();
+
+    // The committed value is unchanged and onDidChange did not fire.
+    await expect(page.getByTestId("datePicker")).toContainText("05/10/2024 - 05/15/2024");
+    const state = await testStateDriver.testState();
+    expect(state).toBe(null);
   });
 });
