@@ -178,6 +178,14 @@ export const DatePickerMd = createMetadata({
     // Match the ModalDialog overlay so the mobile bottom-sheet dims the
     // background the same way as other modals.
     [`backgroundColor-overlay-${COMP}`]: "$backgroundColor-overlay",
+    // Day-cell modifiers — selected days, today, and disabled days each get
+    // a distinct filled-circle look.
+    [`backgroundColor-day-${COMP}--selected`]: "$color-primary-500",
+    [`textColor-day-${COMP}--selected`]: "$color-surface-0",
+    [`backgroundColor-day-${COMP}--today`]: "$color-surface-200",
+    [`textColor-day-${COMP}--today`]: "$textColor-primary",
+    [`backgroundColor-day-${COMP}--disabled`]: "$color-danger-500",
+    [`textColor-day-${COMP}--disabled`]: "$color-surface-0",
     [`paddingVertical-${COMP}`]: "$space-2",
     [`paddingHorizontal-${COMP}`]: "$space-2",
   },
