@@ -95,6 +95,14 @@ export interface ComponentDefCore {
   uses?: string[];
 
   /**
+   * Автоматично обчислений мінімальний набір імен батьківського стану,
+   * що реально використовуються в піддереві цього вузла.
+   * Заповнюється `computeUsesForTree()` під час transform/boot.
+   * Якщо `uses` визначено явно — `computedUses` ігнорується.
+   */
+  computedUses?: string[];
+
+  /**
    * Arbitrary debug information that can be attached to a component definition.
    * Current usage:
    * - `debug: { source: { start: number, end: number } }` The start and end
