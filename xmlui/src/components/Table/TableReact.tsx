@@ -1,6 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
-import { flushSync } from "react-dom";
 import type {
   CellContext,
   Column,
@@ -1548,26 +1547,22 @@ export const Table = memo(forwardRef(function Table(
       for (const [id, w] of constrainedWidths.entries()) {
         widths[id] = w;
       }
-      flushSync(() => {
-        setColumnSizing((prev: any) => {
-          const next = { ...prev, ...widths };
-          table.getAllColumns().forEach((col) => {
-            if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
-              delete next[col.id];
-            }
-          });
-          // Bail if the resulting sizing is identical — prevents redistribute → setState
-          // → useEffect → redistribute infinite loops when touched-column sizes are unchanged.
-          const prevKeys = Object.keys(prev);
-          const nextKeys = Object.keys(next);
-          if (
-            prevKeys.length === nextKeys.length &&
-            nextKeys.every((k) => prev[k] === next[k])
-          ) {
-            return prev;
+      setColumnSizing((prev: any) => {
+        const next = { ...prev, ...widths };
+        table.getAllColumns().forEach((col) => {
+          if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
+            delete next[col.id];
           }
-          return next;
         });
+        const prevKeys = Object.keys(prev);
+        const nextKeys = Object.keys(next);
+        if (
+          prevKeys.length === nextKeys.length &&
+          nextKeys.every((k) => prev[k] === next[k])
+        ) {
+          return prev;
+        }
+        return next;
       });
       // Snapshot touched column sizes so the redistribute effect can detect user-driven changes
       const snapshot: Record<string, number> = {};
