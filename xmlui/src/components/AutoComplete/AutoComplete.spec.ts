@@ -714,7 +714,7 @@ test.describe("Theme Variables", () => {
 
   test.fixme(
     "applies correct fontSize to placeholder",
-    SKIP_REASON.UNSURE("Does AutoComplete applies the correct css for the placeholder?"),
+    SKIP_REASON.OTHER("Does AutoComplete apply the correct css for the placeholder?"),
     async ({ initTestBed, page }) => {
       await initTestBed(`<AutoComplete testId="test" placeholder="Search..." />`, {
         testThemeVars: { "fontSize-placeholder-AutoComplete--default": "20px" },

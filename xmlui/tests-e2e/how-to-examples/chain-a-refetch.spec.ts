@@ -12,13 +12,16 @@ const markdown = getExampleSource(
 test.describe("Click the Like button", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "Click the Like button");
 
-  test("initial state shows the timeline posts and engagement counts", async ({
+  test("initial state shows the timeline posts, engagement counts, and Idle badge", async ({
     initTestBed,
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
 
     await expect(page.getByRole("heading", { name: "Social Media Timeline" })).toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+    await expect(page.getByText("Posting", { exact: true })).not.toBeVisible();
+    await expect(page.getByText("Refetching", { exact: true })).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "John Developer" })).toBeVisible();
     await expect(page.getByText("This is a great post about XMLUI!")).toBeVisible();
     await expect(page.getByText("5", { exact: true })).toBeVisible();
@@ -37,6 +40,7 @@ test.describe("Click the Like button", { tag: "@website" }, () => {
 
     await expect.poll(async () => await page.getByText("6", { exact: true }).count()).toBe(1);
     await expect(page.getByText("5", { exact: true })).not.toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
   });
 
   test("clicking like on a favorited post refetches the decremented count", async ({
@@ -49,5 +53,20 @@ test.describe("Click the Like button", { tag: "@website" }, () => {
 
     await expect.poll(async () => await page.getByText("11", { exact: true }).count()).toBe(1);
     await expect(page.getByText("12", { exact: true })).not.toBeVisible();
+    await expect(page.getByText("Idle", { exact: true })).toBeVisible();
+  });
+
+  test("clicking like surfaces the Posting badge while the APICall is in flight", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(app, { components, apiInterceptor });
+
+    await page.getByRole("button", { name: "like" }).first().click();
+
+    await expect(page.getByText("Posting", { exact: true })).toBeVisible();
+    await expect.poll(async () => await page.getByText("Idle", { exact: true }).count()).toBe(1);
+    await expect(page.getByText("Posting", { exact: true })).not.toBeVisible();
+    await expect(page.getByText("Refetching", { exact: true })).not.toBeVisible();
   });
 });

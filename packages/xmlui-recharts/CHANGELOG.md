@@ -1,5 +1,11 @@
 # xmlui-recharts
 
+## 0.1.2
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.1
 
 ### Patch Changes

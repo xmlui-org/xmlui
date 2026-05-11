@@ -66,4 +66,4 @@ Sometimes a navigation must happen in response to logic — after a form submiss
 
 - [Deep-link to a tab or section](/docs/howto/deep-link-to-a-tab-or-section) — use `navigate()` with `queryParams` to keep the address bar in sync with tab state
 - [Implement an authentication gate](/docs/howto/implement-an-authentication-gate) — redirect to the app after a successful login
-- [Switch between hash and history routing](/docs/howto/switch-between-hash-and-history-routing) — choose the URL format that `navigate()` operates on
+- [Routing and links](/docs/guides/routing-and-links) — choose the URL format that `navigate()` operates on, and configure server-side fallback for history mode

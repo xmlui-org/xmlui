@@ -26,6 +26,15 @@ When you initiate the refetching of data (e.g., with the `refetch` method or set
 
 By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
 
+## Reading values: wrapper vs `.value`
+
+When reading a `DataSource` in code, distinguish the reactive wrapper from the fetched data:
+
+- `userData` — the reactive wrapper object, including `value`, `loaded`, `inProgress`, `isRefetching`, and `error`.
+- `userData.value` — the raw payload returned by the request.
+
+Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
+
 %-DESC-END
 
 %-PROP-START completedNotificationMessage

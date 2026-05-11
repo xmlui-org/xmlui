@@ -31,6 +31,7 @@ test.describe("Parse CSV and JSON file uploads", { tag: "@website" }, () => {
     );
 
     await expect(page.getByText("Loaded 6 rows from sample-products.csv (CSV)")).toBeVisible();
+    await expect(page.getByText("Detected columns: name, price, category, inStock")).toBeVisible();
     await expect(page.getByTestId("parsedRows")).toContainText("Widget");
     await expect(page.getByTestId("parsedRows")).toContainText("Electronics");
   });
@@ -48,6 +49,7 @@ test.describe("Parse CSV and JSON file uploads", { tag: "@website" }, () => {
     );
 
     await expect(page.getByText("Loaded 6 rows from sample-products.json (JSON)")).toBeVisible();
+    await expect(page.getByText("Detected columns: name, price, category, inStock")).toBeVisible();
     await expect(page.getByTestId("parsedRows")).toContainText("Gadget");
     await expect(page.getByTestId("parsedRows")).toContainText("Tools");
   });

@@ -1,8 +1,10 @@
 {
   "name": "xmlui-test-extension",
   "type": "module",
-  "version": "0.1.0",
-  "sideEffects": ["**/*.css"],
+  "version": "0.1.1",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "import": "./dist/xmlui-test-extension.mjs",
@@ -15,5 +17,7 @@
   "devDependencies": {
     "xmlui": "*"
   },
-  "files": ["dist"]
+  "files": [
+    "dist"
+  ]
 }

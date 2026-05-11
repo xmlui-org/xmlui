@@ -1,18 +1,26 @@
 # Add breadcrumb navigation
 
-Build a breadcrumb trail so users can navigate back to any parent page.
+Define a reusable `Breadcrumbs` component and drop a `<Breadcrumbs ancestors="..." current="..." />` on every page so users can navigate back to any parent page.
 
-Each page composes its own breadcrumb bar: ancestor pages are `Link` components pointing to their respective routes, separated by a `Text` divider, with the current page shown as plain text. For dynamic route segments, use `$routeParams` to display the matched value — no hard-coded label needed.
+XMLUI has no built-in breadcrumb — you compose one from `Link` and `Text`. Rather than copy-paste that pattern onto every page, factor it into a user-defined component that takes two props: `ancestors` (an array of clickable steps, each with a `label` and a `to`) and `current` (the label of the page you're on). Each page then names the construct in markup with `<Breadcrumbs ancestors="{[...]}" current="..." />`. For dynamic route segments, pass `$routeParams.slug` (or whatever the segment is called) as the `current` value — no hard-coded label needed.
 
 ```xmlui-pg copy display name="Breadcrumb bar from route segments" height="350px"
+---comp display
+<Component name="Breadcrumbs">
+  <HStack verticalAlignment="center">
+    <Items data="{$props.ancestors}">
+      <Link to="{$item.to}" label="{$item.label}" />
+      <Text variant="secondary">/</Text>
+    </Items>
+    <Text variant="secondary">{$props.current}</Text>
+  </HStack>
+</Component>
 ---app display
 <App scrollWholePage="false">
   <Pages>
     <Page url="/">
       <VStack>
-        <HStack verticalAlignment="center">
-          <Text variant="secondary">Home</Text>
-        </HStack>
+        <Breadcrumbs ancestors="{[]}" current="Home" />
         <Text>Welcome to the project hub. Navigate to a section below.</Text>
         <HStack>
           <Link to="/projects" label="Projects" />
@@ -22,11 +30,9 @@ Each page composes its own breadcrumb bar: ancestor pages are `Link` components 
     </Page>
     <Page url="/projects">
       <VStack>
-        <HStack verticalAlignment="center">
-          <Link to="/" label="Home" />
-          <Text variant="secondary">/</Text>
-          <Text variant="secondary">Projects</Text>
-        </HStack>
+        <Breadcrumbs
+          ancestors="{[{ label: 'Home', to: '/' }]}"
+          current="Projects" />
         <Text>All projects listed here.</Text>
         <HStack>
           <Link to="/projects/alpha" label="Project Alpha" />
@@ -36,24 +42,21 @@ Each page composes its own breadcrumb bar: ancestor pages are `Link` components 
     </Page>
     <Page url="/projects/:slug">
       <VStack>
-        <HStack verticalAlignment="center">
-          <Link to="/" label="Home" />
-          <Text variant="secondary">/</Text>
-          <Link to="/projects" label="Projects" />
-          <Text variant="secondary">/</Text>
-          <Text variant="secondary">{$routeParams.slug}</Text>
-        </HStack>
+        <Breadcrumbs
+          ancestors="{[
+            { label: 'Home', to: '/' },
+            { label: 'Projects', to: '/projects' }
+          ]}"
+          current="{$routeParams.slug}" />
         <Text fontWeight="bold">Project: {$routeParams.slug}</Text>
         <Text>Details for this project go here.</Text>
       </VStack>
     </Page>
     <Page url="/settings">
       <VStack>
-        <HStack verticalAlignment="center">
-          <Link to="/" label="Home" />
-          <Text variant="secondary">/</Text>
-          <Text variant="secondary">Settings</Text>
-        </HStack>
+        <Breadcrumbs
+          ancestors="{[{ label: 'Home', to: '/' }]}"
+          current="Settings" />
         <Text>Application settings.</Text>
       </VStack>
     </Page>
@@ -63,13 +66,13 @@ Each page composes its own breadcrumb bar: ancestor pages are `Link` components 
 
 ## Key points
 
-**`$routeParams` exposes named route parameters**: A route pattern like `/projects/:slug` makes `$routeParams.slug` available. Use it to display the current entity name in the last breadcrumb segment instead of a generic label.
+**Define `Breadcrumbs` once, use it everywhere**: A user-defined `<Component name="Breadcrumbs">` accepts `ancestors` and `current` and renders the trail. Each page emits `<Breadcrumbs ancestors="{[...]}" current="..." />`, naming the construct in markup so a reader can see at a glance where the breadcrumb is. Page bodies stay focused on page-specific content.
 
-**The last segment is plain text, not a link**: Breadcrumb convention is that the current page is shown as non-clickable text while all ancestor pages are clickable `Link` components.
+**Two props split clickable from current**: `ancestors` is the list of pages above the current one — each entry has a `label` and a `to`. `current` is the label of the page itself, rendered as plain non-clickable text after the loop. The split removes the need for any `when=` conditionals inside the component.
 
-**Use `Link` for ancestor segments and `Text` for separators**: Each `Link` has a `to` pointing to the parent path. A `<Text variant="secondary">/</Text>` between segments provides the visual divider without any click behaviour.
+**Items renders Link + separator, then `current` follows**: Each iteration of `<Items data="{$props.ancestors}">` renders a `Link` and a `/` separator. After the loop, a single `<Text variant="secondary">{$props.current}</Text>` renders the current page. On the home page, `ancestors` is empty so `Items` produces nothing and only the current label appears — no extra logic needed.
 
-**Extract the breadcrumb into a reusable component for multi-page apps**: When every page needs a breadcrumb, create a user-defined `Breadcrumbs` component that receives a `path` array prop (e.g. `[{ label, to }, ...]`) and renders the `HStack` of links. This keeps individual page markup clean.
+**`$routeParams` fills in dynamic segments**: A route pattern like `/projects/:slug` makes `$routeParams.slug` available. Pass `current="{$routeParams.slug}"` so the breadcrumb shows the matched value (e.g. `alpha`) instead of a generic placeholder.
 
 ---
 

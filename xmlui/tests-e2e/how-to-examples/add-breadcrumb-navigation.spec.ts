@@ -15,7 +15,7 @@ test.describe("Breadcrumb bar from route segments", { tag: "@website" }, () => {
     "Breadcrumb bar from route segments",
   );
 
-  test("home page shows navigation links and no Home breadcrumb link", async ({
+  test("home page shows navigation links, no Home breadcrumb link, and no separator", async ({
     initTestBed,
     page,
   }) => {
@@ -25,18 +25,25 @@ test.describe("Breadcrumb bar from route segments", { tag: "@website" }, () => {
     await expect(page.getByRole("link", { name: "Settings" })).toBeVisible();
     // Home is the current page so it is plain text, not a link
     await expect(page.getByRole("link", { name: "Home" })).not.toBeVisible();
+    // Single-segment path: no separator
+    await expect(page.getByText("/", { exact: true })).toHaveCount(0);
   });
 
-  test("navigating to Projects shows a Home breadcrumb link", async ({ initTestBed, page }) => {
+  test("navigating to Projects shows a Home breadcrumb link and one separator", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("link", { name: "Projects" }).click();
     await expect(page.getByText("All projects listed here.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
     // Projects is the current page so it is plain text, not a link
     await expect(page.getByRole("link", { name: "Projects" })).not.toBeVisible();
+    // Two-segment path: exactly one separator between Home and Projects
+    await expect(page.getByText("/", { exact: true })).toHaveCount(1);
   });
 
-  test("navigating to a project slug shows the full breadcrumb trail", async ({
+  test("navigating to a project slug shows the full breadcrumb trail and two separators", async ({
     initTestBed,
     page,
   }) => {
@@ -48,12 +55,18 @@ test.describe("Breadcrumb bar from route segments", { tag: "@website" }, () => {
     // The slug "alpha" is the current segment — plain text, not a link
     await expect(page.getByText("alpha", { exact: true })).toBeVisible();
     await expect(page.getByText("Project: alpha")).toBeVisible();
+    // Three-segment path: exactly two separators
+    await expect(page.getByText("/", { exact: true })).toHaveCount(2);
   });
 
-  test("navigating to Settings shows the Home breadcrumb link", async ({ initTestBed, page }) => {
+  test("navigating to Settings shows the Home breadcrumb link and one separator", async ({
+    initTestBed,
+    page,
+  }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("link", { name: "Settings" }).click();
     await expect(page.getByText("Application settings.")).toBeVisible();
     await expect(page.getByRole("link", { name: "Home" })).toBeVisible();
+    await expect(page.getByText("/", { exact: true })).toHaveCount(1);
   });
 });

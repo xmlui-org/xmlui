@@ -1,5 +1,11 @@
 # xmlui-animations
 
+## 0.1.16
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.15
 
 ### Patch Changes

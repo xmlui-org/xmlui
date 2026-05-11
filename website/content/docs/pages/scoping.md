@@ -146,7 +146,7 @@ A variable declared in a user-defined component can be passed into another user-
 
 ## Global variables
 
-A [global variable](../markup#global-variables) declared in the root element of `Main.xmlui`, or in the `Globals.xs` file is visible in all files at any level.
+A [global variable](/docs/guides/markup#global-variables) declared in the root element of `Main.xmlui`, or in the `Globals.xs` file is visible in all files at any level.
 
 Local variables can shadow global variables:
 
@@ -182,6 +182,33 @@ Local variables can shadow global variables:
   <Button onClick="count = count + 1" label="Increment" />
 </App>
 ```
+
+### Declaring globals in `Globals.xs`
+
+Globals can also live in a code-behind file named exactly `Globals.xs` at the project root. Top-level `var` and `function` declarations in that file become globals — equivalent in reach and reactivity to declaring them with `global.` on the App root, but kept out of the markup.
+
+```js
+// Globals.xs
+var stations = ['Bakerloo', 'Central', 'Circle'];
+
+function formatStation(name) {
+  return name + ' line';
+}
+```
+
+```xmlui
+<!-- Main.xmlui — no global. declarations needed -->
+<App>
+  <H2>Station list</H2>
+  <Items data="{stations}">
+    <Text>{ formatStation($item) }</Text>
+  </Items>
+</App>
+```
+
+`stations` and `formatStation` are visible from any component, including user-defined ones, with no prop-threading. Reactivity behaves the same as `global.` declarations in markup: assigning to `stations` from any handler re-renders every consumer.
+
+`Globals.xs` is **not** the same as `Main.xmlui.xs` — the latter is the App's component-specific code-behind, and its declarations are local to Main, not global. See [Scripting › Code-Behind files](/docs/guides/scripting#code-behind-files) for the full distinction.
 
 ## Component IDs
 

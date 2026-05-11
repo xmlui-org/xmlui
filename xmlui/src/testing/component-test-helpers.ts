@@ -149,7 +149,7 @@ class TestSkipReason {
   }
 
   // Need to specify a reason here!
-  UNSURE(description: string) {
+  OTHER(description: string) {
     return this.addAnnotation("unsure", description);
   }
 }

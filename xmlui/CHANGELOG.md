@@ -1,5 +1,31 @@
 # xmlui
 
+## 0.12.27
+
+### Patch Changes
+
+- 61f078d: Add `allowConsole` appGlobals switch (default `true`). Previously `window.console` access in expressions always produced an `[XMLUI sandbox]` warning; now it is permitted by default. Set `appGlobals.allowConsole: false` to restore the sandboxed behaviour (warn or throw per `strictDomSandbox`).
+- 5ff51a0: fix: strange break when rendering form items in a HStack
+- f2abca7: fix: Select placeholder does not use the right theme
+- 0b7c318: Fix script functions not callable from event handlers when the script contains template literals.
+
+  Functions defined in a `<script>` block were silently not hoisted to the parent component when the script contained template literal interpolations (e.g. `` `${n}` ``). This caused calls like `onClick="loop(100)"` to fail with no error when `loop` used a template literal in its body.
+
+  Root cause: `hoistScriptCollectedFromFragments` used `child.script?.includes("$")` to detect context-variable references (e.g. `$item`), but this check incorrectly matched `${...}` inside template literals. The fix narrows the check to `/\$[a-zA-Z_]/`, which matches `$identifier` patterns only.
+
+- 61407a8: feat: add --port option to xmlui preview
+- 29947d4: widen the search space `xmlui ssg` uses to find page routes.
+- 69d4762: Add reactive cycle detection (warn-only probe — Plan #03 Phase 1). On app
+  startup, the runtime now statically analyses the dependency graph between
+  `var` declarations, code-behind `function`s, and `DataSource` / `APICall`
+  loaders and reports any closed loops as a `kind:"reactive-cycle"` Inspector
+  trace entry plus a single `console.warn` per unique cycle. Detection is
+  warn-only by default; setting `App.appGlobals.strictReactiveGraph: true`
+  escalates each cycle to `console.error`. The detector never throws and never
+  blocks rendering.
+- 4caecde: fix: Select does not respect the explicit width when used with wrapContent
+- dbae535: Tweak color of codeblock row selection in dark mode and Inspector container header background.
+
 ## 0.12.26
 
 ### Patch Changes

@@ -23,8 +23,8 @@ test.describe("Equal-width stat cards with HStack wrapContent", { tag: "@website
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByText("Outstanding", { exact: true })).toBeVisible();
-    await expect(page.getByText("Paid This Year", { exact: true })).toBeVisible();
+    await expect(page.getByText("Unpaid", { exact: true })).toBeVisible();
+    await expect(page.getByText("Paid", { exact: true })).toBeVisible();
     await expect(page.getByText("Draft", { exact: true })).toBeVisible();
     await expect(page.getByText("Sent", { exact: true })).toBeVisible();
   });
@@ -39,13 +39,13 @@ test.describe("Equal-width stat cards with HStack wrapContent", { tag: "@website
 
   test("all four cards share the same row (equal Y position)", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    const outstanding = page.getByText("Outstanding", { exact: true });
-    const paidThisYear = page.getByText("Paid This Year", { exact: true });
+    const unpaid = page.getByText("Unpaid", { exact: true });
+    const paid = page.getByText("Paid", { exact: true });
     const draft = page.getByText("Draft", { exact: true });
     const sent = page.getByText("Sent", { exact: true });
     const [a, b, c, d] = await Promise.all([
-      outstanding.boundingBox(),
-      paidThisYear.boundingBox(),
+      unpaid.boundingBox(),
+      paid.boundingBox(),
       draft.boundingBox(),
       sent.boundingBox(),
     ]);
@@ -60,13 +60,13 @@ test.describe("Equal-width stat cards with HStack wrapContent", { tag: "@website
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
-    const outstanding = page.getByText("Outstanding", { exact: true });
-    const paidThisYear = page.getByText("Paid This Year", { exact: true });
+    const unpaid = page.getByText("Unpaid", { exact: true });
+    const paid = page.getByText("Paid", { exact: true });
     const draft = page.getByText("Draft", { exact: true });
     const sent = page.getByText("Sent", { exact: true });
     const [a, b, c, d] = await Promise.all([
-      outstanding.boundingBox(),
-      paidThisYear.boundingBox(),
+      unpaid.boundingBox(),
+      paid.boundingBox(),
       draft.boundingBox(),
       sent.boundingBox(),
     ]);

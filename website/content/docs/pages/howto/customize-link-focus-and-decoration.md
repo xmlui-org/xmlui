@@ -24,9 +24,8 @@ Link theming covers three areas: text decoration (underline style, color, and th
     gap-icon-Link="0.4em"
   >
     <VStack>
-      <Link to="https://example.com" label="External link with underline" />
-      <Link to="https://example.com" label="Link with icon" icon="link" />
-      <Text>Inline <Link label="link inside text" to="/docs" /> looks correct.</Text>
+      <Link to="https://example.com" target="_blank" label="External link (opens in new tab)" />
+      <Link to="https://example.com" target="_blank" label="Link with icon" icon="link" />
     </VStack>
   </Theme>
 </App>
@@ -43,6 +42,8 @@ Link theming covers three areas: text decoration (underline style, color, and th
 **`gap-icon-Link` spaces the icon from the label**: When a Link has an `icon` attribute, this var controls the horizontal space between icon and text. Use an `em`-relative value so the gap scales with the font size.
 
 **`textColor-Link--active` highlights the current route**: When a `Link` points to the current route, XMLUI applies the `--active` state. Set `textColor-Link--active` to a distinct color to visually identify the current page.
+
+**Open external links in a new tab with `target="_blank"`**: `Link` accepts the standard HTML `target` values. Use `target="_blank"` to open the destination in a new browser tab — conventional for external URLs (where the user is leaving your app's context) and inappropriate for internal routes (which should stay in-tab so back/forward navigation works).
 
 ---
 

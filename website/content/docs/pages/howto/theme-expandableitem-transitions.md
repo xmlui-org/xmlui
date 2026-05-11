@@ -6,7 +6,7 @@ ExpandableItem has two styleable regions: the `summary` (the always-visible clic
 
 The three examples below show the same summary styling with three different animation speeds — click any header to see the difference.
 
-**Fast / snappy** (`0.15s` with an overshoot easing):
+**Fast / snappy** (`0.25s` with an overshoot easing):
 
 ```xmlui-pg copy display name="ExpandableItem snappy animation"
 ---app display
@@ -21,7 +21,7 @@ The three examples below show the same summary styling with three different anim
     paddingVertical-summary-ExpandableItem="12px"
     paddingHorizontal-summary-ExpandableItem="16px"
     border-summary-ExpandableItem="1px solid $color-surface-200"
-    animationDuration-content-ExpandableItem="0.15s"
+    animationDuration-content-ExpandableItem="0.25s"
     animation-content-ExpandableItem="cubic-bezier(0.16, 1, 0.3, 1)"
     paddingVertical-content-ExpandableItem="12px"
     paddingHorizontal-content-ExpandableItem="16px"

@@ -1,5 +1,11 @@
 # xmlui-pdf
 
+## 0.1.13
+
+### Patch Changes
+
+- c26758d: Bump extension package versions
+
 ## 0.1.12
 
 ### Patch Changes
