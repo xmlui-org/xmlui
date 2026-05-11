@@ -666,16 +666,24 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   // ===== RANGE SELECTION =====
 
-  // Range cells form a horizontal pill: start cell has a grey "tail" on its
-  // right (toward the middle), end cell has a grey tail on its left, middle
-  // cells fill the whole cell width with grey. The selected endpoints sit on
-  // top as solid coloured circles.
+  // Range cells form a continuous horizontal pill. The start and end cells
+  // paint a solid selected-colour background that's rounded on the outward
+  // edge (semi-circle) and flat on the inward edge so they merge cleanly into
+  // the grey middle cells.
+
+  // Start and end render as clean circular day buttons. The cell background
+  // is half transparent / half hover-colour so the grey middle bar appears
+  // to flow out of the circle on the inward side without painting a square
+  // behind the ball itself. The day_button is the visible circle.
+  //
+  // The horizontal box-shadow on range_middle masks sub-pixel anti-aliasing
+  // seams between adjacent same-coloured cells at fractional pixel positions.
 
   .range_start {
     background: linear-gradient(
-      var(--rdp-gradient-direction),
+      to right,
       transparent 50%,
-      #{$backgroundColor-item-DatePicker--hover} 50%
+      $backgroundColor-item-DatePicker--hover 50%
     );
 
     .day_button {
@@ -688,6 +696,9 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .range_middle {
     background-color: $backgroundColor-item-DatePicker--hover;
+    box-shadow:
+      1px 0 0 0 $backgroundColor-item-DatePicker--hover,
+      -1px 0 0 0 $backgroundColor-item-DatePicker--hover;
 
     .day_button {
       border-color: transparent;
@@ -700,8 +711,8 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .range_end {
     background: linear-gradient(
-      var(--rdp-gradient-direction),
-      #{$backgroundColor-item-DatePicker--hover} 50%,
+      to right,
+      $backgroundColor-item-DatePicker--hover 50%,
       transparent 50%
     );
 
@@ -713,39 +724,11 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
     }
   }
 
-  // Single-day range (or pending state after first click in range mode, where
-  // react-day-picker sets {from, to} to the same day). Paint a solid hover
-  // background instead of compounding the two opposing gradients.
+  // Single-day range (or the pending state after the first click in range
+  // mode, where react-day-picker sets {from, to} to the same day). No grey
+  // background behind the ball — render as a plain selected circle.
   .range_start.range_end {
-    background-color: $backgroundColor-item-DatePicker--hover;
-    background-image: none;
-  }
-
-  // --- Row-edge pill rounding ---------------------------------------------
-  // When a range spans multiple rows, the grey background of the range_middle
-  // (and the gradient of range_start/range_end) hits the row boundary flat.
-  // Round those outward edges so each row segment looks like a discrete pill.
-
-  // Left side: the cell is the first range cell of a row.
-  // Matches:
-  //   - the first day cell of the row that's part of the range, or
-  //   - a range cell preceded by any non-range day cell (including hidden
-  //     outside cells in range mode).
-  .day.range_middle:first-of-type,
-  .day.range_end:first-of-type,
-  .day:not(.range_start):not(.range_middle):not(.range_end) + .day.range_middle,
-  .day:not(.range_start):not(.range_middle):not(.range_end) + .day.range_end {
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
-  }
-
-  // Right side: the cell is the last range cell of a row.
-  .day.range_middle:last-of-type,
-  .day.range_start:last-of-type,
-  .day.range_middle:has(+ .day:not(.range_start):not(.range_middle):not(.range_end)),
-  .day.range_start:has(+ .day:not(.range_start):not(.range_middle):not(.range_end)) {
-    border-top-right-radius: 9999px;
-    border-bottom-right-radius: 9999px;
+    background: transparent;
   }
 
   // --- Range preview on hover (first date selected, hovering over another date)

@@ -1107,10 +1107,10 @@ test.describe("Range Mode Features", () => {
     await page.getByTestId("datePicker").click();
     await expect(page.getByRole("menu")).toBeVisible();
 
-    // Range middle cells keep a solid hover-colored background; range_start and
-    // range_end use a half-and-half gradient to form a pill against the
-    // selected-day circles, so their `background-color` is transparent and
-    // the colored portion is on `background-image` instead.
+    // Range middle cells use a solid hover-colour background. Range start and
+    // end render as clean circular day buttons; their cell uses a half-and-half
+    // gradient (transparent on the outside, hover-colour on the inside) so the
+    // grey middle bar flows into the inward side of the ball.
     const middleDate = page
       .getByRole("grid", { name: "May" })
       .locator("[data-day]")
@@ -1129,7 +1129,7 @@ test.describe("Range Mode Features", () => {
     await expect(endDate).toHaveCSS("background-image", /linear-gradient/);
   });
 
-  test("single selected date in range mode has background styling", async ({
+  test("single selected date in range mode renders as a clean ball", async ({
     page,
     initTestBed,
   }) => {
@@ -1152,7 +1152,8 @@ test.describe("Range Mode Features", () => {
     await expect(page.getByRole("menu")).toBeVisible();
 
     // Select first date — in range mode this puts the picker into the
-    // single-selected state (pending range with only `from`).
+    // single-selected state (pending range with only `from`). The cell must
+    // not paint any background behind the day_button — the ball stands alone.
     await page
       .getByRole("grid")
       .first()
@@ -1161,15 +1162,14 @@ test.describe("Range Mode Features", () => {
       .first()
       .click();
 
-    // The single-selected day cell carries the .singleSelected modifier which
-    // paints the hover background.
     const selectedDate = page
       .getByRole("grid")
       .first()
       .locator("[data-day]")
       .filter({ hasText: /^10$/ })
       .first();
-    await expect(selectedDate).toHaveCSS("background-color", "rgb(240, 240, 240)");
+    await expect(selectedDate).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(selectedDate).toHaveCSS("background-image", "none");
   });
 
   test("hover preview shows background on intermediate dates", async ({ page, initTestBed }) => {
