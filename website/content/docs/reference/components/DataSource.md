@@ -27,6 +27,15 @@ When you initiate the refetching of data (e.g., with the `refetch` method or set
 
 By default, structural sharing is turned on. If you do not need this behavior, set the `structuralSharing` property to `false`.
 
+## Reading values: wrapper vs `.value` [#reading-values-wrapper-vs-value]
+
+When reading a `DataSource` in code, distinguish the reactive wrapper from the fetched data:
+
+- `userData` — the reactive wrapper object, including `value`, `loaded`, `inProgress`, `isRefetching`, and `error`.
+- `userData.value` — the raw payload returned by the request.
+
+Logging or rendering `userData` shows the wrapper's metadata; `userData.value` shows the data itself. This is a common gotcha when debugging — `console.log(userData)` displays the wrapper, while `console.log(userData.value)` displays what came back from the server.
+
 ## Behaviors [#behaviors]
 
 This component supports the following behaviors:
@@ -306,6 +315,57 @@ This event fires when a request results in an error.
 **Signature**: `error(error: Error): void`
 
 - `error`: The error object that occurred during the request.
+
+### `fetch` [#fetch]
+
+When defined, this event handler replaces the default fetch logic. The handler receives the resolved request properties as context variables: `$url`, `$method`, `$queryParams`, `$requestBody`, `$requestHeaders`, and `$pageParams` (when paging). The return value of the handler becomes the data result. Caching, polling, the `loaded`/`error` events, `resultSelector`, `transformResult`, and the `refetch()` method continue to work normally because the handler runs inside the same query function that powers the default fetch.
+
+**Signature**: `fetch(): any`
+
+When the `fetch` event is defined, its handler fully replaces the default
+network fetch. The handler runs inside the same query function used by the
+default fetch, so all of the surrounding behavior — caching, polling, the
+`refetch()` method, the `loaded` and `error` events, `resultSelector`, and
+`transformResult` — continues to work the same way.
+
+The handler receives the resolved request properties as context variables:
+
+| Variable | Description |
+| --- | --- |
+| `$url` | Resolved `url` value |
+| `$method` | Resolved HTTP `method` |
+| `$queryParams` | Resolved `queryParams` object |
+| `$requestBody` | Resolved request body (`rawBody` if set, otherwise `body`) |
+| `$requestHeaders` | Resolved `headers` object |
+| `$pageParams` | The current page parameters (only when paging is enabled) |
+
+The return value of the handler becomes the data result that downstream
+components see through the `value` property.
+
+`fetch` is the `DataSource` counterpart of the `mockExecute` event on
+[`APICall`](/components/APICall): use it to substitute custom logic
+(local computation, an alternative transport, a synthetic response for
+testing, etc.) without losing the rest of the `DataSource` machinery.
+
+```xmlui-pg copy display name="Example: replacing the fetch with custom logic"
+<App var.callCount="{0}">
+  <DataSource
+    id="ds"
+    url="/api/items"
+    onFetch="() => {
+      callCount = callCount + 1;
+      return { items: ['apple', 'banana', 'cherry'], fetchedAt: callCount };
+    }" />
+  <Text>Items: {ds.value.items.join(', ')}</Text>
+  <Text>Handler invocations: {ds.value.fetchedAt}</Text>
+  <Button label="Refetch" onClick="ds.refetch()" />
+</App>
+```
+
+Because the handler runs inside the cached query, mounting two
+`DataSource` instances with the same `url` (and `queryParams`/`body`)
+calls the handler once and shares the result across consumers. Calling
+`refetch()` invalidates that cache entry and re-invokes the handler.
 
 ### `loaded` [#loaded]
 

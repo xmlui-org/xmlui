@@ -13,7 +13,7 @@ This component supports the following behaviors:
 | Form Binding | `bindTo`, `initialValue`, `noSubmit` |
 | Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
-| Validation | `bindTo`, `required`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `verboseValidationFeedback` |
+| Validation | `bindTo`, `required`, `requiredInvalidMessage`, `minLength`, `maxLength`, `lengthInvalidMessage`, `lengthInvalidSeverity`, `minValue`, `maxValue`, `rangeInvalidMessage`, `rangeInvalidSeverity`, `pattern`, `patternInvalidMessage`, `patternInvalidSeverity`, `regex`, `regexInvalidMessage`, `regexInvalidSeverity`, `validationMode`, `customValidationsDebounce`, `validationDisplayDelay`, `verboseValidationFeedback`, `validate` |
 | Styling Variant | `variant` |
 
 ## Properties [#properties]
@@ -97,6 +97,14 @@ This property sets an optional icon to appear at the start (left side when the l
 ### `startText` [#starttext]
 
 This property sets an optional text to appear at the start (left side when the left-to-right direction is set) of the input.
+
+### `type` [#type]
+
+> [!DEF]  default: **"text"**
+
+Sets the HTML input type. Use `"password"` to hide the entered text and classify the value as a secret in the audit pipeline; `"email"` to classify the value as sensitive (PII).
+
+Available values: `text` **(default)**, `password`, `search`, `email`
 
 ### `validationIconError` [#validationiconerror]
 

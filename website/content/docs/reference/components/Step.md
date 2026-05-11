@@ -15,9 +15,21 @@ This component supports the following behaviors:
 
 ## Properties [#properties]
 
+### `completed` [#completed]
+
+> [!DEF]  default: **false**
+
+When `true`, the step header is rendered in the completed state (a checkmark glyph and the completed color). Ignored when `error` is also `true`.
+
 ### `description` [#description]
 
 Optional secondary text shown under the step label.
+
+### `error` [#error]
+
+> [!DEF]  default: **false**
+
+When `true`, the step header is rendered in the error state (red icon and label, with an `!` glyph in place of the step number).
 
 ### `icon` [#icon]
 

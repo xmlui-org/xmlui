@@ -16,7 +16,6 @@ This component supports the following behaviors:
 | --- | --- |
 | Animation | `animation`, `animationOptions` |
 | Bookmark | `bookmark`, `bookmarkLevel`, `bookmarkTitle`, `bookmarkOmitFromToc` |
-| Component Label | `label`, `labelPosition`, `labelWidth`, `labelBreak`, `required`, `enabled`, `shrinkToLabel`, `style`, `readOnly` |
 | Tooltip | `tooltip`, `tooltipMarkdown`, `tooltipOptions` |
 | Styling Variant | `variant` |
 
@@ -25,6 +24,10 @@ This component supports the following behaviors:
 ### `fields` [#fields]
 
 An optional comma-separated list of field names (matching the `bindTo` values of nested inputs) that belong to this segment. When omitted the segment auto-discovers field names by inspecting its direct and nested children for `bindTo` attributes.
+
+### `label` [#label]
+
+An optional human-readable label for this segment. `StepperForm` uses this label as the corresponding step's title; on its own, `FormSegment` does not render the label (it is metadata only).
 
 ### `orientation` [#orientation]
 
@@ -45,6 +48,12 @@ This component does not have any events.
 This property returns `true` when any field in this segment has a validation issue, and `false` when all fields are valid. This is the counterpart of `isValid`.
 
 **Signature**: `hasIssues: boolean`
+
+### `isDirty` [#isdirty]
+
+This property returns `true` when at least one field in this segment has been modified by the user (touched), and `false` when no field has been changed yet. Useful for showing validation feedback only after the user has interacted with the segment.
+
+**Signature**: `isDirty: boolean`
 
 ### `isValid` [#isvalid]
 

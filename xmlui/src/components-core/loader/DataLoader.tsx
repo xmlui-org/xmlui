@@ -38,6 +38,7 @@ type LoaderProps = {
   registerComponentApi: RegisterComponentApiFn;
   onLoaded?: (...args: any[]) => void;
   onError?: (...args: any[]) => Promise<boolean>;
+  onFetch?: (context: Record<string, any>) => Promise<any> | any;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderIsRefetchingChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
@@ -52,6 +53,7 @@ function DataLoader({
   registerComponentApi,
   onLoaded,
   onError,
+  onFetch,
   loaderInProgressChanged,
   loaderIsRefetchingChanged,
   loaderLoaded,
@@ -188,6 +190,30 @@ function DataLoader({
         } else {
           pendingTraceIdRef.current = current;
         }
+      }
+
+      // When an onFetch event handler is defined, it fully replaces the default
+      // fetching logic. The handler receives the resolved request properties as
+      // context variables and its return value becomes the data result. React
+      // Query caching still applies because this runs inside the queryFn.
+      if (onFetch) {
+        const resolvedMethod = extractParam(state, loader.props.method, appContext) || "GET";
+        const resolvedHeaders = extractParam(state, loader.props.headers, appContext) || {};
+        const resolvedQueryParams =
+          extractParam(state, loader.props.queryParams, appContext) || {};
+        const resolvedBody = rawBody
+          ? extractParam(state, loader.props.rawBody, appContext)
+          : extractParam(state, loader.props.body, appContext);
+        const resolvedUrl = extractParam(state, loader.props.url, appContext);
+        const result = await onFetch({
+          $url: resolvedUrl,
+          $method: resolvedMethod,
+          $queryParams: resolvedQueryParams,
+          $requestBody: resolvedBody,
+          $requestHeaders: resolvedHeaders,
+          $pageParams: pageParams,
+        });
+        return result === undefined ? null : result;
       }
 
       // For CSV data type, handle directly rather than using RestApiProxy
@@ -463,7 +489,7 @@ function DataLoader({
         }
       }
     },
-    [api, loader.props, state, url, body, rawBody, appContext, xsVerbose, xsLogMax],
+    [api, loader.props, state, url, body, rawBody, appContext, xsVerbose, xsLogMax, onFetch],
   );
 
   const queryId = useMemo(() => {
@@ -705,6 +731,7 @@ export const DataLoaderMd = createMetadata({
   events: {
     loaded: d("Event to trigger when the data is loaded"),
     error: d("This event fires when an error occurs while fetching data"),
+    fetch: d("When defined, this event handler replaces the default fetch logic"),
   },
 });
 
@@ -739,6 +766,14 @@ export const dataLoaderRenderer = createLoaderRenderer(
       );
     }
 
+    const onFetchSource = loader.events?.fetch;
+    const onFetch = onFetchSource
+      ? async (context: Record<string, any>) => {
+          const fn = lookupAction(onFetchSource, { eventName: "fetch", context });
+          return await fn?.();
+        }
+      : undefined;
+
     return (
       <IndexAwareDataLoader
         loader={loader}
@@ -751,6 +786,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
         transformResult={lookupSyncCallback(loader.props.transformResult)}
         onLoaded={lookupAction(loader.events?.loaded, { eventName: "loaded" })}
         onError={lookupAction(loader.events?.error, { eventName: "error" })}
+        onFetch={onFetch}
         structuralSharing={extractValue.asOptionalBoolean(loader.props.structuralSharing)}
       />
     );
