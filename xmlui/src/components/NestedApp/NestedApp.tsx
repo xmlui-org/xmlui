@@ -56,7 +56,7 @@ export const NestedAppMd = createMetadata({
     [`paddingTop-${COMP}`]: "0",
     [`border-${COMP}`]: "0.5px solid $borderColor",
     [`borderRadius-${COMP}`]: "$space-2",
-    [`backgroundColor-frame-${COMP}`]: "$color-primary-50",
+    [`backgroundColor-frame-${COMP}`]: "$color-surface-100",  // NOTE: for some reason, this affects border color, we match it with borderColor-CodeBlock
     [`gap-frame-${COMP}`]: "0",
     [`fontWeight-header-${COMP}`]: "$fontWeight-bold",
     [`boxShadow-${COMP}`]: "0px 0px 32px 0px rgba(0, 0, 0, 0.05)",
@@ -80,7 +80,7 @@ export const NestedAppMd = createMetadata({
     [`borderRadius-button-splitView-${COMP}`]: "$space-1",
     [`borderColor-button-splitView-${COMP}`]: "transparent",
     dark: {
-      [`backgroundColor-frame-${COMP}`]: "$color-surface-50",
+      [`backgroundColor-frame-${COMP}`]: "$color-surface-100",  // NOTE: for some reason, this affects border color, we match it with borderColor-CodeBlock
       [`backgroundColor-button-splitView-${COMP}--active`]: "$color-surface-200",
       [`color-button-splitView-${COMP}`]: "$color-surface-500",
       [`color-button-splitView-${COMP}--active`]: "$color-surface-100",

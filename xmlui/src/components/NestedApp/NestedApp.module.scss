@@ -64,7 +64,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     height: 100%;
     background-color: t.$backgroundColor;
     position: relative;
-    border-radius: $borderRadius-NestedApp;
   }
 
   .loadingContainer {
@@ -132,7 +131,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: t.$backgroundColor;
-    border-radius: 0 0 $borderRadius-NestedApp $borderRadius-NestedApp;
 
     &.shouldAnimate {
       transition:
@@ -150,8 +148,6 @@ $border-NestedApp: createThemeVar("border-#{$component}");
       }
     }
   }
-
-  // --- End of theme variables collection
 
   .nestedAppContainer {
     @include t.paddingVars($themeVars, $component);
@@ -287,14 +283,12 @@ $border-NestedApp: createThemeVar("border-#{$component}");
     position: relative;
     isolation: isolate;
     background-color: transparent;
-    border-radius: $borderRadius-NestedApp;
   }
 
   .content {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    border-radius: $borderRadius-NestedApp;
   }
 }
 
