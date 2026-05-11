@@ -100,6 +100,7 @@ $borderColor-DatePicker--disabled: createThemeVar("Input:borderColor-DatePicker-
 $boxShadow-menu-DatePicker: createThemeVar("Input:boxShadow-menu-DatePicker");
 $backgroundColor-menu-DatePicker: createThemeVar("Input:backgroundColor-menu-DatePicker");
 $borderRadius-menu-DatePicker: createThemeVar("Input:borderRadius-menu-DatePicker");
+$backgroundColor-overlay-DatePicker: createThemeVar("Input:backgroundColor-overlay-DatePicker");
 
 // --- Variant mixin
 @mixin variant($variantName) {
@@ -215,12 +216,74 @@ $borderColor-selectedItem-DatePicker: createThemeVar("Input:borderColor-selected
 
   .datePickerMenu {
     padding: t.$space-4;
-    overflow-y: auto;
+    overflow: auto;
     height: fit-content;
+    // `!important` is required because the trigger's dynamic theme class (in a
+    // later @layer) is also applied to the popover content and would otherwise
+    // force the dropdown to inherit the trigger's narrow width. Cap both
+    // dimensions to the viewport space Radix reports so the dropdown never
+    // extends past the screen edge — combined with `overflow: auto`, the
+    // calendar gets an internal scrollbar if the natural content is taller
+    // than the available vertical space.
+    width: max-content !important;
+    max-width: var(--radix-popover-content-available-width, 100vw);
+    max-height: var(--radix-popover-content-available-height, 100vh);
     box-shadow: $boxShadow-menu-DatePicker;
     background-color: $backgroundColor-menu-DatePicker;
     border-radius: $borderRadius-menu-DatePicker;
     border: 1px solid $rdp-accent-color;
+  }
+
+  // ===== MOBILE BOTTOM SHEET =====
+  // On small viewports the calendar
+  // is rendered as a Radix Dialog styled as a bottom sheet with a dimming
+  // backdrop instead of an anchored Popover.
+
+  .mobileBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: $backgroundColor-overlay-DatePicker;
+    animation: dpFadeIn 0.2s ease-out;
+  }
+
+  .mobileSheet {
+    position: fixed;
+    z-index: 51;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100% !important;
+    max-width: 100vw;
+    max-height: 90vh;
+    border-radius: t.$space-4 t.$space-4 0 0;
+    border-bottom: none;
+    // Override the Popover-mode positioning hint that Radix Dialog never sets
+    // (but the shared selectors might assume).
+    transform: none;
+    animation: dpSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .srOnly {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @keyframes dpFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes dpSlideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
   }
 
   // ===== CALENDAR ROOT & CSS CUSTOM PROPERTIES =====

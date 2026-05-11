@@ -635,6 +635,103 @@ test("input with label has correct width in %", async ({ page, initTestBed }) =>
   expect(width).toBe(200);
 });
 
+// Regression test for dropdown content clipping with a narrow trigger.
+// Bug: the dynamic theme class that carries the trigger's width is also
+// applied to the popover content (DatePicker.tsx passes the same className as
+// contentClassName), so a narrow trigger like 150px would shrink the calendar
+// dropdown and clip the day columns. The dropdown must stay at least as wide
+// as its natural calendar content.
+test("dropdown is not clipped by a narrow trigger width", async ({ page, initTestBed }) => {
+  await initTestBed(`<DatePicker testId="datePicker" width="150px" />`);
+
+  const trigger = page.getByTestId("datePicker");
+  await trigger.click();
+
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+
+  const triggerBox = await trigger.boundingBox();
+  const menuBox = await menu.boundingBox();
+
+  expect(menuBox.width).toBeGreaterThan(triggerBox.width);
+
+  const hasHorizontalOverflow = await menu.evaluate(
+    (el) => el.scrollWidth > el.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+});
+
+// Regression test for the dropdown overflowing the viewport on small screens.
+// At narrow viewport widths the dropdown switches to a bottom-sheet layout
+// (shadcn's responsive Date Picker pattern); it must stay within the viewport
+// no matter how narrow the trigger is.
+test("dropdown stays within the viewport on narrow screens", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await initTestBed(`<DatePicker testId="datePicker" width="150px" />`);
+
+  const trigger = page.getByTestId("datePicker");
+  await trigger.click();
+
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+
+  // Wait for the slide-up animation to settle before measuring position.
+  await page.waitForFunction(() => {
+    const el = document.querySelector('[role="menu"]') as HTMLElement | null;
+    if (!el) return false;
+    const transform = getComputedStyle(el).transform;
+    return transform === "none" || transform.startsWith("matrix(1, 0, 0, 1, 0, 0)");
+  });
+
+  const menuBox = await menu.boundingBox();
+  const viewportSize = page.viewportSize();
+
+  // The dropdown must not extend past either edge of the viewport. Allow 1px
+  // of subpixel tolerance.
+  expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(viewportSize.width + 1);
+  expect(menuBox.x).toBeGreaterThanOrEqual(-1);
+  expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(viewportSize.height + 1);
+});
+
+// Regression test for the dropdown overflowing the viewport vertically — most
+// visible in range mode where two months stack vertically on narrow screens.
+// At this viewport size the dropdown switches to a bottom-sheet (mobile)
+// layout that must stay within the viewport and scroll its content
+// internally instead of pushing past the screen edge.
+test("dropdown height is capped by the viewport in range mode", async ({ page, initTestBed }) => {
+  await page.setViewportSize({ width: 375, height: 500 });
+  await initTestBed(`<DatePicker testId="datePicker" mode="range" />`);
+
+  const trigger = page.getByTestId("datePicker");
+  await trigger.click();
+
+  const menu = page.getByRole("menu");
+  await expect(menu).toBeVisible();
+
+  // Wait for the slide-up animation to settle before measuring position.
+  await page.waitForFunction(() => {
+    const el = document.querySelector('[role="menu"]') as HTMLElement | null;
+    if (!el) return false;
+    const transform = getComputedStyle(el).transform;
+    return transform === "none" || transform.startsWith("matrix(1, 0, 0, 1, 0, 0)");
+  });
+
+  const menuBox = await menu.boundingBox();
+  const viewportSize = page.viewportSize();
+
+  // The dropdown must not extend past the bottom edge of the viewport. Allow
+  // 1px of subpixel tolerance.
+  expect(menuBox.y + menuBox.height).toBeLessThanOrEqual(viewportSize.height + 1);
+  expect(menuBox.y).toBeGreaterThanOrEqual(-1);
+
+  // In range mode at 500px viewport height, two stacked months don't fit, so
+  // the dropdown must scroll internally rather than overflow.
+  const hasVerticalScroll = await menu.evaluate(
+    (el) => el.scrollHeight > el.clientHeight,
+  );
+  expect(hasVerticalScroll).toBe(true);
+});
+
 // Regression test for height alignment with sibling input components.
 // Bug: DatePicker rendered taller than TextBox/Select/NumberBox/AutoComplete
 // because PR #3280 added `line-height: normal` to other inputs but missed
