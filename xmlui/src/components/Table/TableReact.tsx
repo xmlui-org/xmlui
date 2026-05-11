@@ -1,6 +1,5 @@
 import type { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef, useCallback, useEffect, useMemo, useRef, useState, memo } from "react";
-import { flushSync } from "react-dom";
 import type {
   CellContext,
   Column,
@@ -1448,16 +1447,17 @@ export const Table = memo(forwardRef(function Table(
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
     const lastMeasuredWidthRef = useRef<number | null>(null);
+    const lastTouchedSizesRef = useRef<Record<string, number>>({});
     const columnSizeTouched = useCallback((id: string) => {
       touchedSizesRef.current[id] = true;
     }, []);
 
-    const recalculateStarSizes = useEvent(() => {
+    const recalculateStarSizes = useEvent((resizedColumnId?: string) => {
       if (!tableRef.current) {
         return;
       }
-      const measuredWidth = tableRef.current.clientWidth;
-      if (measuredWidth === lastMeasuredWidthRef.current) {
+      const measuredWidth = Math.floor(tableRef.current.getBoundingClientRect().width);
+      if (resizedColumnId === undefined && measuredWidth === lastMeasuredWidthRef.current) {
         return;
       }
       lastMeasuredWidthRef.current = measuredWidth;
@@ -1466,8 +1466,20 @@ export const Table = memo(forwardRef(function Table(
       const columnsWithoutSize: Array<Column<RowWithOrder>> = [];
       const numberOfUnitsById: Record<string, number> = {};
 
-      table.getAllColumns().forEach((column) => {
-        if (column.columnDef.size !== undefined || touchedSizesRef.current[column.id]) {
+      // When a column was just resized by the user, only redistribute among the columns
+      // AFTER it — columns to the left keep their current width (Excel/Sheets behavior).
+      const allColumns = table.getAllColumns();
+      const resizedIdx = resizedColumnId
+        ? allColumns.findIndex((c) => c.id === resizedColumnId)
+        : -1;
+
+      allColumns.forEach((column, idx) => {
+        const isFrozenByPosition = resizedIdx >= 0 && idx <= resizedIdx;
+        if (
+          column.columnDef.size !== undefined ||
+          touchedSizesRef.current[column.id] ||
+          isFrozenByPosition
+        ) {
           availableWidth -= columnSizing[column.id] || column.columnDef.size || 0;
         } else {
           columnsWithoutSize.push(column);
@@ -1535,20 +1547,54 @@ export const Table = memo(forwardRef(function Table(
       for (const [id, w] of constrainedWidths.entries()) {
         widths[id] = w;
       }
-      flushSync(() => {
-        setColumnSizing((prev: any) => {
-          const next = { ...prev, ...widths };
-          table.getAllColumns().forEach((col) => {
-            if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
-              delete next[col.id];
-            }
-          });
-          return next;
+      setColumnSizing((prev: any) => {
+        const next = { ...prev, ...widths };
+        table.getAllColumns().forEach((col) => {
+          if (col.columnDef.size !== undefined && !touchedSizesRef.current[col.id]) {
+            delete next[col.id];
+          }
         });
+        const prevKeys = Object.keys(prev);
+        const nextKeys = Object.keys(next);
+        if (
+          prevKeys.length === nextKeys.length &&
+          nextKeys.every((k) => prev[k] === next[k])
+        ) {
+          return prev;
+        }
+        return next;
       });
+      // Snapshot touched column sizes so the redistribute effect can detect user-driven changes
+      const snapshot: Record<string, number> = {};
+      for (const id of Object.keys(touchedSizesRef.current)) {
+        if (touchedSizesRef.current[id]) {
+          snapshot[id] = columnSizing[id] ?? 0;
+        }
+      }
+      lastTouchedSizesRef.current = snapshot;
     });
 
-    useResizeObserver(tableRef, recalculateStarSizes);
+    useResizeObserver(tableRef, () => recalculateStarSizes());
+
+    // Redistribute remaining width across non-touched star-sized columns AFTER the resized
+    // column when the user resizes a touched column. Without this, dragging a column smaller
+    // leaves an empty gap on the right because react-table only updates the dragged column.
+    useEffect(() => {
+      let changedId: string | undefined;
+      const nextSnapshot: Record<string, number> = {};
+      for (const id of Object.keys(touchedSizesRef.current)) {
+        if (!touchedSizesRef.current[id]) continue;
+        const current = columnSizing[id] ?? 0;
+        nextSnapshot[id] = current;
+        if (lastTouchedSizesRef.current[id] !== current && changedId === undefined) {
+          changedId = id;
+        }
+      }
+      if (changedId !== undefined) {
+        lastTouchedSizesRef.current = nextSnapshot;
+        recalculateStarSizes(changedId);
+      }
+    }, [columnSizing, recalculateStarSizes]);
 
     useIsomorphicLayoutEffect(() => {
       // Reset cached width so columns are recalculated when the column set changes
