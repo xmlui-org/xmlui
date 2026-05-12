@@ -47,6 +47,7 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
   for (const d of depsOfRecord(node.vars)) usedHere.add(d);
   for (const d of depsOfRecord(node.events as Record<string, unknown> | undefined)) usedHere.add(d);
   for (const d of depsOfRecord(node.api as Record<string, unknown> | undefined)) usedHere.add(d);
+  for (const d of depsOfRecord(node.functions as Record<string, unknown> | undefined)) usedHere.add(d);
 
   if (node.when !== undefined && node.when !== null && typeof node.when !== "boolean") {
     for (const d of depsOfValue(node.when)) usedHere.add(d);

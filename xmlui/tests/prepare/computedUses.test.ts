@@ -123,6 +123,21 @@ describe("computeUsesForTree — loaders", () => {
   });
 });
 
+describe("computeUsesForTree — functions", () => {
+  it("external var referenced in function body is included in computedUses", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      functions: { calcTotal: "{externalPrice * qty}" },
+      children: [node("Text", { props: { value: "{calcTotal}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("externalPrice");
+    expect(root.computedUses).toContain("qty");
+    expect(root.computedUses).not.toContain("local");
+    expect(root.computedUses).not.toContain("calcTotal");
+  });
+});
+
 describe("computeUsesForTree — events", () => {
   it("identifiers in parsed event handlers are included", () => {
     const buttonWithEvent = node("Button", {
