@@ -110,6 +110,19 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
   });
 });
 
+describe("computeUsesForTree — loaders", () => {
+  it("loader uid is treated as locally declared (not bubbled up)", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      loaders: [node("DataSource", { uid: "myData" })],
+      children: [node("Text", { props: { text: "{myData.items}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("myData");
+    expect(root.computedUses).toEqual([]);
+  });
+});
+
 describe("computeUsesForTree — events", () => {
   it("identifiers in parsed event handlers are included", () => {
     const buttonWithEvent = node("Button", {

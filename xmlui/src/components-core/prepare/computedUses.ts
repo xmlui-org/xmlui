@@ -65,14 +65,22 @@ function depsOfValue(value: unknown): string[] {
       // Raw event handler AST: has a `statements` array with numeric-type nodes.
       // Try the fast path first; fall back to structural walk for string-discriminator ASTs.
       if (obj.statements && Array.isArray(obj.statements)) {
-        try {
-          const deps = collectVariableDependencies(obj.statements) ?? [];
-          if (deps.length > 0) return deps.map(rootIdentifier);
-        } catch {
-          // collectVariableDependencies failed — AST uses string discriminators,
-          // so fall through to the generic identifier walk.
+        // Detect string-discriminator ASTs (e.g. from tests or JSON-serialised event handlers).
+        // collectVariableDependencies only handles numeric-discriminator ASTs; for string-
+        // discriminator ASTs it silently returns [] without throwing, so we must check the
+        // format explicitly before deciding which path to take.
+        const hasStringDiscriminators =
+          obj.statements.length > 0 &&
+          typeof (obj.statements[0] as any)?.type === "string";
+        if (hasStringDiscriminators) {
+          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
         }
-        return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+        try {
+          return (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
+        } catch {
+          // collectVariableDependencies failed — fall back to generic identifier walk.
+          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
+        }
       }
       return [];
     }
@@ -115,6 +123,11 @@ export function computeUsesForSubtree(node: ComponentDef): Set<string> {
     for (const k of Object.keys(sc)) localDeclared.add(k);
   }
   if (node.uid) localDeclared.add(node.uid);
+  if (node.loaders) {
+    for (const loader of node.loaders) {
+      if (loader.uid) localDeclared.add(loader.uid);
+    }
+  }
 
   const usedHere = new Set<string>();
 

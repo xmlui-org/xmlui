@@ -747,6 +747,13 @@ function resolveRuntime(runtime: Record<string, any>): {
     });
   }
 
+  // --- Process computedUses for each compound component's tree
+  for (const compDef of components) {
+    if (compDef.component) {
+      computeUsesForTree(compDef.component);
+    }
+  }
+
   // --- Collect globalVars from root element only (components can no longer define globals)
   const mergedGlobals = entryPointWithCodeBehind.globalVars || {};
 
