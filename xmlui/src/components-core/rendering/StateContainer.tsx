@@ -156,7 +156,7 @@ export const StateContainer = memo(
     if (process.env.NODE_ENV === "development") {
       renderCountRef.current += 1;
       const label = node.uid ?? node.type ?? "anon";
-      console.debug(`[render] ${label} #${renderCountRef.current}`);
+      // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
       (globalThis as any).__renderCounts ??= {};
       (globalThis as any).__renderCounts[label] = renderCountRef.current;
     }

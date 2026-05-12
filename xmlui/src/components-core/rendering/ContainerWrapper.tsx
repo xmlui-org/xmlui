@@ -65,6 +65,7 @@ export function isContainerLike(node: ComponentDef) {
     node.loaders ||
     node.vars ||
     node.uses ||
+    node.computedUses ||
     node.contextVars ||
     node.functions ||
     node.scriptCollected
