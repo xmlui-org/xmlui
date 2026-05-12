@@ -272,6 +272,54 @@ useEffect(() => {
 
 ---
 
+## 6.1. Запланований рефакторинг: замінити хардкод на метадані реєстрації
+
+**Статус:** Заплановано (не входить у поточну задачу)
+
+**Проблема:** `IMPLICIT_CONTAINER_COMPONENT_NAMES` — статична константа в парсері. Це означає:
+- User-defined components не можуть скористатись оптимізацією
+- Кожне додавання компонента до списку вимагає зміни коду парсера
+- Парсер знає про конкретні компоненти — порушення розділення відповідальностей
+
+**Рішення:** Додати флаг `isImplicitContainerByDefault: true` до метаданих реєстрації компонента у фреймворку. Парсер читатиме цей флаг з реєстру замість статичного списку.
+
+### Орієнтовний API реєстрації
+
+```ts
+// При реєстрації компонента (наприклад, у defineComponent або registerComponent):
+registerComponent("Select", SelectComponent, {
+  isImplicitContainerByDefault: true,
+  // ...інші метадані
+});
+```
+
+### Зміни у `computedUses.ts`
+
+```ts
+// Замість:
+export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", ...]);
+
+// Після рефакторингу:
+// computeUsesForSubtree отримує registry як параметр або через closure
+function isImplicitContainerByDefault(type: string, registry: ComponentRegistry): boolean {
+  return registry.getMetadata(type)?.isImplicitContainerByDefault === true;
+}
+```
+
+### Що це дає
+
+- User-defined components можуть позначити себе як `isImplicitContainerByDefault: true`
+- Список "важких" компонентів живе поруч з їхнім кодом, а не в парсері
+- Спрощує додавання нових компонентів до оптимізації без зміни core
+
+### Залежності
+
+- Потрібно зрозуміти поточний механізм реєстрації компонентів у фреймворку
+- Вирішити: передавати registry у `computeUsesForTree` як параметр, чи через DI/singleton
+- Перехідний період: `IMPLICIT_CONTAINER_COMPONENT_NAMES` залишається як fallback поки всі компоненти не перейдуть на новий API
+
+---
+
 ## 7. Ризики та застереження
 
 | Ризик | Пом'якшення |
