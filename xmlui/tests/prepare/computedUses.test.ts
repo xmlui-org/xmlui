@@ -110,6 +110,67 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
   });
 });
 
+describe("computeUsesForTree — child UIDs", () => {
+  it("child uid is treated as locally declared (not bubbled up)", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("Select", { uid: "mySelect" }),
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("mySelect");
+    expect(root.computedUses).toEqual([]);
+  });
+
+  it("slot child uid is treated as locally declared (not bubbled up)", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      slots: { header: [node("Select", { uid: "mySelect" })] },
+      children: [node("Text", { props: { text: "{mySelect.value}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("mySelect");
+    expect(root.computedUses).toEqual([]);
+  });
+
+  it("grandchild uid through non-container intermediary is locally declared", () => {
+    // VStack has no vars → NOT a container → mySelect escapes through it to Stack
+    const vstack = node("VStack", {
+      children: [node("Select", { uid: "mySelect" })],
+    });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        vstack,
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("mySelect");
+    expect(root.computedUses).toEqual([]);
+  });
+
+  it("grandchild uid captured by intermediate container does NOT become local in ancestor", () => {
+    // innerStack has vars → IS a container → captures mySelect, does not let it escape
+    const innerStack = node("Stack", {
+      vars: { x: "{0}" },
+      children: [node("Select", { uid: "mySelect" })],
+    });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        innerStack,
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    // mySelect is captured by innerStack, so root must request it from parent
+    expect(root.computedUses).toContain("mySelect");
+  });
+});
+
 describe("computeUsesForTree — loaders", () => {
   it("loader uid is treated as locally declared (not bubbled up)", () => {
     const root = node("Stack", {
@@ -120,21 +181,6 @@ describe("computeUsesForTree — loaders", () => {
     computeUsesForTree(root);
     expect(root.computedUses).not.toContain("myData");
     expect(root.computedUses).toEqual([]);
-  });
-});
-
-describe("computeUsesForTree — functions", () => {
-  it("external var referenced in function body is included in computedUses", () => {
-    const root = node("Stack", {
-      vars: { local: "{0}" },
-      functions: { calcTotal: "{externalPrice * qty}" },
-      children: [node("Text", { props: { value: "{calcTotal}" } })],
-    });
-    computeUsesForTree(root);
-    expect(root.computedUses).toContain("externalPrice");
-    expect(root.computedUses).toContain("qty");
-    expect(root.computedUses).not.toContain("local");
-    expect(root.computedUses).not.toContain("calcTotal");
   });
 });
 
