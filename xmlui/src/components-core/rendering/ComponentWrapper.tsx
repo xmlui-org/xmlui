@@ -9,6 +9,8 @@ import { ContainerWrapper, isContainerLike } from "./ContainerWrapper";
 import ComponentAdapter from "./ComponentAdapter";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { EMPTY_ARRAY } from "../constants";
+import { useShallowCompareMemoize } from "../utils/hooks";
+import { extractScopedState } from "./ContainerUtils";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
@@ -81,13 +83,27 @@ export const ComponentWrapper = memo(
       );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
+    // When the node declares a scope (uses or computedUses), extract only the
+    // relevant slice of parent state and stabilise it with a shallow-equal memo.
+    // This prevents ContainerWrapper/StateContainer from re-rendering when
+    // unrelated state keys change — e.g. a fast-ticking timer should not
+    // cause a scoped Select to re-render on every tick.
+    const nodeUses = nodeWithTransformedDatasourceProp.uses;
+    const nodeComputedUses = nodeWithTransformedDatasourceProp.computedUses;
+    const scopedParentState = useShallowCompareMemoize(
+      useMemo(
+        () => extractScopedState(state, nodeUses ?? nodeComputedUses) ?? state,
+        [state, nodeUses, nodeComputedUses],
+      ),
+    );
+
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
         <ContainerWrapper
           resolvedKey={resolvedKey}
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
-          parentState={state}
+          parentState={scopedParentState}
           parentGlobalVars={globalVars}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
