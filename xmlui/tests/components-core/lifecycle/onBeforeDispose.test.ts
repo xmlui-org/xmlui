@@ -9,7 +9,7 @@
  *
  * Fake timers are used so tests run deterministically without actual I/O delays.
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { fireBeforeDispose } from "../../../src/components-core/lifecycle";
 
 declare const globalThis: any;
