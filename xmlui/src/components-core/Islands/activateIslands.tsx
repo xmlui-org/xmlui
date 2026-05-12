@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { StyleInjectionTargetContext, StyleProvider } from "../theming/StyleContext";
 import StandaloneApp from "../StandaloneApp";
 import StandaloneExtensionManager from "../StandaloneExtensionManager";
-import { CSS_LAYER_ORDER } from "../../components/NestedApp/NestedAppReact";
+import { CSS_LAYER_ORDER } from "../cssLayers";
 
 export function activateIslands(targets: NodeListOf<Element>): void {
   const extensionManager = new StandaloneExtensionManager();
