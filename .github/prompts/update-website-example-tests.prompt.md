@@ -6,7 +6,7 @@ description: Update an existing Playwright test file when a website documentatio
 # Update Website Example Tests
 
 Given a markdown filename (e.g. `generate-a-qr-code-from-user-input.md`), update the matching
-`@website`-tagged spec file in `xmlui/tests-e2e/` so it reflects the current set of named
+`@website`-tagged spec file in `xmlui/tests-e2e/` so it reflects the current set of named eligible
 `xmlui-pg` codefences in that file.
 
 Use this prompt when:
@@ -44,11 +44,15 @@ Read both files in full before proceeding.
 
 Scan the markdown for every codefence whose opening line starts with ` ```xmlui-pg `.
 
+Ignore any `xmlui-pg` codefence whose opening fence appears between a `<pre>` tag and its matching
+`</pre>` tag. Those are documentation literals and must not generate tests.
+
 For each codefence, record:
 - Whether it has a `name="..."` attribute
 - Its name value if present
 - Whether it is **interactive** (body contains an event handler attribute like `onClick`, `onChange`,
-  `onSubmit`, etc., or a `---api` section) or **display-only**
+  `onSubmit`, etc., a `---api` section, or any of these interactive components: `NavLink`,
+  `Select`, `ToneSwitch`) or **display-only**
 
 **If any codefences have no `name` attribute**, stop and report them to the user:
 
@@ -63,6 +67,74 @@ Add a name="..." attribute to each before continuing.
 
 Do NOT generate fallback names. The name must come from the markdown file itself.
 
+## Step 2b — Validate all `---api` sections
+
+For every eligible codefence that contains a `---api` section, extract the text between `---api` and the next `---` (or end of codefence) and attempt to parse it as JSON.
+
+If parsing fails because of multiline JSON string literals (most commonly the `initialize` field containing raw newlines), normalize that markdown `---api` JSON first by rewriting those string values to a single-line JSON string. Then parse again.
+
+Example normalization:
+
+Before (invalid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [
+    { id: 1, name: 'Anna', active: true }
+  ]",
+  "operations": {}
+}
+```
+
+After (valid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [{ id: 1, name: 'Anna', active: true }]",
+  "operations": {}
+}
+```
+
+A valid `---api` section is a single JSON object matching the `ApiInterceptorDefinition` shape:
+```json
+{
+  "apiUrl": "...",
+  "initialize": "...",
+  "operations": { ... }
+}
+```
+
+**Invalid forms include (but are not limited to):**
+- Strings with embedded literal newlines (e.g. `"initialize": "$state.x = [\n  ...\n]"`) — `JSON.parse` rejects bare newlines inside string values
+- Non-JSON preamble lines such as `POST /route\n---\n{body}`
+- Any other content that causes `JSON.parse` to throw
+
+Do NOT work around invalid JSON by duplicating the source example inside the spec file (for example, hardcoding app markup or manually constructing `apiInterceptor`). Tests must use `extractXmluiExample`.
+
+**If any `---api` section is still not valid JSON after normalization**, do not duplicate source code. Instead, keep or add a placeholder failing test for each affected example so the gap is visible in CI:
+
+```
+test("TODO: fix invalid ---api JSON for <example name>", async () => {
+  expect(
+    "Invalid ---api JSON in <filename> for <example name>; fix markdown before enabling this test"
+  ).toBe("");
+});
+```
+
+Also report every affected example to the user:
+
+```
+The following examples in <filename> still have a `---api` section that `extractXmluiExample`
+cannot parse after JSON normalization:
+
+  - "<example name>" (line <N>): <reason, e.g. "multiline string literal in JSON" or
+    "---api content is not a JSON object">
+  - ...
+
+Please fix the `---api` section(s) in the markdown file so they contain valid JSON
+and then replace the placeholder failing test(s).
+```
+
 ## Step 3 — Inventory the spec file
 
 Collect every `test.describe("...")` title from the existing spec file. These are the names
@@ -70,7 +142,7 @@ currently being tested.
 
 ## Step 4 — Compute the diff
 
-Compare the two name sets:
+Compare the eligible markdown name set against the spec name set:
 
 | Situation | Action |
 |-----------|--------|
@@ -98,6 +170,8 @@ Wait for confirmation before proceeding on renames.
 ## Step 5 — Apply changes
 
 Make only the changes identified in Step 4. Do not touch describe blocks that are unchanged.
+
+Never copy-paste the original example markup or API JSON into the spec file.
 
 ### Adding a new describe block
 
@@ -183,14 +257,19 @@ Check for TypeScript errors in the updated file. Confirm:
 
 ## Step 7 — Run and fix
 
-Run the updated spec file and fix any failures before finishing.
+Run the updated spec file from the `xmlui/` directory and fix any failures before finishing.
 
 ```bash
-# Single worker for easy debugging
-npx playwright test <spec-file> --workers=1 --reporter=line
+# Single worker for easy debugging (run from xmlui/)
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=1 --reporter=line
 
 # Parallel stability check before committing
-npx playwright test <spec-file> --workers=10
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=10
+```
+
+For specs under `how-to-examples/`, replace the path accordingly:
+```bash
+npm run test:e2e-website-examples -- tests-e2e/how-to-examples/<name>.spec.ts --workers=1 --reporter=line
 ```
 
 **Common failures to watch for:**

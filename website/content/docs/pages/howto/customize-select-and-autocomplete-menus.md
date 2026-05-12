@@ -22,7 +22,7 @@ Select and AutoComplete share the same variable structure — every var that ref
     borderRadius-Select-badge="4px"
   >
     <VStack>
-      <Select label="Single select" value="b">
+      <Select label="Single select" initialValue="b">
         <Option value="a">Option A</Option>
         <Option value="b">Option B</Option>
         <Option value="c">Option C</Option>
