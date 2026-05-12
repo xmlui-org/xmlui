@@ -306,6 +306,16 @@ function isImplicitContainerByDefault(type: string, registry: ComponentRegistry)
 }
 ```
 
+### Інваріант: флаг активується тільки за наявності залежностей
+
+**Важливо:** `isImplicitContainerByDefault: true` — лише дозвіл стати контейнером. Фактично вузол стає контейнером лише якщо `totalFree.size > 0` (є реальні зовнішні залежності в піддереві). Якщо у компонента немає дітей або всі залежності локальні — `computedUses` не встановлюється. Цей захист **обов'язково зберігати** при рефакторингу.
+
+```ts
+// При рефакторингу цей патерн має залишитись:
+const isImplicitDefault =
+  isImplicitContainerByDefault(node.type, registry) && totalFree.size > 0;
+```
+
 ### Що це дає
 
 - User-defined components можуть позначити себе як `isImplicitContainerByDefault: true`
