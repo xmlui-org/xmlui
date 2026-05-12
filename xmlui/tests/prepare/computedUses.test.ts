@@ -169,6 +169,58 @@ describe("computeUsesForTree — child UIDs", () => {
     // mySelect is captured by innerStack, so root must request it from parent
     expect(root.computedUses).toContain("mySelect");
   });
+
+  it("grandchild uid captured by uses-container does NOT escape to ancestor", () => {
+    // Fragment with explicit uses IS a StateContainer at runtime — captures child UIDs
+    const innerFrag = node("Fragment", {
+      uses: ["x"],
+      children: [node("Select", { uid: "s1" })],
+    });
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [innerFrag, node("Text", { props: { text: "{s1.value}" } })],
+    });
+    computeUsesForTree(root);
+    // s1 is owned by innerFrag's StateContainer; root must ask its parent for it
+    expect(root.computedUses).toContain("s1");
+  });
+
+  it("uid escapes through multiple non-container intermediaries (3+ levels)", () => {
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        node("VStack", {
+          children: [
+            node("HStack", {
+              children: [node("Select", { uid: "deepSelect" })],
+            }),
+          ],
+        }),
+        node("Text", { props: { text: "{deepSelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).not.toContain("deepSelect");
+    expect(root.computedUses).toEqual([]);
+  });
+
+  it("container own uid escapes to parent container (not listed in parent computedUses)", () => {
+    const inner = node("Stack", {
+      uid: "innerStack",
+      vars: { x: "{0}" },
+    });
+    const root = node("Stack", {
+      vars: { dummy: "{0}" },
+      children: [
+        inner,
+        node("Text", { props: { text: "{innerStack.someApi}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    // innerStack registers its own API in root — root doesn't need it from parent
+    expect(root.computedUses).not.toContain("innerStack");
+    expect(root.computedUses).toEqual([]);
+  });
 });
 
 describe("computeUsesForTree — loaders", () => {

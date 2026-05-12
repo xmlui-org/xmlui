@@ -149,11 +149,10 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     for (const k of Object.keys(sc)) localDeclared.add(k);
   }
   if (node.uid) localDeclared.add(node.uid);
-  if (node.loaders) {
-    for (const loader of node.loaders) {
-      if (loader.uid) localDeclared.add(loader.uid);
-    }
-  }
+  // Note: loader UIDs are NOT pre-seeded here. processChildList(node.loaders)
+  // below will receive their escapingUIDs and add them to localDeclared then.
+  // Pre-seeding would create a dual-authority situation and would incorrectly
+  // treat a container-loader's UID as locally owned even if it should escape.
 
   const usedHere = new Set<string>();
 
@@ -214,12 +213,16 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && totalFree.size > 0;
   const isContainer = isRegularContainer || isImplicitDefault;
 
-  if (isContainer && node.uses === undefined) {
-    node.computedUses = Array.from(totalFree);
-    // Container captures all child UIDs. Only this node's own UID (if any)
-    // escapes to the parent container.
+  if (isContainer) {
+    // Both regular containers (vars/loaders/etc.) and explicit-uses containers
+    // create a StateContainer at runtime. Either way, child component APIs
+    // register HERE via registerComponentApi — UIDs do not escape further.
+    // Only this node's own UID (if any) is visible to the parent container.
+    if (node.uses === undefined) {
+      node.computedUses = Array.from(totalFree);
+    }
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
-    return [new Set(node.computedUses), myEscapingUID];
+    return [totalFree, myEscapingUID];
   }
 
   // Non-container: this node's own UID + all child escaping UIDs propagate
