@@ -289,7 +289,7 @@ export const SimpleSelect = forwardRef<HTMLElement, SimpleSelectProps>(
               />
             </Part>
           )}
-          {clearable && value !== undefined && value !== "" && !readOnly && enabled && (
+          {clearable && value !== undefined && value !== null && value !== "" && !readOnly && enabled && (
             <Part partId="clearButton">
               <button
                 type="button"
