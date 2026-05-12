@@ -218,14 +218,19 @@ Check for TypeScript errors in the updated file. Confirm:
 
 ## Step 7 — Run and fix
 
-Run the updated spec file and fix any failures before finishing.
+Run the updated spec file from the `xmlui/` directory and fix any failures before finishing.
 
 ```bash
-# Single worker for easy debugging
-npx playwright test <spec-file> --workers=1 --reporter=line
+# Single worker for easy debugging (run from xmlui/)
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=1 --reporter=line
 
 # Parallel stability check before committing
-npx playwright test <spec-file> --workers=10
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=10
+```
+
+For specs under `how-to-examples/`, replace the path accordingly:
+```bash
+npm run test:e2e-website-examples -- tests-e2e/how-to-examples/<name>.spec.ts --workers=1 --reporter=line
 ```
 
 **Common failures to watch for:**

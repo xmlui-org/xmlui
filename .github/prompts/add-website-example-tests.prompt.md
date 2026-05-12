@@ -167,7 +167,20 @@ Check for TypeScript errors in the new file. Confirm:
 
 ## Step 6 — Run and fix the tests
 
-Run the newly created spec file and fix any failures before finishing.
+Run the newly created spec file from the `xmlui/` directory and fix any failures before finishing.
+
+```bash
+# Single worker for easy debugging (run from xmlui/)
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=1 --reporter=line
+
+# Parallel stability check before committing
+npm run test:e2e-website-examples -- tests-e2e/pages/<name>.spec.ts --workers=10
+```
+
+For specs under `how-to-examples/`, replace the path accordingly:
+```bash
+npm run test:e2e-website-examples -- tests-e2e/how-to-examples/<name>.spec.ts --workers=1 --reporter=line
+```
 
 **Common failures to watch for:**
 - **Strict-mode violations** (`resolved to N elements`): `getByText('X')` matches a substring in other visible text. Use `{ exact: true }` or a more specific locator such as `page.getByText('X', { exact: true })` or `page.locator('…').getByText('X')`.
