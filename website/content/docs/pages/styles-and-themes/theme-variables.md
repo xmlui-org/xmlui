@@ -1084,7 +1084,7 @@ These theme variables define a set of line heights relative to the font size:
 
 XMLUI defines a few stock shadow resources:
 
-```xmlui-pg name="Shadows" height="260px"
+```xmlui-pg name="Shadows" height="320px"
 <App>
   <HStack padding="1.5rem" gap="1.5rem">
     <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" boxShadow="$boxShadow" >
