@@ -6,7 +6,7 @@ description: Create a Playwright test file for a website documentation markdown 
 # Add Website Example Tests
 
 Given a markdown filename (e.g. `generate-a-qr-code-from-user-input.md`), create a `@website`-tagged
-test file in `xmlui/tests-e2e/` that covers every named `xmlui-pg` codefence in that file.
+test file in `xmlui/tests-e2e/` that covers every named eligible `xmlui-pg` codefence in that file.
 
 ## Before starting
 
@@ -25,9 +25,12 @@ website/content/docs/pages/
 
 Resolve the full path from the provided filename and read the file.
 
-## Step 2 — Discover all xmlui-pg codefences
+## Step 2 — Discover eligible xmlui-pg codefences
 
 Scan the markdown for every codefence whose opening line starts with ` ```xmlui-pg `.
+
+Ignore any `xmlui-pg` codefence whose opening fence appears between a `<pre>` tag and its matching
+`</pre>` tag. Those are documentation literals and must not generate tests.
 
 For each codefence, record:
 - Whether it has a `name="..."` attribute
@@ -46,11 +49,35 @@ Add a name="..." attribute to each before continuing.
 
 Do NOT generate fallback names like `"example-1"`. The name must come from the markdown file itself.
 
-Only proceed once every codefence that should be tested has a name.
+Only proceed once every eligible codefence that should be tested has a name.
 
 ## Step 2b — Validate all `---api` sections
 
-For every codefence that contains a `---api` section, extract the text between `---api` and the next `---` (or end of codefence) and attempt to parse it as JSON.
+For every eligible codefence that contains a `---api` section, extract the text between `---api` and the next `---` (or end of codefence) and attempt to parse it as JSON.
+
+If parsing fails because of multiline JSON string literals (most commonly the `initialize` field containing raw newlines), normalize that markdown `---api` JSON first by rewriting those string values to a single-line JSON string. Then parse again.
+
+Example normalization:
+
+Before (invalid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [
+    { id: 1, name: 'Anna', active: true }
+  ]",
+  "operations": {}
+}
+```
+
+After (valid JSON):
+```json
+{
+  "apiUrl": "/api",
+  "initialize": "$state.items = [{ id: 1, name: 'Anna', active: true }]",
+  "operations": {}
+}
+```
 
 A valid `---api` section is a single JSON object matching the `ApiInterceptorDefinition` shape:
 ```json
@@ -66,21 +93,31 @@ A valid `---api` section is a single JSON object matching the `ApiInterceptorDef
 - Non-JSON preamble lines such as `POST /route\n---\n{body}`
 - Any other content that causes `JSON.parse` to throw
 
-**If any `---api` section is not valid JSON**, stop immediately and report every affected example to the user. Do NOT work around the problem by hardcoding app markup or constructing the `apiInterceptor` manually:
+Do NOT work around invalid JSON by duplicating the source example inside the spec file (for example, hardcoding app markup or manually constructing `apiInterceptor`). Tests must use `extractXmluiExample`.
+
+**If any `---api` section is still not valid JSON after normalization**, do not duplicate source code. Instead, create a placeholder failing test for each affected example so the gap is visible in CI:
 
 ```
-The following examples in <filename> have a `---api` section that `extractXmluiExample`
-cannot parse, so test files cannot be generated for them yet:
+test("TODO: fix invalid ---api JSON for <example name>", async () => {
+  expect(
+    "Invalid ---api JSON in <filename> for <example name>; fix markdown before enabling this test"
+  ).toBe("");
+});
+```
+
+Also report every affected example to the user:
+
+```
+The following examples in <filename> still have a `---api` section that `extractXmluiExample`
+cannot parse after JSON normalization:
 
   - "<example name>" (line <N>): <reason, e.g. "multiline string literal in JSON" or
     "---api content is not a JSON object">
   - ...
 
 Please fix the `---api` section(s) in the markdown file so they contain valid JSON
-before running this prompt again.
+and then replace the placeholder failing test(s).
 ```
-
-Only proceed once every `---api` section in the file is valid JSON.
 
 ## Step 3 — Determine the spec file path
 
@@ -127,9 +164,10 @@ Import path depth depends on spec location:
 - `tests-e2e/pages/<subdir>/` → `../../../src/testing/...` and `../../../../website/...`
 
 Rules:
-- One `test.describe` per named codefence. The describe title = the codefence's `name` value exactly.
+- One `test.describe` per named eligible codefence. The describe title = the codefence's `name` value exactly.
 - Every `test.describe` must include `{ tag: "@website" }`.
 - Read the markdown file once at module level with `getExampleSource`; call `extractXmluiExample` inside each describe block.
+- Never copy-paste the original example markup or API JSON into the spec file.
 
 ## Step 4 — Write meaningful tests
 
@@ -154,7 +192,7 @@ For each `test.describe` block, write tests that exercise the example's interact
 - Assert `toBeFocused()` before keyboard interactions
 - For API-backed examples, the `apiInterceptor` from `extractXmluiExample` wires the mock automatically — just pass it to `initTestBed`
 
-If you cannot determine what meaningful assertions to write for a given example from reading its source alone, output a `test.todo` placeholder and note what information is needed.
+If you cannot determine what meaningful assertions to write for a given eligible example from reading its source alone, output a `test.todo` placeholder and note what information is needed.
 
 ## Step 5 — Verify
 

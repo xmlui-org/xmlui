@@ -145,12 +145,7 @@ In this example, `items` starts reactive (`apiResult.value ?? []`) and then gets
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.items = [
-    { id: 1, name: 'Anna', active: true },
-    { id: 2, name: 'Helga', active: false },
-    { id: 3, name: 'Bob', active: true },
-    { id: 4, name: 'John', active: false }
-  ]",
+  "initialize": "$state.items = [{ id: 1, name: 'Anna', active: true }, { id: 2, name: 'Helga', active: false }, { id: 3, name: 'Bob', active: true }, { id: 4, name: 'John', active: false }]",
   "operations": {
     "get-names-with-activity-decoupled": {
       "url": "/names-with-activity-decoupled",
@@ -204,12 +199,7 @@ If you need the variable to stay reactive while also supporting local overrides,
 ---api
 {
   "apiUrl": "/api",
-  "initialize": "$state.items = [
-    { id: 1, name: 'Anna', active: true },
-    { id: 2, name: 'Helga', active: false },
-    { id: 3, name: 'Bob', active: true },
-    { id: 4, name: 'John', active: false }
-  ]",
+  "initialize": "$state.items = [{ id: 1, name: 'Anna', active: true }, { id: 2, name: 'Helga', active: false }, { id: 3, name: 'Bob', active: true }, { id: 4, name: 'John', active: false }]",
   "operations": {
     "get-names-with-activity-live": {
       "url": "/names-with-activity-live",
