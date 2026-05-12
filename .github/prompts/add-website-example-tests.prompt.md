@@ -138,8 +138,9 @@ For each `test.describe` block, write tests that exercise the example's interact
 **Classify each example first:**
 
 - **Interactive** — the codefence body contains an event handler attribute (`onClick`, `onChange`,
-  `onSubmit`, etc.) or a `---api` section. Write a full test suite.
-- **Display-only** — no event handlers, no `---api`. Write only an initial-state test and add a
+  `onSubmit`, etc.), a `---api` section, or any of these interactive components: `NavLink`,
+  `Select`, `ToneSwitch`. Write a full test suite.
+- **Display-only** — none of the above. Write only an initial-state test and add a
   comment `// display-only example — no interaction to test` above the describe block.
 
 **For interactive examples, always include:**

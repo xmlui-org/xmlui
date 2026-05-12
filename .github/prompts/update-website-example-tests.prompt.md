@@ -48,7 +48,8 @@ For each codefence, record:
 - Whether it has a `name="..."` attribute
 - Its name value if present
 - Whether it is **interactive** (body contains an event handler attribute like `onClick`, `onChange`,
-  `onSubmit`, etc., or a `---api` section) or **display-only**
+  `onSubmit`, etc., a `---api` section, or any of these interactive components: `NavLink`,
+  `Select`, `ToneSwitch`) or **display-only**
 
 **If any codefences have no `name` attribute**, stop and report them to the user:
 
