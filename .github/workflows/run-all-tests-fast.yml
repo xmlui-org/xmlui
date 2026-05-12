@@ -6,6 +6,10 @@ concurrency: # Concurrency ensures that only a single job or workflow using the 
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+      - support
 
 jobs:
   test:
