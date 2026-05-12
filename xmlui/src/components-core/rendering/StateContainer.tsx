@@ -155,7 +155,11 @@ export const StateContainer = memo(
     const renderCountRef = useRef(0);
     if (process.env.NODE_ENV === "development") {
       renderCountRef.current += 1;
-      const label = node.uid ?? node.type ?? "anon";
+      // Use the wrapped component's type (first child) for containers — avoids all containers
+      // colliding on the "Container" label when they have no uid.
+      const innerType = (node as any).children?.[0]?.type;
+      const baseLabel = innerType ?? node.type ?? "anon";
+      const label = node.uid ? `${baseLabel}#${node.uid}` : baseLabel;
       // accumulate per-label counts silently; read window.__renderCounts in DevTools to inspect
       (globalThis as any).__renderCounts ??= {};
       (globalThis as any).__renderCounts[label] = renderCountRef.current;
@@ -406,11 +410,31 @@ export const StateContainer = memo(
     // STATE CHANGE CALLBACK
     // ========================================================================
 
+    // Keep mutable values in refs so statePartChanged stays a stable function
+    // reference. statePartChanged is passed as a prop deep into the subtree; if
+    // it changes on every render (e.g. because resolvedLocalVars changes when
+    // oftenChanges++), every child Container re-renders despite memo — defeating
+    // the computedUses optimisation. Refs let the callback always see the latest
+    // values without creating a new function reference each render.
+    const resolvedLocalVarsRef = useRef(resolvedLocalVars);
+    resolvedLocalVarsRef.current = resolvedLocalVars;
+
+    const stableCurrentGlobalVarsRef = useRef(stableCurrentGlobalVars);
+    stableCurrentGlobalVarsRef.current = stableCurrentGlobalVars;
+
+    const parentStatePartChangedRef = useRef(parentStatePartChanged);
+    parentStatePartChangedRef.current = parentStatePartChanged;
+
+    const nodeUsesRef = useRef(node.uses);
+    nodeUsesRef.current = node.uses;
+
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
-        const isLocalVar = key in resolvedLocalVars;
-        const isGlobalVar = key in stableCurrentGlobalVars;
+        const localVars = resolvedLocalVarsRef.current;
+        const globalVars = stableCurrentGlobalVarsRef.current;
+        const isLocalVar = key in localVars;
+        const isGlobalVar = key in globalVars;
         const isRoot = node.uid === "root";
 
         // Check local variables FIRST - they shadow globals
@@ -423,7 +447,7 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars,
+              localVars,
             },
           });
         } else if (isGlobalVar) {
@@ -440,12 +464,12 @@ export const StateContainer = memo(
                 value: newValue,
                 target,
                 actionType: action,
-                localVars: stableCurrentGlobalVars,
+                localVars: globalVars,
               },
             });
           } else {
             // Non-root containers bubble globals to parent
-            parentStatePartChanged(pathArray, newValue, target, action);
+            parentStatePartChangedRef.current(pathArray, newValue, target, action);
           }
         } else if (key in componentStateRef.current) {
           // Component state - handle locally
@@ -456,17 +480,20 @@ export const StateContainer = memo(
               value: newValue,
               target,
               actionType: action,
-              localVars: resolvedLocalVars,
+              localVars,
             },
           });
         } else {
           // Not global, not local - bubble up if allowed by uses
-          if (!node.uses || node.uses.includes(key)) {
-            parentStatePartChanged(pathArray, newValue, target, action);
+          const uses = nodeUsesRef.current;
+          if (!uses || uses.includes(key)) {
+            parentStatePartChangedRef.current(pathArray, newValue, target, action);
           }
         }
       },
-      [resolvedLocalVars, stableCurrentGlobalVars, node.uses, node.uid, node.globalVars, appContext, parentStatePartChanged],
+      // dispatch is stable (from useReducer); node.uid is part of a stable node object.
+      // All other mutable values are accessed via refs above.
+      [dispatch, node.uid],
     );
 
     // ========================================================================
