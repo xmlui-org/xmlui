@@ -237,6 +237,10 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
   delete (wrappedNode.props as any)?.uses;
   delete wrappedNode.api;
   delete wrappedNode.contextVars;
+  // computedUses is moved to the container so the StateContainer can use it for
+  // state scoping. It must be removed from wrappedNode to prevent isContainerLike
+  // from returning true again for the inner node, which would cause infinite wrapping.
+  delete wrappedNode.computedUses;
 
   // --- Do the wrapping
   return {
@@ -254,6 +258,7 @@ const getWrappedWithContainer = (node: ContainerWrapperDef) => {
     containerUid: node?.containerUid,
     apiBoundContainer: node?.apiBoundContainer,
     contextVars: node.contextVars,
+    computedUses: node.computedUses,
     props: {
       debug: (node as any).debug || (node.props as any)?.debug,
     },
