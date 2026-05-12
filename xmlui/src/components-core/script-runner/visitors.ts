@@ -6,7 +6,7 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-
+  CodeDeclaration,
   Identifier} from "./ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import { getIdentifierScope } from "./eval-tree-common";
@@ -48,6 +48,8 @@ import {
 } from "./ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
+import { parseParameterString } from "./ParameterParser";
+import { isParsedValue } from "../state/variable-resolution";
 
 /**
  * Collects the name of local context variables the specified program depends on
@@ -400,6 +402,79 @@ export function collectVariableDependencies(
         return scope.type !== "block" ? expr.name : null;
     }
     return null;
+  }
+}
+
+function rootIdentifier(dep: string): string {
+  const dot = dep.indexOf(".");
+  const bracket = dep.indexOf("[");
+  if (dot === -1 && bracket === -1) return dep;
+  if (dot === -1) return dep.slice(0, bracket);
+  if (bracket === -1) return dep.slice(0, dot);
+  return dep.slice(0, Math.min(dot, bracket));
+}
+
+/**
+ * Walk a plain-object AST tree collecting Identifier node names.
+ */
+function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<string> {
+  if (node === null || node === undefined || typeof node !== "object") return acc;
+  if (Array.isArray(node)) {
+    for (const item of node) gatherIdentifiers(item, acc);
+    return acc;
+  }
+  const obj = node as Record<string, unknown>;
+  if (obj.type === "Identifier" && typeof obj.name === "string") {
+    acc.add(obj.name);
+  } else {
+    for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
+  }
+  return acc;
+}
+
+/**
+ * Collects component/state dependencies for a given value (expression, parsed AST, etc.)
+ */
+export function depsOfValue(value: unknown, stripRoot = true): string[] {
+  const process = (id: string) => (stripRoot ? rootIdentifier(id) : id);
+  try {
+    if (value === null || value === undefined) return [];
+    if (isParsedValue(value)) {
+      // isParsedValue narrows to CodeDeclaration, which has a typed .tree field.
+      return (collectVariableDependencies((value as CodeDeclaration).tree) ?? []).map(process);
+    }
+    if (typeof value === "object") {
+      const obj = value as Record<string, unknown>;
+      // Raw event handler AST: has a `statements` array with numeric-type nodes.
+      if (obj.statements && Array.isArray(obj.statements)) {
+        const hasStringDiscriminators =
+          obj.statements.length > 0 && typeof (obj.statements[0] as any)?.type === "string";
+        if (hasStringDiscriminators) {
+          return Array.from(gatherIdentifiers(obj.statements)).map(process);
+        }
+        try {
+          return (collectVariableDependencies(obj.statements) ?? []).map(process);
+        } catch {
+          // collectVariableDependencies failed — fall back to generic identifier walk.
+          return Array.from(gatherIdentifiers(obj.statements)).map(process);
+        }
+      }
+      return [];
+    }
+    if (typeof value === "string") {
+      const params = parseParameterString(value);
+      const acc = new Set<string>();
+      for (const part of params) {
+        if (part.type !== "expression") continue;
+        for (const id of collectVariableDependencies(part.value) ?? []) {
+          acc.add(process(id));
+        }
+      }
+      return Array.from(acc);
+    }
+    return [];
+  } catch {
+    return [];
   }
 }
 

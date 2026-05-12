@@ -16,9 +16,7 @@
  *     across container boundaries — Step 1.4 / W6 territory.
  *   - Conditional edges (inside `when`/`displayWhen`) are not yet tagged.
  */
-import { collectVariableDependencies } from "../script-runner/visitors";
-import { parseParameterString } from "../script-runner/ParameterParser";
-import { isParsedValue } from "../state/variable-resolution";
+import { depsOfValue, collectVariableDependencies } from "../script-runner/visitors";
 import { walkComponentDefTree } from "../ud-metadata";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { createReactiveGraph, type ReactiveGraph, type ReactiveNodeKind } from "./graph";
@@ -150,32 +148,6 @@ function addEdgesFromValue(
   for (const dep of deps) {
     if (!localNames.has(dep)) continue;
     graph.edge(fromId, makeId(ownerUid, dep));
-  }
-}
-
-function depsOfValue(value: unknown): string[] {
-  try {
-    if (value === null || value === undefined) return [];
-    if (isParsedValue(value)) {
-      // Code-behind / script-block declaration carrying its own AST.
-      return collectVariableDependencies((value as any).tree) ?? [];
-    }
-    if (typeof value === "string") {
-      const params = parseParameterString(value);
-      const acc = new Set<string>();
-      for (const part of params) {
-        if (part.type !== "expression") continue;
-        for (const id of collectVariableDependencies(part.value as any) ?? []) {
-          acc.add(id);
-        }
-      }
-      return Array.from(acc);
-    }
-    return [];
-  } catch {
-    // A malformed expression should never break the analyzer — fall through
-    // and treat the value as having no static dependencies.
-    return [];
   }
 }
 

@@ -9,98 +9,10 @@
  * When called: once at transform/boot time, after the full `ComponentDef`
  * tree has been built and before the reactive graph is wired up.
  */
-import { collectVariableDependencies } from "../script-runner/visitors";
-import { parseParameterString } from "../script-runner/ParameterParser";
-import { isParsedValue } from "../state/variable-resolution";
-import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
+import { depsOfValue } from "../script-runner/visitors";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
-
-/**
- * Walk a plain-object AST tree collecting Identifier node names.
- *
- * This fallback is needed for event handler ASTs that arrive with string-typed
- * `type` discriminators (e.g. `"Identifier"`, `"ExpressionStatement"`) rather
- * than the numeric constants the real scripting parser emits. This format
- * appears when event handler objects are constructed directly (e.g. in tests
- * or via JSON-serialised ASTs) instead of being produced by the scripting
- * parser. `collectVariableDependencies` only handles the numeric-discriminator
- * format, so we fall back to a structural walk for the string-discriminator
- * case.
- */
-function gatherIdentifiers(node: unknown, acc: Set<string> = new Set()): Set<string> {
-  if (node === null || node === undefined || typeof node !== "object") return acc;
-  if (Array.isArray(node)) {
-    for (const item of node) gatherIdentifiers(item, acc);
-    return acc;
-  }
-  const obj = node as Record<string, unknown>;
-  if (obj.type === "Identifier" && typeof obj.name === "string") {
-    acc.add(obj.name);
-  } else {
-    for (const val of Object.values(obj)) gatherIdentifiers(val, acc);
-  }
-  return acc;
-}
-
-function rootIdentifier(dep: string): string {
-  const dot = dep.indexOf(".");
-  const bracket = dep.indexOf("[");
-  if (dot === -1 && bracket === -1) return dep;
-  if (dot === -1) return dep.slice(0, bracket);
-  if (bracket === -1) return dep.slice(0, dot);
-  return dep.slice(0, Math.min(dot, bracket));
-}
-
-function depsOfValue(value: unknown): string[] {
-  try {
-    if (value === null || value === undefined) return [];
-    if (isParsedValue(value)) {
-      // isParsedValue narrows to CodeDeclaration, which has a typed .tree field.
-      return (collectVariableDependencies((value as CodeDeclaration).tree) ?? []).map(rootIdentifier);
-    }
-    if (typeof value === "object") {
-      const obj = value as Record<string, unknown>;
-      // Raw event handler AST: has a `statements` array with numeric-type nodes.
-      // Try the fast path first; fall back to structural walk for string-discriminator ASTs.
-      if (obj.statements && Array.isArray(obj.statements)) {
-        // Detect string-discriminator ASTs (e.g. from tests or JSON-serialised event handlers).
-        // collectVariableDependencies only handles numeric-discriminator ASTs; for string-
-        // discriminator ASTs it silently returns [] without throwing, so we must check the
-        // format explicitly before deciding which path to take.
-        const hasStringDiscriminators =
-          obj.statements.length > 0 &&
-          typeof (obj.statements[0] as any)?.type === "string";
-        if (hasStringDiscriminators) {
-          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
-        }
-        try {
-          return (collectVariableDependencies(obj.statements) ?? []).map(rootIdentifier);
-        } catch {
-          // collectVariableDependencies failed — fall back to generic identifier walk.
-          return Array.from(gatherIdentifiers(obj.statements)).map(rootIdentifier);
-        }
-      }
-      return [];
-    }
-    if (typeof value === "string") {
-      const params = parseParameterString(value);
-      const acc = new Set<string>();
-      for (const part of params) {
-        if (part.type !== "expression") continue;
-        // part.value is Expression — the type parseParameterString returns for expression sections.
-        for (const id of collectVariableDependencies(part.value) ?? []) {
-          acc.add(rootIdentifier(id));
-        }
-      }
-      return Array.from(acc);
-    }
-    return [];
-  } catch {
-    return [];
-  }
-}
 
 function depsOfRecord(record: Record<string, unknown> | undefined): Set<string> {
   const result = new Set<string>();
