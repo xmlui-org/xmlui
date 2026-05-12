@@ -48,6 +48,40 @@ Do NOT generate fallback names like `"example-1"`. The name must come from the m
 
 Only proceed once every codefence that should be tested has a name.
 
+## Step 2b — Validate all `---api` sections
+
+For every codefence that contains a `---api` section, extract the text between `---api` and the next `---` (or end of codefence) and attempt to parse it as JSON.
+
+A valid `---api` section is a single JSON object matching the `ApiInterceptorDefinition` shape:
+```json
+{
+  "apiUrl": "...",
+  "initialize": "...",
+  "operations": { ... }
+}
+```
+
+**Invalid forms include (but are not limited to):**
+- Strings with embedded literal newlines (e.g. `"initialize": "$state.x = [\n  ...\n]"`) — `JSON.parse` rejects bare newlines inside string values
+- Non-JSON preamble lines such as `POST /route\n---\n{body}`
+- Any other content that causes `JSON.parse` to throw
+
+**If any `---api` section is not valid JSON**, stop immediately and report every affected example to the user. Do NOT work around the problem by hardcoding app markup or constructing the `apiInterceptor` manually:
+
+```
+The following examples in <filename> have a `---api` section that `extractXmluiExample`
+cannot parse, so test files cannot be generated for them yet:
+
+  - "<example name>" (line <N>): <reason, e.g. "multiline string literal in JSON" or
+    "---api content is not a JSON object">
+  - ...
+
+Please fix the `---api` section(s) in the markdown file so they contain valid JSON
+before running this prompt again.
+```
+
+Only proceed once every `---api` section in the file is valid JSON.
+
 ## Step 3 — Determine the spec file path
 
 Spec files mirror the markdown's subdirectory relative to `website/content/docs/pages/`, placed
