@@ -147,9 +147,48 @@ test("multi mode allows selecting multiple options", async ({
 
   await driver.click();
 
-  // Both selected options should be visible as badges
-  await expect(page.getByText("Bruce Wayne")).toBeVisible();
-  await expect(page.getByText("Diana Prince")).toBeVisible();
+  // Both selected options should be visible as badges.
+  // `filter({ visible: true })` excludes the off-screen ghost measurer that
+  // mirrors every badge for width calculations.
+  await expect(page.getByText("Bruce Wayne").filter({ visible: true })).toBeVisible();
+  await expect(page.getByText("Diana Prince").filter({ visible: true })).toBeVisible();
+});
+
+// Regression: the ghost measurer (used to compute badge widths for the "+N more"
+// overflow logic) must stay hidden from users. If it ever becomes visible, this
+// test catches the duplication immediately with an exact-count check.
+test("multi mode keeps badge measurer hidden from users", async ({
+  initTestBed,
+  page,
+  createAutoCompleteDriver,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <AutoComplete id="autoComplete" multi="true">
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+        <Option value="3" label="Diana Prince" />
+      </AutoComplete>
+    </Fragment>
+  `);
+
+  const driver = await createAutoCompleteDriver("autoComplete");
+  await driver.click();
+  await driver.selectLabel("Bruce Wayne");
+  await driver.selectLabel("Diana Prince");
+
+  // Exactly one real badge per selected label (ghost spans are tagged
+  // [data-ghost="badge"] and excluded here).
+  const realBadges = page.locator('span:not([data-ghost])');
+  await expect(realBadges.filter({ hasText: "Bruce Wayne" })).toHaveCount(1);
+  await expect(realBadges.filter({ hasText: "Diana Prince" })).toHaveCount(1);
+
+  // Ghost measurer exists but is hidden from users.
+  const ghostBadges = page.locator('[data-ghost="badge"]');
+  await expect(ghostBadges).toHaveCount(2);
+  for (let i = 0; i < 2; i++) {
+    await expect(ghostBadges.nth(i)).toBeHidden();
+  }
 });
 
 test("searching filters options", async ({ initTestBed, page, createAutoCompleteDriver }) => {

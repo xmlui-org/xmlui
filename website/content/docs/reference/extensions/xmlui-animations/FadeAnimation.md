@@ -34,7 +34,7 @@ The duration of the animation in milliseconds
 
 > [!DEF]  default: **0**
 
-Sets the initial opacity of the content. If the `to` property is not set, the initial opacity set here will be used as the final opacity.
+Sets the initial opacity of the content.If the `to` property is not set, the initial opacity set here will be used as the final opacity.
 
 ### `loop`
 
@@ -52,7 +52,7 @@ Indicates whether the animation should run in reverse
 
 > [!DEF]  default: **1**
 
-Sets the final opacity of the content. If the `from` property is not set, the initial opacity set here will be used as the final opacity.
+Sets the final opacity of the content.If the `from` property is not set, the initial opacity set here will be used as the final opacity.
 
 ## Events
 
