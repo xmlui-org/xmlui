@@ -66,6 +66,8 @@ export interface FormItemValidations {
   regex?: string;
   regexInvalidMessage?: string;
   regexInvalidSeverity?: ValidationSeverity;
+  matchValue?: any;
+  matchInvalidMessage?: string;
 }
 
 export const validationSeverityValues = ["error", "warning", "valid", "none"] as const;
