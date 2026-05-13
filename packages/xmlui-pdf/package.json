@@ -7,7 +7,6 @@
   ],
   "exports": "./src/index.tsx",
   "scripts": {
-    "postinstall": "node scripts/setup-wasm.js",
     "prestart": "node scripts/setup-wasm.js",
     "start": "xmlui start",
     "preview": "xmlui preview",
