@@ -25,6 +25,7 @@ import { AutoCompleteContext, useAutoComplete } from "./AutoCompleteContext";
 import { OptionContext, useOption } from "../Select/OptionContext";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import { HiddenOption } from "../Select/HiddenOption";
 import { PART_INPUT } from "../../components-core/parts";
 import { PART_CONCISE_VALIDATION_FEEDBACK, PART_LIST_WRAPPER } from "../../components-core/parts";
@@ -628,11 +629,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
           <Part partId={PART_LIST_WRAPPER}>
             <PopoverTrigger asChild ref={setReferenceElement}>
               <div
-                ref={(el) => {
-                  wrapperRef.current = el;
-                  if (typeof forwardedRef === "function") forwardedRef(el);
-                  else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
-                }}
+                ref={composeRefs(wrapperRef, forwardedRef)}
                 style={style}
                 className={classnames(
                   classes?.[COMPONENT_PART_KEY],

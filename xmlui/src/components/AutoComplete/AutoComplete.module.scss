@@ -145,6 +145,13 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
   .badgeListWrapper {
     outline: none;
     width: 100%;
+    // Allow the wrapper to shrink under flex pressure so the truncation
+    // logic ("+N more" chip) can fire instead of the content pushing past
+    // the row width. `!important` is required because xmlui's layout-prop
+    // system emits an inline `flex: 0 0 auto` for every `width` value that
+    // would otherwise re-pin shrink to 0.
+    flex-shrink: 1 !important;
+    min-width: 0;
     height: auto;
     min-height: $minHeight-AutoComplete;
     line-height: normal;
