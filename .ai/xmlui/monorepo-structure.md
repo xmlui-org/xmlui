@@ -69,13 +69,17 @@ Root `package.json` declares all workspace members:
 
 **Cross-package references:** Use `"xmlui": "workspace:*"` in `devDependencies`. The workspace protocol is replaced with the actual published version when `changeset publish` runs.
 
-**Shared installs:** All packages share `node_modules/` at the root via hoisting. Run `npm install` from the root only.
+**Shared installs:** All packages share `node_modules/` at the root via hoisting. Run `npm run setup` from the root only (see [Development Setup](#development-setup)).
 
 ---
 
 ## Root-Level Scripts
 
 ```bash
+# Setup (run after cloning or after npm install)
+npm run setup                   # npm install && allow-scripts run (required for supply-chain safety)
+npm run allow-scripts           # re-run allow-scripts only (without npm install)
+
 # Core framework
 npm run build-xmlui             # turbo run build:xmlui-all
 npm run build-vscode-extension  # turbo run xmlui-vscode#build:vsix
@@ -216,9 +220,11 @@ If `main` changes significantly after the "Version Packages" PR is created (new 
 ```bash
 git clone <repo-url>
 cd xmlui
-npm install          # Installs all workspace deps in one step
+npm run setup        # npm install + allow-scripts run (required for supply-chain safety)
 npm run build-xmlui  # Build core (required before running extensions or tests)
 ```
+
+> **Why `npm run setup` instead of `npm install`?** The repo uses `@lavamoat/allow-scripts` to gate post-install lifecycle scripts. Running bare `npm install` skips that gate. `npm run setup` runs both steps in the correct order.
 
 ### Working on the core framework
 
@@ -252,7 +258,7 @@ rm -rf website/dist/
 # Full clean install
 rm -rf node_modules package-lock.json
 find . -name 'node_modules' -maxdepth 3 -type d -exec rm -rf {} +
-npm install
+npm run setup
 ```
 
 ---
