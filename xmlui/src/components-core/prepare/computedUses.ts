@@ -36,23 +36,60 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
 
 /**
- * Returns true when the identifier `name` lives on `globalThis` and therefore
- * can never be part of XMLUI app state.
+ * ECMAScript standard globals and universally-available platform globals
+ * that will NEVER be stored in XMLUI app state.
  *
- * Rationale: the XMLUI expression evaluator (`eval-tree-common.ts`) resolves
- * identifiers in this order: block scope → localContext → appContext → globalThis.
- * `collectVariableDependencies` captures every identifier without distinguishing
- * where it will ultimately resolve.  We must mirror the evaluator's last fallback:
- * if `name in globalThis` is true at parse time, the identifier will be satisfied
- * by the runtime global scope — NOT by app state — so it must not appear in
- * `computedUses`.
+ * We deliberately use a curated set rather than a bare `name in globalThis`
+ * check.  The reason: `globalThis` (= `window` in browsers) contains hundreds
+ * of legacy / browser-specific properties such as `external`, `screen`,
+ * `history`, `status`, `frames`, etc.  An XMLUI developer may legitimately
+ * name a component state variable any of those names, so filtering them would
+ * silently suppress valid dependency tracking.
  *
- * Using `globalThis` directly instead of a hardcoded set means:
- *  - New ECMAScript built-ins (e.g. `Temporal`) are automatically covered.
- *  - Platform polyfills that extend `globalThis` are covered too.
- *  - No manual maintenance is required when the stdlib grows.
+ * The set below covers:
+ *  – ECMAScript value properties  (undefined, NaN, Infinity, globalThis)
+ *  – ECMAScript function properties (eval, parseInt, encodeURI, …)
+ *  – ECMAScript intrinsic constructors/namespaces (Array, JSON, Math, …)
+ *  – Universally available globals present in both browsers and Node.js
+ *    (console, setTimeout, fetch, URL, crypto, structuredClone, …)
+ *
+ * It does NOT include browser-only legacy properties (window.external,
+ * window.status, window.frames, …) or Node.js–only properties (process,
+ * require, __dirname, …) that could plausibly be XMLUI variable names.
  */
-const isGlobalThisIdentifier = (name: string): boolean => name in globalThis;
+const JS_STDLIB_GLOBALS = new Set([
+  // ECMAScript value properties
+  "undefined", "NaN", "Infinity", "globalThis",
+  // ECMAScript function properties
+  "eval", "isFinite", "isNaN", "parseFloat", "parseInt",
+  "decodeURI", "decodeURIComponent", "encodeURI", "encodeURIComponent",
+  "escape", "unescape",
+  // ECMAScript intrinsic objects / namespaces
+  "Array", "ArrayBuffer", "Atomics", "BigInt", "BigInt64Array", "BigUint64Array",
+  "Boolean", "DataView", "Date", "Error", "EvalError", "FinalizationRegistry",
+  "Float32Array", "Float64Array", "Function",
+  "Int8Array", "Int16Array", "Int32Array",
+  "JSON", "Map", "Math", "Number", "Object", "Promise", "Proxy", "RangeError",
+  "ReferenceError", "Reflect", "RegExp", "Set", "SharedArrayBuffer", "String",
+  "Symbol", "SyntaxError", "TypeError", "URIError",
+  "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
+  "WeakMap", "WeakRef", "WeakSet",
+  // Upcoming ECMAScript (stage 3+ / shipping)
+  "Temporal", "Iterator",
+  // Universally available (browser + Node.js 18+)
+  "console", "structuredClone", "queueMicrotask",
+  "setTimeout", "clearTimeout", "setInterval", "clearInterval",
+  "fetch", "URL", "URLSearchParams", "FormData", "Headers", "Request", "Response",
+  "ReadableStream", "WritableStream", "TransformStream",
+  "Blob", "File", "FileReader",
+  "crypto", "performance",
+  "TextEncoder", "TextDecoder",
+  "AbortController", "AbortSignal",
+  "CustomEvent", "Event", "EventTarget",
+  "WebSocket",
+]);
+
+const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
@@ -224,8 +261,8 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   }
 
   const totalFree = new Set<string>();
-  for (const d of usedHere) if (!localDeclared.has(d) && !isGlobalThisIdentifier(d)) totalFree.add(d);
-  for (const d of childDeps) if (!localDeclared.has(d) && !isGlobalThisIdentifier(d)) totalFree.add(d);
+  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) totalFree.add(d);
+  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) totalFree.add(d);
 
   const isRegularContainer = !!(
     node.vars ||
