@@ -384,3 +384,69 @@ describe("computeUsesForTree — empty totalFree must NOT set computedUses", () 
     expect(root.computedUses).not.toContain("mySelect");
   });
 });
+
+describe("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
+  it("ECMAScript built-ins (JSON, Math, Array) are NOT included in computedUses", () => {
+    // These identifiers exist on globalThis but are never app state —
+    // they must be filtered so they don't pollute computedUses.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Text", {
+          props: { text: "{JSON.stringify(x)} {Math.max(0, x)} {Array.from(x)}" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // JSON, Math, Array → filtered; no external deps remain → computedUses not set
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("JS built-in mixed with real app var: only app var in computedUses", () => {
+    // {JSON.stringify(rarelyChanges)} — JSON filtered, rarelyChanges stays
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Text", {
+          props: { text: "{JSON.stringify(rarelyChanges)}" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("rarelyChanges");
+    expect(root.computedUses).not.toContain("JSON");
+  });
+
+  it("framework-like identifier (toast) is NOT filtered — appears in computedUses", () => {
+    // Framework globals like 'toast' are resolved from localContext at runtime,
+    // not from globalThis. They are NOT in JS_STDLIB_GLOBALS, so they correctly
+    // appear in computedUses. This is harmless: toast is stable (never changes),
+    // and since it's not in parentState, extractScopedState simply omits it without
+    // breaking the scoped state for other dependencies.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Button", {
+          events: { onClick: "{toast('hello')}" },
+          props: { label: "{rarelyChanges}" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    // toast passes through (not a JS_STDLIB_GLOBAL), rarelyChanges also passes
+    expect(root.computedUses).toContain("toast");
+    expect(root.computedUses).toContain("rarelyChanges");
+  });
+
+  it("legacy browser property (external, screen) is NOT filtered", () => {
+    // window.external, window.screen etc. are browser-specific legacy props.
+    // They could legitimately be XMLUI var names, so they must NOT be filtered.
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [node("Text", { props: { text: "{external} {screen}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("external");
+    expect(root.computedUses).toContain("screen");
+  });
+});
