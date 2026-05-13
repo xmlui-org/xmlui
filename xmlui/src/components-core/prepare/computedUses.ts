@@ -196,13 +196,13 @@ function depsOfRecord(record: Record<string, unknown> | undefined): Set<string> 
  *                     subtree). The caller adds these to its own
  *                     `localDeclared` so they don't pollute `computedUses`.
  */
-function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
+function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string> = new Set()): [Set<string>, Set<string>] {
   const localDeclared = new Set<string>();
   if (node.vars) for (const k of Object.keys(node.vars)) localDeclared.add(k);
   if (node.functions) for (const k of Object.keys(node.functions)) localDeclared.add(k);
   if (node.scriptCollected) {
-    const sc = node.scriptCollected;
-    for (const k of Object.keys(sc)) localDeclared.add(k);
+    for (const k of Object.keys(node.scriptCollected.functions ?? {})) localDeclared.add(k);
+    for (const k of Object.keys(node.scriptCollected.vars ?? {})) localDeclared.add(k);
   }
   if (node.uid) localDeclared.add(node.uid);
   // Context variables ($item, $itemIndex, etc.) are injected by the framework
@@ -215,6 +215,30 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   // below will receive their escapingUIDs and add them to localDeclared then.
   // Pre-seeding would create a dual-authority situation and would incorrectly
   // treat a container-loader's UID as locally owned even if it should escape.
+
+  // Function names declared by THIS node — passed to children as parentFunctionNames
+  // if this node is (or becomes) a container that creates a new scope.
+  // Functions are non-reactive: including extra ones in computedUses never causes
+  // unnecessary rerenders, but excluding them breaks transitive calls at runtime.
+  const nodeFunctionNames = new Set<string>([
+    ...Object.keys(node.functions ?? {}),
+    ...Object.keys(node.scriptCollected?.functions ?? {}),
+  ]);
+  // A node is a "known" container regardless of parentDeps (excludes implicit-default).
+  // Require non-empty vars/functions — the StandaloneApp merge produces `vars: {}` and
+  // `functions: {}` (truthy empty objects) for every compound component even when none
+  // are declared. Treating those as containers would falsely narrow their children.
+  const isKnownContainer = !!(
+    (node.vars && Object.keys(node.vars).length > 0) ||
+    (node.loaders && node.loaders.length > 0) ||
+    (node.functions && Object.keys(node.functions).length > 0) ||
+    node.uses !== undefined ||
+    node.contextVars ||
+    node.scriptCollected
+  );
+  // Children of a container see THIS node's functions; children of a non-container
+  // see the same parentFunctionNames inherited from above (scope doesn't change).
+  const childFunctionNames = isKnownContainer ? nodeFunctionNames : parentFunctionNames;
 
   const usedHere = new Set<string>();
 
@@ -241,7 +265,7 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs] = computeUsesInternal(child);
+      const [deps, escapingUIDs] = computeUsesInternal(child, childFunctionNames);
       for (const d of deps) childDeps.add(d);
       for (const uid of escapingUIDs) {
         childEscapingUIDs.add(uid);
@@ -265,9 +289,9 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) parentDependencies.add(d);
 
   const isRegularContainer = !!(
-    node.vars ||
+    (node.vars && Object.keys(node.vars).length > 0) ||
     (node.loaders && node.loaders.length > 0) ||
-    node.functions ||
+    (node.functions && Object.keys(node.functions).length > 0) ||
     node.uses !== undefined ||
     node.contextVars ||
     node.scriptCollected
@@ -287,8 +311,22 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
     // with computedUses=[] the Fragment isolates all parent state, making
     // {x.value} invisible to siblings even after updateState() dispatches.
-    if (node.uses === undefined && parentDependencies.size > 0) {
-      node.computedUses = Array.from(parentDependencies);
+    // Skip narrowing for nodes with scriptCollected: their function bodies
+    // access global state vars that template expression analysis cannot see.
+    // Narrowing based on template deps alone would silently hide those vars.
+    if (node.uses === undefined && parentDependencies.size > 0 && !node.scriptCollected) {
+      // If any needed dep is a parent-provided function, include ALL parent
+      // functions in computedUses so that functions called transitively within
+      // those functions are also in scope. Functions are non-reactive, so
+      // including extras never triggers unnecessary rerenders.
+      const needsParentFunction = parentFunctionNames.size > 0 &&
+        [...parentDependencies].some(d => parentFunctionNames.has(d));
+      const computedUsesSet = needsParentFunction
+        ? new Set([...parentDependencies, ...parentFunctionNames])
+        : parentDependencies;
+      node.computedUses = Array.from(computedUsesSet);
+    } else if (node.uses === undefined && parentDependencies.size > 0 && node.scriptCollected) {
+      // no-op: scriptCollected nodes are intentionally not narrowed
     }
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
     return [parentDependencies, myEscapingUID];
