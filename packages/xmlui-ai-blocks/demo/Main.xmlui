@@ -1,0 +1,9 @@
+<VStack padding="2rem" gap="1rem">
+  <AiConversation
+    title="XMLUI app builder"
+    provider="OpenAI"
+    model="gpt-5.2"
+    status="Design stub"
+    placeholder="The real component will show a project-aware conversation here."
+  />
+</VStack>
