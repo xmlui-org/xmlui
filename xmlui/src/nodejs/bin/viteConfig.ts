@@ -5,6 +5,7 @@ import svgr from "vite-plugin-svgr";
 import { default as ViteYaml } from "@modyfi/vite-plugin-yaml";
 import { default as ViteXmlui } from "../vite-xmlui-plugin";
 import * as path from "path";
+import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
 
 type ViteConfigData = {
   flatDist?: boolean;
@@ -20,8 +21,6 @@ logger.warn = (msg, options) => {
   if (msg.includes('Failed to resolve "remix:manifest"')) return;
   loggerWarn(msg, options);
 };
-
-const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
 
 /**
  * Defence-in-depth: ensures the canonical CSS `@layer` cascade order is

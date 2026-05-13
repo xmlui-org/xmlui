@@ -23,6 +23,7 @@ import {
   StyleProvider,
   useStyles,
 } from "../../components-core/theming/StyleContext";
+import { CSS_LAYER_ORDER } from "../../components-core/cssLayers";
 
 type NestedAppProps = {
   api?: any;
@@ -40,7 +41,6 @@ type NestedAppProps = {
 
 const PLAYGROUND_ENTRY_FILE = "/__playground__/Main.xmlui";
 const PLAYGROUND_COMPONENTS_DIR = "/__playground__/components";
-export const CSS_LAYER_ORDER = "@layer reset, base, components, themes, dynamic;";
 
 function toSafeFileStem(value: string | undefined, fallback: string): string {
   if (!value) return fallback;
