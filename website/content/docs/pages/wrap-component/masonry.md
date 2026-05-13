@@ -11,7 +11,7 @@ The `Masonry` component arranges children in a responsive multi-column layout. I
 
 ## Basic: colored boxes with varying heights
 
-```xmlui-pg
+```xmlui-pg id="basic-colored-boxes-with-varying-heights-b6be"
 ---app display
 <App>
   <Masonry columns="4" gap="$space-3" minColumnWidth="150px">
@@ -45,7 +45,7 @@ The `Masonry` component arranges children in a responsive multi-column layout. I
 
 ## Content cards: simulated event listings
 
-```xmlui-pg
+```xmlui-pg id="content-cards-simulated-event-listings-b82e"
 ---app display
 <App>
   <Masonry columns="3" gap="$space-4" rowGap="0" minColumnWidth="250px">

@@ -39,7 +39,7 @@ As an XMLUI developer you'll create user interfaces by combining these with othe
 
 You'll also create your own components to combine and extend the built-ins. For example, here's a component that represents the stops on a London tube line.
 
-```xmlui-pg
+```xmlui-pg id="built-in-components-eafb"
 ---app display /line/
 <App>
   <TubeStops line="Bakerloo"/>
@@ -74,7 +74,7 @@ You'll also create your own components to combine and extend the built-ins. For 
 
 An instance of `TubeStops` extracts details for a given tube line. Multiple instances can be arranged on the display using layout components. For example, here's a two-column layout.
 
-```xmlui-pg display
+```xmlui-pg display id="user-defined-components-eab5"
 ---app display
 <App>
     <FlowLayout>

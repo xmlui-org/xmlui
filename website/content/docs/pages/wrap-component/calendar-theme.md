@@ -30,7 +30,7 @@ The `scopeId` ensures styles don't leak to other calendar instances. The `resolv
 
 This is the same calendar from the [native events](/docs/guides/wrap-component/bigcalendar) page. The calendar's event backgrounds, toolbar buttons, borders, and "today" highlight all come from XMLUI design tokens.
 
-```xmlui-pg
+```xmlui-pg id="demo-b767"
 ---app display
 <App>
   <BigCalendar

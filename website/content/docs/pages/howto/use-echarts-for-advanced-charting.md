@@ -6,7 +6,7 @@ The [EChart](/docs/reference/extensions/xmlui-echart/EChart) component wraps [Ap
 
 Pass an `option` object with `xAxis`, `yAxis`, and `series` to render a chart.
 
-```xmlui-pg copy
+```xmlui-pg copy id="basic-bar-chart-b6ce"
 <App>
   <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
   <Card height="400px">
@@ -28,7 +28,7 @@ Pass an `option` object with `xAxis`, `yAxis`, and `series` to render a chart.
 
 Set `series.type` to `'pie'` and use `radius` to create a donut.
 
-```xmlui-pg copy
+```xmlui-pg copy id="pie-donut-chart-b72a"
 <App>
   <DataSource id="stats" url="/resources/files/dashboard-stats.json" method="GET" />
   <Card height="400px">
@@ -57,7 +57,7 @@ Set `series.type` to `'pie'` and use `radius` to create a donut.
 
 Use multiple entries in the `series` array to overlay lines.
 
-```xmlui-pg copy
+```xmlui-pg copy id="line-chart-with-multiple-series-b7b6"
 <App>
   <DataSource id="monthly" url="/resources/files/monthly-status.json" method="GET" />
   <Card height="400px">

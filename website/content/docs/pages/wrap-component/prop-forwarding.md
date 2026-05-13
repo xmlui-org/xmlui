@@ -8,7 +8,7 @@ This page uses `Slider` to show the pattern in isolation. The point is not that 
 
 Radix Slider supports an `inverted` prop that reverses the direction of the track. `Slider` does not need custom wrapper code for this; the prop is simply forwarded to the render component.
 
-```xmlui-pg
+```xmlui-pg id="inverted-b6c8"
 ---app display
 <App>
   <Card var.sw6Val="">
@@ -35,7 +35,7 @@ Radix Slider supports an `inverted` prop that reverses the direction of the trac
 
 The render component spreads native props onto its outer element, so standard HTML attributes like `title` pass through as well. Hover the slider to see the browser tooltip.
 
-```xmlui-pg
+```xmlui-pg id="title-b784"
 ---app display
 <App>
   <Card var.sw7Val="">
@@ -61,7 +61,7 @@ The render component spreads native props onto its outer element, so standard HT
 
 Accessible props are part of prop forwarding too. Here the wrapper passes `aria-label` through to the rendered slider, which makes the control discoverable to assistive technology and gives testing tools a stable semantic selector such as `getByRole('slider', { name: 'Volume' })`.
 
-```xmlui-pg
+```xmlui-pg id="aria-label-b7f2"
 ---app display
 <App>
   <Card>

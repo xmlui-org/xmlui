@@ -18,7 +18,7 @@ This is domain-specific knowledge that the render component owns -- the wrapper 
 
 Type, format, insert a table -- then open the inspector. You'll see events like `native:input "hello"`, `native:format "bold: on"`, `native:insert "table 3x3"`. Every interaction is semantically classified without any changes to the XMLUI core.
 
-```xmlui-pg
+```xmlui-pg id="demo-b6d7"
 ---app display
 <App>
   <TiptapEditor
