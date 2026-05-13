@@ -153,6 +153,8 @@ export const FormItem = memo(forwardRef(function FormItem({
   regex,
   regexInvalidMessage,
   regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
   // ---
   style,
   className,
@@ -203,6 +205,8 @@ export const FormItem = memo(forwardRef(function FormItem({
     regex,
     regexInvalidMessage,
     regexInvalidSeverity,
+  matchValue,
+  matchInvalidMessage,
   });
   const defaultId = useId();
   const inputId = useId();
