@@ -101,6 +101,30 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
     expect(select.computedUses).toBeUndefined();
   });
 
+  it("contextVar keys are locally declared — do NOT make Select an implicit container", () => {
+    // Typical pattern: <Select><Items contextVar="$item" data="{...}"><Option value="{$item.value}"/></Items></Select>
+    // $item is a contextVar of Items — locally provided, not from parent scope.
+    // Without this fix, $item leaks out of Items → Select has totalFree={"$item"} → becomes
+    // implicit container → gets wrapped in outer Container with computedUses=["$item"] →
+    // extractScopedState(parentState, ["$item"]) = {} → value updates get isolated inside
+    // the outer Container and never propagate to Fragment → {mySelect.value} stays empty.
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{someData}" },
+          children: [node("Option", { props: { value: "{$item.value}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(select);
+    // Items absorbs $item (contextVar) and someData (external dep).
+    // Select has totalFree={"someData"} — no $item leak.
+    // Select IS an implicit container (has free vars), but computedUses=["someData"] only.
+    expect(select.computedUses).not.toContain("$item");
+    expect(select.computedUses).toContain("someData");
+  });
+
   it("explicit uses is not overwritten by computedUses", () => {
     const root = node("Stack", {
       uses: ["count"],

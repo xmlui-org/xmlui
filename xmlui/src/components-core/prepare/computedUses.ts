@@ -149,6 +149,12 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     for (const k of Object.keys(sc)) localDeclared.add(k);
   }
   if (node.uid) localDeclared.add(node.uid);
+  // Context variables ($item, $itemIndex, etc.) are injected by the framework
+  // at runtime into the children of this node — they are locally provided, not
+  // external dependencies, so they must be in localDeclared.
+  if (node.contextVars) {
+    for (const k of Object.keys(node.contextVars)) localDeclared.add(k);
+  }
   // Note: loader UIDs are NOT pre-seeded here. processChildList(node.loaders)
   // below will receive their escapingUIDs and add them to localDeclared then.
   // Pre-seeding would create a dual-authority situation and would incorrectly
