@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 import Papa from "papaparse";
 
@@ -32,6 +32,39 @@ import {
   getCurrentTrace,
 } from "../inspector/inspectorUtils";
 
+// --- Component metadata (prop/event declarations used by the XMLUI language server and docs)
+export const DataLoaderMd = createMetadata({
+  status: "stable",
+  description: "This component manages data fetching from a web API",
+  props: {
+    method: d("The HTTP method to use"),
+    url: d("The URL to fetch data from"),
+    rawBody: d("The raw body of the request"),
+    body: d("The body of the request to be sent as JSON"),
+    queryParams: d("Query parameters to send with the request"),
+    headers: d("Headers to send with the request"),
+    credentials: d("Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)"),
+    pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
+    resultSelector: d("An expression to extract the result from the response"),
+    prevPageSelector: d("An expression to extract the previous page parameter from the response"),
+    nextPageSelector: d("An expression to extract the next page parameter from the response"),
+    inProgressNotificationMessage: d("The message to show when the loader is in progress"),
+    completedNotificationMessage: d("The message to show when the loader completes"),
+    errorNotificationMessage: d("The message to show when an error occurs"),
+    transformResult: d("Function for transforming the datasource result"),
+    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
+    structuralSharing: d("Whether to use structural sharing for the data"),
+    mockData: d("Data to return directly without making a network request (for development and testing)"),
+  },
+  events: {
+    loaded: d("Event to trigger when the data is loaded"),
+    error: d("This event fires when an error occurs while fetching data"),
+    fetch: d("When defined, this event handler replaces the default fetch logic"),
+  },
+});
+
+type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
+
 type LoaderProps = {
   loader: DataLoaderDef;
   state: ContainerState;
@@ -47,6 +80,13 @@ type LoaderProps = {
   structuralSharing?: boolean;
 };
 
+/**
+ * Resolves request parameters from component state, executes the fetch (REST, CSV,
+ * text, SQL, or a user-supplied onFetch handler), then dispatches lifecycle callbacks
+ * (loaderInProgressChanged, loaderLoaded, loaderError) and manages in-progress toasts.
+ * Renders either a Loader (simple) or PageableLoader (paginated), or a mock Loader
+ * when mockData is set.
+ */
 function DataLoader({
   loader,
   state,
@@ -72,6 +112,8 @@ function DataLoader({
   // Capture trace ID when fetch is triggered, not when it completes
   const pendingTraceIdRef = useRef<string | undefined>(undefined);
 
+  // Inspector verbose logging — no-op when xsVerbose is off.
+  // Emits a structured entry to the xs log ring buffer with full DataSource context.
   const xsLog = useCallback(
     (...args: any[]) => {
       if (!xsVerbose) return;
@@ -106,6 +148,9 @@ function DataLoader({
   );
 
   const rawUrl = extractParam(state, loader.props.url, appContext);
+  // The *Inner / useShallowCompareMemoize two-step is used for all request params:
+  // useMemo re-evaluates when state changes; useShallowCompareMemoize suppresses
+  // React Query re-fetches when the value is referentially new but shallowly equal.
   const rawQueryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);
   }, [appContext, loader.props.queryParams, state]);
@@ -176,7 +221,12 @@ function DataLoader({
     return new RestApiProxy(appContext, apiInstance);
   }, [apiInstance, appContext]);
 
-  const doLoad = useCallback(
+  /**
+   * Core fetch function passed to Loader/PageableLoader as its queryFn.
+   * Dispatch order: onFetch override → csv → text → sql → default REST via RestApiProxy.
+   * Each branch traces api:start / api:complete / api:error to the xs inspector log.
+   */
+  const fetchData = useCallback(
     async (abortSignal?: AbortSignal, pageParams?: any) => {
       // Capture the current trace ID when fetch is triggered
       // This way the trace is preserved even if the handler completes before fetch does.
@@ -221,22 +271,8 @@ function DataLoader({
         try {
           const method = extractParam(state, loader.props.method, appContext) || "GET";
           const headers = extractParam(state, loader.props.headers, appContext) || {};
-
-          const fetchOptions: RequestInit = {
-            method,
-            headers,
-          };
-
-          if (abortSignal) {
-            fetchOptions.signal = abortSignal;
-          }
-
-          if (rawBody) {
-            fetchOptions.body = rawBody;
-          }
-
           const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
-          const response = await fetch(fetchUrl, fetchOptions);
+          const response = await fetch(fetchUrl, buildSimpleFetchOptions(method, headers, abortSignal, rawBody));
 
           if (!response.ok) {
             throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
@@ -251,6 +287,8 @@ function DataLoader({
               complete: (results) => {
                 if (results.errors && results.errors.length) {
                   console.warn("CSV parsing warnings:", results.errors);
+                  // TODO: filter(() => true) always passes — review whether this should
+                  // filter by error severity (e.g. results.errors.filter(e => e.type === "FieldMismatch")).
                   const fatalErrors = results.errors.filter(() => true);
                   if (fatalErrors.length) {
                     reject(new Error(`CSV parsing error: ${fatalErrors[0].message}`));
@@ -272,11 +310,8 @@ function DataLoader({
         try {
           const method = extractParam(state, loader.props.method, appContext) || "GET";
           const headers = extractParam(state, loader.props.headers, appContext) || {};
-          const fetchOptions: RequestInit = { method, headers };
-          if (abortSignal) { fetchOptions.signal = abortSignal; }
-          if (rawBody) { fetchOptions.body = rawBody; }
           const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
-          const response = await fetch(fetchUrl, fetchOptions);
+          const response = await fetch(fetchUrl, buildSimpleFetchOptions(method, headers, abortSignal, rawBody));
           if (!response.ok) {
             throw new Error(`Failed to fetch text: ${response.status} ${response.statusText}`);
           }
@@ -335,14 +370,10 @@ function DataLoader({
         // Trace API call start
         if (xsVerbose) {
           pushXsLog({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: pendingTraceIdRef.current || getCurrentTrace(),
+            ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
             kind: "api:start",
             url: queryUrl,
-            method: method,
-            instanceId: instanceIdRef.current,
-            dataSourceId: (loader.props as any).id,
+            method,
             dataType: "sql",
             body: { sql: sqlQuery, params: sqlParams },
           }, xsLogMax);
@@ -356,14 +387,10 @@ function DataLoader({
             // Trace API call error
             if (xsVerbose) {
               pushXsLog({
-                ts: Date.now(),
-                perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-                traceId: pendingTraceIdRef.current || getCurrentTrace(),
+                ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
                 kind: "api:error",
                 url: queryUrl,
-                method: method,
-                instanceId: instanceIdRef.current,
-                dataSourceId: (loader.props as any).id,
+                method,
                 dataType: "sql",
                 error: { message: errorMsg },
                 status: response.status,
@@ -375,7 +402,8 @@ function DataLoader({
           // Parse response as JSON
           const jsonResult = await response.json();
 
-          // Determine the final result
+          // Determine the final result.
+          // Some SQL backends wrap rows under a 'rows' or 'results' key; unwrap if present.
           let finalResult = jsonResult;
           if (jsonResult && typeof jsonResult === "object") {
             if (jsonResult.rows) {
@@ -388,14 +416,10 @@ function DataLoader({
           // Trace API call completion
           if (xsVerbose) {
             pushXsLog({
-              ts: Date.now(),
-              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: pendingTraceIdRef.current || getCurrentTrace(),
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
               kind: "api:complete",
               url: queryUrl,
-              method: method,
-              instanceId: instanceIdRef.current,
-              dataSourceId: (loader.props as any).id,
+              method,
               dataType: "sql",
               result: finalResult,
               status: response.status,
@@ -407,14 +431,10 @@ function DataLoader({
           // Trace API call error (for network errors, etc.)
           if (xsVerbose && error?.message && !error.message.startsWith("Failed to execute SQL query:")) {
             pushXsLog({
-              ts: Date.now(),
-              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: pendingTraceIdRef.current || getCurrentTrace(),
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
               kind: "api:error",
               url: queryUrl,
-              method: method,
-              instanceId: instanceIdRef.current,
-              dataSourceId: (loader.props as any).id,
+              method,
               dataType: "sql",
               error: { message: error?.message || String(error), stack: error?.stack },
             }, xsLogMax);
@@ -427,14 +447,10 @@ function DataLoader({
         if (xsVerbose) {
           const method = (loader.props as any).method || "GET";
           pushXsLog({
-            ts: Date.now(),
-            perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-            traceId: pendingTraceIdRef.current || getCurrentTrace(),
+            ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
             kind: "api:start",
-            url: url,
-            method: method,
-            instanceId: instanceIdRef.current,
-            dataSourceId: (loader.props as any).id,
+            url,
+            method,
             body: body || rawBody,
           }, xsLogMax);
         }
@@ -458,15 +474,11 @@ function DataLoader({
           if (xsVerbose) {
             const method = (loader.props as any).method || "GET";
             pushXsLog({
-              ts: Date.now(),
-              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: pendingTraceIdRef.current || getCurrentTrace(),
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
               kind: "api:complete",
-              url: url,
-              method: method,
-              instanceId: instanceIdRef.current,
-              dataSourceId: (loader.props as any).id,
-              result: result,
+              url,
+              method,
+              result,
             }, xsLogMax);
           }
 
@@ -476,14 +488,10 @@ function DataLoader({
           if (xsVerbose) {
             const method = (loader.props as any).method || "GET";
             pushXsLog({
-              ts: Date.now(),
-              perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
-              traceId: pendingTraceIdRef.current || getCurrentTrace(),
+              ...traceBase(pendingTraceIdRef, instanceIdRef, loader, xsLogMax),
               kind: "api:error",
-              url: url,
-              method: method,
-              instanceId: instanceIdRef.current,
-              dataSourceId: (loader.props as any).id,
+              url,
+              method,
               error: { message: e?.message || String(e), stack: e?.stack },
             }, xsLogMax);
           }
@@ -510,13 +518,10 @@ function DataLoader({
   const pendingResponseHeadersRef = useRef<Record<string, string> | undefined>(undefined);
 
   const loadingToastIdRef = useRef<string | undefined>(undefined);
-  const inProgress: LoaderInProgressChangedFn = useCallback(
+  // Manages the in-progress toast and delegates to loaderInProgressChanged.
+  const handleInProgressChange: LoaderInProgressChangedFn = useCallback(
     (isInProgress) => {
-      //console.log("[DataLoader] inProgress() called with isInProgress:", isInProgress);
-      //console.log("[DataLoader] dataType:", loader.props.dataType);
-
       loaderInProgressChanged(isInProgress);
-      //console.log("[DataLoader] After loaderInProgressChanged() call");
 
       const inProgressMessage = extractParam(
         stateRef.current.state,
@@ -533,26 +538,13 @@ function DataLoader({
           toast.dismiss(loadingToastIdRef.current);
         }
       }
-      //console.log("[DataLoader] inProgress() completed");
     },
     [loader.props.inProgressNotificationMessage, loaderInProgressChanged],
   );
 
-  const loaded: LoaderLoadedFn = useCallback(
+  // Logs data changes to the xs inspector and manages the completion toast.
+  const handleLoaded: LoaderLoadedFn = useCallback(
     (data, pageInfo) => {
-      // console.log("[DataLoader] loaded() called with data:", data);
-      // console.log("[DataLoader] loaded() pageInfo:", pageInfo);
-      // console.log("[DataLoader] loader.props.dataType:", loader.props.dataType);
-
-      // if (loader.props.dataType === "sql") {
-      //   console.log("[SQL DataLoader] Processing SQL result data in loaded()");
-      //   console.log("[SQL DataLoader] Data type:", typeof data);
-      //   console.log("[SQL DataLoader] Is array:", Array.isArray(data));
-      //   if (data && typeof data === 'object') {
-      //     console.log("[SQL DataLoader] Data keys:", Object.keys(data));
-      //   }
-      // }
-
       if (xsVerbose) {
         const before = prevDataRef.current;
         const after = data;
@@ -570,7 +562,6 @@ function DataLoader({
       }
 
       loaderLoaded(data, pageInfo, data !== undefined ? pendingResponseHeadersRef.current : undefined);
-      // console.log("[DataLoader] After loaderLoaded() call");
 
       const completedMessage = extractParam(
         {
@@ -589,12 +580,12 @@ function DataLoader({
           toast.dismiss(loadingToastIdRef.current);
         }
       }
-      //console.log("[DataLoader] loaded() completed");
     },
     [loader.props.completedNotificationMessage, loaderLoaded],
   );
 
-  const error: LoaderErrorFn = useCallback(
+  // Delegates to loaderError, runs the user's onError handler (if any), and manages the error toast.
+  const handleError: LoaderErrorFn = useCallback(
     async (error) => {
       loaderError(error);
       if (onError) {
@@ -638,7 +629,7 @@ function DataLoader({
   }, [hasMockData, appContext, loader.props.mockData, state]);
   const mockDataValue = useShallowCompareMemoize(mockDataInner);
 
-  const doLoadMock = useCallback(() => {
+  const returnMockData = useCallback(() => {
     return mockDataValue ?? null;
   }, [mockDataValue]);
 
@@ -656,11 +647,11 @@ function DataLoader({
         key={`mock-${loader.uid}`}
         state={state}
         loader={loader}
-        loaderInProgressChanged={inProgress}
+        loaderInProgressChanged={handleInProgressChange}
         loaderIsRefetchingChanged={loaderIsRefetchingChanged}
-        loaderLoaded={loaded}
-        loaderError={error}
-        loaderFn={doLoadMock}
+        loaderLoaded={handleLoaded}
+        loaderError={handleError}
+        loaderFn={returnMockData}
         pollIntervalInSeconds={pollIntervalInSeconds}
         registerComponentApi={registerComponentApi}
         onLoaded={onLoaded}
@@ -676,11 +667,11 @@ function DataLoader({
       key={queryId?.join("")}
       state={state}
       loader={loader}
-      loaderInProgressChanged={inProgress}
+      loaderInProgressChanged={handleInProgressChange}
       loaderIsRefetchingChanged={loaderIsRefetchingChanged}
-      loaderLoaded={loaded}
-      loaderError={error}
-      loaderFn={doLoad}
+      loaderLoaded={handleLoaded}
+      loaderError={handleError}
+      loaderFn={fetchData}
       registerComponentApi={registerComponentApi}
       pollIntervalInSeconds={pollIntervalInSeconds}
       onLoaded={onLoaded}
@@ -693,11 +684,11 @@ function DataLoader({
       key={queryId?.join("")}
       state={state}
       loader={loader}
-      loaderInProgressChanged={inProgress}
+      loaderInProgressChanged={handleInProgressChange}
       loaderIsRefetchingChanged={loaderIsRefetchingChanged}
-      loaderLoaded={loaded}
-      loaderError={error}
-      loaderFn={doLoad}
+      loaderLoaded={handleLoaded}
+      loaderError={handleError}
+      loaderFn={fetchData}
       pollIntervalInSeconds={pollIntervalInSeconds}
       registerComponentApi={registerComponentApi}
       onLoaded={onLoaded}
@@ -707,38 +698,7 @@ function DataLoader({
   );
 }
 
-export const DataLoaderMd = createMetadata({
-  status: "stable",
-  description: "This component manages data fetching from a web API",
-  props: {
-    method: d("The HTTP method to use"),
-    url: d("The URL to fetch data from"),
-    rawBody: d("The raw body of the request"),
-    body: d("The body of the request to be sent as JSON"),
-    queryParams: d("Query parameters to send with the request"),
-    headers: d("Headers to send with the request"),
-    credentials: d("Controls whether cookies and credentials are sent with the request (omit, same-origin, or include)"),
-    pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
-    resultSelector: d("An expression to extract the result from the response"),
-    prevPageSelector: d("An expression to extract the previous page parameter from the response"),
-    nextPageSelector: d("An expression to extract the next page parameter from the response"),
-    inProgressNotificationMessage: d("The message to show when the loader is in progress"),
-    completedNotificationMessage: d("The message to show when the loader completes"),
-    errorNotificationMessage: d("The message to show when an error occurs"),
-    transformResult: d("Function for transforming the datasource result"),
-    dataType: d("Type of data to fetch (default: json, or csv, sql, or text)"),
-    structuralSharing: d("Whether to use structural sharing for the data"),
-    mockData: d("Data to return directly without making a network request (for development and testing)"),
-  },
-  events: {
-    loaded: d("Event to trigger when the data is loaded"),
-    error: d("This event fires when an error occurs while fetching data"),
-    fetch: d("When defined, this event handler replaces the default fetch logic"),
-  },
-});
-
-type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
-
+// --- IndexAwareDataLoader: suppresses rendering during search indexing
 function IndexAwareDataLoader(props) {
   const { indexing } = useIndexerContext();
   if (indexing) {
@@ -747,6 +707,8 @@ function IndexAwareDataLoader(props) {
   return <DataLoader {...props} />;
 }
 
+// Bridges the XMLUI renderer pipeline to IndexAwareDataLoader.
+// Validates required props and wires the fetch/loaded/error event actions.
 export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",
   ({
@@ -795,3 +757,42 @@ export const dataLoaderRenderer = createLoaderRenderer(
   },
   DataLoaderMd,
 );
+
+// ---------------------------------------------------------------------------
+// Private helpers (used only within this module)
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the common base fields shared by every pushXsLog trace call in fetchData.
+ * Avoids repeating ts/perfTs/traceId/instanceId/dataSourceId at each trace site.
+ */
+function traceBase(
+  pendingTraceIdRef: React.MutableRefObject<string | undefined>,
+  instanceIdRef: React.MutableRefObject<string>,
+  loader: { props?: any; uid?: any },
+  _xsLogMax: number,
+) {
+  return {
+    ts: Date.now(),
+    perfTs: typeof performance !== "undefined" ? performance.now() : undefined,
+    traceId: pendingTraceIdRef.current || getCurrentTrace(),
+    instanceId: instanceIdRef.current,
+    dataSourceId: (loader.props as any).id,
+  };
+}
+
+/**
+ * Builds a RequestInit for simple GET/POST fetches (csv, text data types).
+ * Applies abortSignal and rawBody when provided.
+ */
+function buildSimpleFetchOptions(
+  method: string,
+  headers: Record<string, string>,
+  abortSignal?: AbortSignal,
+  rawBody?: string,
+): RequestInit {
+  const options: RequestInit = { method, headers };
+  if (abortSignal) options.signal = abortSignal;
+  if (rawBody) options.body = rawBody;
+  return options;
+}
