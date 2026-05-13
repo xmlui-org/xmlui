@@ -1,5 +1,5 @@
-import type { ForwardedRef } from "react";
-import React, { forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
+import type { ForwardedRef, HTMLAttributes, Ref } from "react";
+import { forwardRef, memo, useMemo, useRef, useCallback, useEffect } from "react";
 import { useComposedRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
 
@@ -97,7 +97,7 @@ export function getCustomVariantCacheStats() {
 // Component Definition
 // =============================================================================
 
-type TextProps = Omit<React.HTMLAttributes<HTMLElement>, "onContextMenu"> & {
+type TextProps = Omit<HTMLAttributes<HTMLElement>, "onContextMenu"> & {
   uid?: string;
   variant?: TextVariant;
   maxLines?: number;
@@ -116,7 +116,7 @@ export const defaultProps = {
   preserveLinebreaks: false,
   ellipses: true,
   overflowMode: undefined as OverflowMode | undefined,
-  breakMode: "normal" as BreakMode | undefined,
+  breakMode: undefined as BreakMode | undefined,
 };
 
 export const Text = memo(forwardRef(function Text(
@@ -314,7 +314,7 @@ export const Text = memo(forwardRef(function Text(
   return (
     <Element
       {...restVariantSpecificProps}
-      ref={ref as React.Ref<any>}
+      ref={ref as Ref<any>}
       onContextMenu={onContextMenu}
       className={classnames(
         syntaxHighlightClasses,
