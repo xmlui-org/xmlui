@@ -8,10 +8,10 @@ Authoritative reference for the XMLUI build system, CLI commands, Vite configura
 
 Every XMLUI application uses exactly one of two modes — chosen at project creation, not changeable at runtime.
 
-| Mode | Parsing | Build Step | Deployment |
-|------|---------|-----------|------------|
-| **Standalone (buildless)** | Browser at runtime | None | Copy static files |
-| **Vite (built)** | Compile time (Vite) | `xmlui build` | Serve dist/ bundle |
+| Mode                       | Parsing             | Build Step    | Deployment         |
+| -------------------------- | ------------------- | ------------- | ------------------ |
+| **Standalone (buildless)** | Browser at runtime  | None          | Copy static files  |
+| **Vite (built)**           | Compile time (Vite) | `xmlui build` | Serve dist/ bundle |
 
 ### Standalone Mode
 
@@ -23,7 +23,9 @@ Every XMLUI application uses exactly one of two modes — chosen at project crea
 ```html
 <!DOCTYPE html>
 <html>
-  <head><title>My App</title></head>
+  <head>
+    <title>My App</title>
+  </head>
   <body>
     <div id="root"></div>
     <script src="https://cdn.example.com/xmlui/xmlui-standalone.umd.js"></script>
@@ -71,22 +73,22 @@ Production app build.
 xmlui build [--buildMode CONFIG_ONLY|INLINE_ALL|ALL] [--flatDist] [--withMock] [--withHostingMetaFiles] [--withRelativeRoot] [--prod]
 ```
 
-| Flag | Default (dev) | Default (prod) |
-|------|--------------|----------------|
-| `--buildMode` | `CONFIG_ONLY` | auto |
-| `--flatDist` | false | true |
-| `--withMock` | true | false |
-| `--withHostingMetaFiles` | false | false |
-| `--withRelativeRoot` | false | true |
-| `--prod` | — | shorthand for prod settings |
+| Flag                     | Default (dev) | Default (prod)              |
+| ------------------------ | ------------- | --------------------------- |
+| `--buildMode`            | `CONFIG_ONLY` | auto                        |
+| `--flatDist`             | false         | true                        |
+| `--withMock`             | true          | false                       |
+| `--withHostingMetaFiles` | false         | false                       |
+| `--withRelativeRoot`     | false         | true                        |
+| `--prod`                 | —             | shorthand for prod settings |
 
 **Build mode comparison:**
 
-| Mode | Bundle size | Runtime loading | Use case |
-|------|-------------|-----------------|----------|
-| `CONFIG_ONLY` | Smallest | Yes | Dev / dynamic |
-| `INLINE_ALL` | Largest | No | Prod / perf-critical |
-| `ALL` | Medium | Hybrid | Staging / complex |
+| Mode          | Bundle size | Runtime loading | Use case             |
+| ------------- | ----------- | --------------- | -------------------- |
+| `CONFIG_ONLY` | Smallest    | Yes             | Dev / dynamic        |
+| `INLINE_ALL`  | Largest     | No              | Prod / perf-critical |
+| `ALL`         | Medium      | Hybrid          | Staging / complex    |
 
 **dist/ output structures:**
 
@@ -148,14 +150,14 @@ Output: `dist/lib/` (ES Modules)
 
 **All entry points:**
 
-| Export | Source |
-|--------|--------|
-| `xmlui` | `src/index.ts` |
-| `xmlui-parser` | `src/parsers/xmlui-parser/index.ts` |
-| `language-server` | `src/language-server/server.ts` |
+| Export                       | Source                                     |
+| ---------------------------- | ------------------------------------------ |
+| `xmlui`                      | `src/index.ts`                             |
+| `xmlui-parser`               | `src/parsers/xmlui-parser/index.ts`        |
+| `language-server`            | `src/language-server/server.ts`            |
 | `language-server-web-worker` | `src/language-server/server-web-worker.ts` |
-| `syntax-monaco` | `src/syntax/monaco/index.ts` |
-| `syntax-textmate` | `src/syntax/textMate/index.ts` |
+| `syntax-monaco`              | `src/syntax/monaco/index.ts`               |
+| `syntax-textmate`            | `src/syntax/textMate/index.ts`             |
 
 **Vite plugins used:**
 
@@ -192,15 +194,16 @@ Output: `dist/metadata/xmlui-metadata.js`
 
 ## Vite Plugin (`vite-xmlui-plugin`)
 
-Located at `xmlui/bin/vite-xmlui-plugin.ts`. Transforms XMLUI-specific source files during Vite builds.
+Located at `xmlui/bin/vite-xmlui-plugin.ts`. Transforms XMLUI-specific source files when they are imported. Can do it during builds or when runnig apps from the dev server.
+Used when one doesn't utilize the xmlui commands, like `xmlui start`, `xmlui build`, `xmlui ssg`, etc...
 
 ### Files Handled
 
-| File type | Transformation |
-|-----------|---------------|
-| `.xmlui` | Markup → ComponentDef → ESM via `dataToEsm()` |
-| `.xmlui.xs` | Code-behind scripts → parsed → ESM |
-| `.xmlui.xm` | Module scripts → parsed → ESM |
+| File type   | Transformation                                |
+| ----------- | --------------------------------------------- |
+| `.xmlui`    | Markup → ComponentDef → ESM via `dataToEsm()` |
+| `.xmlui.xs` | Code-behind scripts → parsed → ESM            |
+| `.xmlui.xm` | Module scripts → parsed → ESM                 |
 
 ### Pipeline
 
@@ -225,7 +228,7 @@ Located at `xmlui/bin/vite-xmlui-plugin.ts`. Transforms XMLUI-specific source fi
 import ViteXmlui from "xmlui/vite-xmlui-plugin";
 
 export default defineConfig({
-  plugins: [react(), ViteXmlui()]
+  plugins: [react(), ViteXmlui()],
 });
 ```
 
@@ -296,13 +299,13 @@ Extensions use the same `xmlui build-lib` command as the framework.
 
 ### Command reference
 
-| Command | Purpose | Output |
-|---------|---------|--------|
-| `xmlui start` | Dev server for demo app | HMR dev server |
-| `xmlui build-lib` | Build extension library | `dist/*.js`, `.d.ts`, `.css` |
-| `xmlui build-lib --watch` | Watch mode | Continuous rebuilds |
-| `xmlui build` | Build demo app | Production demo |
-| `xmlui build-lib --mode=metadata` | Extract metadata | IDE support files |
+| Command                           | Purpose                 | Output                       |
+| --------------------------------- | ----------------------- | ---------------------------- |
+| `xmlui start`                     | Dev server for demo app | HMR dev server               |
+| `xmlui build-lib`                 | Build extension library | `dist/*.js`, `.d.ts`, `.css` |
+| `xmlui build-lib --watch`         | Watch mode              | Continuous rebuilds          |
+| `xmlui build`                     | Build demo app          | Production demo              |
+| `xmlui build-lib --mode=metadata` | Extract metadata        | IDE support files            |
 
 ### Extension dist/ output
 
@@ -355,20 +358,20 @@ startApp(runtime, [myExtension]);
 
 Defined in root `turbo.json`. Key tasks and dependencies:
 
-| Task | Depends On | Outputs |
-|------|-----------|---------|
-| `build:xmlui` | — | `dist/lib/**` |
-| `build:xmlui-standalone` | — | `dist/standalone/**` |
-| `build:xmlui-metadata` | — | `dist/metadata/**` |
-| `gen:langserver-metadata` | `build:xmlui-metadata` | `src/language-server/xmlui-metadata-generated.js` |
-| `build:extension` | `^build:extension` (upstream extensions) | `dist/**` |
-| `build:meta` | — | `dist/**` |
-| `build:xmlui-all` | all of above | — |
-| `build:docs` | `^build:extension`, `^build:xmlui`, `gen:releases`, `generate-docs-summaries` | `dist/**` |
-| `build:blog` | `^build:extension`, `^build:xmlui` | `dist/**` |
-| `build:playground` | `^build:extension`, `^build:xmlui` | `dist/**` |
-| `xmlui#build:xmlui-test-bed` | `build:extension` | `src/testing/infrastructure/dist/**` |
-| `xmlui-vscode#build` | `^gen:langserver-metadata` | `dist/**` |
+| Task                         | Depends On                                                                    | Outputs                                           |
+| ---------------------------- | ----------------------------------------------------------------------------- | ------------------------------------------------- |
+| `build:xmlui`                | —                                                                             | `dist/lib/**`                                     |
+| `build:xmlui-standalone`     | —                                                                             | `dist/standalone/**`                              |
+| `build:xmlui-metadata`       | —                                                                             | `dist/metadata/**`                                |
+| `gen:langserver-metadata`    | `build:xmlui-metadata`                                                        | `src/language-server/xmlui-metadata-generated.js` |
+| `build:extension`            | `^build:extension` (upstream extensions)                                      | `dist/**`                                         |
+| `build:meta`                 | —                                                                             | `dist/**`                                         |
+| `build:xmlui-all`            | all of above                                                                  | —                                                 |
+| `build:docs`                 | `^build:extension`, `^build:xmlui`, `gen:releases`, `generate-docs-summaries` | `dist/**`                                         |
+| `build:blog`                 | `^build:extension`, `^build:xmlui`                                            | `dist/**`                                         |
+| `build:playground`           | `^build:extension`, `^build:xmlui`                                            | `dist/**`                                         |
+| `xmlui#build:xmlui-test-bed` | `build:extension`                                                             | `src/testing/infrastructure/dist/**`              |
+| `xmlui-vscode#build`         | `^gen:langserver-metadata`                                                    | `dist/**`                                         |
 
 - `^` prefix = "after upstream workspaces complete the same task"
 - Turborepo caches task outputs by input hash; use `"cache": false` for tasks that must always run (e.g., `gen:releases`)
@@ -396,24 +399,34 @@ xmlui/bin/
 
 ### Framework contributor workflow
 
+The `xmlui` package's `exports` field points directly to TypeScript source (`./src/index.ts`), so any Vite app that imports `xmlui` gets live HMR on framework changes with no rebuild step.
+
+The visual dev sandbox is `integration-tests/test-app`.
+
 ```bash
-cd xmlui
-npm run build:bin                 # Build CLI first (required before other commands)
-xmlui build-lib --watch           # Watch mode for library
-# In second terminal:
-cd src/testing/infrastructure
-xmlui start                       # Dev server for test bed
+# One-time setup — builds standalone UMD + test extension, copies to test-app/public/js/:
+# (From repo root)
+npx turbo run xmlui-integration-test-app#setup:standalone
+
+# Daily workflow — Vite dev server with live HMR (no rebuild step needed):
+cd integration-tests/test-app
+npm run start
+
+# Optional: verify changes in standalone (buildless) mode
+npm run serve    # requires setup above to have been run
 ```
 
 ### Extension developer workflow
 
+If an extension's `package.json` `exports` field points to its TypeScript source files, a Vite app that imports it will pick up changes via HMR with no rebuild step.
+This pattern is used throughout all the extensions in the `packages` folder. Such package's `prepublishOnly` script points the `exports` field to the build artifacts, but that's only needed for publishing. When working in the monorepo, using the source files are ideal.
+
 ```bash
 cd packages/xmlui-myextension
-# Terminal 1:
-npm run build-watch              # Continuous library rebuilds
-# Terminal 2:
-npm start                        # Demo app with HMR
+npm start                        # starts the Demo app — HMR reflects source changes instantly. These demo apps contain components from the extension package they are in.
 ```
+
+Since this is a monorepo, in vite environments (those that use `xmlui start` and not the standalone mode) one can just import the extension by its package name, and provide the default export (which is the extension) to the startApp function.
 
 ### Production app build
 
@@ -435,16 +448,16 @@ npx turbo build:docs
 
 ## Key Files
 
-| File | Role |
-|------|------|
-| `xmlui/vite.config.ts` | All three framework build mode configs |
-| `xmlui/bin/vite-xmlui-plugin.ts` | `.xmlui` → ESM transformer |
-| `xmlui/bin/viteConfig.ts` | Shared Vite config utilities |
-| `xmlui/bin/build.ts` | `xmlui build` implementation |
-| `xmlui/bin/build-lib.ts` | `xmlui build-lib` implementation |
-| `xmlui/bin/start.ts` | `xmlui start` implementation |
-| `xmlui/bin/index.ts` | CLI command router |
-| `turbo.json` | Monorepo task pipeline |
-| `xmlui/src/index.ts` | Main framework ESM entry |
-| `xmlui/src/index-standalone.ts` | Standalone UMD entry |
-| `xmlui/src/components/collectedComponentMetadata.ts` | Metadata build entry |
+| File                                                 | Role                                   |
+| ---------------------------------------------------- | -------------------------------------- |
+| `xmlui/vite.config.ts`                               | All three framework build mode configs |
+| `xmlui/bin/vite-xmlui-plugin.ts`                     | `.xmlui` → ESM transformer             |
+| `xmlui/bin/viteConfig.ts`                            | Shared Vite config utilities           |
+| `xmlui/bin/build.ts`                                 | `xmlui build` implementation           |
+| `xmlui/bin/build-lib.ts`                             | `xmlui build-lib` implementation       |
+| `xmlui/bin/start.ts`                                 | `xmlui start` implementation           |
+| `xmlui/bin/index.ts`                                 | CLI command router                     |
+| `turbo.json`                                         | Monorepo task pipeline                 |
+| `xmlui/src/index.ts`                                 | Main framework ESM entry               |
+| `xmlui/src/index-standalone.ts`                      | Standalone UMD entry                   |
+| `xmlui/src/components/collectedComponentMetadata.ts` | Metadata build entry                   |
