@@ -1,6 +1,6 @@
 # Validate dependent fields together
 
-Use `onWillSubmit` to cross-validate fields at submit time, or `onValidate` on an input component when the user needs an inline field error.
+Use `onWillSubmit` to cross-validate fields at submit time, or `matchValue` on an input component when the user needs a simple inline equality check.
 
 A registration form has a Password field and a Confirm Password field. The form must not submit, and the user must see a clear error, when the two values disagree.
 
@@ -42,7 +42,6 @@ Use this pattern when the Confirm Password field should show its own validation 
 ```xmlui-pg copy display name="Inline password match validation"
 <App>
   <Form
-    var.pwd="{''}"
     data="{{ username: '', password: '', confirmPassword: '' }}"
     onSubmit="(data) => toast.success('Account created for ' + data.username)"
     saveLabel="Create account"
@@ -52,14 +51,14 @@ Use this pattern when the Confirm Password field should show its own validation 
       label="Password"
       bindTo="password"
       required="true"
-      onDidChange="(v) => { pwd = v; }"
     />
     <PasswordInput
       label="Confirm Password"
       bindTo="confirmPassword"
       required="true"
       noSubmit="true"
-      onValidate="(v) => v !== pwd ? 'Passwords do not match' : null"
+      matchValue="{$data.password}"
+      matchInvalidMessage="Passwords do not match"
     />
   </Form>
 </App>
@@ -67,15 +66,15 @@ Use this pattern when the Confirm Password field should show its own validation 
 
 ## Key points
 
-**Choose the approach by where the user should see the error**: Use `onWillSubmit` when the rule only needs to run before saving, when the message can be a toast or form-level error, or when the check depends on fields that are excluded from the payload with `noSubmit`. Use `onValidate` when the dependent field itself should show the error while the user is filling out the form.
+**Choose the approach by where the user should see the error**: Use `onWillSubmit` when the rule only needs to run before saving, when the message can be a toast or form-level error, or when the check depends on fields that are excluded from the payload with `noSubmit`. Use `matchValue` when the dependent field itself should show a simple equality error while the user is filling out the form.
 
 **`onWillSubmit` - gate submission with cross-field logic**: The handler receives two arguments: `data` (the form payload without `noSubmit` fields) and `allData` (all form fields including `noSubmit` ones). Return `false` to abort; return nothing to proceed with the original payload. This is the right place for multi-field checks that cannot be expressed per-field. Use `allData` when you need to inspect helper fields that should not be submitted.
 
 **`noSubmit="true"` on the helper field**: The Confirm Password field is only for validation - it should not appear in the submitted data. Set `noSubmit="true"` so the framework strips it from the payload before calling `onSubmit`.
 
-**`onValidate` for immediate inline feedback**: Use `onValidate` on the dependent field to show the mismatch error inline based on the chosen [validation mode](/docs/behaviors#validation). The handler receives only the current field value, so store the reference password in a shared variable with `onDidChange` and compare against that variable.
+**`matchValue` for simple inline equality checks**: Use `matchValue` on the dependent field to show the mismatch error inline based on the chosen [validation mode](/docs/behaviors#validation). Set `matchInvalidMessage` to customize the error. This is the simplest option for password confirmation because `matchValue="{$data.password}"` stays reactive as the Password field changes.
 
-**`onValidate` return value**: Return a non-empty string to show as the error message; return `null`, `undefined`, or nothing to signal the field is valid. The string appears below the field using the same styling as built-in validation errors.
+**Use `onValidate` for advanced inline logic**: If the relationship is more complex than equality, use `onValidate`. Return a non-empty string to show as the error message; return `null`, `undefined`, or nothing to signal the field is valid.
 
 **Keep transformation separate from validation**: `onWillSubmit` can also return a modified payload, but that is a separate use case. See [Transform form data before submission](/docs/howto/transform-form-data-before-submission) for examples that reshape submitted data.
 

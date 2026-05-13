@@ -197,6 +197,18 @@ export const FormItemMd = createMetadata({
       availableValues: filteredValidationSeverityValues,
       defaultValue: "error",
     },
+    matchValue: {
+      description:
+        "The value this field must match. This is useful for confirmation fields, " +
+        "such as checking a repeated password against the original password.",
+      valueType: "any",
+    },
+    matchInvalidMessage: {
+      description:
+        "This optional string property is used to customize the message displayed when " +
+        "the field value does not match `matchValue`.",
+      valueType: "string",
+    },
     inputTemplate: dComponent("This property is used to define a custom input template."),
     gap: {
       description: "This property defines the gap between the adornments and the input area.",
@@ -299,6 +311,8 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
       regex,
       regexInvalidMessage,
       regexInvalidSeverity,
+      matchValue,
+      matchInvalidMessage,
       customValidationsDebounce,
       validationDisplayDelay,
       validationMode,
@@ -361,6 +375,8 @@ export const formItemComponentRenderer = wrapComponent(COMP, FormItem, FormItemM
         regex={extractValue(regex)}
         regexInvalidMessage={extractValue.asOptionalString(regexInvalidMessage)}
         regexInvalidSeverity={parseSeverity(extractValue.asOptionalString(regexInvalidSeverity))}
+        matchValue={extractValue(matchValue)}
+        matchInvalidMessage={extractValue.asOptionalString(matchInvalidMessage)}
         //  ----
         classes={classes}
         layoutContext={layoutContext}

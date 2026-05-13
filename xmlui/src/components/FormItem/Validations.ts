@@ -86,6 +86,7 @@ class FormItemValidator {
         this.validateRange(),
         this.validatePattern(),
         this.validateRegex(),
+        this.validateMatch(),
       );
     }
     validationResults = validationResults.filter(
@@ -295,6 +296,18 @@ class FormItemValidator {
       isValid: isRegexValid(this.value, regex),
       invalidMessage: regexInvalidMessage || "Input is not in the correct format",
       severity: regexInvalidSeverity,
+    };
+  }
+
+  private validateMatch(): SingleValidationResult | undefined {
+    const { matchValue, matchInvalidMessage } = this.validations;
+    if (matchValue === undefined) {
+      return undefined;
+    }
+    return {
+      isValid: Object.is(this.value, matchValue),
+      invalidMessage: matchInvalidMessage || "Input does not match",
+      severity: "error",
     };
   }
 
