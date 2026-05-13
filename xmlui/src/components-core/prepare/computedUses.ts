@@ -36,29 +36,23 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
 
 /**
- * JavaScript built-in global names that can appear as identifiers in XMLUI binding
- * expressions (e.g. `{JSON.stringify(x)}`, `{Math.max(a, b)}`).
+ * Returns true when the identifier `name` lives on `globalThis` and therefore
+ * can never be part of XMLUI app state.
  *
- * These are always globally available via the JS runtime — they are NEVER stored in
- * app state, so they must never appear in `computedUses` as external dependencies.
- * Without this filter, a binding like `{JSON.stringify(testState)}` would cause the
- * containing component to declare "JSON" as an external dependency, potentially
- * generating a non-empty `computedUses` array that isolates the container from its
- * parent state (because `extractScopedState(state, ["JSON"])` returns `{}`).
+ * Rationale: the XMLUI expression evaluator (`eval-tree-common.ts`) resolves
+ * identifiers in this order: block scope → localContext → appContext → globalThis.
+ * `collectVariableDependencies` captures every identifier without distinguishing
+ * where it will ultimately resolve.  We must mirror the evaluator's last fallback:
+ * if `name in globalThis` is true at parse time, the identifier will be satisfied
+ * by the runtime global scope — NOT by app state — so it must not appear in
+ * `computedUses`.
+ *
+ * Using `globalThis` directly instead of a hardcoded set means:
+ *  - New ECMAScript built-ins (e.g. `Temporal`) are automatically covered.
+ *  - Platform polyfills that extend `globalThis` are covered too.
+ *  - No manual maintenance is required when the stdlib grows.
  */
-const JS_BUILTIN_GLOBALS = new Set([
-  // Standard built-in objects
-  "JSON", "Math", "Date", "Array", "Object", "String", "Number", "Boolean",
-  "RegExp", "Error", "Map", "Set", "WeakMap", "WeakSet", "Promise", "Symbol",
-  "Proxy", "Reflect", "ArrayBuffer", "Int8Array", "Uint8Array",
-  // Global functions
-  "parseInt", "parseFloat", "isNaN", "isFinite", "isFinite",
-  "encodeURIComponent", "decodeURIComponent", "encodeURI", "decodeURI",
-  "escape", "unescape", "eval",
-  // Other globals
-  "console", "window", "document", "globalThis", "self",
-  "undefined", "Infinity", "NaN",
-]);
+const isGlobalThisIdentifier = (name: string): boolean => name in globalThis;
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
@@ -230,8 +224,8 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   }
 
   const totalFree = new Set<string>();
-  for (const d of usedHere) if (!localDeclared.has(d) && !JS_BUILTIN_GLOBALS.has(d)) totalFree.add(d);
-  for (const d of childDeps) if (!localDeclared.has(d) && !JS_BUILTIN_GLOBALS.has(d)) totalFree.add(d);
+  for (const d of usedHere) if (!localDeclared.has(d) && !isGlobalThisIdentifier(d)) totalFree.add(d);
+  for (const d of childDeps) if (!localDeclared.has(d) && !isGlobalThisIdentifier(d)) totalFree.add(d);
 
   const isRegularContainer = !!(
     node.vars ||
