@@ -362,6 +362,31 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
     &.strong{
       font-weight: t.$fontWeight-bold;
     }
+
+    // --- Break mode classes (nested to match .text.default specificity 0,2,0)
+    // Source order ensures these override .text.default's word-break/overflow-wrap CSS vars
+    &.breakNormal {
+      word-break: normal;
+      overflow-wrap: normal;
+    }
+
+    &.breakWord {
+      overflow-wrap: break-word;
+    }
+
+    &.breakAnywhere {
+      word-break: break-all;
+      overflow-wrap: anywhere;
+    }
+
+    &.breakKeep {
+      word-break: keep-all;
+    }
+
+    &.breakHyphenate {
+      hyphens: auto;
+      overflow-wrap: break-word;
+    }
   }
 
   /*
@@ -473,30 +498,6 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       border-radius: 3px;
     }
   }
-}
-
-// --- Break mode classes
-.breakNormal {
-  word-break: normal;
-  overflow-wrap: normal;
-}
-
-.breakWord {
-  overflow-wrap: break-word;
-}
-
-.breakAnywhere {
-  word-break: break-all;
-  overflow-wrap: anywhere;
-}
-
-.breakKeep {
-  word-break: keep-all;
-}
-
-.breakHyphenate {
-  hyphens: auto;
-  overflow-wrap: break-word;
 }
 
 :export {
