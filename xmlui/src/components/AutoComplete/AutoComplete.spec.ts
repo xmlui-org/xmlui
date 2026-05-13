@@ -556,10 +556,10 @@ test(
     await initTestBed(`
       <AutoComplete>
         <Option value="1" label="Bruce Wayne">
-          <Text testId="opt-template-1">CUSTOM Bruce</Text>
+          <Text>CUSTOM Bruce</Text>
         </Option>
         <Option value="2" label="Clark Kent">
-          <Text testId="opt-template-2">CUSTOM Clark</Text>
+          <Text>CUSTOM Clark</Text>
         </Option>
       </AutoComplete>
     `);
@@ -567,13 +567,16 @@ test(
     const combobox = page.getByRole("combobox");
     await combobox.focus();
     await page.keyboard.press("ArrowDown");
-    await expect(page.getByRole("listbox")).toBeVisible();
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
 
     // Type to filter — only "Clark" should remain. The custom template for
-    // that option must still be rendered.
+    // that option must still be rendered. Scope the assertion to the dropdown
+    // so we don't also match the hidden registration span that HiddenOption
+    // emits for data collection.
     await page.keyboard.type("Clark");
-    await expect(page.getByTestId("opt-template-2")).toBeVisible();
-    await expect(page.getByTestId("opt-template-1")).toHaveCount(0);
+    await expect(listbox.getByText("CUSTOM Clark")).toBeVisible();
+    await expect(listbox.getByText("CUSTOM Bruce")).toHaveCount(0);
   },
 );
 
