@@ -13,49 +13,35 @@ xmlui-repo-root/
   .changeset/               # Pending changeset files
   vitest.workspace.ts       # Vitest workspace config
   playwright.config.ts      # Playwright E2E config
-  
+
   xmlui/                    # ← CORE FRAMEWORK PACKAGE
   website/                  # Documentation site (Vite mode)
   playground/               # Interactive XMLUI playground
-  blog/                     # Blog site
-  
+
   tools/
     create-app/             # Scaffolding CLI for new apps
     vscode/                 # VS Code extension (xmlui-vscode)
     preview-ssg/            # SSG preview tool
     create-xmlui-hello-world/
-  
+
   packages/                 # Extension packages (xmlui-*)
     xmlui-animations/
     xmlui-crm-blocks/
     xmlui-devtools/
-    xmlui-docs-blocks/
-    xmlui-echart/
-    xmlui-gauge/
-    xmlui-grid-layout/
-    xmlui-hello-world/
-    xmlui-masonry/
-    xmlui-pdf/
-    xmlui-react-flow/
-    xmlui-recharts/
-    xmlui-search/
-    xmlui-select/
-    xmlui-spreadsheet/      # (may vary)
-    xmlui-tiptap-editor/
-    xmlui-website-blocks/
+    # and many more...
 ```
 
 ---
 
 ## Package Categories
 
-| Category | Packages | Role |
-|----------|---------|------|
-| **Core framework** | `xmlui/` | Main framework, CLI, LSP, parsers |
-| **Docs & content** | `website/`, `blog/` | Documentation site and blog |
-| **Playground** | `playground/` | Interactive component explorer |
-| **Tools** | `tools/create-app/`, `tools/vscode/`, `tools/preview-ssg/` | Developer tooling |
-| **Extension packages** | `packages/xmlui-*/` | Component libraries bundled separately |
+| Category               | Packages                                                   | Role                                   |
+| ---------------------- | ---------------------------------------------------------- | -------------------------------------- |
+| **Core framework**     | `xmlui/`                                                   | Main framework, CLI, LSP, parsers      |
+| **Docs & content**     | `website/`, `blog/`                                        | Documentation site and blog            |
+| **Playground**         | `playground/`                                              | Interactive component explorer         |
+| **Tools**              | `tools/create-app/`, `tools/vscode/`, `tools/preview-ssg/` | Developer tooling                      |
+| **Extension packages** | `packages/xmlui-*/`                                        | Component libraries bundled separately |
 
 ---
 
@@ -122,27 +108,6 @@ npm run changeset:publish       # publish to npm + create git tags
 
 Defined in root `turbo.json`. Controls task execution order, caching, and parallelism.
 
-### Key tasks
-
-| Task | Depends On | Outputs | Notes |
-|------|-----------|---------|-------|
-| `build:xmlui` | — | `dist/lib/**` | ESM library |
-| `build:xmlui-standalone` | — | `dist/standalone/**` | UMD bundle |
-| `build:xmlui-metadata` | — | `dist/metadata/**` | Component metadata |
-| `gen:langserver-metadata` | `build:xmlui-metadata` | `src/language-server/xmlui-metadata-generated.js` | Auto-regenerated |
-| `build:extension` | `^build:extension` | `dist/**` | All extension packages |
-| `build:meta` | — | `dist/**` | Metadata per extension |
-| `build:xmlui-all` | all above | — | Master core build |
-| `build:docs` | `^build:extension`, `^build:xmlui`, releases, summaries | `dist/**` | Full docs site |
-| `build:blog` | `^build:extension`, `^build:xmlui` | `dist/**` | Blog |
-| `build:playground` | `^build:extension`, `^build:xmlui` | `dist/**` | Playground |
-| `xmlui#build:xmlui-test-bed` | `build:extension` | `src/testing/infrastructure/dist/**` | E2E test server |
-| `xmlui-vscode#build` | `^gen:langserver-metadata` | `dist/**` | VS Code extension |
-| `xmlui-vscode#build:vsix` | `xmlui-vscode#build` | `xmlui-vscode-*.vsix` | Packaged extension |
-| `generate-docs` | `build:xmlui-metadata`, `build:meta` | — | `cache: false` |
-| `generate-docs-summaries` | `generate-docs` | — | `cache: false` |
-| `gen:releases` | — | — | `cache: false` (fetches GitHub) |
-
 ### Caching rules
 
 - Turborepo hashes all inputs (files + env vars) to determine cache hits
@@ -176,6 +141,7 @@ XMLUI uses `@changesets/cli` for version management.
 ### What is a changeset?
 
 A changeset is a Markdown file in `.changeset/` that declares:
+
 1. Which packages are affected (`"xmlui": patch|minor|major`)
 2. A human-readable description of the change
 
@@ -210,11 +176,11 @@ npm run changeset:publish   # Publishes to npm, creates git tags
 
 ### Conventional Commit types → changeset mapping
 
-| Commit type | Changeset bump |
-|-------------|---------------|
-| `fix:`, `chore:`, `docs:` | patch |
-| `feat:` | minor |
-| `BREAKING CHANGE:` | major |
+| Commit type               | Changeset bump |
+| ------------------------- | -------------- |
+| `fix:`, `chore:`, `docs:` | patch          |
+| `feat:`                   | minor          |
+| `BREAKING CHANGE:`        | major          |
 
 ---
 
@@ -256,22 +222,7 @@ npm run build-xmlui  # Build core (required before running extensions or tests)
 
 ### Working on the core framework
 
-```bash
-cd xmlui
-npm run build:bin              # Build CLI first
-xmlui build-lib --watch        # Watch library builds in Terminal 1
-# Terminal 2:
-cd src/testing/infrastructure
-xmlui start                    # Test bed dev server
-```
-
-### Working on an extension package
-
-```bash
-cd packages/xmlui-myextension
-npm run build-watch            # Continuous library rebuilds (Terminal 1)
-npm start                      # Demo app with HMR (Terminal 2)
-```
+Read the [Build System Documentation](./build-system.md) to know how to see the changes be reflected in applications.
 
 ### Working on the docs site
 
@@ -308,18 +259,18 @@ npm install
 
 ## Key Files
 
-| File | Role |
-|------|------|
-| `package.json` (root) | Workspace declarations, shared scripts, package manager pin |
-| `turbo.json` | Task pipeline, caching config, dependency graph |
-| `vitest.workspace.ts` | Vitest multi-package test config |
-| `playwright.config.ts` | Playwright E2E test config |
-| `.changeset/` | Pending changeset files for version management |
-| `xmlui/package.json` | Core framework package metadata and scripts |
-| `xmlui/vite.config.ts` | Framework build configuration |
-| `xmlui/bin/` | CLI tools (`xmlui` command) |
-| `tools/vscode/` | VS Code extension source |
-| `tools/create-app/` | App scaffolding CLI |
+| File                   | Role                                                        |
+| ---------------------- | ----------------------------------------------------------- |
+| `package.json` (root)  | Workspace declarations, shared scripts, package manager pin |
+| `turbo.json`           | Task pipeline, caching config, dependency graph             |
+| `vitest.workspace.ts`  | Vitest multi-package test config                            |
+| `playwright.config.ts` | Playwright E2E test config                                  |
+| `.changeset/`          | Pending changeset files for version management              |
+| `xmlui/package.json`   | Core framework package metadata and scripts                 |
+| `xmlui/vite.config.ts` | Framework build configuration                               |
+| `xmlui/bin/`           | CLI tools (`xmlui` command)                                 |
+| `tools/vscode/`        | VS Code extension source                                    |
+| `tools/create-app/`    | App scaffolding CLI                                         |
 
 ---
 
