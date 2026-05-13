@@ -46,6 +46,19 @@ jobs:
         run: npm run build-xmlui
       - name: run all tests
         run: npm run test
+      - name: Enforce patch-only changesets
+        if: github.base_ref == 'support'
+        shell: bash
+        run: |
+          shopt -s nullglob
+          fail=false
+          for f in .changeset/*.md; do
+            if grep -qE '^"[^"]+": (minor|major)$' "$f"; then
+              >&2 echo "FAIL: $f contains a non-patch bump — only patch releases are allowed on support."
+              fail=true
+            fi
+          done
+          $fail && exit 1 || echo "All changesets are patch-level."
       - uses: actions/upload-artifact@v4
         with:
           name: playwright-report

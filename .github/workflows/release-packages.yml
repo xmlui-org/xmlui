@@ -7,6 +7,7 @@ on:
       - closed
     branches:
       - main
+      - support
 
 permissions:
   contents: write
@@ -18,10 +19,10 @@ jobs:
     name: Publish Stable and Create GitHub Release
     if: >
       github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'pull_request' &&
-      github.event.action == 'closed' &&
-      github.event.pull_request.merged == true &&
-      (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') || contains(github.event.pull_request.labels.*.name, 'changeset-release')))
+      (github.event.pull_request.merged == true &&
+       (startsWith(github.event.pull_request.title, 'Version Packages for Stable Release') ||
+        startsWith(github.event.pull_request.title, 'Version Packages for Patch Release') ||
+        contains(github.event.pull_request.labels.*.name, 'changeset-release')))
     runs-on: ubuntu-latest-8-core
     timeout-minutes: 60
     env:
@@ -43,6 +44,14 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --prefer-offline
+
+      - name: Determine npm dist-tag
+        run: |
+          if [ "${{ github.base_ref || 'main' }}" = "support" ]; then
+            echo "NPM_DIST_TAG=backport" >> "$GITHUB_ENV"
+          else
+            echo "NPM_DIST_TAG=latest" >> "$GITHUB_ENV"
+          fi
 
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.1

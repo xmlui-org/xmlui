@@ -95,3 +95,55 @@ jobs:
           skip-ci: "true"
           # Configure type mappings if needed
 ```
+
+---
+
+## Support branch strategy (`support` → patch releases)
+
+### Branch model
+
+The `support` branch tracks the current stable patch line (e.g. `0.12.x`). Bug fixes should land on `main` first (trunk-first), then be backported to `support` via the label-triggered bot. This guarantees `main` always has every fix.
+
+Exception: fixes specific to `support` (e.g. reverting a `0.12.x` regression that was refactored away in `main`) go directly to `support` with no backport needed.
+
+### Day-to-day workflow
+
+**Standard bug fix (exists in both branches):**
+1. Open PR to `main` with a `fix:` title — the reminder bot posts a comment asking if a backport is needed.
+2. Reviewer adds the `backport` label if yes; merges (squash).
+3. Bot opens a cherry-pick PR to `support` — review and merge.
+4. When ready to release the patch, trigger `prepare-versions.yml` → branch: support.
+5. Review and merge the patch version PR → publishes to the `backport` npm tag automatically.
+
+**Support-only fix:**
+1. PR directly to `support`, no label needed.
+2. CI Level 1 enforcement runs; reviewer approves; merge.
+3. Same release path as above (step 4–5).
+
+### Enforcement
+
+**Level 1 — PR CI (`run-all-tests-fast.yml`):** Runs on every PR to `support`. Rejects any changeset that is not a patch bump before the PR merges.
+
+**Level 2 — `prepare-versions.yml`:** When `branch: support` is selected, validates changesets a second time before creating the version PR. Stops the release if a non-patch changeset slipped through review.
+
+### npm dist-tags
+
+When `release-packages.yml` runs after a `support` version PR merges, it publishes to the `backport` dist-tag instead of `latest`:
+
+- `npm install xmlui` → latest stable (e.g. `0.13.x`)
+- `npm install xmlui@backport` → latest patch release from `support` (e.g. `0.12.28`)
+
+This is controlled by `NPM_DIST_TAG` set in `release-packages.yml` based on `github.base_ref`, and consumed by `changeset publish --tag ${NPM_DIST_TAG:-latest}` in the root `package.json`.
+
+**Why this is urgent:** Without the dist-tag fix, publishing a `0.12.x` patch after `0.13.0` ships would overwrite `latest` with the older version, regressing all users who rely on `npm install xmlui`.
+
+### Files involved
+
+| File | Role |
+|------|------|
+| `.github/workflows/remind-backport.yml` | Comments on `fix:` PRs to `main` that lack the `backport` label |
+| `.github/workflows/backport.yml` | Cherry-picks merged `main` PRs with `backport` label to `support` |
+| `.github/workflows/prepare-versions.yml` | Extended with `branch` input; Level 2 enforcement when `branch: support` |
+| `.github/workflows/release-packages.yml` | Triggers on `support` PRs; sets `NPM_DIST_TAG=backport` for support releases |
+| `.github/workflows/run-all-tests-fast.yml` | Level 1 enforcement: rejects non-patch changesets on PRs to `support` |
+| `package.json` | `changeset:publish` uses `--tag ${NPM_DIST_TAG:-latest}` |
