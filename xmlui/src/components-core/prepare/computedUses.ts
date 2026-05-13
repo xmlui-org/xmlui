@@ -218,7 +218,14 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     // create a StateContainer at runtime. Either way, child component APIs
     // register HERE via registerComponentApi — UIDs do not escape further.
     // Only this node's own UID (if any) is visible to the parent container.
-    if (node.uses === undefined) {
+    // Only set computedUses when there are actual free vars to scope.
+    // Setting computedUses=[] (empty) is NOT equivalent to not setting it:
+    // extractScopedState(state, []) returns {} (empty), which breaks implicit
+    // containers that must receive full parent state to function correctly.
+    // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
+    // with computedUses=[] the Fragment isolates all parent state, making
+    // {x.value} invisible to siblings even after updateState() dispatches.
+    if (node.uses === undefined && totalFree.size > 0) {
       node.computedUses = Array.from(totalFree);
     }
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();

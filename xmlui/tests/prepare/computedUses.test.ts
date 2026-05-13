@@ -43,7 +43,9 @@ describe("computeUsesForTree — basic cases", () => {
       children: [node("Text", { props: { text: "{x}" } })],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).toEqual([]);
+    // totalFree is empty → computedUses is not set (undefined), not []
+    // Setting computedUses=[] would incorrectly isolate parent state for implicit containers
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("member-access: only root identifier", () => {
@@ -120,8 +122,9 @@ describe("computeUsesForTree — child UIDs", () => {
       ],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).not.toContain("mySelect");
-    expect(root.computedUses).toEqual([]);
+    // mySelect escapes up as an UID → locally declared → totalFree is empty
+    // computedUses not set (undefined) rather than [] to preserve implicit container semantics
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("slot child uid is treated as locally declared (not bubbled up)", () => {
@@ -131,8 +134,7 @@ describe("computeUsesForTree — child UIDs", () => {
       children: [node("Text", { props: { text: "{mySelect.value}" } })],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).not.toContain("mySelect");
-    expect(root.computedUses).toEqual([]);
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("grandchild uid through non-container intermediary is locally declared", () => {
@@ -148,8 +150,7 @@ describe("computeUsesForTree — child UIDs", () => {
       ],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).not.toContain("mySelect");
-    expect(root.computedUses).toEqual([]);
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("grandchild uid captured by intermediate container does NOT become local in ancestor", () => {
@@ -200,8 +201,9 @@ describe("computeUsesForTree — child UIDs", () => {
       ],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).not.toContain("deepSelect");
-    expect(root.computedUses).toEqual([]);
+    // deepSelect bubbles through all non-container intermediaries → locally declared in root
+    // totalFree is empty → computedUses undefined
+    expect(root.computedUses).toBeUndefined();
   });
 
   it("container own uid escapes to parent container (not listed in parent computedUses)", () => {
@@ -218,8 +220,8 @@ describe("computeUsesForTree — child UIDs", () => {
     });
     computeUsesForTree(root);
     // innerStack registers its own API in root — root doesn't need it from parent
-    expect(root.computedUses).not.toContain("innerStack");
-    expect(root.computedUses).toEqual([]);
+    // totalFree is empty → computedUses undefined
+    expect(root.computedUses).toBeUndefined();
   });
 });
 
@@ -231,8 +233,8 @@ describe("computeUsesForTree — loaders", () => {
       children: [node("Text", { props: { text: "{myData.items}" } })],
     });
     computeUsesForTree(root);
-    expect(root.computedUses).not.toContain("myData");
-    expect(root.computedUses).toEqual([]);
+    // myData uid is locally declared via processChildList(loaders) → totalFree empty
+    expect(root.computedUses).toBeUndefined();
   });
 });
 
@@ -257,5 +259,75 @@ describe("computeUsesForTree — events", () => {
     });
     computeUsesForTree(root);
     expect(root.computedUses).toContain("externalVar");
+  });
+});
+
+describe("computeUsesForTree — empty totalFree must NOT set computedUses", () => {
+  /**
+   * Regression tests for the bug where computedUses=[] was set on containers
+   * with no external free vars, causing extractScopedState(state,[]) to return {}
+   * and isolate implicit containers from parent state.
+   *
+   * Pattern that broke: <Wrapper var.x="{0}">
+   *                       <Select id="mySelect"/>       ← registers API in Wrapper
+   *                       <Text>{mySelect.value}</Text> ← reads API from Wrapper
+   *                     </Wrapper>
+   *
+   * With computedUses=[], scopedParentState became {}, so mySelect.value was always "".
+   */
+
+  it("container with only local vars and uid refs: computedUses undefined (not [])", () => {
+    // Select uid escapes to Stack → Stack adds it to localDeclared → totalFree is empty
+    // Stack must NOT get computedUses=[] which would isolate it from parent state
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Select", { uid: "mySelect" }),
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("fragment without external deps wrapping Select+Text: computedUses undefined", () => {
+    // Exact shape used by initTestBed wrapper: Fragment var.testState="{null}"
+    // containing Select with uid and sibling Text reading that uid.
+    // Before the fix this produced computedUses=[] → mySelect.value was empty.
+    const root = node("Fragment", {
+      vars: { testState: "{null}" },
+      children: [
+        node("Select", { uid: "mySelect" }),
+        node("Text", { props: { text: "{mySelect.value}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("container with vars that are self-contained: computedUses undefined", () => {
+    // All references inside are to local vars — nothing external needed
+    const root = node("Stack", {
+      vars: { count: "{0}", doubled: "{count * 2}" },
+      children: [node("Text", { props: { text: "{doubled}" } })],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toBeUndefined();
+  });
+
+  it("only when totalFree has entries does computedUses get set", () => {
+    // Contrast: same shape but text also reads an EXTERNAL var → computedUses set
+    const root = node("Stack", {
+      vars: { x: "{0}" },
+      children: [
+        node("Select", { uid: "mySelect" }),
+        node("Text", { props: { text: "{mySelect.value} {externalVar}" } }),
+      ],
+    });
+    computeUsesForTree(root);
+    // externalVar is not declared locally → must appear in computedUses
+    expect(root.computedUses).toBeDefined();
+    expect(root.computedUses).toContain("externalVar");
+    expect(root.computedUses).not.toContain("mySelect");
   });
 });

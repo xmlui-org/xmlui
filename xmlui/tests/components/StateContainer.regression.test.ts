@@ -36,16 +36,37 @@ describe("extractScopedState with computedUses", () => {
 });
 
 describe("computeUsesForTree — mutation semantics", () => {
-  it("name NOT in computedUses does not reach container", () => {
+  it("no external deps → computedUses undefined (full parent pass-through)", () => {
+    // When totalFree is empty (all refs are locally declared), computedUses must NOT be set
+    // to [] — that would incorrectly isolate the container. undefined = full state pass-through.
     const stack = node("Stack", {
       vars: { a: "{0}" },
       children: [node("Text", { props: { text: "{a}" } })],
     });
     computeUsesForTree(stack);
-    expect(stack.computedUses).toEqual([]);
+    expect(stack.computedUses).toBeUndefined();
     const parentState = { a: 5, b: 99 };
     const scoped = extractScopedState(parentState, stack.computedUses);
-    expect(scoped).toEqual({});
+    // undefined → full parent state passes through (no false isolation)
+    expect(scoped).toBe(parentState);
+  });
+
+  it("external dep NOT listed in computedUses does not reach scoped state", () => {
+    // Contrast: when there ARE external deps, only listed ones are included
+    const stack = node("Stack", {
+      vars: { local: "{0}" },
+      children: [
+        node("Text", { props: { text: "{external}" } }),
+        node("Text", { props: { text: "{local}" } }),
+      ],
+    });
+    computeUsesForTree(stack);
+    // Only "external" is free → computedUses=["external"], "irrelevant" not in it
+    expect(stack.computedUses).toContain("external");
+    const parentState = { external: 42, irrelevant: 99 };
+    const scoped = extractScopedState(parentState, stack.computedUses);
+    expect(scoped).not.toHaveProperty("irrelevant");
+    expect(scoped).toHaveProperty("external", 42);
   });
 
   it("external name IN computedUses passes through to container", () => {

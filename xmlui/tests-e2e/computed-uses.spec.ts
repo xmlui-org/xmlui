@@ -51,7 +51,7 @@ test.describe("computedUses benchmark", () => {
     await expect(page.getByText("|2|")).toBeVisible();
   });
 
-  test("Select renders ≤ 3 times after 2 seconds of 100ms timer ticks (computedUses optimization)", async ({
+  test("Select renders ≤ 5 times after 2 seconds of 100ms timer ticks (computedUses optimization)", async ({
     initTestBed,
     page,
   }) => {
