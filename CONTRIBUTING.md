@@ -2,7 +2,7 @@
 
 Welcome to **xmlui**! We're thrilled to have you contribute to our project. This document outlines the guidelines for contributing, ensuring a smooth and collaborative experience for everyone.
 
-**xmlui** is a modern web UI framework designed to empower desktop developers to effortlessly create web applications without requiring deep knowledge of HTML, CSS, or JavaScript. 
+**xmlui** is a modern web UI framework designed to empower desktop developers to effortlessly create web applications without requiring deep knowledge of HTML, CSS, or JavaScript.
 
 Your contributions are valuable and help us improve and grow the project.
 
@@ -22,16 +22,14 @@ Before you begin contributing, please ensure you have:
 ### Setting Up the Development Environment
 
 1. **Fork the Repository**: Fork the xmlui repository to your GitHub account
-2. **Clone Your Fork**: 
+2. **Clone Your Fork**:
    ```bash
    git clone https://github.com/your-username/xmlui.git
    cd xmlui
    ```
 3. **Install Dependencies**:
    ```bash
-   npm install
-   # or
-   yarn install
+   npm setup
    ```
 
 ## How to Contribute
@@ -192,6 +190,7 @@ Write clear and descriptive commit messages following conventional commit format
 - `chore: update dependencies to latest versions`
 
 **Commit Message Structure:**
+
 ```
 <type>(<scope>): <description>
 
@@ -201,6 +200,7 @@ Write clear and descriptive commit messages following conventional commit format
 ```
 
 **Types:**
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
@@ -256,7 +256,7 @@ By contributing to **xmlui**, you agree that your contributions will be licensed
 
 If you have any questions about contributing, please:
 
-- Check our [FAQ](https://github.com/xmlui-com/xmlui/wiki/FAQ) 
+- Check our [FAQ](https://github.com/xmlui-com/xmlui/wiki/FAQ)
 - Open a [discussion](https://github.com/xmlui-com/xmlui/discussions)
 - Reach out to the maintainers
 

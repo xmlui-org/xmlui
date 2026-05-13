@@ -30,6 +30,8 @@ jobs:
           cache: "npm"
       - name: Install node dependencies
         run: npm ci --prefer-offline
+      - name: Run allowed install scripts
+        run: npm run allow-scripts
       - name: Cache for Turbo
         uses: rharkor/caching-for-turbo@v2.3.1
       - name: Store Playwright's Version
