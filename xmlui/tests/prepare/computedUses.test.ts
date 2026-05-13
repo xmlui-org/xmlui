@@ -339,6 +339,35 @@ describe("computeUsesForTree — empty totalFree must NOT set computedUses", () 
     expect(root.computedUses).toBeUndefined();
   });
 
+  it("initTestBed exact markup with marker text: computedUses undefined", () => {
+    // initTestBed wraps markup in:
+    // <Fragment var.testState="{null}">
+    //   ${source}
+    //   <Stack width="0" height="0">
+    //     <Text value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
+    //   </Stack>
+    // </Fragment>
+    //
+    // The marker Text has JSON.stringify which references the global "JSON".
+    // If "JSON" is treated as a free var, Fragment gets computedUses=["JSON"],
+    // extractScopedState(appRootState, ["JSON"]) = {} → stateFromOutside = {} → broken.
+    const markerText = node("Text", {
+      props: { value: "{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }" },
+    });
+    const root = node("Fragment", {
+      vars: { testState: "{null}" },
+      children: [
+        node("Select", { uid: "mySelect" }),
+        node("Text", { props: { text: "{mySelect.value}" } }),
+        node("Stack", { children: [markerText] }),
+      ],
+    });
+    computeUsesForTree(root);
+    // "JSON" is a built-in global — should not pollute computedUses
+    // Fragment must get computedUses undefined (not ["JSON"]) to avoid state isolation
+    expect(root.computedUses).toBeUndefined();
+  });
+
   it("only when totalFree has entries does computedUses get set", () => {
     // Contrast: same shape but text also reads an EXTERNAL var → computedUses set
     const root = node("Stack", {
