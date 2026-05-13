@@ -1,0 +1,44 @@
+{
+  "name": "xmlui-ai-blocks",
+  "version": "0.0.1",
+  "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "description": "AI-focused custom component blocks for XMLUI applications",
+  "author": "",
+  "license": "ISC",
+  "exports": "./src/index.tsx",
+  "scripts": {
+    "start": "xmlui start",
+    "preview": "xmlui preview",
+    "build:extension": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata",
+    "prepublishOnly": "clean-package",
+    "postpublish": "clean-package restore"
+  },
+  "devDependencies": {
+    "xmlui": "*"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "clean-package": {
+    "replace": {
+      "exports": {
+        ".": {
+          "import": "./dist/xmlui-ai-blocks.mjs",
+          "require": "./dist/xmlui-ai-blocks.js"
+        },
+        "./*.css": {
+          "import": "./dist/*.css"
+        }
+      }
+    }
+  }
+}
