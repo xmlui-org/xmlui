@@ -48,8 +48,8 @@ Ignore any `xmlui-pg` codefence whose opening fence appears between a `<pre>` ta
 `</pre>` tag. Those are documentation literals and must not generate tests.
 
 For each codefence, record:
-- Whether it has a `name="..."` attribute
-- Its name value if present
+- Whether it has a `name="..."` attribute and its value if present
+- Whether it has an `id="..."` attribute and its value if present
 - Whether it is **interactive** (body contains an event handler attribute like `onClick`, `onChange`,
   `onSubmit`, etc., a `---api` section, or any of these interactive components: `NavLink`,
   `Select`, `ToneSwitch`) or **display-only**
@@ -66,6 +66,8 @@ Add a name="..." attribute to each before continuing.
 ```
 
 Do NOT generate fallback names. The name must come from the markdown file itself.
+
+**If any codefences have a `name` but no `id` attribute**, flag them: they will need an `id` added before tests can be updated or added. Defer that work until after you compute the diff in Step 4.
 
 ## Step 2b — Validate all `---api` sections
 
@@ -137,32 +139,32 @@ and then replace the placeholder failing test(s).
 
 ## Step 3 — Inventory the spec file
 
-Collect every `test.describe("...")` title from the existing spec file. These are the names
-currently being tested.
+Collect every `test.describe("...")` title and the corresponding `extractXmluiExample` call from the existing spec file. These describe the current test coverage:
+- Describe title = the `name` value (human-readable)
+- `extractXmluiExample` second argument = the `id` value (stable lookup key)
 
 ## Step 4 — Compute the diff
 
-Compare the eligible markdown name set against the spec name set:
+Compare the markdown's eligible codefences (indexed by `id` value) against the spec's existing `test.describe` blocks (indexed by the second argument to `extractXmluiExample`):
 
 | Situation | Action |
 |-----------|--------|
-| Name exists in markdown **and** spec | **Keep** — do not modify unless the example content changed (see Step 5) |
-| Name exists in markdown but **not** in spec | **Add** — write a new `test.describe` block |
-| Name exists in spec but **not** in markdown | **Remove** — delete the entire `test.describe` block |
+| `id` exists in markdown **and** spec | **Keep** — do not modify unless the example content changed (see Step 5) |
+| `id` exists in markdown but **not** in spec | **Add** — write a new `test.describe` block (first add `id` to the markdown if missing) |
+| `id` exists in spec but **not** in markdown | **Remove** — delete the entire `test.describe` block |
+| Example has `name` but no `id` in markdown | **Flag for addition** — the example will be treated as "not in spec" until you add the `id` attribute |
 
-**Possible renames**: if the counts of added and removed names are equal (e.g., 1 removed + 1
-added), the example may have been renamed rather than replaced. Report this to the user before
-acting:
+**Possible renames**: In the spec, a rename occurs when the `extractXmluiExample` lookup argument stays the same (`id` unchanged) but the `test.describe` title (`name` value) has changed. Report this scenario to the user:
 
 ```
-It looks like the following examples may have been renamed:
+It looks like the following examples may have been renamed (id unchanged, name changed):
 
-  - Removed: "<old name>"
-  - Added:   "<new name>"
+  - Spec title: "<old name>"
+  - New title:  "<new name>"
+  - ID: "<stable-id>"
 
-If this is a rename, the existing tests can be preserved by updating the describe title and
-the extractXmluiExample call. Should I treat this as a rename, or as an unrelated removal
-and addition?
+If this is a rename, the describe title and assertions can be preserved by updating only the describe title.
+Should I treat this as a rename of the name attribute, or as an unrelated removal and addition?
 ```
 
 Wait for confirmation before proceeding on renames.
@@ -177,11 +179,17 @@ Never copy-paste the original example markup or API JSON into the spec file.
 
 Insert a new `test.describe` block at the position matching the example's order in the markdown.
 
+**First ensure the markdown codefence has an `id` attribute.** If it does not, add the `id` using the slug rules from the add prompt:
+- Convert the `name` to lowercase
+- Replace spaces with hyphens
+- Remove or replace any characters not in `[a-z0-9-]`
+- Collapse multiple consecutive hyphens into a single hyphen
+
 For **interactive** examples, follow the full template:
 
 ```typescript
 test.describe("<example name>", { tag: "@website" }, () => {
-  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example name>");
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example id>");
 
   test("<describe what the initial state looks like>", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
@@ -197,7 +205,7 @@ For **display-only** examples (no event handlers, no `---api`), write only an in
 ```typescript
 // display-only example — no interaction to test
 test.describe("<example name>", { tag: "@website" }, () => {
-  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example name>");
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example id>");
 
   test("renders the initial state", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
@@ -212,9 +220,10 @@ Delete the entire `test.describe(...)` block including its closing `});`.
 
 ### Updating a renamed example
 
-Change only:
-1. The `test.describe("…")` title string
-2. The `extractXmluiExample(markdown, "…")` name argument
+When an example's `id` stays the same but its `name` has changed:
+
+1. Update the `test.describe("<old name>", ...)` title to `test.describe("<new name>", ...)`
+2. **Do NOT change** the `extractXmluiExample(markdown, "<id>")` second argument — it stays the same and continues to locate the codefence by its stable `id`.
 
 Preserve all existing test cases inside the block. If the example content also changed
 substantially, rewrite the test assertions to match the new content.
@@ -250,8 +259,9 @@ from reading its source alone, output a `test.todo` placeholder and note what in
 Check for TypeScript errors in the updated file. Confirm:
 - `getExampleSource` is still called once at module level, not inside a describe/test callback
 - Every describe block (old and new) has `{ tag: "@website" }`
-- Example names in `extractXmluiExample` match the markdown exactly (copy-paste, do not paraphrase)
-- No stale describe blocks remain for names no longer in the markdown
+- The second argument to every `extractXmluiExample` call is the `id` value from the markdown codefence (not the `name` string) — copy-paste the exact id value
+- Example names (describe titles) are still correct and match the markdown `name` values exactly
+- No stale describe blocks remain for ids no longer in the markdown
 - Display-only blocks have the `// display-only example — no interaction to test` comment
 - Import paths use the correct depth for the spec file's location
 

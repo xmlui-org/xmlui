@@ -2,7 +2,7 @@
 
 Define a `PostalAddress` component shared for billing and shipping. Use the JavaScript spread operator (`...`) to copy the billing section of the form's data to the shipping section.
 
-```xmlui-pg
+```xmlui-pg id="copy-billing-to-shipping-b76c"
 ---comp display
 <Component name="PostalAddress">
     <TextBox

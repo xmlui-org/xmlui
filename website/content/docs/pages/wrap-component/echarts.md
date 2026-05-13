@@ -63,7 +63,7 @@ Drag the slider handles below the chart to zoom into a date range.
 
 Click legend items to toggle series on and off.
 
-```xmlui-pg
+```xmlui-pg id="line-chart-with-toolbox-b7d5"
 ---app display
 <App>
   <EChart
@@ -94,7 +94,7 @@ Click legend items to toggle series on and off.
 
 ## Donut chart
 
-```xmlui-pg
+```xmlui-pg id="donut-chart-b851"
 ---app display
 <App>
   <EChart

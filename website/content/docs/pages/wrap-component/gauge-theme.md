@@ -20,7 +20,7 @@ There's one wrinkle: Smart UI bakes some values into inline SVG attributes at re
 
 ## Demo
 
-```xmlui-pg
+```xmlui-pg id="demo-b71f"
 ---app display
 <App var.gaugeVal="42">
   <HStack alignItems="center" gap="2rem" padding="1rem">

@@ -33,8 +33,8 @@ Ignore any `xmlui-pg` codefence whose opening fence appears between a `<pre>` ta
 `</pre>` tag. Those are documentation literals and must not generate tests.
 
 For each codefence, record:
-- Whether it has a `name="..."` attribute
-- Its name value if present
+- Whether it has a `name="..."` attribute and its value if present
+- Whether it has an `id="..."` attribute and its value if present
 
 **If any codefences have no `name` attribute**, stop and report them to the user:
 
@@ -49,7 +49,15 @@ Add a name="..." attribute to each before continuing.
 
 Do NOT generate fallback names like `"example-1"`. The name must come from the markdown file itself.
 
-Only proceed once every eligible codefence that should be tested has a name.
+**If any codefences have a `name` but no `id` attribute**, you must add an `id` attribute to each codefence before writing tests. The `id` should be a slug derived from the `name` using these rules:
+- Convert to lowercase
+- Replace spaces with hyphens
+- Remove or replace any characters not in `[a-z0-9-]`
+- Collapse multiple consecutive hyphens into a single hyphen
+
+Examples: `"A literal property"` → `id="a-literal-property"`, `"Declaring a variable with <variable>"` → `id="declaring-a-variable-with-variable"`
+
+Only proceed once every eligible codefence has both a `name` and an `id` attribute.
 
 ## Step 2b — Validate all `---api` sections
 
@@ -145,7 +153,7 @@ const markdown = getExampleSource(
 );
 
 test.describe("<example name>", { tag: "@website" }, () => {
-  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example name>");
+  const { app, components, apiInterceptor } = extractXmluiExample(markdown, "<example id>");
 
   test("<describe what the initial state looks like>", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
@@ -164,7 +172,8 @@ Import path depth depends on spec location:
 - `tests-e2e/pages/<subdir>/` → `../../../src/testing/...` and `../../../../website/...`
 
 Rules:
-- One `test.describe` per named eligible codefence. The describe title = the codefence's `name` value exactly.
+- One `test.describe` per named eligible codefence. The describe title = the codefence's `name` value exactly (for human readability).
+- The `extractXmluiExample` second argument = the codefence's `id` value (for stable lookup, resilient to name changes).
 - Every `test.describe` must include `{ tag: "@website" }`.
 - Read the markdown file once at module level with `getExampleSource`; call `extractXmluiExample` inside each describe block.
 - Never copy-paste the original example markup or API JSON into the spec file.
@@ -199,7 +208,8 @@ If you cannot determine what meaningful assertions to write for a given eligible
 Check for TypeScript errors in the new file. Confirm:
 - `getExampleSource` is called once at the top level, not inside a describe/test callback
 - Every describe block has `{ tag: "@website" }`
-- Example names in `extractXmluiExample` match the markdown exactly (copy-paste, do not paraphrase)
+- The first argument to `extractXmluiExample` is the `id` value from the markdown codefence (not the `name` string) — copy-paste the exact id value
+- Example names in describe titles match the markdown exactly (copy-paste, do not paraphrase)
 - Import paths use the correct depth for the spec file's location (see Step 3 path table)
 - Display-only examples have the `// display-only example — no interaction to test` comment
 
