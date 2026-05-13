@@ -550,6 +550,126 @@ test("supports keyboard navigation with arrow keys", async ({ initTestBed, page 
   await expect(combobox).toHaveValue("Clark Kent");
 });
 
+test(
+  "custom Option children are preserved while filtering",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete>
+        <Option value="1" label="Bruce Wayne">
+          <Text testId="opt-template-1">CUSTOM Bruce</Text>
+        </Option>
+        <Option value="2" label="Clark Kent">
+          <Text testId="opt-template-2">CUSTOM Clark</Text>
+        </Option>
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("listbox")).toBeVisible();
+
+    // Type to filter — only "Clark" should remain. The custom template for
+    // that option must still be rendered.
+    await page.keyboard.type("Clark");
+    await expect(page.getByTestId("opt-template-2")).toBeVisible();
+    await expect(page.getByTestId("opt-template-1")).toHaveCount(0);
+  },
+);
+
+// Regression: with `groupBy` set on AutoComplete, group headers must be
+// derived from the *visible* (filtered) options — not from the static input
+// order. If the first option of a group gets filtered out, the next visible
+// option in that group should now render its group's header.
+test(
+  "group header shifts to next visible option when filtering",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete multi="true" groupBy="clientName">
+        <property name="groupHeaderTemplate">
+          <Text>{($group || '').toUpperCase()}</Text>
+        </property>
+        <Option value="a1" label="Analytics Dashboard"
+                clientName="Verge" keywords="{['Verge']}" />
+        <Option value="a2" label="Data Pipeline"
+                clientName="Verge" keywords="{['Verge']}" />
+        <Option value="b1" label="Compliance Audit"
+                clientName="Aurora" keywords="{['Aurora']}" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("listbox")).toBeVisible();
+
+    // Initially both VERGE and AURORA headers render once each.
+    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(1);
+
+    // Filter out the original first VERGE option ("Analytics Dashboard").
+    // "Data Pipeline" remains and should now carry the VERGE header.
+    await page.keyboard.type("Pipeline");
+    await expect(page.getByText("Data Pipeline")).toBeVisible();
+    await expect(page.getByText("Analytics Dashboard")).toHaveCount(0);
+    await expect(page.getByText("VERGE", { exact: true })).toHaveCount(1);
+    await expect(page.getByText("AURORA", { exact: true })).toHaveCount(0);
+  },
+);
+
+// Regression: when no `groupHeaderTemplate` is provided, the group key string
+// itself renders as the header. Verifies the fallback path.
+test(
+  "groupBy without groupHeaderTemplate renders plain group name",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <AutoComplete groupBy="category">
+        <Option value="apple" label="Apple" category="Fruit" />
+        <Option value="carrot" label="Carrot" category="Vegetable" />
+      </AutoComplete>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("listbox")).toBeVisible();
+    await expect(page.getByText("Fruit", { exact: true })).toBeVisible();
+    await expect(page.getByText("Vegetable", { exact: true })).toBeVisible();
+  },
+);
+
+test(
+  "multi-select supports arrow-key navigation when search term is empty",
+  async ({ initTestBed, page }) => {
+    await initTestBed(`
+      <Fragment var.picked="{[]}">
+        <AutoComplete multi="true" onDidChange="(v) => picked = v || []">
+          <Option value="1" label="Bruce Wayne" />
+          <Option value="2" label="Clark Kent" />
+          <Option value="3" label="Diana Prince" />
+        </AutoComplete>
+        <Text testId="picked">{(picked || []).join(',')}</Text>
+      </Fragment>
+    `);
+
+    const combobox = page.getByRole("combobox");
+    await combobox.focus();
+    await expect(combobox).toBeFocused();
+
+    // Open dropdown (no typing → OptionTypeProvider render branch).
+    await page.keyboard.press("ArrowDown");
+    const listbox = page.getByRole("listbox");
+    await expect(listbox).toBeVisible();
+
+    // Navigate to the second option without typing anything.
+    await page.keyboard.press("ArrowDown"); // first
+    await page.keyboard.press("ArrowDown"); // second
+    await page.keyboard.press("Enter");
+
+    await expect(page.getByTestId("picked")).toHaveText("2");
+  },
+);
+
 // =============================================================================
 // VISUAL STATE TESTS
 // =============================================================================

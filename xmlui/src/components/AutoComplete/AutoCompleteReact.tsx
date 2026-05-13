@@ -66,6 +66,19 @@ type AutoCompleteProps = {
   validationIconError?: string;
   invalidMessages?: string[];
   contentClassName?: string;
+  /** Field name on each Option to group by. When set, the dropdown shows a
+   *  section header above each group of options sharing the same value of
+   *  `option[groupBy]`. Headers are computed from the *visible* (filtered)
+   *  options, so searching automatically updates which option carries the
+   *  group's header. Matches Select's `groupBy` prop. */
+  groupBy?: string;
+  /** Renderer for a group's section header. Receives the group name as the
+   *  `$group` context var. When omitted, the group key string is rendered as
+   *  plain text. */
+  groupHeaderRenderer?: (groupName: string) => ReactNode;
+  /** Renderer for the "Ungrouped" bucket header (options missing the `groupBy`
+   *  field). When omitted, the Ungrouped bucket has no header. */
+  ungroupedHeaderRenderer?: () => ReactNode;
 };
 
 function isOptionsExist(options: Option[], newOptions: Option[]) {
@@ -123,6 +136,9 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     validationIconError,
     invalidMessages,
     contentClassName,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
     ...rest
   }: AutoCompleteProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -471,8 +487,13 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
       open,
       setOpen,
       setSelectedIndex,
+      selectedIndex,
+      allItems,
       readOnly,
       optionRenderer,
+      groupBy,
+      groupHeaderRenderer,
+      ungroupedHeaderRenderer,
     };
   }, [
     inputValue,
@@ -484,8 +505,13 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     open,
     setOpen,
     setSelectedIndex,
+    selectedIndex,
+    allItems,
     readOnly,
     optionRenderer,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
   ]);
 
   return (
@@ -650,35 +676,21 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
               onOpenAutoFocus={(e) => e.preventDefault()}
             >
               <div role="listbox" className={styles.commandList} style={{ height: dropdownHeight }}>
-                {searchTerm ? (
-                  <>
-                    {filteredOptions.map(({ value, label, enabled, keywords }, index) => {
-                      const itemIndex = shouldShowCreatable ? index + 1 : index;
-                      return (
-                        <AutoCompleteOption
-                          key={value}
-                          value={value}
-                          label={label}
-                          enabled={enabled}
-                          keywords={keywords}
-                          readOnly={readOnly}
-                          isHighlighted={selectedIndex === itemIndex}
-                          itemIndex={itemIndex}
-                        />
-                      );
-                    })}
-                    {shouldShowCreatable && (
-                      <CreatableItem
-                        onNewItem={onItemCreated}
-                        isHighlighted={selectedIndex === 0}
-                      />
-                    )}
-                    {filteredOptions.length === 0 && !shouldShowCreatable && (
-                      <div>{emptyListNode}</div>
-                    )}
-                  </>
-                ) : (
-                  <OptionTypeProvider Component={AutoCompleteOption}>{children}</OptionTypeProvider>
+                {/* Always render through OptionTypeProvider so user-provided
+                    Option children (custom templates) are preserved when
+                    filtering. AutoCompleteOption hides itself if its value is
+                    not in `allItems` (i.e. filtered out by searchTerm). The
+                    creatable item and empty-list message are rendered as
+                    siblings. */}
+                {shouldShowCreatable && (
+                  <CreatableItem
+                    onNewItem={onItemCreated}
+                    isHighlighted={selectedIndex === 0}
+                  />
+                )}
+                <OptionTypeProvider Component={AutoCompleteOption}>{children}</OptionTypeProvider>
+                {filteredOptions.length === 0 && !shouldShowCreatable && (
+                  <div>{emptyListNode}</div>
                 )}
               </div>
             </PopoverContent>
@@ -757,8 +769,8 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
     enabled = true,
     readOnly,
     children,
-    isHighlighted = false,
-    itemIndex,
+    isHighlighted: explicitHighlighted,
+    itemIndex: explicitItemIndex,
   } = option;
   const id = useId();
   const {
@@ -767,9 +779,62 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
     multi,
     setOpen,
     setSelectedIndex,
+    selectedIndex,
+    allItems,
     optionRenderer,
+    groupBy,
+    groupHeaderRenderer,
+    ungroupedHeaderRenderer,
   } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
+
+  // AutoCompleteOption is always rendered through OptionTypeProvider so the
+  // user's custom Option children (templates) are preserved even when a
+  // search term is active. We derive `itemIndex`/`isHighlighted` from the
+  // shared context `allItems`/`selectedIndex` when explicit props weren't
+  // passed (legacy callers can still override). If our value isn't in
+  // `allItems`, the searchTerm filtered us out — render nothing.
+  const itemIndex =
+    explicitItemIndex !== undefined
+      ? explicitItemIndex
+      : allItems.findIndex((i) => i.type === "option" && i.value === value);
+  if (explicitItemIndex === undefined && itemIndex === -1) {
+    return null;
+  }
+  const isHighlighted =
+    explicitHighlighted !== undefined
+      ? explicitHighlighted
+      : itemIndex !== -1 && selectedIndex === itemIndex;
+
+  // Decide whether to render a section header above this option. When `groupBy`
+  // is set on the parent AutoComplete, each option is grouped by the value of
+  // `option[groupBy]`. This option is the first visible member of its group iff
+  // the previous visible option in `allItems` either doesn't exist or sits in a
+  // different group. `allItems` is computed against the *current* filtered list,
+  // so searching automatically shifts the header to whichever option becomes
+  // first in its group. Missing group field values fall back to the "Ungrouped"
+  // bucket, matching Select's behavior.
+  let showGroupHeader = false;
+  let groupHeaderContent: ReactNode = null;
+  if (groupBy && itemIndex !== -1) {
+    const groupKey = (option as any)[groupBy] ?? "Ungrouped";
+    const prev = itemIndex > 0 ? allItems[itemIndex - 1] : null;
+    const prevGroupKey =
+      prev && prev.type === "option" ? (prev as any)[groupBy] ?? "Ungrouped" : null;
+    if (prevGroupKey !== groupKey) {
+      if (groupKey === "Ungrouped") {
+        if (ungroupedHeaderRenderer) {
+          showGroupHeader = true;
+          groupHeaderContent = ungroupedHeaderRenderer();
+        }
+      } else {
+        showGroupHeader = true;
+        groupHeaderContent = groupHeaderRenderer
+          ? groupHeaderRenderer(String(groupKey))
+          : String(groupKey);
+      }
+    }
+  }
 
   const handleClick = () => {
     if (!readOnly && enabled) {
@@ -782,39 +847,46 @@ function AutoCompleteOption(option: Option & { isHighlighted?: boolean; itemInde
   };
 
   return (
-    <div
-      id={id}
-      role="option"
-      aria-disabled={!enabled}
-      aria-selected={selected}
-      className={classnames(styles.autoCompleteOption, {
-        [styles.disabledOption]: !enabled,
-        [styles.highlighted]: isHighlighted,
-      })}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseEnter={() => {
-        if (itemIndex !== undefined && setSelectedIndex && enabled) {
-          setSelectedIndex(itemIndex);
-        }
-      }}
-      onClick={handleClick}
-    >
-      {children ? (
-        <>
-          <div className={styles.autoCompleteOptionContent}>{children}</div>
-          {selected && <ThemedIcon name="checkmark" />}
-        </>
-      ) : optionRenderer ? (
-        optionRenderer({ label, value, enabled }, selectedValue as any, false)
-      ) : (
-        <>
-          <div className={styles.autoCompleteOptionContent}>{label}</div>
-          {selected && <ThemedIcon name="checkmark" />}
-        </>
+    <>
+      {showGroupHeader && (
+        <div role="presentation" className={styles.groupHeader}>
+          {groupHeaderContent}
+        </div>
       )}
-    </div>
+      <div
+        id={id}
+        role="option"
+        aria-disabled={!enabled}
+        aria-selected={selected}
+        className={classnames(styles.autoCompleteOption, {
+          [styles.disabledOption]: !enabled,
+          [styles.highlighted]: isHighlighted,
+        })}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseEnter={() => {
+          if (itemIndex !== undefined && itemIndex !== -1 && setSelectedIndex && enabled) {
+            setSelectedIndex(itemIndex);
+          }
+        }}
+        onClick={handleClick}
+      >
+        {children ? (
+          <>
+            <div className={styles.autoCompleteOptionContent}>{children}</div>
+            {selected && <ThemedIcon name="checkmark" />}
+          </>
+        ) : optionRenderer ? (
+          optionRenderer({ label, value, enabled }, selectedValue as any, false)
+        ) : (
+          <>
+            <div className={styles.autoCompleteOptionContent}>{label}</div>
+            {selected && <ThemedIcon name="checkmark" />}
+          </>
+        )}
+      </div>
+    </>
   );
 }

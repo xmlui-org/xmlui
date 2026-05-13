@@ -312,6 +312,20 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
       font-style: italic;
     }
   }
+
+  .groupHeader {
+    padding-top: createThemeVar("paddingTop-groupHeader-#{$component}");
+    padding-bottom: createThemeVar("paddingBottom-groupHeader-#{$component}");
+    padding-left: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
+    padding-right: createThemeVar("paddingHorizontal-groupHeader-#{$component}");
+    font-size: createThemeVar("fontSize-groupHeader-#{$component}");
+    font-weight: createThemeVar("fontWeight-groupHeader-#{$component}");
+    letter-spacing: createThemeVar("letterSpacing-groupHeader-#{$component}");
+    text-transform: createThemeVar("textTransform-groupHeader-#{$component}");
+    color: createThemeVar("textColor-groupHeader-#{$component}");
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
