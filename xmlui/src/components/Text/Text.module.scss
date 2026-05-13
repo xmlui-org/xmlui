@@ -473,30 +473,30 @@ $textColor-Text-secondary--hover: createThemeVar("textColor-#{$component}-second
       border-radius: 3px;
     }
   }
-}
 
-// --- Break mode classes
-.breakNormal {
-  word-break: normal;
-  overflow-wrap: normal;
-}
+  // --- Break mode classes
+  .breakNormal {
+    word-break: normal;
+    overflow-wrap: normal;
+  }
 
-.breakWord {
-  overflow-wrap: break-word;
-}
+  .breakWord {
+    overflow-wrap: break-word;
+  }
 
-.breakAnywhere {
-  word-break: break-all;
-  overflow-wrap: anywhere;
-}
+  .breakAnywhere {
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
 
-.breakKeep {
-  word-break: keep-all;
-}
+  .breakKeep {
+    word-break: keep-all;
+  }
 
-.breakHyphenate {
-  hyphens: auto;
-  overflow-wrap: break-word;
+  .breakHyphenate {
+    hyphens: auto;
+    overflow-wrap: break-word;
+  }
 }
 
 :export {
