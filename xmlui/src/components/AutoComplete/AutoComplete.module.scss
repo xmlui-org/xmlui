@@ -145,13 +145,18 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
   .badgeListWrapper {
     outline: none;
     width: 100%;
-    height: max-content;
+    height: auto;
     min-height: $minHeight-AutoComplete;
     line-height: normal;
     gap: t.$space-1;
     display: flex;
     flex-direction: row;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+    // The list inside truncates with `+N more` once the container runs out
+    // of horizontal space — anything that overflows visually is clipped.
+    overflow: hidden;
+    position: relative;
     @include t.paddingVars($themeVars, $component);
 
     @include variant("");
@@ -187,16 +192,33 @@ $textColor-item-AutoComplete--disabled: createThemeVar("textColor-item-#{$compon
     position: relative;
     align-items: center;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    min-width: 0;
     gap: 0.25rem;
   }
 
   .inputWrapper {
     display: flex;
     align-items: center;
-    min-width: fit-content;
+    // The input shrinks down to here when many badges occupy the trigger.
+    // Keep it tight so the trigger doesn't push a single fitting badge into
+    // a "+N more" chip prematurely. 60px still fits a usable caret + a few
+    // characters of placeholder before ellipsis.
+    min-width: 60px;
     flex: 1;
     gap: t.$space-1;
+  }
+
+  .ghostMeasurer {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
   }
 
   .badge {

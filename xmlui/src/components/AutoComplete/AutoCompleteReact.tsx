@@ -7,6 +7,7 @@ import {
   useId,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -156,6 +157,19 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
   const [isFocused, setIsFocused] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
+  // Refs and state for the multi-mode "+N more" truncation. Badge widths
+  // depend on labels, so we do a hidden measurement pass and decide how many
+  // fit alongside the input. `visibleBadgeCount` starts at Infinity so the
+  // initial render shows every badge; the layout effect immediately cuts it
+  // down based on real DOM measurements.
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const inputWrapperRef = useRef<HTMLDivElement | null>(null);
+  const actionsRef = useRef<HTMLDivElement | null>(null);
+  const ghostRef = useRef<HTMLDivElement | null>(null);
+  const [visibleBadgeCount, setVisibleBadgeCount] = useState<number>(Number.POSITIVE_INFINITY);
+  // Bumped by ResizeObserver so the measurement effect re-runs on width change.
+  const [resizeKey, setResizeKey] = useState(0);
+
   const contextVerboseValidationFeedback = useFormContextPart((ctx) => ctx?.verboseValidationFeedback);
   const contextValidationIconSuccess = useFormContextPart((ctx) => ctx?.validationIconSuccess);
   const contextValidationIconError = useFormContextPart((ctx) => ctx?.validationIconError);
@@ -268,7 +282,11 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
         setSearchTerm("");
       }
 
-      inputRef.current?.focus();
+      // `preventScroll` avoids dragging any ancestor scrollable container —
+      // without it, the browser tries to keep the input fully in view after
+      // each selection, which scrolls a parent <VStack overflowY="auto"> up
+      // by hundreds of pixels in long pages (e.g. Reports filters).
+      inputRef.current?.focus({ preventScroll: true });
     },
     [multi, value, updateState, onDidChange, options],
   );
@@ -280,6 +298,76 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     }
   }, [selectedValue]);
 
+  // --- Multi-mode badge truncation (+N more) ---
+  // Selected items as a stable array (or empty when not multi/no value).
+  const selectedArray: Option[] = useMemo(
+    () => (multi && Array.isArray(selectedValue) ? (selectedValue as Option[]) : []),
+    [multi, selectedValue],
+  );
+
+  // Measure ghost badges and decide how many fit alongside the input + actions.
+  // The ghost wrapper renders every selected badge plus a max-width "+N more"
+  // placeholder at `position: absolute; visibility: hidden` so we can read
+  // real label widths without disturbing layout. Recomputed on every value
+  // change and on container resize.
+  useLayoutEffect(() => {
+    if (!multi || selectedArray.length === 0) {
+      setVisibleBadgeCount(selectedArray.length);
+      return;
+    }
+    const wrapper = wrapperRef.current;
+    const inputWrap = inputWrapperRef.current;
+    const ghost = ghostRef.current;
+    if (!wrapper || !inputWrap || !ghost) return;
+
+    const ghostBadgeEls = Array.from(
+      ghost.querySelectorAll<HTMLElement>('[data-ghost="badge"]'),
+    );
+    const moreEl = ghost.querySelector<HTMLElement>('[data-ghost="more"]');
+    const actionsW = actionsRef.current?.getBoundingClientRect().width ?? 0;
+
+    const wrapperW = wrapper.clientWidth;
+    // Reserve room for the input and the actions block. The input wrapper
+    // is `flex: 1`, so its rendered width grows to swallow whatever space is
+    // free — we must reserve only its CSS-enforced `min-width`, otherwise
+    // the measurement says "no badge fits" when in fact most do.
+    const inputMinW =
+      parseFloat(window.getComputedStyle(inputWrap).minWidth) || 100;
+    const moreW = moreEl?.getBoundingClientRect().width ?? 0;
+    const gap = 4; // matches `.badgeList`/`.ghostMeasurer` gap (0.25rem)
+
+    const reserved = inputMinW + actionsW + gap * 2;
+    const availableForBadges = wrapperW - reserved;
+
+    let used = 0;
+    let count = 0;
+    for (let i = 0; i < ghostBadgeEls.length; i++) {
+      const w = ghostBadgeEls[i].getBoundingClientRect().width;
+      const remainingAfter = ghostBadgeEls.length - (i + 1);
+      // Reserve a "+N more" slot only when at least one badge would overflow.
+      const reserveMore = remainingAfter > 0 ? moreW + gap : 0;
+      const needed = used + w + (i > 0 ? gap : 0) + reserveMore;
+      if (needed <= availableForBadges) {
+        used += w + (i > 0 ? gap : 0);
+        count = i + 1;
+      } else {
+        break;
+      }
+    }
+    setVisibleBadgeCount(count);
+  }, [selectedArray, multi, resizeKey]);
+
+  // Recompute the truncation when the trigger's width changes.
+  useEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
+    const ro = new ResizeObserver(() => {
+      setResizeKey((k) => k + 1);
+    });
+    ro.observe(wrapper);
+    return () => ro.disconnect();
+  }, []);
+
   // Clear selected value
   const clearValue = useCallback(() => {
     const newValue = multi ? [] : "";
@@ -287,6 +375,14 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
     updateState({ value: newValue });
     onDidChange(newValue);
   }, [multi, updateState, onDidChange]);
+
+  // Deselect every item the "+N more" chip stands for, in one state update.
+  const removeOverflowSelections = useCallback(() => {
+    if (selectedArray.length === 0) return;
+    const keptValues = selectedArray.slice(0, visibleBadgeCount).map((o) => o.value);
+    updateState({ value: keptValues });
+    onDidChange(keptValues);
+  }, [selectedArray, visibleBadgeCount, updateState, onDidChange]);
 
   const onOptionAdd = useCallback((option: Option) => {
     setOptions((prev) => [...prev, option]);
@@ -454,7 +550,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    inputRef?.current?.focus();
+    inputRef?.current?.focus({ preventScroll: true });
   }, [inputRef]);
 
   const setValue = useEvent((newValue: string | string[]) => {
@@ -532,7 +628,11 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
           <Part partId={PART_LIST_WRAPPER}>
             <PopoverTrigger asChild ref={setReferenceElement}>
               <div
-                ref={forwardedRef}
+                ref={(el) => {
+                  wrapperRef.current = el;
+                  if (typeof forwardedRef === "function") forwardedRef(el);
+                  else if (forwardedRef) (forwardedRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+                }}
                 style={style}
                 className={classnames(
                   classes?.[COMPONENT_PART_KEY],
@@ -556,26 +656,81 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
                   setOpen((prev) => !prev);
                 }}
               >
-                {Array.isArray(selectedValue) && selectedValue.length > 0 && (
+                {selectedArray.length > 0 && (
                   <div className={styles.badgeList}>
-                    {selectedValue.map((v, index) => (
-                      <span key={index} className={styles.badge}>
+                    {selectedArray
+                      .slice(0, Number.isFinite(visibleBadgeCount) ? visibleBadgeCount : selectedArray.length)
+                      .map((v, index) => (
+                        <span key={index} className={styles.badge}>
+                          {v?.label}
+                          {!readOnly && (
+                            <span
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v.value);
+                              }}
+                            >
+                              <ThemedIcon name="close" size="sm" />
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    {Number.isFinite(visibleBadgeCount) &&
+                      selectedArray.length > visibleBadgeCount && (
+                        <span
+                          className={styles.badge}
+                          role="button"
+                          aria-label={`${selectedArray.length - visibleBadgeCount} more selected, click to open`}
+                          onClick={(event) => {
+                            // Open the dropdown so the user can see the full
+                            // selection — multi mode keeps it open afterwards.
+                            event.stopPropagation();
+                            setOpen(true);
+                          }}
+                        >
+                          {`+${selectedArray.length - visibleBadgeCount} more`}
+                          {!readOnly && (
+                            <span
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                removeOverflowSelections();
+                              }}
+                            >
+                              <ThemedIcon name="close" size="sm" />
+                            </span>
+                          )}
+                        </span>
+                      )}
+                  </div>
+                )}
+                {/* Ghost measurer — invisible, off-screen list used to read real
+                    label widths so we can decide how many badges fit before
+                    swapping the overflow into a "+N more" chip. */}
+                {multi && selectedArray.length > 0 && (
+                  <div ref={ghostRef} className={styles.ghostMeasurer} aria-hidden="true">
+                    {selectedArray.map((v, index) => (
+                      <span key={`g-${index}`} data-ghost="badge" className={styles.badge}>
                         {v?.label}
                         {!readOnly && (
-                          <span
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleOption(v.value);
-                            }}
-                          >
+                          <span>
                             <ThemedIcon name="close" size="sm" />
                           </span>
                         )}
                       </span>
                     ))}
+                    {/* Worst-case "+N more" placeholder — three-digit count
+                        gives an upper bound for the reserved slot. */}
+                    <span data-ghost="more" className={styles.badge}>
+                      {`+${selectedArray.length} more`}
+                      {!readOnly && (
+                        <span>
+                          <ThemedIcon name="close" size="sm" />
+                        </span>
+                      )}
+                    </span>
                   </div>
                 )}
-                <div className={styles.inputWrapper}>
+                <div ref={inputWrapperRef} className={styles.inputWrapper}>
                   <Part partId={PART_INPUT}>
                     <input
                       {...rest}
@@ -629,7 +784,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
                       className={styles.commandInput}
                     />
                   </Part>
-                  <div className={styles.actions}>
+                  <div ref={actionsRef} className={styles.actions}>
                     {!finalVerboseValidationFeedback && (
                       <Part partId={PART_CONCISE_VALIDATION_FEEDBACK}>
                         <ConciseValidationFeedback
@@ -658,7 +813,7 @@ export const AutoComplete = memo(forwardRef(function AutoComplete(
                         if (readOnly || !enabled) return;
                         setOpen(!open);
                         // Focus the input after opening dropdown
-                        inputRef.current?.focus();
+                        inputRef.current?.focus({ preventScroll: true });
                       }}
                     >
                       <ThemedIcon name="chevrondown" />
