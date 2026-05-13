@@ -22,11 +22,11 @@ The `Search` component uses [Tabs](/docs/reference/components/Tabs) to enable sw
 </Component>
 ---comp display
 <Component name="SearchInvoicesAfter">
-This is SearchInvoicesAfter.
+    <Text>This is SearchInvoicesAfter.</Text>
 </Component>
 ---comp display
 <Component name="SearchEverything">
-This is SearchEverything.
+    <Text>This is SearchEverything.</Text>
 </Component>
 ---desc
 Try switching between the two tabs.

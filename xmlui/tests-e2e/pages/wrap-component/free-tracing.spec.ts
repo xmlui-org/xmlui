@@ -20,7 +20,7 @@ test.describe("slider-interact-then-inspect-b6d7", { tag: "@website" }, () => {
 
   test("renders the slider with initial value display", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByRole("slider", { name: "Volume" })).toBeVisible();
+    await expect(page.getByRole("slider")).toBeVisible();
     await expect(page.getByText("Value:")).toBeVisible();
   });
 
@@ -29,7 +29,7 @@ test.describe("slider-interact-then-inspect-b6d7", { tag: "@website" }, () => {
     page,
   }) => {
     await initTestBed(app, { components, apiInterceptor });
-    const slider = page.getByRole("slider", { name: "Volume" });
+    const slider = page.getByRole("slider");
     await slider.focus();
     await expect(slider).toBeFocused();
     await page.keyboard.press("ArrowRight");

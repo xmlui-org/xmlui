@@ -27,17 +27,17 @@ test.describe("copy-billing-to-shipping-b76c", { tag: "@website" }, () => {
 
   test("billing tab shows pre-filled address fields", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByLabel("Address")).toHaveValue("123 W. 57th");
-    await expect(page.getByLabel("City")).toHaveValue("New York");
-    await expect(page.getByLabel("State/Province")).toHaveValue("NY");
-    await expect(page.getByLabel("Country")).toHaveValue("USA");
+    await expect(page.locator('[id="billing.address"]')).toHaveValue("123 W. 57th");
+    await expect(page.locator('[id="billing.city"]')).toHaveValue("New York");
+    await expect(page.locator('[id="billing.state"]')).toHaveValue("NY");
+    await expect(page.locator('[id="billing.country"]')).toHaveValue("USA");
   });
 
   test("shipping tab starts empty", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("tab", { name: "Shipping" }).click();
-    await expect(page.getByLabel("Address")).toHaveValue("");
-    await expect(page.getByLabel("City")).toHaveValue("");
+    await expect(page.locator('[id="shipping.address"]')).toHaveValue("");
+    await expect(page.locator('[id="shipping.city"]')).toHaveValue("");
   });
 
   test("clicking Copy Billing to Shipping fills the shipping tab", async ({
@@ -47,8 +47,8 @@ test.describe("copy-billing-to-shipping-b76c", { tag: "@website" }, () => {
     await initTestBed(app, { components, apiInterceptor });
     await page.getByRole("button", { name: "Copy Billing to Shipping" }).click();
     await page.getByRole("tab", { name: "Shipping" }).click();
-    await expect.poll(() => page.getByLabel("Address").inputValue()).toBe("123 W. 57th");
-    await expect.poll(() => page.getByLabel("City").inputValue()).toBe("New York");
-    await expect.poll(() => page.getByLabel("State/Province").inputValue()).toBe("NY");
+    await expect.poll(() => page.locator('[id="shipping.address"]').inputValue()).toBe("123 W. 57th");
+    await expect.poll(() => page.locator('[id="shipping.city"]').inputValue()).toBe("New York");
+    await expect.poll(() => page.locator('[id="shipping.state"]').inputValue()).toBe("NY");
   });
 });

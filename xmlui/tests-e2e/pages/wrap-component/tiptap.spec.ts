@@ -17,7 +17,7 @@ test.describe("demo-b6d7", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "demo-b6d7");
 
   test("renders the TiptapEditor with initial content", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-tiptap-editor" });
     // The editor renders a contenteditable div with initial rich text content
     await expect(page.getByRole("textbox")).toBeVisible();
     await expect(page.getByText("Try it out")).toBeVisible();

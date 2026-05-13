@@ -14,7 +14,7 @@ test.describe("charts-b76c", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "charts-b76c");
 
   test("renders the Statuses donut chart inside a Card", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.getByText("Statuses")).toBeVisible();
   });
 });
@@ -27,7 +27,7 @@ test.describe("multiseries-charts-b8f6", { tag: "@website" }, () => {
   );
 
   test("renders the MonthlyStatus bar chart", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     // The MonthlyStatus component wraps the chart in a Card
     await expect(page.locator("canvas")).toBeVisible();
   });

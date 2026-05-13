@@ -20,7 +20,7 @@ test.describe("basic-colored-boxes-with-varying-heights-b6be", { tag: "@website"
   );
 
   test("renders all eight colored cards with varying heights", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-masonry" });
     await expect(page.getByText("Card 1 -- short")).toBeVisible();
     await expect(page.getByText("Card 2 -- tall")).toBeVisible();
     await expect(page.getByText("Card 5 -- very tall")).toBeVisible();
@@ -36,10 +36,10 @@ test.describe("content-cards-simulated-event-listings-b82e", { tag: "@website" }
   );
 
   test("renders the event listing cards", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-masonry" });
     await expect(page.getByText("Jazz in the Park")).toBeVisible();
     await expect(page.getByText("Farmers Market Opening Day")).toBeVisible();
-    await expect(page.getByText("Art Walk")).toBeVisible();
-    await expect(page.getByText("Book Sale")).toBeVisible();
+    await expect(page.getByText('Art Walk', { exact: true })).toBeVisible();
+    await expect(page.getByText("Book Sale", { exact: true })).toBeVisible();
   });
 });
