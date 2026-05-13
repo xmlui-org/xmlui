@@ -32,7 +32,7 @@ test.describe("search-invoices-after-date-b82e", { tag: "@website" }, () => {
 
   test("renders the date picker with initial value", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByRole("textbox")).toBeVisible();
+    await expect(page.getByTestId('dateAfter')).toBeVisible();
   });
 
   test("shows invoice results after the initial date", async ({ initTestBed, page }) => {

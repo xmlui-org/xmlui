@@ -20,7 +20,7 @@ test.describe("basic-bar-chart-b6ce", { tag: "@website" }, () => {
   );
 
   test("renders the bar chart inside a card", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.locator("canvas")).toBeVisible();
   });
 });
@@ -33,7 +33,7 @@ test.describe("pie-donut-chart-b72a", { tag: "@website" }, () => {
   );
 
   test("renders the donut chart inside a card", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.locator("canvas")).toBeVisible();
   });
 });
@@ -46,7 +46,7 @@ test.describe("line-chart-with-multiple-series-b7b6", { tag: "@website" }, () =>
   );
 
   test("renders the multi-series line chart inside a card", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.locator("canvas")).toBeVisible();
   });
 });

@@ -20,7 +20,7 @@ test.describe("line-chart-with-toolbox-b7d5", { tag: "@website" }, () => {
   );
 
   test("renders the line chart with toolbox", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.locator("canvas")).toBeVisible();
   });
 });
@@ -30,7 +30,7 @@ test.describe("donut-chart-b851", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "donut-chart-b851");
 
   test("renders the donut chart", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-echart" });
     await expect(page.locator("canvas")).toBeVisible();
   });
 });

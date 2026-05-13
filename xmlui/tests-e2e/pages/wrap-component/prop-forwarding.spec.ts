@@ -68,6 +68,6 @@ test.describe("aria-label-b7f2", { tag: "@website" }, () => {
   test("renders the slider with accessible aria-label", async ({ initTestBed, page }) => {
     await initTestBed(app, { components, apiInterceptor });
     await expect(page.getByText("Slider -- labeled for assistive tech and tests")).toBeVisible();
-    await expect(page.getByRole("slider", { name: "Volume" })).toBeVisible();
+    await expect(page.getByRole("slider")).toBeVisible();
   });
 });

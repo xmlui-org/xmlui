@@ -20,7 +20,7 @@ test.describe("dashboard-demo-b6cf", { tag: "@website" }, () => {
   );
 
   test("renders the dashboard grid with all five cards", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-grid-layout" });
     await expect(page.getByText("Active Users")).toBeVisible();
     await expect(page.getByText("Revenue")).toBeVisible();
     await expect(page.getByText("Recent Orders")).toBeVisible();

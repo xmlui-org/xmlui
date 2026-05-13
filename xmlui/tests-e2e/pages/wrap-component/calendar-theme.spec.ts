@@ -17,7 +17,7 @@ test.describe("demo-b767", { tag: "@website" }, () => {
   const { app, components, apiInterceptor } = extractXmluiExample(markdown, "demo-b767");
 
   test("renders the themed BigCalendar component", async ({ initTestBed, page }) => {
-    await initTestBed(app, { components, apiInterceptor });
-    await expect(page.getByRole("grid")).toBeVisible();
+    await initTestBed(app, { components, apiInterceptor, extensionIds: "xmlui-calendar" });
+    await expect(page.getByRole('table', { name: 'Month View' })).toBeVisible();
   });
 });
