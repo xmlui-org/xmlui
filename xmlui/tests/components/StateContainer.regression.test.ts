@@ -37,7 +37,7 @@ describe("extractScopedState with computedUses", () => {
 
 describe("computeUsesForTree — mutation semantics", () => {
   it("no external deps → computedUses undefined (full parent pass-through)", () => {
-    // When totalFree is empty (all refs are locally declared), computedUses must NOT be set
+    // When parentDependencies is empty (all refs are locally declared), computedUses must NOT be set
     // to [] — that would incorrectly isolate the container. undefined = full state pass-through.
     const stack = node("Stack", {
       vars: { a: "{0}" },

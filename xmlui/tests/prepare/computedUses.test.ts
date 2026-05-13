@@ -43,7 +43,7 @@ describe("computeUsesForTree — basic cases", () => {
       children: [node("Text", { props: { text: "{x}" } })],
     });
     computeUsesForTree(root);
-    // totalFree is empty → computedUses is not set (undefined), not []
+    // parentDependencies is empty → computedUses is not set (undefined), not []
     // Setting computedUses=[] would incorrectly isolate parent state for implicit containers
     expect(root.computedUses).toBeUndefined();
   });
@@ -104,7 +104,7 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
   it("contextVar keys are locally declared — do NOT make Select an implicit container", () => {
     // Typical pattern: <Select><Items contextVar="$item" data="{...}"><Option value="{$item.value}"/></Items></Select>
     // $item is a contextVar of Items — locally provided, not from parent scope.
-    // Without this fix, $item leaks out of Items → Select has totalFree={"$item"} → becomes
+    // Without this fix, $item leaks out of Items → Select has parentDependencies={"$item"} → becomes
     // implicit container → gets wrapped in outer Container with computedUses=["$item"] →
     // extractScopedState(parentState, ["$item"]) = {} → value updates get isolated inside
     // the outer Container and never propagate to Fragment → {mySelect.value} stays empty.
@@ -119,7 +119,7 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
     });
     computeUsesForTree(select);
     // Items absorbs $item (contextVar) and someData (external dep).
-    // Select has totalFree={"someData"} — no $item leak.
+    // Select has parentDependencies={"someData"} — no $item leak.
     // Select IS an implicit container (has free vars), but computedUses=["someData"] only.
     expect(select.computedUses).not.toContain("$item");
     expect(select.computedUses).toContain("someData");
@@ -146,7 +146,7 @@ describe("computeUsesForTree — child UIDs", () => {
       ],
     });
     computeUsesForTree(root);
-    // mySelect escapes up as an UID → locally declared → totalFree is empty
+    // mySelect escapes up as an UID → locally declared → parentDependencies is empty
     // computedUses not set (undefined) rather than [] to preserve implicit container semantics
     expect(root.computedUses).toBeUndefined();
   });
@@ -226,7 +226,7 @@ describe("computeUsesForTree — child UIDs", () => {
     });
     computeUsesForTree(root);
     // deepSelect bubbles through all non-container intermediaries → locally declared in root
-    // totalFree is empty → computedUses undefined
+    // parentDependencies is empty → computedUses undefined
     expect(root.computedUses).toBeUndefined();
   });
 
@@ -244,7 +244,7 @@ describe("computeUsesForTree — child UIDs", () => {
     });
     computeUsesForTree(root);
     // innerStack registers its own API in root — root doesn't need it from parent
-    // totalFree is empty → computedUses undefined
+    // parentDependencies is empty → computedUses undefined
     expect(root.computedUses).toBeUndefined();
   });
 });
@@ -257,7 +257,7 @@ describe("computeUsesForTree — loaders", () => {
       children: [node("Text", { props: { text: "{myData.items}" } })],
     });
     computeUsesForTree(root);
-    // myData uid is locally declared via processChildList(loaders) → totalFree empty
+    // myData uid is locally declared via processChildList(loaders) → parentDependencies empty
     expect(root.computedUses).toBeUndefined();
   });
 });
@@ -286,7 +286,7 @@ describe("computeUsesForTree — events", () => {
   });
 });
 
-describe("computeUsesForTree — empty totalFree must NOT set computedUses", () => {
+describe("computeUsesForTree — empty parentDependencies must NOT set computedUses", () => {
   /**
    * Regression tests for the bug where computedUses=[] was set on containers
    * with no external free vars, causing extractScopedState(state,[]) to return {}
@@ -301,7 +301,7 @@ describe("computeUsesForTree — empty totalFree must NOT set computedUses", () 
    */
 
   it("container with only local vars and uid refs: computedUses undefined (not [])", () => {
-    // Select uid escapes to Stack → Stack adds it to localDeclared → totalFree is empty
+    // Select uid escapes to Stack → Stack adds it to localDeclared → parentDependencies is empty
     // Stack must NOT get computedUses=[] which would isolate it from parent state
     const root = node("Stack", {
       vars: { x: "{0}" },
@@ -368,7 +368,7 @@ describe("computeUsesForTree — empty totalFree must NOT set computedUses", () 
     expect(root.computedUses).toBeUndefined();
   });
 
-  it("only when totalFree has entries does computedUses get set", () => {
+  it("only when parentDependencies has entries does computedUses get set", () => {
     // Contrast: same shape but text also reads an EXTERNAL var → computedUses set
     const root = node("Stack", {
       vars: { x: "{0}" },

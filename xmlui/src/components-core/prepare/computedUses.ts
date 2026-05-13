@@ -260,9 +260,9 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     }
   }
 
-  const totalFree = new Set<string>();
-  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) totalFree.add(d);
-  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) totalFree.add(d);
+  const parentDependencies = new Set<string>();
+  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) parentDependencies.add(d);
+  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) parentDependencies.add(d);
 
   const isRegularContainer = !!(
     node.vars ||
@@ -272,7 +272,7 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     node.contextVars ||
     node.scriptCollected
   );
-  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && totalFree.size > 0;
+  const isImplicitDefault = IMPLICIT_CONTAINER_COMPONENT_NAMES.has(node.type) && parentDependencies.size > 0;
   const isContainer = isRegularContainer || isImplicitDefault;
 
   if (isContainer) {
@@ -287,11 +287,11 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
     // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
     // with computedUses=[] the Fragment isolates all parent state, making
     // {x.value} invisible to siblings even after updateState() dispatches.
-    if (node.uses === undefined && totalFree.size > 0) {
-      node.computedUses = Array.from(totalFree);
+    if (node.uses === undefined && parentDependencies.size > 0) {
+      node.computedUses = Array.from(parentDependencies);
     }
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
-    return [totalFree, myEscapingUID];
+    return [parentDependencies, myEscapingUID];
   }
 
   // Non-container: this node's own UID + all child escaping UIDs propagate
@@ -300,7 +300,7 @@ function computeUsesInternal(node: ComponentDef): [Set<string>, Set<string>] {
   if (node.uid) escapingUIDs.add(node.uid);
   for (const uid of childEscapingUIDs) escapingUIDs.add(uid);
 
-  return [totalFree, escapingUIDs];
+  return [parentDependencies, escapingUIDs];
 }
 
 /**
