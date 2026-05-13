@@ -16,9 +16,7 @@ import { useAppContext } from "../AppContext";
 import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 
-/**
- * The properties of the Loader component
- */
+// Shared state and callback contract for non-visual data loaders.
 type LoaderProps = {
   state: ContainerState;
   loader: ComponentDef;
@@ -35,9 +33,7 @@ type LoaderProps = {
   structuralSharing?: boolean;
 };
 
-/**
- * This function represents the loader's job.
- */
+// Executes the underlying data request. React Query supplies the abort signal.
 type LoaderFunction = (abortSignal?: AbortSignal) => Promise<any>;
 
 export function Loader({
@@ -59,28 +55,23 @@ export function Loader({
   const appContext = useAppContext();
   const { initialized } = useApiInterceptorContext();
 
-  // --- Rely on react-query to decide when data fetching should use the cache or when is should fetch the data from
-  // --- its data source.
-  // --- data: The data obtained by the query
-  // --- status: Query execution status
-  // --- error: Error information about the current query error (in "error" state)
-  // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
+  // React Query owns cache reuse, background refetches, and request state.
   const { data, status, isFetching, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: useMemo(
       () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
       [appContext, loader.props, queryId, state, uid],
     ),
     structuralSharing,
-    //we pause the loaders if the apiInterceptor is not initialized (true when the app is not using mockApi)
+    // Pause loaders until the optional API interceptor has finished initializing.
     enabled: initialized,
     queryFn: useCallback<QueryFunction>(
       async ({ signal }) => {
         try {
-          const newVar: any = await loaderFn(signal);
-          if (newVar === undefined) {
+          const loadedValue: any = await loaderFn(signal);
+          if (loadedValue === undefined) {
             return null;
           }
-          return newVar;
+          return loadedValue;
         } catch (error) {
           throw error;
         }
@@ -89,24 +80,17 @@ export function Loader({
     ),
     select: useCallback(
       (data: any) => {
-        // console.log("[Loader select] Data before transform:", data);
-        // console.log("[Loader select] resultSelector:", loader.props.resultSelector);
-        // console.log("[Loader select] transformResult function:", !!transformResult);
-
         let result = data;
         const resultSelector = loader.props.resultSelector;
         if (resultSelector) {
-          //console.log("[Loader select] Applying resultSelector");
           result = extractParam(
             { $response: data },
             resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`,
           );
-          //console.log("[Loader select] Result after resultSelector:", result);
         }
 
-        const finalResult = transformResult ? transformResult(result) : result;
-        //console.log("[Loader select] Final result:", finalResult);
-        return finalResult;
+        const transformedResult = transformResult ? transformResult(result) : result;
+        return transformedResult;
       },
       [loader.props.resultSelector, transformResult],
     ),
@@ -144,11 +128,10 @@ export function Loader({
     }
   }, [isLoading, isFetching, loaderInProgressChanged, prevIsFetching]);
 
-  // When a genuinely new fetch starts (query key changed, no cached data), reset the loaded
-  // state so stale data from the previous query is not shown during the new fetch.
-  // This is distinct from a background refetch (isRefetching), where old data should remain visible.
+  // Clear stale loader data only when a new foreground load starts.
   useIsomorphicLayoutEffect(() => {
-    if (isLoading && !prevIsLoading) {
+    const isForegroundLoadStarting = isLoading && !prevIsLoading;
+    if (isForegroundLoadStarting) {
       loaderLoaded(undefined);
     }
   }, [isLoading, prevIsLoading, loaderLoaded]);
@@ -158,32 +141,24 @@ export function Loader({
   }, [isRefetching, loaderIsRefetchingChanged]);
 
   useIsomorphicLayoutEffect(() => {
-    //console.log("isRefetching", isRefetching);
-    //console.log("[Loader] useLayoutEffect status:", status);
-    //console.log("[Loader] useLayoutEffect data:", data);
-    //console.log("[Loader] useLayoutEffect prevData:", prevData);
-    //console.log("[Loader] useLayoutEffect data !== prevData:", data !== prevData);
+    const hasNewData = status === "success" && data !== prevData;
+    const hasNewCompletedError =
+      status === "error" && error !== prevError && hasFetchCompletedRef.current;
 
-    if (status === "success" && data !== prevData) {
-      //console.log("[Loader] Calling loaderLoaded with data:", data);
+    if (hasNewData) {
       loaderLoaded(data);
-      //we do this to push the onLoaded callback to the next event loop.
-      // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
-      // access to the latest loader value
+
+      // Run after layout effects so markup handlers can read the updated loader state.
       setTimeout(() => {
-        // console.log("[Loader] Calling onLoaded with data:", data);
-        // console.log("[Loader] onLoaded function exists:", !!onLoaded);
         onLoaded?.(data, isRefetching);
       }, 0);
-    } else if (status === "error" && error !== prevError && hasFetchCompletedRef.current) {
-      // console.log("[Loader] Calling loaderError with error:", error);
+    } else if (hasNewCompletedError) {
       loaderError(error);
     }
   }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, isRefetching]);
 
   useIsomorphicLayoutEffect(() => {
     return () => {
-
       loaderLoaded(undefined);
     };
   }, [loaderLoaded, uid]);
@@ -194,22 +169,22 @@ export function Loader({
         void refetch(options);
       },
       update: async (updater) => {
-        const oldData = appContext.queryClient?.getQueryData(queryId!) as any[];
-        if (!oldData) {
-          //loader not loaded yet, we skip the update
+        const currentItems = appContext.queryClient?.getQueryData(queryId!) as any[];
+        if (!currentItems) {
+          // Skip cache updates until the loader has produced data.
           return;
         }
-        const draft = createDraft(oldData);
-        const ret = await updater(draft); //if it returns a value, we take it as the new data
-        const newData = ret || finishDraft(draft);
+        const draft = createDraft(currentItems);
+        const updatedItems = await updater(draft); // Truthy returns replace the draft result.
+        const newItems = updatedItems || finishDraft(draft);
 
-        if (oldData.length !== newData.length) {
+        if (currentItems.length !== newItems.length) {
           throw new Error(
             "Use this method for update only. If you want to add or delete, call the addItem/deleteItem method.",
           );
         }
 
-        appContext.queryClient?.setQueryData(queryId!, newData);
+        appContext.queryClient?.setQueryData(queryId!, newItems);
       },
       addItem: (element: any, indexToInsert?: number) => {
         const oldData = appContext.queryClient?.getQueryData(queryId!) as any[];

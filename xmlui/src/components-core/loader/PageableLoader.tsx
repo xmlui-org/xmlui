@@ -18,7 +18,8 @@ import { useIsomorphicLayoutEffect, usePrevious } from "../utils/hooks";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
-type LoaderProps = {
+// Shared state and callback contract for infinite, page-aware loaders.
+type PageableLoaderProps = {
   state: ContainerState;
   loader: ComponentDef;
   loaderFn: (abortSignal: AbortSignal | undefined, pageParam: string) => Promise<any>;
@@ -48,57 +49,46 @@ export function PageableLoader({
   loaderError,
   transformResult,
   structuralSharing = true,
-}: LoaderProps) {
+}: PageableLoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
   const queryKey = useMemo(
     () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
     [appContext, loader.props, queryId, state, uid],
   );
-  const thizRef = useRef(queryKey);
+  const queryKeyRef = useRef(queryKey);
 
   const getPreviousPageParam = useCallback(
     (firstPage: any) => {
-      let prevPageParam = undefined;
       const prevPageSelector = loader.props.prevPageSelector;
-      if (prevPageSelector) {
-        prevPageParam = extractParam(
-          { $response: firstPage.filter((item) => !item._optimisticValue) },
-          prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
-        );
-      }
+      const committedItems = firstPage.filter((item) => !item._optimisticValue);
+      const prevPageParam = extractPageParam(committedItems, prevPageSelector);
+
       if (!prevPageParam) {
         return undefined;
       }
       return {
-        prevPageParam: prevPageParam,
+        prevPageParam,
       };
     },
     [loader.props.prevPageSelector],
   );
+
   const getNextPageParam = useCallback(
     (lastPage: any) => {
-      let nextPageParam = undefined;
       const nextPageSelector = loader.props.nextPageSelector;
-      if (nextPageSelector) {
-        nextPageParam = extractParam(
-          { $response: lastPage },
-          nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`,
-        );
-      }
+      const nextPageParam = extractPageParam(lastPage, nextPageSelector);
+
       if (!nextPageParam) {
         return undefined;
       }
       return {
-        nextPageParam: nextPageParam,
+        nextPageParam,
       };
     },
     [loader.props.nextPageSelector],
   );
 
-  // useEffect(()=>{
-  //   console.log("TRANSFORM RESULT CHANGED", transformResult);
-  // }, [transformResult]);
   const {
     data,
     status,
@@ -143,13 +133,9 @@ export function PageableLoader({
     getNextPageParam: loader.props.nextPageSelector === undefined ? undefined : getNextPageParam,
   });
 
-  //TODO revisit
-  // //we clear all the pages, except the last one (it's suitable for the chat app, but for the other direction we'll have to leave the first page)
-  // // otherwise it'll keep it in the cache, and refetch all the pages when you come back
-  // //  see more here: https://stackoverflow.com/questions/71286123/reactquery-useinfinitequery-refetching-issue
-  // //  and here: https://tanstack.com/query/latest/docs/react/guides/infinite-queries?from=reactQueryV3&original=https%3A%2F%2Ftanstack.com%2Fquery%2Fv3%2Fdocs%2Fguides%2Finfinite-queries#what-happens-when-an-infinite-query-needs-to-be-refetched
+  // Keep only the most recent cached page on unmount to avoid refetching the full page history.
   useEffect(() => {
-    const queryKey = thizRef.current;
+    const queryKey = queryKeyRef.current;
     return () => {
       void appContext.queryClient?.cancelQueries(queryKey);
       appContext.queryClient?.setQueryData(queryKey, (old) => {
@@ -170,11 +156,11 @@ export function PageableLoader({
   const prevError = usePrevious(error);
 
   useIsomorphicLayoutEffect(() => {
-    loaderInProgressChanged(isFetching); //TODO isFetchingPrevPage / nextPage
+    loaderInProgressChanged(isFetching);
   }, [isFetching, loaderInProgressChanged]);
 
   useIsomorphicLayoutEffect(() => {
-    loaderIsRefetchingChanged(isRefetching); //TODO isFetchingPrevPage / nextPage
+    loaderIsRefetchingChanged(isRefetching);
   }, [isRefetching, loaderIsRefetchingChanged]);
 
   const pageInfo = useMemo(() => {
@@ -189,20 +175,18 @@ export function PageableLoader({
   const prevPageInfo = usePrevious(pageInfo);
 
   useIsomorphicLayoutEffect(() => {
-    // console.log("data changed", {
-    //   status,
-    //   data,
-    //   pageInfo,
-    // });
-    if (status === "success" && (prevData !== data || prevPageInfo !== pageInfo)) {
+    const hasNewDataOrPageState =
+      status === "success" && (prevData !== data || prevPageInfo !== pageInfo);
+    const hasNewError = status === "error" && prevError !== error;
+
+    if (hasNewDataOrPageState) {
       loaderLoaded(data, pageInfo);
-      //we do this to push the onLoaded callback to the next event loop.
-      // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
-      // access to the latest loader value
+
+      // Run after layout effects so markup handlers can read the updated loader state.
       setTimeout(() => {
         onLoaded?.(data, isRefetching);
       }, 0);
-    } else if (status === "error" && prevError !== error) {
+    } else if (hasNewError) {
       loaderError(error);
     }
   }, [
@@ -237,26 +221,26 @@ export function PageableLoader({
     return fetchPreviousPage();
   }, [fetchPreviousPage]);
 
-  const stableFetchNextPage = useCallback(() => {
+  const fetchNextPageFromApi = useCallback(() => {
     return fetchNextPage();
   }, [fetchNextPage]);
 
   useEffect(() => {
     registerComponentApi({
       fetchPrevPage,
-      fetchNextPage: stableFetchNextPage,
+      fetchNextPage: fetchNextPageFromApi,
       refetch: (options) => {
         void refetch(options);
       },
       update: async (updater) => {
-        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
-        if (!oldData) {
-          //loader not loaded yet, we skip the update
+        const currentPages = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
+        if (!currentPages) {
+          // Skip cache updates until the loader has produced data.
           return;
         }
-        const originalFlatItems = oldData.pages.flatMap((d) => d);
+        const originalFlatItems = currentPages.pages.flatMap((d) => d);
 
-        const draft = createDraft(oldData);
+        const draft = createDraft(currentPages);
         const flatItems = [];
         for (let i = 0; i < draft.pages.length; i++) {
           const page = draft.pages[i];
@@ -278,19 +262,18 @@ export function PageableLoader({
         // console.log("AFTER: ", appContext.queryClient?.getQueryData(queryId!));
       },
       addItem: (element: any, indexToInsert?: number) => {
-        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
-        const draft = createDraft(oldData);
+        const currentPages = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
+        const draft = createDraft(currentPages);
 
         if (indexToInsert === undefined) {
           draft.pages[draft.pages.length - 1].push(element);
         } else {
           throw new Error("not implemented");
-          // TODO is should be something like this
-          // //find the pageIndex and itemIndex in that page
+          // TODO: find the pageIndex and itemIndex in that page.
           // let pageIndex = -1;
           // let itemIndex = -1;
           // let i = 0;
-          // oldData.pages.forEach((page, index)=>{
+          // currentPages.pages.forEach((page, index)=>{
           //   i += page.result.length;
           //   if(i >= indexToInsert){
           //     pageIndex = index;
@@ -315,13 +298,22 @@ export function PageableLoader({
     appContext.queryClient,
     fetchPrevPage,
     data,
+    fetchNextPageFromApi,
     loader.uid,
     queryId,
     queryKey,
     refetch,
     registerComponentApi,
-    stableFetchNextPage,
   ]);
 
   return null;
+}
+
+function extractPageParam(response: any, selector: string | undefined) {
+  if (!selector) {
+    return undefined;
+  }
+
+  const selectorExpression = selector.startsWith("{") ? selector : `{$response.${selector}}`;
+  return extractParam({ $response: response }, selectorExpression);
 }
