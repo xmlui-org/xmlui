@@ -235,7 +235,8 @@ function DataLoader({
             fetchOptions.body = rawBody;
           }
 
-          const response = await fetch(url, fetchOptions);
+          const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
+          const response = await fetch(fetchUrl, fetchOptions);
 
           if (!response.ok) {
             throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
@@ -274,7 +275,8 @@ function DataLoader({
           const fetchOptions: RequestInit = { method, headers };
           if (abortSignal) { fetchOptions.signal = abortSignal; }
           if (rawBody) { fetchOptions.body = rawBody; }
-          const response = await fetch(url, fetchOptions);
+          const fetchUrl = api.resolveUrl({ operation: { url, queryParams } as any });
+          const response = await fetch(fetchUrl, fetchOptions);
           if (!response.ok) {
             throw new Error(`Failed to fetch text: ${response.status} ${response.statusText}`);
           }
@@ -489,7 +491,7 @@ function DataLoader({
         }
       }
     },
-    [api, loader.props, state, url, body, rawBody, appContext, xsVerbose, xsLogMax, onFetch],
+    [api, loader.props, state, url, queryParams, body, rawBody, appContext, xsVerbose, xsLogMax, onFetch],
   );
 
   const queryId = useMemo(() => {
