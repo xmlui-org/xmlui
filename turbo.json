@@ -164,11 +164,20 @@
       "dependsOn": ["xmlui#prepublishOnly", "xmlui-test-extension#build:extension"],
       "outputs": ["integration-tests/test-app/dist-ssg/**"]
     },
+    "xmlui-integration-test-app#build:plugin-mode": {
+      "dependsOn": [
+        "xmlui#prepublishOnly",
+        "xmlui#build:for-node",
+        "xmlui-test-extension#build:extension"
+      ],
+      "outputs": ["integration-tests/test-app/dist-vite-plugin/**"]
+    },
     "//#test:integration": {
       "cache": false,
       "dependsOn": [
         "xmlui-integration-test-app#setup:standalone",
         "xmlui-integration-test-app#build",
+        "xmlui-integration-test-app#build:plugin-mode",
         "xmlui-integration-test-app#ssg"
       ]
     }
