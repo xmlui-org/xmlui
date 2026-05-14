@@ -196,7 +196,11 @@ function depsOfRecord(record: Record<string, unknown> | undefined): Set<string> 
  *                     subtree). The caller adds these to its own
  *                     `localDeclared` so they don't pollute `computedUses`.
  */
-function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string> = new Set()): [Set<string>, Set<string>] {
+function computeUsesInternal(
+  node: ComponentDef,
+  parentFunctionNames: Set<string> = new Set(),
+  disableNarrowing: boolean = false
+): [Set<string>, Set<string>] {
   const localDeclared = new Set<string>();
   if (node.vars) for (const k of Object.keys(node.vars)) localDeclared.add(k);
   if (node.functions) for (const k of Object.keys(node.functions)) localDeclared.add(k);
@@ -258,6 +262,11 @@ function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string
     }
   }
 
+  // Disable narrowing propagation if this node has a <script> tag (scriptCollected) OR
+  // a separate .xs code-behind file (functions populated by StandaloneApp merge).
+  // Either means function bodies can reference any state var — template analysis is insufficient.
+  const hasCodeBehind = !!(node.functions && Object.keys(node.functions).length > 0);
+  const nextDisableNarrowing = disableNarrowing || !!node.scriptCollected || hasCodeBehind;
   const childDeps = new Set<string>();
   // UIDs from the subtree that will register into THIS node's StateContainer
   // at runtime (because they pass through non-container intermediaries).
@@ -265,7 +274,7 @@ function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string
 
   const processChildList = (children: ComponentDef[]) => {
     for (const child of children) {
-      const [deps, escapingUIDs] = computeUsesInternal(child, childFunctionNames);
+      const [deps, escapingUIDs] = computeUsesInternal(child, childFunctionNames, nextDisableNarrowing);
       for (const d of deps) childDeps.add(d);
       for (const uid of escapingUIDs) {
         childEscapingUIDs.add(uid);
@@ -311,10 +320,10 @@ function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string
     // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
     // with computedUses=[] the Fragment isolates all parent state, making
     // {x.value} invisible to siblings even after updateState() dispatches.
-    // Skip narrowing for nodes with scriptCollected: their function bodies
-    // access global state vars that template expression analysis cannot see.
+    // Skip narrowing for nodes with scriptCollected or code-behind functions, and their children:
+    // those function bodies access global state vars that template expression analysis cannot see.
     // Narrowing based on template deps alone would silently hide those vars.
-    if (node.uses === undefined && parentDependencies.size > 0 && !node.scriptCollected) {
+    if (node.uses === undefined && parentDependencies.size > 0 && !nextDisableNarrowing) {
       // If any needed dep is a parent-provided function, include ALL parent
       // functions in computedUses so that functions called transitively within
       // those functions are also in scope. Functions are non-reactive, so
@@ -325,9 +334,8 @@ function computeUsesInternal(node: ComponentDef, parentFunctionNames: Set<string
         ? new Set([...parentDependencies, ...parentFunctionNames])
         : parentDependencies;
       node.computedUses = Array.from(computedUsesSet);
-    } else if (node.uses === undefined && parentDependencies.size > 0 && node.scriptCollected) {
-      // no-op: scriptCollected nodes are intentionally not narrowed
     }
+    // else: scriptCollected/codeBehind nodes and their children are intentionally not narrowed
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
     return [parentDependencies, myEscapingUID];
   }
