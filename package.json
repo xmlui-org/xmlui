@@ -21,7 +21,7 @@
     "cross-env": "^10.1.0",
     "turbo": "^2.9.0",
     "vite": "8.0.9"
-  },   
+  },
   "packageManager": "npm@10.9.2",
   "scripts": {
     "changeset:add": "changeset add",
@@ -38,6 +38,6 @@
     "build-docs": "turbo run build:docs",
     "build-playground": "turbo run build:playground",
     "generate-docs": "turbo run generate-docs",
-    "test-integration": "turbo run //#test:integration && npx playwright test --config integration-tests/tests/playwright.config.ts; npm run --workspace=xmlui postpublish"
+    "test-integration": "node integration-tests/test-app/scripts/test-integration.mjs"
   }
 }
