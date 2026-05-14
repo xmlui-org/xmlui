@@ -7,6 +7,7 @@ const portStandalone = 3212;
 const portViteStart = 3213;
 const portViteBuild = 3214;
 const portViteSSG = 3215;
+const portViteBuildPlugin = 3216;
 
 export default defineConfig({
   use: { ...devices["Desktop Chrome"], channel: "chromium" },
@@ -35,6 +36,12 @@ export default defineConfig({
       cwd: testAppDir,
       reuseExistingServer: true,
     },
+    {
+      command: `npx serve dist-vite-plugin -l ${portViteBuildPlugin} --no-port-switching -s`,
+      port: portViteBuildPlugin,
+      cwd: testAppDir,
+      reuseExistingServer: true,
+    },
   ],
   projects: [
     {
@@ -53,6 +60,10 @@ export default defineConfig({
       name: "vite-start",
       expect: { timeout: 15_000 },
       use: { baseURL: `http://localhost:${portViteStart}` },
+    },
+    {
+      name: "vite-build-plugin",
+      use: { baseURL: `http://localhost:${portViteBuildPlugin}` },
     },
   ],
 });
