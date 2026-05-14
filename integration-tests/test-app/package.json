@@ -10,7 +10,8 @@
     "preview-ssg": "preview-ssg dist-ssg",
     "ssg": "xmlui ssg",
     "serve": "serve . -s",
-    "setup:standalone": "node scripts/setup-standalone.mjs"
+    "setup:standalone": "node scripts/setup-standalone.mjs",
+    "build:plugin-mode": "vite build --config vite.plugin-mode.config.ts"
   },
   "dependencies": {
     "xmlui": "*",
