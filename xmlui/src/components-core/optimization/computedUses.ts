@@ -266,7 +266,8 @@ function computeUsesInternal(
   // a separate .xs code-behind file (functions populated by StandaloneApp merge).
   // Either means function bodies can reference any state var — template analysis is insufficient.
   const hasCodeBehind = !!(node.functions && Object.keys(node.functions).length > 0);
-  const nextDisableNarrowing = disableNarrowing || !!node.scriptCollected || hasCodeBehind;
+  const ownHasScript = !!node.scriptCollected || hasCodeBehind;
+  const nextDisableNarrowing = disableNarrowing || ownHasScript;
   const childDeps = new Set<string>();
   // UIDs from the subtree that will register into THIS node's StateContainer
   // at runtime (because they pass through non-container intermediaries).
@@ -320,22 +321,27 @@ function computeUsesInternal(
     // Example: <Fragment var.testState="{null}"> wrapping <Select id="x"> —
     // with computedUses=[] the Fragment isolates all parent state, making
     // {x.value} invisible to siblings even after updateState() dispatches.
-    // Skip narrowing for nodes with scriptCollected or code-behind functions, and their children:
-    // those function bodies access global state vars that template expression analysis cannot see.
-    // Narrowing based on template deps alone would silently hide those vars.
-    if (node.uses === undefined && parentDependencies.size > 0 && !nextDisableNarrowing) {
+    // Narrowing safety rules:
+    // 1. A node with its OWN <script>/code-behind must NOT be narrowed — its function bodies
+    //    may read parent state vars that are invisible to template-expression analysis.
+    // 2. A child node that INHERITS nextDisableNarrowing=true from an ancestor is safe to
+    //    narrow if it has no own script and does NOT call any parent-scope function.
+    //    In that case function bodies are irrelevant — none are called by this container.
+    const dependsOnParentFunction = parentFunctionNames.size > 0 &&
+      [...parentDependencies].some(d => parentFunctionNames.has(d));
+    const safeToNarrow = !nextDisableNarrowing || (!ownHasScript && !dependsOnParentFunction);
+    if (node.uses === undefined && parentDependencies.size > 0 && safeToNarrow) {
       // If any needed dep is a parent-provided function, include ALL parent
       // functions in computedUses so that functions called transitively within
       // those functions are also in scope. Functions are non-reactive, so
       // including extras never triggers unnecessary rerenders.
-      const needsParentFunction = parentFunctionNames.size > 0 &&
-        [...parentDependencies].some(d => parentFunctionNames.has(d));
-      const computedUsesSet = needsParentFunction
+      const computedUsesSet = dependsOnParentFunction
         ? new Set([...parentDependencies, ...parentFunctionNames])
         : parentDependencies;
       node.computedUses = Array.from(computedUsesSet);
     }
-    // else: scriptCollected/codeBehind nodes and their children are intentionally not narrowed
+    // else: node has own script/code-behind, or calls a parent function while narrowing
+    // is disabled — intentionally not narrowed.
     const myEscapingUID: Set<string> = node.uid ? new Set([node.uid]) : new Set();
     return [parentDependencies, myEscapingUID];
   }

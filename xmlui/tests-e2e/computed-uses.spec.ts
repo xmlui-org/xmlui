@@ -221,3 +221,105 @@ test.describe("computedUses optimization: Select inside user-defined component",
   // making the lookup unreliable.  The functional consequence of this (var. declarations
   // accessible in nested containers) is already covered by the regression tests above.
 });
+
+// ─── 4. Optimization: function-free Select inside component WITH <script> ────
+
+// DataView has a <script> with noop functions — simulates a real component that has
+// code-behind but whose Select does not call any of those functions.
+// With the function-free narrowing optimization, Select still gets
+// computedUses=['rarelyChanges'] even though nextDisableNarrowing=true is inherited.
+const DATA_VIEW_WITH_SCRIPT = `
+<Component name="DataView">
+  <script>
+    function noop() {}
+    function anotherNoop() {}
+  </script>
+  <Select testId="select-component">
+    <Items data="{rarelyChanges}">
+      <Option value="{$item}" label="|{$item}|" />
+    </Items>
+  </Select>
+</Component>
+`;
+
+const APP_WITH_SCRIPT_WRAPPER = `
+<App
+  var.oftenChanges="{0}"
+  var.rarelyChanges="{Array.from({length: 1000}, (_, i) => i + 1)}"
+>
+  <Button testId="tick-btn" onClick="oftenChanges++">Tick</Button>
+  <Text testId="often-changes-text">Often changes: {oftenChanges}</Text>
+  <DataView />
+</App>
+`;
+
+test.describe("computedUses optimization: function-free Select inside component with <script>", () => {
+  test("Select loads correct data (1000 items) when wrapper has <script>", async ({ initTestBed, page }) => {
+    await initTestBed(APP_WITH_SCRIPT_WRAPPER, {
+      noFragmentWrapper: true,
+      components: [DATA_VIEW_WITH_SCRIPT],
+    });
+
+    await expect(page.getByTestId("select-component")).toBeVisible();
+    await page.getByTestId("select-component").click();
+    await expect(page.getByText("|1|")).toBeVisible();
+    await expect(page.getByText("|1000|")).toBeVisible();
+  });
+
+  test(
+    `Select inside component with <script> renders ≤5 times after ${TICK_COUNT} oftenChanges updates`,
+    async ({ initTestBed, page }) => {
+      await initTestBed(APP_WITH_SCRIPT_WRAPPER, {
+        noFragmentWrapper: true,
+        components: [DATA_VIEW_WITH_SCRIPT],
+      });
+
+      await triggerStateUpdates(page, TICK_COUNT);
+      await expect(page.getByTestId("often-changes-text")).toHaveText(
+        `Often changes: ${TICK_COUNT}`,
+      );
+
+      const renderCount = await readSelectRenderCount(page);
+      if (renderCount === null) {
+        test.skip(true, "__renderCounts not available (not running in development mode)");
+        return;
+      }
+
+      // function-free narrowing: Select.computedUses=['rarelyChanges'] even inside <script> wrapper.
+      // rarelyChanges never changes → Select re-renders only on initial mount.
+      expect(renderCount).toBeLessThanOrEqual(5);
+    },
+  );
+
+  test(
+    "Select re-renders when its own dep (rarelyChanges) actually changes",
+    async ({ initTestBed, page }) => {
+      // Verifies that narrowing does NOT break reactivity when the subscribed var changes.
+      const appWithRareChange = `
+<App
+  var.oftenChanges="{0}"
+  var.rarelyChanges="{[1, 2, 3]}"
+>
+  <Button testId="tick-btn" onClick="oftenChanges++">Tick</Button>
+  <Button testId="rare-btn" onClick="rarelyChanges = [10, 20, 30]">Change rare</Button>
+  <Text testId="often-changes-text">Often changes: {oftenChanges}</Text>
+  <DataView />
+</App>
+`;
+      await initTestBed(appWithRareChange, {
+        noFragmentWrapper: true,
+        components: [DATA_VIEW_WITH_SCRIPT],
+      });
+
+      // Trigger several oftenChanges updates — Select should NOT re-render
+      await triggerStateUpdates(page, 5);
+
+      // Now change rarelyChanges — Select MUST show new items
+      await page.getByTestId("rare-btn").click();
+      await page.getByTestId("select-component").click();
+      await expect(page.getByText("|10|")).toBeVisible();
+      await expect(page.getByText("|20|")).toBeVisible();
+      await expect(page.getByText("|30|")).toBeVisible();
+    },
+  );
+});

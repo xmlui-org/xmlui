@@ -453,6 +453,327 @@ describe("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
 });
 
 // ---------------------------------------------------------------------------
+// function-free child narrowing
+// A container that inherits nextDisableNarrowing=true from an ancestor with
+// <script>/code-behind can still be narrowed if it has no own script and
+// does not call any parent-scope function.
+// ---------------------------------------------------------------------------
+
+describe("computeUsesForTree — function-free child narrowing", () => {
+  function nodeWithScript(
+    type: string,
+    scriptFunctions: Record<string, unknown>,
+    overrides: Partial<ComponentDef> = {},
+  ): ComponentDef {
+    return node(type, {
+      scriptCollected: { functions: scriptFunctions } as any,
+      ...overrides,
+    });
+  }
+
+  function nodeWithCodeBehind(
+    type: string,
+    functions: Record<string, unknown>,
+    overrides: Partial<ComponentDef> = {},
+  ): ComponentDef {
+    return node(type, { functions: functions as any, ...overrides });
+  }
+
+  it("function-free Select inside <script> component gets computedUses", () => {
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const parent = nodeWithScript("Stack", { handleSelect: {}, loadData: {} }, {
+      children: [select],
+    });
+    computeUsesForTree(parent);
+    // parent has own <script> → ownHasScript=true → never narrowed
+    expect(parent.computedUses).toBeUndefined();
+    // Select: no function call, only reads {items} → safeToNarrow=true
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+    expect(select.computedUses).not.toContain("handleSelect");
+    expect(select.computedUses).not.toContain("loadData");
+  });
+
+  it("node with own <script> is NOT narrowed even if it reads parent state without calling functions", () => {
+    // inner has its own <script> — its function bodies may read parent vars not in template
+    const inner = nodeWithScript("Stack", { localFn: {} }, {
+      children: [node("Text", { props: { text: "{items}" } })],
+    });
+    const outer = node("Stack", {
+      vars: { items: "{[]}" },
+      children: [inner],
+    });
+    computeUsesForTree(outer);
+    // inner reads {items} from outer and doesn't call outer functions,
+    // but it HAS OWN script → ownHasScript=true → safeToNarrow=false
+    expect(inner.computedUses).toBeUndefined();
+  });
+
+  it("container calling a parent function is NOT narrowed", () => {
+    // Stack with var.x references handleSelect in its props → dependsOnParentFunction=true
+    const containerCallingFn = node("Stack", {
+      vars: { x: "{0}" },
+      props: { label: "{handleSelect()}" },
+    });
+    const parent = nodeWithScript("Stack", { handleSelect: {} }, {
+      children: [containerCallingFn],
+    });
+    computeUsesForTree(parent);
+    expect(containerCallingFn.computedUses).toBeUndefined();
+  });
+
+  it("mixed siblings: function-free Select narrowed, function-calling container not narrowed", () => {
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const containerCallingFn = node("Stack", {
+      vars: { x: "{0}" },
+      props: { label: "{handleSelect()}" },
+    });
+    const parent = nodeWithScript("Stack", { handleSelect: {} }, {
+      children: [select, containerCallingFn],
+    });
+    computeUsesForTree(parent);
+    // Select: function-free → narrowed
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+    // containerCallingFn: calls handleSelect → not narrowed
+    expect(containerCallingFn.computedUses).toBeUndefined();
+  });
+
+  it("function-free Select inside .xs code-behind component gets computedUses", () => {
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const parent = nodeWithCodeBehind("Stack", { handleSelect: {} }, {
+      children: [select],
+    });
+    computeUsesForTree(parent);
+    // parent has own code-behind → never narrowed
+    expect(parent.computedUses).toBeUndefined();
+    // Select: function-free → narrowed (same as <script> case)
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+  });
+
+  it("Select narrowed when nextDisableNarrowing inherited through non-container intermediary", () => {
+    // nextDisableNarrowing=true set by grandparent with <script>, passes through
+    // VStack (non-container) to Select — Select should still get computedUses
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{rarelyChanges}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const vstack = node("VStack", { children: [select] });
+    const parent = nodeWithScript("Stack", { handleSelect: {} }, {
+      children: [vstack],
+    });
+    computeUsesForTree(parent);
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("rarelyChanges");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// expression sources: api, when, responsiveWhen, loader props
+// These fields are scanned by depsOfRecord/depsOfValue in computeUsesInternal.
+// ---------------------------------------------------------------------------
+
+describe("computeUsesForTree — expression sources (api, when, responsiveWhen, loaders)", () => {
+  it("api property expressions contribute to parentDependencies", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      children: [
+        node("Select", {
+          uid: "mySelect",
+          api: { currentValue: "{externalVar}" } as any,
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("externalVar");
+  });
+
+  it("when condition contributes to parentDependencies", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      children: [
+        node("Text", {
+          when: "{isAdmin}",
+          props: { text: "Admin" },
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("isAdmin");
+  });
+
+  it("boolean when=true does not contribute to parentDependencies", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      children: [node("Text", { when: true, props: { text: "{externalVar}" } })],
+    });
+    computeUsesForTree(root);
+    // boolean when is skipped by typeof check; externalVar still captured from props
+    expect(root.computedUses).toContain("externalVar");
+    expect(root.computedUses).not.toContain("true");
+  });
+
+  it("responsiveWhen values contribute to parentDependencies", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      children: [
+        node("Panel", {
+          responsiveWhen: { desktop: "{showPanel}", mobile: "{showPanelMobile}" } as any,
+        }),
+      ],
+    });
+    computeUsesForTree(root);
+    expect(root.computedUses).toContain("showPanel");
+    expect(root.computedUses).toContain("showPanelMobile");
+  });
+
+  it("loader props expressions contribute to container computedUses", () => {
+    const root = node("Stack", {
+      vars: { local: "{0}" },
+      loaders: [
+        node("DataSource", {
+          uid: "ds",
+          props: { url: "{apiEndpoint}" },
+        }),
+      ],
+      children: [node("Text", { props: { text: "{ds.items}" } })],
+    });
+    computeUsesForTree(root);
+    // apiEndpoint is used in loader — must appear in computedUses
+    expect(root.computedUses).toContain("apiEndpoint");
+    // ds uid is locally declared via loader processing
+    expect(root.computedUses).not.toContain("ds");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// function-free child narrowing — additional edge cases
+// ---------------------------------------------------------------------------
+
+describe("computeUsesForTree — function-free narrowing edge cases", () => {
+  it("nodeFunctionNames merges scriptCollected.functions and node.functions", () => {
+    // A parent with BOTH sources: calling either one blocks narrowing for that child
+    const callerOfScriptFn = node("Stack", {
+      vars: { x: "{0}" },
+      props: { label: "{fromScript()}" },
+    });
+    const callerOfCodeBehindFn = node("Stack", {
+      vars: { y: "{0}" },
+      props: { label: "{fromCodeBehind()}" },
+    });
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const parent = node("Stack", {
+      scriptCollected: { functions: { fromScript: {} } } as any,
+      functions: { fromCodeBehind: {} } as any,
+      children: [callerOfScriptFn, callerOfCodeBehindFn, select],
+    });
+    computeUsesForTree(parent);
+    // Both function names recognized as parent functions → callers blocked
+    expect(callerOfScriptFn.computedUses).toBeUndefined();
+    expect(callerOfCodeBehindFn.computedUses).toBeUndefined();
+    // Select reads only {items} — neither fromScript nor fromCodeBehind in deps
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+  });
+
+  it("scriptCollected without .functions: ownHasScript=true blocks node, children have no parent functions → all narrowed", () => {
+    // scriptCollected is truthy (so ownHasScript=true) but carries no function names
+    // → parentFunctionNames={} for children → dependsOnParentFunction=false for all
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const parent = node("Stack", {
+      scriptCollected: { vars: { localVar: 0 } } as any,
+      children: [select],
+    });
+    computeUsesForTree(parent);
+    // parent has own script → not narrowed itself
+    expect(parent.computedUses).toBeUndefined();
+    // select: no functions in scope → narrowed
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+  });
+
+  it("nested script containers: childFunctionNames resets at each container boundary", () => {
+    // outer declares fn1, inner declares fn2
+    // select inside inner sees only fn2 as parentFunctionNames, not fn1
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          contextVars: { $item: "$item" },
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$item}" } })],
+        }),
+      ],
+    });
+    const callerOfFn2 = node("Stack", {
+      vars: { z: "{0}" },
+      props: { label: "{fn2()}" },
+    });
+    const inner = node("Stack", {
+      scriptCollected: { functions: { fn2: {} } } as any,
+      children: [select, callerOfFn2],
+    });
+    const outer = node("Stack", {
+      scriptCollected: { functions: { fn1: {} } } as any,
+      children: [inner],
+    });
+    computeUsesForTree(outer);
+    // inner: own script → not narrowed
+    expect(inner.computedUses).toBeUndefined();
+    // select: reads {items}, fn2 ∉ deps → safeToNarrow=true → narrowed
+    expect(select.computedUses).toBeDefined();
+    expect(select.computedUses).toContain("items");
+    // callerOfFn2: calls fn2 which is in parentFunctionNames → blocked
+    expect(callerOfFn2.computedUses).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // computeUsesForTree + extractScopedState — integration (standalone
 // extractScopedState behavior is covered in ContainerUtils.test.ts)
 // ---------------------------------------------------------------------------
