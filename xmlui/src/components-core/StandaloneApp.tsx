@@ -59,7 +59,7 @@ import { MetadataProvider } from "../language-server/services/common/metadata-ut
 import type { CollectedDeclarations } from "./script-runner/ScriptingSourceTree";
 import { SsgEnvProvider } from "./rendering/SsgEnvContext";
 import { clearLocalStorage, getAllLocalStorage } from "./appContext/local-storage-functions";
-import { computeUsesForTree } from "./prepare/computedUses";
+import { computeUsesForTree } from "./optimization/computedUses";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;

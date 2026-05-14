@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { computeUsesForTree, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
-  "../../src/components-core/prepare/computedUses";
-import type { ComponentDef } from "../../src/abstractions/ComponentDefs";
+  "../../../src/components-core/optimization/computedUses";
+import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
+import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 
 function node(
   type: string,
@@ -448,5 +449,41 @@ describe("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
     computeUsesForTree(root);
     expect(root.computedUses).toContain("external");
     expect(root.computedUses).toContain("screen");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// computeUsesForTree + extractScopedState — integration (standalone
+// extractScopedState behavior is covered in ContainerUtils.test.ts)
+// ---------------------------------------------------------------------------
+
+describe("computeUsesForTree + extractScopedState — end-to-end narrowing", () => { // eslint-disable-line
+  it("no external deps → computedUses undefined → full parent state passes through", () => {
+    // computedUses must not be set to [] when parentDependencies is empty —
+    // that would isolate the container from all parent state.
+    const stack = node("Stack", {
+      vars: { a: "{0}" },
+      children: [node("Text", { props: { text: "{a}" } })],
+    });
+    computeUsesForTree(stack);
+    expect(stack.computedUses).toBeUndefined();
+    const parentState = { a: 5, b: 99 };
+    expect(extractScopedState(parentState, stack.computedUses)).toBe(parentState);
+  });
+
+  it("external dep in computedUses passes through; unlisted dep does not", () => {
+    const stack = node("Stack", {
+      vars: { local: "{0}" },
+      children: [
+        node("Text", { props: { text: "{external}" } }),
+        node("Text", { props: { text: "{local}" } }),
+      ],
+    });
+    computeUsesForTree(stack);
+    expect(stack.computedUses).toContain("external");
+    const parentState = { external: 42, irrelevant: 99 };
+    const scoped = extractScopedState(parentState, stack.computedUses);
+    expect(scoped).toHaveProperty("external", 42);
+    expect(scoped).not.toHaveProperty("irrelevant");
   });
 });

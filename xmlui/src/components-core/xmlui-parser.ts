@@ -1,7 +1,7 @@
 import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { computeUsesForTree } from "./prepare/computedUses";
+import { computeUsesForTree } from "./optimization/computedUses";
 import { TransformDiag } from "../parsers/xmlui-parser/diagnostics";
 import type { GetText } from "../parsers/xmlui-parser/parser";
 import type { GeneralDiag, ParserDiag } from "../parsers/xmlui-parser/diagnostics";

@@ -78,6 +78,22 @@ type Props = {
 };
 
 // ============================================================================
+// DEV-ONLY RENDER-COUNT PROFILER HELPERS
+// ============================================================================
+
+if (process.env.NODE_ENV === "development") {
+  (globalThis as any).__resetRenderCounts = () => {
+    (globalThis as any).__renderCounts = {};
+  };
+  (globalThis as any).__topRenderCounts = (n = 10) => {
+    const counts: Record<string, number> = (globalThis as any).__renderCounts ?? {};
+    return Object.entries(counts)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, n);
+  };
+}
+
+// ============================================================================
 // STATE CONTAINER COMPONENT
 // ============================================================================
 
