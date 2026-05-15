@@ -1,30 +1,33 @@
 # Failing Tests Triage — 2026-05-14
 
 Branch: `yurii/computedUses`  
-Total failures: **191**
+Total failures: **58** (down from 191 on 2026-05-14)
 
 Likely root cause: changes to `computeUsesInternal` / `computedUses` logic that altered how
 free/context variables are tracked, scoped, propagated, or memoized.
+
+**Fixed (133 tests healed):** Groups B (bindTo/form sync) and C (APICall core) fully resolved;
+Group A mostly resolved — 2 remaining (`$queryParams` in DataSource/mockExecute).
 
 ---
 
 ## Updated Failure Summary
 
-| Group | Area | Notes |
-|---|---|---|
-| A | Context-variable propagation | `$param`, `$params`, `$context`, `$item`, `$row`, `$data`, `$this` |
-| B | bindTo / form sync | `$data` synchronization broken across many inputs |
-| C | APICall core | notifications, execute params, mockExecute context |
-| D | APICall deferred mode | polling, cancellation, status updates |
-| E | List selection system | selection APIs, keyboard shortcuts, row events |
-| F | Table / ContextMenu | context variables, refreshOn, copy action |
-| G | Modal / Form / Navigation | nested context propagation and routing events |
-| H | Tree async loading | loaded-state and dynamic-node regressions |
-| I | refreshOn regressions | Table + TileGrid closure refresh behavior |
-| J | Toast / Queue / Option | rendering, accessibility, queue templates |
-| K | E2E website examples | mostly downstream failures caused by A–J |
-| L | Extensions | TableSelect, Gauge, TiptapEditor |
-| M | Regression / compound components | `$this`, cleanup/init, context reuse |
+| Group | Area | Remaining | Status |
+|---|---|---|---|
+| A | Context-variable propagation | 2 | partial — `$queryParams` in DataSource/mockExecute |
+| B | bindTo / form sync | 0 | ✅ fixed |
+| C | APICall core | 0 | ✅ fixed |
+| D | APICall deferred mode | 9 | pending |
+| E | List selection system | 5 | pending |
+| F | Table / ContextMenu | 1 | pending — copy action Ctrl+C |
+| G | Modal / Form / Navigation | 9 | pending — nested DropdownMenu + routing events |
+| H | Tree async loading | 6 | pending |
+| I | refreshOn regressions | 3 | pending — Table refreshOn closure |
+| J | Toast / Queue / Option | 3 | pending — Queue templates |
+| K | E2E website examples | 16 | pending — downstream of D/E/F/J |
+| L | Extensions | 2 | pending — Gauge, TiptapEditor |
+| M | Regression / compound components | 2 | pending — init/cleanup AppState |
 
 ---
 

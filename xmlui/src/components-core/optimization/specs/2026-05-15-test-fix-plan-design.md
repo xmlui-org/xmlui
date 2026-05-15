@@ -1,7 +1,8 @@
 # План виправлення тестів — гілка yurii/computedUses
 **Дата:** 2026-05-15  
 **Гілка:** `yurii/computedUses`  
-**Помилки:** 191 тестів у 13 групах (A–M)  
+**Помилки:** 58 тестів у 11 групах (A,D–M) — зменшилось з 191 (B,C повністю виправлено)  
+
 **Стратегія:** Спочатку корінна причина → поетапне виправлення груп
 
 ---
@@ -272,12 +273,12 @@ npx playwright test xmlui/tests-e2e --reporter=list
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| Phase 0 — Diagnosis | pending | Prerequisite: COMPUTED_USES_ENABLED = true |
-| Phase 1 — Shared fix | pending | Conditional on Phase 0 findings |
-| Phase 2 — Groups A + B | pending | |
-| Phase 3 — Groups C + D | pending | |
-| Phase 4 — Groups E + F + G | pending | |
-| Phase 5 — Groups H + I | pending | |
-| Phase 6 — Group J | pending | |
-| Phase 7 — Groups K + L + M | pending | |
+| Phase 0 — Diagnosis | ✅ done | Confirmed `scopedParentState` over-narrowing as root cause |
+| Phase 1 — Shared fix | ✅ done | `scopedParentState` conditional skip applied; 191→58 |
+| Phase 2 — Groups A + B | ✅ done | B fully fixed; A: 2 remaining (`$queryParams`) |
+| Phase 3 — Groups C + D | partial | C: ✅ fixed; D: 9 remaining (deferred polling) |
+| Phase 4 — Groups E + F + G | pending | E: 5, F: 1, G: 9 remaining |
+| Phase 5 — Groups H + I | pending | H: 6, I: 3 remaining |
+| Phase 6 — Group J | pending | J: 3 remaining (Queue templates) |
+| Phase 7 — Groups K + L + M | pending | K: 16, L: 2, M: 2 remaining |
 | Cleanup | pending | |
