@@ -182,7 +182,9 @@ The Inspector also exposes `open()` and `close()` API methods if you want to ope
 
 ## The Debug View (State Visualizer)
 
-Separate from the trace system, XMLUI includes a **state visualizer** accessible via the keyboard shortcut **Alt + Ctrl + Shift + S**. When active, it draws bounding boxes around each component and can optionally highlight which components are changing state.
+> **⚠️ Not yet implemented.** The keyboard shortcut **Alt + Ctrl + Shift + S** toggles the `displayStateView` flag in `DebugViewProvider`, but no rendering code currently reads this flag to draw anything. Pressing the shortcut has no visible effect. The bounding-box overlay described below is planned for a future release.
+
+Separate from the trace system, XMLUI includes a **state visualizer** accessible via the keyboard shortcut **Alt + Ctrl + Shift + S**. When active, it is intended to draw bounding boxes around each component and optionally highlight which components are changing state.
 
 This is controlled by the `DebugViewProvider` context, which exposes:
 - `setDisplayStateView(true/false)` — toggle the overlay
