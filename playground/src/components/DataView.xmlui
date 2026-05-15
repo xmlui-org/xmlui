@@ -1,0 +1,11 @@
+<Component name="DataView">
+  <script>
+    function noop() {}
+    function anotherNoop() {}
+  </script>
+  <Select>
+    <Items data="{rarelyChanges}">
+      <Option value="{$item}" label="{$item}" />
+    </Items>
+  </Select>
+</Component>

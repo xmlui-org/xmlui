@@ -33,6 +33,16 @@ import { isParsedValue } from "../state/variable-resolution";
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
+/**
+ * Set to false to disable the computedUses narrowing optimisation entirely.
+ * When false, no node receives a `computedUses` assignment and every
+ * parent-state update re-renders all children unconditionally — identical
+ * to behaviour before this feature was introduced.
+ *
+ * Intended for running E2E tests with the optimisation switched off.
+ */
+export const COMPUTED_USES_ENABLED = false;
+
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
 
 /**
@@ -360,10 +370,12 @@ function computeUsesInternal(
  * Prefer `computeUsesForTree` for whole-tree traversal.
  */
 export function computeUsesForSubtree(node: ComponentDef): Set<string> {
+  if (!COMPUTED_USES_ENABLED) return new Set();
   const [freeVars] = computeUsesInternal(node);
   return freeVars;
 }
 
 export function computeUsesForTree(root: ComponentDef): void {
+  if (!COMPUTED_USES_ENABLED) return;
   computeUsesInternal(root);
 }

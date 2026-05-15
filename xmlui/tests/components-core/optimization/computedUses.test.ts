@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { computeUsesForTree, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
+import { computeUsesForTree, COMPUTED_USES_ENABLED, IMPLICIT_CONTAINER_COMPONENT_NAMES } from
   "../../../src/components-core/optimization/computedUses";
+
+const skipIfDisabled = !COMPUTED_USES_ENABLED;
 import { extractScopedState } from "../../../src/components-core/rendering/ContainerUtils";
 import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 
@@ -20,7 +22,7 @@ describe("IMPLICIT_CONTAINER_COMPONENT_NAMES", () => {
   });
 });
 
-describe("computeUsesForTree — basic cases", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — basic cases", () => {
   it("node without expressions: computedUses not set", () => {
     const root = node("Stack", {
       children: [node("Button", { props: { label: "Click" } })],
@@ -78,7 +80,7 @@ describe("computeUsesForTree — basic cases", () => {
   });
 });
 
-describe("computeUsesForTree — isImplicitContainerByDefault", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — isImplicitContainerByDefault", () => {
   it("Select with children that have dependencies becomes container", () => {
     const select = node("Select", {
       children: [
@@ -137,7 +139,7 @@ describe("computeUsesForTree — isImplicitContainerByDefault", () => {
   });
 });
 
-describe("computeUsesForTree — child UIDs", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — child UIDs", () => {
   it("child uid is treated as locally declared (not bubbled up)", () => {
     const root = node("Stack", {
       vars: { dummy: "{0}" },
@@ -250,7 +252,7 @@ describe("computeUsesForTree — child UIDs", () => {
   });
 });
 
-describe("computeUsesForTree — loaders", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — loaders", () => {
   it("loader uid is treated as locally declared (not bubbled up)", () => {
     const root = node("Stack", {
       vars: { dummy: "{0}" },
@@ -263,7 +265,7 @@ describe("computeUsesForTree — loaders", () => {
   });
 });
 
-describe("computeUsesForTree — events", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — events", () => {
   it("identifiers in parsed event handlers are included", () => {
     const buttonWithEvent = node("Button", {
       events: {
@@ -287,7 +289,7 @@ describe("computeUsesForTree — events", () => {
   });
 });
 
-describe("computeUsesForTree — empty parentDependencies must NOT set computedUses", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — empty parentDependencies must NOT set computedUses", () => {
   /**
    * Regression tests for the bug where computedUses=[] was set on containers
    * with no external free vars, causing extractScopedState(state,[]) to return {}
@@ -386,7 +388,7 @@ describe("computeUsesForTree — empty parentDependencies must NOT set computedU
   });
 });
 
-describe("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
   it("ECMAScript built-ins (JSON, Math, Array) are NOT included in computedUses", () => {
     // These identifiers exist on globalThis but are never app state —
     // they must be filtered so they don't pollute computedUses.
@@ -459,7 +461,7 @@ describe("computeUsesForTree — JS_STDLIB_GLOBALS filter", () => {
 // does not call any parent-scope function.
 // ---------------------------------------------------------------------------
 
-describe("computeUsesForTree — function-free child narrowing", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free child narrowing", () => {
   function nodeWithScript(
     type: string,
     scriptFunctions: Record<string, unknown>,
@@ -603,7 +605,7 @@ describe("computeUsesForTree — function-free child narrowing", () => {
 // These fields are scanned by depsOfRecord/depsOfValue in computeUsesInternal.
 // ---------------------------------------------------------------------------
 
-describe("computeUsesForTree — expression sources (api, when, responsiveWhen, loaders)", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — expression sources (api, when, responsiveWhen, loaders)", () => {
   it("api property expressions contribute to parentDependencies", () => {
     const root = node("Stack", {
       vars: { local: "{0}" },
@@ -680,7 +682,7 @@ describe("computeUsesForTree — expression sources (api, when, responsiveWhen, 
 // function-free child narrowing — additional edge cases
 // ---------------------------------------------------------------------------
 
-describe("computeUsesForTree — function-free narrowing edge cases", () => {
+describe.skipIf(skipIfDisabled)("computeUsesForTree — function-free narrowing edge cases", () => {
   it("nodeFunctionNames merges scriptCollected.functions and node.functions", () => {
     // A parent with BOTH sources: calling either one blocks narrowing for that child
     const callerOfScriptFn = node("Stack", {
@@ -778,7 +780,7 @@ describe("computeUsesForTree — function-free narrowing edge cases", () => {
 // extractScopedState behavior is covered in ContainerUtils.test.ts)
 // ---------------------------------------------------------------------------
 
-describe("computeUsesForTree + extractScopedState — end-to-end narrowing", () => { // eslint-disable-line
+describe.skipIf(skipIfDisabled)("computeUsesForTree + extractScopedState — end-to-end narrowing", () => { // eslint-disable-line
   it("no external deps → computedUses undefined → full parent state passes through", () => {
     // computedUses must not be set to [] when parentDependencies is empty —
     // that would isolate the container from all parent state.

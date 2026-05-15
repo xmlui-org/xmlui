@@ -1,1 +1,6 @@
-<StandalonePlayground />
+<App >
+  <Text>Rarely[0]: {rarelyChanges[0]}</Text>
+  <Button onClick="rarelyChanges = [10, 20, 30]">Change rarely</Button>
+  <DataView />
+</App>
+

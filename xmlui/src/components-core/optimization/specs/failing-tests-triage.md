@@ -377,6 +377,25 @@ Most of these are expected to recover automatically after fixing:
 
 ---
 
+# Pre-existing Flaky Tests (Not Caused by This Branch)
+
+The following test files were found to be flaky when running with `COMPUTED_USES_ENABLED = false`.
+All five files are **unchanged from `main`** (confirmed via `git diff main...HEAD --name-only`).
+With the optimization disabled, the framework behaves identically to `main` for these cases.
+Conclusion: these failures are pre-existing and should not be attributed to this branch.
+
+| File | Type | Status |
+|------|------|--------|
+| `xmlui/src/components/AutoComplete/AutoComplete.spec.ts` | component | pre-existing flaky |
+| `xmlui/src/components/MessageListener/MessageListener.spec.ts` | component | pre-existing flaky |
+| `xmlui/tests-e2e/datasource-responseHeaders.spec.ts` | E2E | pre-existing flaky |
+| `xmlui/tests-e2e/state-var-scopes.spec.ts` | E2E | pre-existing flaky |
+| `xmlui/tests-e2e/how-to-examples/customize-tooltip-appearance.spec.ts` | E2E | pre-existing flaky |
+
+Note: `xmlui/tests-e2e/computed-uses.spec.ts` is a **new file added in this branch** — not on `main`.
+
+---
+
 # Recommended Fix Order
 
 ```text
