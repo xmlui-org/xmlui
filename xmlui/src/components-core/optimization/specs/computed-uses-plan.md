@@ -38,7 +38,7 @@
 
 ### 1. Алгоритм `computeUsesForTree` (bottom-up)
 
-Новий модуль `xmlui/src/components-core/prepare/computedUses.ts`.
+Новий модуль `xmlui/src/components-core/optimization/computedUses.ts`.
 
 **Принцип:** рекурсивний обхід дерева `ComponentDef` знизу вверх (спочатку діти, потім батьки). Кожен вузол повертає набір "вільних ідентифікаторів" — тих, що використовуються у його піддереві але **не оголошені локально** в ньому.
 
@@ -524,6 +524,60 @@ for (const d of usedHere)
 
 **Слід мати на увазі:** `ROUTING_STATE_KEYS` визначений у `routing-state.ts` — поруч з `useRoutingParams()` що є єдиним місцем де ці ключі реально записуються у state. При додаванні нової роутерної змінної треба оновити лише один файл. Всі інші `$`-ідентифікатори (`$param`, `$item`, `$row`, нові майбутні) автоматично фільтруються без жодних змін в `computedUses.ts`.
 
+### Баг 18 (виявлений у тестовому додатку): `computedUses` звужував eval-context event handlers — запис у батьківські змінні кидав `"variable not found in scope"`
+
+**Симптом:** Будь-який event handler у компоненті з `computedUses` що намагався присвоїти **батьківську змінну не з `computedUses`** — кидав:
+```
+Error: Left value variable (selectedItem) not found in the scope.
+```
+Наприклад: `<List items="{items}" onSelectionDidChange="(sel) => selectedItem = sel[0]">` де `selectedItem` — `var.` на рівні App, `items` — в `computedUses` List.
+
+**Причина (повний ланцюг):**
+1. `ComponentWrapper`: `scopedParentState = extractScopedState(state, computedUses)` → `{items: ...}` (без `selectedItem`)
+2. `ContainerWrapper` → `StateContainer` отримують вже звужений `parentState = {items}`
+3. `StateContainer` → `Container`: `componentState = resolvedCombinedState` побудований поверх звуженого `stateFromOutside` → також без `selectedItem`
+4. `Container.stateRef = useRef(componentState)` → без `selectedItem`
+5. `getComponentStateClone()` → Proxy над `stateRef.current` → без `selectedItem`
+6. `evalContext.localContext` → без `selectedItem`
+7. Eval engine (`getIdentifierScope`): шукає `selectedItem` в block scopes → `localContext` → `appContext` → **`globalThis`** → не знаходить → `evalAssignmentCore` кидає помилку
+
+`statePartChanged` **ніколи не викликався** — помилка кидалась до того як Proxy SET міг записати зміну.
+
+**Ключовий момент:** `parentState` в `StateContainer` — вже звужений (ComponentWrapper звузив його до передачі в ContainerWrapper). Тому передавати `fullParentState = StateContainer.parentState` безглуздо — він вже вузький. Потрібно пробрасувати `ComponentWrapper.state` (до звуження).
+
+**Виправлення:** Пробросити повний (незвужений) `state` з `ComponentWrapper` через ланцюг аж до `Container.stateRef` як **`MutableRefObject`** (не value-prop). Звуження залишається для рендерингу (`parentState = scopedParentState`), event handlers отримують доступ до повного стану через стабільний ref.
+
+**Чому ref, а не value-prop:** Якщо передати `fullParentState={state}` як звичайний prop, то при кожному тіку `oftenChanges` `state` змінюється → `ContainerWrapper.memo` бачить новий `fullParentState` → Select перерендеровується попри стабільний `scopedParentState`. Оптимізація повністю defeated (34 рендери замість ≤ 5). MutableRefObject стабільний як React prop — `memo` не реагує на зміну `.current`.
+
+```typescript
+// ComponentWrapper.tsx — створює стабільний ref, оновлює .current під час render:
+const fullParentStateRef = useRef<Record<string, any> | undefined>(undefined);
+fullParentStateRef.current = (nodeUses || nodeComputedUses) ? state : undefined;
+
+<ContainerWrapper
+  parentState={scopedParentState}      // ← звужений, для рендерингу
+  fullParentStateRef={fullParentStateRef}  // ← стабільний ref, для event handlers
+  ...
+/>
+
+// ContainerWrapper.tsx → StateContainer.tsx — Props + деструктуризація + threading:
+fullParentStateRef?: MutableRefObject<ContainerState | undefined>;
+
+// Container.tsx — читає .current при побудові stateRef:
+const fullParentState = fullParentStateRef?.current;
+const stateRef = useRef(
+  fullParentState ? { ...fullParentState, ...componentState } : componentState,
+);
+useIsomorphicLayoutEffect(() => {
+  const fp = fullParentStateRef?.current;
+  stateRef.current = fp ? { ...fp, ...componentState } : componentState;
+}, [componentState, fullParentStateRef]); // fullParentStateRef стабільний → ефект = [componentState]
+```
+
+Тепер `selectedItem` присутній у `stateRef.current` → `getComponentStateClone()` → Proxy SET спрацьовує → `changes.push(...)` → `statePartChanged("selectedItem", value)` → бабблінг до батьківського StateContainer → dispatch → стан оновлено ✓
+
+**Результат:** всі 58 регресій усунено. Повний тест-сьют: **9593/9596 passed (176 files)** (3 не-failures: 2 skipped + 1 todo).
+
 ---
 
 ## Результати бенчмарку
@@ -639,13 +693,12 @@ Runtime context vars **не оголошуються у `contextVars`** само
 
 **Слід мати на увазі:** якщо у майбутньому додається нова роутерна змінна (наприклад, `$hash`), треба додати її до `ROUTING_STATE_KEYS` у `routing-state.ts`. Нові runtime context vars (нові `$`-ідентифікатори що впроваджуються фреймворком у дочірній контекст) фільтруються автоматично без змін у `computedUses.ts`.
 
-### 9. Двошарова ізоляція (defense in depth)
+### 9. Тришарова ізоляція (defense in depth)
 
-Виправлення реалізовано в двох шарах:
-1. **`ComponentWrapper`** — scope `state` до `scopedParentState` перед `ContainerWrapper` → `ContainerWrapper`/`StateContainer` взагалі не виконуються при змінах непов'язаних ключів
-2. **`statePartChanged` via refs** — навіть якщо ContainerWrapper чомусь ре-рендерується, `statePartChanged` не створює нову функцію → `memo` дітей захищений
-
-Шар 1 є основним, шар 2 є страховкою і також покращує загальну стабільність коду.
+Виправлення реалізовано в трьох шарах:
+1. **`ComponentWrapper` — `scopedParentState`** — scope `state` до `scopedParentState` перед `ContainerWrapper` → `ContainerWrapper`/`StateContainer` взагалі не виконуються при змінах непов'язаних ключів. Основний шар.
+2. **`statePartChanged` via refs** — навіть якщо `ContainerWrapper` чомусь ре-рендерується, `statePartChanged` не створює нову функцію → `memo` дітей захищений. Страховка + загальна стабільність коду.
+3. **`fullParentStateRef` як `MutableRefObject`** — повний батьківський стан для event handler scope передається як стабільний ref, а не value-prop → `ContainerWrapper/StateContainer/Container.memo` не реагують на зміну `.current` → оптимізація не defeated навіть коли повний state змінюється часто.
 
 ### 10. `mergeComponentApis` і Symbol ключі — механізм передачі API від дочірніх компонентів
 
@@ -666,14 +719,15 @@ Runtime context vars **не оголошуються у `contextVars`** само
 | Файл | Дія | Зміст |
 |------|-----|-------|
 | `xmlui/src/abstractions/ComponentDefs.ts` | Modify | Поле `computedUses?: string[]` в `ComponentDefCore` |
-| `xmlui/src/components-core/prepare/computedUses.ts` | Create + Fix | `computeUsesForTree`, кортеж `[freeVars, escapingUIDs]`, `IMPLICIT_CONTAINER_COMPONENT_NAMES`, `JS_BUILTIN_GLOBALS`; `contextVars` в `localDeclared`; `parentDependencies.size > 0` guard; `parentFunctionNames` parameter; `Object.keys(sc.functions)` замість `Object.keys(sc)`; empty-object guard для `vars`/`functions`; `isRuntimeContextVar` + `ROUTING_STATE_KEYS` import (Баг 17) |
+| `xmlui/src/components-core/optimization/computedUses.ts` | Create + Fix | `computeUsesForTree`, кортеж `[freeVars, escapingUIDs]`, `IMPLICIT_CONTAINER_COMPONENT_NAMES`, `JS_BUILTIN_GLOBALS`; `contextVars` в `localDeclared`; `parentDependencies.size > 0` guard; `parentFunctionNames` parameter; `Object.keys(sc.functions)` замість `Object.keys(sc)`; empty-object guard для `vars`/`functions`; `isRuntimeContextVar` + `ROUTING_STATE_KEYS` import |
 | `xmlui/src/components-core/state/routing-state.ts` | Modify | Додано `export const ROUTING_STATE_KEYS` — єдиний авторитетний список роутерних `$`-змінних що живуть у parent state |
-| `xmlui/tests/prepare/computedUses.test.ts` | Create | unit-тести: базові випадки, UID-escaping (прямі/grandchild/non-container chain/uses-container), contextVars, JSON built-in, initTestBed exact markup |
-| `xmlui/src/components-core/rendering/ContainerWrapper.tsx` | Modify | `isContainerLike` перевіряє `computedUses`; `getWrappedWithContainer` копіює/видаляє `computedUses` |
-| `xmlui/src/components-core/rendering/StateContainer.tsx` | Modify | `uses ?? computedUses` в `extractScopedState`; стабільний `statePartChanged` via refs; dev render counter |
-| `xmlui/src/components-core/rendering/ComponentWrapper.tsx` | Modify | `scopedParentState` через `useShallowCompareMemoize` + `extractScopedState` перед `ContainerWrapper` |
+| `xmlui/tests/components-core/optimization/computedUses.test.ts` | Create | unit-тести: базові випадки, UID-escaping (прямі/grandchild/non-container chain/uses-container), contextVars, JSON built-in, initTestBed exact markup, `isRuntimeContextVar` фільтр, function-free narrowing |
+| `xmlui/src/components-core/rendering/ContainerWrapper.tsx` | Modify | `isContainerLike` перевіряє `computedUses`; `getWrappedWithContainer` копіює/видаляє `computedUses`; prop `fullParentStateRef?: MutableRefObject` (threading для event handler scope) |
+| `xmlui/src/components-core/rendering/StateContainer.tsx` | Modify | `uses ?? computedUses` в `extractScopedState`; стабільний `statePartChanged` via refs (`[dispatch, node.uid]`); dev render counter (`__renderCounts`); prop `fullParentStateRef` threading |
+| `xmlui/src/components-core/rendering/ComponentWrapper.tsx` | Modify | `scopedParentState` через `useShallowCompareMemoize + extractScopedState` перед `ContainerWrapper`; `fullParentStateRef = useRef()` оновлюється під час render, передається як стабільний ref (не value-prop) |
+| `xmlui/src/components-core/rendering/Container.tsx` | Modify | Prop `fullParentStateRef?: MutableRefObject`; `stateRef` мержить `{...fullParentStateRef.current, ...componentState}` лише коли `componentState` змінюється — ref стабільний, memo не інвалідується |
 | `xmlui/src/components-core/xmlui-parser.ts` | Modify | Виклик `computeUsesForTree` після `nodeToComponentDef` |
-| `xmlui/tests-e2e/computed-uses.spec.ts` | Create | E2E: таймер працює, Select має 1000 items, Select ≤ 5 рендерів за 2с |
+| `xmlui/tests-e2e/computed-uses.spec.ts` | Create | E2E: 5 секцій — regression (var. declarations, event handler write to non-computedUses var), optimization (Select ≤ 5 renders, wrapper, function-free Select with script) |
 
 ---
 
@@ -740,13 +794,13 @@ JSON.stringify(window.__renderCounts, null, 2)
 
 ```bash
 # Unit-тести алгоритму
-cd xmlui && npm run test:unit -- tests/prepare/computedUses.test.ts
+cd xmlui && npm run test:unit -- tests/components-core/optimization/computedUses.test.ts
 
 # Повний unit suite
 cd xmlui && npm run test:unit
 
-# E2E тести (потребує запущеного dev server)
-cd xmlui && npx playwright test tests-e2e/computed-uses.spec.ts
+# E2E тести computedUses (потребує запущеного dev server на порту 3211)
+cd xmlui && npm run test:e2e -- tests-e2e/computed-uses.spec.ts --project xmlui-nonsmoke
 
 # TypeScript check
 cd xmlui && npx tsc --noEmit

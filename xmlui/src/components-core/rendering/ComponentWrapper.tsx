@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from "react";
+import type { MutableRefObject, ReactNode, RefObject } from "react";
 import { forwardRef, memo, useMemo, useRef } from "react";
 
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
@@ -97,6 +97,14 @@ export const ComponentWrapper = memo(
       ),
     );
 
+    // Stable ref holding the full (un-narrowed) parent state for event handlers.
+    // Using a MutableRefObject instead of a value prop means ContainerWrapper.memo
+    // never sees this as a changed prop — the optimization (no re-render on
+    // unrelated state changes) is preserved while event handlers can still write
+    // to any parent variable even when it is absent from computedUses.
+    const fullParentStateRef = useRef<Record<string, any> | undefined>(undefined);
+    fullParentStateRef.current = (nodeUses || nodeComputedUses) ? state : undefined;
+
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
       // --- This component should be rendered as a container
       return (
@@ -104,6 +112,7 @@ export const ComponentWrapper = memo(
           resolvedKey={resolvedKey}
           node={nodeWithTransformedDatasourceProp as ContainerWrapperDef}
           parentState={scopedParentState}
+          fullParentStateRef={(nodeUses || nodeComputedUses) ? fullParentStateRef : undefined}
           parentGlobalVars={globalVars}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}

@@ -148,6 +148,10 @@ type Props = {
   node: ContainerWrapperDef;
   resolvedKey?: string;
   parentState: ContainerState;
+  /** Stable ref holding the full un-narrowed parent state for event handler scope.
+   *  Using a ref (not a value) keeps ContainerWrapper.memo stable when unrelated
+   *  parent state changes, preserving the computedUses render optimization. */
+  fullParentStateRef?: MutableRefObject<ContainerState | undefined>;
   parentGlobalVars?: Record<string, any>;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
@@ -169,6 +173,7 @@ export const ContainerWrapper = memo(
       node,
       resolvedKey,
       parentState,
+      fullParentStateRef,
       parentGlobalVars,
       parentStatePartChanged,
       parentRegisterComponentApi,
@@ -190,6 +195,7 @@ export const ContainerWrapper = memo(
           node={containerizedNode as any}
           resolvedKey={resolvedKey}
           parentState={parentState}
+          fullParentStateRef={fullParentStateRef}
           parentGlobalVars={parentGlobalVars}
           parentStatePartChanged={parentStatePartChanged}
           parentRegisterComponentApi={parentRegisterComponentApi}

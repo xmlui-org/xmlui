@@ -70,6 +70,11 @@ type Props = {
   memoedVarsRef: MutableRefObject<MemoedVars>;
   /** Whether this is an implicit container */
   isImplicit?: boolean;
+  /** Stable ref holding the full un-narrowed parent state — used by event handlers
+   *  so they can write to any parent variable even when computedUses has scoped the
+   *  render state. Using a ref (not a value) keeps Container.memo stable when
+   *  unrelated parent state changes, preserving the computedUses render optimization. */
+  fullParentStateRef?: MutableRefObject<Record<string, any> | undefined>;
   /** Parent container's dispatcher */
   parentDispatch: ContainerDispatcher;
   /** Parent rendering context */
@@ -111,6 +116,7 @@ export const Container = memo(
       parentRenderContext,
       memoedVarsRef,
       isImplicit,
+      fullParentStateRef,
       uidInfoRef: parentUidInfoRef,
       children,
       ...rest
@@ -131,13 +137,27 @@ export const Container = memo(
 
     const fnsRef = useRef<Record<symbol, any>>({});
 
-    const stateRef = useRef(componentState);
+    // Merge full parent state so event handlers can write to any parent variable
+    // even when computedUses has narrowed the render state. The Proxy built by
+    // getComponentStateClone() records any SET as a change that is then forwarded
+    // via statePartChanged — so the write still goes through the normal bubbling
+    // path. Without fullParentStateRef, variables not in computedUses are invisible
+    // to the eval engine and it throws "variable not found in scope".
+    // fullParentStateRef is a stable MutableRefObject (not a value prop) so that
+    // Container.memo is not invalidated on every unrelated parent state change —
+    // preserving the computedUses render optimization.
+    const fullParentState = fullParentStateRef?.current;
+    const stateRef = useRef(
+      fullParentState ? { ...fullParentState, ...componentState } : componentState,
+    );
 
-    // Sync ref in layout effect to ensure consistency before browser paint
-    // This follows React best practices and avoids render-time ref mutations
+    // Sync ref in layout effect to ensure consistency before browser paint.
+    // fullParentStateRef is stable (same object reference), so the dep array is
+    // effectively [componentState] — the effect only fires when the scoped state changes.
     useIsomorphicLayoutEffect(() => {
-      stateRef.current = componentState;
-    }, [componentState]);
+      const fp = fullParentStateRef?.current;
+      stateRef.current = fp ? { ...fp, ...componentState } : componentState;
+    }, [componentState, fullParentStateRef]);
 
     const parsedStatementsRef = useRef<Record<string, Array<Statement> | null>>({});
     const [_, startTransition] = useTransition();

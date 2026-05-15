@@ -73,6 +73,10 @@ type Props = {
   uidInfoRef?: RefObject<Record<string, any>>;
   /** Whether this is an implicit container (follows parent's registration) */
   isImplicit?: boolean;
+  /** Stable ref holding the full un-narrowed parent state for event handler scope.
+   *  Using a ref (not a value) keeps StateContainer.memo stable when unrelated
+   *  parent state changes, preserving the computedUses render optimization. */
+  fullParentStateRef?: MutableRefObject<ContainerState | undefined>;
   /** Child elements to render */
   children?: ReactNode;
 };
@@ -122,6 +126,7 @@ export const StateContainer = memo(
       layoutContextRef,
       uidInfoRef,
       isImplicit,
+      fullParentStateRef,
       children,
       ...rest
     }: Props,
@@ -535,6 +540,7 @@ export const StateContainer = memo(
             parentRenderContext={parentRenderContext}
             memoedVarsRef={memoedVars}
             isImplicit={isImplicit}
+            fullParentStateRef={fullParentStateRef}
             ref={ref}
             uidInfoRef={uidInfoRef}
             {...rest}

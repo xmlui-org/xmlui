@@ -21,6 +21,17 @@
  *    Also shows that adding <script> to the wrapper disables the inner
  *    narrowing (nextDisableNarrowing=true → Select re-renders every click).
  *
+ * 4. Regression: event handler writes to parent var not in computedUses
+ *    When a container is narrowed to computedUses=['X'], event handlers that write
+ *    to a parent variable not listed in computedUses must still succeed.
+ *    fullParentState is threaded alongside the narrowed state so Container.stateRef
+ *    includes all parent vars, not just the scoped subset.
+ *
+ * 5. Optimization: function-free Select inside component WITH <script>
+ *    Shows that a Select without function calls is still narrowed even when
+ *    the parent has <script> (nextDisableNarrowing inherited but overridden
+ *    by safeToNarrow=true for function-free nodes).
+ *
  * Button-vs-timer rationale
  * ─────────────────────────
  * Each Playwright click() dispatches a real browser event processed by React
@@ -222,7 +233,87 @@ test.describe("computedUses optimization: Select inside user-defined component",
   // accessible in nested containers) is already covered by the regression tests above.
 });
 
-// ─── 4. Optimization: function-free Select inside component WITH <script> ────
+// ─── 4. Regression: event handler writes to parent var not in computedUses ──────
+//
+// When a container gets computedUses=['X'], ComponentWrapper narrows parentState to {X}.
+// Event handlers that write to a variable absent from computedUses would throw
+// "Left value variable not found in scope" at runtime — because the narrowed stateRef
+// did not include that variable.
+//
+// fullParentState is threaded alongside scopedParentState so Container.stateRef
+// merges all parent vars, keeping every parent variable writable from event handlers.
+//
+// Note: the regression tests in section 1 look similar but use <script> on the Component,
+// which sets nextDisableNarrowing=true and prevents computedUses from being set entirely.
+// These tests intentionally have NO <script> so narrowing is active.
+
+test.describe("computedUses regression: event handler writes to parent var not in computedUses", () => {
+  test(
+    "write-only assignment to parent var works when narrowing excludes that var",
+    async ({ initTestBed, page }) => {
+      // Fragment.var.x makes it an implicit container.
+      // It reads 'counter' in its template → computedUses=['counter'].
+      // onClick="flag = true" is a raw string — 'flag' is not scanned by computeUsesForTree
+      // and is absent from computedUses.  Without fullParentState merged into stateRef,
+      // the assignment throws "Left value variable not found in scope".
+      await initTestBed(`<Toggler />`, {
+        components: [
+          `
+          <Component name="Toggler" var.flag="{false}" var.counter="{0}">
+            <Button testId="count-btn" onClick="counter++">Count</Button>
+            <Fragment var.x="{1}">
+              <Text testId="counter-text">Count: {counter}</Text>
+              <Button testId="set-btn" onClick="flag = true">Set flag</Button>
+            </Fragment>
+            <Text testId="flag-text">{flag ? "set" : "unset"}</Text>
+          </Component>
+          `,
+        ],
+      });
+
+      await expect(page.getByTestId("flag-text")).toHaveText("unset");
+      // Increment counter to confirm narrowing is active (Fragment.computedUses=['counter'])
+      await page.getByTestId("count-btn").click();
+      await expect(page.getByTestId("counter-text")).toHaveText("Count: 1");
+      // Write to 'flag' (absent from computedUses) — must succeed without throwing
+      await page.getByTestId("set-btn").click();
+      await expect(page.getByTestId("flag-text")).toHaveText("set");
+    },
+  );
+
+  test(
+    "write-only assignment succeeds after repeated unrelated state updates (narrowing stays active)",
+    async ({ initTestBed, page }) => {
+      // Stress variant: multiple counter updates confirm narrowing is not broken by
+      // re-renders, and the write-target assignment must still succeed afterwards.
+      await initTestBed(`<Toggler />`, {
+        components: [
+          `
+          <Component name="Toggler" var.flag="{false}" var.counter="{0}">
+            <Button testId="count-btn" onClick="counter++">Count</Button>
+            <Fragment var.x="{1}">
+              <Text testId="counter-text">Count: {counter}</Text>
+              <Button testId="set-btn" onClick="flag = true">Set flag</Button>
+            </Fragment>
+            <Text testId="flag-text">{flag ? "set" : "unset"}</Text>
+          </Component>
+          `,
+        ],
+      });
+
+      for (let i = 0; i < 5; i++) {
+        await page.getByTestId("count-btn").click();
+      }
+      await expect(page.getByTestId("counter-text")).toHaveText("Count: 5");
+      await expect(page.getByTestId("flag-text")).toHaveText("unset");
+
+      await page.getByTestId("set-btn").click();
+      await expect(page.getByTestId("flag-text")).toHaveText("set");
+    },
+  );
+});
+
+// ─── 5. Optimization: function-free Select inside component WITH <script> ────
 
 // DataView has a <script> with noop functions — simulates a real component that has
 // code-behind but whose Select does not call any of those functions.
@@ -253,7 +344,7 @@ const APP_WITH_SCRIPT_WRAPPER = `
 </App>
 `;
 
-test.describe("computedUses optimization: function-free Select inside component with <script>", () => {
+test.describe("computedUses optimization: function-free Select inside component with <script> (narrowing still active)", () => {
   test("Select loads correct data (1000 items) when wrapper has <script>", async ({ initTestBed, page }) => {
     await initTestBed(APP_WITH_SCRIPT_WRAPPER, {
       noFragmentWrapper: true,
