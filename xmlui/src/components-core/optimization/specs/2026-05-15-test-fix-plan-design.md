@@ -18,13 +18,12 @@ Key changes that interact with the 191 failures:
 |------|--------|------|
 | `computedUses.ts` | New algorithm sets `node.computedUses` at boot | Could over-narrow state, cutting off vars components need |
 | `StateContainer.tsx` | `stateFromOutside` now uses `node.computedUses` | If computedUses is wrong, stateFromOutside is wrong |
-| `StateContainer.tsx` | `statePartChanged` useCallback deps: 7 → 2 (ref-based) | Could silently break state propagation upward |
-| `ComponentWrapper.tsx` | `scopedParentState` wraps all state in shallow-memo | Could suppress re-renders in edge cases |
-| `StateContainer.tsx` | 2 debug `console.log` still present | Noise; remove before final cleanup |
+| `StateContainer.tsx` | `statePartChanged` useCallback deps: 7 → 2 (ref-based) | Unlikely to cause failures — refs update synchronously during render |
+| `ComponentWrapper.tsx` | `scopedParentState` wraps all state in shallow-memo | Could suppress re-renders when `uses`/`computedUses` is undefined |
+| `StateContainer.tsx` | 2 debug `console.log` still in prod code | Noise; remove in Final Cleanup |
 
-`COMPUTED_USES_ENABLED` flag (in `computedUses.ts`) disables the algorithm entirely when
-set to `false`. Currently set to `false` for investigation. Must be `true` for all
-diagnostic and fix phases.
+`COMPUTED_USES_ENABLED` flag (in `computedUses.ts`) disables the algorithm when `false`.
+**Must be `true` for all diagnostic and fix phases.**
 
 ---
 
@@ -41,8 +40,8 @@ Each phase follows this loop:
 6. Result     → if green: next phase | if red: another log iteration
 ```
 
-This is log-driven debugging, not static analysis. Root causes are confirmed by
-observing the rendering pipeline, not by reasoning about source code.
+Root causes are confirmed by observing the rendering pipeline, not by reasoning
+about source code alone.
 
 ---
 
@@ -50,50 +49,64 @@ observing the rendering pipeline, not by reasoning about source code.
 
 **Goal:** Determine whether groups A–M share a single root cause or have independent causes.
 
-**Prerequisite:** Set `COMPUTED_USES_ENABLED = true` in `computedUses.ts` before starting.
+**Prerequisite:** Set `COMPUTED_USES_ENABLED = true` in `computedUses.ts`.  
+Without this, `computedUses` is never set and `[CU]` logs produce no output.
 
 ### Scenarios
 
-Three playground scenarios run simultaneously (same log additions, different markup):
+Three separate playground runs (same log additions, different markup each time).
+Collect and return console output from all three runs together.
 
-| ID | Group | Scenario | Failure pattern to observe |
-|----|-------|----------|---------------------------|
-| S1 | A — context vars | `ModalDialog` opened with `$param` | Does `$param` arrive in modal's child state? |
-| S2 | B — bindTo | `TextBox` with `bindTo` and `$data` display | Does `$data` update after typing? |
-| S3 | E — List | `List` with `$item` referenced in a child `Select` | Is `$item` visible inside `Items`? |
+| ID | Group | Scenario | What we're watching |
+|----|-------|----------|---------------------|
+| S1 | A — context vars | `ModalDialog` opened with `$param` | Does `$param` arrive in modal child's state? |
+| S2 | B — bindTo | `TextBox` with `bindTo` + `$data` display | Does `$data` update after typing? |
+| S3 | E — List | `List` with `$item` referenced in a child `Select` | Is `$item` present in Select's computedUses? |
 
-### Log additions (3 points)
+**Note on S2:** `$data` flows through a Form context mechanism, not through parent-state
+narrowing. Logs `[CU]` and `[SC:in]` will not show `$data`. If S2 fails, it needs a
+separate diagnostic phase targeting the Form/bindTo dispatch path.
 
-**Point 1 — `[CU]` in `computedUses.ts`**, right after `node.computedUses = Array.from(computedUsesSet)`:
+**Note on S3:** `$item` is a `contextVar` injected by `Items` — it is NOT a parent-state
+key. `[SC:in]` will correctly show `$item` is absent from parent-state (that's expected).
+The relevant question for S3 is whether `[CU]` sets a correct (non-empty) `computedUses`
+on the Select, and whether `extractScopedState` does not strip the data the Select needs.
+
+### Log additions
+
+**Reuse existing logs first.** `StateContainer.tsx` already has:
+- Line 171: logs `node.contextVars`, `node.computedUses`, `node.uses` for `$param`/`$item` nodes
+- Line 360: logs `combinedState.$param` for `$param`/`$item` nodes
+
+Add **2 new log lines** (the existing ones cover combinedState for S1):
+
+**Point `[CU]`** in `computedUses.ts`, right after `node.computedUses = Array.from(computedUsesSet)`:
 ```typescript
-console.log('[CU] SET', node.type, node.uid ?? '', '=', node.computedUses);
+console.log('[CU] SET', node.type, node.uid ?? '', '=', JSON.stringify(node.computedUses));
 ```
+Filter: look for lines where `node.type` matches the component under test (e.g. `Select`, `Container`).
 
-**Point 2 — `[SC:in]` in `StateContainer.tsx`**, right after `stateFromOutside` is computed:
+**Point `[SC:in]`** in `StateContainer.tsx`, right after `stateFromOutside` is computed (after the `useShallowCompareMemoize` block):
 ```typescript
 console.log('[SC:in]', node.type, node.uid ?? '', 'keys=', Object.keys(stateFromOutside ?? {}));
 ```
-
-**Point 3 — `[SP]` in `StateContainer.tsx`**, inside `statePartChanged` at the point
-where it decides whether to propagate up:
-```typescript
-console.log('[SP]', node.type, node.uid ?? '', 'key=', key, 'isLocal=', isLocalVar, 'propagate=', !uses || uses.includes(key));
-```
+Filter: look for the container wrapping the failing component — verify expected parent-state keys are present.
 
 ### What to look for
 
 | Pattern in logs | Diagnosis |
 |-----------------|-----------|
-| `[CU] SET X = ['a','b']` but X needs key `c` at runtime | `computedUses` over-narrows — algorithm bug |
-| `[SC:in] X keys=[]` when parent has many keys | `computedUses=[]` set incorrectly OR `extractScopedState` gets empty array |
-| `[SP] propagate=false` when it should propagate | `node.uses` or ref stale, state update silently dropped |
-| All 3 scenarios show same missing-key | Shared root cause → go to Phase 1 |
-| Scenarios show different missing keys | Independent causes → skip Phase 1, go to Phase 2 |
+| `[CU] SET Select = ['a']` but Select needs key `b` | `computedUses` over-narrows — algorithm bug |
+| `[SC:in] Container keys=[]` when parent has many keys | Empty `computedUses` set incorrectly |
+| Line-360 shows `combinedState.$param= undefined` | `$param` lost before it reaches children |
+| Line-171 shows `computedUses= ['x']` but modal needs `$param` | Modal container narrowed incorrectly |
+| All 3 scenarios show same missing-key pattern | Shared root cause → go to Phase 1 |
+| Scenarios show different patterns | Independent causes → skip Phase 1, go directly to Phase 2 |
 
 ### Decision gate
 
-- **Single shared pattern across all 3** → Phase 1 (shared fix)
-- **Different patterns** → Phase 1 skipped, go directly to Phase 2
+- **Single shared pattern across all 3 runs** → Phase 1 (fix shared cause first)
+- **Different patterns** → Phase 1 skipped, proceed directly to Phase 2
 
 ---
 
@@ -103,29 +116,29 @@ Only executed if Phase 0 reveals a single shared cause.
 
 **Most likely candidates based on diff analysis:**
 
-**Candidate A — `computedUses` over-narrowing**
-Algorithm sets narrow `computedUses` that excludes keys components legitimately need.
-Fix: correct `computeUsesInternal` to not narrow containers that receive context vars,
-or ensure `isKnownContainer` detection is accurate.
+**Candidate A — `computedUses` over-narrowing**  
+Algorithm sets narrow `computedUses` that excludes keys containers legitimately need
+from parent state. This would explain failures across all groups that rely on parent
+state (A, B, C, E, F, G, J, M).  
+Fix: correct `computeUsesInternal` — ensure containers that wrap components needing
+full parent state are not narrowed (e.g. if `isKnownContainer` misclassifies them).
 
-**Candidate B — `statePartChanged` ref silently drops updates**
-The ref-based `useCallback([dispatch, node.uid])` means `statePartChanged` never
-re-creates even when `parentStatePartChanged` changes identity. In some scenarios
-`parentStatePartChangedRef.current` may be stale at the moment of call.
-Fix: revert to closure-based `useCallback` with correct deps, OR add a targeted test
-to confirm the ref approach is safe.
-
-**Candidate C — `scopedParentState` shallow-memo suppresses re-renders**
-`useShallowCompareMemoize(useMemo(...))` in `ComponentWrapper` returns a stable
-reference even when inner state values change, if the shallow comparison doesn't
-detect the change (e.g., mutated objects).
-Fix: remove the shallow memo from the `undefined`-uses code path (only apply when
-`uses` or `computedUses` is actually defined).
+**Candidate B — `scopedParentState` shallow-memo in ComponentWrapper**  
+`useShallowCompareMemoize(useMemo(...))` runs for every component — even those where
+`uses`/`computedUses` are `undefined` (i.e. full state should pass through unchanged).
+A shallow comparison may incorrectly return a stale state reference if a nested object
+is mutated in place rather than replaced.  
+Fix: only apply shallow-memo when `uses` or `computedUses` is actually defined:
+```typescript
+const scopedParentState = (nodeUses ?? nodeComputedUses)
+  ? useShallowCompareMemoize(useMemo(() => extractScopedState(...), [...]))
+  : state;
+```
 
 **Verification after Phase 1:**
-Run full test suite → record new baseline count. Expected drop: >50 tests.
-If count drops to <100 → proceed to Phase 2 with remaining failures.
-If count barely drops → Phase 1 diagnosis was wrong → re-diagnose.
+Run full test suite → record new baseline count.
+If count drops significantly → proceed to Phase 2.
+If count barely drops → candidate was wrong → re-run Phase 0 with additional log points.
 
 ---
 
@@ -133,17 +146,15 @@ If count barely drops → Phase 1 diagnosis was wrong → re-diagnose.
 
 **Dependencies:** Phase 0 complete; Phase 1 applied if applicable.
 
-**Group A — Context variable propagation**
-Failing vars: `$param`, `$params`, `$context`, `$item`, `$row`, `$data`, `$this`.
+**Group A — Context variable propagation**  
+Failing vars: `$param`, `$params`, `$context`, `$item`, `$row`, `$data`, `$this`.  
 Affected components: APICall, ModalDialog, ContextMenu, List, Table, Queue, Toast, Checkbox.
 
-Likely cause: `computedUses` set on a container that wraps these components excludes
-the key that carries context var info, or the context injection mechanism is disrupted.
-
-**Group B — bindTo / $data synchronization**
-Affected: 16 input components (TextBox, Select, Checkbox, DatePicker, …).
-Likely cause: `statePartChanged` not correctly routing `$data` key up the tree,
-or `stateFromOutside` filtering breaks the two-way sync.
+**Group B — bindTo / $data synchronization**  
+Affected: 16 input components (TextBox, Select, Checkbox, DatePicker, …).  
+Note: `$data` flows through the Form context mechanism, independent of `computedUses`.
+If Group B failures persist after Phase 1, they need a separate log session targeting
+the Form/bindTo dispatch path.
 
 **Verification:**
 ```bash
@@ -154,16 +165,16 @@ npx playwright test --grep "\\$param|\\$context|\\$item|\\$row|\\$data|\\$this|b
 
 ## Phase 3 — Groups C + D (APICall)
 
-**Dependencies:** Groups A + B passing (APICall context vars are subset of Group A).
+**Dependencies:** Groups A + B passing (most APICall context vars are subset of Group A).
 
-**Group C — APICall core**
-Notifications, `execute()` params, `mockExecute` context variables.
-Most failures are downstream of `$param`/`$context` fixes from Phase 2.
+**Group C — APICall core**  
+Notifications, `execute()` params, `mockExecute` context variables.  
+Most failures expected to self-heal once Group A is fixed.
 
-**Group D — APICall deferred mode**
-Polling, cancellation, status updates.
-Likely independent from context-var issues — may need separate log session
-focusing on the polling state machine and async dispatch.
+**Group D — APICall deferred mode**  
+Polling, cancellation, status updates.  
+Async state machine — may be independent from context-var issues.
+If failures remain after Phase 2, needs separate log session focusing on polling dispatch.
 
 **Verification:**
 ```bash
@@ -176,17 +187,17 @@ npx playwright test xmlui/src/components/APICall --reporter=list
 
 **Dependencies:** Groups A + B passing.
 
-**Group E — List selection**
+**Group E — List selection**  
 `selectionDidChange`, `rowDoubleClick`, `selectAll`, `getSelectedIds`, keyboard shortcuts.
 
-**Group F — Table**
+**Group F — Table**  
 Context menu `$context`/`$row`, `refreshOn` closure, copy action.
 
-**Group G — Modal / Form / Navigation**
+**Group G — Modal / Form / Navigation**  
 Nested context propagation, `willNavigate`, `didNavigate`, modal focus.
 
-These groups likely share the same root cause as Group A (context var propagation),
-so most should self-heal after Phase 2. Run verification before investigating individually.
+These groups depend heavily on context-var propagation (Group A). Verify first —
+most failures are expected to self-heal after Phase 2.
 
 **Verification:**
 ```bash
@@ -198,15 +209,16 @@ npx playwright test xmlui/src/components/List xmlui/src/components/Table \
 
 ## Phase 5 — Groups H + I (Tree + refreshOn)
 
-**Dependencies:** None — these are likely independent.
+**Dependencies:** None — likely independent from context-var issues.
 
-**Group H — Tree async loading**
-`setAutoLoadAfter()`, `setDynamic()`, loaded-state tracking, load errors.
-Possibly unrelated to `computedUses` — may be a `statePartChanged` async timing issue.
+**Group H — Tree async loading**  
+`setAutoLoadAfter()`, `setDynamic()`, loaded-state tracking, load errors.  
+May be related to async timing in `statePartChanged`, not `computedUses`.
 
-**Group I — refreshOn regressions**
-TileGrid + Table `refreshOn` closure update / stale handler.
-Likely related to `statePartChanged` ref change making the refresh callback stale.
+**Group I — refreshOn regressions**  
+TileGrid + Table `refreshOn` closure update / stale handler.  
+Potentially caused by `statePartChanged` ref change making refresh callback captured
+at the wrong render cycle. Needs dedicated log session if not self-healing.
 
 **Verification:**
 ```bash
@@ -218,13 +230,9 @@ npx playwright test --grep "refreshOn|TileGrid" --reporter=list
 
 ## Phase 6 — Group J (Toast / Queue / Option)
 
-**Dependencies:** Groups A + B passing (`$param` in toast).
+**Dependencies:** Groups A + B passing (`$param` in toast, context vars in queue).
 
-**Group J**
-Toast show/update/`$param`, Queue progress template context vars, Option dynamic Items.
-
-Most failures likely downstream of Group A fix. Verify first, investigate only
-if failures remain after Phase 2.
+Most failures expected to self-heal after Phase 2. Verify first.
 
 **Verification:**
 ```bash
@@ -238,17 +246,17 @@ npx playwright test xmlui/src/components/Toast xmlui/src/components/Queue \
 
 **Dependencies:** All unit-level groups (A–J) passing.
 
-**Group K — E2E website examples**
-Context menus, modals, deferred API, table selection, background queues.
-Expected to self-heal once A–J are fixed.
+**Group K — E2E examples**  
+Context menus, modals, deferred API, table selection, background queues.  
+Almost entirely downstream — expected to self-heal once A–J pass.
 
-**Group L — Extensions**
-TableSelect (crm-blocks), Gauge (didChange), TiptapEditor (getMarkdown API).
-Run after K; investigate only if they don't self-heal.
+**Group L — Extensions**  
+TableSelect (crm-blocks), Gauge (didChange), TiptapEditor (getMarkdown).  
+Investigate individually only if they don't self-heal after K.
 
-**Group M — Regression / infrastructure**
-Compound component `$this`, cleanup/init AppState, context double-resolution.
-May need separate log session if they don't self-heal.
+**Group M — Regressions / infrastructure**  
+Compound component `$this`, cleanup/init AppState, context double-resolution.  
+May need a dedicated log session if they don't self-heal after Group A fix.
 
 **Verification:**
 ```bash
@@ -259,24 +267,24 @@ npx playwright test xmlui/tests-e2e --reporter=list
 
 ## Final Cleanup (after all phases pass)
 
-1. Remove both debug `console.log` from `StateContainer.tsx` (lines with `$param`/`$item` check)
-2. Remove render-count profiler block from `StateContainer.tsx` (dev-only `__renderCounts`)
-3. Set `COMPUTED_USES_ENABLED = true` (the flag stays — it is intentionally dev/test-only for running E2E with optimization off; default must be `true`)
-4. Remove `[CU]`, `[SC:in]`, `[SP]` log lines added during diagnosis
-5. Run full test suite — green baseline
+1. Remove both debug `console.log` from `StateContainer.tsx` (lines 171 and 360)
+2. Remove render-count profiler block from `StateContainer.tsx` (`__renderCounts`, `__resetRenderCounts`, `__topRenderCounts`)
+3. Set `COMPUTED_USES_ENABLED = true` — the flag stays as a dev/test tool; default must be `true`
+4. Remove `[CU]` and `[SC:in]` log lines added during diagnosis
+5. Run full test suite — confirm green baseline
 
 ---
 
 ## Progress Tracker
 
-| Phase | Status | Tests fixed |
-|-------|--------|-------------|
-| Phase 0 — Diagnosis | pending | — |
-| Phase 1 — Shared fix | pending | — |
-| Phase 2 — Groups A + B | pending | — |
-| Phase 3 — Groups C + D | pending | — |
-| Phase 4 — Groups E + F + G | pending | — |
-| Phase 5 — Groups H + I | pending | — |
-| Phase 6 — Group J | pending | — |
-| Phase 7 — Groups K + L + M | pending | — |
-| Cleanup | pending | — |
+| Phase | Status | Notes |
+|-------|--------|-------|
+| Phase 0 — Diagnosis | pending | Prerequisite: COMPUTED_USES_ENABLED = true |
+| Phase 1 — Shared fix | pending | Conditional on Phase 0 findings |
+| Phase 2 — Groups A + B | pending | |
+| Phase 3 — Groups C + D | pending | |
+| Phase 4 — Groups E + F + G | pending | |
+| Phase 5 — Groups H + I | pending | |
+| Phase 6 — Group J | pending | |
+| Phase 7 — Groups K + L + M | pending | |
+| Cleanup | pending | |
