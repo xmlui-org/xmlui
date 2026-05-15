@@ -32,6 +32,7 @@ import { parseParameterString } from "../script-runner/ParameterParser";
 import { isParsedValue } from "../state/variable-resolution";
 import type { CodeDeclaration } from "../script-runner/ScriptingSourceTree";
 import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { ROUTING_STATE_KEYS } from "../state/routing-state";
 
 /**
  * Set to false to disable the computedUses narrowing optimisation entirely.
@@ -41,7 +42,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
  *
  * Intended for running E2E tests with the optimisation switched off.
  */
-export const COMPUTED_USES_ENABLED = false;
+export const COMPUTED_USES_ENABLED = true;
 
 export const IMPLICIT_CONTAINER_COMPONENT_NAMES = new Set(["Select", "List", "Table", "DataGrid"]);
 
@@ -100,6 +101,15 @@ const JS_STDLIB_GLOBALS = new Set([
 ]);
 
 const isBuiltinGlobal = (name: string): boolean => JS_STDLIB_GLOBALS.has(name);
+
+/**
+ * Returns true for framework-injected context variables that are NOT stored
+ * in parent state.  All XMLUI runtime-injected names start with `$`; the only
+ * `$`-prefixed names that DO live in parent state are the router state keys
+ * defined in routing-state.ts.
+ */
+const isRuntimeContextVar = (name: string): boolean =>
+  name.startsWith("$") && !ROUTING_STATE_KEYS.has(name);
 
 /**
  * Walk a plain-object AST tree collecting Identifier node names.
@@ -305,8 +315,8 @@ function computeUsesInternal(
   }
 
   const parentDependencies = new Set<string>();
-  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) parentDependencies.add(d);
-  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d)) parentDependencies.add(d);
+  for (const d of usedHere) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
+  for (const d of childDeps) if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d)) parentDependencies.add(d);
 
   const isRegularContainer = !!(
     (node.vars && Object.keys(node.vars).length > 0) ||

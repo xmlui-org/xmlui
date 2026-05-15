@@ -494,6 +494,36 @@ const nextDisableNarrowing = disableNarrowing || !!node.scriptCollected || hasCo
 
 **Слід мати на увазі:** `isKnownContainer` вже коректно перевіряв обидва канали (і `scriptCollected`, і `functions`), але `nextDisableNarrowing` відставав. Після фіксу обидва місця синхронізовані.
 
+### Баг 17 (виявлений у e2e тестах): runtime context vars (`$param`, `$item`, `$row`, тощо) витікали в `parentDependencies`
+
+**Симптом:** E2E тести для `ModalDialog` (та інших компонентів що використовують `$param`, `$item`, `$row`, `$data`, `$checked`, `$context`, `$this`) падали коли `COMPUTED_USES_ENABLED = true`. При `COMPUTED_USES_ENABLED = false` — всі тести проходили. Конкретно: `ModalDialog` не відкривався після `modalDialog.open({ msg: "Hello" })`.
+
+**Причина:** Runtime context vars (`$param`, `$item`, `$rowKey`, тощо) **не є ключами батьківського стану** — вони впроваджуються фреймворком безпосередньо у дочірній контекст під час рендеру (наприклад, `ModalDialog.open()` впроваджує `$param`; `Items` впроваджує `$item`). Ці змінні **не оголошені** у `contextVars` самого вузла (на відміну від `$item` у `Items`, де `contextVars: { $item: ... }` заповнений на самому Items-вузлі).
+
+Якщо дочірній вузол (наприклад `Text` всередині `ModalDialog`) містить `{$param.msg}`, алгоритм не знаходить `$param` ні в `localDeclared` вузла, ні в `isBuiltinGlobal` → `$param` потрапляє до `parentDependencies` → `computedUses = ['$param']` встановлюється на ModalDialog → `extractScopedState(parentState, ['$param'])` повертає `{}` (бо `$param` ніколи не є ключем батьківського `parentState`) → `stateFromOutside = {}` → ModalDialog отримує порожній стан → не може відкритись.
+
+**Виправлення, підхід 1 (відхилений):** явний allowlist всіх runtime context vars у `XMLUI_RUNTIME_CONTEXT_VARS = new Set(['$param', '$item', ...])`. Проблема: потребує постійної синхронізації при появі нових context vars.
+
+**Виправлення, підхід 2 (прийнятий):** всі `$`-ідентифікатори за визначенням є або runtime context vars, або роутерними змінними. Роутерних змінних що справді живуть у `parentState` — лише чотири: `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo`. Тому:
+
+```ts
+// routing-state.ts — єдиний авторитет
+export const ROUTING_STATE_KEYS = new Set([
+  "$pathname", "$routeParams", "$queryParams", "$linkInfo",
+]);
+
+// computedUses.ts
+import { ROUTING_STATE_KEYS } from "../state/routing-state";
+const isRuntimeContextVar = (name: string): boolean =>
+  name.startsWith("$") && !ROUTING_STATE_KEYS.has(name);
+
+for (const d of usedHere)
+  if (!localDeclared.has(d) && !isBuiltinGlobal(d) && !isRuntimeContextVar(d))
+    parentDependencies.add(d);
+```
+
+**Слід мати на увазі:** `ROUTING_STATE_KEYS` визначений у `routing-state.ts` — поруч з `useRoutingParams()` що є єдиним місцем де ці ключі реально записуються у state. При додаванні нової роутерної змінної треба оновити лише один файл. Всі інші `$`-ідентифікатори (`$param`, `$item`, `$row`, нові майбутні) автоматично фільтруються без жодних змін в `computedUses.ts`.
+
 ---
 
 ## Результати бенчмарку
@@ -594,6 +624,21 @@ type CollectedDeclarations = {
 
 **Слід мати на увазі:** завжди перевіряти `node.vars && Object.keys(node.vars).length > 0` (аналогічно для `functions`). Для `scriptCollected`, `contextVars`, `uses`, `loaders` — перевірка на truthiness коректна, бо пустих об'єктів там не буває.
 
+### 15. Runtime context vars (`$param`, `$item`, тощо) — не ключі батьківського стану, фільтруються через `isRuntimeContextVar`
+
+Всі XMLUI `$`-ідентифікатори поділяються на дві категорії:
+
+| Категорія | Приклади | Де живуть | Потрапляють у `computedUses`? |
+|-----------|----------|-----------|-------------------------------|
+| **Router state vars** | `$pathname`, `$routeParams`, `$queryParams`, `$linkInfo` | Ключі `parentState` (Layer 6, `useRoutingParams`) | ✅ Так — коректні залежності |
+| **Runtime context vars** | `$param`, `$item`, `$row`, `$rowKey`, `$data`, `$context`, `$this`, `$checked` | Впроваджуються фреймворком у дочірній контекст під час рендеру | ❌ Ні — не є ключами `parentState` |
+
+Runtime context vars **не оголошуються у `contextVars`** самого компонента-споживача — вони просто доступні у виразах дітей як контекст. Тому алгоритм не може знайти їх у `localDeclared` і без фільтрації вони витікають у `parentDependencies`.
+
+Фільтрація реалізована через `isRuntimeContextVar(name)` — перевіряє `name.startsWith("$") && !ROUTING_STATE_KEYS.has(name)`. `ROUTING_STATE_KEYS` (єдиний allowlist) живе у `routing-state.ts` поруч з `useRoutingParams()`.
+
+**Слід мати на увазі:** якщо у майбутньому додається нова роутерна змінна (наприклад, `$hash`), треба додати її до `ROUTING_STATE_KEYS` у `routing-state.ts`. Нові runtime context vars (нові `$`-ідентифікатори що впроваджуються фреймворком у дочірній контекст) фільтруються автоматично без змін у `computedUses.ts`.
+
 ### 9. Двошарова ізоляція (defense in depth)
 
 Виправлення реалізовано в двох шарах:
@@ -621,7 +666,8 @@ type CollectedDeclarations = {
 | Файл | Дія | Зміст |
 |------|-----|-------|
 | `xmlui/src/abstractions/ComponentDefs.ts` | Modify | Поле `computedUses?: string[]` в `ComponentDefCore` |
-| `xmlui/src/components-core/prepare/computedUses.ts` | Create + Fix | `computeUsesForTree`, кортеж `[freeVars, escapingUIDs]`, `IMPLICIT_CONTAINER_COMPONENT_NAMES`, `JS_BUILTIN_GLOBALS`; `contextVars` в `localDeclared`; `parentDependencies.size > 0` guard; `parentFunctionNames` parameter; `Object.keys(sc.functions)` замість `Object.keys(sc)`; empty-object guard для `vars`/`functions` |
+| `xmlui/src/components-core/prepare/computedUses.ts` | Create + Fix | `computeUsesForTree`, кортеж `[freeVars, escapingUIDs]`, `IMPLICIT_CONTAINER_COMPONENT_NAMES`, `JS_BUILTIN_GLOBALS`; `contextVars` в `localDeclared`; `parentDependencies.size > 0` guard; `parentFunctionNames` parameter; `Object.keys(sc.functions)` замість `Object.keys(sc)`; empty-object guard для `vars`/`functions`; `isRuntimeContextVar` + `ROUTING_STATE_KEYS` import (Баг 17) |
+| `xmlui/src/components-core/state/routing-state.ts` | Modify | Додано `export const ROUTING_STATE_KEYS` — єдиний авторитетний список роутерних `$`-змінних що живуть у parent state |
 | `xmlui/tests/prepare/computedUses.test.ts` | Create | unit-тести: базові випадки, UID-escaping (прямі/grandchild/non-container chain/uses-container), contextVars, JSON built-in, initTestBed exact markup |
 | `xmlui/src/components-core/rendering/ContainerWrapper.tsx` | Modify | `isContainerLike` перевіряє `computedUses`; `getWrappedWithContainer` копіює/видаляє `computedUses` |
 | `xmlui/src/components-core/rendering/StateContainer.tsx` | Modify | `uses ?? computedUses` в `extractScopedState`; стабільний `statePartChanged` via refs; dev render counter |

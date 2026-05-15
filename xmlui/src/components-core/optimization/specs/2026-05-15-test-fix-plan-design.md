@@ -1,103 +1,96 @@
-# Test Fix Plan — yurii/computedUses Branch
-**Date:** 2026-05-15  
-**Branch:** `yurii/computedUses`  
-**Failures:** 191 tests across 13 groups (A–M)  
-**Strategy:** Root-cause-first → staged group fixes
+# План виправлення тестів — гілка yurii/computedUses
+**Дата:** 2026-05-15  
+**Гілка:** `yurii/computedUses`  
+**Помилки:** 191 тестів у 13 групах (A–M)  
+**Стратегія:** Спочатку корінна причина → поетапне виправлення груп
 
 ---
 
-## Context
+## Контекст
 
-The `computedUses` optimization was introduced on this branch. It adds a parse-time
-algorithm (`computeUsesInternal`) that narrows which parent-state keys each container
-subscribes to, reducing unnecessary re-renders.
+Оптимізація `computedUses` була введена в цій гілці. Вона додає алгоритм часу парсингу (`computeUsesInternal`), який звужує, до яких ключів батьківського стану підписується кожен контейнер, зменшуючи непотрібні повторні рендери.
 
-Key changes that interact with the 191 failures:
+Ключові зміни, які взаємодіють із 191 помилками:
 
-| File | Change | Risk |
+| Файл | Зміна | Ризик |
 |------|--------|------|
-| `computedUses.ts` | New algorithm sets `node.computedUses` at boot | Could over-narrow state, cutting off vars components need |
-| `StateContainer.tsx` | `stateFromOutside` now uses `node.computedUses` | If computedUses is wrong, stateFromOutside is wrong |
-| `StateContainer.tsx` | `statePartChanged` useCallback deps: 7 → 2 (ref-based) | Unlikely to cause failures — refs update synchronously during render |
-| `ComponentWrapper.tsx` | `scopedParentState` wraps all state in shallow-memo | Could suppress re-renders when `uses`/`computedUses` is undefined |
-| `StateContainer.tsx` | 2 debug `console.log` still in prod code | Noise; remove in Final Cleanup |
+| `computedUses.ts` | Новий алгоритм встановлює `node.computedUses` при завантаженні | Може надто звузити стан, відрізаючи змінні, які потрібні компонентам |
+| `StateContainer.tsx` | `stateFromOutside` тепер використовує `node.computedUses` | Якщо computedUses неправильний, stateFromOutside неправильний |
+| `StateContainer.tsx` | deps useCallback `statePartChanged`: 7 → 2 (на основі ref) | Малоймовірно спричинить помилки — refs оновлюються синхронно під час рендеру |
+| `ComponentWrapper.tsx` | `scopedParentState` обертає весь стан у shallow-memo | Може пригнічувати повторні рендери, коли `uses`/`computedUses` не визначено |
+| `StateContainer.tsx` | 2 debug `console.log` ще в прод коді | Шум; видалити в фінальному очищенні |
 
-`COMPUTED_USES_ENABLED` flag (in `computedUses.ts`) disables the algorithm when `false`.
-**Must be `true` for all diagnostic and fix phases.**
-
----
-
-## Methodology
-
-Each phase follows this loop:
-
-```
-1. I provide  → XMLUI playground markup + list of log lines to add to framework
-2. You run    → playground, return full console output
-3. I analyze  → form hypothesis, propose code fix
-4. You apply  → fix in source files
-5. You run    → test group for that phase
-6. Result     → if green: next phase | if red: another log iteration
-```
-
-Root causes are confirmed by observing the rendering pipeline, not by reasoning
-about source code alone.
+Прапор `COMPUTED_USES_ENABLED` (у `computedUses.ts`) вимикає алгоритм, коли `false`.
+**Має бути `true` для всіх діагностичних і фаз виправлення.**
 
 ---
 
-## Phase 0 — Cross-group Diagnosis
+## Методологія
 
-**Goal:** Determine whether groups A–M share a single root cause or have independent causes.
+Кожна фаза дотримується цього циклу:
 
-**Prerequisite:** Set `COMPUTED_USES_ENABLED = true` in `computedUses.ts`.  
-Without this, `computedUses` is never set and `[CU]` logs produce no output.
+```
+1. Я надаю  → розмітку XMLUI playground + список рядків логів для додавання до фреймворку
+2. Ви запускаєте → playground, повертаєте повний вивід консолі
+3. Я аналізую → формулюю гіпотезу, пропоную виправлення коду
+4. Ви застосовуєте → виправлення у вихідних файлах
+5. Ви запускаєте → групу тестів для цієї фази
+6. Результат → якщо зелений: наступна фаза | якщо червоний: інша ітерація логів
+```
 
-### Scenarios
+Корінні причини підтверджуються спостереженням за конвеєром рендерингу, а не лише міркуванням
+про вихідний код.
 
-Three separate playground runs (same log additions, different markup each time).
-Collect and return console output from all three runs together.
+---
 
-| ID | Group | Scenario | What we're watching |
+## Фаза 0 — Діагностика між групами
+
+**Мета:** Визначити, чи мають групи A–M спільну корінну причину чи незалежні причини.
+
+**Передумова:** Встановіть `COMPUTED_USES_ENABLED = true` у `computedUses.ts`.  
+Без цього `computedUses` ніколи не встановлюється, і логи `[CU]` не виробляють вивід.
+
+### Сценарії
+
+Три окремі запуски playground (ті самі додавання логів, різна розмітка кожного разу).
+Зберіть і поверніть вивід консолі від усіх трьох запусків разом.
+
+| ID | Група | Сценарій | Що ми спостерігаємо |
 |----|-------|----------|---------------------|
-| S1 | A — context vars | `ModalDialog` opened with `$param` | Does `$param` arrive in modal child's state? |
-| S2 | B — bindTo | `TextBox` with `bindTo` + `$data` display | Does `$data` update after typing? |
-| S3 | E — List | `List` with `$item` referenced in a child `Select` | Is `$item` present in Select's computedUses? |
+| S1 | A — контекстні змінні | `ModalDialog` відкритий із `$param` | Чи доходить `$param` до стану дочірнього елемента модального вікна? |
+| S2 | B — bindTo | `TextBox` із `bindTo` + відображенням `$data` | Чи оновлюється `$data` після введення? |
+| S3 | E — List | `List` із `$item`, посиланням у дочірньому `Select` | Чи присутній `$item` у computedUses Select? |
 
-**Note on S2:** `$data` flows through a Form context mechanism, not through parent-state
-narrowing. Logs `[CU]` and `[SC:in]` will not show `$data`. If S2 fails, it needs a
-separate diagnostic phase targeting the Form/bindTo dispatch path.
+**Примітка до S2:** `$data` тече через механізм контексту Form, а не через звуження батьківського стану. Логи `[CU]` і `[SC:in]` не покажуть `$data`. Якщо S2 зазнає невдачі, йому потрібна окрема діагностична фаза, спрямована на шлях відправки Form/bindTo.
 
-**Note on S3:** `$item` is a `contextVar` injected by `Items` — it is NOT a parent-state
-key. `[SC:in]` will correctly show `$item` is absent from parent-state (that's expected).
-The relevant question for S3 is whether `[CU]` sets a correct (non-empty) `computedUses`
-on the Select, and whether `extractScopedState` does not strip the data the Select needs.
+**Примітка до S3:** `$item` — це `contextVar`, ін’єктований `Items` — це НЕ ключ батьківського стану. `[SC:in]` правильно покаже, що `$item` відсутній у батьківському стані (це очікувано). Релевантне питання для S3 — чи встановлює `[CU]` правильний (непорожній) `computedUses` на Select, і чи не видаляє `extractScopedState` дані, які потрібні Select.
 
-### Log additions
+### Додавання логів
 
-**Reuse existing logs first.** `StateContainer.tsx` already has:
-- Line 171: logs `node.contextVars`, `node.computedUses`, `node.uses` for `$param`/`$item` nodes
-- Line 360: logs `combinedState.$param` for `$param`/`$item` nodes
+**Спочатку використовуйте існуючі логи.** `StateContainer.tsx` вже має:
+- Рядок 171: логи `node.contextVars`, `node.computedUses`, `node.uses` для вузлів `$param`/`$item`
+- Рядок 360: логи `combinedState.$param` для вузлів `$param`/`$item`
 
-Add **2 new log lines** (the existing ones cover combinedState for S1):
+Додайте **2 нових рядки логів** (існуючі покривають combinedState для S1):
 
-**Point `[CU]`** in `computedUses.ts`, right after `node.computedUses = Array.from(computedUsesSet)`:
+**Точка `[CU]`** у `computedUses.ts`, прямо після `node.computedUses = Array.from(computedUsesSet)`:
 ```typescript
 console.log('[CU] SET', node.type, node.uid ?? '', '=', JSON.stringify(node.computedUses));
 ```
-Filter: look for lines where `node.type` matches the component under test (e.g. `Select`, `Container`).
+Фільтр: шукайте рядки, де `node.type` відповідає компоненту під тестуванням (наприклад, `Select`, `Container`).
 
-**Point `[SC:in]`** in `StateContainer.tsx`, right after `stateFromOutside` is computed (after the `useShallowCompareMemoize` block):
+**Точка `[SC:in]`** у `StateContainer.tsx`, прямо після обчислення `stateFromOutside` (після блоку `useShallowCompareMemoize`):
 ```typescript
 console.log('[SC:in]', node.type, node.uid ?? '', 'keys=', Object.keys(stateFromOutside ?? {}));
 ```
-Filter: look for the container wrapping the failing component — verify expected parent-state keys are present.
+Фільтр: шукайте контейнер, що обертає невдалий компонент — перевірте, чи присутні очікувані ключі батьківського стану.
 
-### What to look for
+### Що шукати
 
-| Pattern in logs | Diagnosis |
+| Паттерн у логах | Діагноз |
 |-----------------|-----------|
-| `[CU] SET Select = ['a']` but Select needs key `b` | `computedUses` over-narrows — algorithm bug |
-| `[SC:in] Container keys=[]` when parent has many keys | Empty `computedUses` set incorrectly |
+| `[CU] SET Select = ['a']` але Select потрібен ключ `b` | `computedUses` надто звужує — помилка алгоритму |
+| `[SC:in] Container keys=[]` коли батько має багато ключів | Порожній `computedUses` встановлено неправильно |
 | Line-360 shows `combinedState.$param= undefined` | `$param` lost before it reaches children |
 | Line-171 shows `computedUses= ['x']` but modal needs `$param` | Modal container narrowed incorrectly |
 | All 3 scenarios show same missing-key pattern | Shared root cause → go to Phase 1 |

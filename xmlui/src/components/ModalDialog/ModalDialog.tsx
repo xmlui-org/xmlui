@@ -144,16 +144,15 @@ export const modalViewComponentRenderer = wrapComponent(
             onClose={lookupEventHandler("close")}
             onOpen={lookupEventHandler("open")}
             renderDialog={({ openParams, ref }) => {
-              console.log('[ModalDialog] renderDialog openParams=', openParams);
               return (
                 <MemoizedItem
                   node={node}
                   renderChild={renderChild}
                   layoutContext={{ _insideModalFrame: true }}
-                  contextVars={{ 
-                    ...contextVars, 
-                    $param: openParams?.[0], 
-                    $params: openParams 
+                  contextVars={{
+                    ...contextVars,
+                    $param: openParams?.[0],
+                    $params: openParams
                   }}
                   vars={(node as any)._savedVarDefs}
                   functions={(node as any)._savedFunctionDefs}

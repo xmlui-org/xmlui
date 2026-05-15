@@ -810,3 +810,96 @@ describe.skipIf(skipIfDisabled)("computeUsesForTree + extractScopedState — end
     expect(scoped).not.toHaveProperty("irrelevant");
   });
 });
+
+// ---------------------------------------------------------------------------
+// isRuntimeContextVar filter — Баг 17 regression
+//
+// Runtime context vars ($param, $item, $row, $data, $context, $this, $checked,
+// etc.) are injected by the framework at render time into children.  They do NOT
+// exist as keys in the parent StateContainer's state map.  Including them in
+// computedUses causes extractScopedState to return {}, breaking the component.
+//
+// Router state vars ($pathname, $routeParams, $queryParams, $linkInfo) DO live
+// in parent state (Layer 6 — useRoutingParams) and must NOT be filtered.
+// ---------------------------------------------------------------------------
+
+describe.skipIf(skipIfDisabled)("computeUsesForTree — isRuntimeContextVar filter (Баг 17)", () => {
+  it("$param in child expression does NOT appear in computedUses", () => {
+    // Regression: ModalDialog-like pattern — $param injected by .open() at runtime.
+    // Before the fix: computedUses=['$param'] → extractScopedState returns {} → dialog broken.
+    const container = node("Container", {
+      vars: { title: "{'Hello'}" },
+      children: [node("Text", { props: { text: "{$param.msg}" } })],
+    });
+    computeUsesForTree(container);
+    expect(container.computedUses).toBeUndefined();
+  });
+
+  it("$param does not appear even when mixed with a real parent-state dependency", () => {
+    // Real var 'title' must be in computedUses; $param must be excluded.
+    // Use Select (implicit container) so the node becomes a container when it has free deps.
+    const outer = node("Stack", {
+      vars: { title: "{'Hello'}" },
+      children: [
+        node("Select", {
+          children: [
+            node("Text", { props: { text: "{$param.msg} — {title}" } }),
+          ],
+        }),
+      ],
+    });
+    computeUsesForTree(outer);
+    const select = outer.children![0];
+    // Select: parentDependencies={'title'} ($param filtered) → implicit container → computedUses=['title']
+    expect(select.computedUses).toContain("title");
+    expect(select.computedUses).not.toContain("$param");
+  });
+
+  it.each([
+    "$params", "$item", "$itemIndex",
+    "$row", "$rowIndex", "$rowKey",
+    "$context", "$data", "$this",
+    "$checked", "$setChecked",
+  ])("%s is filtered out of computedUses", (runtimeVar) => {
+    const container = node("Container", {
+      vars: { x: "{0}" },
+      children: [node("Text", { props: { text: `{${runtimeVar}}` } })],
+    });
+    computeUsesForTree(container);
+    // Only x is a real parent dep; runtimeVar must be excluded.
+    expect(container.computedUses ?? []).not.toContain(runtimeVar);
+  });
+
+  it.each([
+    "$pathname", "$routeParams", "$queryParams", "$linkInfo",
+  ])("router state var %s IS kept in computedUses (genuine parent-state key)", (routerVar) => {
+    // Router vars live in parent state (Layer 6 — useRoutingParams) — they must survive the filter.
+    // Use Select (implicit container): it becomes a container when it has non-empty parentDependencies.
+    const select = node("Select", {
+      children: [node("Text", { props: { text: `{${routerVar}}` } })],
+    });
+    computeUsesForTree(select);
+    // $pathname etc. are NOT filtered by isRuntimeContextVar → parentDependencies={routerVar}
+    // → isImplicitDefault=true → computedUses=[routerVar]
+    expect(select.computedUses).toContain(routerVar);
+  });
+
+  it("$param does not make an implicit container out of a non-container node", () => {
+    // Select is in IMPLICIT_CONTAINER_COMPONENT_NAMES.
+    // Before fix: $param would leak → parentDependencies={'$param'} (non-empty) →
+    // isImplicitDefault=true → Select gets computedUses=['$param'] → extractScopedState={}.
+    // After fix: $param is filtered → parentDependencies={} → isImplicitDefault=false.
+    const select = node("Select", {
+      children: [
+        node("Items", {
+          props: { data: "{items}" },
+          children: [node("Option", { props: { value: "{$param.id}" } })],
+        }),
+      ],
+    });
+    computeUsesForTree(select);
+    // $param excluded → parentDependencies has only 'items' (from Items.data) which
+    // belongs to Items, not Select. Select itself has no free vars after filtering.
+    expect(select.computedUses ?? []).not.toContain("$param");
+  });
+});

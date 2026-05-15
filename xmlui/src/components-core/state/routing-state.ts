@@ -37,6 +37,19 @@ import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 import { EMPTY_OBJECT } from "../constants";
 
 /**
+ * The set of state-key names injected by the router into every StateContainer
+ * (Layer 6 of the state composition pipeline). These names start with `$` and
+ * exist as genuine parent-state keys — they must NOT be filtered out by the
+ * `computedUses` narrowing algorithm.
+ */
+export const ROUTING_STATE_KEYS = new Set([
+  "$pathname",
+  "$routeParams",
+  "$queryParams",
+  "$linkInfo",
+]);
+
+/**
  * Hook to get routing-related parameters from React Router.
  *
  * This hook integrates with React Router to provide routing state variables

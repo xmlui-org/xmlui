@@ -167,9 +167,6 @@ export const StateContainer = memo(
         [node.uses, node.computedUses, parentState],
       ),
     );
-    if (node.contextVars && ('$param' in node.contextVars || '$item' in node.contextVars)) {
-      console.log('[StateContainer] node.contextVars=', JSON.stringify(node.contextVars), 'computedUses=', node.computedUses, 'uses=', node.uses);
-    }
 
     const renderCountRef = useRef(0);
     if (process.env.NODE_ENV === "development") {
@@ -356,9 +353,6 @@ export const StateContainer = memo(
       mergedWithVars,
       routingParams,
     );
-    if (node.contextVars && ('$param' in node.contextVars || '$item' in node.contextVars)) {
-      console.log('[StateContainer] combinedState.$param=', (combinedState as any)['$param']);
-    }
 
     // ========================================================================
     // LAYER 7: RESOLVE LIVE-REFERENCE SENTINELS

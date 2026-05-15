@@ -28,7 +28,6 @@ export const MemoizedItem = memo(
     functions,
   }: MemoizedItemProps) => {
     const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
-    console.log('[MemoizedItem] contextVars=', JSON.stringify(contextVars));
     const nodeWithContextVars = useMemo(
       () =>
         ({
