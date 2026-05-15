@@ -144,6 +144,7 @@ export const modalViewComponentRenderer = wrapComponent(
             onClose={lookupEventHandler("close")}
             onOpen={lookupEventHandler("open")}
             renderDialog={({ openParams, ref }) => {
+              console.log('[ModalDialog] renderDialog openParams=', openParams);
               return (
                 <MemoizedItem
                   node={node}

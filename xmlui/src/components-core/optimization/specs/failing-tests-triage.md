@@ -1,259 +1,431 @@
-# Failing Tests Triage — 2026-05-13
+# Failing Tests Triage — 2026-05-14
 
 Branch: `yurii/computedUses`  
-Total failures: **189**
+Total failures: **191**
 
 Likely root cause: changes to `computeUsesInternal` / `computedUses` logic that altered how
-free/context variables are tracked, scoped, or propagated.
+free/context variables are tracked, scoped, propagated, or memoized.
 
 ---
 
-## Group Summary
+## Updated Failure Summary
 
-| # | Group | Count | Priority |
-|---|-------|-------|----------|
-| A | Context-variable propagation (`$param`, `$context`, `$item`, etc.) | ~25 | P0 — root cause |
-| B | `bindTo` / form-value sync (`$data`) | ~16 | P0 — likely same root |
-| C | APICall — core (notifications, execute, edge-cases, mockExecute) | ~20 | P1 |
-| D | APICall — Deferred Mode (polling, cancellation, integration) | ~13 | P1 |
-| E | List row-selection (events, APIs, keyboard shortcuts) | ~15 | P2 |
-| F | Table (onContextMenu, keyboard copy, refreshOn) | ~10 | P2 |
-| G | Form / Navigation events | ~5 | P2 |
-| H | Tree async loading | ~6 | P2 |
-| I | TileGrid refreshOn | ~3 | P3 |
-| J | Toast | ~4 | P3 |
-| K | E2E how-to-examples (@website) | ~45 | P3 — depend on A–H |
-| L | Extensions (TableSelect, Gauge, TiptapEditor) | ~3 | P3 |
-| M | Other E2E (compound-component, context-vars, init-cleanup) | ~4 | P3 |
-
----
-
-## Stage 1 — Diagnose (Before Writing Any Fix)
-
-**Goal:** confirm what error message the tests actually produce; check if it's one root cause
-or many.
-
-Tasks:
-1. Run one representative test from Group A and capture the full error:
-   ```
-   npx playwright test xmlui/src/components/ModalDialog/ModalDialog.spec.ts:23 --reporter=list
-   ```
-2. Run one from Group B:
-   ```
-   npx playwright test xmlui/src/components/TextBox/TextBox.spec.ts:402 --reporter=list
-   ```
-3. Compare stack traces — if they share the same failing assertion / internal throw, Groups A
-   and B have a common fix.
-4. Check `computeUsesInternal` diff against `main` for any accidental narrowing of free-variable
-   sets that would hide `$param`, `$data`, or `$item`.
+| Group | Area | Notes |
+|---|---|---|
+| A | Context-variable propagation | `$param`, `$params`, `$context`, `$item`, `$row`, `$data`, `$this` |
+| B | bindTo / form sync | `$data` synchronization broken across many inputs |
+| C | APICall core | notifications, execute params, mockExecute context |
+| D | APICall deferred mode | polling, cancellation, status updates |
+| E | List selection system | selection APIs, keyboard shortcuts, row events |
+| F | Table / ContextMenu | context variables, refreshOn, copy action |
+| G | Modal / Form / Navigation | nested context propagation and routing events |
+| H | Tree async loading | loaded-state and dynamic-node regressions |
+| I | refreshOn regressions | Table + TileGrid closure refresh behavior |
+| J | Toast / Queue / Option | rendering, accessibility, queue templates |
+| K | E2E website examples | mostly downstream failures caused by A–J |
+| L | Extensions | TableSelect, Gauge, TiptapEditor |
+| M | Regression / compound components | `$this`, cleanup/init, context reuse |
 
 ---
 
-## Stage 2 — Fix Context-Variable Propagation (Groups A + B)
+# Stage 1 — Diagnose Root Cause
 
-**Why first:** Every E2E how-to test (Group K) depends on context variables working.
-Fixing A+B unblocks the largest downstream group.
+Goal:
+- confirm whether failures come from one shared regression
+- identify whether `computedUses` stopped tracking reactive/context variables correctly
 
-### Group A — Context-variable propagation
+Run representative failures:
 
-Files:
-- `ModalDialog.spec.ts` lines 23, 37, 53, 203, 218, 235 — `$param` in open/close
-- `APICall.spec.ts` lines 1316, 1344 — `$param`, `$params` in context variables
-- `ContextMenu.spec.ts` lines 50, 125 — `$context` via `openAt`
-- `Checkbox.spec.ts` lines 885, 900 — `$checked`/`$setChecked` scope isolation
-- `DataSource.spec.ts` line 549 — `$url`, `$method`, `$queryParams` in `onFetch`
-- `Table.spec.ts` lines 1484–1572 — `$item`, `$row`, `$rowIndex`, `$itemIndex` in `onContextMenu`
-- `Toast.spec.ts` line 107 — `$param` in default template
-- `Queue.spec.ts` line 737 — context variables in templates
-- `List.spec.ts` line 14 — `$context` via `contextMenu`
-
-### Group B — `bindTo` / `$data` sync
-
-All these tests assert that the component's internal value and `$data` in a parent variable
-stay in sync. Failing components:
-
-- AutoComplete (line 403)
-- Checkbox (line 651)
-- ColorPicker (line 385)
-- DateInput (line 816)
-- DatePicker (line 556)
-- FileInput (line 133)
-- NumberBox (line 520)
-- RadioGroup (line 600)
-- Select (line 1040)
-- Slider (line 513)
-- Switch (line 615)
-- TextArea (line 932)
-- TextBox (lines 402, 417)
-- TimeInput (line 1435)
-- TableSelect/extension (line 562)
-
-Verification after fix:
+```bash
+npx playwright test xmlui/src/components/ModalDialog/ModalDialog.spec.ts:23 --reporter=list
+npx playwright test xmlui/src/components/TextBox/TextBox.spec.ts:402 --reporter=list
 ```
+
+Then compare:
+- assertion failures
+- stack traces
+- undefined context-variable accesses
+- stale closure behavior
+- missing reactive dependency tracking
+
+Focus review areas:
+- `computeUsesInternal`
+- `computedUses`
+- variable scoping
+- dependency graph generation
+- refresh dependency invalidation
+- closure refresh logic
+
+---
+
+# Stage 2 — Context Variable Propagation + bindTo Sync
+
+This is the highest-priority fix stage because most downstream failures depend on it.
+
+## Group A — Context Variables
+
+### APICall
+- notification message properties
+- execute parameter access
+- `$param`
+- `$params`
+- mockExecute variable exposure
+- `$queryParams`
+- `$requestBody`
+- `$requestHeaders`
+
+### ModalDialog
+- imperative open with params
+- `$param` in title
+- `$param` in child variables
+- reopening dialog with updated param
+
+### ContextMenu / List / Table
+- `$context`
+- `$item`
+- `$row`
+- `$rowIndex`
+- `$itemIndex`
+
+### Queue / Toast / DataSource
+- queue template context vars
+- toast `$param`
+- `$url`
+- `$method`
+- `$queryParams`
+
+### Checkbox scope isolation
+- `$checked`
+- `$setChecked`
+
+Verification:
+
+```bash
+npx playwright test --grep "\\$param|\\$context|context variable" --reporter=list
+```
+
+---
+
+## Group B — bindTo / $data Synchronization
+
+Failing components:
+
+- AutoComplete
+- Checkbox
+- ColorPicker
+- DateInput
+- DatePicker
+- FileInput
+- NumberBox
+- RadioGroup
+- Select
+- Slider
+- Switch
+- TextArea
+- TextBox
+- PasswordInput
+- TimeInput
+- TableSelect (extension)
+
+Symptoms:
+- component value updates but `$data` does not
+- `$data` updates but UI does not
+- stale bindings after rerender
+- dependency graph not refreshing after state mutation
+
+Verification:
+
+```bash
 npx playwright test --grep "bindTo syncs" --reporter=list
 ```
 
 ---
 
-## Stage 3 — Fix APICall (Groups C + D)
+# Stage 3 — APICall System
 
-### Group C — Core notifications, execute, edge-cases, mockExecute
+## Group C — APICall Core
 
-Tests:
-- Notification properties (lines 998–1176)
-- Execute with parameters (lines 1226, 1251)
-- Edge cases: null/undefined, large payloads, Unicode (lines 1432, 1506, 1531)
-- mockExecute event: `$queryParams`, `$requestBody`, `$requestHeaders`, `$param`, `$params`,
-  mock list example (lines 3382–3595)
+### Notifications
+- success notifications
+- 400 / 500 notifications
+- unknown errors
+- error details
+- `onError` consistency
 
-### Group D — Deferred Mode
+### execute()
+- accepts parameters
+- supports multiple parameters
 
-Tests (all in `APICall.spec.ts`):
-- Step 3 — Single Poll (lines 2153–2230)
-- Step 4 — Polling Loop (lines 2266–2358)
-- Step 5 — Status Update Event (lines 2400–2488)
-- Step 6 — Progress & context variables (line 2552)
-- Step 7 — Notifications (line 2677)
-- Step 11 — Cancellation (lines 2917, 2970)
-- Step 12 — Integration & Polish (lines 3072–3272)
+### Edge cases
+- null / undefined params
+- very large payloads
+- Unicode characters
 
-Verification after fix:
-```
+### mockExecute
+- exposes request context vars
+- supports execute params
+- mock data list example
+
+---
+
+## Group D — Deferred Mode
+
+### Polling
+- status requests
+- interpolation of result variables
+- polling loop
+- timeout handling
+
+### Status Updates
+- `onStatusUpdate`
+- stop polling from handler
+- progress extraction
+- notification updates
+
+### Cancellation
+- `cancel()`
+- local-only cancel mode
+- polling cleanup
+
+### Integration
+- encryption workflow
+- concurrent deferred operations
+- resume polling
+- component unmount cleanup
+
+Verification:
+
+```bash
 npx playwright test xmlui/src/components/APICall/APICall.spec.ts --reporter=list
 ```
 
 ---
 
-## Stage 4 — Fix Interaction Events (Groups E + F + G)
+# Stage 4 — Selection, Table, Modal, Navigation
 
-### Group E — List row-selection
+## Group E — List Selection
 
-- `selectionDidChange` event (lines 1513, 1530, 1550)
-- `rowDoubleClick` event (lines 1569, 1585)
-- `rowUnselectablePredicate` (lines 1606–1682)
-- `hideSelectionCheckboxes` (line 1753)
-- `selectionCheckboxPosition` overlay (line 1887)
-- Selection APIs: `selectAll`, `clearSelection`, `getSelectedIds`, `getSelectedItems`, `selectId`
-  (lines 1977–2100)
-- Keyboard: Ctrl+A, Ctrl+C, Ctrl+X, Delete, Ctrl+V (lines 2100–2179)
+### Events
+- `selectionDidChange`
+- `rowDoubleClick`
 
-### Group F — Table
+### Selection rules
+- `rowUnselectablePredicate`
+- hidden selection checkboxes
+- overlay checkbox mode
 
-- Context menu: link clickability (line 1433), `onContextMenu` context vars (lines 1484–1572)
-- Keyboard copy (line 3019)
-- `refreshOn`: updates/no-update/not-provided (lines 4487, 4510, 4536)
+### APIs
+- `selectAll`
+- `clearSelection`
+- `getSelectedIds`
+- `getSelectedItems`
+- `selectId`
 
-### Group G — Form & App Navigation
+### Keyboard
+- Ctrl+A
+- Ctrl+C
+- Ctrl+X
+- Delete
+- Ctrl+V
 
-- `Form.spec.ts`: nested form submit (line 1307), nested form + modal context (line 1351),
-  data URL through modal context (line 3439)
-- `App-navigation-events.spec.ts`: willNavigate+didNavigate sequence (line 152),
-  willNavigate blocks (line 191), nested routes (line 303)
-- `Select.spec.ts`: DropdownMenu+Select nested in Modal (lines 1658, 1737),
-  changing options does not reset value (lines 2695, 2741)
-- `DropdownMenu.spec.ts`: nested with Select in Modal (lines 594, 673)
-- `AutoComplete.spec.ts`: nested DropdownMenu+AutoComplete in Modal (lines 1005, 1084)
+---
 
-Verification after fix:
-```
-npx playwright test xmlui/src/components/List xmlui/src/components/Table \
-  xmlui/src/components/Form xmlui/src/components/App --reporter=list
+## Group F — Table
+
+### Context menu
+- right-click behavior
+- row context vars
+- clickable links
+
+### Keyboard
+- copy action
+
+### refreshOn
+- closure updates
+- stale handlers
+- refresh consistency
+
+---
+
+## Group G — Modal / Form / Navigation
+
+### Form
+- nested submit handling
+- modal context access
+- data URL propagation
+
+### Navigation
+- willNavigate
+- didNavigate
+- nested routes
+
+### Nested Dropdown + Modal interactions
+- DropdownMenu + Select
+- AutoComplete + DropdownMenu
+- modal focus interaction
+
+Verification:
+
+```bash
+npx playwright test \
+  xmlui/src/components/List \
+  xmlui/src/components/Table \
+  xmlui/src/components/Form \
+  xmlui/src/components/App \
+  --reporter=list
 ```
 
 ---
 
-## Stage 5 — Fix Tree Async Loading (Group H)
+# Stage 5 — Tree Async Loading
 
-Tests:
-- `Tree-autoLoadAfter-field.spec.ts` line 412 — `setAutoLoadAfter()` API precedence
-- `Tree-dynamic-integration.spec.ts` line 232 — `setDynamic()` override
-- `Tree-loaded-field.spec.ts` lines 335, 377, 424, 579 — marks loaded, handles empty/error,
-  `getNodeLoadingState`
+Failing areas:
+- `setAutoLoadAfter()`
+- `setDynamic()`
+- loaded-state tracking
+- empty children handling
+- load error handling
+- `getNodeLoadingState`
 
 Verification:
-```
+
+```bash
 npx playwright test xmlui/src/components/Tree --reporter=list
 ```
 
 ---
 
-## Stage 6 — Fix Remaining Unit Tests (Groups I + J)
+# Stage 6 — Remaining Unit-Level Regressions
 
-### Group I — TileGrid refreshOn
+## Group I — refreshOn regressions
 
-- Lines 930, 956, 982 — same pattern as Table refreshOn (Stage 4 fix may solve these too)
+### TileGrid
+- closure refresh update
+- unchanged refresh behavior
+- historic refresh behavior
 
-### Group J — Toast
-
-- Line 8 — renders via show API
-- Line 83 — updates existing toast on multiple calls
-- Line 107 — `$param` context variable (may already be fixed in Stage 2)
-- Line 131 — accessibility role='status'
-
-### Other (Option, Queue)
-
-- `Option.spec.ts` line 286 — works with dynamic data through Items
-- `Queue.spec.ts` lines 496, 646 — progressFeedback template, large queue operations
+Likely same root cause as Table `refreshOn`.
 
 ---
 
-## Stage 7 — E2E + Extensions (Groups K + L + M)
+## Group J — Toast / Queue / Option
 
-Run only after all unit groups pass; E2E failures are almost certainly downstream of A–J.
+### Toast
+- show API
+- update existing toast
+- `$param`
+- accessibility role=status
 
-### Group K — how-to-examples (@website)
+### Queue
+- progress feedback template
+- large queue operations
+- context variables
 
-Files (all in `xmlui/tests-e2e/how-to-examples/`):
-- `add-row-actions-with-a-context-menu` (3 cases)
-- `buffer-a-reactive-edit` (3 cases)
-- `build-a-fullscreen-modal-dialog` (2 cases)
-- `build-a-master-detail-layout` (2 cases)
-- `cancel-a-deferred-api-operation` (2 cases)
-- `chain-a-refetch` (4 cases)
-- `control-cache-invalidation` (3 cases)
-- `delay-a-datasource-until-another-datasource-is-ready` (2 cases)
-- `enable-multi-row-selection-in-a-table` (4 cases)
-- `filter-and-transform-data-from-an-api` (3 cases)
-- `handle-background-operations` (2 cases)
-- `markup` (1 case)
-- `open-a-context-menu-on-right-click` (6 cases)
-- `pass-data-to-a-modal-dialog` (2 cases)
-- `prevent-undefined-requests-in-chained-datasources` (2 cases)
-- `render-a-custom-cell-with-components` (1 case)
-- `set-the-initial-value-of-a-select-from-fetched-data` (2 cases)
-- `update-ui-optimistically` (4 cases)
-- `use-mock-data-during-development` (2 cases)
-- `use-the-same-modaldialog-to-add-or-edit` (3 cases)
+### Option
+- dynamic Items integration
 
-### Group L — Extensions
+---
 
-- `TableSelect.spec.ts` line 562 — bindTo sync (may be fixed in Stage 2)
-- `Gauge.spec.ts` line 44 — `didChange` event
-- `TiptapEditor.spec.ts` line 58 — `getMarkdown` API
+# Stage 7 — E2E + Extensions
 
-### Group M — Other E2E
+Do not investigate until unit-level groups pass.
 
-- `api-call-as-extracted-component.spec.ts` line 3
-- `compound-component.spec.ts` lines 585, 666 — `$this` in compound/Queue handlers
-- `context-vars-regression.spec.ts` line 3 — vars resolved multiple times
-- `init-cleanup-events.spec.ts` lines 224, 314 — cleanup updates AppState, accesses init state
+## Group K — Website E2E Examples
 
-Verification:
+Main affected flows:
+
+- context menus
+- modal dialogs
+- deferred API operations
+- optimistic UI
+- refetch chaining
+- datasource chaining
+- table row selection
+- background queues
+- fetched Select defaults
+- mock-data workflows
+
+Most of these are expected to recover automatically after fixing:
+- context propagation
+- bindTo sync
+- APICall deferred mode
+- selection APIs
+
+---
+
+## Group L — Extensions
+
+### xmlui-crm-blocks
+- TableSelect bindTo sync
+
+### xmlui-gauge
+- Gauge didChange
+
+### xmlui-tiptap-editor
+- getMarkdown API
+
+---
+
+## Group M — Regression / Infrastructure Tests
+
+### E2E regressions
+- extracted APICall component
+- compound component `$this`
+- Queue handler `$this`
+- context variable double resolution
+- cleanup/init AppState access
+
+---
+
+# Recommended Fix Order
+
+```text
+1. Diagnose shared root cause
+2. Fix computedUses context propagation
+3. Fix bindTo / reactive synchronization
+4. Fix APICall core
+5. Fix deferred polling system
+6. Fix List/Table selection systems
+7. Fix Modal/Form/navigation interactions
+8. Fix Tree async loading
+9. Run unit suite again
+10. Run E2E suite
+11. Fix remaining extension regressions
 ```
+
+---
+
+# Fast Verification Commands
+
+## Context + bindTo
+
+```bash
+npx playwright test --grep "bindTo syncs|\\$param|\\$context" --reporter=list
+```
+
+## APICall
+
+```bash
+npx playwright test xmlui/src/components/APICall/APICall.spec.ts --reporter=list
+```
+
+## Selection systems
+
+```bash
+npx playwright test \
+  xmlui/src/components/List \
+  xmlui/src/components/Table \
+  --reporter=list
+```
+
+## Tree
+
+```bash
+npx playwright test xmlui/src/components/Tree --reporter=list
+```
+
+## Full E2E
+
+```bash
 npx playwright test xmlui/tests-e2e --reporter=list
-npx playwright test packages/ --reporter=list
-```
-
----
-
-## Quick-reference Checklist
-
-```
-Stage 1  [ ] Diagnose — capture error messages from Groups A & B
-Stage 2  [ ] Fix context-variable propagation (A) + bindTo sync (B)
-Stage 3  [ ] Fix APICall core (C) + Deferred Mode (D)
-Stage 4  [ ] Fix List selection (E) + Table (F) + Form/Nav (G)
-Stage 5  [ ] Fix Tree async loading (H)
-Stage 6  [ ] Fix TileGrid, Toast, Option, Queue (I+J)
-Stage 7  [ ] E2E + Extensions sweep (K+L+M)
 ```
