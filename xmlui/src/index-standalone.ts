@@ -6,7 +6,7 @@ import { injectCSS, removeCSS } from "virtual:css-injected-by-js";
 import { registerCSSInjection } from "./components-core/cssInjectionRegistry";
 import { CSS_LAYER_ORDER } from "./components-core/cssLayers";
 import { startApp } from "./components-core/StandaloneApp";
-import { activateIslands } from "./components-core/Islands/activateIslands";
+import { activateIslands, mountIsland } from "./components-core/Islands/activateIslands";
 import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import * as xmluiExports from "./index";
 
@@ -43,5 +43,6 @@ window.jsxRuntime = jsxRuntime;
 window.ReactDOM = ReactDOM;
 
 // Export everything from index.ts plus the standalone extension manager
-const standaloneExports = { ...xmluiExports, standalone: Xmlui };
+// and the programmatic island mount API.
+const standaloneExports = { ...xmluiExports, standalone: Xmlui, mountIsland };
 export default standaloneExports;
