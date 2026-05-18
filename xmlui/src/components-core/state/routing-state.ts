@@ -30,11 +30,13 @@
  * Part of StateContainer.tsx refactoring - Step 9
  */
 
-import { useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useLocation, useParams, useSearchParams } from "react-router-dom";
 import type { ContainerState } from "../../abstractions/ContainerDefs";
 import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 import { EMPTY_OBJECT } from "../constants";
+
+export const CoercedRouteParamsContext = createContext<Record<string, unknown> | undefined>(undefined);
 
 /**
  * Hook to get routing-related parameters from React Router.
@@ -56,6 +58,7 @@ import { EMPTY_OBJECT } from "../constants";
 export function useRoutingParams(): ContainerState {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
+  const coercedRouteParams = useContext(CoercedRouteParamsContext);
   const location = useLocation();
   const linkInfoContext = useLinkInfoContext();
 
@@ -77,9 +80,9 @@ export function useRoutingParams(): ContainerState {
   return useMemo(() => {
     return {
       $pathname: location.pathname,
-      $routeParams: routeParams,
+      $routeParams: coercedRouteParams ?? routeParams,
       $queryParams: queryParamsMap,
       $linkInfo: linkInfo,
     };
-  }, [linkInfo, location.pathname, queryParamsMap, routeParams]);
+  }, [coercedRouteParams, linkInfo, location.pathname, queryParamsMap, routeParams]);
 }

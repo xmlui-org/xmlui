@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, memo, useEffect, useMemo } from "react";
-import { Navigate, Route, Routes, useParams } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import classnames from "classnames";
 import { COMPONENT_PART_KEY } from "../../components-core/theming/responsive-layout";
 
@@ -9,6 +9,10 @@ import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { useAppContext } from "../../components-core/AppContext";
+import { CoercedRouteParamsContext } from "../../components-core/state/routing-state";
+import { compileRoute, validateRouteParams, canonicalise, type CanonicalPolicy, type CompiledRoute } from "../../components-core/routing";
+import { pushXsLog } from "../../components-core/inspector/inspectorUtils";
 
 // Default props for Pages component
 export const defaultProps = {
@@ -31,6 +35,9 @@ type RouteWrapperProps = {
   className?: string;
   classes?: Record<string, string>;
   uid?: string;
+  compiledRoute?: CompiledRoute;
+  pageUrl?: string;
+  fallbackPath?: string;
 };
 
 export const RouteWrapper = memo(function RouteWrapper({
@@ -41,8 +48,29 @@ export const RouteWrapper = memo(function RouteWrapper({
   className,
   classes,
   uid,
+  compiledRoute,
+  pageUrl,
+  fallbackPath,
 }: RouteWrapperProps) {
   const params = useParams();
+  const appContext = useAppContext();
+  const strictRouting = appContext.appGlobals?.strictRouting === true;
+
+  const validated = useMemo(() => {
+    if (!compiledRoute) return { ok: true as const, params };
+    return validateRouteParams(compiledRoute, params, pageUrl ?? "", strictRouting);
+  }, [compiledRoute, pageUrl, params, strictRouting]);
+
+  if (validated.ok === false) {
+    const diagnostic = validated.diagnostic;
+    pushXsLog({
+      kind: "navigate",
+      ts: Date.now(),
+      to: fallbackPath ?? "/",
+      routingDiagnostic: diagnostic,
+    });
+    return <Navigate to={fallbackPath ?? "/"} replace />;
+  }
 
   //we need to wrap the child route in a container to make sure the route params are available.
   // we do this wrapping by providing an empty object to vars.
@@ -70,7 +98,9 @@ export const RouteWrapper = memo(function RouteWrapper({
       className={classnames(classes?.[COMPONENT_PART_KEY], className, styles.pageWrapper, "xmlui-page-root")}
       style={style}
     >
-      {renderChild(wrappedWithContainer, layoutContext)}
+      <CoercedRouteParamsContext.Provider value={validated.params}>
+        {renderChild(wrappedWithContainer, layoutContext)}
+      </CoercedRouteParamsContext.Provider>
     </div>
   );
 });
@@ -95,6 +125,30 @@ export const Pages = memo(function Pages({
   defaultScrollRestoration,
 }: PagesProps) {
   const context = useAppLayoutContext();
+  const appContext = useAppContext();
+  const strictRouting = appContext.appGlobals?.strictRouting === true;
+  const canonicalPolicy: CanonicalPolicy = useMemo(
+    () => ({
+      case: appContext.appGlobals?.urlCase === "lower" ? "lower" : "preserve",
+      trailingSlash: ["always", "never", "preserve"].includes(appContext.appGlobals?.urlTrailingSlash)
+        ? appContext.appGlobals?.urlTrailingSlash
+        : "preserve",
+      queryParamOrder: appContext.appGlobals?.urlQueryParamOrder === "alphabetical" ? "alphabetical" : "preserve",
+      onMismatch: ["redirect", "rewrite", "warn"].includes(appContext.appGlobals?.nonCanonicalUrl)
+        ? appContext.appGlobals?.nonCanonicalUrl
+        : strictRouting
+          ? "redirect"
+          : "warn",
+    }),
+    [
+      appContext.appGlobals?.nonCanonicalUrl,
+      appContext.appGlobals?.urlCase,
+      appContext.appGlobals?.urlQueryParamOrder,
+      appContext.appGlobals?.urlTrailingSlash,
+      strictRouting,
+    ],
+  );
+  const location = useLocation();
 
   useEffect(() => {
     context?.setScrollRestorationEnabled?.(!!defaultScrollRestoration);
@@ -109,12 +163,46 @@ export const Pages = memo(function Pages({
       restChildren.push(child);
     }
   });
+  useEffect(() => {
+    const incoming = location.pathname + location.search + location.hash;
+    const { canonical, changed } = canonicalise(incoming, canonicalPolicy);
+    if (!changed) return;
+    const diagnostic = {
+      code: "non-canonical-url",
+      severity: strictRouting ? "error" : "warn",
+      message: `URL is not canonical. Expected "${canonical}".`,
+      data: { incoming, canonical },
+    };
+    pushXsLog({ kind: "navigate", ts: Date.now(), to: canonical, routingDiagnostic: diagnostic });
+    if (canonicalPolicy.onMismatch === "redirect" || canonicalPolicy.onMismatch === "rewrite") {
+      window.history.replaceState(window.history.state, "", canonical);
+    }
+  }, [canonicalPolicy, location.hash, location.pathname, location.search, strictRouting]);
+
+  const compiledRoutes = useMemo(() => {
+    return routes.map((child) => compileRoute(String(extractValue(child.props.url) ?? ""), strictRouting));
+  }, [extractValue, routes, strictRouting]);
+
   return (
     <>
       <Routes>
         {routes.map((child, i) => {
+          const routeUrl = String(extractValue(child.props.url) ?? "");
+          const compiledRoute = compiledRoutes[i];
           return (
-            <Route path={extractValue(child.props.url)} key={i} element={renderChild(child)} />
+            <Route
+              path={compiledRoute.rrPath}
+              key={i}
+              element={renderChild({
+                ...child,
+                props: {
+                  ...child.props,
+                  __compiledRoute: compiledRoute,
+                  __fallbackPath: fallbackPath,
+                  __pageUrl: routeUrl,
+                },
+              })}
+            />
           );
         })}
         {fallbackPath && <Route path="*" element={<Navigate to={fallbackPath} replace />} />}

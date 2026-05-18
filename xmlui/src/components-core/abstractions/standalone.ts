@@ -140,6 +140,19 @@ export type StandaloneAppDescription = {
    *   entry. Per-invocation `timeoutMs` overrides this default. The W3-6
    *   risk-probe ships the configuration surface only; the dispatcher
    *   wiring that enforces the budget lands in W7-1.
+   * - `strictRouting` (boolean, default `false`) — when `true`, defended-routing
+   *   diagnostics such as rejected constraints and non-canonical URLs escalate to
+   *   errors. Wave 4 keeps the default warn/additive.
+   * - `strictI18n` (boolean, default `false`) — when `true`, missing locale
+   *   bundles/keys and invalid ICU patterns escalate to errors. Wave 4 keeps
+   *   fallback rendering in non-strict mode.
+   * - `defaultLocale` (string, default `"en"`) — fallback BCP-47 locale for
+   *   `App.locale` resolution.
+   * - `localePersistKey` (string | null, default `"xmlui.locale"`) — localStorage
+   *   key for user-selected locales; `null` disables persistence.
+   * - `strictDeterminism` (boolean, default `false`) — when `true`, determinism
+   *   diagnostics escalate and later waves default the scheduler to FIFO. Wave 4
+   *   ships the contract and diagnostics while leaving execution concurrent.
    */
   appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;

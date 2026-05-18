@@ -107,6 +107,9 @@ type Props = {
   persistTheme?: boolean;
   toneStorageKey?: string;
   themeStorageKey?: string;
+  locale?: string;
+  direction?: "ltr" | "rtl" | "auto";
+  scheduler?: "concurrent" | "fifo";
   applyDefaultContentPadding?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   footerSticky?: boolean;
@@ -174,6 +177,9 @@ export const App = memo(function App({
   persistTheme = defaultProps.persistTheme,
   toneStorageKey = defaultProps.toneStorageKey,
   themeStorageKey = defaultProps.themeStorageKey,
+  locale,
+  direction = "auto",
+  scheduler,
   renderChild,
   name,
   className,
@@ -215,6 +221,24 @@ export const App = memo(function App({
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
+
+  useEffect(() => {
+    if (locale) {
+      appContext.App?.setLocale?.(locale, { source: "app" });
+    }
+  }, [appContext.App, locale]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const resolvedDirection =
+      direction === "auto" ? (appContext.App?.isRtlLocale?.(appContext.App?.locale) ? "rtl" : "ltr") : direction;
+    document.documentElement.dir = resolvedDirection;
+  }, [appContext.App, direction]);
+
+  useEffect(() => {
+    if (typeof document === "undefined" || !scheduler) return;
+    document.documentElement.dataset.xmluiScheduler = scheduler;
+  }, [scheduler]);
 
   // Set navigation event handlers
   useEffect(() => {

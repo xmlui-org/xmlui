@@ -345,6 +345,24 @@ export type AppContextObject = {
   App: typeof AppUtilsNamespace & {
     fetch: (input: string | URL, init?: RequestInit) => Promise<Response>;
     environment: AppEnvironment;
+    locale: string;
+    localeSource: string;
+    availableLocales: readonly string[];
+    setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
+    translate: (key: string, vars?: Record<string, unknown>) => string;
+    t: (key: string, vars?: Record<string, unknown>) => string;
+    isRtlLocale: (locale?: string) => boolean;
+    formatNumber: (value: number, options?: Intl.NumberFormatOptions) => string;
+    formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) => string;
+    formatList: (values: readonly string[], options?: Intl.ListFormatOptions) => string;
+    formatRelativeTime: (
+      value: number,
+      unit: Intl.RelativeTimeFormatUnit,
+      options?: Intl.RelativeTimeFormatOptions,
+    ) => string;
+    compare: (a: string, b: string, options?: Intl.CollatorOptions) => number;
+    pluralRules: (value: number, options?: Intl.PluralRulesOptions) => Intl.LDMLPluralRule;
+    scheduler: "concurrent" | "fifo";
   };
 
   // Clipboard.copy(text) — writes text to the clipboard. Sanctioned replacement for the

@@ -32,6 +32,16 @@ import { mathFunctions } from "../appContext/math-function";
 import { localStorageFunctions, setStorageChangeListener } from "../appContext/local-storage-functions";
 import { createLog } from "../appContext/log";
 import { AppUtilsNamespace, ClipboardNamespace, createAppFetch, getAppEnvironment } from "../appContext/app-utils";
+import {
+  compare,
+  formatCurrency,
+  formatList,
+  formatNumber,
+  formatRelativeTime,
+  pluralRules,
+  resolveLocale,
+  isValidLocale,
+} from "../i18n";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
 import type { GlobalProps } from "./AppRoot";
@@ -141,6 +151,14 @@ export function AppContent({
   const location = useLocation();
   const previousLocationRef = useRef(location.pathname + location.search + location.hash);
   const isInitialRenderRef = useRef(true);
+  const programmaticNavigationRef = useRef<string | undefined>();
+  const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
+  const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+
+  // --- We extract the global properties from the app configuration and pass them to the app context.
+  const appGlobals = useMemo(() => {
+    return (globalProps ?? EMPTY_OBJECT) as Record<string, any>;
+  }, [globalProps]);
 
   // --- Wrapped navigate function that respects willNavigate/didNavigate events
   // Note: willNavigate only works for programmatic navigation (navigate(), Actions.navigate())
@@ -196,6 +214,7 @@ export function AppContent({
       });
 
       // Perform the actual navigation
+      programmaticNavigationRef.current = typeof to === "string" ? to : (to?.pathname ?? "");
       navigateRouter(to, navigateOptions);
 
       // didNavigate will be fired by the useEffect that watches location changes
@@ -215,6 +234,33 @@ export function AppContent({
     const previousPath = previousLocationRef.current;
 
     if (currentPath !== previousPath) {
+      const { onWillNavigate } = navigationHandlers;
+      const isProgrammatic = programmaticNavigationRef.current === currentPath || programmaticNavigationRef.current === location.pathname;
+      programmaticNavigationRef.current = undefined;
+
+      if (
+        onWillNavigate &&
+        !isProgrammatic &&
+        appGlobals?.guardOnPopState !== false
+      ) {
+        void Promise.resolve(onWillNavigate(currentPath, undefined)).then((result) => {
+          if (result === false) {
+            pushXsLog({
+              kind: "navigate",
+              ts: Date.now(),
+              from: previousPath,
+              to: currentPath,
+              routingDiagnostic: {
+                code: "guard-bypass-attempt",
+                severity: appGlobals?.strictRouting === true ? "error" : "warn",
+                message: "Navigation was rejected by willNavigate after a browser-driven route change.",
+              },
+            });
+            navigateRouter(previousPath, { replace: true });
+          }
+        });
+      }
+
       previousLocationRef.current = currentPath;
 
       const { onDidNavigate } = navigationHandlers;
@@ -222,7 +268,7 @@ export function AppContent({
         void onDidNavigate(currentPath, undefined);
       }
     }
-  }, [location, navigationHandlers]);
+  }, [appGlobals?.guardOnPopState, appGlobals?.strictRouting, location, navigateRouter, navigationHandlers]);
 
   // --- Create PubSubService with stable reference across renders
   const pubSubServiceRef = useRef(createPubSubService());
@@ -614,10 +660,72 @@ export function AppContent({
     vpSizeIndex,
   ]);
 
-  // --- We extract the global properties from the app configuration and pass them to the app context
-  const appGlobals = useMemo(() => {
-    return globalProps ?? EMPTY_OBJECT;
-  }, [globalProps]);
+  const localePersistKey =
+    appGlobals?.localePersistKey === null ? null : (appGlobals?.localePersistKey ?? "xmlui.locale");
+  const persistedLocale = useMemo(() => {
+    if (!localePersistKey || typeof window === "undefined") return undefined;
+    return window.localStorage.getItem(localePersistKey) ?? undefined;
+  }, [localePersistKey, storageTimestamp]);
+  const availableLocales = useMemo(() => {
+    const configured = appGlobals?.availableLocales;
+    return Array.isArray(configured) ? configured.filter((v) => typeof v === "string") : [];
+  }, [appGlobals?.availableLocales]);
+  const activeLocale = useMemo(
+    () =>
+      resolveLocale({
+        appProp: appLocaleOverride,
+        userOverride: userLocaleOverride,
+        persisted: persistedLocale,
+        navigatorLanguages:
+          typeof navigator !== "undefined" && Array.isArray(navigator.languages)
+            ? navigator.languages
+            : ["en"],
+        available: availableLocales,
+        fallback: appGlobals?.defaultLocale ?? "en",
+      }),
+    [appGlobals?.defaultLocale, appLocaleOverride, availableLocales, persistedLocale, userLocaleOverride],
+  );
+
+  const setLocale = useCallback(
+    (locale: string, options?: { source?: "app" | "user" }) => {
+      if (!isValidLocale(locale)) {
+        pushXsLog({
+          kind: "i18n",
+          ts: Date.now(),
+          code: "missing-bundle",
+          severity: appGlobals?.strictI18n === true ? "error" : "warn",
+          locale,
+          message: `Invalid locale "${locale}".`,
+        });
+        return;
+      }
+      if (options?.source === "app") {
+        setAppLocaleOverride(locale);
+      } else {
+        setUserLocaleOverride(locale);
+        if (localePersistKey && typeof window !== "undefined") {
+          window.localStorage.setItem(localePersistKey, locale);
+          setStorageTimestamp(Date.now());
+        }
+      }
+    },
+    [appGlobals?.strictI18n, localePersistKey],
+  );
+
+  const translate = useCallback(
+    (key: string, vars?: Record<string, unknown>) => {
+      const bundles = appGlobals?.localeBundles;
+      const bundle =
+        bundles && typeof bundles === "object"
+          ? (bundles[activeLocale.locale] ?? bundles[activeLocale.locale.split("-")[0]])
+          : undefined;
+      const raw = bundle?.[key] ?? key;
+      return String(raw).replace(/\{(\w+)\}/g, (_m, name) => String(vars?.[name] ?? ""));
+    },
+    [activeLocale.locale, appGlobals?.localeBundles],
+  );
+
+  const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
 
   // --- We prepare the helper infrastructure for the `AppState` component, which manages
   // --- app-wide state using buckets (state sections).
@@ -1175,6 +1283,29 @@ export function AppContent({
         ...AppUtilsNamespace,
         fetch: createAppFetch(appGlobals),
         environment: getAppEnvironment(),
+        locale: activeLocale.locale,
+        localeSource: activeLocale.source,
+        availableLocales,
+        setLocale,
+        translate,
+        t: translate,
+        isRtlLocale,
+        formatNumber: (value: number, options?: Intl.NumberFormatOptions) =>
+          formatNumber(value, activeLocale.locale, options),
+        formatCurrency: (value: number, currency: string, options?: Intl.NumberFormatOptions) =>
+          formatCurrency(value, currency, activeLocale.locale, options),
+        formatList: (values: readonly string[], options?: Intl.ListFormatOptions) =>
+          formatList(values, activeLocale.locale, options),
+        formatRelativeTime: (
+          value: number,
+          unit: Intl.RelativeTimeFormatUnit,
+          options?: Intl.RelativeTimeFormatOptions,
+        ) => formatRelativeTime(value, unit, activeLocale.locale, options),
+        compare: (a: string, b: string, options?: Intl.CollatorOptions) =>
+          compare(a, b, activeLocale.locale, options),
+        pluralRules: (value: number, options?: Intl.PluralRulesOptions) =>
+          pluralRules(value, activeLocale.locale, options),
+        scheduler: appGlobals?.strictDeterminism === true ? "fifo" : (appGlobals?.scheduler ?? "concurrent"),
       },
       Clipboard: ClipboardNamespace,
 
@@ -1212,6 +1343,11 @@ export function AppContent({
     Log,
     pubSubService,
     storageTimestamp,
+    activeLocale,
+    availableLocales,
+    setLocale,
+    translate,
+    isRtlLocale,
   ]);
 
   return (
