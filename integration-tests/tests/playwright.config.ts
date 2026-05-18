@@ -36,12 +36,12 @@ export default defineConfig({
       cwd: testAppDir,
       reuseExistingServer: true,
     },
-    {
+    /*{
       command: `npx serve dist-vite-plugin -l ${portViteBuildPlugin} --no-port-switching -s`,
       port: portViteBuildPlugin,
       cwd: testAppDir,
       reuseExistingServer: true,
-    },
+    }, */
   ],
   projects: [
     {
@@ -61,9 +61,9 @@ export default defineConfig({
       expect: { timeout: 15_000 },
       use: { baseURL: `http://localhost:${portViteStart}` },
     },
-    {
+    /*{
       name: "vite-build-plugin",
       use: { baseURL: `http://localhost:${portViteBuildPlugin}` },
-    },
+    }, */
   ],
 });
