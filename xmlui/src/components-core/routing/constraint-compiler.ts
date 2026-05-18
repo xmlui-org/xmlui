@@ -10,13 +10,22 @@ export interface CompiledConstraint {
 export interface CompiledRoute {
   rrPath: string;
   constraints: ReadonlyMap<string, CompiledConstraint>;
+  queryConstraints: ReadonlyMap<string, CompiledQueryConstraint>;
   diagnostics: ReadonlyArray<RoutingDiagnostic>;
 }
 
 const CONSTRAINED_SEGMENT = /^:([A-Za-z_][\w-]*):([A-Za-z_][\w-]*)(?:\((.*)\))?$/;
+const QUERY_DECL = /^([A-Za-z_][\w-]*):([A-Za-z_][\w-]*)(?:\((.*)\))?(\?)?$/;
 
-export function compileRoute(url: string, strict = false): CompiledRoute {
+export interface CompiledQueryConstraint {
+  key: string;
+  optional: boolean;
+  constraint: CompiledConstraint;
+}
+
+export function compileRoute(url: string, strict = false, queryParams?: string): CompiledRoute {
   const constraints = new Map<string, CompiledConstraint>();
+  const queryConstraints = new Map<string, CompiledQueryConstraint>();
   const diagnostics: RoutingDiagnostic[] = [];
   const severity = strict ? "error" : "warn";
   const parts = String(url || "").split("/");
@@ -56,7 +65,11 @@ export function compileRoute(url: string, strict = false): CompiledRoute {
     })
     .join("/");
 
-  return { rrPath, constraints, diagnostics };
+  for (const queryConstraint of parseQueryConstraints(queryParams, url, severity, diagnostics)) {
+    queryConstraints.set(queryConstraint.key, queryConstraint);
+  }
+
+  return { rrPath, constraints, queryConstraints, diagnostics };
 }
 
 export function validateRouteParams(
@@ -84,6 +97,67 @@ export function validateRouteParams(
     }
     coerced[segment] = constraint.coerce(raw);
   }
+  return { ok: true, params: coerced };
+}
+
+export function validateQueryParams(
+  route: CompiledRoute,
+  searchParams: URLSearchParams,
+  pageUrl: string,
+  strict = false,
+): { ok: true; params: Record<string, unknown> } | { ok: false; diagnostic: RoutingDiagnostic } {
+  const coerced: Record<string, unknown> = {};
+  if (route.queryConstraints.size === 0) {
+    for (const [key, value] of searchParams.entries()) {
+      coerced[key] = value;
+    }
+    return { ok: true, params: coerced };
+  }
+
+  for (const [key, { optional, constraint }] of route.queryConstraints) {
+    const raw = searchParams.get(key);
+    if (raw === null || raw === "") {
+      if (optional) {
+        coerced[key] = undefined;
+        continue;
+      }
+      return {
+        ok: false,
+        diagnostic: {
+          code: "constraint-rejected",
+          severity: strict ? "error" : "warn",
+          pageUrl,
+          segment: key,
+          constraint: constraint.name,
+          message: `Required query parameter "${key}" is missing.`,
+        },
+      };
+    }
+    if (!constraint.validate(raw)) {
+      return {
+        ok: false,
+        diagnostic: {
+          code: "constraint-rejected",
+          severity: strict ? "error" : "warn",
+          pageUrl,
+          segment: key,
+          constraint: constraint.name,
+          rawValue: raw,
+          message: `Query parameter "${key}" rejected by "${constraint.name}" constraint.`,
+        },
+      };
+    }
+    coerced[key] = constraint.coerce(raw);
+  }
+
+  if (!strict) {
+    for (const [key, value] of searchParams.entries()) {
+      if (!route.queryConstraints.has(key)) {
+        coerced[key] = value;
+      }
+    }
+  }
+
   return { ok: true, params: coerced };
 }
 
@@ -123,6 +197,12 @@ function createConstraint(name: string, rawParams?: string): CompiledConstraint 
         validate: (raw) => raw === "true" || raw === "false",
         coerce: (raw) => raw === "true",
       };
+    case "string":
+      return {
+        name,
+        validate: () => true,
+        coerce: String,
+      };
     case "enum": {
       const values = (rawParams ?? "").split(",").map((v) => v.trim()).filter(Boolean);
       return {
@@ -154,6 +234,61 @@ function createConstraint(name: string, rawParams?: string): CompiledConstraint 
     default:
       return undefined;
   }
+}
+
+function parseQueryConstraints(
+  queryParams: string | undefined,
+  pageUrl: string,
+  severity: "error" | "warn",
+  diagnostics: RoutingDiagnostic[],
+): CompiledQueryConstraint[] {
+  if (!queryParams?.trim()) return [];
+  const result: CompiledQueryConstraint[] = [];
+  for (const decl of splitTopLevel(queryParams)) {
+    const match = QUERY_DECL.exec(decl.trim());
+    if (!match) {
+      diagnostics.push({
+        code: "unknown-constraint",
+        severity,
+        pageUrl,
+        constraint: decl,
+        message: `Invalid query constraint declaration "${decl}".`,
+      });
+      continue;
+    }
+    const [, key, name, rawParams, optional] = match;
+    const constraint = createConstraint(name, rawParams);
+    if (!constraint) {
+      diagnostics.push({
+        code: "unknown-constraint",
+        severity,
+        pageUrl,
+        segment: key,
+        constraint: name,
+        message: `Unknown query constraint "${name}" on query parameter "${key}".`,
+      });
+      continue;
+    }
+    result.push({ key, optional: optional === "?", constraint });
+  }
+  return result;
+}
+
+function splitTopLevel(input: string): string[] {
+  const result: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (ch === "(") depth++;
+    if (ch === ")") depth = Math.max(0, depth - 1);
+    if (ch === "," && depth === 0) {
+      result.push(input.slice(start, i));
+      start = i + 1;
+    }
+  }
+  result.push(input.slice(start));
+  return result.filter((part) => part.trim() !== "");
 }
 
 function parseNamedNumberParams(raw?: string): { min?: number; max?: number } {

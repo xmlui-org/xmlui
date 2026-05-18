@@ -37,6 +37,7 @@ import { useLinkInfoContext } from "../../components/App/LinkInfoContext";
 import { EMPTY_OBJECT } from "../constants";
 
 export const CoercedRouteParamsContext = createContext<Record<string, unknown> | undefined>(undefined);
+export const CoercedQueryParamsContext = createContext<Record<string, unknown> | undefined>(undefined);
 
 /**
  * Hook to get routing-related parameters from React Router.
@@ -59,6 +60,7 @@ export function useRoutingParams(): ContainerState {
   const [queryParams] = useSearchParams();
   const routeParams = useParams();
   const coercedRouteParams = useContext(CoercedRouteParamsContext);
+  const coercedQueryParams = useContext(CoercedQueryParamsContext);
   const location = useLocation();
   const linkInfoContext = useLinkInfoContext();
 
@@ -81,8 +83,9 @@ export function useRoutingParams(): ContainerState {
     return {
       $pathname: location.pathname,
       $routeParams: coercedRouteParams ?? routeParams,
-      $queryParams: queryParamsMap,
+      $queryParams: coercedQueryParams ?? queryParamsMap,
+      $queryString: location.search,
       $linkInfo: linkInfo,
     };
-  }, [coercedRouteParams, linkInfo, location.pathname, queryParamsMap, routeParams]);
+  }, [coercedQueryParams, coercedRouteParams, linkInfo, location.pathname, location.search, queryParamsMap, routeParams]);
 }
