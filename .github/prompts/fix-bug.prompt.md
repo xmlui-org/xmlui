@@ -7,7 +7,7 @@ description: Diagnose and fix a component bug with regression tests
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it describes the bug, affected component, and reproduction steps (if any).
+1. Clarify with the user: the bug description, affected component, and reproduction steps if not already provided.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 4, 17, 23.
 3. Read the affected component's source:
    - `xmlui/src/components/ComponentName/ComponentName.tsx` — metadata and renderer

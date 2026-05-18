@@ -9,7 +9,7 @@ The goal is to make the code easier to follow for everyday developers. All chang
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it names the files in scope and any decisions already made.
+1. Clarify with the user: the files in scope and any decisions already made if not already specified.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 4–5, 7, 23.
 3. Read these docs only if they are relevant to the files in scope:
    - `.ai/xmlui/component-architecture.md` — if touching any component files
@@ -58,7 +58,7 @@ Apply **only** the techniques that genuinely improve understanding for the speci
    - `[duplication]` — repeated block worth extracting
 2. Present the list to the user. For each `[name/external]` item, explicitly ask for approval before renaming.
 3. Group the approved items into small sequential steps, each verifiable independently.
-4. Record the plan in `feature.md` under a "Readability Plan" section.
+4. Record the plan in session memory under a "Readability Plan" section.
 
 ## Refactor flow
 
@@ -69,7 +69,7 @@ For each step:
 2. Verify no TypeScript/lint errors (Problems pane in VS Code).
 3. Run the unit tests for the affected module.
 4. If the step touches a component, run its E2E spec as a quick sanity check.
-5. Update the step's status in `feature.md`.
+5. Update the step's status in session memory.
 6. Ask for approval before moving to the next step.
 
 ## Commands

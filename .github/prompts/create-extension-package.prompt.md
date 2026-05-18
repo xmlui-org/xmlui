@@ -7,7 +7,7 @@ description: Create a new XMLUI extension package with component(s)
 
 ## Before starting
 
-1. Read `feature.md` at the repo root — it describes the package name, purpose, and initial components.
+1. Clarify with the user: the package name, purpose, and initial components if not already specified.
 2. Read `guidelines.md` at the repo root — focus on rules from Topics 14, 21, 22, 23.
 3. Read these reference files:
    - `.ai/xmlui/extension-packages.md` — extension interface, registration, build config (always)
