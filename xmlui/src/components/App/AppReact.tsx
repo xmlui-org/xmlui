@@ -108,6 +108,7 @@ type Props = {
   toneStorageKey?: string;
   themeStorageKey?: string;
   locale?: string;
+  localeBundles?: unknown;
   direction?: "ltr" | "rtl" | "auto";
   scheduler?: "concurrent" | "fifo";
   applyDefaultContentPadding?: boolean;
@@ -178,6 +179,7 @@ export const App = memo(function App({
   toneStorageKey = defaultProps.toneStorageKey,
   themeStorageKey = defaultProps.themeStorageKey,
   locale,
+  localeBundles,
   direction = "auto",
   scheduler,
   renderChild,
@@ -192,6 +194,7 @@ export const App = memo(function App({
   const { getThemeVar } = useTheme();
   const { setActiveThemeTone, setActiveThemeId, activeThemeTone, activeThemeId, themes } = useThemes();
   const mounted = useRef(false);
+  const registeredLocaleBundlesRef = useRef<string>();
 
   // Validate and sanitize layout input with explicit validation
   const layoutWithDefault = layout || getThemeVar("layout-App") || "condensed-sticky";
@@ -227,6 +230,13 @@ export const App = memo(function App({
       appContext.App?.setLocale?.(locale, { source: "app" });
     }
   }, [appContext.App, locale]);
+
+  useEffect(() => {
+    const signature = stableLocaleBundlesSignature(localeBundles);
+    if (localeBundles === undefined || registeredLocaleBundlesRef.current === signature) return;
+    registeredLocaleBundlesRef.current = signature;
+    void appContext.App?.registerLocaleBundles?.(localeBundles);
+  }, [appContext.App, localeBundles]);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -659,6 +669,16 @@ export const App = memo(function App({
     </>
   );
 });
+
+function stableLocaleBundlesSignature(localeBundles: unknown): string | undefined {
+  if (localeBundles === undefined) return undefined;
+  if (typeof localeBundles === "string") return localeBundles;
+  try {
+    return JSON.stringify(localeBundles);
+  } catch {
+    return String(localeBundles);
+  }
+}
 
 export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
   switch (appLayout) {

@@ -61,6 +61,7 @@ import {
   readLocalStorage,
   writeLocalStorage,
 } from "../../components-core/appContext/local-storage-functions";
+import { useAppContext } from "../../components-core/AppContext";
 
 const PART_CANCEL_BUTTON = "cancelButton";
 const PART_SUBMIT_BUTTON = "submitButton";
@@ -380,10 +381,10 @@ const Form = memo(forwardRef(function (
     className,
     classes,
     enabled = true,
-    cancelLabel = defaultProps.cancelLabel,
-    saveLabel = defaultProps.saveLabel,
-    saveInProgressLabel = defaultProps.saveInProgressLabel,
-    savePendingLabel = defaultProps.savePendingLabel,
+    cancelLabel,
+    saveLabel,
+    saveInProgressLabel,
+    savePendingLabel,
     submitFeedbackDelay = defaultProps.submitFeedbackDelay,
     swapCancelAndSave,
     onWillSubmit,
@@ -418,6 +419,13 @@ const Form = memo(forwardRef(function (
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
+  const appContext = useAppContext();
+  const resolvedCancelLabel = cancelLabel ?? appContext.App.translate("xmlui.form.cancel");
+  const resolvedSaveLabel = saveLabel ?? appContext.App.translate("xmlui.form.save");
+  const resolvedSaveInProgressLabel =
+    saveInProgressLabel ?? appContext.App.translate("xmlui.form.saving");
+  const resolvedSavePendingLabel =
+    savePendingLabel ?? appContext.App.translate("xmlui.form.validating");
   const formRef = useRef<HTMLFormElement>(null);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
@@ -719,7 +727,7 @@ const Form = memo(forwardRef(function (
   });
 
   const cancelButton =
-    cancelLabel === "" ? null : (
+    resolvedCancelLabel === "" ? null : (
       <Part partId={PART_CANCEL_BUTTON} key={PART_CANCEL_BUTTON}>
         <Button
           key="cancel"
@@ -728,7 +736,7 @@ const Form = memo(forwardRef(function (
           variant={"ghost"}
           onClick={doCancel}
         >
-          {cancelLabel}
+          {resolvedCancelLabel}
         </Button>
       </Part>
     );
@@ -741,10 +749,10 @@ const Form = memo(forwardRef(function (
           disabled={!isEnabled || !enableSubmit || isValidating}
         >
           {showValidatingLabel
-            ? savePendingLabel
+            ? resolvedSavePendingLabel
             : showInProgressLabel
-              ? saveInProgressLabel
-              : saveLabel}
+              ? resolvedSaveInProgressLabel
+              : resolvedSaveLabel}
         </Button>
       </Part>
     ),
@@ -753,11 +761,11 @@ const Form = memo(forwardRef(function (
       enableSubmit,
       isValidating,
       showValidatingLabel,
-      savePendingLabel,
+      resolvedSavePendingLabel,
       showInProgressLabel,
       formState.submitInProgress,
-      saveInProgressLabel,
-      saveLabel,
+      resolvedSaveInProgressLabel,
+      resolvedSaveLabel,
     ],
   );
 

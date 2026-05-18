@@ -27,6 +27,7 @@ import { FormMd } from "./Form/Form";
 import { FormItemMd } from "./FormItem/FormItem";
 import { H1Md, H2Md, H3Md, H4Md, H5Md, H6Md, HeadingMd } from "./Heading/Heading";
 import { IconMd } from "./Icon/Icon";
+import { I18nMd } from "./I18n/I18n";
 import { IFrameMd } from "./IFrame/IFrame";
 import { ImageMd } from "./Image/Image";
 import { ItemsMd } from "./Items/Items";
@@ -352,6 +353,7 @@ export const collectedComponentMetadata = {
   H5: H5Md,
   H6: H6Md,
   Icon: IconMd,
+  I18n: I18nMd,
   IFrame: IFrameMd,
   Image: ImageMd,
   IncludeMarkup: IncludeMarkupMd,

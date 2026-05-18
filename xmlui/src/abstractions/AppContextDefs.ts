@@ -349,6 +349,9 @@ export type AppContextObject = {
     localeSource: string;
     availableLocales: readonly string[];
     setLocale: (locale: string, options?: { source?: "app" | "user" }) => void;
+    registerLocaleBundle: (bundle: { locale: string; messages: ReadonlyMap<string, string> | Record<string, string> }) => void;
+    registerLocaleBundles: (bundles: unknown) => Promise<void>;
+    reloadLocale: (locale: string) => Promise<boolean>;
     translate: (key: string, vars?: Record<string, unknown>) => string;
     t: (key: string, vars?: Record<string, unknown>) => string;
     isRtlLocale: (locale?: string) => boolean;

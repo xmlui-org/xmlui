@@ -41,6 +41,11 @@ import {
   pluralRules,
   resolveLocale,
   isValidLocale,
+  createBundleStore,
+  normalizeLocaleBundle,
+  translateMessage,
+  xmluiEnglishBundle,
+  type LocaleBundle,
 } from "../i18n";
 import { TableOfContentsContext } from "../TableOfContentsContext";
 import { AppContext } from "../AppContext";
@@ -154,6 +159,9 @@ export function AppContent({
   const programmaticNavigationRef = useRef<string | undefined>();
   const [appLocaleOverride, setAppLocaleOverride] = useState<string | undefined>();
   const [userLocaleOverride, setUserLocaleOverride] = useState<string | undefined>();
+  const bundleStoreRef = useRef(createBundleStore([xmluiEnglishBundle]));
+  const [bundleVersion, setBundleVersion] = useState(0);
+  const bundleSourcesRef = useRef(new Map<string, string>());
 
   // --- We extract the global properties from the app configuration and pass them to the app context.
   const appGlobals = useMemo(() => {
@@ -668,8 +676,11 @@ export function AppContent({
   }, [localePersistKey, storageTimestamp]);
   const availableLocales = useMemo(() => {
     const configured = appGlobals?.availableLocales;
-    return Array.isArray(configured) ? configured.filter((v) => typeof v === "string") : [];
-  }, [appGlobals?.availableLocales]);
+    const configuredLocales = Array.isArray(configured)
+      ? configured.filter((v) => typeof v === "string")
+      : [];
+    return [...new Set([...bundleStoreRef.current.available(), ...configuredLocales])];
+  }, [appGlobals?.availableLocales, bundleVersion]);
   const activeLocale = useMemo(
     () =>
       resolveLocale({
@@ -712,17 +723,89 @@ export function AppContent({
     [appGlobals?.strictI18n, localePersistKey],
   );
 
+  const registerLocaleBundle = useCallback(
+    (bundle: LocaleBundle) => {
+      bundleStoreRef.current.register(bundle);
+      setBundleVersion((version) => version + 1);
+    },
+    [],
+  );
+
+  const reportI18nDiagnostic = useCallback(
+    (diagnostic: Record<string, unknown>) => {
+      pushXsLog({
+        kind: "i18n",
+        ts: Date.now(),
+        ...diagnostic,
+      });
+    },
+    [],
+  );
+
+  const registerLocaleBundles = useCallback(
+    async (input: unknown) => {
+      const loadedSourceByLocale = new Map<string, string>();
+      const bundles = await resolveLocaleBundleInput(input, async (url) => {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`Failed to load locale bundle "${url}": ${response.status} ${response.statusText}`);
+        }
+        const json = await response.json();
+        const locale = inferLocaleFromBundleUrl(url);
+        const loadedLocale = typeof (json as any)?.locale === "string" ? (json as any).locale : locale;
+        if (loadedLocale) {
+          bundleSourcesRef.current.set(loadedLocale, url);
+          loadedSourceByLocale.set(loadedLocale, url);
+        }
+        if (locale && json && typeof json === "object" && !(json as any).locale) {
+          return { locale, messages: json };
+        }
+        return json;
+      });
+      for (const bundle of bundles) {
+        registerLocaleBundle(bundle);
+        const source = loadedSourceByLocale.get(bundle.locale);
+        if (source) {
+          bundleSourcesRef.current.set(bundle.locale, source);
+        }
+      }
+    },
+    [registerLocaleBundle],
+  );
+
+  const reloadLocale = useCallback(
+    async (locale: string) => {
+      const source = bundleSourcesRef.current.get(locale);
+      if (!source) return false;
+      await registerLocaleBundles(source);
+      return true;
+    },
+    [registerLocaleBundles],
+  );
+
+  useEffect(() => {
+    if (appGlobals?.localeBundles === undefined) return;
+    void registerLocaleBundles(appGlobals.localeBundles).catch((error) => {
+      reportI18nDiagnostic({
+        code: "missing-bundle",
+        severity: appGlobals?.strictI18n === true ? "error" : "warn",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }, [appGlobals?.localeBundles, appGlobals?.strictI18n, registerLocaleBundles, reportI18nDiagnostic]);
+
   const translate = useCallback(
     (key: string, vars?: Record<string, unknown>) => {
-      const bundles = appGlobals?.localeBundles;
-      const bundle =
-        bundles && typeof bundles === "object"
-          ? (bundles[activeLocale.locale] ?? bundles[activeLocale.locale.split("-")[0]])
-          : undefined;
-      const raw = bundle?.[key] ?? key;
-      return String(raw).replace(/\{(\w+)\}/g, (_m, name) => String(vars?.[name] ?? ""));
+      return translateMessage(key, vars, {
+        store: bundleStoreRef.current,
+        locale: activeLocale.locale,
+        strict: appGlobals?.strictI18n === true,
+        onDiagnostic: (diagnostic) => {
+          reportI18nDiagnostic(diagnostic as any);
+        },
+      });
     },
-    [activeLocale.locale, appGlobals?.localeBundles],
+    [activeLocale.locale, appGlobals?.strictI18n, bundleVersion, reportI18nDiagnostic],
   );
 
   const isRtlLocale = useCallback((locale?: string) => /^(ar|fa|he|ps|ur)(-|$)/i.test(locale ?? activeLocale.locale), [activeLocale.locale]);
@@ -1287,6 +1370,9 @@ export function AppContent({
         localeSource: activeLocale.source,
         availableLocales,
         setLocale,
+        registerLocaleBundle,
+        registerLocaleBundles,
+        reloadLocale,
         translate,
         t: translate,
         isRtlLocale,
@@ -1346,6 +1432,9 @@ export function AppContent({
     activeLocale,
     availableLocales,
     setLocale,
+    registerLocaleBundle,
+    registerLocaleBundles,
+    reloadLocale,
     translate,
     isRtlLocale,
   ]);
@@ -1357,6 +1446,34 @@ export function AppContent({
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
+}
+
+async function resolveLocaleBundleInput(
+  input: unknown,
+  loadUrl: (url: string) => Promise<unknown>,
+): Promise<LocaleBundle[]> {
+  if (input === undefined || input === null) return [];
+  if (typeof input === "string") {
+    return resolveLocaleBundleInput(await loadUrl(input), loadUrl);
+  }
+  if (Array.isArray(input)) {
+    const resolved = await Promise.all(input.map((entry) => resolveLocaleBundleInput(entry, loadUrl)));
+    return resolved.flat();
+  }
+  const direct = normalizeLocaleBundle(input);
+  if (direct) return [direct];
+  if (typeof input === "object") {
+    return Object.entries(input as Record<string, unknown>)
+      .filter(([, messages]) => messages && typeof messages === "object")
+      .map(([locale, messages]) => ({ locale, messages: messages as Record<string, string> }));
+  }
+  return [];
+}
+
+function inferLocaleFromBundleUrl(url: string): string | undefined {
+  const filename = url.split(/[/?#]/).filter(Boolean).at(-1) ?? "";
+  const match = filename.match(/(?:^|\.)([a-z]{2,3}(?:-[a-z0-9]{2,8})*)\.json$/i);
+  return match?.[1];
 }
 
 // --- We pass this funtion to the global app context

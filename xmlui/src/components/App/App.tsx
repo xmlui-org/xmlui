@@ -126,6 +126,11 @@ export const AppMd = createMetadata({
       valueType: "string",
       isInternal: true,
     },
+    localeBundles: {
+      description: "Locale bundles registered by the app. Accepts bundle URLs, inline bundles, or a locale-to-messages map.",
+      valueType: "any",
+      isInternal: true,
+    },
     direction: {
       description: "Text direction for the app.",
       valueType: "string",
@@ -336,6 +341,7 @@ function AppNode({ node, extractValue, renderChild, classes, lookupEventHandler,
       themeStorageKey={extractValue(node.props.themeStorageKey) ?? defaultProps.themeStorageKey}
       toneStorageKey={extractValue(node.props.toneStorageKey) ?? defaultProps.toneStorageKey}
       locale={extractValue(node.props.locale)}
+      localeBundles={extractValue(node.props.localeBundles)}
       direction={extractValue.asOptionalString(node.props.direction, "auto")}
       scheduler={extractValue.asOptionalString(node.props.scheduler, "concurrent")}
 
