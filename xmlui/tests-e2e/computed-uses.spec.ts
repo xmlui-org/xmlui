@@ -391,3 +391,111 @@ test.describe("computedUses optimization: function-free Select inside component 
     },
   );
 });
+
+// ─── 6. Regression: $context-only deps must NOT narrow parent container (Баг 19) ─
+
+test.describe("computedUses regression: $context-only deps must not isolate container from sibling APIs (Баг 19)", () => {
+  // Pattern: App has var.* AND a ContextMenu sibling. MenuItem handlers reference
+  // $context — which is a PARENT_STATE_DYNAMIC_VAR set by ContextMenu.openAt() via
+  // implicit dispatch. Before the fix, computedUses=["$context"] was set on App,
+  // making stateFromOutside={} initially (before the first openAt call), which cut
+  // App off from the "ctxMenu" API registered in Theme#root. Cards then could not
+  // call ctxMenu.openAt() because ctxMenu was undefined in their scope.
+
+  const APP = `
+<App>
+  <variable name="items" value="{[
+    { id: 1, name: 'Alpha' },
+    { id: 2, name: 'Beta' }
+  ]}" />
+  <variable name="lastAction" value="" />
+
+  <ContextMenu id="ctxMenu">
+    <MenuItem
+      label="Select"
+      onClick="lastAction = 'Selected: ' + $context.name" />
+    <MenuItem
+      label="Delete"
+      onClick="lastAction = 'Deleted: ' + $context.name" />
+  </ContextMenu>
+
+  <Items data="{items}">
+    <Card testId="{'card-' + $item.id}" onContextMenu="(e) => ctxMenu.openAt(e, $item)">
+      <Text>{$item.name}</Text>
+    </Card>
+  </Items>
+
+  <Text testId="last-action">Last: {lastAction}</Text>
+</App>
+`;
+
+  test("right-clicking a card opens the context menu (ctxMenu.openAt is reachable)", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(APP, { noFragmentWrapper: true });
+
+    // Before the fix, ctxMenu was undefined in Card scope → right-click did nothing.
+    await page.getByTestId("card-1").click({ button: "right" });
+    await expect(page.getByRole("menuitem", { name: "Select" })).toBeVisible();
+    await expect(page.getByRole("menuitem", { name: "Delete" })).toBeVisible();
+  });
+
+  test("$context binds to the right-clicked card's data", async ({ initTestBed, page }) => {
+    await initTestBed(APP, { noFragmentWrapper: true });
+
+    await page.getByTestId("card-2").click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Select" }).click();
+    await expect(page.getByTestId("last-action")).toHaveText("Last: Selected: Beta");
+  });
+
+  test("second right-click on a different card updates $context correctly", async ({
+    initTestBed,
+    page,
+  }) => {
+    await initTestBed(APP, { noFragmentWrapper: true });
+
+    await page.getByTestId("card-1").click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Select" }).click();
+    await expect(page.getByTestId("last-action")).toHaveText("Last: Selected: Alpha");
+
+    // Second right-click on different card — $context must update to new item
+    await page.getByTestId("card-2").click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Delete" }).click();
+    await expect(page.getByTestId("last-action")).toHaveText("Last: Deleted: Beta");
+  });
+
+  test("var. updates in App still work alongside ContextMenu (no state isolation)", async ({
+    initTestBed,
+    page,
+  }) => {
+    // Verifies that App is NOT isolated from its own vars — computedUses must NOT
+    // be set on App, so it receives the full parent state (not just {}).
+    const appWithButton = `
+<App>
+  <variable name="count" value="{0}" />
+  <variable name="lastAction" value="" />
+
+  <ContextMenu id="ctxMenu">
+    <MenuItem label="Action" onClick="lastAction = 'done'" />
+  </ContextMenu>
+
+  <Button testId="inc-btn" onClick="count++">Increment</Button>
+  <Text testId="count-text">Count: {count}</Text>
+  <Text testId="action-text">Action: {lastAction}</Text>
+  <Card testId="ctx-card" onContextMenu="(e) => ctxMenu.openAt(e, {})">Right-click me</Card>
+</App>
+`;
+    await initTestBed(appWithButton, { noFragmentWrapper: true });
+
+    await page.getByTestId("inc-btn").click();
+    await expect(page.getByTestId("count-text")).toHaveText("Count: 1");
+    await page.getByTestId("inc-btn").click();
+    await expect(page.getByTestId("count-text")).toHaveText("Count: 2");
+
+    // ContextMenu must also work — ctxMenu.openAt must be reachable
+    await page.getByTestId("ctx-card").click({ button: "right" });
+    await page.getByRole("menuitem", { name: "Action" }).click();
+    await expect(page.getByTestId("action-text")).toHaveText("Action: done");
+  });
+});
